@@ -2,9 +2,9 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 
-use hyper::{Body, Method, Request, Response, Server, StatusCode};
 use hyper::client::connect::Connect;
 use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Method, Request, Response, Server, StatusCode};
 use tokio::sync::oneshot::Sender;
 use url::Url;
 
@@ -27,16 +27,26 @@ impl AppContext {
     }
 }
 
-async fn dispatcher<C>(http_client: hyper::Client<C>, req: Request<Body>, data: Arc<Mutex<AppContext>>) -> Result<Response<Body>, hyper::Error>
-    where
-        C: Connect + Clone + Send + Sync + 'static
+async fn dispatcher<C>(
+    http_client: hyper::Client<C>,
+    req: Request<Body>,
+    data: Arc<Mutex<AppContext>>,
+) -> Result<Response<Body>, hyper::Error>
+where
+    C: Connect + Clone + Send + Sync + 'static,
 {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/") => Ok(Response::new(Body::from("Hello /"))),
         (&Method::GET, "/callback") => {
-            let params: HashMap<String, String> = req.uri().query().map(|v| {
-                url::form_urlencoded::parse(v.as_bytes()).into_owned().collect()
-            }).unwrap_or_else(HashMap::new);
+            let params: HashMap<String, String> = req
+                .uri()
+                .query()
+                .map(|v| {
+                    url::form_urlencoded::parse(v.as_bytes())
+                        .into_owned()
+                        .collect()
+                })
+                .unwrap_or_else(HashMap::new);
 
             let oauth2_token = {
                 let ctx = data.lock().unwrap().app.clone();
@@ -50,7 +60,9 @@ async fn dispatcher<C>(http_client: hyper::Client<C>, req: Request<Body>, data: 
                 data.oauth2_token = Some(oauth2_token);
                 data.tx.take().unwrap().send(()).unwrap();
             }
-            Ok(Response::new(Body::from(format!("Hello /redirect_url qs:{params:#?}"))))
+            Ok(Response::new(Body::from(format!(
+                "Hello /redirect_url qs:{params:#?}"
+            ))))
         }
 
         // Return the 404 Not Found for other routes.
@@ -64,8 +76,10 @@ async fn dispatcher<C>(http_client: hyper::Client<C>, req: Request<Body>, data: 
 
 fn visit_url(app: &AppClientData, callback_url: String) -> String {
     let mut url = Url::parse("https://my.pcloud.com/oauth2/authorize").unwrap();
-    url.query_pairs_mut().append_pair("client_id", &app.client_id);
-    url.query_pairs_mut().append_pair("redirect_uri", &callback_url);
+    url.query_pairs_mut()
+        .append_pair("client_id", &app.client_id);
+    url.query_pairs_mut()
+        .append_pair("redirect_uri", &callback_url);
     url.query_pairs_mut().append_pair("response_type", "code");
     if app.force_reapprove {
         url.query_pairs_mut().append_pair("force_reapprove", "true");
@@ -74,9 +88,13 @@ fn visit_url(app: &AppClientData, callback_url: String) -> String {
     url.as_str().to_string()
 }
 
-pub(crate) async fn serve<C>(http_client: hyper::Client<C>, app: AppClientData, addr: SocketAddr) -> Result<OAuth2Token, Box<dyn std::error::Error + Send + Sync>>
-    where
-        C: Connect + Clone + Send + Sync + 'static
+pub(crate) async fn serve<C>(
+    http_client: hyper::Client<C>,
+    app: AppClientData,
+    addr: SocketAddr,
+) -> Result<OAuth2Token, Box<dyn std::error::Error + Send + Sync>>
+where
+    C: Connect + Clone + Send + Sync + 'static,
 {
     let (tx, rx) = tokio::sync::oneshot::channel::<()>();
     let visit_url = visit_url(&app, format!("http://{addr}/callback"));
@@ -87,7 +105,11 @@ pub(crate) async fn serve<C>(http_client: hyper::Client<C>, app: AppClientData, 
         let service = make_service_fn(move |_| {
             let data = data.clone();
             let http_client = http_client.clone();
-            async move { Ok::<_, hyper::Error>(service_fn(move |req| { dispatcher(http_client.clone(), req, data.clone()) })) }
+            async move {
+                Ok::<_, hyper::Error>(service_fn(move |req| {
+                    dispatcher(http_client.clone(), req, data.clone())
+                }))
+            }
         });
         let server = Server::bind(&addr).serve(service);
         server.with_graceful_shutdown(async {

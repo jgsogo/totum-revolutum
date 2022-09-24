@@ -38,9 +38,14 @@ impl client::Client for OAuth2Token {
 
  */
 
-pub(crate) async fn exchange_oauth2_token<C>(http_client: hyper::Client<C>, app: AppClientData, hostname: String, code: String) -> Result<OAuth2Token, hyper::Error>
-    where
-        C: Connect + Clone + Send + Sync + 'static
+pub(crate) async fn exchange_oauth2_token<C>(
+    http_client: hyper::Client<C>,
+    app: AppClientData,
+    hostname: String,
+    code: String,
+) -> Result<OAuth2Token, hyper::Error>
+where
+    C: Connect + Clone + Send + Sync + 'static,
 {
     let params = {
         let mut params = HashMap::new();

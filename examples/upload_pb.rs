@@ -1,10 +1,10 @@
-use std::{env, thread};
 use std::future::Future;
 use std::pin::Pin;
 use std::time::Duration;
+use std::{env, thread};
 
-use futures_util::{FutureExt, TryFutureExt};
 use futures_util::future::BoxFuture;
+use futures_util::{FutureExt, TryFutureExt};
 use http_body::Body;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
@@ -40,7 +40,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let m = MultiProgress::new();
     let sty = ProgressStyle::with_template(
         "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
-    ).unwrap().progress_chars("##-");
+    )
+    .unwrap()
+    .progress_chars("##-");
 
     let mut all_tasks = vec![];
     for file in files_to_upload {
@@ -51,13 +53,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             let pcloud = pcloud.clone();
             let file = file.to_string();
             let progresshash = progresshash.clone();
-            all_tasks.push(async move {
-                let mut upload_params = UploadFileParams::new_from_folderid(folderid, file.to_string());
-                upload_params.progresshash = Some(progresshash);
-                tx.send(()).unwrap();
-                let r = pcloud.uploadfile(&file, upload_params).await.unwrap();
-                //r.fileids
-            }.boxed());
+            all_tasks.push(
+                async move {
+                    let mut upload_params =
+                        UploadFileParams::new_from_folderid(folderid, file.to_string());
+                    upload_params.progresshash = Some(progresshash);
+                    tx.send(()).unwrap();
+                    let r = pcloud.uploadfile(&file, upload_params).await.unwrap();
+                    //r.fileids
+                }
+                .boxed(),
+            );
         }
 
         {
@@ -70,36 +76,45 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             let m = m.clone();
             let file = file.to_string();
             let sty = sty.clone();
-            all_tasks.push(async move {
-                rx.await.ok().unwrap();
-                thread::sleep(Duration::from_millis(300));
-                let pb_points = 1000;
-                let pb = m.add(ProgressBar::new(pb_points));
-                pb.set_style(sty);
-                while let xx = pcloud.uploadprogress(&progresshash).await {
-                    match xx {
-                        Ok(UploadProgressData { total, uploaded, finished: false, .. }) => {
-                            let percent = ((uploaded as f32 / total as f32) * pb_points as f32) as u64;
-                            pb.set_message(format!("{} #{}", &file, percent));
-                            pb.set_position(percent);
-                            thread::sleep(Duration::from_millis(15));
-                        }
-                        Ok(UploadProgressData { finished: true, .. }) => {
-                            pb.set_position(pb_points);
-                            pb.finish_with_message(format!("{} #done!", &file));
-                            break;
-                        }
-                        Err(e) => {
-                            // TODO: Propagate actual error
-                            pb.set_position(pb_points);
-                            pb.finish_with_message(format!("{} #error!", &file));
-                            break;
+            all_tasks.push(
+                async move {
+                    rx.await.ok().unwrap();
+                    thread::sleep(Duration::from_millis(300));
+                    let pb_points = 1000;
+                    let pb = m.add(ProgressBar::new(pb_points));
+                    pb.set_style(sty);
+                    while let xx = pcloud.uploadprogress(&progresshash).await {
+                        match xx {
+                            Ok(UploadProgressData {
+                                total,
+                                uploaded,
+                                finished: false,
+                                ..
+                            }) => {
+                                let percent =
+                                    ((uploaded as f32 / total as f32) * pb_points as f32) as u64;
+                                pb.set_message(format!("{} #{}", &file, percent));
+                                pb.set_position(percent);
+                                thread::sleep(Duration::from_millis(15));
+                            }
+                            Ok(UploadProgressData { finished: true, .. }) => {
+                                pb.set_position(pb_points);
+                                pb.finish_with_message(format!("{} #done!", &file));
+                                break;
+                            }
+                            Err(e) => {
+                                // TODO: Propagate actual error
+                                pb.set_position(pb_points);
+                                pb.finish_with_message(format!("{} #error!", &file));
+                                break;
+                            }
                         }
                     }
                 }
-            }.boxed());
+                .boxed(),
+            );
         }
-    };
+    }
 
     let result = futures::future::join_all(all_tasks).await;
     println!("Done");

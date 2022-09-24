@@ -46,21 +46,19 @@ impl ListFolderInput {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolder {
     pub metadata: Metadata,
 }
 
-
 #[async_trait]
 pub trait GetListFolder<C>: client::Client<C>
-    where
-        C: Connect + Clone + Send + Sync + 'static
+where
+    C: Connect + Clone + Send + Sync + 'static,
 {
     async fn listfolder(&self, list_folder: &ListFolderInput) -> Result<ListFolder, hyper::Error>
-        where
-            C: Connect + Clone + Send + Sync + 'static
+    where
+        C: Connect + Clone + Send + Sync + 'static,
     {
         let url = format!("https://{}/listfolder", self.hostname());
         let mut params = HashMap::new();
@@ -68,7 +66,9 @@ pub trait GetListFolder<C>: client::Client<C>
             ListFolderInput { path: Some(p), .. } => {
                 params.insert("path".to_string(), p.clone());
             }
-            ListFolderInput { folderid: Some(f), .. } => {
+            ListFolderInput {
+                folderid: Some(f), ..
+            } => {
                 params.insert("folderid".to_string(), f.to_string());
             }
             _ => (),
@@ -79,6 +79,5 @@ pub trait GetListFolder<C>: client::Client<C>
     }
 }
 
-impl<C, T: client::Client<C>> GetListFolder<C> for T
-    where
-        C: Connect + Clone + Send + Sync + 'static {}
+impl<C, T: client::Client<C>> GetListFolder<C> for T where C: Connect + Clone + Send + Sync + 'static
+{}

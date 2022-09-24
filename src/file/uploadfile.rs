@@ -4,8 +4,8 @@ use async_trait::async_trait;
 use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
-use crate::{client, utils};
 use crate::structures::Metadata;
+use crate::{client, utils};
 
 #[derive(Debug, Clone)]
 pub struct UploadFileParams {
@@ -43,7 +43,6 @@ impl UploadFileParams {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Checksum {
     sha1: String,
@@ -57,15 +56,18 @@ pub struct UploadFile {
     pub checksums: Vec<Checksum>,
 }
 
-
 #[async_trait]
 pub trait PostUploadFile<C>: client::Client<C>
-    where
-        C: Connect + Clone + Send + Sync + 'static
+where
+    C: Connect + Clone + Send + Sync + 'static,
 {
-    async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile, hyper::Error>
-        where
-            C: Connect + Clone + Send + Sync + 'static
+    async fn uploadfile(
+        &self,
+        local_filename: &str,
+        upload_params: UploadFileParams,
+    ) -> Result<UploadFile, hyper::Error>
+    where
+        C: Connect + Clone + Send + Sync + 'static,
     {
         let url = format!("https://{}/uploadfile", self.hostname());
         let mut params = HashMap::new();
@@ -87,6 +89,7 @@ pub trait PostUploadFile<C>: client::Client<C>
     }
 }
 
-impl<C, T: client::Client<C>> PostUploadFile<C> for T
-    where
-        C: Connect + Clone + Send + Sync + 'static {}
+impl<C, T: client::Client<C>> PostUploadFile<C> for T where
+    C: Connect + Clone + Send + Sync + 'static
+{
+}

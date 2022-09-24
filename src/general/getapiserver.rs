@@ -14,12 +14,12 @@ pub struct APIServer {
 
 #[async_trait]
 pub trait GetAPIServer<C>: client::Client<C>
-    where
-        C: Connect + Clone + Send + Sync + 'static
+where
+    C: Connect + Clone + Send + Sync + 'static,
 {
     async fn getapiserver(&self) -> Result<APIServer, hyper::Error>
-        where
-            C: Connect + Clone + Send + Sync + 'static
+    where
+        C: Connect + Clone + Send + Sync + 'static,
     {
         let url = format!("https://{}/getapiserver", self.hostname());
         let apiserver = self.get::<APIServer>(&url, HashMap::new()).await?;
@@ -27,6 +27,4 @@ pub trait GetAPIServer<C>: client::Client<C>
     }
 }
 
-impl<C, T: client::Client<C>> GetAPIServer<C> for T
-    where
-        C: Connect + Clone + Send + Sync + 'static {}
+impl<C, T: client::Client<C>> GetAPIServer<C> for T where C: Connect + Clone + Send + Sync + 'static {}

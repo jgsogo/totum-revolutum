@@ -4,8 +4,8 @@ use async_trait::async_trait;
 use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
-use crate::{client, utils};
 use crate::structures::Metadata;
+use crate::{client, utils};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadProgressData {
@@ -18,12 +18,12 @@ pub struct UploadProgressData {
 
 #[async_trait]
 pub trait UploadProgress<C>: client::Client<C>
-    where
-        C: Connect + Clone + Send + Sync + 'static
+where
+    C: Connect + Clone + Send + Sync + 'static,
 {
     async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData, hyper::Error>
-        where
-            C: Connect + Clone + Send + Sync + 'static
+    where
+        C: Connect + Clone + Send + Sync + 'static,
     {
         let url = format!("https://{}/uploadprogress", self.hostname());
         let mut params = HashMap::new();
@@ -33,6 +33,7 @@ pub trait UploadProgress<C>: client::Client<C>
     }
 }
 
-impl<C, T: client::Client<C>> UploadProgress<C> for T
-    where
-        C: Connect + Clone + Send + Sync + 'static {}
+impl<C, T: client::Client<C>> UploadProgress<C> for T where
+    C: Connect + Clone + Send + Sync + 'static
+{
+}
