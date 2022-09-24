@@ -1,4 +1,4 @@
-pCloud-lib
+pCloud-sdk
 ==========
 
 Implementation of the pCloud API in Rust... while learning the

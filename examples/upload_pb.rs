@@ -8,18 +8,18 @@ use futures_util::{FutureExt, TryFutureExt};
 use http_body::Body;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
-use pcloud_lib::file::uploadfile::{PostUploadFile, UploadFile, UploadFileParams};
-use pcloud_lib::file::uploadprogress::{UploadProgress, UploadProgressData};
-use pcloud_lib::folder::listfolder::GetListFolder;
-use pcloud_lib::folder::ListFolderInput;
-use pcloud_lib::general::userinfo::GetUserInfo;
-use pcloud_lib::oauth2;
+use pcloud_sdk::file::uploadfile::{PostUploadFile, UploadFile, UploadFileParams};
+use pcloud_sdk::file::uploadprogress::{UploadProgress, UploadProgressData};
+use pcloud_sdk::folder::listfolder::GetListFolder;
+use pcloud_sdk::folder::ListFolderInput;
+use pcloud_sdk::general::userinfo::GetUserInfo;
+use pcloud_sdk::oauth2;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let app = oauth2::app_client_data::AppClientData::read_from_file("secrets/app.json").unwrap();
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
-    let pcloud = pcloud_lib::client::HttpClient::authorize(app, addr).await?;
+    let pcloud = pcloud_sdk::client::HttpClient::authorize(app, addr).await?;
 
     let userinfo = pcloud.userinfo().await?;
     println!("{:#?}", userinfo);
