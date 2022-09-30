@@ -1,4 +1,6 @@
+use std::collections::hash_map::DefaultHasher;
 use std::future::Future;
+use std::hash::{Hash, Hasher};
 use std::pin::Pin;
 use std::time::Duration;
 use std::{env, thread};
@@ -46,7 +48,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let mut all_tasks = vec![];
     for file in files_to_upload {
-        let progresshash = file.to_string(); // TODO: Some actual hash would be cooler
+        let mut s = DefaultHasher::new();
+        file.to_string().hash(&mut s);
+        let progresshash = s.finish().to_string();
         let (tx, rx) = tokio::sync::oneshot::channel::<()>();
         {
             // This is the task to upload the file
@@ -105,7 +109,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                             Err(e) => {
                                 // TODO: Propagate actual error
                                 pb.set_position(pb_points);
-                                pb.finish_with_message(format!("{} #error!", &file));
+                                pb.finish_with_message(format!("{} #error! {}", &file, e));
                                 break;
                             }
                         }

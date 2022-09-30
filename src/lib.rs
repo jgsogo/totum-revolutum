@@ -5,3 +5,4 @@ pub mod general;
 pub mod oauth2;
 pub mod structures;
 mod utils;
+pub mod error;

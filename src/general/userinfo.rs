@@ -29,13 +29,8 @@ pub struct UserInfo {
 }
 
 #[async_trait]
-pub trait GetUserInfo<C>: client::Client<C>
-where
-    C: Connect + Clone + Send + Sync + 'static,
-{
-    async fn userinfo(&self) -> Result<UserInfo, hyper::Error>
-    where
-        C: Connect + Clone + Send + Sync + 'static,
+pub trait GetUserInfo: client::Client {
+    async fn userinfo(&self) -> Result<UserInfo, Box<dyn std::error::Error + Send + Sync>>
     {
         let url = format!("https://{}/userinfo", self.hostname());
         let userinfo = self.get::<UserInfo>(&url, HashMap::new()).await?;
@@ -43,4 +38,4 @@ where
     }
 }
 
-impl<C, T: client::Client<C>> GetUserInfo<C> for T where C: Connect + Clone + Send + Sync + 'static {}
+impl<T: client::Client> GetUserInfo for T {}

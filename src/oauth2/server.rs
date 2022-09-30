@@ -5,6 +5,7 @@ use std::sync::{Arc, Mutex};
 use hyper::client::connect::Connect;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request, Response, Server, StatusCode};
+use reqwest;
 use tokio::sync::oneshot::Sender;
 use url::Url;
 
@@ -27,14 +28,11 @@ impl AppContext {
     }
 }
 
-async fn dispatcher<C>(
-    http_client: hyper::Client<C>,
+async fn dispatcher(
+    http_client: reqwest::Client,
     req: Request<Body>,
     data: Arc<Mutex<AppContext>>,
-) -> Result<Response<Body>, hyper::Error>
-where
-    C: Connect + Clone + Send + Sync + 'static,
-{
+) -> Result<Response<Body>, Box<dyn std::error::Error + Send + Sync>> {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/") => Ok(Response::new(Body::from("Hello /"))),
         (&Method::GET, "/callback") => {
@@ -88,14 +86,11 @@ fn visit_url(app: &AppClientData, callback_url: String) -> String {
     url.as_str().to_string()
 }
 
-pub(crate) async fn serve<C>(
-    http_client: hyper::Client<C>,
+pub(crate) async fn serve(
+    http_client: reqwest::Client,
     app: AppClientData,
     addr: SocketAddr,
-) -> Result<OAuth2Token, Box<dyn std::error::Error + Send + Sync>>
-where
-    C: Connect + Clone + Send + Sync + 'static,
-{
+) -> Result<OAuth2Token, Box<dyn std::error::Error + Send + Sync>> {
     let (tx, rx) = tokio::sync::oneshot::channel::<()>();
     let visit_url = visit_url(&app, format!("http://{addr}/callback"));
     let app_context = Arc::new(Mutex::new(AppContext::new(app, tx)));
@@ -106,7 +101,7 @@ where
             let data = data.clone();
             let http_client = http_client.clone();
             async move {
-                Ok::<_, hyper::Error>(service_fn(move |req| {
+                Ok::<_, Box<dyn std::error::Error + Send + Sync>>(service_fn(move |req| {
                     dispatcher(http_client.clone(), req, data.clone())
                 }))
             }

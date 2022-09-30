@@ -9,84 +9,76 @@ use hyper;
 use hyper::client::connect::Connect;
 use hyper::header::CONTENT_TYPE;
 use hyper::Body;
+use reqwest;
 use serde::de::DeserializeOwned;
 use url::Url;
 
+use crate::error::Error;
+
 const BOUNDARY: &'static str = "------------------------ea3bbcf87c101592";
 
-fn url_with_params(url: &str, params: HashMap<String, String>) -> Uri {
-    let mut url = Url::parse(url).unwrap();
-    for (key, value) in params {
-        url.query_pairs_mut().append_pair(&key, &value);
-    }
-    url.as_str().parse().unwrap()
-}
-
-async fn execute_request<C, T>(
-    client: hyper::Client<C>,
-    req: Request<Body>,
-) -> Result<T, hyper::Error>
+fn create_response<T>(result: String) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
 where
-    C: Connect + Clone + Send + Sync + 'static,
     T: DeserializeOwned,
 {
-    let resp = client.request(req).await?;
-    let bytes = hyper::body::to_bytes(resp.into_body()).await?;
-    let result = String::from_utf8(bytes.into_iter().collect()).expect("");
-    let deserialized: T = match serde_json::from_str(&result) {
-        Ok(data) => data,
+    let deserialized = match serde_json::from_str(&result) {
+        Ok(data) => Ok(data),
         Err(e) => {
             // TODO: Provide enough information to debug, but also return meaningful error
-            panic!(
+            Err(Box::new(Error::SerializationError(e)) as Box<dyn std::error::Error + Send + Sync>)
+            /*
+            Err(Box::new(Error::APIError(&format!(
                 "Cannot parse '{}' into {}",
                 result,
                 std::any::type_name::<T>()
-            );
+            ))))
+            */
         }
     };
-    Ok(deserialized)
+    deserialized
 }
 
-pub(crate) async fn get<C, T>(
-    client: hyper::Client<C>,
+pub(crate) async fn get<T>(
+    client: reqwest::Client,
     url: &str,
     params: HashMap<String, String>,
-) -> Result<T, hyper::Error>
+) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
 where
-    C: Connect + Clone + Send + Sync + 'static,
     T: DeserializeOwned,
 {
-    let uri = url_with_params(url, params);
-    let req = Request::builder()
-        .method(Method::GET)
-        .uri(uri)
+    let result = client
+        .get(url)
         .header(CONTENT_TYPE, "application/json")
-        .body(Body::empty())
-        .unwrap();
-    execute_request(client, req).await
+        .query(&params)
+        .send()
+        .await?
+        .text()
+        .await?;
+    create_response(result)
 }
 
-pub(crate) async fn post<C, T>(
-    client: hyper::Client<C>,
+pub(crate) async fn post<T>(
+    client: reqwest::Client,
     url: &str,
     params: HashMap<String, String>,
     data: Vec<u8>,
-) -> Result<T, hyper::Error>
+) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
 where
-    C: Connect + Clone + Send + Sync + 'static,
     T: DeserializeOwned,
 {
-    let uri = url_with_params(url, params);
-    let req = Request::builder()
-        .method(Method::POST)
-        .uri(uri.clone())
+    let result = client
+        .post(url)
         .header(
             CONTENT_TYPE,
             format!("multipart/form-data; boundary={BOUNDARY}"),
         )
-        .body(data.into())
-        .unwrap();
-    execute_request(client, req).await
+        .query(&params)
+        .body(reqwest::Body::from(data))
+        .send()
+        .await?
+        .text()
+        .await?;
+    create_response(result)
 }
 
 pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>> {
