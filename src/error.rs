@@ -11,6 +11,7 @@ pub enum Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        // TODO: Implement actual display
         write!(f, "lsl")
     }
 }
