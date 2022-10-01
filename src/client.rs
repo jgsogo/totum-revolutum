@@ -2,10 +2,6 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 
 use async_trait::async_trait;
-use hyper;
-use hyper::client::connect::Connect;
-use hyper::client::HttpConnector;
-use hyper_tls::HttpsConnector;
 use reqwest;
 use serde::de::DeserializeOwned;
 

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use hyper::client::connect::Connect;
 use reqwest;
 use serde::{Deserialize, Serialize};
 

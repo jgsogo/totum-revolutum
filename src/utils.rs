@@ -4,14 +4,10 @@ use std::io;
 use std::io::Read;
 use std::io::Write;
 
-use http::{Method, Request, Uri};
 use hyper;
-use hyper::client::connect::Connect;
 use hyper::header::CONTENT_TYPE;
-use hyper::Body;
 use reqwest;
 use serde::de::DeserializeOwned;
-use url::Url;
 
 use crate::error::Error;
 
