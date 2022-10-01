@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::structures::Metadata;
@@ -57,18 +56,12 @@ pub struct UploadFile {
 }
 
 #[async_trait]
-pub trait PostUploadFile<C>: client::Client<C>
-where
-    C: Connect + Clone + Send + Sync + 'static,
-{
+pub trait PostUploadFile: client::Client {
     async fn uploadfile(
         &self,
         local_filename: &str,
         upload_params: UploadFileParams,
-    ) -> Result<UploadFile, hyper::Error>
-    where
-        C: Connect + Clone + Send + Sync + 'static,
-    {
+    ) -> Result<UploadFile, Box<dyn std::error::Error + Send + Sync>> {
         let url = format!("https://{}/uploadfile", self.hostname());
         let mut params = HashMap::new();
         params.insert("filename".to_string(), upload_params.filename.clone());
@@ -89,7 +82,4 @@ where
     }
 }
 
-impl<C, T: client::Client<C>> PostUploadFile<C> for T where
-    C: Connect + Clone + Send + Sync + 'static
-{
-}
+impl<T: client::Client> PostUploadFile for T {}

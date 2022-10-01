@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
+use crate::client;
 use crate::structures::Metadata;
-use crate::{client, utils};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadProgressData {
@@ -17,14 +16,11 @@ pub struct UploadProgressData {
 }
 
 #[async_trait]
-pub trait UploadProgress<C>: client::Client<C>
-where
-    C: Connect + Clone + Send + Sync + 'static,
-{
-    async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData, hyper::Error>
-    where
-        C: Connect + Clone + Send + Sync + 'static,
-    {
+pub trait UploadProgress: client::Client {
+    async fn uploadprogress(
+        &self,
+        progresshash: &str,
+    ) -> Result<UploadProgressData, Box<dyn std::error::Error + Send + Sync>> {
         let url = format!("https://{}/uploadprogress", self.hostname());
         let mut params = HashMap::new();
         params.insert("progresshash".to_string(), progresshash.to_string());
@@ -33,7 +29,4 @@ where
     }
 }
 
-impl<C, T: client::Client<C>> UploadProgress<C> for T where
-    C: Connect + Clone + Send + Sync + 'static
-{
-}
+impl<T: client::Client> UploadProgress for T {}

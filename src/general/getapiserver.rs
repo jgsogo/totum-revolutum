@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
@@ -13,13 +12,8 @@ pub struct APIServer {
 }
 
 #[async_trait]
-pub trait GetAPIServer<C>: client::Client<C>
-where
-    C: Connect + Clone + Send + Sync + 'static,
-{
-    async fn getapiserver(&self) -> Result<APIServer, hyper::Error>
-    where
-        C: Connect + Clone + Send + Sync + 'static,
+pub trait GetAPIServer: client::Client {
+    async fn getapiserver(&self) -> Result<APIServer, Box<dyn std::error::Error + Send + Sync>>
     {
         let url = format!("https://{}/getapiserver", self.hostname());
         let apiserver = self.get::<APIServer>(&url, HashMap::new()).await?;
@@ -27,4 +21,4 @@ where
     }
 }
 
-impl<C, T: client::Client<C>> GetAPIServer<C> for T where C: Connect + Clone + Send + Sync + 'static {}
+impl<T: client::Client> GetAPIServer for T {}

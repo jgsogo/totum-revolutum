@@ -1,14 +1,12 @@
-use std::future::Future;
-use std::pin::Pin;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use std::time::Duration;
 use std::{env, thread};
 
-use futures_util::future::BoxFuture;
-use futures_util::{FutureExt, TryFutureExt};
-use http_body::Body;
+use futures_util::FutureExt;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
-use pcloud_sdk::file::uploadfile::{PostUploadFile, UploadFile, UploadFileParams};
+use pcloud_sdk::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::file::uploadprogress::{UploadProgress, UploadProgressData};
 use pcloud_sdk::folder::listfolder::GetListFolder;
 use pcloud_sdk::folder::ListFolderInput;
@@ -46,7 +44,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let mut all_tasks = vec![];
     for file in files_to_upload {
-        let progresshash = file.to_string(); // TODO: Some actual hash would be cooler
+        let mut s = DefaultHasher::new();
+        file.to_string().hash(&mut s);
+        let progresshash = s.finish().to_string();
         let (tx, rx) = tokio::sync::oneshot::channel::<()>();
         {
             // This is the task to upload the file
@@ -79,11 +79,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             all_tasks.push(
                 async move {
                     rx.await.ok().unwrap();
+                    // FIXME: I need to wait here so the upload actually starts and progresshash is available on server side
                     thread::sleep(Duration::from_millis(300));
                     let pb_points = 1000;
                     let pb = m.add(ProgressBar::new(pb_points));
                     pb.set_style(sty);
-                    while let xx = pcloud.uploadprogress(&progresshash).await {
+                    loop {
+                        let xx = pcloud.uploadprogress(&progresshash).await;
                         match xx {
                             Ok(UploadProgressData {
                                 total,
@@ -95,7 +97,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                                     ((uploaded as f32 / total as f32) * pb_points as f32) as u64;
                                 pb.set_message(format!("{} #{}", &file, percent));
                                 pb.set_position(percent);
-                                thread::sleep(Duration::from_millis(15));
                             }
                             Ok(UploadProgressData { finished: true, .. }) => {
                                 pb.set_position(pb_points);
@@ -105,10 +106,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                             Err(e) => {
                                 // TODO: Propagate actual error
                                 pb.set_position(pb_points);
-                                pb.finish_with_message(format!("{} #error!", &file));
+                                pb.finish_with_message(format!("{} #error! {}", &file, e));
                                 break;
                             }
                         }
+                        thread::sleep(Duration::from_millis(15));
                     }
                 }
                 .boxed(),

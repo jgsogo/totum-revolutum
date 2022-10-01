@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use hyper::client::connect::Connect;
+use reqwest;
 use serde::{Deserialize, Serialize};
 
 use crate::oauth2::app_client_data::AppClientData;
@@ -38,15 +38,12 @@ impl client::Client for OAuth2Token {
 
  */
 
-pub(crate) async fn exchange_oauth2_token<C>(
-    http_client: hyper::Client<C>,
+pub(crate) async fn exchange_oauth2_token(
+    http_client: reqwest::Client,
     app: AppClientData,
     hostname: String,
     code: String,
-) -> Result<OAuth2Token, hyper::Error>
-where
-    C: Connect + Clone + Send + Sync + 'static,
-{
+) -> Result<OAuth2Token, Box<dyn std::error::Error + Send + Sync>> {
     let params = {
         let mut params = HashMap::new();
         params.insert("client_id".to_string(), app.client_id);
@@ -56,6 +53,6 @@ where
     };
 
     let url = format!("https://{hostname}/oauth2_token");
-    let oauth2_token = utils::get::<C, OAuth2Token>(http_client, &url, params).await?;
+    let oauth2_token = utils::get::<OAuth2Token>(http_client, &url, params).await?;
     Ok(oauth2_token)
 }

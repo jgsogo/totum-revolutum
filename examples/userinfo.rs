@@ -1,4 +1,3 @@
-use pcloud_sdk::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::folder::listfolder::GetListFolder;
 use pcloud_sdk::folder::ListFolderInput;
 use pcloud_sdk::general::getapiserver::GetAPIServer;

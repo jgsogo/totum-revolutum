@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use hyper::client::connect::Connect;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
@@ -52,14 +51,11 @@ pub struct ListFolder {
 }
 
 #[async_trait]
-pub trait GetListFolder<C>: client::Client<C>
-where
-    C: Connect + Clone + Send + Sync + 'static,
-{
-    async fn listfolder(&self, list_folder: &ListFolderInput) -> Result<ListFolder, hyper::Error>
-    where
-        C: Connect + Clone + Send + Sync + 'static,
-    {
+pub trait GetListFolder: client::Client {
+    async fn listfolder(
+        &self,
+        list_folder: &ListFolderInput,
+    ) -> Result<ListFolder, Box<dyn std::error::Error + Send + Sync>> {
         let url = format!("https://{}/listfolder", self.hostname());
         let mut params = HashMap::new();
         match list_folder {
@@ -79,5 +75,4 @@ where
     }
 }
 
-impl<C, T: client::Client<C>> GetListFolder<C> for T where C: Connect + Clone + Send + Sync + 'static
-{}
+impl<T: client::Client> GetListFolder for T {}
