@@ -52,6 +52,6 @@ pub(crate) async fn exchange_oauth2_token(
     };
 
     let url = format!("https://{hostname}/oauth2_token");
-    let oauth2_token = utils::get::<OAuth2Token>(http_client, &url, params).await?;
+    let oauth2_token = utils::http::get::<OAuth2Token>(http_client, &url, params).await?;
     Ok(oauth2_token)
 }

@@ -6,7 +6,7 @@ use reqwest;
 use serde::de::DeserializeOwned;
 
 use crate::methods::oauth2;
-use crate::utils;
+use crate::utils::http;
 
 #[async_trait]
 pub trait Client: Clone {
@@ -23,7 +23,7 @@ pub trait Client: Clone {
         T: DeserializeOwned,
     {
         params.insert("access_token".to_string(), self.access_token());
-        utils::get::<T>(self.http_client(), url, params).await
+        http::get::<T>(self.http_client(), url, params).await
     }
 
     async fn post<T>(
@@ -36,7 +36,7 @@ pub trait Client: Clone {
         T: DeserializeOwned,
     {
         params.insert("access_token".to_string(), self.access_token());
-        utils::post::<T>(self.http_client(), url, params, data).await
+        http::post::<T>(self.http_client(), url, params, data).await
     }
 }
 
