@@ -1,7 +1,7 @@
-use pcloud_sdk::folder::listfolder::GetListFolder;
-use pcloud_sdk::folder::ListFolderInput;
-use pcloud_sdk::general::getapiserver::GetAPIServer;
-use pcloud_sdk::general::userinfo::GetUserInfo;
+use pcloud_sdk::methods::folder::listfolder::GetListFolder;
+use pcloud_sdk::methods::folder::ListFolderInput;
+use pcloud_sdk::methods::general::getapiserver::GetAPIServer;
+use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::methods::oauth2;
 
 #[tokio::main]

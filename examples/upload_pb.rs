@@ -6,11 +6,11 @@ use std::{env, thread};
 use futures_util::FutureExt;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
-use pcloud_sdk::file::uploadfile::{PostUploadFile, UploadFileParams};
-use pcloud_sdk::file::uploadprogress::{UploadProgress, UploadProgressData};
-use pcloud_sdk::folder::listfolder::GetListFolder;
-use pcloud_sdk::folder::ListFolderInput;
-use pcloud_sdk::general::userinfo::GetUserInfo;
+use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
+use pcloud_sdk::methods::file::uploadprogress::{UploadProgress, UploadProgressData};
+use pcloud_sdk::methods::folder::listfolder::GetListFolder;
+use pcloud_sdk::methods::folder::ListFolderInput;
+use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::methods::oauth2;
 
 #[tokio::main]
