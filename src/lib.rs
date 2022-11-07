@@ -1,5 +1,5 @@
 pub mod client;
-pub mod structures;
-pub mod methods;
-mod utils;
 pub mod error;
+pub mod methods;
+pub mod structures;
+mod utils;
