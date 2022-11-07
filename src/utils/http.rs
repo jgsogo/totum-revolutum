@@ -11,13 +11,13 @@ use serde::de::DeserializeOwned;
 
 use crate::error::Error;
 
-const BOUNDARY: &'static str = "------------------------ea3bbcf87c101592";
+const BOUNDARY: &str = "------------------------ea3bbcf87c101592";
 
 fn create_response<T>(result: String) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
 where
     T: DeserializeOwned,
 {
-    let deserialized = match serde_json::from_str(&result) {
+    match serde_json::from_str(&result) {
         Ok(data) => Ok(data),
         Err(e) => {
             // TODO: Provide enough information to debug, but also return meaningful error
@@ -30,8 +30,7 @@ where
             ))))
             */
         }
-    };
-    deserialized
+    }
 }
 
 pub(crate) async fn get<T>(
@@ -82,11 +81,7 @@ pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>
     write!(data, "--{}\r\n", BOUNDARY)?;
     write!(
         data,
-        "{}",
-        format!(
-            "Content-Disposition: form-data; name=\"smfile\"; filename=\"{}\"\r\n",
-            filename
-        )
+        "Content-Disposition: form-data; name=\"smfile\"; filename=\"{filename}\"\r\n"
     )?;
     write!(data, "\r\n")?;
 
