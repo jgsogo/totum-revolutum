@@ -5,9 +5,7 @@ use async_trait::async_trait;
 use reqwest;
 use serde::de::DeserializeOwned;
 
-use crate::oauth2;
-use crate::oauth2::app_client_data;
-use crate::oauth2::oauth2_token::OAuth2Token;
+use crate::methods::oauth2;
 use crate::utils;
 
 #[async_trait]
@@ -43,12 +41,12 @@ pub trait Client: Clone {
 }
 
 pub struct HttpClient {
-    oauth2_token: OAuth2Token,
+    oauth2_token: oauth2::OAuth2Token,
     http_client: reqwest::Client,
 }
 
 impl HttpClient {
-    pub fn new(oauth2_token: OAuth2Token) -> HttpClient {
+    pub fn new(oauth2_token: oauth2::OAuth2Token) -> HttpClient {
         HttpClient {
             oauth2_token,
             http_client: reqwest::Client::new(),
@@ -56,7 +54,7 @@ impl HttpClient {
     }
 
     pub async fn authorize(
-        app: app_client_data::AppClientData,
+        app: oauth2::AppClientData,
         address: SocketAddr,
     ) -> Result<HttpClient, Box<dyn std::error::Error + Send + Sync>> {
         let client = reqwest::Client::new();

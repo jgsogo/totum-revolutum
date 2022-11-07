@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
+use super::app_client_data::AppClientData;
+use crate::utils;
 use reqwest;
 use serde::{Deserialize, Serialize};
-
-use crate::oauth2::app_client_data::AppClientData;
-use crate::utils;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OAuth2Token {
