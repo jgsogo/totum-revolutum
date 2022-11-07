@@ -68,11 +68,11 @@ pub trait PostUploadFile: client::Client {
         // Folder-id or path, not both
         if let Some(folderid) = upload_params.folderid {
             params.insert("folderid".to_string(), folderid.to_string());
-        } else if let Some(path) = &upload_params.path {
-            params.insert("path".to_string(), path.to_string());
+        } else if let Some(path) = upload_params.path {
+            params.insert("path".to_string(), path);
         }
         if let Some(progresshash) = upload_params.progresshash {
-            params.insert("progresshash".to_string(), progresshash.to_string());
+            params.insert("progresshash".to_string(), progresshash);
         }
 
         let data = utils::http::file_data(local_filename.to_string(), &upload_params.filename).unwrap();
