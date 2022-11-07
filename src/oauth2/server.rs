@@ -11,6 +11,8 @@ use url::Url;
 use crate::oauth2::app_client_data::AppClientData;
 use crate::oauth2::oauth2_token::{exchange_oauth2_token, OAuth2Token};
 
+const CALLBACK_ENDPOINT: &str = "/callback";
+
 struct AppContext {
     app: AppClientData,
     oauth2_token: Option<OAuth2Token>,
@@ -34,7 +36,7 @@ async fn dispatcher(
 ) -> Result<Response<Body>, Box<dyn std::error::Error + Send + Sync>> {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/") => Ok(Response::new(Body::from("Hello /"))),
-        (&Method::GET, "/callback") => {
+        (&Method::GET, CALLBACK_ENDPOINT) => {
             let params: HashMap<String, String> = req
                 .uri()
                 .query()
@@ -49,8 +51,7 @@ async fn dispatcher(
                 let ctx = data.lock().unwrap().app.clone();
                 let hostname = params.get("hostname").unwrap().clone();
                 let code = params.get("code").unwrap().clone();
-                let oauth2_token = exchange_oauth2_token(http_client, ctx, hostname, code).await?;
-                oauth2_token
+                exchange_oauth2_token(http_client, ctx, hostname, code).await?
             };
             {
                 let mut data = data.lock().unwrap();
@@ -91,7 +92,7 @@ pub(crate) async fn serve(
     addr: SocketAddr,
 ) -> Result<OAuth2Token, Box<dyn std::error::Error + Send + Sync>> {
     let (tx, rx) = tokio::sync::oneshot::channel::<()>();
-    let visit_url = visit_url(&app, format!("http://{addr}/callback"));
+    let visit_url = visit_url(&app, format!("http://{addr}{CALLBACK_ENDPOINT}"));
     let app_context = Arc::new(Mutex::new(AppContext::new(app, tx)));
 
     let graceful = {
