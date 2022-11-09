@@ -75,7 +75,8 @@ pub trait PostUploadFile: client::Client {
             params.insert("progresshash".to_string(), progresshash);
         }
 
-        let data = utils::http::file_data(local_filename.to_string(), &upload_params.filename).unwrap();
+        let data =
+            utils::http::file_data(local_filename.to_string(), &upload_params.filename).unwrap();
         // TODO: This should do some streaming (with progress bar). Probably different method to upload several files
         let ret = self.post::<UploadFile>(&url, params, data).await?;
         Ok(ret)
