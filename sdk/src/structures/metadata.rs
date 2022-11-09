@@ -1,11 +1,11 @@
+use crate::id::{FileID, FolderID};
 use serde::{Deserialize, Serialize};
-
 type Timestamp = String;
 
 // https://docs.pcloud.com/structures/metadata.html
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Metadata {
-    parentfolderid: Option<i64>,
+    parentfolderid: Option<FolderID>,
     isfolder: bool,
 
     ismine: bool,
@@ -17,9 +17,9 @@ pub struct Metadata {
     isshared: bool,
     name: String,
     id: String,
-    pub folderid: Option<i64>,
-    fileid: Option<i64>,
-    deletedfileid: Option<i64>,
+    pub folderid: Option<FolderID>,
+    fileid: Option<FileID>,
+    deletedfileid: Option<FileID>,
     created: Timestamp,
     modified: Option<Timestamp>,
     icon: String,
@@ -54,7 +54,7 @@ mod tests {
         match serde_json::from_reader::<_, Metadata>(reader) {
             Err(e) => panic!("Error reading the file: {e}"),
             Ok(data) => {
-                assert_eq!(data.parentfolderid, Some(0));
+                assert_eq!(data.parentfolderid, Some(FolderID(0)));
                 assert_eq!(data.isfolder, false);
 
                 assert_eq!(data.ismine, true);
@@ -67,7 +67,7 @@ mod tests {
                 assert_eq!(data.name, "Simple image.jpg");
                 assert_eq!(data.id, "f1729212");
                 assert_eq!(data.folderid, None);
-                assert_eq!(data.fileid, Some(1729212));
+                assert_eq!(data.fileid, Some(FileID(1729212)));
                 assert_eq!(data.deletedfileid, None);
                 assert_eq!(data.created, "Wed, 02 Oct 2013 14:29:11 +0000");
                 assert_eq!(
