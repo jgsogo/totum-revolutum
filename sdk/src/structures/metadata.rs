@@ -1,0 +1,93 @@
+use crate::id::{FileID, FolderID};
+use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
+
+// TODO: Investigate #[serde(flatten)] for this structure
+// TODO: Use enum for files and folders: https://serde.rs/enum-representations.html
+
+
+// https://docs.pcloud.com/structures/metadata.html
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct Metadata {
+    parentfolderid: Option<FolderID>,
+    isfolder: bool,
+
+    ismine: bool,
+    canread: Option<bool>,
+    canmodify: Option<bool>,
+    candelete: Option<bool>,
+    cancreate: Option<bool>,
+
+    isshared: bool,
+    name: String,
+    id: String,
+    pub folderid: Option<FolderID>,
+    fileid: Option<FileID>,
+    deletedfileid: Option<FileID>,
+    #[serde(with = "time::serde::rfc2822")]
+    created: OffsetDateTime,
+    #[serde(with = "time::serde::rfc2822::option")]
+    modified: Option<OffsetDateTime>,
+    icon: String,
+    category: Option<u8>,
+    // This is an enumerated type
+    thumb: bool,
+    size: Option<i64>,
+    contenttype: Option<String>,
+    hash: Option<u64>,
+    contents: Option<Vec<Metadata>>,
+    isdeleted: Option<bool>,
+    path: Option<String>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+    use std::fs::File;
+    use std::io::BufReader;
+    use std::path::Path;
+    use time::macros::datetime;
+
+    #[test]
+    fn test_deserialize() {
+        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let manifest_json = Path::new(&manifest_dir)
+            .join("resources")
+            .join("testdata")
+            .join("metadata_file.json");
+        let file = File::open(manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        match serde_json::from_reader::<_, Metadata>(reader) {
+            Err(e) => panic!("Error reading the file: {e}"),
+            Ok(data) => {
+                assert_eq!(data.parentfolderid, Some(FolderID(0)));
+                assert_eq!(data.isfolder, false);
+
+                assert_eq!(data.ismine, true);
+                assert_eq!(data.canread, None);
+                assert_eq!(data.canmodify, None);
+                assert_eq!(data.candelete, None);
+                assert_eq!(data.cancreate, None);
+
+                assert_eq!(data.isshared, false);
+                assert_eq!(data.name, "Simple image.jpg");
+                assert_eq!(data.id, "f1729212");
+                assert_eq!(data.folderid, None);
+                assert_eq!(data.fileid, Some(FileID(1729212)));
+                assert_eq!(data.deletedfileid, None);
+                assert_eq!(data.created, datetime!(2013-10-02 14:29:11 UTC));
+                assert_eq!(data.modified, Some(datetime!(2013-10-02 14:29:11 UTC)));
+                assert_eq!(data.icon, "image");
+                assert_eq!(data.category, Some(1));
+                assert_eq!(data.thumb, true);
+                assert_eq!(data.size, Some(73269));
+                assert_eq!(data.contenttype, Some("image/jpeg".into()));
+                assert_eq!(data.hash, Some(10681749967730527559));
+                assert_eq!(data.contents, None);
+                assert_eq!(data.isdeleted, None);
+                assert_eq!(data.path, Some("/Simple image.jpg".into()));
+            }
+        }
+    }
+}
