@@ -2,8 +2,7 @@ use crate::id::{FileID, FolderID};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
-// type Timestamp = String;
-
+// TODO: Investigate #[serde(flatten)] for this structure
 // https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Metadata {
