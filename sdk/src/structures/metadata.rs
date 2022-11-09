@@ -3,6 +3,9 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 // TODO: Investigate #[serde(flatten)] for this structure
+// TODO: Use enum for files and folders: https://serde.rs/enum-representations.html
+
+
 // https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Metadata {
