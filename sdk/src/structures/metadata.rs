@@ -1,6 +1,8 @@
 use crate::id::{FileID, FolderID};
 use serde::{Deserialize, Serialize};
-type Timestamp = String;
+use time::OffsetDateTime;
+
+// type Timestamp = String;
 
 // https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -20,8 +22,10 @@ pub struct Metadata {
     pub folderid: Option<FolderID>,
     fileid: Option<FileID>,
     deletedfileid: Option<FileID>,
-    created: Timestamp,
-    modified: Option<Timestamp>,
+    #[serde(with = "time::serde::rfc2822")]
+    created: OffsetDateTime,
+    #[serde(with = "time::serde::rfc2822::option")]
+    modified: Option<OffsetDateTime>,
     icon: String,
     category: Option<u8>,
     // This is an enumerated type
@@ -34,6 +38,7 @@ pub struct Metadata {
     path: Option<String>,
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -41,6 +46,7 @@ mod tests {
     use std::fs::File;
     use std::io::BufReader;
     use std::path::Path;
+    use time::macros::{date, time};
 
     #[test]
     fn test_deserialize() {
@@ -69,10 +75,10 @@ mod tests {
                 assert_eq!(data.folderid, None);
                 assert_eq!(data.fileid, Some(FileID(1729212)));
                 assert_eq!(data.deletedfileid, None);
-                assert_eq!(data.created, "Wed, 02 Oct 2013 14:29:11 +0000");
+                assert_eq!(data.created, date!(2013-10-02).with_time(time!(14:29:11))); // "Wed, 02 Oct 2013 14:29:11 +0000");
                 assert_eq!(
                     data.modified,
-                    Some("Wed, 02 Oct 2013 14:29:11 +0000".into())
+                    Some( date!(2013-10-02).with_time(time!(14:29:11)))
                 );
                 assert_eq!(data.icon, "image");
                 assert_eq!(data.category, Some(1));
