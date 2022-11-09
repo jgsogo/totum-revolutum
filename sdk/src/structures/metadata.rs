@@ -38,7 +38,6 @@ pub struct Metadata {
     path: Option<String>,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -46,7 +45,7 @@ mod tests {
     use std::fs::File;
     use std::io::BufReader;
     use std::path::Path;
-    use time::macros::{date, time};
+    use time::macros::datetime;
 
     #[test]
     fn test_deserialize() {
@@ -75,11 +74,8 @@ mod tests {
                 assert_eq!(data.folderid, None);
                 assert_eq!(data.fileid, Some(FileID(1729212)));
                 assert_eq!(data.deletedfileid, None);
-                assert_eq!(data.created, date!(2013-10-02).with_time(time!(14:29:11))); // "Wed, 02 Oct 2013 14:29:11 +0000");
-                assert_eq!(
-                    data.modified,
-                    Some( date!(2013-10-02).with_time(time!(14:29:11)))
-                );
+                assert_eq!(data.created, datetime!(2013-10-02 14:29:11 UTC));
+                assert_eq!(data.modified, Some(datetime!(2013-10-02 14:29:11 UTC)));
                 assert_eq!(data.icon, "image");
                 assert_eq!(data.category, Some(1));
                 assert_eq!(data.thumb, true);
