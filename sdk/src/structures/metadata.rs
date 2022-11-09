@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 type Timestamp = String;
 
 // https://docs.pcloud.com/structures/metadata.html
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Metadata {
     parentfolderid: Option<i64>,
     isfolder: bool,
@@ -34,7 +34,6 @@ pub struct Metadata {
     path: Option<String>,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -46,37 +45,45 @@ mod tests {
     #[test]
     fn test_deserialize() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let manifest_json = Path::new(&manifest_dir).join("resources").join("testdata").join("metadata.json");
-
+        let manifest_json = Path::new(&manifest_dir)
+            .join("resources")
+            .join("testdata")
+            .join("metadata_file.json");
         let file = File::open(manifest_json).unwrap();
         let reader = BufReader::new(file);
         match serde_json::from_reader::<_, Metadata>(reader) {
             Err(e) => panic!("Error reading the file: {e}"),
             Ok(data) => {
-                
+                assert_eq!(data.parentfolderid, Some(0));
+                assert_eq!(data.isfolder, false);
+
+                assert_eq!(data.ismine, true);
+                assert_eq!(data.canread, None);
+                assert_eq!(data.canmodify, None);
+                assert_eq!(data.candelete, None);
+                assert_eq!(data.cancreate, None);
+
+                assert_eq!(data.isshared, false);
+                assert_eq!(data.name, "Simple image.jpg");
+                assert_eq!(data.id, "f1729212");
+                assert_eq!(data.folderid, None);
+                assert_eq!(data.fileid, Some(1729212));
+                assert_eq!(data.deletedfileid, None);
+                assert_eq!(data.created, "Wed, 02 Oct 2013 14:29:11 +0000");
+                assert_eq!(
+                    data.modified,
+                    Some("Wed, 02 Oct 2013 14:29:11 +0000".into())
+                );
+                assert_eq!(data.icon, "image");
+                assert_eq!(data.category, Some(1));
+                assert_eq!(data.thumb, true);
+                assert_eq!(data.size, Some(73269));
+                assert_eq!(data.contenttype, Some("image/jpeg".into()));
+                assert_eq!(data.hash, Some(10681749967730527559));
+                assert_eq!(data.contents, None);
+                assert_eq!(data.isdeleted, None);
+                assert_eq!(data.path, Some("/Simple image.jpg".into()));
             }
         }
-
-        assert_eq!(manifest_dir, "lol");
-        // match serde_json::from_str(&result) {
-        //     Ok(data) => Ok(data),
-        //     Err(e) => {
-        //         // TODO: Provide enough information to debug, but also return meaningful error
-        //         Err(Box::new(Error::SerializationError(e)) as Box<dyn std::error::Error + Send + Sync>)
-        //         /*
-        //         Err(Box::new(Error::APIError(&format!(
-        //             "Cannot parse '{}' into {}",
-        //             result,
-        //             std::any::type_name::<T>()
-        //         ))))
-        //         */
-        //     }
-        // }
-
-        // let fileid= FileID(23);
-        // assert_eq!(fileid.to_string(), "fileid:23");
-        // assert_eq!(format!("{fileid:?}"), "fileid:23");
     }
-
 }
-
