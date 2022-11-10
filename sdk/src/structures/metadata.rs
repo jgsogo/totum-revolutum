@@ -5,7 +5,6 @@ use time::OffsetDateTime;
 // TODO: Investigate #[serde(flatten)] for this structure
 // TODO: Use enum for files and folders: https://serde.rs/enum-representations.html
 
-
 // https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Metadata {
@@ -50,6 +49,7 @@ mod tests {
     use time::macros::datetime;
 
     #[test]
+    #[allow(clippy::bool_assert_comparison)]
     fn test_deserialize() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         let manifest_json = Path::new(&manifest_dir)
