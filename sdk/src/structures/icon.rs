@@ -15,6 +15,7 @@ pub enum Icon {
     Database,
     Archive,
     Web,
+    #[allow(clippy::upper_case_acronyms)]
     GIS,
     Spreadsheet,
     Font,
