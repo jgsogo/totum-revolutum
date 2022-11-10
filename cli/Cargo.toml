@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 pcloud-sdk = { path = "../sdk" }
 # indicatif = { version = "0.17"}
+home = "0.5.4"
 tokio = { version = "1.21", features = ["full"] }
-#clap = { version = "3.2" }
+clap = { version = "4.0", features = ["derive"] }
 #clap-verbosity-flag = { version = "1.0" }
