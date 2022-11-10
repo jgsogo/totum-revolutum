@@ -87,8 +87,6 @@ pub struct MetadataVideoFile {
     rotate: u16,
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
