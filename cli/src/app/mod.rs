@@ -13,13 +13,13 @@ pub enum Commands {
     List(list::ListParams),
 }
 
-pub fn handle(_home: &Path, input: &Commands) {
+pub fn handle(home: &Path, input: &Commands) {
     match &input {
         Commands::Auth(input) => {
             auth::handle(input);
         }
         Commands::List(input) => {
-            list::handle(input);
+            list::handle(home, input);
         }
     }
 }
