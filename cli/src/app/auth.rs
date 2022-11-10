@@ -5,6 +5,6 @@ pub struct AuthParams {
     name: Option<String>,
 }
 
-pub fn handle_auth(params: &AuthParams) {
+pub fn handle(params: &AuthParams) {
     print!("Auth application: {:?}", params);
 }
