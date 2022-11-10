@@ -1,4 +1,5 @@
 use super::category::Category;
+use super::icon::Icon;
 use crate::id::{FileID, FolderID};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -9,7 +10,7 @@ use time::OffsetDateTime;
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 /// Metadata that is common to files and folders
 pub struct CommonMetadata {
-    icon: String,
+    icon: Icon,
     id: String,
     #[serde(with = "time::serde::rfc2822")]
     created: OffsetDateTime,
@@ -27,23 +28,66 @@ pub struct CommonMetadata {
 pub struct Metadata {
     #[serde(flatten)]
     common: CommonMetadata,
-
     parentfolderid: Option<FolderID>,
+
     canread: Option<bool>,
     canmodify: Option<bool>,
     candelete: Option<bool>,
-    cancreate: Option<bool>,
 
     pub folderid: Option<FolderID>,
     fileid: Option<FileID>,
     deletedfileid: Option<FileID>,
     category: Option<Category>,
-    size: Option<i64>,
-    contenttype: Option<String>,
-    hash: Option<u64>,
     contents: Option<Vec<Metadata>>,
     isdeleted: Option<bool>,
+
+    // only for folders
+    cancreate: Option<bool>,
+
+    // only for files
+    hash: Option<u64>,
+    size: Option<i64>,
+    contenttype: Option<String>,
+
+    // Optional fields depending on file type
+    #[serde(flatten)]
+    extra_imagefile: Option<MetadataImageFile>,
+    #[serde(flatten)]
+    extra_audiofile: Option<MetadataAudioFile>,
+    #[serde(flatten)]
+    extra_videofile: Option<MetadataVideoFile>,
 }
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct MetadataImageFile {
+    width: u32,
+    height: u32,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct MetadataAudioFile {
+    artist: String,
+    album: u32,
+    title: u32,
+    genre: u32,
+    trackno: u32,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct MetadataVideoFile {
+    width: String,
+    height: u32,
+    duration: f32,
+    fps: f32,
+    videocodec: String,
+    audiocodec: String,
+    videobitrate: u32,
+    audiobitrate: u32,
+    audiosamplerate: u32,
+    rotate: u16,
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -87,7 +131,7 @@ mod tests {
                     data.common.modified,
                     Some(datetime!(2013-10-02 14:29:11 UTC))
                 );
-                assert_eq!(data.common.icon, "image");
+                assert_eq!(data.common.icon, Icon::Image);
                 assert_eq!(data.category, Some(Category::Image));
                 assert_eq!(data.common.thumb, true);
                 assert_eq!(data.size, Some(73269));
