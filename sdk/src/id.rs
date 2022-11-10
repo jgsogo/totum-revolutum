@@ -24,14 +24,14 @@ impl Display for FolderID {
 impl Debug for FileID {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let FileID(value) = self;
-        write!(f, "fileid:{}", value)
+        write!(f, "fileid:{:?}", value)
     }
 }
 
 impl Debug for FolderID {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let FolderID(value) = self;
-        write!(f, "folderid:{}", value)
+        write!(f, "folderid:{:?}", value)
     }
 }
 
