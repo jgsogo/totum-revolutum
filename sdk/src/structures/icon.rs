@@ -9,13 +9,13 @@ use strum_macros::Display;
 /// Described in https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, PartialEq, Eq, Display, Debug)]
 #[serde(rename_all = "lowercase")]
+#[allow(clippy::upper_case_acronyms)]
 #[strum(serialize_all = "snake_case")]
 pub enum Icon {
     Document,
     Database,
     Archive,
     Web,
-    #[allow(clippy::upper_case_acronyms)]
     GIS,
     Spreadsheet,
     Font,
