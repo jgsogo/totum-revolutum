@@ -3,4 +3,5 @@
 members = [
     "sdk",
     "cli",
+    "desktop",
 ]

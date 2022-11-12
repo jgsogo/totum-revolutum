@@ -1,6 +1,7 @@
 use clap::Args;
 
-use crate::data::apps;
+use pcloud_sdk_desktop::storage;
+
 use std::path::Path;
 use tracing::debug;
 
@@ -11,8 +12,8 @@ pub struct ListParams {
 
 pub fn handle(home: &Path, _params: &ListParams) {
     debug!("List applications from {}", home.display());
-    let file_data = apps::FileData::read(home);
+    let file_data = storage::apps::FileData::read(home);
 
-    // TODO: Depending on verbosity level...
-    println!("{:#?}", file_data.content);
+    // TODO: Depending on verbosity level... maybe add formatters
+    println!("{:#?}", file_data.apps());
 }

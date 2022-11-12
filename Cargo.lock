@@ -114,6 +114,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "confy"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e37668cb35145dcfaa1931a5f37fde375eeae8068b4c0d2f289da28a270b2d2c"
+dependencies = [
+ "directories",
+ "serde",
+ "thiserror",
+ "toml",
+]
+
+[[package]]
 name = "console"
 version = "0.15.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -142,6 +154,15 @@ name = "core-foundation-sys"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
+
+[[package]]
+name = "directories"
+version = "4.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f51c5d4ddabd36886dd3e1438cb358cdcb0d7c499cb99cb4ac2e38e18b5cb210"
+dependencies = [
+ "dirs-sys",
+]
 
 [[package]]
 name = "dirs"
@@ -738,23 +759,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pcloud-cli"
-version = "0.1.0"
-dependencies = [
- "clap",
- "clap-verbosity-flag",
- "fs4",
- "home",
- "log",
- "pcloud-sdk",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "pcloud-sdk"
 version = "0.1.0"
 dependencies = [
@@ -778,6 +782,35 @@ dependencies = [
  "tokio",
  "tracing-subscriber",
  "url",
+]
+
+[[package]]
+name = "pcloud-sdk-cli"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "clap-verbosity-flag",
+ "fs4",
+ "home",
+ "log",
+ "pcloud-sdk",
+ "pcloud-sdk-desktop",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "pcloud-sdk-desktop"
+version = "0.1.0"
+dependencies = [
+ "confy",
+ "fs4",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]
@@ -1301,6 +1334,15 @@ dependencies = [
  "pin-project-lite",
  "tokio",
  "tracing",
+]
+
+[[package]]
+name = "toml"
+version = "0.5.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d82e1a7758622a465f8cee077614c73484dac5b836c02ff6a40d5d1010324d7"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

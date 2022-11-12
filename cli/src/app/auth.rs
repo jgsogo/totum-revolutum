@@ -1,10 +1,97 @@
+use std::path::Path;
+
 use clap::Args;
+use pcloud_sdk::methods::oauth2::AppClientData;
+use pcloud_sdk_desktop::storage;
+use tracing::info;
+
+// TODO: Args 'client_secret' and 'client_secret_stdin' are mutually exclusive, but one of them is always required
 
 #[derive(Args, Debug)]
 pub struct AuthParams {
+    #[clap(long)]
+    /// Name to identify this application ()
     name: Option<String>,
+
+    #[clap(long)]
+    /// Client id
+    client_id: String,
+
+    #[clap(long, group = "password")]
+    /// Client secret
+    client_secret: Option<String>,
+
+    #[clap(long, action, group = "password")]
+    /// Take the client secret from stdin
+    client_secret_stdin: bool,
 }
 
-pub fn handle(params: &AuthParams) {
-    print!("Auth application: {:?}", params);
+fn mut_find_or_insert<T: PartialEq, P>(vec: &mut Vec<T>, predicate: P, val: T) -> (&mut T, bool)
+where
+    P: FnMut(&T) -> bool,
+{
+    if let Some(i) = vec.iter().position(predicate) {
+        (&mut vec[i], false)
+    } else {
+        vec.push(val);
+        (vec.last_mut().unwrap(), true)
+    }
+}
+
+pub async fn handle(home: &Path, params: &AuthParams) {
+    let secret = if params.client_secret_stdin {
+        let mut user_input = String::new();
+        let stdin = std::io::stdin(); // We get `Stdin` here.
+        stdin
+            .read_line(&mut user_input)
+            .expect("Error reading from stdin");
+        user_input.trim().into()
+    } else {
+        params.client_secret.as_ref().unwrap().clone()
+    };
+    info!(
+        "Request auth for app with client_id='{}' and client_secret='{}'",
+        params.client_id, secret
+    );
+
+    // Lock the file
+    let mut file_data = storage::apps::FileData::write(home);
+
+    // Search of create new entry for this application
+    let apps = file_data.apps_as_mut();
+    let app = storage::apps::App::default(&params.client_id, &secret);
+    let (app, _inserted) = mut_find_or_insert(apps, |v| v.client_id == params.client_id, app);
+    if app.client_secret != secret {
+        eprintln!("Application with the same client_id but different client_secret already exists! Please, remove it first");
+        std::process::exit(1);
+    }
+
+    // Run oauth request
+    // TODO: Move this to SDK
+    let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
+    let app_client_data = AppClientData::new(&app.client_id, &app.client_secret);
+    let pcloud = pcloud_sdk::client::HttpClient::authorize(app_client_data, addr)
+        .await
+        .expect("TODO: Propagate errors");
+    let token = pcloud.oauth2_token;
+
+    println!("Oauth2 token: {:?}", token);
+    // Update application data and store new token (override if existing)
+    if params.name.is_some() {
+        app.name = params.name.as_ref().unwrap().into();
+    }
+
+    // TODO: Don't like repeating variables here, rustify this piece of code!
+    let mytoken = storage::apps::OAuth2Token {
+        userid: token.userid,
+        locationid: token.locationid,
+        access_token: token.access_token.clone(),
+        token_type: token.token_type.clone(),
+    };
+    let (t, _inserted) = mut_find_or_insert(&mut app.tokens, |t| t.userid == token.userid, mytoken);
+    if !_inserted {
+        t.locationid = token.locationid;
+        t.access_token = token.access_token;
+        t.token_type = token.token_type;
+    }
 }

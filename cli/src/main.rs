@@ -1,6 +1,5 @@
 use clap::{Parser, Subcommand};
 mod app;
-pub mod data;
 mod home;
 use tracing::debug;
 
@@ -51,7 +50,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let pcloud_home = home::pcloud_home();
     match &cli.command {
         Some(Commands::App(input)) => {
-            app::handle(&pcloud_home, input);
+            app::handle(&pcloud_home, input).await;
         }
         Some(Commands::Home) => {
             home::handle(&pcloud_home);

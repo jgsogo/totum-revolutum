@@ -13,10 +13,10 @@ pub enum Commands {
     List(list::ListParams),
 }
 
-pub fn handle(home: &Path, input: &Commands) {
+pub async fn handle(home: &Path, input: &Commands) {
     match &input {
         Commands::Auth(input) => {
-            auth::handle(input);
+            auth::handle(home, input).await;
         }
         Commands::List(input) => {
             list::handle(home, input);
