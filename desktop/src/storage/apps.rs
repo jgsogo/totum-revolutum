@@ -55,7 +55,6 @@ impl AppsData {
     }
 
     pub fn apps_as_mut(&mut self) -> &mut Vec<App> {
-        assert!(self.writable(), "Write is required to borrow mut");
         self.filedata.data_as_mut()
     }
 
@@ -65,10 +64,6 @@ impl AppsData {
 }
 
 impl LockedFileTrait for AppsData {
-    fn writable(&self) -> bool {
-        self.filedata.writable()
-    }
-
     fn read(home: &Path) -> Self {
         let path = AppsData::path(home);
         AppsData {

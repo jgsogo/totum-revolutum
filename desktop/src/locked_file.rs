@@ -44,6 +44,7 @@ where
     }
 
     pub fn data_as_mut(&mut self) -> &mut T {
+        assert!(self.write, "Write is required to borrow mut");
         &mut self.data.data
     }
 
@@ -62,7 +63,6 @@ where
 }
 
 pub trait LockedFileTrait {
-    fn writable(&self) -> bool;
     fn read(path: &Path) -> Self;
     fn write(path: &Path) -> Self;
 }
@@ -71,10 +71,6 @@ impl<T> LockedFileTrait for LockedFile<T>
 where
     T: Default + Serialize + for<'a> Deserialize<'a> + std::fmt::Debug,
 {
-    fn writable(&self) -> bool {
-        self.write
-    }
-
     fn read(path: &Path) -> Self {
         let file = Self::ensure_exists(path);
 
