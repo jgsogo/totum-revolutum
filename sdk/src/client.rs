@@ -41,12 +41,12 @@ pub trait Client: Clone {
 }
 
 pub struct HttpClient {
-    pub oauth2_token: oauth2::OAuth2Token,
+    pub oauth2_token: data::oauth2token::OAuth2Token,
     http_client: reqwest::Client,
 }
 
 impl HttpClient {
-    pub fn new(oauth2_token: oauth2::OAuth2Token) -> HttpClient {
+    pub fn new(oauth2_token: data::oauth2token::OAuth2Token) -> HttpClient {
         HttpClient {
             oauth2_token,
             http_client: reqwest::Client::new(),
