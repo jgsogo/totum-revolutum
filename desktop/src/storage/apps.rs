@@ -11,10 +11,31 @@ const FILENAME: &str = "apps.json";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct App {
-    client_id: String,
-    client_secret: String,
+    pub name: String,
+    pub client_id: String,
+    pub client_secret: String,
 
-    tokens: Vec<OAuth2Token>,
+    pub tokens: Vec<OAuth2Token>,
+}
+
+impl App {
+    pub fn new(name: &str, client_id: &str, client_secret: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            client_id: client_id.to_string(),
+            client_secret: client_secret.to_string(),
+            tokens: Vec::new(),
+        }
+    }
+
+    pub fn default(client_id: &str, client_secret: &str) -> Self {
+        Self {
+            name: "no-name".to_string(),
+            client_id: client_id.to_string(),
+            client_secret: client_secret.to_string(),
+            tokens: Vec::new(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
@@ -27,8 +48,8 @@ pub struct OAuth2Token {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct FileData2 {
-    pub apps: Vec<App>,
     version: String,
+    pub apps: Vec<App>,
 }
 
 impl Default for FileData2 {
@@ -50,6 +71,11 @@ pub struct FileData {
 impl FileData {
     pub fn apps(&self) -> &Vec<App> {
         &self.data.apps
+    }
+
+    pub fn apps_as_mut(&mut self) -> &mut Vec<App> {
+        assert!(self.write, "Write is required to borrow mut");
+        &mut self.data.apps
     }
 }
 
@@ -113,7 +139,11 @@ impl FileData {
 impl Drop for FileData {
     fn drop(&mut self) {
         if self.write {
-            debug!("Save content to file '{}'", self.path.display());
+            debug!(
+                "Save content to file '{}': {:?}",
+                self.path.display(),
+                self.data
+            );
             confy::store_path(&self.path, &self.data).unwrap();
         }
         debug!("Unlock file '{}'", self.path.display());
