@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
 
+use super::data;
+use crate::methods::oauth2;
+use crate::utils::http;
 use async_trait::async_trait;
 use reqwest;
 use serde::de::DeserializeOwned;
-
-use crate::methods::oauth2;
-use crate::utils::http;
 
 #[async_trait]
 pub trait Client: Clone {
@@ -41,12 +41,12 @@ pub trait Client: Clone {
 }
 
 pub struct HttpClient {
-    pub oauth2_token: oauth2::OAuth2Token,
+    pub oauth2_token: data::oauth2token::OAuth2Token,
     http_client: reqwest::Client,
 }
 
 impl HttpClient {
-    pub fn new(oauth2_token: oauth2::OAuth2Token) -> HttpClient {
+    pub fn new(oauth2_token: data::oauth2token::OAuth2Token) -> HttpClient {
         HttpClient {
             oauth2_token,
             http_client: reqwest::Client::new(),
@@ -54,7 +54,7 @@ impl HttpClient {
     }
 
     pub async fn authorize(
-        app: oauth2::AppClientData,
+        app: data::app_client_data::AppClientData,
         address: SocketAddr,
     ) -> Result<HttpClient, Box<dyn std::error::Error + Send + Sync>> {
         let client = reqwest::Client::new();

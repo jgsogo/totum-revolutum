@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use clap::Args;
-use pcloud_sdk::methods::oauth2::AppClientData;
+use pcloud_sdk::data;
 use pcloud_sdk_desktop::storage;
 use pcloud_sdk_desktop::LockedFileTrait;
 use tracing::info;
@@ -60,7 +60,7 @@ pub async fn handle(home: &Path, params: &AuthParams) {
 
     // Search of create new entry for this application
     let apps = file_data.apps_as_mut();
-    let app = storage::apps::App::default(&params.client_id, &secret);
+    let app = data::app::App::default(&params.client_id, &secret);
     let (app, _inserted) = mut_find_or_insert(apps, |v| v.client_id == params.client_id, app);
     if app.client_secret != secret {
         eprintln!("Application with the same client_id but different client_secret already exists! Please, remove it first");
@@ -70,7 +70,8 @@ pub async fn handle(home: &Path, params: &AuthParams) {
     // Run oauth request
     // TODO: Move this to SDK
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
-    let app_client_data = AppClientData::new(&app.client_id, &app.client_secret);
+    let app_client_data =
+        data::app_client_data::AppClientData::new(&app.client_id, &app.client_secret);
     let pcloud = pcloud_sdk::client::HttpClient::authorize(app_client_data, addr)
         .await
         .expect("TODO: Propagate errors");
@@ -83,7 +84,7 @@ pub async fn handle(home: &Path, params: &AuthParams) {
     }
 
     // TODO: Don't like repeating variables here, rustify this piece of code!
-    let mytoken = storage::apps::OAuth2Token {
+    let mytoken = data::oauth2token::OAuth2Token {
         userid: token.userid,
         locationid: token.locationid,
         access_token: token.access_token.clone(),

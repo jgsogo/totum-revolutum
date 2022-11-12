@@ -8,9 +8,10 @@ use reqwest;
 use tokio::sync::oneshot::Sender;
 use url::Url;
 
-use super::app_client_data::AppClientData;
+use crate::data::app_client_data::AppClientData;
+use crate::data::oauth2token::OAuth2Token;
 
-use super::oauth2_token::{exchange_oauth2_token, OAuth2Token};
+use super::oauth2_token::exchange_oauth2_token;
 
 const CALLBACK_ENDPOINT: &str = "/callback";
 

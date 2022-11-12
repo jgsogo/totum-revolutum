@@ -1,60 +1,19 @@
 use crate::locked_file::{LockedFile, LockedFileTrait};
-use serde::{Deserialize, Serialize};
+use pcloud_sdk::data;
 use std::path::{Path, PathBuf};
 
 const FILENAME: &str = "apps.json";
 
-// TODO: Move these structs to the SDK
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct App {
-    pub name: String,
-    pub client_id: String,
-    pub client_secret: String,
-
-    pub tokens: Vec<OAuth2Token>,
-}
-
-impl App {
-    pub fn new(name: &str, client_id: &str, client_secret: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            client_id: client_id.to_string(),
-            client_secret: client_secret.to_string(),
-            tokens: Vec::new(),
-        }
-    }
-
-    pub fn default(client_id: &str, client_secret: &str) -> Self {
-        Self {
-            name: "no-name".to_string(),
-            client_id: client_id.to_string(),
-            client_secret: client_secret.to_string(),
-            tokens: Vec::new(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct OAuth2Token {
-    pub userid: i32,
-    pub locationid: u8,
-    pub access_token: String,
-    pub token_type: String,
-}
-
-// pub type FileData = LockedFile<FileData2>;
-
 pub struct AppsData {
-    filedata: LockedFile<Vec<App>>,
+    filedata: LockedFile<Vec<data::app::App>>,
 }
 
 impl AppsData {
-    pub fn apps(&self) -> &Vec<App> {
+    pub fn apps(&self) -> &Vec<data::app::App> {
         self.filedata.data()
     }
 
-    pub fn apps_as_mut(&mut self) -> &mut Vec<App> {
+    pub fn apps_as_mut(&mut self) -> &mut Vec<data::app::App> {
         self.filedata.data_as_mut()
     }
 
