@@ -16,7 +16,7 @@ pub enum Commands {
 pub fn handle(home: &Path, input: &Commands) {
     match &input {
         Commands::Auth(input) => {
-            auth::handle(input);
+            auth::handle(home, input);
         }
         Commands::List(input) => {
             list::handle(home, input);

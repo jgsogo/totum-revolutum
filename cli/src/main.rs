@@ -1,6 +1,5 @@
 use clap::{Parser, Subcommand};
 mod app;
-pub mod data;
 mod home;
 use tracing::debug;
 
