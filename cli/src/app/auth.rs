@@ -5,6 +5,8 @@ use pcloud_sdk::methods::oauth2::AppClientData;
 use pcloud_sdk_desktop::storage;
 use tracing::info;
 
+// TODO: Args 'client_secret' and 'client_secret_stdin' are mutually exclusive, but one of them is always required
+
 #[derive(Args, Debug)]
 pub struct AuthParams {
     #[clap(long)]
@@ -79,17 +81,17 @@ pub async fn handle(home: &Path, params: &AuthParams) {
         app.name = params.name.as_ref().unwrap().into();
     }
 
+    // TODO: Don't like repeating variables here, rustify this piece of code!
     let mytoken = storage::apps::OAuth2Token {
         userid: token.userid,
         locationid: token.locationid,
         access_token: token.access_token.clone(),
         token_type: token.token_type.clone(),
     };
-    let (t, _inserted) = mut_find_or_insert(&mut app.tokens, | t| t.userid == token.userid, mytoken);
+    let (t, _inserted) = mut_find_or_insert(&mut app.tokens, |t| t.userid == token.userid, mytoken);
     if !_inserted {
         t.locationid = token.locationid;
         t.access_token = token.access_token;
         t.token_type = token.token_type;
     }
-
 }

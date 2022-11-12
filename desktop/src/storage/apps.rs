@@ -9,6 +9,8 @@ use tracing::debug;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const FILENAME: &str = "apps.json";
 
+// TODO: Move these structs to the SDK
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct App {
     pub name: String,

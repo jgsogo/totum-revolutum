@@ -14,6 +14,6 @@ pub fn handle(home: &Path, _params: &ListParams) {
     debug!("List applications from {}", home.display());
     let file_data = storage::apps::FileData::read(home);
 
-    // TODO: Depending on verbosity level...
+    // TODO: Depending on verbosity level... maybe add formatters
     println!("{:#?}", file_data.apps());
 }
