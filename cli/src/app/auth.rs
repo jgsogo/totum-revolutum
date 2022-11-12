@@ -3,6 +3,7 @@ use std::path::Path;
 use clap::Args;
 use pcloud_sdk::methods::oauth2::AppClientData;
 use pcloud_sdk_desktop::storage;
+use pcloud_sdk_desktop::LockedFileTrait;
 use tracing::info;
 
 // TODO: Args 'client_secret' and 'client_secret_stdin' are mutually exclusive, but one of them is always required
@@ -55,7 +56,7 @@ pub async fn handle(home: &Path, params: &AuthParams) {
     );
 
     // Lock the file
-    let mut file_data = storage::apps::FileData::write(home);
+    let mut file_data = storage::apps::AppsData::write(home);
 
     // Search of create new entry for this application
     let apps = file_data.apps_as_mut();
