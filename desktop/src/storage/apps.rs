@@ -2,7 +2,6 @@ use crate::locked_file::{LockedFile, LockedFileTrait};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
 const FILENAME: &str = "apps.json";
 
 // TODO: Move these structs to the SDK
@@ -44,35 +43,20 @@ pub struct OAuth2Token {
     pub token_type: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct FileData2 {
-    version: String,
-    pub apps: Vec<App>,
-}
-
-impl Default for FileData2 {
-    fn default() -> Self {
-        Self {
-            apps: Vec::new(),
-            version: VERSION.to_string(),
-        }
-    }
-}
-
 // pub type FileData = LockedFile<FileData2>;
 
 pub struct AppsData {
-    filedata: LockedFile<FileData2>,
+    filedata: LockedFile<Vec<App>>,
 }
 
 impl AppsData {
     pub fn apps(&self) -> &Vec<App> {
-        &self.filedata.data.apps
+        self.filedata.data()
     }
 
     pub fn apps_as_mut(&mut self) -> &mut Vec<App> {
         assert!(self.writable(), "Write is required to borrow mut");
-        &mut self.filedata.data.apps
+        self.filedata.data_as_mut()
     }
 
     fn path(home: &Path) -> PathBuf {

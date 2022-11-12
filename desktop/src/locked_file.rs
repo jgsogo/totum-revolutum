@@ -6,13 +6,28 @@ use std::ops::Drop;
 use std::path::{Path, PathBuf};
 use tracing::debug;
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct VersionedData<T> {
+    version: String,
+    pub data: T,
+}
+
+impl<T: Default> Default for VersionedData<T> {
+    fn default() -> Self {
+        Self {
+            version: VERSION.to_string(),
+            data: T::default(),
+        }
+    }
+}
 
 pub struct LockedFile<T>
 where
     T: std::fmt::Debug + Serialize,
 {
-    pub data: T,
+    data: VersionedData<T>,
     path: PathBuf,
     file: File,
     write: bool,
@@ -22,13 +37,21 @@ impl<T> LockedFile<T>
 where
     T: Default + Serialize + for<'a> Deserialize<'a> + std::fmt::Debug,
 {
+    pub fn data(&self) -> &T {
+        &self.data.data
+    }
+
+    pub fn data_as_mut(&mut self) -> &mut T {
+        &mut self.data.data
+    }
+
     fn ensure_exists(path: &Path) -> File {
         match File::open(path) {
             Ok(file) => file,
             Err(ref e) if e.kind() == ErrorKind::NotFound => {
                 std::fs::create_dir_all(path.parent().unwrap())
                     .expect("Cannot create home directory");
-                confy::store_path(path, T::default()).unwrap();
+                confy::store_path(path, VersionedData::<T>::default()).unwrap();
                 File::open(path).unwrap()
             }
             Err(e) => panic!("Unhandled error: {e}"),
@@ -57,7 +80,7 @@ where
         file.lock_shared().unwrap();
 
         debug!("Read file from '{}'", path.display());
-        let cfg: T = confy::load_path(path)
+        let cfg: VersionedData<T> = confy::load_path(path)
             .unwrap_or_else(|_| panic!("Failed to open '{}' file", path.display()));
 
         Self {
@@ -75,7 +98,7 @@ where
         file.lock_exclusive().unwrap();
 
         debug!("Read file from '{}'", path.display());
-        let cfg: T = confy::load_path(path)
+        let cfg: VersionedData<T> = confy::load_path(path)
             .unwrap_or_else(|_| panic!("Failed to open '{}' file", path.display()));
 
         Self {
