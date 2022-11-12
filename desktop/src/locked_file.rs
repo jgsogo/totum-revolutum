@@ -8,6 +8,8 @@ use tracing::debug;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+// TODO(low): Logic relate to confy (load/store) has nothing to do with locking
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct VersionedData<T> {
     version: String,
