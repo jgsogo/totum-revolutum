@@ -3,7 +3,7 @@ use std::path::Path;
 use clap::Args;
 use pcloud_sdk::data;
 use pcloud_sdk_desktop::storage;
-use pcloud_sdk_desktop::LockedFileTrait;
+use pcloud_sdk_desktop::utils::mut_find_or_insert;
 use tracing::info;
 
 // TODO: Args 'client_secret' and 'client_secret_stdin' are mutually exclusive, but one of them is always required
@@ -27,18 +27,6 @@ pub struct AuthParams {
     client_secret_stdin: bool,
 }
 
-fn mut_find_or_insert<T: PartialEq, P>(vec: &mut Vec<T>, predicate: P, val: T) -> (&mut T, bool)
-where
-    P: FnMut(&T) -> bool,
-{
-    if let Some(i) = vec.iter().position(predicate) {
-        (&mut vec[i], false)
-    } else {
-        vec.push(val);
-        (vec.last_mut().unwrap(), true)
-    }
-}
-
 pub async fn handle(home: &Path, params: &AuthParams) {
     let secret = if params.client_secret_stdin {
         let mut user_input = String::new();
@@ -56,12 +44,12 @@ pub async fn handle(home: &Path, params: &AuthParams) {
     );
 
     // Lock the file
-    let mut file_data = storage::apps::AppsData::write(home);
+    let path = storage::apps::AppsFile::path(home);
+    let mut file_data = storage::apps::AppsFile::write(&path);
 
     // Search of create new entry for this application
-    let apps = file_data.apps_as_mut();
     let app = data::app::App::default(&params.client_id, &secret);
-    let (app, _inserted) = mut_find_or_insert(apps, |v| v.client_id == params.client_id, app);
+    let (app, _inserted) = file_data.content.find_or_insert(&params.client_id, app);
     if app.client_secret != secret {
         eprintln!("Application with the same client_id but different client_secret already exists! Please, remove it first");
         std::process::exit(1);
@@ -84,6 +72,7 @@ pub async fn handle(home: &Path, params: &AuthParams) {
     }
 
     // TODO: Don't like repeating variables here, rustify this piece of code!
+    // TODO: Move it to App struct impl
     let mytoken = data::oauth2token::OAuth2Token {
         userid: token.userid,
         locationid: token.locationid,

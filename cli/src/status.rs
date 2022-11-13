@@ -2,7 +2,7 @@ use clap::Args;
 
 use path_clean::PathClean;
 use pcloud_sdk_desktop::storage;
-use pcloud_sdk_desktop::LockedFileTrait;
+
 use std::env;
 use std::path::Path;
 use std::path::PathBuf;
@@ -32,8 +32,9 @@ pub fn handle(_home: &Path, params: &StatusParams) {
 
     // TODO: Check if folder is already a pCloud folder
 
-    let config_data = storage::config::ConfigData::read(&working_dir);
-    let config = config_data.config();
+    let path = storage::config::ConfigFile::path(&working_dir);
+    let config_data = storage::config::ConfigFile::read(&path);
+    let config = &config_data.content.data;
     println!("client_id: {}", config.auth.client_id);
     println!("userid: {}", config.auth.userid);
     // TODO: println!("action: {}", config.action.action);

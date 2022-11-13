@@ -1,6 +1,6 @@
 use crate::utils::locked_file::{LockedFile, ReadWrite};
-use std::io::{Read, Write};
-use std::{fs::OpenOptions, path::Path};
+
+use std::path::{Path, PathBuf};
 
 const FILENAME: &str = ".pcloudignore";
 
@@ -23,7 +23,11 @@ impl ReadWrite<IgnoreFilesContent> for IgnoreFilesContent {
 
 pub type IgnoreFiles = LockedFile<IgnoreFilesContent>;
 
-
+impl IgnoreFiles {
+    pub fn path(project_dir: &Path) -> PathBuf {
+        project_dir.join(FILENAME)
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -33,8 +37,8 @@ mod tests {
     #[test]
     fn test_read() {
         let tmp_dir = tempdir().unwrap();
+        let path = IgnoreFiles::path(tmp_dir.path());
 
-        let path = tmp_dir.path().join(FILENAME);
         let ignored_files = IgnoreFiles::read(&path);
         assert!(ignored_files.content.patterns.is_empty());
 
@@ -45,15 +49,14 @@ mod tests {
     #[test]
     fn test_write() {
         let tmp_dir = tempdir().unwrap();
+        let path = IgnoreFiles::path(tmp_dir.path());
 
         {
-            let path = tmp_dir.path().join(FILENAME);
             let mut ignored_files = IgnoreFiles::write(&path);
             ignored_files.content.patterns.push("ignore1".to_string());
             ignored_files.content.patterns.push("ignore2".to_string());
         }
 
-        let path = tmp_dir.path().join(FILENAME);
         let ignored_files = IgnoreFiles::read(&path);
         assert!(ignored_files.content.patterns.len() == 2);
     }

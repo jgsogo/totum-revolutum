@@ -1,5 +1,5 @@
-use crate::locked_file::{LockedFile, LockedFileTrait};
-
+use crate::utils::locked_file::{LockedFile, ReadWrite};
+use crate::utils::versioned_data::VersionedData;
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, TimeZone, Utc};
 
@@ -97,6 +97,26 @@ impl Default for Config {
     }
 }
 
+pub type ConfigFileContent = VersionedData<Config>;
+pub type ConfigFile = LockedFile<ConfigFileContent>;
+
+impl ConfigFile {
+    pub fn path(home: &Path) -> PathBuf {
+        home.join(FILENAME)
+    }
+}
+
+impl ReadWrite<ConfigFileContent> for ConfigFileContent {
+    fn deserialize(content: &str) -> std::io::Result<ConfigFileContent> {
+        Ok(serde_yaml::from_str(content).expect("cannot deserialize content"))
+    }
+
+    fn serialize(object: &ConfigFileContent) -> std::io::Result<String> {
+        Ok(serde_yaml::to_string(&object).expect("Cannot serialize content"))
+    }
+}
+
+/*
 pub struct ConfigData {
     filedata: LockedFile<Config>,
 }
@@ -130,3 +150,4 @@ impl LockedFileTrait for ConfigData {
         }
     }
 }
+*/

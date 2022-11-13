@@ -1,9 +1,8 @@
-use chrono::serde::ts_microseconds_option::serialize;
 use fs4::FileExt;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use tracing::{debug, info};
+use tracing::debug;
 
 pub trait ReadWrite<T> {
     fn read_content(path: &Path) -> std::io::Result<T> {

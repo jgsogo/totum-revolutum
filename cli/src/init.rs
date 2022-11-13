@@ -2,7 +2,7 @@ use clap::Args;
 
 use path_clean::PathClean;
 use pcloud_sdk_desktop::storage;
-use pcloud_sdk_desktop::LockedFileTrait;
+
 use std::env;
 use std::path::Path;
 use std::path::PathBuf;
@@ -47,23 +47,29 @@ pub fn handle(home: &Path, params: &InitParams) {
     // TODO: Check if folder is already a pCloud folder
 
     // Check if we need to authorize or just search for configuration
+    let path = storage::apps::AppsFile::path(home);
     if params.auth {
-        let file_data = storage::apps::AppsData::write(home);
-        let app = file_data.find(&params.client_id);
+        let file_data = storage::apps::AppsFile::write(&path);
+        let app = file_data
+            .content
+            .find(&params.client_id)
+            .expect("Application not found");
 
         // TODO: Implement here, factorize this functionality (repeated in auth command)
         info!("Run auth process for app {:#?}", app);
     } else {
-        let file_data = storage::apps::AppsData::read(home);
+        let file_data = storage::apps::AppsFile::read(&path);
         let app = file_data
+            .content
             .find(&params.client_id)
             .expect("Application not found");
         let token = app
             .find_token(params.userid.unwrap())
             .expect("User is not authenticated for the given application");
 
-        let mut config_data = storage::config::ConfigData::write(&working_dir);
-        let mut config = config_data.config_as_mut();
+        let path = storage::config::ConfigFile::path(&working_dir);
+        let mut config_data = storage::config::ConfigFile::write(&path);
+        let config = &mut config_data.content.data;
         config.auth.client_id = params.client_id.clone();
         config.auth.userid = token.userid;
     }
