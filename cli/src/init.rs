@@ -8,6 +8,8 @@ use std::path::Path;
 use std::path::PathBuf;
 use tracing::{debug, info};
 
+// TODO: Args 'userid' and 'auth' are mutually exclusive, but one of them is always required
+
 #[derive(Args, Debug)]
 pub struct InitParams {
     /// Where to run this command, if directory doesn't exist, it will be created
@@ -49,6 +51,7 @@ pub fn handle(home: &Path, params: &InitParams) {
         let file_data = storage::apps::AppsData::write(home);
         let app = file_data.find(&params.client_id);
 
+        // TODO: Implement here, factorize this functionality (repeated in auth command)
         info!("Run auth process for app {:#?}", app);
     } else {
         let file_data = storage::apps::AppsData::read(home);
