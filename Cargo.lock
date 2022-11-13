@@ -1010,6 +1010,7 @@ dependencies = [
  "pcloud-sdk",
  "serde",
  "serde_json",
+ "tempfile",
  "time 0.3.17",
  "tracing",
 ]
