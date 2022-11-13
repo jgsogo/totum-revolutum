@@ -27,8 +27,6 @@ impl AppsData {
         }
     }
 
-    
-
     fn path(home: &Path) -> PathBuf {
         home.join(FILENAME)
     }
