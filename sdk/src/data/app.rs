@@ -32,7 +32,7 @@ impl App {
 
     pub fn find_token(&self, userid: i32) -> Result<&OAuth2Token, std::io::Error> {
         match self.tokens.iter().find(|&token| token.userid == userid) {
-            Some(token) => Ok(&token),
+            Some(token) => Ok(token),
             None => Err(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "Token not found",
