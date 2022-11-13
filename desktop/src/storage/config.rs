@@ -1,13 +1,13 @@
 use crate::locked_file::{LockedFile, LockedFileTrait};
-use cron::Schedule;
-use serde::{Deserialize, Serialize};
-use std::{
-    path::{Path, PathBuf},
-    str::FromStr,
-};
-use time::OffsetDateTime;
 
-const FILENAME: &str = ".pcloud";
+use chrono::serde::ts_seconds_option;
+use chrono::{DateTime, TimeZone, Utc};
+
+use cron_parser::parse;
+use serde::{Deserialize, Serialize};
+use std::path::{Path, PathBuf};
+
+const FILENAME: &str = ".pcloud/config";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct ConfigAuth {
@@ -32,21 +32,39 @@ pub enum Actions {
     // ZipBackup,
 }
 
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct CronTz {
+    pub expression: String,
+    tz: String,
+}
+
+impl CronTz {
+    pub fn cron_tz(&self) -> chrono_tz::Tz {
+        self.tz.parse().unwrap()
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct ConfigAction {
     pub action: Actions,
-    pub cron: Option<String>,
-    pub last_executed: Option<OffsetDateTime>,
+    pub cron: Option<CronTz>,
+    #[serde(with = "ts_seconds_option")]
+    pub last_executed: Option<DateTime<Utc>>,
 }
 
 impl ConfigAction {
-    pub fn upcoming(&self) -> Option<OffsetDateTime> {
+    pub fn upcoming(&self) -> Option<DateTime<chrono_tz::Tz>> {
         match &self.cron {
             None => None,
-            Some(expression) => {
-                let schedule = Schedule::from_str(expression).unwrap();
-                let next_time = schedule.upcoming(chrono::Utc).take(1).next();
-                next_time.map(|t| OffsetDateTime::from_unix_timestamp(t.timestamp()).unwrap())
+            Some(cron) => {
+                let tz = cron.cron_tz();
+
+                let now_tz = tz
+                    .from_local_datetime(&chrono::Utc::now().naive_utc())
+                    .unwrap();
+
+                let schedule = parse(&cron.expression, &now_tz).unwrap();
+                Some(schedule)
             }
         }
     }

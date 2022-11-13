@@ -6,7 +6,7 @@ use pcloud_sdk_desktop::LockedFileTrait;
 use std::env;
 use std::path::Path;
 use std::path::PathBuf;
-use tracing::{debug, info};
+use tracing::debug;
 
 #[derive(Args, Debug)]
 pub struct StatusParams {
@@ -14,18 +14,21 @@ pub struct StatusParams {
     directory: Option<PathBuf>,
 }
 
-fn format_offsetdatetime(timestamp: &time::OffsetDateTime) -> Result<String, time::error::Format> {
-    let format = time::format_description::parse(
-        "[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \
-             sign:mandatory]:[offset_minute]:[offset_second]",
-    )
-    .unwrap();
+// fn format_offsetdatetime(
+//     timestamp: &chrono::DateTime<chrono::Utc>,
+// ) -> Result<String, time::error::Format> {
+//     let format = time::format_description::parse(
+//         "[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \
+//              sign:mandatory]:[offset_minute]:[offset_second]",
+//     )
+//     .unwrap();
 
-    // TODO: Convert to local offset
-    timestamp.format(&format)
-}
+//     // let local = chrono::DateTime::from(timestamp);
+//     // TODO: Convert to local offset
+//     timestamp.format(&format)
+// }
 
-pub fn handle(home: &Path, params: &StatusParams) {
+pub fn handle(_home: &Path, params: &StatusParams) {
     let working_dir = (match &params.directory {
         Some(d) => {
             if d.is_absolute() {
@@ -53,15 +56,18 @@ pub fn handle(home: &Path, params: &StatusParams) {
         config
             .action
             .last_executed
-            .map_or("NEVER".to_string(), |l| format_offsetdatetime(&l).unwrap())
+            .map_or("NEVER".to_string(), |l| {
+                chrono::DateTime::<chrono::Local>::from(l).to_string()
+            })
     );
     println!(
         "next_execution: {}",
         config
             .action
             .upcoming()
-            .map_or("NOT SCHEDULED".to_string(), |l| format_offsetdatetime(&l)
-                .unwrap())
+            .map_or("NOT SCHEDULED".to_string(), |l| {
+                l.with_timezone(&chrono::Local).to_string()
+            })
     );
     // TODO: Show stats about files in this folder
 }
