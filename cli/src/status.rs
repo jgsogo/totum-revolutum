@@ -14,20 +14,6 @@ pub struct StatusParams {
     directory: Option<PathBuf>,
 }
 
-// fn format_offsetdatetime(
-//     timestamp: &chrono::DateTime<chrono::Utc>,
-// ) -> Result<String, time::error::Format> {
-//     let format = time::format_description::parse(
-//         "[year]-[month]-[day] [hour]:[minute]:[second] [offset_hour \
-//              sign:mandatory]:[offset_minute]:[offset_second]",
-//     )
-//     .unwrap();
-
-//     // let local = chrono::DateTime::from(timestamp);
-//     // TODO: Convert to local offset
-//     timestamp.format(&format)
-// }
-
 pub fn handle(_home: &Path, params: &StatusParams) {
     let working_dir = (match &params.directory {
         Some(d) => {
