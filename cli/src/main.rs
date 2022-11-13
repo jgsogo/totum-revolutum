@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 mod app;
 mod home;
+mod init;
 use tracing::debug;
 
 #[derive(Parser)]
@@ -19,6 +20,9 @@ enum Commands {
     /// Manage pCloud applications
     #[command(subcommand)]
     App(app::Commands),
+
+    /// Initialize pCloud folder
+    Init(init::InitParams),
 
     /// Print home folder
     Home,
@@ -54,6 +58,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
         Some(Commands::Home) => {
             home::handle(&pcloud_home);
+        }
+        Some(Commands::Init(input)) => {
+            init::handle(&pcloud_home, input);
         }
         None => {
             println!("Default subcommand");

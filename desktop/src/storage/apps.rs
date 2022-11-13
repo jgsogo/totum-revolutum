@@ -1,20 +1,36 @@
 use crate::locked_file::{LockedFile, LockedFileTrait};
 use pcloud_sdk::data;
+use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
 const FILENAME: &str = "apps.json";
 
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+struct Apps {
+    pub apps: Vec<data::app::App>,
+}
+
 pub struct AppsData {
-    filedata: LockedFile<Vec<data::app::App>>,
+    filedata: LockedFile<Apps>,
 }
 
 impl AppsData {
     pub fn apps(&self) -> &Vec<data::app::App> {
-        self.filedata.data()
+        &self.filedata.data().apps
     }
 
     pub fn apps_as_mut(&mut self) -> &mut Vec<data::app::App> {
-        self.filedata.data_as_mut()
+        &mut self.filedata.data_as_mut().apps
+    }
+
+    pub fn find(&self, client_id: &str) -> Result<&data::app::App, std::io::Error> {
+        match self.apps().iter().find(|&app| app.client_id == client_id) {
+            Some(app) => Ok(app),
+            None => Err(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("Application not found with id '{}'", client_id),
+            )),
+        }
     }
 
     fn path(home: &Path) -> PathBuf {
