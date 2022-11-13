@@ -115,39 +115,3 @@ impl ReadWrite<ConfigFileContent> for ConfigFileContent {
         Ok(serde_yaml::to_string(&object).expect("Cannot serialize content"))
     }
 }
-
-/*
-pub struct ConfigData {
-    filedata: LockedFile<Config>,
-}
-
-impl ConfigData {
-    pub fn config(&self) -> &Config {
-        self.filedata.data()
-    }
-
-    pub fn config_as_mut(&mut self) -> &mut Config {
-        self.filedata.data_as_mut()
-    }
-
-    fn path(home: &Path) -> PathBuf {
-        home.join(FILENAME)
-    }
-}
-
-impl LockedFileTrait for ConfigData {
-    fn read(home: &Path) -> Self {
-        let path = ConfigData::path(home);
-        ConfigData {
-            filedata: LockedFile::read(&path),
-        }
-    }
-
-    fn write(home: &Path) -> Self {
-        let path = ConfigData::path(home);
-        ConfigData {
-            filedata: LockedFile::write(&path),
-        }
-    }
-}
-*/
