@@ -13,6 +13,8 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct VersionedData<T> {
     version: String,
+
+    #[serde(flatten)]
     pub data: T,
 }
 

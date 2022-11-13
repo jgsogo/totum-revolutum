@@ -64,7 +64,7 @@ pub fn handle(home: &Path, params: &InitParams) {
 
         let mut config_data = storage::config::ConfigData::write(&working_dir);
         let mut config = config_data.config_as_mut();
-        config.client_id = params.client_id.clone();
-        config.userid = token.userid;
+        config.auth.client_id = params.client_id.clone();
+        config.auth.userid = token.userid;
     }
 }
