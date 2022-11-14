@@ -1,9 +1,8 @@
 use crate::utils::locked_file::{LockedFile, ReadWrite};
 use crate::utils::versioned_data::VersionedData;
 use chrono::serde::ts_seconds_option;
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, Utc};
 
-use cron_parser::parse;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
@@ -34,42 +33,11 @@ pub enum Actions {
     // ZipBackup,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct CronTz {
-    pub expression: String,
-    tz: String,
-}
-
-impl CronTz {
-    pub fn cron_tz(&self) -> chrono_tz::Tz {
-        self.tz.parse().unwrap()
-    }
-}
-
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct ConfigAction {
     pub action: Actions,
-    pub cron: Option<CronTz>,
     #[serde(with = "ts_seconds_option")]
     pub last_executed: Option<DateTime<Utc>>,
-}
-
-impl ConfigAction {
-    pub fn upcoming(&self) -> Option<DateTime<chrono_tz::Tz>> {
-        match &self.cron {
-            None => None,
-            Some(cron) => {
-                let tz = cron.cron_tz();
-
-                let now_tz = tz
-                    .from_local_datetime(&chrono::Utc::now().naive_utc())
-                    .unwrap();
-
-                let schedule = parse(&cron.expression, &now_tz).unwrap();
-                Some(schedule)
-            }
-        }
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]

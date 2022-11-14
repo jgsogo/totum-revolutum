@@ -66,7 +66,7 @@ mod tests {
     #[test]
     fn test_path() {
         let base_path = Path::new("home");
-        assert!(AppsFile::path(base_path) == base_path.join("apps.json"));
+        assert!(AppsFile::path(base_path) == base_path.join("apps.yaml"));
     }
 
     #[test]

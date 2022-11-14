@@ -1,0 +1,101 @@
+use crate::utils::to_absolute_path;
+use crate::utils::{
+    locked_file::{LockedFile, ReadWrite},
+    versioned_data::VersionedData,
+};
+use pcloud_sdk::utils;
+use serde::{Deserialize, Serialize};
+use std::path::{Path, PathBuf};
+
+const FILENAME: &str = "cron.yaml";
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+pub struct Directory {
+    path: String,
+    cron: utils::cron::CronTz,
+}
+
+impl Directory {
+    pub fn new(path: &Path, expression: &str, tz: &chrono_tz::Tz) -> Self {
+        Self {
+            path: to_absolute_path(path)
+                .to_str()
+                .expect("Cannot convert path to string")
+                .to_string(),
+            cron: utils::cron::CronTz::new(expression, tz),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+pub struct Directories {
+    directories: Vec<Directory>,
+}
+
+type DirectoriesContent = VersionedData<Directories>;
+
+pub type DirectoriesFile = LockedFile<DirectoriesContent>;
+
+impl DirectoriesFile {
+    pub fn path(home: &Path) -> PathBuf {
+        home.join(FILENAME)
+    }
+}
+
+impl ReadWrite<DirectoriesContent> for DirectoriesContent {
+    fn deserialize(content: &str) -> std::io::Result<DirectoriesContent> {
+        Ok(serde_yaml::from_str(content).expect("cannot deserialize content"))
+    }
+
+    fn serialize(object: &DirectoriesContent) -> std::io::Result<String> {
+        Ok(serde_yaml::to_string(&object).expect("Cannot serialize content"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_path() {
+        let base_path = Path::new("home");
+        assert!(DirectoriesFile::path(base_path) == base_path.join("cron.yaml"));
+    }
+
+    #[test]
+    fn test_read() {
+        let tmp_dir = tempdir().unwrap();
+        let path = DirectoriesFile::path(tmp_dir.path());
+
+        let directories_lock = DirectoriesFile::read(&path);
+        let directories = &directories_lock.content.data;
+        assert!(directories.directories.is_empty());
+
+        let directories_lock2 = DirectoriesFile::read(&path);
+        let directories2 = &directories_lock2.content.data;
+        assert!(directories2.directories.is_empty());
+    }
+
+    #[test]
+    fn test_write() {
+        let tmp_dir = tempdir().unwrap();
+        let path = DirectoriesFile::path(tmp_dir.path());
+
+        {
+            let mut directories_lock = DirectoriesFile::write(&path);
+            let dirs = &mut directories_lock.content.data.directories;
+
+            dirs.push(Directory::new(
+                Path::new("path/to/dir"),
+                "*/2 * * * *",
+                &chrono_tz::Tz::from_str("UTC").unwrap(),
+            ))
+        }
+
+        let directories_lock = DirectoriesFile::read(&path);
+        assert!(directories_lock.content.data.directories.len() == 1);
+    }
+}

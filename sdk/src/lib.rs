@@ -4,4 +4,4 @@ pub mod error;
 mod id;
 pub mod methods;
 pub mod structures;
-mod utils;
+pub mod utils;
