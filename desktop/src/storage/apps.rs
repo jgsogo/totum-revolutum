@@ -6,7 +6,7 @@ use crate::utils::{
 use pcloud_sdk::data;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
-const FILENAME: &str = "apps.json";
+const FILENAME: &str = "apps.yaml";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct Apps {
