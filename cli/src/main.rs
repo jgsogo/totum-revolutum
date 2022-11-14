@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 mod app;
+mod cron;
 mod home;
 mod init;
 mod status;
@@ -21,6 +22,10 @@ enum Commands {
     /// Manage pCloud applications
     #[command(subcommand)]
     App(app::Commands),
+
+    /// Cron management for registered folders
+    #[command(subcommand)]
+    Cron(cron::Commands),
 
     /// Initialize pCloud folder
     Init(init::InitParams),
@@ -59,6 +64,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     match &cli.command {
         Some(Commands::App(input)) => {
             app::handle(&pcloud_home, input).await;
+        }
+        Some(Commands::Cron(input)) => {
+            cron::handle(&pcloud_home, input).await;
         }
         Some(Commands::Home) => {
             home::handle(&pcloud_home);
