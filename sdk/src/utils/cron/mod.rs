@@ -11,10 +11,8 @@ pub struct CronTz {
 impl CronTz {
     pub fn new(expression: &str, tz: &chrono_tz::Tz) -> Self {
         // Validate
-        let now_tz = tz
-            .from_local_datetime(&chrono::Utc::now().naive_utc())
-            .unwrap();
-        parse(expression, &now_tz).unwrap();
+        let now_tz = tz.from_utc_datetime(&chrono::Utc::now().naive_utc());
+        parse(expression, &now_tz).expect("Error parsing cron expression");
 
         // Create the object
         Self {
@@ -29,11 +27,7 @@ impl CronTz {
 
     pub fn upcoming(&self) -> Option<DateTime<chrono_tz::Tz>> {
         let tz = self.cron_tz();
-
-        let now_tz = tz
-            .from_local_datetime(&chrono::Utc::now().naive_utc())
-            .unwrap();
-
+        let now_tz = tz.from_utc_datetime(&chrono::Utc::now().naive_utc());
         let schedule = parse(&self.expression, &now_tz).unwrap();
         Some(schedule)
     }

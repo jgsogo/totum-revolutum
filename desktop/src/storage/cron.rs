@@ -1,8 +1,8 @@
-use crate::utils::to_absolute_path;
 use crate::utils::{
     locked_file::{LockedFile, ReadWrite},
     versioned_data::VersionedData,
 };
+use crate::utils::{mut_find_or_insert, to_absolute_path};
 use pcloud_sdk::utils;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -17,22 +17,38 @@ pub struct Directory {
 
 impl Directory {
     pub fn new(path: &Path, expression: &str, tz: &chrono_tz::Tz) -> Self {
+        let path = to_absolute_path(path);
+
         Self {
-            path: to_absolute_path(path)
+            path: path
                 .to_str()
                 .expect("Cannot convert path to string")
                 .to_string(),
             cron: utils::cron::CronTz::new(expression, tz),
         }
     }
+
+    pub fn upcoming(&self) -> Option<chrono::DateTime<chrono_tz::Tz>> {
+        self.cron.upcoming()
+    }
+
+    pub fn path(&self) -> PathBuf {
+        Path::new(&self.path).to_path_buf()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct Directories {
-    directories: Vec<Directory>,
+    pub directories: Vec<Directory>,
 }
 
 type DirectoriesContent = VersionedData<Directories>;
+
+impl DirectoriesContent {
+    pub fn find_or_insert(&mut self, path: &Path, directory: Directory) -> (&mut Directory, bool) {
+        mut_find_or_insert(&mut self.data.directories, |d| d.path() == path, directory)
+    }
+}
 
 pub type DirectoriesFile = LockedFile<DirectoriesContent>;
 
