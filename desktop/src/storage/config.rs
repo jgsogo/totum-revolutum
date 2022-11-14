@@ -7,7 +7,9 @@ use cron_parser::parse;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
-const FILENAME: &str = ".pcloud/config";
+use super::INSIDE_PROJECT_DIRECTORY;
+
+const FILENAME: &str = "config";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct ConfigAuth {
@@ -70,29 +72,17 @@ impl ConfigAction {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct Config {
     pub auth: ConfigAuth,
     pub action: ConfigAction,
-    pub ignore: Vec<String>,
 }
 
 impl Config {
     pub fn new(client_id: &str, userid: i32) -> Self {
         Self {
             auth: ConfigAuth::new(client_id, userid),
-            ignore: vec![FILENAME.to_string(), ".git".to_string()],
             ..Default::default()
-        }
-    }
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            auth: ConfigAuth::default(),
-            action: ConfigAction::default(),
-            ignore: vec![FILENAME.to_string(), ".git".to_string()],
         }
     }
 }
@@ -102,7 +92,7 @@ pub type ConfigFile = LockedFile<ConfigFileContent>;
 
 impl ConfigFile {
     pub fn path(home: &Path) -> PathBuf {
-        home.join(FILENAME)
+        home.join(INSIDE_PROJECT_DIRECTORY).join(FILENAME)
     }
 }
 
@@ -113,5 +103,16 @@ impl ReadWrite<ConfigFileContent> for ConfigFileContent {
 
     fn serialize(object: &ConfigFileContent) -> std::io::Result<String> {
         Ok(serde_yaml::to_string(&object).expect("Cannot serialize content"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_path() {
+        let base_path = Path::new("base");
+        assert!(ConfigFile::path(base_path) == base_path.join(".pcloud").join("config"));
     }
 }
