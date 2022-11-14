@@ -1,5 +1,5 @@
-use crate::locked_file::{LockedFile, LockedFileTrait};
-
+use crate::utils::locked_file::{LockedFile, ReadWrite};
+use crate::utils::versioned_data::VersionedData;
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, TimeZone, Utc};
 
@@ -97,36 +97,21 @@ impl Default for Config {
     }
 }
 
-pub struct ConfigData {
-    filedata: LockedFile<Config>,
-}
+pub type ConfigFileContent = VersionedData<Config>;
+pub type ConfigFile = LockedFile<ConfigFileContent>;
 
-impl ConfigData {
-    pub fn config(&self) -> &Config {
-        self.filedata.data()
-    }
-
-    pub fn config_as_mut(&mut self) -> &mut Config {
-        self.filedata.data_as_mut()
-    }
-
-    fn path(home: &Path) -> PathBuf {
+impl ConfigFile {
+    pub fn path(home: &Path) -> PathBuf {
         home.join(FILENAME)
     }
 }
 
-impl LockedFileTrait for ConfigData {
-    fn read(home: &Path) -> Self {
-        let path = ConfigData::path(home);
-        ConfigData {
-            filedata: LockedFile::read(&path),
-        }
+impl ReadWrite<ConfigFileContent> for ConfigFileContent {
+    fn deserialize(content: &str) -> std::io::Result<ConfigFileContent> {
+        Ok(serde_yaml::from_str(content).expect("cannot deserialize content"))
     }
 
-    fn write(home: &Path) -> Self {
-        let path = ConfigData::path(home);
-        ConfigData {
-            filedata: LockedFile::write(&path),
-        }
+    fn serialize(object: &ConfigFileContent) -> std::io::Result<String> {
+        Ok(serde_yaml::to_string(&object).expect("Cannot serialize content"))
     }
 }
