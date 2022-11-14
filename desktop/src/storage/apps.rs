@@ -64,6 +64,12 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
+    fn test_path() {
+        let base_path = Path::new("home");
+        assert!(AppsFile::path(base_path) == base_path.join("apps.json"));
+    }
+
+    #[test]
     fn test_read() {
         let tmp_dir = tempdir().unwrap();
         let path = AppsFile::path(tmp_dir.path());
@@ -92,49 +98,3 @@ mod tests {
         assert!(apps_lock.content.data.apps.len() == 1);
     }
 }
-
-/*
-pub struct AppsData {
-    filedata: LockedFile<Apps>,
-}
-
-impl AppsData {
-    pub fn apps(&self) -> &Vec<data::app::App> {
-        &self.filedata.data().apps
-    }
-
-    pub fn apps_as_mut(&mut self) -> &mut Vec<data::app::App> {
-        &mut self.filedata.data_as_mut().apps
-    }
-
-    pub fn find(&self, client_id: &str) -> Result<&data::app::App, std::io::Error> {
-        match self.apps().iter().find(|&app| app.client_id == client_id) {
-            Some(app) => Ok(app),
-            None => Err(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                format!("Application not found with id '{}'", client_id),
-            )),
-        }
-    }
-
-    fn path(home: &Path) -> PathBuf {
-        home.join(FILENAME)
-    }
-}
-
-impl LockedFileTrait for AppsData {
-    fn read(home: &Path) -> Self {
-        let path = AppsData::path(home);
-        AppsData {
-            filedata: LockedFile::read(&path),
-        }
-    }
-
-    fn write(home: &Path) -> Self {
-        let path = AppsData::path(home);
-        AppsData {
-            filedata: LockedFile::write(&path),
-        }
-    }
-}
-*/

@@ -2,11 +2,23 @@ use crate::utils::locked_file::{LockedFile, ReadWrite};
 
 use std::path::{Path, PathBuf};
 
+use super::INSIDE_PROJECT_DIRECTORY;
+
 const FILENAME: &str = ".pcloudignore";
 
-#[derive(Default)]
 pub struct IgnoreFilesContent {
     patterns: Vec<String>,
+}
+
+impl Default for IgnoreFilesContent {
+    fn default() -> Self {
+        Self {
+            patterns: vec![
+                INSIDE_PROJECT_DIRECTORY.to_string() + "/",
+                ".git/".to_string(),
+            ],
+        }
+    }
 }
 
 impl ReadWrite<IgnoreFilesContent> for IgnoreFilesContent {
@@ -17,7 +29,7 @@ impl ReadWrite<IgnoreFilesContent> for IgnoreFilesContent {
     }
 
     fn serialize(object: &IgnoreFilesContent) -> std::io::Result<String> {
-        Ok(object.patterns.join("\n"))
+        Ok(object.patterns.join("\n") + "\n")
     }
 }
 
@@ -35,15 +47,23 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
+    fn test_path() {
+        let base_path = Path::new("base");
+        assert!(IgnoreFiles::path(base_path) == base_path.join(".pcloudignore"));
+    }
+
+    #[test]
     fn test_read() {
         let tmp_dir = tempdir().unwrap();
         let path = IgnoreFiles::path(tmp_dir.path());
 
         let ignored_files = IgnoreFiles::read(&path);
-        assert!(ignored_files.content.patterns.is_empty());
+        assert!(ignored_files.content.patterns.len() == 2);
 
         let ignored_files2 = IgnoreFiles::read(&path);
-        assert!(ignored_files2.content.patterns.is_empty());
+        assert!(ignored_files2.content.patterns.len() == 2);
+
+        assert!(ignored_files.content.patterns == vec![".pcloud/", ".git/"]);
     }
 
     #[test]
@@ -58,6 +78,6 @@ mod tests {
         }
 
         let ignored_files = IgnoreFiles::read(&path);
-        assert!(ignored_files.content.patterns.len() == 2);
+        assert!(ignored_files.content.patterns.len() == 4);
     }
 }
