@@ -10,7 +10,7 @@ const FILENAME: &str = "apps.json";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct Apps {
-    pub apps: Vec<data::app::App>,
+    apps: Vec<data::app::App>,
 }
 
 type AppsFileContent = VersionedData<Apps>;
