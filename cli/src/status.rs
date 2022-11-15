@@ -46,7 +46,7 @@ pub fn handle(home: &Path, params: &StatusParams) {
 
     {
         // Show stats from global pcloud
-        let directories_file_path = storage::cron::DirectoriesFile::path(&home);
+        let directories_file_path = storage::cron::DirectoriesFile::path(home);
         let lock = storage::cron::DirectoriesFile::read(&directories_file_path);
         if let Some(found) = lock.content.find(&path) {
             println!("{:#?}", found);
