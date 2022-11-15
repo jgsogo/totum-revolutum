@@ -1,15 +1,15 @@
 use clap::Args;
 use pcloud_sdk_desktop::storage;
 use pcloud_sdk_desktop::storage::cron;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::str::FromStr;
 
-use crate::utils::ParamsOptionalDirectory;
+use crate::common::DirectoryArg;
 
 #[derive(Args, Debug)]
 pub struct AddParams {
-    /// Where to run this command, if directory doesn't exist, it will be created
-    directory: Option<PathBuf>,
+    #[clap(flatten)]
+    directory: DirectoryArg,
 
     #[clap(long)]
     /// Expression
@@ -21,14 +21,8 @@ pub struct AddParams {
     cron_tz: String,
 }
 
-impl ParamsOptionalDirectory for AddParams {
-    fn get_directory_param(&self) -> Option<PathBuf> {
-        self.directory.clone()
-    }
-}
-
 pub fn handle(home: &Path, params: &AddParams) {
-    let path = params.get_pcloud_dir();
+    let path = params.directory.get_pcloud_dir();
 
     let directory_entry = cron::Directory::new(
         &path,
