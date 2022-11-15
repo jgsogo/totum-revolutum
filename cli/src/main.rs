@@ -5,6 +5,7 @@ mod home;
 mod init;
 mod status;
 use tracing::debug;
+mod common;
 mod utils;
 
 #[derive(Parser)]

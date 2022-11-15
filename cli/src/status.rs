@@ -1,22 +1,9 @@
-use clap::Args;
-
 use pcloud_sdk_desktop::storage;
 use std::path::Path;
-use std::path::PathBuf;
 
-use crate::utils::ParamsOptionalDirectory;
+use crate::common::DirectoryArg;
 
-#[derive(Args, Debug)]
-pub struct StatusParams {
-    /// Where to run this command, if directory doesn't exist, it will be created
-    directory: Option<PathBuf>,
-}
-
-impl ParamsOptionalDirectory for StatusParams {
-    fn get_directory_param(&self) -> Option<PathBuf> {
-        self.directory.clone()
-    }
-}
+pub type StatusParams = DirectoryArg;
 
 pub fn handle(home: &Path, params: &StatusParams) {
     let path = params.get_pcloud_dir();
