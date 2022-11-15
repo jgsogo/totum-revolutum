@@ -5,6 +5,7 @@ mod home;
 mod init;
 mod status;
 use tracing::debug;
+mod utils;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

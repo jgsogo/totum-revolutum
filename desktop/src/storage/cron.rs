@@ -45,6 +45,10 @@ pub struct Directories {
 type DirectoriesContent = VersionedData<Directories>;
 
 impl DirectoriesContent {
+    pub fn find(&self, path: &Path) -> Option<&Directory> {
+        self.data.directories.iter().find(|v| v.path() == path)
+    }
+
     pub fn find_or_insert(&mut self, path: &Path, directory: Directory) -> (&mut Directory, bool) {
         mut_find_or_insert(&mut self.data.directories, |d| d.path() == path, directory)
     }
