@@ -1,9 +1,8 @@
 use clap::Args;
 
-use path_clean::PathClean;
 use pcloud_sdk_desktop::storage;
+use pcloud_sdk_desktop::utils::to_absolute_path;
 
-use std::env;
 use std::path::Path;
 use std::path::PathBuf;
 use tracing::debug;
@@ -15,19 +14,10 @@ pub struct StatusParams {
 }
 
 pub fn handle(_home: &Path, params: &StatusParams) {
-    let working_dir = (match &params.directory {
-        Some(d) => {
-            if d.is_absolute() {
-                d.to_path_buf()
-            } else {
-                env::current_dir()
-                    .expect("Cannot return current dir")
-                    .join(d)
-            }
-        }
-        None => env::current_dir().expect("Cannot return current directory"),
-    })
-    .clean();
+    let working_dir = match &params.directory {
+        Some(d) => to_absolute_path(d),
+        None => to_absolute_path(Path::new(".")),
+    };
     debug!("Status pCloud folder {}", working_dir.display());
 
     // TODO: Check if folder is already a pCloud folder
@@ -45,15 +35,6 @@ pub fn handle(_home: &Path, params: &StatusParams) {
             .last_executed
             .map_or("NEVER".to_string(), |l| {
                 chrono::DateTime::<chrono::Local>::from(l).to_string()
-            })
-    );
-    println!(
-        "next_execution: {}",
-        config
-            .action
-            .upcoming()
-            .map_or("NOT SCHEDULED".to_string(), |l| {
-                l.with_timezone(&chrono::Local).to_string()
             })
     );
     // TODO: Show stats about files in this folder

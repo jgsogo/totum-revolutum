@@ -17,7 +17,9 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 http = "0.2"
 http-body = "0.4"
 futures = "0.3"
-futures-util = { version = "0.3", default-features = false, features = ["alloc"] }
+futures-util = { version = "0.3", default-features = false, features = [
+    "alloc",
+] }
 url = "2.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -25,12 +27,20 @@ serde_repr = "0.1"
 async-trait = "0.1"
 reqwest = { version = "0.11", features = ["stream"] }
 thiserror = "1.0"
-time = {version = "0.3", features = ["serde", "parsing", "formatting", "macros"]}
+time = { version = "0.3", features = [
+    "serde",
+    "parsing",
+    "formatting",
+    "macros",
+] }
 strum = { version = "0.24", features = ["derive"] }
 strum_macros = "0.24"
+chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = { version = "0.8" }
+cron-parser = "0.7.10"
 
 # Optional deps
-indicatif = { version = "0.17", optional = true}
+indicatif = { version = "0.17", optional = true }
 
 [[example]]
 name = "upload_pb"

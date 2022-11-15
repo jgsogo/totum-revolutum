@@ -1,9 +1,8 @@
 use clap::Args;
 
-use path_clean::PathClean;
 use pcloud_sdk_desktop::storage;
+use pcloud_sdk_desktop::utils::to_absolute_path;
 
-use std::env;
 use std::path::Path;
 use std::path::PathBuf;
 use tracing::{debug, info};
@@ -29,19 +28,10 @@ pub struct InitParams {
 }
 
 pub fn handle(home: &Path, params: &InitParams) {
-    let working_dir = (match &params.directory {
-        Some(d) => {
-            if d.is_absolute() {
-                d.to_path_buf()
-            } else {
-                env::current_dir()
-                    .expect("Cannot return current dir")
-                    .join(d)
-            }
-        }
-        None => env::current_dir().expect("Cannot return current directory"),
-    })
-    .clean();
+    let working_dir = match &params.directory {
+        Some(d) => to_absolute_path(d),
+        None => to_absolute_path(Path::new(".")),
+    };
     debug!("Init pCloud folder {}", working_dir.display());
 
     // TODO: Check if folder is already a pCloud folder
