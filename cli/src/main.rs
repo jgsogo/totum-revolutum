@@ -7,6 +7,7 @@ mod status;
 use tracing::debug;
 mod common;
 mod output;
+mod run;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -37,6 +38,9 @@ enum Commands {
 
     /// Print home folder
     Home,
+
+    /// Run syncronization
+    Run(run::RunParams),
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -78,6 +82,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
         Some(Commands::Status(input)) => {
             status::handle(&pcloud_home, input);
+        }
+        Some(Commands::Run(input)) => {
+            run::handle(&pcloud_home, input);
         }
         None => {
             println!("Default subcommand");
