@@ -1,18 +1,19 @@
 use clap::Args;
 
 use pcloud_sdk_desktop::storage;
-use pcloud_sdk_desktop::utils::to_absolute_path;
+use pcloud_sdk_desktop::storage::candidate_pcloud_dir;
 
 use std::path::Path;
-use std::path::PathBuf;
 use tracing::{debug, info};
+
+use crate::common::DirectoryArg;
 
 // TODO: Args 'userid' and 'auth' are mutually exclusive, but one of them is always required
 
 #[derive(Args, Debug)]
 pub struct InitParams {
-    /// Where to run this command, if directory doesn't exist, it will be created
-    directory: Option<PathBuf>,
+    #[clap(flatten)]
+    directory: DirectoryArg,
 
     /// Application to use within this directory
     #[clap(long)]
@@ -28,13 +29,16 @@ pub struct InitParams {
 }
 
 pub fn handle(home: &Path, params: &InitParams) {
-    let working_dir = match &params.directory {
-        Some(d) => to_absolute_path(d),
-        None => to_absolute_path(Path::new(".")),
-    };
+    let working_dir = params.directory.get_working_dir_from_directory_param();
     debug!("Init pCloud folder {}", working_dir.display());
 
-    // TODO: Check if folder is already a pCloud folder
+    if let Err(e) = candidate_pcloud_dir(&working_dir) {
+        eprintln!(
+            "Provided directory (or one of its parents) is already a pcloud one: '{}'",
+            e.display()
+        );
+        std::process::exit(1);
+    }
 
     // Check if we need to authorize or just search for configuration
     let apps_file_path = storage::apps::AppsFile::path(home);
