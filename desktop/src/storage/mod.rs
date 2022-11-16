@@ -47,6 +47,6 @@ pub fn candidate_pcloud_dir(path: &Path) -> result::Result<bool, PathBuf> {
     // Given path doesn't exist, we need to check if any of the parents is already a pcloud-dir
     match path.parent() {
         Some(p) => candidate_pcloud_dir(p),
-        None => Err(path.to_path_buf()),  // TODO: Better error from here
+        None => Err(path.to_path_buf()), // TODO: Better error from here
     }
 }
