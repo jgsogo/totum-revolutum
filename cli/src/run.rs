@@ -1,12 +1,10 @@
 use clap::Args;
 
-use pcloud_sdk_desktop::storage;
+use pcloud_sdk_desktop::run;
 use pcloud_sdk_desktop::storage::is_pcloud_dir;
-use pcloud_sdk_desktop::utils::to_absolute_path;
 
 use std::path::Path;
-use std::path::PathBuf;
-use tracing::{debug, info};
+use tracing::debug;
 
 use crate::common::current_wdir;
 use crate::common::DirectoryArg;
@@ -27,14 +25,8 @@ pub struct RunParams {
     filter_user_id: Option<String>,
 }
 
-#[derive(Debug)]
-enum RunCommand {
-    Global,
-    Directory(PathBuf),
-}
-
 pub fn handle(home: &Path, params: &RunParams) {
-    let runCommand = match params.directory.get_directory_param_abs() {
+    let run_command = match params.directory.get_directory_param_abs() {
         Some(p) => {
             debug!("run on directory '{}'.", p.display());
             if !p.exists() {
@@ -42,7 +34,7 @@ pub fn handle(home: &Path, params: &RunParams) {
                 std::process::exit(1);
             }
             if let Ok(p) = is_pcloud_dir(&p) {
-                RunCommand::Directory(p)
+                run::RunCommand::Directory(p)
             } else {
                 eprintln!("Provided directory is not a ploud-dir: '{}'.", p.display());
                 std::process::exit(1);
@@ -51,11 +43,12 @@ pub fn handle(home: &Path, params: &RunParams) {
         None => {
             let wdir = current_wdir();
             if let Ok(p) = is_pcloud_dir(&wdir) {
-                RunCommand::Directory(p)
+                run::RunCommand::Directory(p)
             } else {
-                RunCommand::Global
+                run::RunCommand::Global
             }
         }
     };
-    debug!("Run command on {:?}", runCommand);
+    debug!("Run command on {:?}", run_command);
+    run::handle(home, run_command);
 }

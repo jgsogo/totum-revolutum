@@ -32,6 +32,13 @@ impl Directory {
         self.cron.upcoming()
     }
 
+    pub fn next<Tz>(&self, previous: &chrono::DateTime<Tz>) -> Option<chrono::DateTime<Tz>>
+    where
+        Tz: chrono::TimeZone,
+    {
+        self.cron.next(previous)
+    }
+
     pub fn path(&self) -> PathBuf {
         Path::new(&self.path).to_path_buf()
     }
