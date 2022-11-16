@@ -1,12 +1,21 @@
+use crate::output;
 use pcloud_sdk_desktop::storage;
 use std::path::Path;
 use tracing::debug;
 
 pub fn handle(home: &Path) {
     debug!("List applications from {}", home.display());
-    let path = storage::cron::DirectoriesFile::path(home);
-    let lock = storage::cron::DirectoriesFile::read(&path);
+
+    let directories_file_path = storage::cron::DirectoriesFile::path(home);
+    let lock = storage::cron::DirectoriesFile::read(&directories_file_path);
 
     // TODO: Depending on verbosity level... maybe add formatters
-    println!("{:#?}", lock.content.data);
+    for cron in lock.content.data.directories.iter() {
+        let config_file_path = storage::config::ConfigFile::path(&cron.path());
+        let lock = storage::config::ConfigFile::read(&config_file_path);
+        let config = &lock.content.data;
+
+        println!("{}", cron.path().display());
+        output::project::_cron_details(config, cron);
+    }
 }

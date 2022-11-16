@@ -30,8 +30,8 @@ pub fn handle(home: &Path, params: &AddParams) {
         &chrono_tz::Tz::from_str(&params.cron_tz).unwrap(),
     );
 
-    let path = storage::cron::DirectoriesFile::path(home);
-    let mut lock = storage::cron::DirectoriesFile::write(&path);
+    let directories_file_path = storage::cron::DirectoriesFile::path(home);
+    let mut lock = storage::cron::DirectoriesFile::write(&directories_file_path);
     let (entry, inserted) = lock.content.find_or_insert(&path, directory_entry);
 
     if !inserted {

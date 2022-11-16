@@ -4,6 +4,7 @@ pub mod cron;
 pub mod ignore_files;
 use std::io::{Error, ErrorKind, Result};
 use std::path::{Path, PathBuf};
+use std::result;
 
 const INSIDE_PROJECT_DIRECTORY: &str = ".pcloud";
 
@@ -28,5 +29,24 @@ pub fn is_pcloud_dir(path: &Path) -> Result<PathBuf> {
         } else {
             Ok(path.to_path_buf())
         }
+    }
+}
+
+/// Returns if the given `path` is a valid candidate as a pcloud dir
+///
+/// Valid candidates are any folder that is not already a pcloud-dir
+/// or under a valid pcloud-dir (even if the directory doesn't exist yet)
+pub fn candidate_pcloud_dir(path: &Path) -> result::Result<bool, PathBuf> {
+    if is_pcloud_dir(path).is_ok() {
+        return Err(path.to_path_buf());
+    }
+    if path.exists() {
+        return Ok(true);
+    }
+
+    // Given path doesn't exist, we need to check if any of the parents is already a pcloud-dir
+    match path.parent() {
+        Some(p) => candidate_pcloud_dir(p),
+        None => Err(path.to_path_buf()), // TODO: Better error from here
     }
 }
