@@ -1,5 +1,5 @@
+use anyhow::Result;
 use std::{env, path::Path, path::PathBuf};
-
 const PCLOUD_HOME_SUBDIR: &str = ".pcloud";
 const PCLOUD_HOME_DIR_ENVVAR: &str = "PCLOUD_HOME_DIR";
 
@@ -30,6 +30,7 @@ pub fn pcloud_home() -> PathBuf {
     }
 }
 
-pub fn handle(home_dir: &Path) {
+pub fn handle(home_dir: &Path) -> Result<()> {
     println!("{}", home_dir.display());
+    Ok(())
 }

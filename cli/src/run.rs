@@ -3,6 +3,8 @@ use clap::Args;
 use pcloud_sdk_desktop::run;
 use pcloud_sdk_desktop::storage::is_pcloud_dir;
 
+use crate::errors::CLIErrors;
+use anyhow::{bail, Result};
 use std::path::Path;
 use tracing::debug;
 
@@ -25,19 +27,23 @@ pub struct RunParams {
     filter_user_id: Option<String>,
 }
 
-pub async fn handle(home: &Path, params: &RunParams) {
+pub async fn handle(home: &Path, params: &RunParams) -> Result<()> {
     let run_command = match params.directory.get_directory_param_abs() {
         Some(p) => {
             debug!("run on directory '{}'.", p.display());
             if !p.exists() {
-                eprintln!("Provided directory doesn't exists: '{}'.", p.display());
-                std::process::exit(1);
+                bail!(CLIErrors::ExitFailure(format!(
+                    "Provided directory doesn't exists: '{}'.",
+                    p.display()
+                )));
             }
             if let Ok(p) = is_pcloud_dir(&p) {
                 run::RunCommand::Directory(p)
             } else {
-                eprintln!("Provided directory is not a ploud-dir: '{}'.", p.display());
-                std::process::exit(1);
+                bail!(CLIErrors::ExitFailure(format!(
+                    "Provided directory is not a ploud-dir: '{}'.",
+                    p.display()
+                )));
             }
         }
         None => {
@@ -50,5 +56,5 @@ pub async fn handle(home: &Path, params: &RunParams) {
         }
     };
     debug!("Run command on {:?}", run_command);
-    run::handle(home, run_command).await;
+    run::handle(home, run_command).await
 }

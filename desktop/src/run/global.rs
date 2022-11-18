@@ -1,15 +1,15 @@
-use std::path::{Path, PathBuf};
-
 use super::super::storage;
+use anyhow::Result;
+use std::path::{Path, PathBuf};
 use tracing::{debug, info, warn};
 
-async fn run_project(home: PathBuf, path: PathBuf) {
+async fn run_project(home: PathBuf, path: PathBuf) -> Result<()> {
     super::project::handle(&home, &path)
 }
 
 /// Run configured action for the directories where cron is configured
 /// and time is elapsed
-pub async fn handle(home: &Path) {
+pub async fn handle(home: &Path) -> Result<()> {
     info!("Start global run");
 
     // Collect the tasks and execute them asyncronously
@@ -58,4 +58,5 @@ pub async fn handle(home: &Path) {
     while let Some(_res) = tasks.join_next().await {
         // let idx = res.unwrap();
     }
+    Ok(())
 }

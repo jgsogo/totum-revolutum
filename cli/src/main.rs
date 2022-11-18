@@ -9,6 +9,7 @@ mod common;
 mod output;
 mod run;
 use anyhow::Result;
+mod errors;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -18,7 +19,7 @@ struct Cli {
     verbose: clap_verbosity_flag::Verbosity,
 
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Commands,
 }
 
 #[derive(Subcommand)]
@@ -69,28 +70,11 @@ async fn main() -> Result<()> {
     // Go ahead!
     let pcloud_home = home::pcloud_home();
     match &cli.command {
-        Some(Commands::App(input)) => {
-            app::handle(&pcloud_home, input).await?;
-        }
-        Some(Commands::Cron(input)) => {
-            cron::handle(&pcloud_home, input)?;
-        }
-        Some(Commands::Home) => {
-            home::handle(&pcloud_home);
-        }
-        Some(Commands::Init(input)) => {
-            init::handle(&pcloud_home, input)?;
-        }
-        Some(Commands::Status(input)) => {
-            status::handle(&pcloud_home, input);
-        }
-        Some(Commands::Run(input)) => {
-            run::handle(&pcloud_home, input).await;
-        }
-        None => {
-            println!("Default subcommand");
-        }
+        Commands::App(input) => app::handle(&pcloud_home, input).await,
+        Commands::Cron(input) => cron::handle(&pcloud_home, input),
+        Commands::Home => home::handle(&pcloud_home),
+        Commands::Init(input) => init::handle(&pcloud_home, input),
+        Commands::Status(input) => status::handle(&pcloud_home, input),
+        Commands::Run(input) => run::handle(&pcloud_home, input).await,
     }
-
-    Ok(())
 }
