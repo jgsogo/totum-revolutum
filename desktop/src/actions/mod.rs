@@ -8,3 +8,14 @@ pub enum Actions {
     // Sync,
     // ZipBackup,
 }
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+pub enum OnConflict {
+    OverrideRemote,
+    OverrideLocal,
+    RenameRemote,
+    RenameLocal,
+
+    #[default]
+    Fail,
+}
