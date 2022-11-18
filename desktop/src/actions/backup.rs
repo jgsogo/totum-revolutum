@@ -24,14 +24,15 @@ pub fn run(path: &Path, _config: &config::Config) -> Result<()> {
         Box::new(move |result| {
             let entry: ignore::DirEntry = result.unwrap();
             let meta = entry.metadata().unwrap();
-            println!("{}", entry.path().display());
-            println!(" - is_file: {}", meta.is_file());
-            println!(" - modified: {:?}", meta.modified().unwrap());
-            println!(" - file_type: {:?}", meta.file_type());
+            // println!("{}", entry.path().display());
+            // println!(" - is_file: {}", meta.is_file());
+            // println!(" - modified: {:?}", meta.modified().unwrap());
+            // println!(" - file_type: {:?}", meta.file_type());
             WalkState::Continue
         })
     });
-    Err(anyhow!(SDKErrors::NotImplemented))
+    Ok(())
+    // Err(anyhow!(SDKErrors::NotImplemented))
 }
 
 #[allow(dead_code)]

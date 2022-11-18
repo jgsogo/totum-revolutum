@@ -1,7 +1,7 @@
 use crate::actions;
 use crate::errors::SDKErrors;
 use crate::storage;
-use anyhow::{anyhow, bail, Result};
+use anyhow::{anyhow, Result};
 use std::path::Path;
 use tracing::info;
 
@@ -11,16 +11,20 @@ pub fn handle(_home: &Path, path: &Path) -> Result<()> {
     info!("Start project run for path '{}'", path.display());
 
     let config_file_path = storage::config::ConfigFile::path(path);
-    let lock = storage::config::ConfigFile::write(&config_file_path);
-    if lock.is_err() {
-        bail!(SDKErrors::ProjectLocked(path.to_string_lossy().to_string()));
-    }
-    let lock = lock.unwrap();
+    let mut lock = storage::config::ConfigFile::write(&config_file_path)
+        .map_err(|_| SDKErrors::ProjectLocked(path.to_string_lossy().to_string()))?;
 
-    match lock.content.data.action.action {
+    let data = &mut lock.content.data;
+    match data.action.action {
         actions::Actions::Backup => {
-            actions::backup::run(path, &lock.content.data)?;
-            // TODO: Update last-execution time
+            let now = chrono::Utc::now();
+
+            actions::backup::run(path, &data)?;
+
+            // Update last-execution time. We use the timestamp when the process started because files might be modified
+            //  while we are running it and after they are synced. We use the `now` we created above!!!
+            data.action.last_executed = Some(now);
+
             Err(anyhow!(SDKErrors::NotImplemented))
         }
         actions::Actions::ZipBackup => Err(anyhow!(SDKErrors::NotImplemented)),
