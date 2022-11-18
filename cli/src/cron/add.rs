@@ -5,6 +5,7 @@ use std::path::Path;
 use std::str::FromStr;
 
 use crate::common::DirectoryArg;
+use anyhow::Result;
 
 #[derive(Args, Debug)]
 pub struct AddParams {
@@ -21,7 +22,7 @@ pub struct AddParams {
     cron_tz: String,
 }
 
-pub fn handle(home: &Path, params: &AddParams) {
+pub fn handle(home: &Path, params: &AddParams) -> Result<()> {
     let path = params.directory.get_pcloud_dir();
 
     let directory_entry = cron::Directory::new(
@@ -31,7 +32,7 @@ pub fn handle(home: &Path, params: &AddParams) {
     );
 
     let directories_file_path = storage::cron::DirectoriesFile::path(home);
-    let mut lock = storage::cron::DirectoriesFile::write(&directories_file_path);
+    let mut lock = storage::cron::DirectoriesFile::write(&directories_file_path)?;
     let (entry, inserted) = lock.content.find_or_insert(&path, directory_entry);
 
     if !inserted {
@@ -47,4 +48,5 @@ pub fn handle(home: &Path, params: &AddParams) {
         entry.path().to_string_lossy(),
         entry.upcoming().unwrap()
     );
+    Ok(())
 }

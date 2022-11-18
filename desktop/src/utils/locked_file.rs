@@ -1,3 +1,4 @@
+use anyhow::Result;
 use fs4::FileExt;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
@@ -63,6 +64,23 @@ where
         }
     }
 
+    pub fn try_read(path: &Path) -> Result<Self> {
+        let file = Self::ensure_exists(path);
+
+        debug!("Lock file (shared) '{}'", path.display());
+        file.try_lock_shared()?;
+
+        debug!("Read file from '{}'", path.display());
+        let content = T::read_content(path).unwrap();
+
+        Ok(Self {
+            content,
+            write: false,
+            path: path.to_path_buf(),
+            file,
+        })
+    }
+
     pub fn read(path: &Path) -> Self {
         let file = Self::ensure_exists(path);
 
@@ -80,21 +98,21 @@ where
         }
     }
 
-    pub fn write(path: &Path) -> Self {
+    pub fn write(path: &Path) -> Result<Self> {
         let file = Self::ensure_exists(path);
 
         debug!("Lock file (exclusive) '{}'", path.display());
-        file.lock_exclusive().unwrap();
+        file.try_lock_exclusive()?;
 
         debug!("Read file from '{}'", path.display());
         let content = T::read_content(path).unwrap();
 
-        Self {
+        Ok(Self {
             content,
             write: true,
             path: path.to_path_buf(),
             file,
-        }
+        })
     }
 }
 

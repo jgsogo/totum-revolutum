@@ -112,7 +112,7 @@ mod tests {
         let path = DirectoriesFile::path(tmp_dir.path());
 
         {
-            let mut directories_lock = DirectoriesFile::write(&path);
+            let mut directories_lock = DirectoriesFile::write(&path).unwrap();
             let dirs = &mut directories_lock.content.data.directories;
 
             dirs.push(Directory::new(

@@ -3,6 +3,7 @@ use crate::utils::versioned_data::VersionedData;
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, Utc};
 
+use crate::actions::Actions;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
@@ -23,14 +24,6 @@ impl ConfigAuth {
             userid,
         }
     }
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
-pub enum Actions {
-    #[default]
-    Backup,
-    // Sync,
-    // ZipBackup,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]

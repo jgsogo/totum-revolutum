@@ -9,9 +9,11 @@ pub enum RunCommand {
     Directory(PathBuf),
 }
 
-pub fn handle(home: &Path, command: RunCommand) {
+pub async fn handle(home: &Path, command: RunCommand) {
     match command {
-        RunCommand::Global => global::handle(home),
+        RunCommand::Global => {
+            global::handle(home).await;
+        }
         RunCommand::Directory(path) => project::handle(home, &path),
     }
 }

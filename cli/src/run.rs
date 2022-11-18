@@ -25,7 +25,7 @@ pub struct RunParams {
     filter_user_id: Option<String>,
 }
 
-pub fn handle(home: &Path, params: &RunParams) {
+pub async fn handle(home: &Path, params: &RunParams) {
     let run_command = match params.directory.get_directory_param_abs() {
         Some(p) => {
             debug!("run on directory '{}'.", p.display());
@@ -50,5 +50,5 @@ pub fn handle(home: &Path, params: &RunParams) {
         }
     };
     debug!("Run command on {:?}", run_command);
-    run::handle(home, run_command);
+    run::handle(home, run_command).await;
 }

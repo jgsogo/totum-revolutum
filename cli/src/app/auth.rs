@@ -1,5 +1,6 @@
 use std::path::Path;
 
+use anyhow::Result;
 use clap::Args;
 use pcloud_sdk::data;
 use pcloud_sdk_desktop::storage;
@@ -27,7 +28,7 @@ pub struct AuthParams {
     client_secret_stdin: bool,
 }
 
-pub async fn handle(home: &Path, params: &AuthParams) {
+pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
     let secret = if params.client_secret_stdin {
         let mut user_input = String::new();
         let stdin = std::io::stdin(); // We get `Stdin` here.
@@ -45,7 +46,7 @@ pub async fn handle(home: &Path, params: &AuthParams) {
 
     // Lock the file
     let path = storage::apps::AppsFile::path(home);
-    let mut file_data = storage::apps::AppsFile::write(&path);
+    let mut file_data = storage::apps::AppsFile::write(&path)?;
 
     // Search of create new entry for this application
     let app = data::app::App::default(&params.client_id, &secret);
@@ -85,4 +86,5 @@ pub async fn handle(home: &Path, params: &AuthParams) {
         t.access_token = token.access_token;
         t.token_type = token.token_type;
     }
+    Ok(())
 }

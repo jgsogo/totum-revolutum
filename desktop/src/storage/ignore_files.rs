@@ -72,7 +72,7 @@ mod tests {
         let path = IgnoreFiles::path(tmp_dir.path());
 
         {
-            let mut ignored_files = IgnoreFiles::write(&path);
+            let mut ignored_files = IgnoreFiles::write(&path).unwrap();
             ignored_files.content.patterns.push("ignore1".to_string());
             ignored_files.content.patterns.push("ignore2".to_string());
         }

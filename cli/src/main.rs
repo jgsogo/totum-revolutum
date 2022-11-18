@@ -8,6 +8,7 @@ use tracing::debug;
 mod common;
 mod output;
 mod run;
+use anyhow::Result;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -55,7 +56,7 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     // Configure tracing
@@ -69,22 +70,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let pcloud_home = home::pcloud_home();
     match &cli.command {
         Some(Commands::App(input)) => {
-            app::handle(&pcloud_home, input).await;
+            app::handle(&pcloud_home, input).await?;
         }
         Some(Commands::Cron(input)) => {
-            cron::handle(&pcloud_home, input).await;
+            cron::handle(&pcloud_home, input)?;
         }
         Some(Commands::Home) => {
             home::handle(&pcloud_home);
         }
         Some(Commands::Init(input)) => {
-            init::handle(&pcloud_home, input);
+            init::handle(&pcloud_home, input)?;
         }
         Some(Commands::Status(input)) => {
             status::handle(&pcloud_home, input);
         }
         Some(Commands::Run(input)) => {
-            run::handle(&pcloud_home, input);
+            run::handle(&pcloud_home, input).await;
         }
         None => {
             println!("Default subcommand");
