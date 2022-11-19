@@ -23,7 +23,7 @@ pub fn run(path: &Path, _config: &config::Config) -> Result<()> {
     walker.run(|| {
         Box::new(move |result| {
             let entry: ignore::DirEntry = result.unwrap();
-            let meta = entry.metadata().unwrap();
+            let _meta = entry.metadata().unwrap();
             // println!("{}", entry.path().display());
             // println!(" - is_file: {}", meta.is_file());
             // println!(" - modified: {:?}", meta.modified().unwrap());

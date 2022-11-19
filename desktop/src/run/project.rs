@@ -19,7 +19,7 @@ pub fn handle(_home: &Path, path: &Path) -> Result<()> {
         actions::Actions::Backup => {
             let now = chrono::Utc::now();
 
-            actions::backup::run(path, &data)?;
+            actions::backup::run(path, data)?;
 
             // Update last-execution time. We use the timestamp when the process started because files might be modified
             //  while we are running it and after they are synced. We use the `now` we created above!!!
