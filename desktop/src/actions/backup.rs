@@ -1,3 +1,4 @@
+use super::parallel_visitor;
 use crate::errors::SDKErrors;
 use crate::storage::config;
 use crate::storage::ignore_files;
@@ -20,19 +21,24 @@ pub fn run(path: &Path, _config: &config::Config) -> Result<()> {
     // TODO: Figure out how to use `visit` (https://docs.rs/ignore/latest/ignore/struct.WalkParallel.html#method.visit), we can group together
     //  the files in each iterator to work in batches.
 
+    /*
     walker.run(|| {
         Box::new(move |result| {
             let entry: ignore::DirEntry = result.unwrap();
             let _meta = entry.metadata().unwrap();
-            // println!("{}", entry.path().display());
+            println!("{}", entry.path().display());
             // println!(" - is_file: {}", meta.is_file());
             // println!(" - modified: {:?}", meta.modified().unwrap());
             // println!(" - file_type: {:?}", meta.file_type());
             WalkState::Continue
         })
     });
-    Ok(())
-    // Err(anyhow!(SDKErrors::NotImplemented))
+    */
+
+    let mut builder = parallel_visitor::Visitor::new();
+    walker.visit(&mut builder);
+
+    Err(anyhow!(SDKErrors::NotImplemented))
 }
 
 #[allow(dead_code)]

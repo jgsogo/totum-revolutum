@@ -24,8 +24,7 @@ pub fn handle(_home: &Path, path: &Path) -> Result<()> {
             // Update last-execution time. We use the timestamp when the process started because files might be modified
             //  while we are running it and after they are synced. We use the `now` we created above!!!
             data.action.last_executed = Some(now);
-
-            Err(anyhow!(SDKErrors::NotImplemented))
+            Ok(())
         }
         actions::Actions::ZipBackup => Err(anyhow!(SDKErrors::NotImplemented)),
         actions::Actions::Sync => Err(anyhow!(SDKErrors::NotImplemented)),

@@ -1,5 +1,6 @@
 pub mod backup;
 use serde::{Deserialize, Serialize};
+mod parallel_visitor;
 
 /// Describes the action to perform
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
@@ -29,4 +30,15 @@ pub enum OnConflict {
 
     #[default]
     Fail,
+}
+
+/// Describe the action to take after a successful backup or dump. The
+/// original file can be removed or kept.
+/// TODO: This is not taken into account anywhere
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+pub enum AfterSend {
+    Remove,
+
+    #[default]
+    Keep,
 }
