@@ -1,10 +1,10 @@
-use super::basepoint::{BasePointDiffImpl, FileMetadata};
-use tokio::sync::mpsc;
+use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
+
 use tracing::info;
 
 pub struct TwoWaysDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
-    lhs_rx: mpsc::UnboundedReceiver<LHSMetadata>,
-    rhs_rx: mpsc::UnboundedReceiver<RHSMetadata>,
+    lhs_rx: flume::Receiver<LHSMetadata>,
+    rhs_rx: flume::Receiver<RHSMetadata>,
 }
 
 impl<LHSMetadata, RHSMetadata> TwoWaysDiff<LHSMetadata, RHSMetadata>
@@ -17,8 +17,8 @@ where
         BasePointDiffImpl<RHSMetadata>,
         TwoWaysDiff<LHSMetadata, RHSMetadata>,
     ) {
-        let (lhs_tx, lhs_rx) = mpsc::unbounded_channel::<LHSMetadata>();
-        let (rhs_tx, rhs_rx) = mpsc::unbounded_channel::<RHSMetadata>();
+        let (lhs_tx, lhs_rx) = flume::bounded::<LHSMetadata>(MAX_BUFFER);
+        let (rhs_tx, rhs_rx) = flume::bounded::<RHSMetadata>(MAX_BUFFER);
         let lhs = BasePointDiffImpl::<LHSMetadata>::new(lhs_tx);
         let rhs = BasePointDiffImpl::<RHSMetadata>::new(rhs_tx);
 
@@ -30,10 +30,10 @@ where
         info!("Start receiving loop");
         loop {
             tokio::select! {
-                Some(lhs) = self.lhs_rx.recv() => {
+                Ok(lhs) = self.lhs_rx.recv_async() => {
                     info!("LHS received {:?}", lhs);
                 },
-                Some(rhs) = self.rhs_rx.recv() => {
+                Ok(rhs) = self.rhs_rx.recv_async() => {
                     info!("RHS received {:?}", rhs);
                 },
                 else => {

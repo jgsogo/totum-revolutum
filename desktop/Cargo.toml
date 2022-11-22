@@ -30,6 +30,7 @@ anyhow = { version = "1.0" }
 thiserror = "1.0"
 ignore = "0.4"
 async-trait = "0.1"
+flume = "0.10.14"
 
 [dev-dependencies]
 tempfile = "3"

@@ -1,3 +1,5 @@
+pub const MAX_BUFFER: usize = 100;
+
 enum SnapshotStatus {
     ToBeDeleted,
     New,
@@ -14,12 +16,14 @@ pub trait FileMetadata: std::marker::Sync + std::marker::Send + std::fmt::Debug 
     fn hash(&self) -> u64;
 }
 
+/// Deal with the [`FileMetadata`] that is being gathered and sends it to the
+/// differ connected to it.
 pub struct BasePointDiffImpl<T: FileMetadata> {
-    tx: tokio::sync::mpsc::UnboundedSender<T>,
+    tx: flume::Sender<T>,
 }
 
 impl<T: FileMetadata> BasePointDiffImpl<T> {
-    pub fn new(tx: tokio::sync::mpsc::UnboundedSender<T>) -> BasePointDiffImpl<T> {
+    pub fn new(tx: flume::Sender<T>) -> BasePointDiffImpl<T> {
         BasePointDiffImpl::<T> { tx }
     }
 
