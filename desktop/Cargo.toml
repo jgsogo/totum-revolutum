@@ -29,6 +29,7 @@ tokio = { version = "1.21", features = ["full"] }
 anyhow = { version = "1.0" }
 thiserror = "1.0"
 ignore = "0.4"
+async-trait = "0.1"
 
 [dev-dependencies]
 tempfile = "3"

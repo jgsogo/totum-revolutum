@@ -1,11 +1,15 @@
 use super::parallel_visitor;
+use crate::changes;
 use crate::errors::SDKErrors;
 use crate::storage::config;
 use crate::storage::ignore_files;
 use anyhow::{anyhow, Result};
 use ignore::{WalkBuilder, WalkState};
+use std::default;
 use std::path::Path;
 use tracing::info;
+
+use crate::changes::BasePointDiffImpl;
 
 pub fn run(path: &Path, _config: &config::Config) -> Result<()> {
     info!("Run backup action on path '{}'", path.display());
@@ -17,25 +21,12 @@ pub fn run(path: &Path, _config: &config::Config) -> Result<()> {
         .build_parallel();
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
+    let diff = changes::two_ways::TwoWaysDiff::<
+        changes::local::LocalMetadata,
+        changes::local::LocalMetadata,
+    >::new();
 
-    // TODO: Figure out how to use `visit` (https://docs.rs/ignore/latest/ignore/struct.WalkParallel.html#method.visit), we can group together
-    //  the files in each iterator to work in batches.
-
-    /*
-    walker.run(|| {
-        Box::new(move |result| {
-            let entry: ignore::DirEntry = result.unwrap();
-            let _meta = entry.metadata().unwrap();
-            println!("{}", entry.path().display());
-            // println!(" - is_file: {}", meta.is_file());
-            // println!(" - modified: {:?}", meta.modified().unwrap());
-            // println!(" - file_type: {:?}", meta.file_type());
-            WalkState::Continue
-        })
-    });
-    */
-
-    let mut builder = parallel_visitor::Visitor::new();
+    let mut builder = parallel_visitor::VisitorBuilder::new(diff.lhs());
     walker.visit(&mut builder);
 
     Err(anyhow!(SDKErrors::NotImplemented))
