@@ -4,14 +4,11 @@ use crate::errors::SDKErrors;
 use crate::storage::config;
 use crate::storage::ignore_files;
 use anyhow::{anyhow, Result};
-use ignore::{WalkBuilder, WalkState};
-use std::default;
+use ignore::WalkBuilder;
 use std::path::Path;
 use tracing::info;
 
-use crate::changes::BasePointDiffImpl;
-
-pub fn run(path: &Path, _config: &config::Config) -> Result<()> {
+pub async fn run(path: &Path, _config: &config::Config) -> Result<()> {
     info!("Run backup action on path '{}'", path.display());
 
     let walker = WalkBuilder::new(path)
@@ -20,15 +17,38 @@ pub fn run(path: &Path, _config: &config::Config) -> Result<()> {
         .add_custom_ignore_filename(ignore_files::IgnoreFiles::path(path))
         .build_parallel();
 
+    let walker2 = WalkBuilder::new(path)
+        .threads(6)
+        .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
+        .add_custom_ignore_filename(ignore_files::IgnoreFiles::path(path))
+        .build_parallel();
+
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
-    let diff = changes::two_ways::TwoWaysDiff::<
+    let (lhs, rhs, mut report) = changes::two_ways::TwoWaysDiff::<
         changes::local::LocalMetadata,
         changes::local::LocalMetadata,
     >::new();
 
-    let mut builder = parallel_visitor::VisitorBuilder::new(diff.lhs());
-    walker.visit(&mut builder);
+    let wait_lhs = {
+        tokio::spawn(async move {
+            info!("Start LHS visitor");
+            let mut builder = parallel_visitor::VisitorBuilder::new(&lhs);
+            walker.visit(&mut builder);
+        })
+    };
 
+    let wait_rhs = {
+        tokio::spawn(async move {
+            info!("Start RHS visitor");
+            let mut builder = parallel_visitor::VisitorBuilder::new(&rhs);
+            walker2.visit(&mut builder);
+        })
+    };
+
+    report.recv().await;
+
+    wait_lhs.await?;
+    wait_rhs.await?;
     Err(anyhow!(SDKErrors::NotImplemented))
 }
 

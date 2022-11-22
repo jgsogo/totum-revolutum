@@ -1,5 +1,6 @@
 use super::basepoint::FileMetadata;
 
+#[derive(Debug)]
 struct RemoteMetadata {
     path: String,
 }

@@ -3,7 +3,7 @@ use crate::utils::versioned_data::VersionedData;
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, Utc};
 
-use crate::actions::{Actions, OnConflict, AfterSend};
+use crate::actions::{Actions, AfterSend, OnConflict};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 

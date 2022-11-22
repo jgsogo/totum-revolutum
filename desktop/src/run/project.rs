@@ -7,7 +7,7 @@ use tracing::info;
 
 /// Run configured action in the given pcloud-dir. It doesn't take into account
 /// any cron considerations (those are stored at global level)
-pub fn handle(_home: &Path, path: &Path) -> Result<()> {
+pub async fn handle(_home: &Path, path: &Path) -> Result<()> {
     info!("Start project run for path '{}'", path.display());
 
     let config_file_path = storage::config::ConfigFile::path(path);
@@ -19,7 +19,7 @@ pub fn handle(_home: &Path, path: &Path) -> Result<()> {
         actions::Actions::Backup => {
             let now = chrono::Utc::now();
 
-            actions::backup::run(path, data)?;
+            actions::backup::run(path, data).await?;
 
             // Update last-execution time. We use the timestamp when the process started because files might be modified
             //  while we are running it and after they are synced. We use the `now` we created above!!!

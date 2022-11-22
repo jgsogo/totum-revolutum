@@ -1,8 +1,5 @@
-use std::path::PathBuf;
-
 use crate::changes::{BasePointDiffImpl, FileMetadata};
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
-use tracing::info;
 
 pub struct Visitor<'a, T: FileMetadata> {
     diff: &'a BasePointDiffImpl<T>,
@@ -19,10 +16,9 @@ where
 
 impl<'a, T> ParallelVisitor for Visitor<'a, T>
 where
-    T: FileMetadata + std::marker::Send + From<ignore::DirEntry>,
+    T: FileMetadata + From<ignore::DirEntry>,
 {
     fn visit(&mut self, entry: Result<ignore::DirEntry, ignore::Error>) -> ignore::WalkState {
-        // println!("{}", entry.unwrap().path().display());
         let entry = entry.unwrap();
         if entry.file_type().unwrap().is_file() {
             let metadata: T = entry.into();
@@ -56,7 +52,7 @@ where
 
 impl<'s, T> ParallelVisitorBuilder<'s> for VisitorBuilder<'s, T>
 where
-    T: FileMetadata + std::marker::Send + From<ignore::DirEntry>,
+    T: FileMetadata + From<ignore::DirEntry>,
 {
     fn build(&mut self) -> Box<dyn ignore::ParallelVisitor + 's> {
         Box::new(Visitor::new(self.diff))

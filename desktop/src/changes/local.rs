@@ -1,9 +1,10 @@
 use super::basepoint::FileMetadata;
-use chrono::Local;
+
 use ignore::DirEntry;
 use std::convert::From;
 use std::path::PathBuf;
 
+#[derive(Debug)]
 pub struct LocalMetadata {
     path: PathBuf,
 }

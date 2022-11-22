@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use tracing::{debug, info, warn};
 
 async fn run_project(home: PathBuf, path: PathBuf) -> Result<()> {
-    super::project::handle(&home, &path)
+    super::project::handle(&home, &path).await
 }
 
 /// Run configured action for the directories where cron is configured

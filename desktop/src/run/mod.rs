@@ -12,6 +12,6 @@ pub enum RunCommand {
 pub async fn handle(home: &Path, command: RunCommand) -> Result<()> {
     match command {
         RunCommand::Global => global::handle(home).await,
-        RunCommand::Directory(path) => project::handle(home, &path),
+        RunCommand::Directory(path) => project::handle(home, &path).await,
     }
 }
