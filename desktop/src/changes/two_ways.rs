@@ -36,7 +36,10 @@ where
                 Some(rhs) = self.rhs_rx.recv() => {
                     info!("RHS received {:?}", rhs);
                 },
-                else => break,
+                else => {
+                    info!("Finished receiving loop");
+                    break
+                },
             }
         }
     }

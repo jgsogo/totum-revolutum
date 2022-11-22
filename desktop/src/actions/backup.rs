@@ -34,6 +34,7 @@ pub async fn run(path: &Path, _config: &config::Config) -> Result<()> {
             info!("Start LHS visitor");
             let mut builder = parallel_visitor::VisitorBuilder::new(&lhs);
             walker.visit(&mut builder);
+            info!("Finished LHS visitor");
         })
     };
 
@@ -42,6 +43,7 @@ pub async fn run(path: &Path, _config: &config::Config) -> Result<()> {
             info!("Start RHS visitor");
             let mut builder = parallel_visitor::VisitorBuilder::new(&rhs);
             walker2.visit(&mut builder);
+            info!("Finished RHS visitor");
         })
     };
 
