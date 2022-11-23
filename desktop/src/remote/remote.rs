@@ -1,4 +1,4 @@
-use crate::actions::basepoint::FileMetadata;
+use crate::diff::basepoint::FileMetadata;
 
 #[derive(Debug)]
 pub struct RemoteMetadata {

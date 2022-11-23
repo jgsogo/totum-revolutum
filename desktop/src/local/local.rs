@@ -1,4 +1,4 @@
-use crate::actions::basepoint::FileMetadata;
+use crate::diff::basepoint::FileMetadata;
 use ignore::DirEntry;
 use std::path::{Path, PathBuf};
 
