@@ -1,7 +1,6 @@
 pub mod backup;
 use serde::{Deserialize, Serialize};
 
-
 /// Describes the action to perform
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub enum Actions {
