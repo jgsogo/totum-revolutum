@@ -13,7 +13,7 @@ impl FileMetadata for RemoteMetadata {
         32
     }
 
-    fn path(&self) -> &str {
+    fn id(&self) -> &str {
         &self.path
     }
 }

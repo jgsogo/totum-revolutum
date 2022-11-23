@@ -30,24 +30,26 @@ pub async fn run(path: &Path, _config: &config::Config) -> Result<()> {
     >::new();
 
     let wait_lhs = {
+        let path = path.to_path_buf();
         tokio::spawn(async move {
             info!("Start LHS visitor");
-            let mut builder = parallel_visitor::VisitorBuilder::new(&lhs);
+            let mut builder = parallel_visitor::VisitorBuilder::new(&path, &lhs);
             walker.visit(&mut builder);
             info!("Finished LHS visitor");
         })
     };
 
     let wait_rhs = {
+        let path = path.to_path_buf();
         tokio::spawn(async move {
             info!("Start RHS visitor");
-            let mut builder = parallel_visitor::VisitorBuilder::new(&rhs);
+            let mut builder = parallel_visitor::VisitorBuilder::new(&path, &rhs);
             walker2.visit(&mut builder);
             info!("Finished RHS visitor");
         })
     };
 
-    report.recv().await;
+    report.report().await;
 
     wait_lhs.await?;
     wait_rhs.await?;

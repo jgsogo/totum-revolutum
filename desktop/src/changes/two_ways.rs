@@ -1,10 +1,35 @@
+use std::collections::{hash_map::Entry, HashMap};
+
 use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
 
-use tracing::info;
+use tracing::{debug, info};
+
+struct FileDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
+    pub lhs_metadata: Option<LHSMetadata>,
+    pub rhs_metadata: Option<RHSMetadata>,
+}
+
+impl<LHSMetadata, RHSMetadata> FileDiff<LHSMetadata, RHSMetadata>
+where
+    LHSMetadata: FileMetadata,
+    RHSMetadata: FileMetadata,
+{
+    pub fn new(
+        lhs: Option<LHSMetadata>,
+        rhs: Option<RHSMetadata>,
+    ) -> FileDiff<LHSMetadata, RHSMetadata> {
+        FileDiff::<LHSMetadata, RHSMetadata> {
+            lhs_metadata: lhs,
+            rhs_metadata: rhs,
+        }
+    }
+}
 
 pub struct TwoWaysDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
     lhs_rx: flume::Receiver<LHSMetadata>,
     rhs_rx: flume::Receiver<RHSMetadata>,
+
+    files: HashMap<String, FileDiff<LHSMetadata, RHSMetadata>>,
 }
 
 impl<LHSMetadata, RHSMetadata> TwoWaysDiff<LHSMetadata, RHSMetadata>
@@ -22,7 +47,11 @@ where
         let lhs = BasePointDiffImpl::<LHSMetadata>::new(lhs_tx);
         let rhs = BasePointDiffImpl::<RHSMetadata>::new(rhs_tx);
 
-        let report = TwoWaysDiff::<LHSMetadata, RHSMetadata> { lhs_rx, rhs_rx };
+        let report = TwoWaysDiff::<LHSMetadata, RHSMetadata> {
+            lhs_rx,
+            rhs_rx,
+            files: HashMap::default(),
+        };
         (lhs, rhs, report)
     }
 
@@ -31,16 +60,52 @@ where
         loop {
             tokio::select! {
                 Ok(lhs) = self.lhs_rx.recv_async() => {
-                    info!("LHS received {:?}", lhs);
+                    debug!("LHS received {:?}", lhs);
+                    match self.files.entry(lhs.id().to_string()) {
+                        Entry::Occupied(o) => {
+                            o.into_mut().lhs_metadata = Some(lhs);
+                        },
+                        Entry::Vacant(v) => {
+                            v.insert(FileDiff::<LHSMetadata, RHSMetadata>::new(Some(lhs), None));
+                        },
+                    };
                 },
                 Ok(rhs) = self.rhs_rx.recv_async() => {
-                    info!("RHS received {:?}", rhs);
+                    debug!("RHS received {:?}", rhs);
+                    match self.files.entry(rhs.id().to_string()) {
+                        Entry::Occupied(o) => {
+                            o.into_mut().rhs_metadata = Some(rhs);
+                        },
+                        Entry::Vacant(v) => {
+                            v.insert(FileDiff::<LHSMetadata, RHSMetadata>::new(None, Some(rhs)));
+                        },
+                    };
                 },
                 else => {
                     info!("Finished receiving loop");
                     break
                 },
             }
+        }
+    }
+
+    pub async fn report(&mut self) {
+        self.recv().await;
+
+        println!("We have {} entries", self.files.len());
+        for (key, value) in self.files.iter() {
+            println!(
+                "{} | {} / {}",
+                key,
+                value
+                    .lhs_metadata
+                    .as_ref()
+                    .map_or("-".into(), |v| v.size().to_string()),
+                value
+                    .rhs_metadata
+                    .as_ref()
+                    .map_or("-".into(), |v| v.size().to_string())
+            );
         }
     }
 }

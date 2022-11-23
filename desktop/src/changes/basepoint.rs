@@ -11,7 +11,8 @@ enum SnapshotStatus {
 /// is not already available or it is preferred to compute it on-demand (computing
 /// hash can take some time)
 pub trait FileMetadata: std::marker::Sync + std::marker::Send + std::fmt::Debug {
-    fn path(&self) -> &str;
+    /// Shared identifier for the file
+    fn id(&self) -> &str;
     fn size(&self) -> i64;
     fn hash(&self) -> u64;
 }
