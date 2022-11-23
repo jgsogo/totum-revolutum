@@ -118,19 +118,11 @@ where
                 _ => panic!("Not expected"),
             };
 
-            println!(
-                "{:?} | {} | {} / {}",
-                status,
-                key,
-                value
-                    .lhs_metadata
-                    .as_ref()
-                    .map_or("-".into(), |v| v.size().to_string()),
-                value
-                    .rhs_metadata
-                    .as_ref()
-                    .map_or("-".into(), |v| v.size().to_string())
-            );
+            debug!("{:?} | {}", status, key);
+            match status {
+                SnapshotStatus::Idle => (),
+                e => println!("{:?} | {}", e, key),
+            }
         }
         Ok(())
     }
