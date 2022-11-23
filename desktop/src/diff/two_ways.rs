@@ -1,6 +1,6 @@
 use std::collections::{hash_map::Entry, HashMap};
 
-use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
+use super::basepoint::{BasePointDiffImpl, FileMetadata, SnapshotStatus, MAX_BUFFER};
 
 use anyhow::Result;
 use tracing::{debug, info};
@@ -96,8 +96,31 @@ where
 
         println!("We have {} entries", self.files.len());
         for (key, value) in self.files.iter() {
+            let status = match value {
+                FileDiff {
+                    lhs_metadata: Some(lhs_metadata),
+                    rhs_metadata: Some(rhs_metadata),
+                } => {
+                    if lhs_metadata.eq(rhs_metadata) {
+                        SnapshotStatus::Idle
+                    } else {
+                        SnapshotStatus::Modified
+                    }
+                }
+                FileDiff {
+                    lhs_metadata: Some(_),
+                    ..
+                } => SnapshotStatus::ToBeDeleted,
+                FileDiff {
+                    rhs_metadata: Some(_),
+                    ..
+                } => SnapshotStatus::New,
+                _ => panic!("Not expected"),
+            };
+
             println!(
-                "{} | {} / {}",
+                "{:?} | {} | {} / {}",
+                status,
                 key,
                 value
                     .lhs_metadata
