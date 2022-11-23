@@ -1,3 +1,3 @@
-mod remote;
+mod file_metadata;
 
-pub use remote::RemoteMetadata;
+pub use file_metadata::RemoteMetadata;

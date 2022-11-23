@@ -1,4 +1,4 @@
-use super::local::LocalFileMetadata;
+use super::file_metadata::LocalFileMetadata;
 use crate::diff::basepoint::BasePointDiffImpl;
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 

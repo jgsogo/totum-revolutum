@@ -1,9 +1,8 @@
 use crate::diff;
-use crate::errors::SDKErrors;
 use crate::local;
 use crate::storage::config;
 use crate::storage::ignore_files;
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use ignore::WalkBuilder;
 use std::path::Path;
 use tracing::info;
@@ -25,8 +24,8 @@ pub async fn run(path: &Path, _config: &config::Config) -> Result<()> {
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
     let (lhs, rhs, mut report) = diff::two_ways::TwoWaysDiff::<
-        local::local::LocalMetadata,
-        local::local::LocalMetadata,
+        local::file_metadata::LocalMetadata,
+        local::file_metadata::LocalMetadata,
     >::new();
 
     let wait_lhs = {
