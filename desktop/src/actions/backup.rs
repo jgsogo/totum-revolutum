@@ -1,6 +1,6 @@
-use super::parallel_visitor;
-use crate::changes;
+use crate::diff;
 use crate::errors::SDKErrors;
+use crate::local;
 use crate::storage::config;
 use crate::storage::ignore_files;
 use anyhow::{anyhow, Result};
@@ -24,16 +24,16 @@ pub async fn run(path: &Path, _config: &config::Config) -> Result<()> {
         .build_parallel();
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
-    let (lhs, rhs, mut report) = changes::two_ways::TwoWaysDiff::<
-        changes::local::LocalMetadata,
-        changes::local::LocalMetadata,
+    let (lhs, rhs, mut report) = diff::two_ways::TwoWaysDiff::<
+        local::local::LocalMetadata,
+        local::local::LocalMetadata,
     >::new();
 
     let wait_lhs = {
         let path = path.to_path_buf();
         tokio::spawn(async move {
             info!("Start LHS visitor");
-            let mut builder = parallel_visitor::VisitorBuilder::new(&path, &lhs);
+            let mut builder = local::parallel_visitor::VisitorBuilder::new(&path, &lhs);
             walker.visit(&mut builder);
             info!("Finished LHS visitor");
         })
@@ -43,7 +43,7 @@ pub async fn run(path: &Path, _config: &config::Config) -> Result<()> {
         let path = path.to_path_buf();
         tokio::spawn(async move {
             info!("Start RHS visitor");
-            let mut builder = parallel_visitor::VisitorBuilder::new(&path, &rhs);
+            let mut builder = local::parallel_visitor::VisitorBuilder::new(&path, &rhs);
             walker2.visit(&mut builder);
             info!("Finished RHS visitor");
         })
