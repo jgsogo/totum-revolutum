@@ -6,6 +6,11 @@ use pcloud_sdk_desktop::storage::is_pcloud_dir;
 use pcloud_sdk_desktop::utils::to_absolute_path;
 use std::env;
 
+pub fn current_wdir() -> PathBuf {
+    let current_wdir = env::current_dir().expect("Cannot return current dir");
+    to_absolute_path(&current_wdir)
+}
+
 #[derive(Args, Debug)]
 pub struct DirectoryArg {
     /// Directory to an existing pcloud configured project
@@ -20,10 +25,7 @@ impl DirectoryArg {
     pub fn get_working_dir_from_directory_param(&self) -> PathBuf {
         match self.get_directory_param_abs() {
             Some(d) => d,
-            None => {
-                let current_wdir = env::current_dir().expect("Cannot return current dir");
-                to_absolute_path(&current_wdir)
-            }
+            None => current_wdir(),
         }
     }
 

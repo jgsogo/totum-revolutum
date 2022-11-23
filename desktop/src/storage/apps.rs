@@ -89,7 +89,7 @@ mod tests {
         let path = AppsFile::path(tmp_dir.path());
 
         {
-            let mut apps_lock = AppsFile::write(&path);
+            let mut apps_lock = AppsFile::write(&path).unwrap();
             let apps = &mut apps_lock.content.data.apps;
             apps.push(data::app::App::new("name", "client_id", "client_secret"))
         }

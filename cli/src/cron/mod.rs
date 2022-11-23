@@ -1,8 +1,8 @@
 pub mod add;
 pub mod list;
-use std::path::Path;
-
+use anyhow::Result;
 use clap::Subcommand;
+use std::path::Path;
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -13,13 +13,14 @@ pub enum Commands {
     Add(add::AddParams),
 }
 
-pub async fn handle(home: &Path, input: &Commands) {
+pub fn handle(home: &Path, input: &Commands) -> Result<()> {
     match &input {
         Commands::List => {
             list::handle(home);
         }
         Commands::Add(input) => {
-            add::handle(home, input);
+            add::handle(home, input)?;
         }
-    }
+    };
+    Ok(())
 }

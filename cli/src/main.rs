@@ -7,6 +7,9 @@ mod status;
 use tracing::debug;
 mod common;
 mod output;
+mod run;
+use anyhow::Result;
+mod errors;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -16,7 +19,7 @@ struct Cli {
     verbose: clap_verbosity_flag::Verbosity,
 
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Commands,
 }
 
 #[derive(Subcommand)]
@@ -37,6 +40,9 @@ enum Commands {
 
     /// Print home folder
     Home,
+
+    /// Run syncronization
+    Run(run::RunParams),
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -51,7 +57,7 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     // Configure tracing
@@ -64,25 +70,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     // Go ahead!
     let pcloud_home = home::pcloud_home();
     match &cli.command {
-        Some(Commands::App(input)) => {
-            app::handle(&pcloud_home, input).await;
-        }
-        Some(Commands::Cron(input)) => {
-            cron::handle(&pcloud_home, input).await;
-        }
-        Some(Commands::Home) => {
-            home::handle(&pcloud_home);
-        }
-        Some(Commands::Init(input)) => {
-            init::handle(&pcloud_home, input);
-        }
-        Some(Commands::Status(input)) => {
-            status::handle(&pcloud_home, input);
-        }
-        None => {
-            println!("Default subcommand");
-        }
+        Commands::App(input) => app::handle(&pcloud_home, input).await,
+        Commands::Cron(input) => cron::handle(&pcloud_home, input),
+        Commands::Home => home::handle(&pcloud_home),
+        Commands::Init(input) => init::handle(&pcloud_home, input),
+        Commands::Status(input) => status::handle(&pcloud_home, input),
+        Commands::Run(input) => run::handle(&pcloud_home, input).await,
     }
-
-    Ok(())
 }
