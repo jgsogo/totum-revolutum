@@ -1,6 +1,6 @@
 use crate::diff::basepoint::FileMetadata;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RemoteMetadata {
     path: String,
 }

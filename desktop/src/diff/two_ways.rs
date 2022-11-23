@@ -2,6 +2,7 @@ use std::collections::{hash_map::Entry, HashMap};
 
 use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
 
+use anyhow::Result;
 use tracing::{debug, info};
 
 struct FileDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
@@ -55,7 +56,7 @@ where
         (lhs, rhs, report)
     }
 
-    pub async fn recv(&mut self) {
+    pub async fn recv(&mut self) -> Result<()> {
         info!("Start receiving loop");
         loop {
             tokio::select! {
@@ -87,10 +88,11 @@ where
                 },
             }
         }
+        Ok(())
     }
 
-    pub async fn report(&mut self) {
-        self.recv().await;
+    pub async fn report(&mut self) -> Result<()> {
+        self.recv().await?;
 
         println!("We have {} entries", self.files.len());
         for (key, value) in self.files.iter() {
@@ -107,5 +109,6 @@ where
                     .map_or("-".into(), |v| v.size().to_string())
             );
         }
+        Ok(())
     }
 }

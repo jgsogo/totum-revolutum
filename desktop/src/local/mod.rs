@@ -1,2 +1,36 @@
-pub mod file_metadata;
-pub mod parallel_visitor;
+mod file_metadata;
+mod parallel_visitor;
+use super::diff::basepoint::BasePointDiffImpl;
+use super::storage::ignore_files;
+
+use anyhow::Result;
+
+use ignore::WalkBuilder;
+use std::path::Path;
+use tracing::info;
+
+pub use file_metadata::LocalMetadata;
+
+pub async fn walk_local_directory(
+    path: &Path,
+    threads: usize,
+    diff: BasePointDiffImpl<file_metadata::LocalMetadata>,
+) -> Result<()> {
+    let walker = WalkBuilder::new(path)
+        .threads(threads)
+        .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
+        .add_custom_ignore_filename(ignore_files::IgnoreFiles::path(path))
+        .build_parallel();
+
+    let wait_lhs = {
+        let path = path.to_path_buf();
+        tokio::spawn(async move {
+            info!("Start LHS visitor");
+            let mut builder = parallel_visitor::VisitorBuilder::new(&path, diff);
+            walker.visit(&mut builder);
+            info!("Finished LHS visitor");
+        })
+    };
+    wait_lhs.await?;
+    Ok(())
+}

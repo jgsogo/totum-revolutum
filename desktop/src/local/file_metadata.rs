@@ -8,7 +8,7 @@ pub trait LocalFileMetadata: FileMetadata {
     fn path(&self) -> &Path;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LocalMetadata {
     id: String,
     path: PathBuf,

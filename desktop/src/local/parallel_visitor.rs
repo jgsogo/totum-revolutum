@@ -2,24 +2,24 @@ use super::file_metadata::LocalFileMetadata;
 use crate::diff::basepoint::BasePointDiffImpl;
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 
-pub struct Visitor<'a, T: LocalFileMetadata> {
+pub struct Visitor<T: LocalFileMetadata> {
     base_path: std::path::PathBuf,
-    diff: &'a BasePointDiffImpl<T>,
+    diff: BasePointDiffImpl<T>,
 }
 
-impl<'a, T> Visitor<'a, T>
+impl<T> Visitor<T>
 where
     T: LocalFileMetadata,
 {
-    pub fn new(base_path: &std::path::Path, diff: &'a BasePointDiffImpl<T>) -> Visitor<'a, T> {
-        Visitor::<'a, T> {
+    pub fn new(base_path: &std::path::Path, diff: BasePointDiffImpl<T>) -> Visitor<T> {
+        Visitor::<T> {
             diff,
             base_path: base_path.to_path_buf(),
         }
     }
 }
 
-impl<'a, T> ParallelVisitor for Visitor<'a, T>
+impl<T> ParallelVisitor for Visitor<T>
 where
     T: LocalFileMetadata,
 {
@@ -42,19 +42,16 @@ where
 //     }
 // }
 
-pub struct VisitorBuilder<'a, T: LocalFileMetadata> {
+pub struct VisitorBuilder<T: LocalFileMetadata> {
     base_path: std::path::PathBuf,
-    diff: &'a BasePointDiffImpl<T>,
+    diff: BasePointDiffImpl<T>,
 }
 
-impl<'a, T> VisitorBuilder<'a, T>
+impl<T> VisitorBuilder<T>
 where
     T: LocalFileMetadata,
 {
-    pub fn new(
-        base_path: &std::path::Path,
-        diff: &'a BasePointDiffImpl<T>,
-    ) -> VisitorBuilder<'a, T> {
+    pub fn new(base_path: &std::path::Path, diff: BasePointDiffImpl<T>) -> VisitorBuilder<T> {
         VisitorBuilder {
             diff,
             base_path: base_path.to_path_buf(),
@@ -62,11 +59,11 @@ where
     }
 }
 
-impl<'s, T> ParallelVisitorBuilder<'s> for VisitorBuilder<'s, T>
+impl<'s, T> ParallelVisitorBuilder<'s> for VisitorBuilder<T>
 where
-    T: LocalFileMetadata,
+    T: LocalFileMetadata + 's,
 {
     fn build(&mut self) -> Box<dyn ignore::ParallelVisitor + 's> {
-        Box::new(Visitor::new(&self.base_path, self.diff))
+        Box::new(Visitor::new(&self.base_path, self.diff.clone()))
     }
 }
