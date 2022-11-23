@@ -1,6 +1,7 @@
 pub mod backup;
 use serde::{Deserialize, Serialize};
 mod parallel_visitor;
+pub mod basepoint;
 
 /// Describes the action to perform
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]

@@ -1,7 +1,7 @@
-use super::basepoint::FileMetadata;
+use crate::actions::basepoint::FileMetadata;
 
 #[derive(Debug)]
-struct RemoteMetadata {
+pub struct RemoteMetadata {
     path: String,
 }
 

@@ -1,6 +1,6 @@
 use std::collections::{hash_map::Entry, HashMap};
 
-use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
+use crate::actions::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
 
 use tracing::{debug, info};
 
