@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 use super::data;
 use crate::methods::oauth2;
 use crate::utils::http;
+use anyhow::Result;
 use async_trait::async_trait;
 use reqwest;
 use serde::de::DeserializeOwned;
@@ -14,11 +15,7 @@ pub trait Client: Clone {
     fn access_token(&self) -> String;
     fn http_client(&self) -> reqwest::Client;
 
-    async fn get<T>(
-        &self,
-        url: &str,
-        mut params: HashMap<String, String>,
-    ) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
+    async fn get<T>(&self, url: &str, mut params: HashMap<String, String>) -> Result<T>
     where
         T: DeserializeOwned,
     {
@@ -31,7 +28,7 @@ pub trait Client: Clone {
         url: &str,
         mut params: HashMap<String, String>,
         data: Vec<u8>,
-    ) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
+    ) -> Result<T>
     where
         T: DeserializeOwned,
     {
@@ -57,7 +54,7 @@ impl HttpClient {
     pub async fn authorize(
         app: data::app_client_data::AppClientData,
         address: SocketAddr,
-    ) -> Result<HttpClient, Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<HttpClient> {
         let client = reqwest::Client::new();
         let oauth2 = oauth2::authorize_oauth2(client.clone(), app, address).await?;
         Ok(HttpClient {

@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::structures::Metadata;
 use crate::{client, utils};
+use anyhow::Result;
 
 #[derive(Debug, Clone)]
 pub struct UploadFileParams {
@@ -61,7 +62,7 @@ pub trait PostUploadFile: client::Client {
         &self,
         local_filename: &str,
         upload_params: UploadFileParams,
-    ) -> Result<UploadFile, Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<UploadFile> {
         let url = format!("https://{}/uploadfile", self.hostname());
         let mut params = HashMap::new();
         params.insert("filename".to_string(), upload_params.filename.clone());
@@ -75,8 +76,7 @@ pub trait PostUploadFile: client::Client {
             params.insert("progresshash".to_string(), progresshash);
         }
 
-        let data =
-            utils::http::file_data(local_filename.to_string(), &upload_params.filename).unwrap();
+        let data = utils::http::file_data(local_filename.to_string(), &upload_params.filename)?;
         // TODO: This should do some streaming (with progress bar). Probably different method to upload several files
         let ret = self.post::<UploadFile>(&url, params, data).await?;
         Ok(ret)

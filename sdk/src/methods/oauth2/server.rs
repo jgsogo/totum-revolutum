@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 
+use anyhow::Result;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request, Response, Server, StatusCode};
 use reqwest;
@@ -35,7 +36,7 @@ async fn dispatcher(
     http_client: reqwest::Client,
     req: Request<Body>,
     data: Arc<Mutex<AppContext>>,
-) -> Result<Response<Body>, Box<dyn std::error::Error + Send + Sync>> {
+) -> Result<Response<Body>> {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/") => Ok(Response::new(Body::from("Hello /"))),
         (&Method::GET, CALLBACK_ENDPOINT) => {
@@ -92,7 +93,7 @@ pub(crate) async fn serve(
     http_client: reqwest::Client,
     app: AppClientData,
     addr: SocketAddr,
-) -> Result<OAuth2Token, Box<dyn std::error::Error + Send + Sync>> {
+) -> Result<OAuth2Token> {
     let (tx, rx) = tokio::sync::oneshot::channel::<()>();
     let visit_url = visit_url(&app, format!("http://{addr}{CALLBACK_ENDPOINT}"));
     let app_context = Arc::new(Mutex::new(AppContext::new(app, tx)));

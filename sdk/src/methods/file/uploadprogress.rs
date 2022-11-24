@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::structures::Metadata;
+use anyhow::Result;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadProgressData {
@@ -17,10 +18,7 @@ pub struct UploadProgressData {
 
 #[async_trait]
 pub trait UploadProgress: client::Client {
-    async fn uploadprogress(
-        &self,
-        progresshash: &str,
-    ) -> Result<UploadProgressData, Box<dyn std::error::Error + Send + Sync>> {
+    async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData> {
         let url = format!("https://{}/uploadprogress", self.hostname());
         let mut params = HashMap::new();
         params.insert("progresshash".to_string(), progresshash.to_string());
