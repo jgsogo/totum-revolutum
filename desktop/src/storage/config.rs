@@ -3,11 +3,12 @@ use crate::utils::versioned_data::VersionedData;
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, Utc};
 
+use super::apps;
+use super::INSIDE_PROJECT_DIRECTORY;
 use crate::actions::{Actions, AfterSend, OnConflict};
+use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
-
-use super::INSIDE_PROJECT_DIRECTORY;
 
 const FILENAME: &str = "config";
 
@@ -15,14 +16,29 @@ const FILENAME: &str = "config";
 pub struct ConfigAuth {
     pub client_id: String,
     pub userid: i32,
+    /// Path inside the remote application root path
+    pub remote_path: Option<String>,
 }
 
 impl ConfigAuth {
-    pub fn new(client_id: &str, userid: i32) -> Self {
+    pub fn new(client_id: &str, userid: i32, remote_path: Option<String>) -> Self {
         Self {
             client_id: client_id.to_string(),
             userid,
+            remote_path,
         }
+    }
+
+    pub fn get_pcloud_client(&self, home: &Path) -> Result<pcloud_sdk::client::HttpClient> {
+        // TODO: This is probably not the place for this function
+        let apps_file_path = apps::AppsFile::path(home);
+        let lock = apps::AppsFile::read(&apps_file_path);
+        if let Ok(found) = lock.content.find(&self.client_id) {
+            if let Ok(token) = found.find_token(self.userid) {
+                return Ok(pcloud_sdk::client::HttpClient::new(token.clone()));
+            }
+        }
+        Err(anyhow!("Cannot find pcloud client for the given config"))
     }
 }
 
@@ -35,20 +51,31 @@ pub struct ConfigAction {
     pub last_executed: Option<DateTime<Utc>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {
     pub auth: ConfigAuth,
     pub action: ConfigAction,
+
+    #[serde(skip)]
+    pub pcloud: Option<pcloud_sdk::client::HttpClient>,
 }
 
 impl Config {
-    pub fn new(client_id: &str, userid: i32) -> Self {
+    pub fn new(client_id: &str, userid: i32, remote_path: Option<String>) -> Self {
         Self {
-            auth: ConfigAuth::new(client_id, userid),
+            auth: ConfigAuth::new(client_id, userid, remote_path),
             ..Default::default()
         }
     }
 }
+
+impl PartialEq for Config {
+    fn eq(&self, other: &Self) -> bool {
+        self.auth == other.auth && self.action == other.action
+    }
+}
+
+impl Eq for Config {}
 
 pub type ConfigFileContent = VersionedData<Config>;
 pub type ConfigFile = LockedFile<ConfigFileContent>;
@@ -56,6 +83,35 @@ pub type ConfigFile = LockedFile<ConfigFileContent>;
 impl ConfigFile {
     pub fn path(home: &Path) -> PathBuf {
         home.join(INSIDE_PROJECT_DIRECTORY).join(FILENAME)
+    }
+
+    pub fn read_with_pcloud_client(home: &Path, path: &Path) -> Result<ConfigFile> {
+        let mut config = ConfigFile::read(path);
+        config
+            .content
+            .data
+            .auth
+            .get_pcloud_client(home)
+            .map(|pcloud| {
+                config.content.data.pcloud = Some(pcloud);
+                config
+            })
+    }
+
+    pub fn write_with_pcloud_client(home: &Path, path: &Path) -> Result<ConfigFile> {
+        let config = ConfigFile::write(path);
+        match config {
+            Ok(mut config) => config
+                .content
+                .data
+                .auth
+                .get_pcloud_client(home)
+                .map(|pcloud| {
+                    config.content.data.pcloud = Some(pcloud);
+                    config
+                }),
+            Err(e) => Err(e),
+        }
     }
 }
 

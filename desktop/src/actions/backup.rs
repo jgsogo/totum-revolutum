@@ -1,21 +1,22 @@
 use crate::diff;
 use crate::local;
+use crate::remote;
 use crate::storage::config;
 use anyhow::Result;
 
 use std::path::Path;
 use tracing::{error, info};
 
-pub async fn run(path: &Path, _config: &config::Config) -> Result<()> {
+pub async fn run(path: &Path, config: &config::Config) -> Result<()> {
     info!("Run backup action on path '{}'", path.display());
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
     let (lhs, rhs, mut report) =
-        diff::two_ways::TwoWaysDiff::<local::LocalMetadata, local::LocalMetadata>::new();
+        diff::two_ways::TwoWaysDiff::<local::LocalMetadata, remote::RemoteMetadata>::new();
 
     let res = tokio::try_join!(
         local::walk_local_directory(path, 6, lhs),
-        local::walk_local_directory(path, 6, rhs),
+        remote::walk_remote_directory(config, 6, rhs),
         report.recv(),
     );
 

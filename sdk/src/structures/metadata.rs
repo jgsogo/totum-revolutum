@@ -16,18 +16,18 @@ pub struct CommonMetadata {
     created: OffsetDateTime,
     #[serde(with = "time::serde::rfc2822::option")]
     modified: Option<OffsetDateTime>,
-    path: Option<String>,
+    pub path: Option<String>,
     thumb: bool,
-    isfolder: bool,
+    pub isfolder: bool,
     isshared: bool,
     ismine: bool,
-    name: String,
+    pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Metadata {
     #[serde(flatten)]
-    common: CommonMetadata,
+    pub common: CommonMetadata,
     parentfolderid: Option<FolderID>,
 
     canread: Option<bool>,
@@ -35,10 +35,10 @@ pub struct Metadata {
     candelete: Option<bool>,
 
     pub folderid: Option<FolderID>,
-    fileid: Option<FileID>,
+    pub fileid: Option<FileID>,
     deletedfileid: Option<FileID>,
     category: Option<Category>,
-    contents: Option<Vec<Metadata>>,
+    pub contents: Option<Vec<Metadata>>,
     isdeleted: Option<bool>,
 
     // only for folders

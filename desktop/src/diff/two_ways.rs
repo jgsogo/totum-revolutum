@@ -110,11 +110,11 @@ where
                 FileDiff {
                     lhs_metadata: Some(_),
                     ..
-                } => SnapshotStatus::ToBeDeleted,
+                } => SnapshotStatus::New,
                 FileDiff {
                     rhs_metadata: Some(_),
                     ..
-                } => SnapshotStatus::New,
+                } => SnapshotStatus::ToBeDeleted,
                 _ => panic!("Not expected"),
             };
 
