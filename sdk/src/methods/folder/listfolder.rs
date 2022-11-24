@@ -26,7 +26,7 @@ pub struct ListFolderInput {
 impl ListFolderInput {
     pub fn new_from_path(path: Option<String>) -> ListFolderInput {
         ListFolderInput {
-            path: Some(path.unwrap_or("/".to_string())),
+            path: Some(path.unwrap_or_else(|| "/".to_string())),
             ..Default::default()
         }
     }

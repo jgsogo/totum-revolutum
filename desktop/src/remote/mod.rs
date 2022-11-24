@@ -1,10 +1,6 @@
 mod file_metadata;
 
-use crate::{
-    diff::basepoint::BasePointDiffImpl,
-    storage::config,
-    storage::{self, apps},
-};
+use crate::{diff::basepoint::BasePointDiffImpl, storage::config};
 use anyhow::Result;
 pub use file_metadata::RemoteMetadata;
 use pcloud_sdk::{
@@ -14,8 +10,8 @@ use pcloud_sdk::{
 
 pub async fn walk_remote_directory(
     config: &config::Config,
-    threads: usize,
-    diff: BasePointDiffImpl<file_metadata::RemoteMetadata>,
+    _threads: usize,
+    _diff: BasePointDiffImpl<file_metadata::RemoteMetadata>,
 ) -> Result<()> {
     let pcloud = config.pcloud.as_ref().unwrap();
 
