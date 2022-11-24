@@ -1,8 +1,9 @@
+use std::path::Path;
+
 use clap::Args;
+use tracing::debug;
 
 use pcloud_sdk_desktop::storage;
-use std::path::Path;
-use tracing::debug;
 
 #[derive(Args, Debug)]
 pub struct ListParams {

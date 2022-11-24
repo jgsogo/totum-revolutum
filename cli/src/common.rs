@@ -1,10 +1,10 @@
-use clap::Args;
-
+use std::env;
 use std::path::PathBuf;
+
+use clap::Args;
 
 use pcloud_sdk_desktop::storage::is_pcloud_dir;
 use pcloud_sdk_desktop::utils::to_absolute_path;
-use std::env;
 
 pub fn current_wdir() -> PathBuf {
     let current_wdir = env::current_dir().expect("Cannot return current dir");

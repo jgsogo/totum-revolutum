@@ -1,13 +1,15 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
 
-use super::data;
-use crate::methods::oauth2;
-use crate::utils::http;
 use anyhow::Result;
 use async_trait::async_trait;
 use reqwest;
 use serde::de::DeserializeOwned;
+
+use crate::methods::oauth2;
+use crate::utils::http;
+
+use super::data;
 
 #[async_trait]
 pub trait Client: Clone {

@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
+use anyhow::Result;
+use reqwest;
+
 use crate::data;
 use crate::data::app_client_data::AppClientData;
 use crate::utils;
-use anyhow::Result;
-use reqwest;
 
 pub(crate) async fn exchange_oauth2_token(
     http_client: reqwest::Client,

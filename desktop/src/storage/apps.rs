@@ -1,11 +1,15 @@
-use crate::utils::mut_find_or_insert;
+use std::path::{Path, PathBuf};
+
+use serde::{Deserialize, Serialize};
+
+use pcloud_sdk::data;
+
 use crate::utils::{
     locked_file::{LockedFile, ReadWrite},
     versioned_data::VersionedData,
 };
-use pcloud_sdk::data;
-use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
+use crate::utils::mut_find_or_insert;
+
 const FILENAME: &str = "apps.yaml";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
@@ -60,8 +64,9 @@ impl ReadWrite<AppsFileContent> for AppsFileContent {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use tempfile::tempdir;
+
+    use super::*;
 
     #[test]
     fn test_path() {

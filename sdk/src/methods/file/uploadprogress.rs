@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::structures::Metadata;
-use anyhow::Result;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadProgressData {

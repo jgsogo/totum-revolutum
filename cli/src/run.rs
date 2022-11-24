@@ -1,15 +1,15 @@
+use std::path::Path;
+
+use anyhow::{bail, Result};
 use clap::Args;
+use tracing::debug;
 
 use pcloud_sdk_desktop::run;
 use pcloud_sdk_desktop::storage::is_pcloud_dir;
 
-use crate::errors::CLIErrors;
-use anyhow::{bail, Result};
-use std::path::Path;
-use tracing::debug;
-
 use crate::common::current_wdir;
 use crate::common::DirectoryArg;
+use crate::errors::CLIErrors;
 
 // TODO: Args 'userid' and 'auth' are mutually exclusive, but one of them is always required
 

@@ -1,7 +1,7 @@
+use std::{env, thread};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::time::Duration;
-use std::{env, thread};
 
 use futures_util::FutureExt;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};

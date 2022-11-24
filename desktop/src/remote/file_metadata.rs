@@ -6,14 +6,14 @@ pub struct RemoteMetadata {
 }
 
 impl FileMetadata for RemoteMetadata {
+    fn id(&self) -> &str {
+        &self.path
+    }
     fn size(&self) -> u64 {
         32
     }
+
     fn hash(&self) -> String {
         "32".into()
-    }
-
-    fn id(&self) -> &str {
-        &self.path
     }
 }

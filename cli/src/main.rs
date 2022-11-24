@@ -1,14 +1,15 @@
+use anyhow::Result;
 use clap::{Parser, Subcommand};
+use tracing::debug;
+
 mod app;
 mod cron;
 mod home;
 mod init;
 mod status;
-use tracing::debug;
 mod common;
 mod output;
 mod run;
-use anyhow::Result;
 mod errors;
 
 #[derive(Parser)]

@@ -1,14 +1,16 @@
+use std::path::{Path, PathBuf};
+
+use anyhow::{anyhow, Result};
+use chrono::{DateTime, Utc};
+use chrono::serde::ts_seconds_option;
+use serde::{Deserialize, Serialize};
+
+use crate::actions::{Actions, AfterSend, OnConflict};
 use crate::utils::locked_file::{LockedFile, ReadWrite};
 use crate::utils::versioned_data::VersionedData;
-use chrono::serde::ts_seconds_option;
-use chrono::{DateTime, Utc};
 
 use super::apps;
 use super::INSIDE_PROJECT_DIRECTORY;
-use crate::actions::{Actions, AfterSend, OnConflict};
-use anyhow::{anyhow, Result};
-use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
 
 const FILENAME: &str = "config";
 

@@ -1,9 +1,9 @@
 use std::collections::{hash_map::Entry, HashMap};
 
-use super::basepoint::{BasePointDiffImpl, FileMetadata, SnapshotStatus, MAX_BUFFER};
-
 use anyhow::Result;
 use tracing::{debug, info};
+
+use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER, SnapshotStatus};
 
 struct FileDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
     pub lhs_metadata: Option<LHSMetadata>,

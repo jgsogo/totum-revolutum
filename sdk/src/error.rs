@@ -1,5 +1,3 @@
-// error1.rs
-
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug, thiserror::Error)]
