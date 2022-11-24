@@ -1,6 +1,8 @@
-use crate::diff::basepoint::FileMetadata;
-use ignore::DirEntry;
 use std::path::Path;
+
+use ignore::DirEntry;
+
+use crate::diff::basepoint::FileMetadata;
 
 pub trait LocalFileMetadata: FileMetadata {
     fn from_direntry(base_path: &Path, entry: DirEntry) -> Self;

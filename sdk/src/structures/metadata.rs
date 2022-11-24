@@ -1,8 +1,10 @@
-use super::category::Category;
-use super::icon::Icon;
-use crate::id::{FileID, FolderID};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+
+use crate::id::{FileID, FolderID};
+
+use super::category::Category;
+use super::icon::Icon;
 
 // TODO: Use enum for files and folders: https://serde.rs/enum-representations.html
 
@@ -91,12 +93,14 @@ pub struct MetadataVideoFile {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
     use std::path::Path;
+
     use time::macros::datetime;
+
+    use super::*;
 
     #[test]
     #[allow(clippy::bool_assert_comparison)]

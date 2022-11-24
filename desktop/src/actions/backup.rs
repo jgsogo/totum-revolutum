@@ -1,11 +1,12 @@
+use std::path::Path;
+
+use anyhow::Result;
+use tracing::{error, info};
+
 use crate::diff;
 use crate::local;
 use crate::remote;
 use crate::storage::config;
-use anyhow::Result;
-
-use std::path::Path;
-use tracing::{error, info};
 
 pub async fn run(path: &Path, config: &config::Config) -> Result<()> {
     info!("Run backup action on path '{}'", path.display());

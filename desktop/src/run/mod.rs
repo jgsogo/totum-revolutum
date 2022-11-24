@@ -1,5 +1,7 @@
-use anyhow::Result;
 use std::path::{Path, PathBuf};
+
+use anyhow::Result;
+
 mod global;
 mod project;
 

@@ -1,11 +1,11 @@
+use std::path::Path;
+
+use anyhow::{anyhow, Result};
 use clap::Args;
+use tracing::{debug, info};
 
 use pcloud_sdk_desktop::storage;
 use pcloud_sdk_desktop::storage::candidate_pcloud_dir;
-
-use anyhow::{anyhow, Result};
-use std::path::Path;
-use tracing::{debug, info};
 
 use crate::common::DirectoryArg;
 

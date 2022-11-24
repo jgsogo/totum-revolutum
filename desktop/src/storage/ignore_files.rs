@@ -1,6 +1,6 @@
-use crate::utils::locked_file::{LockedFile, ReadWrite};
-
 use std::path::{Path, PathBuf};
+
+use crate::utils::locked_file::{LockedFile, ReadWrite};
 
 use super::INSIDE_PROJECT_DIRECTORY;
 
@@ -43,8 +43,9 @@ impl IgnoreFiles {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use tempfile::tempdir;
+
+    use super::*;
 
     #[test]
     fn test_path() {

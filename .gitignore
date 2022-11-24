@@ -4,3 +4,4 @@ secret.json
 /examples/files
 .idea/
 /test
+.DS_Store

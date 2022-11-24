@@ -1,10 +1,11 @@
+use std::io::{Error, ErrorKind, Result};
+use std::path::{Path, PathBuf};
+use std::result;
+
 pub mod apps;
 pub mod config;
 pub mod cron;
 pub mod ignore_files;
-use std::io::{Error, ErrorKind, Result};
-use std::path::{Path, PathBuf};
-use std::result;
 
 const INSIDE_PROJECT_DIRECTORY: &str = ".pcloud";
 

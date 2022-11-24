@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
-use anyhow::Result;
 
 type Datetime = String; // TODO: Parse actual date
 

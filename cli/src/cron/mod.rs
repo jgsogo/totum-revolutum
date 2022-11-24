@@ -1,8 +1,10 @@
-pub mod add;
-pub mod list;
+use std::path::Path;
+
 use anyhow::Result;
 use clap::Subcommand;
-use std::path::Path;
+
+pub mod add;
+pub mod list;
 
 #[derive(Subcommand)]
 pub enum Commands {

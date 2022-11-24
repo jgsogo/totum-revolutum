@@ -1,15 +1,16 @@
-mod file_metadata;
-mod parallel_visitor;
-use super::diff::basepoint::BasePointDiffImpl;
-use super::storage::ignore_files;
+use std::path::Path;
 
 use anyhow::Result;
-
 use ignore::WalkBuilder;
-use std::path::Path;
 use tracing::info;
 
 pub use file_metadata::LocalMetadata;
+
+use super::diff::basepoint::BasePointDiffImpl;
+use super::storage::ignore_files;
+
+mod file_metadata;
+mod parallel_visitor;
 
 pub async fn walk_local_directory(
     path: &Path,

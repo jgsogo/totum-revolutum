@@ -1,7 +1,10 @@
-use crate::output;
-use pcloud_sdk_desktop::storage;
 use std::path::Path;
+
 use tracing::debug;
+
+use pcloud_sdk_desktop::storage;
+
+use crate::output;
 
 pub fn handle(home: &Path) {
     debug!("List applications from {}", home.display());

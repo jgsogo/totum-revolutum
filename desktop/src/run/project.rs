@@ -1,9 +1,11 @@
+use std::path::Path;
+
+use anyhow::{anyhow, Result};
+use tracing::info;
+
 use crate::actions;
 use crate::errors::SDKErrors;
 use crate::storage;
-use anyhow::{anyhow, Result};
-use std::path::Path;
-use tracing::info;
 
 /// Run configured action in the given pcloud-dir. It doesn't take into account
 /// any cron considerations (those are stored at global level)

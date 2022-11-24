@@ -1,17 +1,19 @@
-mod file_metadata;
-
-use crate::{diff::basepoint::BasePointDiffImpl, storage::config};
 use anyhow::Result;
+
 pub use file_metadata::RemoteMetadata;
 use pcloud_sdk::{
     methods::folder::{listfolder::GetListFolder, ListFolderInput},
     structures::Metadata,
 };
 
+use crate::{diff::basepoint::BasePointDiffImpl, storage::config};
+
+mod file_metadata;
+
 pub async fn walk_remote_directory(
     config: &config::Config,
     _threads: usize,
-    _diff: BasePointDiffImpl<file_metadata::RemoteMetadata>,
+    _diff: BasePointDiffImpl<RemoteMetadata>,
 ) -> Result<()> {
     let pcloud = config.pcloud.as_ref().unwrap();
 
@@ -30,6 +32,7 @@ pub async fn walk_remote_directory(
 
 // TODO: This is not the place for outputters
 const PRINT_FOLDER_TOKEN: &str = "|-- ";
+
 fn outputter(metadata: &Metadata, nested: usize) {
     let prefix = format!("{}{}", " ".repeat(nested), PRINT_FOLDER_TOKEN);
 

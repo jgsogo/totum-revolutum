@@ -1,11 +1,14 @@
+use std::path::{Path, PathBuf};
+
+use serde::{Deserialize, Serialize};
+
+use pcloud_sdk::utils;
+
 use crate::utils::{
     locked_file::{LockedFile, ReadWrite},
     versioned_data::VersionedData,
 };
 use crate::utils::{mut_find_or_insert, to_absolute_path};
-use pcloud_sdk::utils;
-use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
 
 const FILENAME: &str = "cron.yaml";
 
@@ -83,8 +86,9 @@ impl ReadWrite<DirectoriesContent> for DirectoriesContent {
 mod tests {
     use std::str::FromStr;
 
-    use super::*;
     use tempfile::tempdir;
+
+    use super::*;
 
     #[test]
     fn test_path() {

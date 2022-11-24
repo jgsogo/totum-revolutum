@@ -1,7 +1,7 @@
+use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 
 use super::oauth2token::OAuth2Token;
-use anyhow::{anyhow, Result};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct App {

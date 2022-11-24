@@ -1,6 +1,8 @@
-use super::file_metadata::LocalFileMetadata;
-use crate::diff::basepoint::BasePointDiffImpl;
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
+
+use crate::diff::basepoint::BasePointDiffImpl;
+
+use super::file_metadata::LocalFileMetadata;
 
 pub struct Visitor<T: LocalFileMetadata> {
     base_path: std::path::PathBuf,

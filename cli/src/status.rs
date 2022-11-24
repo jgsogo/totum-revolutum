@@ -1,9 +1,12 @@
-use anyhow::Result;
 use std::path::Path;
+
+use anyhow::Result;
+
+use pcloud_sdk_desktop::storage;
 
 use crate::common::DirectoryArg;
 use crate::output;
-use pcloud_sdk_desktop::storage;
+
 pub type StatusParams = DirectoryArg;
 
 pub fn handle(home: &Path, params: &StatusParams) -> Result<()> {

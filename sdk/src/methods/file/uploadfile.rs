@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::structures::Metadata;
 use crate::{client, utils};
-use anyhow::Result;
+use crate::structures::Metadata;
 
 #[derive(Debug, Clone)]
 pub struct UploadFileParams {

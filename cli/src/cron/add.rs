@@ -1,11 +1,13 @@
-use clap::Args;
-use pcloud_sdk_desktop::storage;
-use pcloud_sdk_desktop::storage::cron;
 use std::path::Path;
 use std::str::FromStr;
 
-use crate::common::DirectoryArg;
 use anyhow::Result;
+use clap::Args;
+
+use pcloud_sdk_desktop::storage;
+use pcloud_sdk_desktop::storage::cron;
+
+use crate::common::DirectoryArg;
 
 #[derive(Args, Debug)]
 pub struct AddParams {

@@ -3,8 +3,8 @@ use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 
 use anyhow::Result;
-use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request, Response, Server, StatusCode};
+use hyper::service::{make_service_fn, service_fn};
 use reqwest;
 use tokio::sync::oneshot::Sender;
 use url::Url;

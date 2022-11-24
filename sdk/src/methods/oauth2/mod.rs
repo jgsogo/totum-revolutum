@@ -1,10 +1,12 @@
+use std::net::SocketAddr;
+
 use anyhow::Result;
 use reqwest;
-use std::net::SocketAddr;
+
+use crate::data;
 
 mod oauth2_token;
 mod server;
-use crate::data;
 
 pub async fn authorize_oauth2(
     http_client: reqwest::Client,

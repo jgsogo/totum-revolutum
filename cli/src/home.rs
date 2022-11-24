@@ -1,5 +1,7 @@
-use anyhow::Result;
 use std::{env, path::Path, path::PathBuf};
+
+use anyhow::Result;
+
 const PCLOUD_HOME_SUBDIR: &str = ".pcloud";
 const PCLOUD_HOME_DIR_ENVVAR: &str = "PCLOUD_HOME_DIR";
 
