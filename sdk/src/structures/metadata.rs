@@ -9,25 +9,27 @@ use time::OffsetDateTime;
 // https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 /// Metadata that is common to files and folders
+///
+/// Given `filtermeta` argument, everything is optional
 pub struct CommonMetadata {
-    icon: Icon,
-    id: String,
-    #[serde(with = "time::serde::rfc2822")]
-    created: OffsetDateTime,
-    #[serde(with = "time::serde::rfc2822::option")]
+    icon: Option<Icon>,
+    id: Option<String>,
+    #[serde(with = "time::serde::rfc2822::option", default)]
+    created: Option<OffsetDateTime>,
+    #[serde(with = "time::serde::rfc2822::option", default)]
     modified: Option<OffsetDateTime>,
-    path: Option<String>,
-    thumb: bool,
-    isfolder: bool,
-    isshared: bool,
-    ismine: bool,
-    name: String,
+    pub path: Option<String>,
+    thumb: Option<bool>,
+    pub isfolder: Option<bool>,
+    isshared: Option<bool>,
+    ismine: Option<bool>,
+    pub name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Metadata {
     #[serde(flatten)]
-    common: CommonMetadata,
+    pub common: CommonMetadata,
     parentfolderid: Option<FolderID>,
 
     canread: Option<bool>,
@@ -35,18 +37,18 @@ pub struct Metadata {
     candelete: Option<bool>,
 
     pub folderid: Option<FolderID>,
-    fileid: Option<FileID>,
+    pub fileid: Option<FileID>,
     deletedfileid: Option<FileID>,
     category: Option<Category>,
-    contents: Option<Vec<Metadata>>,
+    pub contents: Option<Vec<Metadata>>,
     isdeleted: Option<bool>,
 
     // only for folders
     cancreate: Option<bool>,
 
     // only for files
-    hash: Option<u64>,
-    size: Option<i64>,
+    pub hash: Option<u64>,
+    pub size: Option<i64>,
     contenttype: Option<String>,
 
     // Optional fields depending on file type
@@ -110,28 +112,28 @@ mod tests {
             Err(e) => panic!("Error reading the file: {e}"),
             Ok(data) => {
                 assert_eq!(data.parentfolderid, Some(FolderID(0)));
-                assert_eq!(data.common.isfolder, false);
+                assert_eq!(data.common.isfolder, Some(false));
 
-                assert_eq!(data.common.ismine, true);
+                assert_eq!(data.common.ismine, Some(true));
                 assert_eq!(data.canread, None);
                 assert_eq!(data.canmodify, None);
                 assert_eq!(data.candelete, None);
                 assert_eq!(data.cancreate, None);
 
-                assert_eq!(data.common.isshared, false);
-                assert_eq!(data.common.name, "Simple image.jpg");
-                assert_eq!(data.common.id, "f1729212");
+                assert_eq!(data.common.isshared, Some(false));
+                assert_eq!(data.common.name, Some("Simple image.jpg".to_string()));
+                assert_eq!(data.common.id, Some("f1729212".to_string()));
                 assert_eq!(data.folderid, None);
                 assert_eq!(data.fileid, Some(FileID(1729212)));
                 assert_eq!(data.deletedfileid, None);
-                assert_eq!(data.common.created, datetime!(2013-10-02 14:29:11 UTC));
                 assert_eq!(
-                    data.common.modified,
+                    data.common.created,
                     Some(datetime!(2013-10-02 14:29:11 UTC))
                 );
-                assert_eq!(data.common.icon, Icon::Image);
+                assert_eq!(data.common.modified, None);
+                assert_eq!(data.common.icon, Some(Icon::Image));
                 assert_eq!(data.category, Some(Category::Image));
-                assert_eq!(data.common.thumb, true);
+                assert_eq!(data.common.thumb, Some(true));
                 assert_eq!(data.size, Some(73269));
                 assert_eq!(data.contenttype, Some("image/jpeg".into()));
                 assert_eq!(data.hash, Some(10681749967730527559));

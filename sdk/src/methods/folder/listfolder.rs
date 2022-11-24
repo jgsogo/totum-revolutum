@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::client;
 use crate::structures::Metadata;
 
+#[derive(Default)]
 pub struct ListFolderInput {
     // path to the folder(discouraged)
     path: Option<String>,
@@ -13,7 +14,7 @@ pub struct ListFolderInput {
     folderid: Option<i64>,
 
     // If is set full directory tree will be returned, which means that all directories will have contents filed.
-    pub recursive: Option<u8>,
+    pub recursive: bool,
     // If is set, deleted files and folders that can be undeleted will be displayed.
     pub showdeleted: Option<u8>,
     // If is set, only the folder (sub)structure will be returned.
@@ -23,24 +24,16 @@ pub struct ListFolderInput {
 }
 
 impl ListFolderInput {
-    pub fn new_from_path(path: &str) -> ListFolderInput {
+    pub fn new_from_path(path: Option<String>) -> ListFolderInput {
         ListFolderInput {
-            path: Some(path.to_string()),
-            folderid: None,
-            recursive: None,
-            showdeleted: None,
-            nofiles: None,
-            noshared: None,
+            path: Some(path.unwrap_or_else(|| "/".to_string())),
+            ..Default::default()
         }
     }
     pub fn new_from_folderid(folderid: i64) -> ListFolderInput {
         ListFolderInput {
-            path: None,
             folderid: Some(folderid),
-            recursive: None,
-            showdeleted: None,
-            nofiles: None,
-            noshared: None,
+            ..Default::default()
         }
     }
 }
@@ -56,6 +49,14 @@ pub trait GetListFolder: client::Client {
         &self,
         list_folder: &ListFolderInput,
     ) -> Result<ListFolder, Box<dyn std::error::Error + Send + Sync>> {
+        self.listfolder_with_filtermeta(list_folder, vec![]).await
+    }
+
+    async fn listfolder_with_filtermeta(
+        &self,
+        list_folder: &ListFolderInput,
+        filtermeta: Vec<&str>,
+    ) -> Result<ListFolder, Box<dyn std::error::Error + Send + Sync>> {
         let url = format!("https://{}/listfolder", self.hostname());
         let mut params = HashMap::new();
         match list_folder {
@@ -67,8 +68,15 @@ pub trait GetListFolder: client::Client {
             } => {
                 params.insert("folderid".to_string(), f.to_string());
             }
-            _ => (),
+            _ => todo!("Either path or folderid is compulsory"),
         }
+
+        if list_folder.recursive {
+            params.insert("recursive".to_string(), "1".to_string());
+        }
+
+        let filtermeta = filtermeta.join(",");
+        params.insert("filtermeta".to_string(), filtermeta);
 
         let ret = self.get::<ListFolder>(&url, params).await?;
         Ok(ret)

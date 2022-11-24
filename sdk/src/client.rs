@@ -40,6 +40,7 @@ pub trait Client: Clone {
     }
 }
 
+#[derive(Debug)]
 pub struct HttpClient {
     pub oauth2_token: data::oauth2token::OAuth2Token,
     http_client: reqwest::Client,

@@ -1,7 +1,8 @@
 use std::collections::{hash_map::Entry, HashMap};
 
-use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
+use super::basepoint::{BasePointDiffImpl, FileMetadata, SnapshotStatus, MAX_BUFFER};
 
+use anyhow::Result;
 use tracing::{debug, info};
 
 struct FileDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
@@ -55,7 +56,7 @@ where
         (lhs, rhs, report)
     }
 
-    pub async fn recv(&mut self) {
+    pub async fn recv(&mut self) -> Result<()> {
         info!("Start receiving loop");
         loop {
             tokio::select! {
@@ -87,25 +88,42 @@ where
                 },
             }
         }
+        Ok(())
     }
 
-    pub async fn report(&mut self) {
-        self.recv().await;
+    pub async fn report(&mut self) -> Result<()> {
+        self.recv().await?;
 
         println!("We have {} entries", self.files.len());
         for (key, value) in self.files.iter() {
-            println!(
-                "{} | {} / {}",
-                key,
-                value
-                    .lhs_metadata
-                    .as_ref()
-                    .map_or("-".into(), |v| v.size().to_string()),
-                value
-                    .rhs_metadata
-                    .as_ref()
-                    .map_or("-".into(), |v| v.size().to_string())
-            );
+            let status = match value {
+                FileDiff {
+                    lhs_metadata: Some(lhs_metadata),
+                    rhs_metadata: Some(rhs_metadata),
+                } => {
+                    if lhs_metadata.eq(rhs_metadata) {
+                        SnapshotStatus::Idle
+                    } else {
+                        SnapshotStatus::Modified
+                    }
+                }
+                FileDiff {
+                    lhs_metadata: Some(_),
+                    ..
+                } => SnapshotStatus::New,
+                FileDiff {
+                    rhs_metadata: Some(_),
+                    ..
+                } => SnapshotStatus::ToBeDeleted,
+                _ => panic!("Not expected"),
+            };
+
+            debug!("{:?} | {}", status, key);
+            match status {
+                SnapshotStatus::Idle => (),
+                e => println!("{:?} | {}", e, key),
+            }
         }
+        Ok(())
     }
 }
