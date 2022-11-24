@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::structures::Metadata;
+use anyhow::Result;
 
 #[derive(Default)]
 pub struct ListFolderInput {
@@ -45,10 +46,7 @@ pub struct ListFolder {
 
 #[async_trait]
 pub trait GetListFolder: client::Client {
-    async fn listfolder(
-        &self,
-        list_folder: &ListFolderInput,
-    ) -> Result<ListFolder, Box<dyn std::error::Error + Send + Sync>> {
+    async fn listfolder(&self, list_folder: &ListFolderInput) -> Result<ListFolder> {
         self.listfolder_with_filtermeta(list_folder, vec![]).await
     }
 
@@ -56,7 +54,7 @@ pub trait GetListFolder: client::Client {
         &self,
         list_folder: &ListFolderInput,
         filtermeta: Vec<&str>,
-    ) -> Result<ListFolder, Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<ListFolder> {
         let url = format!("https://{}/listfolder", self.hostname());
         let mut params = HashMap::new();
         match list_folder {

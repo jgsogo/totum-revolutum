@@ -4,6 +4,7 @@ use std::io;
 use std::io::Read;
 use std::io::Write;
 
+use anyhow::{anyhow, Result};
 use hyper;
 use hyper::header::CONTENT_TYPE;
 use reqwest;
@@ -13,7 +14,7 @@ use crate::error::Error;
 
 const BOUNDARY: &str = "------------------------ea3bbcf87c101592";
 
-fn create_response<T>(result: String) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
+fn create_response<T>(result: String) -> Result<T>
 where
     T: DeserializeOwned,
 {
@@ -21,7 +22,7 @@ where
         Ok(data) => Ok(data),
         Err(e) => {
             // TODO: Provide enough information to debug, but also return meaningful error
-            Err(Box::new(Error::SerializationError(e)) as Box<dyn std::error::Error + Send + Sync>)
+            Err(anyhow!(Error::SerializationError(e)))
             /*
             Err(Box::new(Error::APIError(&format!(
                 "Cannot parse '{}' into {}",
@@ -37,7 +38,7 @@ pub(crate) async fn get<T>(
     client: reqwest::Client,
     url: &str,
     params: HashMap<String, String>,
-) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
+) -> Result<T>
 where
     T: DeserializeOwned,
 {
@@ -57,7 +58,7 @@ pub(crate) async fn post<T>(
     url: &str,
     params: HashMap<String, String>,
     data: Vec<u8>,
-) -> Result<T, Box<dyn std::error::Error + Send + Sync>>
+) -> Result<T>
 where
     T: DeserializeOwned,
 {

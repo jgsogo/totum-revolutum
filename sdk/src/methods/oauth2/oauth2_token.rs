@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::data;
 use crate::data::app_client_data::AppClientData;
 use crate::utils;
+use anyhow::Result;
 use reqwest;
 
 pub(crate) async fn exchange_oauth2_token(
@@ -10,7 +11,7 @@ pub(crate) async fn exchange_oauth2_token(
     app: AppClientData,
     hostname: String,
     code: String,
-) -> Result<data::oauth2token::OAuth2Token, Box<dyn std::error::Error + Send + Sync>> {
+) -> Result<data::oauth2token::OAuth2Token> {
     let params = {
         let mut params = HashMap::new();
         params.insert("client_id".to_string(), app.client_id);

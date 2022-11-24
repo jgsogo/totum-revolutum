@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::oauth2token::OAuth2Token;
+use anyhow::{anyhow, Result};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct App {
@@ -30,13 +31,10 @@ impl App {
         }
     }
 
-    pub fn find_token(&self, userid: i32) -> Result<&OAuth2Token, std::io::Error> {
+    pub fn find_token(&self, userid: i32) -> Result<&OAuth2Token> {
         match self.tokens.iter().find(|&token| token.userid == userid) {
             Some(token) => Ok(token),
-            None => Err(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                "Token not found",
-            )),
+            None => Err(anyhow!("Token not found")),
         }
     }
 }

@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
+use anyhow::Result;
 
 type Datetime = String; // TODO: Parse actual date
 
@@ -29,7 +30,7 @@ pub struct UserInfo {
 
 #[async_trait]
 pub trait GetUserInfo: client::Client {
-    async fn userinfo(&self) -> Result<UserInfo, Box<dyn std::error::Error + Send + Sync>> {
+    async fn userinfo(&self) -> Result<UserInfo> {
         let url = format!("https://{}/userinfo", self.hostname());
         let userinfo = self.get::<UserInfo>(&url, HashMap::new()).await?;
         Ok(userinfo)

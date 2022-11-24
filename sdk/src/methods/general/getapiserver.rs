@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
+use anyhow::Result;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct APIServer {
@@ -13,7 +14,7 @@ pub struct APIServer {
 
 #[async_trait]
 pub trait GetAPIServer: client::Client {
-    async fn getapiserver(&self) -> Result<APIServer, Box<dyn std::error::Error + Send + Sync>> {
+    async fn getapiserver(&self) -> Result<APIServer> {
         let url = format!("https://{}/getapiserver", self.hostname());
         let apiserver = self.get::<APIServer>(&url, HashMap::new()).await?;
         Ok(apiserver)
