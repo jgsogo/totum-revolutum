@@ -17,7 +17,11 @@ pub async fn walk_remote_directory(
 
     let mut list_folder_input = ListFolderInput::new_from_path(config.auth.remote_path.clone());
     list_folder_input.recursive = true;
-    let items = pcloud.listfolder(&list_folder_input).await.unwrap();
+    let filtermeta = vec!["name", "contents", "size", "hash"];
+    let items = pcloud
+        .listfolder_with_filtermeta(&list_folder_input, filtermeta)
+        .await
+        .unwrap();
 
     outputter(&items.metadata, 0);
 
@@ -32,21 +36,13 @@ fn outputter(metadata: &Metadata, nested: usize) {
     match &metadata.contents {
         Some(contents) => {
             for it in contents.iter() {
-                if it.common.isfolder {
-                    println!(
-                        "{}{} ({})",
-                        prefix,
-                        it.common.name,
-                        it.folderid.as_ref().unwrap()
-                    );
-                } else {
-                    println!(
-                        "{}{} ({})",
-                        prefix,
-                        it.common.name,
-                        it.fileid.as_ref().unwrap()
-                    );
-                }
+                println!(
+                    "{}{} ({} - {})",
+                    prefix,
+                    it.common.name.as_ref().unwrap(),
+                    it.size.unwrap_or(0),
+                    it.hash.unwrap_or(0),
+                );
                 outputter(it, nested + 4);
             }
         }

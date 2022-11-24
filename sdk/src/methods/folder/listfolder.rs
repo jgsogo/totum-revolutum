@@ -49,6 +49,14 @@ pub trait GetListFolder: client::Client {
         &self,
         list_folder: &ListFolderInput,
     ) -> Result<ListFolder, Box<dyn std::error::Error + Send + Sync>> {
+        self.listfolder_with_filtermeta(list_folder, vec![]).await
+    }
+
+    async fn listfolder_with_filtermeta(
+        &self,
+        list_folder: &ListFolderInput,
+        filtermeta: Vec<&str>,
+    ) -> Result<ListFolder, Box<dyn std::error::Error + Send + Sync>> {
         let url = format!("https://{}/listfolder", self.hostname());
         let mut params = HashMap::new();
         match list_folder {
@@ -66,6 +74,9 @@ pub trait GetListFolder: client::Client {
         if list_folder.recursive {
             params.insert("recursive".to_string(), "1".to_string());
         }
+
+        let filtermeta = filtermeta.join(",");
+        params.insert("filtermeta".to_string(), filtermeta);
 
         let ret = self.get::<ListFolder>(&url, params).await?;
         Ok(ret)

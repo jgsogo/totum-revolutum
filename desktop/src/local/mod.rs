@@ -25,10 +25,10 @@ pub async fn walk_local_directory(
     let wait_lhs = {
         let path = path.to_path_buf();
         tokio::spawn(async move {
-            info!("Start LHS visitor");
+            info!("Start local visitor");
             let mut builder = parallel_visitor::VisitorBuilder::new(&path, diff);
             walker.visit(&mut builder);
-            info!("Finished LHS visitor");
+            info!("Finished local visitor");
         })
     };
     wait_lhs.await?;
