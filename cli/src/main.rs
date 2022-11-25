@@ -3,14 +3,14 @@ use clap::{Parser, Subcommand};
 use tracing::debug;
 
 mod app;
+mod common;
 mod cron;
+mod errors;
 mod home;
 mod init;
-mod status;
-mod common;
 mod output;
 mod run;
-mod errors;
+mod status;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -39,8 +39,7 @@ enum Commands {
     /// Show status for pCloud folder
     Status(status::StatusParams),
 
-    /// Print home folder
-    Home,
+    Home(home::HomeParams),
 
     /// Run syncronization
     Run(run::RunParams),
@@ -73,7 +72,7 @@ async fn main() -> Result<()> {
     match &cli.command {
         Commands::App(input) => app::handle(&pcloud_home, input).await,
         Commands::Cron(input) => cron::handle(&pcloud_home, input),
-        Commands::Home => home::handle(&pcloud_home),
+        Commands::Home(input) => home::handle(&pcloud_home, input),
         Commands::Init(input) => init::handle(&pcloud_home, input),
         Commands::Status(input) => status::handle(&pcloud_home, input),
         Commands::Run(input) => run::handle(&pcloud_home, input).await,
