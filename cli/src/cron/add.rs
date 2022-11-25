@@ -4,8 +4,8 @@ use std::str::FromStr;
 use anyhow::Result;
 use clap::Args;
 
-use pcloud_sdk_desktop::storage;
-use pcloud_sdk_desktop::storage::cron;
+use pcloud_sync::storage;
+use pcloud_sync::storage::cron;
 
 use crate::common::DirectoryArg;
 

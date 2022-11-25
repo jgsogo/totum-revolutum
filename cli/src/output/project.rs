@@ -1,4 +1,4 @@
-use pcloud_sdk_desktop::storage;
+use pcloud_sync::storage;
 
 /// Show stats contained within the project folder
 pub fn _project_details(config: &storage::config::Config) {

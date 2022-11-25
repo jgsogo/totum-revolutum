@@ -3,7 +3,7 @@ use std::path::Path;
 use clap::Args;
 use tracing::debug;
 
-use pcloud_sdk_desktop::storage;
+use pcloud_sync::storage;
 
 #[derive(Args, Debug)]
 pub struct ListParams {
