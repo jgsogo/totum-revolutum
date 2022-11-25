@@ -6,7 +6,7 @@ pub fn _project_details(config: &storage::config::Config) {
 
     // TODO: Translate client_id to application name
     println!("userid: {}", config.auth.userid);
-    println!("action: {:#?}", config.action.action);
+    println!("action: {:#?}", config.action.action());
 }
 
 /// Show data about last execution and next scheduled one

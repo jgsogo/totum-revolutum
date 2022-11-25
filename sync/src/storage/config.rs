@@ -1,8 +1,8 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
-use chrono::{DateTime, Utc};
 use chrono::serde::ts_seconds_option;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::actions::{Actions, AfterSend, OnConflict};
@@ -46,11 +46,17 @@ impl ConfigAuth {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct ConfigAction {
-    pub action: Actions,
-    pub conflict: OnConflict,
-    pub after_send: AfterSend,
+    action: Actions,
+    conflict: OnConflict,
+    after_send: AfterSend,
     #[serde(with = "ts_seconds_option")]
     pub last_executed: Option<DateTime<Utc>>,
+}
+
+impl ConfigAction {
+    pub fn action(&self) -> &Actions {
+        &self.action
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]

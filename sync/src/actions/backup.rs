@@ -11,7 +11,8 @@ use crate::local;
 use crate::remote;
 use crate::storage::config;
 
-fn handle_filediff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>(
+/// Runs action backup for the input `file_diff`
+fn handle_backup<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>(
     file_diff: FileDiff<LHSMetadata, RHSMetadata>,
     config: &config::Config,
 ) {
@@ -51,9 +52,10 @@ async fn work_on_results<
     rx: flume::Receiver<FileDiff<LHSMetadata, RHSMetadata>>,
     config: &config::Config,
 ) -> Result<()> {
+    info!("Start backup receiving loop");
     let start = Instant::now();
     while let Ok(v) = rx.recv_async().await {
-        handle_filediff(v, config);
+        handle_backup(v, config);
     }
     info!("Finished backup receiving loop in {:?}", start.elapsed());
     Ok(())

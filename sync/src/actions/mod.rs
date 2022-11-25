@@ -5,17 +5,24 @@ pub mod backup;
 /// Describes the action to perform
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub enum Actions {
-    /// Send local content to remote
+    /// Send local content to remote. Local is never touched and nothing will be removed from
+    /// remote. It can be combined with `OnConflict::OverrideRemote` or
+    /// `OnConflict::RenameRemote`.
     #[default]
     Backup,
 
-    /// Send local content to remote in zip file
+    /// Send local content to remote in a zip file. It can only be combined with
+    /// `OnConflict::OverrideRemote` or `OnConflict::RenameRemote`
     ZipBackup,
 
-    /// Keep local and remote synced
+    /// Keep local and remote synced. It can be combined with:
+    /// * `OnConflict::KeepLatest`: modification time will decide which file to keep
+    /// * `OnConflict::OverrideLocal`: local will always override remote
+    /// * `OnConflict::OverrideRemote`: remote will always override local
     Sync,
 
-    /// Send remote content to local folder
+    /// Send remote content to local folder. It can be combined with
+    /// `OnConflict::OverrideLocal` or `OnConflict::RenameLocal`.
     Dump,
 }
 
@@ -23,13 +30,12 @@ pub enum Actions {
 /// [`OnConflict`] are compatible with every [`Actions`]
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub enum OnConflict {
+    #[default]
     OverrideRemote,
     OverrideLocal,
     RenameRemote,
     RenameLocal,
-
-    #[default]
-    Fail,
+    KeepLatest,
 }
 
 /// Describe the action to take after a successful backup or dump. The

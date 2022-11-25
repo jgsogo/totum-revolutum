@@ -17,7 +17,7 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
         .map_err(|_| SDKErrors::ProjectLocked(path.to_string_lossy().to_string()))?;
 
     let data = &mut lock.content.data;
-    match data.action.action {
+    match data.action.action() {
         actions::Actions::Backup => {
             let now = chrono::Utc::now();
 
