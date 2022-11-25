@@ -17,15 +17,15 @@ pub struct LocalMetadata {
 }
 
 impl FileMetadata for LocalMetadata {
+    fn id(&self) -> &str {
+        &self.id
+    }
     fn size(&self) -> u64 {
         self.entry.metadata().unwrap().len()
     }
+
     fn hash(&self) -> String {
         sha256::try_digest(self.path()).unwrap()
-    }
-
-    fn id(&self) -> &str {
-        &self.id
     }
 }
 

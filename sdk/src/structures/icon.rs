@@ -7,7 +7,7 @@ use strum_macros::Display;
 /// audio, video, file
 ///
 /// Described in https://docs.pcloud.com/structures/metadata.html
-#[derive(Serialize, Deserialize, PartialEq, Eq, Display, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Display, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 #[allow(clippy::upper_case_acronyms)]
 #[strum(serialize_all = "snake_case")]
