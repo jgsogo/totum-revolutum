@@ -1,7 +1,8 @@
 use std::path::Path;
+use std::time::Instant;
 
 use anyhow::Result;
-use tracing::trace;
+use tracing::{info, trace};
 
 pub use file_metadata::RemoteMetadata;
 use pcloud_sdk::{
@@ -24,6 +25,8 @@ pub async fn walk_remote_directory(
     // FIXME: Here we can implement two different strategies. One of them is to iterate everything
     //  from the ROOT folder recursively, the other one is to list the files in each directory
     //  and use a thread pool to enter child directories and _recurse_.
+    info!("Start remote visitor");
+    let start = Instant::now();
     let mut list_folder_input = ListFolderInput::new_from_path(config.auth.remote_path.clone());
     list_folder_input.recursive = true;
     let filtermeta = vec!["name", "contents", "size", "hash"];
@@ -36,7 +39,7 @@ pub async fn walk_remote_directory(
         Some(contents) => work_on_contents(Path::new(""), contents, &diff, 0)?,
         None => (),
     }
-    // outputter(&items.metadata, 0);
+    info!("Finished remote visitor in {:?}", start.elapsed());
 
     Ok(())
 }
@@ -62,23 +65,3 @@ fn work_on_contents(
 
 // TODO: This is not the place for outputters
 const PRINT_FOLDER_TOKEN: &str = "|-- ";
-
-fn outputter(metadata: &Metadata, nested: usize) {
-    let prefix = format!("{}{}", " ".repeat(nested), PRINT_FOLDER_TOKEN);
-
-    match &metadata.contents {
-        Some(contents) => {
-            for it in contents.iter() {
-                println!(
-                    "{}{} ({} - {})",
-                    prefix,
-                    it.common.name.as_ref().unwrap(),
-                    it.size.unwrap_or(0),
-                    it.hash.unwrap_or(0),
-                );
-                outputter(it, nested + 4);
-            }
-        }
-        None => (),
-    }
-}

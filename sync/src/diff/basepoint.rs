@@ -11,7 +11,7 @@ pub enum SnapshotStatus {
 /// Allows access to file metadata. This is useful in case the information
 /// is not already available or it is preferred to compute it on-demand (computing
 /// hash can take some time)
-pub trait FileMetadata:
+pub trait FileMetadata<RHS = Self>:
     std::marker::Sync + std::marker::Send + std::fmt::Debug + std::clone::Clone
 {
     /// Shared identifier for the file

@@ -1,11 +1,11 @@
-use std::collections::{hash_map::Entry, HashMap};
+use std::collections::HashMap;
+use std::time::Instant;
 
-use anyhow::Result;
-use tracing::{debug, info};
+use tracing::{error, info, trace};
 
-use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER, SnapshotStatus};
+use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
 
-struct FileDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
+pub struct FileDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
     pub lhs_metadata: Option<LHSMetadata>,
     pub rhs_metadata: Option<RHSMetadata>,
 }
@@ -15,7 +15,7 @@ where
     LHSMetadata: FileMetadata,
     RHSMetadata: FileMetadata,
 {
-    pub fn new(
+    fn new(
         lhs: Option<LHSMetadata>,
         rhs: Option<RHSMetadata>,
     ) -> FileDiff<LHSMetadata, RHSMetadata> {
@@ -24,106 +24,90 @@ where
             rhs_metadata: rhs,
         }
     }
-}
 
-pub struct TwoWaysDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
-    lhs_rx: flume::Receiver<LHSMetadata>,
-    rhs_rx: flume::Receiver<RHSMetadata>,
-
-    files: HashMap<String, FileDiff<LHSMetadata, RHSMetadata>>,
-}
-
-impl<LHSMetadata, RHSMetadata> TwoWaysDiff<LHSMetadata, RHSMetadata>
-where
-    LHSMetadata: FileMetadata,
-    RHSMetadata: FileMetadata,
-{
-    pub fn new() -> (
-        BasePointDiffImpl<LHSMetadata>,
-        BasePointDiffImpl<RHSMetadata>,
-        TwoWaysDiff<LHSMetadata, RHSMetadata>,
-    ) {
-        let (lhs_tx, lhs_rx) = flume::bounded::<LHSMetadata>(MAX_BUFFER);
-        let (rhs_tx, rhs_rx) = flume::bounded::<RHSMetadata>(MAX_BUFFER);
-        let lhs = BasePointDiffImpl::<LHSMetadata>::new(lhs_tx);
-        let rhs = BasePointDiffImpl::<RHSMetadata>::new(rhs_tx);
-
-        let report = TwoWaysDiff::<LHSMetadata, RHSMetadata> {
-            lhs_rx,
-            rhs_rx,
-            files: HashMap::default(),
-        };
-        (lhs, rhs, report)
+    pub fn new_from_lhs(lhs: LHSMetadata) -> FileDiff<LHSMetadata, RHSMetadata> {
+        Self::new(Some(lhs), None)
     }
 
-    pub async fn recv(&mut self) -> Result<()> {
+    pub fn new_from_rhs(rhs: RHSMetadata) -> FileDiff<LHSMetadata, RHSMetadata> {
+        Self::new(None, Some(rhs))
+    }
+
+    pub fn id(&self) -> &str {
+        if let Some(v) = &self.lhs_metadata {
+            return v.id();
+        } else {
+            self.rhs_metadata.as_ref().unwrap().id()
+        }
+    }
+}
+
+pub async fn run<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileMetadata + 'static>() -> (
+    BasePointDiffImpl<LHSMetadata>,
+    BasePointDiffImpl<RHSMetadata>,
+    flume::Receiver<FileDiff<LHSMetadata, RHSMetadata>>,
+) {
+    let (lhs_tx, lhs_rx) = flume::bounded::<LHSMetadata>(MAX_BUFFER);
+    let (rhs_tx, rhs_rx) = flume::bounded::<RHSMetadata>(MAX_BUFFER);
+    let lhs = BasePointDiffImpl::<LHSMetadata>::new(lhs_tx);
+    let rhs = BasePointDiffImpl::<RHSMetadata>::new(rhs_tx);
+
+    let (report_tx, report_rx) = flume::bounded::<FileDiff<LHSMetadata, RHSMetadata>>(MAX_BUFFER);
+
+    tokio::spawn(async move {
         info!("Start receiving loop");
+        let start = Instant::now();
+        let mut files: HashMap<String, FileDiff<LHSMetadata, RHSMetadata>> = HashMap::new();
         loop {
             tokio::select! {
-                Ok(lhs) = self.lhs_rx.recv_async() => {
-                    debug!("LHS received {:?}", lhs);
-                    match self.files.entry(lhs.id().to_string()) {
-                        Entry::Occupied(o) => {
-                            o.into_mut().lhs_metadata = Some(lhs);
+                Ok(lhs_metadata) = lhs_rx.recv_async() => {
+                    trace!("LHS received {:?}", lhs_metadata);
+                    let key = lhs_metadata.id().to_string();
+                    match files.remove(&key) {
+                        Some(mut v) => {
+                            v.lhs_metadata = Some(lhs_metadata);
+                            if let Err(e) = report_tx.send(v) {
+                                error!("Receiving loop early stop. Report receiving end is lost: {e}");
+                                break;
+                            }
                         },
-                        Entry::Vacant(v) => {
-                            v.insert(FileDiff::<LHSMetadata, RHSMetadata>::new(Some(lhs), None));
-                        },
-                    };
+                        None => {
+                            assert!(files.insert(key, FileDiff::<LHSMetadata, RHSMetadata>::new_from_lhs(lhs_metadata)).is_none());
+                        }
+                    }
                 },
-                Ok(rhs) = self.rhs_rx.recv_async() => {
-                    debug!("RHS received {:?}", rhs);
-                    match self.files.entry(rhs.id().to_string()) {
-                        Entry::Occupied(o) => {
-                            o.into_mut().rhs_metadata = Some(rhs);
+                Ok(rhs_metadata) = rhs_rx.recv_async() => {
+                    trace!("RHS received {:?}", rhs_metadata);
+                    let key = rhs_metadata.id().to_string();
+                    match files.remove(&key) {
+                        Some(mut v) => {
+                            v.rhs_metadata = Some(rhs_metadata);
+                            if let Err(e) = report_tx.send(v) {
+                                error!("Receiving loop early stop. Report receiving end is lost: {e}");
+                                break;
+                            }
                         },
-                        Entry::Vacant(v) => {
-                            v.insert(FileDiff::<LHSMetadata, RHSMetadata>::new(None, Some(rhs)));
-                        },
-                    };
+                        None => {
+                            assert!(files.insert(key, FileDiff::<LHSMetadata, RHSMetadata>::new_from_rhs(rhs_metadata)).is_none());
+                        }
+                    }
                 },
                 else => {
-                    info!("Finished receiving loop");
+                    info!("Break receiving loop in {:?}", start.elapsed());
                     break
                 },
             }
         }
-        Ok(())
-    }
-
-    pub async fn report(&mut self) -> Result<()> {
-        self.recv().await?;
-
-        println!("We have {} entries", self.files.len());
-        for (key, value) in self.files.iter() {
-            let status = match value {
-                FileDiff {
-                    lhs_metadata: Some(lhs_metadata),
-                    rhs_metadata: Some(rhs_metadata),
-                } => {
-                    if lhs_metadata.eq(rhs_metadata) {
-                        SnapshotStatus::Idle
-                    } else {
-                        SnapshotStatus::Modified
-                    }
-                }
-                FileDiff {
-                    lhs_metadata: Some(_),
-                    ..
-                } => SnapshotStatus::New,
-                FileDiff {
-                    rhs_metadata: Some(_),
-                    ..
-                } => SnapshotStatus::ToBeDeleted,
-                _ => panic!("Not expected"),
-            };
-
-            debug!("{:?} | {}", status, key);
-            match status {
-                SnapshotStatus::Idle => (),
-                e => println!("{:?} | {}", e, key),
+        // Now we need to send the files that are just on one side of the diff
+        trace!("Send remaining {} entries", files.len());
+        for (_, file_diff) in files.drain() {
+            if let Err(e) = report_tx.send(file_diff) {
+                error!("Send error {e}");
             }
         }
-        Ok(())
-    }
+
+        info!("Finished receiving loop in {:?}", start.elapsed());
+    });
+
+    (lhs, rhs, report_rx)
 }
