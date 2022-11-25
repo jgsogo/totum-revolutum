@@ -50,10 +50,13 @@ fn work_on_contents(
     diff: &BasePointDiffImpl<RemoteMetadata>,
     depth: usize,
 ) -> Result<()> {
-    let prefix = format!("{}{}", " ".repeat(depth * 4), PRINT_FOLDER_TOKEN);
     for it in contents.iter() {
         let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
-        trace!("{}{}", prefix, path.display());
+        trace!(
+            "{}{}",
+            format!("{}{}", " ".repeat(depth * 4), PRINT_FOLDER_TOKEN),
+            path.display()
+        );
         diff.file_found(RemoteMetadata::from_pcloud_metadata(&*path, it.clone()));
         match &it.contents {
             Some(contents) => work_on_contents(&path, contents, diff, depth + 1)?,

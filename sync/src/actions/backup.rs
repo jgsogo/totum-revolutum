@@ -13,6 +13,7 @@ use crate::storage::config;
 
 fn handle_filediff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>(
     file_diff: FileDiff<LHSMetadata, RHSMetadata>,
+    config: &config::Config,
 ) {
     let status = match &file_diff {
         FileDiff {
@@ -48,16 +49,13 @@ async fn work_on_results<
     RHSMetadata: FileMetadata + 'static,
 >(
     rx: flume::Receiver<FileDiff<LHSMetadata, RHSMetadata>>,
+    config: &config::Config,
 ) -> Result<()> {
-    tokio::spawn(async move {
-        info!("Start backup receiving loop");
-        let start = Instant::now();
-        while let Ok(v) = rx.recv_async().await {
-            handle_filediff(v);
-        }
-        info!("Finished backup receiving loop in {:?}", start.elapsed());
-    })
-    .await?;
+    let start = Instant::now();
+    while let Ok(v) = rx.recv_async().await {
+        handle_filediff(v, config);
+    }
+    info!("Finished backup receiving loop in {:?}", start.elapsed());
     Ok(())
 }
 
@@ -69,10 +67,9 @@ pub async fn run(path: &Path, config: &config::Config) -> Result<()> {
         diff::two_ways::run::<local::LocalMetadata, remote::RemoteMetadata>().await;
 
     if let Err(e) = tokio::try_join!(
-        work_on_results(differ),
         local::walk_local_directory(path, 6, lhs),
         remote::walk_remote_directory(config, 6, rhs),
-        // work_on_results(differ),
+        work_on_results(differ, config),
     ) {
         error!("Error on workers loop: {e}");
     }
