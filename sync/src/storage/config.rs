@@ -44,7 +44,7 @@ impl ConfigAuth {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct ConfigAction {
     action: Actions,
     conflict: OnConflict,
@@ -59,7 +59,7 @@ impl ConfigAction {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub auth: ConfigAuth,
     pub action: ConfigAction,
@@ -69,10 +69,16 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(client_id: &str, userid: i32, remote_path: Option<String>) -> Self {
+    pub fn new(
+        client_id: &str,
+        userid: i32,
+        remote_path: Option<String>,
+        action: ConfigAction,
+    ) -> Self {
         Self {
             auth: ConfigAuth::new(client_id, userid, remote_path),
-            ..Default::default()
+            action,
+            pcloud: None,
         }
     }
 }

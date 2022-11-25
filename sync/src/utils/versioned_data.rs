@@ -10,11 +10,11 @@ pub struct VersionedData<T> {
     pub data: T,
 }
 
-impl<T: Default> Default for VersionedData<T> {
-    fn default() -> Self {
+impl<T> VersionedData<T> {
+    fn default(default: T) -> Self {
         Self {
             version: VERSION.to_string(),
-            data: T::default(),
+            data: default,
         }
     }
 }

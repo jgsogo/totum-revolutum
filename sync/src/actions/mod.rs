@@ -3,12 +3,11 @@ use serde::{Deserialize, Serialize};
 pub mod backup;
 
 /// Describes the action to perform
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Actions {
     /// Send local content to remote. Local is never touched and nothing will be removed from
     /// remote. It can be combined with `OnConflict::OverrideRemote` or
     /// `OnConflict::RenameRemote`.
-    #[default]
     Backup,
 
     /// Send local content to remote in a zip file. It can only be combined with
@@ -28,9 +27,8 @@ pub enum Actions {
 
 /// Describe the action to take when there are conflicts. Not all
 /// [`OnConflict`] are compatible with every [`Actions`]
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum OnConflict {
-    #[default]
     OverrideRemote,
     OverrideLocal,
     RenameRemote,
@@ -41,10 +39,9 @@ pub enum OnConflict {
 /// Describe the action to take after a successful backup or dump. The
 /// original file can be removed or kept.
 /// TODO: This is not taken into account anywhere
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum AfterSend {
     Remove,
 
-    #[default]
     Keep,
 }

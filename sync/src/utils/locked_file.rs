@@ -42,7 +42,7 @@ pub trait ReadWrite<T> {
 
 pub struct LockedFile<T>
 where
-    T: Default + ReadWrite<T>,
+    T: ReadWrite<T>,
 {
     path: PathBuf,
     file: File,
@@ -53,7 +53,7 @@ where
 
 impl<T> LockedFile<T>
 where
-    T: Default + ReadWrite<T>,
+    T: ReadWrite<T>,
 {
     fn ensure_exists(path: &Path) -> File {
         match File::open(path) {
@@ -133,7 +133,7 @@ where
 
 impl<T> Drop for LockedFile<T>
 where
-    T: Default + ReadWrite<T>,
+    T: ReadWrite<T>,
 {
     fn drop(&mut self) {
         if self.write {
