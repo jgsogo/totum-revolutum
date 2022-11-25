@@ -13,7 +13,7 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
     info!("Start project run for path '{}'", path.display());
 
     let config_file_path = storage::config::ConfigFile::path(path);
-    let mut lock = storage::config::ConfigFile::write_with_pcloud_client(home, &config_file_path)
+    let mut lock = storage::config::ConfigFile::update_with_pcloud_client(home, &config_file_path)
         .map_err(|_| SDKErrors::ProjectLocked(path.to_string_lossy().to_string()))?;
 
     let data = &mut lock.content.data;

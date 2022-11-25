@@ -19,7 +19,7 @@ pub async fn handle(home: &Path) -> Result<()> {
     // Collect the tasks and execute them asyncronously
     let mut tasks = {
         let mut tasks = tokio::task::JoinSet::new();
-        let lock = storage::cron::DirectoriesFile::read(&directories_file_path);
+        let lock = storage::cron::DirectoriesFile::read(&directories_file_path)?;
 
         let now = chrono::Utc::now();
 

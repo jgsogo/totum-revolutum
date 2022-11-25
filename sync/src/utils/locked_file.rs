@@ -2,21 +2,25 @@ use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use fs4::FileExt;
 use tracing::debug;
 
 pub trait ReadWrite<T> {
-    fn read_content(path: &Path) -> std::io::Result<T> {
+    fn read_content(path: &Path) -> std::io::Result<Option<T>> {
         let mut file = std::fs::File::open(path).unwrap();
         let mut s = String::new();
         file.read_to_string(&mut s)
             .expect("Cannot read content from file");
 
-        <Self as ReadWrite<T>>::deserialize(&s)
+        if !s.is_empty() {
+            <Self as ReadWrite<T>>::deserialize(&s).map(|v| Some(v))
+        } else {
+            Ok(None)
+        }
     }
 
-    fn write_content(path: &Path, content: &T) -> std::io::Result<()> {
+    fn write_content(path: &Path, content: Option<&T>) -> std::io::Result<()> {
         let mut f = OpenOptions::new()
             .write(true)
             .create(true)
@@ -24,9 +28,11 @@ pub trait ReadWrite<T> {
             .open(path)
             .expect("Cannot open file");
 
-        let content = <Self as ReadWrite<T>>::serialize(content).unwrap();
-        f.write_all(content.as_bytes())
-            .expect("Error writing the file");
+        if let Some(content) = content {
+            let content_str = <Self as ReadWrite<T>>::serialize(content).unwrap();
+            f.write_all(content_str.as_bytes())
+                .expect("Error writing the file");
+        }
         Ok(())
     }
 
@@ -58,10 +64,25 @@ where
                     .expect("Cannot get parent directory from given path. Is it root?");
 
                 std::fs::create_dir_all(parent_dir).expect("Cannot create directory");
-                T::write_content(path, &T::default()).unwrap();
+                T::write_content(path, None).unwrap();
                 File::open(path).unwrap()
             }
             Err(e) => panic!("Unhandled error: {e}"),
+        }
+    }
+
+    fn read_content(file: File, path: &Path, write: bool) -> Result<Self> {
+        debug!("Read file from '{}'", path.display());
+        let content = T::read_content(path)?;
+
+        match content {
+            None => Err(anyhow!("File is empty, nothing to read")),
+            Some(v) => Ok(Self {
+                content: v,
+                write,
+                path: path.to_path_buf(),
+                file,
+            }),
         }
     }
 
@@ -71,42 +92,26 @@ where
         debug!("Lock file (shared) '{}'", path.display());
         file.try_lock_shared()?;
 
-        debug!("Read file from '{}'", path.display());
-        let content = T::read_content(path).unwrap();
-
-        Ok(Self {
-            content,
-            write: false,
-            path: path.to_path_buf(),
-            file,
-        })
+        LockedFile::read_content(file, path, false)
     }
 
-    pub fn read(path: &Path) -> Self {
+    pub fn read(path: &Path) -> Result<Self> {
         let file = Self::ensure_exists(path);
 
         debug!("Lock file (shared) '{}'", path.display());
         file.lock_shared().unwrap();
 
-        debug!("Read file from '{}'", path.display());
-        let content = T::read_content(path).unwrap();
-
-        Self {
-            content,
-            write: false,
-            path: path.to_path_buf(),
-            file,
-        }
+        LockedFile::read_content(file, path, false)
     }
 
-    pub fn write(path: &Path) -> Result<Self> {
+    pub fn update_or_create(path: &Path, default: T) -> Result<Self> {
         let file = Self::ensure_exists(path);
 
         debug!("Lock file (exclusive) '{}'", path.display());
         file.try_lock_exclusive()?;
 
         debug!("Read file from '{}'", path.display());
-        let content = T::read_content(path).unwrap();
+        let content = T::read_content(path)?.unwrap_or(default);
 
         Ok(Self {
             content,
@@ -114,6 +119,15 @@ where
             path: path.to_path_buf(),
             file,
         })
+    }
+
+    pub fn update(path: &Path) -> Result<Self> {
+        let file = Self::ensure_exists(path);
+
+        debug!("Lock file (exclusive) '{}'", path.display());
+        file.try_lock_exclusive()?;
+
+        LockedFile::read_content(file, path, true)
     }
 }
 
@@ -124,7 +138,7 @@ where
     fn drop(&mut self) {
         if self.write {
             debug!("Save content to file '{}'", self.path.display());
-            T::write_content(&self.path, &self.content).unwrap();
+            T::write_content(&self.path, Some(&self.content)).unwrap();
         }
         debug!("Unlock file '{}'", self.path.display());
         self.file.unlock().unwrap();

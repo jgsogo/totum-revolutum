@@ -47,7 +47,7 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
 
     // Lock the file
     let path = storage::apps::AppsFile::path(home);
-    let mut file_data = storage::apps::AppsFile::write(&path)?;
+    let mut file_data = storage::apps::AppsFile::update(&path)?;
 
     // Search of create new entry for this application
     let app = data::app::App::default(&params.client_id, &secret);

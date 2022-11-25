@@ -34,7 +34,7 @@ impl ConfigAuth {
     pub fn get_pcloud_client(&self, home: &Path) -> Result<pcloud_sdk::client::HttpClient> {
         // TODO: This is probably not the place for this function
         let apps_file_path = apps::AppsFile::path(home);
-        let lock = apps::AppsFile::read(&apps_file_path);
+        let lock = apps::AppsFile::read(&apps_file_path)?;
         if let Ok(found) = lock.content.find(&self.client_id) {
             if let Ok(token) = found.find_token(self.userid) {
                 return Ok(pcloud_sdk::client::HttpClient::new(token.clone()));
@@ -94,7 +94,7 @@ impl ConfigFile {
     }
 
     pub fn read_with_pcloud_client(home: &Path, path: &Path) -> Result<ConfigFile> {
-        let mut config = ConfigFile::read(path);
+        let mut config = ConfigFile::read(path)?;
         config
             .content
             .data
@@ -106,8 +106,8 @@ impl ConfigFile {
             })
     }
 
-    pub fn write_with_pcloud_client(home: &Path, path: &Path) -> Result<ConfigFile> {
-        let config = ConfigFile::write(path);
+    pub fn update_with_pcloud_client(home: &Path, path: &Path) -> Result<ConfigFile> {
+        let config = ConfigFile::update(path);
         match config {
             Ok(mut config) => config
                 .content

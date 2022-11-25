@@ -58,10 +58,10 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let path = IgnoreFiles::path(tmp_dir.path());
 
-        let ignored_files = IgnoreFiles::read(&path);
+        let ignored_files = IgnoreFiles::read(&path).unwrap();
         assert!(ignored_files.content.patterns.len() == 2);
 
-        let ignored_files2 = IgnoreFiles::read(&path);
+        let ignored_files2 = IgnoreFiles::read(&path).unwrap();
         assert!(ignored_files2.content.patterns.len() == 2);
 
         assert!(ignored_files.content.patterns == vec![".pcloud/", ".git/"]);
@@ -73,12 +73,12 @@ mod tests {
         let path = IgnoreFiles::path(tmp_dir.path());
 
         {
-            let mut ignored_files = IgnoreFiles::write(&path).unwrap();
+            let mut ignored_files = IgnoreFiles::update(&path).unwrap();
             ignored_files.content.patterns.push("ignore1".to_string());
             ignored_files.content.patterns.push("ignore2".to_string());
         }
 
-        let ignored_files = IgnoreFiles::read(&path);
+        let ignored_files = IgnoreFiles::read(&path).unwrap();
         assert!(ignored_files.content.patterns.len() == 4);
     }
 }

@@ -101,11 +101,11 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let path = DirectoriesFile::path(tmp_dir.path());
 
-        let directories_lock = DirectoriesFile::read(&path);
+        let directories_lock = DirectoriesFile::read(&path).unwrap();
         let directories = &directories_lock.content.data;
         assert!(directories.directories.is_empty());
 
-        let directories_lock2 = DirectoriesFile::read(&path);
+        let directories_lock2 = DirectoriesFile::read(&path).unwrap();
         let directories2 = &directories_lock2.content.data;
         assert!(directories2.directories.is_empty());
     }
@@ -116,7 +116,7 @@ mod tests {
         let path = DirectoriesFile::path(tmp_dir.path());
 
         {
-            let mut directories_lock = DirectoriesFile::write(&path).unwrap();
+            let mut directories_lock = DirectoriesFile::update(&path).unwrap();
             let dirs = &mut directories_lock.content.data.directories;
 
             dirs.push(Directory::new(
@@ -126,7 +126,7 @@ mod tests {
             ))
         }
 
-        let directories_lock = DirectoriesFile::read(&path);
+        let directories_lock = DirectoriesFile::read(&path).unwrap();
         assert!(directories_lock.content.data.directories.len() == 1);
     }
 }

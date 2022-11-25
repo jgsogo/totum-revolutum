@@ -4,11 +4,11 @@ use serde::{Deserialize, Serialize};
 
 use pcloud_sdk::data;
 
+use crate::utils::mut_find_or_insert;
 use crate::utils::{
     locked_file::{LockedFile, ReadWrite},
     versioned_data::VersionedData,
 };
-use crate::utils::mut_find_or_insert;
 
 const FILENAME: &str = "apps.yaml";
 
@@ -79,11 +79,11 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let path = AppsFile::path(tmp_dir.path());
 
-        let apps_lock = AppsFile::read(&path);
+        let apps_lock = AppsFile::read(&path).unwrap();
         let apps = &apps_lock.content.data;
         assert!(apps.apps.is_empty());
 
-        let apps_lock2 = AppsFile::read(&path);
+        let apps_lock2 = AppsFile::read(&path).unwrap();
         let apps2 = &apps_lock2.content.data;
         assert!(apps2.apps.is_empty());
     }
@@ -94,12 +94,12 @@ mod tests {
         let path = AppsFile::path(tmp_dir.path());
 
         {
-            let mut apps_lock = AppsFile::write(&path).unwrap();
+            let mut apps_lock = AppsFile::update(&path).unwrap();
             let apps = &mut apps_lock.content.data.apps;
             apps.push(data::app::App::new("name", "client_id", "client_secret"))
         }
 
-        let apps_lock = AppsFile::read(&path);
+        let apps_lock = AppsFile::read(&path).unwrap();
         assert!(apps_lock.content.data.apps.len() == 1);
     }
 }

@@ -34,7 +34,7 @@ pub fn handle(home: &Path, params: &AddParams) -> Result<()> {
     );
 
     let directories_file_path = storage::cron::DirectoriesFile::path(home);
-    let mut lock = storage::cron::DirectoriesFile::write(&directories_file_path)?;
+    let mut lock = storage::cron::DirectoriesFile::update(&directories_file_path)?;
     let (entry, inserted) = lock.content.find_or_insert(&path, directory_entry);
 
     if !inserted {

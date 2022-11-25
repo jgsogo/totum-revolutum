@@ -44,7 +44,7 @@ pub fn handle(home: &Path, params: &InitParams) -> Result<()> {
     // Check if we need to authorize or just search for configuration
     let apps_file_path = storage::apps::AppsFile::path(home);
     if params.auth {
-        let file_data = storage::apps::AppsFile::write(&apps_file_path)?;
+        let file_data = storage::apps::AppsFile::update(&apps_file_path)?;
         let app = file_data
             .content
             .find(&params.client_id)
@@ -54,7 +54,7 @@ pub fn handle(home: &Path, params: &InitParams) -> Result<()> {
         info!("Run auth process for app {:#?}", app);
         Err(anyhow!("Not implemented!"))
     } else {
-        let file_data = storage::apps::AppsFile::read(&apps_file_path);
+        let file_data = storage::apps::AppsFile::read(&apps_file_path)?;
         let app = file_data
             .content
             .find(&params.client_id)
@@ -65,14 +65,14 @@ pub fn handle(home: &Path, params: &InitParams) -> Result<()> {
 
         // Create the .pcloud/config file
         let config_file_path = storage::config::ConfigFile::path(&working_dir);
-        let mut config_data = storage::config::ConfigFile::write(&config_file_path)?;
+        let mut config_data = storage::config::ConfigFile::update(&config_file_path)?;
         let config = &mut config_data.content.data;
         config.auth.client_id = params.client_id.clone();
         config.auth.userid = token.userid;
 
         // Create the .pcloudignore file
         let ignore_files_path = storage::ignore_files::IgnoreFiles::path(&working_dir);
-        storage::ignore_files::IgnoreFiles::read(&ignore_files_path);
+        storage::ignore_files::IgnoreFiles::read(&ignore_files_path)?;
         Ok(())
     }
 }
