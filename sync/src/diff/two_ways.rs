@@ -105,8 +105,12 @@ pub async fn run<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileMetadata 
                 error!("Send error {e}");
             }
         }
-
         info!("Finished receiving loop in {:?}", start.elapsed());
+
+        // TODO: We should never have duplicated files on either local or remote (the same id several
+        //  times in the same local or remote), but shit happens. If someone is operating with the files
+        //  while we are working on them, it can happen that we inform about some file, then remove it
+        //  and that process adds it again and our visitors see it one more time. Is this possible?
     });
 
     (lhs, rhs, report_rx)

@@ -19,9 +19,8 @@ pub async fn walk_remote_directory(
     config: &config::Config,
     _threads: usize,
     diff: BasePointDiffImpl<RemoteMetadata>,
+    pcloud: pcloud_sdk::client::HttpClient,
 ) -> Result<()> {
-    let pcloud = config.pcloud.as_ref().unwrap();
-
     // FIXME: Here we can implement two different strategies. One of them is to iterate everything
     //  from the ROOT folder recursively, the other one is to list the files in each directory
     //  and use a thread pool to enter child directories and _recurse_.

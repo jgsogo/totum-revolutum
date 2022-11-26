@@ -14,7 +14,7 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
     info!("Start project run for path '{}'", path.display());
 
     let config_file_path = storage::config::ConfigFile::path(path);
-    let mut lock = storage::config::ConfigFile::update_with_pcloud_client(home, &config_file_path)
+    let mut lock = storage::config::ConfigFile::update(&config_file_path)
         .map_err(|_| SDKErrors::ProjectLocked(path.to_string_lossy().to_string()))?;
 
     let data = &mut lock.content.data;
@@ -22,7 +22,7 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
         actions::Actions::Backup => {
             let now = chrono::Utc::now();
 
-            actions::backup::run(path, data).await?;
+            actions::backup::run(home, path, data).await?;
 
             // Update last-execution time. We use the timestamp when the process started because files might be modified
             //  while we are running it and after they are synced. We use the `now` we created above!!!

@@ -111,15 +111,16 @@ impl ConfigAction {
     pub fn action(&self) -> &Actions {
         &self.action
     }
+
+    pub fn conflict(&self) -> &OnConflict {
+        &self.conflict
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub auth: ConfigAuth,
     pub action: ConfigAction,
-
-    #[serde(skip)]
-    pub pcloud: Option<pcloud_sdk::client::HttpClient>,
 }
 
 impl Config {
@@ -132,7 +133,6 @@ impl Config {
         Self {
             auth: ConfigAuth::new(client_id, userid, remote_path),
             action,
-            pcloud: None,
         }
     }
 }
@@ -151,35 +151,6 @@ pub type ConfigFile = LockedFile<ConfigFileContent>;
 impl ConfigFile {
     pub fn path(home: &Path) -> PathBuf {
         home.join(INSIDE_PROJECT_DIRECTORY).join(FILENAME)
-    }
-
-    pub fn read_with_pcloud_client(home: &Path, path: &Path) -> Result<ConfigFile> {
-        let mut config = ConfigFile::read(path)?;
-        config
-            .content
-            .data
-            .auth
-            .get_pcloud_client(home)
-            .map(|pcloud| {
-                config.content.data.pcloud = Some(pcloud);
-                config
-            })
-    }
-
-    pub fn update_with_pcloud_client(home: &Path, path: &Path) -> Result<ConfigFile> {
-        let config = ConfigFile::update(path);
-        match config {
-            Ok(mut config) => config
-                .content
-                .data
-                .auth
-                .get_pcloud_client(home)
-                .map(|pcloud| {
-                    config.content.data.pcloud = Some(pcloud);
-                    config
-                }),
-            Err(e) => Err(e),
-        }
     }
 }
 
