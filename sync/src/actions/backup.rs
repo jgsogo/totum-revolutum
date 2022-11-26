@@ -2,7 +2,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::Result;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, trace};
 
 use crate::actions::OnConflict;
 use crate::diff;
@@ -34,16 +34,24 @@ impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
     }
 
     async fn copy_to_lhs(&self) -> Result<()> {
-        todo!()
+        trace!("copy_to_lhs({})", self.file_diff.id());
+        // TODO: to implement
+        Ok(())
     }
     async fn copy_to_rhs(&self) -> Result<()> {
-        todo!()
+        trace!("copy_to_rhs({})", self.file_diff.id());
+        // TODO: to implement
+        Ok(())
     }
     async fn rename_lhs(&self) -> Result<()> {
-        todo!()
+        trace!("rename_lhs({})", self.file_diff.id());
+        // TODO: to implement
+        Ok(())
     }
     async fn rename_rhs(&self) -> Result<()> {
-        todo!()
+        trace!("rename_rhs({})", self.file_diff.id());
+        // TODO: to implement
+        Ok(())
     }
 }
 
