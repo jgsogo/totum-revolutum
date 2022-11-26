@@ -1,11 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::actions::{Actions, AfterSend, OnConflict};
+use crate::actions::{Actions, OnConflict};
 use crate::utils::locked_file::{LockedFile, ReadWrite};
 use crate::utils::versioned_data::VersionedData;
 
@@ -48,12 +48,66 @@ impl ConfigAuth {
 pub struct ConfigAction {
     action: Actions,
     conflict: OnConflict,
-    after_send: AfterSend,
     #[serde(with = "ts_seconds_option")]
     pub last_executed: Option<DateTime<Utc>>,
 }
 
 impl ConfigAction {
+    /// Create a new `ConfigAction` instance. Not all [`OnConflict`] are compatible with
+    /// all [`Actions`]
+    pub fn new(action: Actions, conflict: OnConflict) -> Result<ConfigAction> {
+        ConfigAction::check(&action, &conflict)?;
+
+        Ok(ConfigAction {
+            action,
+            conflict,
+            last_executed: None,
+        })
+    }
+
+    /// Check if the given `action` and `conflict` are compatible
+    ///
+    /// * `Actions::Backup`: Send local content to remote. Local is never touched and nothing
+    /// will be removed from remote. It can be combined with `OnConflict::OverrideRemote` or
+    /// `OnConflict::RenameRemote`.
+    ///
+    /// * `Actions::ZipBackup`: Send local content to remote in a zip file. It can only be combined with
+    /// `OnConflict::OverrideRemote` or `OnConflict::RenameRemote`
+    ///
+    /// * `Actions::Sync`: Keep local and remote synced. It can be combined with:
+    ///    * `OnConflict::KeepLatest`: modification time will decide which file to keep
+    ///    * `OnConflict::OverrideLocal`: local will always override remote
+    ///    * `OnConflict::OverrideRemote`: remote will always override local
+    ///
+    /// * `Actions::Dump`: Send remote content to local folder. It can be combined with
+    /// `OnConflict::OverrideLocal` or `OnConflict::RenameLocal`.
+    ///
+    /// * `Actions::MoveUpload`: Move local content to remote folder, local will be removed.
+    /// It can be combined with `OnConflict::OverrideRemote` or `OnConflict::RenameRemote`.
+    ///
+    /// * `Actions::MoveDownload`: Move remote content to local folder, remote will be removed.
+    /// It can be combined with `OnConflict::OverrideLocal` or `OnConflict::RenameLocal`.
+    pub fn check(action: &Actions, conflict: &OnConflict) -> Result<()> {
+        match (action, conflict) {
+            (Actions::Backup, OnConflict::OverrideRemote) => Ok(()),
+            (Actions::Backup, OnConflict::RenameRemote) => Ok(()),
+            (Actions::ZipBackup, OnConflict::OverrideRemote) => Ok(()),
+            (Actions::ZipBackup, OnConflict::RenameRemote) => Ok(()),
+            (Actions::Sync, OnConflict::KeepLatest) => Ok(()),
+            (Actions::Sync, OnConflict::OverrideLocal) => Ok(()),
+            (Actions::Sync, OnConflict::OverrideRemote) => Ok(()),
+            (Actions::Dump, OnConflict::OverrideLocal) => Ok(()),
+            (Actions::Dump, OnConflict::RenameLocal) => Ok(()),
+            (Actions::MoveUpload, OnConflict::OverrideRemote) => Ok(()),
+            (Actions::MoveUpload, OnConflict::RenameRemote) => Ok(()),
+            (Actions::MoveDownload, OnConflict::OverrideLocal) => Ok(()),
+            (Actions::MoveDownload, OnConflict::RenameLocal) => Ok(()),
+            _ => bail!(
+                "Invalid combination of action ({action:?}) and conflict resolution ({conflict:?})"
+            ),
+        }
+    }
+
     pub fn action(&self) -> &Actions {
         &self.action
     }

@@ -6,6 +6,8 @@ use anyhow::{anyhow, Result};
 use fs4::FileExt;
 use tracing::debug;
 
+use crate::utils::versioned_data::VersionedData;
+
 pub trait ReadWrite<T> {
     fn read_content(path: &Path) -> std::io::Result<Option<T>> {
         let mut file = std::fs::File::open(path).unwrap();
@@ -104,14 +106,28 @@ where
         LockedFile::read_content(file, path, false)
     }
 
-    pub fn update_or_create(path: &Path, default: T) -> Result<Self> {
+    pub fn update(path: &Path) -> Result<Self> {
+        let file = Self::ensure_exists(path);
+
+        debug!("Lock file (exclusive) '{}'", path.display());
+        file.try_lock_exclusive()?;
+
+        LockedFile::read_content(file, path, true)
+    }
+}
+
+impl<T> LockedFile<T>
+where
+    T: Default + ReadWrite<T>,
+{
+    pub fn update_or_create(path: &Path) -> Result<Self> {
         let file = Self::ensure_exists(path);
 
         debug!("Lock file (exclusive) '{}'", path.display());
         file.try_lock_exclusive()?;
 
         debug!("Read file from '{}'", path.display());
-        let content = T::read_content(path)?.unwrap_or(default);
+        let content = T::read_content(path)?.unwrap_or(T::default());
 
         Ok(Self {
             content,
@@ -120,14 +136,29 @@ where
             file,
         })
     }
+}
 
-    pub fn update(path: &Path) -> Result<Self> {
+impl<T> LockedFile<VersionedData<T>>
+where
+    VersionedData<T>: ReadWrite<VersionedData<T>>,
+{
+    pub fn update_or_create(path: &Path, default: T) -> Result<Self> {
+        // TODO: Change return type to `Result<(Self, bool)>` so we can know if it was created of updated
         let file = Self::ensure_exists(path);
 
         debug!("Lock file (exclusive) '{}'", path.display());
         file.try_lock_exclusive()?;
 
-        LockedFile::read_content(file, path, true)
+        debug!("Read file from '{}'", path.display());
+        let content =
+            VersionedData::<T>::read_content(path)?.unwrap_or(VersionedData::default(default));
+
+        Ok(Self {
+            content,
+            write: true,
+            path: path.to_path_buf(),
+            file,
+        })
     }
 }
 

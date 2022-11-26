@@ -11,7 +11,7 @@ pub struct VersionedData<T> {
 }
 
 impl<T> VersionedData<T> {
-    fn default(default: T) -> Self {
+    pub fn default(default: T) -> Self {
         Self {
             version: VERSION.to_string(),
             data: default,

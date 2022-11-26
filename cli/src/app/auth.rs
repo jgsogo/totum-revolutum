@@ -6,6 +6,7 @@ use tracing::info;
 
 use pcloud_sdk::data;
 use pcloud_sync::storage;
+use pcloud_sync::storage::apps::Apps;
 use pcloud_sync::utils::mut_find_or_insert;
 
 // TODO: Args 'client_secret' and 'client_secret_stdin' are mutually exclusive, but one of them is always required
@@ -47,7 +48,7 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
 
     // Lock the file
     let path = storage::apps::AppsFile::path(home);
-    let mut file_data = storage::apps::AppsFile::update(&path)?;
+    let mut file_data = storage::apps::AppsFile::update_or_create(&path, Apps::default())?;
 
     // Search of create new entry for this application
     let app = data::app::App::default(&params.client_id, &secret);

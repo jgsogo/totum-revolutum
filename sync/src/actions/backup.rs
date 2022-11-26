@@ -14,7 +14,7 @@ use crate::storage::config;
 /// Runs action backup for the input `file_diff`
 fn handle_backup<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>(
     file_diff: FileDiff<LHSMetadata, RHSMetadata>,
-    config: &config::Config,
+    _config: &config::Config,
 ) {
     let status = match &file_diff {
         FileDiff {

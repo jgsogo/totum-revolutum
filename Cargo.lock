@@ -1174,6 +1174,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "chrono-tz",
+ "clap",
  "confy",
  "cron-parser",
  "flume",

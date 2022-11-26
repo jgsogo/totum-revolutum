@@ -4,8 +4,10 @@ use anyhow::{anyhow, Result};
 use clap::Args;
 use tracing::{debug, info};
 
+use pcloud_sync::actions;
 use pcloud_sync::storage;
 use pcloud_sync::storage::candidate_pcloud_dir;
+use pcloud_sync::storage::config::{Config, ConfigAction};
 
 use crate::common::DirectoryArg;
 
@@ -27,6 +29,12 @@ pub struct InitParams {
     #[clap(long, action, group = "user_id")]
     /// Run authorize for the application
     auth: bool,
+
+    #[clap(long, value_enum)]
+    action: actions::Actions,
+
+    #[clap(long, value_enum)]
+    on_conflict: actions::OnConflict,
 }
 
 pub fn handle(home: &Path, params: &InitParams) -> Result<()> {
@@ -64,15 +72,16 @@ pub fn handle(home: &Path, params: &InitParams) -> Result<()> {
             .expect("User is not authenticated for the given application");
 
         // Create the .pcloud/config file
+        let config_action = ConfigAction::new(params.action, params.on_conflict)?;
+        let config = Config::new(&params.client_id, token.userid, None, config_action);
         let config_file_path = storage::config::ConfigFile::path(&working_dir);
-        let mut config_data = storage::config::ConfigFile::update(&config_file_path)?;
-        let config = &mut config_data.content.data;
-        config.auth.client_id = params.client_id.clone();
-        config.auth.userid = token.userid;
+        let mut _config_data =
+            storage::config::ConfigFile::update_or_create(&config_file_path, config)?;
+        // TODO: Return if updated or created, it is relevant!
 
         // Create the .pcloudignore file
         let ignore_files_path = storage::ignore_files::IgnoreFiles::path(&working_dir);
-        storage::ignore_files::IgnoreFiles::read(&ignore_files_path)?;
+        storage::ignore_files::IgnoreFiles::update_or_create(&ignore_files_path)?;
         Ok(())
     }
 }

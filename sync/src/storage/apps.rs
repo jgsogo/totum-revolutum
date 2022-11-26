@@ -1,5 +1,6 @@
 use std::path::{Path, PathBuf};
 
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 use pcloud_sdk::data;

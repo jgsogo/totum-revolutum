@@ -1,9 +1,10 @@
 use std::path::Path;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use tracing::info;
 
 use crate::actions;
+use crate::actions::Actions;
 use crate::errors::SDKErrors;
 use crate::storage;
 
@@ -28,8 +29,10 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
             data.action.last_executed = Some(now);
             Ok(())
         }
-        actions::Actions::ZipBackup => Err(anyhow!(SDKErrors::NotImplemented)),
-        actions::Actions::Sync => Err(anyhow!(SDKErrors::NotImplemented)),
-        actions::Actions::Dump => Err(anyhow!(SDKErrors::NotImplemented)),
+        actions::Actions::ZipBackup => todo!(),
+        actions::Actions::Sync => todo!(),
+        actions::Actions::Dump => todo!(),
+        Actions::MoveUpload => todo!(),
+        Actions::MoveDownload => todo!(),
     }
 }
