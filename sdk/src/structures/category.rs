@@ -2,7 +2,7 @@ use std::fmt::{Debug, Display, Formatter};
 
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Eq)]
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Eq, Clone)]
 #[repr(u8)]
 /// Category of the file, described in https://docs.pcloud.com/structures/metadata.html
 pub enum Category {

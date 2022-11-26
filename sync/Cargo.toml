@@ -1,5 +1,5 @@
 [package]
-name = "pcloud-sdk-desktop"
+name = "pcloud-sync"
 version = "0.1.0"
 edition = "2021"
 
@@ -32,6 +32,7 @@ ignore = "0.4"
 async-trait = "0.1"
 flume = "0.10.14"
 sha256 = "1.1"
+clap = { version = "4.0", features = ["derive"] }  # TODO: Require cli feature
 
 [dev-dependencies]
 tempfile = "3"

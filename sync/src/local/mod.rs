@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::time::Instant;
 
 use anyhow::Result;
 use ignore::WalkBuilder;
@@ -23,15 +24,10 @@ pub async fn walk_local_directory(
         .add_custom_ignore_filename(ignore_files::IgnoreFiles::path(path))
         .build_parallel();
 
-    let wait_lhs = {
-        let path = path.to_path_buf();
-        tokio::spawn(async move {
-            info!("Start local visitor");
-            let mut builder = parallel_visitor::VisitorBuilder::new(&path, diff);
-            walker.visit(&mut builder);
-            info!("Finished local visitor");
-        })
-    };
-    wait_lhs.await?;
+    info!("Start local visitor");
+    let start = Instant::now();
+    let mut builder = parallel_visitor::VisitorBuilder::new(&path, diff);
+    walker.visit(&mut builder);
+    info!("Finished local visitor in {:?}", start.elapsed());
     Ok(())
 }

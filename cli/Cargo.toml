@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 pcloud-sdk = { path = "../sdk" }
-pcloud-sdk-desktop = { path = "../desktop" }
+pcloud-sync = { path = "../sync" }
 # indicatif = { version = "0.17"}
 home = "0.5.4"
 tokio = { version = "1.22", features = ["full"] }

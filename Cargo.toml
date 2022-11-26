@@ -3,5 +3,5 @@
 members = [
     "sdk",
     "cli",
-    "desktop",
+    "sync",
 ]

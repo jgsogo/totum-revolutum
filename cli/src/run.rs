@@ -4,8 +4,8 @@ use anyhow::{bail, Result};
 use clap::Args;
 use tracing::debug;
 
-use pcloud_sdk_desktop::run;
-use pcloud_sdk_desktop::storage::is_pcloud_dir;
+use pcloud_sync::run;
+use pcloud_sync::storage::is_pcloud_dir;
 
 use crate::common::current_wdir;
 use crate::common::DirectoryArg;

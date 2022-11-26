@@ -1,4 +1,4 @@
-mod actions;
+pub mod actions;
 mod diff;
 pub mod errors;
 mod local;

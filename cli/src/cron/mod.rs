@@ -17,12 +17,7 @@ pub enum Commands {
 
 pub fn handle(home: &Path, input: &Commands) -> Result<()> {
     match &input {
-        Commands::List => {
-            list::handle(home);
-        }
-        Commands::Add(input) => {
-            add::handle(home, input)?;
-        }
-    };
-    Ok(())
+        Commands::List => list::handle(home),
+        Commands::Add(input) => add::handle(home, input),
+    }
 }

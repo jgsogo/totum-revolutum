@@ -17,12 +17,7 @@ pub enum Commands {
 
 pub async fn handle(home: &Path, input: &Commands) -> Result<()> {
     match &input {
-        Commands::Auth(input) => {
-            auth::handle(home, input).await?;
-        }
-        Commands::List(input) => {
-            list::handle(home, input);
-        }
-    };
-    Ok(())
+        Commands::Auth(input) => auth::handle(home, input).await,
+        Commands::List(input) => list::handle(home, input),
+    }
 }

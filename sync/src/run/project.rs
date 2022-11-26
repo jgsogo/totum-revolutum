@@ -1,9 +1,10 @@
 use std::path::Path;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use tracing::info;
 
 use crate::actions;
+use crate::actions::Actions;
 use crate::errors::SDKErrors;
 use crate::storage;
 
@@ -13,23 +14,25 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
     info!("Start project run for path '{}'", path.display());
 
     let config_file_path = storage::config::ConfigFile::path(path);
-    let mut lock = storage::config::ConfigFile::write_with_pcloud_client(home, &config_file_path)
+    let mut lock = storage::config::ConfigFile::update(&config_file_path)
         .map_err(|_| SDKErrors::ProjectLocked(path.to_string_lossy().to_string()))?;
 
     let data = &mut lock.content.data;
-    match data.action.action {
+    match data.action.action() {
         actions::Actions::Backup => {
             let now = chrono::Utc::now();
 
-            actions::backup::run(path, data).await?;
+            actions::backup::run(home, path, data).await?;
 
             // Update last-execution time. We use the timestamp when the process started because files might be modified
             //  while we are running it and after they are synced. We use the `now` we created above!!!
             data.action.last_executed = Some(now);
             Ok(())
         }
-        actions::Actions::ZipBackup => Err(anyhow!(SDKErrors::NotImplemented)),
-        actions::Actions::Sync => Err(anyhow!(SDKErrors::NotImplemented)),
-        actions::Actions::Dump => Err(anyhow!(SDKErrors::NotImplemented)),
+        actions::Actions::ZipBackup => todo!(),
+        actions::Actions::Sync => todo!(),
+        actions::Actions::Dump => todo!(),
+        Actions::MoveUpload => todo!(),
+        Actions::MoveDownload => todo!(),
     }
 }

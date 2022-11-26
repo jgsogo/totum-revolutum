@@ -9,7 +9,7 @@ use super::icon::Icon;
 // TODO: Use enum for files and folders: https://serde.rs/enum-representations.html
 
 // https://docs.pcloud.com/structures/metadata.html
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 /// Metadata that is common to files and folders
 ///
 /// Given `filtermeta` argument, everything is optional
@@ -28,7 +28,7 @@ pub struct CommonMetadata {
     pub name: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Metadata {
     #[serde(flatten)]
     pub common: CommonMetadata,
@@ -50,7 +50,7 @@ pub struct Metadata {
 
     // only for files
     pub hash: Option<u64>,
-    pub size: Option<i64>,
+    pub size: Option<u64>,
     contenttype: Option<String>,
 
     // Optional fields depending on file type
@@ -62,13 +62,13 @@ pub struct Metadata {
     extra_videofile: Option<MetadataVideoFile>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct MetadataImageFile {
     width: u32,
     height: u32,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct MetadataAudioFile {
     artist: String,
     album: u32,
@@ -77,7 +77,7 @@ pub struct MetadataAudioFile {
     trackno: u32,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct MetadataVideoFile {
     width: String,
     height: u32,

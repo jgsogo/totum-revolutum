@@ -1,20 +1,22 @@
 use std::path::Path;
 
+use anyhow::Result;
 use clap::Args;
 use tracing::debug;
 
-use pcloud_sdk_desktop::storage;
+use pcloud_sync::storage;
 
 #[derive(Args, Debug)]
 pub struct ListParams {
     name: Option<String>,
 }
 
-pub fn handle(home: &Path, _params: &ListParams) {
+pub fn handle(home: &Path, _params: &ListParams) -> Result<()> {
     debug!("List applications from {}", home.display());
     let path = storage::apps::AppsFile::path(home);
-    let file_data = storage::apps::AppsFile::read(&path);
+    let file_data = storage::apps::AppsFile::read(&path)?;
 
     // TODO: Depending on verbosity level... maybe add formatters
     println!("{:#?}", file_data.content.data);
+    Ok(())
 }
