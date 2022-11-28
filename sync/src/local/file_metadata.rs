@@ -1,7 +1,11 @@
 use std::path::Path;
 
+use anyhow::Result;
+use async_trait::async_trait;
 use ignore::DirEntry;
+use tracing::trace;
 
+use crate::actions::{Copy, Remove, Rename};
 use crate::diff::basepoint::FileMetadata;
 
 pub trait LocalFileMetadata: FileMetadata {
@@ -45,5 +49,33 @@ impl LocalFileMetadata for LocalMetadata {
 
     fn path(&self) -> &Path {
         self.entry.path()
+    }
+}
+
+#[async_trait]
+impl Copy<LocalMetadata> for LocalMetadata {
+    async fn copy(self, rhs: Option<LocalMetadata>) -> Result<(Self, LocalMetadata)> {
+        trace!(
+            "Copy local '{}' to local '{}'",
+            self.path().display(),
+            rhs.as_ref().map_or("".to_string(), |v| v.path().display().to_string())
+        );
+        Ok((self, rhs.unwrap()))
+    }
+}
+
+#[async_trait]
+impl Remove for LocalMetadata {
+    async fn remove(self) -> Result<()> {
+        trace!("Remove local '{}'", self.path().display());
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl Rename for LocalMetadata {
+    async fn rename(self) -> Result<Self> {
+        trace!("Rename local '{}'", self.path().display());
+        Ok(self)
     }
 }

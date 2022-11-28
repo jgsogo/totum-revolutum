@@ -1,6 +1,34 @@
+use anyhow::Result;
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
+use crate::diff::basepoint::FileMetadata;
+
 pub mod backup;
+
+#[async_trait]
+pub trait Copy<Rhs: FileMetadata = Self>: FileMetadata {
+    async fn copy(self, rhs: Option<Rhs>) -> Result<(Self, Rhs)>;
+}
+
+#[async_trait]
+pub trait Remove: FileMetadata {
+    async fn remove(self) -> Result<()>;
+}
+
+#[async_trait]
+pub trait Move<Rhs: FileMetadata + 'static = Self>: FileMetadata + Copy<Rhs> + Remove {
+    async fn do_move(self, rhs: Option<Rhs>) -> Result<Rhs> {
+        let (lhs, rhs) = self.copy(rhs).await?;
+        lhs.remove().await?;
+        Ok(rhs)
+    }
+}
+
+#[async_trait]
+pub trait Rename: FileMetadata {
+    async fn rename(self) -> Result<Self>;
+}
 
 /// Describes the action to perform
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, clap::ValueEnum, Copy)]

@@ -1,11 +1,20 @@
 use std::path::Path;
 
+use anyhow::Result;
+use async_trait::async_trait;
+use tracing::trace;
+
+use pcloud_sdk::id::FileID;
 use pcloud_sdk::structures::Metadata;
 
+use crate::actions::{Copy, Remove, Rename};
 use crate::diff::basepoint::FileMetadata;
+use crate::local::{LocalFileMetadata, LocalMetadata};
 
 pub trait RemoteFileMetadata: FileMetadata {
     fn from_pcloud_metadata(path: &Path, metadata: Metadata) -> Self;
+
+    fn fileid(&self) -> &FileID;
 }
 
 #[derive(Debug, Clone)]
@@ -33,5 +42,49 @@ impl RemoteFileMetadata for RemoteMetadata {
             id: path.to_string_lossy().parse().unwrap(),
             metadata,
         }
+    }
+
+    fn fileid(&self) -> &FileID {
+        self.metadata.fileid.as_ref().unwrap()
+    }
+}
+
+#[async_trait]
+impl Copy<LocalMetadata> for RemoteMetadata {
+    async fn copy(self, rhs: Option<LocalMetadata>) -> Result<(Self, LocalMetadata)> {
+        trace!(
+            "Copy from remote '{}' to local '{}'",
+            self.fileid(),
+            rhs.as_ref().map_or("".to_string(), |v| v.path().display().to_string())
+        );
+        Ok((self, rhs.unwrap()))
+    }
+}
+
+#[async_trait]
+impl Copy<RemoteMetadata> for LocalMetadata {
+    async fn copy(self, rhs: Option<RemoteMetadata>) -> Result<(Self, RemoteMetadata)> {
+        trace!(
+            "Copy from local '{}' to remote '{}'",
+            self.path().display(),
+            rhs.as_ref().map_or("".to_string(), |v| v.fileid().to_string())
+        );
+        Ok((self, rhs.unwrap()))
+    }
+}
+
+#[async_trait]
+impl Remove for RemoteMetadata {
+    async fn remove(self) -> Result<()> {
+        trace!("Remove remote '{}'", self.fileid());
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl Rename for RemoteMetadata {
+    async fn rename(self) -> Result<Self> {
+        trace!("Rename remote '{}'", self.fileid());
+        Ok(self)
     }
 }

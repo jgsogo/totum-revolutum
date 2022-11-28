@@ -5,19 +5,16 @@ use anyhow::Result;
 use ignore::WalkBuilder;
 use tracing::info;
 
-pub use file_metadata::LocalMetadata;
+pub use file_metadata::{LocalFileMetadata, LocalMetadata};
 
 use super::diff::basepoint::BasePointDiffImpl;
 use super::storage::ignore_files;
 
+mod actions;
 mod file_metadata;
 mod parallel_visitor;
 
-pub async fn walk_local_directory(
-    path: &Path,
-    threads: usize,
-    diff: BasePointDiffImpl<file_metadata::LocalMetadata>,
-) -> Result<()> {
+pub async fn walk_local_directory(path: &Path, threads: usize, diff: BasePointDiffImpl<LocalMetadata>) -> Result<()> {
     let walker = WalkBuilder::new(path)
         .threads(threads)
         .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
