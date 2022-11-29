@@ -1,5 +1,7 @@
 use anyhow::Result;
+use indicatif;
 use tempfile::tempdir;
+use tracing::{error, info, Level};
 use tracing_subscriber::FmtSubscriber;
 
 use pcloud_sdk::data;
@@ -10,11 +12,14 @@ use pcloud_sdk::methods::general::getapiserver::GetAPIServer;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::methods::streaming::getfilelink::{FileLink, GetFileLink, GetFileLinkInput};
 use pcloud_sdk::progress_bar::{ProgressBar, ProgressBarBuilder};
-use tracing::{error, info, Level};
 
 struct OutputExample {}
 
-impl ProgressBarBuilder for OutputExample {}
+impl ProgressBarBuilder for OutputExample {
+    fn new(&self, total_size: u64) -> Box<dyn ProgressBar> {
+        Box::new(indicatif::ProgressBar::new(total_size))
+    }
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {

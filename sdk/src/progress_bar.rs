@@ -30,3 +30,18 @@ impl ProgressBar for NoProgressBar {
         info!("NoProgressBar::finish_with_message({})", message)
     }
 }
+
+#[cfg(feature = "indicatif")]
+impl ProgressBar for indicatif::ProgressBar {
+    fn set_message(&self, message: &str) {
+        self.set_message(message.to_string());
+    }
+
+    fn set_position(&self, position: u64) {
+        self.set_position(position);
+    }
+
+    fn finish_with_message(&self, message: &str) {
+        self.finish_with_message(message.to_string());
+    }
+}
