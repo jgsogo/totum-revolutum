@@ -1,7 +1,7 @@
 use anyhow::{Error, Result};
 use indicatif;
 use tempfile::tempdir;
-use tracing::{error, info, Level};
+use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
 use pcloud_sdk::data;
@@ -10,7 +10,7 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::general::getapiserver::GetAPIServer;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
-use pcloud_sdk::methods::streaming::getfilelink::{FileLink, GetFileLink, GetFileLinkInput};
+use pcloud_sdk::methods::streaming::getfilelink::GetFileLinkInput;
 use pcloud_sdk::progress_bar::{ProgressBar, ProgressBarBuilder};
 
 #[derive(Clone)]
@@ -69,7 +69,7 @@ async fn main() -> Result<()> {
     let listfolder = pcloud.listfolder(&listfolder_input).await?;
 
     let mut futures = tokio::task::JoinSet::new();
-    let r = listfolder
+    listfolder
         .metadata
         .contents
         .as_ref()
