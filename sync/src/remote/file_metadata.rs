@@ -52,11 +52,18 @@ impl RemoteFileMetadata for RemoteMetadata {
 #[async_trait]
 impl Copy<LocalMetadata> for RemoteMetadata {
     async fn copy(self, rhs: Option<LocalMetadata>) -> Result<(Self, LocalMetadata)> {
-        trace!(
-            "Copy from remote '{}' to local '{}'",
-            self.fileid(),
-            rhs.as_ref().map_or("".to_string(), |v| v.path().display().to_string())
-        );
+        match rhs {
+            Some(rhs) => {
+                trace!(
+                    "Copy from remote '{}' to local '{}' (override)",
+                    self.fileid(),
+                    rhs.path().display()
+                );
+            }
+            None => {
+                trace!("Copy from remote '{}' to local ' (new file)", self.fileid(),);
+            }
+        }
         Ok((self, rhs.unwrap()))
     }
 }
