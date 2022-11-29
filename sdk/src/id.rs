@@ -8,6 +8,13 @@ pub struct FileID(pub i64);
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone)]
 pub struct FolderID(pub i64);
 
+impl FileID {
+    pub fn id(&self) -> &i64 {
+        let FileID(value) = self;
+        value
+    }
+}
+
 impl Display for FileID {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let FileID(value) = self;
