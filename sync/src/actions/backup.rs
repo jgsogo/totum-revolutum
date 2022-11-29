@@ -18,9 +18,7 @@ struct Actions<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
     _pcloud: pcloud_sdk::client::HttpClient,
 }
 
-impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
-    Actions<'a, LHSMetadata, RHSMetadata>
-{
+impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> Actions<'a, LHSMetadata, RHSMetadata> {
     pub fn new(
         file_diff: FileDiff<LHSMetadata, RHSMetadata>,
         config: &'a config::Config,
@@ -57,9 +55,7 @@ impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
     }
 }
 
-impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
-    Actions<'a, LHSMetadata, RHSMetadata>
-{
+impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> Actions<'a, LHSMetadata, RHSMetadata> {
     pub async fn backup(&self) -> Result<()> {
         match &self.file_diff {
             FileDiff {
@@ -73,12 +69,10 @@ impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
                 }
             }
             FileDiff {
-                lhs_metadata: Some(_),
-                ..
+                lhs_metadata: Some(_), ..
             } => self.copy_to_rhs().await,
             FileDiff {
-                rhs_metadata: Some(_),
-                ..
+                rhs_metadata: Some(_), ..
             } => Ok(()),
             _ => panic!("Not expected"),
         }
@@ -96,10 +90,7 @@ impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
     }
 }
 
-async fn work_on_results<
-    LHSMetadata: FileMetadata + 'static,
-    RHSMetadata: FileMetadata + 'static,
->(
+async fn work_on_results<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileMetadata + 'static>(
     rx: flume::Receiver<FileDiff<LHSMetadata, RHSMetadata>>,
     config: &config::Config,
     pcloud: pcloud_sdk::client::HttpClient,
@@ -119,8 +110,7 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
     let pcloud = config.auth.get_pcloud_client(home)?;
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
-    let (lhs, rhs, differ) =
-        diff::two_ways::run::<local::LocalMetadata, remote::RemoteMetadata>().await;
+    let (lhs, rhs, differ) = diff::two_ways::run::<local::LocalMetadata, remote::RemoteMetadata>().await;
 
     if let Err(e) = tokio::try_join!(
         local::walk_local_directory(path, 6, lhs),

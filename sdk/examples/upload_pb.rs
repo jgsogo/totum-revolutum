@@ -36,11 +36,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     ];
 
     let m = MultiProgress::new();
-    let sty = ProgressStyle::with_template(
-        "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
-    )
-    .unwrap()
-    .progress_chars("##-");
+    let sty = ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+        .unwrap()
+        .progress_chars("##-");
 
     let mut all_tasks = vec![];
     for file in files_to_upload {
@@ -55,8 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             let progresshash = progresshash.clone();
             all_tasks.push(
                 async move {
-                    let mut upload_params =
-                        UploadFileParams::new_from_folderid(folderid.clone(), file.to_string());
+                    let mut upload_params = UploadFileParams::new_from_folderid(folderid.clone(), file.to_string());
                     upload_params.progresshash = Some(progresshash);
                     tx.send(()).unwrap();
                     let _r = pcloud.uploadfile(&file, upload_params).await.unwrap();
@@ -93,8 +90,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                                 finished: false,
                                 ..
                             }) => {
-                                let percent =
-                                    ((uploaded as f32 / total as f32) * pb_points as f32) as u64;
+                                let percent = ((uploaded as f32 / total as f32) * pb_points as f32) as u64;
                                 pb.set_message(format!("{} #{}", &file, percent));
                                 pb.set_position(percent);
                             }

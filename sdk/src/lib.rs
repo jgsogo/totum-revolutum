@@ -2,7 +2,7 @@ pub mod client;
 pub mod data;
 pub mod error;
 pub mod handy;
-mod id;
+pub mod id;
 pub mod methods;
 pub mod progress_bar;
 pub mod structures;
