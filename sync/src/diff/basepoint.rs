@@ -1,6 +1,7 @@
 pub const MAX_BUFFER: usize = 100;
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub enum SnapshotStatus {
     ToBeDeleted,
     New,

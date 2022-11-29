@@ -72,7 +72,7 @@ mod tests {
     #[test]
     fn test_path() {
         let base_path = Path::new("home");
-        assert!(AppsFile::path(base_path) == base_path.join("apps.yaml"));
+        assert_eq!(AppsFile::path(base_path), base_path.join("apps.yaml"));
     }
 
     #[test]
@@ -80,6 +80,10 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let path = AppsFile::path(tmp_dir.path());
 
+        assert!(AppsFile::read(&path).is_err());
+        {
+            let _lock = AppsFile::update_or_create(&path, Apps::default()).unwrap();
+        }
         let apps_lock = AppsFile::read(&path).unwrap();
         let apps = &apps_lock.content.data;
         assert!(apps.apps.is_empty());
@@ -90,17 +94,16 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn test_update_or_create() {
         let tmp_dir = tempdir().unwrap();
         let path = AppsFile::path(tmp_dir.path());
-
         {
-            let mut apps_lock = AppsFile::update(&path).unwrap();
+            let mut apps_lock = AppsFile::update_or_create(&path, Apps::default()).unwrap();
             let apps = &mut apps_lock.content.data.apps;
             apps.push(data::app::App::new("name", "client_id", "client_secret"))
         }
 
         let apps_lock = AppsFile::read(&path).unwrap();
-        assert!(apps_lock.content.data.apps.len() == 1);
+        assert_eq!(apps_lock.content.data.apps.len(), 1);
     }
 }

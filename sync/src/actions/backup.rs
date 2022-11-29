@@ -2,7 +2,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::Result;
-use tracing::{debug, error, info, trace};
+use tracing::{error, info, trace};
 
 use crate::actions::OnConflict;
 use crate::diff;
@@ -15,7 +15,7 @@ use crate::storage::config;
 struct Actions<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
     file_diff: FileDiff<LHSMetadata, RHSMetadata>,
     config: &'a config::Config,
-    pcloud: pcloud_sdk::client::HttpClient,
+    _pcloud: pcloud_sdk::client::HttpClient,
 }
 
 impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
@@ -29,10 +29,11 @@ impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
         Self {
             file_diff,
             config,
-            pcloud,
+            _pcloud: pcloud,
         }
     }
 
+    #[allow(dead_code)]
     async fn copy_to_lhs(&self) -> Result<()> {
         trace!("copy_to_lhs({})", self.file_diff.id());
         // TODO: to implement
@@ -43,6 +44,7 @@ impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata>
         // TODO: to implement
         Ok(())
     }
+    #[allow(dead_code)]
     async fn rename_lhs(&self) -> Result<()> {
         trace!("rename_lhs({})", self.file_diff.id());
         // TODO: to implement

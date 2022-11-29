@@ -93,7 +93,10 @@ mod tests {
     #[test]
     fn test_path() {
         let base_path = Path::new("home");
-        assert!(DirectoriesFile::path(base_path) == base_path.join("cron.yaml"));
+        assert_eq!(
+            DirectoriesFile::path(base_path),
+            base_path.join("cron.yaml")
+        );
     }
 
     #[test]
@@ -101,6 +104,10 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let path = DirectoriesFile::path(tmp_dir.path());
 
+        assert!(DirectoriesFile::read(&path).is_err());
+        {
+            let _lock = DirectoriesFile::update_or_create(&path, Directories::default()).unwrap();
+        }
         let directories_lock = DirectoriesFile::read(&path).unwrap();
         let directories = &directories_lock.content.data;
         assert!(directories.directories.is_empty());
@@ -111,12 +118,13 @@ mod tests {
     }
 
     #[test]
-    fn test_write() {
+    fn test_update_or_create() {
         let tmp_dir = tempdir().unwrap();
         let path = DirectoriesFile::path(tmp_dir.path());
 
         {
-            let mut directories_lock = DirectoriesFile::update(&path).unwrap();
+            let mut directories_lock =
+                DirectoriesFile::update_or_create(&path, Directories::default()).unwrap();
             let dirs = &mut directories_lock.content.data.directories;
 
             dirs.push(Directory::new(
@@ -127,6 +135,6 @@ mod tests {
         }
 
         let directories_lock = DirectoriesFile::read(&path).unwrap();
-        assert!(directories_lock.content.data.directories.len() == 1);
+        assert_eq!(directories_lock.content.data.directories.len(), 1);
     }
 }

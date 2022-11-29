@@ -50,7 +50,10 @@ mod tests {
     #[test]
     fn test_path() {
         let base_path = Path::new("base");
-        assert!(IgnoreFiles::path(base_path) == base_path.join(".pcloudignore"));
+        assert_eq!(
+            IgnoreFiles::path(base_path),
+            base_path.join(".pcloudignore")
+        );
     }
 
     #[test]
@@ -58,27 +61,31 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let path = IgnoreFiles::path(tmp_dir.path());
 
+        assert!(IgnoreFiles::read(&path).is_err());
+        {
+            let _lock = IgnoreFiles::update_or_create(&path).unwrap();
+        }
         let ignored_files = IgnoreFiles::read(&path).unwrap();
-        assert!(ignored_files.content.patterns.len() == 2);
+        assert_eq!(ignored_files.content.patterns.len(), 2);
 
         let ignored_files2 = IgnoreFiles::read(&path).unwrap();
-        assert!(ignored_files2.content.patterns.len() == 2);
+        assert_eq!(ignored_files2.content.patterns.len(), 2);
 
-        assert!(ignored_files.content.patterns == vec![".pcloud/", ".git/"]);
+        assert_eq!(ignored_files.content.patterns, vec![".pcloud/", ".git/"]);
     }
 
     #[test]
-    fn test_write() {
+    fn test_update_or_create() {
         let tmp_dir = tempdir().unwrap();
         let path = IgnoreFiles::path(tmp_dir.path());
 
         {
-            let mut ignored_files = IgnoreFiles::update(&path).unwrap();
+            let mut ignored_files = IgnoreFiles::update_or_create(&path).unwrap();
             ignored_files.content.patterns.push("ignore1".to_string());
             ignored_files.content.patterns.push("ignore2".to_string());
         }
 
         let ignored_files = IgnoreFiles::read(&path).unwrap();
-        assert!(ignored_files.content.patterns.len() == 4);
+        assert_eq!(ignored_files.content.patterns.len(), 4);
     }
 }

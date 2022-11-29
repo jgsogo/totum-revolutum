@@ -4,13 +4,14 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::{client, utils};
+use crate::id::FolderID;
 use crate::structures::Metadata;
+use crate::{client, utils};
 
 #[derive(Debug, Clone)]
 pub struct UploadFileParams {
     path: Option<String>,
-    folderid: Option<i64>,
+    folderid: Option<FolderID>,
     filename: String,
     // Optional parameters
     pub nopartial: bool,
@@ -21,7 +22,7 @@ pub struct UploadFileParams {
 }
 
 impl UploadFileParams {
-    fn new(path: Option<String>, folderid: Option<i64>, filename: String) -> UploadFileParams {
+    fn new(path: Option<String>, folderid: Option<FolderID>, filename: String) -> UploadFileParams {
         UploadFileParams {
             path,
             folderid,
@@ -38,7 +39,7 @@ impl UploadFileParams {
         UploadFileParams::new(Some(path), None, filename)
     }
 
-    pub fn new_from_folderid(folderid: i64, filename: String) -> UploadFileParams {
+    pub fn new_from_folderid(folderid: FolderID, filename: String) -> UploadFileParams {
         UploadFileParams::new(None, Some(folderid), filename)
     }
 }
