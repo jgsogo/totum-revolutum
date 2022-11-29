@@ -4,8 +4,8 @@ use std::time::Instant;
 use anyhow::Result;
 use tracing::{error, info};
 
-use crate::actions::OnConflict;
-use crate::diff::basepoint::{BasePointDiffImpl, FileMetadata};
+use crate::actions::{Copy, OnConflict, Rename};
+use crate::diff::basepoint::{BasePoint, BasePointDiffImpl, FileMetadata};
 use crate::diff::two_ways::FileDiff;
 use crate::local;
 use crate::local::BasePointLocal;
@@ -14,34 +14,36 @@ use crate::remote::basepoint::BasePointPCloud;
 use crate::storage::config;
 use crate::{actions, diff};
 
-async fn backup<LHSMetadata, RHSMetadata>(
-    filediff: FileDiff<LHSMetadata, RHSMetadata>,
+async fn backup<LHS, RHS, BasePointLHS, BasePointRHS>(
+    filediff: FileDiff<LHS, RHS>,
     config: &config::Config,
-    local_basepoint: &BasePointLocal,
-    remote_basepoint: &BasePointPCloud,
+    local_basepoint: &BasePointLHS,  // &dyn BasePoint<LHS>,
+    remote_basepoint: &BasePointRHS, //&dyn BasePoint<RHS>,
 ) -> Result<()>
 where
-    LHSMetadata: FileMetadata + actions::Copy<RHSMetadata>,
-    RHSMetadata: FileMetadata + actions::Rename,
+    LHS: FileMetadata,
+    RHS: FileMetadata,
+    BasePointLHS: BasePoint<LHS>,
+    BasePointRHS: BasePoint<RHS> + Copy<LHS, RHS> + Rename<RHS>,
 {
     match filediff {
         FileDiff {
-            lhs: Some(lhs_metadata),
-            rhs: Some(rhs_metadata),
+            lhs: Some(lhs),
+            rhs: Some(rhs),
         } => match config.action.conflict() {
-            OnConflict::OverrideRemote => lhs_metadata.copy(Some(rhs_metadata)).await.map(|_| ()),
+            OnConflict::OverrideRemote => {
+                let r = remote_basepoint.copy(&lhs, Some(rhs)).await?;
+                Ok(())
+            }
             OnConflict::RenameRemote => {
-                rhs_metadata.rename().await.map(|_| ())?;
-                lhs_metadata.copy(None).await.map(|_| ())
+                let _ = remote_basepoint.rename(rhs).await?;
+                let r = remote_basepoint.copy(&lhs, None).await?;
+                Ok(())
             }
             s => panic!("Not a valid onConflict for backup: {s:?}"),
         },
-        FileDiff {
-            lhs: Some(lhs_metadata),
-            ..
-        } => {
-            let id = lhs_metadata.id().to_string();
-            let _ = lhs_metadata.copy(None).await?;
+        FileDiff { lhs: Some(lhs), .. } => {
+            let r = remote_basepoint.copy(&lhs, None).await?;
             Ok(())
         }
         FileDiff { rhs: Some(_), .. } => Ok(()),
@@ -49,15 +51,18 @@ where
     }
 }
 
-async fn work_on_results<
-    LHSMetadata: FileMetadata + actions::Copy<RHSMetadata> + 'static,
-    RHSMetadata: FileMetadata + actions::Rename + 'static,
->(
-    rx: flume::Receiver<FileDiff<LHSMetadata, RHSMetadata>>,
+async fn work_on_results<LHS, RHS, BasePointLHS, BasePointRHS>(
+    rx: flume::Receiver<FileDiff<LHS, RHS>>,
     config: &config::Config,
-    local_basepoint: &BasePointLocal,
-    remote_basepoint: &BasePointPCloud,
-) -> Result<()> {
+    local_basepoint: &BasePointLHS,
+    remote_basepoint: &BasePointRHS,
+) -> Result<()>
+where
+    LHS: FileMetadata,
+    RHS: FileMetadata,
+    BasePointLHS: BasePoint<LHS>,
+    BasePointRHS: BasePoint<RHS> + Copy<LHS, RHS> + Rename<RHS>,
+{
     info!("Start backup receiving loop");
     let start = Instant::now();
     while let Ok(v) = rx.recv_async().await {

@@ -2,32 +2,32 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::diff::basepoint::FileMetadata;
+use crate::diff::basepoint::{BasePoint, FileMetadata};
 
 pub mod backup;
 
 #[async_trait]
-pub trait Copy<Rhs: FileMetadata = Self>: FileMetadata {
-    async fn copy(self, rhs: Option<Rhs>) -> Result<(Self, Rhs)>;
+pub trait Copy<LHS: FileMetadata, RHS: FileMetadata>: BasePoint<RHS> {
+    async fn copy(&self, lhs: &LHS, rhs: Option<RHS>) -> Result<(&LHS, RHS)>;
 }
 
 #[async_trait]
-pub trait Remove: FileMetadata {
-    async fn remove(self) -> Result<()>;
+pub trait Remove<T: FileMetadata>: BasePoint<T> {
+    async fn remove(&self, file: T) -> Result<()>;
 }
 
-#[async_trait]
-pub trait Move<Rhs: FileMetadata + 'static = Self>: FileMetadata + Copy<Rhs> + Remove {
-    async fn do_move(self, rhs: Option<Rhs>) -> Result<Rhs> {
-        let (lhs, rhs) = self.copy(rhs).await?;
-        lhs.remove().await?;
-        Ok(rhs)
-    }
-}
+// #[async_trait]
+// pub trait Move<LHS: FileMetadata, RHS: FileMetadata>: BasePoint<LHS> + Copy<LHS, RHS> /*+ Remove<LHS>*/ {
+//     async fn do_move(&self, lhs: LHS, rhs: Option<RHS>) -> Result<RHS> {
+//         let (_, rhs) = self.copy(&lhs, rhs).await?;
+//         self.remove(lhs).await?; // TODO: I can do this here, it doesn't belong to this BasePoint
+//         Ok(rhs)
+//     }
+// }
 
 #[async_trait]
-pub trait Rename: FileMetadata {
-    async fn rename(self) -> Result<Self>;
+pub trait Rename<T: FileMetadata>: BasePoint<T> {
+    async fn rename(&self, file: T) -> Result<T>;
 }
 
 /// Describes the action to perform

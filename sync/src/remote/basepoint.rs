@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use anyhow::Result;
+use async_trait::async_trait;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
@@ -8,6 +9,9 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 
+use crate::actions;
+use crate::diff::basepoint::{BasePoint, FileMetadata};
+use crate::local::{LocalFileMetadata, LocalMetadata};
 use crate::remote::file_metadata::RemoteFileMetadata;
 use crate::remote::RemoteMetadata;
 use crate::storage::config;
@@ -50,6 +54,18 @@ impl BasePointPCloud {
         let meta = RemoteMetadata::from_pcloud_metadata(path, metadata);
         self.tx.send(meta).expect("TODO: Something to implement");
     }
+
+    pub fn copy<T: LocalFileMetadata>(
+        &self,
+        source: &T,
+        target: Option<RemoteMetadata>,
+    ) -> Result<(&T, RemoteMetadata)> {
+        todo!()
+    }
+
+    pub fn rename(&self, file: RemoteMetadata) -> Result<RemoteMetadata> {
+        todo!()
+    }
 }
 
 fn work_on_contents(base_path: &Path, contents: &Vec<Metadata>, diff: &BasePointPCloud, depth: usize) -> Result<()> {
@@ -71,3 +87,19 @@ fn work_on_contents(base_path: &Path, contents: &Vec<Metadata>, diff: &BasePoint
 
 // TODO: This is not the place for outputters
 const PRINT_FOLDER_TOKEN: &str = "|-- ";
+
+impl BasePoint<RemoteMetadata> for BasePointPCloud {}
+
+#[async_trait]
+impl actions::Copy<LocalMetadata, RemoteMetadata> for BasePointPCloud {
+    async fn copy(&self, lhs: &LocalMetadata, rhs: Option<RemoteMetadata>) -> Result<(&LocalMetadata, RemoteMetadata)> {
+        todo!()
+    }
+}
+
+#[async_trait]
+impl actions::Rename<RemoteMetadata> for BasePointPCloud {
+    async fn rename(&self, file: RemoteMetadata) -> Result<RemoteMetadata> {
+        todo!()
+    }
+}
