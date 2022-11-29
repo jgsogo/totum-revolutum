@@ -1,0 +1,4 @@
+# https://rust-lang.github.io/rustfmt/?version=v1.5.1
+
+max_width = 120
+

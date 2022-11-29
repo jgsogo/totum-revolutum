@@ -59,11 +59,7 @@ pub struct UploadFile {
 
 #[async_trait]
 pub trait PostUploadFile: client::Client {
-    async fn uploadfile(
-        &self,
-        local_filename: &str,
-        upload_params: UploadFileParams,
-    ) -> Result<UploadFile> {
+    async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile> {
         let url = format!("https://{}/uploadfile", self.hostname());
         let mut params = HashMap::new();
         params.insert("filename".to_string(), upload_params.filename.clone());
