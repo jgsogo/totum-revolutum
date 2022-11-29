@@ -1,11 +1,12 @@
-use std::{env, thread};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::time::Duration;
+use std::{env, thread};
 
 use futures_util::FutureExt;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
+use pcloud_sdk::data::app_client_data::AppClientData;
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::methods::file::uploadprogress::{UploadProgress, UploadProgressData};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
@@ -15,18 +16,18 @@ use pcloud_sdk::methods::oauth2;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let app = oauth2::AppClientData::read_from_file("secrets/app.json").unwrap();
+    let app = AppClientData::read_from_file("secrets/app.json").unwrap();
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
     let pcloud = pcloud_sdk::client::HttpClient::authorize(app, addr).await?;
 
     let userinfo = pcloud.userinfo().await?;
     println!("{:#?}", userinfo);
 
-    let listfolder_input = ListFolderInput::new_from_path("/");
+    let listfolder_input = ListFolderInput::new_from_path(None);
     let listfolder = pcloud.listfolder(&listfolder_input).await?;
     //println!("{:#?}", listfolder);
 
-    let folderid = listfolder.metadata.folderid.unwrap();
+    let folderid = listfolder.metadata.folderid.as_ref().unwrap();
     let working_dir = env::current_dir().unwrap().to_str().unwrap().to_string();
     let files_to_upload = vec![
         format!("{}/examples/files/file20", working_dir),
@@ -36,11 +37,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     ];
 
     let m = MultiProgress::new();
-    let sty = ProgressStyle::with_template(
-        "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
-    )
-    .unwrap()
-    .progress_chars("##-");
+    let sty = ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+        .unwrap()
+        .progress_chars("##-");
 
     let mut all_tasks = vec![];
     for file in files_to_upload {
@@ -55,8 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             let progresshash = progresshash.clone();
             all_tasks.push(
                 async move {
-                    let mut upload_params =
-                        UploadFileParams::new_from_folderid(folderid, file.to_string());
+                    let mut upload_params = UploadFileParams::new_from_folderid(folderid.clone(), file.to_string());
                     upload_params.progresshash = Some(progresshash);
                     tx.send(()).unwrap();
                     let r = pcloud.uploadfile(&file, upload_params).await.unwrap();
@@ -93,8 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                                 finished: false,
                                 ..
                             }) => {
-                                let percent =
-                                    ((uploaded as f32 / total as f32) * pb_points as f32) as u64;
+                                let percent = ((uploaded as f32 / total as f32) * pb_points as f32) as u64;
                                 pb.set_message(format!("{} #{}", &file, percent));
                                 pb.set_position(percent);
                             }

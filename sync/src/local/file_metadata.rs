@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use ignore::DirEntry;
 use tracing::trace;
@@ -60,6 +60,8 @@ impl Copy<LocalMetadata> for LocalMetadata {
             self.path().display(),
             rhs.as_ref().map_or("".to_string(), |v| v.path().display().to_string())
         );
+        // std::fs::copy(self.path(), rhs.path())
+        //     .map_err(|e| anyhow!("Error copying file from '{}' to '{}'", self.path(), rhs.path()))?;
         Ok((self, rhs.unwrap()))
     }
 }

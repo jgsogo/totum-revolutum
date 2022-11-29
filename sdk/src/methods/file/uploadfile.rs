@@ -4,13 +4,14 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::{client, utils};
+use crate::id::FolderID;
 use crate::structures::Metadata;
+use crate::{client, utils};
 
 #[derive(Debug, Clone)]
 pub struct UploadFileParams {
     path: Option<String>,
-    folderid: Option<i64>,
+    folderid: Option<FolderID>,
     filename: String,
     // Optional parameters
     pub nopartial: bool,
@@ -21,7 +22,7 @@ pub struct UploadFileParams {
 }
 
 impl UploadFileParams {
-    fn new(path: Option<String>, folderid: Option<i64>, filename: String) -> UploadFileParams {
+    fn new(path: Option<String>, folderid: Option<FolderID>, filename: String) -> UploadFileParams {
         UploadFileParams {
             path,
             folderid,
@@ -38,7 +39,7 @@ impl UploadFileParams {
         UploadFileParams::new(Some(path), None, filename)
     }
 
-    pub fn new_from_folderid(folderid: i64, filename: String) -> UploadFileParams {
+    pub fn new_from_folderid(folderid: FolderID, filename: String) -> UploadFileParams {
         UploadFileParams::new(None, Some(folderid), filename)
     }
 }
@@ -58,11 +59,7 @@ pub struct UploadFile {
 
 #[async_trait]
 pub trait PostUploadFile: client::Client {
-    async fn uploadfile(
-        &self,
-        local_filename: &str,
-        upload_params: UploadFileParams,
-    ) -> Result<UploadFile> {
+    async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile> {
         let url = format!("https://{}/uploadfile", self.hostname());
         let mut params = HashMap::new();
         params.insert("filename".to_string(), upload_params.filename.clone());
