@@ -5,7 +5,6 @@ use std::io::Write;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use futures_util::StreamExt;
-
 use tracing::debug;
 
 use crate::methods::streaming::getfilelink;
@@ -38,7 +37,8 @@ pub trait HandyClient: getfilelink::GetFileLink {
 
         // Progress bar setup
         let pb = pb_builder.new(total_size);
-        pb.set_message(&format!("Downloading {}", url));
+        let (_, url_filename) = url.rsplit_once('/').unwrap();
+        pb.set_message(&format!("Downloading {}", url_filename));
 
         // download chunks
         let mut file =
@@ -54,7 +54,12 @@ pub trait HandyClient: getfilelink::GetFileLink {
             pb.set_position(downloaded);
         }
 
-        pb.finish_with_message(&format!("Downloaded {} to {}", url, path.display()));
+        let path_filename = path.file_name().unwrap();
+        pb.finish_with_message(&format!(
+            "Downloaded '{}' to '{}'",
+            url_filename,
+            path_filename.to_string_lossy()
+        ));
         return Ok(());
     }
 }

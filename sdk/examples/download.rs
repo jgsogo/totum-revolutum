@@ -15,13 +15,15 @@ use pcloud_sdk::progress_bar::{ProgressBar, ProgressBarBuilder};
 
 #[derive(Clone)]
 struct OutputExample {
+    sty: indicatif::ProgressStyle,
     pbs: indicatif::MultiProgress,
 }
 
 impl OutputExample {
-    pub fn new() -> Self {
+    pub fn new(sty: indicatif::ProgressStyle) -> Self {
         Self {
             pbs: indicatif::MultiProgress::new(),
+            sty,
         }
     }
 
@@ -32,8 +34,8 @@ impl OutputExample {
 
 impl ProgressBarBuilder for OutputExample {
     fn new(&self, total_size: u64) -> Box<dyn ProgressBar> {
-        let pb = Box::new(indicatif::ProgressBar::new(total_size));
         let r = self.pbs.add(indicatif::ProgressBar::new(total_size));
+        r.set_style(self.sty.clone());
         Box::new(r)
     }
 }
@@ -45,7 +47,14 @@ async fn main() -> Result<()> {
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
-    let output_example = OutputExample::new();
+    // Configure progressbar and output
+    let sty = indicatif::ProgressStyle::with_template(
+        "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
+    )
+    .unwrap()
+    .progress_chars("##-");
+    let output_example = OutputExample::new(sty);
+
     let app = data::app_client_data::AppClientData::read_from_file("secrets/app.json").unwrap();
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
     let pcloud = pcloud_sdk::client::HttpClient::authorize(app, addr).await?;
@@ -58,8 +67,6 @@ async fn main() -> Result<()> {
 
     let listfolder_input = ListFolderInput::new_from_path(None);
     let listfolder = pcloud.listfolder(&listfolder_input).await?;
-
-    let output_example = OutputExample::new();
 
     let mut futures = tokio::task::JoinSet::new();
     let r = listfolder
@@ -88,21 +95,8 @@ async fn main() -> Result<()> {
         });
 
     while let Some(res) = futures.join_next().await {
-        let res = res.unwrap();
-        output_example.println(&format!("Finished {:?}", res));
+        let _res = res.unwrap();
     }
-
-    // for m in listfolder.metadata.contents.unwrap().iter() {
-    //     if !m.common.isfolder.unwrap() {
-    //         println!("Found file: {}", m.common.name.as_ref().unwrap());
-    //
-    //         let flink = GetFileLinkInput::new_from_fileid(m.fileid.as_ref().unwrap());
-    //         let temp_path = tmp_dir.path().join(m.common.name.as_ref().unwrap());
-    //         pcloud
-    //             .getfilelink_and_download(&flink, &temp_path, &output_example)
-    //             .await?;
-    //     }
-    // }
 
     Ok(())
 }
