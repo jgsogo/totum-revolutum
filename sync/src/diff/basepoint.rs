@@ -23,6 +23,8 @@ pub trait FileMetadata: std::marker::Sync + std::marker::Send + std::fmt::Debug 
     }
 }
 
+pub trait BasePoint<T: FileMetadata> {}
+
 /// Deal with the [`FileMetadata`] that is being gathered and sends it to the
 /// differ connected to it.
 #[derive(Clone)]

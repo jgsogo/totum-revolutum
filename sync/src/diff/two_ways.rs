@@ -37,14 +37,14 @@ where
 }
 
 pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> (
-    BasePointDiffImpl<LHS>,
-    BasePointDiffImpl<RHS>,
+    flume::Sender<LHS>,
+    flume::Sender<RHS>,
     flume::Receiver<FileDiff<LHS, RHS>>,
 ) {
     let (lhs_tx, lhs_rx) = flume::bounded::<LHS>(MAX_BUFFER);
     let (rhs_tx, rhs_rx) = flume::bounded::<RHS>(MAX_BUFFER);
-    let lhs = BasePointDiffImpl::<LHS>::new(lhs_tx);
-    let rhs = BasePointDiffImpl::<RHS>::new(rhs_tx);
+    // let lhs = BasePointDiffImpl::<LHS>::new(lhs_tx);
+    // let rhs = BasePointDiffImpl::<RHS>::new(rhs_tx);
 
     let (report_tx, report_rx) = flume::bounded::<FileDiff<LHS, RHS>>(MAX_BUFFER);
 
@@ -107,5 +107,5 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
         //  and that process adds it again and our visitors see it one more time. Is this possible?
     });
 
-    (lhs, rhs, report_rx)
+    (lhs_tx, rhs_tx, report_rx)
 }
