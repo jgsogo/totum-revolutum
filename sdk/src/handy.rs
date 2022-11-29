@@ -6,6 +6,8 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use futures_util::StreamExt;
 
+use tracing::debug;
+
 use crate::methods::streaming::getfilelink;
 
 use super::progress_bar;
@@ -21,6 +23,7 @@ pub trait HandyClient: getfilelink::GetFileLink {
     ) -> Result<()> {
         let r = self.getfilelink(file_link).await?;
         let url = &format!("https://{}{}", r.hosts.first().unwrap(), r.path);
+        debug!("Download file from '{}'", &url);
 
         // Reqwest setup
         let res = self
@@ -55,3 +58,5 @@ pub trait HandyClient: getfilelink::GetFileLink {
         return Ok(());
     }
 }
+
+impl<T: getfilelink::GetFileLink> HandyClient for T {}

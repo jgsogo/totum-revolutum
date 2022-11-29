@@ -40,9 +40,9 @@ impl GetFileLinkInput {
             skipfilename: false,
         }
     }
-    pub fn new_from_fileid(file: FileID) -> GetFileLinkInput {
+    pub fn new_from_fileid(file: &FileID) -> GetFileLinkInput {
         GetFileLinkInput {
-            file: GetFileLinkFileInput::FileID(file),
+            file: GetFileLinkFileInput::FileID(file.clone()),
             forcedownload: false,
             contenttype: None,
             maxspeed: None,
