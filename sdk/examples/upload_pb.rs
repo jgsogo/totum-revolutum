@@ -1,32 +1,32 @@
-use std::{env, thread};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::time::Duration;
+use std::{env, thread};
 
 use futures_util::FutureExt;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
+use pcloud_sdk::data::app_client_data::AppClientData;
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::methods::file::uploadprogress::{UploadProgress, UploadProgressData};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
-use pcloud_sdk::methods::oauth2;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let app = oauth2::AppClientData::read_from_file("secrets/app.json").unwrap();
+    let app = AppClientData::read_from_file("secrets/app.json").unwrap();
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
     let pcloud = pcloud_sdk::client::HttpClient::authorize(app, addr).await?;
 
     let userinfo = pcloud.userinfo().await?;
     println!("{:#?}", userinfo);
 
-    let listfolder_input = ListFolderInput::new_from_path("/");
+    let listfolder_input = ListFolderInput::new_from_path(None);
     let listfolder = pcloud.listfolder(&listfolder_input).await?;
     //println!("{:#?}", listfolder);
 
-    let folderid = listfolder.metadata.folderid.unwrap();
+    let folderid = listfolder.metadata.folderid.as_ref().unwrap();
     let working_dir = env::current_dir().unwrap().to_str().unwrap().to_string();
     let files_to_upload = vec![
         format!("{}/examples/files/file20", working_dir),
@@ -56,10 +56,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             all_tasks.push(
                 async move {
                     let mut upload_params =
-                        UploadFileParams::new_from_folderid(folderid, file.to_string());
+                        UploadFileParams::new_from_folderid(folderid.clone(), file.to_string());
                     upload_params.progresshash = Some(progresshash);
                     tx.send(()).unwrap();
-                    let r = pcloud.uploadfile(&file, upload_params).await.unwrap();
+                    let _r = pcloud.uploadfile(&file, upload_params).await.unwrap();
                     //r.fileids
                 }
                 .boxed(),
@@ -118,7 +118,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
     }
 
-    let result = futures::future::join_all(all_tasks).await;
+    let _result = futures::future::join_all(all_tasks).await;
     println!("Done");
     Ok(())
 }
