@@ -12,7 +12,6 @@ use pcloud_sdk::methods::file::uploadprogress::{UploadProgress, UploadProgressDa
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
-use pcloud_sdk::methods::oauth2;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -57,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                     let mut upload_params = UploadFileParams::new_from_folderid(folderid.clone(), file.to_string());
                     upload_params.progresshash = Some(progresshash);
                     tx.send(()).unwrap();
-                    let r = pcloud.uploadfile(&file, upload_params).await.unwrap();
+                    let _r = pcloud.uploadfile(&file, upload_params).await.unwrap();
                     //r.fileids
                 }
                 .boxed(),
@@ -115,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
     }
 
-    let result = futures::future::join_all(all_tasks).await;
+    let _result = futures::future::join_all(all_tasks).await;
     println!("Done");
     Ok(())
 }
