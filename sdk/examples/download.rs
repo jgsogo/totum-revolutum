@@ -83,10 +83,14 @@ async fn main() -> Result<()> {
             // let tmp_dir = tmp_dir.clone();
             futures.spawn(async move {
                 let name = metadata.common.name.as_ref().unwrap();
-                output_example.println(&format!("Found file: {}", name));
                 let flink = GetFileLinkInput::new_from_fileid(metadata.fileid.as_ref().unwrap());
                 let tmp_dir = tempdir().unwrap();
                 let temp_path = tmp_dir.path().join(name);
+                // output_example.println(&format!(
+                //     "Download '{}' to '{}'",
+                //     name,
+                //     temp_path.display()
+                // ));
                 pcloud
                     .getfilelink_and_download(&flink, &temp_path, &output_example)
                     .await?;

@@ -38,7 +38,7 @@ pub trait HandyClient: getfilelink::GetFileLink {
         // Progress bar setup
         let pb = pb_builder.new(total_size);
         let (_, url_filename) = url.rsplit_once('/').unwrap();
-        pb.set_message(&format!("Downloading {}", url_filename));
+        pb.set_message(&format!("Downloading '{}'", url_filename));
 
         // download chunks
         let mut file =
@@ -54,12 +54,7 @@ pub trait HandyClient: getfilelink::GetFileLink {
             pb.set_position(downloaded);
         }
 
-        let path_filename = path.file_name().unwrap();
-        pb.finish_with_message(&format!(
-            "Downloaded '{}' to '{}'",
-            url_filename,
-            path_filename.to_string_lossy()
-        ));
+        pb.finish();
         return Ok(());
     }
 }
