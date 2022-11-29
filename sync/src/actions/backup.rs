@@ -2,8 +2,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::Result;
-use async_trait::async_trait;
-use tracing::{error, info, trace};
+use tracing::{error, info};
 
 use crate::actions::OnConflict;
 use crate::diff::basepoint::FileMetadata;
@@ -24,8 +23,8 @@ where
 {
     match filediff {
         FileDiff {
-            lhs_metadata: Some(lhs_metadata),
-            rhs_metadata: Some(rhs_metadata),
+            lhs: Some(lhs_metadata),
+            rhs: Some(rhs_metadata),
         } => match config.action.conflict() {
             OnConflict::OverrideRemote => lhs_metadata.copy(Some(rhs_metadata)).await.map(|_| ()),
             OnConflict::RenameRemote => {
@@ -35,16 +34,14 @@ where
             s => panic!("Not a valid onConflict for backup: {s:?}"),
         },
         FileDiff {
-            lhs_metadata: Some(lhs_metadata),
+            lhs: Some(lhs_metadata),
             ..
         } => {
             let id = lhs_metadata.id().to_string();
             let _ = lhs_metadata.copy(None).await?;
             Ok(())
         }
-        FileDiff {
-            rhs_metadata: Some(_), ..
-        } => Ok(()),
+        FileDiff { rhs: Some(_), .. } => Ok(()),
         _ => panic!("Not expected"),
     }
 }
