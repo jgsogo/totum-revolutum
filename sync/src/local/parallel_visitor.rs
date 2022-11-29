@@ -35,15 +35,6 @@ where
     }
 }
 
-// impl Drop for Visitor<'_> {
-//     fn drop(&mut self) {
-//         info!("Files for this visitor");
-//         for it in self.files.iter() {
-//             println!("{}", it.display());
-//         }
-//     }
-// }
-
 pub struct VisitorBuilder<T: LocalFileMetadata> {
     base_path: std::path::PathBuf,
     diff: BasePointDiffImpl<T>,

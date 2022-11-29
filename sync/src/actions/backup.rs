@@ -20,16 +20,20 @@ async fn backup<LHSMetadata, RHSMetadata>(
 ) -> Result<()>
 where
     LHSMetadata: FileMetadata + actions::Copy<RHSMetadata>,
-    RHSMetadata: FileMetadata,
+    RHSMetadata: FileMetadata + actions::Rename,
 {
     match filediff {
         FileDiff {
             lhs_metadata: Some(lhs_metadata),
             rhs_metadata: Some(rhs_metadata),
-        } => {
-            let _ = lhs_metadata.copy(Some(rhs_metadata)).await?;
-            Ok(())
-        }
+        } => match config.action.conflict() {
+            OnConflict::OverrideRemote => lhs_metadata.copy(Some(rhs_metadata)).await.map(|_| ()),
+            OnConflict::RenameRemote => {
+                rhs_metadata.rename().await.map(|_| ())?;
+                lhs_metadata.copy(None).await.map(|_| ())
+            }
+            s => panic!("Not a valid onConflict for backup: {s:?}"),
+        },
         FileDiff {
             lhs_metadata: Some(lhs_metadata),
             ..
@@ -45,85 +49,9 @@ where
     }
 }
 
-// struct Actions<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
-//     file_diff: FileDiff<LHSMetadata, RHSMetadata>,
-//     config: &'a config::Config,
-//     pcloud: pcloud_sdk::client::HttpClient,
-// }
-//
-// impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> Actions<'a, LHSMetadata, RHSMetadata> {
-//     pub fn new(
-//         file_diff: FileDiff<LHSMetadata, RHSMetadata>,
-//         config: &'a config::Config,
-//         pcloud: pcloud_sdk::client::HttpClient,
-//     ) -> Self {
-//         Self {
-//             file_diff,
-//             config,
-//             pcloud,
-//         }
-//     }
-//
-//     async fn copy_to_lhs(&self) -> Result<()> {
-//         trace!("copy_to_lhs({})", self.file_diff.id());
-//         // TODO: to implement
-//         Ok(())
-//     }
-//     async fn copy_to_rhs(&self) -> Result<()> {
-//         trace!("copy_to_rhs({})", self.file_diff.id());
-//         // TODO: to implement
-//         Ok(())
-//     }
-//     async fn rename_lhs(&self) -> Result<()> {
-//         trace!("rename_lhs({})", self.file_diff.id());
-//         // TODO: to implement
-//         Ok(())
-//     }
-//     async fn rename_rhs(&self) -> Result<()> {
-//         trace!("rename_rhs({})", self.file_diff.id());
-//         // TODO: to implement
-//         Ok(())
-//     }
-// }
-//
-// impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> Actions<'a, LHSMetadata, RHSMetadata> {
-//     pub async fn backup(&self) -> Result<()> {
-//         match &self.file_diff {
-//             FileDiff {
-//                 lhs_metadata: Some(lhs_metadata),
-//                 rhs_metadata: Some(rhs_metadata),
-//             } => {
-//                 if lhs_metadata.eq(rhs_metadata) {
-//                     Ok(())
-//                 } else {
-//                     self.backup_modified().await
-//                 }
-//             }
-//             FileDiff {
-//                 lhs_metadata: Some(_), ..
-//             } => self.copy_to_rhs().await,
-//             FileDiff {
-//                 rhs_metadata: Some(_), ..
-//             } => Ok(()),
-//             _ => panic!("Not expected"),
-//         }
-//     }
-//
-//     async fn backup_modified(&self) -> Result<()> {
-//         match self.config.action.conflict() {
-//             OnConflict::OverrideRemote => self.copy_to_rhs().await,
-//             OnConflict::RenameRemote => {
-//                 self.rename_rhs().await?;
-//                 self.copy_to_rhs().await
-//             }
-//             s => panic!("Not a valid onConflict for backup: {s:?}"),
-//         }
-//     }
-// }
-
 async fn work_on_results<
     LHSMetadata: FileMetadata + actions::Copy<RHSMetadata> + 'static,
-    RHSMetadata: FileMetadata + 'static,
+    RHSMetadata: FileMetadata + actions::Rename + 'static,
 >(
     rx: flume::Receiver<FileDiff<LHSMetadata, RHSMetadata>>,
     config: &config::Config,
