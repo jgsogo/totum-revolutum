@@ -21,17 +21,10 @@ jobs:
           override: true
           components: rustfmt, clippy
       - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
+        uses: Swatinem/rust-cache@v2
+        cache-on-failure: true
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          shared-key: "pcloud-sdk"
 
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
@@ -58,17 +51,11 @@ jobs:
           toolchain: stable
           override: true
       - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
+        uses: Swatinem/rust-cache@v2
+        cache-on-failure: true
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          shared-key: "pcloud-sdk"
+
       - name: Run cargo build
         uses: actions-rs/cargo@v1
         with:
@@ -113,19 +100,12 @@ jobs:
           toolchain: stable
           override: true
       - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
+        uses: Swatinem/rust-cache@v2
+        cache-on-failure: true
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          shared-key: "pcloud-sdk"
 
-      - name: Run cargo test 
+      - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
