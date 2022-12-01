@@ -10,7 +10,7 @@ use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 
 use crate::actions;
-use crate::diff::basepoint::{BasePoint, FileMetadata};
+use crate::diff::basepoint::BasePoint;
 use crate::local::{LocalFileMetadata, LocalMetadata};
 use crate::remote::file_metadata::RemoteFileMetadata;
 use crate::remote::RemoteMetadata;
@@ -26,7 +26,7 @@ impl BasePointPCloud {
         Self { pcloud, tx }
     }
 
-    pub async fn walk_remote_directory(&self, threads: usize, config: &config::Config) -> Result<()> {
+    pub async fn walk_remote_directory(&self, _threads: usize, config: &config::Config) -> Result<()> {
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
         //  and use a thread pool to enter child directories and _recurse_.
@@ -55,15 +55,17 @@ impl BasePointPCloud {
         self.tx.send(meta).expect("TODO: Something to implement");
     }
 
+    #[allow(dead_code)]
     pub fn copy<T: LocalFileMetadata>(
         &self,
-        source: &T,
-        target: Option<RemoteMetadata>,
+        _source: &T,
+        _target: Option<RemoteMetadata>,
     ) -> Result<(&T, RemoteMetadata)> {
         todo!()
     }
 
-    pub fn rename(&self, file: RemoteMetadata) -> Result<RemoteMetadata> {
+    #[allow(dead_code)]
+    pub fn rename(&self, _file: RemoteMetadata) -> Result<RemoteMetadata> {
         todo!()
     }
 }
@@ -92,14 +94,18 @@ impl BasePoint<RemoteMetadata> for BasePointPCloud {}
 
 #[async_trait]
 impl actions::Copy<LocalMetadata, RemoteMetadata> for BasePointPCloud {
-    async fn copy(&self, lhs: &LocalMetadata, rhs: Option<RemoteMetadata>) -> Result<(&LocalMetadata, RemoteMetadata)> {
+    async fn copy(
+        &self,
+        _lhs: &LocalMetadata,
+        _rhs: Option<RemoteMetadata>,
+    ) -> Result<(&LocalMetadata, RemoteMetadata)> {
         todo!()
     }
 }
 
 #[async_trait]
 impl actions::Rename<RemoteMetadata> for BasePointPCloud {
-    async fn rename(&self, file: RemoteMetadata) -> Result<RemoteMetadata> {
+    async fn rename(&self, _file: RemoteMetadata) -> Result<RemoteMetadata> {
         todo!()
     }
 }

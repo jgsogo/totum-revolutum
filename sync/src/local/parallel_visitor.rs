@@ -1,9 +1,6 @@
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 
-use crate::diff::basepoint::{BasePoint, BasePointDiffImpl};
 use crate::local::BasePointLocal;
-
-use super::file_metadata::LocalFileMetadata;
 
 pub struct Visitor<'s> {
     diff: &'s BasePointLocal,

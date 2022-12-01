@@ -1,15 +1,9 @@
 use std::path::Path;
 
-use anyhow::Result;
-use async_trait::async_trait;
-use tracing::trace;
-
 use pcloud_sdk::id::FileID;
 use pcloud_sdk::structures::Metadata;
 
-use crate::actions::{Copy, Remove, Rename};
 use crate::diff::basepoint::FileMetadata;
-use crate::local::{LocalFileMetadata, LocalMetadata};
 
 pub trait RemoteFileMetadata: FileMetadata {
     fn from_pcloud_metadata(path: &Path, metadata: Metadata) -> Self;

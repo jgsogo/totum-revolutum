@@ -5,19 +5,19 @@ use anyhow::Result;
 use tracing::{error, info};
 
 use crate::actions::{Copy, OnConflict, Rename};
-use crate::diff::basepoint::{BasePoint, BasePointDiffImpl, FileMetadata};
+use crate::diff;
+use crate::diff::basepoint::{BasePoint, FileMetadata};
 use crate::diff::two_ways::FileDiff;
 use crate::local;
 use crate::local::BasePointLocal;
 use crate::remote;
 use crate::remote::basepoint::BasePointPCloud;
 use crate::storage::config;
-use crate::{actions, diff};
 
 async fn backup<LHS, RHS, BasePointLHS, BasePointRHS>(
     filediff: FileDiff<LHS, RHS>,
     config: &config::Config,
-    local_basepoint: &BasePointLHS,  // &dyn BasePoint<LHS>,
+    _local_basepoint: &BasePointLHS, // &dyn BasePoint<LHS>,
     remote_basepoint: &BasePointRHS, //&dyn BasePoint<RHS>,
 ) -> Result<()>
 where
@@ -32,18 +32,18 @@ where
             rhs: Some(rhs),
         } => match config.action.conflict() {
             OnConflict::OverrideRemote => {
-                let r = remote_basepoint.copy(&lhs, Some(rhs)).await?;
+                let _r = remote_basepoint.copy(&lhs, Some(rhs)).await?;
                 Ok(())
             }
             OnConflict::RenameRemote => {
                 let _ = remote_basepoint.rename(rhs).await?;
-                let r = remote_basepoint.copy(&lhs, None).await?;
+                let _r = remote_basepoint.copy(&lhs, None).await?;
                 Ok(())
             }
             s => panic!("Not a valid onConflict for backup: {s:?}"),
         },
         FileDiff { lhs: Some(lhs), .. } => {
-            let r = remote_basepoint.copy(&lhs, None).await?;
+            let _r = remote_basepoint.copy(&lhs, None).await?;
             Ok(())
         }
         FileDiff { rhs: Some(_), .. } => Ok(()),

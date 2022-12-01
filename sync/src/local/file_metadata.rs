@@ -1,11 +1,7 @@
 use std::path::Path;
 
-use anyhow::Result;
-use async_trait::async_trait;
 use ignore::DirEntry;
-use tracing::trace;
 
-use crate::actions::{Copy, Remove, Rename};
 use crate::diff::basepoint::FileMetadata;
 
 pub trait LocalFileMetadata: FileMetadata {

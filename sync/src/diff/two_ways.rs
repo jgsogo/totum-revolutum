@@ -3,7 +3,7 @@ use std::time::Instant;
 
 use tracing::{error, info, trace};
 
-use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
+use super::basepoint::{FileMetadata, MAX_BUFFER};
 
 pub struct FileDiff<LHS: FileMetadata, RHS: FileMetadata> {
     pub lhs: Option<LHS>,
@@ -25,14 +25,6 @@ where
 
     pub fn new_from_rhs(rhs: RHS) -> FileDiff<LHS, RHS> {
         Self::new(None, Some(rhs))
-    }
-
-    pub fn id(&self) -> &str {
-        if let Some(v) = &self.lhs {
-            return v.id();
-        } else {
-            self.rhs.as_ref().unwrap().id()
-        }
     }
 }
 

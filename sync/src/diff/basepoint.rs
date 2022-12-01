@@ -24,23 +24,3 @@ pub trait FileMetadata: std::marker::Sync + std::marker::Send + std::fmt::Debug 
 }
 
 pub trait BasePoint<T: FileMetadata> {}
-
-/// Deal with the [`FileMetadata`] that is being gathered and sends it to the
-/// differ connected to it.
-#[derive(Clone)]
-pub struct BasePointDiffImpl<T: FileMetadata>
-where
-    T: Clone,
-{
-    tx: flume::Sender<T>,
-}
-
-impl<T: FileMetadata> BasePointDiffImpl<T> {
-    pub fn new(tx: flume::Sender<T>) -> BasePointDiffImpl<T> {
-        BasePointDiffImpl::<T> { tx }
-    }
-
-    pub fn file_found(&self, metadata: T) {
-        self.tx.send(metadata).unwrap();
-    }
-}
