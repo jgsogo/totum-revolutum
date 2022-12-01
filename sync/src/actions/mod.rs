@@ -20,7 +20,7 @@ pub trait Remove<T: FileMetadata>: BasePoint<T> {
 // pub trait Move<LHS: FileMetadata, RHS: FileMetadata>: BasePoint<LHS> + Copy<LHS, RHS> /*+ Remove<LHS>*/ {
 //     async fn do_move(&self, lhs: LHS, rhs: Option<RHS>) -> Result<RHS> {
 //         let (_, rhs) = self.copy(&lhs, rhs).await?;
-//         self.remove(lhs).await?; // TODO: I can do this here, it doesn't belong to this BasePoint
+//         self.remove(lhs).await?; // TODO: I can't do this here, it doesn't belong to this BasePoint
 //         Ok(rhs)
 //     }
 // }
