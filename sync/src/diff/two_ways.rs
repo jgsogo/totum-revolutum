@@ -3,61 +3,47 @@ use std::time::Instant;
 
 use tracing::{error, info, trace};
 
-use super::basepoint::{BasePointDiffImpl, FileMetadata, MAX_BUFFER};
+use super::basepoint::{FileMetadata, MAX_BUFFER};
 
-pub struct FileDiff<LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
-    pub lhs_metadata: Option<LHSMetadata>,
-    pub rhs_metadata: Option<RHSMetadata>,
+pub struct FileDiff<LHS: FileMetadata, RHS: FileMetadata> {
+    pub lhs: Option<LHS>,
+    pub rhs: Option<RHS>,
 }
 
-impl<LHSMetadata, RHSMetadata> FileDiff<LHSMetadata, RHSMetadata>
+impl<LHS, RHS> FileDiff<LHS, RHS>
 where
-    LHSMetadata: FileMetadata,
-    RHSMetadata: FileMetadata,
+    LHS: FileMetadata,
+    RHS: FileMetadata,
 {
-    fn new(
-        lhs: Option<LHSMetadata>,
-        rhs: Option<RHSMetadata>,
-    ) -> FileDiff<LHSMetadata, RHSMetadata> {
-        FileDiff::<LHSMetadata, RHSMetadata> {
-            lhs_metadata: lhs,
-            rhs_metadata: rhs,
-        }
+    fn new(lhs: Option<LHS>, rhs: Option<RHS>) -> FileDiff<LHS, RHS> {
+        FileDiff::<LHS, RHS> { lhs, rhs }
     }
 
-    pub fn new_from_lhs(lhs: LHSMetadata) -> FileDiff<LHSMetadata, RHSMetadata> {
+    pub fn new_from_lhs(lhs: LHS) -> FileDiff<LHS, RHS> {
         Self::new(Some(lhs), None)
     }
 
-    pub fn new_from_rhs(rhs: RHSMetadata) -> FileDiff<LHSMetadata, RHSMetadata> {
+    pub fn new_from_rhs(rhs: RHS) -> FileDiff<LHS, RHS> {
         Self::new(None, Some(rhs))
-    }
-
-    pub fn id(&self) -> &str {
-        if let Some(v) = &self.lhs_metadata {
-            return v.id();
-        } else {
-            self.rhs_metadata.as_ref().unwrap().id()
-        }
     }
 }
 
-pub async fn run<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileMetadata + 'static>() -> (
-    BasePointDiffImpl<LHSMetadata>,
-    BasePointDiffImpl<RHSMetadata>,
-    flume::Receiver<FileDiff<LHSMetadata, RHSMetadata>>,
+pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> (
+    flume::Sender<LHS>,
+    flume::Sender<RHS>,
+    flume::Receiver<FileDiff<LHS, RHS>>,
 ) {
-    let (lhs_tx, lhs_rx) = flume::bounded::<LHSMetadata>(MAX_BUFFER);
-    let (rhs_tx, rhs_rx) = flume::bounded::<RHSMetadata>(MAX_BUFFER);
-    let lhs = BasePointDiffImpl::<LHSMetadata>::new(lhs_tx);
-    let rhs = BasePointDiffImpl::<RHSMetadata>::new(rhs_tx);
+    let (lhs_tx, lhs_rx) = flume::bounded::<LHS>(MAX_BUFFER);
+    let (rhs_tx, rhs_rx) = flume::bounded::<RHS>(MAX_BUFFER);
+    // let lhs = BasePointDiffImpl::<LHS>::new(lhs_tx);
+    // let rhs = BasePointDiffImpl::<RHS>::new(rhs_tx);
 
-    let (report_tx, report_rx) = flume::bounded::<FileDiff<LHSMetadata, RHSMetadata>>(MAX_BUFFER);
+    let (report_tx, report_rx) = flume::bounded::<FileDiff<LHS, RHS>>(MAX_BUFFER);
 
     tokio::spawn(async move {
         info!("Start receiving loop");
         let start = Instant::now();
-        let mut files: HashMap<String, FileDiff<LHSMetadata, RHSMetadata>> = HashMap::new();
+        let mut files: HashMap<String, FileDiff<LHS, RHS>> = HashMap::new();
         loop {
             tokio::select! {
                 Ok(lhs_metadata) = lhs_rx.recv_async() => {
@@ -65,14 +51,14 @@ pub async fn run<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileMetadata 
                     let key = lhs_metadata.id().to_string();
                     match files.remove(&key) {
                         Some(mut v) => {
-                            v.lhs_metadata = Some(lhs_metadata);
+                            v.lhs = Some(lhs_metadata);
                             if let Err(e) = report_tx.send(v) {
                                 error!("Receiving loop early stop. Report receiving end is lost: {e}");
                                 break;
                             }
                         },
                         None => {
-                            assert!(files.insert(key, FileDiff::<LHSMetadata, RHSMetadata>::new_from_lhs(lhs_metadata)).is_none());
+                            assert!(files.insert(key, FileDiff::<LHS, RHS>::new_from_lhs(lhs_metadata)).is_none());
                         }
                     }
                 },
@@ -81,14 +67,14 @@ pub async fn run<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileMetadata 
                     let key = rhs_metadata.id().to_string();
                     match files.remove(&key) {
                         Some(mut v) => {
-                            v.rhs_metadata = Some(rhs_metadata);
+                            v.rhs = Some(rhs_metadata);
                             if let Err(e) = report_tx.send(v) {
                                 error!("Receiving loop early stop. Report receiving end is lost: {e}");
                                 break;
                             }
                         },
                         None => {
-                            assert!(files.insert(key, FileDiff::<LHSMetadata, RHSMetadata>::new_from_rhs(rhs_metadata)).is_none());
+                            assert!(files.insert(key, FileDiff::<LHS, RHS>::new_from_rhs(rhs_metadata)).is_none());
                         }
                     }
                 },
@@ -113,5 +99,5 @@ pub async fn run<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileMetadata 
         //  and that process adds it again and our visitors see it one more time. Is this possible?
     });
 
-    (lhs, rhs, report_rx)
+    (lhs_tx, rhs_tx, report_rx)
 }

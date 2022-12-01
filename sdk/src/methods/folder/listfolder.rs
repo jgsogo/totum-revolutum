@@ -61,9 +61,7 @@ pub trait GetListFolder: client::Client {
             ListFolderInput { path: Some(p), .. } => {
                 params.insert("path".to_string(), p.clone());
             }
-            ListFolderInput {
-                folderid: Some(f), ..
-            } => {
+            ListFolderInput { folderid: Some(f), .. } => {
                 params.insert("folderid".to_string(), f.to_string());
             }
             _ => todo!("Either path or folderid is compulsory"),

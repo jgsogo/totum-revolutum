@@ -102,9 +102,7 @@ impl ConfigAction {
             (Actions::MoveUpload, OnConflict::RenameRemote) => Ok(()),
             (Actions::MoveDownload, OnConflict::OverrideLocal) => Ok(()),
             (Actions::MoveDownload, OnConflict::RenameLocal) => Ok(()),
-            _ => bail!(
-                "Invalid combination of action ({action:?}) and conflict resolution ({conflict:?})"
-            ),
+            _ => bail!("Invalid combination of action ({action:?}) and conflict resolution ({conflict:?})"),
         }
     }
 
@@ -124,12 +122,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(
-        client_id: &str,
-        userid: i32,
-        remote_path: Option<String>,
-        action: ConfigAction,
-    ) -> Self {
+    pub fn new(client_id: &str, userid: i32, remote_path: Option<String>, action: ConfigAction) -> Self {
         Self {
             auth: ConfigAuth::new(client_id, userid, remote_path),
             action,

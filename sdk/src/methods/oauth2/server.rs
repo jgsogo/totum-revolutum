@@ -3,8 +3,8 @@ use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 
 use anyhow::Result;
-use hyper::{Body, Method, Request, Response, Server, StatusCode};
 use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Method, Request, Response, Server, StatusCode};
 use reqwest;
 use tokio::sync::oneshot::Sender;
 use url::Url;
@@ -43,11 +43,7 @@ async fn dispatcher(
             let params: HashMap<String, String> = req
                 .uri()
                 .query()
-                .map(|v| {
-                    url::form_urlencoded::parse(v.as_bytes())
-                        .into_owned()
-                        .collect()
-                })
+                .map(|v| url::form_urlencoded::parse(v.as_bytes()).into_owned().collect())
                 .unwrap_or_else(HashMap::new);
 
             let oauth2_token = {
@@ -61,9 +57,7 @@ async fn dispatcher(
                 data.oauth2_token = Some(oauth2_token);
                 data.tx.take().unwrap().send(()).unwrap();
             }
-            Ok(Response::new(Body::from(format!(
-                "Hello /redirect_url qs:{params:#?}"
-            ))))
+            Ok(Response::new(Body::from(format!("Hello /redirect_url qs:{params:#?}"))))
         }
 
         // Return the 404 Not Found for other routes.
@@ -77,10 +71,8 @@ async fn dispatcher(
 
 fn visit_url(app: &AppClientData, callback_url: String) -> String {
     let mut url = Url::parse("https://my.pcloud.com/oauth2/authorize").unwrap();
-    url.query_pairs_mut()
-        .append_pair("client_id", &app.client_id);
-    url.query_pairs_mut()
-        .append_pair("redirect_uri", &callback_url);
+    url.query_pairs_mut().append_pair("client_id", &app.client_id);
+    url.query_pairs_mut().append_pair("redirect_uri", &callback_url);
     url.query_pairs_mut().append_pair("response_type", "code");
     if app.force_reapprove {
         url.query_pairs_mut().append_pair("force_reapprove", "true");
@@ -89,11 +81,7 @@ fn visit_url(app: &AppClientData, callback_url: String) -> String {
     url.as_str().to_string()
 }
 
-pub(crate) async fn serve(
-    http_client: reqwest::Client,
-    app: AppClientData,
-    addr: SocketAddr,
-) -> Result<OAuth2Token> {
+pub(crate) async fn serve(http_client: reqwest::Client, app: AppClientData, addr: SocketAddr) -> Result<OAuth2Token> {
     let (tx, rx) = tokio::sync::oneshot::channel::<()>();
     let visit_url = visit_url(&app, format!("http://{addr}{CALLBACK_ENDPOINT}"));
     let app_context = Arc::new(Mutex::new(AppContext::new(app, tx)));

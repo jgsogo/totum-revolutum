@@ -33,7 +33,7 @@ impl OutputExample {
 }
 
 impl ProgressBarBuilder for OutputExample {
-    fn new(&self, total_size: u64) -> Box<dyn ProgressBar> {
+    fn build(&self, total_size: u64) -> Box<dyn ProgressBar> {
         let r = self.pbs.add(indicatif::ProgressBar::new(total_size));
         r.set_style(self.sty.clone());
         Box::new(r)
@@ -42,17 +42,13 @@ impl ProgressBarBuilder for OutputExample {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::INFO)
-        .finish();
+    let subscriber = FmtSubscriber::builder().with_max_level(Level::INFO).finish();
     tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     // Configure progressbar and output
-    let sty = indicatif::ProgressStyle::with_template(
-        "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
-    )
-    .unwrap()
-    .progress_chars("##-");
+    let sty = indicatif::ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+        .unwrap()
+        .progress_chars("##-");
     let output_example = OutputExample::new(sty);
 
     let app = data::app_client_data::AppClientData::read_from_file("secrets/app.json").unwrap();

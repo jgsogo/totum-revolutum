@@ -22,12 +22,7 @@ type AppsFileContent = VersionedData<Apps>;
 
 impl AppsFileContent {
     pub fn find(&self, client_id: &str) -> Result<&data::app::App, std::io::Error> {
-        match self
-            .data
-            .apps
-            .iter()
-            .find(|&app| app.client_id == client_id)
-        {
+        match self.data.apps.iter().find(|&app| app.client_id == client_id) {
             Some(app) => Ok(app),
             None => Err(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
@@ -36,11 +31,7 @@ impl AppsFileContent {
         }
     }
 
-    pub fn find_or_insert(
-        &mut self,
-        client_id: &str,
-        app: data::app::App,
-    ) -> (&mut data::app::App, bool) {
+    pub fn find_or_insert(&mut self, client_id: &str, app: data::app::App) -> (&mut data::app::App, bool) {
         mut_find_or_insert(&mut self.data.apps, |app| app.client_id == client_id, app)
     }
 }

@@ -47,3 +47,33 @@ impl LocalFileMetadata for LocalMetadata {
         self.entry.path()
     }
 }
+
+// #[async_trait]
+// impl Copy<LocalMetadata> for LocalMetadata {
+//     async fn copy(self, rhs: Option<LocalMetadata>) -> Result<(Self, LocalMetadata)> {
+//         trace!(
+//             "Copy local '{}' to local '{}'",
+//             self.path().display(),
+//             rhs.as_ref().map_or("".to_string(), |v| v.path().display().to_string())
+//         );
+//         // std::fs::copy(self.path(), rhs.path())
+//         //     .map_err(|e| anyhow!("Error copying file from '{}' to '{}'", self.path(), rhs.path()))?;
+//         Ok((self, rhs.unwrap()))
+//     }
+// }
+
+// #[async_trait]
+// impl Remove for LocalMetadata {
+//     async fn remove(self) -> Result<()> {
+//         trace!("Remove local '{}'", self.path().display());
+//         Ok(())
+//     }
+// }
+//
+// #[async_trait]
+// impl Rename for LocalMetadata {
+//     async fn rename(self) -> Result<Self> {
+//         trace!("Rename local '{}'", self.path().display());
+//         Ok(self)
+//     }
+// }

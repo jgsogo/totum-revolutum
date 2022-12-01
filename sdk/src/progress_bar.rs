@@ -1,7 +1,7 @@
 use tracing::{info, trace};
 
 pub trait ProgressBarBuilder: Send + Sync {
-    fn new(&self, _total_size: u64) -> Box<dyn ProgressBar> {
+    fn build(&self, _total_size: u64) -> Box<dyn ProgressBar> {
         Box::new(NoProgressBar::default())
     }
 }
