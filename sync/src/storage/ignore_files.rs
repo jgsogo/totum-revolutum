@@ -13,10 +13,7 @@ pub struct IgnoreFilesContent {
 impl Default for IgnoreFilesContent {
     fn default() -> Self {
         Self {
-            patterns: vec![
-                INSIDE_PROJECT_DIRECTORY.to_string() + "/",
-                ".git/".to_string(),
-            ],
+            patterns: vec![INSIDE_PROJECT_DIRECTORY.to_string() + "/", ".git/".to_string()],
         }
     }
 }
@@ -50,10 +47,7 @@ mod tests {
     #[test]
     fn test_path() {
         let base_path = Path::new("base");
-        assert_eq!(
-            IgnoreFiles::path(base_path),
-            base_path.join(".pcloudignore")
-        );
+        assert_eq!(IgnoreFiles::path(base_path), base_path.join(".pcloudignore"));
     }
 
     #[test]

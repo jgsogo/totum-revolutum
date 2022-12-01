@@ -12,8 +12,7 @@ pub trait ReadWrite<T> {
     fn read_content(path: &Path) -> std::io::Result<Option<T>> {
         let mut file = std::fs::File::open(path).unwrap();
         let mut s = String::new();
-        file.read_to_string(&mut s)
-            .expect("Cannot read content from file");
+        file.read_to_string(&mut s).expect("Cannot read content from file");
 
         if !s.is_empty() {
             <Self as ReadWrite<T>>::deserialize(&s).map(|v| Some(v))
@@ -32,8 +31,7 @@ pub trait ReadWrite<T> {
 
         if let Some(content) = content {
             let content_str = <Self as ReadWrite<T>>::serialize(content).unwrap();
-            f.write_all(content_str.as_bytes())
-                .expect("Error writing the file");
+            f.write_all(content_str.as_bytes()).expect("Error writing the file");
         }
         Ok(())
     }
@@ -127,7 +125,7 @@ where
         file.try_lock_exclusive()?;
 
         debug!("Read file from '{}'", path.display());
-        let content = T::read_content(path)?.unwrap_or(T::default());
+        let content = T::read_content(path)?.unwrap_or_default();
 
         Ok(Self {
             content,
@@ -150,8 +148,7 @@ where
         file.try_lock_exclusive()?;
 
         debug!("Read file from '{}'", path.display());
-        let content =
-            VersionedData::<T>::read_content(path)?.unwrap_or(VersionedData::default(default));
+        let content = VersionedData::<T>::read_content(path)?.unwrap_or_else(|| VersionedData::default(default));
 
         Ok(Self {
             content,

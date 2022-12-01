@@ -62,9 +62,7 @@ async fn main() -> Result<()> {
 
     // Configure tracing
     let tracing_level = tracing_level(cli.verbose.log_level_filter());
-    tracing_subscriber::fmt()
-        .with_max_level(tracing_level)
-        .init();
+    tracing_subscriber::fmt().with_max_level(tracing_level).init();
     debug!("Tracing level configured to {}", tracing_level);
 
     // Go ahead!

@@ -1201,6 +1201,7 @@ dependencies = [
  "cron-parser",
  "flume",
  "fs4",
+ "futures",
  "ignore",
  "path-clean",
  "pcloud-sdk",

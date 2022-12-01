@@ -23,10 +23,7 @@ impl Directory {
         let path = to_absolute_path(path);
 
         Self {
-            path: path
-                .to_str()
-                .expect("Cannot convert path to string")
-                .to_string(),
+            path: path.to_str().expect("Cannot convert path to string").to_string(),
             cron: utils::cron::CronTz::new(expression, tz),
         }
     }
@@ -93,10 +90,7 @@ mod tests {
     #[test]
     fn test_path() {
         let base_path = Path::new("home");
-        assert_eq!(
-            DirectoriesFile::path(base_path),
-            base_path.join("cron.yaml")
-        );
+        assert_eq!(DirectoriesFile::path(base_path), base_path.join("cron.yaml"));
     }
 
     #[test]
@@ -123,8 +117,7 @@ mod tests {
         let path = DirectoriesFile::path(tmp_dir.path());
 
         {
-            let mut directories_lock =
-                DirectoriesFile::update_or_create(&path, Directories::default()).unwrap();
+            let mut directories_lock = DirectoriesFile::update_or_create(&path, Directories::default()).unwrap();
             let dirs = &mut directories_lock.content.data.directories;
 
             dirs.push(Directory::new(

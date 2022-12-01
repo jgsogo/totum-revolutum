@@ -34,9 +34,7 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
     let secret = if params.client_secret_stdin {
         let mut user_input = String::new();
         let stdin = std::io::stdin(); // We get `Stdin` here.
-        stdin
-            .read_line(&mut user_input)
-            .expect("Error reading from stdin");
+        stdin.read_line(&mut user_input).expect("Error reading from stdin");
         user_input.trim().into()
     } else {
         params.client_secret.as_ref().unwrap().clone()
@@ -54,15 +52,16 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
     let app = data::app::App::default(&params.client_id, &secret);
     let (app, _inserted) = file_data.content.find_or_insert(&params.client_id, app);
     if app.client_secret != secret {
-        eprintln!("Application with the same client_id but different client_secret already exists! Please, remove it first");
+        eprintln!(
+            "Application with the same client_id but different client_secret already exists! Please, remove it first"
+        );
         std::process::exit(1);
     }
 
     // Run oauth request
     // TODO: Move this to SDK
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
-    let app_client_data =
-        data::app_client_data::AppClientData::new(&app.client_id, &app.client_secret);
+    let app_client_data = data::app_client_data::AppClientData::new(&app.client_id, &app.client_secret);
     let pcloud = pcloud_sdk::client::HttpClient::authorize(app_client_data, addr)
         .await
         .expect("TODO: Propagate errors");
