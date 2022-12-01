@@ -21,10 +21,7 @@ pub fn is_pcloud_dir(path: &Path) -> Result<PathBuf> {
         let config_path = config::ConfigFile::path(path);
         if !config_path.exists() {
             path.parent().map_or(
-                Err(Error::new(
-                    ErrorKind::NotFound,
-                    "pcloud directory not found",
-                )),
+                Err(Error::new(ErrorKind::NotFound, "pcloud directory not found")),
                 is_pcloud_dir,
             )
         } else {

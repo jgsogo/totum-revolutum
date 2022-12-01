@@ -41,15 +41,13 @@ pub trait HandyClient: getfilelink::GetFileLink {
         pb.set_message(&format!("Downloading '{}'", url_filename));
 
         // download chunks
-        let mut file =
-            File::create(path).or(Err(anyhow!("Failed to create file '{}'", path.display())))?;
+        let mut file = File::create(path).or(Err(anyhow!("Failed to create file '{}'", path.display())))?;
         let mut downloaded: u64 = 0;
         let mut stream = res.bytes_stream();
 
         while let Some(item) = stream.next().await {
             let chunk = item.or(Err(anyhow!("Error while downloading file")))?;
-            file.write_all(&chunk)
-                .or(Err(anyhow!("Error while writing to file")))?;
+            file.write_all(&chunk).or(Err(anyhow!("Error while writing to file")))?;
             downloaded = min(downloaded + (chunk.len() as u64), total_size);
             pb.set_position(downloaded);
         }

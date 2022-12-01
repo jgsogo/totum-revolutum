@@ -35,11 +35,7 @@ impl DirectoryArg {
         match is_pcloud_dir(&wdir) {
             Ok(p) => p,
             Err(e) => {
-                eprintln!(
-                    "Provided directory is not a pcloud one: '{}'. {}",
-                    wdir.display(),
-                    e
-                );
+                eprintln!("Provided directory is not a pcloud one: '{}'. {}", wdir.display(), e);
                 std::process::exit(1);
             }
         }
