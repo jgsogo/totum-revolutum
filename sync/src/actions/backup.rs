@@ -86,7 +86,7 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
 
     if let Err(e) = tokio::try_join!(
         local_basepoint.walk_local_directory(6),
-        remote_basepoint.walk_remote_directory(6, &config),
+        remote_basepoint.walk_remote_directory(6, config),
         work_on_results(differ, config, &local_basepoint, &remote_basepoint),
     ) {
         error!("Error on workers loop: {e}");

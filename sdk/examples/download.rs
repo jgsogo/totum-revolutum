@@ -33,7 +33,7 @@ impl OutputExample {
 }
 
 impl ProgressBarBuilder for OutputExample {
-    fn new(&self, total_size: u64) -> Box<dyn ProgressBar> {
+    fn build(&self, total_size: u64) -> Box<dyn ProgressBar> {
         let r = self.pbs.add(indicatif::ProgressBar::new(total_size));
         r.set_style(self.sty.clone());
         Box::new(r)

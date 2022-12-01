@@ -22,7 +22,7 @@ impl FileMetadata for RemoteMetadata {
         &self.id
     }
     fn size(&self) -> u64 {
-        self.metadata.size.as_ref().unwrap().clone()
+        *self.metadata.size.as_ref().unwrap()
     }
 
     fn hash(&self) -> String {

@@ -42,7 +42,7 @@ impl BasePointPCloud {
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => work_on_contents(Path::new(""), contents, &self, 0)?,
+            Some(contents) => work_on_contents(Path::new(""), contents, self, 0)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -70,7 +70,7 @@ impl BasePointPCloud {
     }
 }
 
-fn work_on_contents(base_path: &Path, contents: &Vec<Metadata>, diff: &BasePointPCloud, depth: usize) -> Result<()> {
+fn work_on_contents(base_path: &Path, contents: &[Metadata], diff: &BasePointPCloud, depth: usize) -> Result<()> {
     for it in contents.iter() {
         let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
         trace!(
@@ -78,7 +78,7 @@ fn work_on_contents(base_path: &Path, contents: &Vec<Metadata>, diff: &BasePoint
             format!("{}{}", " ".repeat(depth * 4), PRINT_FOLDER_TOKEN),
             path.display()
         );
-        diff.file_found(&*path, it.clone());
+        diff.file_found(&path, it.clone());
         match &it.contents {
             Some(contents) => work_on_contents(&path, contents, diff, depth + 1)?,
             None => (),

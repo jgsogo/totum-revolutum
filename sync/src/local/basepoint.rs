@@ -33,7 +33,7 @@ impl BasePointLocal {
 
         info!("Start local visitor");
         let start = Instant::now();
-        let mut builder = parallel_visitor::VisitorBuilder::new(&self);
+        let mut builder = parallel_visitor::VisitorBuilder::new(self);
         walker.visit(&mut builder);
         info!("Finished local visitor in {:?}", start.elapsed());
         Ok(())

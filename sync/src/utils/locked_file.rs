@@ -125,7 +125,7 @@ where
         file.try_lock_exclusive()?;
 
         debug!("Read file from '{}'", path.display());
-        let content = T::read_content(path)?.unwrap_or(T::default());
+        let content = T::read_content(path)?.unwrap_or_default();
 
         Ok(Self {
             content,
@@ -148,7 +148,7 @@ where
         file.try_lock_exclusive()?;
 
         debug!("Read file from '{}'", path.display());
-        let content = VersionedData::<T>::read_content(path)?.unwrap_or(VersionedData::default(default));
+        let content = VersionedData::<T>::read_content(path)?.unwrap_or_else(|| VersionedData::default(default));
 
         Ok(Self {
             content,
