@@ -27,12 +27,6 @@ jobs:
           override: true
           components: rustfmt, clippy
 
-      - name: Run cargo fetch
-        uses: actions-rs/cargo@v1
-        with:
-          command: fetch
-          args: --target x86_64-unknown-linux-gnu
-
       - name: Run cargo build
         uses: actions-rs/cargo@v1
         with:
