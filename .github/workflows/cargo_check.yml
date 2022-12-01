@@ -14,17 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set up cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          shared-key: "pcloud-sdk"
+
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
           components: rustfmt, clippy
-      - name: Set up cargo cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-on-failure: true
-          shared-key: "pcloud-sdk"
 
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
@@ -45,11 +47,7 @@ jobs:
       - lints
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+
       - name: Set up cargo cache
         uses: Swatinem/rust-cache@v2
         with:
@@ -94,11 +92,7 @@ jobs:
       - build
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+
       - name: Set up cargo cache
         uses: Swatinem/rust-cache@v2
         with:
