@@ -75,8 +75,7 @@ pub fn handle(home: &Path, params: &InitParams) -> Result<()> {
         let config_action = ConfigAction::new(params.action, params.on_conflict)?;
         let config = Config::new(&params.client_id, token.userid, None, config_action);
         let config_file_path = storage::config::ConfigFile::path(&working_dir);
-        let mut _config_data =
-            storage::config::ConfigFile::update_or_create(&config_file_path, config)?;
+        let mut _config_data = storage::config::ConfigFile::update_or_create(&config_file_path, config)?;
         // TODO: Return if updated or created, it is relevant!
 
         // Create the .pcloudignore file

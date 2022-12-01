@@ -130,10 +130,7 @@ mod tests {
                 assert_eq!(data.folderid, None);
                 assert_eq!(data.fileid, Some(FileID(1729212)));
                 assert_eq!(data.deletedfileid, None);
-                assert_eq!(
-                    data.common.created,
-                    Some(datetime!(2013-10-02 14:29:11 UTC))
-                );
+                assert_eq!(data.common.created, Some(datetime!(2013-10-02 14:29:11 UTC)));
                 assert_eq!(data.common.modified, None);
                 assert_eq!(data.common.icon, Some(Icon::Image));
                 assert_eq!(data.category, Some(Category::Image));

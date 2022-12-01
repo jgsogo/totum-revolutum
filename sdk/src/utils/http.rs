@@ -34,11 +34,7 @@ where
     }
 }
 
-pub(crate) async fn get<T>(
-    client: reqwest::Client,
-    url: &str,
-    params: HashMap<String, String>,
-) -> Result<T>
+pub(crate) async fn get<T>(client: reqwest::Client, url: &str, params: HashMap<String, String>) -> Result<T>
 where
     T: DeserializeOwned,
 {
@@ -64,10 +60,7 @@ where
 {
     let result = client
         .post(url)
-        .header(
-            CONTENT_TYPE,
-            format!("multipart/form-data; boundary={BOUNDARY}"),
-        )
+        .header(CONTENT_TYPE, format!("multipart/form-data; boundary={BOUNDARY}"))
         .query(&params)
         .body(reqwest::Body::from(data))
         .send()

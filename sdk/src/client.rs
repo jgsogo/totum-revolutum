@@ -25,12 +25,7 @@ pub trait Client: Clone {
         http::get::<T>(self.http_client(), url, params).await
     }
 
-    async fn post<T>(
-        &self,
-        url: &str,
-        mut params: HashMap<String, String>,
-        data: Vec<u8>,
-    ) -> Result<T>
+    async fn post<T>(&self, url: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
     where
         T: DeserializeOwned,
     {
@@ -53,10 +48,7 @@ impl HttpClient {
         }
     }
 
-    pub async fn authorize(
-        app: data::app_client_data::AppClientData,
-        address: SocketAddr,
-    ) -> Result<HttpClient> {
+    pub async fn authorize(app: data::app_client_data::AppClientData, address: SocketAddr) -> Result<HttpClient> {
         let client = reqwest::Client::new();
         let oauth2 = oauth2::authorize_oauth2(client.clone(), app, address).await?;
         Ok(HttpClient {

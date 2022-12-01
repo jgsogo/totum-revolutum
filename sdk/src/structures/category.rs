@@ -68,10 +68,7 @@ mod tests {
 
     #[test]
     fn test_serialize() {
-        assert_eq!(
-            serde_json::to_string(&Category::Uncategorized).unwrap(),
-            "0"
-        );
+        assert_eq!(serde_json::to_string(&Category::Uncategorized).unwrap(), "0");
         assert_eq!(serde_json::to_string(&Category::Image).unwrap(), "1");
         assert_eq!(serde_json::to_string(&Category::Video).unwrap(), "2");
         assert_eq!(serde_json::to_string(&Category::Audio).unwrap(), "3");
@@ -81,29 +78,11 @@ mod tests {
 
     #[test]
     fn test_deserialize() {
-        assert_eq!(
-            serde_json::from_str::<Category>("0").unwrap(),
-            Category::Uncategorized
-        );
-        assert_eq!(
-            serde_json::from_str::<Category>("1").unwrap(),
-            Category::Image
-        );
-        assert_eq!(
-            serde_json::from_str::<Category>("2").unwrap(),
-            Category::Video
-        );
-        assert_eq!(
-            serde_json::from_str::<Category>("3").unwrap(),
-            Category::Audio
-        );
-        assert_eq!(
-            serde_json::from_str::<Category>("4").unwrap(),
-            Category::Document
-        );
-        assert_eq!(
-            serde_json::from_str::<Category>("5").unwrap(),
-            Category::Archive
-        );
+        assert_eq!(serde_json::from_str::<Category>("0").unwrap(), Category::Uncategorized);
+        assert_eq!(serde_json::from_str::<Category>("1").unwrap(), Category::Image);
+        assert_eq!(serde_json::from_str::<Category>("2").unwrap(), Category::Video);
+        assert_eq!(serde_json::from_str::<Category>("3").unwrap(), Category::Audio);
+        assert_eq!(serde_json::from_str::<Category>("4").unwrap(), Category::Document);
+        assert_eq!(serde_json::from_str::<Category>("5").unwrap(), Category::Archive);
     }
 }

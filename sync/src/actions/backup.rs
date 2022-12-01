@@ -2,104 +2,72 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::Result;
-use tracing::{error, info, trace};
+use tracing::{error, info};
 
-use crate::actions::OnConflict;
+use crate::actions::{Copy, OnConflict, Rename};
 use crate::diff;
-use crate::diff::basepoint::FileMetadata;
+use crate::diff::basepoint::{BasePoint, FileMetadata};
 use crate::diff::two_ways::FileDiff;
 use crate::local;
+use crate::local::BasePointLocal;
 use crate::remote;
+use crate::remote::basepoint::BasePointPCloud;
 use crate::storage::config;
 
-struct Actions<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> {
-    file_diff: FileDiff<LHSMetadata, RHSMetadata>,
-    config: &'a config::Config,
-    _pcloud: pcloud_sdk::client::HttpClient,
-}
-
-impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> Actions<'a, LHSMetadata, RHSMetadata> {
-    pub fn new(
-        file_diff: FileDiff<LHSMetadata, RHSMetadata>,
-        config: &'a config::Config,
-        pcloud: pcloud_sdk::client::HttpClient,
-    ) -> Self {
-        Self {
-            file_diff,
-            config,
-            _pcloud: pcloud,
-        }
-    }
-
-    #[allow(dead_code)]
-    async fn copy_to_lhs(&self) -> Result<()> {
-        trace!("copy_to_lhs({})", self.file_diff.id());
-        // TODO: to implement
-        Ok(())
-    }
-    async fn copy_to_rhs(&self) -> Result<()> {
-        trace!("copy_to_rhs({})", self.file_diff.id());
-        // TODO: to implement
-        Ok(())
-    }
-    #[allow(dead_code)]
-    async fn rename_lhs(&self) -> Result<()> {
-        trace!("rename_lhs({})", self.file_diff.id());
-        // TODO: to implement
-        Ok(())
-    }
-    async fn rename_rhs(&self) -> Result<()> {
-        trace!("rename_rhs({})", self.file_diff.id());
-        // TODO: to implement
-        Ok(())
-    }
-}
-
-impl<'a, LHSMetadata: FileMetadata, RHSMetadata: FileMetadata> Actions<'a, LHSMetadata, RHSMetadata> {
-    pub async fn backup(&self) -> Result<()> {
-        match &self.file_diff {
-            FileDiff {
-                lhs_metadata: Some(lhs_metadata),
-                rhs_metadata: Some(rhs_metadata),
-            } => {
-                if lhs_metadata.eq(rhs_metadata) {
-                    Ok(())
-                } else {
-                    self.backup_modified().await
-                }
+async fn backup<LHS, RHS, BasePointLHS, BasePointRHS>(
+    filediff: FileDiff<LHS, RHS>,
+    config: &config::Config,
+    _local_basepoint: &BasePointLHS, // &dyn BasePoint<LHS>,
+    remote_basepoint: &BasePointRHS, //&dyn BasePoint<RHS>,
+) -> Result<()>
+where
+    LHS: FileMetadata,
+    RHS: FileMetadata,
+    BasePointLHS: BasePoint<LHS>,
+    BasePointRHS: BasePoint<RHS> + Copy<LHS, RHS> + Rename<RHS>,
+{
+    match filediff {
+        FileDiff {
+            lhs: Some(lhs),
+            rhs: Some(rhs),
+        } => match config.action.conflict() {
+            OnConflict::OverrideRemote => {
+                let _r = remote_basepoint.copy(&lhs, Some(rhs)).await?;
+                Ok(())
             }
-            FileDiff {
-                lhs_metadata: Some(_), ..
-            } => self.copy_to_rhs().await,
-            FileDiff {
-                rhs_metadata: Some(_), ..
-            } => Ok(()),
-            _ => panic!("Not expected"),
-        }
-    }
-
-    async fn backup_modified(&self) -> Result<()> {
-        match self.config.action.conflict() {
-            OnConflict::OverrideRemote => self.copy_to_rhs().await,
             OnConflict::RenameRemote => {
-                self.rename_rhs().await?;
-                self.copy_to_rhs().await
+                let _ = remote_basepoint.rename(rhs).await?;
+                let _r = remote_basepoint.copy(&lhs, None).await?;
+                Ok(())
             }
             s => panic!("Not a valid onConflict for backup: {s:?}"),
+        },
+        FileDiff { lhs: Some(lhs), .. } => {
+            let _r = remote_basepoint.copy(&lhs, None).await?;
+            Ok(())
         }
+        FileDiff { rhs: Some(_), .. } => Ok(()),
+        _ => panic!("Not expected"),
     }
 }
 
-async fn work_on_results<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileMetadata + 'static>(
-    rx: flume::Receiver<FileDiff<LHSMetadata, RHSMetadata>>,
+async fn work_on_results<LHS, RHS, BasePointLHS, BasePointRHS>(
+    rx: flume::Receiver<FileDiff<LHS, RHS>>,
     config: &config::Config,
-    pcloud: pcloud_sdk::client::HttpClient,
-) -> Result<()> {
+    local_basepoint: &BasePointLHS,
+    remote_basepoint: &BasePointRHS,
+) -> Result<()>
+where
+    LHS: FileMetadata,
+    RHS: FileMetadata,
+    BasePointLHS: BasePoint<LHS>,
+    BasePointRHS: BasePoint<RHS> + Copy<LHS, RHS> + Rename<RHS>,
+{
     info!("Start backup receiving loop");
     let start = Instant::now();
     while let Ok(v) = rx.recv_async().await {
         // TODO: We have independent actions here that can be parallelized
-        Actions::new(v, &config, pcloud.clone()).backup().await?;
+        backup(v, config, local_basepoint, remote_basepoint).await?;
     }
     info!("Finished backup receiving loop in {:?}", start.elapsed());
     Ok(())
@@ -107,15 +75,19 @@ async fn work_on_results<LHSMetadata: FileMetadata + 'static, RHSMetadata: FileM
 
 pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()> {
     info!("Run backup action on path '{}'", path.display());
-    let pcloud = config.auth.get_pcloud_client(home)?;
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
     let (lhs, rhs, differ) = diff::two_ways::run::<local::LocalMetadata, remote::RemoteMetadata>().await;
 
+    let local_basepoint = BasePointLocal::new(path, lhs);
+
+    let pcloud = config.auth.get_pcloud_client(home)?;
+    let remote_basepoint = BasePointPCloud::new(pcloud.clone(), rhs);
+
     if let Err(e) = tokio::try_join!(
-        local::walk_local_directory(path, 6, lhs),
-        remote::walk_remote_directory(config, 6, rhs, pcloud.clone()),
-        work_on_results(differ, config, pcloud),
+        local_basepoint.walk_local_directory(6),
+        remote_basepoint.walk_remote_directory(6, config),
+        work_on_results(differ, config, &local_basepoint, &remote_basepoint),
     ) {
         error!("Error on workers loop: {e}");
     }

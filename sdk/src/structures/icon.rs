@@ -56,32 +56,17 @@ mod tests {
 
     #[test]
     fn test_serialize() {
-        assert_eq!(
-            serde_json::to_string(&Icon::Document).unwrap(),
-            "\"document\""
-        );
+        assert_eq!(serde_json::to_string(&Icon::Document).unwrap(), "\"document\"");
         assert_eq!(serde_json::to_string(&Icon::GIS).unwrap(), "\"gis\"");
-        assert_eq!(
-            serde_json::to_string(&Icon::DiskImage).unwrap(),
-            "\"diskimage\""
-        );
+        assert_eq!(serde_json::to_string(&Icon::DiskImage).unwrap(), "\"diskimage\"");
         assert_eq!(serde_json::to_string(&Icon::Other).unwrap(), "\"other\"");
     }
 
     #[test]
     fn test_deserialize() {
-        assert_eq!(
-            serde_json::from_str::<Icon>("\"document\"").unwrap(),
-            Icon::Document
-        );
+        assert_eq!(serde_json::from_str::<Icon>("\"document\"").unwrap(), Icon::Document);
         assert_eq!(serde_json::from_str::<Icon>("\"gis\"").unwrap(), Icon::GIS);
-        assert_eq!(
-            serde_json::from_str::<Icon>("\"diskimage\"").unwrap(),
-            Icon::DiskImage
-        );
-        assert_eq!(
-            serde_json::from_str::<Icon>("\"otherthing\"").unwrap(),
-            Icon::Other
-        );
+        assert_eq!(serde_json::from_str::<Icon>("\"diskimage\"").unwrap(), Icon::DiskImage);
+        assert_eq!(serde_json::from_str::<Icon>("\"otherthing\"").unwrap(), Icon::Other);
     }
 }
