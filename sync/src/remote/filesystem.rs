@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use anyhow::Result;
+use async_trait::async_trait;
 use flume::Sender;
 use tokio::time::Instant;
 use tracing::{info, trace};
@@ -12,44 +13,18 @@ use pcloud_sdk::structures::Metadata;
 use crate::diff::Filesystem;
 use crate::local::LocalFileMetadata;
 use crate::remote::RemoteMetadata;
-use crate::storage::config;
 
 pub struct FilesystemPCloud {
+    path: String,
     pcloud: pcloud_sdk::client::HttpClient,
 }
 
 impl FilesystemPCloud {
-    pub fn new(pcloud: pcloud_sdk::client::HttpClient) -> Self {
-        Self { pcloud }
-    }
-
-    pub async fn walk_directory(
-        &self,
-        tx: flume::Sender<RemoteMetadata>,
-        _threads: usize,
-        config: &config::Config,
-    ) -> Result<()> {
-        // FIXME: Here we can implement two different strategies. One of them is to iterate everything
-        //  from the ROOT folder recursively, the other one is to list the files in each directory
-        //  and use a thread pool to enter child directories and _recurse_.
-        info!("Start remote visitor");
-        let start = Instant::now();
-        let mut list_folder_input = ListFolderInput::new_from_path(config.auth.remote_path.clone());
-        list_folder_input.recursive = true;
-        let filtermeta = vec!["name", "contents", "size", "hash", "isfolder"];
-        let items = self
-            .pcloud
-            .listfolder_with_filtermeta(&list_folder_input, filtermeta)
-            .await
-            .unwrap();
-
-        match &items.metadata.contents {
-            Some(contents) => self.work_on_contents(tx, Path::new(""), contents, 0)?,
-            None => (),
+    pub fn new(path: &str, pcloud: pcloud_sdk::client::HttpClient) -> Self {
+        Self {
+            path: path.to_string(),
+            pcloud,
         }
-        info!("Finished remote visitor in {:?}", start.elapsed());
-
-        Ok(())
     }
 
     #[allow(dead_code)]
@@ -87,24 +62,31 @@ impl FilesystemPCloud {
     }
 }
 
+#[async_trait]
 impl Filesystem for FilesystemPCloud {
     type Metadata = RemoteMetadata;
-}
 
-// #[async_trait]
-// impl actions::Copy<LocalMetadata, RemoteMetadata> for FilesystemPCloud {
-//     async fn copy(
-//         &self,
-//         _lhs: &LocalMetadata,
-//         _rhs: Option<RemoteMetadata>,
-//     ) -> Result<(&LocalMetadata, RemoteMetadata)> {
-//         todo!()
-//     }
-// }
-//
-// #[async_trait]
-// impl actions::Rename<RemoteMetadata> for FilesystemPCloud {
-//     async fn rename(&self, _file: RemoteMetadata) -> Result<RemoteMetadata> {
-//         todo!()
-//     }
-// }
+    async fn walk_directory(&self, tx: Sender<Self::Metadata>, _threads: usize) -> Result<()> {
+        // FIXME: Here we can implement two different strategies. One of them is to iterate everything
+        //  from the ROOT folder recursively, the other one is to list the files in each directory
+        //  and use a thread pool to enter child directories and _recurse_.
+        info!("Start remote visitor");
+        let start = Instant::now();
+        let mut list_folder_input = ListFolderInput::new_from_path(Some(self.path.clone()));
+        list_folder_input.recursive = true;
+        let filtermeta = vec!["name", "contents", "size", "hash", "isfolder"];
+        let items = self
+            .pcloud
+            .listfolder_with_filtermeta(&list_folder_input, filtermeta)
+            .await
+            .unwrap();
+
+        match &items.metadata.contents {
+            Some(contents) => self.work_on_contents(tx, Path::new(""), contents, 0)?,
+            None => (),
+        }
+        info!("Finished remote visitor in {:?}", start.elapsed());
+
+        Ok(())
+    }
+}

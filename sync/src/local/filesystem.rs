@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
+use async_trait::async_trait;
 use flume::Sender;
 use ignore::WalkBuilder;
 use tokio::time::Instant;
@@ -22,8 +23,13 @@ impl FilesystemLocal {
             path: path.to_path_buf(),
         }
     }
+}
 
-    pub async fn walk_directory(&self, tx: flume::Sender<LocalMetadata>, threads: usize) -> Result<()> {
+#[async_trait]
+impl Filesystem for FilesystemLocal {
+    type Metadata = LocalMetadata;
+
+    async fn walk_directory(&self, tx: Sender<Self::Metadata>, threads: usize) -> Result<()> {
         let walker = WalkBuilder::new(&self.path)
             .threads(threads)
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
@@ -37,8 +43,4 @@ impl FilesystemLocal {
         info!("Finished local visitor in {:?}", start.elapsed());
         Ok(())
     }
-}
-
-impl Filesystem for FilesystemLocal {
-    type Metadata = LocalMetadata;
 }

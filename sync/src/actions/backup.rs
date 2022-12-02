@@ -63,7 +63,7 @@ where
     let start = Instant::now();
     while let Ok(v) = rx.recv_async().await {
         // TODO: We have independent actions here that can be parallelized
-        info!("Backout work on {}", v.id());
+        info!("Backup work on {}", v.id());
         backup(v, config, local_basepoint, remote_basepoint).await?;
     }
     info!("Finished backup receiving loop in {:?}", start.elapsed());
@@ -79,11 +79,12 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
     let local_basepoint = FilesystemLocal::new(path);
 
     let pcloud = config.auth.get_pcloud_client(home)?;
-    let remote_basepoint = FilesystemPCloud::new(pcloud.clone());
+    let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();
+    let remote_basepoint = FilesystemPCloud::new(&base_path, pcloud.clone());
 
     if let Err(e) = tokio::try_join!(
         local_basepoint.walk_directory(lhs, 6),
-        remote_basepoint.walk_directory(rhs, 6, config),
+        remote_basepoint.walk_directory(rhs, 6),
         work_on_results(differ, config, &local_basepoint, &remote_basepoint),
     ) {
         error!("Error on workers loop: {e}");
