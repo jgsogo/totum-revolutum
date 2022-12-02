@@ -5,18 +5,18 @@ use ignore::WalkBuilder;
 use tokio::time::Instant;
 use tracing::info;
 
-use crate::diff::basepoint::BasePoint;
+use crate::diff::filesystem::Filesystem;
 use crate::local::{LocalFileMetadata, LocalMetadata};
 use crate::storage::ignore_files;
 
 use super::parallel_visitor;
 
-pub struct BasePointLocal {
+pub struct FilesystemLocal {
     path: PathBuf,
     tx: flume::Sender<LocalMetadata>,
 }
 
-impl BasePointLocal {
+impl FilesystemLocal {
     pub fn new(path: &Path, tx: flume::Sender<LocalMetadata>) -> Self {
         Self {
             path: path.to_path_buf(),
@@ -24,7 +24,7 @@ impl BasePointLocal {
         }
     }
 
-    pub async fn walk_local_directory(&self, threads: usize) -> Result<()> {
+    pub async fn walk_directory(&self, threads: usize) -> Result<()> {
         let walker = WalkBuilder::new(&self.path)
             .threads(threads)
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
@@ -45,4 +45,4 @@ impl BasePointLocal {
     }
 }
 
-impl BasePoint<LocalMetadata> for BasePointLocal {}
+impl Filesystem<LocalMetadata> for FilesystemLocal {}

@@ -6,12 +6,12 @@ use tracing::{error, info};
 
 use crate::actions::{Copy, OnConflict, Rename};
 use crate::diff;
-use crate::diff::basepoint::{BasePoint, FileMetadata};
+use crate::diff::filesystem::{FileMetadata, Filesystem};
 use crate::diff::two_ways::FileDiff;
 use crate::local;
-use crate::local::BasePointLocal;
+use crate::local::FilesystemLocal;
 use crate::remote;
-use crate::remote::basepoint::BasePointPCloud;
+use crate::remote::filesystem::FilesystemPCloud;
 use crate::storage::config;
 
 async fn backup<LHS, RHS, BasePointLHS, BasePointRHS>(
@@ -23,8 +23,8 @@ async fn backup<LHS, RHS, BasePointLHS, BasePointRHS>(
 where
     LHS: FileMetadata,
     RHS: FileMetadata,
-    BasePointLHS: BasePoint<LHS>,
-    BasePointRHS: BasePoint<RHS> + Copy<LHS, RHS> + Rename<RHS>,
+    BasePointLHS: Filesystem<LHS>,
+    BasePointRHS: Filesystem<RHS> + Copy<LHS, RHS> + Rename<RHS>,
 {
     match filediff {
         FileDiff {
@@ -60,8 +60,8 @@ async fn work_on_results<LHS, RHS, BasePointLHS, BasePointRHS>(
 where
     LHS: FileMetadata,
     RHS: FileMetadata,
-    BasePointLHS: BasePoint<LHS>,
-    BasePointRHS: BasePoint<RHS> + Copy<LHS, RHS> + Rename<RHS>,
+    BasePointLHS: Filesystem<LHS>,
+    BasePointRHS: Filesystem<RHS> + Copy<LHS, RHS> + Rename<RHS>,
 {
     info!("Start backup receiving loop");
     let start = Instant::now();
@@ -79,14 +79,14 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
     let (lhs, rhs, differ) = diff::two_ways::run::<local::LocalMetadata, remote::RemoteMetadata>().await;
 
-    let local_basepoint = BasePointLocal::new(path, lhs);
+    let local_basepoint = FilesystemLocal::new(path, lhs);
 
     let pcloud = config.auth.get_pcloud_client(home)?;
-    let remote_basepoint = BasePointPCloud::new(pcloud.clone(), rhs);
+    let remote_basepoint = FilesystemPCloud::new(pcloud.clone(), rhs);
 
     if let Err(e) = tokio::try_join!(
-        local_basepoint.walk_local_directory(6),
-        remote_basepoint.walk_remote_directory(6, config),
+        local_basepoint.walk_directory(6),
+        remote_basepoint.walk_directory(6, config),
         work_on_results(differ, config, &local_basepoint, &remote_basepoint),
     ) {
         error!("Error on workers loop: {e}");

@@ -3,7 +3,7 @@ use std::time::Instant;
 
 use tracing::{error, info, trace};
 
-use super::basepoint::{FileMetadata, MAX_BUFFER};
+use super::filesystem::{FileMetadata, MAX_BUFFER};
 
 pub struct FileDiff<LHS: FileMetadata, RHS: FileMetadata> {
     pub lhs: Option<LHS>,

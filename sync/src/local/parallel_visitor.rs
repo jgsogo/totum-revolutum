@@ -1,13 +1,13 @@
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 
-use crate::local::BasePointLocal;
+use crate::local::FilesystemLocal;
 
 pub struct Visitor<'s> {
-    diff: &'s BasePointLocal,
+    diff: &'s FilesystemLocal,
 }
 
 impl<'s> Visitor<'s> {
-    pub fn new(diff: &'s BasePointLocal) -> Visitor<'s> {
+    pub fn new(diff: &'s FilesystemLocal) -> Visitor<'s> {
         Visitor { diff }
     }
 }
@@ -23,11 +23,11 @@ impl<'s> ParallelVisitor for Visitor<'s> {
 }
 
 pub struct VisitorBuilder<'s> {
-    diff: &'s BasePointLocal,
+    diff: &'s FilesystemLocal,
 }
 
 impl<'s> VisitorBuilder<'s> {
-    pub fn new(diff: &BasePointLocal) -> VisitorBuilder {
+    pub fn new(diff: &FilesystemLocal) -> VisitorBuilder {
         VisitorBuilder { diff }
     }
 }

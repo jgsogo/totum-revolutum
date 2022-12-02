@@ -1,3 +1,5 @@
+use std::path::Path;
+
 pub const MAX_BUFFER: usize = 100;
 
 #[derive(Debug)]
@@ -23,4 +25,5 @@ pub trait FileMetadata: std::marker::Sync + std::marker::Send + std::fmt::Debug 
     }
 }
 
-pub trait BasePoint<T: FileMetadata> {}
+/// Represents the local or remote storage as a filesystem
+pub trait Filesystem<T: FileMetadata> {}

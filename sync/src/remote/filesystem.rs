@@ -10,23 +10,23 @@ use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 
 use crate::actions;
-use crate::diff::basepoint::BasePoint;
+use crate::diff::filesystem::Filesystem;
 use crate::local::{LocalFileMetadata, LocalMetadata};
 use crate::remote::file_metadata::RemoteFileMetadata;
 use crate::remote::RemoteMetadata;
 use crate::storage::config;
 
-pub struct BasePointPCloud {
+pub struct FilesystemPCloud {
     pcloud: pcloud_sdk::client::HttpClient,
     tx: flume::Sender<RemoteMetadata>,
 }
 
-impl BasePointPCloud {
+impl FilesystemPCloud {
     pub fn new(pcloud: pcloud_sdk::client::HttpClient, tx: flume::Sender<RemoteMetadata>) -> Self {
         Self { pcloud, tx }
     }
 
-    pub async fn walk_remote_directory(&self, _threads: usize, config: &config::Config) -> Result<()> {
+    pub async fn walk_directory(&self, _threads: usize, config: &config::Config) -> Result<()> {
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
         //  and use a thread pool to enter child directories and _recurse_.
@@ -42,7 +42,7 @@ impl BasePointPCloud {
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => work_on_contents(Path::new(""), contents, self, 0)?,
+            Some(contents) => FilesystemPCloud::work_on_contents(Path::new(""), contents, self, 0)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -68,32 +68,25 @@ impl BasePointPCloud {
     pub fn rename(&self, _file: RemoteMetadata) -> Result<RemoteMetadata> {
         todo!()
     }
-}
 
-fn work_on_contents(base_path: &Path, contents: &[Metadata], diff: &BasePointPCloud, depth: usize) -> Result<()> {
-    for it in contents.iter() {
-        let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
-        trace!(
-            "{}{}",
-            format!("{}{}", " ".repeat(depth * 4), PRINT_FOLDER_TOKEN),
-            path.display()
-        );
-        diff.file_found(&path, it.clone());
-        match &it.contents {
-            Some(contents) => work_on_contents(&path, contents, diff, depth + 1)?,
-            None => (),
+    fn work_on_contents(base_path: &Path, contents: &[Metadata], diff: &FilesystemPCloud, depth: usize) -> Result<()> {
+        for it in contents.iter() {
+            let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
+            trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path.display());
+            diff.file_found(&path, it.clone());
+            match &it.contents {
+                Some(contents) => FilesystemPCloud::work_on_contents(&path, contents, diff, depth + 1)?,
+                None => (),
+            }
         }
+        Ok(())
     }
-    Ok(())
 }
 
-// TODO: This is not the place for outputters
-const PRINT_FOLDER_TOKEN: &str = "|-- ";
-
-impl BasePoint<RemoteMetadata> for BasePointPCloud {}
+impl Filesystem<RemoteMetadata> for FilesystemPCloud {}
 
 #[async_trait]
-impl actions::Copy<LocalMetadata, RemoteMetadata> for BasePointPCloud {
+impl actions::Copy<LocalMetadata, RemoteMetadata> for FilesystemPCloud {
     async fn copy(
         &self,
         _lhs: &LocalMetadata,
@@ -104,7 +97,7 @@ impl actions::Copy<LocalMetadata, RemoteMetadata> for BasePointPCloud {
 }
 
 #[async_trait]
-impl actions::Rename<RemoteMetadata> for BasePointPCloud {
+impl actions::Rename<RemoteMetadata> for FilesystemPCloud {
     async fn rename(&self, _file: RemoteMetadata) -> Result<RemoteMetadata> {
         todo!()
     }

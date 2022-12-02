@@ -2,17 +2,17 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::diff::basepoint::{BasePoint, FileMetadata};
+use crate::diff::filesystem::{FileMetadata, Filesystem};
 
 pub mod backup;
 
 #[async_trait]
-pub trait Copy<LHS: FileMetadata, RHS: FileMetadata>: BasePoint<RHS> {
+pub trait Copy<LHS: FileMetadata, RHS: FileMetadata>: Filesystem<RHS> {
     async fn copy(&self, lhs: &LHS, rhs: Option<RHS>) -> Result<(&LHS, RHS)>;
 }
 
 #[async_trait]
-pub trait Remove<T: FileMetadata>: BasePoint<T> {
+pub trait Remove<T: FileMetadata>: Filesystem<T> {
     async fn remove(&self, file: T) -> Result<()>;
 }
 
@@ -26,7 +26,7 @@ pub trait Remove<T: FileMetadata>: BasePoint<T> {
 // }
 
 #[async_trait]
-pub trait Rename<T: FileMetadata>: BasePoint<T> {
+pub trait Rename<T: FileMetadata>: Filesystem<T> {
     async fn rename(&self, file: T) -> Result<T>;
 }
 
