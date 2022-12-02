@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::Result;
 use flume::Sender;
@@ -9,7 +9,6 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 
-use super::file_metadata::RemoteMetadataEntry;
 use crate::diff::Filesystem;
 use crate::local::LocalFileMetadata;
 use crate::remote::RemoteMetadata;
@@ -41,7 +40,7 @@ impl FilesystemPCloud {
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => FilesystemPCloud::work_on_contents(Path::new(""), contents, self, 0)?,
+            Some(contents) => self.work_on_contents(Path::new(""), contents, 0)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -63,14 +62,14 @@ impl FilesystemPCloud {
         todo!()
     }
 
-    fn work_on_contents(base_path: &Path, contents: &[Metadata], diff: &FilesystemPCloud, depth: usize) -> Result<()> {
+    fn work_on_contents(&self, base_path: &Path, contents: &[Metadata], depth: usize) -> Result<()> {
         for it in contents.iter() {
             let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
             trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path.display());
             if !it.common.isfolder.unwrap() {
-                diff.file_found((path, it.clone()))?;
+                self.file_found((path, it.clone()))?;
             } else {
-                FilesystemPCloud::work_on_contents(&path, &it.contents.as_ref().unwrap(), diff, depth + 1)?
+                self.work_on_contents(&path, &it.contents.as_ref().unwrap(), depth + 1)?
             }
         }
         Ok(())

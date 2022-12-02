@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use tracing::{error, info, trace};
+use tracing::{debug, error, info, trace};
 
 use super::FileMetadata;
 
@@ -91,7 +91,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
             }
         }
         // Now we need to send the files that are just on one side of the diff
-        trace!("Send remaining {} entries", files.len());
+        debug!("Send remaining {} entries", files.len());
         for (_, file_diff) in files.drain() {
             if let Err(e) = report_tx.send(file_diff) {
                 error!("Send error {e}");
