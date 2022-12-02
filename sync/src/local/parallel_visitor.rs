@@ -1,5 +1,6 @@
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 
+use crate::diff::Filesystem;
 use crate::local::FilesystemLocal;
 
 pub struct Visitor<'s> {

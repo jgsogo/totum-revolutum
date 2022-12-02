@@ -3,7 +3,9 @@ use std::time::Instant;
 
 use tracing::{error, info, trace};
 
-use super::filesystem::{FileMetadata, MAX_BUFFER};
+use super::FileMetadata;
+
+pub const MAX_BUFFER: usize = 100;
 
 pub struct FileDiff<LHS: FileMetadata, RHS: FileMetadata> {
     pub lhs: Option<LHS>,

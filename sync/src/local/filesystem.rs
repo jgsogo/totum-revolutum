@@ -1,11 +1,12 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
+use flume::Sender;
 use ignore::WalkBuilder;
 use tokio::time::Instant;
 use tracing::info;
 
-use crate::diff::filesystem::Filesystem;
+use crate::diff::Filesystem;
 use crate::local::{LocalFileMetadata, LocalMetadata};
 use crate::storage::ignore_files;
 
@@ -38,11 +39,12 @@ impl FilesystemLocal {
         info!("Finished local visitor in {:?}", start.elapsed());
         Ok(())
     }
-
-    pub fn file_found(&self, entry: ignore::DirEntry) {
-        let meta = LocalMetadata::from_direntry(&self.path, entry);
-        self.tx.send(meta).expect("TODO: Something to implement");
-    }
 }
 
-impl Filesystem<LocalMetadata> for FilesystemLocal {}
+impl Filesystem for FilesystemLocal {
+    type Metadata = LocalMetadata;
+
+    fn tx(&self) -> &Sender<Self::Metadata> {
+        &self.tx
+    }
+}

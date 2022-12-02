@@ -2,6 +2,7 @@ use std::path::Path;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use flume::Sender;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
@@ -10,7 +11,7 @@ use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 
 use crate::actions;
-use crate::diff::filesystem::Filesystem;
+use crate::diff::Filesystem;
 use crate::local::{LocalFileMetadata, LocalMetadata};
 use crate::remote::file_metadata::RemoteFileMetadata;
 use crate::remote::RemoteMetadata;
@@ -50,11 +51,6 @@ impl FilesystemPCloud {
         Ok(())
     }
 
-    pub fn file_found(&self, path: &Path, metadata: Metadata) {
-        let meta = RemoteMetadata::from_pcloud_metadata(path, metadata);
-        self.tx.send(meta).expect("TODO: Something to implement");
-    }
-
     #[allow(dead_code)]
     pub fn copy<T: LocalFileMetadata>(
         &self,
@@ -73,7 +69,7 @@ impl FilesystemPCloud {
         for it in contents.iter() {
             let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
             trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path.display());
-            diff.file_found(&path, it.clone());
+            diff.file_found(it.clone())?;
             match &it.contents {
                 Some(contents) => FilesystemPCloud::work_on_contents(&path, contents, diff, depth + 1)?,
                 None => (),
@@ -83,22 +79,28 @@ impl FilesystemPCloud {
     }
 }
 
-impl Filesystem<RemoteMetadata> for FilesystemPCloud {}
+impl Filesystem for FilesystemPCloud {
+    type Metadata = RemoteMetadata;
 
-#[async_trait]
-impl actions::Copy<LocalMetadata, RemoteMetadata> for FilesystemPCloud {
-    async fn copy(
-        &self,
-        _lhs: &LocalMetadata,
-        _rhs: Option<RemoteMetadata>,
-    ) -> Result<(&LocalMetadata, RemoteMetadata)> {
-        todo!()
+    fn tx(&self) -> &Sender<Self::Metadata> {
+        &self.tx
     }
 }
 
-#[async_trait]
-impl actions::Rename<RemoteMetadata> for FilesystemPCloud {
-    async fn rename(&self, _file: RemoteMetadata) -> Result<RemoteMetadata> {
-        todo!()
-    }
-}
+// #[async_trait]
+// impl actions::Copy<LocalMetadata, RemoteMetadata> for FilesystemPCloud {
+//     async fn copy(
+//         &self,
+//         _lhs: &LocalMetadata,
+//         _rhs: Option<RemoteMetadata>,
+//     ) -> Result<(&LocalMetadata, RemoteMetadata)> {
+//         todo!()
+//     }
+// }
+//
+// #[async_trait]
+// impl actions::Rename<RemoteMetadata> for FilesystemPCloud {
+//     async fn rename(&self, _file: RemoteMetadata) -> Result<RemoteMetadata> {
+//         todo!()
+//     }
+// }

@@ -3,7 +3,7 @@ use std::path::Path;
 use pcloud_sdk::id::FileID;
 use pcloud_sdk::structures::Metadata;
 
-use crate::diff::filesystem::FileMetadata;
+use crate::diff::FileMetadata;
 
 pub trait RemoteFileMetadata: FileMetadata {
     fn from_pcloud_metadata(path: &Path, metadata: Metadata) -> Self;
@@ -18,6 +18,7 @@ pub struct RemoteMetadata {
 }
 
 impl FileMetadata for RemoteMetadata {
+    type DirEntry = Metadata;
     fn id(&self) -> &str {
         &self.id
     }
@@ -27,6 +28,15 @@ impl FileMetadata for RemoteMetadata {
 
     fn hash(&self) -> String {
         self.metadata.hash.as_ref().unwrap().to_string()
+    }
+}
+
+impl From<Metadata> for RemoteMetadata {
+    fn from(metadata: Metadata) -> Self {
+        Self {
+            id: metadata.common.path.as_ref().unwrap().to_string(),
+            metadata,
+        }
     }
 }
 
