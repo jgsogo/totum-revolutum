@@ -42,7 +42,6 @@ impl FilesystemPCloud {
     }
 
     fn work_on_contents(
-        &self,
         tx: flume::Sender<RemoteMetadata>,
         base_path: &Path,
         contents: &[Metadata],
@@ -55,7 +54,7 @@ impl FilesystemPCloud {
                 let data: RemoteMetadata = (path, it.clone()).into();
                 tx.send(data)?;
             } else {
-                self.work_on_contents(tx.clone(), &path, &it.contents.as_ref().unwrap(), depth + 1)?
+                FilesystemPCloud::work_on_contents(tx.clone(), &path, it.contents.as_ref().unwrap(), depth + 1)?
             }
         }
         Ok(())
@@ -82,7 +81,7 @@ impl Filesystem for FilesystemPCloud {
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => self.work_on_contents(tx, Path::new(""), contents, 0)?,
+            Some(contents) => FilesystemPCloud::work_on_contents(tx, Path::new(""), contents, 0)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
