@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use flume::Sender;
@@ -9,6 +9,7 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 
+use super::file_metadata::RemoteMetadataEntry;
 use crate::diff::Filesystem;
 use crate::local::LocalFileMetadata;
 use crate::remote::RemoteMetadata;
@@ -32,7 +33,7 @@ impl FilesystemPCloud {
         let start = Instant::now();
         let mut list_folder_input = ListFolderInput::new_from_path(config.auth.remote_path.clone());
         list_folder_input.recursive = true;
-        let filtermeta = vec!["name", "contents", "size", "hash"];
+        let filtermeta = vec!["name", "contents", "size", "hash", "isfolder"];
         let items = self
             .pcloud
             .listfolder_with_filtermeta(&list_folder_input, filtermeta)
@@ -66,10 +67,10 @@ impl FilesystemPCloud {
         for it in contents.iter() {
             let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
             trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path.display());
-            diff.file_found(it.clone())?;
-            match &it.contents {
-                Some(contents) => FilesystemPCloud::work_on_contents(&path, contents, diff, depth + 1)?,
-                None => (),
+            if !it.common.isfolder.unwrap() {
+                diff.file_found((path, it.clone()))?;
+            } else {
+                FilesystemPCloud::work_on_contents(&path, &it.contents.as_ref().unwrap(), diff, depth + 1)?
             }
         }
         Ok(())

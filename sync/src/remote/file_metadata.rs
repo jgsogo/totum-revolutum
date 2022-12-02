@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use pcloud_sdk::id::FileID;
 use pcloud_sdk::structures::Metadata;
@@ -11,6 +11,8 @@ pub trait RemoteFileMetadata: FileMetadata {
     fn fileid(&self) -> &FileID;
 }
 
+pub type RemoteMetadataEntry = (PathBuf, Metadata);
+
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {
     id: String,
@@ -18,7 +20,7 @@ pub struct RemoteMetadata {
 }
 
 impl FileMetadata for RemoteMetadata {
-    type DirEntry = Metadata;
+    type DirEntry = RemoteMetadataEntry;
     fn id(&self) -> &str {
         &self.id
     }
@@ -31,10 +33,11 @@ impl FileMetadata for RemoteMetadata {
     }
 }
 
-impl From<Metadata> for RemoteMetadata {
-    fn from(metadata: Metadata) -> Self {
+impl From<RemoteMetadataEntry> for RemoteMetadata {
+    fn from(entry: RemoteMetadataEntry) -> Self {
+        let (path, metadata) = entry;
         Self {
-            id: metadata.common.path.as_ref().unwrap().to_string(),
+            id: path.to_str().unwrap().to_string(),
             metadata,
         }
     }

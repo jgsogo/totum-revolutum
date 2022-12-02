@@ -28,6 +28,12 @@ where
     pub fn new_from_rhs(rhs: RHS) -> FileDiff<LHS, RHS> {
         Self::new(None, Some(rhs))
     }
+
+    pub fn id(&self) -> &str {
+        self.lhs
+            .as_ref()
+            .map_or_else(|| self.rhs.as_ref().unwrap().id(), |v| v.id())
+    }
 }
 
 pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> (
@@ -37,8 +43,6 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
 ) {
     let (lhs_tx, lhs_rx) = flume::bounded::<LHS>(MAX_BUFFER);
     let (rhs_tx, rhs_rx) = flume::bounded::<RHS>(MAX_BUFFER);
-    // let lhs = BasePointDiffImpl::<LHS>::new(lhs_tx);
-    // let rhs = BasePointDiffImpl::<RHS>::new(rhs_tx);
 
     let (report_tx, report_rx) = flume::bounded::<FileDiff<LHS, RHS>>(MAX_BUFFER);
 

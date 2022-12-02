@@ -63,6 +63,7 @@ where
     let start = Instant::now();
     while let Ok(v) = rx.recv_async().await {
         // TODO: We have independent actions here that can be parallelized
+        info!("Backout work on {}", v.id());
         backup(v, config, local_basepoint, remote_basepoint).await?;
     }
     info!("Finished backup receiving loop in {:?}", start.elapsed());
