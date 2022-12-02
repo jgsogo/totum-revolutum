@@ -1,4 +1,3 @@
-use std::fs::File;
 use std::path::Path;
 use std::time::Instant;
 
@@ -10,7 +9,7 @@ use crate::diff;
 use crate::diff::FileDiff;
 use crate::diff::{FileMetadata, Filesystem};
 use crate::local;
-use crate::local::{FilesystemLocal, LocalMetadata};
+use crate::local::FilesystemLocal;
 use crate::remote;
 use crate::remote::filesystem::FilesystemPCloud;
 use crate::storage::config;
@@ -19,7 +18,7 @@ async fn backup<LHS, RHS>(
     filediff: FileDiff<LHS, RHS>,
     config: &config::Config,
     _local_basepoint: &dyn Filesystem<Metadata = LHS>,
-    remote_basepoint: &dyn Filesystem<Metadata = RHS>,
+    _remote_basepoint: &dyn Filesystem<Metadata = RHS>,
 ) -> Result<()>
 where
     LHS: FileMetadata,
@@ -27,8 +26,8 @@ where
 {
     match filediff {
         FileDiff {
-            lhs: Some(lhs),
-            rhs: Some(rhs),
+            lhs: Some(_lhs),
+            rhs: Some(_rhs),
         } => match config.action.conflict() {
             OnConflict::OverrideRemote => {
                 // let _r = remote_basepoint.copy(&lhs, Some(rhs)).await?;
@@ -41,7 +40,7 @@ where
             }
             s => panic!("Not a valid onConflict for backup: {s:?}"),
         },
-        FileDiff { lhs: Some(lhs), .. } => {
+        FileDiff { lhs: Some(_lhs), .. } => {
             // let _r = remote_basepoint.copy(&lhs, None).await?;
             Ok(())
         }

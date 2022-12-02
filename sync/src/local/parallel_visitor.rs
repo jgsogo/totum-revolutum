@@ -17,7 +17,9 @@ impl<'s> ParallelVisitor for Visitor<'s> {
     fn visit(&mut self, entry: Result<ignore::DirEntry, ignore::Error>) -> WalkState {
         let entry = entry.unwrap();
         if entry.file_type().unwrap().is_file() {
-            self.diff.file_found(entry);
+            if let Err(_) = self.diff.file_found(entry) {
+                return WalkState::Quit;
+            }
         }
         WalkState::Continue
     }

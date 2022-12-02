@@ -1,7 +1,6 @@
 use std::path::Path;
 
 use anyhow::Result;
-use async_trait::async_trait;
 use flume::Sender;
 use tokio::time::Instant;
 use tracing::{info, trace};
@@ -10,10 +9,8 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 
-use crate::actions;
 use crate::diff::Filesystem;
-use crate::local::{LocalFileMetadata, LocalMetadata};
-use crate::remote::file_metadata::RemoteFileMetadata;
+use crate::local::LocalFileMetadata;
 use crate::remote::RemoteMetadata;
 use crate::storage::config;
 

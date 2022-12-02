@@ -1,17 +1,6 @@
-use std::path::Path;
-
 use anyhow::{anyhow, Result};
 
 use super::file_metadata::FileMetadata;
-
-#[derive(Debug)]
-#[allow(dead_code)]
-pub enum SnapshotStatus {
-    ToBeDeleted,
-    New,
-    Modified,
-    Idle,
-}
 
 /// Represents the local or remote storage as a filesystem
 pub trait Filesystem

@@ -7,7 +7,7 @@ use tokio::time::Instant;
 use tracing::info;
 
 use crate::diff::Filesystem;
-use crate::local::{LocalFileMetadata, LocalMetadata};
+use crate::local::LocalMetadata;
 use crate::storage::ignore_files;
 
 use super::parallel_visitor;
