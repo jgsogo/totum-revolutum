@@ -1,24 +1,25 @@
+use anyhow::anyhow;
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 use tracing::error;
 
-use crate::diff::Filesystem;
-use crate::local::FilesystemLocal;
+use crate::local::LocalMetadata;
 
-pub struct Visitor<'s> {
-    diff: &'s FilesystemLocal,
+pub struct Visitor {
+    tx: flume::Sender<LocalMetadata>,
 }
 
-impl<'s> Visitor<'s> {
-    pub fn new(diff: &'s FilesystemLocal) -> Visitor<'s> {
-        Visitor { diff }
+impl Visitor {
+    pub fn new(tx: flume::Sender<LocalMetadata>) -> Visitor {
+        Visitor { tx }
     }
 }
 
-impl<'s> ParallelVisitor for Visitor<'s> {
+impl ParallelVisitor for Visitor {
     fn visit(&mut self, entry: Result<ignore::DirEntry, ignore::Error>) -> WalkState {
         let entry = entry.unwrap();
         if entry.file_type().unwrap().is_file() {
-            if let Err(e) = self.diff.file_found(entry) {
+            let data: LocalMetadata = entry.into();
+            if let Err(e) = self.tx.send(data).map_err(|e| anyhow!("Error sending metadata: {e}")) {
                 error!("Error sending direntry: {e}. Quit visiting.");
                 return WalkState::Quit;
             }
@@ -27,18 +28,18 @@ impl<'s> ParallelVisitor for Visitor<'s> {
     }
 }
 
-pub struct VisitorBuilder<'s> {
-    diff: &'s FilesystemLocal,
+pub struct VisitorBuilder {
+    tx: flume::Sender<LocalMetadata>,
 }
 
-impl<'s> VisitorBuilder<'s> {
-    pub fn new(diff: &FilesystemLocal) -> VisitorBuilder {
-        VisitorBuilder { diff }
+impl VisitorBuilder {
+    pub fn new(tx: flume::Sender<LocalMetadata>) -> VisitorBuilder {
+        VisitorBuilder { tx }
     }
 }
 
-impl<'s> ParallelVisitorBuilder<'s> for VisitorBuilder<'s> {
+impl<'s> ParallelVisitorBuilder<'s> for VisitorBuilder {
     fn build(&mut self) -> Box<dyn ParallelVisitor + 's> {
-        Box::new(Visitor::new(self.diff))
+        Box::new(Visitor::new(self.tx.clone()))
     }
 }

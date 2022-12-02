@@ -16,15 +16,19 @@ use crate::storage::config;
 
 pub struct FilesystemPCloud {
     pcloud: pcloud_sdk::client::HttpClient,
-    tx: flume::Sender<RemoteMetadata>,
 }
 
 impl FilesystemPCloud {
-    pub fn new(pcloud: pcloud_sdk::client::HttpClient, tx: flume::Sender<RemoteMetadata>) -> Self {
-        Self { pcloud, tx }
+    pub fn new(pcloud: pcloud_sdk::client::HttpClient) -> Self {
+        Self { pcloud }
     }
 
-    pub async fn walk_directory(&self, _threads: usize, config: &config::Config) -> Result<()> {
+    pub async fn walk_directory(
+        &self,
+        tx: flume::Sender<RemoteMetadata>,
+        _threads: usize,
+        config: &config::Config,
+    ) -> Result<()> {
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
         //  and use a thread pool to enter child directories and _recurse_.
@@ -40,7 +44,7 @@ impl FilesystemPCloud {
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => self.work_on_contents(Path::new(""), contents, 0)?,
+            Some(contents) => self.work_on_contents(tx, Path::new(""), contents, 0)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -62,14 +66,21 @@ impl FilesystemPCloud {
         todo!()
     }
 
-    fn work_on_contents(&self, base_path: &Path, contents: &[Metadata], depth: usize) -> Result<()> {
+    fn work_on_contents(
+        &self,
+        tx: flume::Sender<RemoteMetadata>,
+        base_path: &Path,
+        contents: &[Metadata],
+        depth: usize,
+    ) -> Result<()> {
         for it in contents.iter() {
             let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
             trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path.display());
             if !it.common.isfolder.unwrap() {
-                self.file_found((path, it.clone()))?;
+                let data: RemoteMetadata = (path, it.clone()).into();
+                tx.send(data)?;
             } else {
-                self.work_on_contents(&path, &it.contents.as_ref().unwrap(), depth + 1)?
+                self.work_on_contents(tx.clone(), &path, &it.contents.as_ref().unwrap(), depth + 1)?
             }
         }
         Ok(())
@@ -78,10 +89,6 @@ impl FilesystemPCloud {
 
 impl Filesystem for FilesystemPCloud {
     type Metadata = RemoteMetadata;
-
-    fn tx(&self) -> &Sender<Self::Metadata> {
-        &self.tx
-    }
 }
 
 // #[async_trait]

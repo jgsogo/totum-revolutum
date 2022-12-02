@@ -76,14 +76,14 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
     let (lhs, rhs, differ) = diff::two_ways_run::<local::LocalMetadata, remote::RemoteMetadata>().await;
 
-    let local_basepoint = FilesystemLocal::new(path, lhs);
+    let local_basepoint = FilesystemLocal::new(path);
 
     let pcloud = config.auth.get_pcloud_client(home)?;
-    let remote_basepoint = FilesystemPCloud::new(pcloud.clone(), rhs);
+    let remote_basepoint = FilesystemPCloud::new(pcloud.clone());
 
     if let Err(e) = tokio::try_join!(
-        local_basepoint.walk_directory(6),
-        remote_basepoint.walk_directory(6, config),
+        local_basepoint.walk_directory(lhs, 6),
+        remote_basepoint.walk_directory(rhs, 6, config),
         work_on_results(differ, config, &local_basepoint, &remote_basepoint),
     ) {
         error!("Error on workers loop: {e}");

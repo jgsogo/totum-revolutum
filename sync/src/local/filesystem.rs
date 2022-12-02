@@ -14,18 +14,16 @@ use super::parallel_visitor;
 
 pub struct FilesystemLocal {
     path: PathBuf,
-    tx: flume::Sender<LocalMetadata>,
 }
 
 impl FilesystemLocal {
-    pub fn new(path: &Path, tx: flume::Sender<LocalMetadata>) -> Self {
+    pub fn new(path: &Path) -> Self {
         Self {
             path: path.to_path_buf(),
-            tx,
         }
     }
 
-    pub async fn walk_directory(&self, threads: usize) -> Result<()> {
+    pub async fn walk_directory(&self, tx: flume::Sender<LocalMetadata>, threads: usize) -> Result<()> {
         let walker = WalkBuilder::new(&self.path)
             .threads(threads)
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
@@ -34,7 +32,7 @@ impl FilesystemLocal {
 
         info!("Start local visitor");
         let start = Instant::now();
-        let mut builder = parallel_visitor::VisitorBuilder::new(self);
+        let mut builder = parallel_visitor::VisitorBuilder::new(tx);
         walker.visit(&mut builder);
         info!("Finished local visitor in {:?}", start.elapsed());
         Ok(())
@@ -43,8 +41,4 @@ impl FilesystemLocal {
 
 impl Filesystem for FilesystemLocal {
     type Metadata = LocalMetadata;
-
-    fn tx(&self) -> &Sender<Self::Metadata> {
-        &self.tx
-    }
 }
