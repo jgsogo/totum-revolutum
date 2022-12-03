@@ -4,8 +4,8 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::id::FolderID;
 use crate::structures::Metadata;
+use crate::types::FolderID;
 use crate::{client, utils};
 
 #[derive(Debug, Clone)]

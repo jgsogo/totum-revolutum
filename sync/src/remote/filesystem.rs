@@ -95,7 +95,7 @@ impl Filesystem for FilesystemPCloud {
         Ok(())
     }
 
-    fn open(&self, _path: &Path) -> Result<Box<dyn File>> {
+    async fn open(&self, _path: &Path) -> Result<Box<dyn File>> {
         todo!()
     }
 }

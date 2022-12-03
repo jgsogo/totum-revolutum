@@ -5,8 +5,8 @@ use async_trait::async_trait;
 
 use crate::utils::normalize_path;
 
-use super::File;
 use super::file_metadata::FileMetadata;
+use super::File;
 
 /// Represents the local or remote storage as a filesystem
 #[async_trait]
@@ -39,5 +39,5 @@ where
 
     /// Tries to open the file requested by the argument `path`. Returns an object implementing
     /// a [`File`] or an error.
-    fn open(&self, path: &Path) -> Result<Box<dyn File>>;
+    async fn open(&self, path: &Path) -> Result<Box<dyn File>>;
 }

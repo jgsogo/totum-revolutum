@@ -32,6 +32,7 @@ flume = "0.10.14"
 sha256 = "1.1"
 clap = { version = "4.0", features = ["derive"] }  # TODO: Require cli feature
 futures = "0.3"
+async-std = "1.12"
 
 [dev-dependencies]
 tempfile = "3"

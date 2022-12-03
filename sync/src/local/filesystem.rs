@@ -8,10 +8,13 @@ use ignore::WalkBuilder;
 use tokio::time::Instant;
 use tracing::info;
 
+use async_std::fs::File as AsyncFile;
+
 use crate::diff::{File, Filesystem};
 use crate::local::LocalMetadata;
 use crate::storage::ignore_files;
 
+use super::file::LocalFile;
 use super::parallel_visitor;
 
 pub struct FilesystemLocal {
@@ -49,9 +52,12 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    fn open(&self, path: &Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(path) {
-            Ok(v) => Ok(fs::File::open(v).map(|v| Box::new(v))?),
+            Ok(v) => {
+                let f = AsyncFile::open(v).await?;
+                Ok(Box::new(LocalFile::new(f)))
+            }
             Err(e) => Err(e),
         }
     }
