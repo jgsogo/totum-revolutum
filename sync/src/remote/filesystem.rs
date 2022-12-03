@@ -9,10 +9,13 @@ use tracing::{info, trace};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
+use pcloud_sdk::types::PCloudFile;
 
 use crate::diff::{File, Filesystem};
 use crate::local::LocalFileMetadata;
 use crate::remote::RemoteMetadata;
+
+use super::file::RemoteFile;
 
 pub struct FilesystemPCloud {
     path: PathBuf,
@@ -95,7 +98,14 @@ impl Filesystem for FilesystemPCloud {
         Ok(())
     }
 
-    async fn open(&self, _path: &Path) -> Result<Box<dyn File>> {
-        todo!()
+    async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
+        match self.check_path(path) {
+            Ok(v) => {
+                let f = RemoteFile::new(PCloudFile::Path(v.to_str().unwrap().to_string()), self.pcloud.clone());
+                // TODO: Open the file with pcloud.popen... and use a file descriptor here
+                Ok(Box::new(f))
+            }
+            Err(e) => Err(e),
+        }
     }
 }
