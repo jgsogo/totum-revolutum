@@ -1,4 +1,4 @@
-pub use file_metadata::RemoteMetadata;
+pub use file_metadata::{RemoteMetadata, RemoteMetadataEntry};
 
-pub mod basepoint;
 mod file_metadata;
+pub mod filesystem;

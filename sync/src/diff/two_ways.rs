@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use tracing::{error, info, trace};
+use tracing::{debug, error, info, trace};
 
-use super::basepoint::{FileMetadata, MAX_BUFFER};
+use super::FileMetadata;
+
+pub const MAX_BUFFER: usize = 100;
 
 pub struct FileDiff<LHS: FileMetadata, RHS: FileMetadata> {
     pub lhs: Option<LHS>,
@@ -26,6 +28,12 @@ where
     pub fn new_from_rhs(rhs: RHS) -> FileDiff<LHS, RHS> {
         Self::new(None, Some(rhs))
     }
+
+    pub fn id(&self) -> &str {
+        self.lhs
+            .as_ref()
+            .map_or_else(|| self.rhs.as_ref().unwrap().id(), |v| v.id())
+    }
 }
 
 pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> (
@@ -35,8 +43,6 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
 ) {
     let (lhs_tx, lhs_rx) = flume::bounded::<LHS>(MAX_BUFFER);
     let (rhs_tx, rhs_rx) = flume::bounded::<RHS>(MAX_BUFFER);
-    // let lhs = BasePointDiffImpl::<LHS>::new(lhs_tx);
-    // let rhs = BasePointDiffImpl::<RHS>::new(rhs_tx);
 
     let (report_tx, report_rx) = flume::bounded::<FileDiff<LHS, RHS>>(MAX_BUFFER);
 
@@ -85,7 +91,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
             }
         }
         // Now we need to send the files that are just on one side of the diff
-        trace!("Send remaining {} entries", files.len());
+        debug!("Send remaining {} entries", files.len());
         for (_, file_diff) in files.drain() {
             if let Err(e) = report_tx.send(file_diff) {
                 error!("Send error {e}");

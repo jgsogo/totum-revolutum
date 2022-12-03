@@ -2,7 +2,7 @@ use std::path::Path;
 
 use ignore::DirEntry;
 
-use crate::diff::basepoint::FileMetadata;
+use crate::diff::FileMetadata;
 
 pub trait LocalFileMetadata: FileMetadata {
     fn from_direntry(base_path: &Path, entry: DirEntry) -> Self;
@@ -17,6 +17,8 @@ pub struct LocalMetadata {
 }
 
 impl FileMetadata for LocalMetadata {
+    type DirEntry = DirEntry;
+
     fn id(&self) -> &str {
         &self.id
     }
@@ -26,6 +28,15 @@ impl FileMetadata for LocalMetadata {
 
     fn hash(&self) -> String {
         sha256::try_digest(self.path()).unwrap()
+    }
+}
+
+impl From<DirEntry> for LocalMetadata {
+    fn from(entry: DirEntry) -> Self {
+        Self {
+            id: entry.path().to_str().unwrap().to_string(),
+            entry,
+        }
     }
 }
 
