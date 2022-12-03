@@ -1,3 +1,4 @@
+use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
@@ -7,7 +8,7 @@ use ignore::WalkBuilder;
 use tokio::time::Instant;
 use tracing::info;
 
-use crate::diff::Filesystem;
+use crate::diff::{File, Filesystem};
 use crate::local::LocalMetadata;
 use crate::storage::ignore_files;
 
@@ -19,15 +20,19 @@ pub struct FilesystemLocal {
 
 impl FilesystemLocal {
     pub fn new(path: &Path) -> Self {
-        Self {
-            path: path.to_path_buf(),
-        }
+        // We use `fs::canonicalize` because this path should exist
+        let canonical = fs::canonicalize(path).unwrap();
+        Self { path: canonical }
     }
 }
 
 #[async_trait]
 impl Filesystem for FilesystemLocal {
     type Metadata = LocalMetadata;
+
+    fn root(&self) -> &Path {
+        &self.path
+    }
 
     async fn walk_directory(&self, tx: Sender<Self::Metadata>, threads: usize) -> Result<()> {
         let walker = WalkBuilder::new(&self.path)
@@ -42,5 +47,12 @@ impl Filesystem for FilesystemLocal {
         walker.visit(&mut builder);
         info!("Finished local visitor in {:?}", start.elapsed());
         Ok(())
+    }
+
+    fn open(&self, path: &Path) -> Result<Box<dyn File>> {
+        match self.check_path(path) {
+            Ok(v) => Ok(fs::File::open(v).map(|v| Box::new(v))?),
+            Err(e) => Err(e),
+        }
     }
 }

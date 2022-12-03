@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -10,19 +10,21 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 
-use crate::diff::Filesystem;
+use crate::diff::{File, Filesystem};
 use crate::local::LocalFileMetadata;
 use crate::remote::RemoteMetadata;
 
 pub struct FilesystemPCloud {
-    path: String,
+    path: PathBuf,
     pcloud: pcloud_sdk::client::HttpClient,
 }
 
 impl FilesystemPCloud {
-    pub fn new(path: &str, pcloud: pcloud_sdk::client::HttpClient) -> Self {
+    pub fn new(path: &Path, pcloud: pcloud_sdk::client::HttpClient) -> Self {
+        // TODO: Probably check it doesn't contain any remaining `../`
+        assert!(path.is_absolute());
         Self {
-            path: path.to_string(),
+            path: path.to_path_buf(),
             pcloud,
         }
     }
@@ -65,13 +67,17 @@ impl FilesystemPCloud {
 impl Filesystem for FilesystemPCloud {
     type Metadata = RemoteMetadata;
 
+    fn root(&self) -> &Path {
+        &self.path
+    }
+
     async fn walk_directory(&self, tx: Sender<Self::Metadata>, _threads: usize) -> Result<()> {
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
         //  and use a thread pool to enter child directories and _recurse_.
         info!("Start remote visitor");
         let start = Instant::now();
-        let mut list_folder_input = ListFolderInput::new_from_path(Some(self.path.clone()));
+        let mut list_folder_input = ListFolderInput::new_from_path(Some(self.root().to_str().unwrap().to_string()));
         list_folder_input.recursive = true;
         let filtermeta = vec!["name", "contents", "size", "hash", "isfolder"];
         let items = self
@@ -87,5 +93,9 @@ impl Filesystem for FilesystemPCloud {
         info!("Finished remote visitor in {:?}", start.elapsed());
 
         Ok(())
+    }
+
+    fn open(&self, _path: &Path) -> Result<Box<dyn File>> {
+        todo!()
     }
 }
