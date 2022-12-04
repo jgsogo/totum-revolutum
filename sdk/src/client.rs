@@ -48,7 +48,10 @@ impl HttpClient {
             http_client: client,
         })
     }
+}
 
+#[async_trait]
+impl Client for HttpClient {
     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
     where
         T: DeserializeOwned + 'static,

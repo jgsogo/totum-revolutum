@@ -8,12 +8,15 @@ use serde::de::DeserializeOwned;
 use crate::client::Client;
 
 mock! {
+    #[allow(dead_code)]
     pub LocalClient {}
 
+    #[allow(dead_code)]
     impl Clone for LocalClient {
         fn clone(&self) -> Self;
     }
 
+    #[allow(dead_code)]
     #[async_trait]
     impl Client for LocalClient {
         async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
