@@ -22,3 +22,24 @@ pub trait GetAPIServer: client::Client {
 }
 
 impl<T: client::Client> GetAPIServer for T {}
+
+#[cfg(test)]
+mod tests {
+    use crate::mocks::client::MockLocalClient;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_getapiserver() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        client.expect_hostname().times(1).returning(|| "<hostname>".into());
+        client
+            .expect_access_token()
+            .times(1)
+            .returning(|| "<access_token>".into());
+        client.expect_http_client().times(1).returning(|| 23);
+
+        let apiserver = client.getapiserver().await?;
+        Ok(())
+    }
+}

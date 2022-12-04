@@ -121,3 +121,76 @@ impl Filesystem for FilesystemPCloud {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::env;
+    use std::env::VarError;
+
+    use tempfile::tempdir;
+
+    use pcloud_sdk::data::oauth2token::OAuth2Token;
+
+    use super::*;
+
+    fn pcloud_client() -> Box<dyn pcloud_sdk::client::Client> {
+        match env::var("PCLOUD_TEST_ACCESS_TOKEN") {
+            Ok(access_token) => {
+                let oauth2_token = OAuth2Token {
+                    userid: 0,
+                    locationid: 0,
+                    access_token,
+                    token_type: "bearer".to_string(),
+                };
+
+                Box::new(pcloud_sdk::client::HttpClient::new(oauth2_token))
+            }
+            Err(_) => {}
+        }
+    }
+
+    #[test]
+    fn test_root_not_exists() -> Result<()> {
+        let pcloud = pcloud_client();
+        let tmp_dir = tempdir().unwrap();
+        let r = FilesystemPCloud::new(&tmp_dir.path().join("not-exist"), pcloud);
+        assert!(r.is_err());
+        Ok(())
+    }
+
+    /*
+    #[test]
+    fn test_root() -> Result<()> {
+        let tmp_dir = tempdir().unwrap();
+        let fs = FilesystemLocal::new(tmp_dir.path())?;
+        assert_eq!(fs::canonicalize(tmp_dir.path())?, fs.root());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_create_write_read() -> Result<()> {
+        let tmp_dir = tempdir().unwrap();
+        let fs = FilesystemLocal::new(tmp_dir.path())?;
+
+        let filepath = tmp_dir.path().join("myfile");
+        let content: Vec<u8> = b"Hello, world!".to_vec();
+
+        // Create and write
+        {
+            let mut f = fs.create(&filepath).await?;
+            f.write_all(&content).await?;
+        }
+
+        // Read
+        {
+            let mut file = fs.open(&filepath).await?;
+            let mut content_read = Vec::new();
+            file.read_to_end(&mut content_read).await?;
+            assert_eq!(content, content_read);
+        }
+
+        Ok(())
+    }
+
+     */
+}
