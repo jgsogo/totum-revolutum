@@ -36,3 +36,43 @@ pub trait GetUserInfo: client::Client {
 }
 
 impl<T: client::Client> GetUserInfo for T {}
+
+
+#[cfg(test)]
+mod tests {
+    use crate::mocks::client::MockLocalClient;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_userinfo() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        client
+            .expect_get()
+            .times(1)
+            .returning(|endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, "/userinfo");
+                assert!(params.is_empty());
+                Ok(UserInfo {
+                    email: "email".to_string(),
+                    emailverified: false,
+                    registered: Datetime::default(),
+                    premium: false,
+                    premiumexpires: Datetime::default(),
+                    quota: 5,
+                    usedquota: 9,
+                    language: "language".to_string(),
+                })
+            });
+        let userinfo = client.userinfo().await?;
+        assert_eq!(userinfo.email, "email".to_string());
+        assert_eq!(userinfo.emailverified, false);
+        assert_eq!(userinfo.registered, Datetime::default());
+        assert_eq!(userinfo.premium, false);
+        assert_eq!(userinfo.premiumexpires, Datetime::default());
+        assert_eq!(userinfo.quota, 5);
+        assert_eq!(userinfo.usedquota, 9);
+        assert_eq!(userinfo.language, "language".to_string());
+        Ok(())
+    }
+}
