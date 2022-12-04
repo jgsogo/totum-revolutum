@@ -31,9 +31,7 @@ pub struct UserInfo {
 #[async_trait]
 pub trait GetUserInfo: client::Client {
     async fn userinfo(&self) -> Result<UserInfo> {
-        let url = format!("https://{}/userinfo", self.hostname());
-        let userinfo = self.get::<UserInfo>(&url, HashMap::new()).await?;
-        Ok(userinfo)
+        self.get::<UserInfo>("/userinfo", HashMap::new()).await
     }
 }
 

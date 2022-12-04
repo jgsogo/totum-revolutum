@@ -6,16 +6,12 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 use crate::client;
-use crate::id::FileID;
-
-enum GetFileLinkFileInput {
-    FileID(FileID),
-    Path(String),
-}
+use crate::types::FileID;
+use crate::types::PCloudFile;
 
 pub struct GetFileLinkInput {
     // `FileID` or path (`String`) to the file
-    file: GetFileLinkFileInput,
+    file: PCloudFile,
 
     // Download with Content-Type = application/octet-stream
     pub forcedownload: bool,
@@ -31,23 +27,21 @@ pub struct GetFileLinkInput {
 }
 
 impl GetFileLinkInput {
-    pub fn new_from_path(path: &str) -> GetFileLinkInput {
+    pub fn new_from_file(file: PCloudFile) -> GetFileLinkInput {
         GetFileLinkInput {
-            file: GetFileLinkFileInput::Path(path.to_string()),
+            file: file,
             forcedownload: false,
             contenttype: None,
             maxspeed: None,
             skipfilename: false,
         }
     }
+
+    pub fn new_from_path(path: &str) -> GetFileLinkInput {
+        Self::new_from_file(PCloudFile::Path(path.to_string()))
+    }
     pub fn new_from_fileid(file: &FileID) -> GetFileLinkInput {
-        GetFileLinkInput {
-            file: GetFileLinkFileInput::FileID(file.clone()),
-            forcedownload: false,
-            contenttype: None,
-            maxspeed: None,
-            skipfilename: false,
-        }
+        Self::new_from_file(PCloudFile::FileID(file.clone()))
     }
 }
 
@@ -63,17 +57,16 @@ pub struct FileLink {
 #[async_trait]
 pub trait GetFileLink: client::Client {
     async fn getfilelink(&self, file_link: &GetFileLinkInput) -> Result<FileLink> {
-        let url = format!("https://{}/getfilelink", self.hostname());
         let mut params = HashMap::new();
         match file_link {
             GetFileLinkInput {
-                file: GetFileLinkFileInput::Path(p),
+                file: PCloudFile::Path(p),
                 ..
             } => {
                 params.insert("path".to_string(), p.clone());
             }
             GetFileLinkInput {
-                file: GetFileLinkFileInput::FileID(f),
+                file: PCloudFile::FileID(f),
                 ..
             } => {
                 params.insert("fileid".to_string(), f.id().to_string());
@@ -96,7 +89,7 @@ pub trait GetFileLink: client::Client {
             params.insert("skipfilename".to_string(), "1".to_string());
         }
 
-        let ret = self.get::<FileLink>(&url, params).await?;
+        let ret = self.get::<FileLink>("/getfilelink", params).await?;
         Ok(ret)
     }
 }
