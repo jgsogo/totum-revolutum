@@ -9,11 +9,11 @@ use tracing::debug;
 
 use crate::methods::streaming::getfilelink;
 
-use super::progress_bar;
+use crate::progress_bar;
 
-/// Provides some handy methods for [`client::Client`]
+/// Downloads a file to the given ˋpathˋ
 #[async_trait]
-pub trait HandyClient: getfilelink::GetFileLink {
+pub trait GetFileLinkAndDonwload: getfilelink::GetFileLink {
     async fn getfilelink_and_download(
         &self,
         file_link: &getfilelink::GetFileLinkInput,
@@ -58,4 +58,4 @@ pub trait HandyClient: getfilelink::GetFileLink {
     }
 }
 
-impl<T: getfilelink::GetFileLink> HandyClient for T {}
+impl<T: getfilelink::GetFileLink> GetFileLinkAndDonwload for T {}
