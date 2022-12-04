@@ -14,15 +14,15 @@ use crate::remote;
 use crate::remote::filesystem::FilesystemPCloud;
 use crate::storage::config;
 
-async fn backup<LHS, RHS>(
-    filediff: FileDiff<LHS, RHS>,
+async fn backup<FS_LHS, FS_RHS>(
+    filediff: FileDiff<FS_LHS::Metadata, FS_RHS::Metadata>,
     config: &config::Config,
-    _local_basepoint: &dyn Filesystem<Metadata = LHS>,
-    _remote_basepoint: &dyn Filesystem<Metadata = RHS>,
+    _local_basepoint: &FS_LHS,
+    _remote_basepoint: &FS_RHS,
 ) -> Result<()>
 where
-    LHS: FileMetadata,
-    RHS: FileMetadata,
+    FS_LHS: Filesystem,
+    FS_RHS: Filesystem,
 {
     match filediff {
         FileDiff {
@@ -49,15 +49,15 @@ where
     }
 }
 
-async fn work_on_results<LHS, RHS>(
-    rx: flume::Receiver<FileDiff<LHS, RHS>>,
+async fn work_on_results<FS_LHS, FS_RHS>(
+    rx: flume::Receiver<FileDiff<FS_LHS::Metadata, FS_RHS::Metadata>>,
     config: &config::Config,
-    local_basepoint: &dyn Filesystem<Metadata = LHS>,
-    remote_basepoint: &dyn Filesystem<Metadata = RHS>,
+    local_basepoint: &FS_LHS,
+    remote_basepoint: &FS_RHS,
 ) -> Result<()>
 where
-    LHS: FileMetadata,
-    RHS: FileMetadata,
+    FS_LHS: Filesystem,
+    FS_RHS: Filesystem,
 {
     info!("Start backup receiving loop");
     let start = Instant::now();
@@ -76,7 +76,7 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
     let (lhs, rhs, differ) = diff::two_ways_run::<local::LocalMetadata, remote::RemoteMetadata>().await;
 
-    let local_basepoint = FilesystemLocal::new(path);
+    let local_basepoint = FilesystemLocal::new(path)?;
 
     let pcloud = config.auth.get_pcloud_client(home)?;
     let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();

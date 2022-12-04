@@ -69,6 +69,7 @@ impl FilesystemPCloud {
 #[async_trait]
 impl Filesystem for FilesystemPCloud {
     type Metadata = RemoteMetadata;
+    type File = RemoteFile;
 
     fn root(&self) -> &Path {
         &self.path
@@ -98,12 +99,23 @@ impl Filesystem for FilesystemPCloud {
         Ok(())
     }
 
-    async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
+    async fn create(&self, path: &Path) -> Result<RemoteFile> {
+        match self.check_path(path) {
+            Ok(v) => {
+                let f = RemoteFile::new(PCloudFile::Path(v.to_str().unwrap().to_string()), self.pcloud.clone());
+                // TODO: Open file to create/write/...
+                Ok(f)
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    async fn open(&self, path: &Path) -> Result<RemoteFile> {
         match self.check_path(path) {
             Ok(v) => {
                 let f = RemoteFile::new(PCloudFile::Path(v.to_str().unwrap().to_string()), self.pcloud.clone());
                 // TODO: Open the file with pcloud.popen... and use a file descriptor here
-                Ok(Box::new(f))
+                Ok(f)
             }
             Err(e) => Err(e),
         }
