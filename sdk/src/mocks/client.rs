@@ -23,7 +23,7 @@ mock! {
         where
             T: DeserializeOwned+ 'static;
 
-    async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
+        async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
         where
             T: DeserializeOwned+ 'static;
     }
