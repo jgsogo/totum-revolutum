@@ -3,10 +3,9 @@ use std::collections::HashMap;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 use crate::client;
-
-type Datetime = String; // TODO: Parse actual date
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserInfo {
@@ -15,11 +14,13 @@ pub struct UserInfo {
     // true if the user had verified it's email
     emailverified: bool,
     // when the user was registerd
-    registered: Datetime,
+    #[serde(with = "time::serde::rfc2822")]
+    registered: OffsetDateTime,
     // true if the user is premium
     premium: bool,
     // if premium is true: premiumexpires will be the date until the service is
-    premiumexpires: Datetime,
+    #[serde(with = "time::serde::rfc2822::option", default)]
+    premiumexpires: Option<OffsetDateTime>,
     // in bytes
     quota: u64,
     // in bytes, so quite big numbers
@@ -39,9 +40,41 @@ impl<T: client::Client> GetUserInfo for T {}
 
 #[cfg(test)]
 mod tests {
+    use std::env;
+    use std::fs::File;
+    use std::io::BufReader;
+    use std::path::Path;
+
+    use time::macros::datetime;
+
     use crate::mocks::client::MockLocalClient;
 
     use super::*;
+
+    #[test]
+    #[allow(clippy::bool_assert_comparison)]
+    fn test_deserialize_userinfo() {
+        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let userinfo_json = Path::new(&manifest_dir)
+            .join("resources")
+            .join("testdata")
+            .join("userinfo.json");
+        let file = File::open(userinfo_json).unwrap();
+        let reader = BufReader::new(file);
+        match serde_json::from_reader::<_, UserInfo>(reader) {
+            Err(e) => panic!("Error reading the file: {e}"),
+            Ok(data) => {
+                assert_eq!(data.email, "pcloud@pcloud.com".to_string());
+                assert_eq!(data.emailverified, true);
+                assert_eq!(data.registered, datetime!(2013-11-18 15:32:05 UTC));
+                assert_eq!(data.premium, false);
+                assert_eq!(data.premiumexpires, None);
+                assert_eq!(data.quota, 1000);
+                assert_eq!(data.usedquota, 500);
+                assert_eq!(data.language, "en".to_string());
+            }
+        }
+    }
 
     #[tokio::test]
     async fn test_userinfo() -> Result<()> {
@@ -55,9 +88,9 @@ mod tests {
                 Ok(UserInfo {
                     email: "email".to_string(),
                     emailverified: false,
-                    registered: Datetime::default(),
+                    registered: datetime!(2013-10-02 14:29:11 UTC),
                     premium: false,
-                    premiumexpires: Datetime::default(),
+                    premiumexpires: None,
                     quota: 5,
                     usedquota: 9,
                     language: "language".to_string(),
@@ -66,9 +99,9 @@ mod tests {
         let userinfo = client.userinfo().await?;
         assert_eq!(userinfo.email, "email".to_string());
         assert_eq!(userinfo.emailverified, false);
-        assert_eq!(userinfo.registered, Datetime::default());
+        assert_eq!(userinfo.registered, datetime!(2013-10-02 14:29:11 UTC));
         assert_eq!(userinfo.premium, false);
-        assert_eq!(userinfo.premiumexpires, Datetime::default());
+        assert_eq!(userinfo.premiumexpires, None);
         assert_eq!(userinfo.quota, 5);
         assert_eq!(userinfo.usedquota, 9);
         assert_eq!(userinfo.language, "language".to_string());

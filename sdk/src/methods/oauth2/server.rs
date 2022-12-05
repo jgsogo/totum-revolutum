@@ -6,24 +6,25 @@ use anyhow::Result;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request, Response, Server, StatusCode};
 use reqwest;
+use serde::de::DeserializeOwned;
 use tokio::sync::oneshot::Sender;
 use url::Url;
 
+use crate::data;
 use crate::data::app_client_data::AppClientData;
-use crate::data::oauth2token::OAuth2Token;
 
 use super::oauth2_token::exchange_oauth2_token;
 
 const CALLBACK_ENDPOINT: &str = "/callback";
 
-struct AppContext {
+struct AppContext<Token: data::oauth2token::OAuth2Token> {
     app: AppClientData,
-    oauth2_token: Option<OAuth2Token>,
+    oauth2_token: Option<Token>,
     tx: Option<Sender<()>>,
 }
 
-impl AppContext {
-    fn new(app: AppClientData, tx: Sender<()>) -> AppContext {
+impl<Token: data::oauth2token::OAuth2Token> AppContext<Token> {
+    fn new(app: AppClientData, tx: Sender<()>) -> AppContext<Token> {
         AppContext {
             app,
             oauth2_token: None,
@@ -32,10 +33,10 @@ impl AppContext {
     }
 }
 
-async fn dispatcher(
+async fn dispatcher<Token: data::oauth2token::OAuth2Token + DeserializeOwned>(
     http_client: reqwest::Client,
     req: Request<Body>,
-    data: Arc<Mutex<AppContext>>,
+    data: Arc<Mutex<AppContext<Token>>>,
 ) -> Result<Response<Body>> {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/") => Ok(Response::new(Body::from("Hello /"))),
@@ -81,7 +82,11 @@ fn visit_url(app: &AppClientData, callback_url: String) -> String {
     url.as_str().to_string()
 }
 
-pub(crate) async fn serve(http_client: reqwest::Client, app: AppClientData, addr: SocketAddr) -> Result<OAuth2Token> {
+pub(crate) async fn serve<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static>(
+    http_client: reqwest::Client,
+    app: AppClientData,
+    addr: SocketAddr,
+) -> Result<Token> {
     let (tx, rx) = tokio::sync::oneshot::channel::<()>();
     let visit_url = visit_url(&app, format!("http://{addr}{CALLBACK_ENDPOINT}"));
     let app_context = Arc::new(Mutex::new(AppContext::new(app, tx)));

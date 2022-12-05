@@ -1,19 +1,35 @@
 use serde::{Deserialize, Serialize};
 
+pub trait OAuth2Token {
+    fn hostname(&self) -> String; // TODO: return &str
+
+    fn access_token(&self) -> &str;
+}
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-pub struct OAuth2Token {
+pub struct OAuth2TokenImpl {
     pub userid: i32,
     pub locationid: u8,
     pub access_token: String,
     pub token_type: String,
 }
 
-impl OAuth2Token {
-    pub fn hostname(&self) -> String {
+impl OAuth2TokenImpl {
+    pub fn userid(&self) -> i32 {
+        self.userid
+    }
+}
+
+impl OAuth2Token for OAuth2TokenImpl {
+    fn hostname(&self) -> String {
         match self.locationid {
             1 => "api.pcloud.com".to_string(),
             2 => "eapi.pcloud.com".to_string(),
             _ => panic!("Never"),
         }
+    }
+
+    fn access_token(&self) -> &str {
+        &self.access_token
     }
 }
