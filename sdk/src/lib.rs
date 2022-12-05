@@ -1,5 +1,4 @@
 /// Implements pCloud API
-
 pub mod client;
 pub mod data;
 pub mod error;

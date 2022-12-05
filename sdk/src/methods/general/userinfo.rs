@@ -37,7 +37,6 @@ pub trait GetUserInfo: client::Client {
 
 impl<T: client::Client> GetUserInfo for T {}
 
-
 #[cfg(test)]
 mod tests {
     use crate::mocks::client::MockLocalClient;

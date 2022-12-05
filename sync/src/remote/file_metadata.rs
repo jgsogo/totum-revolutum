@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
-use pcloud_sdk::types::FileID;
 use pcloud_sdk::structures::Metadata;
+use pcloud_sdk::types::FileID;
 
 use crate::diff::FileMetadata;
 
