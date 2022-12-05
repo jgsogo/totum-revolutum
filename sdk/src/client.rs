@@ -26,18 +26,21 @@ pub trait Client {
 pub struct HttpClient<Token: data::oauth2token::OAuth2Token> {
     pub oauth2_token: Token,
     http_client: reqwest::Client,
+    secure: bool,
 }
 
 impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
-    pub fn new(oauth2_token: Token) -> HttpClient<Token> {
+    pub fn new(oauth2_token: Token, secure: bool) -> HttpClient<Token> {
         HttpClient {
             oauth2_token,
             http_client: reqwest::Client::new(),
+            secure,
         }
     }
 
     fn build_url(&self, endpoint: &str) -> String {
-        format!("https://{}{}", self.oauth2_token.hostname(), endpoint)
+        let schema = if self.secure { "https" } else { "http" };
+        format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
     }
 
     pub async fn authorize(
@@ -49,6 +52,7 @@ impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 's
         Ok(HttpClient {
             oauth2_token: oauth2,
             http_client: client,
+            secure: true,
         })
     }
 }
@@ -81,6 +85,7 @@ impl<Token: data::oauth2token::OAuth2Token + Clone> Clone for HttpClient<Token> 
         HttpClient::<Token> {
             oauth2_token: self.oauth2_token.clone(),
             http_client: self.http_client.clone(),
+            secure: self.secure,
         }
     }
 }

@@ -52,7 +52,6 @@ env_logger = "0.10"
 tracing-subscriber = "0.3"
 pcloud-sdk = { path = ".", features = ["mocks"] }
 httpmock = "0.6"
-isahc = "1.7"
 
 [[example]]
 name = "upload_pb"

@@ -10,23 +10,23 @@ use crate::client;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserInfo {
     // email address of the user
-    email: String,
+    pub email: String,
     // true if the user had verified it's email
-    emailverified: bool,
+    pub emailverified: bool,
     // when the user was registerd
     #[serde(with = "time::serde::rfc2822")]
-    registered: OffsetDateTime,
+    pub registered: OffsetDateTime,
     // true if the user is premium
-    premium: bool,
+    pub premium: bool,
     // if premium is true: premiumexpires will be the date until the service is
     #[serde(with = "time::serde::rfc2822::option", default)]
-    premiumexpires: Option<OffsetDateTime>,
+    pub premiumexpires: Option<OffsetDateTime>,
     // in bytes
-    quota: u64,
+    pub quota: u64,
     // in bytes, so quite big numbers
-    usedquota: u64,
+    pub usedquota: u64,
     // 2-3 characters lowercase languageid
-    language: String,
+    pub language: String,
 }
 
 #[async_trait]

@@ -1,11 +1,10 @@
 use std::env;
-use std::fs::File;
-use std::io::Read;
 use std::path::Path;
 
 use anyhow::Result;
 use httpmock::prelude::*;
 use serde::{Deserialize, Serialize};
+use time::macros::datetime;
 
 use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::data::oauth2token::OAuth2Token;
@@ -50,24 +49,22 @@ async fn test_userinfo_get() -> Result<()> {
             .join("resources")
             .join("testdata")
             .join("userinfo.json");
-        let mut file = File::open(&userinfo_json).unwrap();
-        let mut content = String::new();
-        file.read_to_string(&mut content)
-            .expect(&format!("Cannot read file {}", userinfo_json.display()));
         then.status(200)
             .header("content-type", "application/json; charset=UTF-8")
             .body_from_file(userinfo_json.to_str().unwrap());
     });
-
-    let r = server.url("/userinfo?access_token=token");
-    let response = isahc::get(server.url("/userinfo?access_token=token")).unwrap();
-    let response = isahc::get(server.url("/userinfo?access_token=token")).unwrap();
-    assert_eq!(response.status(), 200);
-    // assert_eq!(response.text()?, "lol");
-
     let oauth2_token = OAuth2TokenMock::new(&format!("{}:{}", server.host(), server.port()), "token");
-    let pcloud = HttpClient::<OAuth2TokenMock>::new(oauth2_token);
-    let _r = pcloud.userinfo().await?;
+    let pcloud = HttpClient::<OAuth2TokenMock>::new(oauth2_token, false);
+    let data = pcloud.userinfo().await?;
+
+    assert_eq!(data.email, "pcloud@pcloud.com".to_string());
+    assert_eq!(data.emailverified, true);
+    assert_eq!(data.registered, datetime!(2013-11-18 15:32:05 UTC));
+    assert_eq!(data.premium, false);
+    assert_eq!(data.premiumexpires, None);
+    assert_eq!(data.quota, 1000);
+    assert_eq!(data.usedquota, 500);
+    assert_eq!(data.language, "en".to_string());
 
     userinfo_mock.assert();
     Ok(())
