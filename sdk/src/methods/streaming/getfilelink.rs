@@ -29,7 +29,7 @@ pub struct GetFileLinkInput {
 impl GetFileLinkInput {
     pub fn new_from_file(file: PCloudFile) -> GetFileLinkInput {
         GetFileLinkInput {
-            file: file,
+            file,
             forcedownload: false,
             contenttype: None,
             maxspeed: None,
