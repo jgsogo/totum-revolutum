@@ -41,6 +41,7 @@ mod tests {
                     api: vec!["api".into()],
                 })
             });
+
         let apiserver = client.getapiserver().await?;
         assert_eq!(apiserver.binapi, vec!["binapi".to_string()]);
         assert_eq!(apiserver.api, vec!["api".to_string()]);
