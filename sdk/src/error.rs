@@ -1,15 +1,13 @@
-use std::fmt::{Display, Formatter};
+use thiserror::Error;
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, Error)]
 pub enum Error {
     #[error(transparent)]
-    APIError(#[from] reqwest::Error),
-    SerializationError(#[from] serde_json::Error),
-}
+    ReqwestError(#[from] reqwest::Error),
 
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        // TODO: Implement actual display
-        write!(f, "lsl")
-    }
+    #[error("Serialization error '{error}': {content:?}")]
+    SerializationError { error: serde_json::Error, content: String },
+
+    #[error("API error {code}: {message}")]
+    ApiError { code: u16, message: String },
 }

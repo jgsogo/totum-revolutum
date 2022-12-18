@@ -9,28 +9,38 @@ use hyper;
 use hyper::header::CONTENT_TYPE;
 use reqwest;
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 
 use crate::error::Error;
 
 const BOUNDARY: &str = "------------------------ea3bbcf87c101592";
 
+#[derive(Serialize, Deserialize, Debug)]
+struct ApiResult<T> {
+    result: u16,
+    error: Option<String>,
+
+    #[serde(flatten)]
+    data: Option<T>,
+}
+
 fn create_response<T>(result: String) -> Result<T>
 where
     T: DeserializeOwned,
 {
-    match serde_json::from_str(&result) {
-        Ok(data) => Ok(data),
-        Err(e) => {
-            // TODO: Provide enough information to debug, but also return meaningful error
-            Err(anyhow!(Error::SerializationError(e)))
-            /*
-            Err(Box::new(Error::APIError(&format!(
-                "Cannot parse '{}' into {}",
-                result,
-                std::any::type_name::<T>()
-            ))))
-            */
-        }
+    let r = serde_json::from_str::<ApiResult<T>>(&result).map_err(|e| {
+        anyhow!(Error::SerializationError {
+            error: e,
+            content: result
+        })
+    })?;
+
+    match r.result {
+        0 => Ok(r.data.unwrap()),
+        _ => Err(anyhow!(Error::ApiError {
+            code: r.result,
+            message: r.error.unwrap()
+        })),
     }
 }
 
