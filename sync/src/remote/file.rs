@@ -5,19 +5,22 @@ use pcloud_sdk::types::PCloudFile;
 
 use crate::diff::File;
 
-pub struct RemoteFile<HttpClient: GetFileLink> {
-    pcloud: HttpClient,
+pub struct RemoteFile<'fs, HttpClient: GetFileLink>
+where
+    HttpClient: 'fs,
+{
+    pcloud: &'fs HttpClient,
     file: PCloudFile,
 }
 
-impl<HttpClient: GetFileLink> RemoteFile<HttpClient> {
-    pub fn new(file: PCloudFile, pcloud: HttpClient) -> Self {
+impl<'fs, HttpClient: GetFileLink> RemoteFile<'fs, HttpClient> {
+    pub fn new(file: PCloudFile, pcloud: &'fs HttpClient) -> Self {
         Self { file, pcloud }
     }
 }
 
 #[async_trait]
-impl<HttpClient: GetFileLink + Sync + Send> File for RemoteFile<HttpClient> {
+impl<'fs, HttpClient: GetFileLink + Sync + Send> File for RemoteFile<'fs, HttpClient> {
     async fn read_to_end(&mut self, buf: &mut Vec<u8>) -> anyhow::Result<usize> {
         let input = GetFileLinkInput::new_from_file(self.file.clone());
         let r = self.pcloud.getfilelink(&input).await?;

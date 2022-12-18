@@ -22,7 +22,11 @@ where
         Ok(data) => Ok(data),
         Err(e) => {
             // TODO: Provide enough information to debug, but also return meaningful error
-            Err(anyhow!(Error::SerializationError(e)))
+            Err(anyhow!(
+                "Serialization error {} from result {}",
+                Error::SerializationError(e),
+                result
+            ))
             /*
             Err(Box::new(Error::APIError(&format!(
                 "Cannot parse '{}' into {}",

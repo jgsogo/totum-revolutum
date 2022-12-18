@@ -36,3 +36,4 @@ async-std = "1.12"
 
 [dev-dependencies]
 tempfile = "3"
+pcloud-sdk = { path = "../sdk", features = ["mocks"] }

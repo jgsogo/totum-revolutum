@@ -5,7 +5,7 @@ pub mod error;
 pub mod handy;
 pub mod methods;
 #[cfg(feature = "mocks")]
-mod mocks;
+pub mod mocks;
 pub mod progress_bar;
 pub mod structures;
 pub mod types;

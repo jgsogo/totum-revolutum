@@ -1,16 +1,17 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use flume::Sender;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
+use pcloud_sdk::client::Client;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
-use pcloud_sdk::types::PCloudFile;
+use pcloud_sdk::types::{FolderID, PCloudFile};
 
 use crate::diff::{File, Filesystem};
 use crate::local::LocalFileMetadata;
@@ -19,17 +20,26 @@ use crate::remote::RemoteMetadata;
 
 pub type PCloudHttpClient = pcloud_sdk::client::HttpClient<OAuth2TokenImpl>;
 
-pub struct FilesystemPCloud {
+pub struct FilesystemPCloud<HttpClient: Client> {
     path: PathBuf,
-    pcloud: PCloudHttpClient,
+    folderid: FolderID,
+    pcloud: HttpClient,
 }
 
-impl FilesystemPCloud {
-    pub fn new(path: &Path, pcloud: PCloudHttpClient) -> Self {
-        Self {
+impl<HttpClient: Client + Send + Sync> FilesystemPCloud<HttpClient> {
+    pub async fn new(path: &Path, pcloud: HttpClient) -> Result<Self> {
+        let listfolder_input = ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
+        let filtermeta = vec!["folderid"];
+        let r = pcloud.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
+
+        Ok(Self {
             path: path.to_path_buf(),
+            folderid: r
+                .metadata
+                .folderid
+                .ok_or(anyhow!("Cannot get folderID for given path"))?,
             pcloud,
-        }
+        })
     }
 
     #[allow(dead_code)]
@@ -59,7 +69,12 @@ impl FilesystemPCloud {
                 let data: RemoteMetadata = (path, it.clone()).into();
                 tx.send(data)?;
             } else {
-                FilesystemPCloud::work_on_contents(tx.clone(), &path, it.contents.as_ref().unwrap(), depth + 1)?
+                FilesystemPCloud::<HttpClient>::work_on_contents(
+                    tx.clone(),
+                    &path,
+                    it.contents.as_ref().unwrap(),
+                    depth + 1,
+                )?
             }
         }
         Ok(())
@@ -67,9 +82,9 @@ impl FilesystemPCloud {
 }
 
 #[async_trait]
-impl Filesystem for FilesystemPCloud {
+impl<HttpClient: Client + Send + Sync + 'fs> Filesystem for FilesystemPCloud<HttpClient> {
     type Metadata = RemoteMetadata;
-    type File = RemoteFile<PCloudHttpClient>;
+    type File = RemoteFile<'fs, HttpClient>;
 
     fn root(&self) -> &Path {
         &self.path
@@ -91,7 +106,7 @@ impl Filesystem for FilesystemPCloud {
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => FilesystemPCloud::work_on_contents(tx, Path::new(""), contents, 0)?,
+            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(tx, self.root(), contents, 0)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -102,7 +117,7 @@ impl Filesystem for FilesystemPCloud {
     async fn create(&self, path: &Path) -> Result<Self::File> {
         match self.check_path(path) {
             Ok(v) => {
-                let f = RemoteFile::new(PCloudFile::Path(v.to_str().unwrap().to_string()), self.pcloud.clone());
+                let f = Self::File::new(PCloudFile::Path(v.to_str().unwrap().to_string()), &self.pcloud);
                 // TODO: Open file to create/write/...
                 Ok(f)
             }
@@ -113,7 +128,7 @@ impl Filesystem for FilesystemPCloud {
     async fn open(&self, path: &Path) -> Result<Self::File> {
         match self.check_path(path) {
             Ok(v) => {
-                let f = RemoteFile::new(PCloudFile::Path(v.to_str().unwrap().to_string()), self.pcloud.clone());
+                let f = Self::File::new(PCloudFile::Path(v.to_str().unwrap().to_string()), &self.pcloud);
                 // TODO: Open the file with pcloud.popen... and use a file descriptor here
                 Ok(f)
             }
@@ -124,10 +139,50 @@ impl Filesystem for FilesystemPCloud {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
+    use tempfile::tempdir;
+
+    use pcloud_sdk::methods::folder::listfolder::ListFolder;
+    use pcloud_sdk::mocks::client::MockLocalClient;
+
+    use super::*;
+
+    #[test]
+    fn test_root() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        client
+            .expect_get()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, GetListFolder::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+
+                Ok(ListFolder {
+                    metadata: Metadata { folderid: None },
+                })
+            });
+
+        let fs = FilesystemPCloud::new(Path::new("the/path"), client);
+
+        let tmp_dir = tempdir().unwrap();
+        assert_eq!(fs::canonicalize(tmp_dir.path())?, fs.root());
+        Ok(())
+    }
+
+    //
+    // #[test]
+    // fn test_root_not_exists() {
+    //     let tmp_dir = tempdir().unwrap();
+    //     let r = FilesystemLocal::new(&tmp_dir.path().join("not-exist"));
+    //     assert!(r.is_err());
+    // }
+
     // use std::env;
     // use std::env::VarError;
     //
-    // use tempfile::tempdir;
     //
     // use pcloud_sdk::data::oauth2token::OAuth2Token;
     //

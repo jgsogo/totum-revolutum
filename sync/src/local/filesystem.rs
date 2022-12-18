@@ -111,7 +111,7 @@ mod tests {
             f.write_all(&content).await?;
         }
 
-        // Read
+        // Open and read
         {
             let mut file = fs.open(&filepath).await?;
             let mut content_read = Vec::new();
