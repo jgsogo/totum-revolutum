@@ -41,7 +41,6 @@ impl ListFolderInput {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolder {
-    result: u8,
     pub metadata: Metadata,
 }
 
@@ -77,9 +76,6 @@ pub trait GetListFolder: client::Client {
         params.insert("filtermeta".to_string(), filtermeta);
 
         let ret = self.get::<ListFolder>(Self::ENDPOINT, params).await?;
-
-        ret.result
-        Gestionar los result, pasarlo a un método común en client::Client
 
         Ok(ret)
     }
