@@ -8,7 +8,7 @@ pcloud-sdk = { path = "../sdk" }
 pcloud-sync = { path = "../sync" }
 # indicatif = { version = "0.17"}
 home = "0.5.4"
-tokio = { version = "1.22", features = ["full"] }
+tokio = { version = "1.23", features = ["full"] }
 clap = { version = "4.0", features = ["derive"] }
 clap-verbosity-flag = "2.0.0"
 tracing = { version = "0.1" }

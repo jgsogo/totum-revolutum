@@ -5,7 +5,7 @@ use pcloud_sdk::types::PCloudFile;
 
 use crate::diff::File;
 
-pub struct RemoteFile {
+pub struct RemoteFile<HttpClient: impl pcloud_sdk::client::GetFileLink> {
     pcloud: pcloud_sdk::client::HttpClient,
     file: PCloudFile,
 }

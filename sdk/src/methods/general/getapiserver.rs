@@ -15,9 +15,7 @@ pub struct APIServer {
 #[async_trait]
 pub trait GetAPIServer: client::Client {
     async fn getapiserver(&self) -> Result<APIServer> {
-        let url = format!("https://{}/getapiserver", self.hostname());
-        let apiserver = self.get::<APIServer>(&url, HashMap::new()).await?;
-        Ok(apiserver)
+        self.get::<APIServer>("/getapiserver", HashMap::new()).await
     }
 }
 
@@ -32,14 +30,21 @@ mod tests {
     #[tokio::test]
     async fn test_getapiserver() -> Result<()> {
         let mut client = MockLocalClient::new();
-        client.expect_hostname().times(1).returning(|| "<hostname>".into());
         client
-            .expect_access_token()
+            .expect_get()
             .times(1)
-            .returning(|| "<access_token>".into());
-        client.expect_http_client().times(1).returning(|| 23);
+            .returning(|endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, "/getapiserver");
+                assert!(params.is_empty());
+                Ok(APIServer {
+                    binapi: vec!["binapi".into()],
+                    api: vec!["api".into()],
+                })
+            });
 
         let apiserver = client.getapiserver().await?;
+        assert_eq!(apiserver.binapi, vec!["binapi".to_string()]);
+        assert_eq!(apiserver.api, vec!["api".to_string()]);
         Ok(())
     }
 }

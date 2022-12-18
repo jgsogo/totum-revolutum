@@ -60,7 +60,6 @@ pub struct UploadFile {
 #[async_trait]
 pub trait PostUploadFile: client::Client {
     async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile> {
-        let url = format!("https://{}/uploadfile", self.hostname());
         let mut params = HashMap::new();
         params.insert("filename".to_string(), upload_params.filename.clone());
         // Folder-id or path, not both
@@ -75,7 +74,7 @@ pub trait PostUploadFile: client::Client {
 
         let data = utils::http::file_data(local_filename.to_string(), &upload_params.filename)?;
         // TODO: This should do some streaming (with progress bar). Probably different method to upload several files
-        let ret = self.post::<UploadFile>(&url, params, data).await?;
+        let ret = self.post::<UploadFile>("/uploadfile", params, data).await?;
         Ok(ret)
     }
 }

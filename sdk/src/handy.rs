@@ -25,8 +25,9 @@ pub trait HandyClient: getfilelink::GetFileLink {
         debug!("Download file from '{}'", &url);
 
         // Reqwest setup
-        let res = self
-            .http_client()
+        // TODO: it should use underlying reqwest::Client
+        let res = reqwest::ClientBuilder::default()
+            .build()?
             .get(url)
             .send()
             .await

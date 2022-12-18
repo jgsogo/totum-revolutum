@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 
-use super::oauth2token::OAuth2Token;
+use super::oauth2token::OAuth2TokenImpl;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct App {
@@ -9,7 +9,7 @@ pub struct App {
     pub client_id: String,
     pub client_secret: String,
 
-    pub tokens: Vec<OAuth2Token>,
+    pub tokens: Vec<OAuth2TokenImpl>,
 }
 
 impl App {
@@ -31,8 +31,8 @@ impl App {
         }
     }
 
-    pub fn find_token(&self, userid: i32) -> Result<&OAuth2Token> {
-        match self.tokens.iter().find(|&token| token.userid == userid) {
+    pub fn find_token(&self, userid: i32) -> Result<&OAuth2TokenImpl> {
+        match self.tokens.iter().find(|&token| token.userid() == userid) {
             Some(token) => Ok(token),
             None => Err(anyhow!("Token not found")),
         }
