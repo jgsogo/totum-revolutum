@@ -39,7 +39,7 @@ where
         0 => Ok(r.data.unwrap()),
         _ => Err(anyhow!(Error::ApiError {
             code: r.result,
-            message: r.error.unwrap_or("Error message not available".into())
+            message: r.error.unwrap_or_else(|| "Error message not available".into())
         })),
     }
 }
@@ -101,11 +101,10 @@ pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>
 #[cfg(test)]
 mod tests {
     use std::env;
-    use std::fs::{read, File};
+    use std::fs::File;
     use std::io::BufReader;
     use std::path::Path;
 
-    use crate::error::Error::SerializationError;
     use crate::methods::general::UserInfo;
 
     use super::*;
