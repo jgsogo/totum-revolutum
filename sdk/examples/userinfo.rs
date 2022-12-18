@@ -1,4 +1,5 @@
 use pcloud_sdk::data;
+use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::general::getapiserver::GetAPIServer;
@@ -8,7 +9,7 @@ use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let app = data::app_client_data::AppClientData::read_from_file("secrets/app.json").unwrap();
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
-    let pcloud = pcloud_sdk::client::HttpClient::authorize(app, addr).await?;
+    let pcloud = pcloud_sdk::client::HttpClient::<OAuth2TokenImpl>::authorize(app, addr).await?;
 
     let userinfo = pcloud.userinfo().await?;
     println!("{:#?}", userinfo);

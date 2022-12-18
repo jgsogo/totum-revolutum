@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use async_trait::async_trait;
 use flume::Sender;
+use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
@@ -14,13 +15,15 @@ use crate::diff::Filesystem;
 use crate::local::LocalFileMetadata;
 use crate::remote::RemoteMetadata;
 
+pub type PCloudHttpClient = pcloud_sdk::client::HttpClient<OAuth2TokenImpl>;
+
 pub struct FilesystemPCloud {
     path: String,
-    pcloud: pcloud_sdk::client::HttpClient,
+    pcloud: PCloudHttpClient,
 }
 
 impl FilesystemPCloud {
-    pub fn new(path: &str, pcloud: pcloud_sdk::client::HttpClient) -> Self {
+    pub fn new(path: &str, pcloud: PCloudHttpClient) -> Self {
         Self {
             path: path.to_string(),
             pcloud,

@@ -5,6 +5,7 @@ use clap::Args;
 use tracing::info;
 
 use pcloud_sdk::data;
+use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sync::storage;
 use pcloud_sync::storage::apps::Apps;
 use pcloud_sync::utils::mut_find_or_insert;
@@ -62,7 +63,7 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
     // TODO: Move this to SDK
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
     let app_client_data = data::app_client_data::AppClientData::new(&app.client_id, &app.client_secret);
-    let pcloud = pcloud_sdk::client::HttpClient::authorize(app_client_data, addr)
+    let pcloud = pcloud_sdk::client::HttpClient::<OAuth2TokenImpl>::authorize(app_client_data, addr)
         .await
         .expect("TODO: Propagate errors");
     let token = pcloud.oauth2_token;
@@ -75,7 +76,7 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
 
     // TODO: Don't like repeating variables here, rustify this piece of code!
     // TODO: Move it to App struct impl
-    let mytoken = data::oauth2token::OAuth2Token {
+    let mytoken = data::oauth2token::OAuth2TokenImpl {
         userid: token.userid,
         locationid: token.locationid,
         access_token: token.access_token.clone(),

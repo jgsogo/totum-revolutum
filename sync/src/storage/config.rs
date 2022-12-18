@@ -6,6 +6,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::actions::{Actions, OnConflict};
+use crate::remote::filesystem::PCloudHttpClient;
 use crate::utils::locked_file::{LockedFile, ReadWrite};
 use crate::utils::versioned_data::VersionedData;
 
@@ -31,13 +32,13 @@ impl ConfigAuth {
         }
     }
 
-    pub fn get_pcloud_client(&self, home: &Path) -> Result<pcloud_sdk::client::HttpClient> {
+    pub fn get_pcloud_client(&self, home: &Path) -> Result<PCloudHttpClient> {
         // TODO: This is probably not the place for this function
         let apps_file_path = apps::AppsFile::path(home);
         let lock = apps::AppsFile::read(&apps_file_path)?;
         if let Ok(found) = lock.content.find(&self.client_id) {
             if let Ok(token) = found.find_token(self.userid) {
-                return Ok(pcloud_sdk::client::HttpClient::new(token.clone()));
+                return Ok(pcloud_sdk::client::HttpClient::new(token.clone(), true));
             }
         }
         Err(anyhow!("Cannot find pcloud client for the given config"))

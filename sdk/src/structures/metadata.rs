@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
-use crate::id::{FileID, FolderID};
+use crate::types::{FileID, FolderID};
 
 use super::category::Category;
 use super::icon::Icon;

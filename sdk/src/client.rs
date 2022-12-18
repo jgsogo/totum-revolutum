@@ -12,71 +12,80 @@ use crate::utils::http;
 use super::data;
 
 #[async_trait]
-pub trait Client: Clone {
-    fn hostname(&self) -> String;
-    fn access_token(&self) -> String;
-    fn http_client(&self) -> reqwest::Client;
-
-    async fn get<T>(&self, url: &str, mut params: HashMap<String, String>) -> Result<T>
+pub trait Client {
+    async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
     where
-        T: DeserializeOwned,
-    {
-        params.insert("access_token".to_string(), self.access_token());
-        http::get::<T>(self.http_client(), url, params).await
-    }
+        T: DeserializeOwned + 'static;
 
-    async fn post<T>(&self, url: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
+    async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
     where
-        T: DeserializeOwned,
-    {
-        params.insert("access_token".to_string(), self.access_token());
-        http::post::<T>(self.http_client(), url, params, data).await
-    }
+        T: DeserializeOwned + 'static;
 }
 
 #[derive(Debug)]
-pub struct HttpClient {
-    pub oauth2_token: data::oauth2token::OAuth2Token,
+pub struct HttpClient<Token: data::oauth2token::OAuth2Token> {
+    pub oauth2_token: Token,
     http_client: reqwest::Client,
+    secure: bool,
 }
 
-impl HttpClient {
-    pub fn new(oauth2_token: data::oauth2token::OAuth2Token) -> HttpClient {
+impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
+    pub fn new(oauth2_token: Token, secure: bool) -> HttpClient<Token> {
         HttpClient {
             oauth2_token,
             http_client: reqwest::Client::new(),
+            secure,
         }
     }
 
-    pub async fn authorize(app: data::app_client_data::AppClientData, address: SocketAddr) -> Result<HttpClient> {
+    fn build_url(&self, endpoint: &str) -> String {
+        let schema = if self.secure { "https" } else { "http" };
+        format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
+    }
+
+    pub async fn authorize(
+        app: data::app_client_data::AppClientData,
+        address: SocketAddr,
+    ) -> Result<HttpClient<Token>> {
         let client = reqwest::Client::new();
         let oauth2 = oauth2::authorize_oauth2(client.clone(), app, address).await?;
         Ok(HttpClient {
             oauth2_token: oauth2,
             http_client: client,
+            secure: true,
         })
     }
 }
 
-impl Clone for HttpClient {
-    fn clone(&self) -> Self {
-        HttpClient {
-            oauth2_token: self.oauth2_token.clone(),
-            http_client: self.http_client.clone(),
-        }
+#[async_trait]
+impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for HttpClient<Token> {
+    async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
+    where
+        T: DeserializeOwned + 'static,
+    {
+        let url = self.build_url(endpoint);
+        let access_token = self.oauth2_token.access_token();
+        params.insert("access_token".to_string(), access_token.to_string());
+        http::get::<T>(self.http_client.clone(), &url, params).await
+    }
+
+    async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
+    where
+        T: DeserializeOwned + 'static,
+    {
+        let url = self.build_url(endpoint);
+        let access_token = self.oauth2_token.access_token();
+        params.insert("access_token".to_string(), access_token.to_string());
+        http::post::<T>(self.http_client.clone(), &url, params, data).await
     }
 }
 
-impl Client for HttpClient {
-    fn hostname(&self) -> String {
-        self.oauth2_token.hostname()
-    }
-
-    fn access_token(&self) -> String {
-        self.oauth2_token.access_token.clone()
-    }
-
-    fn http_client(&self) -> reqwest::Client {
-        self.http_client.clone()
+impl<Token: data::oauth2token::OAuth2Token + Clone> Clone for HttpClient<Token> {
+    fn clone(&self) -> Self {
+        HttpClient::<Token> {
+            oauth2_token: self.oauth2_token.clone(),
+            http_client: self.http_client.clone(),
+            secure: self.secure,
+        }
     }
 }

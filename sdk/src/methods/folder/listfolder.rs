@@ -55,7 +55,6 @@ pub trait GetListFolder: client::Client {
         list_folder: &ListFolderInput,
         filtermeta: Vec<&str>,
     ) -> Result<ListFolder> {
-        let url = format!("https://{}/listfolder", self.hostname());
         let mut params = HashMap::new();
         match list_folder {
             ListFolderInput { path: Some(p), .. } => {
@@ -74,7 +73,7 @@ pub trait GetListFolder: client::Client {
         let filtermeta = filtermeta.join(",");
         params.insert("filtermeta".to_string(), filtermeta);
 
-        let ret = self.get::<ListFolder>(&url, params).await?;
+        let ret = self.get::<ListFolder>("/listfolder", params).await?;
         Ok(ret)
     }
 }
