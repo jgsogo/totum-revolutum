@@ -32,34 +32,34 @@ pub struct CommonMetadata {
 pub struct Metadata {
     #[serde(flatten)]
     pub common: CommonMetadata,
-    parentfolderid: Option<FolderID>,
+    pub parentfolderid: Option<FolderID>,
 
-    canread: Option<bool>,
-    canmodify: Option<bool>,
-    candelete: Option<bool>,
+    pub canread: Option<bool>,
+    pub canmodify: Option<bool>,
+    pub candelete: Option<bool>,
 
     pub folderid: Option<FolderID>,
     pub fileid: Option<FileID>,
-    deletedfileid: Option<FileID>,
-    category: Option<Category>,
+    pub deletedfileid: Option<FileID>,
+    pub category: Option<Category>,
     pub contents: Option<Vec<Metadata>>,
-    isdeleted: Option<bool>,
+    pub isdeleted: Option<bool>,
 
     // only for folders
-    cancreate: Option<bool>,
+    pub cancreate: Option<bool>,
 
     // only for files
     pub hash: Option<u64>,
     pub size: Option<u64>,
-    contenttype: Option<String>,
+    pub contenttype: Option<String>,
 
     // Optional fields depending on file type
     #[serde(flatten)]
-    extra_imagefile: Option<MetadataImageFile>,
+    pub extra_imagefile: Option<MetadataImageFile>,
     #[serde(flatten)]
-    extra_audiofile: Option<MetadataAudioFile>,
+    pub extra_audiofile: Option<MetadataAudioFile>,
     #[serde(flatten)]
-    extra_videofile: Option<MetadataVideoFile>,
+    pub extra_videofile: Option<MetadataVideoFile>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
@@ -89,6 +89,50 @@ pub struct MetadataVideoFile {
     audiobitrate: u32,
     audiosamplerate: u32,
     rotate: u16,
+}
+
+#[cfg(feature = "test_utils")]
+impl Default for Metadata {
+    fn default() -> Self {
+        Self {
+            common: CommonMetadata::default(),
+            parentfolderid: None,
+            canread: None,
+            canmodify: None,
+            candelete: None,
+            folderid: None,
+            fileid: None,
+            deletedfileid: None,
+            category: None,
+            contents: None,
+            isdeleted: None,
+            cancreate: None,
+            hash: None,
+            size: None,
+            contenttype: None,
+            extra_imagefile: None,
+            extra_audiofile: None,
+            extra_videofile: None,
+        }
+    }
+}
+
+#[cfg(feature = "test_utils")]
+impl Default for CommonMetadata {
+    fn default() -> Self {
+        Self {
+            icon: None,
+            id: None,
+            created: None,
+            modified: None,
+            path: None,
+            thumb: None,
+            isfolder: None,
+            isshared: None,
+            ismine: None,
+            name: None,
+        }
+    }
 }
 
 #[cfg(test)]
