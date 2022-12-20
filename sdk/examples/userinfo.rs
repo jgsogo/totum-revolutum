@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let apiserver = pcloud.getapiserver().await?;
     println!("{:#?}", apiserver);
 
-    let listfolder_input = ListFolderInput::new_from_path(None);
+    let listfolder_input = ListFolderInput::new_from_path(Some("invalidasdfas".into()));
     let listfolder = pcloud.listfolder(&listfolder_input).await?;
     println!("{:#?}", listfolder);
 
