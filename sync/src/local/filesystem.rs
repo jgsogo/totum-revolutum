@@ -3,7 +3,6 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 use async_std::fs::File as AsyncFile;
-use async_std::io::WriteExt;
 use async_trait::async_trait;
 use flume::Sender;
 use ignore::WalkBuilder;
@@ -13,7 +12,6 @@ use tracing::info;
 use crate::diff::{File, Filesystem};
 use crate::local::LocalMetadata;
 use crate::storage::ignore_files;
-use crate::utils::normalize_path;
 
 use super::file::LocalFile;
 use super::parallel_visitor;
@@ -33,7 +31,6 @@ impl FilesystemLocal {
 #[async_trait]
 impl Filesystem for FilesystemLocal {
     type Metadata = LocalMetadata;
-    type File = LocalFile;
 
     fn root(&self) -> &Path {
         &self.path
@@ -54,7 +51,7 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn create(&self, path: &Path) -> Result<Self::File> {
+    async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
         // Parent directory should exist
         let parent = path
             .parent()
@@ -62,14 +59,14 @@ impl Filesystem for FilesystemLocal {
         self.check_path(&fs::canonicalize(parent)?)?;
 
         let f = AsyncFile::create(path).await?;
-        Ok(LocalFile::new(f))
+        Ok(Box::new(LocalFile::new(f)))
     }
 
-    async fn open(&self, path: &Path) -> Result<LocalFile> {
+    async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(&fs::canonicalize(path)?) {
             Ok(v) => {
                 let f = AsyncFile::open(v).await?;
-                Ok(LocalFile::new(f))
+                Ok(Box::new(LocalFile::new(f)))
             }
             Err(e) => Err(e),
         }

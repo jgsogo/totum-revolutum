@@ -68,12 +68,12 @@ async fn test_create_write_read() -> Result<()> {
     }
 
     // Open and read
-    // {
-    //     let mut file = fs.open(&filepath).await?;
-    //     let mut content_read = Vec::new();
-    //     file.read_to_end(&mut content_read).await?;
-    //     assert_eq!(content, content_read);
-    // }
+    {
+        let mut file = fs.open(&filepath).await?;
+        let mut content_read = Vec::new();
+        file.read_to_end(&mut content_read).await?;
+        assert_eq!(content, content_read);
+    }
 
     Ok(())
 }

@@ -15,7 +15,6 @@ where
     Self: Sync,
 {
     type Metadata: FileMetadata;
-    type File: File;
 
     fn root(&self) -> &Path;
 
@@ -42,9 +41,9 @@ where
     /// Walk files in the filesystem, for each file found it will send it via `tx`
     async fn walk_directory(&self, tx: flume::Sender<Self::Metadata>, threads: usize) -> Result<()>;
 
-    async fn create(&self, path: &Path) -> Result<Self::File>;
+    async fn create(&self, path: &Path) -> Result<Box<dyn File>>;
 
     /// Tries to open the file requested by the argument `path`. Returns an object implementing
     /// a [`File`] or an error.
-    async fn open(&self, path: &Path) -> Result<Self::File>;
+    async fn open(&self, path: &Path) -> Result<Box<dyn File>>;
 }

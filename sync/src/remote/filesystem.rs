@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
@@ -14,7 +13,7 @@ use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::{FolderID, PCloudFile};
 
-use crate::diff::Filesystem;
+use crate::diff::{File, Filesystem};
 use crate::local::LocalFileMetadata;
 use crate::remote::file::RemoteFile;
 use crate::remote::RemoteMetadata;
@@ -83,9 +82,8 @@ impl<HttpClient: Client + Send + Sync + Clone> FilesystemPCloud<HttpClient> {
 }
 
 #[async_trait]
-impl<HttpClient: Client + Send + Sync + Clone> Filesystem for FilesystemPCloud<HttpClient> {
+impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
     type Metadata = RemoteMetadata;
-    type File = RemoteFile<HttpClient>;
 
     fn root(&self) -> &Path {
         &self.path
@@ -115,23 +113,29 @@ impl<HttpClient: Client + Send + Sync + Clone> Filesystem for FilesystemPCloud<H
         Ok(())
     }
 
-    async fn create(&self, path: &Path) -> Result<Self::File> {
+    async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(path) {
             Ok(v) => {
-                let f = Self::File::new(PCloudFile::Path(v.to_str().unwrap().to_string()), self.pcloud.clone());
+                let f = RemoteFile::<HttpClient>::new(
+                    PCloudFile::Path(v.to_str().unwrap().to_string()),
+                    self.pcloud.clone(),
+                );
                 // TODO: Open file to create/write/...
-                Ok(f)
+                Ok(Box::new(f))
             }
             Err(e) => Err(e),
         }
     }
 
-    async fn open(&self, path: &Path) -> Result<Self::File> {
+    async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(path) {
             Ok(v) => {
-                let f = Self::File::new(PCloudFile::Path(v.to_str().unwrap().to_string()), self.pcloud.clone());
+                let f = RemoteFile::<HttpClient>::new(
+                    PCloudFile::Path(v.to_str().unwrap().to_string()),
+                    self.pcloud.clone(),
+                );
                 // TODO: Open the file with pcloud.popen... and use a file descriptor here
-                Ok(f)
+                Ok(Box::new(f))
             }
             Err(e) => Err(e),
         }
@@ -141,8 +145,6 @@ impl<HttpClient: Client + Send + Sync + Clone> Filesystem for FilesystemPCloud<H
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-
-    use tempfile::tempdir;
 
     use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::folder::listfolder;
