@@ -41,6 +41,7 @@ chrono-tz = { version = "0.8" }
 cron-parser = "0.7.10"
 anyhow = { version = "1.0" }
 tracing = { version = "0.1" }
+bitflags = "1.3"
 
 # Optional dependencies
 indicatif = { version = "0.17", optional = true }

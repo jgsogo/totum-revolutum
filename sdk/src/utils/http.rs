@@ -80,6 +80,18 @@ where
     create_response(result)
 }
 
+pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMap<String, String>) -> Result<Vec<u8>> {
+    let r = client
+        .get(url)
+        .header(CONTENT_TYPE, "application/json")
+        .query(&params)
+        .send()
+        .await?
+        .bytes()
+        .await?;
+    Ok(r.to_vec())
+}
+
 pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>> {
     let mut data = Vec::new();
     write!(data, "--{}\r\n", BOUNDARY)?;

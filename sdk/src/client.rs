@@ -20,6 +20,8 @@ pub trait Client {
     async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
     where
         T: DeserializeOwned + 'static;
+
+    async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>>;
 }
 
 #[derive(Debug)]
@@ -77,6 +79,13 @@ impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 's
         let access_token = self.oauth2_token.access_token();
         params.insert("access_token".to_string(), access_token.to_string());
         http::post::<T>(self.http_client.clone(), &url, params, data).await
+    }
+
+    async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>> {
+        let url = self.build_url(endpoint);
+        let access_token = self.oauth2_token.access_token();
+        params.insert("access_token".to_string(), access_token.to_string());
+        http::get_bytes(self.http_client.clone(), &url, params).await
     }
 }
 
