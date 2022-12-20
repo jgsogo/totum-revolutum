@@ -144,6 +144,7 @@ mod tests {
 
     use tempfile::tempdir;
 
+    use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
     use pcloud_sdk::mocks::client::MockLocalClient;
 
@@ -170,8 +171,34 @@ mod tests {
             });
 
         let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
-
         assert_eq!(Path::new("the/path"), fs.root());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_root_not_exists() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        client
+            .expect_get::<ListFolder>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, MockLocalClient::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+
+                Err(anyhow!(Error::ApiError {
+                    code: 9999,
+                    message: "Mock: the folder doesn't exist".to_string(),
+                }))
+            });
+
+        let r = FilesystemPCloud::new(Path::new("the/path"), client).await;
+        assert!(r.is_err());
+        assert_eq!(
+            r.err().unwrap().to_string(),
+            "API error 9999: Mock: the folder doesn't exist".to_string()
+        );
         Ok(())
     }
 
