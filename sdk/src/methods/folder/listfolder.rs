@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 use crate::client;
 use crate::structures::Metadata;
 
+pub const ENDPOINT: &str = "/listfolder";
+
 #[derive(Default)]
 pub struct ListFolderInput {
     // path to the folder(discouraged)
@@ -73,7 +75,8 @@ pub trait GetListFolder: client::Client {
         let filtermeta = filtermeta.join(",");
         params.insert("filtermeta".to_string(), filtermeta);
 
-        let ret = self.get::<ListFolder>("/listfolder", params).await?;
+        let ret = self.get::<ListFolder>(ENDPOINT, params).await?;
+
         Ok(ret)
     }
 }

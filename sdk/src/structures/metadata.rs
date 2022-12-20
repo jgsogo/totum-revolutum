@@ -10,6 +10,7 @@ use super::icon::Icon;
 
 // https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "test_utils", derive(Default))]
 /// Metadata that is common to files and folders
 ///
 /// Given `filtermeta` argument, everything is optional
@@ -29,37 +30,38 @@ pub struct CommonMetadata {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "test_utils", derive(Default))]
 pub struct Metadata {
     #[serde(flatten)]
     pub common: CommonMetadata,
-    parentfolderid: Option<FolderID>,
+    pub parentfolderid: Option<FolderID>,
 
-    canread: Option<bool>,
-    canmodify: Option<bool>,
-    candelete: Option<bool>,
+    pub canread: Option<bool>,
+    pub canmodify: Option<bool>,
+    pub candelete: Option<bool>,
 
     pub folderid: Option<FolderID>,
     pub fileid: Option<FileID>,
-    deletedfileid: Option<FileID>,
-    category: Option<Category>,
+    pub deletedfileid: Option<FileID>,
+    pub category: Option<Category>,
     pub contents: Option<Vec<Metadata>>,
-    isdeleted: Option<bool>,
+    pub isdeleted: Option<bool>,
 
     // only for folders
-    cancreate: Option<bool>,
+    pub cancreate: Option<bool>,
 
     // only for files
     pub hash: Option<u64>,
     pub size: Option<u64>,
-    contenttype: Option<String>,
+    pub contenttype: Option<String>,
 
     // Optional fields depending on file type
     #[serde(flatten)]
-    extra_imagefile: Option<MetadataImageFile>,
+    pub extra_imagefile: Option<MetadataImageFile>,
     #[serde(flatten)]
-    extra_audiofile: Option<MetadataAudioFile>,
+    pub extra_audiofile: Option<MetadataAudioFile>,
     #[serde(flatten)]
-    extra_videofile: Option<MetadataVideoFile>,
+    pub extra_videofile: Option<MetadataVideoFile>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
