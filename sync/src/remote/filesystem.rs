@@ -145,6 +145,7 @@ mod tests {
     use tempfile::tempdir;
 
     use pcloud_sdk::error::Error;
+    use pcloud_sdk::methods::folder::listfolder;
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
     use pcloud_sdk::mocks::client::MockLocalClient;
 
@@ -157,7 +158,7 @@ mod tests {
             .expect_get()
             .times(1)
             .returning(move |endpoint, params: HashMap<_, _>| {
-                assert_eq!(endpoint, MockLocalClient::ENDPOINT);
+                assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"the/path".to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
@@ -182,7 +183,7 @@ mod tests {
             .expect_get::<ListFolder>()
             .times(1)
             .returning(move |endpoint, params: HashMap<_, _>| {
-                assert_eq!(endpoint, MockLocalClient::ENDPOINT);
+                assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"the/path".to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
@@ -209,7 +210,7 @@ mod tests {
             .expect_get::<ListFolder>()
             .times(1)
             .returning(move |endpoint, params: HashMap<_, _>| {
-                assert_eq!(endpoint, MockLocalClient::ENDPOINT);
+                assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"the/path".to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));

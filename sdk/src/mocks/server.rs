@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 
@@ -7,6 +8,7 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 use crate::data::oauth2token::OAuth2Token;
+use crate::methods::folder::listfolder;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 struct OAuth2TokenMock {
@@ -44,8 +46,22 @@ impl PCloudServerMock {
         Self { server }
     }
 
-    pub fn token(&self) -> impl OAuth2Token + DeserializeOwned + Sync + Send + 'static {
+    pub fn token(&self) -> impl OAuth2Token + DeserializeOwned + Sync + Send + Clone + 'static {
         OAuth2TokenMock::new(&format!("{}:{}", self.server.host(), self.server.port()), "token")
+    }
+
+    pub fn listfolder_mock(&self, params: HashMap<&str, &str>, body: impl AsRef<[u8]>) -> Mock {
+        self.server.mock(|when, then| {
+            let mut wh = when.method(GET).path(listfolder::ENDPOINT);
+
+            for (k, v) in params {
+                wh = wh.query_param(k, v);
+            }
+
+            then.status(200)
+                .header("content-type", "application/json; charset=UTF-8")
+                .body(body);
+        })
     }
 
     pub fn userinfo_mock(&self) -> Mock {

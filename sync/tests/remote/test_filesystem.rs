@@ -1,40 +1,12 @@
-use std::env;
+use std::collections::HashMap;
 use std::path::Path;
 
 use anyhow::Result;
-use serde::{Deserialize, Serialize};
-use time::macros::datetime;
 
-use httpmock::prelude::*;
 use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::data::oauth2token::OAuth2Token;
-use pcloud_sdk::methods::general::userinfo::GetUserInfo;
+use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sync::remote::filesystem::FilesystemPCloud;
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-struct OAuth2TokenMock {
-    hostname: String,
-    access_token: String,
-}
-
-impl OAuth2TokenMock {
-    pub fn new(hostname: &str, access_token: &str) -> Self {
-        Self {
-            hostname: hostname.to_string(),
-            access_token: access_token.to_string(),
-        }
-    }
-}
-
-impl OAuth2Token for OAuth2TokenMock {
-    fn hostname(&self) -> String {
-        self.hostname.clone()
-    }
-
-    fn access_token(&self) -> &str {
-        &self.access_token
-    }
-}
 
 // fn oauth2_token() -> impl OAuth2Token {
 //     match env::var("TESTING_PCLOUD_TOKEN") {
@@ -68,10 +40,22 @@ impl OAuth2Token for OAuth2TokenMock {
 
 #[tokio::test]
 async fn test_create_write_read() -> Result<()> {
-    // let oauth2_token = OAuth2TokenMock::new(&format!("{}:{}", server.host(), server.port()), "token");
-    // let client = HttpClient::<OAuth2TokenMock>::new(oauth2_token, false);
-    //
-    // let r = FilesystemPCloud::new(Path::new("the/path"), client).await;
+    let server = PCloudServerMock::new();
+    let fs = {
+        let server_token = server.token();
+        let root_folder_mock = {
+            let mut qparams = HashMap::new();
+            qparams.insert("path", "the/root/path");
+            qparams.insert("filtermeta", "folderid");
+            qparams.insert("access_token", server_token.access_token());
+            server.listfolder_mock(qparams, "{\"result\": 0, \"metadata\": {\"folderid\": 1234}}")
+        };
+
+        let pcloud = HttpClient::new(server_token, false);
+        let r = FilesystemPCloud::new(Path::new("the/root/path"), pcloud).await?;
+        root_folder_mock.assert();
+        r
+    };
 
     Ok(())
 }
