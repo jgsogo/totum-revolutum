@@ -25,6 +25,7 @@ impl File for LocalFile {
     }
 }
 
+// Implementing this trait is required to implement `async_std::io::Write`. See: https://docs.rs/async-std/0.99.4/async_std/io/trait.Write.html
 impl futures::io::AsyncWrite for LocalFile {
     fn poll_write(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &[u8]) -> Poll<std::io::Result<usize>> {
         unsafe {
