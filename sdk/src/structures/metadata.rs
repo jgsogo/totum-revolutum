@@ -10,6 +10,7 @@ use super::icon::Icon;
 
 // https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "test_utils", derive(Default))]
 /// Metadata that is common to files and folders
 ///
 /// Given `filtermeta` argument, everything is optional
@@ -29,6 +30,7 @@ pub struct CommonMetadata {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "test_utils", derive(Default))]
 pub struct Metadata {
     #[serde(flatten)]
     pub common: CommonMetadata,
@@ -89,50 +91,6 @@ pub struct MetadataVideoFile {
     audiobitrate: u32,
     audiosamplerate: u32,
     rotate: u16,
-}
-
-#[cfg(feature = "test_utils")]
-impl Default for Metadata {
-    fn default() -> Self {
-        Self {
-            common: CommonMetadata::default(),
-            parentfolderid: None,
-            canread: None,
-            canmodify: None,
-            candelete: None,
-            folderid: None,
-            fileid: None,
-            deletedfileid: None,
-            category: None,
-            contents: None,
-            isdeleted: None,
-            cancreate: None,
-            hash: None,
-            size: None,
-            contenttype: None,
-            extra_imagefile: None,
-            extra_audiofile: None,
-            extra_videofile: None,
-        }
-    }
-}
-
-#[cfg(feature = "test_utils")]
-impl Default for CommonMetadata {
-    fn default() -> Self {
-        Self {
-            icon: None,
-            id: None,
-            created: None,
-            modified: None,
-            path: None,
-            thumb: None,
-            isfolder: None,
-            isshared: None,
-            ismine: None,
-            name: None,
-        }
-    }
 }
 
 #[cfg(test)]

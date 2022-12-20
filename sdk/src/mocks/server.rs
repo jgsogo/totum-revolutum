@@ -40,12 +40,14 @@ pub struct PCloudServerMock {
     pub server: MockServer,
 }
 
-impl PCloudServerMock {
-    pub fn new() -> Self {
+impl Default for PCloudServerMock {
+    fn default() -> Self {
         let server = MockServer::start();
         Self { server }
     }
+}
 
+impl PCloudServerMock {
     pub fn token(&self) -> impl OAuth2Token + DeserializeOwned + Sync + Send + Clone + 'static {
         OAuth2TokenMock::new(&format!("{}:{}", self.server.host(), self.server.port()), "token")
     }

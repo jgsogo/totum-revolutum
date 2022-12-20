@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::client;
 use crate::structures::Metadata;
 
-pub const ENDPOINT: &'static str = "/listfolder";
+pub const ENDPOINT: &str = "/listfolder";
 
 #[derive(Default)]
 pub struct ListFolderInput {
