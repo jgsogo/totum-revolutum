@@ -55,7 +55,7 @@ pub trait GetFileOpen: client::Client {
             // If the file exists, fileid or path need to be provided
             match path {
                 FileOpenPath::FileID(fileid) => {
-                    params.insert("fileid".to_string(), fileid.to_string());
+                    params.insert("fileid".to_string(), fileid.0.to_string());
                 }
                 FileOpenPath::Path(path) => {
                     params.insert("path".to_string(), path);

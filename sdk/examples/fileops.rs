@@ -9,6 +9,7 @@ use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::general::getapiserver::GetAPIServer;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::types::FolderID;
+use serde::de::Unexpected::Str;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -24,18 +25,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let folderid = listfolder.metadata.folderid.unwrap();
     println!("{}", folderid);
 
-    let fd = pcloud
-        .file_open(
-            Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC | Flags::O_APPEND,
-            FileOpenPath::FolderAndName(folderid, "name2.txt".to_string()),
-        )
-        .await?;
-    println!("File is opened with descriptor {}", fd.fd);
+    // Open + write + close
+    let fileid = {
+        let fd = pcloud
+            .file_open(
+                Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC | Flags::O_APPEND,
+                FileOpenPath::FolderAndName(folderid.clone(), "name2.txt".to_string()),
+            )
+            .await?;
+        println!("File is opened with descriptor {}", fd.fd);
 
-    let bytes_count = pcloud.file_write(fd.fd, &mut "eaeaeaea".as_bytes().to_vec()).await?;
-    println!("wrote {} bytes", bytes_count.bytes);
+        let bytes_count = pcloud.file_write(fd.fd, &mut "eaeaeaea".as_bytes().to_vec()).await?;
+        println!("wrote {} bytes", bytes_count.bytes);
 
-    pcloud.file_close(fd.fd).await?;
-    println!("File is closed");
+        pcloud.file_close(fd.fd).await?;
+        println!("File is closed");
+
+        fd.fileid
+    };
+
+    // Open + read + close
+    {
+        let fd = pcloud.file_open(Flags::empty(), FileOpenPath::FileID(fileid)).await?;
+        println!("File is opened with descriptor {}", fd.fd);
+
+        let r = pcloud.file_read(fd.fd, 100).await?;
+        let content = String::from_utf8_lossy(&*r.bytes);
+        println!("Content: {}", content);
+
+        pcloud.file_close(fd.fd).await?;
+        println!("File is closed");
+    }
+
     Ok(())
 }
