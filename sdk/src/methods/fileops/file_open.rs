@@ -29,7 +29,7 @@ pub enum FileOpenPath {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileOpen {
-    pub file_descriptor: FileDescriptor,
+    pub fd: FileDescriptor,
     pub fileid: FileID,
 }
 
@@ -43,7 +43,7 @@ pub trait GetFileOpen: client::Client {
             // When creating a file, folderid+name OR path need to be provided
             match path {
                 FileOpenPath::FolderAndName(folderid, name) => {
-                    params.insert("folderid".to_string(), folderid.to_string());
+                    params.insert("folderid".to_string(), folderid.0.to_string());
                     params.insert("name".to_string(), name);
                 }
                 FileOpenPath::Path(path) => {

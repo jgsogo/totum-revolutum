@@ -61,3 +61,7 @@ required-features = ["indicatif"]
 [[example]]
 name = "download"
 required-features = ["indicatif"]
+
+[[example]]
+name = "fileops"
+required-features = ["indicatif"]

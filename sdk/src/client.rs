@@ -33,9 +33,10 @@ pub struct HttpClient<Token: data::oauth2token::OAuth2Token> {
 
 impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
     pub fn new(oauth2_token: Token, secure: bool) -> HttpClient<Token> {
+        let client = reqwest::ClientBuilder::new().build().unwrap();
         HttpClient {
             oauth2_token,
-            http_client: reqwest::Client::new(),
+            http_client: client,
             secure,
         }
     }
