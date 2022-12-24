@@ -27,3 +27,32 @@ pub trait PostFileWrite: client::Client {
 }
 
 impl<T: client::Client> PostFileWrite for T {}
+
+#[cfg(test)]
+mod tests {
+    use crate::mocks::client::MockLocalClient;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_file_write() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        let mut data = "gaudeamus igitur".as_bytes().to_vec();
+
+        let bdata = utils::http::file_write(&mut data.clone(), "filename")?;
+        client
+            .expect_post()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>, posted_data: Vec<u8>| {
+                assert_eq!(endpoint, "/file_write");
+                assert_eq!(params.len(), 1);
+                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                assert_eq!(posted_data, bdata);
+                Ok(FileWrite { bytes: 10 })
+            });
+
+        let r = client.file_write(42, &mut data).await?;
+        assert_eq!(r.bytes, 10);
+        Ok(())
+    }
+}

@@ -2,17 +2,11 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::fileops::FileDescriptor;
 
 pub const ENDPOINT: &str = "/file_close";
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct FileClose {
-    pub bytes: Vec<u8>,
-}
 
 #[async_trait]
 pub trait GetFileClose: client::Client {
@@ -24,3 +18,26 @@ pub trait GetFileClose: client::Client {
 }
 
 impl<T: client::Client> GetFileClose for T {}
+
+#[cfg(test)]
+mod tests {
+    use crate::mocks::client::MockLocalClient;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_file_close() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        client
+            .expect_get()
+            .times(1)
+            .returning(|endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, "/file_close");
+                assert_eq!(params.len(), 1);
+                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                Ok(())
+            });
+        let _r = client.file_close(42).await?;
+        Ok(())
+    }
+}

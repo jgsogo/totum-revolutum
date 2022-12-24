@@ -70,3 +70,139 @@ pub trait GetFileOpen: client::Client {
 }
 
 impl<T: client::Client> GetFileOpen for T {}
+
+#[cfg(test)]
+mod tests {
+    use crate::mocks::client::MockLocalClient;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_ocreate() -> Result<()> {
+        let flags = Flags::O_CREAT;
+
+        // test we get the expected error
+        {
+            let client = MockLocalClient::new();
+            let r = client.file_open(flags, FileOpenPath::FileID(FileID(42))).await;
+            assert!(r.is_err());
+            assert_eq!(
+                r.unwrap_err().to_string(),
+                "If O_CREATE is set, provide either folderid+name or path"
+            );
+        }
+
+        // test O_CREAT with folderid + name
+        {
+            let mut client = MockLocalClient::new();
+            client
+                .expect_get()
+                .times(1)
+                .returning(|endpoint, params: HashMap<_, _>| {
+                    assert_eq!(endpoint, "/file_open");
+                    assert_eq!(params.len(), 3);
+                    assert_eq!(params.get("flags"), Some(&"64".to_string()));
+                    assert_eq!(params.get("folderid"), Some(&"42".to_string()));
+                    assert_eq!(params.get("name"), Some(&"name".to_string()));
+                    Ok(FileOpen {
+                        fd: 42,
+                        fileid: FileID(42),
+                    })
+                });
+            let input = FileOpenPath::FolderAndName(FolderID(42), "name".to_string());
+            let r = client.file_open(flags, input).await?;
+            assert_eq!(r.fd, 42);
+            assert_eq!(r.fileid, FileID(42));
+        }
+
+        // test O_CREAT with path
+        {
+            let flags = flags | Flags::O_APPEND;
+            let mut client = MockLocalClient::new();
+            client
+                .expect_get()
+                .times(1)
+                .returning(|endpoint, params: HashMap<_, _>| {
+                    assert_eq!(endpoint, "/file_open");
+                    assert_eq!(params.len(), 2);
+                    assert_eq!(params.get("flags"), Some(&"1088".to_string()));
+                    assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                    Ok(FileOpen {
+                        fd: 42,
+                        fileid: FileID(42),
+                    })
+                });
+            let input = FileOpenPath::Path("the/path".to_string());
+            let r = client.file_open(flags, input).await?;
+            assert_eq!(r.fd, 42);
+            assert_eq!(r.fileid, FileID(42));
+        }
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_no_ocreate() -> Result<()> {
+        let flags = Flags::empty();
+
+        // test we get the expected error
+        {
+            let client = MockLocalClient::new();
+            let r = client
+                .file_open(flags, FileOpenPath::FolderAndName(FolderID(42), "name".to_string()))
+                .await;
+            assert!(r.is_err());
+            assert_eq!(
+                r.unwrap_err().to_string(),
+                "If O_CREATE is not set, provide either fileid or path"
+            );
+        }
+
+        // test ~O_CREAT with fileid
+        {
+            let mut client = MockLocalClient::new();
+            client
+                .expect_get()
+                .times(1)
+                .returning(|endpoint, params: HashMap<_, _>| {
+                    assert_eq!(endpoint, "/file_open");
+                    assert_eq!(params.len(), 2);
+                    assert_eq!(params.get("flags"), Some(&"0".to_string()));
+                    assert_eq!(params.get("fileid"), Some(&"42".to_string()));
+                    Ok(FileOpen {
+                        fd: 42,
+                        fileid: FileID(42),
+                    })
+                });
+            let input = FileOpenPath::FileID(FileID(42));
+            let r = client.file_open(flags, input).await?;
+            assert_eq!(r.fd, 42);
+            assert_eq!(r.fileid, FileID(42));
+        }
+
+        // test ~O_CREAT with path
+        {
+            let flags = flags | Flags::O_EXCL;
+            let mut client = MockLocalClient::new();
+            client
+                .expect_get()
+                .times(1)
+                .returning(|endpoint, params: HashMap<_, _>| {
+                    assert_eq!(endpoint, "/file_open");
+                    assert_eq!(params.len(), 2);
+                    assert_eq!(params.get("flags"), Some(&"128".to_string()));
+                    assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                    Ok(FileOpen {
+                        fd: 42,
+                        fileid: FileID(42),
+                    })
+                });
+            let input = FileOpenPath::Path("the/path".to_string());
+            let r = client.file_open(flags, input).await?;
+            assert_eq!(r.fd, 42);
+            assert_eq!(r.fileid, FileID(42));
+        }
+
+        Ok(())
+    }
+}
