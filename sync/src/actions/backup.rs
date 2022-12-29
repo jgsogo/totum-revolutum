@@ -7,22 +7,22 @@ use tracing::{error, info};
 use crate::actions::OnConflict;
 use crate::diff;
 use crate::diff::FileDiff;
-use crate::diff::{FileMetadata, Filesystem};
+use crate::diff::Filesystem;
 use crate::local;
 use crate::local::FilesystemLocal;
 use crate::remote;
 use crate::remote::filesystem::FilesystemPCloud;
 use crate::storage::config;
 
-async fn backup<FS_LHS, FS_RHS>(
-    filediff: FileDiff<FS_LHS::Metadata, FS_RHS::Metadata>,
+async fn backup<FsLhs, FsRhs>(
+    filediff: FileDiff<FsLhs::Metadata, FsRhs::Metadata>,
     config: &config::Config,
-    _local_basepoint: &FS_LHS,
-    _remote_basepoint: &FS_RHS,
+    _local_basepoint: &FsLhs,
+    _remote_basepoint: &FsRhs,
 ) -> Result<()>
 where
-    FS_LHS: Filesystem,
-    FS_RHS: Filesystem,
+    FsLhs: Filesystem,
+    FsRhs: Filesystem,
 {
     match filediff {
         FileDiff {
@@ -49,15 +49,15 @@ where
     }
 }
 
-async fn work_on_results<FS_LHS, FS_RHS>(
-    rx: flume::Receiver<FileDiff<FS_LHS::Metadata, FS_RHS::Metadata>>,
+async fn work_on_results<FsLhs, FsRhs>(
+    rx: flume::Receiver<FileDiff<FsLhs::Metadata, FsRhs::Metadata>>,
     config: &config::Config,
-    local_basepoint: &FS_LHS,
-    remote_basepoint: &FS_RHS,
+    local_basepoint: &FsLhs,
+    remote_basepoint: &FsRhs,
 ) -> Result<()>
 where
-    FS_LHS: Filesystem,
-    FS_RHS: Filesystem,
+    FsLhs: Filesystem,
+    FsRhs: Filesystem,
 {
     info!("Start backup receiving loop");
     let start = Instant::now();

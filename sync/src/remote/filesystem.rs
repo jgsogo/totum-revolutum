@@ -8,10 +8,11 @@ use tracing::{info, trace};
 
 use pcloud_sdk::client::Client;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
+use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
-use pcloud_sdk::types::{FolderID, PCloudFile};
+use pcloud_sdk::types::FolderID;
 
 use crate::diff::{File, Filesystem};
 use crate::local::LocalFileMetadata;
@@ -116,11 +117,15 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(path) {
             Ok(v) => {
-                let f = RemoteFile::<HttpClient>::new(
-                    PCloudFile::Path(v.to_str().unwrap().to_string()),
-                    self.pcloud.clone(),
-                );
-                // TODO: Open file to create/write/...
+                let fd = self
+                    .pcloud
+                    .file_open(
+                        Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
+                        FileOpenPath::FolderAndName(self.folderid.clone(), v.to_string_lossy().parse()?),
+                    )
+                    .await?;
+
+                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
                 Ok(Box::new(f))
             }
             Err(e) => Err(e),
@@ -130,11 +135,15 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(path) {
             Ok(v) => {
-                let f = RemoteFile::<HttpClient>::new(
-                    PCloudFile::Path(v.to_str().unwrap().to_string()),
-                    self.pcloud.clone(),
-                );
-                // TODO: Open the file with pcloud.popen... and use a file descriptor here
+                let fd = self
+                    .pcloud
+                    .file_open(
+                        Flags::O_WRITE,
+                        FileOpenPath::FolderAndName(self.folderid.clone(), v.to_string_lossy().parse()?),
+                    )
+                    .await?;
+
+                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
                 Ok(Box::new(f))
             }
             Err(e) => Err(e),
@@ -234,7 +243,15 @@ mod tests {
         // Create and write
         {
             let mut f = fs.create(&filepath).await?;
-            // f.write_all(&content).await?;
+            f.write_all(&content).await?;
+        }
+
+        // Open and read
+        {
+            let mut file = fs.open(&filepath).await?;
+            let mut content_read = Vec::new();
+            file.read_to_end(&mut content_read).await?;
+            assert_eq!(content, content_read);
         }
 
         Ok(())
