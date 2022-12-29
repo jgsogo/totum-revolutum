@@ -41,7 +41,7 @@ use pcloud_sync::remote::filesystem::FilesystemPCloud;
 
 #[tokio::test]
 async fn test_create_write_read() -> Result<()> {
-    let server = PCloudServerMock::new();
+    let server = PCloudServerMock::default();
     let fs = {
         let server_token = server.token();
         let root_folder_mock = {

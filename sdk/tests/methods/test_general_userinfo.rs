@@ -7,7 +7,7 @@ use pcloud_sdk::mocks::server::PCloudServerMock;
 
 #[tokio::test]
 async fn test_userinfo_get() -> Result<()> {
-    let server = PCloudServerMock::new();
+    let server = PCloudServerMock::default();
     let userinfo_mock = server.userinfo_mock();
     let oauth2_token = server.token();
 

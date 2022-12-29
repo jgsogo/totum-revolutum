@@ -3,7 +3,7 @@ use std::fmt::{Debug, Display, Formatter};
 use serde::{Deserialize, Serialize};
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone)]
-pub struct FolderID(pub i64);
+pub struct FolderID(pub u64);
 
 impl Display for FolderID {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

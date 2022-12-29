@@ -26,5 +26,7 @@ mock! {
         async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
         where
             T: DeserializeOwned+ 'static;
+
+        async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>>;
     }
 }
