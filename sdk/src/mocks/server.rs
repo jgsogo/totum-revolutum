@@ -156,7 +156,7 @@ impl PCloudServerMock {
 
             then.status(200)
                 .header("content-type", "application/json; charset=UTF-8")
-                .body("{{\"result\": 0 }}");
+                .body("{\"result\": 0 }");
         });
 
         (m1, m2, m3, m4, m5)
