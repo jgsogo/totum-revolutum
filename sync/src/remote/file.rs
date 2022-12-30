@@ -4,6 +4,7 @@ use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::FileOpen;
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
+use std::sync::Arc;
 
 use crate::diff::File;
 
@@ -11,12 +12,12 @@ pub struct RemoteFile<HttpClient: GetFileRead + PostFileWrite + GetFileClose> {
     // TODO: This should be a reference &HttpClient, as every file can live as long as
     //  its filesystem will live... and the filesystem is one-to-one relationship with
     //  the httpclient used to connect to it.
-    pcloud: HttpClient,
+    pcloud: Arc<HttpClient>,
     file: FileOpen,
 }
 
 impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose> RemoteFile<HttpClient> {
-    pub fn new(file: FileOpen, pcloud: HttpClient) -> Self {
+    pub fn new(file: FileOpen, pcloud: Arc<HttpClient>) -> Self {
         Self { file, pcloud }
     }
 }

@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -24,7 +25,8 @@ pub type PCloudHttpClient = pcloud_sdk::client::HttpClient<OAuth2TokenImpl>;
 pub struct FilesystemPCloud<HttpClient: Client + Clone> {
     path: PathBuf,
     folderid: FolderID,
-    pcloud: HttpClient,
+    // TODO: This shouldn't be an `Arc<HttpClient>`. It should be just `HttpClient`
+    pcloud: Arc<HttpClient>,
 }
 
 impl<HttpClient: Client + Send + Sync + Clone> FilesystemPCloud<HttpClient> {
@@ -39,7 +41,7 @@ impl<HttpClient: Client + Send + Sync + Clone> FilesystemPCloud<HttpClient> {
                 .metadata
                 .folderid
                 .ok_or(anyhow!("Cannot get folderID for given path"))?,
-            pcloud,
+            pcloud: Arc::new(pcloud),
         })
     }
 
@@ -117,11 +119,12 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(path) {
             Ok(v) => {
+                let relative_path = v.strip_prefix(self.root())?;
                 let fd = self
                     .pcloud
                     .file_open(
                         Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
-                        FileOpenPath::FolderAndName(self.folderid.clone(), v.to_string_lossy().parse()?),
+                        FileOpenPath::FolderAndName(self.folderid.clone(), relative_path.to_string_lossy().parse()?),
                     )
                     .await?;
 
@@ -135,11 +138,12 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(path) {
             Ok(v) => {
+                let relative_path = v.strip_prefix(self.root())?;
                 let fd = self
                     .pcloud
                     .file_open(
-                        Flags::O_WRITE,
-                        FileOpenPath::FolderAndName(self.folderid.clone(), v.to_string_lossy().parse()?),
+                        Flags::empty(),
+                        FileOpenPath::Path(relative_path.to_string_lossy().parse()?),
                     )
                     .await?;
 
@@ -156,9 +160,14 @@ mod tests {
     use std::collections::HashMap;
 
     use pcloud_sdk::error::Error;
+    use pcloud_sdk::methods::fileops::file_open::FileOpen;
+    use pcloud_sdk::methods::fileops::file_write::FileWrite;
+    use pcloud_sdk::methods::fileops::{file_open, file_read, file_write};
     use pcloud_sdk::methods::folder::listfolder;
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
     use pcloud_sdk::mocks::client::MockLocalClient;
+    use pcloud_sdk::types::FileID;
+    use pcloud_sdk::utils;
 
     use super::*;
 
@@ -217,6 +226,8 @@ mod tests {
     #[tokio::test]
     async fn test_create_write_read() -> Result<()> {
         let mut client = MockLocalClient::new();
+
+        // Expectation for FilesystemPCloud::new
         client
             .expect_get::<ListFolder>()
             .times(1)
@@ -233,14 +244,57 @@ mod tests {
                     },
                 })
             });
-        client.expect_clone().times(1).returning(move || MockLocalClient::new());
 
+        // Expectation for create
+        client
+            .expect_get::<FileOpen>()
+            .times(2)
+            .returning(move |endpoint, _params: HashMap<_, _>| {
+                assert_eq!(endpoint, file_open::ENDPOINT);
+                // assert_eq!(params.len(), 3);
+                // let flags = (Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC).bits().to_string();
+                // assert_eq!(params.get("flags"), Some(&flags));
+                // assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
+                // assert_eq!(params.get("name"), Some(&"file".to_string()));
+                Ok(FileOpen {
+                    fd: 42,
+                    fileid: FileID(1234),
+                })
+            });
+
+        // Expectation for write_all
+        client
+            .expect_post()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>, posted_data: Vec<u8>| {
+                assert_eq!(endpoint, file_write::ENDPOINT);
+                assert_eq!(params.len(), 1);
+                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                let mut data = b"Hello, world!".to_vec();
+                let bdata = utils::http::file_write(&mut data, "filename")?;
+                assert_eq!(posted_data, bdata);
+                Ok(FileWrite { bytes: 321 })
+            });
+
+        // Expectation for read_to_end
+        client
+            .expect_get_bytes()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, file_read::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                assert_eq!(params.get("count"), Some(&"100".to_string()));
+                Ok(b"Hello, world!".to_vec())
+            });
+
+        // Create the filesystem
         let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
 
         let filepath = Path::new("file");
         let content: Vec<u8> = b"Hello, world!".to_vec();
 
-        // Create and write
+        // Create and write_all
         {
             let mut f = fs.create(&filepath).await?;
             f.write_all(&content).await?;
