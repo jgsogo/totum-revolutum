@@ -60,7 +60,7 @@ impl<HttpClient: Client + Send + Sync + Clone> FilesystemPCloud<HttpClient> {
     }
 
     fn work_on_contents(
-        tx: flume::Sender<RemoteMetadata>,
+        tx: Sender<RemoteMetadata>,
         base_path: &Path,
         contents: &[Metadata],
         depth: usize,
@@ -224,7 +224,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_create_write_read() -> Result<()> {
+    async fn test_create_write_all() -> Result<()> {
         let mut client = MockLocalClient::new();
 
         // Expectation for FilesystemPCloud::new
@@ -248,14 +248,14 @@ mod tests {
         // Expectation for create
         client
             .expect_get::<FileOpen>()
-            .times(2)
-            .returning(move |endpoint, _params: HashMap<_, _>| {
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
                 assert_eq!(endpoint, file_open::ENDPOINT);
-                // assert_eq!(params.len(), 3);
-                // let flags = (Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC).bits().to_string();
-                // assert_eq!(params.get("flags"), Some(&flags));
-                // assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
-                // assert_eq!(params.get("name"), Some(&"file".to_string()));
+                assert_eq!(params.len(), 3);
+                let flags = (Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC).bits().to_string();
+                assert_eq!(params.get("flags"), Some(&flags));
+                assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
+                assert_eq!(params.get("name"), Some(&"file".to_string()));
                 Ok(FileOpen {
                     fd: 42,
                     fileid: FileID(1234),
@@ -276,6 +276,58 @@ mod tests {
                 Ok(FileWrite { bytes: 321 })
             });
 
+        // Create the filesystem
+        let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
+
+        let filepath = Path::new("file");
+        let content: Vec<u8> = b"Hello, world!".to_vec();
+
+        // Create and write_all
+        {
+            let mut f = fs.create(&filepath).await?;
+            f.write_all(&content).await?;
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_open_read_all() -> Result<()> {
+        let mut client = MockLocalClient::new();
+
+        // Expectation for FilesystemPCloud::new
+        client
+            .expect_get::<ListFolder>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, listfolder::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+
+                Ok(ListFolder {
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        // Expectation for open
+        client
+            .expect_get::<FileOpen>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, file_open::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                let flags = (Flags::empty()).bits().to_string();
+                assert_eq!(params.get("flags"), Some(&flags));
+                assert_eq!(params.get("path"), Some(&"file".to_string()));
+                Ok(FileOpen {
+                    fd: 42,
+                    fileid: FileID(1234),
+                })
+            });
+
         // Expectation for read_to_end
         client
             .expect_get_bytes()
@@ -293,12 +345,6 @@ mod tests {
 
         let filepath = Path::new("file");
         let content: Vec<u8> = b"Hello, world!".to_vec();
-
-        // Create and write_all
-        {
-            let mut f = fs.create(&filepath).await?;
-            f.write_all(&content).await?;
-        }
 
         // Open and read
         {
