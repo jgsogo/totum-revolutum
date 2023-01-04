@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
 use anyhow::{anyhow, Result};
@@ -10,6 +10,7 @@ use tracing::{info, trace};
 use pcloud_sdk::client::Client;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
+use pcloud_sdk::methods::folder::createfolderifnotexists::{CreateFolderIfNotExistsInput, GetCreateFolderIfNotExists};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
@@ -131,7 +132,13 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
                 let filename = relative_path.file_name().unwrap().to_string_lossy().to_string();
                 let folderid = match relative_path.parent() {
                     None => self.folderid.clone(),
-                    Some(parent_dir) => get_folderid(&self.pcloud, parent_dir).await?,
+                    Some(parent_dir) => {
+                        if parent_dir != Path::new("") {
+                            get_folderid(&self.pcloud, parent_dir).await?
+                        } else {
+                            self.folderid.clone()
+                        }
+                    }
                 };
 
                 let fd = self
@@ -166,7 +173,23 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     }
 
     async fn create_dir_all(&self, path: &Path) -> Result<()> {
-        todo!()
+        match self.check_path(path) {
+            Ok(v) => {
+                let mut folderid = self.folderid.clone();
+                for cmp in v.components() {
+                    if let Component::Normal(p) = cmp {
+                        let input = CreateFolderIfNotExistsInput::FolderAndName(
+                            folderid.clone(),
+                            p.to_string_lossy().to_string(),
+                        );
+                        let r = self.pcloud.createfolderifnotexists(&input).await?;
+                        folderid = r.metadata.folderid.unwrap();
+                    }
+                }
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
     }
 }
 
@@ -178,8 +201,9 @@ mod tests {
     use pcloud_sdk::methods::fileops::file_open::FileOpen;
     use pcloud_sdk::methods::fileops::file_write::FileWrite;
     use pcloud_sdk::methods::fileops::{file_open, file_read, file_write};
-    use pcloud_sdk::methods::folder::listfolder;
+    use pcloud_sdk::methods::folder::createfolderifnotexists::CreateFolderIfNotExists;
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
+    use pcloud_sdk::methods::folder::{createfolderifnotexists, listfolder};
     use pcloud_sdk::mocks::client::MockLocalClient;
     use pcloud_sdk::types::FileID;
     use pcloud_sdk::utils;
@@ -418,10 +442,6 @@ mod tests {
         let filepath = Path::new("nested/nested2/myfile.txt");
         let r = fs.create(&filepath).await;
         assert!(r.is_ok());
-        //
-        // fs.create_dir_all(Path::new("nested/nested2")).await?;
-        // let r = fs.create(&filepath).await;
-        // assert!(r.is_ok());
         Ok(())
     }
 
@@ -429,6 +449,7 @@ mod tests {
     async fn test_create_dir_all() -> Result<()> {
         let mut client = MockLocalClient::new();
         let root_path = Path::new("the/root/path");
+
         // Expectation for FilesystemPCloud::new
         client
             .expect_get::<ListFolder>()
@@ -440,6 +461,25 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
 
                 Ok(ListFolder {
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        // Expectation for create_dir_all
+        client
+            .expect_get::<CreateFolderIfNotExists>()
+            .times(5) // One for each folder
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, createfolderifnotexists::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert!(params.contains_key("folderid"));
+                assert!(params.contains_key("name"));
+
+                Ok(CreateFolderIfNotExists {
+                    created: true,
                     metadata: Metadata {
                         folderid: Some(FolderID(1234)),
                         ..Default::default()

@@ -23,6 +23,9 @@ pub struct CreateFolderIfNotExists {
 
 #[async_trait]
 pub trait GetCreateFolderIfNotExists: client::Client {
+    /// Creates the given directory (if it doesn't exists) and returns its metadata. It can only
+    /// create one folder at a time, for nested ones you will need to call the function several
+    /// times.
     async fn createfolderifnotexists(&self, input: &CreateFolderIfNotExistsInput) -> Result<CreateFolderIfNotExists> {
         let mut params = HashMap::new();
         match input {

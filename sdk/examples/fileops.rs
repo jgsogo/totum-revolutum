@@ -4,6 +4,9 @@ use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
+use pcloud_sdk::methods::folder::createfolderifnotexists::{
+    CreateFolderIfNotExists, CreateFolderIfNotExistsInput, GetCreateFolderIfNotExists,
+};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::general::getapiserver::GetAPIServer;
@@ -23,14 +26,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let listfolder_input = ListFolderInput::new_from_path(Some("/".into()));
     let listfolder = pcloud.listfolder(&listfolder_input).await?;
     let folderid = listfolder.metadata.folderid.unwrap();
-    println!("{}", folderid);
+    println!("folderid: {}", folderid);
+
+    // Create folder
+    let fentry = CreateFolderIfNotExistsInput::Path("/nested".to_string());
+    let new_folder = pcloud.createfolderifnotexists(&fentry).await?;
+    let new_folderid = new_folder.metadata.folderid.unwrap();
+    println!("new_folderid: {}", new_folderid);
 
     // Open + write + close
     let fileid = {
         let fd = pcloud
             .file_open(
                 Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC | Flags::O_APPEND,
-                FileOpenPath::FolderAndName(folderid.clone(), "nested/name2.txt".to_string()),
+                FileOpenPath::FolderAndName(new_folderid.clone(), "name2.txt".to_string()),
             )
             .await?;
         println!("File is opened with descriptor {}", fd.fd);
