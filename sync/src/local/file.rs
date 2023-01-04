@@ -24,7 +24,7 @@ impl File for LocalFile {
         self.file.read_to_end(buf).await.map_err(|e| anyhow!(e))
     }
 
-    async fn write_all(&mut self, buf: &Vec<u8>) -> anyhow::Result<()> {
+    async fn write_all(&mut self, buf: &[u8]) -> anyhow::Result<()> {
         self.file.write_all(buf).await.map_err(|e| anyhow!(e))
     }
 }

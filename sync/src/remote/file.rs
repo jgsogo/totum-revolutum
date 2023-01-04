@@ -31,7 +31,7 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File 
         Ok(content.bytes.len())
     }
 
-    async fn write_all(&mut self, buf: &Vec<u8>) -> anyhow::Result<()> {
+    async fn write_all(&mut self, buf: &[u8]) -> anyhow::Result<()> {
         let _r = self.pcloud.file_write(self.file.fd, buf).await?;
         Ok(())
     }
