@@ -34,13 +34,14 @@ impl<HttpClient: Client + Send + Sync + Clone> FilesystemPCloud<HttpClient> {
         let listfolder_input = ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
         let filtermeta = vec!["folderid"];
         let r = pcloud.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
+        let folderid = r
+            .metadata
+            .folderid
+            .ok_or_else(|| anyhow!("Cannot get folderID for given path"))?;
 
         Ok(Self {
             path: path.to_path_buf(),
-            folderid: r
-                .metadata
-                .folderid
-                .ok_or_else(|| anyhow!("Cannot get folderID for given path"))?,
+            folderid,
             pcloud: Arc::new(pcloud),
         })
     }
