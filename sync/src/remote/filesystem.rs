@@ -29,20 +29,27 @@ pub struct FilesystemPCloud<HttpClient: Client + Clone> {
     pcloud: Arc<HttpClient>,
 }
 
+async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
+    pcloud: &Arc<HttpClient>,
+    path: &Path,
+) -> Result<FolderID> {
+    let listfolder_input = ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
+    let filtermeta = vec!["folderid"];
+    let r = pcloud.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
+    r.metadata
+        .folderid
+        .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
+}
+
 impl<HttpClient: Client + Send + Sync + Clone> FilesystemPCloud<HttpClient> {
     pub async fn new(path: &Path, pcloud: HttpClient) -> Result<Self> {
-        let listfolder_input = ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
-        let filtermeta = vec!["folderid"];
-        let r = pcloud.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
-        let folderid = r
-            .metadata
-            .folderid
-            .ok_or_else(|| anyhow!("Cannot get folderID for given path"))?;
+        let pcloud = Arc::new(pcloud);
+        let folderid = get_folderid(&pcloud, path).await?;
 
         Ok(Self {
             path: path.to_path_buf(),
             folderid,
-            pcloud: Arc::new(pcloud),
+            pcloud,
         })
     }
 
@@ -121,11 +128,17 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         match self.check_path(path) {
             Ok(v) => {
                 let relative_path = v.strip_prefix(self.root())?;
+                let filename = relative_path.file_name().unwrap().to_string_lossy().to_string();
+                let folderid = match relative_path.parent() {
+                    None => self.folderid.clone(),
+                    Some(parent_dir) => get_folderid(&self.pcloud, parent_dir).await?,
+                };
+
                 let fd = self
                     .pcloud
                     .file_open(
                         Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
-                        FileOpenPath::FolderAndName(self.folderid.clone(), relative_path.to_string_lossy().parse()?),
+                        FileOpenPath::FolderAndName(folderid, filename),
                     )
                     .await?;
 
@@ -150,6 +163,10 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
             }
             Err(e) => Err(e),
         }
+    }
+
+    async fn create_dir_all(&self, path: &Path) -> Result<()> {
+        todo!()
     }
 }
 
@@ -352,6 +369,87 @@ mod tests {
             assert_eq!(content, content_read);
         }
 
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_create_in_subfolder() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        let root_path = Path::new("the/root/path");
+
+        // Expectation for FilesystemPCloud::new
+        client
+            .expect_get::<ListFolder>()
+            .times(2) // One on filesystem::new, another to check folder for file being created
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, listfolder::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert!(params.contains_key("path"));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+
+                Ok(ListFolder {
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        // Expectation for create
+        client
+            .expect_get::<FileOpen>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, file_open::ENDPOINT);
+                assert_eq!(params.len(), 3);
+                let flags = (Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC).bits().to_string();
+                assert_eq!(params.get("flags"), Some(&flags));
+                assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
+                assert_eq!(params.get("name"), Some(&"myfile.txt".to_string()));
+                Ok(FileOpen {
+                    fd: 42,
+                    fileid: FileID(1234),
+                })
+            });
+
+        // Create the filesystem
+        let fs = FilesystemPCloud::new(root_path, client).await?;
+
+        let filepath = Path::new("nested/nested2/myfile.txt");
+        let r = fs.create(&filepath).await;
+        assert!(r.is_ok());
+        //
+        // fs.create_dir_all(Path::new("nested/nested2")).await?;
+        // let r = fs.create(&filepath).await;
+        // assert!(r.is_ok());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_create_dir_all() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        let root_path = Path::new("the/root/path");
+        // Expectation for FilesystemPCloud::new
+        client
+            .expect_get::<ListFolder>()
+            .times(1) // One on filesystem::new, another to check folder for file being created
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, listfolder::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("path"), Some(&"the/root/path".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+
+                Ok(ListFolder {
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        let fs = FilesystemPCloud::new(root_path, client).await?;
+
+        fs.create_dir_all(Path::new("nested/nested2")).await?;
         Ok(())
     }
 }

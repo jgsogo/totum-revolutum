@@ -47,4 +47,7 @@ where
     /// Tries to open the file requested by the argument `path` in read-only mode. Returns an object implementing
     /// a [`File`] or an error.
     async fn open(&self, path: &Path) -> Result<Box<dyn File>>;
+
+    /// Creates the given directory and any intermediate one
+    async fn create_dir_all(&self, path: &Path) -> Result<()>;
 }

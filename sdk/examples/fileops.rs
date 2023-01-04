@@ -30,7 +30,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let fd = pcloud
             .file_open(
                 Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC | Flags::O_APPEND,
-                FileOpenPath::FolderAndName(folderid.clone(), "name2.txt".to_string()),
+                FileOpenPath::FolderAndName(folderid.clone(), "nested/name2.txt".to_string()),
             )
             .await?;
         println!("File is opened with descriptor {}", fd.fd);

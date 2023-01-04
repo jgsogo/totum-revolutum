@@ -71,6 +71,13 @@ impl Filesystem for FilesystemLocal {
             Err(e) => Err(e),
         }
     }
+
+    async fn create_dir_all(&self, path: &Path) -> Result<()> {
+        match self.check_path(path) {
+            Ok(v) => fs::create_dir_all(v).map_err(|e| anyhow!("Error creating the directory: {e}")),
+            Err(e) => Err(e),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -116,6 +123,21 @@ mod tests {
             assert_eq!(content, content_read);
         }
 
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_create_in_subfolder() -> Result<()> {
+        let tmp_dir = tempdir().unwrap();
+        let fs = FilesystemLocal::new(tmp_dir.path())?;
+
+        let filepath = tmp_dir.path().join("nested/nested2/myfile.txt");
+        let r = fs.create(&filepath).await;
+        assert!(r.is_err());
+
+        fs.create_dir_all(Path::new("nested/nested2")).await?;
+        let r = fs.create(&filepath).await;
+        assert!(r.is_ok());
         Ok(())
     }
 }
