@@ -55,7 +55,7 @@ impl Filesystem for FilesystemLocal {
         // Parent directory should exist
         let parent = path
             .parent()
-            .ok_or(anyhow!("Cannot get parent directory for file '{}'", path.display()))?;
+            .ok_or_else(|| anyhow!("Cannot get parent directory for file '{}'", path.display()))?;
         self.check_path(&fs::canonicalize(parent)?)?;
 
         let f = AsyncFile::create(path).await?;

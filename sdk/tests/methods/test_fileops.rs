@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::Result;
 
 use pcloud_sdk::client::HttpClient;
@@ -19,11 +21,12 @@ async fn test_fileops() -> Result<()> {
 
     // Add mock so we can create a file
     let folderid = FolderID(42);
+    let root_path = Path::new("the/root/path");
     let name = String::from("myfile.txt");
     let write_bytes = 100;
     let content = "the content".as_bytes().to_vec();
-    let (create, open, write, read, close) =
-        server.fileops_create_with_folder_and_name(folderid.clone(), &name, write_bytes, content.clone());
+    let (create, open, open_with_path, write, read, close) =
+        server.fileops_create_with_folder_and_name(folderid.clone(), &name, root_path, write_bytes, content.clone());
 
     // Open + write + close
     let fileid = {
@@ -42,6 +45,7 @@ async fn test_fileops() -> Result<()> {
         pcloud.file_close(fd.fd).await?;
         close.assert();
 
+        open_with_path.assert_hits(0);
         fd.fileid
     };
 

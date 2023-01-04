@@ -27,7 +27,7 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File 
     async fn read_to_end(&mut self, buf: &mut Vec<u8>) -> anyhow::Result<usize> {
         // TODO: Read chunks until exhausted
         let content = self.pcloud.file_read(self.file.fd, 100).await?;
-        buf.write_all(&*content.bytes).await?;
+        buf.write_all(&content.bytes).await?;
         Ok(content.bytes.len())
     }
 

@@ -40,7 +40,7 @@ impl<HttpClient: Client + Send + Sync + Clone> FilesystemPCloud<HttpClient> {
             folderid: r
                 .metadata
                 .folderid
-                .ok_or(anyhow!("Cannot get folderID for given path"))?,
+                .ok_or_else(|| anyhow!("Cannot get folderID for given path"))?,
             pcloud: Arc::new(pcloud),
         })
     }
@@ -138,13 +138,10 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
         match self.check_path(path) {
             Ok(v) => {
-                let relative_path = v.strip_prefix(self.root())?;
+                //let relative_path = v.strip_prefix(self.root())?;
                 let fd = self
                     .pcloud
-                    .file_open(
-                        Flags::empty(),
-                        FileOpenPath::Path(relative_path.to_string_lossy().parse()?),
-                    )
+                    .file_open(Flags::empty(), FileOpenPath::Path(v.to_string_lossy().parse()?))
                     .await?;
 
                 let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
@@ -321,7 +318,7 @@ mod tests {
                 assert_eq!(params.len(), 2);
                 let flags = (Flags::empty()).bits().to_string();
                 assert_eq!(params.get("flags"), Some(&flags));
-                assert_eq!(params.get("path"), Some(&"file".to_string()));
+                assert_eq!(params.get("path"), Some(&"the/path/file".to_string()));
                 Ok(FileOpen {
                     fd: 42,
                     fileid: FileID(1234),

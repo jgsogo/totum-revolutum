@@ -80,7 +80,7 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
 
     let pcloud = config.auth.get_pcloud_client(home)?;
     let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();
-    let remote_basepoint = FilesystemPCloud::new(&Path::new(&base_path), pcloud.clone()).await?;
+    let remote_basepoint = FilesystemPCloud::new(Path::new(&base_path), pcloud.clone()).await?;
 
     if let Err(e) = tokio::try_join!(
         local_basepoint.walk_directory(lhs, 6),

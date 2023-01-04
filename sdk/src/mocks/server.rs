@@ -90,9 +90,10 @@ impl PCloudServerMock {
         &mut self,
         folder: FolderID,
         name: &str,
+        folder_path: &Path,
         write_bytes: u64,
         read_content: Vec<u8>,
-    ) -> (Mock, Mock, Mock, Mock, Mock) {
+    ) -> (Mock, Mock, Mock, Mock, Mock, Mock) {
         self.fd_count += 1;
         let fd = self.fd_count;
         let fileid = folder.0 + fd;
@@ -124,8 +125,22 @@ impl PCloudServerMock {
                 .body(format!("{{\"result\": 0, \"fd\": {fd}, \"fileid\": {fileid} }}"));
         });
 
-        // Enable file_write
+        // Enable file_open with path
         let m3 = self.server.mock(|when, then| {
+            let full_path = folder_path.join(name);
+            when.method(GET)
+                .path(file_open::ENDPOINT)
+                .query_param("access_token", "token")
+                .query_param("path", full_path.to_string_lossy())
+                .query_param_exists("flags");
+
+            then.status(200)
+                .header("content-type", "application/json; charset=UTF-8")
+                .body(format!("{{\"result\": 0, \"fd\": {fd}, \"fileid\": {fileid} }}"));
+        });
+
+        // Enable file_write
+        let m4 = self.server.mock(|when, then| {
             when.method(POST)
                 .path(file_write::ENDPOINT)
                 .query_param("access_token", "token")
@@ -137,7 +152,7 @@ impl PCloudServerMock {
         });
 
         // Enable file_read
-        let m4 = self.server.mock(|when, then| {
+        let m5 = self.server.mock(|when, then| {
             when.method(GET)
                 .path(file_read::ENDPOINT)
                 .query_param("access_token", "token")
@@ -150,7 +165,7 @@ impl PCloudServerMock {
         });
 
         // Enable file_close
-        let m5 = self.server.mock(|when, then| {
+        let m6 = self.server.mock(|when, then| {
             when.method(GET)
                 .path(file_close::ENDPOINT)
                 .query_param("access_token", "token")
@@ -161,6 +176,6 @@ impl PCloudServerMock {
                 .body("{\"result\": 0 }");
         });
 
-        (m1, m2, m3, m4, m5)
+        (m1, m2, m3, m4, m5, m6)
     }
 }
