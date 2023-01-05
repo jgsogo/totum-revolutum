@@ -1707,6 +1707,7 @@ dependencies = [
  "httpmock",
  "hyper",
  "indicatif",
+ "itertools",
  "mockall",
  "pcloud-sdk",
  "reqwest",

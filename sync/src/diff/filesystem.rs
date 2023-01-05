@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 
-use crate::utils::normalize_path;
+use pcloud_sdk::utils::normalize_path;
 
 use super::file_metadata::FileMetadata;
 use super::File;

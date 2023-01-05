@@ -1,23 +1,65 @@
 use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
+use std::path::{Component, Path};
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use futures_util::StreamExt;
 use tracing::debug;
 
+use crate::methods::folder::createfolderifnotexists::GetCreateFolderIfNotExists;
+use crate::methods::folder::{createfolderifnotexists, listfolder, ListFolderInput};
 use crate::methods::streaming::getfilelink;
+use crate::types::FolderID;
+use crate::utils::normalize_path;
 
 use super::progress_bar;
 
-/// Provides some handy methods for [`client::Client`]
 #[async_trait]
-pub trait HandyClient: getfilelink::GetFileLink {
+pub trait GetFolderID: listfolder::GetListFolder {
+    async fn get_folderid(&self, path: &Path) -> Result<FolderID> {
+        let listfolder_input = ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
+        let filtermeta = vec!["folderid"];
+        let r = self.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
+        r.metadata
+            .folderid
+            .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
+    }
+}
+
+#[async_trait]
+pub trait GetCreateFolderIfNotExistsAll: GetFolderID + GetCreateFolderIfNotExists {
+    async fn createfolderifnotexists_all(&self, path: &Path) -> Result<FolderID> {
+        let path = normalize_path(path);
+        debug!("Create all folders (if not exist): '{}'", path.display());
+        assert!(path.is_absolute());
+
+        let mut folderid = self.get_folderid(Path::new("/")).await?;
+        for cmp in path.components() {
+            match cmp {
+                Component::RootDir => continue,
+                Component::Normal(p) => {
+                    let input = createfolderifnotexists::CreateFolderIfNotExistsInput::FolderAndName(
+                        folderid.clone(),
+                        p.to_string_lossy().to_string(),
+                    );
+                    let r = self.createfolderifnotexists(&input).await?;
+                    folderid = r.metadata.folderid.unwrap();
+                }
+                _ => bail!("Component in path not expected"),
+            }
+        }
+        Ok(folderid)
+    }
+}
+
+#[async_trait]
+pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
     async fn getfilelink_and_download(
         &self,
         file_link: &getfilelink::GetFileLinkInput,
-        path: &std::path::Path,
+        path: &Path,
         pb_builder: &dyn progress_bar::ProgressBarBuilder,
     ) -> Result<()> {
         let r = self.getfilelink(file_link).await?;
@@ -59,4 +101,6 @@ pub trait HandyClient: getfilelink::GetFileLink {
     }
 }
 
-impl<T: getfilelink::GetFileLink> HandyClient for T {}
+impl<T: listfolder::GetListFolder> GetFolderID for T {}
+impl<T: GetFolderID + GetCreateFolderIfNotExists> GetCreateFolderIfNotExistsAll for T {}
+impl<T: getfilelink::GetFileLink> GetFileLinkAndDownload for T {}

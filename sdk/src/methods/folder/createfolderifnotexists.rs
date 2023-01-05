@@ -17,7 +17,7 @@ pub enum CreateFolderIfNotExistsInput {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderIfNotExists {
-    pub created: bool,
+    pub created: Option<bool>,
     pub metadata: Metadata,
 }
 
@@ -60,13 +60,13 @@ mod tests {
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("path"), Some(&"the/path/to/folder".to_string()));
                 Ok(CreateFolderIfNotExists {
-                    created: true,
+                    created: Some(true),
                     metadata: Default::default(),
                 })
             });
         let input = CreateFolderIfNotExistsInput::Path("the/path/to/folder".to_string());
         let r = client.createfolderifnotexists(&input).await?;
-        assert_eq!(r.created, true);
+        assert_eq!(r.created.unwrap(), true);
         Ok(())
     }
 
@@ -82,13 +82,13 @@ mod tests {
                 assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
                 assert_eq!(params.get("name"), Some(&"name.txt".to_string()));
                 Ok(CreateFolderIfNotExists {
-                    created: true,
+                    created: Some(true),
                     metadata: Default::default(),
                 })
             });
         let input = CreateFolderIfNotExistsInput::FolderAndName(FolderID(1234), "name.txt".to_string());
         let r = client.createfolderifnotexists(&input).await?;
-        assert_eq!(r.created, true);
+        assert_eq!(r.created.unwrap(), true);
         Ok(())
     }
 }

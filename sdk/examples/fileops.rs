@@ -1,18 +1,15 @@
+use std::path::Path;
+
 use pcloud_sdk::data;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
+use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
-use pcloud_sdk::methods::folder::createfolderifnotexists::{
-    CreateFolderIfNotExists, CreateFolderIfNotExistsInput, GetCreateFolderIfNotExists,
-};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
-use pcloud_sdk::methods::general::getapiserver::GetAPIServer;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
-use pcloud_sdk::types::FolderID;
-use serde::de::Unexpected::Str;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -29,9 +26,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     println!("folderid: {}", folderid);
 
     // Create folder
-    let fentry = CreateFolderIfNotExistsInput::Path("/nested".to_string());
-    let new_folder = pcloud.createfolderifnotexists(&fentry).await?;
-    let new_folderid = new_folder.metadata.folderid.unwrap();
+    let new_folderid = pcloud
+        .createfolderifnotexists_all(Path::new("/example/l1/l2/l3"))
+        .await?;
     println!("new_folderid: {}", new_folderid);
 
     // Open + write + close

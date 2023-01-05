@@ -479,7 +479,7 @@ mod tests {
                 assert!(params.contains_key("name"));
 
                 Ok(CreateFolderIfNotExists {
-                    created: true,
+                    created: Some(true),
                     metadata: Metadata {
                         folderid: Some(FolderID(1234)),
                         ..Default::default()
