@@ -8,8 +8,7 @@ use async_trait::async_trait;
 use futures_util::StreamExt;
 use tracing::debug;
 
-use crate::methods::folder::createfolderifnotexists::GetCreateFolderIfNotExists;
-use crate::methods::folder::{createfolderifnotexists, listfolder, ListFolderInput};
+use crate::methods::folder::{createfolderifnotexists, listfolder};
 use crate::methods::streaming::getfilelink;
 use crate::types::FolderID;
 use crate::utils::normalize_path;
@@ -19,7 +18,7 @@ use super::progress_bar;
 #[async_trait]
 pub trait GetFolderID: listfolder::GetListFolder {
     async fn get_folderid(&self, path: &Path) -> Result<FolderID> {
-        let listfolder_input = ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
+        let listfolder_input = listfolder::ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
         let filtermeta = vec!["folderid"];
         let r = self.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
         r.metadata
@@ -29,7 +28,7 @@ pub trait GetFolderID: listfolder::GetListFolder {
 }
 
 #[async_trait]
-pub trait GetCreateFolderIfNotExistsAll: GetFolderID + GetCreateFolderIfNotExists {
+pub trait GetCreateFolderIfNotExistsAll: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists {
     async fn createfolderifnotexists_all(&self, path: &Path) -> Result<FolderID> {
         let path = normalize_path(path);
         debug!("Create all folders (if not exist): '{}'", path.display());
@@ -102,5 +101,5 @@ pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
 }
 
 impl<T: listfolder::GetListFolder> GetFolderID for T {}
-impl<T: GetFolderID + GetCreateFolderIfNotExists> GetCreateFolderIfNotExistsAll for T {}
+impl<T: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists> GetCreateFolderIfNotExistsAll for T {}
 impl<T: getfilelink::GetFileLink> GetFileLinkAndDownload for T {}

@@ -76,7 +76,8 @@ pub trait GetListFolder: client::Client {
 
         if !filtermeta.is_empty() {
             // We insert `id` always to prevent a pcloud API bug. If we only use one element,
-            // for example `filtermeta=folderid`, the response JSON is not well formed, it returns
+            // for example `filtermeta=folderid`, the response JSON is not well formed when there
+            // are files and folders inside the query directory, it returns
             // some empty lists where empty dictionaries were expected
             let mut filtermeta = filtermeta;
             filtermeta.push("id");
