@@ -15,12 +15,12 @@ use serde::{Deserialize, Serialize};
 const BOUNDARY: &str = "ea3bbcf87c101592";
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ApiResult<T> {
-    result: u16,
-    error: Option<String>,
+pub(crate) struct ApiResult<T> {
+    pub result: u16,
+    pub error: Option<String>,
 
     #[serde(flatten)]
-    data: Option<T>,
+    pub data: Option<T>,
 }
 
 fn create_response<T>(result: String) -> Result<T>
@@ -114,7 +114,7 @@ pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>
     Ok(data)
 }
 
-pub(crate) fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
+pub fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
     let mut data = Vec::new();
     write!(data, "--{}\r\n", BOUNDARY)?;
     write!(

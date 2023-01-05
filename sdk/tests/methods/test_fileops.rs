@@ -1,6 +1,4 @@
 use anyhow::Result;
-use serde::de::Unexpected::Str;
-use time::macros::datetime;
 
 use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
