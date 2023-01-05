@@ -114,7 +114,7 @@ pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>
     Ok(data)
 }
 
-pub fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
+pub(crate) fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
     let mut data = Vec::new();
     write!(data, "--{}\r\n", BOUNDARY)?;
     write!(
