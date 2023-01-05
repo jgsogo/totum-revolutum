@@ -220,7 +220,7 @@ mod tests {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"the/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
                     metadata: Metadata {
@@ -245,7 +245,7 @@ mod tests {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"the/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Err(anyhow!(Error::ApiError {
                     code: 9999,
@@ -274,7 +274,7 @@ mod tests {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"the/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
                     metadata: Metadata {
@@ -341,7 +341,7 @@ mod tests {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"the/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
                     metadata: Metadata {
@@ -409,7 +409,7 @@ mod tests {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert!(params.contains_key("path"));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
                     metadata: Metadata {
@@ -458,7 +458,7 @@ mod tests {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"the/root/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid".to_string()));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
                     metadata: Metadata {
