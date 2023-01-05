@@ -15,12 +15,12 @@ use serde::{Deserialize, Serialize};
 const BOUNDARY: &str = "ea3bbcf87c101592";
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ApiResult<T> {
-    result: u16,
-    error: Option<String>,
+pub(crate) struct ApiResult<T> {
+    pub result: u16,
+    pub error: Option<String>,
 
     #[serde(flatten)]
-    data: Option<T>,
+    pub data: Option<T>,
 }
 
 fn create_response<T>(result: String) -> Result<T>
