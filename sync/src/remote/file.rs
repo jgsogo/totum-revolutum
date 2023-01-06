@@ -11,7 +11,7 @@ use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
 
 use crate::diff::File;
 
-pub(crate) const CHUNK_SIZE: usize = 32;
+pub(crate) const CHUNK_SIZE: usize = 512; // Just a guess of _optimal package size over a network_
 
 pub struct RemoteFile<HttpClient: GetFileRead + PostFileWrite + GetFileClose> {
     // TODO: This should be a reference &HttpClient, as every file can live as long as
