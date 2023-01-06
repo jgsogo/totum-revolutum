@@ -1,5 +1,5 @@
 pub use file_metadata::{RemoteMetadata, RemoteMetadataEntry};
 
-mod file;
+pub mod file;
 mod file_metadata;
 pub mod filesystem;

@@ -25,8 +25,15 @@ async fn test_fileops() -> Result<()> {
     let name = String::from("myfile.txt");
     let write_bytes = 100;
     let content = "the content".as_bytes().to_vec();
-    let (create, open, open_with_path, write, read, close) =
-        server.fileops_create_with_folder_and_name(folderid.clone(), &name, root_path, write_bytes, content.clone());
+    let chunk_size = 100;
+    let (create, open, open_with_path, write, read, read_eof, close) = server.fileops_create_with_folder_and_name(
+        folderid.clone(),
+        &name,
+        root_path,
+        write_bytes,
+        content.clone(),
+        chunk_size.clone(),
+    );
 
     // Open + write + close
     let fileid = {
@@ -54,9 +61,14 @@ async fn test_fileops() -> Result<()> {
         let fd = pcloud.file_open(Flags::empty(), FileOpenPath::FileID(fileid)).await?;
         open.assert();
 
-        let r = pcloud.file_read(fd.fd, 100).await?;
+        let r = pcloud.file_read(fd.fd, chunk_size as u64).await?;
         assert_eq!(String::from_utf8_lossy(&*r.bytes), String::from_utf8_lossy(&*content));
         read.assert();
+
+        let remain_count = chunk_size - content.len();
+        let r = pcloud.file_read(fd.fd, remain_count as u64).await?;
+        assert_eq!(String::from_utf8_lossy(&*r.bytes), "");
+        read_eof.assert();
 
         pcloud.file_close(fd.fd).await?;
         close.assert_hits(2);
