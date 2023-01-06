@@ -167,6 +167,8 @@ mod tests {
     use pcloud_sdk::types::FileID;
     use pcloud_sdk::utils;
 
+    use crate::remote::file::CHUNK_SIZE;
+
     use super::*;
 
     #[tokio::test]
@@ -326,30 +328,52 @@ mod tests {
                 })
             });
 
-        // Expectation for read_to_end
+        let file_content = b"Hello, world!";
+        // Expectation for read_to_end (first call)
         client
             .expect_get_bytes()
             .times(1)
+            .withf(|endpoint: &str, params: &HashMap<_, _>| {
+                endpoint == file_read::ENDPOINT && params.contains_key("count") && {
+                    let count: usize = params.get("count").unwrap().parse().unwrap();
+                    count == CHUNK_SIZE
+                }
+            })
             .returning(move |endpoint, params: HashMap<_, _>| {
                 assert_eq!(endpoint, file_read::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
-                assert_eq!(params.get("count"), Some(&"100".to_string()));
-                Ok(b"Hello, world!".to_vec())
+                Ok(file_content.to_vec())
+            });
+
+        // Expectation for read_to_end (last call, remaining buffer, returns 0)
+        client
+            .expect_get_bytes()
+            .times(1)
+            .withf(|endpoint: &str, params: &HashMap<_, _>| {
+                endpoint == file_read::ENDPOINT && params.contains_key("count") && {
+                    let count: usize = params.get("count").unwrap().parse().unwrap();
+                    count == CHUNK_SIZE - file_content.len()
+                }
+            })
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, file_read::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                Ok(b"".to_vec())
             });
 
         // Create the filesystem
         let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
 
         let filepath = Path::new("file");
-        let content: Vec<u8> = b"Hello, world!".to_vec();
 
         // Open and read
         {
             let mut file = fs.open(&filepath).await?;
             let mut content_read = Vec::new();
             file.read_to_end(&mut content_read).await?;
-            assert_eq!(content, content_read);
+            assert_eq!(file_content.to_vec(), content_read);
         }
 
         Ok(())
