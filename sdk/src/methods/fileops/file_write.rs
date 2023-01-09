@@ -16,11 +16,11 @@ pub struct FileWrite {
 
 #[async_trait]
 pub trait PostFileWrite: client::Client {
-    async fn file_write(&self, descriptor: FileDescriptor, data: &mut Vec<u8>) -> Result<FileWrite> {
+    async fn file_write(&self, descriptor: FileDescriptor, data: &[u8]) -> Result<FileWrite> {
         let mut params = HashMap::new();
         params.insert("fd".to_string(), descriptor.to_string());
 
-        let data = utils::http::file_write(data, "filename")?;
+        let data = utils::http::file_write(&mut data.to_owned(), "filename")?;
         let ret = self.post::<FileWrite>(ENDPOINT, params, data).await?;
         Ok(ret)
     }

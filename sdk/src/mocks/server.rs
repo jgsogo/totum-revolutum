@@ -1,5 +1,5 @@
+use std::collections::HashMap;
 use std::env;
-
 use std::path::Path;
 
 use httpmock::prelude::*;
@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::data::oauth2token::OAuth2Token;
 use crate::methods::fileops::{file_close, file_open, file_read, file_write};
-
+use crate::methods::folder::listfolder;
 use crate::types::FolderID;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
@@ -55,19 +55,19 @@ impl PCloudServerMock {
         OAuth2TokenMock::new(&format!("{}:{}", self.server.host(), self.server.port()), "token")
     }
 
-    // pub fn listfolder_mock(&self, params: HashMap<&str, &str>, body: impl AsRef<[u8]>) -> Mock {
-    //     self.server.mock(|when, then| {
-    //         let mut wh = when.method(GET).path(listfolder::ENDPOINT);
-    //
-    //         for (k, v) in params {
-    //             wh = wh.query_param(k, v);
-    //         }
-    //
-    //         then.status(200)
-    //             .header("content-type", "application/json; charset=UTF-8")
-    //             .body(body);
-    //     })
-    // }
+    pub fn listfolder_mock(&self, params: HashMap<&str, &str>, body: impl AsRef<[u8]>) -> Mock {
+        self.server.mock(|when, then| {
+            let mut wh = when.method(GET).path(listfolder::ENDPOINT);
+
+            for (k, v) in params {
+                wh = wh.query_param(k, v);
+            }
+
+            then.status(200)
+                .header("content-type", "application/json; charset=UTF-8")
+                .body(body);
+        })
+    }
 
     pub fn userinfo_mock(&self) -> Mock {
         self.server.mock(|when, then| {
@@ -88,12 +88,20 @@ impl PCloudServerMock {
         &mut self,
         folder: FolderID,
         name: &str,
+        folder_path: &Path,
         write_bytes: u64,
         read_content: Vec<u8>,
-    ) -> (Mock, Mock, Mock, Mock, Mock) {
+        chunk_size: usize,
+    ) -> (Mock, Mock, Mock, Mock, Mock, Mock, Mock) {
         self.fd_count += 1;
         let fd = self.fd_count;
         let fileid = folder.0 + fd;
+
+        let read_content_len = read_content.len();
+        assert!(
+            read_content_len < chunk_size,
+            "This is a limitation of the test implementation, content should fit into a chunk"
+        );
 
         // Enable file_open with folderid+path
         let m1 = self.server.mock(|when, then| {
@@ -122,8 +130,22 @@ impl PCloudServerMock {
                 .body(format!("{{\"result\": 0, \"fd\": {fd}, \"fileid\": {fileid} }}"));
         });
 
-        // Enable file_write
+        // Enable file_open with path
         let m3 = self.server.mock(|when, then| {
+            let full_path = folder_path.join(name);
+            when.method(GET)
+                .path(file_open::ENDPOINT)
+                .query_param("access_token", "token")
+                .query_param("path", full_path.to_string_lossy())
+                .query_param_exists("flags");
+
+            then.status(200)
+                .header("content-type", "application/json; charset=UTF-8")
+                .body(format!("{{\"result\": 0, \"fd\": {fd}, \"fileid\": {fileid} }}"));
+        });
+
+        // Enable file_write
+        let m4 = self.server.mock(|when, then| {
             when.method(POST)
                 .path(file_write::ENDPOINT)
                 .query_param("access_token", "token")
@@ -134,21 +156,35 @@ impl PCloudServerMock {
                 .body(format!("{{\"result\": 0, \"bytes\": {write_bytes} }}"));
         });
 
-        // Enable file_read
-        let m4 = self.server.mock(|when, then| {
+        // Enable file_read (first call reads everything)
+        let m5 = self.server.mock(|when, then| {
             when.method(GET)
                 .path(file_read::ENDPOINT)
                 .query_param("access_token", "token")
                 .query_param("fd", fd.to_string())
-                .query_param_exists("count");
+                .query_param("count", chunk_size.to_string());
 
             then.status(200)
                 .header("content-type", "application/json; charset=UTF-8")
                 .body(read_content);
         });
 
+        // Enable file_read (last call returns 0)
+        let count_expected = chunk_size - read_content_len;
+        let m6 = self.server.mock(|when, then| {
+            when.method(GET)
+                .path(file_read::ENDPOINT)
+                .query_param("access_token", "token")
+                .query_param("fd", fd.to_string())
+                .query_param("count", count_expected.to_string());
+
+            then.status(200)
+                .header("content-type", "application/json; charset=UTF-8")
+                .body("");
+        });
+
         // Enable file_close
-        let m5 = self.server.mock(|when, then| {
+        let m7 = self.server.mock(|when, then| {
             when.method(GET)
                 .path(file_close::ENDPOINT)
                 .query_param("access_token", "token")
@@ -159,6 +195,6 @@ impl PCloudServerMock {
                 .body("{\"result\": 0 }");
         });
 
-        (m1, m2, m3, m4, m5)
+        (m1, m2, m3, m4, m5, m6, m7)
     }
 }

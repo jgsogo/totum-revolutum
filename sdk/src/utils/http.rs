@@ -4,13 +4,14 @@ use std::io;
 use std::io::Read;
 use std::io::Write;
 
-use crate::error::Error;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use hyper;
 use hyper::header::{CONNECTION, CONTENT_TYPE};
 use reqwest;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+
+use crate::error::Error;
 
 const BOUNDARY: &str = "ea3bbcf87c101592";
 
@@ -92,7 +93,25 @@ where
 }
 
 pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMap<String, String>) -> Result<Vec<u8>> {
-    let r = client.get(url).query(&params).send().await?.bytes().await?;
+    let r = client
+        .get(url)
+        .header(CONNECTION, "Keep-Alive")
+        .query(&params)
+        .send()
+        .await?
+        .bytes()
+        .await?;
+
+    // If there is an error, it returns a JSON with the result and error fields
+    let as_str = String::from_utf8_lossy(&r);
+    if let Ok(r) = serde_json::from_str::<ApiResult<()>>(&as_str) {
+        bail!(Error::ApiError {
+            code: r.result,
+            message: r.error.unwrap_or_else(|| "Error message not available".into())
+        })
+    }
+
+    // If not, just the bytes
     Ok(r.to_vec())
 }
 
@@ -114,7 +133,8 @@ pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>
     Ok(data)
 }
 
-pub(crate) fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
+/// Creates the payload for a POST request (`form-data`) to send the contents of a file
+pub fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
     let mut data = Vec::new();
     write!(data, "--{}\r\n", BOUNDARY)?;
     write!(

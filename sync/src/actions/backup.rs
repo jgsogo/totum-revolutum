@@ -7,22 +7,22 @@ use tracing::{error, info};
 use crate::actions::OnConflict;
 use crate::diff;
 use crate::diff::FileDiff;
-use crate::diff::{FileMetadata, Filesystem};
+use crate::diff::Filesystem;
 use crate::local;
 use crate::local::FilesystemLocal;
 use crate::remote;
 use crate::remote::filesystem::FilesystemPCloud;
 use crate::storage::config;
 
-async fn backup<LHS, RHS>(
-    filediff: FileDiff<LHS, RHS>,
+async fn backup<FsLhs, FsRhs>(
+    filediff: FileDiff<FsLhs::Metadata, FsRhs::Metadata>,
     config: &config::Config,
-    _local_basepoint: &dyn Filesystem<Metadata = LHS>,
-    _remote_basepoint: &dyn Filesystem<Metadata = RHS>,
+    _local_basepoint: &FsLhs,
+    _remote_basepoint: &FsRhs,
 ) -> Result<()>
 where
-    LHS: FileMetadata,
-    RHS: FileMetadata,
+    FsLhs: Filesystem,
+    FsRhs: Filesystem,
 {
     match filediff {
         FileDiff {
@@ -49,15 +49,15 @@ where
     }
 }
 
-async fn work_on_results<LHS, RHS>(
-    rx: flume::Receiver<FileDiff<LHS, RHS>>,
+async fn work_on_results<FsLhs, FsRhs>(
+    rx: flume::Receiver<FileDiff<FsLhs::Metadata, FsRhs::Metadata>>,
     config: &config::Config,
-    local_basepoint: &dyn Filesystem<Metadata = LHS>,
-    remote_basepoint: &dyn Filesystem<Metadata = RHS>,
+    local_basepoint: &FsLhs,
+    remote_basepoint: &FsRhs,
 ) -> Result<()>
 where
-    LHS: FileMetadata,
-    RHS: FileMetadata,
+    FsLhs: Filesystem,
+    FsRhs: Filesystem,
 {
     info!("Start backup receiving loop");
     let start = Instant::now();
@@ -76,11 +76,11 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
     let (lhs, rhs, differ) = diff::two_ways_run::<local::LocalMetadata, remote::RemoteMetadata>().await;
 
-    let local_basepoint = FilesystemLocal::new(path);
+    let local_basepoint = FilesystemLocal::new(path)?;
 
     let pcloud = config.auth.get_pcloud_client(home)?;
     let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();
-    let remote_basepoint = FilesystemPCloud::new(&base_path, pcloud.clone());
+    let remote_basepoint = FilesystemPCloud::new(Path::new(&base_path), pcloud.clone()).await?;
 
     if let Err(e) = tokio::try_join!(
         local_basepoint.walk_directory(lhs, 6),
