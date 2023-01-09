@@ -15,7 +15,7 @@ pub trait File {
     /// Reads some bytes from the byte stream.
     ///
     /// Returns the number of bytes read from the start of the buffer.
-
+    ///
     /// If the return value is `Ok(n)`, then it must be guaranteed that
     /// `0 <= n <= buf.len()`. A nonzero `n` value indicates that the buffer has been
     /// filled in with `n` bytes of data
