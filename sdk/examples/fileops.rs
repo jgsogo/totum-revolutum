@@ -31,6 +31,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .await?;
     println!("new_folderid: {}", new_folderid);
 
+    let content = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod \
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation \
+    ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in \
+    voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non \
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        .to_vec();
+
     // Open + write + close
     let fileid = {
         let fd = pcloud
@@ -41,7 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             .await?;
         println!("File is opened with descriptor {}", fd.fd);
 
-        let bytes_count = pcloud.file_write(fd.fd, &mut "eaeaeaea".as_bytes().to_vec()).await?;
+        let bytes_count = pcloud.file_write(fd.fd, &mut content.clone()).await?;
         println!("wrote {} bytes", bytes_count.bytes);
 
         pcloud.file_close(fd.fd).await?;
@@ -55,9 +62,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let fd = pcloud.file_open(Flags::empty(), FileOpenPath::FileID(fileid)).await?;
         println!("File is opened with descriptor {}", fd.fd);
 
-        let r = pcloud.file_read(fd.fd, 100).await?;
-        let content = String::from_utf8_lossy(&*r.bytes);
-        println!("Content: {}", content);
+        let buffer_len: u64 = 100;
+        assert!(buffer_len < content.len() as u64, "Ensure we read several chunks");
+        let mut content_read = Vec::<u8>::new();
+        loop {
+            let mut r = pcloud.file_read(fd.fd, buffer_len).await?;
+            let read_len = r.bytes.len() as u64;
+            let read_content = String::from_utf8_lossy(&*r.bytes);
+            println!("Read iteration (len {read_len}): {read_content}");
+            content_read.append(&mut r.bytes);
+            if read_len < buffer_len {
+                println!("Read exhausted");
+                break;
+            }
+        }
+        // let content = String::from_utf8_lossy(&*r.bytes);
+        let read_content = String::from_utf8_lossy(&*content_read);
+        println!("Content: {}", read_content);
+        assert_eq!(read_content, String::from_utf8_lossy(&*content));
 
         pcloud.file_close(fd.fd).await?;
         println!("File is closed");

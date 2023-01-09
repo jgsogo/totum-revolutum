@@ -1,7 +1,7 @@
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 use async_std::fs::File as AsyncFile;
 use async_std::io::{ReadExt, WriteExt};
 use async_trait::async_trait;
@@ -20,24 +20,18 @@ impl LocalFile {
 
 #[async_trait]
 impl File for LocalFile {
-    async fn read_to_end(&mut self, buf: &mut Vec<u8>) -> anyhow::Result<usize> {
+    async fn read_to_end(&mut self, buf: &mut Vec<u8>) -> Result<usize> {
         self.file.read_to_end(buf).await.map_err(|e| anyhow!(e))
     }
 
-    async fn write_all(&mut self, buf: &[u8]) -> anyhow::Result<()> {
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
+        self.file.read(buf).await.map_err(|e| anyhow!(e))
+    }
+
+    async fn write_all(&mut self, buf: &[u8]) -> Result<()> {
         self.file.write_all(buf).await.map_err(|e| anyhow!(e))
     }
 }
-
-// impl futures::io::AsyncRead for LocalFile {
-//     fn poll_read(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &mut [u8]) -> Poll<std::io::Result<usize>> {
-//         unsafe {
-//             let a = Pin::get_unchecked_mut(self);
-//             let boxed = Pin::new(&mut a.file);
-//             boxed.poll_read(cx, buf)
-//         }
-//     }
-// }
 
 // Implementing this trait is required to implement `async_std::io::Write`. See: https://docs.rs/async-std/0.99.4/async_std/io/trait.Write.html
 impl futures::io::AsyncWrite for LocalFile {

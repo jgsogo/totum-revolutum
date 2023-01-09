@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::env;
-
 use std::path::Path;
 
 use httpmock::prelude::*;
@@ -93,10 +92,17 @@ impl PCloudServerMock {
         folder_path: &Path,
         write_bytes: u64,
         read_content: Vec<u8>,
-    ) -> (Mock, Mock, Mock, Mock, Mock, Mock) {
+        chunk_size: usize,
+    ) -> (Mock, Mock, Mock, Mock, Mock, Mock, Mock) {
         self.fd_count += 1;
         let fd = self.fd_count;
         let fileid = folder.0 + fd;
+
+        let read_content_len = read_content.len();
+        assert!(
+            read_content_len < chunk_size,
+            "This is a limitation of the test implementation, content should fit into a chunk"
+        );
 
         // Enable file_open with folderid+path
         let m1 = self.server.mock(|when, then| {
@@ -151,21 +157,35 @@ impl PCloudServerMock {
                 .body(format!("{{\"result\": 0, \"bytes\": {write_bytes} }}"));
         });
 
-        // Enable file_read
+        // Enable file_read (first call reads everything)
         let m5 = self.server.mock(|when, then| {
             when.method(GET)
                 .path(file_read::ENDPOINT)
                 .query_param("access_token", "token")
                 .query_param("fd", fd.to_string())
-                .query_param_exists("count");
+                .query_param("count", chunk_size.to_string());
 
             then.status(200)
                 .header("content-type", "application/json; charset=UTF-8")
                 .body(read_content);
         });
 
-        // Enable file_close
+        // Enable file_read (last call returns 0)
+        let count_expected = chunk_size - read_content_len;
         let m6 = self.server.mock(|when, then| {
+            when.method(GET)
+                .path(file_read::ENDPOINT)
+                .query_param("access_token", "token")
+                .query_param("fd", fd.to_string())
+                .query_param("count", count_expected.to_string());
+
+            then.status(200)
+                .header("content-type", "application/json; charset=UTF-8")
+                .body("");
+        });
+
+        // Enable file_close
+        let m7 = self.server.mock(|when, then| {
             when.method(GET)
                 .path(file_close::ENDPOINT)
                 .query_param("access_token", "token")
@@ -176,6 +196,6 @@ impl PCloudServerMock {
                 .body("{\"result\": 0 }");
         });
 
-        (m1, m2, m3, m4, m5, m6)
+        (m1, m2, m3, m4, m5, m6, m7)
     }
 }
