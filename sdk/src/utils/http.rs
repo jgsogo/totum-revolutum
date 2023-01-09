@@ -4,13 +4,14 @@ use std::io;
 use std::io::Read;
 use std::io::Write;
 
-use crate::error::Error;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use hyper;
 use hyper::header::{CONNECTION, CONTENT_TYPE};
 use reqwest;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+
+use crate::error::Error;
 
 const BOUNDARY: &str = "ea3bbcf87c101592";
 
@@ -92,7 +93,25 @@ where
 }
 
 pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMap<String, String>) -> Result<Vec<u8>> {
-    let r = client.get(url).query(&params).send().await?.bytes().await?;
+    let r = client
+        .get(url)
+        .header(CONNECTION, "Keep-Alive")
+        .query(&params)
+        .send()
+        .await?
+        .bytes()
+        .await?;
+
+    // If there is an error, it returns a JSON with the result and error fields
+    let as_str = String::from_utf8_lossy(&r);
+    if let Ok(r) = serde_json::from_str::<ApiResult<()>>(&as_str) {
+        bail!(Error::ApiError {
+            code: r.result,
+            message: r.error.unwrap_or_else(|| "Error message not available".into())
+        })
+    }
+
+    // If not, just the bytes
     Ok(r.to_vec())
 }
 
