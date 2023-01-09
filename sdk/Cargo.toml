@@ -11,7 +11,7 @@ test_utils = ["dep:mockall", "dep:httpmock"]
 bytes = "1"
 #clap = { version = "3.2" }
 #clap-verbosity-flag = { version = "1.0" }
-tokio = { version = "1.23", features = ["full"] }
+tokio = { version = "1.24", features = ["full"] }
 hyper = { version = "0.14", features = ["full"] }
 dirs = { version = "4.0" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
