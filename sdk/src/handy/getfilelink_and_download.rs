@@ -1,57 +1,15 @@
 use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
-use std::path::{Component, Path};
+use std::path::Path;
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use futures_util::StreamExt;
 use tracing::debug;
 
-use crate::methods::folder::{createfolderifnotexists, listfolder};
 use crate::methods::streaming::getfilelink;
-use crate::types::FolderID;
-use crate::utils::normalize_path;
-
-use super::progress_bar;
-
-#[async_trait]
-pub trait GetFolderID: listfolder::GetListFolder {
-    async fn get_folderid(&self, path: &Path) -> Result<FolderID> {
-        let listfolder_input = listfolder::ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
-        let filtermeta = vec!["folderid"];
-        let r = self.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
-        r.metadata
-            .folderid
-            .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
-    }
-}
-
-#[async_trait]
-pub trait GetCreateFolderIfNotExistsAll: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists {
-    async fn createfolderifnotexists_all(&self, path: &Path) -> Result<FolderID> {
-        let path = normalize_path(path);
-        debug!("Create all folders (if not exist): '{}'", path.display());
-        assert!(path.is_absolute());
-
-        let mut folderid = self.get_folderid(Path::new("/")).await?;
-        for cmp in path.components() {
-            match cmp {
-                Component::RootDir => continue,
-                Component::Normal(p) => {
-                    let input = createfolderifnotexists::CreateFolderIfNotExistsInput::FolderAndName(
-                        folderid.clone(),
-                        p.to_string_lossy().to_string(),
-                    );
-                    let r = self.createfolderifnotexists(&input).await?;
-                    folderid = r.metadata.folderid.unwrap();
-                }
-                _ => bail!("Component in path not expected"),
-            }
-        }
-        Ok(folderid)
-    }
-}
+use crate::progress_bar;
 
 #[async_trait]
 pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
@@ -100,6 +58,4 @@ pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
     }
 }
 
-impl<T: listfolder::GetListFolder> GetFolderID for T {}
-impl<T: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists> GetCreateFolderIfNotExistsAll for T {}
 impl<T: getfilelink::GetFileLink> GetFileLinkAndDownload for T {}
