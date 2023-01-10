@@ -1,6 +1,7 @@
 use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
+use std::path::Path;
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -8,16 +9,14 @@ use futures_util::StreamExt;
 use tracing::debug;
 
 use crate::methods::streaming::getfilelink;
+use crate::progress_bar;
 
-use super::progress_bar;
-
-/// Provides some handy methods for [`client::Client`]
 #[async_trait]
-pub trait HandyClient: getfilelink::GetFileLink {
+pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
     async fn getfilelink_and_download(
         &self,
         file_link: &getfilelink::GetFileLinkInput,
-        path: &std::path::Path,
+        path: &Path,
         pb_builder: &dyn progress_bar::ProgressBarBuilder,
     ) -> Result<()> {
         let r = self.getfilelink(file_link).await?;
@@ -59,4 +58,4 @@ pub trait HandyClient: getfilelink::GetFileLink {
     }
 }
 
-impl<T: getfilelink::GetFileLink> HandyClient for T {}
+impl<T: getfilelink::GetFileLink> GetFileLinkAndDownload for T {}

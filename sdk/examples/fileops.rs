@@ -1,5 +1,8 @@
+use std::path::Path;
+
 use pcloud_sdk::data;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
+use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
@@ -20,7 +23,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let listfolder_input = ListFolderInput::new_from_path(Some("/".into()));
     let listfolder = pcloud.listfolder(&listfolder_input).await?;
     let folderid = listfolder.metadata.folderid.unwrap();
-    println!("{}", folderid);
+    println!("folderid: {}", folderid);
+
+    // Create folder
+    let new_folderid = pcloud
+        .createfolderifnotexists_all(Path::new("/example/l1/l2/l3"))
+        .await?;
+    println!("new_folderid: {}", new_folderid);
 
     let content = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod \
     tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation \
@@ -34,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let fd = pcloud
             .file_open(
                 Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC | Flags::O_APPEND,
-                FileOpenPath::FolderAndName(folderid.clone(), "name2.txt".to_string()),
+                FileOpenPath::FolderAndName(new_folderid.clone(), "name2.txt".to_string()),
             )
             .await?;
         println!("File is opened with descriptor {}", fd.fd);
