@@ -4,7 +4,6 @@ use anyhow::Result;
 use tracing::info;
 
 use crate::actions;
-use crate::actions::Actions;
 use crate::errors::SDKErrors;
 use crate::storage;
 
@@ -18,21 +17,5 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
         .map_err(|_| SDKErrors::ProjectLocked(path.to_string_lossy().to_string()))?;
 
     let data = &mut lock.content.data;
-    match data.action.action() {
-        Actions::Backup => {
-            let now = chrono::Utc::now();
-
-            actions::backup::run(home, path, data).await?;
-
-            // Update last-execution time. We use the timestamp when the process started because files might be modified
-            //  while we are running it and after they are synced. We use the `now` we created above!!!
-            data.action.last_executed = Some(now);
-            Ok(())
-        }
-        Actions::ZipBackup => todo!(),
-        Actions::Sync => todo!(),
-        Actions::Dump => todo!(),
-        Actions::MoveUpload => todo!(),
-        Actions::MoveDownload => todo!(),
-    }
+    actions::run(home, path, data).await
 }
