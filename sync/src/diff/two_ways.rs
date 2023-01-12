@@ -3,53 +3,35 @@ use std::time::Instant;
 
 use tracing::{debug, error, info, trace};
 
+use crate::diff::file_pair::FilePair;
+
 use super::FileMetadata;
 
-pub const MAX_BUFFER: usize = 100;
+const MAX_BUFFER: usize = 100;
 
-pub struct FileDiff<LHS: FileMetadata, RHS: FileMetadata> {
-    pub lhs: Option<LHS>,
-    pub rhs: Option<RHS>,
-}
-
-impl<LHS, RHS> FileDiff<LHS, RHS>
-where
-    LHS: FileMetadata,
-    RHS: FileMetadata,
-{
-    fn new(lhs: Option<LHS>, rhs: Option<RHS>) -> FileDiff<LHS, RHS> {
-        FileDiff::<LHS, RHS> { lhs, rhs }
-    }
-
-    pub fn new_from_lhs(lhs: LHS) -> FileDiff<LHS, RHS> {
-        Self::new(Some(lhs), None)
-    }
-
-    pub fn new_from_rhs(rhs: RHS) -> FileDiff<LHS, RHS> {
-        Self::new(None, Some(rhs))
-    }
-
-    pub fn id(&self) -> &str {
-        self.lhs
-            .as_ref()
-            .map_or_else(|| self.rhs.as_ref().unwrap().id(), |v| v.id())
-    }
-}
-
+/// Creates the channels for a two ways diffs and implements the main algorithm. Returns
+/// the endpoints for:
+///  * `lhs_sender`: this endpoint should be used by the lhs filesystem to send the [`FileMetadata`]
+///     for the files in the working directory
+///  * `rhs_sender`: this endpoint should be used by the rhs filesystem to send the [`FileMetadata`]
+///     for the files in the working directory
+///  * `file_pair_receiver`: this endpoint will consume the [`FilePair`]s tuples composed based on the
+///     inputs of the other two senders. It will also receive orphan pairs, that is, files that appears
+///     just on one of the filesystems.
 pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> (
     flume::Sender<LHS>,
     flume::Sender<RHS>,
-    flume::Receiver<FileDiff<LHS, RHS>>,
+    flume::Receiver<FilePair<LHS, RHS>>,
 ) {
     let (lhs_tx, lhs_rx) = flume::bounded::<LHS>(MAX_BUFFER);
     let (rhs_tx, rhs_rx) = flume::bounded::<RHS>(MAX_BUFFER);
 
-    let (report_tx, report_rx) = flume::bounded::<FileDiff<LHS, RHS>>(MAX_BUFFER);
+    let (report_tx, report_rx) = flume::bounded::<FilePair<LHS, RHS>>(MAX_BUFFER);
 
     tokio::spawn(async move {
         info!("Start receiving loop");
         let start = Instant::now();
-        let mut files: HashMap<String, FileDiff<LHS, RHS>> = HashMap::new();
+        let mut files: HashMap<String, FilePair<LHS, RHS>> = HashMap::new();
         loop {
             tokio::select! {
                 Ok(lhs_metadata) = lhs_rx.recv_async() => {
@@ -64,7 +46,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
                             }
                         },
                         None => {
-                            assert!(files.insert(key, FileDiff::<LHS, RHS>::new_from_lhs(lhs_metadata)).is_none());
+                            assert!(files.insert(key, FilePair::<LHS, RHS>::new_from_lhs(lhs_metadata)).is_none());
                         }
                     }
                 },
@@ -80,7 +62,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
                             }
                         },
                         None => {
-                            assert!(files.insert(key, FileDiff::<LHS, RHS>::new_from_rhs(rhs_metadata)).is_none());
+                            assert!(files.insert(key, FilePair::<LHS, RHS>::new_from_rhs(rhs_metadata)).is_none());
                         }
                     }
                 },
