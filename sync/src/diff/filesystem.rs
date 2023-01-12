@@ -38,6 +38,13 @@ where
         }
     }
 
+    /// Returns the relative path for any given one
+    fn rel_path(&self, path: &Path) -> Result<PathBuf> {
+        let abs_path = self.check_path(path)?;
+        let r = abs_path.strip_prefix(self.root()).map_err(|e| anyhow!(e));
+        r.map(|p| p.to_path_buf())
+    }
+
     /// Walk files in the filesystem, for each file found it will send it via `tx`
     async fn walk_directory(&self, tx: flume::Sender<Self::Metadata>, threads: usize) -> Result<()>;
 

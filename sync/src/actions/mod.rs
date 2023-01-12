@@ -1,4 +1,3 @@
-use std::path::Path;
 use std::time::Instant;
 
 use anyhow::Result;
@@ -9,10 +8,6 @@ use crate::actions::action_run::ActionRun;
 use crate::diff;
 use crate::diff::Filesystem;
 use crate::diff::{FileMetadata, FilePair};
-use crate::local;
-use crate::local::FilesystemLocal;
-use crate::remote;
-use crate::remote::filesystem::FilesystemPCloud;
 use crate::storage::config;
 
 mod action_run;
@@ -74,19 +69,11 @@ async fn work_on_results<FsLhsMetadata: FileMetadata + 'static, FsRhsMetadata: F
     Ok(())
 }
 
-pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()> {
-    info!("Run backup action on path '{}'", path.display());
-
-    // TODO: We cannot assume lhs filesystem is the local one
-    let lhs_fs = FilesystemLocal::new(path)?;
-
-    // TODO: We cannot assume rhs filesystem is a remote-pcloud one
-    let rhs_fs = {
-        let pcloud = config.auth.get_pcloud_client(home)?;
-        let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();
-        FilesystemPCloud::new(Path::new(&base_path), pcloud.clone()).await?
-    };
-
+pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
+    lhs_fs: FsLhs,
+    rhs_fs: FsRhs,
+    config: &config::Config,
+) -> Result<()> {
     let action_run = match config.action.action() {
         Actions::Backup => backup::Backup::new(&lhs_fs, &rhs_fs, *config.action.conflict()),
         Actions::ZipBackup => todo!("impl pending"),
@@ -97,7 +84,7 @@ pub async fn run(home: &Path, path: &Path, config: &config::Config) -> Result<()
     };
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
-    let (lhs, rhs, differ) = diff::two_ways_run::<local::LocalMetadata, remote::RemoteMetadata>().await;
+    let (lhs, rhs, differ) = diff::two_ways_run::<FsLhs::Metadata, FsRhs::Metadata>().await;
     if let Err(e) = tokio::try_join!(
         lhs_fs.walk_directory(lhs, 6),
         rhs_fs.walk_directory(rhs, 6),
