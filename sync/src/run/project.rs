@@ -19,7 +19,7 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
 
     let data = &mut lock.content.data;
     match data.action.action() {
-        actions::Actions::Backup => {
+        Actions::Backup => {
             let now = chrono::Utc::now();
 
             actions::backup::run(home, path, data).await?;
@@ -29,9 +29,9 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
             data.action.last_executed = Some(now);
             Ok(())
         }
-        actions::Actions::ZipBackup => todo!(),
-        actions::Actions::Sync => todo!(),
-        actions::Actions::Dump => todo!(),
+        Actions::ZipBackup => todo!(),
+        Actions::Sync => todo!(),
+        Actions::Dump => todo!(),
         Actions::MoveUpload => todo!(),
         Actions::MoveDownload => todo!(),
     }
