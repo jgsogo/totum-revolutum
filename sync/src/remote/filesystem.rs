@@ -16,7 +16,7 @@ use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::FolderID;
 
-use crate::diff::{File, Filesystem};
+use crate::filesystem::{File, Filesystem};
 use crate::local::LocalFileMetadata;
 use crate::remote::file::RemoteFile;
 use crate::remote::RemoteMetadata;

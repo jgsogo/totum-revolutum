@@ -7,7 +7,7 @@ use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::data::oauth2token::OAuth2Token;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::FolderID;
-use pcloud_sync::diff::filesystem::Filesystem;
+use pcloud_sync::filesystem::Filesystem;
 use pcloud_sync::remote::file::CHUNK_SIZE;
 use pcloud_sync::remote::filesystem::FilesystemPCloud;
 

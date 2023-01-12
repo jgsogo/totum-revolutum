@@ -6,8 +6,8 @@ use tracing::{error, info};
 
 use crate::actions::action_run::ActionRun;
 use crate::diff;
-use crate::diff::Filesystem;
-use crate::diff::{FileMetadata, FilePair};
+use crate::diff::FilePair;
+use crate::filesystem::{FileMetadata, Filesystem};
 use crate::storage::config;
 
 mod action_run;

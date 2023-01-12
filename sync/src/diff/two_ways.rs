@@ -4,8 +4,7 @@ use std::time::Instant;
 use tracing::{debug, error, info, trace};
 
 use crate::diff::file_pair::FilePair;
-
-use super::FileMetadata;
+use crate::filesystem::FileMetadata;
 
 const MAX_BUFFER: usize = 100;
 

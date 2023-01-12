@@ -6,7 +6,7 @@ use async_std::fs::File as AsyncFile;
 use async_std::io::{ReadExt, WriteExt};
 use async_trait::async_trait;
 
-use crate::diff::File;
+use crate::filesystem::File;
 
 pub struct LocalFile {
     file: AsyncFile,

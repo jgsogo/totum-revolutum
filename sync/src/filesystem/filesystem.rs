@@ -5,8 +5,7 @@ use async_trait::async_trait;
 
 use pcloud_sdk::utils::normalize_path;
 
-use super::file_metadata::FileMetadata;
-use super::File;
+use crate::filesystem::{File, FileMetadata};
 
 /// Abstract a filesystem, either local or remote and provide methods to access their files
 #[async_trait]

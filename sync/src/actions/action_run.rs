@@ -1,7 +1,8 @@
 use anyhow::anyhow;
 use async_trait::async_trait;
 
-use crate::diff::{FileMetadata, FilePair};
+use crate::diff::FilePair;
+use crate::filesystem::FileMetadata;
 
 #[async_trait]
 pub trait ActionRun<FsLhsMetadata: FileMetadata + 'static, FsRhsMetadata: FileMetadata + 'static>: Sync {
