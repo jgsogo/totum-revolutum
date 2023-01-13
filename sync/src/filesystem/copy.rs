@@ -22,7 +22,7 @@ pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
                 break;
             }
             Ok(n) => {
-                rhs_file.write_all(&mut buf[..n]).await?;
+                rhs_file.write_all(&buf[..n]).await?;
             }
             Err(e) => bail!("Error reading from source: {e}"),
         }

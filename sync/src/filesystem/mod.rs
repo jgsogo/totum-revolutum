@@ -1,8 +1,8 @@
 pub use file::File;
 pub use file_metadata::FileMetadata;
-pub use filesystem::Filesystem;
+pub use filesystem_t::Filesystem;
 
 pub mod copy;
 mod file;
 mod file_metadata;
-mod filesystem;
+mod filesystem_t;
