@@ -31,6 +31,10 @@ impl File for LocalFile {
     async fn write_all(&mut self, buf: &[u8]) -> Result<()> {
         self.file.write_all(buf).await.map_err(|e| anyhow!(e))
     }
+
+    async fn sync_all(&mut self) -> Result<()> {
+        self.file.sync_all().await.map_err(|e| anyhow!(e))
+    }
 }
 
 // Implementing this trait is required to implement `async_std::io::Write`. See: https://docs.rs/async-std/0.99.4/async_std/io/trait.Write.html

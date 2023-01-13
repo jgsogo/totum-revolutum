@@ -13,7 +13,7 @@ use crate::filesystem::File;
 
 pub const CHUNK_SIZE: usize = 512; // Just a guess of _optimal package size over a network_
 
-pub struct RemoteFile<HttpClient: GetFileRead + PostFileWrite + GetFileClose> {
+pub struct RemoteFile<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> {
     // TODO: This should be a reference &HttpClient, as every file can live as long as
     //  its filesystem will live... and the filesystem is one-to-one relationship with
     //  the httpclient used to connect to it.
@@ -21,9 +21,15 @@ pub struct RemoteFile<HttpClient: GetFileRead + PostFileWrite + GetFileClose> {
     file: FileOpen,
 }
 
-impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose> RemoteFile<HttpClient> {
+impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> RemoteFile<HttpClient> {
     pub fn new(file: FileOpen, pcloud: Arc<HttpClient>) -> Self {
         Self { file, pcloud }
+    }
+}
+
+impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Drop for RemoteFile<HttpClient> {
+    fn drop(&mut self) {
+        let _ = futures::executor::block_on(self.sync_all());
     }
 }
 
@@ -84,5 +90,9 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File 
     async fn write_all(&mut self, buf: &[u8]) -> Result<()> {
         let _r = self.pcloud.file_write(self.file.fd, buf).await?;
         Ok(())
+    }
+
+    async fn sync_all(&mut self) -> Result<()> {
+        self.pcloud.file_close(self.file.fd).await
     }
 }
