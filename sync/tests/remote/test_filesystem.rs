@@ -11,7 +11,7 @@ use pcloud_sync::filesystem::Filesystem;
 use pcloud_sync::remote::file::CHUNK_SIZE;
 use pcloud_sync::remote::filesystem::FilesystemPCloud;
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn test_create_write_read_in_root_folder() -> Result<()> {
     let root_path = Path::new("the/root/path");
     let mut server = PCloudServerMock::default();
@@ -66,7 +66,7 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
     read.assert();
     read_eof.assert();
 
-    close.assert_hits(0);
+    close.assert_hits(2);
     open.assert_hits(0);
     Ok(())
 }

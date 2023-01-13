@@ -29,6 +29,11 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Remot
 
 impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Drop for RemoteFile<HttpClient> {
     fn drop(&mut self) {
+        // FIXME: We shouldn't do this (https://www.reddit.com/r/rust/comments/lsrmqf/how_to_turn_async_code_into_sync_code/).
+        //  In the end the recommendation is to use some kind of channel, send from here and let the other side
+        //  run the async code.
+        //  BTW, this issue happens in the tests (because here we need another thread) and the workaround
+        //  is to use `#[tokio::test(flavor = "multi_thread")]` to have more threads available.
         let _ = futures::executor::block_on(self.sync_all());
     }
 }
