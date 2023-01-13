@@ -200,7 +200,7 @@ mod tests {
     use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::fileops::file_open::FileOpen;
     use pcloud_sdk::methods::fileops::file_write::FileWrite;
-    use pcloud_sdk::methods::fileops::{file_open, file_read, file_write};
+    use pcloud_sdk::methods::fileops::{file_close, file_open, file_read, file_write};
     use pcloud_sdk::methods::folder::createfolderifnotexists::CreateFolderIfNotExists;
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
     use pcloud_sdk::methods::folder::{createfolderifnotexists, listfolder};
@@ -317,6 +317,17 @@ mod tests {
                 Ok(FileWrite { bytes: 321 })
             });
 
+        // Expectation for close
+        client
+            .expect_get::<()>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, file_close::ENDPOINT);
+                assert_eq!(params.len(), 1);
+                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                Ok(())
+            });
+
         // Create the filesystem
         let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
 
@@ -404,6 +415,17 @@ mod tests {
                 Ok(b"".to_vec())
             });
 
+        // Expectation for close
+        client
+            .expect_get::<()>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, file_close::ENDPOINT);
+                assert_eq!(params.len(), 1);
+                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                Ok(())
+            });
+
         // Create the filesystem
         let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
 
@@ -458,6 +480,17 @@ mod tests {
                     fd: 42,
                     fileid: FileID(1234),
                 })
+            });
+
+        // Expectation for close
+        client
+            .expect_get::<()>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, file_close::ENDPOINT);
+                assert_eq!(params.len(), 1);
+                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                Ok(())
             });
 
         // Create the filesystem
