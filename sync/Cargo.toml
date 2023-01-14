@@ -38,3 +38,7 @@ async-std = "1.12"
 tempfile = "3"
 pcloud-sdk = { path = "../sdk", features = ["test_utils"] }
 httpmock = "0.6"
+
+
+[[example]]
+name = "copy_file"

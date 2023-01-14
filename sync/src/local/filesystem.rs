@@ -9,7 +9,7 @@ use ignore::WalkBuilder;
 use tokio::time::Instant;
 use tracing::info;
 
-use crate::diff::{File, Filesystem};
+use crate::filesystem::{File, Filesystem};
 use crate::local::LocalMetadata;
 use crate::storage::ignore_files;
 

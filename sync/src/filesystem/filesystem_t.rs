@@ -5,8 +5,7 @@ use async_trait::async_trait;
 
 use pcloud_sdk::utils::normalize_path;
 
-use super::file_metadata::FileMetadata;
-use super::File;
+use crate::filesystem::{File, FileMetadata};
 
 /// Abstract a filesystem, either local or remote and provide methods to access their files
 #[async_trait]
@@ -36,6 +35,13 @@ where
         } else {
             Ok(path)
         }
+    }
+
+    /// Returns the relative path for any given one
+    fn rel_path(&self, path: &Path) -> Result<PathBuf> {
+        let abs_path = self.check_path(path)?;
+        let r = abs_path.strip_prefix(self.root()).map_err(|e| anyhow!(e));
+        r.map(|p| p.to_path_buf())
     }
 
     /// Walk files in the filesystem, for each file found it will send it via `tx`

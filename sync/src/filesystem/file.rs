@@ -2,6 +2,11 @@ use anyhow::Result;
 use async_trait::async_trait;
 
 #[async_trait]
+/// An object providing access to an open file on the [`Filesystem`]
+///
+/// Files are automatically closed when they go out of scope. Errors detected on closing
+/// are ignored by the implementation of Drop. Use the method `sync_all` if these errors
+/// must be manually handled.
 pub trait File {
     /// Reads all bytes from the byte stream.
     ///
@@ -22,4 +27,6 @@ pub trait File {
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize>;
 
     async fn write_all(&mut self, buf: &[u8]) -> Result<()>;
+
+    async fn sync_all(&mut self) -> Result<()>;
 }

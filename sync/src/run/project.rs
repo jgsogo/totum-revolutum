@@ -4,8 +4,9 @@ use anyhow::Result;
 use tracing::info;
 
 use crate::actions;
-use crate::actions::Actions;
 use crate::errors::SDKErrors;
+use crate::local::FilesystemLocal;
+use crate::remote::filesystem::FilesystemPCloud;
 use crate::storage;
 
 /// Run configured action in the given pcloud-dir. It doesn't take into account
@@ -17,22 +18,17 @@ pub async fn handle(home: &Path, path: &Path) -> Result<()> {
     let mut lock = storage::config::ConfigFile::update(&config_file_path)
         .map_err(|_| SDKErrors::ProjectLocked(path.to_string_lossy().to_string()))?;
 
-    let data = &mut lock.content.data;
-    match data.action.action() {
-        actions::Actions::Backup => {
-            let now = chrono::Utc::now();
+    let config = &mut lock.content.data;
 
-            actions::backup::run(home, path, data).await?;
+    // TODO: We cannot assume lhs filesystem is the local one
+    let lhs_fs = FilesystemLocal::new(path)?;
 
-            // Update last-execution time. We use the timestamp when the process started because files might be modified
-            //  while we are running it and after they are synced. We use the `now` we created above!!!
-            data.action.last_executed = Some(now);
-            Ok(())
-        }
-        actions::Actions::ZipBackup => todo!(),
-        actions::Actions::Sync => todo!(),
-        actions::Actions::Dump => todo!(),
-        Actions::MoveUpload => todo!(),
-        Actions::MoveDownload => todo!(),
-    }
+    // TODO: We cannot assume rhs filesystem is a remote-pcloud one
+    let rhs_fs = {
+        let pcloud = config.auth.get_pcloud_client(home)?;
+        let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();
+        FilesystemPCloud::new(Path::new(&base_path), pcloud.clone()).await?
+    };
+
+    actions::run(lhs_fs, rhs_fs, config).await
 }

@@ -7,7 +7,7 @@ use tracing::{info, trace};
 /// By default it creates a mock that will print just a trace message.
 pub trait ProgressBarBuilder: Send + Sync {
     fn build(&self, _total_size: u64) -> Box<dyn ProgressBar> {
-        Box::new(NoProgressBar::default())
+        Box::<NoProgressBar>::default()
     }
 }
 

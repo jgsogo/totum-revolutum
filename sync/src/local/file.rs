@@ -6,7 +6,7 @@ use async_std::fs::File as AsyncFile;
 use async_std::io::{ReadExt, WriteExt};
 use async_trait::async_trait;
 
-use crate::diff::File;
+use crate::filesystem::File;
 
 pub struct LocalFile {
     file: AsyncFile,
@@ -30,6 +30,10 @@ impl File for LocalFile {
 
     async fn write_all(&mut self, buf: &[u8]) -> Result<()> {
         self.file.write_all(buf).await.map_err(|e| anyhow!(e))
+    }
+
+    async fn sync_all(&mut self) -> Result<()> {
+        self.file.sync_all().await.map_err(|e| anyhow!(e))
     }
 }
 

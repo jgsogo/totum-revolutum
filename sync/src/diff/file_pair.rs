@@ -1,4 +1,4 @@
-use crate::diff::FileMetadata;
+use crate::filesystem::FileMetadata;
 
 /// Contains a pair of [`FileMetadata`]
 ///

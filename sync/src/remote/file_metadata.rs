@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::FileID;
 
-use crate::diff::FileMetadata;
+use crate::filesystem::FileMetadata;
 
 pub trait RemoteFileMetadata: FileMetadata {
     fn from_pcloud_metadata(path: &Path, metadata: Metadata) -> Self;
