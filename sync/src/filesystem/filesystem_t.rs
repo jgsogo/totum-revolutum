@@ -56,4 +56,19 @@ where
 
     /// Creates the given directory and any intermediate one
     async fn create_dir_all(&self, path: &Path) -> Result<()>;
+
+    /// Copy
+    async fn copy(&self, origin: &Path, target: &Path) -> Result<()> {
+        todo!()
+    }
+
+    /// Rename
+    async fn rename(&self, origin: &Path, target: &Path) -> Result<()> {
+        todo!()
+    }
+
+    /// Delete
+    async fn delete(&self, path: &Path) -> Result<()> {
+        todo!()
+    }
 }
