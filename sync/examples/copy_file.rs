@@ -32,6 +32,7 @@ async fn main() -> Result<()> {
     // Creates a file in the origin
     let origin = Path::new("origin.txt");
     {
+        println!("Creates file in origin: {}", origin.display());
         let mut origin_file = fs.create(&origin).await?;
         origin_file
             .write_all(
@@ -48,10 +49,16 @@ async fn main() -> Result<()> {
 
     // Now copies origin to target
     let target = Path::new("target.txt");
+    println!(
+        "Copies from origin '{}' to target '{}'",
+        origin.display(),
+        target.display()
+    );
     copy(&fs, &fs, &origin, &target, false).await?;
 
     // And let's read target
     let data = {
+        println!("Reads content from target '{}'", target.display());
         let mut target_file = fs.open(target).await?;
         let mut data = Vec::new();
         target_file.read_to_end(&mut data).await?;

@@ -3,11 +3,14 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use flume::Sender;
+use tracing::warn;
 
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::FileOpen;
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
+use pcloud_sdk::methods::fileops::FileDescriptor;
 
 use crate::filesystem::File;
 
@@ -19,22 +22,25 @@ pub struct RemoteFile<HttpClient: GetFileRead + PostFileWrite + GetFileClose + S
     //  the httpclient used to connect to it.
     pcloud: Arc<HttpClient>,
     file: FileOpen,
+    tx_file_close: Sender<FileDescriptor>,
 }
 
 impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> RemoteFile<HttpClient> {
-    pub fn new(file: FileOpen, pcloud: Arc<HttpClient>) -> Self {
-        Self { file, pcloud }
+    pub fn new(file: FileOpen, pcloud: Arc<HttpClient>, tx_file_close: Sender<FileDescriptor>) -> Self {
+        Self {
+            file,
+            pcloud,
+            tx_file_close,
+        }
     }
 }
 
 impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Drop for RemoteFile<HttpClient> {
     fn drop(&mut self) {
-        // FIXME: We shouldn't do this (https://www.reddit.com/r/rust/comments/lsrmqf/how_to_turn_async_code_into_sync_code/).
-        //  In the end the recommendation is to use some kind of channel, send from here and let the other side
-        //  run the async code.
-        //  BTW, this issue happens in the tests (because here we need another thread) and the workaround
-        //  is to use `#[tokio::test(flavor = "multi_thread")]` to have more threads available.
-        let _ = futures::executor::block_on(self.sync_all());
+        // The filesystem takes care of closing the file
+        if let Err(e) = self.tx_file_close.send(self.file.fd) {
+            warn!("Error closing the file on drop action: {e}");
+        }
     }
 }
 

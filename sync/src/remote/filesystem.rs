@@ -5,11 +5,13 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use flume::Sender;
 use tokio::time::Instant;
-use tracing::{info, trace};
+use tracing::{info, trace, warn};
 
 use pcloud_sdk::client::Client;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
+use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
+use pcloud_sdk::methods::fileops::FileDescriptor;
 use pcloud_sdk::methods::folder::createfolderifnotexists::{CreateFolderIfNotExistsInput, GetCreateFolderIfNotExists};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
@@ -17,7 +19,6 @@ use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::FolderID;
 
 use crate::filesystem::{File, Filesystem};
-use crate::local::LocalFileMetadata;
 use crate::remote::file::RemoteFile;
 use crate::remote::RemoteMetadata;
 
@@ -28,6 +29,8 @@ pub struct FilesystemPCloud<HttpClient: Client + Clone> {
     folderid: FolderID,
     // TODO: This shouldn't be an `Arc<HttpClient>`. It should be just `HttpClient`
     pcloud: Arc<HttpClient>,
+
+    tx_file_close: Sender<FileDescriptor>,
 }
 
 async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
@@ -42,30 +45,30 @@ async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
         .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
 }
 
-impl<HttpClient: Client + Send + Sync + Clone> FilesystemPCloud<HttpClient> {
+impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpClient> {
     pub async fn new(path: &Path, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
         let folderid = get_folderid(&pcloud, path).await?;
+        let (tx, rx) = flume::unbounded::<FileDescriptor>();
+
+        // This async loop will take care of calling the 'file_close' method when RemoteFiles go out
+        //  of scope. Here we can call this async method, while it is not possible to do it in the
+        //  `Drop` implementation of those files.
+        let pcloud_clone = pcloud.clone();
+        tokio::spawn(async move {
+            while let Ok(fd) = rx.recv_async().await {
+                if let Err(e) = pcloud_clone.file_close(fd).await {
+                    warn!("Error closing file '{fd}': {e}");
+                }
+            }
+        });
 
         Ok(Self {
             path: path.to_path_buf(),
             folderid,
             pcloud,
+            tx_file_close: tx,
         })
-    }
-
-    #[allow(dead_code)]
-    pub fn copy<T: LocalFileMetadata>(
-        &self,
-        _source: &T,
-        _target: Option<RemoteMetadata>,
-    ) -> Result<(&T, RemoteMetadata)> {
-        todo!()
-    }
-
-    #[allow(dead_code)]
-    pub fn rename(&self, _file: RemoteMetadata) -> Result<RemoteMetadata> {
-        todo!()
     }
 
     fn work_on_contents(
@@ -149,7 +152,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
                     )
                     .await?;
 
-                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
+                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
                 Ok(Box::new(f))
             }
             Err(e) => Err(e),
@@ -165,7 +168,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
                     .file_open(Flags::empty(), FileOpenPath::Path(v.to_string_lossy().parse()?))
                     .await?;
 
-                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
+                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
                 Ok(Box::new(f))
             }
             Err(e) => Err(e),
