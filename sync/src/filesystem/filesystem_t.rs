@@ -58,17 +58,21 @@ where
     async fn create_dir_all(&self, path: &Path) -> Result<()>;
 
     /// Copy
-    async fn copy(&self, origin: &Path, target: &Path) -> Result<()> {
-        todo!()
+    async fn copy(&self, _origin: &Path, _target: &Path) -> Result<()> {
+        todo!("A default `copy` using existing methods is not implemented")
     }
 
     /// Rename
-    async fn rename(&self, origin: &Path, target: &Path) -> Result<()> {
-        todo!()
+    async fn rename(&self, _origin: &Path, _target: &Path) -> Result<()> {
+        todo!("A default `rename` using existing methods is not implemented")
     }
 
-    /// Delete
-    async fn delete(&self, path: &Path) -> Result<()> {
-        todo!()
-    }
+    /// Removes a file from the filesystem.
+    async fn remove_file(&self, path: &Path) -> Result<()>;
+
+    /// Removes an empty directory.
+    async fn remove_dir(&self, path: &Path) -> Result<()>;
+
+    /// Removes a directory at this path, after removing all its contents. Use carefully!
+    async fn remove_dir_all(&self, path: &Path) -> Result<()>;
 }

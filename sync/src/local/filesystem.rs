@@ -78,6 +78,30 @@ impl Filesystem for FilesystemLocal {
             Err(e) => Err(e),
         }
     }
+
+    async fn remove_file(&self, path: &Path) -> Result<()> {
+        match self.check_path(path) {
+            // Do not resolve symlinks
+            Ok(v) => fs::remove_file(v).map_err(|e| anyhow!("Error removing a file: {e}")),
+            Err(e) => Err(e),
+        }
+    }
+
+    async fn remove_dir(&self, path: &Path) -> Result<()> {
+        match self.check_path(path) {
+            // Do not resolve symlinks
+            Ok(v) => fs::remove_dir(v).map_err(|e| anyhow!("Error removing a directory: {e}")),
+            Err(e) => Err(e),
+        }
+    }
+
+    async fn remove_dir_all(&self, path: &Path) -> Result<()> {
+        match self.check_path(path) {
+            // Do not resolve symlinks
+            Ok(v) => fs::remove_dir_all(v).map_err(|e| anyhow!("Error removing a directory: {e}")),
+            Err(e) => Err(e),
+        }
+    }
 }
 
 #[cfg(test)]
