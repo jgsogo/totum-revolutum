@@ -66,7 +66,7 @@ pub struct CopyFile {
 }
 
 #[async_trait]
-pub trait GetDeleteFile: client::Client {
+pub trait GetCopyFile: client::Client {
     async fn copyfile(&self, input: CopyFileInput) -> Result<CopyFile> {
         let params = HashMap::try_from(input)?;
         let ret = self.get::<CopyFile>(ENDPOINT, params).await?;
@@ -74,7 +74,7 @@ pub trait GetDeleteFile: client::Client {
     }
 }
 
-impl<T: client::Client> GetDeleteFile for T {}
+impl<T: client::Client> GetCopyFile for T {}
 
 #[cfg(test)]
 mod tests {
