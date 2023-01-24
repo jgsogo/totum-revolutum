@@ -40,7 +40,7 @@ pub struct DeleteFile {
 }
 
 #[async_trait]
-pub trait GetDeletefile: client::Client {
+pub trait GetDeleteFile: client::Client {
     async fn deletefile(&self, input: DeleteFileInput) -> Result<DeleteFile> {
         let params = HashMap::try_from(input)?;
         let ret = self.get::<DeleteFile>(ENDPOINT, params).await?;
@@ -48,7 +48,7 @@ pub trait GetDeletefile: client::Client {
     }
 }
 
-impl<T: client::Client> GetDeletefile for T {}
+impl<T: client::Client> GetDeleteFile for T {}
 
 #[cfg(test)]
 mod tests {
