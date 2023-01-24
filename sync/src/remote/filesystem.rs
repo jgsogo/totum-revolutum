@@ -9,10 +9,13 @@ use tracing::{info, trace, warn};
 
 use pcloud_sdk::client::Client;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
+use pcloud_sdk::methods::file::deletefile::{DeleteFileInput, GetDeleteFile};
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::FileDescriptor;
 use pcloud_sdk::methods::folder::createfolderifnotexists::{CreateFolderIfNotExistsInput, GetCreateFolderIfNotExists};
+use pcloud_sdk::methods::folder::deletefolder::{DeleteFolderInput, GetDeleteFolder};
+use pcloud_sdk::methods::folder::deletefolderrecursive::{DeleteFolderRecursiveInput, GetDeleteFolderRecursive};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
@@ -194,6 +197,39 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
             Err(e) => Err(e),
         }
     }
+
+    async fn remove_file(&self, path: &Path) -> Result<()> {
+        match self.check_path(path) {
+            Ok(v) => {
+                let input = DeleteFileInput::Path(v);
+                self.pcloud.deletefile(input).await?;
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    async fn remove_dir(&self, path: &Path) -> Result<()> {
+        match self.check_path(path) {
+            Ok(v) => {
+                let input = DeleteFolderInput::Path(v);
+                self.pcloud.deletefolder(input).await?;
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
+
+    async fn remove_dir_all(&self, path: &Path) -> Result<()> {
+        match self.check_path(path) {
+            Ok(v) => {
+                let input = DeleteFolderRecursiveInput::Path(v);
+                self.pcloud.deletefolderrecursive(input).await?;
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -201,6 +237,8 @@ mod tests {
     use std::collections::HashMap;
 
     use pcloud_sdk::error::Error;
+    use pcloud_sdk::methods::file::deletefile;
+    use pcloud_sdk::methods::file::deletefile::DeleteFile;
     use pcloud_sdk::methods::fileops::file_open::FileOpen;
     use pcloud_sdk::methods::fileops::file_write::FileWrite;
     use pcloud_sdk::methods::fileops::{file_close, file_open, file_read, file_write};
@@ -550,6 +588,53 @@ mod tests {
         let fs = FilesystemPCloud::new(root_path, client).await?;
 
         fs.create_dir_all(Path::new("nested/nested2")).await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_remove_file() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        let root_path = Path::new("the/root/path");
+
+        // Expectation for FilesystemPCloud::new
+        client
+            .expect_get::<ListFolder>()
+            .times(1) // One on filesystem::new, another to check folder for file being created
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, listfolder::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("path"), Some(&root_path.to_string_lossy().parse()?));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
+
+                Ok(ListFolder {
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        // Expectation for remove_file
+        client
+            .expect_get::<DeleteFile>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, deletefile::ENDPOINT);
+                assert_eq!(params.len(), 1);
+                assert!(params.contains_key("path"));
+
+                Ok(DeleteFile {
+                    id: "1234-0".to_string(),
+                    metadata: Metadata {
+                        fileid: Some(FileID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        let fs = FilesystemPCloud::new(root_path, client).await?;
+
+        fs.remove_file(Path::new("nested/nested2")).await?;
         Ok(())
     }
 }
