@@ -6,3 +6,4 @@ pub mod copy;
 mod file;
 mod file_metadata;
 mod filesystem_t;
+pub mod move_file;

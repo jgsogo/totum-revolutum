@@ -15,7 +15,7 @@ pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     // TODO: Depending on `force` value, check if the file already exists
     let mut rhs_file = rhs_fs.create(target).await?;
 
-    let mut buf: [u8; 100] = [0; 100];
+    let mut buf: [u8; 100] = [0; 100]; // TODO: Configure buffer size
     loop {
         match lhs_file.read(&mut buf).await {
             Ok(0) => {
