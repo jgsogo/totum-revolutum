@@ -26,11 +26,59 @@ mod tests {
 
     #[tokio::test]
     async fn test_move_no_force() -> Result<()> {
-        todo!("Copy with NO force")
+        let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
+        let lhs_path = PathBuf::from("file.txt");
+
+        let lhs_fs = {
+            let fs = FilesystemMock::default();
+            let mut f1 = fs.create(&lhs_path).await?;
+            f1.write_all(&file_content).await?;
+            fs
+        };
+
+        let rhs_fs = FilesystemMock::default();
+        let rhs_path = PathBuf::from("the_target.txt");
+        assert!(!rhs_fs.exists(&rhs_path).await?);
+
+        move_file(&lhs_fs, &rhs_fs, &lhs_path, &rhs_path, false).await?;
+        assert!(!lhs_fs.exists(&lhs_path).await?);
+        assert!(rhs_fs.exists(&rhs_path).await?);
+
+        Ok(())
     }
 
     #[tokio::test]
     async fn test_move_force() -> Result<()> {
-        todo!("Move with force")
+        let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
+        let lhs_path = PathBuf::from("file.txt");
+
+        let lhs_fs = {
+            let fs = FilesystemMock::default();
+            let mut f1 = fs.create(&lhs_path).await?;
+            f1.write_all(&file_content).await?;
+            fs
+        };
+
+        let rhs_fs = {
+            let fs = FilesystemMock::default();
+            let mut f1 = fs.create(&lhs_path).await?;
+            f1.write_all(&file_content).await?;
+            fs
+        };
+        assert!(lhs_fs.exists(&lhs_path).await?);
+        assert!(rhs_fs.exists(&lhs_path).await?);
+
+        // If we don't force, we cannot move the file
+        let r = move_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, false).await;
+        assert!(r.is_err());
+
+        // If we force, the file is moved
+        let r = move_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, true).await;
+        assert!(r.is_ok());
+
+        assert!(!lhs_fs.exists(&lhs_path).await?);
+        assert!(rhs_fs.exists(&lhs_path).await?);
+
+        Ok(())
     }
 }
