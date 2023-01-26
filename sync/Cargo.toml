@@ -3,6 +3,9 @@ name = "pcloud-sync"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+test_utils = ["dep:httpmock", "dep:tempfile"]
+
 [dependencies]
 pcloud-sdk = { path = "../sdk" }
 fs4 = { version = "0.6" }
@@ -34,11 +37,14 @@ clap = { version = "4.1", features = ["derive"] }  # TODO: Require cli feature
 futures = "0.3"
 async-std = "1.12"
 
+# Optional dependencies
+httpmock = { version = "0.6", optional = true }
+tempfile = { version = "3.3", optional = true }
+
 [dev-dependencies]
 tempfile = "3"
 pcloud-sdk = { path = "../sdk", features = ["test_utils"] }
-httpmock = "0.6"
-
+pcloud-sync = { path = ".", features = ["test_utils"] }
 
 [[example]]
 name = "copy_file"

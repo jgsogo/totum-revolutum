@@ -29,3 +29,39 @@ pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use crate::mocks::filesystem::FilesystemMock;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_copy() -> Result<()> {
+        let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
+        let lhs_path = PathBuf::from("file.txt");
+
+        let lhs_fs = {
+            let fs = FilesystemMock::default();
+            let mut f1 = fs.create(&lhs_path).await?;
+            f1.write_all(&file_content).await?;
+            fs
+        };
+
+        let rhs_fs = FilesystemMock::default();
+        let rhs_path = PathBuf::from("the_copy.txt");
+        assert!(rhs_fs.open(&rhs_path).await.is_err());
+
+        copy(&lhs_fs, &rhs_fs, &lhs_path, &rhs_path, false).await?;
+
+        // We can read the file from the RHS
+        let mut rhs_file = rhs_fs.open(&rhs_path).await?;
+        let mut content_read = Vec::new();
+        rhs_file.read_to_end(&mut content_read).await?;
+        assert_eq!(file_content, &*content_read);
+
+        Ok(())
+    }
+}

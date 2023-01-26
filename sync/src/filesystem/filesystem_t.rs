@@ -28,7 +28,7 @@ where
         let path = normalize_path(path);
         if !path.starts_with(self.root()) {
             Err(anyhow!(
-                "Path '{}' is outside filesystem (root '{}')",
+                "Path '{}' is outside filesystem (root '{}'), or it's the root itself",
                 path.display(),
                 self.root().display()
             ))
