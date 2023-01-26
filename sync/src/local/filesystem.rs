@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use async_std::fs::File as AsyncFile;
 use async_trait::async_trait;
 use flume::Sender;
@@ -22,9 +22,12 @@ pub struct FilesystemLocal {
 
 impl FilesystemLocal {
     pub fn new(path: &Path) -> Result<Self> {
-        // We use `fs::canonicalize` to check that the path exists and resolve any symlinks
-        let path = fs::canonicalize(path)?;
-        Ok(Self { path })
+        if !path.exists() {
+            bail!("Given path doesn't exist: {}", path.display());
+        }
+        Ok(Self {
+            path: path.to_path_buf(),
+        })
     }
 }
 
@@ -40,7 +43,7 @@ impl Filesystem for FilesystemLocal {
         let walker = WalkBuilder::new(&self.path)
             .threads(threads)
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
-            .add_custom_ignore_filename(ignore_files::IgnoreFiles::path(&self.path))
+            .add_custom_ignore_filename(ignore_files::IgnoreFiles::path(self.root()))
             .build_parallel();
 
         info!("Start local visitor");
@@ -51,32 +54,44 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
-        // Parent directory should exist
-        let parent = path
-            .parent()
-            .ok_or_else(|| anyhow!("Cannot get parent directory for file '{}'", path.display()))?;
-        self.check_path(&fs::canonicalize(parent)?)?;
+    async fn exists(&self, path: &Path) -> Result<bool> {
+        let path = self.check_path(path)?;
+        Ok(path.exists())
+    }
 
+    async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
+        let path = self.check_path(path)?;
         let f = AsyncFile::create(path).await?;
         Ok(Box::new(LocalFile::new(f)))
     }
 
     async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
-        match self.check_path(&fs::canonicalize(path)?) {
-            Ok(v) => {
-                let f = AsyncFile::open(v).await?;
-                Ok(Box::new(LocalFile::new(f)))
-            }
-            Err(e) => Err(e),
-        }
+        let path = self.check_path(path)?;
+        let f = AsyncFile::open(path).await?;
+        Ok(Box::new(LocalFile::new(f)))
     }
 
     async fn create_dir_all(&self, path: &Path) -> Result<()> {
-        match self.check_path(path) {
-            Ok(v) => fs::create_dir_all(v).map_err(|e| anyhow!("Error creating the directory: {e}")),
-            Err(e) => Err(e),
-        }
+        let path = self.check_path(path)?;
+        fs::create_dir_all(path).map_err(|e| anyhow!("Error creating the directory: {e}"))
+    }
+
+    async fn remove_file(&self, path: &Path) -> Result<()> {
+        // Do not resolve symlinks
+        let path = self.check_path(path)?;
+        fs::remove_file(path).map_err(|e| anyhow!("Error removing a file: {e}"))
+    }
+
+    async fn remove_dir(&self, path: &Path) -> Result<()> {
+        // Do not resolve symlinks
+        let path = self.check_path(path)?;
+        fs::remove_dir(path).map_err(|e| anyhow!("Error removing a directory: {e}"))
+    }
+
+    async fn remove_dir_all(&self, path: &Path) -> Result<()> {
+        // Do not resolve symlinks
+        let path = self.check_path(path)?;
+        fs::remove_dir_all(path).map_err(|e| anyhow!("Error removing a directory: {e}"))
     }
 }
 
@@ -97,7 +112,10 @@ mod tests {
     fn test_root() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
         let fs = FilesystemLocal::new(tmp_dir.path())?;
-        assert_eq!(fs::canonicalize(tmp_dir.path())?, fs.root());
+        // Root is not cannonicalized, it fails in MacOS where tmp directories are inside sym folder
+        #[cfg(target_os = "macos")]
+        assert_ne!(fs::canonicalize(tmp_dir.path())?, fs.root());
+        assert_eq!(tmp_dir.path(), fs.root());
         Ok(())
     }
 

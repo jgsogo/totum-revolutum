@@ -4,15 +4,20 @@ use std::sync::Arc;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use flume::Sender;
+use tokio::task::JoinHandle;
 use tokio::time::Instant;
 use tracing::{info, trace, warn};
 
 use pcloud_sdk::client::Client;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
+use pcloud_sdk::methods::file::deletefile::{DeleteFileInput, GetDeleteFile};
+use pcloud_sdk::methods::file::stat::{GetStat, StatInput};
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::FileDescriptor;
 use pcloud_sdk::methods::folder::createfolderifnotexists::{CreateFolderIfNotExistsInput, GetCreateFolderIfNotExists};
+use pcloud_sdk::methods::folder::deletefolder::{DeleteFolderInput, GetDeleteFolder};
+use pcloud_sdk::methods::folder::deletefolderrecursive::{DeleteFolderRecursiveInput, GetDeleteFolderRecursive};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
@@ -24,13 +29,19 @@ use crate::remote::RemoteMetadata;
 
 pub type PCloudHttpClient = pcloud_sdk::client::HttpClient<OAuth2TokenImpl>;
 
+pub enum FileCloseMessage {
+    FileDescriptor(FileDescriptor),
+    Stop,
+}
+
 pub struct FilesystemPCloud<HttpClient: Client + Clone> {
     path: PathBuf,
     folderid: FolderID,
     // TODO: This shouldn't be an `Arc<HttpClient>`. It should be just `HttpClient`
     pcloud: Arc<HttpClient>,
 
-    tx_file_close: Sender<FileDescriptor>,
+    tx_file_close: Sender<FileCloseMessage>,
+    thread_file_close: Option<JoinHandle<()>>,
 }
 
 async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
@@ -49,16 +60,24 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpCl
     pub async fn new(path: &Path, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
         let folderid = get_folderid(&pcloud, path).await?;
-        let (tx, rx) = flume::unbounded::<FileDescriptor>();
+        let (tx, rx) = flume::unbounded::<FileCloseMessage>();
 
         // This async loop will take care of calling the 'file_close' method when RemoteFiles go out
         //  of scope. Here we can call this async method, while it is not possible to do it in the
         //  `Drop` implementation of those files.
         let pcloud_clone = pcloud.clone();
-        tokio::spawn(async move {
-            while let Ok(fd) = rx.recv_async().await {
-                if let Err(e) = pcloud_clone.file_close(fd).await {
-                    warn!("Error closing file '{fd}': {e}");
+        let t = tokio::spawn(async move {
+            while let Ok(msg) = rx.recv_async().await {
+                match msg {
+                    FileCloseMessage::FileDescriptor(fd) => {
+                        if let Err(e) = pcloud_clone.file_close(fd).await {
+                            warn!("Error closing file '{fd}': {e}");
+                        }
+                    }
+                    FileCloseMessage::Stop => {
+                        info!("Received STOP message");
+                        break;
+                    }
                 }
             }
         });
@@ -68,7 +87,19 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpCl
             folderid,
             pcloud,
             tx_file_close: tx,
+            thread_file_close: Some(t),
         })
+    }
+
+    /// Complete any pending operations: joins the file_close thread
+    pub async fn flush(&mut self) -> Result<()> {
+        if self.tx_file_close.send(FileCloseMessage::Stop).is_ok() {
+            self.thread_file_close
+                .take()
+                .ok_or_else(|| anyhow!("Thread is already closed!"))?
+                .await?;
+        }
+        Ok(())
     }
 
     fn work_on_contents(
@@ -128,71 +159,90 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         Ok(())
     }
 
+    async fn exists(&self, path: &Path) -> Result<bool> {
+        let path = self.check_path(path)?;
+        let _r = self.pcloud.stat(StatInput::Path(path)).await?;
+        Ok(true)
+    }
+
     async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
-        match self.check_path(path) {
-            Ok(v) => {
-                let relative_path = v.strip_prefix(self.root())?;
-                let filename = relative_path.file_name().unwrap().to_string_lossy().to_string();
-                let folderid = match relative_path.parent() {
-                    None => self.folderid.clone(),
-                    Some(parent_dir) => {
-                        if parent_dir != Path::new("") {
-                            get_folderid(&self.pcloud, parent_dir).await?
-                        } else {
-                            self.folderid.clone()
-                        }
-                    }
-                };
+        let path = self.check_path(path)?;
 
-                let fd = self
-                    .pcloud
-                    .file_open(
-                        Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
-                        FileOpenPath::FolderAndName(folderid, filename),
-                    )
-                    .await?;
-
-                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
-                Ok(Box::new(f))
+        let relative_path = path.strip_prefix(self.root())?;
+        let filename = relative_path.file_name().unwrap().to_string_lossy().to_string();
+        let folderid = match relative_path.parent() {
+            None => self.folderid.clone(),
+            Some(parent_dir) => {
+                if parent_dir != Path::new("") {
+                    get_folderid(&self.pcloud, parent_dir).await?
+                } else {
+                    self.folderid.clone()
+                }
             }
-            Err(e) => Err(e),
-        }
+        };
+
+        let fd = self
+            .pcloud
+            .file_open(
+                Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
+                FileOpenPath::FolderAndName(folderid, filename),
+            )
+            .await?;
+
+        let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
+        Ok(Box::new(f))
     }
 
     async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
-        match self.check_path(path) {
-            Ok(v) => {
-                //let relative_path = v.strip_prefix(self.root())?;
-                let fd = self
-                    .pcloud
-                    .file_open(Flags::empty(), FileOpenPath::Path(v.to_string_lossy().parse()?))
-                    .await?;
+        let path = self.check_path(path)?;
 
-                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
-                Ok(Box::new(f))
-            }
-            Err(e) => Err(e),
-        }
+        //let relative_path = v.strip_prefix(self.root())?;
+        let fd = self
+            .pcloud
+            .file_open(Flags::empty(), FileOpenPath::Path(path.to_string_lossy().parse()?))
+            .await?;
+
+        let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
+        Ok(Box::new(f))
     }
 
     async fn create_dir_all(&self, path: &Path) -> Result<()> {
-        match self.check_path(path) {
-            Ok(v) => {
-                let mut folderid = self.folderid.clone();
-                for cmp in v.components() {
-                    if let Component::Normal(p) = cmp {
-                        let input = CreateFolderIfNotExistsInput::FolderAndName(
-                            folderid.clone(),
-                            p.to_string_lossy().to_string(),
-                        );
-                        let r = self.pcloud.createfolderifnotexists(&input).await?;
-                        folderid = r.metadata.folderid.unwrap();
-                    }
-                }
-                Ok(())
+        let path = self.check_path(path)?;
+
+        let mut folderid = self.folderid.clone();
+        for cmp in path.components() {
+            if let Component::Normal(p) = cmp {
+                let input =
+                    CreateFolderIfNotExistsInput::FolderAndName(folderid.clone(), p.to_string_lossy().to_string());
+                let r = self.pcloud.createfolderifnotexists(&input).await?;
+                folderid = r.metadata.folderid.unwrap();
             }
-            Err(e) => Err(e),
         }
+        Ok(())
+    }
+
+    async fn remove_file(&self, path: &Path) -> Result<()> {
+        let path = self.check_path(path)?;
+
+        let input = DeleteFileInput::Path(path);
+        self.pcloud.deletefile(input).await?;
+        Ok(())
+    }
+
+    async fn remove_dir(&self, path: &Path) -> Result<()> {
+        let path = self.check_path(path)?;
+
+        let input = DeleteFolderInput::Path(path);
+        self.pcloud.deletefolder(input).await?;
+        Ok(())
+    }
+
+    async fn remove_dir_all(&self, path: &Path) -> Result<()> {
+        let path = self.check_path(path)?;
+
+        let input = DeleteFolderRecursiveInput::Path(path);
+        self.pcloud.deletefolderrecursive(input).await?;
+        Ok(())
     }
 }
 
@@ -201,12 +251,16 @@ mod tests {
     use std::collections::HashMap;
 
     use pcloud_sdk::error::Error;
+    use pcloud_sdk::methods::file::deletefile;
+    use pcloud_sdk::methods::file::deletefile::DeleteFile;
     use pcloud_sdk::methods::fileops::file_open::FileOpen;
     use pcloud_sdk::methods::fileops::file_write::FileWrite;
     use pcloud_sdk::methods::fileops::{file_close, file_open, file_read, file_write};
     use pcloud_sdk::methods::folder::createfolderifnotexists::CreateFolderIfNotExists;
+    use pcloud_sdk::methods::folder::deletefolder::DeleteFolder;
+    use pcloud_sdk::methods::folder::deletefolderrecursive::DeleteFolderRecursive;
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
-    use pcloud_sdk::methods::folder::{createfolderifnotexists, listfolder};
+    use pcloud_sdk::methods::folder::{createfolderifnotexists, deletefolder, deletefolderrecursive, listfolder};
     use pcloud_sdk::mocks::client::MockLocalClient;
     use pcloud_sdk::types::FileID;
     use pcloud_sdk::utils;
@@ -332,7 +386,7 @@ mod tests {
             });
 
         // Create the filesystem
-        let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
+        let mut fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
 
         let filepath = Path::new("file");
         let content: Vec<u8> = b"Hello, world!".to_vec();
@@ -342,6 +396,7 @@ mod tests {
             let mut f = fs.create(&filepath).await?;
             f.write_all(&content).await?;
         }
+        fs.flush().await?;
         Ok(())
     }
 
@@ -430,7 +485,7 @@ mod tests {
             });
 
         // Create the filesystem
-        let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
+        let mut fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
 
         let filepath = Path::new("file");
 
@@ -441,7 +496,7 @@ mod tests {
             file.read_to_end(&mut content_read).await?;
             assert_eq!(file_content.to_vec(), content_read);
         }
-
+        fs.flush().await?;
         Ok(())
     }
 
@@ -497,11 +552,13 @@ mod tests {
             });
 
         // Create the filesystem
-        let fs = FilesystemPCloud::new(root_path, client).await?;
-
-        let filepath = Path::new("nested/nested2/myfile.txt");
-        let r = fs.create(&filepath).await;
-        assert!(r.is_ok());
+        let mut fs = FilesystemPCloud::new(root_path, client).await?;
+        {
+            let filepath = Path::new("nested/nested2/myfile.txt");
+            let r = fs.create(&filepath).await;
+            assert!(r.is_ok());
+        }
+        fs.flush().await?;
         Ok(())
     }
 
@@ -550,6 +607,141 @@ mod tests {
         let fs = FilesystemPCloud::new(root_path, client).await?;
 
         fs.create_dir_all(Path::new("nested/nested2")).await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_remove_file() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        let root_path = Path::new("the/root/path");
+
+        // Expectation for FilesystemPCloud::new
+        client
+            .expect_get::<ListFolder>()
+            .times(1) // One on filesystem::new, another to check folder for file being created
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, listfolder::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("path"), Some(&root_path.to_string_lossy().parse()?));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
+
+                Ok(ListFolder {
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        // Expectation for remove_file
+        client
+            .expect_get::<DeleteFile>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, deletefile::ENDPOINT);
+                assert_eq!(params.len(), 1);
+                assert!(params.contains_key("path"));
+
+                Ok(DeleteFile {
+                    id: "1234-0".to_string(),
+                    metadata: Metadata {
+                        fileid: Some(FileID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        let fs = FilesystemPCloud::new(root_path, client).await?;
+        fs.remove_file(Path::new("nested/nested2")).await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_remove_folder() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        let root_path = Path::new("the/root/path");
+
+        // Expectation for FilesystemPCloud::new
+        client
+            .expect_get::<ListFolder>()
+            .times(1) // One on filesystem::new, another to check folder for file being created
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, listfolder::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("path"), Some(&root_path.to_string_lossy().parse()?));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
+
+                Ok(ListFolder {
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        // Expectation for remove_folder
+        client
+            .expect_get::<DeleteFolder>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, deletefolder::ENDPOINT);
+                assert_eq!(params.len(), 1);
+                assert!(params.contains_key("path"));
+
+                Ok(DeleteFolder {
+                    id: "1234-0".to_string(),
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        let fs = FilesystemPCloud::new(root_path, client).await?;
+        fs.remove_dir(Path::new("nested/nested2")).await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_remove_folder_recursive() -> Result<()> {
+        let mut client = MockLocalClient::new();
+        let root_path = Path::new("the/root/path");
+
+        // Expectation for FilesystemPCloud::new
+        client
+            .expect_get::<ListFolder>()
+            .times(1) // One on filesystem::new, another to check folder for file being created
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, listfolder::ENDPOINT);
+                assert_eq!(params.len(), 2);
+                assert_eq!(params.get("path"), Some(&root_path.to_string_lossy().parse()?));
+                assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
+
+                Ok(ListFolder {
+                    metadata: Metadata {
+                        folderid: Some(FolderID(1234)),
+                        ..Default::default()
+                    },
+                })
+            });
+
+        // Expectation for remove_folder
+        client
+            .expect_get::<DeleteFolderRecursive>()
+            .times(1)
+            .returning(move |endpoint, params: HashMap<_, _>| {
+                assert_eq!(endpoint, deletefolderrecursive::ENDPOINT);
+                assert_eq!(params.len(), 1);
+                assert!(params.contains_key("path"));
+
+                Ok(DeleteFolderRecursive {
+                    deletedfiles: 10,
+                    deletedfolders: 20,
+                })
+            });
+
+        let fs = FilesystemPCloud::new(root_path, client).await?;
+        fs.remove_dir_all(Path::new("nested/nested2")).await?;
         Ok(())
     }
 }

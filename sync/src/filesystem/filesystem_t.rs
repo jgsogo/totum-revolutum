@@ -28,7 +28,7 @@ where
         let path = normalize_path(path);
         if !path.starts_with(self.root()) {
             Err(anyhow!(
-                "Path '{}' is outside filesystem (root '{}')",
+                "Path '{}' is outside filesystem (root '{}'), or it's the root itself",
                 path.display(),
                 self.root().display()
             ))
@@ -47,6 +47,9 @@ where
     /// Walk files in the filesystem, for each file found it will send it via `tx`
     async fn walk_directory(&self, tx: flume::Sender<Self::Metadata>, threads: usize) -> Result<()>;
 
+    /// Returns true if the path points at an existing entity.
+    async fn exists(&self, path: &Path) -> Result<bool>;
+
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.
     async fn create(&self, path: &Path) -> Result<Box<dyn File>>;
 
@@ -56,4 +59,23 @@ where
 
     /// Creates the given directory and any intermediate one
     async fn create_dir_all(&self, path: &Path) -> Result<()>;
+
+    /// Copy
+    async fn copy(&self, _origin: &Path, _target: &Path) -> Result<()> {
+        todo!("A default `copy` using existing methods is not implemented")
+    }
+
+    /// Rename
+    async fn rename(&self, _origin: &Path, _target: &Path) -> Result<()> {
+        todo!("A default `rename` using existing methods is not implemented")
+    }
+
+    /// Removes a file from the filesystem.
+    async fn remove_file(&self, path: &Path) -> Result<()>;
+
+    /// Removes an empty directory.
+    async fn remove_dir(&self, path: &Path) -> Result<()>;
+
+    /// Removes a directory at this path, after removing all its contents. Use carefully!
+    async fn remove_dir_all(&self, path: &Path) -> Result<()>;
 }
