@@ -54,6 +54,11 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
+    async fn exists(&self, path: &Path) -> Result<bool> {
+        let path = self.check_path(path)?;
+        Ok(path.exists())
+    }
+
     async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
         let f = AsyncFile::create(path).await?;
@@ -108,6 +113,7 @@ mod tests {
         let tmp_dir = tempdir().unwrap();
         let fs = FilesystemLocal::new(tmp_dir.path())?;
         // Root is not cannonicalized, it fails in MacOS where tmp directories are inside sym folder
+        #[cfg(target_os = "macos")]
         assert_ne!(fs::canonicalize(tmp_dir.path())?, fs.root());
         assert_eq!(tmp_dir.path(), fs.root());
         Ok(())

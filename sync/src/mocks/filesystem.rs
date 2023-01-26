@@ -36,6 +36,10 @@ impl Filesystem for FilesystemMock {
         self.local.walk_directory(tx, threads).await
     }
 
+    async fn exists(&self, path: &Path) -> Result<bool> {
+        self.local.exists(path).await
+    }
+
     async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
         self.local.create(path).await
     }

@@ -47,6 +47,9 @@ where
     /// Walk files in the filesystem, for each file found it will send it via `tx`
     async fn walk_directory(&self, tx: flume::Sender<Self::Metadata>, threads: usize) -> Result<()>;
 
+    /// Returns true if the path points at an existing entity.
+    async fn exists(&self, path: &Path) -> Result<bool>;
+
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.
     async fn create(&self, path: &Path) -> Result<Box<dyn File>>;
 

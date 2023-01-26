@@ -39,15 +39,15 @@ pub struct Stat {
 }
 
 #[async_trait]
-pub trait GetDeleteFile: client::Client {
-    async fn deletefile(&self, input: StatInput) -> Result<Stat> {
+pub trait GetStat: client::Client {
+    async fn stat(&self, input: StatInput) -> Result<Stat> {
         let params = HashMap::try_from(input)?;
         let ret = self.get::<Stat>(ENDPOINT, params).await?;
         Ok(ret)
     }
 }
 
-impl<T: client::Client> GetDeleteFile for T {}
+impl<T: client::Client> GetStat for T {}
 
 #[cfg(test)]
 mod tests {

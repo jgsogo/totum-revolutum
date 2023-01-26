@@ -15,3 +15,22 @@ pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     copy(lhs_fs, rhs_fs, origin, target, force).await?;
     lhs_fs.remove_file(origin).await
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use crate::mocks::filesystem::FilesystemMock;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_move_no_force() -> Result<()> {
+        todo!("Copy with NO force")
+    }
+
+    #[tokio::test]
+    async fn test_move_force() -> Result<()> {
+        todo!("Move with force")
+    }
+}

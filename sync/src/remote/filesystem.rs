@@ -11,6 +11,7 @@ use tracing::{info, trace, warn};
 use pcloud_sdk::client::Client;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sdk::methods::file::deletefile::{DeleteFileInput, GetDeleteFile};
+use pcloud_sdk::methods::file::stat::{GetStat, StatInput};
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::FileDescriptor;
@@ -156,6 +157,12 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         info!("Finished remote visitor in {:?}", start.elapsed());
 
         Ok(())
+    }
+
+    async fn exists(&self, path: &Path) -> Result<bool> {
+        let path = self.check_path(path)?;
+        let _r = self.pcloud.stat(StatInput::Path(path)).await?;
+        Ok(true)
     }
 
     async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
