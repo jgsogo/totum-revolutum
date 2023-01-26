@@ -55,37 +55,37 @@ impl Filesystem for FilesystemLocal {
     }
 
     async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
-        let path = self.check_path(&path)?;
+        let path = self.check_path(path)?;
         let f = AsyncFile::create(path).await?;
         Ok(Box::new(LocalFile::new(f)))
     }
 
     async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
-        let path = self.check_path(&path)?;
+        let path = self.check_path(path)?;
         let f = AsyncFile::open(path).await?;
         Ok(Box::new(LocalFile::new(f)))
     }
 
     async fn create_dir_all(&self, path: &Path) -> Result<()> {
-        let path = self.check_path(&path)?;
+        let path = self.check_path(path)?;
         fs::create_dir_all(path).map_err(|e| anyhow!("Error creating the directory: {e}"))
     }
 
     async fn remove_file(&self, path: &Path) -> Result<()> {
         // Do not resolve symlinks
-        let path = self.check_path(&path)?;
+        let path = self.check_path(path)?;
         fs::remove_file(path).map_err(|e| anyhow!("Error removing a file: {e}"))
     }
 
     async fn remove_dir(&self, path: &Path) -> Result<()> {
         // Do not resolve symlinks
-        let path = self.check_path(&path)?;
+        let path = self.check_path(path)?;
         fs::remove_dir(path).map_err(|e| anyhow!("Error removing a directory: {e}"))
     }
 
     async fn remove_dir_all(&self, path: &Path) -> Result<()> {
         // Do not resolve symlinks
-        let path = self.check_path(&path)?;
+        let path = self.check_path(path)?;
         fs::remove_dir_all(path).map_err(|e| anyhow!("Error removing a directory: {e}"))
     }
 }

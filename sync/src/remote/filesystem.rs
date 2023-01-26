@@ -159,103 +159,83 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     }
 
     async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
-        match self.check_path(path) {
-            Ok(v) => {
-                let relative_path = v.strip_prefix(self.root())?;
-                let filename = relative_path.file_name().unwrap().to_string_lossy().to_string();
-                let folderid = match relative_path.parent() {
-                    None => self.folderid.clone(),
-                    Some(parent_dir) => {
-                        if parent_dir != Path::new("") {
-                            get_folderid(&self.pcloud, parent_dir).await?
-                        } else {
-                            self.folderid.clone()
-                        }
-                    }
-                };
+        let path = self.check_path(path)?;
 
-                let fd = self
-                    .pcloud
-                    .file_open(
-                        Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
-                        FileOpenPath::FolderAndName(folderid, filename),
-                    )
-                    .await?;
-
-                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
-                Ok(Box::new(f))
+        let relative_path = path.strip_prefix(self.root())?;
+        let filename = relative_path.file_name().unwrap().to_string_lossy().to_string();
+        let folderid = match relative_path.parent() {
+            None => self.folderid.clone(),
+            Some(parent_dir) => {
+                if parent_dir != Path::new("") {
+                    get_folderid(&self.pcloud, parent_dir).await?
+                } else {
+                    self.folderid.clone()
+                }
             }
-            Err(e) => Err(e),
-        }
+        };
+
+        let fd = self
+            .pcloud
+            .file_open(
+                Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
+                FileOpenPath::FolderAndName(folderid, filename),
+            )
+            .await?;
+
+        let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
+        Ok(Box::new(f))
     }
 
     async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
-        match self.check_path(path) {
-            Ok(v) => {
-                //let relative_path = v.strip_prefix(self.root())?;
-                let fd = self
-                    .pcloud
-                    .file_open(Flags::empty(), FileOpenPath::Path(v.to_string_lossy().parse()?))
-                    .await?;
+        let path = self.check_path(path)?;
 
-                let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
-                Ok(Box::new(f))
-            }
-            Err(e) => Err(e),
-        }
+        //let relative_path = v.strip_prefix(self.root())?;
+        let fd = self
+            .pcloud
+            .file_open(Flags::empty(), FileOpenPath::Path(path.to_string_lossy().parse()?))
+            .await?;
+
+        let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
+        Ok(Box::new(f))
     }
 
     async fn create_dir_all(&self, path: &Path) -> Result<()> {
-        match self.check_path(path) {
-            Ok(v) => {
-                let mut folderid = self.folderid.clone();
-                for cmp in v.components() {
-                    if let Component::Normal(p) = cmp {
-                        let input = CreateFolderIfNotExistsInput::FolderAndName(
-                            folderid.clone(),
-                            p.to_string_lossy().to_string(),
-                        );
-                        let r = self.pcloud.createfolderifnotexists(&input).await?;
-                        folderid = r.metadata.folderid.unwrap();
-                    }
-                }
-                Ok(())
+        let path = self.check_path(path)?;
+
+        let mut folderid = self.folderid.clone();
+        for cmp in path.components() {
+            if let Component::Normal(p) = cmp {
+                let input =
+                    CreateFolderIfNotExistsInput::FolderAndName(folderid.clone(), p.to_string_lossy().to_string());
+                let r = self.pcloud.createfolderifnotexists(&input).await?;
+                folderid = r.metadata.folderid.unwrap();
             }
-            Err(e) => Err(e),
         }
+        Ok(())
     }
 
     async fn remove_file(&self, path: &Path) -> Result<()> {
-        match self.check_path(path) {
-            Ok(v) => {
-                let input = DeleteFileInput::Path(v);
-                self.pcloud.deletefile(input).await?;
-                Ok(())
-            }
-            Err(e) => Err(e),
-        }
+        let path = self.check_path(path)?;
+
+        let input = DeleteFileInput::Path(path);
+        self.pcloud.deletefile(input).await?;
+        Ok(())
     }
 
     async fn remove_dir(&self, path: &Path) -> Result<()> {
-        match self.check_path(path) {
-            Ok(v) => {
-                let input = DeleteFolderInput::Path(v);
-                self.pcloud.deletefolder(input).await?;
-                Ok(())
-            }
-            Err(e) => Err(e),
-        }
+        let path = self.check_path(path)?;
+
+        let input = DeleteFolderInput::Path(path);
+        self.pcloud.deletefolder(input).await?;
+        Ok(())
     }
 
     async fn remove_dir_all(&self, path: &Path) -> Result<()> {
-        match self.check_path(path) {
-            Ok(v) => {
-                let input = DeleteFolderRecursiveInput::Path(v);
-                self.pcloud.deletefolderrecursive(input).await?;
-                Ok(())
-            }
-            Err(e) => Err(e),
-        }
+        let path = self.check_path(path)?;
+
+        let input = DeleteFolderRecursiveInput::Path(path);
+        self.pcloud.deletefolderrecursive(input).await?;
+        Ok(())
     }
 }
 
