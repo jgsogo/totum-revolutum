@@ -24,7 +24,7 @@ impl Display for Category {
             Category::Document => "document",
             Category::Archive => "archive",
         };
-        write!(f, "{}", readable)
+        write!(f, "{readable}")
     }
 }
 
@@ -38,7 +38,7 @@ impl Debug for Category {
             Category::Document => "document(4)",
             Category::Archive => "archive(5)",
         };
-        write!(f, "{}", readable)
+        write!(f, "{readable}")
     }
 }
 

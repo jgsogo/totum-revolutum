@@ -68,7 +68,7 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
         .expect("TODO: Propagate errors");
     let token = pcloud.oauth2_token;
 
-    println!("Oauth2 token: {:?}", token);
+    println!("Oauth2 token: {token:?}");
     // Update application data and store new token (override if existing)
     if params.name.is_some() {
         app.name = params.name.as_ref().unwrap().into();

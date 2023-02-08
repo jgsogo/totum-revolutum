@@ -38,7 +38,7 @@ pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
         // Progress bar setup
         let pb = pb_builder.build(total_size);
         let (_, url_filename) = url.rsplit_once('/').unwrap();
-        pb.set_message(&format!("Downloading '{}'", url_filename));
+        pb.set_message(&format!("Downloading '{url_filename}'"));
 
         // download chunks
         let mut file = File::create(path).map_err(|e| anyhow!("Failed to create file '{}': {e}", path.display()))?;
