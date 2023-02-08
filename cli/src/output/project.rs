@@ -15,9 +15,9 @@ pub fn _cron_details(config: &storage::config::Config, directory: &storage::cron
         Some(d) => d.to_string(),
         None => "NEVER".into(),
     };
-    println!("   last: {}", last_executed);
+    println!("   last: {last_executed}");
 
     if let Some(upcoming) = directory.upcoming() {
-        println!("   next: {}", upcoming);
+        println!("   next: {upcoming}");
     }
 }
