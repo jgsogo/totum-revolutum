@@ -15,14 +15,14 @@ impl FileID {
 impl Display for FileID {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let FileID(value) = self;
-        write!(f, "fileid:{}", value)
+        write!(f, "fileid:{value}")
     }
 }
 
 impl Debug for FileID {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let FileID(value) = self;
-        write!(f, "fileid:{:?}", value)
+        write!(f, "fileid:{value:?}")
     }
 }
 

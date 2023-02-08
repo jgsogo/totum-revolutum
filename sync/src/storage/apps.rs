@@ -26,7 +26,7 @@ impl AppsFileContent {
             Some(app) => Ok(app),
             None => Err(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
-                format!("Application not found with id '{}'", client_id),
+                format!("Application not found with id '{client_id}'"),
             )),
         }
     }
