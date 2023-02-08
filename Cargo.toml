@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "sdk",
+    "pcloud_sdk",
     "cli",
     "sync",
 ]

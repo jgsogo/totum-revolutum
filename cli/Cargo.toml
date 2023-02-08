@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-pcloud-sdk = { path = "../sdk" }
+pcloud-sdk = { path = "../pcloud_sdk" }
 pcloud-sync = { path = "../sync" }
 # indicatif = { version = "0.17"}
 home = "0.5.4"

@@ -7,7 +7,7 @@ edition = "2021"
 test_utils = ["dep:httpmock", "dep:tempfile"]
 
 [dependencies]
-pcloud-sdk = { path = "../sdk" }
+pcloud-sdk = { path = "../pcloud_sdk" }
 fs4 = { version = "0.6" }
 confy = { version = "0.5", default-features = false, features = ["yaml_conf"] }
 
@@ -43,7 +43,7 @@ tempfile = { version = "3.3", optional = true }
 
 [dev-dependencies]
 tempfile = "3"
-pcloud-sdk = { path = "../sdk", features = ["test_utils"] }
+pcloud-sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
 pcloud-sync = { path = ".", features = ["test_utils"] }
 
 [[example]]
