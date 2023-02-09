@@ -1,4 +1,4 @@
-use crate::filesystem::FileMetadata;
+use crate::FileMetadata;
 
 /// Contains a pair of [`FileMetadata`]
 ///

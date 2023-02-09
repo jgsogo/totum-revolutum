@@ -3,8 +3,9 @@ use std::time::Instant;
 
 use tracing::{debug, error, info, trace};
 
-use crate::diff::file_pair::FilePair;
-use crate::filesystem::FileMetadata;
+use crate::FileMetadata;
+
+use super::file_pair::FilePair;
 
 const MAX_BUFFER: usize = 100;
 

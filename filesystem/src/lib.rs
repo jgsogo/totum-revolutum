@@ -3,6 +3,8 @@ pub use file_metadata::FileMetadata;
 pub use filesystem_t::Filesystem;
 
 pub mod copy;
+#[cfg(feature = "diff")]
+pub mod diff;
 mod file;
 mod file_metadata;
 mod filesystem_t;
