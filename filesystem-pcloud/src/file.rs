@@ -11,8 +11,8 @@ use pcloud_sdk::methods::fileops::file_open::FileOpen;
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
 
-use crate::filesystem::File;
-use crate::remote::filesystem::FileCloseMessage;
+use crate::filesystem::FileCloseMessage;
+use filesystem::File;
 
 pub const CHUNK_SIZE: usize = 512; // Just a guess of _optimal package size over a network_
 

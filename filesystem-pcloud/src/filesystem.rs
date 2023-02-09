@@ -23,9 +23,9 @@ use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::FolderID;
 
-use crate::filesystem::{File, Filesystem};
-use crate::remote::file::RemoteFile;
-use crate::remote::RemoteMetadata;
+use crate::file::RemoteFile;
+use crate::RemoteMetadata;
+use filesystem::{File, Filesystem};
 
 pub type PCloudHttpClient = pcloud_sdk::client::HttpClient<OAuth2TokenImpl>;
 
@@ -135,7 +135,14 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         &self.path
     }
 
-    async fn walk_directory(&self, tx: Sender<Self::Metadata>, _threads: usize) -> Result<()> {
+    async fn walk_directory(
+        &self,
+        tx: Sender<Self::Metadata>,
+        _threads: usize,
+        _custom_ignore_filename: &Path,
+    ) -> Result<()> {
+        // TODO: Implement _custom_ignore_filename logic
+
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
         //  and use a thread pool to enter child directories and _recurse_.
@@ -265,7 +272,7 @@ mod tests {
     use pcloud_sdk::types::FileID;
     use pcloud_sdk::utils;
 
-    use crate::remote::file::CHUNK_SIZE;
+    use crate::file::CHUNK_SIZE;
 
     use super::*;
 

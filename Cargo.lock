@@ -685,6 +685,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "filesystem-pcloud"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "filesystem",
+ "flume",
+ "pcloud-sdk",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "fixedbitset"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
