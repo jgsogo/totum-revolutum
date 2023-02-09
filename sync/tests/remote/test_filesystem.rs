@@ -3,13 +3,13 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
+use filesystem::Filesystem;
+use filesystem_pcloud::FilesystemPCloud;
+use filesystem_pcloud::CHUNK_SIZE;
 use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::data::oauth2token::OAuth2Token;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::FolderID;
-use pcloud_sync::filesystem::Filesystem;
-use pcloud_sync::remote::file::CHUNK_SIZE;
-use pcloud_sync::remote::filesystem::FilesystemPCloud;
 
 #[tokio::test]
 async fn test_create_write_read_in_root_folder() -> Result<()> {

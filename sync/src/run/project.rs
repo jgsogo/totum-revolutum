@@ -5,9 +5,9 @@ use tracing::info;
 
 use crate::actions;
 use crate::errors::SDKErrors;
-use crate::local::FilesystemLocal;
-use crate::remote::filesystem::FilesystemPCloud;
 use crate::storage;
+use filesystem::local::FilesystemLocal;
+use filesystem_pcloud::FilesystemPCloud;
 
 /// Run configured action in the given pcloud-dir. It doesn't take into account
 /// any cron considerations (those are stored at global level)

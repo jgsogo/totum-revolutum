@@ -5,7 +5,7 @@ use tracing::info;
 
 use crate::actions::action_run::ActionRun;
 use crate::actions::OnConflict;
-use crate::filesystem::{FileMetadata, Filesystem};
+use filesystem::{FileMetadata, Filesystem};
 
 pub struct Backup<'action, FsLhs: Filesystem, FsRhs: Filesystem> {
     _lhs_fs: &'action FsLhs,

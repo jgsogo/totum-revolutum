@@ -6,9 +6,9 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::actions::{Actions, OnConflict};
-use crate::remote::filesystem::PCloudHttpClient;
 use crate::utils::locked_file::{LockedFile, ReadWrite};
 use crate::utils::versioned_data::VersionedData;
+use filesystem_pcloud::PCloudHttpClient;
 
 use super::apps;
 use super::INSIDE_PROJECT_DIRECTORY;

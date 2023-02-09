@@ -4,10 +4,10 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 
+use filesystem::diff::{two_ways_run, FilePair};
+use filesystem::{FileMetadata, Filesystem};
+
 use crate::actions::action_run::ActionRun;
-use crate::diff;
-use crate::diff::FilePair;
-use crate::filesystem::{FileMetadata, Filesystem};
 use crate::storage::config;
 
 mod action_run;
@@ -84,10 +84,14 @@ pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
     };
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
-    let (lhs, rhs, differ) = diff::two_ways_run::<FsLhs::Metadata, FsRhs::Metadata>().await;
+    let (lhs, rhs, differ) = two_ways_run::<FsLhs::Metadata, FsRhs::Metadata>().await;
+    // TODO: This is not right
+    let lhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(lhs_fs.root());
+    let rhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(rhs_fs.root());
+
     if let Err(e) = tokio::try_join!(
-        lhs_fs.walk_directory(lhs, 6),
-        rhs_fs.walk_directory(rhs, 6),
+        lhs_fs.walk_directory(lhs, 6, &lhs_ignore_filepath),
+        rhs_fs.walk_directory(rhs, 6, &rhs_ignore_filepath),
         work_on_results(differ, &action_run),
     ) {
         error!("Error on workers loop: {e}");

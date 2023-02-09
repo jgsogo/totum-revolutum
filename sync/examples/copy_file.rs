@@ -2,13 +2,13 @@ use std::path::Path;
 
 use anyhow::Result;
 
+use filesystem::copy::copy;
+use filesystem::Filesystem;
+use filesystem_pcloud::FilesystemPCloud;
 use pcloud_sdk::data;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
-use pcloud_sync::filesystem::copy::copy;
-use pcloud_sync::filesystem::Filesystem;
-use pcloud_sync::remote::filesystem::FilesystemPCloud;
 
 #[tokio::main]
 async fn main() -> Result<()> {

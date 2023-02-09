@@ -8,6 +8,9 @@ test_utils = ["dep:httpmock", "dep:tempfile"]
 
 [dependencies]
 pcloud-sdk = { path = "../pcloud_sdk" }
+filesystem = { path = "../filesystem", features = ["diff", "local"] }
+filesystem-pcloud = { path = "../filesystem-pcloud" }
+
 fs4 = { version = "0.6" }
 confy = { version = "0.5", default-features = false, features = ["yaml_conf"] }
 
