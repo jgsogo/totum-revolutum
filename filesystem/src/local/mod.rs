@@ -1,5 +1,5 @@
+pub use self::filesystem::FilesystemLocal;
 pub use file_metadata::{LocalFileMetadata, LocalMetadata};
-pub use filesystem::FilesystemLocal;
 
 mod actions;
 mod file;

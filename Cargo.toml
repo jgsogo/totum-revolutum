@@ -2,6 +2,7 @@
 
 members = [
     "pcloud_sdk",
-    "cli",
-    "sync",
+    "filesystem",
+#    "cli",
+#    "sync",
 ]

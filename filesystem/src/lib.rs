@@ -6,4 +6,9 @@ pub mod copy;
 mod file;
 mod file_metadata;
 mod filesystem_t;
+#[cfg(feature = "local")]
+pub mod local;
+#[cfg(feature = "test_utils")]
+pub mod mocks;
 pub mod move_file;
+mod utils;

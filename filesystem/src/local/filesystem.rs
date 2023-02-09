@@ -2,16 +2,16 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, bail, Result};
-use async_std::fs::File as AsyncFile;
 use async_trait::async_trait;
 use flume::Sender;
-use ignore::WalkBuilder;
 use tokio::time::Instant;
+
+use async_std::fs::File as AsyncFile;
+use ignore::WalkBuilder;
 use tracing::info;
 
-use crate::filesystem::{File, Filesystem};
 use crate::local::LocalMetadata;
-use crate::storage::ignore_files;
+use crate::{File, Filesystem};
 
 use super::file::LocalFile;
 use super::parallel_visitor;
@@ -39,11 +39,16 @@ impl Filesystem for FilesystemLocal {
         &self.path
     }
 
-    async fn walk_directory(&self, tx: Sender<Self::Metadata>, threads: usize) -> Result<()> {
+    async fn walk_directory(
+        &self,
+        tx: Sender<Self::Metadata>,
+        threads: usize,
+        custom_ignore_filename: &Path,
+    ) -> Result<()> {
         let walker = WalkBuilder::new(&self.path)
             .threads(threads)
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
-            .add_custom_ignore_filename(ignore_files::IgnoreFiles::path(self.root()))
+            .add_custom_ignore_filename(custom_ignore_filename)
             .build_parallel();
 
         info!("Start local visitor");

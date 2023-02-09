@@ -3,9 +3,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 
-use pcloud_sdk::utils::normalize_path;
-
-use crate::filesystem::{File, FileMetadata};
+use super::utils::normalize_path;
+use super::{File, FileMetadata};
 
 /// Abstract a filesystem, either local or remote and provide methods to access their files
 #[async_trait]
@@ -45,7 +44,12 @@ where
     }
 
     /// Walk files in the filesystem, for each file found it will send it via `tx`
-    async fn walk_directory(&self, tx: flume::Sender<Self::Metadata>, threads: usize) -> Result<()>;
+    async fn walk_directory(
+        &self,
+        tx: flume::Sender<Self::Metadata>,
+        threads: usize,
+        custom_ignore_filename: &Path,
+    ) -> Result<()>;
 
     /// Returns true if the path points at an existing entity.
     async fn exists(&self, path: &Path) -> Result<bool>;
