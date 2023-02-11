@@ -1,28 +1,21 @@
-pCloud-sdk
-==========
+Totum revolutum
+===============
 
-Implementation of the pCloud API in Rust... while learning the
-language (help and suggestion are very welcome).
+> Loc. lat.; literalmente 'todo revuelto'.
+> 
+> m. revoltijo (‖ conjunto de cosas sin orden).
 
-## Authentication
+The aim of this project is to create an easy-to-use (git-like) tool to run sync
+operations between different directories and storages. It uses an abstraction
+over a filesystem and, on top of the abstraction, it builds some sync operations
+like backup, copy, mirror,...
 
-Only OAuth2 using an application is implemented. Using username/password
-should be discouraged: inherently more dangerous and authorization is harder
-to revoke, also it is not possible if two-factor authentication is enabled.
+The project has evolved quite a bit and now it contains several crates:
 
-To use the library you will need to create a pCloud application and get its
-`client_id` and `client_secret`. If you want to emulate username/password
-access, just create an application with write permissions to every folder. 
-Then, store credentials in a JSON file like:
-
-```json
-{
-  "client_id": "<client_id>",
-  "client_secret": "<client_secret>",
-  "force_reapprove": false
-}
-```
-
-> **Note.-** Remember that you can always revoke access to your account for any application
-from your pCloud account in `Settings >> Linked accounts >> Linked apps`.
-
+ * [pcloud-sdk](pcloud_sdk): Implementation of the [pCloud](https://pcloud.com/) API
+ * [filesystem](filesystem): Filesystem abstraction. It also implements `local`
+   and `mock`.
+ * [filesystem-pcloud](filesystem-pcloud): Implementation of the `filesystem` trait
+   for remote pCloud storage.
+ * [syncronia](sync): Operations between different filesystems. It also provides a 
+   CLI tool
