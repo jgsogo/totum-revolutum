@@ -6,5 +6,5 @@ members = [
     "filesystem-pcloud",
 
     "cli",
-    "sync",
+    "syncronia",
 ]

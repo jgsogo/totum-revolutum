@@ -5,6 +5,8 @@ Totum revolutum
 > 
 > m. revoltijo (‖ conjunto de cosas sin orden).
 
+[![Build and tests](https://github.com/jgsogo/pcloud-sdk/actions/workflows/cargo_check.yml/badge.svg)](https://github.com/jgsogo/pcloud-sdk/actions/workflows/cargo_check.yml)
+
 The aim of this project is to create an easy-to-use (git-like) tool to run sync
 operations between different directories and storages. It uses an abstraction
 over a filesystem and, on top of the abstraction, it builds some sync operations
@@ -17,5 +19,5 @@ The project has evolved quite a bit and now it contains several crates:
    and `mock`.
  * [filesystem-pcloud](filesystem-pcloud): Implementation of the `filesystem` trait
    for remote pCloud storage.
- * [syncronia](sync): Operations between different filesystems. It also provides a 
+ * [syncronia](syncronia): Operations between different filesystems. It also provides a 
    CLI tool
