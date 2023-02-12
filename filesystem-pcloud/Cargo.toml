@@ -19,3 +19,8 @@ tracing = { version = "0.1" }
 [dev-dependencies]
 #filesystem = { path = ".", features = ["test_utils"] }
 pcloud-sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
+
+
+[[example]]
+name = "copy_file"
+

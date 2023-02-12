@@ -57,9 +57,6 @@ pcloud-sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
 syncronia = { path = ".", features = ["test_utils"] }
 
 
-[[example]]
-name = "copy_file"
-
 [[bin]]
 name = "scr"
 path = "src/cli/main.rs"
