@@ -1,10 +1,11 @@
 [package]
-name = "pcloud-sync"
+name = "syncronia"
 version = "0.1.0"
 edition = "2021"
 
 [features]
 test_utils = ["dep:httpmock", "dep:tempfile"]
+cli = ["dep:clap-verbosity-flag", "dep:log", "dep:tracing-subscriber", "dep:home"]
 
 [dependencies]
 pcloud-sdk = { path = "../pcloud_sdk" }
@@ -44,10 +45,23 @@ async-std = "1.12"
 httpmock = { version = "0.6", optional = true }
 tempfile = { version = "3.3", optional = true }
 
+# Deps for CLI
+clap-verbosity-flag = { version = "2.0.0", optional = true }
+log = { version = "0.4", optional = true }
+tracing-subscriber = { version = "0.3", optional = true }
+home = { version = "0.5.4", optional = true }
+
 [dev-dependencies]
 tempfile = "3"
 pcloud-sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
-pcloud-sync = { path = ".", features = ["test_utils"] }
+syncronia = { path = ".", features = ["test_utils"] }
+
 
 [[example]]
 name = "copy_file"
+
+[[bin]]
+name = "scr"
+path = "src/cli/main.rs"
+# Waiting for https://github.com/rust-lang/rfcs/pull/3374
+required-features = ["cli"]

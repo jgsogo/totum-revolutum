@@ -4,7 +4,7 @@ use anyhow::Result;
 use clap::Args;
 use tracing::debug;
 
-use pcloud_sync::storage;
+use syncronia::storage;
 
 #[derive(Args, Debug)]
 pub struct ListParams {

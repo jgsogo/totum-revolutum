@@ -6,9 +6,9 @@ use tracing::info;
 
 use pcloud_sdk::data;
 use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
-use pcloud_sync::storage;
-use pcloud_sync::storage::apps::Apps;
-use pcloud_sync::utils::mut_find_or_insert;
+use syncronia::storage;
+use syncronia::storage::apps::Apps;
+use syncronia::utils::mut_find_or_insert;
 
 // TODO: Args 'client_secret' and 'client_secret_stdin' are mutually exclusive, but one of them is always required
 

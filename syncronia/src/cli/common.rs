@@ -3,8 +3,8 @@ use std::path::PathBuf;
 
 use clap::Args;
 
-use pcloud_sync::storage::is_pcloud_dir;
-use pcloud_sync::utils::to_absolute_path;
+use syncronia::storage::is_pcloud_dir;
+use syncronia::utils::to_absolute_path;
 
 pub fn current_wdir() -> PathBuf {
     let current_wdir = env::current_dir().expect("Cannot return current dir");

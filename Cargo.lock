@@ -1595,15 +1595,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num_threads"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2819ce041d2ee131036f4fc9d6ae7ae125a3a40e97ba64d04fe799ad9dabbb44"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "number_prefix"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1758,62 +1749,6 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "url",
-]
-
-[[package]]
-name = "pcloud-sdk-cli"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "clap",
- "clap-verbosity-flag",
- "fs4",
- "home",
- "log",
- "pcloud-sdk",
- "pcloud-sync",
- "serde",
- "serde_json",
- "thiserror",
- "time 0.3.17",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "pcloud-sync"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-std",
- "async-trait",
- "chrono",
- "chrono-tz",
- "clap",
- "confy",
- "cron-parser",
- "filesystem",
- "filesystem-pcloud",
- "flume",
- "fs4",
- "futures",
- "httpmock",
- "ignore",
- "path-clean",
- "pcloud-sdk",
- "pcloud-sync",
- "serde",
- "serde_json",
- "serde_yaml 0.9.17",
- "sha256",
- "tempfile",
- "thiserror",
- "time 0.3.17",
- "tokio",
- "tracing",
 ]
 
 [[package]]
@@ -2473,6 +2408,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "syncronia"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "async-trait",
+ "chrono",
+ "chrono-tz",
+ "clap",
+ "clap-verbosity-flag",
+ "confy",
+ "cron-parser",
+ "filesystem",
+ "filesystem-pcloud",
+ "flume",
+ "fs4",
+ "futures",
+ "home",
+ "httpmock",
+ "ignore",
+ "log",
+ "path-clean",
+ "pcloud-sdk",
+ "serde",
+ "serde_json",
+ "serde_yaml 0.9.17",
+ "sha256",
+ "syncronia",
+ "tempfile",
+ "thiserror",
+ "time 0.3.17",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "tempfile"
 version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2559,8 +2531,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a561bf4617eebd33bca6434b988f39ed798e527f51a1e797d0ee4f61c0a38376"
 dependencies = [
  "itoa",
- "libc",
- "num_threads",
  "serde",
  "time-core",
  "time-macros",

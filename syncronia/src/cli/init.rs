@@ -4,10 +4,10 @@ use anyhow::{anyhow, Result};
 use clap::Args;
 use tracing::{debug, info};
 
-use pcloud_sync::actions;
-use pcloud_sync::storage;
-use pcloud_sync::storage::candidate_pcloud_dir;
-use pcloud_sync::storage::config::{Config, ConfigAction};
+use syncronia::actions;
+use syncronia::storage;
+use syncronia::storage::candidate_pcloud_dir;
+use syncronia::storage::config::{Config, ConfigAction};
 
 use crate::common::DirectoryArg;
 

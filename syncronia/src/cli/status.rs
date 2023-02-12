@@ -2,7 +2,7 @@ use std::path::Path;
 
 use anyhow::Result;
 
-use pcloud_sync::storage;
+use syncronia::storage;
 
 use crate::common::DirectoryArg;
 use crate::output;

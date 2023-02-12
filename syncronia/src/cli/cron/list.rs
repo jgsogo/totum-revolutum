@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use tracing::debug;
 
-use pcloud_sync::storage;
+use syncronia::storage;
 
 use crate::output;
 
