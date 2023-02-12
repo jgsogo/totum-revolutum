@@ -14,7 +14,8 @@ mod action_run;
 mod backup;
 
 /// Describes the action to perform
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, clap::ValueEnum, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "cli", derive(clap::ValueEnum))]
 pub enum Actions {
     /// Send local content to remote. Local is not modified
     Backup,
@@ -37,7 +38,8 @@ pub enum Actions {
 
 /// Describe the action to take when there are conflicts. Not all
 /// [`OnConflict`] are compatible with every [`Actions`]
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, clap::ValueEnum, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "cli", derive(clap::ValueEnum))]
 pub enum OnConflict {
     /// Overrides remote content with local
     OverrideRemote,

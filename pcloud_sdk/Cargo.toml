@@ -6,6 +6,7 @@ edition = "2021"
 [features]
 indicatif = ["dep:indicatif"]
 test_utils = ["dep:mockall", "dep:httpmock"]
+cli = ["dep:clap-verbosity-flag", "dep:tracing-subscriber", "dep:log", "dep:clap"]
 
 [dependencies]
 bytes = "1"
@@ -14,7 +15,6 @@ bytes = "1"
 tokio = { version = "1.25", features = ["full"] }
 hyper = { version = "0.14", features = ["full"] }
 dirs = { version = "4.0" }
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 http = "0.2"
 http-body = "0.4"
 futures = "0.3"
@@ -49,6 +49,12 @@ indicatif = { version = "0.17", optional = true }
 mockall = { version = "0.11", optional = true }
 httpmock = { version = "0.6", optional = true }
 
+# Deps for CLI
+clap-verbosity-flag = { version = "2.0.0", optional = true }
+tracing-subscriber = { version = "0.3", optional = true }
+log = { version = "0.4", optional = true }
+clap = { version = "4.1", features = ["derive"], optional = true }
+
 [dev-dependencies]
 tempfile = "3.3"
 env_logger = "0.10"
@@ -66,3 +72,9 @@ required-features = ["indicatif"]
 [[example]]
 name = "fileops"
 required-features = ["indicatif"]
+
+[[bin]]
+name = "pcloud-sdk"
+path = "src/cli/main.rs"
+# Waiting for https://github.com/rust-lang/rfcs/pull/3374
+required-features = ["cli"]
