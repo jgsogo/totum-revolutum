@@ -4,6 +4,5 @@ pub use to_absolute_path::to_absolute_path;
 
 mod find_or_insert;
 pub mod locked_file;
-mod normalize_path;
 mod to_absolute_path;
 pub mod versioned_data;

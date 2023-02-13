@@ -2,21 +2,18 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
-
 use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::structures::Metadata;
+use crate::types::{Folder, FolderValue};
 
 pub const ENDPOINT: &str = "/listfolder";
 
-#[derive(Default)]
 pub struct ListFolderInput {
-    // path to the folder(discouraged)
-    path: Option<String>,
-    // id of the folder
-    folderid: Option<i64>,
+    /// ID of the folder, or path to it (discouraged)
+    folder: Folder,
 
     // If is set full directory tree will be returned, which means that all directories will have contents filed.
     pub recursive: bool,
@@ -29,16 +26,13 @@ pub struct ListFolderInput {
 }
 
 impl ListFolderInput {
-    pub fn new_from_path(path: Option<String>) -> ListFolderInput {
+    pub fn new(folder: Folder) -> ListFolderInput {
         ListFolderInput {
-            path: Some(path.unwrap_or_else(|| "/".to_string())),
-            ..Default::default()
-        }
-    }
-    pub fn new_from_folderid(folderid: i64) -> ListFolderInput {
-        ListFolderInput {
-            folderid: Some(folderid),
-            ..Default::default()
+            folder,
+            recursive: false,
+            showdeleted: None,
+            nofiles: None,
+            noshared: None,
         }
     }
 }
@@ -61,13 +55,18 @@ pub trait GetListFolder: client::Client {
     ) -> Result<ListFolder> {
         let mut params = HashMap::new();
         match list_folder {
-            ListFolderInput { path: Some(p), .. } => {
-                params.insert("path".to_string(), p.clone());
+            ListFolderInput {
+                folder: Folder(FolderValue::Path(p)),
+                ..
+            } => {
+                params.insert("path".to_string(), p.display().to_string());
             }
-            ListFolderInput { folderid: Some(f), .. } => {
+            ListFolderInput {
+                folder: Folder(FolderValue::FolderID(f)),
+                ..
+            } => {
                 params.insert("folderid".to_string(), f.to_string());
             }
-            _ => todo!("Either path or folderid is compulsory"),
         }
 
         if list_folder.recursive {

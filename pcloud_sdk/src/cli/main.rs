@@ -5,6 +5,7 @@ use tracing::debug;
 use pcloud_sdk::client::HttpClient;
 
 mod auth;
+mod listfolder;
 mod userinfo;
 
 #[derive(Parser)]
@@ -31,6 +32,8 @@ enum Commands {
     AuthFile(auth::AuthFileParams),
 
     Userinfo,
+
+    Listfolder(listfolder::Params),
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -62,6 +65,7 @@ async fn main() -> Result<()> {
             let client = HttpClient::new(token, true);
             match &cli.command {
                 Commands::Userinfo => userinfo::handle(client).await,
+                Commands::Listfolder(params) => listfolder::handle(client, params).await,
                 c => bail!("Unexpected command {:?}", c),
             }
         }
