@@ -1,10 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-pub trait OAuth2Token {
-    fn hostname(&self) -> String; // TODO: return &str
-
-    fn access_token(&self) -> &str;
-}
+use crate::access_token::OAuth2Token;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct OAuth2TokenImpl {

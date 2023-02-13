@@ -11,7 +11,7 @@ use crate::methods::fileops::{file_close, file_open, file_read, file_write};
 use crate::methods::folder::listfolder;
 use crate::types::FolderID;
 
-use crate::methods::oauth2::OAuth2Token;
+use crate::access_token::OAuth2Token;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 struct OAuth2TokenMock {

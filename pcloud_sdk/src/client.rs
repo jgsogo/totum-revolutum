@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
 
+use crate::access_token;
 use anyhow::Result;
 use async_trait::async_trait;
 use reqwest;
@@ -23,13 +24,13 @@ pub trait Client {
 }
 
 #[derive(Debug)]
-pub struct HttpClient<Token: oauth2::OAuth2Token> {
+pub struct HttpClient<Token: access_token::OAuth2Token> {
     pub oauth2_token: Token,
     http_client: reqwest::Client,
     secure: bool,
 }
 
-impl<Token: oauth2::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
     pub fn new(oauth2_token: Token, secure: bool) -> HttpClient<Token> {
         let client = reqwest::ClientBuilder::new().build().unwrap();
         HttpClient {
@@ -56,7 +57,7 @@ impl<Token: oauth2::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Http
 }
 
 #[async_trait]
-impl<Token: oauth2::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for HttpClient<Token> {
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for HttpClient<Token> {
     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
     where
         T: DeserializeOwned + 'static,
@@ -85,7 +86,7 @@ impl<Token: oauth2::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Clie
     }
 }
 
-impl<Token: oauth2::OAuth2Token + Clone> Clone for HttpClient<Token> {
+impl<Token: access_token::OAuth2Token + Clone> Clone for HttpClient<Token> {
     fn clone(&self) -> Self {
         HttpClient::<Token> {
             oauth2_token: self.oauth2_token.clone(),

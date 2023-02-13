@@ -5,7 +5,9 @@ use reqwest;
 use serde::de::DeserializeOwned;
 
 pub use app_client_data::AppClientData;
-pub use oauth2token::{OAuth2Token, OAuth2TokenImpl};
+pub use oauth2token::OAuth2TokenImpl;
+
+use crate::access_token::OAuth2Token;
 
 mod app_client_data;
 mod exchange_oauth2_token;

@@ -2,6 +2,7 @@ use std::io::{Error, ErrorKind, Result};
 use std::path::{Path, PathBuf};
 use std::result;
 
+pub mod app;
 pub mod apps;
 pub mod config;
 pub mod cron;

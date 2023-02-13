@@ -4,9 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
+### The `cli` feature is required for the CLI binary. It also provides structs and methods to handle and
+### store app authentication.
+cli = ["dep:clap-verbosity-flag", "dep:tracing-subscriber", "dep:log", "dep:clap"]
+
 indicatif = ["dep:indicatif"]
 test_utils = ["dep:mockall", "dep:httpmock"]
-cli = ["dep:clap-verbosity-flag", "dep:tracing-subscriber", "dep:log", "dep:clap"]
+
 
 [dependencies]
 bytes = "1"
