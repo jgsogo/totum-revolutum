@@ -5,8 +5,9 @@ use reqwest;
 use serde::de::DeserializeOwned;
 
 use crate::data;
-use crate::data::app_client_data::AppClientData;
 use crate::utils;
+
+use super::AppClientData;
 
 pub(crate) async fn exchange_oauth2_token<Token: data::oauth2token::OAuth2Token + DeserializeOwned>(
     http_client: reqwest::Client,

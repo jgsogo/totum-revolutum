@@ -46,10 +46,7 @@ impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 's
         format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
     }
 
-    pub async fn authorize(
-        app: data::app_client_data::AppClientData,
-        address: SocketAddr,
-    ) -> Result<HttpClient<Token>> {
+    pub async fn authorize(app: oauth2::AppClientData, address: SocketAddr) -> Result<HttpClient<Token>> {
         let client = reqwest::Client::new();
         let oauth2 = oauth2::authorize_oauth2(client.clone(), app, address).await?;
         Ok(HttpClient {

@@ -11,9 +11,9 @@ use tokio::sync::oneshot::Sender;
 use url::Url;
 
 use crate::data;
-use crate::data::app_client_data::AppClientData;
 
-use super::oauth2_token::exchange_oauth2_token;
+use super::exchange_oauth2_token::exchange_oauth2_token;
+use super::AppClientData;
 
 const CALLBACK_ENDPOINT: &str = "/callback";
 
