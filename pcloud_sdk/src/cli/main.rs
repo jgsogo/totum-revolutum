@@ -53,9 +53,6 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt().with_max_level(tracing_level).init();
     debug!("Tracing level configured to {}", tracing_level);
 
-    // Get the token
-    // let _token = get_user_token(cli.secrets_file, cli.token_file, false).await?;
-
     // Go ahead!
     match &cli.command {
         Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
