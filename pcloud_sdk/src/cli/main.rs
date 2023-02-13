@@ -1,8 +1,11 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use clap::{Parser, Subcommand};
 use tracing::debug;
 
+use pcloud_sdk::client::HttpClient;
+
 mod auth;
+mod userinfo;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -19,13 +22,15 @@ struct Cli {
     command: Commands,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Debug)]
 enum Commands {
     /// Authenticate using inputs from command line
     Auth(auth::AuthParams),
 
     /// Authenticate using inputs from file
     AuthFile(auth::AuthFileParams),
+
+    Userinfo,
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -55,5 +60,13 @@ async fn main() -> Result<()> {
     match &cli.command {
         Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
         Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
+        _ => {
+            let token = auth::read_from_file(&cli.token_file)?;
+            let client = HttpClient::new(token, true);
+            match &cli.command {
+                Commands::Userinfo => userinfo::handle(client).await,
+                c => bail!("Unexpected command {:?}", c),
+            }
+        }
     }
 }

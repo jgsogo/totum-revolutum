@@ -32,7 +32,7 @@ pub struct AuthFileParams {
     secrets_file: std::path::PathBuf,
 }
 
-fn read_from_file<T: DeserializeOwned, P: AsRef<std::path::Path>>(path: P) -> Result<T> {
+pub fn read_from_file<T: DeserializeOwned, P: AsRef<std::path::Path>>(path: P) -> Result<T> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let u = serde_json::from_reader(reader)?;
