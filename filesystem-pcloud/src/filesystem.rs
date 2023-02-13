@@ -9,7 +9,6 @@ use tokio::time::Instant;
 use tracing::{info, trace, warn};
 
 use pcloud_sdk::client::Client;
-use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sdk::methods::file::deletefile::{DeleteFileInput, GetDeleteFile};
 use pcloud_sdk::methods::file::stat::{GetStat, StatInput};
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
@@ -20,6 +19,7 @@ use pcloud_sdk::methods::folder::deletefolder::{DeleteFolderInput, GetDeleteFold
 use pcloud_sdk::methods::folder::deletefolderrecursive::{DeleteFolderRecursiveInput, GetDeleteFolderRecursive};
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
+use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::FolderID;
 

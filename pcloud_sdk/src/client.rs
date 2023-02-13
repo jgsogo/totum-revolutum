@@ -9,8 +9,6 @@ use serde::de::DeserializeOwned;
 use crate::methods::oauth2;
 use crate::utils::http;
 
-use super::data;
-
 #[async_trait]
 pub trait Client {
     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
@@ -25,13 +23,13 @@ pub trait Client {
 }
 
 #[derive(Debug)]
-pub struct HttpClient<Token: data::oauth2token::OAuth2Token> {
+pub struct HttpClient<Token: oauth2::OAuth2Token> {
     pub oauth2_token: Token,
     http_client: reqwest::Client,
     secure: bool,
 }
 
-impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
+impl<Token: oauth2::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
     pub fn new(oauth2_token: Token, secure: bool) -> HttpClient<Token> {
         let client = reqwest::ClientBuilder::new().build().unwrap();
         HttpClient {
@@ -58,7 +56,7 @@ impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 's
 }
 
 #[async_trait]
-impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for HttpClient<Token> {
+impl<Token: oauth2::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for HttpClient<Token> {
     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
     where
         T: DeserializeOwned + 'static,
@@ -87,7 +85,7 @@ impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 's
     }
 }
 
-impl<Token: data::oauth2token::OAuth2Token + Clone> Clone for HttpClient<Token> {
+impl<Token: oauth2::OAuth2Token + Clone> Clone for HttpClient<Token> {
     fn clone(&self) -> Self {
         HttpClient::<Token> {
             oauth2_token: self.oauth2_token.clone(),

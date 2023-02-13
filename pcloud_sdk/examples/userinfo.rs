@@ -1,9 +1,9 @@
-use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::general::getapiserver::GetAPIServer;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::methods::oauth2;
+use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {

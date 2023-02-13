@@ -10,20 +10,18 @@ use serde::de::DeserializeOwned;
 use tokio::sync::oneshot::Sender;
 use url::Url;
 
-use crate::data;
-
 use super::exchange_oauth2_token::exchange_oauth2_token;
-use super::AppClientData;
+use super::{AppClientData, OAuth2Token};
 
 const CALLBACK_ENDPOINT: &str = "/callback";
 
-struct AppContext<Token: data::oauth2token::OAuth2Token> {
+struct AppContext<Token: OAuth2Token> {
     app: AppClientData,
     oauth2_token: Option<Token>,
     tx: Option<Sender<()>>,
 }
 
-impl<Token: data::oauth2token::OAuth2Token> AppContext<Token> {
+impl<Token: OAuth2Token> AppContext<Token> {
     fn new(app: AppClientData, tx: Sender<()>) -> AppContext<Token> {
         AppContext {
             app,
@@ -33,7 +31,7 @@ impl<Token: data::oauth2token::OAuth2Token> AppContext<Token> {
     }
 }
 
-async fn dispatcher<Token: data::oauth2token::OAuth2Token + DeserializeOwned>(
+async fn dispatcher<Token: OAuth2Token + DeserializeOwned>(
     http_client: reqwest::Client,
     req: Request<Body>,
     data: Arc<Mutex<AppContext<Token>>>,
@@ -82,7 +80,7 @@ fn visit_url(app: &AppClientData, callback_url: String) -> String {
     url.as_str().to_string()
 }
 
-pub(crate) async fn serve<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static>(
+pub(crate) async fn serve<Token: OAuth2Token + DeserializeOwned + Sync + Send + 'static>(
     http_client: reqwest::Client,
     app: AppClientData,
     addr: SocketAddr,

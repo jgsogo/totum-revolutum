@@ -5,7 +5,6 @@ use anyhow::Result;
 use filesystem::copy::copy;
 use filesystem::Filesystem;
 use filesystem_pcloud::FilesystemPCloud;
-use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
 use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::methods::oauth2;
@@ -18,7 +17,7 @@ async fn main() -> Result<()> {
         let pcloud = {
             let app = oauth2::AppClientData::read_from_file("secrets/app.json").unwrap();
             let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
-            pcloud_sdk::client::HttpClient::<OAuth2TokenImpl>::authorize(app, addr).await?
+            pcloud_sdk::client::HttpClient::<oauth2::OAuth2TokenImpl>::authorize(app, addr).await?
         };
 
         let userinfo = pcloud.userinfo().await?;

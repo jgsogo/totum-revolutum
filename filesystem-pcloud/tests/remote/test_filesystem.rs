@@ -7,7 +7,7 @@ use filesystem::Filesystem;
 use filesystem_pcloud::FilesystemPCloud;
 use filesystem_pcloud::CHUNK_SIZE;
 use pcloud_sdk::client::HttpClient;
-use pcloud_sdk::data::oauth2token::OAuth2Token;
+use pcloud_sdk::methods::oauth2::OAuth2Token;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::FolderID;
 
