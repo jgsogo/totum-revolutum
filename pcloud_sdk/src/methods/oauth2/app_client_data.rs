@@ -5,11 +5,14 @@ use std::path::Path;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
+/// Stores the information required to perform an authorization request. It can be
+/// created manually using [`AppClientData::new`] or retrieved from a JSON file
+/// with [`AppClientData::read_from_file`] method.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AppClientData {
-    pub client_id: String,
-    pub client_secret: String,
-    pub force_reapprove: bool,
+    client_id: String,
+    client_secret: String,
+    force_reapprove: bool,
 }
 
 impl AppClientData {
@@ -26,5 +29,17 @@ impl AppClientData {
         let reader = BufReader::new(file);
         let u = serde_json::from_reader(reader)?;
         Ok(u)
+    }
+
+    pub fn client_id(&self) -> &str {
+        &self.client_id
+    }
+
+    pub fn client_secret(&self) -> &str {
+        &self.client_secret
+    }
+
+    pub fn force_reapprove(&self) -> bool {
+        self.force_reapprove
     }
 }

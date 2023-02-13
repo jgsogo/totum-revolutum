@@ -70,10 +70,10 @@ async fn dispatcher<Token: OAuth2Token + DeserializeOwned>(
 
 fn visit_url(app: &AppClientData, callback_url: String) -> String {
     let mut url = Url::parse("https://my.pcloud.com/oauth2/authorize").unwrap();
-    url.query_pairs_mut().append_pair("client_id", &app.client_id);
+    url.query_pairs_mut().append_pair("client_id", app.client_id());
     url.query_pairs_mut().append_pair("redirect_uri", &callback_url);
     url.query_pairs_mut().append_pair("response_type", "code");
-    if app.force_reapprove {
+    if app.force_reapprove() {
         url.query_pairs_mut().append_pair("force_reapprove", "true");
     }
     //url.query_pairs_mut().append_pair("state", "25");
