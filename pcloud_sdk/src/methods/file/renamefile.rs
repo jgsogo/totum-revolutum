@@ -7,14 +7,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::structures::Metadata;
-use crate::types::{FileID, FolderID};
+use crate::types::{File, FolderID};
 
 pub const ENDPOINT: &str = "/renamefile";
-
-pub enum RenameFileSourceInput {
-    FileID(FileID),
-    Path(PathBuf),
-}
 
 pub struct RenameFileTargetID {
     folderid: Option<FolderID>,
@@ -36,7 +31,7 @@ pub enum RenameFileTargetInput {
 }
 
 pub struct RenameFileInput {
-    source: RenameFileSourceInput,
+    source: File,
     target: RenameFileTargetInput,
 }
 
@@ -47,10 +42,10 @@ impl TryFrom<RenameFileInput> for HashMap<String, String> {
         let mut params = HashMap::new();
         let RenameFileInput { source, target } = value;
         match source {
-            RenameFileSourceInput::FileID(fid) => {
+            File::FileID(fid) => {
                 params.insert("fileid".to_string(), fid.0.to_string());
             }
-            RenameFileSourceInput::Path(p) => {
+            File::Path(p) => {
                 params.insert("path".to_string(), p.to_string_lossy().parse()?);
             }
         };
@@ -91,10 +86,11 @@ impl<T: client::Client> GetRenameFile for T {}
 #[cfg(test)]
 mod tests {
     use std::env;
-    use std::fs::File;
+    use std::fs;
     use std::io::BufReader;
     use std::path::Path;
 
+    use crate::types::FileID;
     use crate::utils::http::ApiResult;
 
     use super::*;
@@ -102,7 +98,7 @@ mod tests {
     #[test]
     fn test_params_with_ids_noname() {
         let input = RenameFileInput {
-            source: RenameFileSourceInput::FileID(FileID(1234)),
+            source: File::FileID(FileID(1234)),
             target: RenameFileTargetInput::FolderID(RenameFileTargetID::new(Some(FolderID(4321)), None).unwrap()),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
@@ -114,7 +110,7 @@ mod tests {
     #[test]
     fn test_params_with_ids_with_name() {
         let input = RenameFileInput {
-            source: RenameFileSourceInput::FileID(FileID(1234)),
+            source: File::FileID(FileID(1234)),
             target: RenameFileTargetInput::FolderID(
                 RenameFileTargetID::new(Some(FolderID(4321)), Some("name".to_string())).unwrap(),
             ),
@@ -129,7 +125,7 @@ mod tests {
     #[test]
     fn test_params_with_ids_only_name() {
         let input = RenameFileInput {
-            source: RenameFileSourceInput::FileID(FileID(1234)),
+            source: File::FileID(FileID(1234)),
             target: RenameFileTargetInput::FolderID(RenameFileTargetID::new(None, Some("name".to_string())).unwrap()),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
@@ -146,7 +142,7 @@ mod tests {
     #[test]
     fn test_params_with_paths() {
         let input = RenameFileInput {
-            source: RenameFileSourceInput::Path(PathBuf::from("/from/path")),
+            source: File::Path(PathBuf::from("/from/path")),
             target: RenameFileTargetInput::Path(PathBuf::from("/to/path")),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
@@ -162,7 +158,7 @@ mod tests {
             .join("resources")
             .join("testdata")
             .join("renamefile.json");
-        let file = File::open(userinfo_json).unwrap();
+        let file = fs::File::open(userinfo_json).unwrap();
         let reader = BufReader::new(file);
         match serde_json::from_reader::<_, ApiResult<RenameFile>>(reader) {
             Err(e) => panic!("Error reading the file: {e}"),

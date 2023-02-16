@@ -10,8 +10,8 @@ use tracing::{info, trace, warn};
 
 use filesystem::{File, Filesystem};
 use pcloud_sdk::client::Client;
-use pcloud_sdk::methods::file::deletefile::{DeleteFileInput, GetDeleteFile};
-use pcloud_sdk::methods::file::stat::{GetStat, StatInput};
+use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
+use pcloud_sdk::methods::file::stat::GetStat;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::FileDescriptor;
@@ -22,7 +22,7 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::structures::Metadata;
-use pcloud_sdk::types::{Folder, FolderID};
+use pcloud_sdk::types::{File as PCloudFile, Folder, FolderID};
 
 use crate::file::RemoteFile;
 use crate::RemoteMetadata;
@@ -170,7 +170,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 
     async fn exists(&self, path: &Path) -> Result<bool> {
         let path = self.check_path(path)?;
-        let _r = self.pcloud.stat(StatInput::Path(path)).await?;
+        let _r = self.pcloud.stat(PCloudFile::Path(path)).await?;
         Ok(true)
     }
 
@@ -233,7 +233,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn remove_file(&self, path: &Path) -> Result<()> {
         let path = self.check_path(path)?;
 
-        let input = DeleteFileInput::Path(path);
+        let input = PCloudFile::Path(path);
         self.pcloud.deletefile(input).await?;
         Ok(())
     }
@@ -262,14 +262,14 @@ mod tests {
     use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::file::deletefile;
     use pcloud_sdk::methods::file::deletefile::DeleteFile;
+    use pcloud_sdk::methods::fileops::{file_close, file_open, file_read, file_write};
     use pcloud_sdk::methods::fileops::file_open::FileOpen;
     use pcloud_sdk::methods::fileops::file_write::FileWrite;
-    use pcloud_sdk::methods::fileops::{file_close, file_open, file_read, file_write};
+    use pcloud_sdk::methods::folder::{createfolderifnotexists, deletefolder, deletefolderrecursive, listfolder};
     use pcloud_sdk::methods::folder::createfolderifnotexists::CreateFolderIfNotExists;
     use pcloud_sdk::methods::folder::deletefolder::DeleteFolder;
     use pcloud_sdk::methods::folder::deletefolderrecursive::DeleteFolderRecursive;
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
-    use pcloud_sdk::methods::folder::{createfolderifnotexists, deletefolder, deletefolderrecursive, listfolder};
     use pcloud_sdk::mocks::client::MockLocalClient;
     use pcloud_sdk::types::FileID;
     use pcloud_sdk::utils;
