@@ -7,27 +7,17 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::structures::Metadata;
-use crate::types::{FileID, FolderID};
+use crate::types::{File, FolderID};
 
 pub const ENDPOINT: &str = "/copyfile";
 
-pub enum CopyFileSourceInput {
-    FileID(FileID),
-    Path(PathBuf),
-}
-
-pub struct CopyFileTargetID {
-    folderid: FolderID,
-    name: Option<String>,
-}
-
 pub enum CopyFileTargetInput {
-    FolderID(CopyFileTargetID),
+    FolderName((FolderID, Option<String>)),
     Path(PathBuf),
 }
 
 pub struct CopyFileInput {
-    source: CopyFileSourceInput,
+    source: File,
     target: CopyFileTargetInput,
 }
 
@@ -38,17 +28,17 @@ impl TryFrom<CopyFileInput> for HashMap<String, String> {
         let mut params = HashMap::new();
         let CopyFileInput { source, target } = value;
         match source {
-            CopyFileSourceInput::FileID(fid) => {
+            File::FileID(fid) => {
                 params.insert("fileid".to_string(), fid.0.to_string());
             }
-            CopyFileSourceInput::Path(p) => {
+            File::Path(p) => {
                 params.insert("path".to_string(), p.to_string_lossy().parse()?);
             }
         };
         match target {
-            CopyFileTargetInput::FolderID(target) => {
-                params.insert("tofolderid".to_string(), target.folderid.0.to_string());
-                if let Some(name) = target.name {
+            CopyFileTargetInput::FolderName((folderid, name)) => {
+                params.insert("tofolderid".to_string(), folderid.0.to_string());
+                if let Some(name) = name {
                     params.insert("toname".to_string(), name);
                 }
             }
@@ -79,10 +69,11 @@ impl<T: client::Client> GetCopyFile for T {}
 #[cfg(test)]
 mod tests {
     use std::env;
-    use std::fs::File;
+    use std::fs;
     use std::io::BufReader;
     use std::path::Path;
 
+    use crate::types::FileID;
     use crate::utils::http::ApiResult;
 
     use super::*;
@@ -90,11 +81,8 @@ mod tests {
     #[test]
     fn test_params_with_ids_noname() {
         let input = CopyFileInput {
-            source: CopyFileSourceInput::FileID(FileID(1234)),
-            target: CopyFileTargetInput::FolderID(CopyFileTargetID {
-                folderid: FolderID(4321),
-                name: None,
-            }),
+            source: File::FileID(FileID(1234)),
+            target: CopyFileTargetInput::FolderName((FolderID(4321), None)),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
         assert_eq!(params.len(), 2);
@@ -105,11 +93,8 @@ mod tests {
     #[test]
     fn test_params_with_ids_with_name() {
         let input = CopyFileInput {
-            source: CopyFileSourceInput::FileID(FileID(1234)),
-            target: CopyFileTargetInput::FolderID(CopyFileTargetID {
-                folderid: FolderID(4321),
-                name: Some("name".to_string()),
-            }),
+            source: File::FileID(FileID(1234)),
+            target: CopyFileTargetInput::FolderName((FolderID(4321), Some("name".to_string()))),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
         assert_eq!(params.len(), 3);
@@ -121,7 +106,7 @@ mod tests {
     #[test]
     fn test_params_with_paths() {
         let input = CopyFileInput {
-            source: CopyFileSourceInput::Path(PathBuf::from("/from/path")),
+            source: File::Path(PathBuf::from("/from/path")),
             target: CopyFileTargetInput::Path(PathBuf::from("/to/path")),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
@@ -137,7 +122,7 @@ mod tests {
             .join("resources")
             .join("testdata")
             .join("copyfile.json");
-        let file = File::open(userinfo_json).unwrap();
+        let file = fs::File::open(userinfo_json).unwrap();
         let reader = BufReader::new(file);
         match serde_json::from_reader::<_, ApiResult<CopyFile>>(reader) {
             Err(e) => panic!("Error reading the file: {e}"),
