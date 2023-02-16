@@ -13,4 +13,7 @@ pub enum Error {
 
     #[error("Cannot parse '{string}' to folder. Provide a folderid:<id> or absolute path")]
     ParseFolderError { string: String },
+
+    #[error("Cannot parse '{string}' to file. Provide a fileid:<id> or absolute path")]
+    ParseFileError { string: String },
 }

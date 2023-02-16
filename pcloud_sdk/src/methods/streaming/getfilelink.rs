@@ -6,12 +6,11 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 use crate::client;
-use crate::types::FileID;
-use crate::types::PCloudFile;
+use crate::types::File;
 
 pub struct GetFileLinkInput {
     // `FileID` or path (`String`) to the file
-    file: PCloudFile,
+    file: File,
 
     // Download with Content-Type = application/octet-stream
     pub forcedownload: bool,
@@ -27,7 +26,7 @@ pub struct GetFileLinkInput {
 }
 
 impl GetFileLinkInput {
-    pub fn new_from_file(file: PCloudFile) -> GetFileLinkInput {
+    pub fn new(file: File) -> GetFileLinkInput {
         GetFileLinkInput {
             file,
             forcedownload: false,
@@ -35,13 +34,6 @@ impl GetFileLinkInput {
             maxspeed: None,
             skipfilename: false,
         }
-    }
-
-    pub fn new_from_path(path: &str) -> GetFileLinkInput {
-        Self::new_from_file(PCloudFile::Path(path.to_string()))
-    }
-    pub fn new_from_fileid(file: &FileID) -> GetFileLinkInput {
-        Self::new_from_file(PCloudFile::FileID(file.clone()))
     }
 }
 
@@ -60,16 +52,14 @@ pub trait GetFileLink: client::Client {
         let mut params = HashMap::new();
         match file_link {
             GetFileLinkInput {
-                file: PCloudFile::Path(p),
-                ..
+                file: File::Path(p), ..
             } => {
-                params.insert("path".to_string(), p.clone());
+                params.insert("path".to_string(), p.to_string_lossy().to_string());
             }
             GetFileLinkInput {
-                file: PCloudFile::FileID(f),
-                ..
+                file: File::FileID(f), ..
             } => {
-                params.insert("fileid".to_string(), f.id().to_string());
+                params.insert("fileid".to_string(), f.0.to_string());
             }
         }
 
@@ -98,15 +88,18 @@ impl<T: client::Client> GetFileLink for T {}
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
     use crate::mocks::client::MockLocalClient;
+    use crate::types::FileID;
 
     use super::*;
 
     #[test]
     fn test_getfilelinkinput_defaults() {
-        let path = "path/to/file";
-        let input = GetFileLinkInput::new_from_file(PCloudFile::Path(path.to_string()));
-        assert_eq!(input.file, PCloudFile::Path(path.to_string()));
+        let path = File::from_str("/path/to/file").unwrap();
+        let input = GetFileLinkInput::new(path.clone());
+        assert_eq!(input.file, path);
         assert_eq!(input.forcedownload, false);
         assert_eq!(input.contenttype, None);
         assert_eq!(input.maxspeed, None);
@@ -115,7 +108,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_getfilelink_from_path() -> Result<()> {
-        let mut input = GetFileLinkInput::new_from_file(PCloudFile::Path("the/path".to_string()));
+        let mut input = GetFileLinkInput::new(File::from_str("/the/path").unwrap());
         input.skipfilename = true;
         input.contenttype = Some("<contenttype>".to_string());
         input.maxspeed = Some(200);
@@ -130,7 +123,7 @@ mod tests {
                 assert_eq!(endpoint, "/getfilelink");
                 assert_eq!(params.len(), 5);
                 assert_eq!(params.get("fileid"), None);
-                assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                 assert_eq!(params.get("forcedownload"), Some(&"1".to_string()));
                 assert_eq!(params.get("contenttype"), Some(&"<contenttype>".to_string()));
                 assert_eq!(params.get("maxspeed"), Some(&"200".to_string()));
@@ -155,7 +148,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_getfilelink_from_fileid() -> Result<()> {
-        let input = GetFileLinkInput::new_from_file(PCloudFile::FileID(FileID { 0: 42 }));
+        let input = GetFileLinkInput::new(File::FileID(FileID(42)));
 
         let utc_now = OffsetDateTime::now_utc();
         let mut client = MockLocalClient::new();
