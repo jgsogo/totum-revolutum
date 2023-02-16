@@ -3,6 +3,8 @@ use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
+use crate::error::Error;
+
 const FILEID_PREFIX: &str = "fileid";
 
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone)]
@@ -22,19 +24,18 @@ impl Debug for FileID {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct ParseFileIDError;
-
 impl FromStr for FileID {
-    type Err = ParseFileIDError;
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let r = s
             .strip_prefix(FILEID_PREFIX)
             .and_then(|s| s.strip_prefix(":"))
-            .ok_or(ParseFileIDError)?;
+            .ok_or(Error::ParseFileIDError { string: s.to_string() })?;
 
-        let x_fromstr = r.parse::<u64>().map_err(|_| ParseFileIDError)?;
+        let x_fromstr = r
+            .parse::<u64>()
+            .map_err(|_| Error::ParseFileIDError { string: s.to_string() })?;
         Ok(Self(x_fromstr))
     }
 }
