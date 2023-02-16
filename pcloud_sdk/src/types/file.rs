@@ -20,7 +20,7 @@ impl FromStr for File {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Ok(f) = FileID::from_str(s) {
             return Ok(File::FileID(f));
-        } else if let Ok(p) = PathBuf::from_str(&s) {
+        } else if let Ok(p) = PathBuf::from_str(s) {
             let p = normalize_path(p);
             if p.starts_with("/") && !p.starts_with("/..") {
                 return Ok(File::Path(p));

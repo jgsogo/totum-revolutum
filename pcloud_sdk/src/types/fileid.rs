@@ -30,7 +30,7 @@ impl FromStr for FileID {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let r = s
             .strip_prefix(FILEID_PREFIX)
-            .and_then(|s| s.strip_prefix(":"))
+            .and_then(|s| s.strip_prefix(':'))
             .ok_or(Error::ParseFileIDError { string: s.to_string() })?;
 
         let x_fromstr = r

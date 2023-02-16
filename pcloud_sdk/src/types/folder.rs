@@ -19,7 +19,7 @@ impl FromStr for Folder {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Ok(f) = FolderID::from_str(s) {
             return Ok(Folder::FolderID(f));
-        } else if let Ok(p) = PathBuf::from_str(&s) {
+        } else if let Ok(p) = PathBuf::from_str(s) {
             let p = normalize_path(p);
             if p.starts_with("/") && !p.starts_with("/..") {
                 return Ok(Folder::Path(p));

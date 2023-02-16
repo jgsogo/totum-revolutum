@@ -8,6 +8,7 @@ use tokio::task::JoinHandle;
 use tokio::time::Instant;
 use tracing::{info, trace, warn};
 
+use filesystem::{File, Filesystem};
 use pcloud_sdk::client::Client;
 use pcloud_sdk::methods::file::deletefile::{DeleteFileInput, GetDeleteFile};
 use pcloud_sdk::methods::file::stat::{GetStat, StatInput};
@@ -21,11 +22,10 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::structures::Metadata;
-use pcloud_sdk::types::FolderID;
+use pcloud_sdk::types::{Folder, FolderID};
 
 use crate::file::RemoteFile;
 use crate::RemoteMetadata;
-use filesystem::{File, Filesystem};
 
 pub type PCloudHttpClient = pcloud_sdk::client::HttpClient<OAuth2TokenImpl>;
 
@@ -48,7 +48,8 @@ async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
     pcloud: &Arc<HttpClient>,
     path: &Path,
 ) -> Result<FolderID> {
-    let listfolder_input = ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
+    let folder = Folder::Path(path.to_path_buf());
+    let listfolder_input = ListFolderInput::new(folder);
     let filtermeta = vec!["folderid"];
     let r = pcloud.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
     r.metadata
@@ -148,7 +149,8 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         //  and use a thread pool to enter child directories and _recurse_.
         info!("Start remote visitor");
         let start = Instant::now();
-        let mut list_folder_input = ListFolderInput::new_from_path(Some(self.root().to_str().unwrap().to_string()));
+        let folder = Folder::Path(self.root().to_path_buf());
+        let mut list_folder_input = ListFolderInput::new(folder);
         list_folder_input.recursive = true;
         let filtermeta = vec!["name", "contents", "size", "hash", "isfolder"];
         let items = self
