@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::structures::Metadata;
-use crate::types::{Folder, FolderValue};
+use crate::types::Folder;
 
 pub const ENDPOINT: &str = "/listfolder";
 
@@ -56,13 +56,13 @@ pub trait GetListFolder: client::Client {
         let mut params = HashMap::new();
         match list_folder {
             ListFolderInput {
-                folder: Folder(FolderValue::Path(p)),
+                folder: Folder::Path(p),
                 ..
             } => {
                 params.insert("path".to_string(), p.display().to_string());
             }
             ListFolderInput {
-                folder: Folder(FolderValue::FolderID(f)),
+                folder: Folder::FolderID(f),
                 ..
             } => {
                 params.insert("folderid".to_string(), f.to_string());

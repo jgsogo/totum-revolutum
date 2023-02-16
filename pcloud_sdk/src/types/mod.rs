@@ -1,6 +1,6 @@
 pub use file::PCloudFile;
 pub use fileid::FileID;
-pub use folder::{Folder, FolderValue};
+pub use folder::Folder;
 pub use folderid::FolderID;
 
 mod file;

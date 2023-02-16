@@ -10,4 +10,7 @@ pub enum Error {
 
     #[error("API error {code}: {message}")]
     ApiError { code: u16, message: String },
+
+    #[error("Cannot parse '{string}' to folder. Provide a folderid:<id> or absolute path")]
+    ParseFolderError { string: String },
 }
