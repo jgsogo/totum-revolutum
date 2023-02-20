@@ -1,24 +1,20 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
+use crate::methods::params::Params;
+use crate::methods::params::TargetFile;
 use crate::structures::Metadata;
-use crate::types::{File, FolderID};
+use crate::types::File;
 
 pub const ENDPOINT: &str = "/copyfile";
 
-pub enum CopyFileTargetInput {
-    FolderName((FolderID, Option<String>)),
-    Path(PathBuf),
-}
-
 pub struct CopyFileInput {
     source: File,
-    target: CopyFileTargetInput,
+    target: TargetFile,
 }
 
 impl TryFrom<CopyFileInput> for HashMap<String, String> {
@@ -26,26 +22,8 @@ impl TryFrom<CopyFileInput> for HashMap<String, String> {
 
     fn try_from(value: CopyFileInput) -> std::result::Result<Self, Self::Error> {
         let mut params = HashMap::new();
-        let CopyFileInput { source, target } = value;
-        match source {
-            File::FileID(fid) => {
-                params.insert("fileid".to_string(), fid.0.to_string());
-            }
-            File::Path(p) => {
-                params.insert("path".to_string(), p.to_string_lossy().parse()?);
-            }
-        };
-        match target {
-            CopyFileTargetInput::FolderName((folderid, name)) => {
-                params.insert("tofolderid".to_string(), folderid.0.to_string());
-                if let Some(name) = name {
-                    params.insert("toname".to_string(), name);
-                }
-            }
-            CopyFileTargetInput::Path(p) => {
-                params.insert("topath".to_string(), p.to_string_lossy().parse()?);
-            }
-        };
+        value.source.add_to_params(&mut params)?;
+        value.target.add_to_params(&mut params)?;
         Ok(params)
     }
 }
@@ -71,9 +49,9 @@ mod tests {
     use std::env;
     use std::fs;
     use std::io::BufReader;
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
 
-    use crate::types::FileID;
+    use crate::types::{FileID, FolderID};
     use crate::utils::http::ApiResult;
 
     use super::*;
@@ -82,7 +60,7 @@ mod tests {
     fn test_params_with_ids_noname() {
         let input = CopyFileInput {
             source: File::FileID(FileID(1234)),
-            target: CopyFileTargetInput::FolderName((FolderID(4321), None)),
+            target: TargetFile::FolderAndName((FolderID(4321), None)),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
         assert_eq!(params.len(), 2);
@@ -94,7 +72,7 @@ mod tests {
     fn test_params_with_ids_with_name() {
         let input = CopyFileInput {
             source: File::FileID(FileID(1234)),
-            target: CopyFileTargetInput::FolderName((FolderID(4321), Some("name".to_string()))),
+            target: TargetFile::FolderAndName((FolderID(4321), Some("name".to_string()))),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
         assert_eq!(params.len(), 3);
@@ -107,7 +85,7 @@ mod tests {
     fn test_params_with_paths() {
         let input = CopyFileInput {
             source: File::Path(PathBuf::from("/from/path")),
-            target: CopyFileTargetInput::Path(PathBuf::from("/to/path")),
+            target: TargetFile::Path(PathBuf::from("/to/path")),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
         assert_eq!(params.len(), 2);

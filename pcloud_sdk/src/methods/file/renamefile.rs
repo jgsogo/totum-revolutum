@@ -1,38 +1,19 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
+use crate::methods::params::{Params, TargetFile};
 use crate::structures::Metadata;
-use crate::types::{File, FolderID};
+use crate::types::File;
 
 pub const ENDPOINT: &str = "/renamefile";
 
-pub struct RenameFileTargetID {
-    folderid: Option<FolderID>,
-    name: Option<String>,
-}
-
-impl RenameFileTargetID {
-    pub fn new(folderid: Option<FolderID>, name: Option<String>) -> Result<Self> {
-        if folderid.is_none() && name.is_none() {
-            bail!("folderid or name (or both) are required");
-        }
-        Ok(Self { folderid, name })
-    }
-}
-
-pub enum RenameFileTargetInput {
-    FolderID(RenameFileTargetID),
-    Path(PathBuf),
-}
-
 pub struct RenameFileInput {
     source: File,
-    target: RenameFileTargetInput,
+    target: TargetFile,
 }
 
 impl TryFrom<RenameFileInput> for HashMap<String, String> {
@@ -40,28 +21,8 @@ impl TryFrom<RenameFileInput> for HashMap<String, String> {
 
     fn try_from(value: RenameFileInput) -> std::result::Result<Self, Self::Error> {
         let mut params = HashMap::new();
-        let RenameFileInput { source, target } = value;
-        match source {
-            File::FileID(fid) => {
-                params.insert("fileid".to_string(), fid.0.to_string());
-            }
-            File::Path(p) => {
-                params.insert("path".to_string(), p.to_string_lossy().parse()?);
-            }
-        };
-        match target {
-            RenameFileTargetInput::FolderID(target) => {
-                if let Some(folderid) = target.folderid {
-                    params.insert("tofolderid".to_string(), folderid.0.to_string());
-                }
-                if let Some(name) = target.name {
-                    params.insert("toname".to_string(), name);
-                }
-            }
-            RenameFileTargetInput::Path(p) => {
-                params.insert("topath".to_string(), p.to_string_lossy().parse()?);
-            }
-        };
+        value.source.add_to_params(&mut params)?;
+        value.target.add_to_params(&mut params)?;
         Ok(params)
     }
 }
@@ -88,9 +49,9 @@ mod tests {
     use std::env;
     use std::fs;
     use std::io::BufReader;
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
 
-    use crate::types::FileID;
+    use crate::types::{FileID, FolderID};
     use crate::utils::http::ApiResult;
 
     use super::*;
@@ -99,7 +60,7 @@ mod tests {
     fn test_params_with_ids_noname() {
         let input = RenameFileInput {
             source: File::FileID(FileID(1234)),
-            target: RenameFileTargetInput::FolderID(RenameFileTargetID::new(Some(FolderID(4321)), None).unwrap()),
+            target: TargetFile::FolderAndName((FolderID(4321), None)),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
         assert_eq!(params.len(), 2);
@@ -111,9 +72,7 @@ mod tests {
     fn test_params_with_ids_with_name() {
         let input = RenameFileInput {
             source: File::FileID(FileID(1234)),
-            target: RenameFileTargetInput::FolderID(
-                RenameFileTargetID::new(Some(FolderID(4321)), Some("name".to_string())).unwrap(),
-            ),
+            target: TargetFile::FolderAndName((FolderID(4321), Some("name".to_string()))),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
         assert_eq!(params.len(), 3);
@@ -123,27 +82,10 @@ mod tests {
     }
 
     #[test]
-    fn test_params_with_ids_only_name() {
-        let input = RenameFileInput {
-            source: File::FileID(FileID(1234)),
-            target: RenameFileTargetInput::FolderID(RenameFileTargetID::new(None, Some("name".to_string())).unwrap()),
-        };
-        let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
-        assert_eq!(params.len(), 2);
-        assert_eq!(params.get("fileid"), Some(&"1234".to_string()));
-        assert_eq!(params.get("toname"), Some(&"name".to_string()));
-    }
-
-    #[test]
-    fn test_params_with_ids_invalid() {
-        assert!(RenameFileTargetID::new(None, None).is_err());
-    }
-
-    #[test]
     fn test_params_with_paths() {
         let input = RenameFileInput {
             source: File::Path(PathBuf::from("/from/path")),
-            target: RenameFileTargetInput::Path(PathBuf::from("/to/path")),
+            target: TargetFile::Path(PathBuf::from("/to/path")),
         };
         let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
         assert_eq!(params.len(), 2);

@@ -4,6 +4,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
+use crate::methods::params::Params;
 use crate::structures::Metadata;
 use crate::types::Folder;
 use crate::{client, utils};
@@ -40,7 +41,8 @@ impl TryFrom<UploadFileParams> for HashMap<String, String> {
     type Error = anyhow::Error;
 
     fn try_from(value: UploadFileParams) -> std::result::Result<Self, Self::Error> {
-        let mut params: HashMap<String, String> = value.folder.try_into()?;
+        let mut params = HashMap::new();
+        value.folder.add_to_params(&mut params)?;
         if let Some(progresshash) = value.progresshash {
             params.insert("progresshash".to_string(), progresshash);
         }

@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
+use crate::methods::params::Params;
 use crate::structures::Metadata;
 use crate::types::File;
 
@@ -19,7 +20,8 @@ pub struct DeleteFile {
 #[async_trait]
 pub trait GetDeleteFile: client::Client {
     async fn deletefile(&self, input: File) -> Result<DeleteFile> {
-        let params = HashMap::try_from(input)?;
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params)?;
         let ret = self.get::<DeleteFile>(ENDPOINT, params).await?;
         Ok(ret)
     }

@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
+use crate::methods::params::Params;
 use crate::structures::Metadata;
 use crate::types::File;
 
@@ -18,7 +19,8 @@ pub struct Stat {
 #[async_trait]
 pub trait GetStat: client::Client {
     async fn stat(&self, input: File) -> Result<Stat> {
-        let params = HashMap::try_from(input)?;
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params)?;
         let ret = self.get::<Stat>(ENDPOINT, params).await?;
         Ok(ret)
     }
