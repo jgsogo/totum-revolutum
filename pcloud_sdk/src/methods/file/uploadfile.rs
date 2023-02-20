@@ -5,13 +5,14 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::structures::Metadata;
-use crate::types::FolderID;
+use crate::types::Folder;
 use crate::{client, utils};
+
+pub const ENDPOINT: &str = "/uploadfile";
 
 #[derive(Debug, Clone)]
 pub struct UploadFileParams {
-    path: Option<String>,
-    folderid: Option<FolderID>,
+    folder: Folder,
     filename: String,
     // Optional parameters
     pub nopartial: bool,
@@ -22,10 +23,9 @@ pub struct UploadFileParams {
 }
 
 impl UploadFileParams {
-    fn new(path: Option<String>, folderid: Option<FolderID>, filename: String) -> UploadFileParams {
+    pub fn new(folder: Folder, filename: String) -> UploadFileParams {
         UploadFileParams {
-            path,
-            folderid,
+            folder,
             filename,
             nopartial: false,
             progresshash: None,
@@ -34,13 +34,17 @@ impl UploadFileParams {
             ctime: None,
         }
     }
+}
 
-    pub fn new_from_path(path: String, filename: String) -> UploadFileParams {
-        UploadFileParams::new(Some(path), None, filename)
-    }
+impl TryFrom<UploadFileParams> for HashMap<String, String> {
+    type Error = anyhow::Error;
 
-    pub fn new_from_folderid(folderid: FolderID, filename: String) -> UploadFileParams {
-        UploadFileParams::new(None, Some(folderid), filename)
+    fn try_from(value: UploadFileParams) -> std::result::Result<Self, Self::Error> {
+        let mut params: HashMap<String, String> = value.folder.try_into()?;
+        if let Some(progresshash) = value.progresshash {
+            params.insert("progresshash".to_string(), progresshash);
+        }
+        Ok(params)
     }
 }
 
@@ -60,21 +64,11 @@ pub struct UploadFile {
 #[async_trait]
 pub trait PostUploadFile: client::Client {
     async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile> {
-        let mut params = HashMap::new();
-        params.insert("filename".to_string(), upload_params.filename.clone());
-        // Folder-id or path, not both
-        if let Some(folderid) = upload_params.folderid {
-            params.insert("folderid".to_string(), folderid.to_string());
-        } else if let Some(path) = upload_params.path {
-            params.insert("path".to_string(), path);
-        }
-        if let Some(progresshash) = upload_params.progresshash {
-            params.insert("progresshash".to_string(), progresshash);
-        }
-
-        let data = utils::http::file_data(local_filename.to_string(), &upload_params.filename)?;
+        let filename = upload_params.filename.clone();
+        let params: HashMap<String, String> = upload_params.try_into()?;
+        let data = utils::http::file_data(local_filename.to_string(), &filename)?;
         // TODO: This should do some streaming (with progress bar). Probably different method to upload several files
-        let ret = self.post::<UploadFile>("/uploadfile", params, data).await?;
+        let ret = self.post::<UploadFile>(ENDPOINT, params, data).await?;
         Ok(ret)
     }
 }
