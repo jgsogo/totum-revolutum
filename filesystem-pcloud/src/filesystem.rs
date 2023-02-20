@@ -262,14 +262,14 @@ mod tests {
     use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::file::deletefile;
     use pcloud_sdk::methods::file::deletefile::DeleteFile;
-    use pcloud_sdk::methods::fileops::{file_close, file_open, file_read, file_write};
     use pcloud_sdk::methods::fileops::file_open::FileOpen;
     use pcloud_sdk::methods::fileops::file_write::FileWrite;
-    use pcloud_sdk::methods::folder::{createfolderifnotexists, deletefolder, deletefolderrecursive, listfolder};
+    use pcloud_sdk::methods::fileops::{file_close, file_open, file_read, file_write};
     use pcloud_sdk::methods::folder::createfolderifnotexists::CreateFolderIfNotExists;
     use pcloud_sdk::methods::folder::deletefolder::DeleteFolder;
     use pcloud_sdk::methods::folder::deletefolderrecursive::DeleteFolderRecursive;
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
+    use pcloud_sdk::methods::folder::{createfolderifnotexists, deletefolder, deletefolderrecursive, listfolder};
     use pcloud_sdk::mocks::client::MockLocalClient;
     use pcloud_sdk::types::FileID;
     use pcloud_sdk::utils;
