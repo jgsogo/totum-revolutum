@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -18,16 +16,17 @@ pub struct DeleteFile {
 }
 
 #[async_trait]
-pub trait GetDeleteFile: client::Client {
+pub trait GetDeleteFile {
+    async fn deletefile(&self, input: File) -> Result<DeleteFile>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetDeleteFile for T {
     async fn deletefile(&self, input: File) -> Result<DeleteFile> {
-        let mut params = HashMap::new();
-        input.add_to_params(&mut params)?;
-        let ret = self.get::<DeleteFile>(ENDPOINT, params).await?;
+        let ret = self.get::<DeleteFile>(ENDPOINT, input.into_params()?).await?;
         Ok(ret)
     }
 }
-
-impl<T: client::Client> GetDeleteFile for T {}
 
 #[cfg(test)]
 mod tests {

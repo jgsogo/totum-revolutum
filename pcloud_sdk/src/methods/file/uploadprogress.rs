@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 use crate::client;
 use crate::structures::Metadata;
 
+pub const ENDPOINT: &str = "/uploadprogress";
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadProgressData {
     pub total: u64,
@@ -17,13 +19,16 @@ pub struct UploadProgressData {
 }
 
 #[async_trait]
-pub trait UploadProgress: client::Client {
+pub trait UploadProgress {
+    async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData>;
+}
+
+#[async_trait]
+impl<T: client::Client> UploadProgress for T {
     async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData> {
         let mut params = HashMap::new();
         params.insert("progresshash".to_string(), progresshash.to_string());
-        let ret = self.get::<UploadProgressData>("/uploadprogress", params).await?;
+        let ret = self.get::<UploadProgressData>(ENDPOINT, params).await?;
         Ok(ret)
     }
 }
-
-impl<T: client::Client> UploadProgress for T {}

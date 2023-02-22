@@ -1,17 +1,17 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
 
-use crate::access_token;
 use anyhow::Result;
 use async_trait::async_trait;
 use reqwest;
 use serde::de::DeserializeOwned;
 
+use crate::access_token;
 use crate::methods::oauth2;
 use crate::utils::http;
 
 #[async_trait]
-pub trait Client {
+pub trait Client: Sync {
     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
     where
         T: DeserializeOwned + 'static;

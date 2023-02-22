@@ -1,13 +1,11 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::methods::params::Params;
+use crate::{client, utils};
+use crate::methods::params::{Params, ParamsType};
 use crate::structures::Metadata;
 use crate::types::Folder;
-use crate::{client, utils};
 
 pub const ENDPOINT: &str = "/uploadfile";
 
@@ -37,16 +35,13 @@ impl UploadFileParams {
     }
 }
 
-impl TryFrom<UploadFileParams> for HashMap<String, String> {
-    type Error = anyhow::Error;
-
-    fn try_from(value: UploadFileParams) -> std::result::Result<Self, Self::Error> {
-        let mut params = HashMap::new();
-        value.folder.add_to_params(&mut params)?;
-        if let Some(progresshash) = value.progresshash {
-            params.insert("progresshash".to_string(), progresshash);
+impl Params for UploadFileParams {
+    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
+        self.folder.add_to_params(params)?;
+        if let Some(progresshash) = &self.progresshash {
+            params.insert("progresshash".to_string(), progresshash.clone());
         }
-        Ok(params)
+        Ok(())
     }
 }
 
@@ -64,15 +59,19 @@ pub struct UploadFile {
 }
 
 #[async_trait]
-pub trait PostUploadFile: client::Client {
+pub trait PostUploadFile {
+    async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile>;
+}
+
+#[async_trait]
+impl<T: client::Client> PostUploadFile for T {
     async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile> {
         let filename = upload_params.filename.clone();
-        let params: HashMap<String, String> = upload_params.try_into()?;
         let data = utils::http::file_data(local_filename.to_string(), &filename)?;
         // TODO: This should do some streaming (with progress bar). Probably different method to upload several files
-        let ret = self.post::<UploadFile>(ENDPOINT, params, data).await?;
+        let ret = self
+            .post::<UploadFile>(ENDPOINT, upload_params.into_params()?, data)
+            .await?;
         Ok(ret)
     }
 }
-
-impl<T: client::Client> PostUploadFile for T {}

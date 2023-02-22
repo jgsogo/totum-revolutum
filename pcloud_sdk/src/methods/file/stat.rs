@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -17,16 +15,17 @@ pub struct Stat {
 }
 
 #[async_trait]
-pub trait GetStat: client::Client {
+pub trait GetStat {
+    async fn stat(&self, input: File) -> Result<Stat>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetStat for T {
     async fn stat(&self, input: File) -> Result<Stat> {
-        let mut params = HashMap::new();
-        input.add_to_params(&mut params)?;
-        let ret = self.get::<Stat>(ENDPOINT, params).await?;
+        let ret = self.get::<Stat>(ENDPOINT, input.into_params()?).await?;
         Ok(ret)
     }
 }
-
-impl<T: client::Client> GetStat for T {}
 
 #[cfg(test)]
 mod tests {
