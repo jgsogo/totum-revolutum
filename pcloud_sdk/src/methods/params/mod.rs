@@ -1,4 +1,4 @@
-pub use params::Params;
+pub use params::{Params, ParamsType};
 pub use target_file::TargetFile;
 
 mod file;

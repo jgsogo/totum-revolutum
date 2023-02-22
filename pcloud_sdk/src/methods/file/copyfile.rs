@@ -1,30 +1,31 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::params::Params;
-use crate::methods::params::TargetFile;
 use crate::structures::Metadata;
-use crate::types::File;
 
 pub const ENDPOINT: &str = "/copyfile";
 
-pub struct CopyFileInput {
-    source: File,
-    target: TargetFile,
-}
+mod params {
+    use crate::methods::params::ParamsType;
+    use crate::methods::params::TargetFile;
+    use crate::types::File;
 
-impl TryFrom<CopyFileInput> for HashMap<String, String> {
-    type Error = anyhow::Error;
+    use super::{Params, Result};
 
-    fn try_from(value: CopyFileInput) -> std::result::Result<Self, Self::Error> {
-        let mut params = HashMap::new();
-        value.source.add_to_params(&mut params)?;
-        value.target.add_to_params(&mut params)?;
-        Ok(params)
+    pub struct CopyFileInput {
+        pub source: File,
+        pub target: TargetFile,
+    }
+
+    impl Params for CopyFileInput {
+        fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
+            self.source.add_to_params(params)?;
+            self.target.add_to_params(params)?;
+            Ok(())
+        }
     }
 }
 
@@ -35,9 +36,8 @@ pub struct CopyFile {
 
 #[async_trait]
 pub trait GetCopyFile: client::Client {
-    async fn copyfile(&self, input: CopyFileInput) -> Result<CopyFile> {
-        let params = HashMap::try_from(input)?;
-        let ret = self.get::<CopyFile>(ENDPOINT, params).await?;
+    async fn copyfile(&self, input: params::CopyFileInput) -> Result<CopyFile> {
+        let ret = self.get::<CopyFile>(ENDPOINT, input.into_params()?).await?;
         Ok(ret)
     }
 }
@@ -51,9 +51,11 @@ mod tests {
     use std::io::BufReader;
     use std::path::{Path, PathBuf};
 
-    use crate::types::{FileID, FolderID};
+    use crate::methods::params::TargetFile;
+    use crate::types::{File, FileID, FolderID};
     use crate::utils::http::ApiResult;
 
+    use super::params::*;
     use super::*;
 
     #[test]
@@ -62,7 +64,7 @@ mod tests {
             source: File::FileID(FileID(1234)),
             target: TargetFile::FolderAndName((FolderID(4321), None)),
         };
-        let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
+        let params = input.into_params().unwrap();
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("fileid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -74,7 +76,7 @@ mod tests {
             source: File::FileID(FileID(1234)),
             target: TargetFile::FolderAndName((FolderID(4321), Some("name".to_string()))),
         };
-        let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
+        let params = input.into_params().unwrap();
         assert_eq!(params.len(), 3);
         assert_eq!(params.get("fileid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -87,7 +89,7 @@ mod tests {
             source: File::Path(PathBuf::from("/from/path")),
             target: TargetFile::Path(PathBuf::from("/to/path")),
         };
-        let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
+        let params = input.into_params().unwrap();
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("path"), Some(&"/from/path".to_string()));
         assert_eq!(params.get("topath"), Some(&"/to/path".to_string()));
