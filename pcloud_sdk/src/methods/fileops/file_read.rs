@@ -1,11 +1,10 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::fileops::FileDescriptor;
+use crate::methods::params::Params;
 
 pub const ENDPOINT: &str = "/file_read";
 
@@ -15,10 +14,14 @@ pub struct FileRead {
 }
 
 #[async_trait]
-pub trait GetFileRead: client::Client {
+pub trait GetFileRead {
+    async fn file_read(&self, descriptor: FileDescriptor, count: u64) -> Result<FileRead>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetFileRead for T {
     async fn file_read(&self, descriptor: FileDescriptor, count: u64) -> Result<FileRead> {
-        let mut params = HashMap::new();
-        params.insert("fd".to_string(), descriptor.to_string());
+        let mut params = descriptor.into_params()?;
         params.insert("count".to_string(), count.to_string());
 
         let bytes = self.get_bytes(ENDPOINT, params).await?;
@@ -26,10 +29,10 @@ pub trait GetFileRead: client::Client {
     }
 }
 
-impl<T: client::Client> GetFileRead for T {}
-
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use crate::mocks::client::MockLocalClient;
 
     use super::*;

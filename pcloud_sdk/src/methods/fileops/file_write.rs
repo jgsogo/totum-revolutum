@@ -1,10 +1,9 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::methods::fileops::FileDescriptor;
+use crate::methods::params::Params;
 use crate::{client, utils};
 
 pub const ENDPOINT: &str = "/file_write";
@@ -15,21 +14,25 @@ pub struct FileWrite {
 }
 
 #[async_trait]
-pub trait PostFileWrite: client::Client {
-    async fn file_write(&self, descriptor: FileDescriptor, data: &[u8]) -> Result<FileWrite> {
-        let mut params = HashMap::new();
-        params.insert("fd".to_string(), descriptor.to_string());
+pub trait PostFileWrite {
+    async fn file_write(&self, descriptor: FileDescriptor, data: &[u8]) -> Result<FileWrite>;
+}
 
+#[async_trait]
+impl<T: client::Client> PostFileWrite for T {
+    async fn file_write(&self, descriptor: FileDescriptor, data: &[u8]) -> Result<FileWrite> {
         let data = utils::http::file_write(&mut data.to_owned(), "filename")?;
-        let ret = self.post::<FileWrite>(ENDPOINT, params, data).await?;
+        let ret = self
+            .post::<FileWrite>(ENDPOINT, descriptor.into_params()?, data)
+            .await?;
         Ok(ret)
     }
 }
 
-impl<T: client::Client> PostFileWrite for T {}
-
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use crate::mocks::client::MockLocalClient;
 
     use super::*;
