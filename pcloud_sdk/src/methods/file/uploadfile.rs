@@ -2,10 +2,10 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::{client, utils};
 use crate::methods::params::{Params, ParamsType};
 use crate::structures::Metadata;
 use crate::types::Folder;
+use crate::{client, utils};
 
 pub const ENDPOINT: &str = "/uploadfile";
 
