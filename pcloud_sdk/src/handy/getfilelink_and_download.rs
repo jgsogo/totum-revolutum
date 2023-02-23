@@ -15,7 +15,7 @@ use crate::progress_bar;
 pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
     async fn getfilelink_and_download(
         &self,
-        file_link: &getfilelink::GetFileLinkInput,
+        file_link: getfilelink::GetFileLinkInput,
         path: &Path,
         pb_builder: &dyn progress_bar::ProgressBarBuilder,
     ) -> Result<()> {

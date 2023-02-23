@@ -1,18 +1,34 @@
-use std::collections::HashMap;
+use std::path::PathBuf;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
+use crate::methods::params::{Params, ParamsType};
 use crate::structures::Metadata;
 use crate::types::FolderID;
 
 pub const ENDPOINT: &str = "/createfolderifnotexists";
 
-pub enum CreateFolderIfNotExistsInput {
-    Path(String),
-    FolderAndName(FolderID, String),
+pub enum TargetFolder {
+    FolderAndName((FolderID, String)),
+    Path(PathBuf),
+}
+
+impl Params for TargetFolder {
+    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
+        match &self {
+            TargetFolder::Path(p) => {
+                params.insert("path".to_string(), p.to_string_lossy().parse()?);
+            }
+            TargetFolder::FolderAndName((folderid, name)) => {
+                params.insert("folderid".to_string(), folderid.0.to_string());
+                params.insert("name".to_string(), name.clone());
+            }
+        }
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -22,29 +38,26 @@ pub struct CreateFolderIfNotExists {
 }
 
 #[async_trait]
-pub trait GetCreateFolderIfNotExists: client::Client {
+pub trait GetCreateFolderIfNotExists {
     /// Creates the given directory (if it doesn't exists) and returns its metadata. It can only
     /// create one folder at a time, for nested ones you will need to call the function several
     /// times.
-    async fn createfolderifnotexists(&self, input: &CreateFolderIfNotExistsInput) -> Result<CreateFolderIfNotExists> {
-        let mut params = HashMap::new();
-        match input {
-            CreateFolderIfNotExistsInput::Path(p) => {
-                params.insert("path".to_string(), p.clone());
-            }
-            CreateFolderIfNotExistsInput::FolderAndName(folderid, name) => {
-                params.insert("folderid".to_string(), folderid.0.to_string());
-                params.insert("name".to_string(), name.to_string());
-            }
-        }
-        self.get::<CreateFolderIfNotExists>(ENDPOINT, params).await
+    async fn createfolderifnotexists(&self, input: TargetFolder) -> Result<CreateFolderIfNotExists>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetCreateFolderIfNotExists for T {
+    async fn createfolderifnotexists(&self, input: TargetFolder) -> Result<CreateFolderIfNotExists> {
+        self.get::<CreateFolderIfNotExists>(ENDPOINT, input.into_params()?)
+            .await
     }
 }
 
-impl<T: client::Client> GetCreateFolderIfNotExists for T {}
-
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+    use std::str::FromStr;
+
     use crate::mocks::client::MockLocalClient;
 
     use super::*;
@@ -64,8 +77,8 @@ mod tests {
                     metadata: Default::default(),
                 })
             });
-        let input = CreateFolderIfNotExistsInput::Path("the/path/to/folder".to_string());
-        let r = client.createfolderifnotexists(&input).await?;
+        let input = TargetFolder::Path(PathBuf::from_str("the/path/to/folder")?);
+        let r = client.createfolderifnotexists(input).await?;
         assert_eq!(r.created.unwrap(), true);
         Ok(())
     }
@@ -86,8 +99,8 @@ mod tests {
                     metadata: Default::default(),
                 })
             });
-        let input = CreateFolderIfNotExistsInput::FolderAndName(FolderID(1234), "name.txt".to_string());
-        let r = client.createfolderifnotexists(&input).await?;
+        let input = TargetFolder::FolderAndName((FolderID(1234), "name.txt".to_string()));
+        let r = client.createfolderifnotexists(input).await?;
         assert_eq!(r.created.unwrap(), true);
         Ok(())
     }

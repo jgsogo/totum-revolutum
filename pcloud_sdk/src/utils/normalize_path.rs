@@ -38,7 +38,7 @@ mod path_normalize_tests {
     use super::normalize_path;
 
     fn check(before: &str, after: &str) {
-        println!("-----------------\nnormalizing {:?}", before);
+        // println!("-----------------\nnormalizing {:?}", before);
         // As seen by Stargateur, the test here doesn't work on Windows
         //
         // There are two problems, at least:

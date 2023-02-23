@@ -1,6 +1,12 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use clap::{Parser, Subcommand};
 use tracing::debug;
+
+use pcloud_sdk::client::HttpClient;
+
+mod auth;
+mod listfolder;
+mod userinfo;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -9,13 +15,25 @@ struct Cli {
     #[clap(flatten)]
     verbose: clap_verbosity_flag::Verbosity,
 
+    /// Path to a JSON file with user token
+    #[clap(long)]
+    token_file: std::path::PathBuf,
+
     #[command(subcommand)]
     command: Commands,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Debug)]
 enum Commands {
-    None,
+    /// Authenticate using inputs from command line
+    Auth(auth::AuthParams),
+
+    /// Authenticate using inputs from file
+    AuthFile(auth::AuthFileParams),
+
+    Userinfo,
+
+    Listfolder(listfolder::Params),
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -39,5 +57,17 @@ async fn main() -> Result<()> {
     debug!("Tracing level configured to {}", tracing_level);
 
     // Go ahead!
-    Ok(())
+    match &cli.command {
+        Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
+        Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
+        _ => {
+            let token = auth::read_from_file(&cli.token_file)?;
+            let client = HttpClient::new(token, true);
+            match &cli.command {
+                Commands::Userinfo => userinfo::handle(client).await,
+                Commands::Listfolder(params) => listfolder::handle(client, params).await,
+                c => bail!("Unexpected command {:?}", c),
+            }
+        }
+    }
 }

@@ -34,7 +34,12 @@ pub struct FileOpen {
 }
 
 #[async_trait]
-pub trait GetFileOpen: client::Client {
+pub trait GetFileOpen {
+    async fn file_open(&self, flags: Flags, path: FileOpenPath) -> Result<FileOpen>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetFileOpen for T {
     async fn file_open(&self, flags: Flags, path: FileOpenPath) -> Result<FileOpen> {
         let mut params = HashMap::new();
         params.insert("flags".to_string(), flags.bits().to_string());
@@ -68,8 +73,6 @@ pub trait GetFileOpen: client::Client {
         Ok(ret)
     }
 }
-
-impl<T: client::Client> GetFileOpen for T {}
 
 #[cfg(test)]
 mod tests {

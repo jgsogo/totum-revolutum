@@ -10,20 +10,18 @@ use serde::de::DeserializeOwned;
 use tokio::sync::oneshot::Sender;
 use url::Url;
 
-use crate::data;
-use crate::data::app_client_data::AppClientData;
-
-use super::oauth2_token::exchange_oauth2_token;
+use super::exchange_oauth2_token::exchange_oauth2_token;
+use super::{AppClientData, OAuth2Token};
 
 const CALLBACK_ENDPOINT: &str = "/callback";
 
-struct AppContext<Token: data::oauth2token::OAuth2Token> {
+struct AppContext<Token: OAuth2Token> {
     app: AppClientData,
     oauth2_token: Option<Token>,
     tx: Option<Sender<()>>,
 }
 
-impl<Token: data::oauth2token::OAuth2Token> AppContext<Token> {
+impl<Token: OAuth2Token> AppContext<Token> {
     fn new(app: AppClientData, tx: Sender<()>) -> AppContext<Token> {
         AppContext {
             app,
@@ -33,7 +31,7 @@ impl<Token: data::oauth2token::OAuth2Token> AppContext<Token> {
     }
 }
 
-async fn dispatcher<Token: data::oauth2token::OAuth2Token + DeserializeOwned>(
+async fn dispatcher<Token: OAuth2Token + DeserializeOwned>(
     http_client: reqwest::Client,
     req: Request<Body>,
     data: Arc<Mutex<AppContext<Token>>>,
@@ -72,17 +70,17 @@ async fn dispatcher<Token: data::oauth2token::OAuth2Token + DeserializeOwned>(
 
 fn visit_url(app: &AppClientData, callback_url: String) -> String {
     let mut url = Url::parse("https://my.pcloud.com/oauth2/authorize").unwrap();
-    url.query_pairs_mut().append_pair("client_id", &app.client_id);
+    url.query_pairs_mut().append_pair("client_id", app.client_id());
     url.query_pairs_mut().append_pair("redirect_uri", &callback_url);
     url.query_pairs_mut().append_pair("response_type", "code");
-    if app.force_reapprove {
+    if app.force_reapprove() {
         url.query_pairs_mut().append_pair("force_reapprove", "true");
     }
     //url.query_pairs_mut().append_pair("state", "25");
     url.as_str().to_string()
 }
 
-pub(crate) async fn serve<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static>(
+pub(crate) async fn serve<Token: OAuth2Token + DeserializeOwned + Sync + Send + 'static>(
     http_client: reqwest::Client,
     app: AppClientData,
     addr: SocketAddr,

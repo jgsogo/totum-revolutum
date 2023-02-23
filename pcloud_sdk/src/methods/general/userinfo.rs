@@ -30,13 +30,16 @@ pub struct UserInfo {
 }
 
 #[async_trait]
-pub trait GetUserInfo: client::Client {
+pub trait GetUserInfo {
+    async fn userinfo(&self) -> Result<UserInfo>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetUserInfo for T {
     async fn userinfo(&self) -> Result<UserInfo> {
         self.get::<UserInfo>("/userinfo", HashMap::new()).await
     }
 }
-
-impl<T: client::Client> GetUserInfo for T {}
 
 #[cfg(test)]
 mod tests {

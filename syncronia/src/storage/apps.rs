@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-use pcloud_sdk::data;
+use super::app;
 
 use crate::utils::mut_find_or_insert;
 use crate::utils::{
@@ -15,13 +15,13 @@ const FILENAME: &str = "apps.yaml";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub struct Apps {
-    apps: Vec<data::app::App>,
+    apps: Vec<app::App>,
 }
 
 type AppsFileContent = VersionedData<Apps>;
 
 impl AppsFileContent {
-    pub fn find(&self, client_id: &str) -> Result<&data::app::App, std::io::Error> {
+    pub fn find(&self, client_id: &str) -> Result<&app::App, std::io::Error> {
         match self.data.apps.iter().find(|&app| app.client_id == client_id) {
             Some(app) => Ok(app),
             None => Err(std::io::Error::new(
@@ -31,7 +31,7 @@ impl AppsFileContent {
         }
     }
 
-    pub fn find_or_insert(&mut self, client_id: &str, app: data::app::App) -> (&mut data::app::App, bool) {
+    pub fn find_or_insert(&mut self, client_id: &str, app: app::App) -> (&mut app::App, bool) {
         mut_find_or_insert(&mut self.data.apps, |app| app.client_id == client_id, app)
     }
 }
@@ -91,7 +91,7 @@ mod tests {
         {
             let mut apps_lock = AppsFile::update_or_create(&path, Apps::default()).unwrap();
             let apps = &mut apps_lock.content.data.apps;
-            apps.push(data::app::App::new("name", "client_id", "client_secret"))
+            apps.push(app::App::new("name", "client_id", "client_secret"))
         }
 
         let apps_lock = AppsFile::read(&path).unwrap();

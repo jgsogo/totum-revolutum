@@ -1,24 +1,17 @@
-use std::collections::HashMap;
-use std::path::PathBuf;
-
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
+use crate::methods::params::{Params, ParamsType};
 use crate::structures::Metadata;
-use crate::types::FolderID;
+use crate::types::Folder;
 
 pub const ENDPOINT: &str = "/copyfolder";
 
-pub enum CopyFolderLocation {
-    FolderID(FolderID),
-    Path(PathBuf),
-}
-
 pub struct CopyFolderInput {
-    source: CopyFolderLocation,
-    target: CopyFolderLocation,
+    source: Folder,
+    target: Folder,
 
     /// If it is set and files with the same name already exist, no overwriting will be
     /// preformed and error 2004 will be returned
@@ -32,42 +25,29 @@ pub struct CopyFolderInput {
     copycontentonly: bool,
 }
 
-impl TryFrom<CopyFolderInput> for HashMap<String, String> {
-    type Error = anyhow::Error;
-
-    fn try_from(value: CopyFolderInput) -> std::result::Result<Self, Self::Error> {
-        let mut params = HashMap::new();
-        let CopyFolderInput { source, target, .. } = value;
-        match source {
-            CopyFolderLocation::FolderID(fid) => {
-                params.insert("folderid".to_string(), fid.0.to_string());
-            }
-            CopyFolderLocation::Path(p) => {
-                params.insert("path".to_string(), p.to_string_lossy().parse()?);
-            }
-        };
-        match target {
-            CopyFolderLocation::FolderID(fid) => {
+impl Params for CopyFolderInput {
+    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
+        self.source.add_to_params(params)?;
+        match &self.target {
+            Folder::FolderID(fid) => {
                 params.insert("tofolderid".to_string(), fid.0.to_string());
             }
-            CopyFolderLocation::Path(p) => {
+            Folder::Path(p) => {
                 params.insert("topath".to_string(), p.to_string_lossy().parse()?);
             }
-        };
-
-        if value.noover {
+        }
+        if self.noover {
             params.insert("noover".to_string(), "1".to_string());
         }
 
-        if value.skipexisting {
+        if self.skipexisting {
             params.insert("skipexisting".to_string(), "1".to_string());
         }
 
-        if value.copycontentonly {
+        if self.copycontentonly {
             params.insert("copycontentonly".to_string(), "1".to_string());
         }
-
-        Ok(params)
+        Ok(())
     }
 }
 
@@ -77,15 +57,17 @@ pub struct CopyFolder {
 }
 
 #[async_trait]
-pub trait GetCopyFolder: client::Client {
+pub trait GetCopyFolder {
+    async fn copyfile(&self, input: CopyFolderInput) -> Result<CopyFolder>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetCopyFolder for T {
     async fn copyfile(&self, input: CopyFolderInput) -> Result<CopyFolder> {
-        let params = HashMap::try_from(input)?;
-        let ret = self.get::<CopyFolder>(ENDPOINT, params).await?;
+        let ret = self.get::<CopyFolder>(ENDPOINT, input.into_params()?).await?;
         Ok(ret)
     }
 }
-
-impl<T: client::Client> GetCopyFolder for T {}
 
 #[cfg(test)]
 mod tests {
@@ -93,7 +75,9 @@ mod tests {
     use std::fs::File;
     use std::io::BufReader;
     use std::path::Path;
+    use std::str::FromStr;
 
+    use crate::types::FolderID;
     use crate::utils::http::ApiResult;
 
     use super::*;
@@ -101,13 +85,13 @@ mod tests {
     #[test]
     fn test_params_with_ids() {
         let input = CopyFolderInput {
-            source: CopyFolderLocation::FolderID(FolderID(1234)),
-            target: CopyFolderLocation::FolderID(FolderID(4321)),
+            source: Folder::FolderID(FolderID(1234)),
+            target: Folder::FolderID(FolderID(4321)),
             noover: true,
             skipexisting: true,
             copycontentonly: true,
         };
-        let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
+        let params = input.into_params().unwrap();
         assert_eq!(params.len(), 5);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -119,13 +103,13 @@ mod tests {
     #[test]
     fn test_params_with_paths() {
         let input = CopyFolderInput {
-            source: CopyFolderLocation::Path(PathBuf::from("/source/path")),
-            target: CopyFolderLocation::Path(PathBuf::from("/target/path")),
+            source: Folder::from_str("/source/path").unwrap(),
+            target: Folder::from_str("/target/path").unwrap(),
             noover: false,
             skipexisting: false,
             copycontentonly: false,
         };
-        let params: HashMap<String, String> = HashMap::try_from(input).unwrap();
+        let params = input.into_params().unwrap();
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("path"), Some(&"/source/path".to_string()));
         assert_eq!(params.get("topath"), Some(&"/target/path".to_string()));

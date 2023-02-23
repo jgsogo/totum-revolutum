@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 
-use super::oauth2token::OAuth2TokenImpl;
+use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct App {

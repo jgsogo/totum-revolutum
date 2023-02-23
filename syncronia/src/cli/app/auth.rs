@@ -4,8 +4,7 @@ use anyhow::Result;
 use clap::Args;
 use tracing::info;
 
-use pcloud_sdk::data;
-use pcloud_sdk::data::oauth2token::OAuth2TokenImpl;
+use pcloud_sdk::methods::oauth2;
 use syncronia::storage;
 use syncronia::storage::apps::Apps;
 use syncronia::utils::mut_find_or_insert;
@@ -50,7 +49,7 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
     let mut file_data = storage::apps::AppsFile::update_or_create(&path, Apps::default())?;
 
     // Search of create new entry for this application
-    let app = data::app::App::default(&params.client_id, &secret);
+    let app = storage::app::App::default(&params.client_id, &secret);
     let (app, _inserted) = file_data.content.find_or_insert(&params.client_id, app);
     if app.client_secret != secret {
         eprintln!(
@@ -62,8 +61,8 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
     // Run oauth request
     // TODO: Move this to SDK
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
-    let app_client_data = data::app_client_data::AppClientData::new(&app.client_id, &app.client_secret);
-    let pcloud = pcloud_sdk::client::HttpClient::<OAuth2TokenImpl>::authorize(app_client_data, addr)
+    let app_client_data = oauth2::AppClientData::new(&app.client_id, &app.client_secret);
+    let pcloud = pcloud_sdk::client::HttpClient::<oauth2::OAuth2TokenImpl>::authorize(app_client_data, addr)
         .await
         .expect("TODO: Propagate errors");
     let token = pcloud.oauth2_token;
@@ -76,7 +75,7 @@ pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
 
     // TODO: Don't like repeating variables here, rustify this piece of code!
     // TODO: Move it to App struct impl
-    let mytoken = data::oauth2token::OAuth2TokenImpl {
+    let mytoken = oauth2::OAuth2TokenImpl {
         userid: token.userid,
         locationid: token.locationid,
         access_token: token.access_token.clone(),

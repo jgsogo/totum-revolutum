@@ -6,13 +6,12 @@ use async_trait::async_trait;
 use reqwest;
 use serde::de::DeserializeOwned;
 
+use crate::access_token;
 use crate::methods::oauth2;
 use crate::utils::http;
 
-use super::data;
-
 #[async_trait]
-pub trait Client {
+pub trait Client: Sync {
     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
     where
         T: DeserializeOwned + 'static;
@@ -25,13 +24,13 @@ pub trait Client {
 }
 
 #[derive(Debug)]
-pub struct HttpClient<Token: data::oauth2token::OAuth2Token> {
+pub struct HttpClient<Token: access_token::OAuth2Token> {
     pub oauth2_token: Token,
     http_client: reqwest::Client,
     secure: bool,
 }
 
-impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient<Token> {
     pub fn new(oauth2_token: Token, secure: bool) -> HttpClient<Token> {
         let client = reqwest::ClientBuilder::new().build().unwrap();
         HttpClient {
@@ -46,10 +45,7 @@ impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 's
         format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
     }
 
-    pub async fn authorize(
-        app: data::app_client_data::AppClientData,
-        address: SocketAddr,
-    ) -> Result<HttpClient<Token>> {
+    pub async fn authorize(app: oauth2::AppClientData, address: SocketAddr) -> Result<HttpClient<Token>> {
         let client = reqwest::Client::new();
         let oauth2 = oauth2::authorize_oauth2(client.clone(), app, address).await?;
         Ok(HttpClient {
@@ -61,7 +57,7 @@ impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 's
 }
 
 #[async_trait]
-impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for HttpClient<Token> {
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for HttpClient<Token> {
     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
     where
         T: DeserializeOwned + 'static,
@@ -90,7 +86,7 @@ impl<Token: data::oauth2token::OAuth2Token + DeserializeOwned + Sync + Send + 's
     }
 }
 
-impl<Token: data::oauth2token::OAuth2Token + Clone> Clone for HttpClient<Token> {
+impl<Token: access_token::OAuth2Token + Clone> Clone for HttpClient<Token> {
     fn clone(&self) -> Self {
         HttpClient::<Token> {
             oauth2_token: self.oauth2_token.clone(),

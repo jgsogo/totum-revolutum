@@ -1,22 +1,18 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use itertools::Itertools;
-
 use crate::client;
+use crate::methods::params::{Params, ParamsType};
 use crate::structures::Metadata;
+use crate::types::Folder;
 
 pub const ENDPOINT: &str = "/listfolder";
 
-#[derive(Default)]
 pub struct ListFolderInput {
-    // path to the folder(discouraged)
-    path: Option<String>,
-    // id of the folder
-    folderid: Option<i64>,
+    /// ID of the folder, or path to it (discouraged)
+    folder: Folder,
 
     // If is set full directory tree will be returned, which means that all directories will have contents filed.
     pub recursive: bool,
@@ -29,17 +25,24 @@ pub struct ListFolderInput {
 }
 
 impl ListFolderInput {
-    pub fn new_from_path(path: Option<String>) -> ListFolderInput {
+    pub fn new(folder: Folder) -> ListFolderInput {
         ListFolderInput {
-            path: Some(path.unwrap_or_else(|| "/".to_string())),
-            ..Default::default()
+            folder,
+            recursive: false,
+            showdeleted: None,
+            nofiles: None,
+            noshared: None,
         }
     }
-    pub fn new_from_folderid(folderid: i64) -> ListFolderInput {
-        ListFolderInput {
-            folderid: Some(folderid),
-            ..Default::default()
+}
+
+impl Params for ListFolderInput {
+    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
+        self.folder.add_to_params(params)?;
+        if self.recursive {
+            params.insert("recursive".to_string(), "1".to_string());
         }
+        Ok(())
     }
 }
 
@@ -49,31 +52,26 @@ pub struct ListFolder {
 }
 
 #[async_trait]
-pub trait GetListFolder: client::Client {
-    async fn listfolder(&self, list_folder: &ListFolderInput) -> Result<ListFolder> {
+pub trait GetListFolder {
+    async fn listfolder(&self, list_folder: ListFolderInput) -> Result<ListFolder> {
         self.listfolder_with_filtermeta(list_folder, vec![]).await
     }
 
     async fn listfolder_with_filtermeta(
         &self,
-        list_folder: &ListFolderInput,
+        list_folder: ListFolderInput,
+        filtermeta: Vec<&str>,
+    ) -> Result<ListFolder>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetListFolder for T {
+    async fn listfolder_with_filtermeta(
+        &self,
+        list_folder: ListFolderInput,
         filtermeta: Vec<&str>,
     ) -> Result<ListFolder> {
-        let mut params = HashMap::new();
-        match list_folder {
-            ListFolderInput { path: Some(p), .. } => {
-                params.insert("path".to_string(), p.clone());
-            }
-            ListFolderInput { folderid: Some(f), .. } => {
-                params.insert("folderid".to_string(), f.to_string());
-            }
-            _ => todo!("Either path or folderid is compulsory"),
-        }
-
-        if list_folder.recursive {
-            params.insert("recursive".to_string(), "1".to_string());
-        }
-
+        let mut params = list_folder.into_params()?;
         if !filtermeta.is_empty() {
             // We insert `id` always to prevent a pcloud API bug. If we only use one element,
             // for example `filtermeta=folderid`, the response JSON is not well formed when there
@@ -86,12 +84,9 @@ pub trait GetListFolder: client::Client {
         }
 
         let ret = self.get::<ListFolder>(ENDPOINT, params).await?;
-
         Ok(ret)
     }
 }
-
-impl<T: client::Client> GetListFolder for T {}
 
 #[cfg(test)]
 mod tests {

@@ -1,10 +1,11 @@
+use std::fs::File;
+use std::io::BufReader;
+use std::path::Path;
+
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-pub trait OAuth2Token {
-    fn hostname(&self) -> String; // TODO: return &str
-
-    fn access_token(&self) -> &str;
-}
+use crate::access_token::OAuth2Token;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct OAuth2TokenImpl {
@@ -17,6 +18,13 @@ pub struct OAuth2TokenImpl {
 impl OAuth2TokenImpl {
     pub fn userid(&self) -> i32 {
         self.userid
+    }
+
+    pub fn read_from_file<P: AsRef<Path>>(path: P) -> Result<OAuth2TokenImpl> {
+        let file = File::open(path)?;
+        let reader = BufReader::new(file);
+        let u = serde_json::from_reader(reader)?;
+        Ok(u)
     }
 }
 

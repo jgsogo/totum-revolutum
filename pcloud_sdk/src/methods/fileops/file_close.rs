@@ -1,26 +1,28 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
 
 use crate::client;
 use crate::methods::fileops::FileDescriptor;
+use crate::methods::params::Params;
 
 pub const ENDPOINT: &str = "/file_close";
 
 #[async_trait]
-pub trait GetFileClose: client::Client {
+pub trait GetFileClose {
+    async fn file_close(&self, descriptor: FileDescriptor) -> Result<()>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetFileClose for T {
     async fn file_close(&self, descriptor: FileDescriptor) -> Result<()> {
-        let mut params = HashMap::new();
-        params.insert("fd".to_string(), descriptor.to_string());
-        self.get::<()>(ENDPOINT, params).await
+        self.get::<()>(ENDPOINT, descriptor.into_params()?).await
     }
 }
 
-impl<T: client::Client> GetFileClose for T {}
-
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use crate::mocks::client::MockLocalClient;
 
     use super::*;
