@@ -1,12 +1,13 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 use crate::client;
+use crate::methods::params::{Params, ParamsType};
 use crate::types::File;
+
+pub const ENDPOINT: &str = "/getfilelink";
 
 pub struct GetFileLinkInput {
     // `FileID` or path (`String`) to the file
@@ -37,6 +38,25 @@ impl GetFileLinkInput {
     }
 }
 
+impl Params for GetFileLinkInput {
+    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
+        self.file.add_to_params(params)?;
+        if self.forcedownload {
+            params.insert("forcedownload".to_string(), "1".to_string());
+        }
+        if let Some(ct) = &self.contenttype {
+            params.insert("contenttype".to_string(), ct.to_string());
+        }
+        if let Some(v) = &self.maxspeed {
+            params.insert("maxspeed".to_string(), v.to_string());
+        }
+        if self.skipfilename {
+            params.insert("skipfilename".to_string(), "1".to_string());
+        }
+        Ok(())
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileLink {
     pub result: u16,
@@ -47,47 +67,21 @@ pub struct FileLink {
 }
 
 #[async_trait]
-pub trait GetFileLink: client::Client {
-    async fn getfilelink(&self, file_link: &GetFileLinkInput) -> Result<FileLink> {
-        let mut params = HashMap::new();
-        match file_link {
-            GetFileLinkInput {
-                file: File::Path(p), ..
-            } => {
-                params.insert("path".to_string(), p.to_string_lossy().to_string());
-            }
-            GetFileLinkInput {
-                file: File::FileID(f), ..
-            } => {
-                params.insert("fileid".to_string(), f.0.to_string());
-            }
-        }
+pub trait GetFileLink {
+    async fn getfilelink(&self, file_link: GetFileLinkInput) -> Result<FileLink>;
+}
 
-        if file_link.forcedownload {
-            params.insert("forcedownload".to_string(), "1".to_string());
-        }
-
-        if let Some(ct) = &file_link.contenttype {
-            params.insert("contenttype".to_string(), ct.to_string());
-        }
-
-        if let Some(v) = &file_link.maxspeed {
-            params.insert("maxspeed".to_string(), v.to_string());
-        }
-
-        if file_link.skipfilename {
-            params.insert("skipfilename".to_string(), "1".to_string());
-        }
-
-        let ret = self.get::<FileLink>("/getfilelink", params).await?;
+#[async_trait]
+impl<T: client::Client> GetFileLink for T {
+    async fn getfilelink(&self, file_link: GetFileLinkInput) -> Result<FileLink> {
+        let ret = self.get::<FileLink>(ENDPOINT, file_link.into_params()?).await?;
         Ok(ret)
     }
 }
 
-impl<T: client::Client> GetFileLink for T {}
-
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use std::str::FromStr;
 
     use crate::mocks::client::MockLocalClient;
@@ -137,7 +131,7 @@ mod tests {
                 })
             });
 
-        let filelink = client.getfilelink(&input).await?;
+        let filelink = client.getfilelink(input).await?;
         assert_eq!(filelink.result, 0);
         assert_eq!(filelink.path, "<path>".to_string());
         assert_eq!(filelink.expires, utc_now);
@@ -169,7 +163,7 @@ mod tests {
                 })
             });
 
-        let filelink = client.getfilelink(&input).await?;
+        let filelink = client.getfilelink(input).await?;
         assert_eq!(filelink.result, 0);
         assert_eq!(filelink.path, "<path>".to_string());
         assert_eq!(filelink.expires, utc_now);

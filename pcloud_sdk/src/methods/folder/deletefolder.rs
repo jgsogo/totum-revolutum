@@ -16,7 +16,7 @@ pub struct DeleteFolder {
 }
 
 #[async_trait]
-pub trait GetDeleteFolder: client::Client {
+pub trait GetDeleteFolder {
     async fn deletefolder(&self, input: Folder) -> Result<DeleteFolder>;
 }
 

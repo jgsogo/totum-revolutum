@@ -13,13 +13,16 @@ pub struct APIServer {
 }
 
 #[async_trait]
-pub trait GetAPIServer: client::Client {
+pub trait GetAPIServer {
+    async fn getapiserver(&self) -> Result<APIServer>;
+}
+
+#[async_trait]
+impl<T: client::Client> GetAPIServer for T {
     async fn getapiserver(&self) -> Result<APIServer> {
         self.get::<APIServer>("/getapiserver", HashMap::new()).await
     }
 }
-
-impl<T: client::Client> GetAPIServer for T {}
 
 #[cfg(test)]
 mod tests {

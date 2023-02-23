@@ -15,7 +15,7 @@ pub struct RenameFolder {
 
 /// Rename or move
 #[async_trait]
-pub trait GetRenameFolder: client::Client {
+pub trait GetRenameFolder {
     async fn copyfile(&self, input: SourceAndTargetFolder) -> Result<RenameFolder>;
 }
 
