@@ -24,7 +24,7 @@ pub async fn handle(pcloud: HttpClient<OAuth2TokenImpl>, params: &Params) -> Res
     let folder = Folder::from_str(&params.folder).map_err(|_| anyhow!("Cannot parse input parameter 'folder'"))?;
     debug!("Listfolder {folder:?}");
     let input = ListFolderInput::new(folder);
-    let l = pcloud.listfolder(&input).await?;
+    let l = pcloud.listfolder(input).await?;
     println!("{:#?}", l);
     Ok(())
 }
