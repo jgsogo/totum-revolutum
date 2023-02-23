@@ -15,9 +15,9 @@ use pcloud_sdk::methods::file::stat::GetStat;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::FileDescriptor;
-use pcloud_sdk::methods::folder::createfolderifnotexists::{CreateFolderIfNotExistsInput, GetCreateFolderIfNotExists};
-use pcloud_sdk::methods::folder::deletefolder::{DeleteFolderInput, GetDeleteFolder};
-use pcloud_sdk::methods::folder::deletefolderrecursive::{DeleteFolderRecursiveInput, GetDeleteFolderRecursive};
+use pcloud_sdk::methods::folder::createfolderifnotexists::{GetCreateFolderIfNotExists, TargetFolder};
+use pcloud_sdk::methods::folder::deletefolder::GetDeleteFolder;
+use pcloud_sdk::methods::folder::deletefolderrecursive::GetDeleteFolderRecursive;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
@@ -51,7 +51,7 @@ async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
     let folder = Folder::Path(path.to_path_buf());
     let listfolder_input = ListFolderInput::new(folder);
     let filtermeta = vec!["folderid"];
-    let r = pcloud.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
+    let r = pcloud.listfolder_with_filtermeta(listfolder_input, filtermeta).await?;
     r.metadata
         .folderid
         .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
@@ -155,7 +155,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         let filtermeta = vec!["name", "contents", "size", "hash", "isfolder"];
         let items = self
             .pcloud
-            .listfolder_with_filtermeta(&list_folder_input, filtermeta)
+            .listfolder_with_filtermeta(list_folder_input, filtermeta)
             .await
             .unwrap();
 
@@ -221,9 +221,8 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         let mut folderid = self.folderid.clone();
         for cmp in path.components() {
             if let Component::Normal(p) = cmp {
-                let input =
-                    CreateFolderIfNotExistsInput::FolderAndName(folderid.clone(), p.to_string_lossy().to_string());
-                let r = self.pcloud.createfolderifnotexists(&input).await?;
+                let input = TargetFolder::FolderAndName((folderid.clone(), p.to_string_lossy().parse()?));
+                let r = self.pcloud.createfolderifnotexists(input).await?;
                 folderid = r.metadata.folderid.unwrap();
             }
         }
@@ -241,7 +240,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn remove_dir(&self, path: &Path) -> Result<()> {
         let path = self.check_path(path)?;
 
-        let input = DeleteFolderInput::Path(path);
+        let input = Folder::Path(path);
         self.pcloud.deletefolder(input).await?;
         Ok(())
     }
@@ -249,7 +248,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn remove_dir_all(&self, path: &Path) -> Result<()> {
         let path = self.check_path(path)?;
 
-        let input = DeleteFolderRecursiveInput::Path(path);
+        let input = Folder::Path(path);
         self.pcloud.deletefolderrecursive(input).await?;
         Ok(())
     }
