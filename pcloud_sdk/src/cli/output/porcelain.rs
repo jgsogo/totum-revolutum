@@ -26,6 +26,11 @@ impl Porcelain {
 impl Print for Porcelain {
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()> {
         if let Some(contents) = &list_folder.metadata.contents {
+            println!(
+                "{}",
+                Porcelain::format_line("", &list_folder.metadata.folderid.as_ref().unwrap().to_string())
+            );
+
             for it in contents.iter() {
                 let line = match it {
                     Metadata {
@@ -37,7 +42,10 @@ impl Print for Porcelain {
                         common,
                         folderid: Some(fd),
                         ..
-                    } => Porcelain::format_line(&fd.to_string(), common.name.as_ref().unwrap_or(&"".to_string())),
+                    } => Porcelain::format_line(
+                        &fd.to_string(),
+                        &format!("{}/", common.name.as_ref().unwrap_or(&"".to_string())),
+                    ),
                     _ => bail!("Not a folder, neither a file"),
                 };
                 println!("{line}");

@@ -57,7 +57,7 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    // Configure tracing
+    // Configure tracing - logs go to stderr so it can be separated from actual output
     let tracing_level = tracing_level(cli.verbose.log_level_filter());
     tracing_subscriber::fmt().with_writer(std::io::stderr).with_max_level(tracing_level).init();
     debug!("Tracing level configured to {}", tracing_level);
