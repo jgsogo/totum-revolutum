@@ -101,6 +101,7 @@ mod tests {
                 assert_eq!(endpoint, "/userinfo");
                 assert!(params.is_empty());
                 Ok(UserInfo {
+                    userid: 1234,
                     email: "email".to_string(),
                     emailverified: false,
                     registered: datetime!(2013-10-02 14:29:11 UTC),
@@ -112,6 +113,7 @@ mod tests {
                 })
             });
         let userinfo = client.userinfo().await?;
+        assert_eq!(userinfo.userid, 1234);
         assert_eq!(userinfo.email, "email".to_string());
         assert_eq!(userinfo.emailverified, false);
         assert_eq!(userinfo.registered, datetime!(2013-10-02 14:29:11 UTC));
