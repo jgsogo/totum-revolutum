@@ -16,7 +16,7 @@ use crate::stdin_lines::StdinLines;
 #[derive(Args, Debug)]
 pub struct Params {
     #[clap(num_args = 0.., value_delimiter = ' ')]
-    folders: Vec::<String>,
+    folders: Vec<String>,
 }
 
 enum ParamsOrStdin {
@@ -25,10 +25,10 @@ enum ParamsOrStdin {
 }
 
 impl ParamsOrStdin {
-    pub fn new(folders: Vec::<String>) -> Self {
+    pub fn new(folders: Vec<String>) -> Self {
         if folders.is_empty() {
             debug!("No folders provided, will iterate from stdin");
-            ParamsOrStdin::Stdin(StdinLines{})
+            ParamsOrStdin::Stdin(StdinLines {})
         } else {
             ParamsOrStdin::Params(folders.into_iter())
         }
@@ -41,11 +41,10 @@ impl<'a> Iterator for ParamsOrStdin {
     fn next(&mut self) -> Option<Self::Item> {
         match self {
             ParamsOrStdin::Params(p) => p.next(),
-            ParamsOrStdin::Stdin(s) => s.next()
+            ParamsOrStdin::Stdin(s) => s.next(),
         }
     }
 }
-
 
 pub async fn handle(pcloud: HttpClient<OAuth2TokenImpl>, output: &PrintVariant, params: Params) -> Result<()> {
     let input = ParamsOrStdin::new(params.folders);
