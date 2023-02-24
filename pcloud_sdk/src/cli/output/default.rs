@@ -5,9 +5,9 @@ use pcloud_sdk::methods::general::UserInfo;
 
 use crate::output::Print;
 
-pub struct Debug;
+pub struct Default;
 
-impl Print for Debug {
+impl Print for Default {
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()> {
         println!("{:?}", list_folder);
         Ok(())

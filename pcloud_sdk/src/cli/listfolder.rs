@@ -19,6 +19,7 @@ pub struct Params {
     folders: Vec<String>,
 }
 
+// TODO: Probably more complex than needed...
 enum ParamsOrStdin {
     Params(std::vec::IntoIter<String>),
     Stdin(StdinLines),

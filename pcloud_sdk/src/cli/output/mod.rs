@@ -1,11 +1,11 @@
 use anyhow::Result;
 
-pub use debug::Debug;
+pub use default::Default;
 use pcloud_sdk::methods::folder::listfolder::ListFolder;
 use pcloud_sdk::methods::general::userinfo::UserInfo;
 pub use porcelain::Porcelain;
 
-mod debug;
+mod default;
 mod porcelain;
 
 pub trait Print {
@@ -14,14 +14,15 @@ pub trait Print {
 }
 
 pub enum PrintVariant {
-    Debug(Debug),
+    Default(Default),
     Porcelain(Porcelain),
 }
 
 #[derive(clap::ValueEnum, Clone)]
 pub enum OutputArg {
     /// Print as much information as possible
-    Debug,
+    Default,
+
     /// Gives the output in an easy to parse format. Usually just one data or one data per line.
     Porcelain,
 }
@@ -29,7 +30,7 @@ pub enum OutputArg {
 impl From<OutputArg> for PrintVariant {
     fn from(value: OutputArg) -> Self {
         match value {
-            OutputArg::Debug => PrintVariant::Debug(Debug {}),
+            OutputArg::Default => PrintVariant::Default(Default {}),
             OutputArg::Porcelain => PrintVariant::Porcelain(Porcelain {}),
         }
     }
@@ -39,14 +40,14 @@ impl Print for PrintVariant {
     // TODO: There is a lot of boilerplate here just to forward a funciton call -- macro?
     fn list_folder(&self, value: &ListFolder) -> Result<()> {
         match &self {
-            PrintVariant::Debug(inner) => inner.list_folder(value),
+            PrintVariant::Default(inner) => inner.list_folder(value),
             PrintVariant::Porcelain(inner) => inner.list_folder(value),
         }
     }
 
     fn user_info(&self, value: &UserInfo) -> Result<()> {
         match &self {
-            PrintVariant::Debug(inner) => inner.user_info(value),
+            PrintVariant::Default(inner) => inner.user_info(value),
             PrintVariant::Porcelain(inner) => inner.user_info(value),
         }
     }

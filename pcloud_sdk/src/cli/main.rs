@@ -23,7 +23,7 @@ struct Cli {
     #[clap(long)]
     token_file: std::path::PathBuf,
 
-    #[clap(value_enum, long)]
+    #[clap(value_enum, long, default_value_t=OutputArg::Default)]
     output: OutputArg,
 
     #[command(subcommand)]
