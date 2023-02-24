@@ -9,6 +9,8 @@ use crate::client;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserInfo {
+    // userid
+    pub userid: u64,
     // email address of the user
     pub email: String,
     // true if the user had verified it's email
@@ -27,6 +29,16 @@ pub struct UserInfo {
     pub usedquota: u64,
     // 2-3 characters lowercase languageid
     pub language: String,
+}
+
+impl UserInfo {
+    pub fn quota_in_gigas(&self) -> u64 {
+        self.quota / 1e9 as u64
+    }
+
+    pub fn usedquota_in_gigas(&self) -> u64 {
+        self.usedquota / 1e9 as u64
+    }
 }
 
 #[async_trait]

@@ -10,21 +10,18 @@ use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::Folder;
 
+use crate::output::{Print, PrintVariant};
+
 #[derive(Args, Debug)]
 pub struct Params {
-    /// Output prepared to be piped to other commands
-    #[clap(long, action)]
-    porcelain: bool,
-
     // #[clap(flatten)]
     folder: String,
 }
 
-pub async fn handle(pcloud: HttpClient<OAuth2TokenImpl>, params: &Params) -> Result<()> {
+pub async fn handle(pcloud: HttpClient<OAuth2TokenImpl>, output: &PrintVariant, params: &Params) -> Result<()> {
     let folder = Folder::from_str(&params.folder).map_err(|_| anyhow!("Cannot parse input parameter 'folder'"))?;
     debug!("Listfolder {folder:?}");
     let input = ListFolderInput::new(folder);
     let l = pcloud.listfolder(input).await?;
-    println!("{:#?}", l);
-    Ok(())
+    output.list_folder(&l)
 }
