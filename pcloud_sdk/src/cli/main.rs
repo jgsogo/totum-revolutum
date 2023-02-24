@@ -10,6 +10,7 @@ mod auth;
 mod listfolder;
 mod output;
 mod userinfo;
+mod stdin_lines;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -72,7 +73,7 @@ async fn main() -> Result<()> {
         _ => {
             let token = auth::read_from_file(&cli.token_file)?;
             let client = HttpClient::new(token, true);
-            match &cli.command {
+            match cli.command {
                 Commands::Userinfo => userinfo::handle(client, &output).await,
                 Commands::Listfolder(params) => listfolder::handle(client, &output, params).await,
                 c => bail!("Unexpected command {:?}", c),

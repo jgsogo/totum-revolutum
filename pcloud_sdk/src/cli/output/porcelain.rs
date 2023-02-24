@@ -14,12 +14,16 @@ pub struct Porcelain;
 
 impl Porcelain {
     fn format_line(data: &str, comment: &str) -> String {
-        format!("{}\t{} {}", data, COMMENT_SEPARATOR, comment)
+        if data.is_empty() {
+            format!("{} {}", COMMENT_SEPARATOR, comment)
+        } else {
+            format!("{}\t{} {}", data, COMMENT_SEPARATOR, comment)
+        }
     }
 
-    fn parse_line(line: &str) -> String {
+    pub fn parse_line(line: &str) -> String {
         let parts: Vec<&str> = line.splitn(2, COMMENT_SEPARATOR).collect();
-        parts.into_iter().nth(0).unwrap().to_string()
+        parts.into_iter().nth(0).unwrap().trim().to_string()
     }
 }
 
@@ -86,6 +90,16 @@ mod tests {
     #[test]
     fn test_parse_line_with_comments() {
         let data = "data";
+        let comment = &format!("comment {} more comment", COMMENT_SEPARATOR);
+        let line = Porcelain::format_line(data, comment);
+
+        let parsed_data = Porcelain::parse_line(&line);
+        assert_eq!(data, parsed_data);
+    }
+
+    #[test]
+    fn test_parse_just_comment() {
+        let data = "";
         let comment = &format!("comment {} more comment", COMMENT_SEPARATOR);
         let line = Porcelain::format_line(data, comment);
 
