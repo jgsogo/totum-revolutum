@@ -4,8 +4,12 @@ use tracing::debug;
 
 use pcloud_sdk::client::HttpClient;
 
+use crate::output::{OutputArg, PrintVariant};
+
 mod auth;
 mod listfolder;
+mod output;
+mod stdin_lines;
 mod userinfo;
 
 #[derive(Parser)]
@@ -18,6 +22,9 @@ struct Cli {
     /// Path to a JSON file with user token
     #[clap(long)]
     token_file: std::path::PathBuf,
+
+    #[clap(value_enum, long, default_value_t=OutputArg::Default)]
+    output: OutputArg,
 
     #[command(subcommand)]
     command: Commands,
@@ -51,21 +58,27 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    // Configure tracing
+    // Configure tracing - logs go to stderr so it can be separated from actual output
     let tracing_level = tracing_level(cli.verbose.log_level_filter());
-    tracing_subscriber::fmt().with_max_level(tracing_level).init();
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .with_max_level(tracing_level)
+        .init();
     debug!("Tracing level configured to {}", tracing_level);
+
+    // Get the output
+    let output: PrintVariant = cli.output.into();
 
     // Go ahead!
     match &cli.command {
-        Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
+        Commands::Auth(input) => auth::handle_auth(&cli.token_file, &output, input).await,
         Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
         _ => {
             let token = auth::read_from_file(&cli.token_file)?;
             let client = HttpClient::new(token, true);
-            match &cli.command {
-                Commands::Userinfo => userinfo::handle(client).await,
-                Commands::Listfolder(params) => listfolder::handle(client, params).await,
+            match cli.command {
+                Commands::Userinfo => userinfo::handle(client, &output).await,
+                Commands::Listfolder(params) => listfolder::handle(client, &output, params).await,
                 c => bail!("Unexpected command {:?}", c),
             }
         }
