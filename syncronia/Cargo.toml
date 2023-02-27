@@ -42,7 +42,7 @@ async-std = "1.12"
 
 # Optional dependencies
 httpmock = { version = "0.6", optional = true }
-tempfile = { version = "3.3", optional = true }
+tempfile = { version = "3.4", optional = true }
 
 # Deps for CLI
 clap = { version = "4.1", features = ["derive"], optional = true }
