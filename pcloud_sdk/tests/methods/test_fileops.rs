@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use anyhow::Result;
 
@@ -21,7 +21,7 @@ async fn test_fileops() -> Result<()> {
 
     // Add mock so we can create a file
     let folderid = FolderID(42);
-    let root_path = Path::new("the/root/path");
+    let root_path = Utf8Path::new("the/root/path");
     let name = String::from("myfile.txt");
     let write_bytes = 100;
     let content = "the content".as_bytes().to_vec();

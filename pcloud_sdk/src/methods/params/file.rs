@@ -13,7 +13,7 @@ impl Params for File {
                 params.insert("fileid".to_string(), fid.0.to_string());
             }
             File::Path(p) => {
-                params.insert("path".to_string(), p.to_string_lossy().parse()?);
+                params.insert("path".to_string(), p.to_string());
             }
         }
         Ok(())

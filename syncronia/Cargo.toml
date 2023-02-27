@@ -14,7 +14,7 @@ filesystem-pcloud = { path = "../filesystem-pcloud" }
 
 fs4 = { version = "0.6" }
 confy = { version = "0.5", default-features = false, features = ["yaml_conf"] }
-
+camino = { version = "1.1", features = ["serde1"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.9"

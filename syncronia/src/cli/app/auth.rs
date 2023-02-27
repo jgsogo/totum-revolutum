@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use anyhow::Result;
 use clap::Args;
@@ -30,7 +30,7 @@ pub struct AuthParams {
     client_secret_stdin: bool,
 }
 
-pub async fn handle(home: &Path, params: &AuthParams) -> Result<()> {
+pub async fn handle(home: &Utf8Path, params: &AuthParams) -> Result<()> {
     let secret = if params.client_secret_stdin {
         let mut user_input = String::new();
         let stdin = std::io::stdin(); // We get `Stdin` here.

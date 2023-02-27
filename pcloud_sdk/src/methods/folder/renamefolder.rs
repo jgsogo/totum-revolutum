@@ -29,11 +29,10 @@ impl<T: client::Client> GetRenameFolder for T {
 
 #[cfg(test)]
 mod tests {
+    use camino::{Utf8Path, Utf8PathBuf};
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
-    use std::path::Path;
-    use std::path::PathBuf;
     use std::str::FromStr;
 
     use crate::methods::params::TargetLocation;
@@ -71,7 +70,7 @@ mod tests {
     fn test_params_with_paths() {
         let input = SourceAndTargetFolder {
             source: Folder::from_str("/from/path").unwrap(),
-            target: TargetLocation::Path(PathBuf::from("/to/path")),
+            target: TargetLocation::Path(Utf8PathBuf::from("/to/path")),
         };
         let params = input.into_params().unwrap();
         assert_eq!(params.len(), 2);
@@ -82,7 +81,7 @@ mod tests {
     #[test]
     fn test_deserialize() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let userinfo_json = Path::new(&manifest_dir)
+        let userinfo_json = Utf8Path::new(&manifest_dir)
             .join("resources")
             .join("testdata")
             .join("copyfolder.json");

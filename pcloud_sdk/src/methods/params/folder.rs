@@ -13,7 +13,7 @@ impl Params for Folder {
                 params.insert("folderid".to_string(), fid.0.to_string());
             }
             Folder::Path(p) => {
-                params.insert("path".to_string(), p.to_string_lossy().parse()?);
+                params.insert("path".to_string(), p.to_string());
             }
         }
         Ok(())

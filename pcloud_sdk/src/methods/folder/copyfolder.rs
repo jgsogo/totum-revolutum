@@ -33,7 +33,7 @@ impl Params for CopyFolderInput {
                 params.insert("tofolderid".to_string(), fid.0.to_string());
             }
             Folder::Path(p) => {
-                params.insert("topath".to_string(), p.to_string_lossy().parse()?);
+                params.insert("topath".to_string(), p.to_string());
             }
         }
         if self.noover {

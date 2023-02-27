@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use anyhow::Result;
 
@@ -9,7 +9,7 @@ use crate::output;
 
 pub type StatusParams = DirectoryArg;
 
-pub fn handle(home: &Path, params: &StatusParams) -> Result<()> {
+pub fn handle(home: &Utf8Path, params: &StatusParams) -> Result<()> {
     let path = params.get_pcloud_dir();
 
     let config_file_path = storage::config::ConfigFile::path(&path);

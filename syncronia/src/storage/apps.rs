@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use camino::{Utf8Path, Utf8PathBuf};
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -39,7 +39,7 @@ impl AppsFileContent {
 pub type AppsFile = LockedFile<AppsFileContent>;
 
 impl AppsFile {
-    pub fn path(home: &Path) -> PathBuf {
+    pub fn path(home: &Utf8Path) -> Utf8PathBuf {
         home.join(FILENAME)
     }
 }
@@ -62,14 +62,15 @@ mod tests {
 
     #[test]
     fn test_path() {
-        let base_path = Path::new("home");
+        let base_path = Utf8Path::new("home");
         assert_eq!(AppsFile::path(base_path), base_path.join("apps.yaml"));
     }
 
     #[test]
     fn test_read() {
         let tmp_dir = tempdir().unwrap();
-        let path = AppsFile::path(tmp_dir.path());
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let path = AppsFile::path(utf8_path);
 
         assert!(AppsFile::read(&path).is_err());
         {
@@ -87,7 +88,8 @@ mod tests {
     #[test]
     fn test_update_or_create() {
         let tmp_dir = tempdir().unwrap();
-        let path = AppsFile::path(tmp_dir.path());
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let path = AppsFile::path(utf8_path);
         {
             let mut apps_lock = AppsFile::update_or_create(&path, Apps::default()).unwrap();
             let apps = &mut apps_lock.content.data.apps;

@@ -12,6 +12,7 @@ pcloud-sdk = { path = "../pcloud_sdk" }
 
 anyhow = { version = "1.0" }
 async-trait = "0.1"
+camino = "1.1"
 flume = "0.10.14"
 tokio = { version = "1.25", features = ["full"] }
 tracing = { version = "0.1" }

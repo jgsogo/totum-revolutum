@@ -1,16 +1,16 @@
 use std::fmt::{Debug, Display, Formatter};
-use std::path::PathBuf;
 use std::str::FromStr;
 
 use crate::error::Error;
 use crate::utils::normalize_path;
+use camino::Utf8PathBuf;
 
 use super::FolderID;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Folder {
     FolderID(FolderID),
-    Path(PathBuf),
+    Path(Utf8PathBuf),
 }
 
 impl FromStr for Folder {
@@ -19,7 +19,7 @@ impl FromStr for Folder {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Ok(f) = FolderID::from_str(s) {
             return Ok(Folder::FolderID(f));
-        } else if let Ok(p) = PathBuf::from_str(s) {
+        } else if let Ok(p) = Utf8PathBuf::from_str(s) {
             let p = normalize_path(p);
             if p.starts_with("/") && !p.starts_with("/..") {
                 return Ok(Folder::Path(p));
@@ -33,7 +33,7 @@ impl Display for Folder {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Folder::FolderID(value) => write!(f, "{value}"),
-            Folder::Path(value) => write!(f, "{}", value.display()),
+            Folder::Path(value) => write!(f, "{value}"),
         }
     }
 }
@@ -49,7 +49,7 @@ mod tests {
         assert_eq!(Folder::from_str("folderid:123")?, Folder::FolderID(FolderID(123)));
         assert_eq!(
             Folder::from_str("/folderid-123")?,
-            Folder::Path(PathBuf::from_str("/folderid-123")?)
+            Folder::Path(Utf8PathBuf::from_str("/folderid-123")?)
         );
         Ok(())
     }
@@ -58,7 +58,7 @@ mod tests {
     fn test_display() -> Result<()> {
         assert_eq!(&format!("{}", Folder::FolderID(FolderID(123))), "folderid:123");
         assert_eq!(
-            &format!("{}", Folder::Path(PathBuf::from_str("/folderid-123")?)),
+            &format!("{}", Folder::Path(Utf8PathBuf::from_str("/folderid-123")?)),
             "/folderid-123"
         );
         Ok(())
@@ -71,7 +71,7 @@ mod tests {
             "FolderID(folderid:123)"
         );
         assert_eq!(
-            &format!("{:?}", Folder::Path(PathBuf::from_str("/folderid-123")?)),
+            &format!("{:?}", Folder::Path(Utf8PathBuf::from_str("/folderid-123")?)),
             "Path(\"/folderid-123\")"
         );
         Ok(())

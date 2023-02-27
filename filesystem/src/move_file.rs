@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use anyhow::Result;
 
@@ -8,8 +8,8 @@ use super::Filesystem;
 pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action FsRhs,
-    origin: &Path,
-    target: &Path,
+    origin: &Utf8Path,
+    target: &Utf8Path,
     force: bool,
 ) -> Result<()> {
     copy(lhs_fs, rhs_fs, origin, target, force).await?;
@@ -18,7 +18,7 @@ pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
+    use camino::Utf8PathBuf;
 
     use crate::mocks::filesystem::FilesystemMock;
 
@@ -27,7 +27,7 @@ mod tests {
     #[tokio::test]
     async fn test_move_no_force() -> Result<()> {
         let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
-        let lhs_path = PathBuf::from("file.txt");
+        let lhs_path = Utf8PathBuf::from("file.txt");
 
         let lhs_fs = {
             let fs = FilesystemMock::default();
@@ -37,7 +37,7 @@ mod tests {
         };
 
         let rhs_fs = FilesystemMock::default();
-        let rhs_path = PathBuf::from("the_target.txt");
+        let rhs_path = Utf8PathBuf::from("the_target.txt");
         assert!(!rhs_fs.exists(&rhs_path).await?);
 
         move_file(&lhs_fs, &rhs_fs, &lhs_path, &rhs_path, false).await?;
@@ -50,7 +50,7 @@ mod tests {
     #[tokio::test]
     async fn test_move_force() -> Result<()> {
         let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
-        let lhs_path = PathBuf::from("file.txt");
+        let lhs_path = Utf8PathBuf::from("file.txt");
 
         let lhs_fs = {
             let fs = FilesystemMock::default();

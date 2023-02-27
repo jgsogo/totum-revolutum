@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use async_trait::async_trait;
 use tracing::info;
@@ -44,9 +44,9 @@ impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> ActionRu
     }
 
     async fn run_with_lhs(&self, lhs: &FsLhs::Metadata) -> anyhow::Result<()> {
-        let lhs_path = Path::new(lhs.id());
+        let lhs_path = Utf8Path::new(lhs.id());
         let relative_path = self._lhs_fs.rel_path(lhs_path)?;
-        info!("Copy to remote '{}'", relative_path.display());
+        info!("Copy to remote '{relative_path}'");
         // let rhs_file = self._rhs_fs.create()
         Ok(())
     }

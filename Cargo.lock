@@ -299,6 +299,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "89b2fd2a0dcf38d7971e2194b6b6eebab45ae01067456a7fd93d5547a61b70be"
 
 [[package]]
+name = "camino"
+version = "1.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6031a462f977dd38968b6f23378356512feeace69cef817e1a4475108093cec3"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "castaway"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -742,6 +751,7 @@ dependencies = [
  "anyhow",
  "async-std",
  "async-trait",
+ "camino",
  "filesystem",
  "flume",
  "futures",
@@ -758,6 +768,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "camino",
  "filesystem",
  "flume",
  "pcloud-sdk",
@@ -1712,6 +1723,7 @@ dependencies = [
  "async-trait",
  "bitflags",
  "bytes",
+ "camino",
  "chrono",
  "chrono-tz",
  "clap",
@@ -2390,6 +2402,7 @@ dependencies = [
  "anyhow",
  "async-std",
  "async-trait",
+ "camino",
  "chrono",
  "chrono-tz",
  "clap",

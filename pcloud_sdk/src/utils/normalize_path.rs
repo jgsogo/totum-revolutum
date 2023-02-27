@@ -1,6 +1,6 @@
 // NOTE: Taken from https://github.com/Canop/broot/blob/bf622a9af0bc86a88f153524e0aa96cca8837452/src/path/normalize.rs
 
-use std::path::{Component, Path, PathBuf};
+use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
 
 /// Improve the path to try remove and solve .. token.
 ///
@@ -12,12 +12,12 @@ use std::path::{Component, Path, PathBuf};
 ///
 /// This function ensures a given path ending with '/' still
 /// ends with '/' after normalization.
-pub fn normalize_path<P: AsRef<Path>>(path: P) -> PathBuf {
-    let ends_with_slash = path.as_ref().to_str().map_or(false, |s| s.ends_with('/'));
-    let mut normalized = PathBuf::new();
+pub fn normalize_path<P: AsRef<Utf8Path>>(path: P) -> Utf8PathBuf {
+    let ends_with_slash = path.as_ref().to_string().ends_with('/');
+    let mut normalized = Utf8PathBuf::new();
     for component in path.as_ref().components() {
         match &component {
-            Component::ParentDir => {
+            Utf8Component::ParentDir => {
                 if !normalized.pop() {
                     normalized.push(component);
                 }
@@ -46,7 +46,7 @@ mod path_normalize_tests {
         // * strings used for test use the '/' separator. This is a test problem
         // * we do a "end with '/'" test in the tested function. This might
         //   lead to suboptimal interaction on windows
-        assert_eq!(normalize_path(before.to_string()).to_string_lossy(), after);
+        assert_eq!(normalize_path(before.to_string()).to_string(), after);
     }
 
     #[test]
