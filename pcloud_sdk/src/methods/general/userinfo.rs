@@ -55,10 +55,10 @@ impl<T: client::Client> GetUserInfo for T {
 
 #[cfg(test)]
 mod tests {
+    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
-    use std::path::Path;
 
     use time::macros::datetime;
 
@@ -70,7 +70,7 @@ mod tests {
     #[allow(clippy::bool_assert_comparison)]
     fn test_deserialize_userinfo() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let userinfo_json = Path::new(&manifest_dir)
+        let userinfo_json = Utf8Path::new(&manifest_dir)
             .join("resources")
             .join("testdata")
             .join("userinfo.json");

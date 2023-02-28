@@ -1,7 +1,7 @@
+use camino::Utf8Path;
 use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
-use std::path::Path;
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -16,7 +16,7 @@ pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
     async fn getfilelink_and_download(
         &self,
         file_link: getfilelink::GetFileLinkInput,
-        path: &Path,
+        path: &Utf8Path,
         pb_builder: &dyn progress_bar::ProgressBarBuilder,
     ) -> Result<()> {
         let r = self.getfilelink(file_link).await?;
@@ -41,7 +41,7 @@ pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
         pb.set_message(&format!("Downloading '{url_filename}'"));
 
         // download chunks
-        let mut file = File::create(path).map_err(|e| anyhow!("Failed to create file '{}': {e}", path.display()))?;
+        let mut file = File::create(path).map_err(|e| anyhow!("Failed to create file '{path}': {e}"))?;
         let mut downloaded: u64 = 0;
         let mut stream = res.bytes_stream();
 

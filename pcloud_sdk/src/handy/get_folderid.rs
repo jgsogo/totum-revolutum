@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -8,7 +8,7 @@ use crate::types::FolderID;
 
 #[async_trait]
 pub trait GetFolderID: listfolder::GetListFolder {
-    async fn get_folderid(&self, _path: &Path) -> Result<FolderID> {
+    async fn get_folderid(&self, _path: &Utf8Path) -> Result<FolderID> {
         todo!("This method needs testing for different inputs");
         // let listfolder_input = listfolder::ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
         // let filtermeta = vec!["folderid"];

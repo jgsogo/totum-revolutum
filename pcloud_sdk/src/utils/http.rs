@@ -154,10 +154,10 @@ pub fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> 
 
 #[cfg(test)]
 mod tests {
+    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
-    use std::path::Path;
 
     use crate::methods::general::UserInfo;
 
@@ -166,7 +166,7 @@ mod tests {
     #[test]
     fn create_response_success() -> Result<()> {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let userinfo_json = Path::new(&manifest_dir)
+        let userinfo_json = Utf8Path::new(&manifest_dir)
             .join("resources")
             .join("testdata")
             .join("userinfo.json");

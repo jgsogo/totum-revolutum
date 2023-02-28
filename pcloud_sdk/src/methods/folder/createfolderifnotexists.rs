@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use camino::Utf8PathBuf;
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -13,14 +13,14 @@ pub const ENDPOINT: &str = "/createfolderifnotexists";
 
 pub enum TargetFolder {
     FolderAndName((FolderID, String)),
-    Path(PathBuf),
+    Path(Utf8PathBuf),
 }
 
 impl Params for TargetFolder {
     fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
         match &self {
             TargetFolder::Path(p) => {
-                params.insert("path".to_string(), p.to_string_lossy().parse()?);
+                params.insert("path".to_string(), p.to_string());
             }
             TargetFolder::FolderAndName((folderid, name)) => {
                 params.insert("folderid".to_string(), folderid.0.to_string());
@@ -77,7 +77,7 @@ mod tests {
                     metadata: Default::default(),
                 })
             });
-        let input = TargetFolder::Path(PathBuf::from_str("the/path/to/folder")?);
+        let input = TargetFolder::Path(Utf8PathBuf::from_str("the/path/to/folder")?);
         let r = client.createfolderifnotexists(input).await?;
         assert_eq!(r.created.unwrap(), true);
         Ok(())
