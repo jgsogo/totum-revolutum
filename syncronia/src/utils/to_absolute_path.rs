@@ -1,7 +1,6 @@
 use std::env;
 
 use camino::{Utf8Path, Utf8PathBuf};
-use path_clean::PathClean;
 
 pub fn to_absolute_path(path: &Utf8Path) -> Utf8PathBuf {
     if path.is_absolute() {
