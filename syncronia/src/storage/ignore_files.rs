@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use camino::{Utf8Path, Utf8PathBuf};
 
 use crate::utils::locked_file::{LockedFile, ReadWrite};
 
@@ -33,7 +33,7 @@ impl ReadWrite<IgnoreFilesContent> for IgnoreFilesContent {
 pub type IgnoreFiles = LockedFile<IgnoreFilesContent>;
 
 impl IgnoreFiles {
-    pub fn path(project_dir: &Path) -> PathBuf {
+    pub fn path(project_dir: &Utf8Path) -> Utf8PathBuf {
         project_dir.join(FILENAME)
     }
 }
@@ -46,14 +46,15 @@ mod tests {
 
     #[test]
     fn test_path() {
-        let base_path = Path::new("base");
+        let base_path = Utf8Path::new("base");
         assert_eq!(IgnoreFiles::path(base_path), base_path.join(".pcloudignore"));
     }
 
     #[test]
     fn test_read() {
         let tmp_dir = tempdir().unwrap();
-        let path = IgnoreFiles::path(tmp_dir.path());
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let path = IgnoreFiles::path(utf8_path);
 
         assert!(IgnoreFiles::read(&path).is_err());
         {
@@ -71,7 +72,8 @@ mod tests {
     #[test]
     fn test_update_or_create() {
         let tmp_dir = tempdir().unwrap();
-        let path = IgnoreFiles::path(tmp_dir.path());
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let path = IgnoreFiles::path(utf8_path);
 
         {
             let mut ignored_files = IgnoreFiles::update_or_create(&path).unwrap();

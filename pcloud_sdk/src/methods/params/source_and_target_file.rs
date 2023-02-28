@@ -20,7 +20,7 @@ impl Params for SourceAndTargetFile {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
+    use camino::Utf8PathBuf;
 
     use crate::methods::params::TargetLocation;
     use crate::types::{File, FileID, FolderID};
@@ -55,8 +55,8 @@ mod tests {
     #[test]
     fn test_params_with_paths() {
         let input = SourceAndTargetFile {
-            source: File::Path(PathBuf::from("/from/path")),
-            target: TargetLocation::Path(PathBuf::from("/to/path")),
+            source: File::Path(Utf8PathBuf::from("/from/path")),
+            target: TargetLocation::Path(Utf8PathBuf::from("/to/path")),
         };
         let params = input.into_params().unwrap();
         assert_eq!(params.len(), 2);

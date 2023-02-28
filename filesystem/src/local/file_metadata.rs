@@ -1,13 +1,12 @@
-use std::path::Path;
-
+use camino::Utf8Path;
 use ignore::DirEntry;
 
 use crate::FileMetadata;
 
 pub trait LocalFileMetadata: FileMetadata {
-    fn from_direntry(base_path: &Path, entry: DirEntry) -> Self;
+    fn from_direntry(base_path: &Utf8Path, entry: DirEntry) -> Self;
 
-    fn path(&self) -> &Path;
+    fn path(&self) -> &Utf8Path;
 }
 
 #[derive(Debug, Clone)]
@@ -27,7 +26,7 @@ impl FileMetadata for LocalMetadata {
     }
 
     fn hash(&self) -> String {
-        sha256::try_digest(self.path()).unwrap()
+        sha256::try_digest(self.path().as_std_path()).unwrap()
     }
 }
 
@@ -41,7 +40,7 @@ impl From<DirEntry> for LocalMetadata {
 }
 
 impl LocalFileMetadata for LocalMetadata {
-    fn from_direntry(base_path: &Path, entry: DirEntry) -> Self {
+    fn from_direntry(base_path: &Utf8Path, entry: DirEntry) -> Self {
         Self {
             id: entry
                 .path()
@@ -54,8 +53,8 @@ impl LocalFileMetadata for LocalMetadata {
         }
     }
 
-    fn path(&self) -> &Path {
-        self.entry.path()
+    fn path(&self) -> &Utf8Path {
+        Utf8Path::from_path(self.entry.path()).unwrap()
     }
 }
 

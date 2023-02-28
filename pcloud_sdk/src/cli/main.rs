@@ -5,7 +5,7 @@ use tracing::debug;
 use pcloud_sdk::client::HttpClient;
 
 use crate::output::{OutputArg, PrintVariant};
-
+use camino::Utf8PathBuf;
 mod auth;
 mod listfolder;
 mod output;
@@ -21,7 +21,7 @@ struct Cli {
 
     /// Path to a JSON file with user token
     #[clap(long)]
-    token_file: std::path::PathBuf,
+    token_file: Utf8PathBuf,
 
     #[clap(value_enum, long, default_value_t=OutputArg::Default)]
     output: OutputArg,

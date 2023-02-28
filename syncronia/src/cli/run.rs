@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use anyhow::{bail, Result};
 use clap::Args;
@@ -27,22 +27,20 @@ pub struct RunParams {
     filter_user_id: Option<String>,
 }
 
-pub async fn handle(home: &Path, params: &RunParams) -> Result<()> {
+pub async fn handle(home: &Utf8Path, params: &RunParams) -> Result<()> {
     let run_command = match params.directory.get_directory_param_abs() {
         Some(p) => {
-            debug!("run on directory '{}'.", p.display());
+            debug!("run on directory '{p}'.");
             if !p.exists() {
                 bail!(CLIErrors::ExitFailure(format!(
-                    "Provided directory doesn't exists: '{}'.",
-                    p.display()
+                    "Provided directory doesn't exists: '{p}'."
                 )));
             }
             if let Ok(p) = is_pcloud_dir(&p) {
                 run::RunCommand::Directory(p)
             } else {
                 bail!(CLIErrors::ExitFailure(format!(
-                    "Provided directory is not a ploud-dir: '{}'.",
-                    p.display()
+                    "Provided directory is not a ploud-dir: '{p}'."
                 )));
             }
         }

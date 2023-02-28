@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 use std::str::FromStr;
 
 use anyhow::Result;
@@ -24,7 +24,7 @@ pub struct AddParams {
     cron_tz: String,
 }
 
-pub fn handle(home: &Path, params: &AddParams) -> Result<()> {
+pub fn handle(home: &Utf8Path, params: &AddParams) -> Result<()> {
     let path = params.directory.get_pcloud_dir();
 
     let directory_entry = cron::Directory::new(
@@ -40,14 +40,14 @@ pub fn handle(home: &Path, params: &AddParams) -> Result<()> {
     if !inserted {
         eprintln!(
             "There is already an entry for the same path '{}'. Remove it first.",
-            entry.path().to_string_lossy()
+            entry.path()
         );
         std::process::exit(1);
     }
 
     println!(
         "Added directory '{}', next run: '{}'",
-        entry.path().to_string_lossy(),
+        entry.path(),
         entry.upcoming().unwrap()
     );
     Ok(())

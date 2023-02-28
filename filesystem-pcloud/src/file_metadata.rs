@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use camino::{Utf8Path, Utf8PathBuf};
 
 use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::FileID;
@@ -6,12 +6,12 @@ use pcloud_sdk::types::FileID;
 use filesystem::FileMetadata;
 
 pub trait RemoteFileMetadata: FileMetadata {
-    fn from_pcloud_metadata(path: &Path, metadata: Metadata) -> Self;
+    fn from_pcloud_metadata(path: &Utf8Path, metadata: Metadata) -> Self;
 
     fn fileid(&self) -> &FileID;
 }
 
-pub type RemoteMetadataEntry = (PathBuf, Metadata);
+pub type RemoteMetadataEntry = (Utf8PathBuf, Metadata);
 
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {
@@ -37,16 +37,16 @@ impl From<RemoteMetadataEntry> for RemoteMetadata {
     fn from(entry: RemoteMetadataEntry) -> Self {
         let (path, metadata) = entry;
         Self {
-            id: path.to_str().unwrap().to_string(),
+            id: path.to_string(),
             metadata,
         }
     }
 }
 
 impl RemoteFileMetadata for RemoteMetadata {
-    fn from_pcloud_metadata(path: &Path, metadata: Metadata) -> Self {
+    fn from_pcloud_metadata(path: &Utf8Path, metadata: Metadata) -> Self {
         Self {
-            id: path.to_string_lossy().parse().unwrap(),
+            id: path.to_string(),
             metadata,
         }
     }

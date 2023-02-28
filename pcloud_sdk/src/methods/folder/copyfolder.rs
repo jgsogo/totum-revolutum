@@ -33,7 +33,7 @@ impl Params for CopyFolderInput {
                 params.insert("tofolderid".to_string(), fid.0.to_string());
             }
             Folder::Path(p) => {
-                params.insert("topath".to_string(), p.to_string_lossy().parse()?);
+                params.insert("topath".to_string(), p.to_string());
             }
         }
         if self.noover {
@@ -71,10 +71,10 @@ impl<T: client::Client> GetCopyFolder for T {
 
 #[cfg(test)]
 mod tests {
+    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
-    use std::path::Path;
     use std::str::FromStr;
 
     use crate::types::FolderID;
@@ -118,7 +118,7 @@ mod tests {
     #[test]
     fn test_deserialize() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let userinfo_json = Path::new(&manifest_dir)
+        let userinfo_json = Utf8Path::new(&manifest_dir)
             .join("resources")
             .join("testdata")
             .join("copyfolder.json");

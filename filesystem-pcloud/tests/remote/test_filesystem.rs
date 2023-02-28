@@ -1,5 +1,5 @@
+use camino::{Utf8Path, Utf8PathBuf};
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
@@ -13,7 +13,7 @@ use pcloud_sdk::types::FolderID;
 
 #[tokio::test]
 async fn test_create_write_read_in_root_folder() -> Result<()> {
-    let root_path = Path::new("the/root/path");
+    let root_path = Utf8Path::new("the/root/path");
     let mut server = PCloudServerMock::default();
     let fs = {
         let server_token = server.token();
@@ -45,7 +45,7 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
         CHUNK_SIZE,
     );
 
-    let p = PathBuf::from(name.clone());
+    let p = Utf8PathBuf::from(name.clone());
     // Create and write
     {
         let mut f = fs.create(&*p).await?;

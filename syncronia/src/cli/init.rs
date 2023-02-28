@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use anyhow::{anyhow, Result};
 use clap::Args;
@@ -37,15 +37,12 @@ pub struct InitParams {
     on_conflict: actions::OnConflict,
 }
 
-pub fn handle(home: &Path, params: &InitParams) -> Result<()> {
+pub fn handle(home: &Utf8Path, params: &InitParams) -> Result<()> {
     let working_dir = params.directory.get_working_dir_from_directory_param();
-    debug!("Init pCloud folder {}", working_dir.display());
+    debug!("Init pCloud folder {working_dir}");
 
     if let Err(e) = candidate_pcloud_dir(&working_dir) {
-        eprintln!(
-            "Provided directory (or one of its parents) is already a pcloud one: '{}'",
-            e.display()
-        );
+        eprintln!("Provided directory (or one of its parents) is already a pcloud one: '{e}'");
         std::process::exit(1);
     }
 

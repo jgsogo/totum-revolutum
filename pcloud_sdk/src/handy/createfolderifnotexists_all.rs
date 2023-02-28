@@ -1,4 +1,4 @@
-use std::path::Path;
+use camino::Utf8Path;
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -10,7 +10,7 @@ use super::GetFolderID;
 
 #[async_trait]
 pub trait GetCreateFolderIfNotExistsAll: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists {
-    async fn createfolderifnotexists_all(&self, _path: &Path) -> Result<FolderID> {
+    async fn createfolderifnotexists_all(&self, _path: &Utf8Path) -> Result<FolderID> {
         // let path = normalize_path(path);
         todo!("This method needs testing for different inputs");
         // debug!("Create all folders (if not exist): '{}'", path.display());

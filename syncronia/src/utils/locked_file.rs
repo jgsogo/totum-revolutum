@@ -1,6 +1,6 @@
+use camino::{Utf8Path, Utf8PathBuf};
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
-use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 use fs4::FileExt;
@@ -9,7 +9,7 @@ use tracing::debug;
 use crate::utils::versioned_data::VersionedData;
 
 pub trait ReadWrite<T> {
-    fn read_content(path: &Path) -> std::io::Result<Option<T>> {
+    fn read_content(path: &Utf8Path) -> std::io::Result<Option<T>> {
         let mut file = std::fs::File::open(path).unwrap();
         let mut s = String::new();
         file.read_to_string(&mut s).expect("Cannot read content from file");
@@ -21,7 +21,7 @@ pub trait ReadWrite<T> {
         }
     }
 
-    fn write_content(path: &Path, content: Option<&T>) -> std::io::Result<()> {
+    fn write_content(path: &Utf8Path, content: Option<&T>) -> std::io::Result<()> {
         let mut f = OpenOptions::new()
             .write(true)
             .create(true)
@@ -44,7 +44,7 @@ pub struct LockedFile<T>
 where
     T: ReadWrite<T>,
 {
-    path: PathBuf,
+    path: Utf8PathBuf,
     file: File,
     write: bool,
 
@@ -55,7 +55,7 @@ impl<T> LockedFile<T>
 where
     T: ReadWrite<T>,
 {
-    fn ensure_exists(path: &Path) -> File {
+    fn ensure_exists(path: &Utf8Path) -> File {
         match File::open(path) {
             Ok(file) => file,
             Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
@@ -71,8 +71,8 @@ where
         }
     }
 
-    fn read_content(file: File, path: &Path, write: bool) -> Result<Self> {
-        debug!("Read file from '{}'", path.display());
+    fn read_content(file: File, path: &Utf8Path, write: bool) -> Result<Self> {
+        debug!("Read file from '{path}'");
         let content = T::read_content(path)?;
 
         match content {
@@ -86,28 +86,28 @@ where
         }
     }
 
-    pub fn try_read(path: &Path) -> Result<Self> {
+    pub fn try_read(path: &Utf8Path) -> Result<Self> {
         let file = Self::ensure_exists(path);
 
-        debug!("Lock file (shared) '{}'", path.display());
+        debug!("Lock file (shared) '{path}'");
         file.try_lock_shared()?;
 
         LockedFile::read_content(file, path, false)
     }
 
-    pub fn read(path: &Path) -> Result<Self> {
+    pub fn read(path: &Utf8Path) -> Result<Self> {
         let file = Self::ensure_exists(path);
 
-        debug!("Lock file (shared) '{}'", path.display());
+        debug!("Lock file (shared) '{path}'");
         file.lock_shared().unwrap();
 
         LockedFile::read_content(file, path, false)
     }
 
-    pub fn update(path: &Path) -> Result<Self> {
+    pub fn update(path: &Utf8Path) -> Result<Self> {
         let file = Self::ensure_exists(path);
 
-        debug!("Lock file (exclusive) '{}'", path.display());
+        debug!("Lock file (exclusive) '{path}'");
         file.try_lock_exclusive()?;
 
         LockedFile::read_content(file, path, true)
@@ -118,13 +118,13 @@ impl<T> LockedFile<T>
 where
     T: Default + ReadWrite<T>,
 {
-    pub fn update_or_create(path: &Path) -> Result<Self> {
+    pub fn update_or_create(path: &Utf8Path) -> Result<Self> {
         let file = Self::ensure_exists(path);
 
-        debug!("Lock file (exclusive) '{}'", path.display());
+        debug!("Lock file (exclusive) '{path}'");
         file.try_lock_exclusive()?;
 
-        debug!("Read file from '{}'", path.display());
+        debug!("Read file from '{path}'");
         let content = T::read_content(path)?.unwrap_or_default();
 
         Ok(Self {
@@ -140,14 +140,14 @@ impl<T> LockedFile<VersionedData<T>>
 where
     VersionedData<T>: ReadWrite<VersionedData<T>>,
 {
-    pub fn update_or_create(path: &Path, default: T) -> Result<Self> {
+    pub fn update_or_create(path: &Utf8Path, default: T) -> Result<Self> {
         // TODO: Change return type to `Result<(Self, bool)>` so we can know if it was created of updated
         let file = Self::ensure_exists(path);
 
-        debug!("Lock file (exclusive) '{}'", path.display());
+        debug!("Lock file (exclusive) '{path}'");
         file.try_lock_exclusive()?;
 
-        debug!("Read file from '{}'", path.display());
+        debug!("Read file from '{path}'");
         let content = VersionedData::<T>::read_content(path)?.unwrap_or_else(|| VersionedData::default(default));
 
         Ok(Self {
@@ -165,10 +165,10 @@ where
 {
     fn drop(&mut self) {
         if self.write {
-            debug!("Save content to file '{}'", self.path.display());
+            debug!("Save content to file '{}'", self.path);
             T::write_content(&self.path, Some(&self.content)).unwrap();
         }
-        debug!("Unlock file '{}'", self.path.display());
+        debug!("Unlock file '{}'", self.path);
         self.file.unlock().unwrap();
     }
 }

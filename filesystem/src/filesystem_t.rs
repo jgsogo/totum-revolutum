@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use camino::{Utf8Path, Utf8PathBuf};
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -14,11 +14,11 @@ where
 {
     type Metadata: FileMetadata;
 
-    fn root(&self) -> &Path;
+    fn root(&self) -> &Utf8Path;
 
     /// Checks that the given path relies within the filesystem. Returns the absolute path or
     /// an error
-    fn check_path(&self, path: &Path) -> Result<PathBuf> {
+    fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
         let path = if path.is_absolute() {
             path.to_path_buf()
         } else {
@@ -27,9 +27,8 @@ where
         let path = normalize_path(path);
         if !path.starts_with(self.root()) {
             Err(anyhow!(
-                "Path '{}' is outside filesystem (root '{}'), or it's the root itself",
-                path.display(),
-                self.root().display()
+                "Path '{path}' is outside filesystem (root '{}'), or it's the root itself",
+                self.root()
             ))
         } else {
             Ok(path)
@@ -37,7 +36,7 @@ where
     }
 
     /// Returns the relative path for any given one
-    fn rel_path(&self, path: &Path) -> Result<PathBuf> {
+    fn rel_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
         let abs_path = self.check_path(path)?;
         let r = abs_path.strip_prefix(self.root()).map_err(|e| anyhow!(e));
         r.map(|p| p.to_path_buf())
@@ -48,38 +47,38 @@ where
         &self,
         tx: flume::Sender<Self::Metadata>,
         threads: usize,
-        custom_ignore_filename: &Path,
+        custom_ignore_filename: &Utf8Path,
     ) -> Result<()>;
 
     /// Returns true if the path points at an existing entity.
-    async fn exists(&self, path: &Path) -> Result<bool>;
+    async fn exists(&self, path: &Utf8Path) -> Result<bool>;
 
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.
-    async fn create(&self, path: &Path) -> Result<Box<dyn File>>;
+    async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>>;
 
     /// Tries to open the file requested by the argument `path` in read-only mode. Returns an object implementing
     /// a [`File`] or an error.
-    async fn open(&self, path: &Path) -> Result<Box<dyn File>>;
+    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>>;
 
     /// Creates the given directory and any intermediate one
-    async fn create_dir_all(&self, path: &Path) -> Result<()>;
+    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()>;
 
     /// Copy
-    async fn copy(&self, _origin: &Path, _target: &Path) -> Result<()> {
+    async fn copy(&self, _origin: &Utf8Path, _target: &Utf8Path) -> Result<()> {
         todo!("A default `copy` using existing methods is not implemented")
     }
 
     /// Rename
-    async fn rename(&self, _origin: &Path, _target: &Path) -> Result<()> {
+    async fn rename(&self, _origin: &Utf8Path, _target: &Utf8Path) -> Result<()> {
         todo!("A default `rename` using existing methods is not implemented")
     }
 
     /// Removes a file from the filesystem.
-    async fn remove_file(&self, path: &Path) -> Result<()>;
+    async fn remove_file(&self, path: &Utf8Path) -> Result<()>;
 
     /// Removes an empty directory.
-    async fn remove_dir(&self, path: &Path) -> Result<()>;
+    async fn remove_dir(&self, path: &Utf8Path) -> Result<()>;
 
     /// Removes a directory at this path, after removing all its contents. Use carefully!
-    async fn remove_dir_all(&self, path: &Path) -> Result<()>;
+    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()>;
 }

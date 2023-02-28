@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use camino::{Utf8Path, Utf8PathBuf};
 
 use anyhow::{anyhow, bail, Result};
 use chrono::serde::ts_seconds_option;
@@ -32,7 +32,7 @@ impl ConfigAuth {
         }
     }
 
-    pub fn get_pcloud_client(&self, home: &Path) -> Result<PCloudHttpClient> {
+    pub fn get_pcloud_client(&self, home: &Utf8Path) -> Result<PCloudHttpClient> {
         // TODO: This is probably not the place for this function
         let apps_file_path = apps::AppsFile::path(home);
         let lock = apps::AppsFile::read(&apps_file_path)?;
@@ -143,7 +143,7 @@ pub type ConfigFileContent = VersionedData<Config>;
 pub type ConfigFile = LockedFile<ConfigFileContent>;
 
 impl ConfigFile {
-    pub fn path(home: &Path) -> PathBuf {
+    pub fn path(home: &Utf8Path) -> Utf8PathBuf {
         home.join(INSIDE_PROJECT_DIRECTORY).join(FILENAME)
     }
 }
@@ -164,7 +164,7 @@ mod tests {
 
     #[test]
     fn test_path() {
-        let base_path = Path::new("base");
+        let base_path = Utf8Path::new("base");
         assert!(ConfigFile::path(base_path) == base_path.join(".pcloud").join("config"));
     }
 }

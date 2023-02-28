@@ -20,7 +20,7 @@ impl Params for SourceAndTargetFolder {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
+    use camino::Utf8PathBuf;
     use std::str::FromStr;
 
     use crate::methods::params::TargetLocation;
@@ -57,7 +57,7 @@ mod tests {
     fn test_params_with_paths() {
         let input = SourceAndTargetFolder {
             source: Folder::from_str("/from/path").unwrap(),
-            target: TargetLocation::Path(PathBuf::from("/to/path")),
+            target: TargetLocation::Path(Utf8PathBuf::from("/to/path")),
         };
         let params = input.into_params().unwrap();
         assert_eq!(params.len(), 2);

@@ -1,6 +1,6 @@
+use camino::Utf8Path;
 use std::collections::HashMap;
 use std::env;
-use std::path::Path;
 
 use httpmock::prelude::*;
 use httpmock::Mock;
@@ -75,13 +75,13 @@ impl PCloudServerMock {
             when.method(GET).path("/userinfo").query_param("access_token", "token");
 
             let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-            let userinfo_json = Path::new(&manifest_dir)
+            let userinfo_json = Utf8Path::new(&manifest_dir)
                 .join("resources")
                 .join("testdata")
                 .join("userinfo.json");
             then.status(200)
                 .header("content-type", "application/json; charset=UTF-8")
-                .body_from_file(userinfo_json.to_str().unwrap());
+                .body_from_file(userinfo_json.to_string());
         })
     }
 
@@ -89,7 +89,7 @@ impl PCloudServerMock {
         &mut self,
         folder: FolderID,
         name: &str,
-        folder_path: &Path,
+        folder_path: &Utf8Path,
         write_bytes: u64,
         read_content: Vec<u8>,
         chunk_size: usize,
@@ -137,7 +137,7 @@ impl PCloudServerMock {
             when.method(GET)
                 .path(file_open::ENDPOINT)
                 .query_param("access_token", "token")
-                .query_param("path", full_path.to_string_lossy())
+                .query_param("path", full_path.to_string())
                 .query_param_exists("flags");
 
             then.status(200)

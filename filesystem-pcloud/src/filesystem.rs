@@ -1,4 +1,3 @@
-use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
 use anyhow::{anyhow, Result};
@@ -8,6 +7,7 @@ use tokio::task::JoinHandle;
 use tokio::time::Instant;
 use tracing::{info, trace, warn};
 
+use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
 use filesystem::{File, Filesystem};
 use pcloud_sdk::client::Client;
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
@@ -35,7 +35,7 @@ pub enum FileCloseMessage {
 }
 
 pub struct FilesystemPCloud<HttpClient: Client + Clone> {
-    path: PathBuf,
+    path: Utf8PathBuf,
     folderid: FolderID,
     // TODO: This shouldn't be an `Arc<HttpClient>`. It should be just `HttpClient`
     pcloud: Arc<HttpClient>,
@@ -46,7 +46,7 @@ pub struct FilesystemPCloud<HttpClient: Client + Clone> {
 
 async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
     pcloud: &Arc<HttpClient>,
-    path: &Path,
+    path: &Utf8Path,
 ) -> Result<FolderID> {
     let folder = Folder::Path(path.to_path_buf());
     let listfolder_input = ListFolderInput::new(folder);
@@ -58,7 +58,7 @@ async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
 }
 
 impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpClient> {
-    pub async fn new(path: &Path, pcloud: HttpClient) -> Result<Self> {
+    pub async fn new(path: &Utf8Path, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
         let folderid = get_folderid(&pcloud, path).await?;
         let (tx, rx) = flume::unbounded::<FileCloseMessage>();
@@ -105,13 +105,13 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpCl
 
     fn work_on_contents(
         tx: Sender<RemoteMetadata>,
-        base_path: &Path,
+        base_path: &Utf8Path,
         contents: &[Metadata],
         depth: usize,
     ) -> Result<()> {
         for it in contents.iter() {
-            let path = base_path.join(Path::new(it.common.name.as_ref().unwrap()));
-            trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path.display());
+            let path = base_path.join(Utf8Path::new(it.common.name.as_ref().unwrap()));
+            trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
             if !it.common.isfolder.unwrap() {
                 let data: RemoteMetadata = (path, it.clone()).into();
                 tx.send(data)?;
@@ -132,7 +132,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpCl
 impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
     type Metadata = RemoteMetadata;
 
-    fn root(&self) -> &Path {
+    fn root(&self) -> &Utf8Path {
         &self.path
     }
 
@@ -140,7 +140,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         &self,
         tx: Sender<Self::Metadata>,
         _threads: usize,
-        _custom_ignore_filename: &Path,
+        _custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
         // TODO: Implement _custom_ignore_filename logic
 
@@ -168,21 +168,21 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         Ok(())
     }
 
-    async fn exists(&self, path: &Path) -> Result<bool> {
+    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         let path = self.check_path(path)?;
         let _r = self.pcloud.stat(PCloudFile::Path(path)).await?;
         Ok(true)
     }
 
-    async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
+    async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
 
         let relative_path = path.strip_prefix(self.root())?;
-        let filename = relative_path.file_name().unwrap().to_string_lossy().to_string();
+        let filename = relative_path.file_name().unwrap().to_string();
         let folderid = match relative_path.parent() {
             None => self.folderid.clone(),
             Some(parent_dir) => {
-                if parent_dir != Path::new("") {
+                if parent_dir != Utf8Path::new("") {
                     get_folderid(&self.pcloud, parent_dir).await?
                 } else {
                     self.folderid.clone()
@@ -202,26 +202,26 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         Ok(Box::new(f))
     }
 
-    async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
 
         //let relative_path = v.strip_prefix(self.root())?;
         let fd = self
             .pcloud
-            .file_open(Flags::empty(), FileOpenPath::Path(path.to_string_lossy().parse()?))
+            .file_open(Flags::empty(), FileOpenPath::Path(path.to_string()))
             .await?;
 
         let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
         Ok(Box::new(f))
     }
 
-    async fn create_dir_all(&self, path: &Path) -> Result<()> {
+    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
 
         let mut folderid = self.folderid.clone();
         for cmp in path.components() {
-            if let Component::Normal(p) = cmp {
-                let input = TargetFolder::FolderAndName((folderid.clone(), p.to_string_lossy().parse()?));
+            if let Utf8Component::Normal(p) = cmp {
+                let input = TargetFolder::FolderAndName((folderid.clone(), p.to_string()));
                 let r = self.pcloud.createfolderifnotexists(input).await?;
                 folderid = r.metadata.folderid.unwrap();
             }
@@ -229,7 +229,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         Ok(())
     }
 
-    async fn remove_file(&self, path: &Path) -> Result<()> {
+    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
 
         let input = PCloudFile::Path(path);
@@ -237,7 +237,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         Ok(())
     }
 
-    async fn remove_dir(&self, path: &Path) -> Result<()> {
+    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
 
         let input = Folder::Path(path);
@@ -245,7 +245,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         Ok(())
     }
 
-    async fn remove_dir_all(&self, path: &Path) -> Result<()> {
+    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
 
         let input = Folder::Path(path);
@@ -297,8 +297,8 @@ mod tests {
                 })
             });
 
-        let fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
-        assert_eq!(Path::new("the/path"), fs.root());
+        let fs = FilesystemPCloud::new(Utf8Path::new("the/path"), client).await?;
+        assert_eq!(Utf8Path::new("the/path"), fs.root());
         Ok(())
     }
 
@@ -320,7 +320,7 @@ mod tests {
                 }))
             });
 
-        let r = FilesystemPCloud::new(Path::new("the/path"), client).await;
+        let r = FilesystemPCloud::new(Utf8Path::new("the/path"), client).await;
         assert!(r.is_err());
         assert_eq!(
             r.err().unwrap().to_string(),
@@ -394,9 +394,9 @@ mod tests {
             });
 
         // Create the filesystem
-        let mut fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
+        let mut fs = FilesystemPCloud::new(Utf8Path::new("the/path"), client).await?;
 
-        let filepath = Path::new("file");
+        let filepath = Utf8Path::new("file");
         let content: Vec<u8> = b"Hello, world!".to_vec();
 
         // Create and write_all
@@ -493,9 +493,9 @@ mod tests {
             });
 
         // Create the filesystem
-        let mut fs = FilesystemPCloud::new(Path::new("the/path"), client).await?;
+        let mut fs = FilesystemPCloud::new(Utf8Path::new("the/path"), client).await?;
 
-        let filepath = Path::new("file");
+        let filepath = Utf8Path::new("file");
 
         // Open and read
         {
@@ -511,7 +511,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_in_subfolder() -> Result<()> {
         let mut client = MockLocalClient::new();
-        let root_path = Path::new("the/root/path");
+        let root_path = Utf8Path::new("the/root/path");
 
         // Expectation for FilesystemPCloud::new
         client
@@ -562,7 +562,7 @@ mod tests {
         // Create the filesystem
         let mut fs = FilesystemPCloud::new(root_path, client).await?;
         {
-            let filepath = Path::new("nested/nested2/myfile.txt");
+            let filepath = Utf8Path::new("nested/nested2/myfile.txt");
             let r = fs.create(&filepath).await;
             assert!(r.is_ok());
         }
@@ -573,7 +573,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_dir_all() -> Result<()> {
         let mut client = MockLocalClient::new();
-        let root_path = Path::new("the/root/path");
+        let root_path = Utf8Path::new("the/root/path");
 
         // Expectation for FilesystemPCloud::new
         client
@@ -614,14 +614,14 @@ mod tests {
 
         let fs = FilesystemPCloud::new(root_path, client).await?;
 
-        fs.create_dir_all(Path::new("nested/nested2")).await?;
+        fs.create_dir_all(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_remove_file() -> Result<()> {
         let mut client = MockLocalClient::new();
-        let root_path = Path::new("the/root/path");
+        let root_path = Utf8Path::new("the/root/path");
 
         // Expectation for FilesystemPCloud::new
         client
@@ -630,7 +630,7 @@ mod tests {
             .returning(move |endpoint, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&root_path.to_string_lossy().parse()?));
+                assert_eq!(params.get("path"), Some(&root_path.to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
@@ -660,14 +660,14 @@ mod tests {
             });
 
         let fs = FilesystemPCloud::new(root_path, client).await?;
-        fs.remove_file(Path::new("nested/nested2")).await?;
+        fs.remove_file(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_remove_folder() -> Result<()> {
         let mut client = MockLocalClient::new();
-        let root_path = Path::new("the/root/path");
+        let root_path = Utf8Path::new("the/root/path");
 
         // Expectation for FilesystemPCloud::new
         client
@@ -676,7 +676,7 @@ mod tests {
             .returning(move |endpoint, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&root_path.to_string_lossy().parse()?));
+                assert_eq!(params.get("path"), Some(&root_path.to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
@@ -706,14 +706,14 @@ mod tests {
             });
 
         let fs = FilesystemPCloud::new(root_path, client).await?;
-        fs.remove_dir(Path::new("nested/nested2")).await?;
+        fs.remove_dir(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }
 
     #[tokio::test]
     async fn test_remove_folder_recursive() -> Result<()> {
         let mut client = MockLocalClient::new();
-        let root_path = Path::new("the/root/path");
+        let root_path = Utf8Path::new("the/root/path");
 
         // Expectation for FilesystemPCloud::new
         client
@@ -722,7 +722,7 @@ mod tests {
             .returning(move |endpoint, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&root_path.to_string_lossy().parse()?));
+                assert_eq!(params.get("path"), Some(&root_path.to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
@@ -749,7 +749,7 @@ mod tests {
             });
 
         let fs = FilesystemPCloud::new(root_path, client).await?;
-        fs.remove_dir_all(Path::new("nested/nested2")).await?;
+        fs.remove_dir_all(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }
 }

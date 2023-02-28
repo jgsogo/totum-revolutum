@@ -30,10 +30,10 @@ impl<T: client::Client> GetRenameFile for T {
 
 #[cfg(test)]
 mod tests {
+    use camino::Utf8Path;
     use std::env;
     use std::fs;
     use std::io::BufReader;
-    use std::path::Path;
 
     use crate::types::FileID;
     use crate::utils::http::ApiResult;
@@ -43,7 +43,7 @@ mod tests {
     #[test]
     fn test_deserialize() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let userinfo_json = Path::new(&manifest_dir)
+        let userinfo_json = Utf8Path::new(&manifest_dir)
             .join("resources")
             .join("testdata")
             .join("renamefile.json");

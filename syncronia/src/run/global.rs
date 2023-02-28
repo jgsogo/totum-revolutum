@@ -1,17 +1,17 @@
-use std::path::{Path, PathBuf};
+use camino::{Utf8Path, Utf8PathBuf};
 
 use anyhow::Result;
 use tracing::{debug, info, warn};
 
 use super::super::storage;
 
-async fn run_project(home: PathBuf, path: PathBuf) -> Result<()> {
+async fn run_project(home: Utf8PathBuf, path: Utf8PathBuf) -> Result<()> {
     super::project::handle(&home, &path).await
 }
 
 /// Run configured action for the directories where cron is configured
 /// and time is elapsed
-pub async fn handle(home: &Path) -> Result<()> {
+pub async fn handle(home: &Utf8Path) -> Result<()> {
     info!("Start global run");
 
     let directories_file_path = storage::cron::DirectoriesFile::path(home);
@@ -24,7 +24,7 @@ pub async fn handle(home: &Path) -> Result<()> {
         let now = chrono::Utc::now();
 
         for cron in lock.content.data.directories.iter() {
-            debug!("Work on path '{}'", cron.path().display());
+            debug!("Work on path '{}'", cron.path());
             let last_executed = {
                 let config_file_path = storage::config::ConfigFile::path(&cron.path());
                 match storage::config::ConfigFile::try_read(&config_file_path) {

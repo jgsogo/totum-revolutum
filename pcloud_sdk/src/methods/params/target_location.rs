@@ -1,5 +1,5 @@
+use camino::Utf8PathBuf;
 use std::collections::HashMap;
-use std::path::PathBuf;
 
 use anyhow::Result;
 
@@ -16,7 +16,7 @@ use super::Params;
 /// will use original target name
 pub enum TargetLocation {
     FolderAndName((FolderID, Option<String>)),
-    Path(PathBuf),
+    Path(Utf8PathBuf),
 }
 
 impl Params for TargetLocation {
@@ -29,7 +29,7 @@ impl Params for TargetLocation {
                 }
             }
             TargetLocation::Path(p) => {
-                params.insert("topath".to_string(), p.to_string_lossy().parse()?);
+                params.insert("topath".to_string(), p.to_string());
             }
         }
         Ok(())

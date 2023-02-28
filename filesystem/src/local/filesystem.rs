@@ -1,5 +1,5 @@
+use camino::{Utf8Path, Utf8PathBuf};
 use std::fs;
-use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
@@ -17,13 +17,13 @@ use super::file::LocalFile;
 use super::parallel_visitor;
 
 pub struct FilesystemLocal {
-    path: PathBuf,
+    path: Utf8PathBuf,
 }
 
 impl FilesystemLocal {
-    pub fn new(path: &Path) -> Result<Self> {
+    pub fn new(path: &Utf8Path) -> Result<Self> {
         if !path.exists() {
-            bail!("Given path doesn't exist: {}", path.display());
+            bail!("Given path doesn't exist: {path}");
         }
         Ok(Self {
             path: path.to_path_buf(),
@@ -35,7 +35,7 @@ impl FilesystemLocal {
 impl Filesystem for FilesystemLocal {
     type Metadata = LocalMetadata;
 
-    fn root(&self) -> &Path {
+    fn root(&self) -> &Utf8Path {
         &self.path
     }
 
@@ -43,7 +43,7 @@ impl Filesystem for FilesystemLocal {
         &self,
         tx: Sender<Self::Metadata>,
         threads: usize,
-        custom_ignore_filename: &Path,
+        custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
         let walker = WalkBuilder::new(&self.path)
             .threads(threads)
@@ -59,41 +59,41 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn exists(&self, path: &Path) -> Result<bool> {
+    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         let path = self.check_path(path)?;
         Ok(path.exists())
     }
 
-    async fn create(&self, path: &Path) -> Result<Box<dyn File>> {
+    async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
-        let f = AsyncFile::create(path).await?;
+        let f = AsyncFile::create(path.into_std_path_buf()).await?;
         Ok(Box::new(LocalFile::new(f)))
     }
 
-    async fn open(&self, path: &Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
-        let f = AsyncFile::open(path).await?;
+        let f = AsyncFile::open(path.into_std_path_buf()).await?;
         Ok(Box::new(LocalFile::new(f)))
     }
 
-    async fn create_dir_all(&self, path: &Path) -> Result<()> {
+    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
         fs::create_dir_all(path).map_err(|e| anyhow!("Error creating the directory: {e}"))
     }
 
-    async fn remove_file(&self, path: &Path) -> Result<()> {
+    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.check_path(path)?;
         fs::remove_file(path).map_err(|e| anyhow!("Error removing a file: {e}"))
     }
 
-    async fn remove_dir(&self, path: &Path) -> Result<()> {
+    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.check_path(path)?;
         fs::remove_dir(path).map_err(|e| anyhow!("Error removing a directory: {e}"))
     }
 
-    async fn remove_dir_all(&self, path: &Path) -> Result<()> {
+    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.check_path(path)?;
         fs::remove_dir_all(path).map_err(|e| anyhow!("Error removing a directory: {e}"))
@@ -109,14 +109,16 @@ mod tests {
     #[test]
     fn test_root_not_exists() {
         let tmp_dir = tempdir().unwrap();
-        let r = FilesystemLocal::new(&tmp_dir.path().join("not-exist"));
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let r = FilesystemLocal::new(&utf8_path.join("not-exist"));
         assert!(r.is_err());
     }
 
     #[test]
     fn test_root() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
-        let fs = FilesystemLocal::new(tmp_dir.path())?;
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let fs = FilesystemLocal::new(utf8_path)?;
         // Root is not cannonicalized, it fails in MacOS where tmp directories are inside sym folder
         #[cfg(target_os = "macos")]
         assert_ne!(fs::canonicalize(tmp_dir.path())?, fs.root());
@@ -127,9 +129,10 @@ mod tests {
     #[tokio::test]
     async fn test_create_write_read() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
-        let fs = FilesystemLocal::new(tmp_dir.path())?;
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let fs = FilesystemLocal::new(utf8_path)?;
 
-        let filepath = tmp_dir.path().join("myfile");
+        let filepath = utf8_path.join("myfile");
         let content: Vec<u8> = b"Hello, world!".to_vec();
 
         // Create and write
@@ -152,13 +155,14 @@ mod tests {
     #[tokio::test]
     async fn test_create_in_subfolder() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
-        let fs = FilesystemLocal::new(tmp_dir.path())?;
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let fs = FilesystemLocal::new(utf8_path)?;
 
-        let filepath = tmp_dir.path().join("nested/nested2/myfile.txt");
+        let filepath = utf8_path.join("nested/nested2/myfile.txt");
         let r = fs.create(&filepath).await;
         assert!(r.is_err());
 
-        fs.create_dir_all(Path::new("nested/nested2")).await?;
+        fs.create_dir_all(Utf8Path::new("nested/nested2")).await?;
         let r = fs.create(&filepath).await;
         assert!(r.is_ok());
         Ok(())

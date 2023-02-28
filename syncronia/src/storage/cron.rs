@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use camino::{Utf8Path, Utf8PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -19,11 +19,11 @@ pub struct Directory {
 }
 
 impl Directory {
-    pub fn new(path: &Path, expression: &str, tz: &chrono_tz::Tz) -> Self {
+    pub fn new(path: &Utf8Path, expression: &str, tz: &chrono_tz::Tz) -> Self {
         let path = to_absolute_path(path);
 
         Self {
-            path: path.to_str().expect("Cannot convert path to string").to_string(),
+            path: path.to_string(),
             cron: utils::cron::CronTz::new(expression, tz),
         }
     }
@@ -39,8 +39,8 @@ impl Directory {
         self.cron.next(previous)
     }
 
-    pub fn path(&self) -> PathBuf {
-        Path::new(&self.path).to_path_buf()
+    pub fn path(&self) -> Utf8PathBuf {
+        Utf8Path::new(&self.path).to_path_buf()
     }
 }
 
@@ -52,11 +52,11 @@ pub struct Directories {
 type DirectoriesContent = VersionedData<Directories>;
 
 impl DirectoriesContent {
-    pub fn find(&self, path: &Path) -> Option<&Directory> {
+    pub fn find(&self, path: &Utf8Path) -> Option<&Directory> {
         self.data.directories.iter().find(|v| v.path() == path)
     }
 
-    pub fn find_or_insert(&mut self, path: &Path, directory: Directory) -> (&mut Directory, bool) {
+    pub fn find_or_insert(&mut self, path: &Utf8Path, directory: Directory) -> (&mut Directory, bool) {
         mut_find_or_insert(&mut self.data.directories, |d| d.path() == path, directory)
     }
 }
@@ -64,7 +64,7 @@ impl DirectoriesContent {
 pub type DirectoriesFile = LockedFile<DirectoriesContent>;
 
 impl DirectoriesFile {
-    pub fn path(home: &Path) -> PathBuf {
+    pub fn path(home: &Utf8Path) -> Utf8PathBuf {
         home.join(FILENAME)
     }
 }
@@ -89,14 +89,15 @@ mod tests {
 
     #[test]
     fn test_path() {
-        let base_path = Path::new("home");
+        let base_path = Utf8Path::new("home");
         assert_eq!(DirectoriesFile::path(base_path), base_path.join("cron.yaml"));
     }
 
     #[test]
     fn test_read() {
         let tmp_dir = tempdir().unwrap();
-        let path = DirectoriesFile::path(tmp_dir.path());
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let path = DirectoriesFile::path(utf8_path);
 
         assert!(DirectoriesFile::read(&path).is_err());
         {
@@ -114,14 +115,15 @@ mod tests {
     #[test]
     fn test_update_or_create() {
         let tmp_dir = tempdir().unwrap();
-        let path = DirectoriesFile::path(tmp_dir.path());
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let path = DirectoriesFile::path(utf8_path);
 
         {
             let mut directories_lock = DirectoriesFile::update_or_create(&path, Directories::default()).unwrap();
             let dirs = &mut directories_lock.content.data.directories;
 
             dirs.push(Directory::new(
-                Path::new("path/to/dir"),
+                Utf8Path::new("path/to/dir"),
                 "*/2 * * * *",
                 &chrono_tz::Tz::from_str("UTC").unwrap(),
             ))
