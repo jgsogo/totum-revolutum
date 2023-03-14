@@ -21,6 +21,10 @@ use crate::CliParams;
 pub struct Params {
     #[clap(num_args = 0.., value_delimiter = ' ')]
     files: Vec<String>,
+
+    /// Output folder to download the files to. Defaults to current path.
+    #[clap(long, default_value_t=current_path())]
+    output_dir: Utf8PathBuf,
 }
 
 // TODO: Probably more complex than needed...
@@ -51,10 +55,15 @@ impl<'a> Iterator for ParamsOrStdin {
     }
 }
 
-async fn download(pcloud: HttpClient<OAuth2TokenImpl>, output: &PrintVariant, input: String) -> Result<Utf8PathBuf> {
+async fn download(
+    pcloud: HttpClient<OAuth2TokenImpl>,
+    output: &PrintVariant,
+    output_folder: &Utf8Path,
+    input: String,
+) -> Result<Utf8PathBuf> {
     let file = File::from_str(&input).map_err(|e| anyhow!("Cannot parse input parameter 'file': {e}"))?;
     let output_path = {
-        let with_current_path = current_path().join(Utf8Path::new(&input).strip_prefix("/")?); // TODO: Here we need some tests. I'm assuming that `File::from_str` has already validated that it is an absolute path
+        let with_current_path = output_folder.join(Utf8Path::new(&input).strip_prefix("/")?); // TODO: Here we need some tests. I'm assuming that `File::from_str` has already validated that it is an absolute path
         to_absolute_path(&with_current_path)
     };
     debug!("Download file '{input}' to '{output_path}'");
@@ -69,16 +78,21 @@ pub async fn handle(
     params: Params,
     cli_params: CliParams,
 ) -> Result<()> {
+    let output_folder = params.output_dir;
     let input = ParamsOrStdin::new(params.files);
 
     // Execute concurrently the download function
-    let downloads = futures::stream::iter(input.into_iter().map(|path| download(pcloud.clone(), output, path)))
-        .buffer_unordered(cli_params.parallel)
-        .map(|r| match r {
-            Ok(file) => output.path(file),
-            Err(e) => output.eprintln(&*format!("Error downloading {e}")),
-        })
-        .collect::<Vec<_>>();
+    let downloads = futures::stream::iter(
+        input
+            .into_iter()
+            .map(|path| download(pcloud.clone(), output, &output_folder, path)),
+    )
+    .buffer_unordered(cli_params.parallel)
+    .map(|r| match r {
+        Ok(file) => output.path(file),
+        Err(e) => output.eprintln(&*format!("Error downloading {e}")),
+    })
+    .collect::<Vec<_>>();
     downloads.await;
 
     Ok(())
