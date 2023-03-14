@@ -67,8 +67,8 @@ async fn download(
         to_absolute_path(&with_current_path)
     };
     debug!("Download file '{input}' to '{output_path}'");
-    let fileLink = GetFileLinkInput::new(file);
-    pcloud.getfilelink_and_download(fileLink, &output_path, output).await?;
+    let file_link = GetFileLinkInput::new(file);
+    pcloud.getfilelink_and_download(file_link, &output_path, output).await?;
     Ok(output_path)
 }
 

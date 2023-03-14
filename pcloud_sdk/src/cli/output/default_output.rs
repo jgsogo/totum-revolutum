@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Result};
 use camino::Utf8PathBuf;
-use tracing::metadata::LevelFilter;
 
 use pcloud_sdk::methods::folder::ListFolder;
 use pcloud_sdk::methods::general::UserInfo;
@@ -52,7 +51,7 @@ impl Print for DefaultOutput {
     }
 
     fn eprintln(&self, text: &str) -> Result<()> {
-        self.pbs.println("{text}").map_err(|e| anyhow!(e))
+        self.pbs.println(format!("{text}")).map_err(|e| anyhow!(e))
     }
 
     fn path(&self, path: Utf8PathBuf) -> Result<()> {
