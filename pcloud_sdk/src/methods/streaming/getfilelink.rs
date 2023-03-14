@@ -1,8 +1,8 @@
 use anyhow::Result;
 use async_trait::async_trait;
-use log::debug;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use tracing::debug;
 
 use crate::client;
 use crate::methods::params::{Params, ParamsType};
