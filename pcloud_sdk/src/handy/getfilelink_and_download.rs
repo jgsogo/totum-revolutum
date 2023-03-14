@@ -1,10 +1,10 @@
-use camino::Utf8Path;
 use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
+use camino::Utf8Path;
 use futures_util::StreamExt;
 use tracing::debug;
 
@@ -12,7 +12,17 @@ use crate::methods::streaming::getfilelink;
 use crate::progress_bar;
 
 #[async_trait]
-pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
+pub trait GetFileLinkAndDownload {
+    async fn getfilelink_and_download(
+        &self,
+        file_link: getfilelink::GetFileLinkInput,
+        path: &Utf8Path,
+        pb_builder: &dyn progress_bar::ProgressBarBuilder,
+    ) -> Result<()>;
+}
+
+#[async_trait]
+impl<T: getfilelink::GetFileLink + std::marker::Sync> GetFileLinkAndDownload for T {
     async fn getfilelink_and_download(
         &self,
         file_link: getfilelink::GetFileLinkInput,
@@ -40,6 +50,10 @@ pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
         let (_, url_filename) = url.rsplit_once('/').unwrap();
         pb.set_message(&format!("Downloading '{url_filename}'"));
 
+        // Create parent folder
+        if let Some(p) = path.parent() {
+            std::fs::create_dir_all(p)?;
+        }
         // download chunks
         let mut file = File::create(path).map_err(|e| anyhow!("Failed to create file '{path}': {e}"))?;
         let mut downloaded: u64 = 0;
@@ -57,5 +71,3 @@ pub trait GetFileLinkAndDownload: getfilelink::GetFileLink {
         return Ok(());
     }
 }
-
-impl<T: getfilelink::GetFileLink> GetFileLinkAndDownload for T {}

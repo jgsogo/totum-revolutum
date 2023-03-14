@@ -2,10 +2,13 @@ use anyhow::Result;
 
 use pcloud_sdk::methods::folder::ListFolder;
 use pcloud_sdk::methods::general::UserInfo;
+use pcloud_sdk::progress_bar::ProgressBarBuilder;
 
 use crate::output::Print;
 
 pub struct Default;
+
+impl ProgressBarBuilder for Default {}
 
 impl Print for Default {
     fn print(&self, text: &str) {

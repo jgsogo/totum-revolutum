@@ -3,12 +3,13 @@ use anyhow::Result;
 pub use default::Default;
 use pcloud_sdk::methods::folder::listfolder::ListFolder;
 use pcloud_sdk::methods::general::userinfo::UserInfo;
+use pcloud_sdk::progress_bar::{ProgressBar, ProgressBarBuilder};
 pub use porcelain::Porcelain;
 
 mod default;
 mod porcelain;
 
-pub trait Print {
+pub trait Print: ProgressBarBuilder {
     fn print(&self, text: &str);
     fn println(&self, text: &str);
     fn eprint(&self, text: &str);
@@ -82,6 +83,15 @@ impl Print for PrintVariant {
         match &self {
             PrintVariant::Default(inner) => inner.user_info(value),
             PrintVariant::Porcelain(inner) => inner.user_info(value),
+        }
+    }
+}
+
+impl ProgressBarBuilder for PrintVariant {
+    fn build(&self, total_size: u64) -> Box<dyn ProgressBar> {
+        match &self {
+            PrintVariant::Default(inner) => inner.build(total_size),
+            PrintVariant::Porcelain(inner) => inner.build(total_size),
         }
     }
 }

@@ -2,6 +2,7 @@ use anyhow::{bail, Result};
 
 use pcloud_sdk::methods::folder::ListFolder;
 use pcloud_sdk::methods::general::UserInfo;
+use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::structures::Metadata;
 
 use crate::output::Print;
@@ -26,6 +27,8 @@ impl Porcelain {
         parts.into_iter().nth(0).unwrap().trim().to_string()
     }
 }
+
+impl ProgressBarBuilder for Porcelain {}
 
 impl Print for Porcelain {
     // Forward messages to stderr, as porcelain output reduces noise as much as possible
