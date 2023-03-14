@@ -75,7 +75,7 @@ pub async fn handle(
     let downloads = futures::stream::iter(input.into_iter().map(|path| download(pcloud.clone(), output, path)))
         .buffer_unordered(cli_params.parallel)
         .map(|r| match r {
-            Ok(file) => output.println(&*format!("Succesfully download '{file}'")),
+            Ok(file) => output.path(file),
             Err(e) => output.eprintln(&*format!("Error downloading {e}")),
         })
         .collect::<Vec<_>>();

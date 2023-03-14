@@ -1,26 +1,28 @@
 use anyhow::Result;
+use camino::Utf8PathBuf;
 
-pub use default::Default;
+pub use default_output::DefaultOutput;
 use pcloud_sdk::methods::folder::listfolder::ListFolder;
 use pcloud_sdk::methods::general::userinfo::UserInfo;
 use pcloud_sdk::progress_bar::{ProgressBar, ProgressBarBuilder};
 pub use porcelain::Porcelain;
 
-mod default;
+use crate::CliParams;
+
+mod default_output;
 mod porcelain;
 
 pub trait Print: ProgressBarBuilder {
-    fn print(&self, text: &str);
-    fn println(&self, text: &str);
-    fn eprint(&self, text: &str);
-    fn eprintln(&self, text: &str);
+    fn println(&self, text: &str) -> Result<()>;
+    fn eprintln(&self, text: &str) -> Result<()>;
 
+    fn path(&self, path: Utf8PathBuf) -> Result<()>;
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()>;
     fn user_info(&self, user_info: &UserInfo) -> Result<()>;
 }
 
 pub enum PrintVariant {
-    Default(Default),
+    Default(DefaultOutput),
     Porcelain(Porcelain),
 }
 
@@ -33,42 +35,44 @@ pub enum OutputArg {
     Porcelain,
 }
 
-impl From<OutputArg> for PrintVariant {
-    fn from(value: OutputArg) -> Self {
+impl PrintVariant {
+    pub fn new(value: OutputArg, cli_params: &CliParams) -> Self {
         match value {
-            OutputArg::Default => PrintVariant::Default(Default {}),
+            OutputArg::Default => PrintVariant::Default(DefaultOutput::new(cli_params)),
             OutputArg::Porcelain => PrintVariant::Porcelain(Porcelain {}),
         }
     }
 }
 
+// impl From<OutputArg> for PrintVariant {
+//     fn from(value: OutputArg) -> Self {
+//         match value {
+//             OutputArg::Default => PrintVariant::Default(DefaultOutput::default()),
+//             OutputArg::Porcelain => PrintVariant::Porcelain(Porcelain {}),
+//         }
+//     }
+// }
+
 impl Print for PrintVariant {
     // TODO: There is a lot of boilerplate here just to forward a funciton call -- macro?
-    fn print(&self, value: &str) {
-        match &self {
-            PrintVariant::Default(inner) => inner.print(value),
-            PrintVariant::Porcelain(inner) => inner.print(value),
-        }
-    }
-
-    fn println(&self, value: &str) {
+    fn println(&self, value: &str) -> Result<()> {
         match &self {
             PrintVariant::Default(inner) => inner.println(value),
             PrintVariant::Porcelain(inner) => inner.println(value),
         }
     }
 
-    fn eprint(&self, value: &str) {
-        match &self {
-            PrintVariant::Default(inner) => inner.eprint(value),
-            PrintVariant::Porcelain(inner) => inner.eprint(value),
-        }
-    }
-
-    fn eprintln(&self, value: &str) {
+    fn eprintln(&self, value: &str) -> Result<()> {
         match &self {
             PrintVariant::Default(inner) => inner.eprintln(value),
             PrintVariant::Porcelain(inner) => inner.eprintln(value),
+        }
+    }
+
+    fn path(&self, path: Utf8PathBuf) -> Result<()> {
+        match &self {
+            PrintVariant::Default(inner) => inner.path(path),
+            PrintVariant::Porcelain(inner) => inner.path(path),
         }
     }
 

@@ -1,4 +1,5 @@
 use anyhow::{bail, Result};
+use camino::Utf8PathBuf;
 
 use pcloud_sdk::methods::folder::ListFolder;
 use pcloud_sdk::methods::general::UserInfo;
@@ -32,21 +33,19 @@ impl ProgressBarBuilder for Porcelain {}
 
 impl Print for Porcelain {
     // Forward messages to stderr, as porcelain output reduces noise as much as possible
-    fn print(&self, text: &str) {
-        eprint!("{text}");
-    }
-
-    // Forward messages to stderr, as porcelain output reduces noise as much as possible
-    fn println(&self, text: &str) {
+    fn println(&self, text: &str) -> Result<()> {
         eprintln!("{text}");
+        Ok(())
     }
 
-    fn eprint(&self, text: &str) {
-        eprint!("{text}");
-    }
-
-    fn eprintln(&self, text: &str) {
+    fn eprintln(&self, text: &str) -> Result<()> {
         eprintln!("{text}");
+        Ok(())
+    }
+
+    fn path(&self, path: Utf8PathBuf) -> Result<()> {
+        println!("{path}");
+        Ok(())
     }
 
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()> {

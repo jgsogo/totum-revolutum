@@ -1,11 +1,12 @@
 use anyhow::{bail, Result};
+use camino::Utf8PathBuf;
 use clap::{Parser, Subcommand};
 use tracing::debug;
 
 use pcloud_sdk::client::HttpClient;
 
 use crate::output::{OutputArg, PrintVariant};
-use camino::Utf8PathBuf;
+
 mod auth;
 mod download;
 mod listfolder;
@@ -81,7 +82,7 @@ async fn main() -> Result<()> {
     debug!("Tracing level configured to {}", tracing_level);
 
     // Get the output
-    let output: PrintVariant = cli.output.into();
+    let output: PrintVariant = PrintVariant::new(cli.output, &cli.common);
 
     // Go ahead!
     match &cli.command {
