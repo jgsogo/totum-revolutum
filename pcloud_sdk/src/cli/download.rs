@@ -4,12 +4,14 @@ use anyhow::{anyhow, Result};
 use clap::Args;
 use tracing::debug;
 
+use futures::StreamExt;
+
 use crate::CliParams;
 use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
-use pcloud_sdk::types::Folder;
+use pcloud_sdk::types::File;
 
 use crate::output::{Print, PrintVariant};
 use crate::stdin_lines::StdinLines;
@@ -17,7 +19,7 @@ use crate::stdin_lines::StdinLines;
 #[derive(Args, Debug)]
 pub struct Params {
     #[clap(num_args = 0.., value_delimiter = ' ')]
-    folders: Vec<String>,
+    files: Vec<String>,
 }
 
 // TODO: Probably more complex than needed...
@@ -27,12 +29,12 @@ enum ParamsOrStdin {
 }
 
 impl ParamsOrStdin {
-    pub fn new(folders: Vec<String>) -> Self {
-        if folders.is_empty() {
-            debug!("No folders provided, will iterate from stdin");
+    pub fn new(files: Vec<String>) -> Self {
+        if files.is_empty() {
+            debug!("No files provided, will iterate from stdin");
             ParamsOrStdin::Stdin(StdinLines {})
         } else {
-            ParamsOrStdin::Params(folders.into_iter())
+            ParamsOrStdin::Params(files.into_iter())
         }
     }
 }
@@ -48,19 +50,29 @@ impl<'a> Iterator for ParamsOrStdin {
     }
 }
 
+async fn download(input: String) -> Result<File> {
+    debug!("Download file '{input}'");
+    let file = File::from_str(&input).map_err(|e| anyhow!("Cannot parse input parameter 'file': {e}"))?;
+    Ok(file)
+}
+
 pub async fn handle(
     pcloud: HttpClient<OAuth2TokenImpl>,
     output: &PrintVariant,
     params: Params,
-    _cli_params: CliParams,
+    cli_params: CliParams,
 ) -> Result<()> {
-    let input = ParamsOrStdin::new(params.folders);
-    for it in input {
-        let folder = Folder::from_str(&it).map_err(|e| anyhow!("Cannot parse input parameter 'folder': {e}"))?;
-        debug!("Listfolder {it}");
-        let input = ListFolderInput::new(folder);
-        let l = pcloud.listfolder(input).await?;
-        output.list_folder(&l)?;
-    }
+    let input = ParamsOrStdin::new(params.files);
+
+    // Execute concurrently the download function
+    let downloads = futures::stream::iter(input.into_iter().map(|path| download(path)))
+        .buffer_unordered(cli_params.parallel)
+        .map(|r| match r {
+            Ok(file) => println!("Succesfully download '{file}'"),
+            Err(e) => eprintln!("Error downloading {e}"),
+        })
+        .collect::<Vec<_>>();
+    downloads.await;
+
     Ok(())
 }
