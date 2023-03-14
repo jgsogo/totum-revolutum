@@ -11,7 +11,6 @@ mod download;
 mod listfolder;
 mod output;
 mod stdin_lines;
-mod tasks;
 mod userinfo;
 
 /// Arguments that apply to all subcommands

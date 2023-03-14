@@ -28,6 +28,24 @@ impl Porcelain {
 }
 
 impl Print for Porcelain {
+    // Forward messages to stderr, as porcelain output reduces noise as much as possible
+    fn print(&self, text: &str) {
+        eprint!("{text}");
+    }
+
+    // Forward messages to stderr, as porcelain output reduces noise as much as possible
+    fn println(&self, text: &str) {
+        eprintln!("{text}");
+    }
+
+    fn eprint(&self, text: &str) {
+        eprint!("{text}");
+    }
+
+    fn eprintln(&self, text: &str) {
+        eprintln!("{text}");
+    }
+
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()> {
         if let Some(contents) = &list_folder.metadata.contents {
             println!(

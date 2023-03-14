@@ -9,6 +9,11 @@ mod default;
 mod porcelain;
 
 pub trait Print {
+    fn print(&self, text: &str);
+    fn println(&self, text: &str);
+    fn eprint(&self, text: &str);
+    fn eprintln(&self, text: &str);
+
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()>;
     fn user_info(&self, user_info: &UserInfo) -> Result<()>;
 }
@@ -38,6 +43,34 @@ impl From<OutputArg> for PrintVariant {
 
 impl Print for PrintVariant {
     // TODO: There is a lot of boilerplate here just to forward a funciton call -- macro?
+    fn print(&self, value: &str) {
+        match &self {
+            PrintVariant::Default(inner) => inner.print(value),
+            PrintVariant::Porcelain(inner) => inner.print(value),
+        }
+    }
+
+    fn println(&self, value: &str) {
+        match &self {
+            PrintVariant::Default(inner) => inner.println(value),
+            PrintVariant::Porcelain(inner) => inner.println(value),
+        }
+    }
+
+    fn eprint(&self, value: &str) {
+        match &self {
+            PrintVariant::Default(inner) => inner.eprint(value),
+            PrintVariant::Porcelain(inner) => inner.eprint(value),
+        }
+    }
+
+    fn eprintln(&self, value: &str) {
+        match &self {
+            PrintVariant::Default(inner) => inner.eprintln(value),
+            PrintVariant::Porcelain(inner) => inner.eprintln(value),
+        }
+    }
+
     fn list_folder(&self, value: &ListFolder) -> Result<()> {
         match &self {
             PrintVariant::Default(inner) => inner.list_folder(value),

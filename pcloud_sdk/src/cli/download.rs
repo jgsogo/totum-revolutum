@@ -2,19 +2,16 @@ use std::str::FromStr;
 
 use anyhow::{anyhow, Result};
 use clap::Args;
+use futures::StreamExt;
 use tracing::debug;
 
-use futures::StreamExt;
-
-use crate::CliParams;
 use pcloud_sdk::client::HttpClient;
-use pcloud_sdk::methods::folder::listfolder::GetListFolder;
-use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::File;
 
 use crate::output::{Print, PrintVariant};
 use crate::stdin_lines::StdinLines;
+use crate::CliParams;
 
 #[derive(Args, Debug)]
 pub struct Params {
@@ -50,7 +47,7 @@ impl<'a> Iterator for ParamsOrStdin {
     }
 }
 
-async fn download(input: String) -> Result<File> {
+async fn download(_pcloud: HttpClient<OAuth2TokenImpl>, _output: &PrintVariant, input: String) -> Result<File> {
     debug!("Download file '{input}'");
     let file = File::from_str(&input).map_err(|e| anyhow!("Cannot parse input parameter 'file': {e}"))?;
     Ok(file)
@@ -65,11 +62,11 @@ pub async fn handle(
     let input = ParamsOrStdin::new(params.files);
 
     // Execute concurrently the download function
-    let downloads = futures::stream::iter(input.into_iter().map(|path| download(path)))
+    let downloads = futures::stream::iter(input.into_iter().map(|path| download(pcloud.clone(), output, path)))
         .buffer_unordered(cli_params.parallel)
         .map(|r| match r {
-            Ok(file) => println!("Succesfully download '{file}'"),
-            Err(e) => eprintln!("Error downloading {e}"),
+            Ok(file) => output.println(&*format!("Succesfully download '{file}'")),
+            Err(e) => output.eprintln(&*format!("Error downloading {e}")),
         })
         .collect::<Vec<_>>();
     downloads.await;
