@@ -38,7 +38,7 @@ where
     match r.result {
         0 => match r.data {
             Some(data) => Ok(data),
-            None => Err(anyhow!("Empty data in result string: {result}")),
+            None => Err(anyhow!("Failed to parse data type from result string: {result}")),
         },
         _ => Err(anyhow!(Error::ApiError {
             code: r.result,
