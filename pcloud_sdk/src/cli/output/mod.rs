@@ -13,11 +13,19 @@ mod default_output;
 mod porcelain;
 
 pub trait Print: ProgressBarBuilder {
+    /// Actual output of the application. Use it carefully.
     fn println(&self, text: &str) -> Result<()>;
+
+    /// Logs, additional information to dump to the output.
     fn eprintln(&self, text: &str) -> Result<()>;
 
+    /// Prints the path to stdout
     fn path(&self, path: Utf8PathBuf) -> Result<()>;
+
+    /// Prints folder information to stdout
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()>;
+
+    /// Prints user information to stdout
     fn user_info(&self, user_info: &UserInfo) -> Result<()>;
 }
 
