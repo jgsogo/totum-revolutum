@@ -28,7 +28,7 @@ pub trait ProgressBar: Send {
 }
 
 #[derive(Default)]
-struct NoProgressBar;
+pub struct NoProgressBar;
 
 impl ProgressBar for NoProgressBar {
     fn set_message(&self, message: &str) {

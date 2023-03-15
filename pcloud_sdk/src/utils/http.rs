@@ -31,12 +31,15 @@ where
     let r = serde_json::from_str::<ApiResult<T>>(&result).map_err(|e| {
         anyhow!(Error::SerializationError {
             error: e,
-            content: result
+            content: result.clone()
         })
     })?;
 
     match r.result {
-        0 => Ok(r.data.unwrap()),
+        0 => match r.data {
+            Some(data) => Ok(data),
+            None => Err(anyhow!("Failed to parse data type from result string: {result}")),
+        },
         _ => Err(anyhow!(Error::ApiError {
             code: r.result,
             message: r.error.unwrap_or_else(|| "Error message not available".into())
@@ -154,10 +157,11 @@ pub fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> 
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
+
+    use camino::Utf8Path;
 
     use crate::methods::general::UserInfo;
 

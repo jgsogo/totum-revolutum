@@ -55,30 +55,38 @@ impl<T: client::Client> GetUserInfo for T {
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
 
+    use camino::Utf8Path;
     use time::macros::datetime;
 
     use crate::mocks::client::MockLocalClient;
+    use crate::utils::http::ApiResult;
 
     use super::*;
 
     #[test]
     #[allow(clippy::bool_assert_comparison)]
     fn test_deserialize_userinfo() {
-        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let userinfo_json = Utf8Path::new(&manifest_dir)
-            .join("resources")
-            .join("testdata")
-            .join("userinfo.json");
-        let file = File::open(userinfo_json).unwrap();
-        let reader = BufReader::new(file);
-        match serde_json::from_reader::<_, UserInfo>(reader) {
+        fn reader() -> BufReader<std::fs::File> {
+            let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+            let userinfo_json = Utf8Path::new(&manifest_dir)
+                .join("resources")
+                .join("testdata")
+                .join("userinfo.json");
+            let file = File::open(userinfo_json).unwrap();
+            BufReader::new(file)
+        }
+
+        // Deserialize with ApiResult wrapper
+        match serde_json::from_reader::<_, ApiResult<UserInfo>>(reader()) {
             Err(e) => panic!("Error reading the file: {e}"),
             Ok(data) => {
+                assert_eq!(data.result, 0);
+                assert_eq!(data.error, None);
+                let data = data.data.unwrap();
                 assert_eq!(data.email, "pcloud@pcloud.com".to_string());
                 assert_eq!(data.emailverified, true);
                 assert_eq!(data.registered, datetime!(2013-11-18 15:32:05 UTC));

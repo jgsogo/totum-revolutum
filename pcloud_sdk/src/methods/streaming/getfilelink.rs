@@ -2,6 +2,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use tracing::debug;
 
 use crate::client;
 use crate::methods::params::{Params, ParamsType};
@@ -59,7 +60,6 @@ impl Params for GetFileLinkInput {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FileLink {
-    pub result: u16,
     pub(crate) path: String,
     #[serde(with = "time::serde::rfc2822")]
     expires: OffsetDateTime,
@@ -74,6 +74,7 @@ pub trait GetFileLink {
 #[async_trait]
 impl<T: client::Client> GetFileLink for T {
     async fn getfilelink(&self, file_link: GetFileLinkInput) -> Result<FileLink> {
+        debug!("pcloud::getfilelink - file '{}'", file_link.file);
         let ret = self.get::<FileLink>(ENDPOINT, file_link.into_params()?).await?;
         Ok(ret)
     }
@@ -82,12 +83,45 @@ impl<T: client::Client> GetFileLink for T {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::env;
+    use std::fs::File as FsFile;
+    use std::io::BufReader;
     use std::str::FromStr;
+
+    use camino::Utf8Path;
+    use time::macros::datetime;
 
     use crate::mocks::client::MockLocalClient;
     use crate::types::FileID;
+    use crate::utils::http::ApiResult;
 
     use super::*;
+
+    #[test]
+    fn test_deserialize_getfilelink() {
+        fn reader() -> BufReader<FsFile> {
+            let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+            let getfilelink_json = Utf8Path::new(&manifest_dir)
+                .join("resources")
+                .join("testdata")
+                .join("getfilelink.json");
+            let file = FsFile::open(getfilelink_json).unwrap();
+            BufReader::new(file)
+        }
+
+        // Deserialize using ApiResult wrapper
+        match serde_json::from_reader::<_, ApiResult<FileLink>>(reader()) {
+            Err(e) => panic!("Error reading the file: {e}"),
+            Ok(data) => {
+                assert_eq!(data.result, 0);
+                assert_eq!(data.error, None);
+                let filelink = data.data.unwrap();
+                assert_eq!(filelink.path, "/lkjasdffdai99009asfda/name2.txt".to_string());
+                assert_eq!(filelink.expires, datetime!(2023-03-14 22:06:18 UTC));
+                assert_eq!(filelink.hosts, vec!["evc23.pcloud.com", "evc300.pcloud.com"]);
+            }
+        }
+    }
 
     #[test]
     fn test_getfilelinkinput_defaults() {
@@ -124,7 +158,6 @@ mod tests {
                 assert_eq!(params.get("skipfilename"), Some(&"1".to_string()));
 
                 Ok(FileLink {
-                    result: 0,
                     path: "<path>".to_string(),
                     expires: utc_now.clone(),
                     hosts: vec!["host1".to_string(), "host2".to_string()],
@@ -132,7 +165,6 @@ mod tests {
             });
 
         let filelink = client.getfilelink(input).await?;
-        assert_eq!(filelink.result, 0);
         assert_eq!(filelink.path, "<path>".to_string());
         assert_eq!(filelink.expires, utc_now);
         assert_eq!(filelink.hosts, vec!["host1".to_string(), "host2".to_string()]);
@@ -156,7 +188,6 @@ mod tests {
                 assert_eq!(params.get("path"), None);
 
                 Ok(FileLink {
-                    result: 0,
                     path: "<path>".to_string(),
                     expires: utc_now.clone(),
                     hosts: vec!["host1".to_string(), "host2".to_string()],
@@ -164,7 +195,6 @@ mod tests {
             });
 
         let filelink = client.getfilelink(input).await?;
-        assert_eq!(filelink.result, 0);
         assert_eq!(filelink.path, "<path>".to_string());
         assert_eq!(filelink.expires, utc_now);
         assert_eq!(filelink.hosts, vec!["host1".to_string(), "host2".to_string()]);

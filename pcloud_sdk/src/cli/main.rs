@@ -1,23 +1,36 @@
 use anyhow::{bail, Result};
+use camino::Utf8PathBuf;
 use clap::{Parser, Subcommand};
 use tracing::debug;
 
 use pcloud_sdk::client::HttpClient;
 
 use crate::output::{OutputArg, PrintVariant};
-use camino::Utf8PathBuf;
+
 mod auth;
+mod download;
 mod listfolder;
 mod output;
-mod stdin_lines;
 mod userinfo;
+mod utils;
+
+/// Arguments that apply to all subcommands
+#[derive(Parser)]
+pub struct CliParams {
+    #[clap(flatten)]
+    verbose: clap_verbosity_flag::Verbosity,
+
+    /// If the command allows it, number of parallel task to run
+    #[clap(long, default_value_t = 3)]
+    parallel: usize,
+}
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
 struct Cli {
     #[clap(flatten)]
-    verbose: clap_verbosity_flag::Verbosity,
+    common: CliParams,
 
     /// Path to a JSON file with user token
     #[clap(long)]
@@ -41,6 +54,8 @@ enum Commands {
     Userinfo,
 
     Listfolder(listfolder::Params),
+
+    Download(download::Params),
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -59,7 +74,7 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     // Configure tracing - logs go to stderr so it can be separated from actual output
-    let tracing_level = tracing_level(cli.verbose.log_level_filter());
+    let tracing_level = tracing_level(cli.common.verbose.log_level_filter());
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
         .with_max_level(tracing_level)
@@ -67,7 +82,7 @@ async fn main() -> Result<()> {
     debug!("Tracing level configured to {}", tracing_level);
 
     // Get the output
-    let output: PrintVariant = cli.output.into();
+    let output: PrintVariant = PrintVariant::new(cli.output, &cli.common);
 
     // Go ahead!
     match &cli.command {
@@ -77,8 +92,9 @@ async fn main() -> Result<()> {
             let token = auth::read_from_file(&cli.token_file)?;
             let client = HttpClient::new(token, true);
             match cli.command {
-                Commands::Userinfo => userinfo::handle(client, &output).await,
-                Commands::Listfolder(params) => listfolder::handle(client, &output, params).await,
+                Commands::Userinfo => userinfo::handle(client, &output, cli.common).await,
+                Commands::Listfolder(params) => listfolder::handle(client, &output, params, cli.common).await,
+                Commands::Download(params) => download::handle(client, &output, params, cli.common).await,
                 c => bail!("Unexpected command {:?}", c),
             }
         }

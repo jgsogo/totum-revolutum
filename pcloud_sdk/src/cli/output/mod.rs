@@ -1,20 +1,36 @@
 use anyhow::Result;
+use camino::Utf8PathBuf;
 
-pub use default::Default;
+pub use default_output::DefaultOutput;
 use pcloud_sdk::methods::folder::listfolder::ListFolder;
 use pcloud_sdk::methods::general::userinfo::UserInfo;
+use pcloud_sdk::progress_bar::{ProgressBar, ProgressBarBuilder};
 pub use porcelain::Porcelain;
 
-mod default;
+use crate::CliParams;
+
+mod default_output;
 mod porcelain;
 
-pub trait Print {
+pub trait Print: ProgressBarBuilder {
+    /// Actual output of the application. Use it carefully.
+    fn println(&self, text: &str) -> Result<()>;
+
+    /// Logs, additional information to dump to the output.
+    fn eprintln(&self, text: &str) -> Result<()>;
+
+    /// Prints the path to stdout
+    fn path(&self, path: Utf8PathBuf) -> Result<()>;
+
+    /// Prints folder information to stdout
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()>;
+
+    /// Prints user information to stdout
     fn user_info(&self, user_info: &UserInfo) -> Result<()>;
 }
 
 pub enum PrintVariant {
-    Default(Default),
+    Default(DefaultOutput),
     Porcelain(Porcelain),
 }
 
@@ -27,10 +43,10 @@ pub enum OutputArg {
     Porcelain,
 }
 
-impl From<OutputArg> for PrintVariant {
-    fn from(value: OutputArg) -> Self {
+impl PrintVariant {
+    pub fn new(value: OutputArg, cli_params: &CliParams) -> Self {
         match value {
-            OutputArg::Default => PrintVariant::Default(Default {}),
+            OutputArg::Default => PrintVariant::Default(DefaultOutput::new(cli_params)),
             OutputArg::Porcelain => PrintVariant::Porcelain(Porcelain {}),
         }
     }
@@ -38,6 +54,27 @@ impl From<OutputArg> for PrintVariant {
 
 impl Print for PrintVariant {
     // TODO: There is a lot of boilerplate here just to forward a funciton call -- macro?
+    fn println(&self, value: &str) -> Result<()> {
+        match &self {
+            PrintVariant::Default(inner) => inner.println(value),
+            PrintVariant::Porcelain(inner) => inner.println(value),
+        }
+    }
+
+    fn eprintln(&self, value: &str) -> Result<()> {
+        match &self {
+            PrintVariant::Default(inner) => inner.eprintln(value),
+            PrintVariant::Porcelain(inner) => inner.eprintln(value),
+        }
+    }
+
+    fn path(&self, path: Utf8PathBuf) -> Result<()> {
+        match &self {
+            PrintVariant::Default(inner) => inner.path(path),
+            PrintVariant::Porcelain(inner) => inner.path(path),
+        }
+    }
+
     fn list_folder(&self, value: &ListFolder) -> Result<()> {
         match &self {
             PrintVariant::Default(inner) => inner.list_folder(value),
@@ -49,6 +86,15 @@ impl Print for PrintVariant {
         match &self {
             PrintVariant::Default(inner) => inner.user_info(value),
             PrintVariant::Porcelain(inner) => inner.user_info(value),
+        }
+    }
+}
+
+impl ProgressBarBuilder for PrintVariant {
+    fn build(&self, total_size: u64) -> Box<dyn ProgressBar> {
+        match &self {
+            PrintVariant::Default(inner) => inner.build(total_size),
+            PrintVariant::Porcelain(inner) => inner.build(total_size),
         }
     }
 }

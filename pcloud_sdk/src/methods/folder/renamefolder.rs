@@ -80,14 +80,18 @@ mod tests {
 
     #[test]
     fn test_deserialize() {
-        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let userinfo_json = Utf8Path::new(&manifest_dir)
-            .join("resources")
-            .join("testdata")
-            .join("copyfolder.json");
-        let file = File::open(userinfo_json).unwrap();
-        let reader = BufReader::new(file);
-        match serde_json::from_reader::<_, ApiResult<RenameFolder>>(reader) {
+        fn reader() -> BufReader<std::fs::File> {
+            let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+            let userinfo_json = Utf8Path::new(&manifest_dir)
+                .join("resources")
+                .join("testdata")
+                .join("copyfolder.json");
+            let file = File::open(userinfo_json).unwrap();
+            BufReader::new(file)
+        }
+
+        // Deserialize data with ApiResultWrapper
+        match serde_json::from_reader::<_, ApiResult<RenameFolder>>(reader()) {
             Err(e) => panic!("Error reading the file: {e}"),
             Ok(data) => {
                 assert_eq!(data.result, 0);

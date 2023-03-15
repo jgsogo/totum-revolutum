@@ -1,7 +1,9 @@
 use anyhow::{bail, Result};
+use camino::Utf8PathBuf;
 
 use pcloud_sdk::methods::folder::ListFolder;
 use pcloud_sdk::methods::general::UserInfo;
+use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::structures::Metadata;
 
 use crate::output::Print;
@@ -27,7 +29,25 @@ impl Porcelain {
     }
 }
 
+impl ProgressBarBuilder for Porcelain {}
+
 impl Print for Porcelain {
+    // Forward messages to stderr, as porcelain output reduces noise as much as possible
+    fn println(&self, text: &str) -> Result<()> {
+        eprintln!("{text}");
+        Ok(())
+    }
+
+    fn eprintln(&self, text: &str) -> Result<()> {
+        eprintln!("{text}");
+        Ok(())
+    }
+
+    fn path(&self, path: Utf8PathBuf) -> Result<()> {
+        println!("{path}");
+        Ok(())
+    }
+
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()> {
         if let Some(contents) = &list_folder.metadata.contents {
             println!(
