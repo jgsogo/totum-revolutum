@@ -11,8 +11,8 @@ mod auth;
 mod download;
 mod listfolder;
 mod output;
-mod stdin_lines;
 mod userinfo;
+mod utils;
 
 /// Arguments that apply to all subcommands
 #[derive(Parser)]
