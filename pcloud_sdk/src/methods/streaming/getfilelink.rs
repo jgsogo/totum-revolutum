@@ -99,15 +99,18 @@ mod tests {
 
     #[test]
     fn test_deserialize_getfilelink() {
-        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let getfilelink_json = Utf8Path::new(&manifest_dir)
-            .join("resources")
-            .join("testdata")
-            .join("getfilelink.json");
-        let file = FsFile::open(getfilelink_json).unwrap();
-        let reader = BufReader::new(file);
-        // TODO: All methods should test `T` and `ApiResult<T>` for deserialization
-        match serde_json::from_reader::<_, ApiResult<FileLink>>(reader) {
+        fn reader() -> BufReader<FsFile> {
+            let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+            let getfilelink_json = Utf8Path::new(&manifest_dir)
+                .join("resources")
+                .join("testdata")
+                .join("getfilelink.json");
+            let file = FsFile::open(getfilelink_json).unwrap();
+            BufReader::new(file)
+        }
+
+        // Deserialize using ApiResult wrapper
+        match serde_json::from_reader::<_, ApiResult<FileLink>>(reader()) {
             Err(e) => panic!("Error reading the file: {e}"),
             Ok(data) => {
                 assert_eq!(data.result, 0);

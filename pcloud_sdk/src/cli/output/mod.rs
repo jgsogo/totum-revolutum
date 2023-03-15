@@ -44,15 +44,6 @@ impl PrintVariant {
     }
 }
 
-// impl From<OutputArg> for PrintVariant {
-//     fn from(value: OutputArg) -> Self {
-//         match value {
-//             OutputArg::Default => PrintVariant::Default(DefaultOutput::default()),
-//             OutputArg::Porcelain => PrintVariant::Porcelain(Porcelain {}),
-//         }
-//     }
-// }
-
 impl Print for PrintVariant {
     // TODO: There is a lot of boilerplate here just to forward a funciton call -- macro?
     fn println(&self, value: &str) -> Result<()> {
