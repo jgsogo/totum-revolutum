@@ -7,11 +7,13 @@ use pcloud_sdk::methods::general::userinfo::UserInfo;
 use pcloud_sdk::progress_bar::{ProgressBar, ProgressBarBuilder};
 use pcloud_sdk::types::FileID;
 pub use porcelain::Porcelain;
+pub use progressbar_for_progresshash::progressbar_for_progresshash;
 
 use crate::CliParams;
 
 mod default_output;
 mod porcelain;
+mod progressbar_for_progresshash;
 
 pub trait Print: ProgressBarBuilder {
     /// Actual output of the application. Use it carefully.

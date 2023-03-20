@@ -1,4 +1,5 @@
-use std::arch::x86_64::_andn_u64;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use std::str::FromStr;
 
 use anyhow::{anyhow, bail, Result};
@@ -11,11 +12,12 @@ use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
+use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::types::FileID;
 use pcloud_sdk::types::{Folder, FolderID};
 use pcloud_sdk::utils::{current_path, normalize_path, to_absolute_path};
 
-use crate::output::{Print, PrintVariant};
+use crate::output::{progressbar_for_progresshash, Print, PrintVariant};
 use crate::utils::params_or_stdin::ParamsOrStdin;
 use crate::CliParams;
 
@@ -52,7 +54,7 @@ fn remote_path_from_local_file(abs_file_to_upload: &Utf8Path, keep_relative_path
 
 async fn upload(
     pcloud: HttpClient<OAuth2TokenImpl>,
-    _output: &PrintVariant,
+    output: &PrintVariant,
     file_to_upload: Utf8PathBuf,
     folder: &FolderID,
     keep_relative_paths: bool,
@@ -82,8 +84,28 @@ async fn upload(
     let remote_folder_id = pcloud
         .createfolderifnotexists_all(Some(folder.clone()), &remote_folder_path)
         .await?;
-    let upload_params = UploadFileParams::new(Folder::FolderID(remote_folder_id), remote_filename.to_string());
+
+    // Get all the inputs we need for the operation
+    let mut upload_params = UploadFileParams::new(Folder::FolderID(remote_folder_id), remote_filename.to_string());
+    let progresshash = {
+        let mut s = DefaultHasher::new();
+        file_to_upload.to_string().hash(&mut s);
+        s.finish().to_string()
+    };
+    upload_params.progresshash = Some(progresshash.clone());
+
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    {
+        let pb_points = 100;
+        let pb = output.build(pb_points);
+        let pcloud = pcloud.clone();
+        tokio::spawn(async move {
+            progressbar_for_progresshash(pcloud.clone(), progresshash, rx, pb, pb_points).await;
+        });
+    }
+
     let r = pcloud.uploadfile(abs_file_to_upload.as_ref(), upload_params).await?;
+    let _ = tx.send(());
 
     let file_id = r.fileids.get(0).unwrap();
     Ok(FileID(file_id.clone()))
@@ -101,7 +123,7 @@ pub async fn handle(
         Folder::Path(p) => pcloud
             .get_folderid(&p)
             .await
-            .map_err(|e| anyhow!("Folder {p} doesn't exist"))?,
+            .map_err(|_| anyhow!("Folder {p} doesn't exist"))?,
     };
     let input = ParamsOrStdin::new(params.files);
 
@@ -115,7 +137,7 @@ pub async fn handle(
     .buffer_unordered(cli_params.parallel)
     .map(|r| match r {
         Ok(file) => output.fileid(file),
-        Err(e) => output.eprintln(&*format!("Error downloading {e}")),
+        Err(e) => output.eprintln(&*format!("Error uploading {e}")),
     })
     .collect::<Vec<_>>();
     uploads.await;
