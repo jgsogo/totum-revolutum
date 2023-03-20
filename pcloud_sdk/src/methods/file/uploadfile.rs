@@ -65,6 +65,7 @@ pub trait PostUploadFile {
 
 #[async_trait]
 impl<T: client::Client> PostUploadFile for T {
+    // TODO: Make `local_filename` as Utf8Path
     async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile> {
         let filename = upload_params.filename.clone();
         let data = utils::http::file_data(local_filename.to_string(), &filename)?;

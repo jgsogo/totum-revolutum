@@ -13,6 +13,7 @@ mod listfolder;
 mod output;
 mod userinfo;
 mod utils;
+mod upload;
 
 /// Arguments that apply to all subcommands
 #[derive(Parser)]
@@ -56,6 +57,8 @@ enum Commands {
     Listfolder(listfolder::Params),
 
     Download(download::Params),
+
+    Upload(upload::Params),
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -95,6 +98,7 @@ async fn main() -> Result<()> {
                 Commands::Userinfo => userinfo::handle(client, &output, cli.common).await,
                 Commands::Listfolder(params) => listfolder::handle(client, &output, params, cli.common).await,
                 Commands::Download(params) => download::handle(client, &output, params, cli.common).await,
+                Commands::Upload(params) => upload::handle(client, &output, params, cli.common).await,
                 c => bail!("Unexpected command {:?}", c),
             }
         }

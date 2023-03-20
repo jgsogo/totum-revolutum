@@ -218,6 +218,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
 
+        // TODO: Substitute by 'self.pcloud.createfolderifnotexists_all'
         let mut folderid = self.folderid.clone();
         for cmp in path.components() {
             if let Utf8Component::Normal(p) = cmp {

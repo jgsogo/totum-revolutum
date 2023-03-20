@@ -23,7 +23,7 @@ async fn main() -> Result<()> {
         println!("{:#?}", userinfo);
 
         let base_path = Utf8Path::new("/backup_file");
-        pcloud.createfolderifnotexists_all(&base_path).await?;
+        pcloud.createfolderifnotexists_all(None, &base_path).await?;
         FilesystemPCloud::new(&base_path, pcloud).await?
     };
 
