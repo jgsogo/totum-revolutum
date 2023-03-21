@@ -100,7 +100,7 @@ async fn upload(
         let pb = output.build(pb_points);
         let pcloud = pcloud.clone();
         tokio::spawn(async move {
-            progressbar_for_progresshash(pcloud.clone(), progresshash, rx, pb, pb_points).await;
+            progressbar_for_progresshash(&pcloud, progresshash, rx, pb, pb_points).await;
         });
     }
 
