@@ -19,12 +19,15 @@ pub trait GetCreateFolderIfNotExistsAll {
 trait _HelperTrait: GetFolderID {
     async fn get_folder_and_path(&self, folder: Option<FolderID>, path: &Utf8Path) -> Result<(FolderID, Utf8PathBuf)> {
         let path = normalize_path(path);
+        let root_folder: Utf8PathBuf = "/".into();
         match folder {
             None => {
                 if !path.is_absolute() {
                     bail!("If no parent folder is given, the `path` needs to be an absolute one")
                 }
-                let root_folder: Utf8PathBuf = "/".into();
+                if path.starts_with("/..") {
+                    bail!("Folder '{path}' is outside the root folder")
+                }
                 let root_folderid = self.get_folderid(&root_folder).await?;
                 Ok((root_folderid, path.strip_prefix(root_folder)?.into()))
             }
@@ -32,7 +35,7 @@ trait _HelperTrait: GetFolderID {
                 if path.starts_with("/..") || path.starts_with("..") {
                     bail!("Folder '{path}' is outside the given parent")
                 }
-                Ok((fid, path))
+                Ok((fid, path.strip_prefix(root_folder).unwrap_or_else(|_| &path).into()))
             }
         }
     }
@@ -53,5 +56,113 @@ impl<T: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists + Sync
             }
         }
         Ok(folderid)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct HelperTraitMock;
+
+    #[async_trait]
+    impl GetFolderID for HelperTraitMock {
+        async fn get_folderid(&self, _path: &Utf8Path) -> Result<FolderID> {
+            Ok(FolderID(42))
+        }
+    }
+
+    #[tokio::test]
+    async fn test_helper_trait_without_folderid() -> Result<()> {
+        let trait_impl = HelperTraitMock {};
+
+        {
+            let (folder, path) = trait_impl
+                .get_folder_and_path(None, &Utf8PathBuf::from("/abs/path"))
+                .await?;
+
+            assert_eq!(folder, FolderID(42));
+            assert_eq!(path, Utf8PathBuf::from("abs/path"));
+        }
+
+        {
+            let (folder, path) = trait_impl
+                .get_folder_and_path(None, &Utf8PathBuf::from("/abs/../path"))
+                .await?;
+
+            assert_eq!(folder, FolderID(42));
+            assert_eq!(path, Utf8PathBuf::from("path"));
+        }
+
+        {
+            let r = trait_impl
+                .get_folder_and_path(None, &Utf8PathBuf::from("/../outside/root"))
+                .await;
+
+            assert!(r.is_err());
+            assert_eq!(
+                r.err().unwrap().to_string(),
+                "Folder '/../outside/root' is outside the root folder".to_string()
+            );
+        }
+
+        {
+            let r = trait_impl
+                .get_folder_and_path(None, &Utf8PathBuf::from("a/relative/path"))
+                .await;
+
+            assert!(r.is_err());
+            assert_eq!(
+                r.err().unwrap().to_string(),
+                "If no parent folder is given, the `path` needs to be an absolute one".to_string()
+            );
+        }
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_helper_trait_with_folderid() -> Result<()> {
+        let trait_impl = HelperTraitMock {};
+
+        {
+            let (folder, path) = trait_impl
+                .get_folder_and_path(Some(FolderID(54)), &Utf8PathBuf::from("/abs/path"))
+                .await?;
+
+            assert_eq!(folder, FolderID(54));
+            assert_eq!(path, Utf8PathBuf::from("abs/path"));
+        }
+
+        {
+            let r = trait_impl
+                .get_folder_and_path(Some(FolderID(54)), &Utf8PathBuf::from("/../outside/root"))
+                .await;
+
+            assert!(r.is_err());
+            assert_eq!(
+                r.err().unwrap().to_string(),
+                "Folder '/../outside/root' is outside the given parent".to_string()
+            );
+        }
+
+        {
+            let (folder, path) = trait_impl
+                .get_folder_and_path(Some(FolderID(54)), &Utf8PathBuf::from("a/relative/path"))
+                .await?;
+
+            assert_eq!(folder, FolderID(54));
+            assert_eq!(path, Utf8PathBuf::from("a/relative/path"));
+        }
+
+        {
+            let (folder, path) = trait_impl
+                .get_folder_and_path(Some(FolderID(54)), &Utf8PathBuf::from("a/relative/../path"))
+                .await?;
+
+            assert_eq!(folder, FolderID(54));
+            assert_eq!(path, Utf8PathBuf::from("a/path"));
+        }
+        Ok(())
     }
 }
