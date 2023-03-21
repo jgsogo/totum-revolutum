@@ -96,8 +96,9 @@ async fn upload(
 
     let (tx, rx) = tokio::sync::oneshot::channel();
     {
-        let pb_points = 100;
+        let pb_points = std::fs::metadata(abs_file_to_upload.clone())?.len();
         let pb = output.build(pb_points);
+        pb.set_message(&format!("Uploading '{abs_file_to_upload}'"));
         let pcloud = pcloud.clone();
         tokio::spawn(async move {
             progressbar_for_progresshash(&pcloud, progresshash, rx, pb, pb_points).await;
