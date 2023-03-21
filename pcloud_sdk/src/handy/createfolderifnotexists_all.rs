@@ -35,7 +35,7 @@ trait _HelperTrait: GetFolderID {
                 if path.starts_with("/..") || path.starts_with("..") {
                     bail!("Folder '{path}' is outside the given parent")
                 }
-                Ok((fid, path.strip_prefix(root_folder).unwrap_or_else(|_| &path).into()))
+                Ok((fid, path.strip_prefix(root_folder).unwrap_or(&path).into()))
             }
         }
     }
