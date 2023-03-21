@@ -11,9 +11,9 @@ mod auth;
 mod download;
 mod listfolder;
 mod output;
+mod upload;
 mod userinfo;
 mod utils;
-mod upload;
 
 /// Arguments that apply to all subcommands
 #[derive(Parser)]
