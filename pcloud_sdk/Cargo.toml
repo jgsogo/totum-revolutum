@@ -67,10 +67,6 @@ tracing-subscriber = "0.3"
 pcloud-sdk = { path = ".", features = ["test_utils"] }
 
 [[example]]
-name = "upload_pb"
-required-features = ["indicatif"]
-
-[[example]]
 name = "fileops"
 required-features = ["indicatif"]
 
