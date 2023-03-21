@@ -2,7 +2,6 @@ use tracing::debug;
 
 use super::stdin_lines::StdinLines;
 
-// TODO: Probably more complex than needed...
 pub enum ParamsOrStdin<T> {
     Params(std::vec::IntoIter<T>),
     Stdin(StdinLines),
