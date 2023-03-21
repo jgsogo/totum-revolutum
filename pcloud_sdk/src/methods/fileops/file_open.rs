@@ -82,10 +82,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_ocreate() -> Result<()> {
-        let flags = Flags::O_CREAT;
-
         // test we get the expected error
         {
+            let flags = Flags::O_CREAT;
             let client = MockLocalClient::new();
             let r = client.file_open(flags, FileOpenPath::FileID(FileID(42))).await;
             assert!(r.is_err());
@@ -97,6 +96,7 @@ mod tests {
 
         // test O_CREAT with folderid + name
         {
+            let flags = Flags::O_CREAT;
             let mut client = MockLocalClient::new();
             client
                 .expect_get()
@@ -120,7 +120,7 @@ mod tests {
 
         // test O_CREAT with path
         {
-            let flags = flags | Flags::O_APPEND;
+            let flags = Flags::O_CREAT | Flags::O_APPEND;
             let mut client = MockLocalClient::new();
             client
                 .expect_get()
@@ -146,10 +146,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_no_ocreate() -> Result<()> {
-        let flags = Flags::empty();
-
         // test we get the expected error
         {
+            let flags = Flags::empty();
             let client = MockLocalClient::new();
             let r = client
                 .file_open(flags, FileOpenPath::FolderAndName(FolderID(42), "name".to_string()))
@@ -163,6 +162,7 @@ mod tests {
 
         // test ~O_CREAT with fileid
         {
+            let flags = Flags::empty();
             let mut client = MockLocalClient::new();
             client
                 .expect_get()
@@ -185,6 +185,7 @@ mod tests {
 
         // test ~O_CREAT with path
         {
+            let flags = Flags::empty();
             let flags = flags | Flags::O_EXCL;
             let mut client = MockLocalClient::new();
             client
