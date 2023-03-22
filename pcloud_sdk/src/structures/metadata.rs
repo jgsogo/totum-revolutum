@@ -1,145 +1,12 @@
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 
-use crate::types::{FileID, FolderID};
-
-use super::category::Category;
-use super::icon::Icon;
-
-// https://docs.pcloud.com/structures/metadata.html
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-#[cfg_attr(feature = "test_utils", derive(Default))]
-/// Metadata that is common to files and folders
-///
-/// Given `filtermeta` argument, everything is optional
-pub struct CommonMetadata {
-    icon: Option<Icon>,
-    id: Option<String>,
-    #[serde(with = "time::serde::rfc2822::option", default)]
-    created: Option<OffsetDateTime>,
-    #[serde(with = "time::serde::rfc2822::option", default)]
-    modified: Option<OffsetDateTime>,
-    pub path: Option<String>,
-    thumb: Option<bool>,
-    pub isfolder: Option<bool>,
-    isshared: Option<bool>,
-
-    ismine: Option<bool>,
-    pub canread: Option<bool>,
-    pub canmodify: Option<bool>,
-    pub candelete: Option<bool>,
-
-    pub name: Option<String>,
-    pub isdeleted: Option<bool>,
-
-    pub parentfolderid: Option<FolderID>,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct MetadataFile {
-    // Given `filtermeta` argument, everything is optional. However, we make this field required so
-    // the parser can differentiate between this [`MetadataFile`] and [`MetadataFolder`].
-    pub fileid: FileID,
-
-    #[serde(flatten)]
-    pub common: CommonMetadata,
-
-    pub deletedfileid: Option<FileID>,
-    pub category: Option<Category>,
-
-    // only for files
-    pub hash: Option<u64>,
-    pub size: Option<u64>,
-    pub contenttype: Option<String>,
-
-    // Optional fields depending on file type
-    #[serde(flatten)]
-    pub extra_imagefile: Option<MetadataImageFile>,
-    #[serde(flatten)]
-    pub extra_audiofile: Option<MetadataAudioFile>,
-    #[serde(flatten)]
-    pub extra_videofile: Option<MetadataVideoFile>,
-}
-
-impl MetadataFile {
-    #[cfg(feature = "test_utils")]
-    pub fn default(fileid: FileID) -> Self {
-        Self {
-            fileid,
-            common: CommonMetadata::default(),
-            deletedfileid: None,
-            category: None,
-            hash: None,
-            size: None,
-            contenttype: None,
-            extra_imagefile: None,
-            extra_audiofile: None,
-            extra_videofile: None,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct MetadataFolder {
-    // Given `filtermeta` argument, everything is optional. However, we make this field required so
-    // the parser can differentiate between this [`MetadataFile`] and [`MetadataFolder`].
-    pub folderid: FolderID,
-
-    #[serde(flatten)]
-    pub common: CommonMetadata,
-
-    pub contents: Option<Vec<Metadata>>,
-
-    // only for folders
-    pub cancreate: Option<bool>,
-}
-
-impl MetadataFolder {
-    #[cfg(feature = "test_utils")]
-    pub fn default(folderid: FolderID) -> Self {
-        Self {
-            folderid,
-            common: CommonMetadata::default(),
-            contents: None,
-            cancreate: None,
-        }
-    }
-}
+use super::{MetadataFile, MetadataFolder};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 #[serde(untagged)]
 pub enum Metadata {
     MetadataFile(MetadataFile),
     MetadataFolder(MetadataFolder),
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-pub struct MetadataImageFile {
-    width: u32,
-    height: u32,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-pub struct MetadataAudioFile {
-    artist: String,
-    album: u32,
-    title: u32,
-    genre: u32,
-    trackno: u32,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct MetadataVideoFile {
-    width: String,
-    height: u32,
-    duration: f32,
-    fps: f32,
-    videocodec: String,
-    audiocodec: String,
-    videobitrate: u32,
-    audiobitrate: u32,
-    audiosamplerate: u32,
-    rotate: u16,
 }
 
 #[cfg(test)]
@@ -151,6 +18,10 @@ mod tests {
     use camino::Utf8Path;
     use time::macros::datetime;
 
+    use crate::types::{FileID, FolderID};
+
+    use super::super::category::Category;
+    use super::super::icon::Icon;
     use super::*;
 
     #[test]
