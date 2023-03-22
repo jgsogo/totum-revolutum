@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::params::Params;
-use crate::structures::Metadata;
+use crate::structures::MetadataFolder;
 use crate::types::Folder;
 
 pub const ENDPOINT: &str = "/deletefolder";
@@ -12,7 +12,7 @@ pub const ENDPOINT: &str = "/deletefolder";
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteFolder {
     pub id: String,
-    pub metadata: Metadata,
+    pub metadata: MetadataFolder,
 }
 
 #[async_trait]
@@ -54,7 +54,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid.unwrap(), FolderID(230807));
+                assert_eq!(data.metadata.folderid, FolderID(230807));
                 assert_eq!(data.id, "111-0".to_string());
             }
         }

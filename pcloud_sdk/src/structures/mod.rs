@@ -1,4 +1,4 @@
-pub use metadata::Metadata;
+pub use metadata::{Metadata, MetadataFile, MetadataFolder};
 
 mod category;
 mod icon;

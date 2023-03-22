@@ -1,3 +1,4 @@
+use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
@@ -5,8 +6,6 @@ use crate::types::{FileID, FolderID};
 
 use super::category::Category;
 use super::icon::Icon;
-
-// TODO: Use enum for files and folders: https://serde.rs/enum-representations.html
 
 // https://docs.pcloud.com/structures/metadata.html
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
@@ -25,30 +24,29 @@ pub struct CommonMetadata {
     thumb: Option<bool>,
     pub isfolder: Option<bool>,
     isshared: Option<bool>,
+
     ismine: Option<bool>,
-    pub name: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-#[cfg_attr(feature = "test_utils", derive(Default))]
-pub struct Metadata {
-    #[serde(flatten)]
-    pub common: CommonMetadata,
-    pub parentfolderid: Option<FolderID>,
-
     pub canread: Option<bool>,
     pub canmodify: Option<bool>,
     pub candelete: Option<bool>,
 
-    pub folderid: Option<FolderID>,
-    pub fileid: Option<FileID>,
-    pub deletedfileid: Option<FileID>,
-    pub category: Option<Category>,
-    pub contents: Option<Vec<Metadata>>,
+    pub name: Option<String>,
     pub isdeleted: Option<bool>,
 
-    // only for folders
-    pub cancreate: Option<bool>,
+    pub parentfolderid: Option<FolderID>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct MetadataFile {
+    // Given `filtermeta` argument, everything is optional. However, we make this field require so
+    // the parser can differentiate between this [`MetadataFile`] and [`MetadataFolder`].
+    pub fileid: FileID,
+
+    #[serde(flatten)]
+    pub common: CommonMetadata,
+
+    pub deletedfileid: Option<FileID>,
+    pub category: Option<Category>,
 
     // only for files
     pub hash: Option<u64>,
@@ -62,6 +60,74 @@ pub struct Metadata {
     pub extra_audiofile: Option<MetadataAudioFile>,
     #[serde(flatten)]
     pub extra_videofile: Option<MetadataVideoFile>,
+}
+
+impl MetadataFile {
+    #[cfg(feature = "test_utils")]
+    pub fn default(fileid: FileID) -> Self {
+        Self {
+            fileid,
+            common: CommonMetadata::default(),
+            deletedfileid: None,
+            category: None,
+            hash: None,
+            size: None,
+            contenttype: None,
+            extra_imagefile: None,
+            extra_audiofile: None,
+            extra_videofile: None,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct MetadataFolder {
+    // Given `filtermeta` argument, everything is optional. However, we make this field require so
+    // the parser can differentiate between this [`MetadataFile`] and [`MetadataFolder`].
+    pub folderid: FolderID,
+
+    #[serde(flatten)]
+    pub common: CommonMetadata,
+
+    pub contents: Option<Vec<Metadata>>,
+
+    // only for folders
+    pub cancreate: Option<bool>,
+}
+
+impl MetadataFolder {
+    #[cfg(feature = "test_utils")]
+    pub fn default(folderid: FolderID) -> Self {
+        Self {
+            folderid,
+            common: CommonMetadata::default(),
+            contents: None,
+            cancreate: None,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[serde(untagged)]
+pub enum Metadata {
+    MetadataFile(MetadataFile),
+    MetadataFolder(MetadataFolder),
+}
+
+impl Metadata {
+    pub fn folderid(&self) -> Result<FolderID> {
+        match self {
+            Metadata::MetadataFile(_) => bail!("It's a file, not a folder"),
+            Metadata::MetadataFolder(m) => Ok(m.folderid.clone()),
+        }
+    }
+
+    pub fn fileid(&self) -> Result<FileID> {
+        match self {
+            Metadata::MetadataFile(m) => Ok(m.fileid.clone()),
+            Metadata::MetadataFolder(_) => bail!("It's a folder, not a file"),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
@@ -95,18 +161,19 @@ pub struct MetadataVideoFile {
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
 
+    use camino::Utf8Path;
     use time::macros::datetime;
 
     use super::*;
 
     #[test]
     #[allow(clippy::bool_assert_comparison)]
-    fn test_deserialize() {
+    fn test_deserialize_metadata_file() {
+        // A manifest for a file, cannot be read as a [`MetadataFolder`]
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         let manifest_json = Utf8Path::new(&manifest_dir)
             .join("resources")
@@ -114,23 +181,27 @@ mod tests {
             .join("metadata_file.json");
         let file = File::open(manifest_json).unwrap();
         let reader = BufReader::new(file);
-        match serde_json::from_reader::<_, Metadata>(reader) {
+        assert!(serde_json::from_reader::<_, MetadataFolder>(reader).is_err());
+
+        // it can be read as a [`MetadataFile`]
+        let manifest_json = Utf8Path::new(&manifest_dir)
+            .join("resources")
+            .join("testdata")
+            .join("metadata_file.json");
+        let file = File::open(manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        match serde_json::from_reader::<_, MetadataFile>(reader) {
             Err(e) => panic!("Error reading the file: {e}"),
             Ok(data) => {
-                assert_eq!(data.parentfolderid, Some(FolderID(0)));
+                // TODO: Check that all fields are here
                 assert_eq!(data.common.isfolder, Some(false));
 
                 assert_eq!(data.common.ismine, Some(true));
-                assert_eq!(data.canread, None);
-                assert_eq!(data.canmodify, None);
-                assert_eq!(data.candelete, None);
-                assert_eq!(data.cancreate, None);
 
                 assert_eq!(data.common.isshared, Some(false));
                 assert_eq!(data.common.name, Some("Simple image.jpg".to_string()));
                 assert_eq!(data.common.id, Some("f1729212".to_string()));
-                assert_eq!(data.folderid, None);
-                assert_eq!(data.fileid, Some(FileID(1729212)));
+                assert_eq!(data.fileid, FileID(1729212));
                 assert_eq!(data.deletedfileid, None);
                 assert_eq!(data.common.created, Some(datetime!(2013-10-02 14:29:11 UTC)));
                 assert_eq!(data.common.modified, None);
@@ -140,9 +211,47 @@ mod tests {
                 assert_eq!(data.size, Some(73269));
                 assert_eq!(data.contenttype, Some("image/jpeg".into()));
                 assert_eq!(data.hash, Some(10681749967730527559));
-                assert_eq!(data.contents, None);
-                assert_eq!(data.isdeleted, None);
+                assert_eq!(data.common.isdeleted, None);
                 assert_eq!(data.common.path, Some("/Simple image.jpg".into()));
+            }
+        }
+    }
+
+    #[test]
+    #[allow(clippy::bool_assert_comparison)]
+    fn test_deserialize_metadata_folder() {
+        // A manifest for a file, cannot be read as a [`MetadataFolder`]
+        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let manifest_json = Utf8Path::new(&manifest_dir)
+            .join("resources")
+            .join("testdata")
+            .join("metadata_folder.json");
+        let file = File::open(manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        assert!(serde_json::from_reader::<_, MetadataFile>(reader).is_err());
+
+        // it can be read as a [`MetadataFile`]
+        let manifest_json = Utf8Path::new(&manifest_dir)
+            .join("resources")
+            .join("testdata")
+            .join("metadata_folder.json");
+        let file = File::open(manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        match serde_json::from_reader::<_, MetadataFolder>(reader) {
+            Err(e) => panic!("Error reading the file: {e}"),
+            Ok(data) => {
+                // TODO: Check that all fields are here
+                assert_eq!(data.common.isfolder, Some(true));
+
+                assert_eq!(data.common.ismine, Some(true));
+
+                assert_eq!(data.common.isshared, Some(false));
+                assert_eq!(data.common.name, Some("a folder".to_string()));
+                assert_eq!(data.common.id, Some("d1729212".to_string()));
+                assert_eq!(data.folderid, FolderID(1729212));
+                assert_eq!(data.common.created, Some(datetime!(2013-10-02 14:29:11 UTC)));
+                assert_eq!(data.common.modified, None);
+                assert_eq!(data.common.isdeleted, None);
             }
         }
     }

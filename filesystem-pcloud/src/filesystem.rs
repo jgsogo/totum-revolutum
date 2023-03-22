@@ -52,9 +52,7 @@ async fn get_folderid<HttpClient: Client + Send + Sync + Clone>(
     let listfolder_input = ListFolderInput::new(folder);
     let filtermeta = vec!["folderid"];
     let r = pcloud.listfolder_with_filtermeta(listfolder_input, filtermeta).await?;
-    r.metadata
-        .folderid
-        .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
+    Ok(r.metadata.folderid)
 }
 
 impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpClient> {
@@ -110,18 +108,25 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpCl
         depth: usize,
     ) -> Result<()> {
         for it in contents.iter() {
-            let path = base_path.join(Utf8Path::new(it.common.name.as_ref().unwrap()));
-            trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
-            if !it.common.isfolder.unwrap() {
-                let data: RemoteMetadata = (path, it.clone()).into();
-                tx.send(data)?;
-            } else {
-                FilesystemPCloud::<HttpClient>::work_on_contents(
-                    tx.clone(),
-                    &path,
-                    it.contents.as_ref().unwrap(),
-                    depth + 1,
-                )?
+            match it {
+                Metadata::MetadataFile(m) => {
+                    let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
+                    trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
+
+                    let data: RemoteMetadata = (path, m.clone()).into();
+                    tx.send(data)?;
+                }
+                Metadata::MetadataFolder(m) => {
+                    let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
+                    trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
+
+                    FilesystemPCloud::<HttpClient>::work_on_contents(
+                        tx.clone(),
+                        &path,
+                        m.contents.as_ref().unwrap(),
+                        depth + 1,
+                    )?
+                }
             }
         }
         Ok(())
@@ -263,6 +268,7 @@ mod tests {
     use pcloud_sdk::methods::folder::listfolder::ListFolder;
     use pcloud_sdk::methods::folder::{createfolderifnotexists, deletefolder, deletefolderrecursive, listfolder};
     use pcloud_sdk::mocks::client::MockLocalClient;
+    use pcloud_sdk::structures::{MetadataFile, MetadataFolder};
     use pcloud_sdk::types::FileID;
     use pcloud_sdk::utils;
 
@@ -283,10 +289,7 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -337,10 +340,7 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -416,10 +416,7 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -517,10 +514,7 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -579,10 +573,7 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -598,10 +589,7 @@ mod tests {
 
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -627,10 +615,7 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -645,10 +630,7 @@ mod tests {
 
                 Ok(DeleteFile {
                     id: "1234-0".to_string(),
-                    metadata: Metadata {
-                        fileid: Some(FileID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFile::default(FileID(1234)),
                 })
             });
 
@@ -673,10 +655,7 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -691,10 +670,7 @@ mod tests {
 
                 Ok(DeleteFolder {
                     id: "1234-0".to_string(),
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 
@@ -719,10 +695,7 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
-                    metadata: Metadata {
-                        folderid: Some(FolderID(1234)),
-                        ..Default::default()
-                    },
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
 

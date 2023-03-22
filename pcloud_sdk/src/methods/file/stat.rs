@@ -4,14 +4,14 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::params::Params;
-use crate::structures::Metadata;
+use crate::structures::MetadataFile;
 use crate::types::File;
 
 pub const ENDPOINT: &str = "/stat";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Stat {
-    pub metadata: Metadata,
+    pub metadata: MetadataFile,
 }
 
 #[async_trait]
@@ -53,7 +53,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.fileid.unwrap(), FileID(1729212));
+                assert_eq!(data.metadata.fileid, FileID(1729212));
             }
         }
     }

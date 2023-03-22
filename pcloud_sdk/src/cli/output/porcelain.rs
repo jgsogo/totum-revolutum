@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::Result;
 use camino::Utf8PathBuf;
 
 use pcloud_sdk::methods::folder::ListFolder;
@@ -58,25 +58,18 @@ impl Print for Porcelain {
         if let Some(contents) = &list_folder.metadata.contents {
             println!(
                 "{}",
-                Porcelain::format_line("", &list_folder.metadata.folderid.as_ref().unwrap().to_string())
+                Porcelain::format_line("", &list_folder.metadata.folderid.to_string())
             );
 
             for it in contents.iter() {
                 let line = match it {
-                    Metadata {
-                        common,
-                        fileid: Some(fd),
-                        ..
-                    } => Porcelain::format_line(&fd.to_string(), common.name.as_ref().unwrap_or(&"".to_string())),
-                    Metadata {
-                        common,
-                        folderid: Some(fd),
-                        ..
-                    } => Porcelain::format_line(
-                        &fd.to_string(),
-                        &format!("{}/", common.name.as_ref().unwrap_or(&"".to_string())),
+                    Metadata::MetadataFile(m) => {
+                        Porcelain::format_line(&m.fileid.to_string(), m.common.name.as_ref().unwrap_or(&"".to_string()))
+                    }
+                    Metadata::MetadataFolder(m) => Porcelain::format_line(
+                        &m.folderid.to_string(),
+                        &format!("{}/", m.common.name.as_ref().unwrap_or(&"".to_string())),
                     ),
-                    _ => bail!("Not a folder, neither a file"),
                 };
                 println!("{line}");
             }

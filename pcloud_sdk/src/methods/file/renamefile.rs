@@ -5,13 +5,13 @@ use serde::{Deserialize, Serialize};
 use crate::client;
 use crate::methods::params::Params;
 use crate::methods::params::SourceAndTargetFile;
-use crate::structures::Metadata;
+use crate::structures::MetadataFile;
 
 pub const ENDPOINT: &str = "/renamefile";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RenameFile {
-    pub metadata: Metadata,
+    pub metadata: MetadataFile,
 }
 
 /// Renames or moves
@@ -54,7 +54,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.fileid.unwrap(), FileID(1729212));
+                assert_eq!(data.metadata.fileid, FileID(1729212));
             }
         }
     }
