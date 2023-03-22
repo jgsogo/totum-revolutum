@@ -10,6 +10,7 @@ use tracing::{info, trace, warn};
 use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
 use filesystem::{File, Filesystem};
 use pcloud_sdk::client::Client;
+use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
 use pcloud_sdk::methods::file::stat::GetStat;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
@@ -220,13 +221,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 
         // TODO: Substitute by 'self.pcloud.createfolderifnotexists_all'
         let mut folderid = self.folderid.clone();
-        for cmp in path.components() {
-            if let Utf8Component::Normal(p) = cmp {
-                let input = TargetFolder::FolderAndName((folderid.clone(), p.to_string()));
-                let r = self.pcloud.createfolderifnotexists(input).await?;
-                folderid = r.metadata.folderid.unwrap();
-            }
-        }
+        self.pcloud.createfolderifnotexists_all(Some(folderid), &path).await?;
         Ok(())
     }
 
