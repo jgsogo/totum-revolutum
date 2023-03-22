@@ -1,5 +1,6 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use camino::Utf8Path;
 use serde::{Deserialize, Serialize};
 
 use crate::methods::params::{Params, ParamsType};
@@ -60,14 +61,14 @@ pub struct UploadFile {
 
 #[async_trait]
 pub trait PostUploadFile {
-    async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile>;
+    async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile>;
 }
 
 #[async_trait]
 impl<T: client::Client> PostUploadFile for T {
-    async fn uploadfile(&self, local_filename: &str, upload_params: UploadFileParams) -> Result<UploadFile> {
+    async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile> {
         let filename = upload_params.filename.clone();
-        let data = utils::http::file_data(local_filename.to_string(), &filename)?;
+        let data = utils::http::file_data(local_filename, &filename)?;
         let ret = self
             .post::<UploadFile>(ENDPOINT, upload_params.into_params()?, data)
             .await?;
