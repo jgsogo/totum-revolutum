@@ -1,4 +1,3 @@
-use anyhow::{bail, Result};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
@@ -38,7 +37,7 @@ pub struct CommonMetadata {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct MetadataFile {
-    // Given `filtermeta` argument, everything is optional. However, we make this field require so
+    // Given `filtermeta` argument, everything is optional. However, we make this field required so
     // the parser can differentiate between this [`MetadataFile`] and [`MetadataFolder`].
     pub fileid: FileID,
 
@@ -82,7 +81,7 @@ impl MetadataFile {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct MetadataFolder {
-    // Given `filtermeta` argument, everything is optional. However, we make this field require so
+    // Given `filtermeta` argument, everything is optional. However, we make this field required so
     // the parser can differentiate between this [`MetadataFile`] and [`MetadataFolder`].
     pub folderid: FolderID,
 
@@ -112,22 +111,6 @@ impl MetadataFolder {
 pub enum Metadata {
     MetadataFile(MetadataFile),
     MetadataFolder(MetadataFolder),
-}
-
-impl Metadata {
-    pub fn folderid(&self) -> Result<FolderID> {
-        match self {
-            Metadata::MetadataFile(_) => bail!("It's a file, not a folder"),
-            Metadata::MetadataFolder(m) => Ok(m.folderid.clone()),
-        }
-    }
-
-    pub fn fileid(&self) -> Result<FileID> {
-        match self {
-            Metadata::MetadataFile(m) => Ok(m.fileid.clone()),
-            Metadata::MetadataFolder(_) => bail!("It's a folder, not a file"),
-        }
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
