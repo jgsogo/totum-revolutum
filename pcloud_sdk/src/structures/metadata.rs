@@ -203,7 +203,7 @@ mod tests {
     #[test]
     #[allow(clippy::bool_assert_comparison)]
     fn test_deserialize_metadata_folder() {
-        // A manifest for a file, cannot be read as a [`MetadataFolder`]
+        // A manifest for a folder, cannot be read as a [`MetadataFile`]
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         let manifest_json = Utf8Path::new(&manifest_dir)
             .join("resources")
@@ -213,7 +213,7 @@ mod tests {
         let reader = BufReader::new(file);
         assert!(serde_json::from_reader::<_, MetadataFile>(reader).is_err());
 
-        // it can be read as a [`MetadataFile`]
+        // it can be read as a [`MetadataFolder`]
         let manifest_json = Utf8Path::new(&manifest_dir)
             .join("resources")
             .join("testdata")
