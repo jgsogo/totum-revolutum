@@ -2,20 +2,20 @@ use std::sync::Arc;
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
+use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use tokio::task::JoinHandle;
 use tokio::time::Instant;
 use tracing::{info, trace, warn};
 
-use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
 use filesystem::{File, Filesystem};
 use pcloud_sdk::client::Client;
+use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
 use pcloud_sdk::methods::file::stat::GetStat;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::fileops::FileDescriptor;
-use pcloud_sdk::methods::folder::createfolderifnotexists::{GetCreateFolderIfNotExists, TargetFolder};
 use pcloud_sdk::methods::folder::deletefolder::GetDeleteFolder;
 use pcloud_sdk::methods::folder::deletefolderrecursive::GetDeleteFolderRecursive;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
@@ -217,16 +217,8 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-
-        // TODO: Substitute by 'self.pcloud.createfolderifnotexists_all'
-        let mut folderid = self.folderid.clone();
-        for cmp in path.components() {
-            if let Utf8Component::Normal(p) = cmp {
-                let input = TargetFolder::FolderAndName((folderid.clone(), p.to_string()));
-                let r = self.pcloud.createfolderifnotexists(input).await?;
-                folderid = r.metadata.folderid.unwrap();
-            }
-        }
+        let folderid = self.folderid.clone();
+        self.pcloud.createfolderifnotexists_all(Some(folderid), &path).await?;
         Ok(())
     }
 
