@@ -4,6 +4,7 @@ use camino::Utf8PathBuf;
 use pcloud_sdk::methods::folder::ListFolder;
 use pcloud_sdk::methods::general::UserInfo;
 use pcloud_sdk::progress_bar::{NoProgressBar, ProgressBar, ProgressBarBuilder};
+use pcloud_sdk::types::FileID;
 
 use crate::output::Print;
 use crate::CliParams;
@@ -59,6 +60,10 @@ impl Print for DefaultOutput {
         Ok(())
     }
 
+    fn fileid(&self, fileid: FileID) -> Result<()> {
+        println!("{fileid}");
+        Ok(())
+    }
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()> {
         println!("{:?}", list_folder);
         Ok(())

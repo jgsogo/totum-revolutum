@@ -5,12 +5,15 @@ pub use default_output::DefaultOutput;
 use pcloud_sdk::methods::folder::listfolder::ListFolder;
 use pcloud_sdk::methods::general::userinfo::UserInfo;
 use pcloud_sdk::progress_bar::{ProgressBar, ProgressBarBuilder};
+use pcloud_sdk::types::FileID;
 pub use porcelain::Porcelain;
+pub use progressbar_for_progresshash::progressbar_for_progresshash;
 
 use crate::CliParams;
 
 mod default_output;
 mod porcelain;
+mod progressbar_for_progresshash;
 
 pub trait Print: ProgressBarBuilder {
     /// Actual output of the application. Use it carefully.
@@ -21,6 +24,9 @@ pub trait Print: ProgressBarBuilder {
 
     /// Prints the path to stdout
     fn path(&self, path: Utf8PathBuf) -> Result<()>;
+
+    /// Prints the fileid to stdout
+    fn fileid(&self, fileid: FileID) -> Result<()>;
 
     /// Prints folder information to stdout
     fn list_folder(&self, list_folder: &ListFolder) -> Result<()>;
@@ -72,6 +78,13 @@ impl Print for PrintVariant {
         match &self {
             PrintVariant::Default(inner) => inner.path(path),
             PrintVariant::Porcelain(inner) => inner.path(path),
+        }
+    }
+
+    fn fileid(&self, fileid: FileID) -> Result<()> {
+        match &self {
+            PrintVariant::Default(inner) => inner.fileid(fileid),
+            PrintVariant::Porcelain(inner) => inner.fileid(fileid),
         }
     }
 

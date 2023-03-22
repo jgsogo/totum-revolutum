@@ -1,22 +1,24 @@
+use anyhow::{anyhow, Result};
+use async_trait::async_trait;
 use camino::Utf8Path;
 
-use anyhow::Result;
-use async_trait::async_trait;
-
-use crate::methods::folder::listfolder;
-use crate::types::FolderID;
+use crate::methods::folder::{listfolder, ListFolderInput};
+use crate::types::{Folder, FolderID};
 
 #[async_trait]
-pub trait GetFolderID: listfolder::GetListFolder {
-    async fn get_folderid(&self, _path: &Utf8Path) -> Result<FolderID> {
-        todo!("This method needs testing for different inputs");
-        // let listfolder_input = listfolder::ListFolderInput::new_from_path(Some(path.to_str().unwrap().to_string()));
-        // let filtermeta = vec!["folderid"];
-        // let r = self.listfolder_with_filtermeta(&listfolder_input, filtermeta).await?;
-        // r.metadata
-        //     .folderid
-        //     .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
-    }
+/// Returns the `FolderID` for the given path. It will fail if the folder doesn't exist.
+pub trait GetFolderID {
+    async fn get_folderid(&self, path: &Utf8Path) -> Result<FolderID>;
 }
 
-impl<T: listfolder::GetListFolder> GetFolderID for T {}
+#[async_trait]
+impl<T: listfolder::GetListFolder + Sync> GetFolderID for T {
+    async fn get_folderid(&self, path: &Utf8Path) -> Result<FolderID> {
+        let input = ListFolderInput::new(Folder::Path(path.to_path_buf()));
+        let filtermeta = vec!["folderid"];
+        let r = self.listfolder_with_filtermeta(input, filtermeta).await?;
+        r.metadata
+            .folderid
+            .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
+    }
+}

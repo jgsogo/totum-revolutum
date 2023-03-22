@@ -5,6 +5,7 @@ use pcloud_sdk::methods::folder::ListFolder;
 use pcloud_sdk::methods::general::UserInfo;
 use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::structures::Metadata;
+use pcloud_sdk::types::FileID;
 
 use crate::output::Print;
 
@@ -45,6 +46,11 @@ impl Print for Porcelain {
 
     fn path(&self, path: Utf8PathBuf) -> Result<()> {
         println!("{path}");
+        Ok(())
+    }
+
+    fn fileid(&self, fileid: FileID) -> Result<()> {
+        println!("{fileid}");
         Ok(())
     }
 
