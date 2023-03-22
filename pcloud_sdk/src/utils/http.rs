@@ -5,6 +5,7 @@ use std::io::Read;
 use std::io::Write;
 
 use anyhow::{anyhow, bail, Result};
+use camino::Utf8Path;
 use hyper;
 use hyper::header::{CONNECTION, CONTENT_TYPE};
 use reqwest;
@@ -118,7 +119,7 @@ pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMa
     Ok(r.to_vec())
 }
 
-pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>> {
+pub(crate) fn file_data(local_filepath: &Utf8Path, filename: &str) -> io::Result<Vec<u8>> {
     let mut data = Vec::new();
     write!(data, "--{BOUNDARY}\r\n")?;
     write!(
@@ -127,7 +128,7 @@ pub(crate) fn file_data(localfile: String, filename: &str) -> io::Result<Vec<u8>
     )?;
     write!(data, "\r\n")?;
 
-    let mut f = File::open(localfile)?;
+    let mut f = File::open(local_filepath)?;
     f.read_to_end(&mut data)?;
 
     write!(data, "\r\n")?;
