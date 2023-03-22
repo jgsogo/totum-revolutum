@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::params::Params;
-use crate::structures::Metadata;
+use crate::structures::MetadataFile;
 use crate::types::File;
 
 pub const ENDPOINT: &str = "/deletefile";
@@ -12,7 +12,7 @@ pub const ENDPOINT: &str = "/deletefile";
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteFile {
     pub id: String,
-    pub metadata: Metadata,
+    pub metadata: MetadataFile,
 }
 
 #[async_trait]
@@ -55,7 +55,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.fileid.unwrap(), FileID(1736716));
+                assert_eq!(data.metadata.fileid, FileID(1736716));
                 assert_eq!(data.id, "139-0".to_string());
             }
         }

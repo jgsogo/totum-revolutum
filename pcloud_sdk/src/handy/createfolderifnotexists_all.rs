@@ -52,7 +52,7 @@ impl<T: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists + Sync
             if let Utf8Component::Normal(p) = cmp {
                 let input = TargetFolder::FolderAndName((folderid.clone(), p.to_string()));
                 let r = self.createfolderifnotexists(input).await?;
-                folderid = r.metadata.folderid.unwrap();
+                folderid = r.metadata.folderid;
             }
         }
         Ok(folderid)

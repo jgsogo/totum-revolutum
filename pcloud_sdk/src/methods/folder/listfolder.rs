@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::params::{Params, ParamsType};
-use crate::structures::Metadata;
+use crate::structures::MetadataFolder;
 use crate::types::Folder;
 
 pub const ENDPOINT: &str = "/listfolder";
@@ -48,7 +48,7 @@ impl Params for ListFolderInput {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ListFolder {
-    pub metadata: Metadata,
+    pub metadata: MetadataFolder,
 }
 
 #[async_trait]
@@ -72,17 +72,21 @@ impl<T: client::Client> GetListFolder for T {
         filtermeta: Vec<&str>,
     ) -> Result<ListFolder> {
         let mut params = list_folder.into_params()?;
-        if !filtermeta.is_empty() {
-            // We insert `id` always to prevent a pcloud API bug. If we only use one element,
-            // for example `filtermeta=folderid`, the response JSON is not well formed when there
-            // are files and folders inside the query directory, it returns
-            // some empty lists where empty dictionaries were expected
-            let mut filtermeta = filtermeta;
-            filtermeta.push("id");
-            let filtermeta = filtermeta.into_iter().unique().collect::<Vec<_>>().join(",");
-            params.insert("filtermeta".to_string(), filtermeta);
-        }
+        let mut filtermeta = filtermeta;
 
+        // Insert `folderid` always, it is required to parse [`MetadataFolder`] and differentiate
+        // it from [`MetadataFile`]. Read about `#[serde(untagged)]` in [`Metadata`] enum for more
+        // info about why this is needed.
+        filtermeta.push("folderid");
+
+        // We insert `id` always to prevent a pcloud API bug. If we only use one element,
+        // for example `filtermeta=folderid`, the response JSON is not well formed when there
+        // are files and folders inside the query directory, it returns
+        // some empty lists where empty dictionaries were expected
+        filtermeta.push("id");
+
+        let filtermeta = filtermeta.into_iter().unique().collect::<Vec<_>>().join(",");
+        params.insert("filtermeta".to_string(), filtermeta);
         let ret = self.get::<ListFolder>(ENDPOINT, params).await?;
         Ok(ret)
     }
@@ -114,7 +118,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid.unwrap(), FolderID(4075092622));
+                assert_eq!(data.metadata.folderid, FolderID(4075092622));
             }
         }
     }

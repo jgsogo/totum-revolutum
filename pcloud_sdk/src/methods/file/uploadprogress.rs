@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::client;
-use crate::structures::Metadata;
+use crate::structures::MetadataFile;
 
 pub const ENDPOINT: &str = "/uploadprogress";
 
@@ -14,7 +14,7 @@ pub struct UploadProgressData {
     pub total: u64,
     pub uploaded: u64,
     pub currentfile: Option<String>,
-    pub files: Vec<Metadata>,
+    pub files: Vec<MetadataFile>,
     pub finished: bool,
 }
 

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::params::{Params, ParamsType};
-use crate::structures::Metadata;
+use crate::structures::MetadataFolder;
 use crate::types::FolderID;
 
 pub const ENDPOINT: &str = "/createfolderifnotexists";
@@ -34,7 +34,7 @@ impl Params for TargetFolder {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderIfNotExists {
     pub created: Option<bool>,
-    pub metadata: Metadata,
+    pub metadata: MetadataFolder,
 }
 
 #[async_trait]
@@ -74,7 +74,7 @@ mod tests {
                 assert_eq!(params.get("path"), Some(&"the/path/to/folder".to_string()));
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
-                    metadata: Default::default(),
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
         let input = TargetFolder::Path(Utf8PathBuf::from_str("the/path/to/folder")?);
@@ -96,7 +96,7 @@ mod tests {
                 assert_eq!(params.get("name"), Some(&"name.txt".to_string()));
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
-                    metadata: Default::default(),
+                    metadata: MetadataFolder::default(FolderID(1234)),
                 })
             });
         let input = TargetFolder::FolderAndName((FolderID(1234), "name.txt".to_string()));

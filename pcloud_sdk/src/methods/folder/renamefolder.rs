@@ -4,13 +4,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::params::{Params, SourceAndTargetFolder};
-use crate::structures::Metadata;
+use crate::structures::MetadataFolder;
 
 pub const ENDPOINT: &str = "/renamefolder";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RenameFolder {
-    pub metadata: Metadata,
+    pub metadata: MetadataFolder,
 }
 
 /// Rename or move
@@ -96,7 +96,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid.unwrap(), FolderID(230807));
+                assert_eq!(data.metadata.folderid, FolderID(230807));
             }
         }
     }

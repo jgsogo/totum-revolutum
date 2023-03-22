@@ -1,149 +1,73 @@
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 
-use crate::types::{FileID, FolderID};
-
-use super::category::Category;
-use super::icon::Icon;
-
-// TODO: Use enum for files and folders: https://serde.rs/enum-representations.html
-
-// https://docs.pcloud.com/structures/metadata.html
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-#[cfg_attr(feature = "test_utils", derive(Default))]
-/// Metadata that is common to files and folders
-///
-/// Given `filtermeta` argument, everything is optional
-pub struct CommonMetadata {
-    icon: Option<Icon>,
-    id: Option<String>,
-    #[serde(with = "time::serde::rfc2822::option", default)]
-    created: Option<OffsetDateTime>,
-    #[serde(with = "time::serde::rfc2822::option", default)]
-    modified: Option<OffsetDateTime>,
-    pub path: Option<String>,
-    thumb: Option<bool>,
-    pub isfolder: Option<bool>,
-    isshared: Option<bool>,
-    ismine: Option<bool>,
-    pub name: Option<String>,
-}
+use super::{MetadataFile, MetadataFolder};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-#[cfg_attr(feature = "test_utils", derive(Default))]
-pub struct Metadata {
-    #[serde(flatten)]
-    pub common: CommonMetadata,
-    pub parentfolderid: Option<FolderID>,
-
-    pub canread: Option<bool>,
-    pub canmodify: Option<bool>,
-    pub candelete: Option<bool>,
-
-    pub folderid: Option<FolderID>,
-    pub fileid: Option<FileID>,
-    pub deletedfileid: Option<FileID>,
-    pub category: Option<Category>,
-    pub contents: Option<Vec<Metadata>>,
-    pub isdeleted: Option<bool>,
-
-    // only for folders
-    pub cancreate: Option<bool>,
-
-    // only for files
-    pub hash: Option<u64>,
-    pub size: Option<u64>,
-    pub contenttype: Option<String>,
-
-    // Optional fields depending on file type
-    #[serde(flatten)]
-    pub extra_imagefile: Option<MetadataImageFile>,
-    #[serde(flatten)]
-    pub extra_audiofile: Option<MetadataAudioFile>,
-    #[serde(flatten)]
-    pub extra_videofile: Option<MetadataVideoFile>,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-pub struct MetadataImageFile {
-    width: u32,
-    height: u32,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-pub struct MetadataAudioFile {
-    artist: String,
-    album: u32,
-    title: u32,
-    genre: u32,
-    trackno: u32,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct MetadataVideoFile {
-    width: String,
-    height: u32,
-    duration: f32,
-    fps: f32,
-    videocodec: String,
-    audiocodec: String,
-    videobitrate: u32,
-    audiobitrate: u32,
-    audiosamplerate: u32,
-    rotate: u16,
+#[serde(untagged)]
+pub enum Metadata {
+    MetadataFile(MetadataFile),
+    MetadataFolder(MetadataFolder),
 }
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
 
-    use time::macros::datetime;
+    use camino::Utf8Path;
 
     use super::*;
 
     #[test]
-    #[allow(clippy::bool_assert_comparison)]
-    fn test_deserialize() {
+    fn test_deserialize_metadata_file() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         let manifest_json = Utf8Path::new(&manifest_dir)
             .join("resources")
             .join("testdata")
             .join("metadata_file.json");
-        let file = File::open(manifest_json).unwrap();
+
+        // A manifest for a file, cannot be read as a [`MetadataFolder`]
+        let file = File::open(&manifest_json).unwrap();
         let reader = BufReader::new(file);
-        match serde_json::from_reader::<_, Metadata>(reader) {
-            Err(e) => panic!("Error reading the file: {e}"),
-            Ok(data) => {
-                assert_eq!(data.parentfolderid, Some(FolderID(0)));
-                assert_eq!(data.common.isfolder, Some(false));
+        assert!(serde_json::from_reader::<_, MetadataFolder>(reader).is_err());
 
-                assert_eq!(data.common.ismine, Some(true));
-                assert_eq!(data.canread, None);
-                assert_eq!(data.canmodify, None);
-                assert_eq!(data.candelete, None);
-                assert_eq!(data.cancreate, None);
+        // it can be read as a [`MetadataFile`]
+        let file = File::open(&manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        assert!(serde_json::from_reader::<_, MetadataFile>(reader).is_ok());
 
-                assert_eq!(data.common.isshared, Some(false));
-                assert_eq!(data.common.name, Some("Simple image.jpg".to_string()));
-                assert_eq!(data.common.id, Some("f1729212".to_string()));
-                assert_eq!(data.folderid, None);
-                assert_eq!(data.fileid, Some(FileID(1729212)));
-                assert_eq!(data.deletedfileid, None);
-                assert_eq!(data.common.created, Some(datetime!(2013-10-02 14:29:11 UTC)));
-                assert_eq!(data.common.modified, None);
-                assert_eq!(data.common.icon, Some(Icon::Image));
-                assert_eq!(data.category, Some(Category::Image));
-                assert_eq!(data.common.thumb, Some(true));
-                assert_eq!(data.size, Some(73269));
-                assert_eq!(data.contenttype, Some("image/jpeg".into()));
-                assert_eq!(data.hash, Some(10681749967730527559));
-                assert_eq!(data.contents, None);
-                assert_eq!(data.isdeleted, None);
-                assert_eq!(data.common.path, Some("/Simple image.jpg".into()));
-            }
-        }
+        // it can be read as a [`Metadata`] -> returns [`MetadataFile`]
+        let file = File::open(&manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        let r = serde_json::from_reader::<_, Metadata>(reader);
+        assert!(r.is_ok());
+        assert!(matches!(r.unwrap(), Metadata::MetadataFile { .. }));
+    }
+
+    #[test]
+    fn test_deserialize_metadata_folder() {
+        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let manifest_json = Utf8Path::new(&manifest_dir)
+            .join("resources")
+            .join("testdata")
+            .join("metadata_folder.json");
+
+        // A manifest for a folder, cannot be read as a [`MetadataFile`]
+        let file = File::open(&manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        assert!(serde_json::from_reader::<_, MetadataFile>(reader).is_err());
+
+        // it can be read as a [`MetadataFolder`]
+        let file = File::open(&manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        assert!(serde_json::from_reader::<_, MetadataFolder>(reader).is_ok());
+
+        // it can be read as a [`Metadata`] -> returns [`MetadataFolder`]
+        let file = File::open(&manifest_json).unwrap();
+        let reader = BufReader::new(file);
+        let r = serde_json::from_reader::<_, Metadata>(reader);
+        assert!(r.is_ok());
+        assert!(matches!(r.unwrap(), Metadata::MetadataFolder { .. }));
     }
 }

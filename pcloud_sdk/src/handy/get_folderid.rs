@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use async_trait::async_trait;
 use camino::Utf8Path;
 
@@ -17,8 +17,6 @@ impl<T: listfolder::GetListFolder + Sync> GetFolderID for T {
         let input = ListFolderInput::new(Folder::Path(path.to_path_buf()));
         let filtermeta = vec!["folderid"];
         let r = self.listfolder_with_filtermeta(input, filtermeta).await?;
-        r.metadata
-            .folderid
-            .ok_or_else(|| anyhow!("Cannot get folderID for given path"))
+        Ok(r.metadata.folderid)
     }
 }

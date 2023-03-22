@@ -4,7 +4,7 @@ use camino::Utf8Path;
 use serde::{Deserialize, Serialize};
 
 use crate::methods::params::{Params, ParamsType};
-use crate::structures::Metadata;
+use crate::structures::MetadataFile;
 use crate::types::Folder;
 use crate::{client, utils};
 
@@ -55,7 +55,7 @@ pub struct Checksum {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UploadFile {
     pub fileids: Vec<u64>,
-    pub metadata: Vec<Metadata>,
+    pub metadata: Vec<MetadataFile>,
     pub checksums: Vec<Checksum>,
 }
 
