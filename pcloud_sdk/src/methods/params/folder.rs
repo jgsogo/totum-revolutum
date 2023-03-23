@@ -12,8 +12,8 @@ impl Params for Folder {
             Folder::FolderID(fid) => {
                 params.insert("folderid".to_string(), fid.0.to_string());
             }
-            Folder::Path(p) => {
-                params.insert("path".to_string(), p.to_string());
+            Folder::RemotePath(p) => {
+                params.insert("path".to_string(), p.path().to_string());
             }
         }
         Ok(())

@@ -13,7 +13,7 @@ use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::progress_bar::ProgressBarBuilder;
-use pcloud_sdk::types::FileID;
+use pcloud_sdk::types::{FileID, RemotePath};
 use pcloud_sdk::types::{Folder, FolderID};
 use pcloud_sdk::utils::{current_path, normalize_path, to_absolute_path};
 
@@ -77,7 +77,8 @@ async fn upload(
             .file_name()
             .ok_or(anyhow!("Cannot get remote filename from {remote_path_filename}"))?;
         debug!("Upload file '{abs_file_to_upload}' to remote at '{remote_path}'");
-        (remote_path.to_path_buf(), remote_filename.to_string())
+        let remote_path = RemotePath::try_from(remote_path)?;
+        (remote_path, remote_filename.to_string())
     };
 
     // Create folder if it doesn't exist
@@ -121,7 +122,7 @@ pub async fn handle(
     let remote_folder = Folder::from_str(&*params.remote_dir)?;
     let remote_folder = match remote_folder {
         Folder::FolderID(f) => f,
-        Folder::Path(p) => pcloud
+        Folder::RemotePath(p) => pcloud
             .get_folderid(&p)
             .await
             .map_err(|_| anyhow!("Folder {p} doesn't exist"))?,

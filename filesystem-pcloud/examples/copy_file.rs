@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use anyhow::Result;
 use camino::Utf8Path;
 
@@ -7,6 +9,7 @@ use filesystem_pcloud::FilesystemPCloud;
 use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::methods::oauth2;
+use pcloud_sdk::types::RemotePath;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -22,7 +25,7 @@ async fn main() -> Result<()> {
         let userinfo = pcloud.userinfo().await?;
         println!("{:#?}", userinfo);
 
-        let base_path = Utf8Path::new("/backup_file");
+        let base_path = RemotePath::from_str("path:/backup_file")?;
         pcloud.createfolderifnotexists_all(None, &base_path).await?;
         FilesystemPCloud::new(&base_path, pcloud).await?
     };

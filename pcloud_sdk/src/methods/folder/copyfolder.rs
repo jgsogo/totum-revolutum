@@ -32,8 +32,8 @@ impl Params for CopyFolderInput {
             Folder::FolderID(fid) => {
                 params.insert("tofolderid".to_string(), fid.0.to_string());
             }
-            Folder::Path(p) => {
-                params.insert("topath".to_string(), p.to_string());
+            Folder::RemotePath(p) => {
+                params.insert("topath".to_string(), p.path().to_string());
             }
         }
         if self.noover {
@@ -71,11 +71,12 @@ impl<T: client::Client> GetCopyFolder for T {
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
     use std::str::FromStr;
+
+    use camino::Utf8Path;
 
     use crate::types::FolderID;
     use crate::utils::http::ApiResult;

@@ -9,11 +9,11 @@ use filesystem_pcloud::CHUNK_SIZE;
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::mocks::server::PCloudServerMock;
-use pcloud_sdk::types::FolderID;
+use pcloud_sdk::types::{FolderID, RemotePath};
 
 #[tokio::test]
 async fn test_create_write_read_in_root_folder() -> Result<()> {
-    let root_path = Utf8Path::new("the/root/path");
+    let root_path = Utf8PathBuf::from("the/root/path");
     let mut server = PCloudServerMock::default();
     let fs = {
         let server_token = server.token();
@@ -26,7 +26,8 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
         };
 
         let pcloud = HttpClient::new(server_token, false);
-        let r = FilesystemPCloud::new(root_path, pcloud).await?;
+        let root_path_remote = RemotePath::try_from(root_path.as_path())?;
+        let r = FilesystemPCloud::new(&root_path_remote, pcloud).await?;
         root_folder_mock.assert();
         r
     };
