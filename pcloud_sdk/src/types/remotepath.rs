@@ -21,7 +21,7 @@ impl RemotePath {
     pub fn join(&self, other: &RemotePath) -> Self {
         let has_trailing = {
             let other_str = other.0.to_string();
-            other_str != "/" && other_str.ends_with("/")
+            other_str != "/" && other_str.ends_with('/')
         };
 
         // We need to remove the leading `/` from `other`, then a regular `join` works

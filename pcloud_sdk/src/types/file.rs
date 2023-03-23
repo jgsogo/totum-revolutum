@@ -20,7 +20,7 @@ impl FromStr for File {
         if let Ok(f) = FileID::from_str(s) {
             return Ok(File::FileID(f));
         } else if let Ok(p) = RemotePath::from_str(s) {
-            if !p.to_string().ends_with("/") {
+            if !p.to_string().ends_with('/') {
                 return Ok(File::RemotePath(p));
             }
         }
