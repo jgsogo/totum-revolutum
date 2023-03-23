@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::str::FromStr;
 
 use anyhow::Result;
-use camino::Utf8PathBuf;
 
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::HttpClient;

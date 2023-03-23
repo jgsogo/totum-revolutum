@@ -1,6 +1,5 @@
 use anyhow::Result;
 use async_trait::async_trait;
-use camino::Utf8Path;
 
 use crate::methods::folder::{listfolder, ListFolderInput};
 use crate::types::{Folder, FolderID, RemotePath};

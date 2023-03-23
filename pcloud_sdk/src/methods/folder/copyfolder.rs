@@ -104,8 +104,8 @@ mod tests {
     #[test]
     fn test_params_with_paths() {
         let input = CopyFolderInput {
-            source: Folder::from_str("/source/path").unwrap(),
-            target: Folder::from_str("/target/path").unwrap(),
+            source: Folder::from_str("path:/source/path").unwrap(),
+            target: Folder::from_str("path:/target/path").unwrap(),
             noover: false,
             skipexisting: false,
             copycontentonly: false,

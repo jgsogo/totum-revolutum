@@ -125,7 +125,7 @@ mod tests {
 
     #[test]
     fn test_getfilelinkinput_defaults() {
-        let path = File::from_str("/path/to/file").unwrap();
+        let path = File::from_str("path:/path/to/file").unwrap();
         let input = GetFileLinkInput::new(path.clone());
         assert_eq!(input.file, path);
         assert_eq!(input.forcedownload, false);
@@ -136,7 +136,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_getfilelink_from_path() -> Result<()> {
-        let mut input = GetFileLinkInput::new(File::from_str("/the/path").unwrap());
+        let mut input = GetFileLinkInput::new(File::from_str("path:/the/path").unwrap());
         input.skipfilename = true;
         input.contenttype = Some("<contenttype>".to_string());
         input.maxspeed = Some(200);

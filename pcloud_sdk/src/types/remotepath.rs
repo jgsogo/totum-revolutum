@@ -2,7 +2,6 @@ use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
 use camino::{Utf8Components, Utf8Path, Utf8PathBuf};
-use itertools::join;
 use serde::{Deserialize, Serialize};
 
 use crate::error::Error;

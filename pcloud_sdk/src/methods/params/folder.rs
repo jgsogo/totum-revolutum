@@ -40,7 +40,7 @@ mod tests {
 
     #[test]
     fn test_params_with_path() -> Result<()> {
-        let input = Folder::from_str("/this/is/the/path").unwrap();
+        let input = Folder::from_str("path:/this/is/the/path").unwrap();
         let mut params = HashMap::new();
         input.add_to_params(&mut params)?;
         assert_eq!(params.len(), 1);

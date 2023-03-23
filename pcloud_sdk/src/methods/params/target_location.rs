@@ -1,9 +1,8 @@
-use camino::Utf8PathBuf;
 use std::collections::HashMap;
 
 use anyhow::Result;
 
-use crate::types::FolderID;
+use crate::types::{FolderID, RemotePath};
 
 use super::Params;
 
@@ -16,7 +15,7 @@ use super::Params;
 /// will use original target name
 pub enum TargetLocation {
     FolderAndName((FolderID, Option<String>)),
-    Path(Utf8PathBuf),
+    RemotePath(RemotePath),
 }
 
 impl Params for TargetLocation {
@@ -28,8 +27,8 @@ impl Params for TargetLocation {
                     params.insert("toname".to_string(), name.clone());
                 }
             }
-            TargetLocation::Path(p) => {
-                params.insert("topath".to_string(), p.to_string());
+            TargetLocation::RemotePath(p) => {
+                params.insert("topath".to_string(), p.path().to_string());
             }
         }
         Ok(())

@@ -1,11 +1,8 @@
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
-use camino::Utf8PathBuf;
-
 use crate::error::Error;
 use crate::types::RemotePath;
-use crate::utils::normalize_path;
 
 use super::FolderID;
 
@@ -40,7 +37,6 @@ impl Display for Folder {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
-    use futures_util::stream::Fold;
 
     use super::*;
 
@@ -70,7 +66,7 @@ mod tests {
         );
 
         let remote_path = Folder::from_str("path:/path/to/something")?;
-        assert_eq!(&format!("{:?}", remote_path), "Path(\"/folderid-123\")");
+        assert_eq!(&format!("{:?}", remote_path), "RemotePath(path:\"/path/to/something\")");
         Ok(())
     }
 }
