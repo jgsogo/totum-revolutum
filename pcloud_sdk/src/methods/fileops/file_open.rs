@@ -22,7 +22,7 @@ bitflags! {
 }
 
 pub enum FileOpenPath {
-    Path(String),
+    Path(String), // TODO: Is this a RemotePath(RemotePath)
     FileID(FileID),
     FolderAndName(FolderID, String),
 }

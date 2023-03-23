@@ -1,9 +1,8 @@
-use std::str::FromStr;
 use std::sync::Arc;
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use flume::Sender;
 use tokio::task::JoinHandle;
 use tokio::time::Instant;
@@ -166,13 +165,13 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         let path = self.check_path(path)?;
-        let _r = self.pcloud.stat(PCloudFile::Path(path)).await?;
+        let _r = self.pcloud.stat(PCloudFile::RemotePath(path.try_into()?)).await?;
         Ok(true)
     }
 
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
-        let path = RemotePath::from_str(&path.to_string())?;
+        let path = RemotePath::try_from(path)?;
 
         let filename = path
             .path()
@@ -181,7 +180,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         let folderid = match path.path().parent() {
             None => self.root_folderid.clone(),
             Some(p) => {
-                let path = self.root_path.join(&RemotePath::from_str(&p.to_string())?);
+                let path = RemotePath::try_from(p)?;
                 self.pcloud.get_folderid(&path).await?
             }
         };
@@ -223,7 +222,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
 
-        let input = PCloudFile::Path(path);
+        let input = PCloudFile::RemotePath(path.try_into()?);
         self.pcloud.deletefile(input).await?;
         Ok(())
     }
@@ -246,6 +245,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::str::FromStr;
 
     use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::file::deletefile;
@@ -276,7 +276,7 @@ mod tests {
             .returning(move |endpoint, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {
@@ -325,7 +325,7 @@ mod tests {
         // Expectation for FilesystemPCloud::new
         client
             .expect_get::<ListFolder>()
-            .times(1)
+            .times(2)
             .returning(move |endpoint, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
@@ -423,7 +423,7 @@ mod tests {
                 assert_eq!(params.len(), 2);
                 let flags = (Flags::empty()).bits().to_string();
                 assert_eq!(params.get("flags"), Some(&flags));
-                assert_eq!(params.get("path"), Some(&"the/path/file".to_string()));
+                assert_eq!(params.get("path"), Some(&"/the/path/file".to_string()));
                 Ok(FileOpen {
                     fd: 42,
                     fileid: FileID(1234),
@@ -564,7 +564,7 @@ mod tests {
             .returning(move |endpoint, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"the/root/path".to_string()));
+                assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,id".to_string()));
 
                 Ok(ListFolder {

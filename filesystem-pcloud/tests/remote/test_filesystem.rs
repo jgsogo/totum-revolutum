@@ -1,7 +1,7 @@
-use camino::{Utf8Path, Utf8PathBuf};
 use std::collections::HashMap;
 
 use anyhow::Result;
+use camino::Utf8PathBuf;
 
 use filesystem::Filesystem;
 use filesystem_pcloud::FilesystemPCloud;
@@ -13,13 +13,13 @@ use pcloud_sdk::types::{FolderID, RemotePath};
 
 #[tokio::test]
 async fn test_create_write_read_in_root_folder() -> Result<()> {
-    let root_path = Utf8PathBuf::from("the/root/path");
+    let root_path = Utf8PathBuf::from("/the/root/path");
     let mut server = PCloudServerMock::default();
     let fs = {
         let server_token = server.token();
         let root_folder_mock = {
             let mut qparams = HashMap::new();
-            qparams.insert("path", "the/root/path");
+            qparams.insert("path", "/the/root/path");
             qparams.insert("filtermeta", "folderid,id");
             qparams.insert("access_token", server_token.access_token());
             server.listfolder_mock(qparams, "{\"result\": 0, \"metadata\": {\"folderid\": 1234}}")

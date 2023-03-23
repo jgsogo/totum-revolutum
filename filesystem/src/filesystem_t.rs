@@ -19,6 +19,9 @@ where
     /// Checks that the given path relies within the filesystem. Returns the absolute path or
     /// an error
     fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
+        // TODO: Here we cannot join with ROOT. Doing that we are leaking information to consumers.
+        // TODO: We need to return an absolute path starting from ROOT.
+
         let path = if path.is_absolute() {
             path.to_path_buf()
         } else {
