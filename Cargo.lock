@@ -773,6 +773,7 @@ dependencies = [
  "flume",
  "futures",
  "ignore",
+ "path-utils",
  "sha256",
  "tempfile",
  "tokio",
@@ -1727,6 +1728,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "path-utils"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "camino",
+ "tracing",
+]
+
+[[package]]
 name = "pcloud-sdk"
 version = "0.1.0"
 dependencies = [
@@ -1752,6 +1762,7 @@ dependencies = [
  "itertools",
  "log",
  "mockall",
+ "path-utils",
  "pcloud-sdk",
  "reqwest",
  "serde",

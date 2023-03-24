@@ -1,7 +1,6 @@
-use camino::Utf8Path;
-
 use anyhow::Result;
 use async_trait::async_trait;
+use camino::Utf8Path;
 use flume::Sender;
 use tempfile::{tempdir, TempDir};
 
@@ -29,8 +28,10 @@ impl Default for FilesystemMock {
 impl Filesystem for FilesystemMock {
     type Metadata = <FilesystemLocal as Filesystem>::Metadata;
 
-    fn root(&self) -> &Utf8Path {
-        self.local.root()
+    type FilesystemPath = <FilesystemLocal as Filesystem>::FilesystemPath;
+
+    fn to_filesystem_path(&self, path: &Utf8Path) -> Result<Self::FilesystemPath> {
+        todo!()
     }
 
     async fn walk_directory(

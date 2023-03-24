@@ -13,4 +13,3 @@ pub mod local;
 #[cfg(feature = "test_utils")]
 pub mod mocks;
 pub mod move_file;
-mod utils;

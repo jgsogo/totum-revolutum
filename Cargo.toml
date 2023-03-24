@@ -1,6 +1,7 @@
 [workspace]
 
 members = [
+    "path_utils",
     "pcloud_sdk",
     "filesystem",
     "filesystem-pcloud",

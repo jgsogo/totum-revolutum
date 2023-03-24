@@ -1,49 +1,24 @@
+use anyhow::Result;
+use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 
-use anyhow::{anyhow, Result};
-use async_trait::async_trait;
-
-use super::utils::normalize_path;
 use super::{File, FileMetadata};
 
-/// Abstract a filesystem, either local or remote and provide methods to access their files
+/// Abstract a filesystem, either local or remote and provide methods to access its files
 #[async_trait]
 pub trait Filesystem
 where
     Self: Sync,
 {
+    /// Information about a File in this filesystem
     type Metadata: FileMetadata;
 
-    fn root(&self) -> &Utf8Path;
+    /// A path-like type. It guarantees that the inner path is contained inside this filesystem abstraction
+    type FilesystemPath;
 
-    /// Checks that the given path relies within the filesystem. Returns the absolute path or
-    /// an error
-    fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        // TODO: Here we cannot join with ROOT. Doing that we are leaking information to consumers.
-        // TODO: We need to return an absolute path starting from ROOT.
-
-        let path = if path.is_absolute() {
-            path.to_path_buf()
-        } else {
-            self.root().join(path)
-        };
-        let path = normalize_path(path);
-        if !path.starts_with(self.root()) {
-            Err(anyhow!(
-                "Path '{path}' is outside filesystem (root '{}'), or it's the root itself",
-                self.root()
-            ))
-        } else {
-            Ok(path)
-        }
-    }
-
-    /// Returns the relative path for any given one
-    fn rel_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        let abs_path = self.check_path(path)?;
-        let r = abs_path.strip_prefix(self.root()).map_err(|e| anyhow!(e));
-        r.map(|p| p.to_path_buf())
-    }
+    /// Takes a naïve `path` and converts it into a [`FilesystemPath`]. The input `path` needs to
+    /// be contained within the filesystem
+    fn to_filesystem_path(&self, path: &Utf8Path) -> Result<Self::FilesystemPath>;
 
     /// Walk files in the filesystem, for each file found it will send it via `tx`
     async fn walk_directory(
@@ -53,7 +28,7 @@ where
         custom_ignore_filename: &Utf8Path,
     ) -> Result<()>;
 
-    /// Returns true if the path points at an existing entity.
+    /// Returns true if the path points to an existing entity.
     async fn exists(&self, path: &Utf8Path) -> Result<bool>;
 
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.

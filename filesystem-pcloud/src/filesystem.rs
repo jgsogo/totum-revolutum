@@ -164,13 +164,13 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        let path = self.check_path(path)?;
+        let path = self.to_filesystem_path(path)?;
         let _r = self.pcloud.stat(path.try_into()?).await?;
         Ok(true)
     }
 
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
-        let path = self.check_path(path)?;
+        let path = self.to_filesystem_path(path)?;
         let path: RemotePath = path.try_into()?;
 
         let filename = path
@@ -195,7 +195,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     }
 
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
-        let path = self.check_path(path)?;
+        let path = self.to_filesystem_path(path)?;
         let path: PCloudFile = path.try_into()?;
 
         //let relative_path = v.strip_prefix(self.root())?;
@@ -206,7 +206,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     }
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
+        let path = self.to_filesystem_path(path)?;
         let folderid = self.root_folderid.clone();
         self.pcloud
             .createfolderifnotexists_all(Some(folderid), &path.try_into()?)
@@ -215,19 +215,19 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
     }
 
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
+        let path = self.to_filesystem_path(path)?;
         self.pcloud.deletefile(path.try_into()?).await?;
         Ok(())
     }
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
+        let path = self.to_filesystem_path(path)?;
         self.pcloud.deletefolder(path.try_into()?).await?;
         Ok(())
     }
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
+        let path = self.to_filesystem_path(path)?;
         self.pcloud.deletefolderrecursive(path.try_into()?).await?;
         Ok(())
     }
