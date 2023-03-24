@@ -22,7 +22,7 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::structures::Metadata;
-use pcloud_sdk::types::{FolderID, RemotePath};
+use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 
 use crate::file::RemoteFile;
 use crate::RemoteMetadata;
@@ -196,12 +196,10 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
+        let path: PCloudFile = path.try_into()?;
 
         //let relative_path = v.strip_prefix(self.root())?;
-        let fd = self
-            .pcloud
-            .file_open(Flags::empty(), FileOpenPath::Path(path.to_string()))
-            .await?;
+        let fd = self.pcloud.file_open(Flags::empty(), FileOpenPath::File(path)).await?;
 
         let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
         Ok(Box::new(f))

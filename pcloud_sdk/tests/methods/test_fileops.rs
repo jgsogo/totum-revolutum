@@ -1,6 +1,5 @@
-use camino::Utf8Path;
-
 use anyhow::Result;
+use camino::Utf8Path;
 
 use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
@@ -58,7 +57,9 @@ async fn test_fileops() -> Result<()> {
 
     // Open + read + close
     {
-        let fd = pcloud.file_open(Flags::empty(), FileOpenPath::FileID(fileid)).await?;
+        let fd = pcloud
+            .file_open(Flags::empty(), FileOpenPath::File(fileid.into()))
+            .await?;
         open.assert();
 
         let r = pcloud.file_read(fd.fd, chunk_size as u64).await?;
