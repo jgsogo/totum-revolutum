@@ -1,6 +1,8 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
+use camino::Utf8PathBuf;
+
 use crate::error::Error;
 use crate::types::RemotePath;
 
@@ -30,6 +32,15 @@ impl TryFrom<RemotePath> for File {
                 string: value.to_string(),
             })
         }
+    }
+}
+
+impl TryFrom<Utf8PathBuf> for File {
+    type Error = Error;
+
+    fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
+        let r: RemotePath = value.try_into()?;
+        r.try_into()
     }
 }
 

@@ -22,7 +22,7 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::structures::Metadata;
-use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
+use pcloud_sdk::types::{FolderID, RemotePath};
 
 use crate::file::RemoteFile;
 use crate::RemoteMetadata;
@@ -165,13 +165,13 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         let path = self.check_path(path)?;
-        let _r = self.pcloud.stat(PCloudFile::RemotePath(path.try_into()?)).await?;
+        let _r = self.pcloud.stat(path.try_into()?).await?;
         Ok(true)
     }
 
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
-        let path = RemotePath::try_from(path)?;
+        let path: RemotePath = path.try_into()?;
 
         let filename = path
             .path()
@@ -179,10 +179,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
             .ok_or(anyhow!("No filename can be guess from path '{path}'"))?;
         let folderid = match path.path().parent() {
             None => self.root_folderid.clone(),
-            Some(p) => {
-                let path = RemotePath::try_from(p)?;
-                self.pcloud.get_folderid(&path).await?
-            }
+            Some(p) => self.pcloud.get_folderid(&p.try_into()?).await?,
         };
 
         let fd = self
@@ -214,30 +211,26 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         let path = self.check_path(path)?;
         let folderid = self.root_folderid.clone();
         self.pcloud
-            .createfolderifnotexists_all(Some(folderid), &RemotePath::try_from(path)?)
+            .createfolderifnotexists_all(Some(folderid), &path.try_into()?)
             .await?;
         Ok(())
     }
 
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-
-        let input = PCloudFile::RemotePath(path.try_into()?);
-        self.pcloud.deletefile(input).await?;
+        self.pcloud.deletefile(path.try_into()?).await?;
         Ok(())
     }
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-        let input = path.try_into()?;
-        self.pcloud.deletefolder(input).await?;
+        self.pcloud.deletefolder(path.try_into()?).await?;
         Ok(())
     }
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-        let input = path.try_into()?;
-        self.pcloud.deletefolderrecursive(input).await?;
+        self.pcloud.deletefolderrecursive(path.try_into()?).await?;
         Ok(())
     }
 }
