@@ -20,7 +20,7 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
         let root_folder_mock = {
             let mut qparams = HashMap::new();
             qparams.insert("path", "/the/root/path");
-            qparams.insert("filtermeta", "folderid,id");
+            qparams.insert("filtermeta", "folderid,fileid");
             qparams.insert("access_token", server_token.access_token());
             server.listfolder_mock(qparams, "{\"result\": 0, \"metadata\": {\"folderid\": 1234}}")
         };

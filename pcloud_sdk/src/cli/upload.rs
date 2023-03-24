@@ -122,10 +122,7 @@ pub async fn handle(
     let remote_folder = Folder::from_str(&*params.remote_dir)?;
     let remote_folder = match remote_folder {
         Folder::FolderID(f) => f,
-        Folder::RemotePath(p) => pcloud
-            .get_folderid(&p)
-            .await
-            .map_err(|_| anyhow!("Folder {p} doesn't exist"))?,
+        Folder::RemotePath(p) => pcloud.get_folderid(&p).await?,
     };
     let input = ParamsOrStdin::new(params.files);
 
