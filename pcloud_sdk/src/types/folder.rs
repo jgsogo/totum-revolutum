@@ -12,14 +12,26 @@ pub enum Folder {
     RemotePath(RemotePath),
 }
 
+impl From<FolderID> for Folder {
+    fn from(value: FolderID) -> Self {
+        Folder::FolderID(value)
+    }
+}
+
+impl From<RemotePath> for Folder {
+    fn from(value: RemotePath) -> Self {
+        Folder::RemotePath(value)
+    }
+}
+
 impl FromStr for Folder {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Ok(f) = FolderID::from_str(s) {
-            return Ok(Folder::FolderID(f));
+            return Ok(f.into());
         } else if let Ok(p) = RemotePath::from_str(s) {
-            return Ok(Folder::RemotePath(p));
+            return Ok(p.into());
         }
         Err(Error::ParseFolderError { string: s.to_string() })
     }

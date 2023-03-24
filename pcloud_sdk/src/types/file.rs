@@ -13,18 +13,37 @@ pub enum File {
     RemotePath(RemotePath),
 }
 
+impl From<FileID> for File {
+    fn from(value: FileID) -> Self {
+        File::FileID(value)
+    }
+}
+
+impl TryFrom<RemotePath> for File {
+    type Error = Error;
+
+    fn try_from(value: RemotePath) -> Result<Self, Self::Error> {
+        if !value.to_string().ends_with('/') {
+            Ok(File::RemotePath(value))
+        } else {
+            Err(Error::ParseFileError {
+                string: value.to_string(),
+            })
+        }
+    }
+}
+
 impl FromStr for File {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Ok(f) = FileID::from_str(s) {
-            return Ok(File::FileID(f));
+            Ok(f.into())
         } else if let Ok(p) = RemotePath::from_str(s) {
-            if !p.to_string().ends_with('/') {
-                return Ok(File::RemotePath(p));
-            }
+            p.try_into()
+        } else {
+            Err(Error::ParseFileError { string: s.to_string() })
         }
-        Err(Error::ParseFileError { string: s.to_string() })
     }
 }
 

@@ -54,8 +54,6 @@ mod tests {
     #[test]
     fn test_parse_folderid() {
         assert_eq!(FolderID::from_str("folderid:123").unwrap(), FolderID(123));
-
-        let r = FolderID::from_str("folderid-123");
-        assert!(r.is_err());
+        assert!(FolderID::from_str("folderid-123").is_err());
     }
 }

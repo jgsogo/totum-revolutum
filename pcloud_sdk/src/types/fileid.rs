@@ -54,8 +54,6 @@ mod tests {
     #[test]
     fn test_parse_fileid() {
         assert_eq!(FileID::from_str("fileid:123").unwrap(), FileID(123));
-
-        let r = FileID::from_str("fileid-123");
-        assert!(r.is_err());
+        assert!(FileID::from_str("fileid-123").is_err());
     }
 }

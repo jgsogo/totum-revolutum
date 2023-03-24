@@ -88,11 +88,7 @@ impl FromStr for RemotePath {
             .parse::<Utf8PathBuf>()
             .map_err(|_| Error::ParseRemotePathError { string: s.to_string() })?;
 
-        let path = normalize_path(path);
-        if !path.is_absolute() || path.starts_with("/..") {
-            return Err(Error::ParseRemotePathError { string: s.to_string() });
-        }
-        Ok(Self(path))
+        Ok(path.try_into()?)
     }
 }
 
