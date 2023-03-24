@@ -65,7 +65,7 @@ mod tests {
 
     #[test]
     fn test_parse_str() -> Result<()> {
-        assert_eq!(File::from_str("fileid:123")?, File::FileID(FileID(123)));
+        assert_eq!(File::from_str("fileid:123")?, FileID(123).into());
         assert_eq!(
             File::from_str("path:/fileid-123")?,
             File::RemotePath(Utf8PathBuf::from_str("/fileid-123")?.try_into()?)

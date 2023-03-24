@@ -1,6 +1,8 @@
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
+use camino::Utf8PathBuf;
+
 use crate::error::Error;
 use crate::types::RemotePath;
 
@@ -24,16 +26,26 @@ impl From<RemotePath> for Folder {
     }
 }
 
+impl TryFrom<Utf8PathBuf> for Folder {
+    type Error = Error;
+
+    fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
+        let r: RemotePath = value.try_into()?;
+        Ok(r.into())
+    }
+}
+
 impl FromStr for Folder {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Ok(f) = FolderID::from_str(s) {
-            return Ok(f.into());
+            Ok(f.into())
         } else if let Ok(p) = RemotePath::from_str(s) {
-            return Ok(p.into());
+            Ok(p.into())
+        } else {
+            Err(Error::ParseFolderError { string: s.to_string() })
         }
-        Err(Error::ParseFolderError { string: s.to_string() })
     }
 }
 
@@ -54,7 +66,7 @@ mod tests {
 
     #[test]
     fn test_parse_str() -> Result<()> {
-        assert_eq!(Folder::from_str("folderid:123")?, Folder::FolderID(FolderID(123)));
+        assert_eq!(Folder::from_str("folderid:123")?, FolderID(123).into());
 
         let remote_path = Folder::from_str("path:/path/to/something")?;
         assert!(matches!(remote_path, Folder::RemotePath { .. }));

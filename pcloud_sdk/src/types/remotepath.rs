@@ -88,7 +88,7 @@ impl FromStr for RemotePath {
             .parse::<Utf8PathBuf>()
             .map_err(|_| Error::ParseRemotePathError { string: s.to_string() })?;
 
-        Ok(path.try_into()?)
+        path.try_into()
     }
 }
 

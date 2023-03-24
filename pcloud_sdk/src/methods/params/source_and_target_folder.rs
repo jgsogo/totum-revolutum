@@ -30,7 +30,7 @@ mod tests {
     #[test]
     fn test_params_with_ids_noname() {
         let input = SourceAndTargetFolder {
-            source: Folder::FolderID(FolderID(1234)),
+            source: FolderID(1234).into(),
             target: TargetLocation::FolderAndName((FolderID(4321), None)),
         };
         let params = input.into_params().unwrap();
@@ -42,7 +42,7 @@ mod tests {
     #[test]
     fn test_params_with_ids_with_name() {
         let input = SourceAndTargetFolder {
-            source: Folder::FolderID(FolderID(1234)),
+            source: FolderID(1234).into(),
             target: TargetLocation::FolderAndName((FolderID(4321), Some("name".to_string()))),
         };
         let params = input.into_params().unwrap();

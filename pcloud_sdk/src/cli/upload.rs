@@ -87,7 +87,7 @@ async fn upload(
         .await?;
 
     // Get all the inputs we need for the operation
-    let mut upload_params = UploadFileParams::new(Folder::FolderID(remote_folder_id), remote_filename.to_string());
+    let mut upload_params = UploadFileParams::new(remote_folder_id.into(), remote_filename.to_string());
     let progresshash = {
         let mut s = DefaultHasher::new();
         file_to_upload.to_string().hash(&mut s);

@@ -8,7 +8,7 @@ use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::mocks::server::PCloudServerMock;
-use pcloud_sdk::types::{Folder, FolderID, RemotePath};
+use pcloud_sdk::types::{Folder, FolderID};
 
 #[tokio::test]
 async fn test_listfolder() -> Result<()> {
@@ -22,7 +22,7 @@ async fn test_listfolder() -> Result<()> {
     };
 
     let pcloud = HttpClient::new(server_token, false);
-    let input = ListFolderInput::new(Folder::RemotePath(RemotePath::from_str("path:/the/root/path")?));
+    let input = ListFolderInput::new(Folder::from_str("path:/the/root/path")?);
     let data = pcloud.listfolder(input).await?;
 
     assert_eq!(data.metadata.folderid, FolderID(1234));

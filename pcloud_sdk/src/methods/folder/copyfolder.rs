@@ -86,8 +86,8 @@ mod tests {
     #[test]
     fn test_params_with_ids() {
         let input = CopyFolderInput {
-            source: Folder::FolderID(FolderID(1234)),
-            target: Folder::FolderID(FolderID(4321)),
+            source: FolderID(1234).into(),
+            target: FolderID(4321).into(),
             noover: true,
             skipexisting: true,
             copycontentonly: true,

@@ -30,7 +30,7 @@ mod tests {
 
     #[test]
     fn test_params_with_fileid() -> Result<()> {
-        let input = File::FileID(FileID(1234));
+        let input: File = FileID(1234).into();
         let mut params = HashMap::new();
         input.add_to_params(&mut params)?;
         assert_eq!(params.len(), 1);

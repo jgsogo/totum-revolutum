@@ -22,7 +22,7 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::structures::Metadata;
-use pcloud_sdk::types::{File as PCloudFile, Folder, FolderID, RemotePath};
+use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 
 use crate::file::RemoteFile;
 use crate::RemoteMetadata;
@@ -145,7 +145,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
         //  and use a thread pool to enter child directories and _recurse_.
         info!("Start remote visitor");
         let start = Instant::now();
-        let mut list_folder_input = ListFolderInput::new(Folder::FolderID(self.root_folderid.clone()));
+        let mut list_folder_input = ListFolderInput::new(self.root_folderid.clone().into());
         list_folder_input.recursive = true;
         let filtermeta = vec!["name", "contents", "size", "hash", "isfolder"];
         let items = self
@@ -229,14 +229,14 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-        let input = Folder::RemotePath(path.try_into()?);
+        let input = path.try_into()?;
         self.pcloud.deletefolder(input).await?;
         Ok(())
     }
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-        let input = Folder::RemotePath(path.try_into()?);
+        let input = path.try_into()?;
         self.pcloud.deletefolderrecursive(input).await?;
         Ok(())
     }
