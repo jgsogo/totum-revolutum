@@ -1,13 +1,13 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use anyhow::Result;
-use camino::Utf8PathBuf;
 
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::HttpClient;
 use pcloud_sdk::handy::GetFolderID;
 use pcloud_sdk::mocks::server::PCloudServerMock;
-use pcloud_sdk::types::FolderID;
+use pcloud_sdk::types::{FolderID, RemotePath};
 
 #[tokio::test]
 async fn test_get_folderid() -> Result<()> {
@@ -15,14 +15,15 @@ async fn test_get_folderid() -> Result<()> {
     let server_token = server.token();
     let listfolder_mock = {
         let mut qparams = HashMap::new();
-        qparams.insert("path", "the/path");
-        qparams.insert("filtermeta", "folderid,id");
+        qparams.insert("path", "/the/path");
+        qparams.insert("filtermeta", "folderid,fileid");
         qparams.insert("access_token", server_token.access_token());
         server.listfolder_mock(qparams, "{\"result\": 0, \"metadata\": {\"folderid\": 1234}}")
     };
 
     let pcloud = HttpClient::new(server_token, false);
-    let data = pcloud.get_folderid(&Utf8PathBuf::from("the/path")).await?;
+    let remote_path = RemotePath::from_str("path:/the/path")?;
+    let data = pcloud.get_folderid(&remote_path).await?;
 
     assert_eq!(data, FolderID(1234));
 

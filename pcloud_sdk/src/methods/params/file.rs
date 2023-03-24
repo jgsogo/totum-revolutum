@@ -12,8 +12,8 @@ impl Params for File {
             File::FileID(fid) => {
                 params.insert("fileid".to_string(), fid.0.to_string());
             }
-            File::Path(p) => {
-                params.insert("path".to_string(), p.to_string());
+            File::RemotePath(p) => {
+                params.insert("path".to_string(), p.path().to_string());
             }
         }
         Ok(())
@@ -30,7 +30,7 @@ mod tests {
 
     #[test]
     fn test_params_with_fileid() -> Result<()> {
-        let input = File::FileID(FileID(1234));
+        let input: File = FileID(1234).into();
         let mut params = HashMap::new();
         input.add_to_params(&mut params)?;
         assert_eq!(params.len(), 1);
@@ -40,7 +40,7 @@ mod tests {
 
     #[test]
     fn test_params_with_path() -> Result<()> {
-        let input = File::from_str("/this/is/the/path").unwrap();
+        let input = File::from_str("path:/this/is/the/path").unwrap();
         let mut params = HashMap::new();
         input.add_to_params(&mut params)?;
         assert_eq!(params.len(), 1);

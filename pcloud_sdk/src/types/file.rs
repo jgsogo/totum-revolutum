@@ -1,17 +1,47 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
+use camino::Utf8PathBuf;
+
 use crate::error::Error;
-use crate::utils::normalize_path;
+use crate::types::RemotePath;
 
 use super::FileID;
-use camino::Utf8PathBuf;
 
 /// A file in pCloud is represented by either a String/path or a FileID
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum File {
     FileID(FileID),
-    Path(Utf8PathBuf),
+    RemotePath(RemotePath),
+}
+
+impl From<FileID> for File {
+    fn from(value: FileID) -> Self {
+        File::FileID(value)
+    }
+}
+
+impl TryFrom<RemotePath> for File {
+    type Error = Error;
+
+    fn try_from(value: RemotePath) -> Result<Self, Self::Error> {
+        if !value.to_string().ends_with('/') {
+            Ok(File::RemotePath(value))
+        } else {
+            Err(Error::ParseFileError {
+                string: value.to_string(),
+            })
+        }
+    }
+}
+
+impl TryFrom<Utf8PathBuf> for File {
+    type Error = Error;
+
+    fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
+        let r: RemotePath = value.try_into()?;
+        r.try_into()
+    }
 }
 
 impl FromStr for File {
@@ -19,14 +49,12 @@ impl FromStr for File {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Ok(f) = FileID::from_str(s) {
-            return Ok(File::FileID(f));
-        } else if let Ok(p) = Utf8PathBuf::from_str(s) {
-            let p = normalize_path(p);
-            if p.starts_with("/") && !p.starts_with("/..") {
-                return Ok(File::Path(p));
-            }
+            Ok(f.into())
+        } else if let Ok(p) = RemotePath::from_str(s) {
+            p.try_into()
+        } else {
+            Err(Error::ParseFileError { string: s.to_string() })
         }
-        Err(Error::ParseFileError { string: s.to_string() })
     }
 }
 
@@ -34,7 +62,7 @@ impl Display for File {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             File::FileID(value) => write!(f, "{value}"),
-            File::Path(value) => write!(f, "{value}"),
+            File::RemotePath(value) => write!(f, "{value}"),
         }
     }
 }
@@ -42,16 +70,20 @@ impl Display for File {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
+    use camino::Utf8PathBuf;
 
     use super::*;
 
     #[test]
     fn test_parse_str() -> Result<()> {
-        assert_eq!(File::from_str("fileid:123")?, File::FileID(FileID(123)));
+        assert_eq!(File::from_str("fileid:123")?, FileID(123).into());
         assert_eq!(
-            File::from_str("/fileid-123")?,
-            File::Path(Utf8PathBuf::from_str("/fileid-123")?)
+            File::from_str("path:/fileid-123")?,
+            File::RemotePath(Utf8PathBuf::from_str("/fileid-123")?.try_into()?)
         );
+
+        assert!(File::from_str("path:/path/to/file").is_ok());
+        assert!(File::from_str("path:/path/to/folder/").is_err());
         Ok(())
     }
 
@@ -59,8 +91,8 @@ mod tests {
     fn test_display() -> Result<()> {
         assert_eq!(&format!("{}", File::FileID(FileID(123))), "fileid:123");
         assert_eq!(
-            &format!("{}", File::Path(Utf8PathBuf::from_str("/fileid-123")?)),
-            "/fileid-123"
+            &format!("{}", File::RemotePath(RemotePath::from_str("path:/fileid-123")?)),
+            "path:/fileid-123"
         );
         Ok(())
     }
@@ -69,8 +101,8 @@ mod tests {
     fn test_debug() -> Result<()> {
         assert_eq!(&format!("{:?}", File::FileID(FileID(123))), "FileID(fileid:123)");
         assert_eq!(
-            &format!("{:?}", File::Path(Utf8PathBuf::from_str("/fileid-123")?)),
-            "Path(\"/fileid-123\")"
+            &format!("{:?}", File::RemotePath(RemotePath::from_str("path:/fileid-123")?)),
+            "RemotePath(path:\"/fileid-123\")"
         );
         Ok(())
     }

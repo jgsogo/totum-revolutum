@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use anyhow::Result;
-use camino::Utf8PathBuf;
 
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::HttpClient;
@@ -16,13 +16,13 @@ async fn test_listfolder() -> Result<()> {
     let server_token = server.token();
     let listfolder_mock = {
         let mut qparams = HashMap::new();
-        qparams.insert("path", "the/root/path");
+        qparams.insert("path", "/the/root/path");
         qparams.insert("access_token", server_token.access_token());
         server.listfolder_mock(qparams, "{\"result\": 0, \"metadata\": {\"folderid\": 1234}}")
     };
 
     let pcloud = HttpClient::new(server_token, false);
-    let input = ListFolderInput::new(Folder::Path(Utf8PathBuf::from("the/root/path")));
+    let input = ListFolderInput::new(Folder::from_str("path:/the/root/path")?);
     let data = pcloud.listfolder(input).await?;
 
     assert_eq!(data.metadata.folderid, FolderID(1234));

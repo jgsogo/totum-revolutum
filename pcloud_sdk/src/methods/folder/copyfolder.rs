@@ -32,8 +32,8 @@ impl Params for CopyFolderInput {
             Folder::FolderID(fid) => {
                 params.insert("tofolderid".to_string(), fid.0.to_string());
             }
-            Folder::Path(p) => {
-                params.insert("topath".to_string(), p.to_string());
+            Folder::RemotePath(p) => {
+                params.insert("topath".to_string(), p.path().to_string());
             }
         }
         if self.noover {
@@ -71,11 +71,12 @@ impl<T: client::Client> GetCopyFolder for T {
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
     use std::str::FromStr;
+
+    use camino::Utf8Path;
 
     use crate::types::FolderID;
     use crate::utils::http::ApiResult;
@@ -85,8 +86,8 @@ mod tests {
     #[test]
     fn test_params_with_ids() {
         let input = CopyFolderInput {
-            source: Folder::FolderID(FolderID(1234)),
-            target: Folder::FolderID(FolderID(4321)),
+            source: FolderID(1234).into(),
+            target: FolderID(4321).into(),
             noover: true,
             skipexisting: true,
             copycontentonly: true,
@@ -103,8 +104,8 @@ mod tests {
     #[test]
     fn test_params_with_paths() {
         let input = CopyFolderInput {
-            source: Folder::from_str("/source/path").unwrap(),
-            target: Folder::from_str("/target/path").unwrap(),
+            source: Folder::from_str("path:/source/path").unwrap(),
+            target: Folder::from_str("path:/target/path").unwrap(),
             noover: false,
             skipexisting: false,
             copycontentonly: false,

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::client;
 use crate::methods::fileops::FileDescriptor;
-use crate::types::{FileID, FolderID};
+use crate::types::{File, FileID, FolderID};
 
 pub const ENDPOINT: &str = "/file_open";
 
@@ -22,8 +22,7 @@ bitflags! {
 }
 
 pub enum FileOpenPath {
-    Path(String),
-    FileID(FileID),
+    File(File),
     FolderAndName(FolderID, String),
 }
 
@@ -51,19 +50,19 @@ impl<T: client::Client> GetFileOpen for T {
                     params.insert("folderid".to_string(), folderid.0.to_string());
                     params.insert("name".to_string(), name);
                 }
-                FileOpenPath::Path(path) => {
-                    params.insert("path".to_string(), path);
+                FileOpenPath::File(File::RemotePath(path)) => {
+                    params.insert("path".to_string(), path.path().to_string());
                 }
                 _ => bail!("If O_CREATE is set, provide either folderid+name or path"),
             }
         } else {
             // If the file exists, fileid or path need to be provided
             match path {
-                FileOpenPath::FileID(fileid) => {
+                FileOpenPath::File(File::FileID(fileid)) => {
                     params.insert("fileid".to_string(), fileid.0.to_string());
                 }
-                FileOpenPath::Path(path) => {
-                    params.insert("path".to_string(), path);
+                FileOpenPath::File(File::RemotePath(path)) => {
+                    params.insert("path".to_string(), path.path().to_string());
                 }
                 _ => bail!("If O_CREATE is not set, provide either fileid or path"),
             }
@@ -76,6 +75,8 @@ impl<T: client::Client> GetFileOpen for T {
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
     use crate::mocks::client::MockLocalClient;
 
     use super::*;
@@ -86,7 +87,7 @@ mod tests {
         {
             let flags = Flags::O_CREAT;
             let client = MockLocalClient::new();
-            let r = client.file_open(flags, FileOpenPath::FileID(FileID(42))).await;
+            let r = client.file_open(flags, FileOpenPath::File(FileID(42).into())).await;
             assert!(r.is_err());
             assert_eq!(
                 r.unwrap_err().to_string(),
@@ -129,13 +130,13 @@ mod tests {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"1088".to_string()));
-                    assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                    assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                     Ok(FileOpen {
                         fd: 42,
                         fileid: FileID(42),
                     })
                 });
-            let input = FileOpenPath::Path("the/path".to_string());
+            let input = FileOpenPath::File(File::from_str("path:/the/path")?);
             let r = client.file_open(flags, input).await?;
             assert_eq!(r.fd, 42);
             assert_eq!(r.fileid, FileID(42));
@@ -177,7 +178,7 @@ mod tests {
                         fileid: FileID(42),
                     })
                 });
-            let input = FileOpenPath::FileID(FileID(42));
+            let input = FileOpenPath::File(FileID(42).into());
             let r = client.file_open(flags, input).await?;
             assert_eq!(r.fd, 42);
             assert_eq!(r.fileid, FileID(42));
@@ -195,13 +196,13 @@ mod tests {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"128".to_string()));
-                    assert_eq!(params.get("path"), Some(&"the/path".to_string()));
+                    assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                     Ok(FileOpen {
                         fd: 42,
                         fileid: FileID(42),
                     })
                 });
-            let input = FileOpenPath::Path("the/path".to_string());
+            let input = FileOpenPath::File(File::from_str("path:/the/path")?);
             let r = client.file_open(flags, input).await?;
             assert_eq!(r.fd, 42);
             assert_eq!(r.fileid, FileID(42));

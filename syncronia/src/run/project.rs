@@ -1,13 +1,14 @@
-use camino::Utf8Path;
-
 use anyhow::Result;
+use camino::Utf8Path;
 use tracing::info;
+
+use filesystem::local::FilesystemLocal;
+use filesystem_pcloud::FilesystemPCloud;
+use pcloud_sdk::types::RemotePath;
 
 use crate::actions;
 use crate::errors::SDKErrors;
 use crate::storage;
-use filesystem::local::FilesystemLocal;
-use filesystem_pcloud::FilesystemPCloud;
 
 /// Run configured action in the given pcloud-dir. It doesn't take into account
 /// any cron considerations (those are stored at global level)
@@ -27,7 +28,7 @@ pub async fn handle(home: &Utf8Path, path: &Utf8Path) -> Result<()> {
     let rhs_fs = {
         let pcloud = config.auth.get_pcloud_client(home)?;
         let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();
-        FilesystemPCloud::new(Utf8Path::new(&base_path), pcloud.clone()).await?
+        FilesystemPCloud::new(&RemotePath::try_from(Utf8Path::new(&base_path))?, pcloud.clone()).await?
     };
 
     actions::run(lhs_fs, rhs_fs, config).await

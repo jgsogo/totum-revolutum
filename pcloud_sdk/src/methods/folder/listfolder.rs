@@ -74,16 +74,16 @@ impl<T: client::Client> GetListFolder for T {
         let mut params = list_folder.into_params()?;
         let mut filtermeta = filtermeta;
 
-        // Insert `folderid` always, it is required to parse [`MetadataFolder`] and differentiate
-        // it from [`MetadataFile`]. Read about `#[serde(untagged)]` in [`Metadata`] enum for more
-        // info about why this is needed.
+        // Insert `folderid` and `fileid` always, it is required to parse [`MetadataFolder`] and
+        // differentiate it from [`MetadataFile`]. Read about `#[serde(untagged)]` in [`Metadata`]
+        // enum for more info about why this is needed.
         filtermeta.push("folderid");
+        filtermeta.push("fileid");
 
-        // We insert `id` always to prevent a pcloud API bug. If we only use one element,
-        // for example `filtermeta=folderid`, the response JSON is not well formed when there
-        // are files and folders inside the query directory, it returns
-        // some empty lists where empty dictionaries were expected
-        filtermeta.push("id");
+        // Having two elements is also required to prevent a pcloud API bug. If we only use one
+        // element, for example `filtermeta=folderid`, the response JSON is not well formed when
+        // there are files and folders inside the query directory, it returns some empty lists
+        // where empty dictionaries were expected
 
         let filtermeta = filtermeta.into_iter().unique().collect::<Vec<_>>().join(",");
         params.insert("filtermeta".to_string(), filtermeta);
