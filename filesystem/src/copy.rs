@@ -3,7 +3,7 @@ use camino::Utf8Path;
 
 use super::Filesystem;
 
-pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
+pub async fn copy<'action, FsLhs: Filesystem<'action>, FsRhs: Filesystem<'action>>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action FsRhs,
     origin: &Utf8Path,

@@ -5,8 +5,10 @@ use camino::{Utf8Path, Utf8PathBuf};
 use super::{File, FileMetadata};
 
 /// Abstract a filesystem, either local or remote and provide methods to access its files
+///
+/// Lifetime is required here _as a workaround_. See https://stackoverflow.com/questions/75854357/cyclic-references-and-lifetimes
 #[async_trait]
-pub trait Filesystem
+pub trait Filesystem<'a>
 where
     Self: Sync,
 {
@@ -18,7 +20,7 @@ where
 
     /// Takes a naïve `path` and converts it into a [`FilesystemPath`]. The input `path` needs to
     /// be contained within the filesystem
-    fn to_filesystem_path(&self, path: &Utf8Path) -> Result<Self::FilesystemPath>;
+    fn to_filesystem_path(&'a self, path: &Utf8Path) -> Result<Self::FilesystemPath>;
 
     /// Walk files in the filesystem, for each file found it will send it via `tx`
     async fn walk_directory(

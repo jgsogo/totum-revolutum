@@ -8,12 +8,12 @@ use crate::local::FilesystemLocal;
 use crate::{File, Filesystem};
 
 /// Mocks a filesystem using a temporal directory that is removed on drop
-pub struct FilesystemMock {
+pub struct FilesystemMock<'a> {
     _tmp_dir: TempDir,
-    local: FilesystemLocal,
+    local: FilesystemLocal<'a>,
 }
 
-impl Default for FilesystemMock {
+impl Default for FilesystemMock<'_> {
     fn default() -> Self {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
@@ -25,10 +25,10 @@ impl Default for FilesystemMock {
 }
 
 #[async_trait]
-impl Filesystem for FilesystemMock {
-    type Metadata = <FilesystemLocal as Filesystem>::Metadata;
+impl<'a> Filesystem<'a> for FilesystemMock<'a> {
+    type Metadata = <FilesystemLocal<'a> as Filesystem<'a>>::Metadata;
 
-    type FilesystemPath = <FilesystemLocal as Filesystem>::FilesystemPath;
+    type FilesystemPath = <FilesystemLocal<'a> as Filesystem<'a>>::FilesystemPath;
 
     fn to_filesystem_path(&self, path: &Utf8Path) -> Result<Self::FilesystemPath> {
         todo!()

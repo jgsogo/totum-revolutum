@@ -8,7 +8,7 @@ use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use ignore::WalkBuilder;
 use tokio::time::Instant;
-use tracing::info;
+use tracing::{info, trace};
 
 use path_utils::{normalize_path, to_absolute_path};
 
@@ -18,11 +18,11 @@ use crate::{File, Filesystem};
 use super::file::LocalFile;
 use super::parallel_visitor;
 
-pub struct FilesystemLocal {
-    path: LocalPath,
+pub struct FilesystemLocal<'a> {
+    path: LocalPath<'a>,
 }
 
-impl FilesystemLocal {
+impl FilesystemLocal<'_> {
     pub fn new(path: &Utf8Path) -> Result<Self> {
         let path = LocalPath::new_root(path);
         if let Ok(true) = path.try_exists() {
@@ -36,15 +36,16 @@ impl FilesystemLocal {
 }
 
 #[async_trait]
-impl Filesystem for FilesystemLocal {
+impl<'a> Filesystem<'a> for FilesystemLocal<'a> {
     type Metadata = LocalMetadata;
 
-    type FilesystemPath = LocalPath;
+    type FilesystemPath = LocalPath<'a>;
 
     /// Converts the input `path` into a relative path that joined with the local root gives
     /// the absolute path to the local file
-    fn to_filesystem_path(&self, path: &Utf8Path) -> Result<Self::FilesystemPath> {
-        LocalPath::try_from(path, &self.path)
+    fn to_filesystem_path(&'a self, path: &Utf8Path) -> Result<Self::FilesystemPath> {
+        //LocalPath::try_from(path, &self.path)
+        self.path.new_relative(path)
     }
 
     async fn walk_directory(
@@ -53,7 +54,7 @@ impl Filesystem for FilesystemLocal {
         threads: usize,
         custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
-        let walker = WalkBuilder::new(&self.path)
+        let walker = WalkBuilder::new(&self.path.full_path())
             .threads(threads)
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
             .add_custom_ignore_filename(custom_ignore_filename)
@@ -68,64 +69,43 @@ impl Filesystem for FilesystemLocal {
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        let full_path = {
-            let path = self.to_filesystem_path(path)?;
-            self.path.join(&path)?
-        };
-        full_path.try_exists()
+        let path = self.to_filesystem_path(path)?;
+        path.try_exists()
     }
 
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
-        let full_path = {
-            let path = self.to_filesystem_path(path)?;
-            self.path.join(&path)?
-        };
-        let f = AsyncFile::create(&full_path).await?;
+        let path = self.to_filesystem_path(path)?;
+        let f = AsyncFile::create(path.full_path().as_std_path()).await?;
         Ok(Box::new(LocalFile::new(f)))
     }
 
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
-        let full_path = {
-            let path = self.to_filesystem_path(path)?;
-            self.path.join(&path)?
-        };
-        let f = AsyncFile::open(&full_path).await?;
+        let path = self.to_filesystem_path(path)?;
+        let f = AsyncFile::open(path.full_path().as_std_path()).await?;
         Ok(Box::new(LocalFile::new(f)))
     }
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        let full_path = {
-            let path = self.to_filesystem_path(path)?;
-            self.path.join(&path)?
-        };
-        fs::create_dir_all(&full_path).map_err(|e| anyhow!("Error creating the directory: {e}"))
+        let path = self.to_filesystem_path(path)?;
+        fs::create_dir_all(path.full_path().as_std_path()).map_err(|e| anyhow!("Error creating the directory: {e}"))
     }
 
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
-        let full_path = {
-            let path = self.to_filesystem_path(path)?;
-            self.path.join(&path)?
-        };
-        fs::remove_file(&full_path).map_err(|e| anyhow!("Error removing a file: {e}"))
+        let path = self.to_filesystem_path(path)?;
+        fs::remove_file(path.full_path().as_std_path()).map_err(|e| anyhow!("Error removing a file: {e}"))
     }
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
-        let full_path = {
-            let path = self.to_filesystem_path(path)?;
-            self.path.join(&path)?
-        };
-        fs::remove_dir(&full_path).map_err(|e| anyhow!("Error removing a directory: {e}"))
+        let path = self.to_filesystem_path(path)?;
+        fs::remove_dir(path.full_path().as_std_path()).map_err(|e| anyhow!("Error removing a directory: {e}"))
     }
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
-        let full_path = {
-            let path = self.to_filesystem_path(path)?;
-            self.path.join(&path)?
-        };
-        fs::remove_dir_all(&full_path).map_err(|e| anyhow!("Error removing a directory: {e}"))
+        let path = self.to_filesystem_path(path)?;
+        fs::remove_dir_all(path.full_path().as_std_path()).map_err(|e| anyhow!("Error removing a directory: {e}"))
     }
 }
 

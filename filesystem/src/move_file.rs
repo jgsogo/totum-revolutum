@@ -5,7 +5,7 @@ use anyhow::Result;
 use super::copy::copy;
 use super::Filesystem;
 
-pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
+pub async fn move_file<'action, FsLhs: Filesystem<'action>, FsRhs: Filesystem<'action>>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action FsRhs,
     origin: &Utf8Path,

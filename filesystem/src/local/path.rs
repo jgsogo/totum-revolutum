@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::path::{Path, StripPrefixError};
 
 use anyhow::{anyhow, bail, Result};
@@ -8,19 +8,36 @@ use path_utils::{normalize_path, to_absolute_path};
 
 /// Wraps a relative path that has been constructed taking root into account. This path, joined to
 /// the `root` used to create it should return the (absolute) original one.  
-pub struct LocalPath {
+pub struct LocalPath<'a> {
     path: Utf8PathBuf,
-    is_root: bool,
+    root: Option<Box<&'a LocalPath<'a>>>,
 }
 
-impl LocalPath {
-    /// Creates a new instance of [`LocalPath`], it converts `value` into a normalized absolute path
+impl<'a> LocalPath<'a> {
+    /// Creates a new instance of [`LocalPath`], it normalizes path in `value` and converts it
+    /// into an **absolute** path.
     pub fn new_root(value: &Utf8Path) -> Self {
         let path = to_absolute_path(&normalize_path(value));
-        Self { path, is_root: true }
+        Self { path, root: None }
     }
 
-    pub fn try_from(path: &Utf8Path, root: &LocalPath) -> Result<Self> {
+    pub fn is_root(&self) -> bool {
+        match &self.root {
+            Some(_) => false,
+            None => true,
+        }
+    }
+
+    pub fn new_relative(&'a self, path: &Utf8Path) -> Result<LocalPath<'a>> {
+        Ok(Self {
+            path: path.to_path_buf(),
+            root: Some(Box::new(self)),
+        })
+    }
+
+    /// Creates a new instance of [`LocalPath`], storing just the relative directory from `root`.
+    /// It normalize `path` and preserves trailing `/` if any.
+    pub fn try_from(path: &Utf8Path, root: &'a LocalPath) -> Result<LocalPath<'a>> {
         let path = root.path.join(path);
         let path = to_absolute_path(&normalize_path(path));
         match path.strip_prefix(&root.path) {
@@ -28,12 +45,12 @@ impl LocalPath {
                 if path.to_string().ends_with("/") {
                     Ok(Self {
                         path: Utf8PathBuf::from(format!("{}/", p)),
-                        is_root: false,
+                        root: Some(Box::new(root)),
                     })
                 } else {
                     Ok(Self {
                         path: p.to_path_buf(),
-                        is_root: false,
+                        root: Some(Box::new(root)),
                     })
                 }
             }
@@ -41,46 +58,47 @@ impl LocalPath {
         }
     }
 
-    pub fn join(&self, other: &LocalPath) -> Result<LocalPath> {
-        if other.is_root {
-            bail!("Cannot join with a root path. `{}` is a root one", other.path)
+    /// Returns the full path. This is always an **absolute** path
+    pub fn full_path(&self) -> Utf8PathBuf {
+        match &self.root {
+            Some(r) => r.path.join(&self.path),
+            None => self.path.clone(),
         }
-        Ok(Self {
-            path: self.path.join(&other.path),
-            is_root: self.is_root,
-        })
     }
 
     pub fn try_exists(&self) -> Result<bool> {
-        if !self.is_root {
-            bail!("Cannot check existence of a non-root path")
-        }
-        self.path.try_exists().map_err(|e| anyhow!(e))
+        self.full_path().try_exists().map_err(|e| anyhow!(e))
     }
 }
 
-impl AsRef<Utf8Path> for LocalPath {
-    fn as_ref(&self) -> &Utf8Path {
-        &self.path
-    }
-}
+// impl AsRef<Utf8Path> for LocalPath {
+//     fn as_ref(&self) -> &Utf8Path {
+//         &self.path
+//     }
+// }
+//
+// impl AsRef<Path> for LocalPath {
+//     fn as_ref(&self) -> &Path {
+//         self.path.as_std_path()
+//     }
+// }
+//
+// impl AsRef<async_std::path::Path> for LocalPath {
+//     fn as_ref(&self) -> &async_std::path::Path {
+//         let path: &Path = self.path.as_std_path();
+//         path.into()
+//     }
+// }
 
-impl AsRef<Path> for LocalPath {
-    fn as_ref(&self) -> &Path {
-        self.path.as_std_path()
-    }
-}
-
-impl AsRef<async_std::path::Path> for LocalPath {
-    fn as_ref(&self) -> &async_std::path::Path {
-        let path: &Path = self.path.as_std_path();
-        path.into()
-    }
-}
-
-impl Display for LocalPath {
+impl Display for LocalPath<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.path)
+    }
+}
+
+impl Debug for LocalPath<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.full_path())
     }
 }
 
@@ -113,14 +131,14 @@ mod tests {
             let utf8_path = "/root/abs/path/to/file.txt".into();
             let path = LocalPath::try_from(utf8_path, &root)?;
             assert_eq!(path.to_string(), "abs/path/to/file.txt");
-            assert_eq!(root.join(&path)?.to_string(), "/root/abs/path/to/file.txt");
+            assert_eq!(path.full_path().to_string(), "/root/abs/path/to/file.txt");
         }
 
         {
             let utf8_path = "/root/abs/../to/file.txt".into();
             let path = LocalPath::try_from(utf8_path, &root)?;
             assert_eq!(path.to_string(), "to/file.txt");
-            assert_eq!(root.join(&path)?.to_string(), "/root/to/file.txt");
+            assert_eq!(path.full_path().to_string(), "/root/to/file.txt");
         }
         Ok(())
     }
@@ -133,14 +151,14 @@ mod tests {
             let utf8_path = "/root/abs/path/to/folder/".into();
             let path = LocalPath::try_from(utf8_path, &root)?;
             assert_eq!(path.to_string(), "abs/path/to/folder/");
-            assert_eq!(root.join(&path)?.to_string(), "/root/abs/path/to/folder/");
+            assert_eq!(path.full_path().to_string(), "/root/abs/path/to/folder/");
         }
 
         {
             let utf8_path = "/root/abs/../to/folder/".into();
             let path = LocalPath::try_from(utf8_path, &root)?;
             assert_eq!(path.to_string(), "to/folder/");
-            assert_eq!(root.join(&path)?.to_string(), "/root/to/folder/");
+            assert_eq!(path.full_path().to_string(), "/root/to/folder/");
         }
         Ok(())
     }
