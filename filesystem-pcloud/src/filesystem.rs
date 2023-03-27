@@ -94,21 +94,21 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpCl
 
     fn work_on_contents(
         tx: Sender<RemoteMetadata>,
-        base_path: &Utf8Path,
+        base_path: &RemotePath,
         contents: &[Metadata],
         depth: usize,
     ) -> Result<()> {
         for it in contents.iter() {
             match it {
                 Metadata::MetadataFile(m) => {
-                    let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
+                    let path = RemotePath::try_from(base_path.path().join(m.common.name.as_ref().unwrap())).unwrap();
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
                     let data: RemoteMetadata = (path, m.clone()).into();
                     tx.send(data)?;
                 }
                 Metadata::MetadataFolder(m) => {
-                    let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
+                    let path = RemotePath::try_from(base_path.path().join(m.common.name.as_ref().unwrap())).unwrap();
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
                     FilesystemPCloud::<HttpClient>::work_on_contents(
@@ -125,11 +125,12 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpCl
 }
 
 #[async_trait]
-impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
+impl<'a, HttpClient: Client + Send + Sync + Clone + 'static> Filesystem<'a> for FilesystemPCloud<HttpClient> {
     type Metadata = RemoteMetadata;
+    type FilesystemPath = RemotePath;
 
-    fn root(&self) -> &Utf8Path {
-        self.root_path.path()
+    fn to_filesystem_path(&'a self, path: &Utf8Path) -> Result<Self::FilesystemPath> {
+        RemotePath::try_from(path).map_err(|e| anyhow!(e))
     }
 
     async fn walk_directory(
@@ -155,7 +156,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(tx, self.root(), contents, 0)?,
+            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(tx, &self.root_path, contents, 0)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -171,7 +172,6 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for Filesyst
 
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.to_filesystem_path(path)?;
-        let path: RemotePath = path.try_into()?;
 
         let filename = path
             .path()
@@ -277,7 +277,7 @@ mod tests {
 
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(&root, client).await?;
-        assert_eq!(Utf8Path::new("/the/path"), fs.root());
+        assert_eq!("/the/path", fs.root_path.to_string());
         Ok(())
     }
 

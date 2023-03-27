@@ -7,13 +7,13 @@ use crate::actions::action_run::ActionRun;
 use crate::actions::OnConflict;
 use filesystem::{FileMetadata, Filesystem};
 
-pub struct Backup<'action, FsLhs: Filesystem, FsRhs: Filesystem> {
+pub struct Backup<'action, FsLhs: Filesystem<'action>, FsRhs: Filesystem<'action>> {
     _lhs_fs: &'action FsLhs,
     _rhs_fs: &'action FsRhs,
     on_conflict: OnConflict,
 }
 
-impl<'action, FsLhs: Filesystem, FsRhs: Filesystem> Backup<'action, FsLhs, FsRhs> {
+impl<'action, FsLhs: Filesystem<'action>, FsRhs: Filesystem<'action>> Backup<'action, FsLhs, FsRhs> {
     pub fn new(lhs_fs: &'action FsLhs, rhs_fs: &'action FsRhs, on_conflict: OnConflict) -> Self {
         Self {
             _lhs_fs: lhs_fs,
@@ -24,7 +24,7 @@ impl<'action, FsLhs: Filesystem, FsRhs: Filesystem> Backup<'action, FsLhs, FsRhs
 }
 
 #[async_trait]
-impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> ActionRun<FsLhs::Metadata, FsRhs::Metadata>
+impl<'action, FsLhs: Filesystem<'action>, FsRhs: Filesystem<'action>> ActionRun<FsLhs::Metadata, FsRhs::Metadata>
     for Backup<'action, FsLhs, FsRhs>
 {
     async fn run_with_both(&self, lhs: &FsLhs::Metadata, rhs: &FsRhs::Metadata) -> anyhow::Result<()> {

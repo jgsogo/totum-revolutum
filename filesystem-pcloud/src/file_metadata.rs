@@ -2,7 +2,7 @@ use camino::{Utf8Path, Utf8PathBuf};
 
 use filesystem::FileMetadata;
 use pcloud_sdk::structures::MetadataFile;
-use pcloud_sdk::types::FileID;
+use pcloud_sdk::types::{FileID, RemotePath};
 
 pub trait RemoteFileMetadata: FileMetadata {
     fn from_pcloud_metadata(path: &Utf8Path, metadata: MetadataFile) -> Self;
@@ -10,7 +10,7 @@ pub trait RemoteFileMetadata: FileMetadata {
     fn fileid(&self) -> &FileID;
 }
 
-pub type RemoteMetadataEntry = (Utf8PathBuf, MetadataFile);
+pub type RemoteMetadataEntry = (RemotePath, MetadataFile);
 
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {

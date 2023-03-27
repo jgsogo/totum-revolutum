@@ -5,7 +5,7 @@ use filesystem::diff::FilePair;
 use filesystem::FileMetadata;
 
 #[async_trait]
-pub trait ActionRun<FsLhsMetadata: FileMetadata + 'static, FsRhsMetadata: FileMetadata + 'static>: Sync {
+pub trait ActionRun<FsLhsMetadata: FileMetadata, FsRhsMetadata: FileMetadata>: Sync {
     async fn run(&self, file_pair: FilePair<FsLhsMetadata, FsRhsMetadata>) -> anyhow::Result<()> {
         match file_pair {
             // Both files exist
