@@ -61,7 +61,7 @@ log = { version = "0.4", optional = true }
 clap = { version = "4.1", features = ["derive"], optional = true }
 
 [dev-dependencies]
-tempfile = "3.4"
+tempfile = "3.6"
 env_logger = "0.10"
 tracing-subscriber = "0.3"
 pcloud-sdk = { path = ".", features = ["test_utils"] }
