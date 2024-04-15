@@ -1,0 +1,54 @@
+name: bazel-diff
+
+# Controls when the action will run.
+on:
+  push:
+    branches: [master]
+  pull_request:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  bazel-diff-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Base from base branch (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          echo "I'm a PR to base '${{ github.event.pull_request.base.ref }}'"
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git worktree add ${{ runner.temp }}/base ${{ github.event.pull_request.base.ref }}
+
+      - name: Base from previous commit (not PR)
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo "I'm NOT a PR"
+          git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
+
+      - name: Generate hashes from base
+        run: bazel run //bazel/diff -- generate-hashes -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
+
+      - name: Generate hashes from current
+        run: bazel run //bazel/diff -- generate-hashes -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
+
+      - name: Compute impacted targets
+        run: |
+          bazel run //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
+          cat ${{ runner.temp }}/impacted-targets.txt
+
+      - name: Test impacted targets
+        run: |
+          impacted_targets=()
+          IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
+          formatted_impacted_targets=$(IFS=$'\n'; echo "${impacted_targets[*]}")
+
+          # Do not fail for next command
+          set +e 
+          bazel test $formatted_impacted_targets
+
+          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
+          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
