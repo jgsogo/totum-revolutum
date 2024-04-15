@@ -38,7 +38,7 @@ time = { version = "0.3", features = [
     "formatting",
     "macros",
 ] }
-strum = { version = "0.24", features = ["derive"] }
+strum = { version = "0.26", features = ["derive"] }
 strum_macros = "0.24"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.8" }
