@@ -20,9 +20,9 @@ http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_j
 # Bazel-diff: https://github.com/Tinder/bazel-diff
 http_jar(
     name = "bazel_diff",
-    sha256 = "02684250b5279c88afe4fc1e21e1724c2bba9dc3b7d19830b5a4d76d61dca663",
+    sha256 = "0b9e32f9c20e570846b083743fe967ae54d13e2a1f7364983e0a7792979442be",
     urls = [
-        "https://github.com/Tinder/bazel-diff/releases/download/5.1.0/bazel-diff_deploy.jar",
+        "https://github.com/Tinder/bazel-diff/releases/download/7.0.0/bazel-diff_deploy.jar",
     ],
 )
 
@@ -53,3 +53,19 @@ rust.toolchain(
 use_repo(rust, "rust_toolchains")
 
 register_toolchains("@rust_toolchains//:all")
+
+#####
+# Crates repositories
+#####
+crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+crate.from_cargo(
+    name = "crates_libraries",
+    cargo_lockfile = "//libraries:Cargo.lock",
+    manifests = [
+        # "//libraries:Cargo.toml",
+        # "//libraries/map:Cargo.toml",
+        # "//libraries/storage:Cargo.toml",
+        # "//libraries/constants:Cargo.toml",
+    ],
+)
+use_repo(crate, "crates_libraries")
