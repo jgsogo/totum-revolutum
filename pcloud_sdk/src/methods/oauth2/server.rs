@@ -43,7 +43,7 @@ async fn dispatcher<Token: OAuth2Token + DeserializeOwned>(
                 .uri()
                 .query()
                 .map(|v| url::form_urlencoded::parse(v.as_bytes()).into_owned().collect())
-                .unwrap_or_else(HashMap::new);
+                .unwrap_or_default();
 
             let oauth2_token = {
                 let ctx = data.lock().unwrap().app.clone();
