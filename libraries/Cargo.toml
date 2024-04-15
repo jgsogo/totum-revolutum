@@ -8,7 +8,7 @@ members = [
 
 
 [workspace.dependencies]
-anyhow = "1.0.81"
+anyhow = "1.0.82"
 num-traits = "0.2.18"
 log = "0.4.21"
 strum = "0.26.2"
