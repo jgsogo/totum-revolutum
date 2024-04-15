@@ -1,0 +1,7 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary")
+
+py_binary(
+    name = "version_default",
+    srcs = ["version.py"],
+    main = "version.py",
+)

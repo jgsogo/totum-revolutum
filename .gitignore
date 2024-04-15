@@ -1,3 +1,13 @@
+# Bazel specific
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-totum-revolutum
+.bazelrc.user
+
+# Rust
+target/
+
 /target
 secret.json
 /secrets
