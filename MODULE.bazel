@@ -1,0 +1,55 @@
+module(
+    name = "totum_revolutum",
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+bazel_dep(name = "platforms", version = "0.0.8")
+
+bazel_dep(name = "rules_python", version = "0.31.0", dev_dependency = True)
+bazel_dep(name = "rules_rust", version = "0.40.0", dev_dependency = True)
+
+bazel_dep(name = "aspect_rules_py", version = "0.5.0")
+
+bazel_dep(name = "aspect_bazel_lib", version = "2.5.1", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "6.4.0", dev_dependency = True)
+
+http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
+# Bazel-diff: https://github.com/Tinder/bazel-diff
+http_jar(
+    name = "bazel_diff",
+    sha256 = "02684250b5279c88afe4fc1e21e1724c2bba9dc3b7d19830b5a4d76d61dca663",
+    urls = [
+        "https://github.com/Tinder/bazel-diff/releases/download/5.1.0/bazel-diff_deploy.jar",
+    ],
+)
+
+########
+# Python
+# ======
+#
+# Here we configure a toolchain for Python. We will use [`aspect_rules_py`](https://github.com/aspect-build/rules_py)
+# for our libraries and binaries
+########
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    configure_coverage_tool = True,
+    python_version = "3.12",
+)
+
+######
+# Rust
+# ====
+#
+# Rust setup is mostly taken from rust = use_extension("//rust:extensions.bzl", "rust")
+######
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2021",
+    versions = ["1.75.0"],
+)
+use_repo(rust, "rust_toolchains")
+
+register_toolchains("@rust_toolchains//:all")
