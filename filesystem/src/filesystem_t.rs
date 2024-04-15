@@ -68,12 +68,12 @@ where
 
     /// Copy
     async fn copy(&self, _origin: &Utf8Path, _target: &Utf8Path) -> Result<()> {
-        todo!("A default `copy` using existing methods is not implemented")
+        Err(anyhow!("A default `copy` using existing methods is not implemented"))
     }
 
     /// Rename
     async fn rename(&self, _origin: &Utf8Path, _target: &Utf8Path) -> Result<()> {
-        todo!("A default `rename` using existing methods is not implemented")
+        Err(anyhow!("A default `rename` using existing methods is not implemented"))
     }
 
     /// Removes a file from the filesystem.
