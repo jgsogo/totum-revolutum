@@ -1,29 +1,26 @@
 [workspace]
 resolver = "2"
-members = [
-    "filesystem",
-    "constants",
-    ]
+members = ["filesystem", "constants"]
 
 
 # List all the dependencies that are "common" to all crates. If using them, we
 # probably want to use the same version for all of them.
 [workspace.dependencies]
 anyhow = "1.0.82"
+async-std = { version = "1.12" }
 async-trait = "0.1"
 camino = "1.1"
-num-traits = "0.2.18"
-log = "0.4.21"
-strum = "0.26.2"
-strum_macros = "0.26.2"
-main_error = "0.1.2"
-lazy_static = "1.4.0"
 dyn-clone = "1.0.17"
-flume = "0.10.14"
-tokio = { version = "1.26" }
-tracing = { version = "0.1" }
-async-std = { version = "1.12" }
+flume = "0.11.0"
 futures = { version = "0.3" }
 ignore = { version = "0.4" }
+lazy_static = "1.4.0"
+log = "0.4.21"
+main_error = "0.1.2"
+num-traits = "0.2.18"
 sha256 = { version = "1.1" }
+strum = "0.26.2"
+strum_macros = "0.26.2"
 tempfile = { version = "3" }
+tokio = { version = "1.26" }
+tracing = { version = "0.1" }

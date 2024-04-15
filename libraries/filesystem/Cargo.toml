@@ -18,7 +18,7 @@ tracing = { workspace = true }
 
 # Optional dependencies
 async-std = { workspace = true, optional = true }
-futures = {workspace = true, optional = true }
+futures = { workspace = true, optional = true }
 ignore = { workspace = true, optional = true }
 sha256 = { workspace = true, optional = true }
 tempfile = { workspace = true, optional = true }

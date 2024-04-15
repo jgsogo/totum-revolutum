@@ -4,8 +4,8 @@
 mod file;
 mod file_metadata;
 mod filesystem;
-
-pub use filesystem::Filesystem;
 mod utils;
+
 pub use file::File;
 pub use file_metadata::FileMetadata;
+pub use filesystem::Filesystem;
