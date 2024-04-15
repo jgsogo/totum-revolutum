@@ -9,3 +9,4 @@ mod utils;
 pub use file::File;
 pub use file_metadata::FileMetadata;
 pub use filesystem::Filesystem;
+pub mod actions;
