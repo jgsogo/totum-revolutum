@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "92b4a2c87dce2b7c95d689252245efe01af8b84355b9ca889773860c80d058af",
+  "moduleFileHash": "fe9df2133e7f406f5a8bbad1cdf156f3b5be13b11bfbcab308bdfc32d71f72e5",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -43,9 +43,9 @@
             {
               "tagName": "@bazel_tools//tools/build_defs/repo:http.bzl%http_jar",
               "attributeValues": {
-                "sha256": "02684250b5279c88afe4fc1e21e1724c2bba9dc3b7d19830b5a4d76d61dca663",
+                "sha256": "0b9e32f9c20e570846b083743fe967ae54d13e2a1f7364983e0a7792979442be",
                 "urls": [
-                  "https://github.com/Tinder/bazel-diff/releases/download/5.1.0/bazel-diff_deploy.jar"
+                  "https://github.com/Tinder/bazel-diff/releases/download/7.0.0/bazel-diff_deploy.jar"
                 ],
                 "name": "bazel_diff"
               },
