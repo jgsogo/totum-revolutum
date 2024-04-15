@@ -16,4 +16,9 @@ rust_library(
 rust_test(
     name = "tests",
     crate = ":filesystem",
+    crate_features = [
+        "test_utils",
+        "diff",
+        "local",
+    ],
 )
