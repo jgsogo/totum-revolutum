@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "531f6d04557a9cc026435e025436649b07ab5db0e0d70df30f08b577921c2ff0",
+  "moduleFileHash": "8894aff978a2169eff44eca503e4983cff177de93779148fd9060c0ba7b09ba3",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -43,9 +43,9 @@
             {
               "tagName": "@bazel_tools//tools/build_defs/repo:http.bzl%http_jar",
               "attributeValues": {
-                "sha256": "02684250b5279c88afe4fc1e21e1724c2bba9dc3b7d19830b5a4d76d61dca663",
+                "sha256": "0b9e32f9c20e570846b083743fe967ae54d13e2a1f7364983e0a7792979442be",
                 "urls": [
-                  "https://github.com/Tinder/bazel-diff/releases/download/5.1.0/bazel-diff_deploy.jar"
+                  "https://github.com/Tinder/bazel-diff/releases/download/7.0.0/bazel-diff_deploy.jar"
                 ],
                 "name": "bazel_diff"
               },
@@ -116,6 +116,38 @@
                 "file": "@@//:MODULE.bazel",
                 "line": 49,
                 "column": 15
+              }
+            }
+          ],
+          "hasDevUseExtension": false,
+          "hasNonDevUseExtension": true
+        },
+        {
+          "extensionBzlFile": "@rules_rust//crate_universe:extension.bzl",
+          "extensionName": "crate",
+          "usingModule": "<root>",
+          "location": {
+            "file": "@@//:MODULE.bazel",
+            "line": 60,
+            "column": 22
+          },
+          "imports": {
+            "crates_libraries": "crates_libraries"
+          },
+          "devImports": [],
+          "tags": [
+            {
+              "tagName": "from_cargo",
+              "attributeValues": {
+                "name": "crates_libraries",
+                "cargo_lockfile": "//libraries:Cargo.lock",
+                "manifests": []
+              },
+              "devDependency": false,
+              "location": {
+                "file": "@@//:MODULE.bazel",
+                "line": 61,
+                "column": 17
               }
             }
           ],
