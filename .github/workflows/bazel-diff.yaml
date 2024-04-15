@@ -33,7 +33,9 @@ jobs:
         run: bazel run //bazel/diff -- generate-hashes -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
 
       - name: Generate hashes from current
-        run: bazel run //bazel/diff -- generate-hashes -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
+        run: |
+          cargo version
+          bazel run //bazel/diff -- generate-hashes -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
 
       - name: Compute impacted targets
         run: |
