@@ -43,7 +43,7 @@ cron-parser = "0.7.10"
 anyhow = { workspace = true }
 tracing = { workspace = true }
 bitflags = "2.0"
-itertools = "0.10.5"
+itertools = "0.12.1"
 camino = { workspace = true, features = ["serde1"] }
 
 # Optional dependencies
