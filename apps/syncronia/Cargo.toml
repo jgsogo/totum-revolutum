@@ -35,7 +35,7 @@ thiserror = "1.0"
 ignore = {workspace = true}
 async-trait = {workspace = true}
 flume = {workspace = true}
-sha256 = "1.1"
+sha256 = "1.5"
 futures = {workspace = true}
 async-std = {workspace = true}
 
