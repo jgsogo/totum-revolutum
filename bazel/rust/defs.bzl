@@ -3,7 +3,7 @@
 
 load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rust_test_suite")
 
-def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
+def rust_library_tests_and_docs(name, all_features = {}, test_data = None, **kwargs):
     """Creates a predefined set of targets for the given arguments.
 
     This macro generates the following targets:
@@ -31,6 +31,7 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
     rust_library(
         name = "{}/vanilla".format(name),
         crate_name = name,
+        visibility = ["//visibility:public"],
         **kwargs
     )
 
@@ -41,6 +42,7 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
             name = "{}/{}".format(name, key),
             crate_features = value,
             crate_name = name,
+            visibility = ["//visibility:public"],
             **kwargs
         )
         collect_all_features = collect_all_features + value
@@ -50,6 +52,7 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
         name = name,
         crate_features = collect_all_features,
         crate_name = name,
+        visibility = ["//visibility:public"],
         **kwargs
     )
 
@@ -74,7 +77,7 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
     rust_doc(
         name = "doc",
         crate = ":{}".format(name),
-        visibility = ["//libraries:__pkg__"],
+        visibility = ["//visibility:public"],
     )
 
     # Documentation - tests
