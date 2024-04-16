@@ -59,13 +59,14 @@ register_toolchains("@rust_toolchains//:all")
 crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
 crate.from_cargo(
     name = "crates_libraries",
-    cargo_lockfile = "//libraries:Cargo.lock",
+    cargo_lockfile = "//:Cargo.lock",
     manifests = [
-        "//libraries:Cargo.toml",
-        "//libraries/filesystem:Cargo.toml",
+        "//:Cargo.toml",
+        "//apps/syncronia:Cargo.toml",
         "//libraries/constants:Cargo.toml",
-        "//libraries/pcloud_sdk:Cargo.toml",
+        "//libraries/filesystem:Cargo.toml",
         "//libraries/filesystem_pcloud:Cargo.toml",
+        "//libraries/pcloud_sdk:Cargo.toml",
     ],
 )
 use_repo(crate, "crates_libraries")

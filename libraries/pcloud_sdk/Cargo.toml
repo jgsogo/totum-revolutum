@@ -1,5 +1,5 @@
 [package]
-name = "pcloud-sdk"
+name = "pcloud_sdk"
 version = "0.1.0"
 edition = "2021"
 
@@ -61,10 +61,10 @@ clap = { workspace = true, features = ["derive"] }
 tempfile = "3.10"
 env_logger = "0.10"
 tracing-subscriber = "0.3"
-pcloud-sdk = { path = ".", features = ["test_utils"] }
+pcloud_sdk = { path = ".", features = ["test_utils"] }
 
 [[bin]]
-name = "pcloud-sdk"
+name = "pcloud_sdk"
 path = "src/cli/main.rs"
 # Waiting for https://github.com/rust-lang/rfcs/pull/3374
 required-features = ["cli"]
