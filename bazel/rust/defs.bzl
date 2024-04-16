@@ -30,6 +30,7 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
     # A target without any feature
     rust_library(
         name = name,
+        crate_name = name,
         **kwargs
     )
 
@@ -39,6 +40,7 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
         rust_library(
             name = "{}/{}".format(name, key),
             crate_features = value,
+            crate_name = name,
             **kwargs
         )
         collect_all_features = collect_all_features + value
