@@ -61,3 +61,4 @@ repos:
         name: Branch up-to-date with master
         entry: scripts/branch_updated.sh
         language: script
+        always_run: true
