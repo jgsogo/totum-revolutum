@@ -53,3 +53,11 @@ repos:
       - id: fmt
       - id: cargo-check
       - id: clippy
+
+  # Some local scripts
+  - repo: local
+    hooks:
+      - id: branch-updated
+        name: Branch up-to-date with master
+        entry: scripts/branch_updated.sh
+        language: script
