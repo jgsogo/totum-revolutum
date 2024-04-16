@@ -59,6 +59,7 @@ jobs:
           impacted_targets=()
           IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
           formatted_impacted_targets=$(IFS=$'\n'; echo "${impacted_targets[*]}")
+          echo "Impacted targets: $formatted_impacted_targets"
 
           # Do not fail for next command
           set +e
