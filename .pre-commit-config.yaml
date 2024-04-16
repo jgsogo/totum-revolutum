@@ -23,6 +23,7 @@ repos:
       - id: check-toml
       - id: check-xml
       - id: pretty-format-json
+        args: [--autofix]
       - id: no-commit-to-branch
 
   # Check formatting and lint for starlark code
@@ -39,12 +40,6 @@ repos:
       # Requires that commitizen is already installed
       - id: commitizen
         stages: [commit-msg]
-
-  # Prettify some source code files
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
-      - id: prettier
 
   # Run Rust pre-commit hooks
   - repo: https://github.com/doublify/pre-commit-rust

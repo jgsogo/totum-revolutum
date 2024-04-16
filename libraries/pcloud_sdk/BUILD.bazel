@@ -2,20 +2,21 @@ load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@totum_revolutum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
 rust_library_tests_and_docs(
-    name = "filesystem",
+    name = "pcloud_sdk",
     srcs = glob(["src/**/*.rs"]),
     aliases = aliases(),
     all_features = {
-        "diff": ["diff"],
-        "local": ["local"],
-        "test_utils": [
-            "test_utils",
-            "local",
+        "cli": [
+            "cli",
+            "indicatif",
         ],
+        "indicatif": ["indicatif"],
+        "test_utils": ["test_utils"],
     },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    test_data = glob(["resources/**/*.*"]),
     deps = all_crate_deps(
         normal = True,
     ),

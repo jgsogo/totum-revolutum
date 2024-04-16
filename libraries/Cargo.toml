@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["filesystem", "constants"]
+members = ["filesystem", "constants", "pcloud_sdk"]
 
 
 # List all the dependencies that are "common" to all crates. If using them, we

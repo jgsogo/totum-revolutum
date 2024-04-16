@@ -3,52 +3,70 @@
 
 load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test")
 
-def rust_library_tests_and_docs(name, all_features, **kwargs):
+def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
     """Creates a predefined set of targets for the given arguments.
 
-    The generated targets are:
-     * a main target using `rust_library(name="<name>", **kwargs)`
-     * another `rust_library` using `all_features`
-     * a `rust_test` unittesting target `tests`
-     * a `rust_doc` documentation target `doc`
-     * a `rust_doc_test` testing documentation target `doc/test`
+    This macro generates the following targets:
+     * Rust libraries:
+        - `name`: the Rust crate without any feature enabled
+        - `name/<key>`: one crate per entry in the `all_features` dictionary
+        - `name/all_features`: a crate with all features enabled
+     * Documentation target `doc`
+     * Testing targets `tests` and `doc/tests` for documentation
+
+    # FIXME: I'm passing a dictionary to `all_features` even if dependencies between features
+    are already declared in the `Cargo.toml` file. It looks like those dependencies are not
+    taken into account by the Bazel `rust_library`.
 
     Args:
         name (str): the name of the generated targets
-        all_features (List[str]): all the features available for the Rust crate
+        all_features (Dict[str, List]): a dictionary mapping an identifier to a list of features. One
+            target named `<name>/<key>` enabling the list of features in the `<value>` will be created,
+            for each of the entries in the dictionary.
+        test_data (List): data files (and targets) to add to the `data` argument in `rust_test`
         **kwargs: other arguments to use for `rust_library`
     """
+
+    # A target without any feature
     rust_library(
         name = name,
         **kwargs
     )
 
-    kwargs.pop("crate_features", None)
-    kwargs.pop("visibility", None)
+    # Targets created following user inputs
+    collect_all_features = list()
+    for key, value in all_features.items():
+        rust_library(
+            name = "{}/{}".format(name, key),
+            crate_features = value,
+            **kwargs
+        )
+        collect_all_features = collect_all_features + value
 
+    # Target with all features enabled
     rust_library(
-        name = "{}/all".format(name),
-        crate_features = all_features,
+        name = "{}/all_features".format(name),
+        crate_features = collect_all_features,
         crate_name = name,
-        visibility = ["//visibility:private"],
         **kwargs
     )
 
     rust_test(
         name = "tests",
-        crate = ":{}/all".format(name),
-        crate_features = all_features,
+        crate = ":{}/all_features".format(name),
+        crate_features = collect_all_features,
         visibility = ["//visibility:private"],
+        data = test_data,
     )
 
     rust_doc(
         name = "doc",
-        crate = ":{}/all".format(name),
+        crate = ":{}/all_features".format(name),
         visibility = ["//libraries:__pkg__"],
     )
 
     rust_doc_test(
         name = "doc/tests",
-        crate = ":{}/all".format(name),
+        crate = ":{}/all_features".format(name),
         visibility = ["//visibility:private"],
     )
