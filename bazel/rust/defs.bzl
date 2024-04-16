@@ -27,10 +27,12 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, **kwa
         **kwargs: other arguments to use for `rust_library`
     """
 
+    crate_name = kwargs.pop("crate_name", name)
+
     # A target without any feature
     rust_library(
         name = "{}/vanilla".format(name),
-        crate_name = name,
+        crate_name = crate_name,
         visibility = ["//visibility:public"],
         **kwargs
     )
@@ -41,7 +43,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, **kwa
         rust_library(
             name = "{}/{}".format(name, key),
             crate_features = value,
-            crate_name = name,
+            crate_name = crate_name,
             visibility = ["//visibility:public"],
             **kwargs
         )
@@ -51,7 +53,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, **kwa
     rust_library(
         name = name,
         crate_features = collect_all_features,
-        crate_name = name,
+        crate_name = crate_name,
         visibility = ["//visibility:public"],
         **kwargs
     )

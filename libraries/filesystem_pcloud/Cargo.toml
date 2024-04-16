@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 filesystem = { path = "../filesystem" }
-pcloud-sdk = { path = "../pcloud_sdk" }
+pcloud_sdk = { path = "../pcloud_sdk" }
 
 anyhow = { workspace = true }
 async-trait = { workspace = true }
@@ -19,7 +19,7 @@ tracing = { workspace = true }
 
 [dev-dependencies]
 #filesystem = { path = ".", features = ["test_utils"] }
-pcloud-sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
+pcloud_sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
 
 
 [[example]]

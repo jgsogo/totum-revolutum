@@ -1,0 +1,63 @@
+[package]
+name = "syncronia"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+test_utils = []
+cli = []
+
+[dependencies]
+pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
+filesystem = { path = "../../libraries/filesystem", features = ["diff", "local"] }
+filesystem_pcloud = { path = "../../libraries/filesystem_pcloud" }
+
+fs4 = { version = "0.6" }
+confy = { version = "0.5", default-features = false, features = ["yaml_conf"] }
+camino = { workspace = true, features = ["serde1"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+tracing = { workspace = true }
+time = { version = "0.3", features = [
+    "serde",
+    "parsing",
+    "formatting",
+    "macros",
+] }
+# tokio-cron-scheduler = { version = "0.8" }
+cron-parser = "0.7.10"
+chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = { version = "0.8" }
+tokio = { workspace = true, features = ["full"] }
+anyhow = {workspace = true }
+thiserror = "1.0"
+ignore = {workspace = true}
+async-trait = {workspace = true}
+flume = {workspace = true}
+sha256 = "1.1"
+futures = {workspace = true}
+async-std = {workspace = true}
+
+# Optional dependencies
+httpmock = { workspace = true }
+tempfile = { workspace = true}
+
+# Deps for CLI
+clap = {workspace = true, features = ["derive"] }
+clap-verbosity-flag = { workspace = true }
+log = { workspace = true }
+tracing-subscriber = { workspace = true}
+home = { version = "0.5.9" }
+
+[dev-dependencies]
+tempfile = {workspace = true}
+pcloud_sdk = { path = "../../libraries/pcloud_sdk", features = ["test_utils"] }
+syncronia = { path = ".", features = ["test_utils"] }
+
+
+[[bin]]
+name = "scr"
+path = "src/cli/main.rs"
+# Waiting for https://github.com/rust-lang/rfcs/pull/3374
+required-features = ["cli"]
