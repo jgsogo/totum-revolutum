@@ -3,7 +3,7 @@ use std::str::FromStr;
 use anyhow::Result;
 use camino::Utf8Path;
 
-use filesystem::copy::copy;
+use filesystem::actions::copy;
 use filesystem::Filesystem;
 use filesystem_pcloud::FilesystemPCloud;
 use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
