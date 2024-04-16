@@ -17,7 +17,7 @@ async-std = { version = "1.12" }
 async-trait = "0.1"
 camino = "1.1"
 clap = { version = "4.1" }
-clap-verbosity-flag = { version = "2.0.0" }
+clap-verbosity-flag = { version = "2.2.0" }
 dyn-clone = "1.0.17"
 flume = "0.11.0"
 futures = { version = "0.3" }
