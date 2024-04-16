@@ -63,7 +63,7 @@ jobs:
 
           # Do not fail for next command
           set +e
-          bazel test $formatted_impacted_targets
+          bazel test $impacted_targets
 
           # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
           err=$? ; if (( $err != 4 )) ; then exit $err ; fi
