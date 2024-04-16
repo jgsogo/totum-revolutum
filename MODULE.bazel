@@ -63,8 +63,7 @@ crate.from_cargo(
     cargo_lockfile = "//libraries:Cargo.lock",
     manifests = [
         "//libraries:Cargo.toml",
-        # "//libraries/map:Cargo.toml",
-        # "//libraries/storage:Cargo.toml",
+        "//libraries/filesystem:Cargo.toml",
         "//libraries/constants:Cargo.toml",
     ],
 )
