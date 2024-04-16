@@ -5,11 +5,14 @@ rust_library_tests_and_docs(
     name = "pcloud_sdk",
     srcs = glob(["src/**/*.rs"]),
     aliases = aliases(),
-    all_features = [
-        "cli",
-        "indicatif",
-        "test_utils",
-    ],
+    all_features = {
+        "cli": [
+            "cli",
+            "indicatif",
+        ],
+        "indicatif": ["indicatif"],
+        "test_utils": ["test_utils"],
+    },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
