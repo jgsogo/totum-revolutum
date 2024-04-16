@@ -616,9 +616,9 @@ dependencies = [
 
 [[package]]
 name = "cron-parser"
-version = "0.7.11"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3d0da1167446e43ab7212425dd51557626e3635c4687bf622ab12e13ad27a73"
+checksum = "dec3fb0ecd16373b24b010094aba123e810f5f778b419bf826cb36919b8a42fe"
 dependencies = [
  "chrono",
 ]
