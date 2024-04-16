@@ -40,12 +40,14 @@ jobs:
             ${{ runner.os }}-bazel-
 
       - name: Generate hashes from base
-        run: bazel run //bazel/diff -- generate-hashes --useCquery -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
+        run: |
+          bazel run //bazel/diff -- generate-hashes --useCquery -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
+          cat ${{ runner.temp }}/base-hashes.json
 
       - name: Generate hashes from current
         run: |
-          cargo version
           bazel run //bazel/diff -- generate-hashes --useCquery -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
+          cat ${{ runner.temp }}/current-hashes.json
 
       - name: Compute impacted targets
         run: |
