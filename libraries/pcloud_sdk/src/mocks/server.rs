@@ -74,7 +74,13 @@ impl PCloudServerMock {
         self.server.mock(|when, then| {
             when.method(GET).path("/userinfo").query_param("access_token", "token");
 
-            let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+            let manifest_dir = match env::var("BAZEL_TEST") {
+                Ok(_) => {
+                    let current_path = env::current_dir().unwrap();
+                    current_path.join("libraries/pcloud_sdk").to_str().unwrap().to_string()
+                }
+                Err(_) => env::var("CARGO_MANIFEST_DIR").unwrap(),
+            };
             let userinfo_json = Utf8Path::new(&manifest_dir)
                 .join("resources")
                 .join("testdata")

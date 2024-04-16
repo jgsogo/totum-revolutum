@@ -1,6 +1,6 @@
 use tracing::{info, trace};
 
-/// A builder for [ˋprogress_bar::ProgressBar`] items. All bars should be created
+/// A builder for [`ProgressBar`] items. All bars should be created
 /// using the same builder so it can control the output to the
 /// terminal.
 ///

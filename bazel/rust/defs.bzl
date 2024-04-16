@@ -1,7 +1,7 @@
 """ Bazel module providing some helper functions for the Rust rules
 """
 
-load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test")
+load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rust_test_suite")
 
 def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
     """Creates a predefined set of targets for the given arguments.
@@ -51,22 +51,32 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
         **kwargs
     )
 
+    # Unittests
     rust_test(
         name = "tests",
         crate = ":{}/all_features".format(name),
         crate_features = collect_all_features,
-        visibility = ["//visibility:private"],
         data = test_data,
     )
 
+    # Integration tests
+    deps = kwargs.pop("deps", None)
+    rust_test_suite(
+        name = "integration_tests",
+        srcs = native.glob(["tests/**"]),
+        data = test_data,
+        deps = deps + [":{}/all_features".format(name)],
+    )
+
+    # Documentation
     rust_doc(
         name = "doc",
         crate = ":{}/all_features".format(name),
         visibility = ["//libraries:__pkg__"],
     )
 
+    # Documentation - tests
     rust_doc_test(
         name = "doc/tests",
         crate = ":{}/all_features".format(name),
-        visibility = ["//visibility:private"],
     )
