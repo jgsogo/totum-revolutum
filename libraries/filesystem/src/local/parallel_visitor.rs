@@ -4,6 +4,8 @@ use tracing::error;
 
 use crate::local::LocalMetadata;
 
+// FIXME: This doesn't probably belongs to this crate
+
 pub struct Visitor {
     tx: flume::Sender<LocalMetadata>,
 }
