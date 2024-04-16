@@ -1,10 +1,4 @@
-# See CONTRIBUTING.md for instructions.
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
-
-# Commitizen runs in commit-msg stage
-# but we don't want to run the other hooks on commit messages
-# default_stages: [commit]
+# Use 'pre-commit autoupdate' in the CLI to update this repositories
 
 # Use a slightly older version of node by default
 # as the default uses a very new version of GLIBC
