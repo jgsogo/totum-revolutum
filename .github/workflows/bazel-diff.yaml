@@ -29,6 +29,16 @@ jobs:
           echo "I'm NOT a PR"
           git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
 
+      # Bazel cache example taken from https://github.com/actions/cache/blob/main/examples.md#---bazel
+      - name: Cache Bazel
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
       - name: Generate hashes from base
         run: bazel run //bazel/diff -- generate-hashes --useCquery -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
 
@@ -49,7 +59,7 @@ jobs:
           formatted_impacted_targets=$(IFS=$'\n'; echo "${impacted_targets[*]}")
 
           # Do not fail for next command
-          set +e 
+          set +e
           bazel test $formatted_impacted_targets
 
           # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
