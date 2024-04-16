@@ -29,6 +29,16 @@ jobs:
           echo "I'm NOT a PR"
           git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
 
+      # Bazel cache example taken from https://github.com/actions/cache/blob/main/examples.md#---bazel
+      - name: Cache Bazel
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
       - name: Generate hashes from base
         run: bazel run //bazel/diff -- generate-hashes --useCquery -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
 
@@ -41,16 +51,6 @@ jobs:
         run: |
           bazel run //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
           cat ${{ runner.temp }}/impacted-targets.txt
-
-      # Bazel cache example taken from https://github.com/actions/cache/blob/main/examples.md#---bazel
-      - name: Cache Bazel
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          restore-keys: |
-            ${{ runner.os }}-bazel-
 
       - name: Test impacted targets
         run: |
