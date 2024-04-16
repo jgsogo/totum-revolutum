@@ -1,6 +1,6 @@
 use tracing::{info, trace};
 
-/// A builder for [ˋProgressBarˋ] items. All bars should be created
+/// A builder for [ˋprogress_bar::ProgressBar`] items. All bars should be created
 /// using the same builder so it can control the output to the
 /// terminal.
 ///
@@ -48,21 +48,21 @@ impl ProgressBar for NoProgressBar {
     }
 }
 
-#[cfg(feature = "indicatif")]
-impl ProgressBar for indicatif::ProgressBar {
-    fn set_message(&self, message: &str) {
-        self.set_message(message.to_string());
-    }
+// #[cfg(feature = "indicatif")]
+// impl ProgressBar for indicatif::ProgressBar {
+//     fn set_message(&self, message: &str) {
+//         self.set_message(message.to_string());
+//     }
 
-    fn set_position(&self, position: u64) {
-        self.set_position(position);
-    }
+//     fn set_position(&self, position: u64) {
+//         self.set_position(position);
+//     }
 
-    fn finish_with_message(&self, message: &str) {
-        self.finish_with_message(message.to_string());
-    }
+//     fn finish_with_message(&self, message: &str) {
+//         self.finish_with_message(message.to_string());
+//     }
 
-    fn finish(&self) {
-        self.finish();
-    }
-}
+//     fn finish(&self) {
+//         self.finish();
+//     }
+// }
