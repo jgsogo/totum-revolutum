@@ -8,9 +8,9 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
 
     This macro generates the following targets:
      * Rust libraries:
-        - `name`: the Rust crate without any feature enabled
+        - `name/vanilla`: the Rust crate without any feature enabled
         - `name/<key>`: one crate per entry in the `all_features` dictionary
-        - `name/all_features`: a crate with all features enabled
+        - `name`: the Rust library with all features enabled
      * Documentation target `doc`
      * Testing targets `tests` and `doc/tests` for documentation
 
@@ -29,7 +29,8 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
 
     # A target without any feature
     rust_library(
-        name = name,
+        name = "{}/vanilla".format(name),
+        crate_name = name,
         **kwargs
     )
 
@@ -39,13 +40,14 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
         rust_library(
             name = "{}/{}".format(name, key),
             crate_features = value,
+            crate_name = name,
             **kwargs
         )
         collect_all_features = collect_all_features + value
 
     # Target with all features enabled
     rust_library(
-        name = "{}/all_features".format(name),
+        name = name,
         crate_features = collect_all_features,
         crate_name = name,
         **kwargs
@@ -54,7 +56,7 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
     # Unittests
     rust_test(
         name = "tests",
-        crate = ":{}/all_features".format(name),
+        crate = ":{}".format(name),
         crate_features = collect_all_features,
         data = test_data,
     )
@@ -65,18 +67,18 @@ def rust_library_tests_and_docs(name, all_features, test_data = None, **kwargs):
         name = "integration_tests",
         srcs = native.glob(["tests/**"]),
         data = test_data,
-        deps = deps + [":{}/all_features".format(name)],
+        deps = deps + [":{}".format(name)],
     )
 
     # Documentation
     rust_doc(
         name = "doc",
-        crate = ":{}/all_features".format(name),
+        crate = ":{}".format(name),
         visibility = ["//libraries:__pkg__"],
     )
 
     # Documentation - tests
     rust_doc_test(
         name = "doc/tests",
-        crate = ":{}/all_features".format(name),
+        crate = ":{}".format(name),
     )
