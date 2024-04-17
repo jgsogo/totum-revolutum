@@ -1,0 +1,70 @@
+[package]
+name = "pcloud_sdk"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+### The `cli` feature is required for the CLI binary. It also provides structs and methods to handle and
+### store app authentication.
+cli = ["indicatif"]
+indicatif = []
+test_utils = []
+
+
+[dependencies]
+bytes = "1"
+#clap = { version = "3.2" }
+#clap-verbosity-flag = { version = "1.0" }
+tokio = { workspace = true, features = ["full"] }
+hyper = { version = "0.14", features = ["full"] }
+dirs = { version = "5.0" }
+http = "0.2"
+http-body = "0.4"
+futures = {workspace = true}
+futures-util = { version = "0.3", default-features = false, features = ["alloc"] }
+url = "2.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_repr = "0.1"
+async-trait = "0.1"
+reqwest = { version = "0.11", features = ["stream"] }
+thiserror = "1.0"
+time = { version = "0.3", features = [
+    "serde",
+    "parsing",
+    "formatting",
+    "macros",
+] }
+strum = { workspace = true, features = ["derive"] }
+strum_macros = {workspace = true}
+chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = { version = "0.8" }
+cron-parser = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+bitflags = "2.5"
+itertools = "0.12.1"
+camino = { workspace = true, features = ["serde1"] }
+
+# Optional dependencies
+indicatif = {workspace = true }
+mockall = { workspace = true }
+httpmock = { workspace = true }
+
+# Deps for CLI
+clap-verbosity-flag = { workspace = true  }
+tracing-subscriber = { workspace = true }
+log = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+
+[dev-dependencies]
+tempfile = {workspace = true}
+env_logger = "0.11.3"
+tracing-subscriber = "0.3"
+pcloud_sdk = { path = ".", features = ["test_utils"] }
+
+[[bin]]
+name = "pcloud_sdk"
+path = "src/cli/main.rs"
+# Waiting for https://github.com/rust-lang/rfcs/pull/3374
+required-features = ["cli"]

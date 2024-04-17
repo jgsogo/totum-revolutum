@@ -1,0 +1,10 @@
+# TODO: Collect all documentation targets from libraries here, make it possible to spawn a static webserver for them. See https://github.com/bazelbuild/rules_rust/issues/472
+
+filegroup(
+    name = "doc",
+    srcs = [
+        "//libraries/constants:doc",
+        "//libraries/filesystem:doc",
+    ],
+    visibility = ["//docs:__subpackages__"],
+)

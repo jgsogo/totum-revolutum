@@ -5,24 +5,23 @@ module(
 )
 
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
-bazel_dep(name = "platforms", version = "0.0.8")
+bazel_dep(name = "platforms", version = "0.0.9")
 
 bazel_dep(name = "rules_python", version = "0.31.0", dev_dependency = True)
-bazel_dep(name = "rules_rust", version = "0.41.1", dev_dependency = True)
+bazel_dep(name = "rules_rust", version = "0.42.1", dev_dependency = True)
 
-bazel_dep(name = "aspect_rules_py", version = "0.5.0")
+bazel_dep(name = "aspect_rules_py", version = "0.7.1")
 
-bazel_dep(name = "aspect_bazel_lib", version = "2.5.1", dev_dependency = True)
-bazel_dep(name = "buildifier_prebuilt", version = "6.4.0", dev_dependency = True)
+bazel_dep(name = "aspect_bazel_lib", version = "2.7.0", dev_dependency = True)
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
 # Bazel-diff: https://github.com/Tinder/bazel-diff
 http_jar(
     name = "bazel_diff",
-    sha256 = "0b9e32f9c20e570846b083743fe967ae54d13e2a1f7364983e0a7792979442be",
+    sha256 = "29757a669e321a56c0dd1737a66eb595de07164612a116a1d82ef498a58d6cc3",
     urls = [
-        "https://github.com/Tinder/bazel-diff/releases/download/7.0.0/bazel-diff_deploy.jar",
+        "https://github.com/Tinder/bazel-diff/releases/download/7.0.1/bazel-diff_deploy.jar",
     ],
 )
 
@@ -60,12 +59,14 @@ register_toolchains("@rust_toolchains//:all")
 crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
 crate.from_cargo(
     name = "crates_libraries",
-    cargo_lockfile = "//libraries:Cargo.lock",
+    cargo_lockfile = "//:Cargo.lock",
     manifests = [
-        "//libraries:Cargo.toml",
-        # "//libraries/map:Cargo.toml",
-        # "//libraries/storage:Cargo.toml",
+        "//:Cargo.toml",
+        "//apps/syncronia:Cargo.toml",
         "//libraries/constants:Cargo.toml",
+        "//libraries/filesystem:Cargo.toml",
+        "//libraries/filesystem_pcloud:Cargo.toml",
+        "//libraries/pcloud_sdk:Cargo.toml",
     ],
 )
 use_repo(crate, "crates_libraries")
