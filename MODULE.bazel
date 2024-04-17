@@ -1,5 +1,5 @@
 module(
-    name = "totum_revolutum",
+    name = "totum",
     version = "0.0.0",
     compatibility_level = 1,
 )
