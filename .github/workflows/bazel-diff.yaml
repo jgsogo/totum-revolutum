@@ -31,7 +31,7 @@ jobs:
 
       # Bazel cache example taken from https://github.com/actions/cache/blob/main/examples.md#---bazel
       - name: Cache Bazel
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cache/bazel
