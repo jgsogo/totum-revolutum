@@ -19,7 +19,7 @@ bitflags = "2.5"
 bytes = "1"
 camino = "1.1"
 chrono = { version = "0.4" }
-chrono-tz = { version = "0.8" }
+chrono-tz = { version = "0.9" }
 clap = { version = "4.5" }
 clap-verbosity-flag = { version = "2.2" }
 confy = { version = "0.6.1", default-features = false, features = ["yaml_conf"] }
