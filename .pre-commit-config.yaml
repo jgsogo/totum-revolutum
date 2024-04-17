@@ -28,8 +28,6 @@ repos:
       - id: file-contents-sorter
         files: (\.gitignore|\.bazelignore)
         args: [--unique]
-        verbose: true
-        always_run: true
 
   # Check formatting and lint for starlark code
   - repo: https://github.com/keith/pre-commit-buildifier

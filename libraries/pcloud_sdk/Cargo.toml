@@ -5,10 +5,12 @@ edition = "2021"
 
 [features]
 ### The `cli` feature is required for the CLI binary. It also provides structs and methods to handle and
-### store app authentication.
-cli = ["indicatif"]
-indicatif = []
-test_utils = []
+### store app authentication. We need to add it ot the "default" features as they are the ones enabled
+### while building the CLI "binary"
+default = ["cli"]
+cli = ["dep:clap-verbosity-flag", "dep:tracing-subscriber", "dep:log", "dep:clap", "use_indicatif"]
+use_indicatif = ["dep:indicatif"]
+test_utils = ["dep:mockall", "dep:httpmock"]
 
 
 [dependencies]
@@ -45,15 +47,15 @@ itertools = {workspace = true}
 camino = { workspace = true, features = ["serde1"] }
 
 # Optional dependencies
-indicatif = {workspace = true }
-mockall = { workspace = true }
-httpmock = { workspace = true }
+indicatif = {workspace = true, optional = true }
+mockall = { workspace = true, optional = true }
+httpmock = { workspace = true, optional = true }
 
 # Deps for CLI
-clap-verbosity-flag = { workspace = true  }
-tracing-subscriber = { workspace = true }
-log = { workspace = true }
-clap = { workspace = true, features = ["derive"] }
+clap-verbosity-flag = { workspace = true, optional = true  }
+tracing-subscriber = { workspace = true , optional = true}
+log = { workspace = true, optional = true }
+clap = { workspace = true, features = ["derive"], optional = true }
 
 [dev-dependencies]
 tempfile = {workspace = true}
@@ -64,5 +66,5 @@ pcloud_sdk = { path = ".", features = ["test_utils"] }
 [[bin]]
 name = "pcloud_sdk"
 path = "src/cli/main.rs"
-# Waiting for https://github.com/rust-lang/rfcs/pull/3374
+# Waiting for https://github.com/rust-lang/cargo/issues/4663 (and related: https://github.com/rust-lang/rfcs/pull/3374)
 required-features = ["cli"]

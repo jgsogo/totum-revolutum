@@ -109,8 +109,8 @@ async fn upload(
     let r = pcloud.uploadfile(abs_file_to_upload.as_ref(), upload_params).await?;
     let _ = tx.send(());
 
-    let file_id = r.fileids.get(0).unwrap();
-    Ok(FileID(file_id.clone()))
+    let file_id = r.fileids.first().unwrap();
+    Ok(FileID(*file_id))
 }
 
 pub async fn handle(
@@ -119,7 +119,7 @@ pub async fn handle(
     params: Params,
     cli_params: CliParams,
 ) -> Result<()> {
-    let remote_folder = Folder::from_str(&*params.remote_dir)?;
+    let remote_folder = Folder::from_str(&params.remote_dir)?;
     let remote_folder = match remote_folder {
         Folder::FolderID(f) => f,
         Folder::RemotePath(p) => pcloud.get_folderid(&p).await?,
@@ -136,7 +136,7 @@ pub async fn handle(
     .buffer_unordered(cli_params.parallel)
     .map(|r| match r {
         Ok(file) => output.fileid(file),
-        Err(e) => output.eprintln(&*format!("Error uploading {e}")),
+        Err(e) => output.eprintln(&format!("Error uploading {e}")),
     })
     .collect::<Vec<_>>();
     uploads.await;

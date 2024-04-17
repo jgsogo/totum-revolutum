@@ -9,9 +9,9 @@ rust_library_tests_and_docs(
     all_features = {
         "cli": [
             "cli",
-            "indicatif",
+            "use_indicatif",
         ],
-        "indicatif": ["indicatif"],
+        "use_indicatif": ["use_indicatif"],
         "test_utils": ["test_utils"],
     },
     proc_macro_deps = all_crate_deps(
@@ -26,9 +26,10 @@ rust_library_tests_and_docs(
 rust_binary(
     name = "cli",
     srcs = glob(["src/cli/**/*.rs"]),
+    aliases = aliases(),
     crate_features = [
         "cli",
-        "indicatif",
+        "use_indicatif",
     ],
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
@@ -36,7 +37,9 @@ rust_binary(
     deps = all_crate_deps(
         normal = True,
     ) + [
-        ":pcloud_sdk/cli",
-        "@crates_libraries//:indicatif",
+        ":pcloud_sdk",
+        # "@crates_libraries//:tracing-subscriber",
+        # "@crates_libraries//:log",
+        # "@crates_libraries//:indicatif",
     ],
 )

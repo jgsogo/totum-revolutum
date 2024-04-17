@@ -52,7 +52,7 @@ impl Print for DefaultOutput {
     }
 
     fn eprintln(&self, text: &str) -> Result<()> {
-        self.pbs.println(format!("{text}")).map_err(|e| anyhow!(e))
+        self.pbs.println(text).map_err(|e| anyhow!(e))
     }
 
     fn path(&self, path: Utf8PathBuf) -> Result<()> {
