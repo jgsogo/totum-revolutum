@@ -5,31 +5,31 @@ edition = "2021"
 
 [features]
 ### The `cli` feature is required for the CLI binary. It also provides structs and methods to handle and
-### store app authentication.
-cli = ["indicatif"]
-indicatif = []
-test_utils = []
+### store app authentication. We need to add it ot the "default" features as they are the ones enabled
+### while building the CLI "binary"
+default = ["cli"]
+cli = ["dep:clap-verbosity-flag", "dep:tracing-subscriber", "dep:log", "dep:clap", "use_indicatif"]
+use_indicatif = ["dep:indicatif"]
+test_utils = ["dep:mockall", "dep:httpmock"]
 
 
 [dependencies]
-bytes = "1"
-#clap = { version = "3.2" }
-#clap-verbosity-flag = { version = "1.0" }
+bytes = {workspace = true}
 tokio = { workspace = true, features = ["full"] }
-hyper = { version = "0.14", features = ["full"] }
-dirs = { version = "5.0" }
-http = "0.2"
-http-body = "0.4"
+hyper = { workspace = true, features = ["full"] }
+dirs = { workspace = true }
+http = {workspace = true}
+http-body = {workspace = true}
 futures = {workspace = true}
-futures-util = { version = "0.3", default-features = false, features = ["alloc"] }
-url = "2.5"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde_repr = "0.1"
-async-trait = "0.1"
-reqwest = { version = "0.11", features = ["stream"] }
-thiserror = "1.0"
-time = { version = "0.3", features = [
+futures-util = { workspace = true, default-features = false, features = ["alloc"] }
+url = {workspace = true}
+serde = { workspace = true, features = ["derive"] }
+serde_json = {workspace = true}
+serde_repr = {workspace = true}
+async-trait = {workspace = true}
+reqwest = { workspace = true, features = ["stream"] }
+thiserror = {workspace = true}
+time = { workspace = true, features = [
     "serde",
     "parsing",
     "formatting",
@@ -37,34 +37,34 @@ time = { version = "0.3", features = [
 ] }
 strum = { workspace = true, features = ["derive"] }
 strum_macros = {workspace = true}
-chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = { version = "0.8" }
+chrono = { workspace = true, features = ["serde"] }
+chrono-tz = { workspace = true }
 cron-parser = { workspace = true }
 anyhow = { workspace = true }
 tracing = { workspace = true }
-bitflags = "2.5"
-itertools = "0.12.1"
+bitflags = {workspace = true}
+itertools = {workspace = true}
 camino = { workspace = true, features = ["serde1"] }
 
 # Optional dependencies
-indicatif = {workspace = true }
-mockall = { workspace = true }
-httpmock = { workspace = true }
+indicatif = {workspace = true, optional = true }
+mockall = { workspace = true, optional = true }
+httpmock = { workspace = true, optional = true }
 
 # Deps for CLI
-clap-verbosity-flag = { workspace = true  }
-tracing-subscriber = { workspace = true }
-log = { workspace = true }
-clap = { workspace = true, features = ["derive"] }
+clap-verbosity-flag = { workspace = true, optional = true  }
+tracing-subscriber = { workspace = true , optional = true}
+log = { workspace = true, optional = true }
+clap = { workspace = true, features = ["derive"], optional = true }
 
 [dev-dependencies]
 tempfile = {workspace = true}
-env_logger = "0.11.3"
-tracing-subscriber = "0.3"
+env_logger = {workspace = true}
+tracing-subscriber = {workspace = true}
 pcloud_sdk = { path = ".", features = ["test_utils"] }
 
 [[bin]]
 name = "pcloud_sdk"
 path = "src/cli/main.rs"
-# Waiting for https://github.com/rust-lang/rfcs/pull/3374
+# Waiting for https://github.com/rust-lang/cargo/issues/4663 (and related: https://github.com/rust-lang/rfcs/pull/3374)
 required-features = ["cli"]

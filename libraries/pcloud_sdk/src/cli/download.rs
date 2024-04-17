@@ -67,7 +67,7 @@ pub async fn handle(
     .buffer_unordered(cli_params.parallel)
     .map(|r| match r {
         Ok(file) => output.path(file),
-        Err(e) => output.eprintln(&*format!("Error downloading {e}")),
+        Err(e) => output.eprintln(&format!("Error downloading {e}")),
     })
     .collect::<Vec<_>>();
     downloads.await;

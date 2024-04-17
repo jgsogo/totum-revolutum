@@ -1,17 +1,12 @@
-# Bazel specific
+.DS_Store
+.bazelrc.user
+.idea/
 bazel-bin
 bazel-out
 bazel-testlogs
 bazel-totum-revolutum
-.bazelrc.user
-
-# Rust
-target/
-
-/target
+examples/files/
 secret.json
-/secrets
-/examples/files
-.idea/
-/test
-.DS_Store
+secrets/
+target/
+test/

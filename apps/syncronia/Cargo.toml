@@ -4,22 +4,26 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-test_utils = []
-cli = []
+### The `cli` feature is required for the CLI binary. It also provides structs and methods to handle and
+### store app authentication. We need to add it ot the "default" features as they are the ones enabled
+### while building the CLI "binary"
+default = ["cli"]
+test_utils = ["dep:httpmock", "dep:tempfile"]
+cli = ["dep:clap-verbosity-flag", "dep:log", "dep:tracing-subscriber", "dep:home", "dep:clap"]
 
 [dependencies]
 pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
 filesystem = { path = "../../libraries/filesystem", features = ["diff", "local"] }
 filesystem_pcloud = { path = "../../libraries/filesystem_pcloud" }
 
-fs4 = { version = "0.8.2" }
-confy = { version = "0.6.1", default-features = false, features = ["yaml_conf"] }
+fs4 = { workspace = true }
+confy = { workspace = true, default-features = false, features = ["yaml_conf"] }
 camino = { workspace = true, features = ["serde1"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde_yaml = "0.9"
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
 tracing = { workspace = true }
-time = { version = "0.3", features = [
+time = {workspace = true, features = [
     "serde",
     "parsing",
     "formatting",
@@ -27,11 +31,11 @@ time = { version = "0.3", features = [
 ] }
 # tokio-cron-scheduler = { version = "0.8" }
 cron-parser = {workspace = true }
-chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = { version = "0.8" }
+chrono = { workspace = true, features = ["serde"] }
+chrono-tz = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 anyhow = {workspace = true }
-thiserror = "1.0"
+thiserror = {workspace = true }
 ignore = {workspace = true}
 async-trait = {workspace = true}
 flume = {workspace = true}
@@ -40,15 +44,15 @@ futures = {workspace = true}
 async-std = {workspace = true}
 
 # Optional dependencies
-httpmock = { workspace = true }
-tempfile = { workspace = true}
+httpmock = { workspace = true, optional = true }
+tempfile = { workspace = true, optional = true}
 
 # Deps for CLI
-clap = {workspace = true, features = ["derive"] }
-clap-verbosity-flag = { workspace = true }
-log = { workspace = true }
-tracing-subscriber = { workspace = true}
-home = { version = "0.5.9" }
+clap = {workspace = true, features = ["derive"], optional = true }
+clap-verbosity-flag = { workspace = true, optional = true }
+log = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true}
+home = {workspace = true, optional = true }
 
 [dev-dependencies]
 tempfile = {workspace = true}
@@ -59,5 +63,5 @@ syncronia = { path = ".", features = ["test_utils"] }
 [[bin]]
 name = "scr"
 path = "src/cli/main.rs"
-# Waiting for https://github.com/rust-lang/rfcs/pull/3374
+# Waiting for https://github.com/rust-lang/cargo/issues/4663 (and related: https://github.com/rust-lang/rfcs/pull/3374)
 required-features = ["cli"]
