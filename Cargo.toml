@@ -32,7 +32,7 @@ fs4 = { version = "0.8.2" }
 futures = { version = "0.3" }
 futures-util = { version = "0.3", default-features = false }
 home = { version = "0.5.9" }
-http = "0.2"
+http = "1.1"
 http-body = "0.4"
 httpmock = { version = "0.7" }
 hyper = { version = "0.14" }
