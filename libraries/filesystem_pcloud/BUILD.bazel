@@ -1,6 +1,6 @@
 load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
-load("@totum_revolutum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
 rust_library_tests_and_docs(
     name = "filesystem_pcloud",
@@ -12,8 +12,8 @@ rust_library_tests_and_docs(
     deps = all_crate_deps(
         normal = True,
     ) + [
-        "@totum_revolutum//libraries/filesystem",
-        "@totum_revolutum//libraries/pcloud_sdk",
+        "@totum//libraries/filesystem",
+        "@totum//libraries/pcloud_sdk",
     ],
 )
 
@@ -27,7 +27,7 @@ rust_binary(
         normal = True,
     ) + [
         ":filesystem_pcloud",
-        "@totum_revolutum//libraries/filesystem",
-        "@totum_revolutum//libraries/pcloud_sdk",
+        "@totum//libraries/filesystem",
+        "@totum//libraries/pcloud_sdk",
     ],
 )

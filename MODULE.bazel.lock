@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "4ece6254ac15835f7845c45e4fa7e85ccec6b92938a0ca21fca4bc0b82a998d3",
+  "moduleFileHash": "76bd8248bb5e937dde8799f7ee5ecee3d2a6f1b51db632ea15ad6971e4b7dc12",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -17,10 +17,10 @@
   },
   "moduleDepGraph": {
     "<root>": {
-      "name": "totum_revolutum",
+      "name": "totum",
       "version": "0.0.0",
       "key": "<root>",
-      "repoName": "totum_revolutum",
+      "repoName": "totum",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [
         "@rust_toolchains//:all"
