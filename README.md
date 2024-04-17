@@ -4,6 +4,9 @@ Totum revolutum
 > Loc. lat.; literalmente 'todo revuelto'.
 >
 > m. revoltijo (‖ conjunto de cosas sin orden).
+>
+> <small>REAL ACADEMIA ESPAÑOLA: Diccionario de la lengua española, 23.ª ed., [versión 23.7 en línea]. <https://dle.rae.es> 2024-04-17.</small>
+
 
 I find myself reinventing the wheel from time to time, I find myself loving it! But many times
 I find myself reinventing the wheel so I can reinvent the wheel again. There are a lot of tooling
@@ -22,31 +25,25 @@ Enjoy the visit!
 
 Applications in this repository:
 
+ * [syncronia](apps/syncronia/): a tool to run sync operations between different
+   directories and storages
+
 ## Libraries
 
 You can find the following libraries in this repository:
+
+ * [constants](libraries/constants/) [Rust]: compile-time constants definition
+ * [filesystem](libraries/filesystem/) [Rust]: abstraction of filesystem and files.
+   Implementation for local storage.
+ * [filesystem_pcloud](libraries/filesystem_pcloud/): implementation of [filesystem](libraries/filesystem/)
+   for pCloud remote storage.
+ * [pcloud_sdk](libraries/pcloud_sdk/) [Rust]: pCloud SDK.
 
 ## Tooling
 
 Tools that can be reused from this repository:
 
 
-[![Build and test](https://github.com/jgsogo/totum-revolutum/actions/workflows/bazel-diff.yaml/badge.svg)](https://github.com/jgsogo/totum-revolutum/actions/workflows/bazel-diff.yaml)
-
 ---
 
-
-The aim of this project is to create an easy-to-use (git-like) tool to run sync
-operations between different directories and storages. It uses an abstraction
-over a filesystem and, on top of the abstraction, it builds some sync operations
-like backup, copy, mirror,...
-
-The project has evolved quite a bit and now it contains several crates:
-
- * [pcloud-sdk](pcloud_sdk): Implementation of the [pCloud](https://pcloud.com/) API
- * [filesystem](filesystem): Filesystem abstraction. It also implements `local`
-   and `mock`.
- * [filesystem-pcloud](filesystem-pcloud): Implementation of the `filesystem` trait
-   for remote pCloud storage.
- * [syncronia](syncronia): Operations between different filesystems. It also provides a
-   CLI tool
+[![Build and test](https://github.com/jgsogo/totum-revolutum/actions/workflows/bazel-diff.yaml/badge.svg)](https://github.com/jgsogo/totum-revolutum/actions/workflows/bazel-diff.yaml)
