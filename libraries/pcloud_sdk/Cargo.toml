@@ -12,24 +12,22 @@ test_utils = []
 
 
 [dependencies]
-bytes = "1"
-#clap = { version = "3.2" }
-#clap-verbosity-flag = { version = "1.0" }
+bytes = {workspace = true}
 tokio = { workspace = true, features = ["full"] }
-hyper = { version = "0.14", features = ["full"] }
-dirs = { version = "5.0" }
-http = "0.2"
-http-body = "0.4"
+hyper = { workspace = true, features = ["full"] }
+dirs = { workspace = true }
+http = {workspace = true}
+http-body = {workspace = true}
 futures = {workspace = true}
-futures-util = { version = "0.3", default-features = false, features = ["alloc"] }
-url = "2.5"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde_repr = "0.1"
-async-trait = "0.1"
-reqwest = { version = "0.11", features = ["stream"] }
-thiserror = "1.0"
-time = { version = "0.3", features = [
+futures-util = { workspace = true, default-features = false, features = ["alloc"] }
+url = {workspace = true}
+serde = { workspace = true, features = ["derive"] }
+serde_json = {workspace = true}
+serde_repr = {workspace = true}
+async-trait = {workspace = true}
+reqwest = { workspace = true, features = ["stream"] }
+thiserror = {workspace = true}
+time = { workspace = true, features = [
     "serde",
     "parsing",
     "formatting",
@@ -37,13 +35,13 @@ time = { version = "0.3", features = [
 ] }
 strum = { workspace = true, features = ["derive"] }
 strum_macros = {workspace = true}
-chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = { version = "0.8" }
+chrono = { workspace = true, features = ["serde"] }
+chrono-tz = { workspace = true }
 cron-parser = { workspace = true }
 anyhow = { workspace = true }
 tracing = { workspace = true }
-bitflags = "2.5"
-itertools = "0.12.1"
+bitflags = {workspace = true}
+itertools = {workspace = true}
 camino = { workspace = true, features = ["serde1"] }
 
 # Optional dependencies
@@ -59,8 +57,8 @@ clap = { workspace = true, features = ["derive"] }
 
 [dev-dependencies]
 tempfile = {workspace = true}
-env_logger = "0.11.3"
-tracing-subscriber = "0.3"
+env_logger = {workspace = true}
+tracing-subscriber = {workspace = true}
 pcloud_sdk = { path = ".", features = ["test_utils"] }
 
 [[bin]]
