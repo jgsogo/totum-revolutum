@@ -1936,7 +1936,7 @@ dependencies = [
  "futures",
  "futures-util",
  "headers",
- "http 0.2.12",
+ "http 1.1.0",
  "http-body 0.4.6",
  "httpmock",
  "hyper 0.14.28",

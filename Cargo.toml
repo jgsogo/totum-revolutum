@@ -33,10 +33,10 @@ futures = { version = "0.3" }
 futures-util = { version = "0.3", default-features = false }
 headers = { version = "0.4.0" }
 home = { version = "0.5.9" }
-http = "0.2"
+http = "1.1.0"
 http-body = "0.4"
 httpmock = { version = "0.7" }
-hyper = { version = "0.14" }
+hyper = { version = "0.14.27" }
 ignore = { version = "0.4" }
 indicatif = { version = "0.17" }
 itertools = "0.12.1"
