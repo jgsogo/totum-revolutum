@@ -12,4 +12,5 @@ ALL_LIBRARIES = [
 rust_docs(
     name = "docs",
     crates = ["//libraries/{}".format(it) for it in ALL_LIBRARIES],
+    visibility = ["//docs:__subpackages__"],
 )

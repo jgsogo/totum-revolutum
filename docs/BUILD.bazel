@@ -1,1 +1,9 @@
 # TODO: Take docs from target `//libraries:docs.zip` and compose the documentation to be published
+
+filegroup(
+    name = "docs",
+    srcs = [
+        "//apps/syncronia:docs",
+        "//libraries:docs",
+    ],
+)

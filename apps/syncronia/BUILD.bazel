@@ -49,4 +49,5 @@ rust_docs(
         ":syncronia",
         ":syncronia_lib",
     ],
+    visibility = ["//docs:__subpackages__"],
 )
