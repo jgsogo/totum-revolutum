@@ -3,11 +3,12 @@ use std::fs::File;
 use std::io;
 use std::io::Read;
 use std::io::Write;
+use std::str::FromStr;
 
 use anyhow::{anyhow, bail, Result};
 use camino::Utf8Path;
-use hyper;
-use hyper::header::{CONNECTION, CONTENT_TYPE};
+use headers::HeaderMapExt;
+use mime::Mime;
 use reqwest;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -59,11 +60,18 @@ where
 {
     // TODO: Pass headers from the client, we don't need to keep-alive always, only in
     //  file_open/close/read/... or for performance reasons
+    let header_map = {
+        let mut header_map = headers::HeaderMap::new();
+        let conn = headers::Connection::keep_alive();
+        header_map.typed_insert(conn);
+        header_map
+    };
+
     let result = client
         .get(url)
         //.headers(headers)
         //.header("Keep-Alive", "timeout=5, max=1000")
-        .header(CONNECTION, "Keep-Alive")
+        .headers(header_map)
         .query(&params)
         .send()
         .await?
@@ -82,11 +90,20 @@ pub(crate) async fn post<T>(
 where
     T: DeserializeOwned,
 {
+    let header_map = {
+        let mut header_map = headers::HeaderMap::new();
+        let conn = headers::Connection::keep_alive();
+        header_map.typed_insert(conn);
+        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
+        let content_type = headers::ContentType::from(mime_multipart);
+        header_map.typed_insert(content_type);
+        header_map
+    };
+
     let result = client
         .post(url)
         //.headers(headers)
-        .header(CONTENT_TYPE, format!("multipart/form-data; boundary={BOUNDARY}"))
-        .header(CONNECTION, "Keep-Alive")
+        .headers(header_map)
         .query(&params)
         .body(reqwest::Body::from(data))
         .send()
@@ -97,9 +114,16 @@ where
 }
 
 pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMap<String, String>) -> Result<Vec<u8>> {
+    let header_map = {
+        let mut header_map = headers::HeaderMap::new();
+        let conn = headers::Connection::keep_alive();
+        header_map.typed_insert(conn);
+        header_map
+    };
+
     let r = client
         .get(url)
-        .header(CONNECTION, "Keep-Alive")
+        .headers(header_map)
         .query(&params)
         .send()
         .await?
