@@ -17,6 +17,7 @@ test_utils = ["dep:mockall", "dep:httpmock"]
 bytes = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 hyper = { workspace = true, features = ["full"] }
+hyper-util = { workspace = true, features = ["server"] }
 dirs = { workspace = true }
 http = { workspace = true }
 http-body = { workspace = true }
@@ -47,6 +48,7 @@ itertools = { workspace = true }
 camino = { workspace = true, features = ["serde1"] }
 headers = { workspace = true }
 mime = { workspace = true }
+http-body-util = { workspace = true }
 
 # Optional dependencies
 indicatif = { workspace = true, optional = true }

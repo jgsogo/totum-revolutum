@@ -1,12 +1,18 @@
 use std::collections::HashMap;
+use std::io;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 
 use anyhow::Result;
-use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Method, Request, Response, Server, StatusCode};
+use http_body_util::Full;
+use hyper::body::{Bytes, Incoming};
+use hyper::server::conn::http1;
+use hyper::service::service_fn;
+use hyper::{Method, Request, Response, StatusCode};
+use hyper_util::rt::TokioIo;
 use reqwest;
 use serde::de::DeserializeOwned;
+use tokio::net::TcpListener;
 use tokio::sync::oneshot::Sender;
 use url::Url;
 
@@ -33,11 +39,11 @@ impl<Token: OAuth2Token> AppContext<Token> {
 
 async fn dispatcher<Token: OAuth2Token + DeserializeOwned>(
     http_client: reqwest::Client,
-    req: Request<Body>,
+    req: Request<Incoming>,
     data: Arc<Mutex<AppContext<Token>>>,
-) -> Result<Response<Body>> {
+) -> Result<Response<Full<Bytes>>> {
     match (req.method(), req.uri().path()) {
-        (&Method::GET, "/") => Ok(Response::new(Body::from("Hello /"))),
+        (&Method::GET, "/") => Ok(Response::new(Full::new(Bytes::from("Hello /")))),
         (&Method::GET, CALLBACK_ENDPOINT) => {
             let params: HashMap<String, String> = req
                 .uri()
@@ -56,7 +62,9 @@ async fn dispatcher<Token: OAuth2Token + DeserializeOwned>(
                 data.oauth2_token = Some(oauth2_token);
                 data.tx.take().unwrap().send(()).unwrap();
             }
-            Ok(Response::new(Body::from(format!("Hello /redirect_url qs:{params:#?}"))))
+            Ok(Response::new(Full::new(Bytes::from(format!(
+                "Hello /redirect_url qs:{params:#?}"
+            )))))
         }
 
         // Return the 404 Not Found for other routes.
@@ -83,35 +91,42 @@ fn visit_url(app: &AppClientData, callback_url: String) -> String {
 pub(crate) async fn serve<Token: OAuth2Token + DeserializeOwned + Sync + Send + 'static>(
     http_client: reqwest::Client,
     app: AppClientData,
-    addr: SocketAddr,
+    listen_addr: SocketAddr,
 ) -> Result<Token> {
     let (tx, rx) = tokio::sync::oneshot::channel::<()>();
-    let visit_url = visit_url(&app, format!("http://{addr}{CALLBACK_ENDPOINT}"));
+    let visit_url = visit_url(&app, format!("http://{listen_addr}{CALLBACK_ENDPOINT}"));
     let app_context = Arc::new(Mutex::new(AppContext::new(app, tx)));
 
-    let graceful = {
-        let data = app_context.clone();
-        let service = make_service_fn(move |_| {
-            let data = data.clone();
-            let http_client = http_client.clone();
-            async move {
-                Ok::<_, Box<dyn std::error::Error + Send + Sync>>(service_fn(move |req| {
-                    dispatcher(http_client.clone(), req, data.clone())
-                }))
-            }
-        });
-        let server = Server::bind(&addr).serve(service);
-        server.with_graceful_shutdown(async {
-            rx.await.ok();
-        })
-    };
-
-    println!("Listening on http://{addr}");
+    // Bind to the port and listen for incoming TCP connections
+    let listener = TcpListener::bind(listen_addr).await?;
+    println!("Listening on http://{}", listen_addr);
     println!("Visit {visit_url}");
 
-    // Await the `server` receiving the signal...
-    if let Err(e) = graceful.await {
-        eprintln!("server error: {e}");
+    tokio::select! {
+        _ = async {
+            loop {
+                let (tcp, remote_address) = listener.accept().await?;
+                let io = TokioIo::new(tcp);
+                tracing::info!("accepted connection from {:?}", remote_address);
+
+                let app_context = app_context.clone();
+                let http_client = http_client.clone();
+                tokio::spawn(async move {
+                    if let Err(err) = http1::Builder::new().serve_connection(
+                        io,
+                        service_fn(move |req| dispatcher(http_client.clone(), req, app_context.clone())),
+                    ).await {
+                        tracing::error!("Error serving connection: {:?}", err)
+                    }
+                });
+            }
+            #[allow(unreachable_code)]
+            // Help the rust type inference out
+            Ok::<_, io::Error>(())
+        } => {}
+        _ = rx => {
+            tracing::info!("calling conn.graceful_shutdown");
+        }
     }
 
     let xx = &mut app_context.lock().unwrap();
