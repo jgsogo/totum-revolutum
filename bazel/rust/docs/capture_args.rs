@@ -25,7 +25,6 @@ pub fn main() {
 
     // Write environment variables to the file as well, use keyword "env: " to idenfity them
     for (key, value) in env::vars() {
-        println!("{key}: {value}");
         writeln!(&mut file, "env: {}={}", key, value).expect("Unable to write to OUTPUT_FILE");
     }
 
