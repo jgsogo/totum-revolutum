@@ -65,3 +65,8 @@ jobs:
 
           # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
           err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+
+      # It's fine to build this docs target only in master. The individual ones have already been tested ('doc/tests' are building 'doc')
+      - name: Build docs
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        run: bazel build //docs

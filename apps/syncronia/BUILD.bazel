@@ -1,6 +1,7 @@
 load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("@totum//bazel/rust/docs:defs.bzl", "rust_docs")
 
 rust_library_tests_and_docs(
     name = "syncronia_lib",
@@ -40,4 +41,13 @@ rust_binary(
         "@totum//libraries/filesystem_pcloud",
         "@totum//libraries/pcloud_sdk",
     ],
+)
+
+rust_docs(
+    name = "docs",
+    crates = [
+        ":syncronia",
+        ":syncronia_lib",
+    ],
+    visibility = ["//docs:__subpackages__"],
 )
