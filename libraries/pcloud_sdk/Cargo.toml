@@ -14,21 +14,21 @@ test_utils = ["dep:mockall", "dep:httpmock"]
 
 
 [dependencies]
-bytes = {workspace = true}
+bytes = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 hyper = { workspace = true, features = ["full"] }
 dirs = { workspace = true }
-http = {workspace = true}
-http-body = {workspace = true}
-futures = {workspace = true}
+http = { workspace = true }
+http-body = { workspace = true }
+futures = { workspace = true }
 futures-util = { workspace = true, default-features = false, features = ["alloc"] }
-url = {workspace = true}
+url = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-serde_json = {workspace = true}
-serde_repr = {workspace = true}
-async-trait = {workspace = true}
+serde_json = { workspace = true }
+serde_repr = { workspace = true }
+async-trait = { workspace = true }
 reqwest = { workspace = true, features = ["stream"] }
-thiserror = {workspace = true}
+thiserror = { workspace = true }
 time = { workspace = true, features = [
     "serde",
     "parsing",
@@ -36,31 +36,33 @@ time = { workspace = true, features = [
     "macros",
 ] }
 strum = { workspace = true, features = ["derive"] }
-strum_macros = {workspace = true}
+strum_macros = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 chrono-tz = { workspace = true }
 cron-parser = { workspace = true }
 anyhow = { workspace = true }
 tracing = { workspace = true }
-bitflags = {workspace = true}
-itertools = {workspace = true}
+bitflags = { workspace = true }
+itertools = { workspace = true }
 camino = { workspace = true, features = ["serde1"] }
+headers = { workspace = true }
+mime = { workspace = true }
 
 # Optional dependencies
-indicatif = {workspace = true, optional = true }
+indicatif = { workspace = true, optional = true }
 mockall = { workspace = true, optional = true }
 httpmock = { workspace = true, optional = true }
 
 # Deps for CLI
-clap-verbosity-flag = { workspace = true, optional = true  }
-tracing-subscriber = { workspace = true , optional = true}
+clap-verbosity-flag = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true }
 log = { workspace = true, optional = true }
 clap = { workspace = true, features = ["derive"], optional = true }
 
 [dev-dependencies]
-tempfile = {workspace = true}
-env_logger = {workspace = true}
-tracing-subscriber = {workspace = true}
+tempfile = { workspace = true }
+env_logger = { workspace = true }
+tracing-subscriber = { workspace = true }
 pcloud_sdk = { path = ".", features = ["test_utils"] }
 
 [[bin]]
