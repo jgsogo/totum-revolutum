@@ -23,6 +23,12 @@ pub fn main() {
     let file_name = env::var("OUTPUT_FILE").expect("OUTPUT_FILE environment variable is not set");
     let mut file = File::create(file_name).expect("Can't open OUTPUT_FILE");
 
+    // Write environment variables to the file as well, use keyword "env: " to idenfity them
+    for (key, value) in env::vars() {
+        println!("{key}: {value}");
+        writeln!(&mut file, "env: {}={}", key, value).expect("Unable to write to OUTPUT_FILE");
+    }
+
     // Write command line args, skipping the first (our executable path), to
     // `OUTPUT_FILE` separated by newlines.
     let mut args: Vec<String> = env::args().skip(1).collect();

@@ -71,7 +71,7 @@ def _rust_docs_impl(ctx):
             outputs = [arg_file],
             executable = ctx.executable._capture_args,
             inputs = [],
-            env = {"OUTPUT_FILE": arg_file.path},
+            env = {"OUTPUT_FILE": arg_file.path} | action.env,
             arguments = [dump_args] + action.arguments,
         )
 

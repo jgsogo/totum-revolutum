@@ -1,15 +1,1 @@
-genrule(
-    name = "docs",
-    srcs = [
-        "//libraries:doc.zip",
-    ],
-    outs = ["docs.tar.gz"],
-    cmd = """
-    mkdir site &&
-    zips=($(locations //libraries:doc.zip));
-    for it in "$${zips[@]}"; do
-        tar xvfz $$it -C site
-    done;
-    tar cvfz $@ -C site .
-    """,
-)
+# TODO: Take docs from target `//libraries:docs.zip` and compose the documentation to be published
