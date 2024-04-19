@@ -69,7 +69,7 @@ def _rust_docs_impl(ctx):
             mnemonic = "Args",
             progress_message = "Dumping args for {}".format(crate.label),
             outputs = [arg_file],
-            executable = ctx.executable._capture_args,
+            executable = ctx.executable._capture_args_and_env,
             inputs = [],
             env = {"OUTPUT_FILE": arg_file.path} | action.env,
             arguments = [dump_args] + action.arguments,
@@ -193,9 +193,9 @@ rust_docs = rule(
             cfg = "exec",
             executable = True,
         ),
-        "_capture_args": attr.label(
-            doc = "A tool for dumping arguments to a file",
-            default = Label("@totum//bazel/rust/docs:capture_args"),
+        "_capture_args_and_env": attr.label(
+            doc = "A tool for dumping arguments and env vars to a file",
+            default = Label("@totum//bazel/rust/docs:capture_args_and_env"),
             cfg = "exec",
             executable = True,
         ),

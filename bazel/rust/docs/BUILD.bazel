@@ -1,8 +1,8 @@
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 
 rust_binary(
-    name = "capture_args",
-    srcs = ["capture_args.rs"],
+    name = "capture_args_and_env",
+    srcs = ["capture_args_and_env.rs"],
     edition = "2018",
     visibility = ["//visibility:public"],
 )

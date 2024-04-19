@@ -5,11 +5,5 @@ with these modifications:
  * I improved `capture_args.rs` script so it can handle params files (see https://bazel.build/rules/lib/builtins/Args.html),
    basically when there are too many arguments, Bazel spills those to a params file and replace them with a pointer to
    the file. In my `capture_args.rs` version I'm just following the pointer and collecting those arguments as well.
-
-
-# TODO: Not implemented yet
-
-There are still some missing bits:
- * The rule captures the command line arguments, but it doesn't capture (and forward) the environment variables. Some
-   of these variables are required at compile time (uses `env!`). We need `capture_args` to capture environment variables
-   too and then reuse them in `run_scripts.rs`.
+ * `capture_args.rs` now captures environment variables too and reuse them when calling each one
+   of the scripts in `run_scripts.rs`. Renamed to `capture_args_and_env.rs`
