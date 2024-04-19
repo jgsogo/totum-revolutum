@@ -1,0 +1,15 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+rust_binary(
+    name = "capture_args",
+    srcs = ["capture_args.rs"],
+    edition = "2018",
+    visibility = ["//visibility:public"],
+)
+
+rust_binary(
+    name = "run_scripts",
+    srcs = ["run_scripts.rs"],
+    edition = "2018",
+    visibility = ["//visibility:public"],
+)

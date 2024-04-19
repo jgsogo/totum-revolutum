@@ -1,10 +1,15 @@
 # TODO: Collect all documentation targets from libraries here, make it possible to spawn a static webserver for them. See https://github.com/bazelbuild/rules_rust/issues/472
 
-filegroup(
-    name = "doc",
-    srcs = [
-        "//libraries/constants:doc",
-        "//libraries/filesystem:doc",
-    ],
-    visibility = ["//docs:__subpackages__"],
+load("@totum//bazel/rust/docs:defs.bzl", "rust_docs")
+
+ALL_LIBRARIES = [
+    "constants",
+    "filesystem",
+    "pcloud_sdk",
+    "filesystem_pcloud",
+]
+
+rust_docs(
+    name = "docs",
+    crates = ["//libraries/{}".format(it) for it in ALL_LIBRARIES],
 )
