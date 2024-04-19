@@ -1,4 +1,4 @@
-//! Implements traits from [`filesystem`] crate for pCloud remote filesystem
+//! Implements traits from [`filesystem` crate](../filesystem/index.html) for pCloud remote filesystem
 //!
 
 pub use file::CHUNK_SIZE;
