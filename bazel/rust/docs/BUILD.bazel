@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_test")
 
 rust_binary(
     name = "capture_args_and_env",
@@ -12,4 +12,10 @@ rust_binary(
     srcs = ["run_scripts.rs"],
     edition = "2018",
     visibility = ["//visibility:public"],
+)
+
+# Unittests
+rust_test(
+    name = "capture_args_and_env/tests",
+    crate = ":capture_args_and_env",
 )
