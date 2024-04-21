@@ -18,12 +18,13 @@ use std::io::BufRead;
 use std::io::BufReader;
 
 const ENVVAR_PREFIX: &str = "env: ";
+const ENVVAR_SEPARATOR: &str = "=";
 const PARAMS_FILE_MARKER: &str = "@";
 const OUTPUT_FILE_ENVVAR: &str = "OUTPUT_FILE";
 
 fn collect_env_vars(envvars: impl Iterator<Item = (String, String)>, mut writer: impl std::io::Write) {
     for (key, value) in envvars {
-        writeln!(&mut writer, "{}{}={}", ENVVAR_PREFIX, key, value).expect("Unable to write");
+        writeln!(&mut writer, "{}{}{}{}", ENVVAR_PREFIX, key, ENVVAR_SEPARATOR, value).expect("Unable to write");
     }
 }
 
