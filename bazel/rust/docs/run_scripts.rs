@@ -67,3 +67,28 @@ pub fn main() {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_file() {
+        let (command, envvars, args) = parse_lines(
+            vec![
+                "env: k1=v1".to_string(),
+                "env: k2=v2".to_string(),
+                "mycommand".to_string(),
+                "--args1=value1".to_string(),
+                "--args2".to_string(),
+            ]
+            .into_iter(),
+        );
+
+        assert_eq!(command, "mycommand");
+        assert_eq!(envvars.len(), 2);
+        assert_eq!(envvars["k1"], "v1");
+        assert_eq!(envvars["k2"], "v2");
+        assert_eq!(args, vec!["--args1=value1", "--args2"]);
+    }
+}

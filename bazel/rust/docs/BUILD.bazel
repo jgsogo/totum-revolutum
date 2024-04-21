@@ -22,3 +22,8 @@ rust_test(
         "@crates_libraries//:tempfile",
     ],
 )
+
+rust_test(
+    name = "run_scripts/tests",
+    crate = ":run_scripts",
+)
