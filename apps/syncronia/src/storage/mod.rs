@@ -13,7 +13,7 @@ const INSIDE_PROJECT_DIRECTORY: &str = ".pcloud";
 /// Check if the given directory is a _pcloud_ directory. It will
 /// go back in the directory tree looking for the [`config::ConfigFile`]
 ///
-/// Returns the [PathBuf] to the _pcloud_ directory root if it's a valid path.
+/// Returns the [Utf8PathBuf] to the _pcloud_ directory root if it's a valid path.
 pub fn is_pcloud_dir(path: &Utf8Path) -> Result<Utf8PathBuf> {
     assert!(path.is_absolute(), "Provide absolute path");
     if !path.exists() {

@@ -2,11 +2,11 @@
 resolver = "2"
 members = [
     "apps/syncronia",
-    "libraries/bricklink",
     "libraries/constants",
     "libraries/filesystem",
     "libraries/filesystem_pcloud",
     "libraries/pcloud_sdk",
+    "libraries/rebrickable",
 ]
 
 

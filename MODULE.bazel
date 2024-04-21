@@ -63,11 +63,11 @@ crate.from_cargo(
     manifests = [
         "//:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
-        "//libraries/bricklink:Cargo.toml",
         "//libraries/constants:Cargo.toml",
         "//libraries/filesystem:Cargo.toml",
         "//libraries/filesystem_pcloud:Cargo.toml",
         "//libraries/pcloud_sdk:Cargo.toml",
+        "//libraries/rebrickable:Cargo.toml",
     ],
 )
 use_repo(crate, "crates_libraries")

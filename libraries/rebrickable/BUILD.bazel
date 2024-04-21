@@ -3,7 +3,7 @@ load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
 rust_library_tests_and_docs(
-    name = "bricklink",
+    name = "rebrickable",
     srcs = glob(["src/**/*.rs"]),
     aliases = aliases(),
     proc_macro_deps = all_crate_deps(
@@ -24,6 +24,6 @@ rust_binary(
     deps = all_crate_deps(
         normal = True,
     ) + [
-        ":bricklink",
+        ":rebrickable",
     ],
 )

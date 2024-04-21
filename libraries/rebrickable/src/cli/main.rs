@@ -1,6 +1,7 @@
 use anyhow::Result;
-use camino::Utf8PathBuf;
 use clap::Parser;
+use rebrickable::client::HttpClient;
+use rebrickable::methods::lego::sets::GetSetDetail;
 use tracing::debug;
 
 /// Arguments that apply to all subcommands
@@ -8,6 +9,9 @@ use tracing::debug;
 pub struct CliParams {
     #[clap(flatten)]
     verbose: clap_verbosity_flag::Verbosity,
+
+    #[arg(long)]
+    api_key: String,
 }
 
 #[derive(Parser)]
@@ -16,10 +20,6 @@ pub struct CliParams {
 struct Cli {
     #[clap(flatten)]
     common: CliParams,
-
-    /// Path to a JSON file with user token
-    #[clap(long)]
-    token_file: Utf8PathBuf,
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -45,5 +45,8 @@ async fn main() -> Result<()> {
         .init();
     debug!("Tracing level configured to {}", tracing_level);
 
+    let client = HttpClient::new(cli.common.api_key, true);
+    let r = client.sets_detail("8868-1".to_string()).await?;
+    println!("{}", serde_json::to_string_pretty(&r).unwrap());
     Ok(())
 }
