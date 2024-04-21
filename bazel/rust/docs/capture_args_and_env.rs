@@ -63,6 +63,8 @@ pub fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_collect_env_vars() {
@@ -74,5 +76,50 @@ mod tests {
         collect_env_vars(envvars.into_iter(), &mut result);
 
         assert_eq!(String::from_utf8(result).unwrap(), "env: k1=v1\nenv: k2=v2\n");
+    }
+
+    #[test]
+    fn test_collect_env_args() {
+        let mut result = Vec::new();
+        let envargs = vec![
+            "mycommand".to_string(),
+            "--args1=value1".to_string(),
+            "--args2".to_string(),
+            "-args3".to_string(),
+            "v3".to_string(),
+            "-f".to_string(),
+            "pos_arg".to_string(),
+        ];
+        collect_env_args(envargs.into_iter(), &mut result);
+
+        assert_eq!(
+            String::from_utf8(result).unwrap(),
+            "--args1=value1\n--args2\n-args3\nv3\n-f\npos_arg\n"
+        );
+    }
+
+    #[test]
+    fn test_collect_env_args_with_params_file() {
+        let mut result = Vec::new();
+
+        let params_file = {
+            let mut params_file = NamedTempFile::new().expect("Failed to create a temporary file");
+            writeln!(params_file, "file\nwith\n--\nargs\n").expect("Unable to write");
+            params_file.into_temp_path()
+        };
+
+        let envargs = vec![
+            "mycommand".to_string(),
+            "--args1=value1".to_string(),
+            format!("{}{}", PARAMS_FILE_MARKER, params_file.to_str().unwrap()).to_string(),
+        ];
+        collect_env_args(envargs.into_iter(), &mut result);
+
+        assert_eq!(
+            String::from_utf8(result).unwrap(),
+            "--args1=value1\nfile\nwith\n--\nargs\n\n"
+        );
+
+        params_file.close().expect("Can't close tempfile");
     }
 }
