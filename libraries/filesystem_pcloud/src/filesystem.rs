@@ -9,7 +9,6 @@ use tokio::time::Instant;
 use tracing::{info, trace, warn};
 
 use filesystem::{File, Filesystem};
-use http_utils::rest::RESTClient;
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
@@ -35,7 +34,7 @@ pub enum FileCloseMessage {
     Stop,
 }
 
-pub struct FilesystemPCloud<HttpClient: RESTClient + PCloudClient + Clone> {
+pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone> {
     // Root folder for this filesystem
     root_path: RemotePath,
     root_folderid: FolderID,
@@ -47,7 +46,7 @@ pub struct FilesystemPCloud<HttpClient: RESTClient + PCloudClient + Clone> {
     thread_file_close: Option<JoinHandle<()>>,
 }
 
-impl<HttpClient: RESTClient + PCloudClient + Send + Sync + Clone + 'static> FilesystemPCloud<HttpClient> {
+impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpClient> {
     pub async fn new(path: &RemotePath, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
         let folderid = pcloud.get_folderid(path).await?;
@@ -126,9 +125,7 @@ impl<HttpClient: RESTClient + PCloudClient + Send + Sync + Clone + 'static> File
 }
 
 #[async_trait]
-impl<HttpClient: RESTClient + PCloudClient + Send + Sync + Clone + 'static> Filesystem
-    for FilesystemPCloud<HttpClient>
-{
+impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
     type Metadata = RemoteMetadata;
 
     fn root(&self) -> &Utf8Path {
