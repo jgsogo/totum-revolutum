@@ -64,6 +64,7 @@ crate.from_cargo(
         "//:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
         "//libraries/constants:Cargo.toml",
+        "//libraries/cron:Cargo.toml",
         "//libraries/filesystem:Cargo.toml",
         "//libraries/filesystem_pcloud:Cargo.toml",
         "//libraries/http_utils:Cargo.toml",

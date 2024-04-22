@@ -41,9 +41,6 @@ time = { workspace = true, features = [
 ] }
 strum = { workspace = true, features = ["derive"] }
 strum_macros = { workspace = true }
-chrono = { workspace = true, features = ["serde"] }
-chrono-tz = { workspace = true }
-cron-parser = { workspace = true }
 anyhow = { workspace = true }
 tracing = { workspace = true }
 bitflags = { workspace = true }
