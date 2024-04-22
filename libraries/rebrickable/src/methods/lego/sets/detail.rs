@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::client::RebrickableClient;
 use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
@@ -26,7 +27,7 @@ pub trait GetSetDetail {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetSetDetail for T {
+impl<T: RebrickableClient> GetSetDetail for T {
     async fn sets_detail(&self, set_num: String) -> Result<SetDetail> {
         let endpoint = format!("/lego/sets/{set_num}");
         RESTClient::get::<SetDetail>(self, &endpoint, HeaderMap::default(), HashMap::new()).await

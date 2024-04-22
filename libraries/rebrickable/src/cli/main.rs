@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use rebrickable::client::RebrickableClient;
+use rebrickable::client::RebrickableClientImpl;
 use rebrickable::methods::lego::sets::GetSetDetail;
 use tracing::debug;
 
@@ -45,7 +45,7 @@ async fn main() -> Result<()> {
         .init();
     debug!("Tracing level configured to {}", tracing_level);
 
-    let client = RebrickableClient::new(cli.common.api_key)?;
+    let client = RebrickableClientImpl::new(cli.common.api_key)?;
     let r = client.sets_detail("8868-1".to_string()).await?;
     println!("{}", serde_json::to_string_pretty(&r).unwrap());
     Ok(())
