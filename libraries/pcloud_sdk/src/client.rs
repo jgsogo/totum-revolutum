@@ -17,10 +17,8 @@ use crate::utils::http;
 use crate::utils::http::create_response;
 
 #[async_trait]
-pub trait Client: RESTClient {}
-
-#[async_trait]
 pub trait ClientBytes: HttpClient {
+    // FIXME: Remove and make it a member function
     async fn get_bytes(&self, endpoint: &str, params: HashMap<String, String>) -> Result<Vec<u8>>;
 }
 
@@ -39,11 +37,6 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
             http_client: client,
             secure,
         }
-    }
-
-    fn build_url(&self, endpoint: &str) -> String {
-        let schema = if self.secure { "https" } else { "http" };
-        format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
     }
 
     pub async fn authorize(app: oauth2::AppClientData, address: SocketAddr) -> Result<PCloudClient<Token>> {
@@ -99,29 +92,6 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
         create_response(result)
     }
 }
-//
-// #[async_trait]
-// impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for PCloudClient<Token> {
-//     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
-//     where
-//         T: DeserializeOwned + 'static,
-//     {
-//         let url = self.build_url(endpoint);
-//         let access_token = self.oauth2_token.access_token();
-//         params.insert("access_token".to_string(), access_token.to_string());
-//         http::get::<T>(self.http_client.clone(), &url, params).await
-//     }
-//
-//     async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
-//     where
-//         T: DeserializeOwned + 'static,
-//     {
-//         let url = self.build_url(endpoint);
-//         let access_token = self.oauth2_token.access_token();
-//         params.insert("access_token".to_string(), access_token.to_string());
-//         http::post::<T>(self.http_client.clone(), &url, params, data).await
-//     }
-// }
 
 impl<Token: access_token::OAuth2Token + Clone> Clone for PCloudClient<Token> {
     fn clone(&self) -> Self {
