@@ -1,12 +1,19 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use camino::Utf8Path;
+use headers::HeaderMapExt;
+use http::HeaderMap;
+use mime::Mime;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+
+use http_utils::rest::RESTClient;
 
 use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFile;
 use crate::types::Folder;
-use crate::{client, utils};
+use crate::utils;
+use crate::utils::http::BOUNDARY;
 
 pub const ENDPOINT: &str = "/uploadfile";
 
@@ -65,13 +72,16 @@ pub trait PostUploadFile {
 }
 
 #[async_trait]
-impl<T: client::Client> PostUploadFile for T {
+impl<T: RESTClient> PostUploadFile for T {
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile> {
+        let mut headers = HeaderMap::default();
+        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
+        let content_type = headers::ContentType::from(mime_multipart);
+        headers.typed_insert(content_type);
+
         let filename = upload_params.filename.clone();
-        let data = utils::http::file_data(local_filename, &filename)?;
-        let ret = self
-            .post::<UploadFile>(ENDPOINT, upload_params.into_params()?, data)
-            .await?;
+        let data = utils::http::create_file_data(local_filename, &filename)?;
+        let ret = RESTClient::post::<UploadFile>(self, ENDPOINT, headers, upload_params.into_params()?, data).await?;
         Ok(ret)
     }
 }

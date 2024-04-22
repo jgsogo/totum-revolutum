@@ -4,7 +4,7 @@ use anyhow::{anyhow, Result};
 use clap::Args;
 use tracing::debug;
 
-use pcloud_sdk::client::HttpClient;
+use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
@@ -21,7 +21,7 @@ pub struct Params {
 }
 
 pub async fn handle(
-    pcloud: HttpClient<OAuth2TokenImpl>,
+    pcloud: PCloudClient<OAuth2TokenImpl>,
     output: &PrintVariant,
     params: Params,
     _cli_params: CliParams,

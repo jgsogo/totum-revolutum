@@ -3,9 +3,11 @@ use std::collections::HashMap;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use bitflags::bitflags;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::fileops::FileDescriptor;
 use crate::types::{File, FileID, FolderID};
 
@@ -38,7 +40,7 @@ pub trait GetFileOpen {
 }
 
 #[async_trait]
-impl<T: client::Client> GetFileOpen for T {
+impl<T: RESTClient> GetFileOpen for T {
     async fn file_open(&self, flags: Flags, path: FileOpenPath) -> Result<FileOpen> {
         let mut params = HashMap::new();
         params.insert("flags".to_string(), flags.bits().to_string());
@@ -68,7 +70,7 @@ impl<T: client::Client> GetFileOpen for T {
             }
         }
 
-        let ret = self.get::<FileOpen>(ENDPOINT, params).await?;
+        let ret = RESTClient::get::<FileOpen>(self, ENDPOINT, HeaderMap::default(), params).await?;
         Ok(ret)
     }
 }
@@ -102,12 +104,13 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 3);
                     assert_eq!(params.get("flags"), Some(&"64".to_string()));
                     assert_eq!(params.get("folderid"), Some(&"42".to_string()));
                     assert_eq!(params.get("name"), Some(&"name".to_string()));
+                    assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
                         fd: 42,
                         fileid: FileID(42),
@@ -126,11 +129,12 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"1088".to_string()));
                     assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
+                    assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
                         fd: 42,
                         fileid: FileID(42),
@@ -168,11 +172,12 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"0".to_string()));
                     assert_eq!(params.get("fileid"), Some(&"42".to_string()));
+                    assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
                         fd: 42,
                         fileid: FileID(42),
@@ -192,11 +197,12 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"128".to_string()));
                     assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
+                    assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
                         fd: 42,
                         fileid: FileID(42),

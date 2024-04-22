@@ -1,10 +1,11 @@
-use camino::Utf8PathBuf;
-
 use anyhow::Result;
 use async_trait::async_trait;
+use camino::Utf8PathBuf;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFolder;
 use crate::types::FolderID;
@@ -46,10 +47,9 @@ pub trait GetCreateFolderIfNotExists {
 }
 
 #[async_trait]
-impl<T: client::Client> GetCreateFolderIfNotExists for T {
+impl<T: RESTClient> GetCreateFolderIfNotExists for T {
     async fn createfolderifnotexists(&self, input: TargetFolder) -> Result<CreateFolderIfNotExists> {
-        self.get::<CreateFolderIfNotExists>(ENDPOINT, input.into_params()?)
-            .await
+        RESTClient::get::<CreateFolderIfNotExists>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await
     }
 }
 
@@ -68,10 +68,11 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, "/createfolderifnotexists");
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("path"), Some(&"the/path/to/folder".to_string()));
+                assert_eq!(headers.len(), 0);
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
                     metadata: MetadataFolder::default(FolderID(1234)),
@@ -89,11 +90,12 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, "/createfolderifnotexists");
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
                 assert_eq!(params.get("name"), Some(&"name.txt".to_string()));
+                assert_eq!(headers.len(), 0);
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
                     metadata: MetadataFolder::default(FolderID(1234)),

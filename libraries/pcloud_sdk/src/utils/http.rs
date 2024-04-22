@@ -3,19 +3,17 @@ use std::fs::File;
 use std::io;
 use std::io::Read;
 use std::io::Write;
-use std::str::FromStr;
 
 use anyhow::{anyhow, bail, Result};
 use camino::Utf8Path;
 use headers::HeaderMapExt;
-use mime::Mime;
 use reqwest;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 use crate::error::Error;
 
-const BOUNDARY: &str = "ea3bbcf87c101592";
+pub const BOUNDARY: &str = "ea3bbcf87c101592";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct ApiResult<T> {
@@ -26,7 +24,7 @@ pub(crate) struct ApiResult<T> {
     pub data: Option<T>,
 }
 
-fn create_response<T>(result: String) -> Result<T>
+pub fn create_response<T>(result: String) -> Result<T>
 where
     T: DeserializeOwned,
 {
@@ -47,70 +45,6 @@ where
             message: r.error.unwrap_or_else(|| "Error message not available".into())
         })),
     }
-}
-
-pub(crate) async fn get<T>(
-    client: reqwest::Client,
-    url: &str,
-    //headers: HeaderMap,
-    params: HashMap<String, String>,
-) -> Result<T>
-where
-    T: DeserializeOwned,
-{
-    // TODO: Pass headers from the client, we don't need to keep-alive always, only in
-    //  file_open/close/read/... or for performance reasons
-    let header_map = {
-        let mut header_map = headers::HeaderMap::new();
-        let conn = headers::Connection::keep_alive();
-        header_map.typed_insert(conn);
-        header_map
-    };
-
-    let result = client
-        .get(url)
-        //.headers(headers)
-        //.header("Keep-Alive", "timeout=5, max=1000")
-        .headers(header_map)
-        .query(&params)
-        .send()
-        .await?
-        .text()
-        .await?;
-    create_response(result)
-}
-
-pub(crate) async fn post<T>(
-    client: reqwest::Client,
-    url: &str,
-    //headers: HeaderMap,
-    params: HashMap<String, String>,
-    data: Vec<u8>,
-) -> Result<T>
-where
-    T: DeserializeOwned,
-{
-    let header_map = {
-        let mut header_map = headers::HeaderMap::new();
-        let conn = headers::Connection::keep_alive();
-        header_map.typed_insert(conn);
-        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
-        let content_type = headers::ContentType::from(mime_multipart);
-        header_map.typed_insert(content_type);
-        header_map
-    };
-
-    let result = client
-        .post(url)
-        //.headers(headers)
-        .headers(header_map)
-        .query(&params)
-        .body(reqwest::Body::from(data))
-        .send()
-        .await?
-        .text()
-        .await?;
-    create_response(result)
 }
 
 pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMap<String, String>) -> Result<Vec<u8>> {
@@ -143,7 +77,8 @@ pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMa
     Ok(r.to_vec())
 }
 
-pub(crate) fn file_data(local_filepath: &Utf8Path, filename: &str) -> io::Result<Vec<u8>> {
+pub(crate) fn create_file_data(local_filepath: &Utf8Path, filename: &str) -> io::Result<Vec<u8>> {
+    // FIXME: Receive BOUNDARY as argument
     let mut data = Vec::new();
     write!(data, "--{BOUNDARY}\r\n")?;
     write!(
@@ -162,7 +97,8 @@ pub(crate) fn file_data(local_filepath: &Utf8Path, filename: &str) -> io::Result
 }
 
 /// Creates the payload for a POST request (`form-data`) to send the contents of a file
-pub fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
+pub fn create_file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
+    // FIXME: Receive BOUNDARY as argument
     let mut data = Vec::new();
     write!(data, "--{BOUNDARY}\r\n")?;
     write!(

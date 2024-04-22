@@ -2,10 +2,11 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
-use crate::client;
+use http_utils::rest::RESTClient;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserInfo {
@@ -47,9 +48,9 @@ pub trait GetUserInfo {
 }
 
 #[async_trait]
-impl<T: client::Client> GetUserInfo for T {
+impl<T: RESTClient> GetUserInfo for T {
     async fn userinfo(&self) -> Result<UserInfo> {
-        self.get::<UserInfo>("/userinfo", HashMap::new()).await
+        RESTClient::get::<UserInfo>(self, "/userinfo", HeaderMap::default(), HashMap::new()).await
     }
 }
 
@@ -105,9 +106,10 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, "/userinfo");
                 assert!(params.is_empty());
+                assert_eq!(headers.len(), 0);
                 Ok(UserInfo {
                     userid: 1234,
                     email: "email".to_string(),

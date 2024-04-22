@@ -2,9 +2,11 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::structures::MetadataFile;
 
 pub const ENDPOINT: &str = "/uploadprogress";
@@ -24,11 +26,11 @@ pub trait UploadProgress {
 }
 
 #[async_trait]
-impl<T: client::Client> UploadProgress for T {
+impl<T: RESTClient> UploadProgress for T {
     async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData> {
         let mut params = HashMap::new();
         params.insert("progresshash".to_string(), progresshash.to_string());
-        let ret = self.get::<UploadProgressData>(ENDPOINT, params).await?;
+        let ret = RESTClient::get::<UploadProgressData>(self, ENDPOINT, HeaderMap::default(), params).await?;
         Ok(ret)
     }
 }

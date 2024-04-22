@@ -20,7 +20,9 @@ rust_library_tests_and_docs(
     test_data = glob(["resources/**/*.*"]),
     deps = all_crate_deps(
         normal = True,
-    ),
+    ) + [
+        "@totum//libraries/http_utils",
+    ],
 )
 
 rust_binary(
@@ -38,8 +40,6 @@ rust_binary(
         normal = True,
     ) + [
         ":pcloud_sdk",
-        # "@crates_libraries//:tracing-subscriber",
-        # "@crates_libraries//:log",
-        # "@crates_libraries//:indicatif",
+        "@totum//libraries/http_utils",
     ],
 )

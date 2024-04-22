@@ -2,10 +2,14 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use headers::HeaderMap;
 use mockall::mock;
 use serde::de::DeserializeOwned;
 
-use crate::client::Client;
+use http_utils::rest::RESTClient;
+use http_utils::HttpClient;
+
+use crate::client::ClientBytes;
 
 mock! {
     #[allow(dead_code)]
@@ -18,15 +22,43 @@ mock! {
 
     #[allow(dead_code)]
     #[async_trait]
-    impl Client for LocalClient {
-        async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
-        where
-            T: DeserializeOwned+ 'static;
+    impl HttpClient for LocalClient {
+        fn build_url(&self, endpoint: &str) -> String;
 
-        async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
-        where
-            T: DeserializeOwned+ 'static;
+        fn http_client(&self) -> &reqwest::Client;
 
+        fn headers(&self, headers: HeaderMap) -> HeaderMap;
+
+        fn params(&self, params: HashMap<String, String>) -> HashMap<String, String>;
+
+
+    }
+
+    #[allow(dead_code)]
+    #[async_trait]
+    impl RESTClient for LocalClient {
+        fn parse_response<T>(result: String) -> Result<T>
+        where
+            T: DeserializeOwned + 'static;
+
+        async fn get<T>(&self, endpoint: &str, headers: HeaderMap, params: HashMap<String, String>) -> Result<T>
+        where
+            T: DeserializeOwned + 'static;
+
+        async fn post<T>(
+            &self,
+            endpoint: &str,
+            headers: HeaderMap,
+            params: HashMap<String, String>,
+            data: Vec<u8>,
+        ) -> Result<T>
+        where
+            T: DeserializeOwned + 'static;
+    }
+
+    #[allow(dead_code)]
+    #[async_trait]
+    impl ClientBytes for LocalClient {
         async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>>;
     }
 }

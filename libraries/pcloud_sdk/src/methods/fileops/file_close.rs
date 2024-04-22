@@ -1,7 +1,9 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::fileops::FileDescriptor;
 use crate::methods::params::Params;
 
@@ -13,9 +15,9 @@ pub trait GetFileClose {
 }
 
 #[async_trait]
-impl<T: client::Client> GetFileClose for T {
+impl<T: RESTClient> GetFileClose for T {
     async fn file_close(&self, descriptor: FileDescriptor) -> Result<()> {
-        self.get::<()>(ENDPOINT, descriptor.into_params()?).await
+        RESTClient::get::<()>(self, ENDPOINT, HeaderMap::default(), descriptor.into_params()?).await
     }
 }
 
@@ -33,10 +35,11 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, "/file_close");
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                assert_eq!(headers.len(), 0);
                 Ok(())
             });
         let _r = client.file_close(42).await?;

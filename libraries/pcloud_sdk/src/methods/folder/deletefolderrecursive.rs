@@ -1,8 +1,10 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::params::Params;
 use crate::types::Folder;
 
@@ -20,10 +22,9 @@ pub trait GetDeleteFolderRecursive {
 }
 
 #[async_trait]
-impl<T: client::Client> GetDeleteFolderRecursive for T {
+impl<T: RESTClient> GetDeleteFolderRecursive for T {
     async fn deletefolderrecursive(&self, input: Folder) -> Result<DeleteFolderRecursive> {
-        let ret = self
-            .get::<DeleteFolderRecursive>(ENDPOINT, input.into_params()?)
+        let ret = RESTClient::get::<DeleteFolderRecursive>(self, ENDPOINT, HeaderMap::default(), input.into_params()?)
             .await?;
         Ok(ret)
     }
@@ -31,10 +32,11 @@ impl<T: client::Client> GetDeleteFolderRecursive for T {
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
+
+    use camino::Utf8Path;
 
     use crate::utils::http::ApiResult;
 

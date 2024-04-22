@@ -38,7 +38,7 @@ impl ConfigAuth {
         let lock = apps::AppsFile::read(&apps_file_path)?;
         if let Ok(found) = lock.content.find(&self.client_id) {
             if let Ok(token) = found.find_token(self.userid) {
-                return Ok(pcloud_sdk::client::HttpClient::new(token.clone(), true));
+                return Ok(pcloud_sdk::client::PCloudClient::new(token.clone(), true));
             }
         }
         Err(anyhow!("Cannot find pcloud client for the given config"))

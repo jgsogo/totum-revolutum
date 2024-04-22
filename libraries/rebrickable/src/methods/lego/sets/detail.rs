@@ -2,10 +2,10 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
+use http_utils::rest::RESTClient;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
-
-use crate::client;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SetDetail {
@@ -26,9 +26,9 @@ pub trait GetSetDetail {
 }
 
 #[async_trait]
-impl<T: client::Client> GetSetDetail for T {
+impl<T: RESTClient> GetSetDetail for T {
     async fn sets_detail(&self, set_num: String) -> Result<SetDetail> {
-        let endpoint = format!("/api/v3/lego/sets/{set_num}");
-        self.get::<SetDetail>(&endpoint, HashMap::new()).await
+        let endpoint = format!("/lego/sets/{set_num}");
+        RESTClient::get::<SetDetail>(self, &endpoint, HeaderMap::default(), HashMap::new()).await
     }
 }

@@ -1,9 +1,11 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
@@ -65,7 +67,7 @@ pub trait GetListFolder {
 }
 
 #[async_trait]
-impl<T: client::Client> GetListFolder for T {
+impl<T: RESTClient> GetListFolder for T {
     async fn listfolder_with_filtermeta(
         &self,
         list_folder: ListFolderInput,
@@ -87,17 +89,18 @@ impl<T: client::Client> GetListFolder for T {
 
         let filtermeta = filtermeta.into_iter().unique().collect::<Vec<_>>().join(",");
         params.insert("filtermeta".to_string(), filtermeta);
-        let ret = self.get::<ListFolder>(ENDPOINT, params).await?;
+        let ret = RESTClient::get::<ListFolder>(self, ENDPOINT, HeaderMap::default(), params).await?;
         Ok(ret)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
+
+    use camino::Utf8Path;
 
     use crate::types::FolderID;
     use crate::utils::http::ApiResult;

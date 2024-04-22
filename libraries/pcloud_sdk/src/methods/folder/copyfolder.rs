@@ -1,8 +1,10 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
@@ -62,9 +64,9 @@ pub trait GetCopyFolder {
 }
 
 #[async_trait]
-impl<T: client::Client> GetCopyFolder for T {
+impl<T: RESTClient> GetCopyFolder for T {
     async fn copyfile(&self, input: CopyFolderInput) -> Result<CopyFolder> {
-        let ret = self.get::<CopyFolder>(ENDPOINT, input.into_params()?).await?;
+        let ret = RESTClient::get::<CopyFolder>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
         Ok(ret)
     }
 }

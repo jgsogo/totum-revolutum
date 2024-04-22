@@ -19,7 +19,7 @@ pub trait GetFileRead {
 }
 
 #[async_trait]
-impl<T: client::Client> GetFileRead for T {
+impl<T: client::ClientBytes> GetFileRead for T {
     async fn file_read(&self, descriptor: FileDescriptor, count: u64) -> Result<FileRead> {
         let mut params = descriptor.into_params()?;
         params.insert("count".to_string(), count.to_string());

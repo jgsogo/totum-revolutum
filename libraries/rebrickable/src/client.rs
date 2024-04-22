@@ -1,69 +1,37 @@
-use crate::utils::http;
-use async_trait::async_trait;
-use serde::de::DeserializeOwned;
+use anyhow::Result;
+use http_utils::rest::RESTClient;
+use http_utils::HttpClient;
 use std::collections::HashMap;
 
-#[async_trait]
-pub trait Client: Sync {
-    async fn get<T>(&self, endpoint: &str, params: HashMap<String, String>) -> anyhow::Result<T>
-    where
-        T: DeserializeOwned + 'static;
-
-    async fn post<T>(&self, endpoint: &str, params: HashMap<String, String>, data: Vec<u8>) -> anyhow::Result<T>
-    where
-        T: DeserializeOwned + 'static;
-}
-
 #[derive(Debug)]
-pub struct HttpClient {
+pub struct RebrickableClient {
     api_key: String,
     http_client: reqwest::Client,
-    secure: bool,
 }
 
-impl HttpClient {
-    pub fn new(api_key: String, secure: bool) -> HttpClient {
-        let client = reqwest::ClientBuilder::new().build().unwrap();
-        HttpClient {
+impl HttpClient for RebrickableClient {
+    fn build_url(&self, endpoint: &str) -> String {
+        format!("https://rebrickable.com/api/v3{}", endpoint)
+    }
+
+    fn http_client(&self) -> &reqwest::Client {
+        &self.http_client
+    }
+
+    fn params(&self, mut params: HashMap<String, String>) -> HashMap<String, String> {
+        params.insert("key".to_string(), self.api_key.clone());
+        params
+    }
+}
+
+impl RESTClient for RebrickableClient {}
+
+impl RebrickableClient {
+    pub fn new(api_key: String) -> Result<Self> {
+        let client = reqwest::ClientBuilder::new().build()?;
+        Ok(Self {
             api_key,
             http_client: client,
-            secure,
-        }
-    }
-
-    fn build_url(&self, endpoint: &str) -> String {
-        let schema = if self.secure { "https" } else { "http" };
-        format!("{}://rebrickable.com{}", schema, endpoint)
-    }
-}
-
-#[async_trait]
-impl Client for HttpClient {
-    async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> anyhow::Result<T>
-    where
-        T: DeserializeOwned + 'static,
-    {
-        let url = self.build_url(endpoint);
-        params.insert("key".to_string(), self.api_key.clone());
-        http::get::<T>(self.http_client.clone(), &url, params).await
-    }
-
-    async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> anyhow::Result<T>
-    where
-        T: DeserializeOwned + 'static,
-    {
-        let url = self.build_url(endpoint);
-        params.insert("key".to_string(), self.api_key.clone());
-        http::post::<T>(self.http_client.clone(), &url, params, data).await
-    }
-}
-
-impl Clone for HttpClient {
-    fn clone(&self) -> Self {
-        HttpClient {
-            api_key: self.api_key.clone(),
-            http_client: self.http_client.clone(),
-            secure: self.secure,
-        }
+        })
     }
 }

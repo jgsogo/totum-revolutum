@@ -1,8 +1,10 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::params::Params;
 use crate::methods::params::SourceAndTargetFile;
 use crate::structures::MetadataFile;
@@ -21,19 +23,20 @@ pub trait GetRenameFile {
 }
 
 #[async_trait]
-impl<T: client::Client> GetRenameFile for T {
+impl<T: RESTClient> GetRenameFile for T {
     async fn renamefile(&self, input: SourceAndTargetFile) -> Result<RenameFile> {
-        let ret = self.get::<RenameFile>(ENDPOINT, input.into_params()?).await?;
+        let ret = RESTClient::get::<RenameFile>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
         Ok(ret)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs;
     use std::io::BufReader;
+
+    use camino::Utf8Path;
 
     use crate::types::FileID;
     use crate::utils::http::ApiResult;
