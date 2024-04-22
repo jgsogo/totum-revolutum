@@ -62,7 +62,7 @@ pub async fn handle(home: &Utf8Path, params: &AuthParams) -> Result<()> {
     // TODO: Move this to SDK
     let addr = ([127, 0, 0, 1], 3000).into(); // But this address needs to be configured in the app
     let app_client_data = oauth2::AppClientData::new(&app.client_id, &app.client_secret);
-    let pcloud = pcloud_sdk::client::HttpClient::<oauth2::OAuth2TokenImpl>::authorize(app_client_data, addr)
+    let pcloud = pcloud_sdk::client::PCloudClient::<oauth2::OAuth2TokenImpl>::authorize(app_client_data, addr)
         .await
         .expect("TODO: Propagate errors");
     let token = pcloud.oauth2_token;

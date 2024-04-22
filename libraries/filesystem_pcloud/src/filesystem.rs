@@ -27,7 +27,7 @@ use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 use crate::file::RemoteFile;
 use crate::RemoteMetadata;
 
-pub type PCloudHttpClient = pcloud_sdk::client::HttpClient<OAuth2TokenImpl>;
+pub type PCloudHttpClient = pcloud_sdk::client::PCloudClient<OAuth2TokenImpl>;
 
 pub enum FileCloseMessage {
     FileDescriptor(FileDescriptor),
