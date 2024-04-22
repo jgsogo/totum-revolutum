@@ -626,6 +626,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cron"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "cron-parser",
+ "serde",
+]
+
+[[package]]
 name = "cron-parser"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1922,13 +1932,11 @@ dependencies = [
  "bitflags 2.5.0",
  "bytes",
  "camino",
- "chrono",
- "chrono-tz",
  "clap",
  "clap-verbosity-flag",
- "cron-parser",
  "dirs",
  "env_logger",
+ "filesystem",
  "futures",
  "futures-util",
  "headers",
@@ -2202,8 +2210,6 @@ dependencies = [
  "http-body-util",
  "http_utils",
  "httpmock",
- "hyper 1.3.1",
- "hyper-util",
  "indicatif",
  "itertools 0.12.1",
  "log",
@@ -2691,6 +2697,7 @@ dependencies = [
  "clap",
  "clap-verbosity-flag",
  "confy",
+ "cron",
  "cron-parser",
  "filesystem",
  "filesystem_pcloud",

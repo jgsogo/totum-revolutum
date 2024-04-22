@@ -18,7 +18,6 @@ use crate::utils::http::create_response;
 
 #[async_trait]
 pub trait PCloudClient: RESTClient {
-    // FIXME: Remove and make it a member function
     async fn get_bytes(&self, endpoint: &str, params: HashMap<String, String>) -> Result<Vec<u8>>;
 }
 

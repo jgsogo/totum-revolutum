@@ -2,7 +2,7 @@ use camino::{Utf8Path, Utf8PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use pcloud_sdk::utils;
+use ::cron::CronTz;
 
 use crate::utils::{
     locked_file::{LockedFile, ReadWrite},
@@ -15,7 +15,7 @@ const FILENAME: &str = "cron.yaml";
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Directory {
     path: String,
-    cron: utils::cron::CronTz,
+    cron: CronTz,
 }
 
 impl Directory {
@@ -24,7 +24,7 @@ impl Directory {
 
         Self {
             path: path.to_string(),
-            cron: utils::cron::CronTz::new(expression, tz),
+            cron: CronTz::new(expression, tz),
         }
     }
 

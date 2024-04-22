@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "apps/syncronia",
+    "libraries/cron",
     "libraries/constants",
     "libraries/filesystem",
     "libraries/filesystem_pcloud",

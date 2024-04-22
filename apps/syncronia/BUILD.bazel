@@ -18,6 +18,7 @@ rust_library_tests_and_docs(
     deps = all_crate_deps(
         normal = True,
     ) + [
+        "@totum//libraries/cron",
         "@totum//libraries/filesystem",
         "@totum//libraries/filesystem_pcloud",
         "@totum//libraries/pcloud_sdk",
@@ -37,6 +38,7 @@ rust_binary(
         normal = True,
     ) + [
         ":syncronia_lib",
+        "@totum//libraries/cron",
         "@totum//libraries/filesystem",
         "@totum//libraries/filesystem_pcloud",
         "@totum//libraries/pcloud_sdk",

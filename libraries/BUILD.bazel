@@ -4,6 +4,7 @@ load("@totum//bazel/rust/docs:defs.bzl", "rust_docs")
 
 ALL_LIBRARIES = [
     "constants",
+    "cron",
     "filesystem",
     "filesystem_pcloud",
     "http_utils",
