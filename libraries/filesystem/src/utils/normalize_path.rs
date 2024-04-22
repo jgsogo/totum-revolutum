@@ -13,7 +13,7 @@ use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
 /// This function ensures a given path ending with '/' still
 /// ends with '/' after normalization.
 pub fn normalize_path<P: AsRef<Utf8Path>>(path: P) -> Utf8PathBuf {
-    let ends_with_slash = path.as_ref().ends_with("/");
+    let ends_with_slash = path.as_ref().to_string().ends_with('/');
     let mut normalized = Utf8PathBuf::new();
     for component in path.as_ref().components() {
         match &component {

@@ -5,7 +5,7 @@ use camino::{Utf8Components, Utf8Path, Utf8PathBuf};
 use serde::{Deserialize, Serialize};
 
 use crate::error::Error;
-use crate::utils::normalize_path;
+use filesystem::utils::normalize_path;
 
 const REMOTEPATH_PREFIX: &str = "path";
 
