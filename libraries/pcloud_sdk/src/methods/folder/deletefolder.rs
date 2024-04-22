@@ -1,8 +1,10 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::params::Params;
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
@@ -21,19 +23,20 @@ pub trait GetDeleteFolder {
 }
 
 #[async_trait]
-impl<T: client::Client> GetDeleteFolder for T {
+impl<T: RESTClient> GetDeleteFolder for T {
     async fn deletefolder(&self, input: Folder) -> Result<DeleteFolder> {
-        let ret = self.get::<DeleteFolder>(ENDPOINT, input.into_params()?).await?;
+        let ret = RESTClient::get::<DeleteFolder>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
         Ok(ret)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
+
+    use camino::Utf8Path;
 
     use crate::types::FolderID;
     use crate::utils::http::ApiResult;

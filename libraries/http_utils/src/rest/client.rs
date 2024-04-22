@@ -40,5 +40,3 @@ pub trait RESTClient: HttpClient {
         Self::parse_response(response.text().await?)
     }
 }
-
-impl<T: HttpClient> RESTClient for T {}

@@ -1,12 +1,15 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use camino::Utf8Path;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
+
+use http_utils::rest::RESTClient;
 
 use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFile;
 use crate::types::Folder;
-use crate::{client, utils};
+use crate::utils;
 
 pub const ENDPOINT: &str = "/uploadfile";
 
@@ -65,13 +68,13 @@ pub trait PostUploadFile {
 }
 
 #[async_trait]
-impl<T: client::Client> PostUploadFile for T {
+impl<T: RESTClient> PostUploadFile for T {
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile> {
         let filename = upload_params.filename.clone();
         let data = utils::http::file_data(local_filename, &filename)?;
-        let ret = self
-            .post::<UploadFile>(ENDPOINT, upload_params.into_params()?, data)
-            .await?;
+        let ret =
+            RESTClient::post::<UploadFile>(self, ENDPOINT, HeaderMap::default(), upload_params.into_params()?, data)
+                .await?;
         Ok(ret)
     }
 }

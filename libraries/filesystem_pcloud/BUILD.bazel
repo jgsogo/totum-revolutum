@@ -13,6 +13,7 @@ rust_library_tests_and_docs(
         normal = True,
     ) + [
         "@totum//libraries/filesystem",
+        "@totum//libraries/http_utils",
         "@totum//libraries/pcloud_sdk",
     ],
 )
@@ -28,6 +29,7 @@ rust_binary(
     ) + [
         ":filesystem_pcloud",
         "@totum//libraries/filesystem",
+        "@totum//libraries/http_utils",
         "@totum//libraries/pcloud_sdk",
     ],
 )

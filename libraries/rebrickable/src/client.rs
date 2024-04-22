@@ -1,4 +1,5 @@
 use anyhow::Result;
+use http_utils::rest::RESTClient;
 use http_utils::HttpClient;
 use std::collections::HashMap;
 
@@ -22,6 +23,8 @@ impl HttpClient for RebrickableClient {
         params
     }
 }
+
+impl RESTClient for RebrickableClient {}
 
 impl RebrickableClient {
     pub fn new(api_key: String) -> Result<Self> {

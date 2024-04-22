@@ -922,6 +922,8 @@ dependencies = [
  "camino",
  "filesystem",
  "flume",
+ "headers",
+ "http_utils",
  "pcloud_sdk",
  "tokio",
  "tracing",

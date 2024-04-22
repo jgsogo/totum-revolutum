@@ -1,10 +1,12 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tracing::debug;
 
-use crate::client;
+use http_utils::rest::RESTClient;
+
 use crate::methods::params::{Params, ParamsType};
 use crate::types::File;
 
@@ -72,10 +74,10 @@ pub trait GetFileLink {
 }
 
 #[async_trait]
-impl<T: client::Client> GetFileLink for T {
+impl<T: RESTClient> GetFileLink for T {
     async fn getfilelink(&self, file_link: GetFileLinkInput) -> Result<FileLink> {
         debug!("pcloud::getfilelink - file '{}'", file_link.file);
-        let ret = self.get::<FileLink>(ENDPOINT, file_link.into_params()?).await?;
+        let ret = RESTClient::get::<FileLink>(self, ENDPOINT, HeaderMap::default(), file_link.into_params()?).await?;
         Ok(ret)
     }
 }
@@ -147,7 +149,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, "/getfilelink");
                 assert_eq!(params.len(), 5);
                 assert_eq!(params.get("fileid"), None);
@@ -156,6 +158,7 @@ mod tests {
                 assert_eq!(params.get("contenttype"), Some(&"<contenttype>".to_string()));
                 assert_eq!(params.get("maxspeed"), Some(&"200".to_string()));
                 assert_eq!(params.get("skipfilename"), Some(&"1".to_string()));
+                assert_eq!(headers.len(), 0);
 
                 Ok(FileLink {
                     path: "<path>".to_string(),
@@ -181,11 +184,12 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, "/getfilelink");
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("fileid"), Some(&"42".to_string()));
                 assert_eq!(params.get("path"), None);
+                assert_eq!(headers.len(), 0);
 
                 Ok(FileLink {
                     path: "<path>".to_string(),

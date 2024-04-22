@@ -2,9 +2,10 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use http_utils::rest::RESTClient;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct APIServer {
@@ -18,9 +19,9 @@ pub trait GetAPIServer {
 }
 
 #[async_trait]
-impl<T: client::Client> GetAPIServer for T {
+impl<T: RESTClient> GetAPIServer for T {
     async fn getapiserver(&self) -> Result<APIServer> {
-        self.get::<APIServer>("/getapiserver", HashMap::new()).await
+        RESTClient::get::<APIServer>(self, "/getapiserver", HeaderMap::default(), HashMap::new()).await
     }
 }
 
@@ -36,9 +37,10 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, "/getapiserver");
                 assert!(params.is_empty());
+                assert_eq!(headers.len(), 0);
                 Ok(APIServer {
                     binapi: vec!["binapi".into()],
                     api: vec!["api".into()],

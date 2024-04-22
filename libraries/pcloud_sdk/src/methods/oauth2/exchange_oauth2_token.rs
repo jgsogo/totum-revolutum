@@ -4,7 +4,7 @@ use anyhow::Result;
 use reqwest;
 use serde::de::DeserializeOwned;
 
-use crate::utils;
+use crate::utils::http::create_response;
 
 use super::{AppClientData, OAuth2Token};
 
@@ -25,6 +25,7 @@ pub(crate) async fn exchange_oauth2_token<Token: OAuth2Token + DeserializeOwned>
     };
 
     let url = format!("https://{hostname}/oauth2_token");
-    let oauth2_token = utils::http::get::<Token>(http_client, &url, params).await?;
-    Ok(oauth2_token)
+
+    let result = http_client.get(url).query(&params).send().await?.text().await?;
+    create_response::<Token>(result)
 }

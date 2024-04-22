@@ -1,28 +1,28 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
+use std::str::FromStr;
 
 use anyhow::Result;
 use async_trait::async_trait;
+use headers::HeaderMap;
+use headers::HeaderMapExt;
+use mime::Mime;
 use reqwest;
+use reqwest::Response;
 use serde::de::DeserializeOwned;
 
 use crate::access_token;
 use crate::methods::oauth2;
 use crate::utils::http;
+use crate::utils::http::{create_response, BOUNDARY};
+use http_utils::rest::RESTClient;
+use http_utils::HttpClient;
 
 #[async_trait]
-pub trait Client: Sync {
-    async fn get<T>(&self, endpoint: &str, params: HashMap<String, String>) -> Result<T>
-    where
-        T: DeserializeOwned + 'static;
-
-    async fn post<T>(&self, endpoint: &str, params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
-    where
-        T: DeserializeOwned + 'static;
-}
+pub trait Client: RESTClient {}
 
 #[async_trait]
-pub trait ClientBytes: Client {
+pub trait ClientBytes: HttpClient {
     async fn get_bytes(&self, endpoint: &str, params: HashMap<String, String>) -> Result<Vec<u8>>;
 }
 
@@ -60,6 +60,44 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 }
 
 #[async_trait]
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient for PCloudClient<Token> {
+    fn build_url(&self, endpoint: &str) -> String {
+        let schema = if self.secure { "https" } else { "http" };
+        format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
+    }
+
+    fn http_client(&self) -> &reqwest::Client {
+        &self.http_client
+    }
+
+    fn headers(&self, mut headers: HeaderMap) -> HeaderMap {
+        let conn = headers::Connection::keep_alive();
+        headers.typed_insert(conn);
+        headers
+    }
+
+    fn params(&self, mut params: HashMap<String, String>) -> HashMap<String, String> {
+        let access_token = self.oauth2_token.access_token();
+        params.insert("access_token".to_string(), access_token.to_string());
+        params
+    }
+
+    async fn post(
+        &self,
+        endpoint: &str,
+        mut headers: HeaderMap,
+        params: HashMap<String, String>,
+        data: Vec<u8>,
+    ) -> Result<Response> {
+        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
+        let content_type = headers::ContentType::from(mime_multipart);
+        headers.typed_insert(content_type);
+
+        HttpClient::post(self, endpoint, headers, params, data).await
+    }
+}
+
+#[async_trait]
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> ClientBytes for PCloudClient<Token> {
     async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>> {
         let url = self.build_url(endpoint);
@@ -69,28 +107,37 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
     }
 }
 
-#[async_trait]
-impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for PCloudClient<Token> {
-    async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> RESTClient for PCloudClient<Token> {
+    fn parse_response<T>(result: String) -> Result<T>
     where
         T: DeserializeOwned + 'static,
     {
-        let url = self.build_url(endpoint);
-        let access_token = self.oauth2_token.access_token();
-        params.insert("access_token".to_string(), access_token.to_string());
-        http::get::<T>(self.http_client.clone(), &url, params).await
-    }
-
-    async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
-    where
-        T: DeserializeOwned + 'static,
-    {
-        let url = self.build_url(endpoint);
-        let access_token = self.oauth2_token.access_token();
-        params.insert("access_token".to_string(), access_token.to_string());
-        http::post::<T>(self.http_client.clone(), &url, params, data).await
+        create_response(result)
     }
 }
+//
+// #[async_trait]
+// impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for PCloudClient<Token> {
+//     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
+//     where
+//         T: DeserializeOwned + 'static,
+//     {
+//         let url = self.build_url(endpoint);
+//         let access_token = self.oauth2_token.access_token();
+//         params.insert("access_token".to_string(), access_token.to_string());
+//         http::get::<T>(self.http_client.clone(), &url, params).await
+//     }
+//
+//     async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
+//     where
+//         T: DeserializeOwned + 'static,
+//     {
+//         let url = self.build_url(endpoint);
+//         let access_token = self.oauth2_token.access_token();
+//         params.insert("access_token".to_string(), access_token.to_string());
+//         http::post::<T>(self.http_client.clone(), &url, params, data).await
+//     }
+// }
 
 impl<Token: access_token::OAuth2Token + Clone> Clone for PCloudClient<Token> {
     fn clone(&self) -> Self {
