@@ -23,8 +23,6 @@ headers = { workspace = true }
 http = { workspace = true }
 http-body = { workspace = true }
 http-body-util = { workspace = true }
-hyper = { workspace = true, features = ["full"] }
-hyper-util = { workspace = true, features = ["server"] }
 itertools = { workspace = true }
 mime = { workspace = true }
 reqwest = { workspace = true, features = ["stream"] }

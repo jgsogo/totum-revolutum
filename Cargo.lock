@@ -2210,8 +2210,6 @@ dependencies = [
  "http-body-util",
  "http_utils",
  "httpmock",
- "hyper 1.3.1",
- "hyper-util",
  "indicatif",
  "itertools 0.12.1",
  "log",

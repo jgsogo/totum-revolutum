@@ -30,7 +30,6 @@ time = { workspace = true, features = [
     "formatting",
     "macros",
 ] }
-# tokio-cron-scheduler = { version = "0.8" }
 cron-parser = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 chrono-tz = { workspace = true }
