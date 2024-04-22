@@ -1,0 +1,29 @@
+load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+
+rust_library_tests_and_docs(
+    name = "rebrickable",
+    srcs = glob(["src/**/*.rs"]),
+    aliases = aliases(),
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)
+
+rust_binary(
+    name = "cli",
+    srcs = glob(["src/cli/**/*.rs"]),
+    aliases = aliases(),
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    deps = all_crate_deps(
+        normal = True,
+    ) + [
+        ":rebrickable",
+    ],
+)

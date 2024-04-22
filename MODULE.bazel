@@ -67,6 +67,7 @@ crate.from_cargo(
         "//libraries/filesystem:Cargo.toml",
         "//libraries/filesystem_pcloud:Cargo.toml",
         "//libraries/pcloud_sdk:Cargo.toml",
+        "//libraries/rebrickable:Cargo.toml",
     ],
 )
 use_repo(crate, "crates_libraries")

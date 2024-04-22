@@ -6,6 +6,7 @@ ALL_LIBRARIES = [
     "constants",
     "filesystem",
     "pcloud_sdk",
+    "rebrickable",
     "filesystem_pcloud",
 ]
 
