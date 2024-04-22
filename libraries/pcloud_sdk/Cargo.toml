@@ -14,6 +14,8 @@ test_utils = ["dep:mockall", "dep:httpmock"]
 
 
 [dependencies]
+http_utils = { path = "../http_utils" }
+
 bytes = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 hyper = { workspace = true, features = ["full"] }
