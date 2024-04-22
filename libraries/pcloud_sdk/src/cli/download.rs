@@ -6,12 +6,12 @@ use clap::Args;
 use futures::StreamExt;
 use tracing::debug;
 
+use filesystem::utils::{current_path, to_absolute_path};
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::handy::GetFileLinkAndDownload;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::methods::streaming::getfilelink::GetFileLinkInput;
 use pcloud_sdk::types::RemotePath;
-use pcloud_sdk::utils::{current_path, to_absolute_path};
 
 use crate::output::{Print, PrintVariant};
 use crate::utils::params_or_stdin::ParamsOrStdin;

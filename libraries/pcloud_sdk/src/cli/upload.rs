@@ -8,7 +8,7 @@ use clap::Args;
 use futures::StreamExt;
 use tracing::debug;
 
-use filesystem::utils::normalize_path;
+use filesystem::utils::{current_path, normalize_path, to_absolute_path};
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
@@ -16,7 +16,6 @@ use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::types::{FileID, RemotePath};
 use pcloud_sdk::types::{Folder, FolderID};
-use pcloud_sdk::utils::{current_path, to_absolute_path};
 
 use crate::output::{progressbar_for_progresshash, Print, PrintVariant};
 use crate::utils::params_or_stdin::ParamsOrStdin;
