@@ -19,7 +19,10 @@ pub trait Client: Sync {
     async fn post<T>(&self, endpoint: &str, params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
     where
         T: DeserializeOwned + 'static;
+}
 
+#[async_trait]
+pub trait ClientBytes: Client {
     async fn get_bytes(&self, endpoint: &str, params: HashMap<String, String>) -> Result<Vec<u8>>;
 }
 
@@ -57,6 +60,16 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 }
 
 #[async_trait]
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> ClientBytes for PCloudClient<Token> {
+    async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>> {
+        let url = self.build_url(endpoint);
+        let access_token = self.oauth2_token.access_token();
+        params.insert("access_token".to_string(), access_token.to_string());
+        http::get_bytes(self.http_client.clone(), &url, params).await
+    }
+}
+
+#[async_trait]
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> Client for PCloudClient<Token> {
     async fn get<T>(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<T>
     where
@@ -76,13 +89,6 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
         let access_token = self.oauth2_token.access_token();
         params.insert("access_token".to_string(), access_token.to_string());
         http::post::<T>(self.http_client.clone(), &url, params, data).await
-    }
-
-    async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>> {
-        let url = self.build_url(endpoint);
-        let access_token = self.oauth2_token.access_token();
-        params.insert("access_token".to_string(), access_token.to_string());
-        http::get_bytes(self.http_client.clone(), &url, params).await
     }
 }
 

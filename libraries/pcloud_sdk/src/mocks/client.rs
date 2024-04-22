@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use mockall::mock;
 use serde::de::DeserializeOwned;
 
-use crate::client::Client;
+use crate::client::{Client, ClientBytes};
 
 mock! {
     #[allow(dead_code)]
@@ -26,7 +26,11 @@ mock! {
         async fn post<T>(&self, endpoint: &str, mut params: HashMap<String, String>, data: Vec<u8>) -> Result<T>
         where
             T: DeserializeOwned+ 'static;
+    }
 
+        #[allow(dead_code)]
+    #[async_trait]
+    impl ClientBytes for LocalClient {
         async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>>;
     }
 }

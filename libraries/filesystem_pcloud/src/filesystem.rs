@@ -9,7 +9,7 @@ use tokio::time::Instant;
 use tracing::{info, trace, warn};
 
 use filesystem::{File, Filesystem};
-use pcloud_sdk::client::Client;
+use pcloud_sdk::client::{Client, ClientBytes};
 use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
 use pcloud_sdk::methods::file::stat::GetStat;
@@ -125,7 +125,7 @@ impl<HttpClient: Client + Send + Sync + Clone + 'static> FilesystemPCloud<HttpCl
 }
 
 #[async_trait]
-impl<HttpClient: Client + Send + Sync + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
+impl<HttpClient: Client + ClientBytes + Send + Sync + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
     type Metadata = RemoteMetadata;
 
     fn root(&self) -> &Utf8Path {
