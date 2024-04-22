@@ -6,7 +6,7 @@ edition = "2021"
 [features]
 
 [dependencies]
-serde = { version = "1.0.198", features = ["derive"] }
 chrono = { workspace = true, features = ["serde"] }
 chrono-tz = { workspace = true }
 cron-parser = { workspace = true }
+serde = { version = "1.0.198", features = ["derive"] }

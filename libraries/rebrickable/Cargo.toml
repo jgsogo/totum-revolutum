@@ -16,21 +16,21 @@ test_utils = ["dep:mockall", "dep:httpmock"]
 [dependencies]
 http_utils = { path = "../http_utils" }
 
-#bytes = { workspace = true }
-tokio = { workspace = true, features = ["full"] }
-hyper = { workspace = true, features = ["full"] }
-hyper-util = { workspace = true, features = ["server"] }
-#dirs = { workspace = true }
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+camino = { workspace = true, features = ["serde1"] }
+headers = { workspace = true }
 http = { workspace = true }
 http-body = { workspace = true }
-#futures = { workspace = true }
-#futures-util = { workspace = true, default-features = false, features = ["alloc"] }
-#url = { workspace = true }
+http-body-util = { workspace = true }
+hyper = { workspace = true, features = ["full"] }
+hyper-util = { workspace = true, features = ["server"] }
+itertools = { workspace = true }
+mime = { workspace = true }
+reqwest = { workspace = true, features = ["stream"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_repr = { workspace = true }
-async-trait = { workspace = true }
-reqwest = { workspace = true, features = ["stream"] }
 thiserror = { workspace = true }
 time = { workspace = true, features = [
     "serde",
@@ -38,36 +38,25 @@ time = { workspace = true, features = [
     "formatting",
     "macros",
 ] }
-#strum = { workspace = true, features = ["derive"] }
-#strum_macros = { workspace = true }
-#chrono = { workspace = true, features = ["serde"] }
-#chrono-tz = { workspace = true }
-#cron-parser = { workspace = true }
-anyhow = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
-#bitflags = { workspace = true }
-itertools = { workspace = true }
-camino = { workspace = true, features = ["serde1"] }
-headers = { workspace = true }
-mime = { workspace = true }
-http-body-util = { workspace = true }
 
 # Optional dependencies
+httpmock = { workspace = true, optional = true }
 indicatif = { workspace = true, optional = true }
 mockall = { workspace = true, optional = true }
-httpmock = { workspace = true, optional = true }
 
 # Deps for CLI
-clap-verbosity-flag = { workspace = true, optional = true }
-tracing-subscriber = { workspace = true, optional = true }
-log = { workspace = true, optional = true }
 clap = { workspace = true, features = ["derive"], optional = true }
+clap-verbosity-flag = { workspace = true, optional = true }
+log = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true }
 
 [dev-dependencies]
-tempfile = { workspace = true }
 env_logger = { workspace = true }
-tracing-subscriber = { workspace = true }
 rebrickable = { path = ".", features = ["test_utils"] }
+tempfile = { workspace = true }
+tracing-subscriber = { workspace = true }
 
 [[bin]]
 name = "briclink"

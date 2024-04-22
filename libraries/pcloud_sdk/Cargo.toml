@@ -17,21 +17,28 @@ test_utils = ["dep:mockall", "dep:httpmock"]
 http_utils = { path = "../http_utils" }
 filesystem = { path = "../filesystem" }
 
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+bitflags = { workspace = true }
 bytes = { workspace = true }
-tokio = { workspace = true, features = ["full"] }
-hyper = { workspace = true, features = ["full"] }
-hyper-util = { workspace = true, features = ["server"] }
+camino = { workspace = true, features = ["serde1"] }
 dirs = { workspace = true }
-http = { workspace = true }
-http-body = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true, default-features = false, features = ["alloc"] }
-url = { workspace = true }
+headers = { workspace = true }
+http = { workspace = true }
+http-body = { workspace = true }
+http-body-util = { workspace = true }
+hyper = { workspace = true, features = ["full"] }
+hyper-util = { workspace = true, features = ["server"] }
+itertools = { workspace = true }
+mime = { workspace = true }
+reqwest = { workspace = true, features = ["stream"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_repr = { workspace = true }
-async-trait = { workspace = true }
-reqwest = { workspace = true, features = ["stream"] }
+strum = { workspace = true, features = ["derive"] }
+strum_macros = { workspace = true }
 thiserror = { workspace = true }
 time = { workspace = true, features = [
     "serde",
@@ -39,33 +46,26 @@ time = { workspace = true, features = [
     "formatting",
     "macros",
 ] }
-strum = { workspace = true, features = ["derive"] }
-strum_macros = { workspace = true }
-anyhow = { workspace = true }
 tracing = { workspace = true }
-bitflags = { workspace = true }
-itertools = { workspace = true }
-camino = { workspace = true, features = ["serde1"] }
-headers = { workspace = true }
-mime = { workspace = true }
-http-body-util = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+url = { workspace = true }
 
 # Optional dependencies
+httpmock = { workspace = true, optional = true }
 indicatif = { workspace = true, optional = true }
 mockall = { workspace = true, optional = true }
-httpmock = { workspace = true, optional = true }
 
 # Deps for CLI
-clap-verbosity-flag = { workspace = true, optional = true }
-tracing-subscriber = { workspace = true, optional = true }
-log = { workspace = true, optional = true }
 clap = { workspace = true, features = ["derive"], optional = true }
+clap-verbosity-flag = { workspace = true, optional = true }
+log = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true }
 
 [dev-dependencies]
-tempfile = { workspace = true }
 env_logger = { workspace = true }
-tracing-subscriber = { workspace = true }
 pcloud_sdk = { path = ".", features = ["test_utils"] }
+tempfile = { workspace = true }
+tracing-subscriber = { workspace = true }
 
 [[bin]]
 name = "pcloud_sdk"
