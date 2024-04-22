@@ -141,7 +141,8 @@ pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMa
     Ok(r.to_vec())
 }
 
-pub(crate) fn file_data(local_filepath: &Utf8Path, filename: &str) -> io::Result<Vec<u8>> {
+pub(crate) fn create_file_data(local_filepath: &Utf8Path, filename: &str) -> io::Result<Vec<u8>> {
+    // FIXME: Receive BOUNDARY as argument
     let mut data = Vec::new();
     write!(data, "--{BOUNDARY}\r\n")?;
     write!(
@@ -160,7 +161,8 @@ pub(crate) fn file_data(local_filepath: &Utf8Path, filename: &str) -> io::Result
 }
 
 /// Creates the payload for a POST request (`form-data`) to send the contents of a file
-pub fn file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
+pub fn create_file_write(content: &mut Vec<u8>, filename: &str) -> io::Result<Vec<u8>> {
+    // FIXME: Receive BOUNDARY as argument
     let mut data = Vec::new();
     write!(data, "--{BOUNDARY}\r\n")?;
     write!(

@@ -357,7 +357,7 @@ mod tests {
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
                 assert_eq!(headers.len(), 0);
                 let mut data = b"Hello, world!".to_vec();
-                let bdata = utils::http::file_write(&mut data, "filename")?;
+                let bdata = utils::http::create_file_write(&mut data, "filename")?;
                 assert_eq!(posted_data, bdata);
                 Ok(FileWrite { bytes: 321 })
             },

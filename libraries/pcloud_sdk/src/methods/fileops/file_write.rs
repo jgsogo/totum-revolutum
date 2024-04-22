@@ -1,9 +1,12 @@
+use crate::utils::http::BOUNDARY;
 use anyhow::Result;
 use async_trait::async_trait;
+use headers::HeaderMapExt;
 use http::HeaderMap;
-use serde::{Deserialize, Serialize};
-
 use http_utils::rest::RESTClient;
+use mime::Mime;
+use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 
 use crate::methods::fileops::FileDescriptor;
 use crate::methods::params::Params;
@@ -24,7 +27,12 @@ pub trait PostFileWrite {
 #[async_trait]
 impl<T: RESTClient> PostFileWrite for T {
     async fn file_write(&self, descriptor: FileDescriptor, data: &[u8]) -> Result<FileWrite> {
-        let data = utils::http::file_write(&mut data.to_owned(), "filename")?;
+        let mut headers = HeaderMap::default();
+        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
+        let content_type = headers::ContentType::from(mime_multipart);
+        headers.typed_insert(content_type);
+
+        let data = utils::http::create_file_write(&mut data.to_owned(), "filename")?;
         let ret = RESTClient::post::<FileWrite>(self, ENDPOINT, HeaderMap::default(), descriptor.into_params()?, data)
             .await?;
         Ok(ret)
@@ -44,7 +52,7 @@ mod tests {
         let mut client = MockLocalClient::new();
         let mut data = "gaudeamus igitur".as_bytes().to_vec();
 
-        let bdata = utils::http::file_write(&mut data.clone(), "filename")?;
+        let bdata = utils::http::create_file_write(&mut data.clone(), "filename")?;
         client.expect_post().times(1).returning(
             move |endpoint, headers: HeaderMap, params: HashMap<_, _>, posted_data: Vec<u8>| {
                 assert_eq!(endpoint, "/file_write");

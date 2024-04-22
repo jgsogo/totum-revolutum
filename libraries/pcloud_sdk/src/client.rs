@@ -1,22 +1,20 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
-use std::str::FromStr;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use headers::HeaderMap;
 use headers::HeaderMapExt;
-use mime::Mime;
 use reqwest;
-use reqwest::Response;
 use serde::de::DeserializeOwned;
+
+use http_utils::rest::RESTClient;
+use http_utils::HttpClient;
 
 use crate::access_token;
 use crate::methods::oauth2;
 use crate::utils::http;
-use crate::utils::http::{create_response, BOUNDARY};
-use http_utils::rest::RESTClient;
-use http_utils::HttpClient;
+use crate::utils::http::create_response;
 
 #[async_trait]
 pub trait Client: RESTClient {}
@@ -80,20 +78,6 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
         let access_token = self.oauth2_token.access_token();
         params.insert("access_token".to_string(), access_token.to_string());
         params
-    }
-
-    async fn post(
-        &self,
-        endpoint: &str,
-        mut headers: HeaderMap,
-        params: HashMap<String, String>,
-        data: Vec<u8>,
-    ) -> Result<Response> {
-        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
-        let content_type = headers::ContentType::from(mime_multipart);
-        headers.typed_insert(content_type);
-
-        HttpClient::post(self, endpoint, headers, params, data).await
     }
 }
 
