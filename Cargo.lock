@@ -1301,6 +1301,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "http_utils"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "headers",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "httparse"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2184,6 +2197,7 @@ dependencies = [
  "http 1.1.0",
  "http-body 1.0.0",
  "http-body-util",
+ "http_utils",
  "httpmock",
  "hyper 1.3.1",
  "hyper-util",
