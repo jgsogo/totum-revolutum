@@ -3,7 +3,7 @@ use camino::Utf8PathBuf;
 use clap::{Parser, Subcommand};
 use tracing::debug;
 
-use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::client::PCloudClientImpl;
 
 use crate::output::{OutputArg, PrintVariant};
 
@@ -93,7 +93,7 @@ async fn main() -> Result<()> {
         Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
         _ => {
             let token = auth::read_from_file(&cli.token_file)?;
-            let client = PCloudClient::new(token, true);
+            let client = PCloudClientImpl::new(token, true);
             match cli.command {
                 Commands::Userinfo => userinfo::handle(client, &output, cli.common).await,
                 Commands::Listfolder(params) => listfolder::handle(client, &output, params, cli.common).await,

@@ -8,7 +8,7 @@ use clap::Args;
 use futures::StreamExt;
 use tracing::debug;
 
-use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
@@ -53,7 +53,7 @@ fn remote_path_from_local_file(abs_file_to_upload: &Utf8Path, keep_relative_path
 }
 
 async fn upload(
-    pcloud: PCloudClient<OAuth2TokenImpl>,
+    pcloud: PCloudClientImpl<OAuth2TokenImpl>,
     output: &PrintVariant,
     file_to_upload: Utf8PathBuf,
     folder: &FolderID,
@@ -114,7 +114,7 @@ async fn upload(
 }
 
 pub async fn handle(
-    pcloud: PCloudClient<OAuth2TokenImpl>,
+    pcloud: PCloudClientImpl<OAuth2TokenImpl>,
     output: &PrintVariant,
     params: Params,
     cli_params: CliParams,

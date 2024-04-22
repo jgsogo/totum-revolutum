@@ -1,3 +1,4 @@
+use crate::client::PCloudClient;
 use crate::utils::http::BOUNDARY;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -25,7 +26,7 @@ pub trait PostFileWrite {
 }
 
 #[async_trait]
-impl<T: RESTClient> PostFileWrite for T {
+impl<T: PCloudClient> PostFileWrite for T {
     async fn file_write(&self, descriptor: FileDescriptor, data: &[u8]) -> Result<FileWrite> {
         let mut headers = HeaderMap::default();
         let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();

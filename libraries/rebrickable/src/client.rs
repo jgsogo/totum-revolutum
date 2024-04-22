@@ -3,13 +3,15 @@ use http_utils::rest::RESTClient;
 use http_utils::HttpClient;
 use std::collections::HashMap;
 
+pub trait RebrickableClient: RESTClient {}
+
 #[derive(Debug)]
-pub struct RebrickableClient {
+pub struct RebrickableClientImpl {
     api_key: String,
     http_client: reqwest::Client,
 }
 
-impl HttpClient for RebrickableClient {
+impl HttpClient for RebrickableClientImpl {
     fn build_url(&self, endpoint: &str) -> String {
         format!("https://rebrickable.com/api/v3{}", endpoint)
     }
@@ -24,9 +26,11 @@ impl HttpClient for RebrickableClient {
     }
 }
 
-impl RESTClient for RebrickableClient {}
+impl RESTClient for RebrickableClientImpl {}
 
-impl RebrickableClient {
+impl RebrickableClient for RebrickableClientImpl {}
+
+impl RebrickableClientImpl {
     pub fn new(api_key: String) -> Result<Self> {
         let client = reqwest::ClientBuilder::new().build()?;
         Ok(Self {

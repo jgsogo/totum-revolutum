@@ -6,6 +6,7 @@ use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -48,7 +49,7 @@ pub trait GetUserInfo {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetUserInfo for T {
+impl<T: PCloudClient> GetUserInfo for T {
     async fn userinfo(&self) -> Result<UserInfo> {
         RESTClient::get::<UserInfo>(self, "/userinfo", HeaderMap::default(), HashMap::new()).await
     }

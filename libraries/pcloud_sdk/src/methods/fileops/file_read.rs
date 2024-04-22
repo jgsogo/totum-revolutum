@@ -2,7 +2,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::client;
+use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;
 use crate::methods::params::Params;
 
@@ -19,7 +19,7 @@ pub trait GetFileRead {
 }
 
 #[async_trait]
-impl<T: client::ClientBytes> GetFileRead for T {
+impl<T: PCloudClient> GetFileRead for T {
     async fn file_read(&self, descriptor: FileDescriptor, count: u64) -> Result<FileRead> {
         let mut params = descriptor.into_params()?;
         params.insert("count".to_string(), count.to_string());

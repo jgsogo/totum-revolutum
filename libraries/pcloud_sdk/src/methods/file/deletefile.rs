@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::params::Params;
@@ -23,7 +24,7 @@ pub trait GetDeleteFile {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetDeleteFile for T {
+impl<T: PCloudClient> GetDeleteFile for T {
     async fn deletefile(&self, input: File) -> Result<DeleteFile> {
         let ret = RESTClient::get::<DeleteFile>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
         Ok(ret)

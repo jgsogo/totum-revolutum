@@ -9,7 +9,7 @@ use serde::de::DeserializeOwned;
 use http_utils::rest::RESTClient;
 use http_utils::HttpClient;
 
-use crate::client::ClientBytes;
+use crate::client::PCloudClient;
 
 mock! {
     #[allow(dead_code)]
@@ -58,7 +58,7 @@ mock! {
 
     #[allow(dead_code)]
     #[async_trait]
-    impl ClientBytes for LocalClient {
+    impl PCloudClient for LocalClient {
         async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>>;
     }
 }

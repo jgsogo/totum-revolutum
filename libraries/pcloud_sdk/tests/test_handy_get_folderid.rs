@@ -4,7 +4,7 @@ use std::str::FromStr;
 use anyhow::Result;
 
 use pcloud_sdk::access_token::OAuth2Token;
-use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::handy::GetFolderID;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::{FolderID, RemotePath};
@@ -21,7 +21,7 @@ async fn test_get_folderid() -> Result<()> {
         server.listfolder_mock(qparams, "{\"result\": 0, \"metadata\": {\"folderid\": 1234}}")
     };
 
-    let pcloud = PCloudClient::new(server_token, false);
+    let pcloud = PCloudClientImpl::new(server_token, false);
     let remote_path = RemotePath::from_str("path:/the/path")?;
     let data = pcloud.get_folderid(&remote_path).await?;
 

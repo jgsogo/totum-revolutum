@@ -17,32 +17,32 @@ use crate::utils::http;
 use crate::utils::http::create_response;
 
 #[async_trait]
-pub trait ClientBytes: HttpClient {
+pub trait PCloudClient: RESTClient {
     // FIXME: Remove and make it a member function
     async fn get_bytes(&self, endpoint: &str, params: HashMap<String, String>) -> Result<Vec<u8>>;
 }
 
 #[derive(Debug)]
-pub struct PCloudClient<Token: access_token::OAuth2Token> {
+pub struct PCloudClientImpl<Token: access_token::OAuth2Token> {
     pub oauth2_token: Token,
     http_client: reqwest::Client,
     secure: bool,
 }
 
-impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> PCloudClient<Token> {
-    pub fn new(oauth2_token: Token, secure: bool) -> PCloudClient<Token> {
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> PCloudClientImpl<Token> {
+    pub fn new(oauth2_token: Token, secure: bool) -> PCloudClientImpl<Token> {
         let client = reqwest::ClientBuilder::new().build().unwrap();
-        PCloudClient {
+        PCloudClientImpl {
             oauth2_token,
             http_client: client,
             secure,
         }
     }
 
-    pub async fn authorize(app: oauth2::AppClientData, address: SocketAddr) -> Result<PCloudClient<Token>> {
+    pub async fn authorize(app: oauth2::AppClientData, address: SocketAddr) -> Result<PCloudClientImpl<Token>> {
         let client = reqwest::Client::new();
         let oauth2 = oauth2::authorize_oauth2(client.clone(), app, address).await?;
-        Ok(PCloudClient {
+        Ok(PCloudClientImpl {
             oauth2_token: oauth2,
             http_client: client,
             secure: true,
@@ -51,7 +51,9 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 }
 
 #[async_trait]
-impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient for PCloudClient<Token> {
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient
+    for PCloudClientImpl<Token>
+{
     fn build_url(&self, endpoint: &str) -> String {
         let schema = if self.secure { "https" } else { "http" };
         format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
@@ -75,7 +77,9 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 }
 
 #[async_trait]
-impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> ClientBytes for PCloudClient<Token> {
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> PCloudClient
+    for PCloudClientImpl<Token>
+{
     async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>> {
         let url = self.build_url(endpoint);
         let access_token = self.oauth2_token.access_token();
@@ -84,7 +88,9 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
     }
 }
 
-impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> RESTClient for PCloudClient<Token> {
+impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> RESTClient
+    for PCloudClientImpl<Token>
+{
     fn parse_response<T>(result: String) -> Result<T>
     where
         T: DeserializeOwned + 'static,
@@ -93,9 +99,9 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
     }
 }
 
-impl<Token: access_token::OAuth2Token + Clone> Clone for PCloudClient<Token> {
+impl<Token: access_token::OAuth2Token + Clone> Clone for PCloudClientImpl<Token> {
     fn clone(&self) -> Self {
-        PCloudClient::<Token> {
+        PCloudClientImpl::<Token> {
             oauth2_token: self.oauth2_token.clone(),
             http_client: self.http_client.clone(),
             secure: self.secure,

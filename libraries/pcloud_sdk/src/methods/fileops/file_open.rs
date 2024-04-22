@@ -6,6 +6,7 @@ use bitflags::bitflags;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::fileops::FileDescriptor;
@@ -40,7 +41,7 @@ pub trait GetFileOpen {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetFileOpen for T {
+impl<T: PCloudClient> GetFileOpen for T {
     async fn file_open(&self, flags: Flags, path: FileOpenPath) -> Result<FileOpen> {
         let mut params = HashMap::new();
         params.insert("flags".to_string(), flags.bits().to_string());

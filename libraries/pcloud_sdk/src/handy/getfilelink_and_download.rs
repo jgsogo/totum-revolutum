@@ -22,7 +22,7 @@ pub trait GetFileLinkAndDownload {
 }
 
 #[async_trait]
-impl<T: getfilelink::GetFileLink + std::marker::Sync> GetFileLinkAndDownload for T {
+impl<T: getfilelink::GetFileLink + Sync> GetFileLinkAndDownload for T {
     async fn getfilelink_and_download(
         &self,
         file_link: getfilelink::GetFileLinkInput,
