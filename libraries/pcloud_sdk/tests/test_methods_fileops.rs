@@ -44,7 +44,7 @@ async fn test_fileops() -> Result<()> {
             .await?;
         create.assert();
 
-        let bytes_count = pcloud.file_write(fd.fd, &mut "eaeaeaea".as_bytes().to_vec()).await?;
+        let bytes_count = pcloud.file_write(fd.fd, &"eaeaeaea".as_bytes().to_vec()).await?;
         assert_eq!(bytes_count.bytes, write_bytes);
         write.assert();
 

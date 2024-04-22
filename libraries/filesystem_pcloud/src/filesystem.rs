@@ -355,7 +355,11 @@ mod tests {
                 assert_eq!(endpoint, file_write::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
-                assert_eq!(headers.len(), 0);
+                assert_eq!(headers.len(), 1);
+                assert_eq!(
+                    headers.get("content-type").unwrap(),
+                    "multipart/form-data; boundary=ea3bbcf87c101592"
+                );
                 let mut data = b"Hello, world!".to_vec();
                 let bdata = utils::http::create_file_write(&mut data, "filename")?;
                 assert_eq!(posted_data, bdata);

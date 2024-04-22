@@ -33,8 +33,7 @@ impl<T: RESTClient> PostFileWrite for T {
         headers.typed_insert(content_type);
 
         let data = utils::http::create_file_write(&mut data.to_owned(), "filename")?;
-        let ret = RESTClient::post::<FileWrite>(self, ENDPOINT, HeaderMap::default(), descriptor.into_params()?, data)
-            .await?;
+        let ret = RESTClient::post::<FileWrite>(self, ENDPOINT, headers, descriptor.into_params()?, data).await?;
         Ok(ret)
     }
 }
@@ -59,7 +58,11 @@ mod tests {
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
                 assert_eq!(posted_data, bdata);
-                assert_eq!(headers.len(), 0);
+                assert_eq!(headers.len(), 1);
+                assert_eq!(
+                    headers.get("content-type").unwrap(),
+                    "multipart/form-data; boundary=ea3bbcf87c101592"
+                );
                 Ok(FileWrite { bytes: 10 })
             },
         );

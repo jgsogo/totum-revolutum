@@ -31,15 +31,7 @@ mock! {
 
         fn params(&self, params: HashMap<String, String>) -> HashMap<String, String>;
 
-        // async fn get(&self, endpoint: &str, headers: HeaderMap, params: HashMap<String, String>) -> Result<Response>;
-        //
-        // async fn post(
-        //     &self,
-        //     endpoint: &str,
-        //     headers: HeaderMap,
-        //     params: HashMap<String, String>,
-        //     data: Vec<u8>,
-        // ) -> Result<Response>;
+
     }
 
     #[allow(dead_code)]
