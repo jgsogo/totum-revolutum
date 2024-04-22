@@ -1,7 +1,7 @@
 use anyhow::Result;
 use camino::Utf8Path;
 
-use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::GetFileOpen;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags};
@@ -16,7 +16,7 @@ async fn test_fileops() -> Result<()> {
     //let userinfo_mock = server.fileops_();
     let oauth2_token = server.token();
 
-    let pcloud = PCloudClient::new(oauth2_token, false);
+    let pcloud = PCloudClientImpl::new(oauth2_token, false);
 
     // Add mock so we can create a file
     let folderid = FolderID(42);

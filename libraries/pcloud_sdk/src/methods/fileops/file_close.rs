@@ -2,6 +2,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::fileops::FileDescriptor;
@@ -15,7 +16,7 @@ pub trait GetFileClose {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetFileClose for T {
+impl<T: PCloudClient> GetFileClose for T {
     async fn file_close(&self, descriptor: FileDescriptor) -> Result<()> {
         RESTClient::get::<()>(self, ENDPOINT, HeaderMap::default(), descriptor.into_params()?).await
     }

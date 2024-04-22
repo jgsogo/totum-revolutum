@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::params::{Params, SourceAndTargetFolder};
@@ -22,7 +23,7 @@ pub trait GetRenameFolder {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetRenameFolder for T {
+impl<T: PCloudClient> GetRenameFolder for T {
     async fn copyfile(&self, input: SourceAndTargetFolder) -> Result<RenameFolder> {
         let ret = RESTClient::get::<RenameFolder>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
         Ok(ret)

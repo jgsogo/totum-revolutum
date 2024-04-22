@@ -4,6 +4,7 @@ use http::HeaderMap;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::params::{Params, ParamsType};
@@ -67,7 +68,7 @@ pub trait GetListFolder {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetListFolder for T {
+impl<T: PCloudClient> GetListFolder for T {
     async fn listfolder_with_filtermeta(
         &self,
         list_folder: ListFolderInput,

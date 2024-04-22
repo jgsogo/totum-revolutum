@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -19,7 +20,7 @@ pub trait GetAPIServer {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetAPIServer for T {
+impl<T: PCloudClient> GetAPIServer for T {
     async fn getapiserver(&self) -> Result<APIServer> {
         RESTClient::get::<APIServer>(self, "/getapiserver", HeaderMap::default(), HashMap::new()).await
     }

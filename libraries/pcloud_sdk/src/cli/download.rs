@@ -6,7 +6,7 @@ use clap::Args;
 use futures::StreamExt;
 use tracing::debug;
 
-use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::handy::GetFileLinkAndDownload;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::methods::streaming::getfilelink::GetFileLinkInput;
@@ -36,7 +36,7 @@ fn local_path_from_remote_file(output_folder: &Utf8Path, input: &RemotePath) -> 
 }
 
 async fn download(
-    pcloud: PCloudClient<OAuth2TokenImpl>,
+    pcloud: PCloudClientImpl<OAuth2TokenImpl>,
     output: &PrintVariant,
     output_folder: &Utf8Path,
     path: String,
@@ -50,7 +50,7 @@ async fn download(
 }
 
 pub async fn handle(
-    pcloud: PCloudClient<OAuth2TokenImpl>,
+    pcloud: PCloudClientImpl<OAuth2TokenImpl>,
     output: &PrintVariant,
     params: Params,
     cli_params: CliParams,

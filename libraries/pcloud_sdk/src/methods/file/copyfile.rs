@@ -1,3 +1,4 @@
+use crate::client::PCloudClient;
 use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
@@ -21,7 +22,7 @@ pub trait GetCopyFile {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetCopyFile for T {
+impl<T: PCloudClient> GetCopyFile for T {
     async fn copyfile(&self, input: SourceAndTargetFile) -> Result<CopyFile> {
         let ret = RESTClient::get::<CopyFile>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
         Ok(ret)

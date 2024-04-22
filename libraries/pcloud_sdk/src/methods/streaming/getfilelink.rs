@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tracing::debug;
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::params::{Params, ParamsType};
@@ -74,7 +75,7 @@ pub trait GetFileLink {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetFileLink for T {
+impl<T: PCloudClient> GetFileLink for T {
     async fn getfilelink(&self, file_link: GetFileLinkInput) -> Result<FileLink> {
         debug!("pcloud::getfilelink - file '{}'", file_link.file);
         let ret = RESTClient::get::<FileLink>(self, ENDPOINT, HeaderMap::default(), file_link.into_params()?).await?;

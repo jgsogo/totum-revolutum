@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::structures::MetadataFile;
@@ -26,7 +27,7 @@ pub trait UploadProgress {
 }
 
 #[async_trait]
-impl<T: RESTClient> UploadProgress for T {
+impl<T: PCloudClient> UploadProgress for T {
     async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData> {
         let mut params = HashMap::new();
         params.insert("progresshash".to_string(), progresshash.to_string());

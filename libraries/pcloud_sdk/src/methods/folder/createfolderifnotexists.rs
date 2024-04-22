@@ -4,6 +4,7 @@ use camino::Utf8PathBuf;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::params::{Params, ParamsType};
@@ -47,7 +48,7 @@ pub trait GetCreateFolderIfNotExists {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetCreateFolderIfNotExists for T {
+impl<T: PCloudClient> GetCreateFolderIfNotExists for T {
     async fn createfolderifnotexists(&self, input: TargetFolder) -> Result<CreateFolderIfNotExists> {
         RESTClient::get::<CreateFolderIfNotExists>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await
     }

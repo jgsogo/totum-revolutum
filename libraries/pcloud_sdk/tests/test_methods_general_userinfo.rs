@@ -1,7 +1,7 @@
 use anyhow::Result;
 use time::macros::datetime;
 
-use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 
@@ -11,7 +11,7 @@ async fn test_userinfo_get() -> Result<()> {
     let userinfo_mock = server.userinfo_mock();
     let oauth2_token = server.token();
 
-    let pcloud = PCloudClient::new(oauth2_token, false);
+    let pcloud = PCloudClientImpl::new(oauth2_token, false);
     let data = pcloud.userinfo().await?;
 
     assert_eq!(data.email, "pcloud@pcloud.com".to_string());

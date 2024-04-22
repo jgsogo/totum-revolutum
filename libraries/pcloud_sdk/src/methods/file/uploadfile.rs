@@ -7,6 +7,7 @@ use mime::Mime;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::params::{Params, ParamsType};
@@ -72,7 +73,7 @@ pub trait PostUploadFile {
 }
 
 #[async_trait]
-impl<T: RESTClient> PostUploadFile for T {
+impl<T: PCloudClient> PostUploadFile for T {
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile> {
         let mut headers = HeaderMap::default();
         let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();

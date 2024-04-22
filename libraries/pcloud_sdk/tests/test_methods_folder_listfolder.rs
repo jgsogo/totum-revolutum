@@ -4,7 +4,7 @@ use std::str::FromStr;
 use anyhow::Result;
 
 use pcloud_sdk::access_token::OAuth2Token;
-use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::mocks::server::PCloudServerMock;
@@ -21,7 +21,7 @@ async fn test_listfolder() -> Result<()> {
         server.listfolder_mock(qparams, "{\"result\": 0, \"metadata\": {\"folderid\": 1234}}")
     };
 
-    let pcloud = PCloudClient::new(server_token, false);
+    let pcloud = PCloudClientImpl::new(server_token, false);
     let input = ListFolderInput::new(Folder::from_str("path:/the/root/path")?);
     let data = pcloud.listfolder(input).await?;
 

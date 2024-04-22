@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
+use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::params::Params;
@@ -22,7 +23,7 @@ pub trait GetStat {
 }
 
 #[async_trait]
-impl<T: RESTClient> GetStat for T {
+impl<T: PCloudClient> GetStat for T {
     async fn stat(&self, input: File) -> Result<Stat> {
         let ret = RESTClient::get::<Stat>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
         Ok(ret)
