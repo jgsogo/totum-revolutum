@@ -6,6 +6,7 @@ bazel-out
 bazel-testlogs
 bazel-totum-revolutum
 examples/files/
+node_modules/
 secret.json
 secrets/
 target/

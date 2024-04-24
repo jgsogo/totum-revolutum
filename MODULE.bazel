@@ -10,9 +10,13 @@ bazel_dep(name = "platforms", version = "0.0.9")
 bazel_dep(name = "rules_python", version = "0.31.0", dev_dependency = True)
 bazel_dep(name = "rules_rust", version = "0.42.1", dev_dependency = True)
 
-bazel_dep(name = "aspect_rules_py", version = "0.7.1")
+bazel_dep(name = "rules_nodejs", version = "6.1.0")
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.1", dev_dependency = True)
+
+bazel_dep(name = "aspect_rules_py", version = "0.7.1")
+bazel_dep(name = "aspect_rules_js", version = "1.41.2")
+bazel_dep(name = "aspect_rules_ts", version = "2.2.0")
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
@@ -73,3 +77,35 @@ crate.from_cargo(
     ],
 )
 use_repo(crate, "crates_libraries")
+
+#####
+# Node
+# ====
+#
+# rules_nodejs devs recommend using aspect_rules_js for npm install (see https://github.com/bazelbuild/rules_nodejs/issues/3138),
+# so here I'm just following their examples: https://github.com/aspect-build/rules_js/blob/main/MODULE.bazel
+####
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+npm.npm_translate_lock(
+    name = "npm",
+    # bins = {
+    #     # derived from "bin" attribute in node_modules/typescript/package.json
+    #     "typescript": [
+    #         "tsc=./bin/tsc",
+    #         "tsserver=./bin/tsserver",
+    #     ],
+    # },
+    # custom_postinstalls = {
+    #     "@aspect-test/c": "echo moo > cow.txt",
+    #     "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
+    # },
+    data = [
+        "//sandbox/svelte-social-app:package.json",
+    ],
+    # generate_bzl_library_targets = True,
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    # update_pnpm_lock = True,
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")

@@ -1,0 +1,3 @@
+# Documentation about this file: https://pnpm.io/pnpm-workspace_yaml
+packages:
+  - 'sandbox/svelte-social-app'
