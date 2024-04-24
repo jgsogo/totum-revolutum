@@ -85,6 +85,9 @@ use_repo(crate, "crates_libraries")
 # rules_nodejs devs recommend using aspect_rules_js for npm install (see https://github.com/bazelbuild/rules_nodejs/issues/3138),
 # so here I'm just following their examples: https://github.com/aspect-build/rules_js/blob/main/MODULE.bazel
 ####
+# node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
+# node.toolchain()  # Uses default version from https://github.com/bazelbuild/rules_nodejs/blob/main/nodejs/repositories.bzl#L19
+
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 npm.npm_translate_lock(
     name = "npm",
