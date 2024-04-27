@@ -1,7 +1,11 @@
+load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
+
+# TODO: Search about using Bazel with Vite
+#  - https://medium.com/@yanirmanor/using-bazel-with-vite-and-vitest-c75b133f4707
 
 filegroup(
     name = "src",
@@ -64,4 +68,32 @@ vite_bin.vite(
     chdir = package_name(),
     out_dirs = ["dist"],
     visibility = ["//visibility:public"],
+)
+
+# This target (use `bazel run`) executes `vite dev` which starts the development server
+# at 'http://localhost:5173/' with live CLI output!.
+#
+# However as Bazel moves its files out of the WORKSPACE into build directories,
+# hot reloading doesn't work.
+#
+# We could use 'ibazel' to rerun this target whenever sources change, but it doesn't work
+# with MODULE.bazel file (FIXME: https://github.com/bazelbuild/bazel-watcher/pull/647)
+js_run_devserver(
+    name = "devserver",
+    args = ["dev --config vite.config.ts"],
+    chdir = package_name(),
+    command = "./node_modules/.bin/vite",
+    data = [
+        # Configs
+        "vite.config.ts",
+        "package.json",
+        "tsconfig.json",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
+    ],
 )
