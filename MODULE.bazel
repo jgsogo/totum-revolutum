@@ -91,13 +91,16 @@ use_repo(crate, "crates_libraries")
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 npm.npm_translate_lock(
     name = "npm",
-    # bins = {
-    #     # derived from "bin" attribute in node_modules/typescript/package.json
-    #     "typescript": [
-    #         "tsc=./bin/tsc",
-    #         "tsserver=./bin/tsserver",
-    #     ],
-    # },
+    bins = {
+        #     # derived from "bin" attribute in node_modules/typescript/package.json
+        #     "typescript": [
+        #         "tsc=./bin/tsc",
+        #         "tsserver=./bin/tsserver",
+        #     ],
+        "vite": [
+            "vite=./bin/vite",
+        ],
+    },
     # custom_postinstalls = {
     #     "@aspect-test/c": "echo moo > cow.txt",
     #     "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",

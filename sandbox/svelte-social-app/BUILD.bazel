@@ -3,6 +3,21 @@ load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
 
+filegroup(
+    name = "src",
+    srcs = glob(["src/**/*.*"]),
+)
+
+filegroup(
+    name = "static",
+    srcs = glob(["static/**/*.*"]),
+)
+
+# This target (bazel build) executes 'vite build' and generates an empty 'dist'
+# folder in 'bazel-bin'. I guess this should create the [build for production](https://vitejs.dev/guide/cli.html#vite-build),
+# but the folder is empty.
+#
+# FIXME: What is the expected output of this command? Is this the equivalent to a 'build'?
 vite_bin.vite(
     name = "svelte-social-app",
     srcs = [
@@ -10,17 +25,42 @@ vite_bin.vite(
         "vite.config.ts",
         "package.json",
         "tsconfig.json",
-        # "tsconfig.node.json",
-        # "index.html",
 
         # Build deps
         ":node_modules",  # TODO: Use //:node_modules instead
 
         # Sources
-    ] + glob(["src/**/*"]),
-
-    #  BUILD_DEPS + CONFIGS + [":vite_srcs_export"],
+        ":src",
+        ":static",
+    ],
     args = ["build --config vite.config.ts"],
+    chdir = package_name(),
+    out_dirs = ["dist"],
+    visibility = ["//visibility:public"],
+)
+
+# This target (use `bazel build`) executes `vite dev` which starts the development server
+# at 'http://localhost:5173/'. However as Bazel moves its files out of the WORKSPACE into
+# build directories, hot reloading doesn't work.
+#
+# We could use 'ibazel' to rerun this target whenever sources change, but it doesn't work
+# with MODULE.bazel file (FIXME: https://github.com/bazelbuild/bazel-watcher/pull/647)
+vite_bin.vite(
+    name = "dev",
+    srcs = [
+        # Configs
+        "vite.config.ts",
+        "package.json",
+        "tsconfig.json",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
+    ],
+    args = ["dev --config vite.config.ts"],
     chdir = package_name(),
     out_dirs = ["dist"],
     visibility = ["//visibility:public"],

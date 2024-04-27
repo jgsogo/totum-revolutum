@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "de4dbd0c794d4f8760ade2df1fca4d4fc2a09fa703f7c86ce5a99dde9142349f",
+  "moduleFileHash": "01dc74f046a1dee7de61c92fa0043f6381d67ec579b25344b072596fe6292cef",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -184,6 +184,11 @@
               "tagName": "npm_translate_lock",
               "attributeValues": {
                 "name": "npm",
+                "bins": {
+                  "vite": [
+                    "vite=./bin/vite"
+                  ]
+                },
                 "data": [
                   "//sandbox/svelte-social-app:package.json"
                 ],
