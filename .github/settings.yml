@@ -164,9 +164,4 @@ labels:
   - name: cmp:tooling/python
     color: "000000"
 
-  # Legacy/to be removed
-  - name: category:cli
-    color: "000000"
-  - name: category:ux
-    color: "000000"
 
