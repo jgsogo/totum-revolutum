@@ -6,7 +6,7 @@ repository:
   homepage: https://jgsogo.es/
   topics: rust, cpp, python, bazel, monorepo
   private: true
-  
+
   has_issues: true
   has_projects: true
   has_wiki: false
@@ -131,6 +131,34 @@ labels:
     description: Related to Raspberry platform
 
   # Specific to this repo
+  - name: cmp:apps/syncronia
+    color: "000000"
+  - name: cmp:bazel/diff
+    color: "000000"
+  - name: cmp:bazel/rust
+    color: "000000"
+  - name: cmp:docs
+    color: "000000"
+  - name: cmp:libraries/constants
+    color: "000000"
+  - name: cmp:libraries/cron
+    color: "000000"
+  - name: cmp:libraries/filesystem
+    color: "000000"
+  - name: cmp:libraries/filesystem_pcloud
+    color: "000000"
+  - name: cmp:libraries/http_utils
+    color: "000000"
+  - name: cmp:libraries/pcloud_sdk
+    color: "000000"
+  - name: cmp:libraries/rebrickable
+    color: "000000"
+  - name: cmp:scripts
+    color: "000000"
+  - name: cmp:tooling/python
+    color: "000000"
+
+  # Legacy/to be removed
   - name: bug
     color: "000000"
   - name: category:cli
