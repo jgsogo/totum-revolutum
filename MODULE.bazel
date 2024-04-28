@@ -100,6 +100,9 @@ npm.npm_translate_lock(
         "vite": [
             "vite=./bin/vite",
         ],
+        "svelte-kit": [
+            "@sveltejs/kit=./bin/svelte-kit",
+        ],
     },
     # custom_postinstalls = {
     #     "@aspect-test/c": "echo moo > cow.txt",
