@@ -1,0 +1,167 @@
+# These settings are synced to GitHub by https://github.com/apps/settings/
+
+repository:
+  name: totum-revolutum
+  description: Monorepo for personal projects
+  homepage: https://jgsogo.es/
+  topics: rust, cpp, python, bazel, monorepo
+  private: true
+
+  has_issues: true
+  has_projects: true
+  has_wiki: false
+  has_downloads: false
+
+  default_branch: master
+
+  delete_branch_on_merge: true
+
+  enable_automated_security_fixes: true
+  enable_vulnerability_alerts: true
+
+labels:
+  # Priorities
+  - name: priority:default
+    color: FBCA04
+    description: Something to be done
+  - name: priority:none
+    color: 0E8A16
+    description: Only if you feel like it
+  - name: priority:now
+    color: D93F0B
+    description: Don't be lazy!
+
+  # Size
+  - name: size:huge
+    color: B60205
+    description: Ongoing effort more than a week
+  - name: size:big
+    color: D93F0B
+    description: A week of work
+  - name: size:small
+    color: FBCA04
+    description: A long session
+  - name: size:tiny
+    color: 0E8A16
+    description: Short session, 1-2 hours
+
+  # Type
+  - name: type:bug
+    color: D4C5F9
+    description: Something isn't working
+  - name: type:devx:ci-cd
+    color: D4C5F9
+    description: Automate all the things
+  - name: type:devx:debt
+    color: D4C5F9
+    description: Technical debt and refactors
+  - name: type:devx:testing
+    color: D4C5F9
+    description: DevX related to testing
+  - name: type:docs
+    color: D4C5F9
+    description: Improvements or additions to documentation
+  - name: type:dream
+    color: D4C5F9
+    description: This will not be worked on (but it'd be soooo cool)
+  - name: type:feature
+    color: D4C5F9
+    description: New features
+  - name: type:inbox
+    color: D4C5F9
+    description: Interesting to read or to digest before further action
+  - name: type:performance
+    color: D4C5F9
+    description: Only related to performance and optimizations (no technical debt)
+  - name: type:ux
+    color: D4C5F9
+    description: User experience
+  - name: type:ux:cli
+    color: D4C5F9
+    description: User experience related to CLI interface
+
+  - name: cmp:ALL
+    color: "000000"
+    description: Apply to all components
+  - name: cmp:NEW
+    color: "000000"
+    description: Applies to a new component not yet in the repo
+  - name: cmp:pre-commit-hooks
+    color: "000000"
+    description: Related to pre-commit-hooks and automated validations
+  - name: cmp:github
+    color: "000000"
+    description: Related to github actions or GH applications
+
+  # About a concrete technology
+  - name: tech:rust
+    color: CDF7F7
+    description: Related to Rust language
+  - name: tech:typescript
+    color: CDF7F7
+    description: Related to Typescript (and Javascript) language
+  - name: tech:python
+    color: CDF7F7
+    description: Related to Python language
+  - name: tech:cpp
+    color: CDF7F7
+    description: Related to C and C++ languages
+  - name: tech:starlack
+    color: CDF7F7
+    description: Starlack (Bazel) build system
+  - name: tech:tauri
+    color: CDF7F7
+    description: Tauri (Rust + Typescript) library
+  - name: tech:svelte
+    color: CDF7F7
+    description: Svelte framework
+  - name: tech:bluetooth
+    color: CDF7F7
+    description: Bluetooth
+  - name: tech:math/geometry
+    color: CDF7F7
+    description: Geometry
+  
+  # Architectures
+  - name: arch:windows
+    color: CDF7F7
+    description: Related to Windows platform
+  - name: arch:linux
+    color: CDF7F7
+    description: Related to Linux platform
+  - name: arch:macos
+    color: CDF7F7
+    description: Related to MacOS platform
+  - name: arch:raspberry-pi
+    color: CDF7F7
+    description: Related to Raspberry platform
+
+  # Specific to this repo
+  - name: cmp:apps/syncronia
+    color: "000000"
+  - name: cmp:bazel/diff
+    color: "000000"
+  - name: cmp:bazel/rust
+    color: "000000"
+  - name: cmp:docs
+    color: "000000"
+  - name: cmp:libraries/constants
+    color: "000000"
+  - name: cmp:libraries/cron
+    color: "000000"
+  - name: cmp:libraries/filesystem
+    color: "000000"
+  - name: cmp:libraries/filesystem_pcloud
+    color: "000000"
+  - name: cmp:libraries/http_utils
+    color: "000000"
+  - name: cmp:libraries/pcloud_sdk
+    color: "000000"
+  - name: cmp:libraries/rebrickable
+    color: "000000"
+  - name: cmp:scripts
+    color: "000000"
+  - name: cmp:tooling/python
+    color: "000000"
+
+
