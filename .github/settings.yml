@@ -73,6 +73,12 @@ labels:
   - name: type:performance
     color: D4C5F9
     description: Only related to performance and optimizations (no technical debt)
+  - name: type:ux
+    color: D4C5F9
+    description: User experience
+  - name: type:ux:cli
+    color: D4C5F9
+    description: User experience related to CLI interface
 
   - name: cmp:ALL
     color: "000000"
@@ -159,47 +165,8 @@ labels:
     color: "000000"
 
   # Legacy/to be removed
-  - name: bug
-    color: "000000"
   - name: category:cli
-    color: "000000"
-  - name: category:performance
-    color: "000000"
-  - name: category:refactor
-    color: "000000"
-  - name: category:testing
     color: "000000"
   - name: category:ux
     color: "000000"
-  - name: ci
-    color: "000000"
-  - name: component:bazel
-    color: "000000"
-  - name: component:daemon
-    color: "000000"
-  - name: component:filesystem
-    color: "000000"
-  - name: component:pcloud-sdk
-    color: "000000"
-  - name: component:pre-commit-hook
-    color: "000000"
-  - name: component:sdk
-    color: "000000"
-  - name: component:syncronia
-    color: "000000"
-  - name: components:actions
-    color: "000000"
-  - name: dependencies
-    color: "000000"
-  - name: documentation
-    color: "000000"
-  - name: icebox
-    color: "000000"
-  - name: priority:high
-    color: "000000"
-  - name: priority:low
-    color: "000000"
-  - name: priority:medium
-    color: "000000"
-  - name: rfc
-    color: "000000"
+
