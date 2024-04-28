@@ -1,3 +1,4 @@
+load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//sandbox/svelte-social-app:@sveltejs/kit/package_json.bzl", sveltejs_kit_bin = "bin")
 load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
@@ -6,6 +7,9 @@ npm_link_all_packages(name = "node_modules")
 
 # TODO: Search about using Bazel with Vite
 #  - https://medium.com/@yanirmanor/using-bazel-with-vite-and-vitest-c75b133f4707
+
+# TODO: Some of these rules can be generalized and moved to `bazel/js/svelte`
+# so they are reused by other libraries
 
 filegroup(
     name = "src",
