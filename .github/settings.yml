@@ -3,8 +3,10 @@
 repository:
   name: totum-revolutum
   description: Monorepo for personal projects
-
+  homepage: https://jgsogo.es/
+  topics: rust, cpp, python, bazel, monorepo
   private: true
+  
   has_issues: true
   has_projects: true
   has_wiki: false
