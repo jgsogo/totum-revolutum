@@ -1,2 +1,3 @@
-sandbox/svelte-social-app/node_modules
+node_modules/
+sandbox/svelte-social-app/node_modules/
 target/
