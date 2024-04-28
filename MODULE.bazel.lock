@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "24ec02079a3117cc21f9b874c5ee25b7578ff5b825ecc8684d60cbe8db569bb2",
+  "moduleFileHash": "047cae2acb3e9bec18db9b2569bac8cbf01b1b7b2851d5d4f532211c9c35a75b",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -188,8 +188,8 @@
                   "vite": [
                     "vite=./bin/vite"
                   ],
-                  "svelte-kit": [
-                    "@sveltejs/kit=./bin/svelte-kit"
+                  "svelte-check": [
+                    "svelte-check=./bin/svelte-check"
                   ]
                 },
                 "data": [

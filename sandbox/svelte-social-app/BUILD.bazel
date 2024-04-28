@@ -1,8 +1,5 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//sandbox/svelte-social-app:@sveltejs/kit/package_json.bzl", sveltejs_kit_bin = "bin")
-
-# load("@npm//sandbox/svelte-social-app:svelte-check/package_json.bzl", svelte_check_bin = "bin")
 load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
@@ -42,32 +39,6 @@ sveltejs_kit_bin.svelte_kit(
     out_dirs = [".svelte-kit"],
     visibility = ["//visibility:public"],
 )
-
-# # Runs `svelte-check`... but it doesn´t generate any output so not
-# # sure what to do with it
-# svelte_check_bin.svelte_check(
-#     name = "svelte_check",
-#     srcs = [
-#         ":svelte_kit_sync",
-
-#         # Configs
-#         "vite.config.ts",
-#         "package.json",
-#         "tsconfig.json",
-#         "svelte.config.js",
-
-#         # Build deps
-#         ":node_modules",  # TODO: Use //:node_modules instead
-
-#         # Sources
-#         ":src",
-#         ":static",
-#     ],
-#     args = ["check --tsconfig ./tsconfig.json"],
-#     chdir = package_name(),
-#     # outs = ["<output>"],
-#     visibility = ["//visibility:public"],
-# )
 
 # This target (bazel build) executes 'vite build' and generates an empty 'dist'
 # folder in 'bazel-bin'. I guess this should create the [build for production](https://vitejs.dev/guide/cli.html#vite-build),

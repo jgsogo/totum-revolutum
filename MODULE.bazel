@@ -92,16 +92,9 @@ npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependenc
 npm.npm_translate_lock(
     name = "npm",
     bins = {
-        #     # derived from "bin" attribute in node_modules/typescript/package.json
-        #     "typescript": [
-        #         "tsc=./bin/tsc",
-        #         "tsserver=./bin/tsserver",
-        #     ],
+        # This is basically the "bin" entry from `node_modules/<package>/package.json`
         "vite": [
             "vite=./bin/vite",
-        ],
-        "svelte-kit": [
-            "@sveltejs/kit=./bin/svelte-kit",
         ],
     },
     # custom_postinstalls = {

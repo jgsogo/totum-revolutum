@@ -1,0 +1,8 @@
+# In the `sandbox/svelte-social-app` there are many configuration files
+# that are dedicate to some tools (see below). I'm not running any
+# of those tests. It would be great to create tools (like rustfmt.sh
+# or clippy) so we can use them in pre-commint hooks:
+
+# TODO: svelte-check as a tool, so we can run a pre-commit-hook
+# TODO: ESLINT as a tool, so we can run a pre-commit-hook
+# TODO: prettier as a tool, so we can run a pre-commit-hook
