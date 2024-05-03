@@ -1,0 +1,18 @@
+# This package is just a placeholder to depend on everything that is not
+# consumed by any other library or application, but it's needed
+# by the crates that are built using files from this `external` folder.
+#
+# TODO: This is a workaround and shouldn't be needed
+[package]
+name = "external_crates"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diffy = { workspace = true }
+syn = { workspace = true }
+toml = { workspace = true }
+regex = { workspace = true }
+clap_complete = { workspace = true }
+serde_regex = { workspace = true }
+diesel_table_macro_syntax = { workspace = true }

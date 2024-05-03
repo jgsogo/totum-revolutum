@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "apps/photodb",
     "apps/syncronia",
     "libraries/cron",
     "libraries/constants",
@@ -9,6 +10,9 @@ members = [
     "libraries/http_utils",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
+
+    # A placeholder to depend on crates that are not consumed by any other library or project
+    "bazel/external",
 ]
 
 
@@ -23,11 +27,18 @@ bytes = "1"
 camino = "1.1"
 chrono = { version = "0.4" }
 chrono-tz = { version = "0.9.0" }
-clap = { version = "4.5" }
+clap = { version = "4.5", features = ["cargo", "string"]}
+clap_complete = "4.5.2"
 clap-verbosity-flag = { version = "2.2" }
 confy = { version = "0.6.1", default-features = false, features = ["yaml_conf"] }
 cron-parser = "0.9.0"
+diesel = { version = "2.1.0", features = ["sqlite"] }
+diesel_cli = "2.1.1"
+diesel_migrations = "2.1.0"
+diesel_table_macro_syntax = "0.1.0"
+diffy = "0.3.0"
 dirs = { version = "5.0" }
+dotenvy = "0.15"
 dyn-clone = "1.0.17"
 env_logger = "0.11.3"
 flume = "0.11.0"
@@ -51,18 +62,22 @@ main_error = "0.1.2"
 mime = "0.3.17"
 mockall = { version = "0.12.1" }
 num-traits = "0.2.18"
+regex = "1.10.4"
 reqwest = { version = "0.12.4" }
 serde = { version = "1.0" }
 serde_json = "1.0"
+serde_regex = "1.1.0"
 serde_repr = "0.1"
 serde_yaml = "0.9"
 sha256 = { version = "1.5" }
 strum = "0.26.2"
 strum_macros = "0.26.2"
+syn = { version="2.0.60",features = ["visit"]}
 tempfile = { version = "3.10" }
 thiserror = "1.0"
 time = { version = "0.3" }
 tokio = { version = "1.37" }
+toml = "0.8.12"
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3" }
 url = "2.5"
