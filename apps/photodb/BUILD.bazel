@@ -26,7 +26,7 @@ diesel_print_schema(
     # schema = "src/schema.rs"
 )
 
-# We need to run this rule so we can build using Cargo -- FIXME: Make it a pre-commit hook
+# We need to run this rule so we can build using Cargo
 run_copy_to_workspace(
     name = "schema.update",
     origin = ":schema",
