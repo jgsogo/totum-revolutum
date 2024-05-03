@@ -10,7 +10,7 @@ def _diesel_setup_impl(ctx):
     args.add(ctx.file.config_file)
 
     ctx.actions.run(
-        inputs = [ctx.file.config_file],
+        inputs = [ctx.file.config_file] + ctx.files.migrations,
         outputs = [ctx.outputs.database_url],
         arguments = [args],
         progress_message = "Running Diesel CLI setup",
@@ -27,6 +27,11 @@ diesel_setup = rule(
         "config_file": attr.label(
             allow_single_file = True,
             doc = "Configuration file (diesel.toml)",
+        ),
+        "migrations": attr.label_list(
+            allow_files = True,
+            doc = "Configuration file (diesel.toml)",
+            mandatory = False,
         ),
         "_diesel_cli": attr.label(
             default = Label("@diesel_cli//:diesel_cli"),
