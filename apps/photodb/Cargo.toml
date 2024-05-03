@@ -1,0 +1,24 @@
+[package]
+name = "photodb"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+
+[dependencies]
+filesystem = { path = "../../libraries/filesystem" }
+
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+camino = { workspace = true }
+diesel = { workspace = true, features = ["sqlite"] }
+diesel_migrations = { workspace = true }
+dotenvy = { workspace = true }
+tracing = { workspace = true }
+
+
+[dev-dependencies]
+filesystem = { path = "../../libraries/filesystem", features = ["local", "test_utils"] }
+
+[[bin]]
+name = "list_photos"

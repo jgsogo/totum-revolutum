@@ -60,3 +60,9 @@ repos:
         entry: scripts/branch_updated.sh
         language: script
         always_run: true
+      - id: bazel-regenerate
+        name: Regenerate files
+        entry: scripts/bazel_regenerate_ws_files.sh
+        language: script
+        always_run: true
+        require_serial: true
