@@ -32,4 +32,9 @@ run_copy_to_workspace = rule(
         ),
     },
     executable = True,
+    doc = """Overrides a file in the user workspace
+
+    Use this RUN rule to update files in the workspace with content
+    created by other rules.
+    """,
 )
