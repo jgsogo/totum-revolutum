@@ -75,7 +75,7 @@ strum_macros = "0.26.2"
 syn = { version="2.0.60",features = ["visit"]}
 tempfile = { version = "3.10.1" }
 thiserror = "1.0.59"
-time = { version = "0.3" }
+time = { version = "0.3.36" }
 tokio = { version = "1.37" }
 toml = "0.8.12"
 tracing = { version = "0.1" }
