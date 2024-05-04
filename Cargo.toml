@@ -59,7 +59,7 @@ serde_yaml = "0.9.34"
 sha256 = { version = "1.5" }
 strum = "0.26.2"
 strum_macros = "0.26.2"
-tempfile = { version = "3.10" }
+tempfile = { version = "3.10.1" }
 thiserror = "1.0"
 time = { version = "0.3" }
 tokio = { version = "1.37" }
