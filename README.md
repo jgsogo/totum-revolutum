@@ -25,6 +25,7 @@ Enjoy the visit!
 
 Applications in this repository:
 
+ * [photodb](app/photodb/): application to backup photos in pCloud storage and access them
  * [syncronia](apps/syncronia/): a tool to run sync operations between different
    directories and storages
 
@@ -32,12 +33,15 @@ Applications in this repository:
 
 You can find the following libraries in this repository:
 
- * [constants](libraries/constants/) [Rust]: compile-time constants definition
- * [filesystem](libraries/filesystem/) [Rust]: abstraction of filesystem and files.
+ * [constants](libraries/constants/): compile-time constants definition
+ * [cron](libraries/cron/): utilities related to cron expressions
+ * [filesystem](libraries/filesystem/): abstraction of filesystem and files.
    Implementation for local storage.
  * [filesystem_pcloud](libraries/filesystem_pcloud/): implementation of [filesystem](libraries/filesystem/)
    for pCloud remote storage.
- * [pcloud_sdk](libraries/pcloud_sdk/) [Rust]: pCloud SDK.
+ * [http_utils](libraries/http_utils/): utilities related to HTTP (vanilla client, REST client,...)
+ * [pcloud_sdk](libraries/pcloud_sdk/): pCloud SDK.
+ * [rebrickable](libraries/rebrickable/): API for https://rebrickable.com/
 
 ## Tooling
 
