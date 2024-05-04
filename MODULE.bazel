@@ -57,11 +57,25 @@ register_toolchains("@rust_toolchains//:all")
 # Crates repositories
 #####
 crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+
+# Diesel CLI is a binary only package. We need to build it "manually" (see [this note](./notes/2024-05-04-1923.md))
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "diesel_cli",
+    build_file = "//bazel/external:BUILD.diesel_cli.bazel",
+    sha256 = "ed0d26f384b697e94535595644e2826fb04cc83bf0949283f535f2d9c65ed31e",
+    strip_prefix = "diesel_cli-2.1.1",
+    type = "tar.gz",
+    urls = ["https://crates.io/api/v1/crates/diesel_cli/2.1.1/download"],
+)
+
 crate.from_cargo(
     name = "crates_libraries",
     cargo_lockfile = "//:Cargo.lock",
     manifests = [
         "//:Cargo.toml",
+        "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
         "//libraries/constants:Cargo.toml",
         "//libraries/cron:Cargo.toml",
@@ -70,6 +84,8 @@ crate.from_cargo(
         "//libraries/http_utils:Cargo.toml",
         "//libraries/pcloud_sdk:Cargo.toml",
         "//libraries/rebrickable:Cargo.toml",
+        # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
+        "//bazel/external:Cargo.toml",
     ],
 )
 use_repo(crate, "crates_libraries")

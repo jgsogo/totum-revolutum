@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "8f51649b2c513fc14ecec3baede63c0f29bb54501466870fb29301dc1b2815ee",
+  "moduleFileHash": "1e6ecc6c67853d36b422c3611ef2114b6fd1bd34df42ab84f0004affae183a93",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -36,7 +36,8 @@
             "column": 0
           },
           "imports": {
-            "bazel_diff": "bazel_diff"
+            "bazel_diff": "bazel_diff",
+            "diesel_cli": "diesel_cli"
           },
           "devImports": [],
           "tags": [
@@ -54,6 +55,25 @@
                 "file": "@@//:MODULE.bazel",
                 "line": 20,
                 "column": 9
+              }
+            },
+            {
+              "tagName": "@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+              "attributeValues": {
+                "build_file": "//bazel/external:BUILD.diesel_cli.bazel",
+                "sha256": "ed0d26f384b697e94535595644e2826fb04cc83bf0949283f535f2d9c65ed31e",
+                "strip_prefix": "diesel_cli-2.1.1",
+                "type": "tar.gz",
+                "urls": [
+                  "https://crates.io/api/v1/crates/diesel_cli/2.1.1/download"
+                ],
+                "name": "diesel_cli"
+              },
+              "devDependency": false,
+              "location": {
+                "file": "@@//:MODULE.bazel",
+                "line": 64,
+                "column": 13
               }
             }
           ],
@@ -143,6 +163,7 @@
                 "cargo_lockfile": "//:Cargo.lock",
                 "manifests": [
                   "//:Cargo.toml",
+                  "//apps/photodb:Cargo.toml",
                   "//apps/syncronia:Cargo.toml",
                   "//libraries/constants:Cargo.toml",
                   "//libraries/cron:Cargo.toml",
@@ -150,13 +171,14 @@
                   "//libraries/filesystem_pcloud:Cargo.toml",
                   "//libraries/http_utils:Cargo.toml",
                   "//libraries/pcloud_sdk:Cargo.toml",
-                  "//libraries/rebrickable:Cargo.toml"
+                  "//libraries/rebrickable:Cargo.toml",
+                  "//bazel/external:Cargo.toml"
                 ]
               },
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 60,
+                "line": 73,
                 "column": 17
               }
             }
