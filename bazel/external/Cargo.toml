@@ -2,7 +2,7 @@
 # consumed by any other library or application, but it's needed
 # by the crates that are built using files from this `external` folder.
 #
-# TODO: This is a workaround and shouldn't be needed
+# See [this note](./../../notes/2024-05-04-1923.md))
 [package]
 name = "external_crates"
 version = "0.1.0"

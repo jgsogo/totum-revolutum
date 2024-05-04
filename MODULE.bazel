@@ -58,6 +58,7 @@ register_toolchains("@rust_toolchains//:all")
 #####
 crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
 
+# Diesel CLI is a binary only package. We need to build it "manually" (see [this note](./notes/2024-05-04-1923.md))
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
@@ -83,7 +84,7 @@ crate.from_cargo(
         "//libraries/http_utils:Cargo.toml",
         "//libraries/pcloud_sdk:Cargo.toml",
         "//libraries/rebrickable:Cargo.toml",
-        # This is added to the workspace as a workaround
+        # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
         "//bazel/external:Cargo.toml",
     ],
 )

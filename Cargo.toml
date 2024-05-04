@@ -11,7 +11,7 @@ members = [
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
 
-    # A placeholder to depend on crates that are not consumed by any other library or project
+    # A placeholder to depend on _external_ crates (see [this note](./notes/2024-05-04-1923.md))
     "bazel/external",
 ]
 
