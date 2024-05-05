@@ -1,0 +1,24 @@
+load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@totum//bazel/rust/docs:defs.bzl", "rust_docs")
+
+rust_binary(
+    name = "gh-sanitizer",
+    srcs = glob(["src/**/*.rs"]),
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)
+
+# FIXME: Add tests
+
+rust_docs(
+    name = "docs",
+    crates = [
+        ":gh-sanitizer",
+    ],
+    visibility = ["//docs:__subpackages__"],
+)

@@ -62,6 +62,7 @@ crate.from_cargo(
     cargo_lockfile = "//:Cargo.lock",
     manifests = [
         "//:Cargo.toml",
+        "//apps/gh-sanitizer:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
         "//libraries/constants:Cargo.toml",
         "//libraries/cron:Cargo.toml",
