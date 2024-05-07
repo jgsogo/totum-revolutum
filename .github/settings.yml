@@ -137,6 +137,8 @@ labels:
     description: Related to Raspberry platform
 
   # Specific to this repo
+  - name: cmp:apps/photodb
+    color: "000000"
   - name: cmp:apps/syncronia
     color: "000000"
   - name: cmp:bazel/diff
