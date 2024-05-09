@@ -1074,9 +1074,9 @@ checksum = "6c2141d6d6c8512188a7891b4b01590a45f6dac67afb4f255c4124dbb86d4eaa"
 
 [[package]]
 name = "fs4"
-version = "0.8.2"
+version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21dabded2e32cd57ded879041205c60a4a4c4bab47bd0fd2fa8b01f30849f02b"
+checksum = "73969b81e8bc90a3828d913dd3973d80771bfb9d7fbe1a78a79122aad456af15"
 dependencies = [
  "rustix 0.38.34",
  "windows-sys 0.52.0",
@@ -2581,9 +2581,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.116"
+version = "1.0.117"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e17db7126d17feb94eb3fad46bf1a96b034e8aacbc2e775fe81505f8b0b2813"
+checksum = "455182ea6142b14f93f4bc5320a2b31c1f266b66a4a5c858b013302a5d8cbfc3"
 dependencies = [
  "itoa",
  "ryu",
