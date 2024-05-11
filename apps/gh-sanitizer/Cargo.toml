@@ -1,0 +1,15 @@
+[package]
+name = "gh-sanitizer"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+
+[dependencies]
+octocrab = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+clap-verbosity-flag = { workspace = true }
+log = { workspace = true}
+tracing-subscriber = { workspace = true }
+home = { workspace = true }
+tracing ={ workspace = true }

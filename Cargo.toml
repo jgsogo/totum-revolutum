@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "apps/gh-sanitizer",
     "apps/photodb",
     "apps/syncronia",
     "libraries/cron",
@@ -62,6 +63,7 @@ main_error = "0.1.2"
 mime = "0.3.17"
 mockall = { version = "0.12.1" }
 num-traits = "0.2.19"
+octocrab = "0.38.0"
 regex = "1.10.4"
 reqwest = { version = "0.12.4" }
 serde = { version = "1.0.200" }
