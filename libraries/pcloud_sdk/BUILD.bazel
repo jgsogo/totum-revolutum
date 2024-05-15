@@ -28,7 +28,7 @@ rust_library_tests_and_docs(
 
 rust_binary(
     name = "cli",
-    srcs = glob(["src/cli/**/*.rs"]),
+    srcs = glob(["src/bin/pcloud_sdk/**/*.rs"]),
     aliases = aliases(),
     crate_features = [
         "cli",

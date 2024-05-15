@@ -69,6 +69,6 @@ tracing-subscriber = { workspace = true }
 
 [[bin]]
 name = "pcloud_sdk"
-path = "src/cli/main.rs"
+path = "src/bin/pcloud_sdk/main.rs"
 # Waiting for https://github.com/rust-lang/cargo/issues/4663 (and related: https://github.com/rust-lang/rfcs/pull/3374)
 required-features = ["cli"]
