@@ -143,6 +143,8 @@ labels:
     color: "000000"
   - name: cmp:apps/finances
     color: "000000"
+  - name: cmp:apps/task_manager
+    color: "000000"
   - name: cmp:bazel/diff
     color: "000000"
   - name: cmp:bazel/rust
