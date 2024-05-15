@@ -1,5 +1,7 @@
 /// Implements pCloud API
 pub mod access_token;
+#[cfg(feature = "cli")]
+pub mod cli;
 pub mod client;
 pub mod error;
 pub mod handy;

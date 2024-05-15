@@ -7,10 +7,8 @@ use std::fs::File;
 use std::io::BufReader;
 use tracing::info;
 
-use pcloud_sdk::methods::oauth2;
-use pcloud_sdk::methods::oauth2::{AppClientData, OAuth2TokenImpl};
-
-use crate::output::PrintVariant;
+use crate::methods::oauth2;
+use crate::methods::oauth2::{AppClientData, OAuth2TokenImpl};
 
 #[derive(Args, Debug)]
 pub struct AuthParams {
@@ -65,7 +63,7 @@ pub async fn handle_auth_file(token_file: &Utf8Path, input: &AuthFileParams) -> 
     write_to_file(token_file, &token)
 }
 
-pub async fn handle_auth(token_file: &Utf8Path, _output: &PrintVariant, input: &AuthParams) -> Result<()> {
+pub async fn handle_auth(token_file: &Utf8Path, input: &AuthParams) -> Result<()> {
     let client_secret = if input.client_secret_stdin {
         let mut user_input = String::new();
         let stdin = std::io::stdin(); // We get `Stdin` here.

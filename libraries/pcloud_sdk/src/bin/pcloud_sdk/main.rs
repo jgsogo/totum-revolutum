@@ -3,11 +3,11 @@ use camino::Utf8PathBuf;
 use clap::{Parser, Subcommand};
 use tracing::debug;
 
+use pcloud_sdk::cli::auth;
 use pcloud_sdk::client::PCloudClientImpl;
 
 use crate::output::{OutputArg, PrintVariant};
 
-mod auth;
 mod download;
 mod listfolder;
 mod output;
@@ -76,7 +76,7 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    // Configure tracing - logs go to stderr so it can be separated from actual output
+    // Configure tracing - logs go to stderr, so it can be separated from actual output
     let tracing_level = tracing_level(cli.common.verbose.log_level_filter());
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
@@ -89,7 +89,7 @@ async fn main() -> Result<()> {
 
     // Go ahead!
     match &cli.command {
-        Commands::Auth(input) => auth::handle_auth(&cli.token_file, &output, input).await,
+        Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
         Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
         _ => {
             let token = auth::read_from_file(&cli.token_file)?;
