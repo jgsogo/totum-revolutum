@@ -2162,6 +2162,8 @@ dependencies = [
  "filesystem",
  "home",
  "log",
+ "pcloud_sdk",
+ "tokio",
  "tracing",
  "tracing-subscriber",
 ]

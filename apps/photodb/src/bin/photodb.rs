@@ -1,5 +1,11 @@
+use anyhow::bail;
+use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
 use tracing::debug;
+
+use pcloud_sdk::cli::auth;
+use pcloud_sdk::client::PCloudClientImpl;
+use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -10,15 +16,25 @@ struct Cli {
 
     #[command(subcommand)]
     command: Commands,
+
+    /// Path to a JSON file with user token
+    #[clap(long)]
+    token_file: Utf8PathBuf,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Debug)]
 enum Commands {
+    /// Authenticate using inputs from command line
+    Auth(auth::AuthParams),
+
+    /// Authenticate using inputs from file
+    AuthFile(auth::AuthFileParams),
+
     /// Adds files to myapp
     Add(Add),
 }
 
-#[derive(Args)]
+#[derive(Args, Debug)]
 struct Add {
     name: Option<String>,
 }
@@ -34,7 +50,8 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     // Configure tracing - logs go to stderr so it can be separated from actual output
@@ -48,8 +65,18 @@ fn main() {
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli.command {
-        Commands::Add(name) => {
-            println!("'myapp add' was used, name is: {:?}", name.name)
+        Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
+        Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
+        _ => {
+            let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&cli.token_file)?;
+            let _client = PCloudClientImpl::new(token, true);
+            match cli.command {
+                Commands::Add(name) => {
+                    println!("'myapp add' was used, name is: {:?}", name.name);
+                    Ok(())
+                }
+                c => bail!("Unexpected command {:?}", c),
+            }
         }
     }
 }
