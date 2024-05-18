@@ -70,7 +70,8 @@ pub struct PCloudDatabase<PCloud: PCloudClient + Send> {
 }
 
 impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
-    /// Initializes the database and pushes it to the remote pCloud storage
+    /// Initializes the database and pushes it to the remote pCloud storage. It will fail if the
+    /// remote file already exists
     pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<()> {
         // Create the database in a local file
         let tmpfile = NamedTempFile::new()?;
