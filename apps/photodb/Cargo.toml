@@ -14,12 +14,13 @@ async-trait = { workspace = true }
 camino = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 clap-verbosity-flag = { workspace = true }
-diesel = { workspace = true, features = ["sqlite"] }
+diesel = { workspace = true, features = ["sqlite", "r2d2"] }
 diesel_migrations = { workspace = true }
 dirs = { workspace = true }
 dotenvy = { workspace = true }
 home = { workspace = true }
 log = { workspace = true }
+tempfile = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }

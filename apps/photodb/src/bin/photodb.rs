@@ -1,11 +1,14 @@
 use anyhow::bail;
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
+use std::str::FromStr;
 use tracing::debug;
 
 use pcloud_sdk::cli::auth;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
+use pcloud_sdk::types::RemotePath;
+use photodb::db::PCloudDatabase;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -18,7 +21,7 @@ struct Cli {
     command: Commands,
 
     /// Path to a JSON file with user token
-    #[clap(long, default_value_t = Utf8PathBuf::from_path_buf(dirs::home_dir().expect("Cannot get dirs::config_dir()").join(".pcloud")).expect("Failed to get Utf8Path from dirs::config_dir()"))]
+    #[clap(long, default_value_t = Utf8PathBuf::from_path_buf(dirs::home_dir().expect("Cannot get dirs::config_dir()").join(".photodb/.pcloud")).expect("Failed to get Utf8Path from dirs::config_dir()"))]
     token_file: Utf8PathBuf,
 }
 
@@ -29,6 +32,9 @@ enum Commands {
 
     /// Authenticate using inputs from file
     AuthFile(auth::AuthFileParams),
+
+    /// Initializes the database (fails if file already exists)
+    Initialize,
 
     /// Adds files to myapp
     Add(Add),
@@ -62,6 +68,8 @@ async fn main() -> anyhow::Result<()> {
         .init();
     debug!("Tracing level configured to {}", tracing_level);
 
+    let db_path = RemotePath::from_str("path:/")?;
+
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli.command {
@@ -69,8 +77,10 @@ async fn main() -> anyhow::Result<()> {
         Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
         _ => {
             let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&cli.token_file)?;
-            let _client = PCloudClientImpl::new(token, true);
+            let client = PCloudClientImpl::new(token, true);
+            let _db = PCloudDatabase::new(client, db_path).await?;
             match cli.command {
+                Commands::Initialize => photodb::initialize::initialize(),
                 Commands::Add(name) => {
                     println!("'myapp add' was used, name is: {:?}", name.name);
                     Ok(())
