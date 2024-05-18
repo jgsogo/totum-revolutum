@@ -49,6 +49,7 @@ rust_library_tests_and_docs(
         normal = True,
     ) + [
         "//libraries/filesystem",
+        "//libraries/pcloud_sdk",
     ],
 )
 

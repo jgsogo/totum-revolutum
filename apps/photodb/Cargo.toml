@@ -7,18 +7,28 @@ edition = "2021"
 
 [dependencies]
 filesystem = { path = "../../libraries/filesystem" }
+pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
 
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 camino = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+clap-verbosity-flag = { workspace = true }
 diesel = { workspace = true, features = ["sqlite"] }
 diesel_migrations = { workspace = true }
+dirs = { workspace = true }
 dotenvy = { workspace = true }
+home = { workspace = true }
+log = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
-
+tracing-subscriber = { workspace = true }
 
 [dev-dependencies]
 filesystem = { path = "../../libraries/filesystem", features = ["local", "test_utils"] }
 
+#[[bin]]
+#name = "list_photos"
+
 [[bin]]
-name = "list_photos"
+name = "photodb"
