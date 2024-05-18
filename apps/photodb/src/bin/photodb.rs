@@ -18,7 +18,7 @@ struct Cli {
     command: Commands,
 
     /// Path to a JSON file with user token
-    #[clap(long)]
+    #[clap(long, default_value_t = Utf8PathBuf::from_path_buf(dirs::home_dir().expect("Cannot get dirs::config_dir()").join(".pcloud")).expect("Failed to get Utf8Path from dirs::config_dir()"))]
     token_file: Utf8PathBuf,
 }
 
