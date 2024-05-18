@@ -68,7 +68,7 @@ async fn main() -> anyhow::Result<()> {
         .init();
     debug!("Tracing level configured to {}", tracing_level);
 
-    let db_path = RemotePath::from_str("path:/")?;
+    let db_path = RemotePath::from_str("path:/developing")?;
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
@@ -78,14 +78,18 @@ async fn main() -> anyhow::Result<()> {
         _ => {
             let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&cli.token_file)?;
             let client = PCloudClientImpl::new(token, true);
-            let _db = PCloudDatabase::new(client, db_path).await?;
-            match cli.command {
-                Commands::Initialize => photodb::initialize::initialize(),
-                Commands::Add(name) => {
-                    println!("'myapp add' was used, name is: {:?}", name.name);
-                    Ok(())
+            match &cli.command {
+                Commands::Initialize => PCloudDatabase::initialize(client, db_path).await,
+                _ => {
+                    let _db = PCloudDatabase::new(client, db_path).await?;
+                    match cli.command {
+                        Commands::Add(add) => {
+                            println!("Commands::Add({add:?})");
+                            Ok(())
+                        }
+                        c => bail!("Unexpected command {:?}", c),
+                    }
                 }
-                c => bail!("Unexpected command {:?}", c),
             }
         }
     }

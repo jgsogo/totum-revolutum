@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use diesel::prelude::*;
@@ -6,7 +6,7 @@ use diesel::r2d2::Pool;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
 use dotenvy::dotenv;
 use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::{GetFileLinkAndDownload, GetFolderID};
+use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFileLinkAndDownload, GetFolderID};
 use pcloud_sdk::methods::file::stat::GetStat;
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFile, UploadFileParams};
 
@@ -70,6 +70,23 @@ pub struct PCloudDatabase<PCloud: PCloudClient + Send> {
 }
 
 impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
+    /// Initializes the database and pushes it to the remote pCloud storage
+    pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<()> {
+        // Create the database in a local file
+        let tmpfile = NamedTempFile::new()?;
+
+        // TODO: Create the SQLite3 database
+
+        // Create the folder and upload the file
+        let folderid = pcloud.createfolderifnotexists_all(None, &path).await?;
+        let db_remote_file = RemotePath::from_str(&format!("{}/{}", path, DB_FILENAME))?;
+        if pcloud.stat(File::try_from(db_remote_file)?).await.is_ok() {
+            bail!("Remote DB already exists");
+        }
+        let _r = upload(&pcloud, &tmpfile, folderid.clone()).await?;
+        Ok(())
+    }
+
     /// Creates a new [`PCloudDatabase`] instance. Requires a pCloud client and the folder
     /// path where the database (and files) are located
     pub async fn new(pcloud: PCloud, path: RemotePath) -> Result<Self> {
