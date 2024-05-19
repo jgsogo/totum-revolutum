@@ -10,6 +10,12 @@ use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::RemotePath;
 use photodb::db::PCloudDatabase;
 
+fn application_dir() -> Utf8PathBuf {
+    let home_dir = dirs::home_dir().expect("Failed to get dirs::home_dir()");
+    let photodb_dir = home_dir.join(".photodb");
+    Utf8PathBuf::from_path_buf(photodb_dir).unwrap()
+}
+
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
@@ -20,9 +26,9 @@ struct Cli {
     #[command(subcommand)]
     command: Commands,
 
-    /// Path to a JSON file with user token
-    #[clap(long, default_value_t = Utf8PathBuf::from_path_buf(dirs::home_dir().expect("Cannot get dirs::config_dir()").join(".photodb/.pcloud")).expect("Failed to get Utf8Path from dirs::config_dir()"))]
-    token_file: Utf8PathBuf,
+    /// Path to application directory. Temporary files and secrets will be stored here
+    #[clap(long, default_value_t = application_dir())]
+    app_dir: Utf8PathBuf,
 }
 
 #[derive(Subcommand, Debug)]
@@ -68,20 +74,22 @@ async fn main() -> anyhow::Result<()> {
         .init();
     debug!("Tracing level configured to {}", tracing_level);
 
+    std::fs::create_dir_all(&cli.app_dir)?;
+    let token_file = cli.app_dir.join(".pcloud");
     let db_path = RemotePath::from_str("path:/developing")?;
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli.command {
-        Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
-        Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
+        Commands::Auth(input) => auth::handle_auth(&token_file, input).await,
+        Commands::AuthFile(input) => auth::handle_auth_file(&token_file, input).await,
         _ => {
-            let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&cli.token_file)?;
+            let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&token_file)?;
             let client = PCloudClientImpl::new(token, true);
             match &cli.command {
-                Commands::Initialize => PCloudDatabase::initialize(client, db_path).await,
+                Commands::Initialize => PCloudDatabase::initialize(client, &cli.app_dir, db_path).await,
                 _ => {
-                    let _db = PCloudDatabase::new(client, db_path).await?;
+                    let _db = PCloudDatabase::new(client, &cli.app_dir, db_path).await?;
                     match cli.command {
                         Commands::Add(add) => {
                             println!("Commands::Add({add:?})");

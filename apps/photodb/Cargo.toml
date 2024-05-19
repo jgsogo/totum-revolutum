@@ -12,6 +12,7 @@ pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 camino = { workspace = true }
+chrono = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 clap-verbosity-flag = { workspace = true }
 diesel = { workspace = true, features = ["sqlite", "r2d2"] }
