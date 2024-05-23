@@ -16,7 +16,7 @@ use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::types::{FileID, FolderID, RemotePath};
 use std::env;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::str::FromStr;
 use tokio::sync::oneshot::Sender;
 use tracing::{debug, error};
@@ -110,11 +110,13 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         // Create the database in a local file
         let tmpfilename = temp_db_filename(app_dir);
 
-        // TODO: Create the SQLite3 database
-        {
-            let mut file = File::create(&tmpfilename)?;
-            file.write_all(b"Hello, world!")?;
-        }
+        // // TODO: Create the SQLite3 database
+        // {
+        //     diesel_cli::database::setup_database();
+        //     // TODO: Probably follow this three ops: https://github.com/diesel-rs/diesel/blob/master/diesel_cli/src/database.rs#L165
+        //     let mut file = File::create(&tmpfilename)?;
+        //     file.write_all(b"Hello, world!")?;
+        // }
 
         // Upload local file to remote
         let file = File::open(&tmpfilename)?;

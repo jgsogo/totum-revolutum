@@ -716,6 +716,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "diesel_cli"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed0d26f384b697e94535595644e2826fb04cc83bf0949283f535f2d9c65ed31e"
+dependencies = [
+ "chrono",
+ "clap",
+ "clap_complete",
+ "diesel",
+ "diesel_migrations",
+ "diesel_table_macro_syntax",
+ "diffy",
+ "dotenvy",
+ "heck 0.4.1",
+ "regex",
+ "serde",
+ "serde_regex",
+ "syn 2.0.64",
+ "toml 0.7.8",
+ "url",
+]
+
+[[package]]
 name = "diesel_derives"
 version = "2.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2159,6 +2182,7 @@ dependencies = [
  "clap",
  "clap-verbosity-flag",
  "diesel",
+ "diesel_cli",
  "diesel_migrations",
  "dirs",
  "dotenvy",
