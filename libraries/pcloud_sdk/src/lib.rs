@@ -9,6 +9,11 @@ pub mod methods;
 #[cfg(feature = "test_utils")]
 pub mod mocks;
 pub mod progress_bar;
+mod proxied_file;
+mod side_task;
 pub mod structures;
 pub mod types;
 pub mod utils;
+
+pub use proxied_file::ProxiedFile;
+pub use side_task::create_side_task;
