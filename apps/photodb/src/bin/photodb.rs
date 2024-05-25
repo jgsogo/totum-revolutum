@@ -2,6 +2,7 @@ use anyhow::bail;
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
 use std::str::FromStr;
+use std::time;
 use tracing::debug;
 
 use pcloud_sdk::cli::auth;
@@ -80,7 +81,7 @@ async fn main() -> anyhow::Result<()> {
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
-    match &cli.command {
+    let r = match &cli.command {
         Commands::Auth(input) => auth::handle_auth(&token_file, input).await,
         Commands::AuthFile(input) => auth::handle_auth_file(&token_file, input).await,
         _ => {
@@ -100,5 +101,9 @@ async fn main() -> anyhow::Result<()> {
                 }
             }
         }
-    }
+    };
+    // FIXME: We need to sleep here so the DB is uploaded again to pcloud. We need to implement a better alternative: send a signal back once the work is done
+    debug!("Sleep for a while");
+    std::thread::sleep(time::Duration::from_secs(5));
+    r
 }

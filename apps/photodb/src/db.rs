@@ -4,9 +4,9 @@ use camino::Utf8PathBuf;
 use diesel::prelude::*;
 use diesel::r2d2::Pool;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
-use dotenvy::dotenv;
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFileLinkAndDownload, GetFolderID};
+use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFileLinkAndDownload};
 use pcloud_sdk::methods::file::stat::GetStat;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
@@ -14,12 +14,12 @@ use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
 use pcloud_sdk::methods::streaming::getfilelink::GetFileLinkInput;
 use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::types::{FileID, FolderID, RemotePath};
-use std::env;
 use std::fs::File;
 use std::io::Read;
 use std::str::FromStr;
 use tokio::sync::oneshot::Sender;
 use tracing::{debug, error};
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 // TODO: We need a proper Output for this PhotoDB application
 #[derive(Default)]
@@ -42,6 +42,42 @@ async fn download<PCloud: GetFileLinkAndDownload>(
         .await
 }
 
+async fn upload_using_fileid<PCloud: GetFileClose + PostFileWrite + GetFileOpen>(
+    pcloud: &PCloud,
+    mut file: File,
+    fileid: FileID,
+) -> Result<()> {
+    debug!("Upload DB from local file to fileid '{fileid}'");
+
+    // Open the remote file
+    let fd = match pcloud
+        .file_open(
+            Flags::O_TRUNC,
+            FileOpenPath::File(pcloud_sdk::types::File::FileID(fileid)),
+        )
+        .await
+    {
+        Ok(fd) => fd,
+        Err(e) => {
+            error!("Error opening remote file: {}", e);
+            bail!("Error opening remote file: {}", e);
+        }
+    };
+
+    // Read content from the local file
+    debug!("Read content from local file");
+    let mut buffer = Vec::new();
+    let bytes_read = file.read_to_end(&mut buffer)?;
+
+    // Write the buffer into the remote file
+    debug!("Write content to remote file");
+    let bytes_count = pcloud.file_write(fd.fd, &buffer).await?;
+    assert_eq!(bytes_count.bytes, bytes_read as u64);
+
+    // Close and done
+    debug!("Close the remote file");
+    pcloud.file_close(fd.fd).await
+}
 async fn upload<PCloud: GetFileClose + PostFileWrite + GetFileOpen>(
     pcloud: &PCloud,
     mut file: File,
@@ -50,22 +86,32 @@ async fn upload<PCloud: GetFileClose + PostFileWrite + GetFileOpen>(
     debug!("Upload DB from local file to folder '{folder}'");
 
     // Open the remote file
-    let fd = pcloud
+    let fd = match pcloud
         .file_open(
             Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC | Flags::O_APPEND,
             FileOpenPath::FolderAndName(folder.clone(), DB_FILENAME.to_string()),
         )
-        .await?;
+        .await
+    {
+        Ok(fd) => fd,
+        Err(e) => {
+            error!("Error opening remote file: {}", e);
+            bail!("Error opening remote file: {}", e);
+        }
+    };
 
     // Read content from the local file
+    debug!("Read content from local file");
     let mut buffer = Vec::new();
     let bytes_read = file.read_to_end(&mut buffer)?;
 
     // Write the buffer into the remote file
+    debug!("Write content to remote file");
     let bytes_count = pcloud.file_write(fd.fd, &buffer).await?;
     assert_eq!(bytes_count.bytes, bytes_read as u64);
 
     // Close and done
+    debug!("Close the remote file");
     pcloud.file_close(fd.fd).await
 }
 
@@ -80,16 +126,16 @@ pub trait Database {
     /// Returns a connection to the database
     fn get_connection(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>>;
 
-    /// Executes any pending operation
-    async fn flush(&self) -> Result<()>;
+    // ///Executes any pending operation
+    // async fn flush(&self) -> Result<()>;
 }
 
 pub struct PCloudDatabase<PCloud: PCloudClient + Send> {
     pcloud: Option<PCloud>,
-    pcloud_folderid: FolderID,
+    pcloud_fileid: FileID,
     tmpfile: Utf8PathBuf,
     pool: Pool<ConnectionManager<SqliteConnection>>,
-    drop_tx: Option<Sender<(PCloud, Utf8PathBuf, FolderID)>>,
+    drop_tx: Option<Sender<(PCloud, Utf8PathBuf, FileID)>>,
 }
 
 impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
@@ -99,6 +145,7 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         // Create the remote folder and check if file exists
         let folderid = pcloud.createfolderifnotexists_all(None, &path).await?;
         let db_remote_file = RemotePath::from_str(&format!("{}/{}", path, DB_FILENAME))?;
+        debug!("Check if remote file already exists");
         if pcloud
             .stat(pcloud_sdk::types::File::try_from(db_remote_file)?)
             .await
@@ -109,14 +156,14 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
 
         // Create the database in a local file
         let tmpfilename = temp_db_filename(app_dir);
+        debug!("Using temp local file '{}'", tmpfilename);
 
-        // // TODO: Create the SQLite3 database
-        // {
-        //     diesel_cli::database::setup_database();
-        //     // TODO: Probably follow this three ops: https://github.com/diesel-rs/diesel/blob/master/diesel_cli/src/database.rs#L165
-        //     let mut file = File::create(&tmpfilename)?;
-        //     file.write_all(b"Hello, world!")?;
-        // }
+        // Create the SQLite3 database and run migrations
+        {
+            let mut conn = SqliteConnection::establish(tmpfilename.as_str())?;
+            conn.run_pending_migrations(MIGRATIONS)
+                .map_err(|e| anyhow!("Error {}", e))?;
+        }
 
         // Upload local file to remote
         let file = File::open(&tmpfilename)?;
@@ -132,7 +179,6 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
     pub async fn new(pcloud: PCloud, app_dir: &Utf8PathBuf, path: RemotePath) -> Result<Self> {
         // Get the relevant IDs from pCloud
         debug!("Use remote (pcloud) filesystem at '{path}'");
-        let folderid = pcloud.get_folderid(&path).await?;
         let db_remote_file = RemotePath::from_str(&format!("{}/{}", path, DB_FILENAME))?;
         let fileid = pcloud
             .stat(pcloud_sdk::types::File::try_from(db_remote_file)?)
@@ -149,9 +195,11 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         let (tx, rx) = tokio::sync::oneshot::channel();
         tokio::task::spawn(async move {
             match rx.await {
-                Ok((pcloud_, filepath_, folderid_)) => {
+                Ok((pcloud_, filepath_, fileid_)) => {
                     let f = File::open(&filepath_).unwrap_or_else(|_| panic!("Failed to open filepath '{filepath_}'"));
-                    upload(&pcloud_, f, folderid_).await.expect("Failed to upload");
+                    if let Err(e) = upload_using_fileid(&pcloud_, f, fileid_).await {
+                        error!("Error uploading file: {}", e);
+                    }
                     std::fs::remove_file(&filepath_).expect("Upload succeeded, but failed to remove file");
                 }
                 Err(e) => error!("Error receiving final upload: {e}"),
@@ -163,10 +211,15 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
             let manager = ConnectionManager::<SqliteConnection>::new(tmpfilename.clone());
             Pool::builder().test_on_check_out(true).build(manager)?
         };
+
+        let mut conn = pool.get()?;
+        conn.run_pending_migrations(MIGRATIONS)
+            .map_err(|e| anyhow!("Error {}", e))?;
+
         // Return the instance
         Ok(Self {
             pcloud: Some(pcloud),
-            pcloud_folderid: folderid,
+            pcloud_fileid: fileid,
             tmpfile: tmpfilename,
             pool,
             drop_tx: Some(tx),
@@ -180,30 +233,24 @@ impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
         self.pool.get().map_err(|e| anyhow!(e.to_string()))
     }
 
-    async fn flush(&self) -> Result<()> {
-        debug!("Flush DB remote (pcloud)");
-        let f = File::open(&self.tmpfile)?;
-        let _ = upload(self.pcloud.as_ref().unwrap(), f, self.pcloud_folderid.clone()).await?;
-        Ok(())
-    }
+    // async fn flush(&self) -> Result<()> {
+    //     debug!("Flush DB remote (pcloud)");
+    //     let f = File::open(&self.tmpfile)?;
+    //     let _ = upload(self.pcloud.as_ref().unwrap(), f, self.pcloud_folderid.clone()).await?;
+    //     Ok(())
+    // }
 }
 
 impl<PCloud: PCloudClient + Send> Drop for PCloudDatabase<PCloud> {
     fn drop(&mut self) {
+        debug!("Drop PCloudDatabase instance");
         let data = (
             self.pcloud.take().unwrap(),
             self.tmpfile.clone(),
-            self.pcloud_folderid.clone(),
+            self.pcloud_fileid.clone(),
         );
         if self.drop_tx.take().unwrap().send(data).is_err() {
             error!("Error sending drop signal");
         }
     }
-}
-
-pub fn establish_connection() -> SqliteConnection {
-    dotenv().ok();
-
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    SqliteConnection::establish(&database_url).unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
