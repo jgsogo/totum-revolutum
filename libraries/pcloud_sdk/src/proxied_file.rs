@@ -92,6 +92,15 @@ impl<PCloud: PCloudClient + Send + 'static> Drop for ProxiedFile<PCloud> {
                     );
                 });
 
+                let runtime = tokio::runtime::Runtime::new().unwrap();
+                let s = runtime.block_on(upload((
+                    self.pcloud.take().unwrap(),
+                    self.file_id.clone(),
+                    self.local_filepath(),
+                )));
+
+                s.unwrap_or_else(|e| error!("Error uploading the file from drop: {e}"));
+
                 // TODO: I should wrap all of this somehow. Maybe into some `Drop` implementation of whatever is returned by the `create_side_task`.
 
                 // Execute the side task and wait for it to finish

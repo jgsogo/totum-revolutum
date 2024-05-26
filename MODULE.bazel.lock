@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "5b195acfa38af7d04572a9bad7b3389060aa4209a5b1ec52264aaaa1d20f2b02",
+  "moduleFileHash": "96c2ad5b91a494efb2abbcf47146b37e18efbfb1e6246839da0248c0ee25f4c7",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -165,6 +165,7 @@
                   "//:Cargo.toml",
                   "//apps/photodb:Cargo.toml",
                   "//apps/syncronia:Cargo.toml",
+                  "//libraries/async_utils:Cargo.toml",
                   "//libraries/constants:Cargo.toml",
                   "//libraries/cron:Cargo.toml",
                   "//libraries/filesystem:Cargo.toml",
