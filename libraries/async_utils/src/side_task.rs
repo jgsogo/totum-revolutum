@@ -12,11 +12,13 @@ use tokio::task::JoinHandle;
 ///  * at certain point in time: (create with `SideTask::new` and use `SideTask::start` to start), or
 ///  * when it's about to drop (just create with `SideTask::new`).
 ///
-/// When the object is created, it also returns a `Receiver` that the user can use to receive
-/// the result from the future. Only awaiting this receiver it's guaranteed that the future will
-/// finish it's execution, otherwise the program might end before the future is completed.
+/// When the object is created, it also returns a `Receiver` that the user can use to await
+/// the result from the future. Alternatively, the user can await on the `JoinHandle` returned
+/// from the `SideTask::start` function (result is not returned).
 ///
-/// Alternatively, if `SideTask::start` is used, the user can wait on the returned JoinHandle
+/// **To guarantee that the task is fully executed, the user needs to await either the `JoinHandle`
+/// or the `Receiver`**, otherwise, it's up to the user to ensure that the tokio runtime lives
+/// long enough to finish the task.
 pub struct SideTask<F, Fut, Args, R>
 where
     F: FnOnce(Args) -> Fut + Send + 'static,
@@ -63,7 +65,7 @@ where
     }
 
     pub fn start(&mut self, args: Option<Args>) -> Result<JoinHandle<()>> {
-        let task = self.task.take().ok_or(anyhow!("Error taking task"))?;
+        let task = self.task.take().ok_or(anyhow!("Task is already executing"))?;
         let args = match (args, self.args.take()) {
             (Some(_input), Some(_stored)) => {
                 bail!("Arguments were already provided when the object was created")
@@ -72,7 +74,7 @@ where
             (Some(input), _) => input,
             (_, Some(stored)) => stored,
         };
-        let inner_tx = self.inner_tx.take().ok_or(anyhow!("Error taking 'inner_tx'"))?;
+        let inner_tx = self.inner_tx.take().unwrap();
 
         let join_handle = tokio::task::spawn(async move {
             let r = task(args).await;
@@ -105,20 +107,25 @@ where
 mod tests {
     use super::*;
     use log::{info, Level};
+    use std::time::Duration;
     use testing_logger;
+    use tokio::time::sleep;
 
     async fn task(value: i32) -> i32 {
         info!("Task executed with value {value}");
         value * 2
     }
+    async fn task_return_error(_value: i32) -> Result<()> {
+        info!("Task fail: execute");
+        Err(anyhow!("Error from task"))
+    }
 
     #[tokio::test]
-    async fn test_new() -> Result<()> {
+    async fn new_then_start_with_arguments() -> Result<()> {
         testing_logger::setup();
 
         let (mut task, receiver) = SideTask::new(task, None)?;
         task.start(Some(24i32))?;
-        // drop(task);
 
         let value = receiver.await?;
         assert_eq!(value, 48i32);
@@ -126,6 +133,155 @@ mod tests {
         testing_logger::validate(|captured_logs| {
             assert_eq!(captured_logs.len(), 1);
             assert_eq!(captured_logs[0].body, "Task executed with value 24");
+            assert_eq!(captured_logs[0].level, Level::Info);
+        });
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn new_with_arguments_then_start() -> Result<()> {
+        testing_logger::setup();
+
+        let (mut task, receiver) = SideTask::new(task, Some(10))?;
+        task.start(None)?;
+
+        let value = receiver.await?;
+        assert_eq!(value, 20);
+
+        testing_logger::validate(|captured_logs| {
+            assert_eq!(captured_logs.len(), 1);
+            assert_eq!(captured_logs[0].body, "Task executed with value 10");
+            assert_eq!(captured_logs[0].level, Level::Info);
+        });
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn new_and_start() -> Result<()> {
+        testing_logger::setup();
+
+        let (_, receiver) = SideTask::new_and_start(task, 20)?;
+        let value = receiver.await?;
+        assert_eq!(value, 40);
+
+        testing_logger::validate(|captured_logs| {
+            assert_eq!(captured_logs.len(), 1);
+            assert_eq!(captured_logs[0].body, "Task executed with value 20");
+            assert_eq!(captured_logs[0].level, Level::Info);
+        });
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn new_and_drop() -> Result<()> {
+        testing_logger::setup();
+
+        // Variable `_` ignores the output and it's immediately dropped
+        let (_, receiver) = SideTask::new(task, Some(30))?;
+        let value = receiver.await?;
+        assert_eq!(value, 60);
+
+        testing_logger::validate(|captured_logs| {
+            assert_eq!(captured_logs.len(), 1);
+            assert_eq!(captured_logs[0].body, "Task executed with value 30");
+            assert_eq!(captured_logs[0].level, Level::Info);
+        });
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn duplicated_args() -> Result<()> {
+        let (mut task, _) = SideTask::new(task, Some(40))?;
+        let r = task.start(Some(50));
+        assert!(r.is_err());
+        assert_eq!(
+            r.unwrap_err().to_string(),
+            "Arguments were already provided when the object was created"
+        );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn no_args() -> Result<()> {
+        let (mut task, _) = SideTask::new(task, None)?;
+        let r = task.start(None);
+        assert!(r.is_err());
+        assert_eq!(
+            r.unwrap_err().to_string(),
+            "Arguments need to be provided when the object is created or now in the start call"
+        );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn multiple_start() -> Result<()> {
+        let (mut task, _) = SideTask::new(task, Some(50))?;
+        task.start(None)?;
+        let r = task.start(None);
+        assert!(r.is_err());
+        assert_eq!(r.unwrap_err().to_string(), "Task is already executing");
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn receiver_dropped() -> Result<()> {
+        testing_logger::setup();
+
+        // Variable `_` ignores the output and it's immediately dropped
+        let (_, _) = SideTask::new(task, Some(60))?;
+        // We need to sleep so the task has time to finish
+        sleep(Duration::from_millis(200)).await;
+
+        testing_logger::validate(|captured_logs| {
+            assert_eq!(captured_logs.len(), 2);
+            assert_eq!(captured_logs[0].body, "Task executed with value 60");
+            assert_eq!(captured_logs[0].level, Level::Info);
+            assert_eq!(
+                captured_logs[1].body,
+                "Error sending the result from inside the task. The receiver might be dropped"
+            );
+            assert_eq!(captured_logs[1].level, Level::Debug);
+        });
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn receiver_dropped_but_thread_joined() -> Result<()> {
+        let (mut task, _) = SideTask::new(task, Some(110))?;
+        let j = task.start(None)?;
+        // Wait for the thread to join. Task is finished.
+        j.await?;
+
+        testing_logger::validate(|captured_logs| {
+            assert_eq!(captured_logs.len(), 2);
+            assert_eq!(captured_logs[0].body, "Task executed with value 110");
+            assert_eq!(captured_logs[0].level, Level::Info);
+            assert_eq!(
+                captured_logs[1].body,
+                "Error sending the result from inside the task. The receiver might be dropped"
+            );
+            assert_eq!(captured_logs[1].level, Level::Debug);
+        });
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn task_that_fails() -> Result<()> {
+        testing_logger::setup();
+
+        let (_, receiver) = SideTask::new_and_start(task_return_error, 1)?;
+        let value = receiver.await?;
+        assert!(value.is_err());
+        assert_eq!(value.unwrap_err().to_string(), "Error from task");
+
+        testing_logger::validate(|captured_logs| {
+            assert_eq!(captured_logs.len(), 1);
+            assert_eq!(captured_logs[0].body, "Task fail: execute");
             assert_eq!(captured_logs[0].level, Level::Info);
         });
 
