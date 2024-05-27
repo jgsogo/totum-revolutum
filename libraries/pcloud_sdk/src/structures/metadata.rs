@@ -1,12 +1,22 @@
 use serde::{Deserialize, Serialize};
 
-use super::{MetadataFile, MetadataFolder};
+use super::{CommonMetadata, MetadataFile, MetadataFolder};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 #[serde(untagged)]
 pub enum Metadata {
     MetadataFile(MetadataFile),
     MetadataFolder(MetadataFolder),
+}
+
+impl Metadata {
+    /// Return the [`CommonMetadata`] chunk, which is available in all enum variants.
+    pub fn common(&self) -> &CommonMetadata {
+        match self {
+            Metadata::MetadataFile(mfile) => &mfile.common,
+            Metadata::MetadataFolder(mfolder) => &mfolder.common,
+        }
+    }
 }
 
 #[cfg(test)]
