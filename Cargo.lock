@@ -743,7 +743,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_regex",
- "syn 2.0.64",
+ "syn 2.0.66",
  "toml 0.7.8",
  "url",
 ]
@@ -2079,6 +2079,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "async_utils",
  "bitflags 2.5.0",
  "bytes",
  "camino",

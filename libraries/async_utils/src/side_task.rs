@@ -8,17 +8,26 @@ use tokio::task::JoinHandle;
 
 /// Implements RAII pattern. This object stores a future that is guaranteed to be executed:
 /// The user can decide when the task is started:
-///  * immediately: use `SideTask::new_and_start`,
-///  * at certain point in time: (create with `SideTask::new` and use `SideTask::start` to start), or
-///  * when it's about to drop (just create with `SideTask::new`).
+///  * immediately: use [`SideTask::new_and_start`],
+///  * at certain point in time: (create with [`SideTask::new`] and use [`SideTask::start`] to
+///    start), or
+///  * when it's about to drop (just create with [`SideTask::new`]).
 ///
-/// When the object is created, it also returns a `Receiver` that the user can use to await
-/// the result from the future. Alternatively, the user can await on the `JoinHandle` returned
-/// from the `SideTask::start` function (result is not returned).
+/// When the object is created, it also returns a [`Receiver`] that the user can use to await
+/// the result from the future. Alternatively, the user can await on the [`JoinHandle`] returned
+/// from the [`SideTask::start`] function (result is not returned).
 ///
-/// **To guarantee that the task is fully executed, the user needs to await either the `JoinHandle`
-/// or the `Receiver`**, otherwise, it's up to the user to ensure that the tokio runtime lives
-/// long enough to finish the task.
+/// **To guarantee that the task is fully executed, the user needs to await either the
+/// [`JoinHandle`] or the [`Receiver`]**, otherwise, it's up to the user to ensure that the
+/// tokio runtime lives long enough to finish the task.
+///
+/// TODO: Can we execute the task in [`Drop::drop`] and wait for it completion? Is this related to
+/// TODO: the "Async Drop" discussion in Rust internet? Would something like this work...?
+/// TODO: ```
+/// TODO: let runtime = tokio::runtime::Runtime::new().unwrap();
+/// TODO: let s = runtime.block_on(...async function...)
+/// TODO: ```
+///
 pub struct SideTask<F, Fut, Args, R>
 where
     F: FnOnce(Args) -> Fut + Send + 'static,
@@ -43,6 +52,9 @@ where
     Fut: Future<Output = R> + Send + 'static,
     Fut::Output: Send + 'static,
 {
+    /// Creates a [`SideTask`] object, but doesn't start the underlying task yet. Use the returned
+    /// object to start the task with [`SideTask::start`] and the [`Receiver`] to await for the
+    /// task result. If the task is not started manually, it will be triggered on [`Drop`].
     pub fn new(task: F, args: Option<Args>) -> Result<(Self, Receiver<R>)> {
         //let (trigger, inner_rx) = channel();
         let (inner_tx, inner_rx) = channel();
@@ -58,12 +70,16 @@ where
         Ok((s, inner_rx))
     }
 
+    /// Creates a [`SideTask`] object and starts the task immediately. Use the returned [`Receiver`]
+    /// to await for the task result.
     pub fn new_and_start(func: F, args: Args) -> Result<(Self, Receiver<R>)> {
         let (mut s, receiver) = Self::new(func, None)?;
         s.start(Some(args))?;
         Ok((s, receiver))
     }
 
+    /// Start the underlying task, if it hasn't been started yet. The task will be started with
+    /// the given arguments if they were not already provided when the [`SideTask`] was created.
     pub fn start(&mut self, args: Option<Args>) -> Result<JoinHandle<()>> {
         let task = self.task.take().ok_or(anyhow!("Task is already executing"))?;
         let args = match (args, self.args.take()) {
@@ -93,8 +109,12 @@ where
     Fut: Future<Output = R> + Send + 'static,
     Fut::Output: Send + 'static,
 {
+    /// Drop the [`SideTask`] object. If the underlying task hasn't been started yet, it will be
+    /// triggered now. It's the responsibility of the user to wait until the task finishes before
+    /// shutting-down the current runtime (the user can await on the returned [`Receiver`] when the
+    /// `SideTask` was created or started.
     fn drop(&mut self) {
-        // If the task didn't started yet, trigger it now (with stored arguments)
+        // If the task didn't start yet, trigger it now (with stored arguments)
         if self.task.is_some() {
             if let Err(e) = self.start(None) {
                 error!("Error starting the task from Drop: {e}");
