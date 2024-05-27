@@ -30,8 +30,5 @@ tracing-subscriber = { workspace = true }
 [dev-dependencies]
 filesystem = { path = "../../libraries/filesystem", features = ["local", "test_utils"] }
 
-#[[bin]]
-#name = "list_photos"
-
 [[bin]]
 name = "photodb"

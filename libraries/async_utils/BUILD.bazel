@@ -8,6 +8,9 @@ rust_library_tests_and_docs(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    test_deps = [
+        "@crates_libraries//:testing_logger",
+    ],
     deps = all_crate_deps(
         normal = True,
     ),

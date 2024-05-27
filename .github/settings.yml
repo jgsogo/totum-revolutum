@@ -121,7 +121,7 @@ labels:
   - name: tech:math/geometry
     color: CDF7F7
     description: Geometry
-  
+
   # Architectures
   - name: arch:windows
     color: CDF7F7
@@ -151,6 +151,8 @@ labels:
     color: "000000"
   - name: cmp:docs
     color: "000000"
+  - name: cmp:libraries/async_utils
+    color: "000000"
   - name: cmp:libraries/constants
     color: "000000"
   - name: cmp:libraries/cron
@@ -165,9 +167,9 @@ labels:
     color: "000000"
   - name: cmp:libraries/rebrickable
     color: "000000"
+  - name: cmp:notes
+    color: "000000"
   - name: cmp:scripts
     color: "000000"
   - name: cmp:tooling/python
     color: "000000"
-
-

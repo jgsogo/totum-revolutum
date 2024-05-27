@@ -3,7 +3,7 @@
 
 load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rust_test_suite")
 
-def rust_library_tests_and_docs(name, all_features = {}, test_data = None, **kwargs):
+def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_deps = None, **kwargs):
     """Creates a predefined set of targets for the given arguments.
 
     This macro generates the following targets:
@@ -24,6 +24,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, **kwa
             target named `<name>/<key>` enabling the list of features in the `<value>` will be created,
             for each of the entries in the dictionary.
         test_data (List): data files (and targets) to add to the `data` argument in `rust_test`
+        test_deps (List): dependencies only for the `rust_test` rule
         **kwargs: other arguments to use for `rust_library`
     """
 
@@ -64,6 +65,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, **kwa
         crate = ":{}".format(name),
         crate_features = collect_all_features,
         data = test_data,
+        deps = test_deps,
     )
 
     # Integration tests
