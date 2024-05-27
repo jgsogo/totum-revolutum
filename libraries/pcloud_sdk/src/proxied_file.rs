@@ -7,24 +7,15 @@ use std::future::Future;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
-// use futures_util::future::BoxFuture;
-// use futures_util::FutureExt;
 use tempfile::{tempdir, TempDir};
 use tracing::error;
 
-// type UploadFnType<PCloud: PCloudClient + Send + 'static> =
-//     fn((PCloud, FileID, TempDir)) -> BoxFuture<'static, Result<(), TempDir>>;
-
-type UploadFnType<PCloud> = Box<
-    dyn FnOnce((PCloud, FileID, TempDir)) -> Pin<Box<dyn Future<Output = Result<(), TempDir>> + Send + 'static>>
-        + Send
-        + 'static,
->;
+type UploadFnType<PCloud> =
+    Box<dyn FnOnce((PCloud, FileID, TempDir)) -> Pin<Box<dyn Future<Output = Result<(), TempDir>> + Send>> + Send>;
 
 fn force_boxed<PCloud: PCloudClient + Send + 'static, T>(f: fn((PCloud, FileID, TempDir)) -> T) -> UploadFnType<PCloud>
 where
     T: Future<Output = Result<(), TempDir>> + Send + 'static,
-    T::Output: Send + 'static,
 {
     Box::new(move |n| Box::pin(f(n)))
 }
@@ -60,21 +51,6 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
     fn get_local_filepath(directory: &Path) -> PathBuf {
         directory.join("proxied_file.tmp")
     }
-
-    // fn upload_and_remove(args: (PCloud, FileID, TempDir)) -> BoxFuture<'static, Result<(), TempDir>> {
-    //     async move {
-    //         let (_, _, temp_dir) = args;
-    //
-    //         // Execute upload
-    //         let upload: Result<(), TempDir> = Ok(());
-    //
-    //         // If upload fails, return the `TempDir` and let the user decide what to do
-    //         match upload {
-    //             Ok(ok) => Ok(ok),
-    //             Err(_) => Err(temp_dir),
-    //         }
-    //     }.boxed()
-    // }
 
     async fn upload_and_remove(args: (PCloud, FileID, TempDir)) -> Result<(), TempDir> {
         let (_, _, temp_dir) = args;
