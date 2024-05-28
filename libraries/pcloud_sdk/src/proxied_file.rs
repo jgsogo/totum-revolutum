@@ -15,7 +15,7 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
-use tracing::error;
+use tracing::{debug, error};
 
 type UploadFnType<PCloud> =
     Box<dyn FnOnce((PCloud, FileID, TempDir)) -> Pin<Box<dyn Future<Output = Result<(), TempDir>> + Send>> + Send>;
@@ -99,7 +99,7 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
             let folder_content = pcloud
                 .listfolder_with_filtermeta(
                     ListFolderInput::new(Folder::from(folder_id.clone())),
-                    vec!["fileid", "path"],
+                    vec!["fileid", "name"],
                 )
                 .await?;
             let file_id = folder_content
@@ -112,13 +112,14 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
                             Metadata::MetadataFile(m) => Some(m),
                             Metadata::MetadataFolder(_) => None,
                         })
-                        .find(|f| f.common.path.as_ref().unwrap() == filename)
+                        .find(|f| f.common.name.as_ref().unwrap() == filename)
                 })
                 .map(|metadata| metadata.fileid);
 
             // If it exists, return. Otherwise, create the remote file
             match file_id {
                 None => {
+                    debug!("Remote file {filename} doesn't exist, it will be created");
                     let r = pcloud
                         .file_open(
                             Flags::O_CREAT,
@@ -133,6 +134,10 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
 
         // Return to the user
         let temp_dir = tempdir()?;
+        debug!("File will be proxied in {:?}", Self::get_local_filepath(&temp_dir));
+
+        // TODO: Download the file
+
         let (upload_on_drop, upload_receiver) = SideTask::new(force_boxed(Self::upload_and_remove), None)?;
         Ok((
             Self {

@@ -1,9 +1,7 @@
-use anyhow::bail;
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
 use std::str::FromStr;
-use std::time;
-use tracing::debug;
+use tracing::{debug, error};
 
 use pcloud_sdk::cli::auth;
 use pcloud_sdk::client::PCloudClientImpl;
@@ -81,29 +79,31 @@ async fn main() -> anyhow::Result<()> {
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
-    let r = match &cli.command {
-        Commands::Auth(input) => auth::handle_auth(&token_file, input).await,
-        Commands::AuthFile(input) => auth::handle_auth_file(&token_file, input).await,
+    match &cli.command {
+        Commands::Auth(input) => auth::handle_auth(&token_file, input).await?,
+        Commands::AuthFile(input) => auth::handle_auth_file(&token_file, input).await?,
         _ => {
             let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&token_file)?;
             let client = PCloudClientImpl::new(token, true);
-            match &cli.command {
-                Commands::Initialize => PCloudDatabase::initialize(client, &cli.app_dir, db_path).await,
+            let done = match &cli.command {
+                Commands::Initialize => PCloudDatabase::initialize(client, &cli.app_dir, db_path).await?,
                 _ => {
-                    let _db = PCloudDatabase::new(client, &cli.app_dir, db_path).await?;
+                    let (_db, done) = PCloudDatabase::new(client, &cli.app_dir, db_path).await?;
                     match cli.command {
                         Commands::Add(add) => {
                             println!("Commands::Add({add:?})");
-                            Ok(())
                         }
-                        c => bail!("Unexpected command {:?}", c),
-                    }
+                        c => error!("Unexpected command {:?}", c),
+                    };
+                    done
                 }
+            };
+            debug!("Await for proxied-file upload to finish");
+            if let Err(_tmpdir) = done.await? {
+                // TODO: Implement some backup
+                error!("Failed to execute cleanup task of proxied file. Changes might not been stored.")
             }
         }
     };
-    // FIXME: We need to sleep here so the DB is uploaded again to pcloud. We need to implement a better alternative: send a signal back once the work is done
-    debug!("Sleep for a while");
-    std::thread::sleep(time::Duration::from_secs(5));
-    r
+    Ok(())
 }
