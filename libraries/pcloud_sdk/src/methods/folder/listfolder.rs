@@ -77,6 +77,9 @@ impl<T: PCloudClient> GetListFolder for T {
         let mut params = list_folder.into_params()?;
         let mut filtermeta = filtermeta;
 
+        // TODO: I'm afraid not all the fields are valid here... search some docs or try/error and
+        // TODO: document them manually (and raise if any of them is used)
+
         // Insert `folderid` and `fileid` always, it is required to parse [`MetadataFolder`] and
         // differentiate it from [`MetadataFile`]. Read about `#[serde(untagged)]` in [`Metadata`]
         // enum for more info about why this is needed.
