@@ -10,7 +10,7 @@ use std::io::Read;
 use crate::types::FileID;
 
 #[async_trait]
-/// Uploads a local file to the give [`FileID`]
+/// Uploads a local file to the given [`FileID`]
 pub trait UploadToFileID {
     async fn upload_to_fileid(&self, local_path: &Utf8Path, fileid: FileID) -> Result<()>;
 }

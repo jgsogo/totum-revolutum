@@ -1,13 +1,15 @@
 use crate::client::PCloudClient;
-use crate::handy::UploadToFileID;
+use crate::handy::{GetFileLinkAndDownload, UploadToFileID};
 use crate::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use crate::methods::folder::listfolder::GetListFolder;
 use crate::methods::folder::ListFolderInput;
+use crate::methods::streaming::getfilelink::GetFileLinkInput;
+use crate::progress_bar::ProgressBarBuilder;
 use crate::structures::Metadata;
 use crate::types::{FileID, Folder, FolderID};
 use anyhow::Result;
 use async_utils::SideTask;
-use camino::Utf8Path;
+use camino::{Utf8Path, Utf8PathBuf};
 use std::fs::File;
 use std::future::Future;
 use std::io::Write;
@@ -16,6 +18,10 @@ use std::pin::Pin;
 use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 use tracing::{debug, error};
+
+struct NoProgressBarBuilder;
+
+impl ProgressBarBuilder for NoProgressBarBuilder {}
 
 type UploadFnType<PCloud> =
     Box<dyn FnOnce((PCloud, FileID, TempDir)) -> Pin<Box<dyn Future<Output = Result<(), TempDir>> + Send>> + Send>;
@@ -132,12 +138,19 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
             }
         };
 
-        // Return to the user
+        // Download the file to the local system
         let temp_dir = tempdir()?;
-        debug!("File will be proxied in {:?}", Self::get_local_filepath(&temp_dir));
+        let local_filepath = Utf8PathBuf::from_path_buf(Self::get_local_filepath(&temp_dir)).unwrap();
+        debug!("File will be proxied in {}", local_filepath);
+        pcloud
+            .getfilelink_and_download(
+                GetFileLinkInput::new(crate::types::File::FileID(file_id.clone())),
+                &local_filepath,
+                &NoProgressBarBuilder,
+            )
+            .await?;
 
-        // TODO: Download the file
-
+        // Create side task (upload and remove on drop) and return to user
         let (upload_on_drop, upload_receiver) = SideTask::new(force_boxed(Self::upload_and_remove), None)?;
         Ok((
             Self {
