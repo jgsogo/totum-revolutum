@@ -19,6 +19,7 @@ use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 use tracing::{debug, error};
 
+// TODO: Some 'Output' should arrive from outside. Remove this struct NoProgressBarBuilder
 struct NoProgressBarBuilder;
 
 impl ProgressBarBuilder for NoProgressBarBuilder {}
