@@ -16,6 +16,7 @@ test_utils = ["dep:mockall", "dep:httpmock"]
 [dependencies]
 http_utils = { path = "../http_utils" }
 filesystem = { path = "../filesystem" }
+async_utils = { path = "../async_utils" }
 
 anyhow = { workspace = true }
 async-trait = { workspace = true }
@@ -39,6 +40,7 @@ serde_json = { workspace = true }
 serde_repr = { workspace = true }
 strum = { workspace = true, features = ["derive"] }
 strum_macros = { workspace = true }
+tempfile = { workspace = true }
 thiserror = { workspace = true }
 time = { workspace = true, features = [
     "serde",

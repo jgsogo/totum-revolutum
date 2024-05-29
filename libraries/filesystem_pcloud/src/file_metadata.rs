@@ -4,6 +4,7 @@ use filesystem::FileMetadata;
 use pcloud_sdk::structures::MetadataFile;
 use pcloud_sdk::types::FileID;
 
+#[allow(dead_code)]
 pub trait RemoteFileMetadata: FileMetadata {
     fn from_pcloud_metadata(path: &Utf8Path, metadata: MetadataFile) -> Self;
 

@@ -1,11 +1,19 @@
-use anyhow::bail;
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
-use tracing::debug;
+use std::str::FromStr;
+use tracing::{debug, error};
 
 use pcloud_sdk::cli::auth;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
+use pcloud_sdk::types::RemotePath;
+use photodb::db::PCloudDatabase;
+
+fn application_dir() -> Utf8PathBuf {
+    let home_dir = dirs::home_dir().expect("Failed to get dirs::home_dir()");
+    let photodb_dir = home_dir.join(".photodb");
+    Utf8PathBuf::from_path_buf(photodb_dir).unwrap()
+}
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -17,9 +25,9 @@ struct Cli {
     #[command(subcommand)]
     command: Commands,
 
-    /// Path to a JSON file with user token
-    #[clap(long, default_value_t = Utf8PathBuf::from_path_buf(dirs::home_dir().expect("Cannot get dirs::config_dir()").join(".pcloud")).expect("Failed to get Utf8Path from dirs::config_dir()"))]
-    token_file: Utf8PathBuf,
+    /// Path to application directory. Temporary files and secrets will be stored here
+    #[clap(long, default_value_t = application_dir())]
+    app_dir: Utf8PathBuf,
 }
 
 #[derive(Subcommand, Debug)]
@@ -29,6 +37,9 @@ enum Commands {
 
     /// Authenticate using inputs from file
     AuthFile(auth::AuthFileParams),
+
+    /// Initializes the database (fails if file already exists)
+    Initialize,
 
     /// Adds files to myapp
     Add(Add),
@@ -62,21 +73,37 @@ async fn main() -> anyhow::Result<()> {
         .init();
     debug!("Tracing level configured to {}", tracing_level);
 
+    std::fs::create_dir_all(&cli.app_dir)?;
+    let token_file = cli.app_dir.join(".pcloud");
+    let db_path = RemotePath::from_str("path:/developing")?;
+
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli.command {
-        Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
-        Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
+        Commands::Auth(input) => auth::handle_auth(&token_file, input).await?,
+        Commands::AuthFile(input) => auth::handle_auth_file(&token_file, input).await?,
         _ => {
-            let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&cli.token_file)?;
-            let _client = PCloudClientImpl::new(token, true);
-            match cli.command {
-                Commands::Add(name) => {
-                    println!("'myapp add' was used, name is: {:?}", name.name);
-                    Ok(())
+            let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&token_file)?;
+            let client = PCloudClientImpl::new(token, true);
+            let done = match &cli.command {
+                Commands::Initialize => PCloudDatabase::initialize(client, &cli.app_dir, db_path).await?,
+                _ => {
+                    let (_db, done) = PCloudDatabase::new(client, &cli.app_dir, db_path).await?;
+                    match cli.command {
+                        Commands::Add(add) => {
+                            println!("Commands::Add({add:?})");
+                        }
+                        c => error!("Unexpected command {:?}", c),
+                    };
+                    done
                 }
-                c => bail!("Unexpected command {:?}", c),
+            };
+            debug!("Await for proxied-file upload to finish");
+            if let Err(_tmpdir) = done.await? {
+                // TODO: Implement some backup
+                error!("Failed to execute cleanup task of proxied file. Changes might not been stored.")
             }
         }
-    }
+    };
+    Ok(())
 }

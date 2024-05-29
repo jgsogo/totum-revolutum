@@ -4,13 +4,13 @@ members = [
     "apps/photodb",
     "apps/syncronia",
     "libraries/cron",
+    "libraries/async_utils",
     "libraries/constants",
     "libraries/filesystem",
     "libraries/filesystem_pcloud",
     "libraries/http_utils",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
-
     # A placeholder to depend on _external_ crates (see [this note](./notes/2024-05-04-1923.md))
     "bazel/external",
 ]
@@ -27,14 +27,14 @@ bytes = "1.6.0"
 camino = "1.1.6"
 chrono = { version = "0.4.38" }
 chrono-tz = { version = "0.9.0" }
-clap = { version = "4.5.4", features = ["cargo", "string"]}
+clap = { version = "4.5.4", features = ["cargo", "string"] }
 clap_complete = "4.5.2"
 clap-verbosity-flag = { version = "2.2" }
 confy = { version = "0.6.1", default-features = false, features = ["yaml_conf"] }
 cron-parser = "0.9.0"
-diesel = { version = "2.1.6", features = ["sqlite"] }
-diesel_cli = "2.1.1"
-diesel_migrations = "2.1.0"
+diesel = { version = "2.1.6", default-features = false, features = ["sqlite", "r2d2"] }
+diesel_cli = { version = "2.1.1", default-features = false, features = ["sqlite"] }
+diesel_migrations = { version = "2.1.0", default-features = false, features = ["sqlite"] }
 diesel_table_macro_syntax = "0.1.0"
 diffy = "0.3.0"
 dirs = { version = "5.0.1" }
@@ -72,8 +72,9 @@ serde_yaml = "0.9.34"
 sha256 = { version = "1.5" }
 strum = "0.26.2"
 strum_macros = "0.26.2"
-syn = { version="2.0.60",features = ["visit"]}
+syn = { version = "2.0.60", features = ["visit"] }
 tempfile = { version = "3.10.1" }
+testing_logger = "0.1.1"
 thiserror = "1.0.59"
 time = { version = "0.3.36" }
 tokio = { version = "1.37" }

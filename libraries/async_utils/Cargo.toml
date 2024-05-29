@@ -1,0 +1,17 @@
+[package]
+name = "async_utils"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+
+
+[dependencies]
+anyhow = { workspace = true }
+#async-trait = { workspace = true }
+#tracing = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+log = { workspace = true }
+
+[dev-dependencies]
+testing_logger = { workspace = true }

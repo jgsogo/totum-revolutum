@@ -1,0 +1,17 @@
+load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
+load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+
+rust_library_tests_and_docs(
+    name = "async_utils",
+    srcs = glob(["src/**/*.rs"]),
+    aliases = aliases(),
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    test_deps = [
+        "@crates_libraries//:testing_logger",
+    ],
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)

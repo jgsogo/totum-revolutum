@@ -326,6 +326,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "async_utils"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "log",
+ "testing_logger",
+ "tokio",
+]
+
+[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -711,7 +721,31 @@ checksum = "ff236accb9a5069572099f0b350a92e9560e8e63a9b8d546162f4a5e03026bb2"
 dependencies = [
  "diesel_derives",
  "libsqlite3-sys",
+ "r2d2",
  "time",
+]
+
+[[package]]
+name = "diesel_cli"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed0d26f384b697e94535595644e2826fb04cc83bf0949283f535f2d9c65ed31e"
+dependencies = [
+ "chrono",
+ "clap",
+ "clap_complete",
+ "diesel",
+ "diesel_migrations",
+ "diesel_table_macro_syntax",
+ "diffy",
+ "dotenvy",
+ "heck 0.4.1",
+ "regex",
+ "serde",
+ "serde_regex",
+ "syn 2.0.66",
+ "toml 0.7.8",
+ "url",
 ]
 
 [[package]]
@@ -2045,6 +2079,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "async_utils",
  "bitflags 2.5.0",
  "bytes",
  "camino",
@@ -2154,9 +2189,11 @@ dependencies = [
  "anyhow",
  "async-trait",
  "camino",
+ "chrono",
  "clap",
  "clap-verbosity-flag",
  "diesel",
+ "diesel_cli",
  "diesel_migrations",
  "dirs",
  "dotenvy",
@@ -2164,6 +2201,7 @@ dependencies = [
  "home",
  "log",
  "pcloud_sdk",
+ "tempfile",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2315,6 +2353,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fa76aaf39101c457836aec0ce2316dbdc3ab723cdda1c6bd4e6ad4208acaca7"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "r2d2"
+version = "0.8.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "51de85fb3fb6524929c8a2eb85e6b6d363de4e8c48f9e2c2eac4944abc181c93"
+dependencies = [
+ "log",
+ "parking_lot",
+ "scheduled-thread-pool",
 ]
 
 [[package]]
@@ -2536,6 +2585,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fbc91545643bcf3a0bbb6569265615222618bdf33ce4ffbbd13c4bbd4c093534"
 dependencies = [
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "scheduled-thread-pool"
+version = "0.2.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3cbc66816425a074528352f5789333ecff06ca41b36b0b0efdfbb29edc391a19"
+dependencies = [
+ "parking_lot",
 ]
 
 [[package]]
@@ -2918,6 +2976,15 @@ name = "termtree"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3369f5ac52d5eb6ab48c6b4ffdc8efbcad6b89c765749064ba298f2c68a16a76"
+
+[[package]]
+name = "testing_logger"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d92b727cb45d33ae956f7f46b966b25f1bc712092aeef9dba5ac798fc89f720"
+dependencies = [
+ "log",
+]
 
 [[package]]
 name = "thiserror"
