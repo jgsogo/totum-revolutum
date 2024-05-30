@@ -7,7 +7,6 @@ use anyhow::{anyhow, bail, Result};
 use camino::Utf8PathBuf;
 use diesel::prelude::*;
 use diesel::{RunQueryDsl, SelectableHelper};
-use log::warn;
 use oxipng::{optimize, Options};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::Exists;
@@ -128,18 +127,23 @@ impl<'a, T: Database, PCloud: PCloudClient + Clone + Send + 'static> PhotoDB<'a,
         // remove if it doesn't
 
         let (db_remove_tx, mut db_remove_rx) = tokio::sync::mpsc::channel(100);
+
+        let mut conn = self.db.get_connection()?;
         tokio::spawn(async move {
-            let capacity = 10;
-            let mut buffer: Vec<i32> = Vec::with_capacity(capacity);
-            // TODO: Hide receiver behind an iterator, take a batch. FIXME: this `recv_many` returns as soon as there is one message available
-            while db_remove_rx.recv_many(&mut buffer, capacity).await != 0 {
-                // TODO: Do the batch remove from the database
-                warn!("Not implemented: remove rows {:?}", buffer);
-                buffer.clear();
+            loop {
+                // TODO: Hide receiver behind an iterator, take a batch. FIXME: this `recv_many` returns as soon as there is one message available
+                match db_remove_rx.recv().await {
+                    None => break,
+                    Some(row_id) => {
+                        if let Err(e) = diesel::delete(photos.filter(id.eq(row_id))).execute(&mut conn) {
+                            error!("Error removing row {row_id}: {e}");
+                        }
+                    }
+                }
             }
         });
 
-        // TODO: Write some abstration to use an iterator (pagination hidden) to iterate over the full table. See https://github.com/diesel-rs/diesel/issues/1087
+        // TODO: Write some abstraction to use an iterator (pagination hidden) to iterate over the full table. See https://github.com/diesel-rs/diesel/issues/1087
         use crate::schema::photos::dsl::*;
         let results = photos.select(Photo::as_select()).load(&mut self.db.get_connection()?)?;
 
