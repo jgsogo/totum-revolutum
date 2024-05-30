@@ -22,12 +22,15 @@ diesel_migrations = { workspace = true, features = ["sqlite"] }
 dirs = { workspace = true }
 dotenvy = { workspace = true }
 home = { workspace = true }
+image = { workspace = true }
 log = { workspace = true }
+oxipng = { workspace = true }
 ring = { workspace = true }
 tempfile = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }
 
 [dev-dependencies]
 filesystem = { path = "../../libraries/filesystem", features = ["local", "test_utils"] }

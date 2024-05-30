@@ -1,12 +1,10 @@
 use crate::client::PCloudClient;
+use crate::handy::Exists;
 use crate::handy::{GetFileLinkAndDownload, UploadToFileID};
 use crate::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
-use crate::methods::folder::listfolder::GetListFolder;
-use crate::methods::folder::ListFolderInput;
 use crate::methods::streaming::getfilelink::GetFileLinkInput;
 use crate::progress_bar::ProgressBarBuilder;
-use crate::structures::Metadata;
-use crate::types::{FileID, Folder, FolderID};
+use crate::types::{FileID, FolderID};
 use anyhow::Result;
 use async_utils::SideTask;
 use camino::{Utf8Path, Utf8PathBuf};
@@ -104,26 +102,7 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
         filename: &str,
     ) -> Result<(Self, bool, Receiver<UploadReturnType>)> {
         let (file_id, created): (FileID, bool) = {
-            // Search the folder content for the file we are looking for
-            let folder_content = pcloud
-                .listfolder_with_filtermeta(
-                    ListFolderInput::new(Folder::from(folder_id.clone())),
-                    vec!["fileid", "name"],
-                )
-                .await?;
-            let file_id = folder_content
-                .metadata
-                .contents
-                .and_then(|files| {
-                    files
-                        .into_iter()
-                        .filter_map(|m| match m {
-                            Metadata::MetadataFile(m) => Some(m),
-                            Metadata::MetadataFolder(_) => None,
-                        })
-                        .find(|f| f.common.name.as_ref().unwrap() == filename)
-                })
-                .map(|metadata| metadata.fileid);
+            let file_id = pcloud.exists(folder_id.clone(), filename).await?;
 
             // If it exists, return. Otherwise, create the remote file
             match file_id {
@@ -141,17 +120,21 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
             }
         };
 
-        // Download the file to the local system
+        // Get the temporal local filename
         let temp_dir = tempdir()?;
         let local_filepath = Utf8PathBuf::from_path_buf(Self::get_local_filepath(&temp_dir)).unwrap();
         debug!("File will be proxied in {}", local_filepath);
-        pcloud
-            .getfilelink_and_download(
-                GetFileLinkInput::new(crate::types::File::FileID(file_id.clone())),
-                &local_filepath,
-                &NoProgressBarBuilder,
-            )
-            .await?;
+
+        // If not created, download it to the local filesystem
+        if !created {
+            pcloud
+                .getfilelink_and_download(
+                    GetFileLinkInput::new(crate::types::File::FileID(file_id.clone())),
+                    &local_filepath,
+                    &NoProgressBarBuilder,
+                )
+                .await?;
+        }
 
         // Create side task (upload and remove on drop) and return to user
         let (upload_on_drop, upload_receiver) = SideTask::new(force_boxed(Self::upload_and_remove), None)?;
