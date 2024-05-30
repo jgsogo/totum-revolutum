@@ -1,6 +1,5 @@
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
-use camino::Utf8PathBuf;
 use diesel::prelude::*;
 use diesel::r2d2::Pool;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
@@ -10,6 +9,7 @@ use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::types::RemotePath;
 use pcloud_sdk::ProxiedFile;
+use std::path::PathBuf;
 use tempfile::TempDir;
 use tokio::sync::oneshot::Receiver;
 use tracing::debug;
@@ -40,11 +40,7 @@ pub struct PCloudDatabase<PCloud: PCloudClient + Send + 'static> {
 impl<PCloud: PCloudClient + Send + Clone + 'static> PCloudDatabase<PCloud> {
     /// Initializes the database and pushes it to the remote pCloud storage. It will fail if the
     /// remote file already exists
-    pub async fn initialize(
-        pcloud: PCloud,
-        _app_dir: &Utf8PathBuf,
-        path: RemotePath,
-    ) -> Result<Receiver<Result<(), TempDir>>> {
+    pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<Receiver<Result<(), (TempDir, PathBuf)>>> {
         // Create the remote folder and check if file exists
         let folderid = pcloud.createfolderifnotexists_all(None, &path).await?;
         let (proxied_file, created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
@@ -63,12 +59,9 @@ impl<PCloud: PCloudClient + Send + Clone + 'static> PCloudDatabase<PCloud> {
 
     /// Creates a new [`PCloudDatabase`] instance. Requires a pCloud client and the folder
     /// path where the database (and files) are located
-    pub async fn new(
-        pcloud: PCloud,
-        _app_dir: &Utf8PathBuf,
-        path: RemotePath,
-    ) -> Result<(Self, Receiver<Result<(), TempDir>>)> {
+    pub async fn new(pcloud: PCloud, path: RemotePath) -> Result<(Self, Receiver<Result<(), (TempDir, PathBuf)>>)> {
         let folderid = pcloud.get_folderid(&path).await?;
+        // TODO: Add a flag to `ProxiedFile` to indicate if it's allowed to create the file or not
         let (proxied_file, _created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
 
         // Create a connection pool using the local temp file

@@ -1,5 +1,7 @@
 pub mod db;
 pub mod models;
-// pub mod photodb;
-pub mod initialize;
+mod photodb;
 pub mod schema;
+pub mod utils;
+
+pub use photodb::PhotoDB;
