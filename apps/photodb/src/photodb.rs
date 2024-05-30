@@ -35,16 +35,14 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
     }
 
     fn to_tmp_storage(&self, input: Utf8PathBuf) -> Result<Utf8PathBuf> {
-        // Convert to PNG
+        debug!("Convert to PNG format");
         let input = {
-            debug!("Convert to PNG format");
             let image = image::io::Reader::open(input)?.decode()?;
             let input_filename = self.app_dir.temp_filename(None, None);
             image.save_with_format(&input_filename, image::ImageFormat::Png)?;
             input_filename
         };
 
-        // Apply oxipng optimizer
         debug!("Apply oxipng optimizer");
         let output_filename = {
             let input_file = oxipng::InFile::Path(input.into_std_path_buf());
