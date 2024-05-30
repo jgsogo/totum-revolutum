@@ -1,15 +1,15 @@
-use anyhow::anyhow;
+use anyhow::{anyhow, bail, Result};
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
 use std::str::FromStr;
 use tracing::{debug, error};
 
 use pcloud_sdk::cli::auth;
-use pcloud_sdk::client::PCloudClientImpl;
+use pcloud_sdk::client::{PCloudClient, PCloudClientImpl};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::RemotePath;
-use photodb::db::PCloudDatabase;
-use photodb::PhotoDB;
+use photodb::db::{Database, PCloudDatabase};
+use photodb::{AppDirs, PhotoDB};
 
 fn application_dir() -> Utf8PathBuf {
     let home_dir = dirs::home_dir().expect("Failed to get dirs::home_dir()");
@@ -63,8 +63,20 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
     }
 }
 
+/// Any command that uses the DB is executed here. This way we can guarantee that the Receiver work
+/// (store the database back to pCloud if anything fails) is always executed
+async fn db_commands<T: Database, PCloud: PCloudClient>(
+    command: Commands,
+    photodb: PhotoDB<'_, T, PCloud>,
+) -> Result<()> {
+    match command {
+        Commands::Add(add) => photodb.add(add.photo_file).await,
+        c => bail!("Unexpected command {:?}", c),
+    }
+}
+
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
+async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     // Configure tracing - logs go to stderr so it can be separated from actual output
@@ -78,9 +90,7 @@ async fn main() -> anyhow::Result<()> {
     std::fs::create_dir_all(&cli.app_dir)?;
     let token_file = cli.app_dir.join(".pcloud");
     let db_path = RemotePath::from_str("path:/developing")?;
-    let app_dir = cli.app_dir;
-    let app_dir_db = app_dir.join("db");
-    std::fs::create_dir_all(&app_dir_db)?; // Create it here, we don't want to do anything unless we are sure that we will be able to back up the DB in case of error.
+    let app_dir = AppDirs::new(cli.app_dir)?;
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
@@ -90,17 +100,18 @@ async fn main() -> anyhow::Result<()> {
         _ => {
             let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&token_file)?;
             let client = PCloudClientImpl::new(token, true);
+
+            // I can't raise from these commands, as I always need to execute the backup routine
             let done = match &cli.command {
                 Commands::Initialize => PCloudDatabase::initialize(client, db_path).await?,
                 _ => {
                     let (db, done) = PCloudDatabase::new(client.clone(), db_path.clone()).await?;
-                    let photodb = PhotoDB::new(db, client, app_dir, db_path);
-                    match cli.command {
-                        Commands::Add(add) => {
-                            photodb.add(add.photo_file)?;
-                        }
-                        c => error!("Unexpected command {:?}", c),
-                    };
+                    let photodb = PhotoDB::new(db, client, &app_dir, db_path);
+
+                    if let Err(e) = db_commands(cli.command, photodb).await {
+                        error!("{}", e);
+                    }
+
                     done
                 }
             };
@@ -109,7 +120,7 @@ async fn main() -> anyhow::Result<()> {
                 error!("Failed to execute cleanup task (upload) of proxied file. We save the DB to a local file");
                 let date = chrono::Local::now();
                 let db_filename = format!("{}.sqlite3", date.format("%Y-%m-%d][%H:%M:%S"));
-                let db_backup_filename = app_dir_db.join(db_filename);
+                let db_backup_filename = app_dir.db_backups().join(db_filename);
                 std::fs::copy(&localfile, &db_backup_filename).map_err(|e| {
                     anyhow!(
                         "Failed to back up from temporal file '{:?}'. Database changes are lost: {e}",
