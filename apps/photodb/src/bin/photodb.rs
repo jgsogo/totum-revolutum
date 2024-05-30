@@ -45,11 +45,21 @@ enum Commands {
 
     /// Adds (and backups) a photo to the database
     Add(Add),
+
+    /// Cleans the database
+    Clean(Clean),
 }
 
 #[derive(Args, Debug)]
 struct Add {
     photo_file: Utf8PathBuf,
+}
+
+#[derive(Args, Debug)]
+struct Clean {
+    /// Remove DB entries that are no longer in the storage
+    #[clap(long, default_value_t = true)]
+    clean_file_id: bool,
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -65,12 +75,18 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 
 /// Any command that uses the DB is executed here. This way we can guarantee that the Receiver work
 /// (store the database back to pCloud if anything fails) is always executed
-async fn db_commands<T: Database, PCloud: PCloudClient>(
+async fn db_commands<T: Database, PCloud: PCloudClient + Clone + Send + 'static>(
     command: Commands,
     photodb: PhotoDB<'_, T, PCloud>,
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,
+        Commands::Clean(clean) => {
+            if clean.clean_file_id {
+                photodb.clean_fileids().await?;
+            }
+            Ok(())
+        }
         c => bail!("Unexpected command {:?}", c),
     }
 }
