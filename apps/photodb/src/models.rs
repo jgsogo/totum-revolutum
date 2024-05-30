@@ -5,5 +5,5 @@ use diesel::prelude::*;
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Photo {
     pub id: i32,
-    pub storage_path: String,
+    pub fileid: i64,
 }
