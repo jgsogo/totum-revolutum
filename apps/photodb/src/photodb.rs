@@ -1,8 +1,10 @@
 use super::db::Database;
+use super::models;
 use super::utils::sha256_string_from_file;
 use super::AppDirs;
 use anyhow::{anyhow, bail, Result};
 use camino::Utf8PathBuf;
+use diesel::{RunQueryDsl, SelectableHelper};
 use oxipng::{optimize, Options};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::Exists;
@@ -11,6 +13,9 @@ use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::types::{FileID, Folder, RemotePath};
 use std::str::FromStr;
 use tracing::{debug, info};
+
+// Path inside the remote folder to locate files using sha256 filename
+const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
 pub struct PhotoDB<'a, T: Database, PCloud: PCloudClient> {
@@ -77,7 +82,7 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
             debug!(" - sha256 '{}'", sha256);
             let (c1, rest) = sha256.split_at(4);
             let (c2, rest) = rest.split_at(4);
-            let folder_path = self.remote_dir.path().join("sha256").join(c1).join(c2);
+            let folder_path = self.remote_dir.path().join(SHA256_BASE_PATH).join(c1).join(c2);
             (
                 RemotePath::from_str(&format!("path:/{}", folder_path))?,
                 format!("{}.png", rest),
@@ -96,9 +101,19 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
             .pcloud
             .uploadfile(&photo, UploadFileParams::new(Folder::RemotePath(folder), filename))
             .await?;
-        let _file_id = FileID(*r.fileids.first().unwrap());
+        let file_id = FileID(*r.fileids.first().unwrap());
 
         // Store the data in the database
+        use crate::schema::photos;
+        let new_photo = models::NewPhoto {
+            fileid: &(file_id.0 as i64),
+        };
+        let photo = diesel::insert_into(photos::table)
+            .values(&new_photo)
+            .returning(models::Photo::as_returning())
+            .get_result(&mut self.db.get_connection()?)?;
+
+        debug!("Photo inserted into database: {}", photo.id);
 
         Ok(())
     }
