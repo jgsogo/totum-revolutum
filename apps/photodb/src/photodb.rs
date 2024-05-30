@@ -66,9 +66,9 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
 
     pub async fn add(&self, photo_filepath: Utf8PathBuf) -> Result<()> {
         debug!("Add photo at '{}'", photo_filepath);
-        // FIXME: If it is a GIF or some other extension that will loose something (animation,...)
-        // FIXME: when converter to PNG we should raise here. Maybe don't convert/optimize and just
-        // FIXME: upload
+        // FIXME: If it is a GIF or some other extension that will loose something (animation,
+        // FIXME: video, ...) when converting to PNG we should raise here. Maybe don't
+        // FIXME: convert/optimize and just upload
 
         let photo = self.to_tmp_storage(photo_filepath)?;
 
