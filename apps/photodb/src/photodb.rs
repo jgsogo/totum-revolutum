@@ -112,6 +112,7 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
             .values(&new_photo)
             .returning(models::Photo::as_returning())
             .get_result(&mut self.db.get_connection()?)?;
+        // TODO: Handle scenario if the insert fails: duplicate fileid
 
         debug!("Photo inserted into database: {}", photo.id);
 
