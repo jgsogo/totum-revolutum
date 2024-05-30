@@ -106,7 +106,6 @@ async fn main() -> anyhow::Result<()> {
             };
             debug!("Await for proxied-file upload to finish");
             if let Err((_tmpdir, localfile)) = done.await? {
-                // TODO: Implement some backup
                 error!("Failed to execute cleanup task (upload) of proxied file. We save the DB to a local file");
                 let date = chrono::Local::now();
                 let db_filename = format!("{}.sqlite3", date.format("%Y-%m-%d][%H:%M:%S"));

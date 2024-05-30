@@ -24,23 +24,22 @@ struct NoProgressBarBuilder;
 
 impl ProgressBarBuilder for NoProgressBarBuilder {}
 
-type UploadFnType<PCloud> = Box<
-    dyn FnOnce((PCloud, FileID, TempDir)) -> Pin<Box<dyn Future<Output = Result<(), (TempDir, PathBuf)>> + Send>>
-        + Send,
->;
+type UploadReturnType = Result<(), (TempDir, PathBuf)>;
+type UploadFnType<PCloud> =
+    Box<dyn FnOnce((PCloud, FileID, TempDir)) -> Pin<Box<dyn Future<Output = UploadReturnType> + Send>> + Send>;
 
 fn force_boxed<PCloud: PCloudClient + Send + 'static, T>(f: fn((PCloud, FileID, TempDir)) -> T) -> UploadFnType<PCloud>
 where
-    T: Future<Output = Result<(), (TempDir, PathBuf)>> + Send + 'static,
+    T: Future<Output = UploadReturnType> + Send + 'static,
 {
     Box::new(move |n| Box::pin(f(n)))
 }
 
 type UploadSideTaskType<PCloud> = SideTask<
     UploadFnType<PCloud>,
-    Pin<Box<dyn Future<Output = Result<(), (TempDir, PathBuf)>> + Send + 'static>>,
+    Pin<Box<dyn Future<Output = UploadReturnType> + Send + 'static>>,
     (PCloud, FileID, TempDir),
-    Result<(), (TempDir, PathBuf)>,
+    UploadReturnType,
 >;
 
 /// Keeps a local temporal copy of a remote file. The remote file is fetched (or created) as
@@ -72,7 +71,7 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
     /// Uploads file contents to the given [`FileID`]. Note that the file will be removed after
     /// this function call when [`TempDir`] goes out of scope, this is why in case of error it
     /// sends the [`TempDir`] to the consumer, so they can back up the file before it is removed.
-    async fn upload_and_remove(args: (PCloud, FileID, TempDir)) -> Result<(), (TempDir, PathBuf)> {
+    async fn upload_and_remove(args: (PCloud, FileID, TempDir)) -> UploadReturnType {
         let (pcloud, fileid, temp_dir) = args;
 
         // Execute upload
@@ -103,7 +102,7 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
         pcloud: PCloud,
         folder_id: FolderID,
         filename: &str,
-    ) -> Result<(Self, bool, Receiver<Result<(), (TempDir, PathBuf)>>)> {
+    ) -> Result<(Self, bool, Receiver<UploadReturnType>)> {
         let (file_id, created): (FileID, bool) = {
             // Search the folder content for the file we are looking for
             let folder_content = pcloud
