@@ -58,7 +58,7 @@ mod tests {
     #[async_trait]
     impl GetFolderID for HelperTraitMock {
         async fn get_folderid(&self, _path: &RemotePath) -> Result<FolderID> {
-            Ok(FolderID(42))
+            Ok(FolderID::new(42))
         }
     }
 
@@ -71,7 +71,7 @@ mod tests {
                 .get_folder_and_path(None, &RemotePath::from_str("path:/abs/path")?)
                 .await?;
 
-            assert_eq!(folder, FolderID(42));
+            assert_eq!(folder, FolderID::new(42));
             assert_eq!(path.to_string(), "path:/abs/path");
         }
 
@@ -80,7 +80,7 @@ mod tests {
                 .get_folder_and_path(None, &RemotePath::from_str("path:/abs/../path")?)
                 .await?;
 
-            assert_eq!(folder, FolderID(42));
+            assert_eq!(folder, FolderID::new(42));
             assert_eq!(path.to_string(), "path:/path");
         }
 
@@ -93,10 +93,10 @@ mod tests {
 
         {
             let (folder, path) = trait_impl
-                .get_folder_and_path(Some(FolderID(54)), &RemotePath::from_str("path:/abs/path")?)
+                .get_folder_and_path(Some(FolderID::new(54)), &RemotePath::from_str("path:/abs/path")?)
                 .await?;
 
-            assert_eq!(folder, FolderID(54));
+            assert_eq!(folder, FolderID::new(54));
             assert_eq!(path.to_string(), "path:/abs/path");
         }
 

@@ -2,21 +2,23 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
-use crate::types::Folder;
+use crate::types::{Folder, FolderID};
 
-use super::Params;
+use super::{Params, ParamsType};
+
+impl Params for FolderID {
+    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
+        params.insert("folderid".to_string(), self.inner().to_string());
+        Ok(())
+    }
+}
 
 impl Params for Folder {
     fn add_to_params(&self, params: &mut HashMap<String, String>) -> Result<()> {
         match self {
-            Folder::FolderID(fid) => {
-                params.insert("folderid".to_string(), fid.0.to_string());
-            }
-            Folder::RemotePath(p) => {
-                params.insert("path".to_string(), p.path().to_string());
-            }
+            Folder::FolderID(fid) => fid.add_to_params(params),
+            Folder::RemotePath(p) => p.add_to_params(params),
         }
-        Ok(())
     }
 }
 
@@ -30,7 +32,7 @@ mod tests {
 
     #[test]
     fn test_params_with_fileid() -> Result<()> {
-        let input: Folder = FolderID(1234).into();
+        let input: Folder = FolderID::new(1234).into();
         let mut params = HashMap::new();
         input.add_to_params(&mut params)?;
         assert_eq!(params.len(), 1);

@@ -15,7 +15,7 @@ pub const ENDPOINT: &str = "/createfolderifnotexists";
 
 pub enum TargetFolder {
     FolderAndName((FolderID, String)),
-    Path(Utf8PathBuf),
+    Path(Utf8PathBuf), // FIXME: Is this a RemotePath?
 }
 
 impl Params for TargetFolder {
@@ -25,7 +25,7 @@ impl Params for TargetFolder {
                 params.insert("path".to_string(), p.to_string());
             }
             TargetFolder::FolderAndName((folderid, name)) => {
-                params.insert("folderid".to_string(), folderid.0.to_string());
+                folderid.add_to_params(params)?;
                 params.insert("name".to_string(), name.clone());
             }
         }
@@ -76,7 +76,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
         let input = TargetFolder::Path(Utf8PathBuf::from_str("the/path/to/folder")?);
@@ -99,10 +99,10 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
-        let input = TargetFolder::FolderAndName((FolderID(1234), "name.txt".to_string()));
+        let input = TargetFolder::FolderAndName((FolderID::new(1234), "name.txt".to_string()));
         let r = client.createfolderifnotexists(input).await?;
         assert_eq!(r.created.unwrap(), true);
         Ok(())

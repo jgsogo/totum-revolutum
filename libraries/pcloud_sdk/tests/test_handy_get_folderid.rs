@@ -25,7 +25,7 @@ async fn test_get_folderid() -> Result<()> {
     let remote_path = RemotePath::from_str("path:/the/path")?;
     let data = pcloud.get_folderid(&remote_path).await?;
 
-    assert_eq!(data, FolderID(1234));
+    assert_eq!(data, FolderID::new(1234));
 
     listfolder_mock.assert();
     Ok(())

@@ -19,7 +19,7 @@ async fn test_fileops() -> Result<()> {
     let pcloud = PCloudClientImpl::new(oauth2_token, false);
 
     // Add mock so we can create a file
-    let folderid = FolderID(42);
+    let folderid = FolderID::new(42);
     let root_path = Utf8Path::new("the/root/path");
     let name = String::from("myfile.txt");
     let write_bytes = 100;

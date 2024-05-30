@@ -110,7 +110,7 @@ async fn upload(
     let _ = tx.send(());
 
     let file_id = r.fileids.first().unwrap();
-    Ok(FileID(*file_id))
+    Ok(FileID::new(*file_id))
 }
 
 pub async fn handle(

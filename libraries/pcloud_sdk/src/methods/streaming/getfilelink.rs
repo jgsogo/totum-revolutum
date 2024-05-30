@@ -178,7 +178,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_getfilelink_from_fileid() -> Result<()> {
-        let input = GetFileLinkInput::new(FileID(42).into());
+        let input = GetFileLinkInput::new(FileID::new(42).into());
 
         let utc_now = OffsetDateTime::now_utc();
         let mut client = MockLocalClient::new();

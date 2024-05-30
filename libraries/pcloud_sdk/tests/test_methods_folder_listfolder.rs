@@ -25,7 +25,7 @@ async fn test_listfolder() -> Result<()> {
     let input = ListFolderInput::new(Folder::from_str("path:/the/root/path")?);
     let data = pcloud.listfolder(input).await?;
 
-    assert_eq!(data.metadata.folderid, FolderID(1234));
+    assert_eq!(data.metadata.folderid, FolderID::new(1234));
 
     listfolder_mock.assert();
     Ok(())

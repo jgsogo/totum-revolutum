@@ -58,7 +58,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.fileid, FileID(1729212));
+                assert_eq!(data.metadata.fileid, FileID::new(1729212));
             }
         }
     }

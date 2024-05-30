@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     fn test_parse_str() -> Result<()> {
-        assert_eq!(Folder::from_str("folderid:123")?, FolderID(123).into());
+        assert_eq!(Folder::from_str("folderid:123")?, FolderID::new(123).into());
 
         let remote_path = Folder::from_str("path:/path/to/something")?;
         assert!(matches!(remote_path, Folder::RemotePath { .. }));
@@ -75,7 +75,7 @@ mod tests {
 
     #[test]
     fn test_display() -> Result<()> {
-        assert_eq!(&format!("{}", Folder::FolderID(FolderID(123))), "folderid:123");
+        assert_eq!(&format!("{}", Folder::from(FolderID::new(123))), "folderid:123");
 
         let remote_path = Folder::from_str("path:/path/to/something")?;
         assert_eq!(&format!("{}", remote_path), "path:/path/to/something");
@@ -85,7 +85,7 @@ mod tests {
     #[test]
     fn test_debug() -> Result<()> {
         assert_eq!(
-            &format!("{:?}", Folder::FolderID(FolderID(123))),
+            &format!("{:?}", Folder::from(FolderID::new(123))),
             "FolderID(folderid:123)"
         );
 

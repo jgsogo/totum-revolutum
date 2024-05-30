@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_parse_str() -> Result<()> {
-        assert_eq!(File::from_str("fileid:123")?, FileID(123).into());
+        assert_eq!(File::from_str("fileid:123")?, FileID::new(123).into());
         assert_eq!(
             File::from_str("path:/fileid-123")?,
             File::RemotePath(Utf8PathBuf::from_str("/fileid-123")?.try_into()?)
@@ -89,7 +89,7 @@ mod tests {
 
     #[test]
     fn test_display() -> Result<()> {
-        assert_eq!(&format!("{}", File::FileID(FileID(123))), "fileid:123");
+        assert_eq!(&format!("{}", File::from(FileID::new(123))), "fileid:123");
         assert_eq!(
             &format!("{}", File::RemotePath(RemotePath::from_str("path:/fileid-123")?)),
             "path:/fileid-123"
@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn test_debug() -> Result<()> {
-        assert_eq!(&format!("{:?}", File::FileID(FileID(123))), "FileID(fileid:123)");
+        assert_eq!(&format!("{:?}", File::from(FileID::new(123))), "FileID(fileid:123)");
         assert_eq!(
             &format!("{:?}", File::RemotePath(RemotePath::from_str("path:/fileid-123")?)),
             "RemotePath(path:\"/fileid-123\")"
