@@ -10,7 +10,7 @@ use crate::methods::params::Params;
 use crate::structures::MetadataFolder;
 use crate::types::FolderID;
 
-const ENDPOINT: &str = "/createfolderifnotexists";
+pub const ENDPOINT: &str = "/createfolderifnotexists";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderIfNotExists {
