@@ -25,7 +25,7 @@ pub trait GetStat {
 #[async_trait]
 impl<T: PCloudClient> GetStat for T {
     async fn stat(&self, input: File) -> Result<Stat> {
-        let ret = RESTClient::get::<Stat>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
+        let ret = RESTClient::get(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
         Ok(ret)
     }
 }

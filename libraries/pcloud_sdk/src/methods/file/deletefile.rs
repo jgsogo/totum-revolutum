@@ -26,7 +26,8 @@ pub trait GetDeleteFile {
 #[async_trait]
 impl<T: PCloudClient> GetDeleteFile for T {
     async fn deletefile(&self, input: File) -> Result<DeleteFile> {
-        let ret = RESTClient::get::<DeleteFile>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
+        let ret =
+            RESTClient::get::<DeleteFile, _>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
         Ok(ret)
     }
 }

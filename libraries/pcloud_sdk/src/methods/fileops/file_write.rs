@@ -34,8 +34,7 @@ impl<T: PCloudClient> PostFileWrite for T {
         headers.typed_insert(content_type);
 
         let data = utils::http::create_file_write(&mut data.to_owned(), "filename")?;
-        let ret = RESTClient::post::<FileWrite>(self, ENDPOINT, headers, descriptor.create_params()?, data).await?;
-        Ok(ret)
+        RESTClient::post(self, ENDPOINT, headers, descriptor.create_params()?, data).await
     }
 }
 

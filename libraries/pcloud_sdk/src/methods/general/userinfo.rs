@@ -51,7 +51,7 @@ pub trait GetUserInfo {
 #[async_trait]
 impl<T: PCloudClient> GetUserInfo for T {
     async fn userinfo(&self) -> Result<UserInfo> {
-        RESTClient::get::<UserInfo>(self, "/userinfo", HeaderMap::default(), HashMap::new()).await
+        RESTClient::get(self, "/userinfo", HeaderMap::default(), HashMap::new()).await
     }
 }
 

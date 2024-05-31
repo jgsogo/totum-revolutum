@@ -78,8 +78,7 @@ pub trait GetFileLink {
 impl<T: PCloudClient> GetFileLink for T {
     async fn getfilelink(&self, file_link: GetFileLinkInput) -> Result<FileLink> {
         debug!("pcloud::getfilelink - file '{}'", file_link.file);
-        let ret = RESTClient::get::<FileLink>(self, ENDPOINT, HeaderMap::default(), file_link.create_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), file_link.create_params()?).await
     }
 }
 

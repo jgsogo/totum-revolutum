@@ -34,7 +34,7 @@ impl<T: PCloudClient> GetCreateFolderIfNotExists for T {
     async fn createfolderifnotexists(&self, folder_id: &FolderID, name: &str) -> Result<CreateFolderIfNotExists> {
         let mut params = folder_id.create_params()?;
         params.insert("name".to_string(), name.to_string());
-        RESTClient::get::<CreateFolderIfNotExists>(self, ENDPOINT, HeaderMap::default(), params).await
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), params).await
     }
 }
 

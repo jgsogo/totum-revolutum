@@ -26,8 +26,7 @@ pub trait GetDeleteFolder {
 #[async_trait]
 impl<T: PCloudClient> GetDeleteFolder for T {
     async fn deletefolder(&self, input: Folder) -> Result<DeleteFolder> {
-        let ret = RESTClient::get::<DeleteFolder>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await
     }
 }
 

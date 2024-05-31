@@ -88,7 +88,6 @@ impl<T: PCloudClient> PostUploadFile for T {
 
         let filename = upload_params.filename.clone();
         let data = utils::http::create_file_data(local_filename, &filename)?;
-        let ret = RESTClient::post::<UploadFile>(self, ENDPOINT, headers, upload_params.create_params()?, data).await?;
-        Ok(ret)
+        RESTClient::post(self, ENDPOINT, headers, upload_params.create_params()?, data).await
     }
 }

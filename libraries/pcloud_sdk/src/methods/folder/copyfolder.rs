@@ -67,8 +67,7 @@ pub trait GetCopyFolder {
 #[async_trait]
 impl<T: PCloudClient> GetCopyFolder for T {
     async fn copyfile(&self, input: CopyFolderInput) -> Result<CopyFolder> {
-        let ret = RESTClient::get::<CopyFolder>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await
     }
 }
 

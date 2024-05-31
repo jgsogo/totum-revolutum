@@ -24,8 +24,14 @@ pub trait HttpClient: Sync {
     }
 
     /// Runs GET request to the given `endpoint` (URL will be built using [`self.build_url`])
-    async fn get(&self, endpoint: &str, headers: HeaderMap, params: HashMap<String, String>) -> Result<Response> {
+    async fn get<T: Into<HashMap<String, String>> + Send + 'static>(
+        &self,
+        endpoint: &str,
+        headers: HeaderMap,
+        params: T,
+    ) -> Result<Response> {
         let url = self.build_url(endpoint);
+        let params = params.into();
         tracing::debug!("GET '{url}'");
         let request = self
             .http_client()
@@ -37,14 +43,15 @@ pub trait HttpClient: Sync {
     }
 
     /// Runs POST request to the given `endpoint` (URL will be built using [`self.build_url`])
-    async fn post(
+    async fn post<T: Into<HashMap<String, String>> + Send + 'static>(
         &self,
         endpoint: &str,
         headers: HeaderMap,
-        params: HashMap<String, String>,
+        params: T,
         data: Vec<u8>,
     ) -> Result<Response> {
         let url = self.build_url(endpoint);
+        let params = params.into();
         tracing::debug!("POST '{url}'");
         let request = self
             .http_client()

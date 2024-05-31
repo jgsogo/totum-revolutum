@@ -41,15 +41,15 @@ mock! {
         where
             T: DeserializeOwned + 'static;
 
-        async fn get<T>(&self, endpoint: &str, headers: HeaderMap, params: HashMap<String, String>) -> Result<T>
+        async fn get<T, TParams: Into<HashMap<String, String>> + Send+ 'static>(&self, endpoint: &str, headers: HeaderMap, params: TParams) -> Result<T>
         where
             T: DeserializeOwned + 'static;
 
-        async fn post<T>(
+        async fn post<T, TParams: Into<HashMap<String, String>> + Send+ 'static>(
             &self,
             endpoint: &str,
             headers: HeaderMap,
-            params: HashMap<String, String>,
+            params: TParams,
             data: Vec<u8>,
         ) -> Result<T>
         where
@@ -59,6 +59,6 @@ mock! {
     #[allow(dead_code)]
     #[async_trait]
     impl PCloudClient for LocalClient {
-        async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>>;
+        async fn get_bytes<TParams: Into<HashMap<String, String>> + Send+ 'static>(&self, endpoint: &str, mut params: TParams) -> Result<Vec<u8>>;
     }
 }

@@ -288,7 +288,7 @@ mod tests {
     #[tokio::test]
     async fn test_root_not_exists() -> Result<()> {
         let mut client = MockLocalClient::new();
-        client.expect_get::<ListFolder>().times(1).returning(
+        client.expect_get::<ListFolder, _>().times(1).returning(
             move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
@@ -318,7 +318,7 @@ mod tests {
         let mut client = MockLocalClient::new();
 
         // Expectation for FilesystemPCloud::new
-        client.expect_get::<ListFolder>().times(2).returning(
+        client.expect_get::<ListFolder, _>().times(2).returning(
             move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
@@ -333,7 +333,7 @@ mod tests {
         );
 
         // Expectation for create
-        client.expect_get::<FileOpen>().times(1).returning(
+        client.expect_get::<FileOpen, _>().times(1).returning(
             move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, file_open::ENDPOINT);
                 assert_eq!(params.len(), 3);
@@ -369,7 +369,7 @@ mod tests {
 
         // Expectation for close
         client
-            .expect_get::<()>()
+            .expect_get::<(), _>()
             .times(1)
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
@@ -400,8 +400,10 @@ mod tests {
         let mut client = MockLocalClient::new();
 
         // Expectation for FilesystemPCloud::new
-        client.expect_get::<ListFolder>().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+        client
+            .expect_get()
+            .times(1)
+            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
@@ -411,12 +413,13 @@ mod tests {
                 Ok(ListFolder {
                     metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
-            },
-        );
+            });
 
         // Expectation for open
-        client.expect_get::<FileOpen>().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+        client
+            .expect_get()
+            .times(1)
+            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, file_open::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 let flags = (Flags::empty()).bits().to_string();
@@ -427,8 +430,7 @@ mod tests {
                     fd: 42,
                     fileid: FileID::new(1234),
                 })
-            },
-        );
+            });
 
         let file_content = b"Hello, world!";
         // Expectation for read_to_end (first call)
@@ -467,7 +469,7 @@ mod tests {
 
         // Expectation for close
         client
-            .expect_get::<()>()
+            .expect_get()
             .times(1)
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
@@ -501,7 +503,7 @@ mod tests {
 
         // Expectation for FilesystemPCloud::new
         client
-            .expect_get::<ListFolder>()
+            .expect_get()
             .times(2) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
@@ -516,8 +518,10 @@ mod tests {
             });
 
         // Expectation for create
-        client.expect_get::<FileOpen>().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+        client
+            .expect_get()
+            .times(1)
+            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, file_open::ENDPOINT);
                 assert_eq!(params.len(), 3);
                 let flags = (Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC).bits().to_string();
@@ -529,12 +533,11 @@ mod tests {
                     fd: 42,
                     fileid: FileID::new(1234),
                 })
-            },
-        );
+            });
 
         // Expectation for close
         client
-            .expect_get::<()>()
+            .expect_get()
             .times(1)
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
@@ -562,7 +565,7 @@ mod tests {
 
         // Expectation for FilesystemPCloud::new
         client
-            .expect_get::<ListFolder>()
+            .expect_get()
             .times(1) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
@@ -578,7 +581,7 @@ mod tests {
 
         // Expectation for create_dir_all
         client
-            .expect_get::<CreateFolderIfNotExists>()
+            .expect_get()
             .times(2) // One for each folder
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, createfolderifnotexists::ENDPOINT);
@@ -606,7 +609,7 @@ mod tests {
 
         // Expectation for FilesystemPCloud::new
         client
-            .expect_get::<ListFolder>()
+            .expect_get()
             .times(1) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
@@ -621,8 +624,10 @@ mod tests {
             });
 
         // Expectation for remove_file
-        client.expect_get::<DeleteFile>().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+        client
+            .expect_get()
+            .times(1)
+            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, deletefile::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert!(params.contains_key("path"));
@@ -632,8 +637,7 @@ mod tests {
                     id: "1234-0".to_string(),
                     metadata: MetadataFile::default(FileID::new(1234)),
                 })
-            },
-        );
+            });
 
         let fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_file(Utf8Path::new("nested/nested2")).await?;
@@ -647,7 +651,7 @@ mod tests {
 
         // Expectation for FilesystemPCloud::new
         client
-            .expect_get::<ListFolder>()
+            .expect_get()
             .times(1) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
@@ -662,8 +666,10 @@ mod tests {
             });
 
         // Expectation for remove_folder
-        client.expect_get::<DeleteFolder>().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+        client
+            .expect_get()
+            .times(1)
+            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, deletefolder::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert!(params.contains_key("path"));
@@ -673,8 +679,7 @@ mod tests {
                     id: "1234-0".to_string(),
                     metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
-            },
-        );
+            });
 
         let fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_dir(Utf8Path::new("nested/nested2")).await?;
@@ -688,7 +693,7 @@ mod tests {
 
         // Expectation for FilesystemPCloud::new
         client
-            .expect_get::<ListFolder>()
+            .expect_get()
             .times(1) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
@@ -703,8 +708,10 @@ mod tests {
             });
 
         // Expectation for remove_folder
-        client.expect_get::<DeleteFolderRecursive>().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+        client
+            .expect_get()
+            .times(1)
+            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, deletefolderrecursive::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert!(params.contains_key("path"));
@@ -714,8 +721,7 @@ mod tests {
                     deletedfiles: 10,
                     deletedfolders: 20,
                 })
-            },
-        );
+            });
 
         let fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_dir_all(Utf8Path::new("nested/nested2")).await?;

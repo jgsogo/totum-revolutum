@@ -18,7 +18,12 @@ pub trait RESTClient: HttpClient {
 
     /// Runs GET request to the given `endpoint` (URL will be built using [`self.build_url`]) with
     /// some `params`
-    async fn get<T>(&self, endpoint: &str, headers: HeaderMap, params: HashMap<String, String>) -> Result<T>
+    async fn get<T, TParams: Into<HashMap<String, String>> + Send + 'static>(
+        &self,
+        endpoint: &str,
+        headers: HeaderMap,
+        params: TParams,
+    ) -> Result<T>
     where
         T: DeserializeOwned + 'static,
     {
@@ -26,11 +31,11 @@ pub trait RESTClient: HttpClient {
         Self::parse_response(response.text().await?)
     }
 
-    async fn post<T>(
+    async fn post<T, TParams: Into<HashMap<String, String>> + Send + 'static>(
         &self,
         endpoint: &str,
         headers: HeaderMap,
-        params: HashMap<String, String>,
+        params: TParams,
         data: Vec<u8>,
     ) -> Result<T>
     where

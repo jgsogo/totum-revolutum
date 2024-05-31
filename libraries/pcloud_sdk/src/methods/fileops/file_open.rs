@@ -67,8 +67,7 @@ impl<T: PCloudClient> GetFileOpen for T {
             }
         }
 
-        let ret = RESTClient::get::<FileOpen>(self, ENDPOINT, HeaderMap::default(), params).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), params).await
     }
 }
 

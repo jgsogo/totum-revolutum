@@ -18,7 +18,11 @@ use crate::utils::http::create_response;
 
 #[async_trait]
 pub trait PCloudClient: RESTClient {
-    async fn get_bytes(&self, endpoint: &str, params: HashMap<String, String>) -> Result<Vec<u8>>;
+    async fn get_bytes<TParams: Into<HashMap<String, String>> + Send + 'static>(
+        &self,
+        endpoint: &str,
+        params: TParams,
+    ) -> Result<Vec<u8>>;
 }
 
 #[derive(Debug)]
@@ -79,8 +83,13 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> PCloudClient
     for PCloudClientImpl<Token>
 {
-    async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>> {
+    async fn get_bytes<TParams: Into<HashMap<String, String>> + Send + 'static>(
+        &self,
+        endpoint: &str,
+        params: TParams,
+    ) -> Result<Vec<u8>> {
         let url = self.build_url(endpoint);
+        let mut params = params.into();
         let access_token = self.oauth2_token.access_token();
         params.insert("access_token".to_string(), access_token.to_string());
         http::get_bytes(self.http_client.clone(), &url, params).await

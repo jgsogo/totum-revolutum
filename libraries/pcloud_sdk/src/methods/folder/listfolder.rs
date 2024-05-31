@@ -93,8 +93,7 @@ impl<T: PCloudClient> GetListFolder for T {
 
         let filtermeta = filtermeta.into_iter().unique().collect::<Vec<_>>().join(",");
         params.insert("filtermeta".to_string(), filtermeta);
-        let ret = RESTClient::get::<ListFolder>(self, ENDPOINT, HeaderMap::default(), params).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), params).await
     }
 }
 

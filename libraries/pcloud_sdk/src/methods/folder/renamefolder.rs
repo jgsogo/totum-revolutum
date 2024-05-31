@@ -25,8 +25,7 @@ pub trait GetRenameFolder {
 #[async_trait]
 impl<T: PCloudClient> GetRenameFolder for T {
     async fn copyfile(&self, input: SourceAndTargetFolder) -> Result<RenameFolder> {
-        let ret = RESTClient::get::<RenameFolder>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await
     }
 }
 
