@@ -1,12 +1,13 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
+use http_utils::AddToParams;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
 
@@ -28,9 +29,9 @@ pub struct CopyFolderInput {
     copycontentonly: bool,
 }
 
-impl Params for CopyFolderInput {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        self.source.add_to_params(params)?;
+impl AddToParams for CopyFolderInput {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
+        self.source.add_to_params(params);
         match &self.target {
             Folder::FolderID(fid) => {
                 params.insert("tofolderid".to_string(), fid.inner().to_string());
@@ -50,7 +51,6 @@ impl Params for CopyFolderInput {
         if self.copycontentonly {
             params.insert("copycontentonly".to_string(), "1".to_string());
         }
-        Ok(())
     }
 }
 
@@ -67,8 +67,7 @@ pub trait GetCopyFolder {
 #[async_trait]
 impl<T: PCloudClient> GetCopyFolder for T {
     async fn copyfile(&self, input: CopyFolderInput) -> Result<CopyFolder> {
-        let ret = RESTClient::get::<CopyFolder>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 
@@ -95,7 +94,9 @@ mod tests {
             skipexisting: true,
             copycontentonly: true,
         };
-        let params = input.create_params().unwrap();
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
         assert_eq!(params.len(), 5);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -113,7 +114,9 @@ mod tests {
             skipexisting: false,
             copycontentonly: false,
         };
-        let params = input.create_params().unwrap();
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("path"), Some(&"/source/path".to_string()));
         assert_eq!(params.get("topath"), Some(&"/target/path".to_string()));

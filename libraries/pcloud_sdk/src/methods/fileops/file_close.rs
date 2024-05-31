@@ -6,7 +6,6 @@ use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
 use crate::methods::fileops::FileDescriptor;
-use crate::methods::params::Params;
 
 pub const ENDPOINT: &str = "/file_close";
 
@@ -18,14 +17,12 @@ pub trait GetFileClose {
 #[async_trait]
 impl<T: PCloudClient> GetFileClose for T {
     async fn file_close(&self, descriptor: FileDescriptor) -> Result<()> {
-        RESTClient::get::<()>(self, ENDPOINT, HeaderMap::default(), descriptor.create_params()?).await
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &descriptor).await
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
     use crate::mocks::client::MockLocalClient;
 
     use super::*;
@@ -36,14 +33,13 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, query: &FileDescriptor| {
                 assert_eq!(endpoint, "/file_close");
-                assert_eq!(params.len(), 1);
-                assert_eq!(params.get("fd"), Some(&"42".to_string()));
                 assert_eq!(headers.len(), 0);
+                assert_eq!(query, &FileDescriptor::new(42));
                 Ok(())
             });
-        let _r = client.file_close(42).await?;
+        let _r = client.file_close(FileDescriptor::new(42)).await?;
         Ok(())
     }
 }

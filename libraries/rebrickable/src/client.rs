@@ -20,7 +20,8 @@ impl HttpClient for RebrickableClientImpl {
         &self.http_client
     }
 
-    fn params(&self, mut params: HashMap<String, String>) -> HashMap<String, String> {
+    fn params(&self) -> HashMap<String, String> {
+        let mut params = HashMap::new();
         params.insert("key".to_string(), self.api_key.clone());
         params
     }

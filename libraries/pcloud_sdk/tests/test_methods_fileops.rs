@@ -44,11 +44,13 @@ async fn test_fileops() -> Result<()> {
             .await?;
         create.assert();
 
-        let bytes_count = pcloud.file_write(fd.fd, &"eaeaeaea".as_bytes().to_vec()).await?;
+        let bytes_count = pcloud
+            .file_write(fd.fd.clone(), &"eaeaeaea".as_bytes().to_vec())
+            .await?;
         assert_eq!(bytes_count.bytes, write_bytes);
         write.assert();
 
-        pcloud.file_close(fd.fd).await?;
+        pcloud.file_close(fd.fd.clone()).await?;
         close.assert();
 
         open_with_path.assert_hits(0);
@@ -62,16 +64,16 @@ async fn test_fileops() -> Result<()> {
             .await?;
         open.assert();
 
-        let r = pcloud.file_read(fd.fd, chunk_size as u64).await?;
+        let r = pcloud.file_read(fd.fd.clone(), chunk_size as u64).await?;
         assert_eq!(String::from_utf8_lossy(&*r.bytes), String::from_utf8_lossy(&*content));
         read.assert();
 
         let remain_count = chunk_size - content.len();
-        let r = pcloud.file_read(fd.fd, remain_count as u64).await?;
+        let r = pcloud.file_read(fd.fd.clone(), remain_count as u64).await?;
         assert_eq!(String::from_utf8_lossy(&*r.bytes), "");
         read_eof.assert();
 
-        pcloud.file_close(fd.fd).await?;
+        pcloud.file_close(fd.fd.clone()).await?;
         close.assert_hits(2);
     }
 

@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 use crate::methods::fileops::FileDescriptor;
-use crate::methods::params::Params;
 use crate::utils;
 
 pub const ENDPOINT: &str = "/file_write";
@@ -34,14 +33,12 @@ impl<T: PCloudClient> PostFileWrite for T {
         headers.typed_insert(content_type);
 
         let data = utils::http::create_file_write(&mut data.to_owned(), "filename")?;
-        let ret = RESTClient::post::<FileWrite>(self, ENDPOINT, headers, descriptor.create_params()?, data).await?;
-        Ok(ret)
+        RESTClient::post(self, ENDPOINT, headers, &descriptor, data).await
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
 
     use crate::mocks::client::MockLocalClient;
 
@@ -54,10 +51,9 @@ mod tests {
 
         let bdata = utils::http::create_file_write(&mut data.clone(), "filename")?;
         client.expect_post().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>, posted_data: Vec<u8>| {
+            move |endpoint, headers: HeaderMap, params: &FileDescriptor, posted_data: Vec<u8>| {
                 assert_eq!(endpoint, "/file_write");
-                assert_eq!(params.len(), 1);
-                assert_eq!(params.get("fd"), Some(&"42".to_string()));
+                assert_eq!(params, &FileDescriptor::new(42));
                 assert_eq!(posted_data, bdata);
                 assert_eq!(headers.len(), 1);
                 assert_eq!(
@@ -68,7 +64,7 @@ mod tests {
             },
         );
 
-        let r = client.file_write(42, &mut data).await?;
+        let r = client.file_write(FileDescriptor::new(42), &mut data).await?;
         assert_eq!(r.bytes, 10);
         Ok(())
     }

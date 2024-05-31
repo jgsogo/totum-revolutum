@@ -22,7 +22,7 @@ pub trait GetAPIServer {
 #[async_trait]
 impl<T: PCloudClient> GetAPIServer for T {
     async fn getapiserver(&self) -> Result<APIServer> {
-        RESTClient::get::<APIServer>(self, "/getapiserver", HeaderMap::default(), HashMap::new()).await
+        RESTClient::get(self, "/getapiserver", HeaderMap::default(), &HashMap::new()).await
     }
 }
 
@@ -38,7 +38,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, "/getapiserver");
                 assert!(params.is_empty());
                 assert_eq!(headers.len(), 0);

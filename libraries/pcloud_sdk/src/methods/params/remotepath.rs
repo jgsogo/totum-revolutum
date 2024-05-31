@@ -1,12 +1,10 @@
-use anyhow::Result;
+use http_utils::AddToParams;
+use std::collections::HashMap;
 
 use crate::types::RemotePath;
 
-use super::{Params, ParamsType};
-
-impl Params for RemotePath {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
+impl AddToParams for RemotePath {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
         params.insert("path".to_string(), self.as_path().to_string());
-        Ok(())
     }
 }

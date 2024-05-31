@@ -7,11 +7,10 @@ use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
 use crate::client::PCloudClient;
-use http_utils::rest::RESTClient;
-
 use crate::methods::fileops::FileDescriptor;
-use crate::methods::params::Params;
 use crate::types::{File, FileID, FolderID};
+use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
 
 pub const ENDPOINT: &str = "/file_open";
 
@@ -51,24 +50,23 @@ impl<T: PCloudClient> GetFileOpen for T {
             // When creating a file, folderid+name OR path need to be provided
             match path {
                 FileOpenPath::FolderAndName(folderid, name) => {
-                    folderid.add_to_params(&mut params)?;
+                    folderid.add_to_params(&mut params);
                     params.insert("name".to_string(), name);
                 }
                 FileOpenPath::File(File::RemotePath(path)) => {
-                    path.add_to_params(&mut params)?;
+                    path.add_to_params(&mut params);
                 }
                 _ => bail!("If O_CREATE is set, provide either folderid+name or path"),
             }
         } else {
             // If the file exists, fileid or path need to be provided
             match path {
-                FileOpenPath::File(file) => file.add_to_params(&mut params)?,
+                FileOpenPath::File(file) => file.add_to_params(&mut params),
                 _ => bail!("If O_CREATE is not set, provide either fileid or path"),
             }
         }
 
-        let ret = RESTClient::get::<FileOpen>(self, ENDPOINT, HeaderMap::default(), params).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &params).await
     }
 }
 
@@ -103,7 +101,7 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 3);
                     assert_eq!(params.get("flags"), Some(&"64".to_string()));
@@ -111,13 +109,13 @@ mod tests {
                     assert_eq!(params.get("name"), Some(&"name".to_string()));
                     assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
-                        fd: 42,
+                        fd: FileDescriptor::new(42),
                         fileid: FileID::new(42),
                     })
                 });
             let input = FileOpenPath::FolderAndName(FolderID::new(42), "name".to_string());
             let r = client.file_open(flags, input).await?;
-            assert_eq!(r.fd, 42);
+            assert_eq!(r.fd, FileDescriptor::new(42));
             assert_eq!(r.fileid, FileID::new(42));
         }
 
@@ -128,20 +126,20 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"1088".to_string()));
                     assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                     assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
-                        fd: 42,
+                        fd: FileDescriptor::new(42),
                         fileid: FileID::new(42),
                     })
                 });
             let input = FileOpenPath::File(File::from_str("path:/the/path")?);
             let r = client.file_open(flags, input).await?;
-            assert_eq!(r.fd, 42);
+            assert_eq!(r.fd, FileDescriptor::new(42));
             assert_eq!(r.fileid, FileID::new(42));
         }
 
@@ -174,20 +172,20 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"0".to_string()));
                     assert_eq!(params.get("fileid"), Some(&"42".to_string()));
                     assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
-                        fd: 42,
+                        fd: FileDescriptor::new(42),
                         fileid: FileID::new(42),
                     })
                 });
             let input = FileOpenPath::File(FileID::new(42).into());
             let r = client.file_open(flags, input).await?;
-            assert_eq!(r.fd, 42);
+            assert_eq!(r.fd, FileDescriptor::new(42));
             assert_eq!(r.fileid, FileID::new(42));
         }
 
@@ -199,20 +197,20 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"128".to_string()));
                     assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                     assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
-                        fd: 42,
+                        fd: FileDescriptor::new(42),
                         fileid: FileID::new(42),
                     })
                 });
             let input = FileOpenPath::File(File::from_str("path:/the/path")?);
             let r = client.file_open(flags, input).await?;
-            assert_eq!(r.fd, 42);
+            assert_eq!(r.fd, FileDescriptor::new(42));
             assert_eq!(r.fileid, FileID::new(42));
         }
 

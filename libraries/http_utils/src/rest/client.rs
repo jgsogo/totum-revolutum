@@ -1,9 +1,8 @@
-use crate::HttpClient;
+use crate::{AddToParams, HttpClient};
 use anyhow::Result;
 use async_trait::async_trait;
 use headers::HeaderMap;
 use serde::de::DeserializeOwned;
-use std::collections::HashMap;
 
 #[async_trait]
 pub trait RESTClient: HttpClient {
@@ -18,7 +17,12 @@ pub trait RESTClient: HttpClient {
 
     /// Runs GET request to the given `endpoint` (URL will be built using [`self.build_url`]) with
     /// some `params`
-    async fn get<T>(&self, endpoint: &str, headers: HeaderMap, params: HashMap<String, String>) -> Result<T>
+    async fn get<T, TParams: AddToParams + Sync + 'static>(
+        &self,
+        endpoint: &str,
+        headers: HeaderMap,
+        params: &TParams,
+    ) -> Result<T>
     where
         T: DeserializeOwned + 'static,
     {
@@ -26,11 +30,11 @@ pub trait RESTClient: HttpClient {
         Self::parse_response(response.text().await?)
     }
 
-    async fn post<T>(
+    async fn post<T, TParams: AddToParams + Sync + 'static>(
         &self,
         endpoint: &str,
         headers: HeaderMap,
-        params: HashMap<String, String>,
+        params: &TParams,
         data: Vec<u8>,
     ) -> Result<T>
     where

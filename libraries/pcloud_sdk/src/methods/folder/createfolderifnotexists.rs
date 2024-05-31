@@ -1,12 +1,13 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
+use http_utils::AddToParams;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::Params;
 use crate::structures::MetadataFolder;
 use crate::types::FolderID;
 
@@ -32,9 +33,11 @@ pub trait GetCreateFolderIfNotExists {
 #[async_trait]
 impl<T: PCloudClient> GetCreateFolderIfNotExists for T {
     async fn createfolderifnotexists(&self, folder_id: &FolderID, name: &str) -> Result<CreateFolderIfNotExists> {
-        let mut params = folder_id.create_params()?;
+        let mut params = HashMap::new();
+        folder_id.add_to_params(&mut params);
         params.insert("name".to_string(), name.to_string());
-        RESTClient::get::<CreateFolderIfNotExists>(self, ENDPOINT, HeaderMap::default(), params).await
+
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &params).await
     }
 }
 
@@ -52,7 +55,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, "/createfolderifnotexists");
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("folderid"), Some(&"1234".to_string()));

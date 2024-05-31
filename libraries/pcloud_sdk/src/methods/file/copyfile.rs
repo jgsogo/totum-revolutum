@@ -5,7 +5,6 @@ use http::HeaderMap;
 use http_utils::rest::RESTClient;
 use serde::{Deserialize, Serialize};
 
-use crate::methods::params::Params;
 use crate::methods::params::SourceAndTargetFile;
 use crate::structures::MetadataFile;
 
@@ -24,8 +23,7 @@ pub trait GetCopyFile {
 #[async_trait]
 impl<T: PCloudClient> GetCopyFile for T {
     async fn copyfile(&self, input: SourceAndTargetFile) -> Result<CopyFile> {
-        let ret = RESTClient::get::<CopyFile>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 

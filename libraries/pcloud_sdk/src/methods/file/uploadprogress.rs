@@ -31,7 +31,6 @@ impl<T: PCloudClient> UploadProgress for T {
     async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData> {
         let mut params = HashMap::new();
         params.insert("progresshash".to_string(), progresshash.to_string());
-        let ret = RESTClient::get::<UploadProgressData>(self, ENDPOINT, HeaderMap::default(), params).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &params).await
     }
 }
