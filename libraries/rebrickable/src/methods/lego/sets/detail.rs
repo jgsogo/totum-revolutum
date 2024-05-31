@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::client::RebrickableClient;
-use anyhow::Result;
+use crate::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
 use http_utils::rest::RESTClient;

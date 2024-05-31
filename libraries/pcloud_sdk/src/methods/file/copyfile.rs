@@ -1,5 +1,4 @@
 use crate::client::PCloudClient;
-use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
 use http_utils::rest::RESTClient;
@@ -7,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::methods::params::SourceAndTargetFile;
 use crate::structures::MetadataFile;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/copyfile";
 

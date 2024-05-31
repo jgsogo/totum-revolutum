@@ -1,15 +1,24 @@
+use std::io;
 use thiserror::Error;
+
+pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Error)]
 pub enum Error {
     #[error(transparent)]
     ReqwestError(#[from] reqwest::Error),
 
-    #[error("Serialization error '{error}': {content:?}")]
-    SerializationError { error: serde_json::Error, content: String },
+    #[error(transparent)]
+    SerializationError(#[from] serde_json::Error),
 
-    #[error("API error {code}: {message}")]
-    ApiError { code: u16, message: String },
+    #[error(transparent)]
+    IoError(#[from] io::Error),
+
+    #[error("Error from PCloud {code}: {message}")]
+    PCloudError { code: u16, message: String },
+
+    #[error("No data received from request")]
+    EmptyDataError,
 
     #[error(transparent)]
     Other(#[from] anyhow::Error), // source and Display delegate to anyhow::Error

@@ -7,7 +7,6 @@ edition = "2021"
 
 
 [dependencies]
-anyhow = { workspace = true }
 async-trait = { workspace = true }
 headers = { workspace = true }
 reqwest = { workspace = true }

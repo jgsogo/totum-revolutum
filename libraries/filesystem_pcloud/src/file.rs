@@ -1,7 +1,7 @@
 use std::io::Write;
 use std::sync::Arc;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use flume::Sender;
 use tracing::warn;
@@ -107,6 +107,9 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File 
     }
 
     async fn sync_all(&mut self) -> Result<()> {
-        self.pcloud.file_close(self.file.fd.clone()).await
+        self.pcloud
+            .file_close(self.file.fd.clone())
+            .await
+            .map_err(|e| anyhow!(e))
     }
 }

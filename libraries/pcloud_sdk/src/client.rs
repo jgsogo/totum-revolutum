@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
 
-use anyhow::Result;
 use async_trait::async_trait;
 use headers::HeaderMap;
 use headers::HeaderMapExt;
@@ -11,13 +10,13 @@ use serde::de::DeserializeOwned;
 use http_utils::rest::RESTClient;
 use http_utils::{AddToParams, HttpClient};
 
-use crate::access_token;
 use crate::methods::oauth2;
 use crate::utils::http;
 use crate::utils::http::create_response;
+use crate::{access_token, Error, Result};
 
 #[async_trait]
-pub trait PCloudClient: RESTClient {
+pub trait PCloudClient: RESTClient<RESTClientError = Error> {
     async fn get_bytes<TParams: AddToParams + Sync + 'static>(
         &self,
         endpoint: &str,
@@ -57,6 +56,8 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient
     for PCloudClientImpl<Token>
 {
+    type Error = Error;
+
     fn build_url(&self, endpoint: &str) -> String {
         let schema = if self.secure { "https" } else { "http" };
         format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
@@ -97,7 +98,9 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> RESTClient
     for PCloudClientImpl<Token>
 {
-    fn parse_response<T>(result: String) -> Result<T>
+    type RESTClientError = Error;
+
+    fn parse_response<T>(result: String) -> std::result::Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {

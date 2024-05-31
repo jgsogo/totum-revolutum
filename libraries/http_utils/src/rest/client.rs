@@ -1,18 +1,18 @@
 use crate::{AddToParams, HttpClient};
-use anyhow::Result;
 use async_trait::async_trait;
 use headers::HeaderMap;
 use serde::de::DeserializeOwned;
 
 #[async_trait]
-pub trait RESTClient: HttpClient {
+pub trait RESTClient: HttpClient<Error = Self::RESTClientError> {
+    type RESTClientError: From<reqwest::Error> + From<serde_json::Error>;
+
     /// Deserialize API call result to return type
-    fn parse_response<T>(result: String) -> Result<T>
+    fn parse_response<T>(result: String) -> std::result::Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {
-        let r = serde_json::from_str::<T>(&result)?;
-        Ok(r)
+        serde_json::from_str::<T>(&result).map_err(|e| e.into())
     }
 
     /// Runs GET request to the given `endpoint` (URL will be built using [`self.build_url`]) with
@@ -22,7 +22,7 @@ pub trait RESTClient: HttpClient {
         endpoint: &str,
         headers: HeaderMap,
         params: &TParams,
-    ) -> Result<T>
+    ) -> std::result::Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {
@@ -36,7 +36,7 @@ pub trait RESTClient: HttpClient {
         headers: HeaderMap,
         params: &TParams,
         data: Vec<u8>,
-    ) -> Result<T>
+    ) -> std::result::Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {

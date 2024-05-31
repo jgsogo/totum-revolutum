@@ -1,16 +1,17 @@
-use anyhow::Result;
+use std::collections::HashMap;
+
 use async_trait::async_trait;
 use http::HeaderMap;
-use http_utils::AddToParams;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use time::OffsetDateTime;
 use tracing::debug;
 
-use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
 
+use crate::client::PCloudClient;
 use crate::types::File;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/getfilelink";
 

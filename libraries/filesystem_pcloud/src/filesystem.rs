@@ -299,10 +299,10 @@ mod tests {
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
                 assert_eq!(headers.len(), 0);
 
-                Err(anyhow!(Error::ApiError {
+                Err(Error::PCloudError {
                     code: 9999,
                     message: "Mock: the folder doesn't exist".to_string(),
-                }))
+                })
             },
         );
 
@@ -311,7 +311,7 @@ mod tests {
         assert!(r.is_err());
         assert_eq!(
             r.err().unwrap().to_string(),
-            "API error 9999: Mock: the folder doesn't exist".to_string()
+            "Error from PCloud 9999: Mock: the folder doesn't exist".to_string()
         );
         Ok(())
     }

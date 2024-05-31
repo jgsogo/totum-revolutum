@@ -1,6 +1,6 @@
 use crate::client::PCloudClient;
 use crate::utils::http::BOUNDARY;
-use anyhow::Result;
+use crate::Result;
 use async_trait::async_trait;
 use headers::HeaderMapExt;
 use http::HeaderMap;

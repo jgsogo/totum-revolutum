@@ -4,14 +4,13 @@ use std::io;
 use std::io::Read;
 use std::io::Write;
 
-use anyhow::{anyhow, bail, Result};
 use camino::Utf8Path;
 use headers::HeaderMapExt;
 use reqwest;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use crate::error::Error;
+use crate::error::{Error, Result};
 
 pub const BOUNDARY: &str = "ea3bbcf87c101592";
 
@@ -28,22 +27,17 @@ pub fn create_response<T>(result: String) -> Result<T>
 where
     T: DeserializeOwned,
 {
-    let r = serde_json::from_str::<ApiResult<T>>(&result).map_err(|e| {
-        anyhow!(Error::SerializationError {
-            error: e,
-            content: result.clone()
-        })
-    })?;
+    let r = serde_json::from_str::<ApiResult<T>>(&result)?;
 
     match r.result {
         0 => match r.data {
             Some(data) => Ok(data),
-            None => Err(anyhow!("Failed to parse data type from result string: {result}")),
+            None => Err(Error::EmptyDataError),
         },
-        _ => Err(anyhow!(Error::ApiError {
+        _ => Err(Error::PCloudError {
             code: r.result,
-            message: r.error.unwrap_or_else(|| "Error message not available".into())
-        })),
+            message: r.error.unwrap_or_else(|| "Error message not available".into()),
+        }),
     }
 }
 
@@ -67,10 +61,10 @@ pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMa
     // If there is an error, it returns a JSON with the result and error fields
     let as_str = String::from_utf8_lossy(&r);
     if let Ok(r) = serde_json::from_str::<ApiResult<()>>(&as_str) {
-        bail!(Error::ApiError {
+        return Err(Error::PCloudError {
             code: r.result,
-            message: r.error.unwrap_or_else(|| "Error message not available".into())
-        })
+            message: r.error.unwrap_or_else(|| "Error message not available".into()),
+        });
     }
 
     // If not, just the bytes
@@ -148,14 +142,17 @@ mod tests {
     fn create_response_serialization_error() {
         let r = create_response::<UserInfo>("this is not serializable".into());
         assert!(r.is_err());
-        assert!(r.unwrap_err().to_string().contains("Serialization error"));
+        assert_eq!(r.unwrap_err().to_string(), "expected ident at line 1 column 2");
     }
 
     #[test]
     fn create_response_api_error() {
         let r = create_response::<UserInfo>("{\"result\": 1234, \"error\": \"message\"}".into());
         assert!(r.is_err());
-        assert_eq!(r.unwrap_err().to_string(), "API error 1234: message".to_string());
+        assert_eq!(
+            r.unwrap_err().to_string(),
+            "Error from PCloud 1234: message".to_string()
+        );
     }
 
     #[test]
@@ -164,7 +161,7 @@ mod tests {
         assert!(r.is_err());
         assert_eq!(
             r.unwrap_err().to_string(),
-            "API error 1234: Error message not available".to_string()
+            "Error from PCloud 1234: Error message not available".to_string()
         );
     }
 }
