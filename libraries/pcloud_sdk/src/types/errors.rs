@@ -9,6 +9,7 @@ pub struct ParseError {
     pub source: ParseErrorKind,
 }
 
+/// Additional information for [`ParseError`] error
 #[derive(Debug, Error)]
 pub enum ParseErrorKind {
     #[error("no FileID prefix, missing `fileid:`")]
@@ -26,10 +27,3 @@ pub enum ParseErrorKind {
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
-
-// #[derive(Debug, Error)]
-// pub enum TypeError {
-//
-//     ParseFileIDError(#[from] ParseError),
-//
-// }
