@@ -253,7 +253,7 @@ mod tests {
     use pcloud_sdk::methods::folder::{createfolderifnotexists, deletefolder, deletefolderrecursive, listfolder};
     use pcloud_sdk::mocks::client::MockLocalClient;
     use pcloud_sdk::structures::{MetadataFile, MetadataFolder};
-    use pcloud_sdk::types::FileID;
+    use pcloud_sdk::types::{FileID, Folder};
     use pcloud_sdk::utils;
 
     use crate::file::CHUNK_SIZE;
@@ -354,15 +354,15 @@ mod tests {
 
         // Expectation for write_all
         client.expect_post().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: &HashMap<_, _>, posted_data: Vec<u8>| {
+            move |endpoint, headers: HeaderMap, params: &FileDescriptor, posted_data: Vec<u8>| {
                 assert_eq!(endpoint, file_write::ENDPOINT);
-                assert_eq!(params.len(), 1);
-                assert_eq!(params.get("fd"), Some(&"42".to_string()));
                 assert_eq!(headers.len(), 1);
                 assert_eq!(
                     headers.get("content-type").unwrap(),
                     "multipart/form-data; boundary=ea3bbcf87c101592"
                 );
+                assert_eq!(params, &FileDescriptor::new(42));
+
                 let mut data = b"Hello, world!".to_vec();
                 let bdata = utils::http::create_file_write(&mut data, "filename")?;
                 assert_eq!(posted_data, bdata);
@@ -371,16 +371,14 @@ mod tests {
         );
 
         // Expectation for close
-        client
-            .expect_get::<(), _>()
-            .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
+        client.expect_get::<(), _>().times(1).returning(
+            move |endpoint, headers: HeaderMap, params: &FileDescriptor| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
-                assert_eq!(params.len(), 1);
-                assert_eq!(params.get("fd"), Some(&"42".to_string()));
                 assert_eq!(headers.len(), 0);
+                assert_eq!(params, &FileDescriptor::new(42));
                 Ok(())
-            });
+            },
+        );
 
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
@@ -474,11 +472,10 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &FileDescriptor| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
-                assert_eq!(params.len(), 1);
-                assert_eq!(params.get("fd"), Some(&"42".to_string()));
                 assert_eq!(headers.len(), 0);
+                assert_eq!(params, &FileDescriptor::new(42));
                 Ok(())
             });
 
@@ -542,11 +539,10 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &FileDescriptor| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
-                assert_eq!(params.len(), 1);
-                assert_eq!(params.get("fd"), Some(&"42".to_string()));
                 assert_eq!(headers.len(), 0);
+                assert_eq!(params, &FileDescriptor::new(42));
                 Ok(())
             });
 
@@ -627,20 +623,21 @@ mod tests {
             });
 
         // Expectation for remove_file
-        client
-            .expect_get()
-            .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
+        client.expect_get().times(1).returning(
+            move |endpoint, headers: HeaderMap, params: &pcloud_sdk::types::File| {
                 assert_eq!(endpoint, deletefile::ENDPOINT);
-                assert_eq!(params.len(), 1);
-                assert!(params.contains_key("path"));
                 assert_eq!(headers.len(), 0);
+                assert_eq!(
+                    params,
+                    &pcloud_sdk::types::File::from_str("path:/the/root/path/nested/nested2").unwrap()
+                );
 
                 Ok(DeleteFile {
                     id: "1234-0".to_string(),
                     metadata: MetadataFile::default(FileID::new(1234)),
                 })
-            });
+            },
+        );
 
         let fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_file(Utf8Path::new("nested/nested2")).await?;
@@ -672,11 +669,10 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &Folder| {
                 assert_eq!(endpoint, deletefolder::ENDPOINT);
-                assert_eq!(params.len(), 1);
-                assert!(params.contains_key("path"));
                 assert_eq!(headers.len(), 0);
+                assert_eq!(params, &Folder::from_str("path:/the/root/path/nested/nested2").unwrap());
 
                 Ok(DeleteFolder {
                     id: "1234-0".to_string(),
@@ -714,11 +710,10 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &Folder| {
                 assert_eq!(endpoint, deletefolderrecursive::ENDPOINT);
-                assert_eq!(params.len(), 1);
-                assert!(params.contains_key("path"));
                 assert_eq!(headers.len(), 0);
+                assert_eq!(params, &Folder::from_str("path:/the/root/path/nested/nested2").unwrap());
 
                 Ok(DeleteFolderRecursive {
                     deletedfiles: 10,
