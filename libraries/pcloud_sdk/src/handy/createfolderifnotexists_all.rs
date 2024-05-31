@@ -4,33 +4,16 @@ use camino::{Utf8Component, Utf8Path};
 use itertools::any;
 
 use crate::methods::folder::createfolderifnotexists;
-use crate::types::{FolderID, RemotePath};
+use crate::types::FolderID;
 
 use super::GetFolderID;
-
-pub enum BaseFolder<'a> {
-    FolderID(&'a FolderID),
-    RemotePath(&'a RemotePath),
-}
-
-impl<'a> From<&'a FolderID> for BaseFolder<'a> {
-    fn from(value: &'a FolderID) -> Self {
-        Self::FolderID(value)
-    }
-}
-
-impl<'a> From<&'a RemotePath> for BaseFolder<'a> {
-    fn from(value: &'a RemotePath) -> Self {
-        Self::RemotePath(value)
-    }
-}
 
 #[async_trait]
 /// Create the folder given by `path` inside folder given by `folder` (defaults to root)
 pub trait GetCreateFolderIfNotExistsAll {
-    async fn createfolderifnotexists_all<'a, T: Into<BaseFolder<'a>> + Send>(
+    async fn createfolderifnotexists_all(
         &self,
-        folder: T,
+        folderid: &FolderID,
         path: impl AsRef<Utf8Path> + Send,
     ) -> Result<FolderID>;
 }
@@ -39,15 +22,12 @@ pub trait GetCreateFolderIfNotExistsAll {
 impl<Client: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists + Sync> GetCreateFolderIfNotExistsAll
     for Client
 {
-    async fn createfolderifnotexists_all<'a, T: Into<BaseFolder<'a>> + Send>(
+    async fn createfolderifnotexists_all(
         &self,
-        folder: T,
+        folderid: &FolderID,
         path: impl AsRef<Utf8Path> + Send,
     ) -> Result<FolderID> {
-        let mut folderid = match folder.into() {
-            BaseFolder::FolderID(fid) => fid.clone(),
-            BaseFolder::RemotePath(remote_path) => self.get_folderid(remote_path).await?,
-        };
+        let mut folderid = folderid.clone();
 
         // Check path components
         if any(path.as_ref().components(), |c| {
