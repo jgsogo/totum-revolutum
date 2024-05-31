@@ -1,9 +1,9 @@
+use crate::methods::folder::createfolderifnotexists::GetCreateFolderIfNotExists;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use camino::{Utf8Component, Utf8Path};
 use itertools::any;
 
-use crate::methods::folder::createfolderifnotexists;
 use crate::types::FolderID;
 
 use super::GetFolderID;
@@ -19,9 +19,7 @@ pub trait GetCreateFolderIfNotExistsAll {
 }
 
 #[async_trait]
-impl<Client: GetFolderID + createfolderifnotexists::GetCreateFolderIfNotExists + Sync> GetCreateFolderIfNotExistsAll
-    for Client
-{
+impl<Client: GetFolderID + GetCreateFolderIfNotExists + Sync> GetCreateFolderIfNotExistsAll for Client {
     async fn createfolderifnotexists_all(
         &self,
         folderid: &FolderID,
