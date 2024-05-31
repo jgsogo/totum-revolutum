@@ -1,14 +1,15 @@
+use anyhow::anyhow;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
 use camino::Utf8PathBuf;
 
-use crate::error::Error;
-use crate::types::RemotePath;
+use crate::types::errors::{InvalidFile, InvalidRemotePath, InvalidRemotePathKind};
+use crate::types::{ParseError, ParseErrorKind, RemotePath};
 
 use super::FileID;
 
-/// A file in pCloud is represented by either a String/path or a FileID
+/// A file in pCloud is represented by either a [`FileID`] or a [`RemotePath`]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum File {
     FileID(FileID),
@@ -22,39 +23,48 @@ impl From<FileID> for File {
 }
 
 impl TryFrom<RemotePath> for File {
-    type Error = Error;
+    type Error = InvalidFile;
 
     fn try_from(value: RemotePath) -> Result<Self, Self::Error> {
         if !value.to_string().ends_with('/') {
             Ok(File::RemotePath(value))
         } else {
-            Err(Error::ParseFileError {
-                string: value.to_string(),
-            })
+            let source = InvalidRemotePath {
+                source: InvalidRemotePathKind::NotAFile,
+            };
+            Err(InvalidFile { source: source.into() })
         }
     }
 }
 
 impl TryFrom<Utf8PathBuf> for File {
-    type Error = Error;
+    type Error = InvalidFile;
 
     fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
-        let r: RemotePath = value.try_into()?;
+        let r: RemotePath = value
+            .try_into()
+            .map_err(|source: InvalidRemotePath| InvalidFile { source: source.into() })?;
         r.try_into()
     }
 }
 
 impl FromStr for File {
-    type Err = Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if let Ok(f) = FileID::from_str(s) {
-            Ok(f.into())
-        } else if let Ok(p) = RemotePath::from_str(s) {
-            p.try_into()
-        } else {
-            Err(Error::ParseFileError { string: s.to_string() })
+        {
+            if let Ok(f) = FileID::from_str(s) {
+                Ok(f.into())
+            } else if let Ok(p) = RemotePath::from_str(s) {
+                p.try_into().map_err(ParseErrorKind::InvalidFile)
+            } else {
+                Err(ParseErrorKind::Other(anyhow!("can't parse into FileID or RemotePath")))
+            }
         }
+        .map_err(|source| ParseError {
+            string: s.to_string(),
+            source,
+        })
     }
 }
 

@@ -36,7 +36,7 @@ impl Params for CopyFolderInput {
                 params.insert("tofolderid".to_string(), fid.inner().to_string());
             }
             Folder::RemotePath(p) => {
-                params.insert("topath".to_string(), p.path().to_string());
+                params.insert("topath".to_string(), p.as_path().to_string());
             }
         }
         if self.noover {

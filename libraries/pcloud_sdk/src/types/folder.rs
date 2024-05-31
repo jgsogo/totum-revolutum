@@ -1,10 +1,11 @@
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
+use anyhow::anyhow;
 use camino::Utf8PathBuf;
 
-use crate::error::Error;
-use crate::types::RemotePath;
+use crate::types::errors::{InvalidFolder, InvalidRemotePath};
+use crate::types::{ParseError, ParseErrorKind, RemotePath};
 
 use super::FolderID;
 
@@ -27,25 +28,35 @@ impl From<RemotePath> for Folder {
 }
 
 impl TryFrom<Utf8PathBuf> for Folder {
-    type Error = Error;
+    type Error = InvalidFolder;
 
     fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
-        let r: RemotePath = value.try_into()?;
+        let r: RemotePath = value
+            .try_into()
+            .map_err(|source: InvalidRemotePath| InvalidFolder { source: source.into() })?;
         Ok(r.into())
     }
 }
 
 impl FromStr for Folder {
-    type Err = Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if let Ok(f) = FolderID::from_str(s) {
-            Ok(f.into())
-        } else if let Ok(p) = RemotePath::from_str(s) {
-            Ok(p.into())
-        } else {
-            Err(Error::ParseFolderError { string: s.to_string() })
+        {
+            if let Ok(f) = FolderID::from_str(s) {
+                Ok(f.into())
+            } else if let Ok(p) = RemotePath::from_str(s) {
+                Ok(p.into())
+            } else {
+                Err(ParseErrorKind::Other(anyhow!(
+                    "can't parse into FolderID or RemotePath"
+                )))
+            }
         }
+        .map_err(|source| ParseError {
+            string: s.to_string(),
+            source,
+        })
     }
 }
 

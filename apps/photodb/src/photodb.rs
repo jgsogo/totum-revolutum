@@ -82,7 +82,7 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
             debug!(" - sha256 '{}'", sha256);
             let (c1, rest) = sha256.split_at(4);
             let (c2, rest) = rest.split_at(4);
-            let folder_path = self.remote_dir.path().join(SHA256_BASE_PATH).join(c1).join(c2);
+            let folder_path = self.remote_dir.as_path().join(SHA256_BASE_PATH).join(c1).join(c2);
             (
                 RemotePath::from_str(&format!("path:/{}", folder_path))?,
                 format!("{}.png", rest),

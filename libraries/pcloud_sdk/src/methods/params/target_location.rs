@@ -28,7 +28,7 @@ impl Params for TargetLocation {
                 }
             }
             TargetLocation::RemotePath(p) => {
-                params.insert("topath".to_string(), p.path().to_string());
+                params.insert("topath".to_string(), p.as_path().to_string());
             }
         }
         Ok(())

@@ -129,7 +129,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     type Metadata = RemoteMetadata;
 
     fn root(&self) -> &Utf8Path {
-        self.root_path.path()
+        self.root_path.as_path()
     }
 
     async fn walk_directory(
@@ -174,10 +174,10 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         let path: RemotePath = path.try_into()?;
 
         let filename = path
-            .path()
+            .as_path()
             .file_name()
             .ok_or(anyhow!("No filename can be guess from path '{path}'"))?;
-        let folderid = match path.path().parent() {
+        let folderid = match path.as_path().parent() {
             None => self.root_folderid.clone(),
             Some(p) => self.pcloud.get_folderid(&p.try_into()?).await?,
         };
