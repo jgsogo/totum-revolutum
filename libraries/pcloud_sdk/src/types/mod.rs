@@ -1,3 +1,4 @@
+pub use errors::{ParseError, ParseErrorKind};
 pub use file::File;
 pub use fileid::FileID;
 pub use folder::Folder;
@@ -10,5 +11,3 @@ mod fileid;
 mod folder;
 mod folderid;
 mod remotepath;
-
-pub use errors::{ParseError, ParseErrorKind};

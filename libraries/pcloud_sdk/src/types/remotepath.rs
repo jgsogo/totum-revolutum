@@ -1,16 +1,18 @@
+use anyhow::anyhow;
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
 use camino::{Utf8Components, Utf8Path, Utf8PathBuf};
 use serde::{Deserialize, Serialize};
 
-use crate::error::Error;
+use crate::types::{ParseError, ParseErrorKind};
 use filesystem::utils::normalize_path;
 
-const REMOTEPATH_PREFIX: &str = "path";
+const REMOTEPATH_PREFIX: &str = "path:";
 
+/// Contains an absolute path representing a remote location in PCloud directory tree. It can be
+/// either a file or a folder.
 #[derive(PartialEq, Eq, Serialize, Deserialize, Clone)]
-/// Contains an absolute path representing a remote location in pcloud directory tree.
 pub struct RemotePath(Utf8PathBuf);
 
 impl RemotePath {
@@ -42,19 +44,19 @@ impl RemotePath {
 impl Display for RemotePath {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let RemotePath(value) = self;
-        write!(f, "{REMOTEPATH_PREFIX}:{value}")
+        write!(f, "{REMOTEPATH_PREFIX}{value}")
     }
 }
 
 impl Debug for RemotePath {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let RemotePath(value) = self;
-        write!(f, "{REMOTEPATH_PREFIX}:{value:?}")
+        write!(f, "{REMOTEPATH_PREFIX}{value:?}")
     }
 }
 
 impl TryFrom<Utf8PathBuf> for RemotePath {
-    type Error = Error;
+    type Error = anyhow::Error;
 
     fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
         RemotePath::try_from(value.as_path())
@@ -62,33 +64,37 @@ impl TryFrom<Utf8PathBuf> for RemotePath {
 }
 
 impl TryFrom<&Utf8Path> for RemotePath {
-    type Error = Error;
+    type Error = anyhow::Error;
 
     fn try_from(value: &Utf8Path) -> Result<Self, Self::Error> {
         let value = normalize_path(value);
-        if !value.is_absolute() || value.starts_with("/..") {
-            return Err(Error::ParseRemotePathError {
-                string: value.to_string(),
-            });
+        if !value.is_absolute() {
+            Err(anyhow!("RemotePath only accepts absolute paths"))
+        } else if value.starts_with("/..") {
+            Err(anyhow!("RemotePath cannot start outside root folder"))
+        } else {
+            Ok(RemotePath(value))
         }
-        Ok(RemotePath(value))
     }
 }
 
 impl FromStr for RemotePath {
-    type Err = Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let r = s
-            .strip_prefix(REMOTEPATH_PREFIX)
-            .and_then(|s| s.strip_prefix(':'))
-            .ok_or(Error::ParseRemotePathError { string: s.to_string() })?;
+        let from_str = || -> Result<_, ParseErrorKind> {
+            let s = s
+                .strip_prefix(REMOTEPATH_PREFIX)
+                .ok_or(ParseErrorKind::NoRemotePathPrefix)?;
 
-        let path = r
-            .parse::<Utf8PathBuf>()
-            .map_err(|_| Error::ParseRemotePathError { string: s.to_string() })?;
+            let path = Utf8PathBuf::from_str(s).unwrap();
+            path.try_into().map_err(ParseErrorKind::Other)
+        };
 
-        path.try_into()
+        from_str().map_err(|source| ParseError {
+            string: s.to_string(),
+            source,
+        })
     }
 }
 
@@ -115,7 +121,12 @@ mod tests {
             RemotePath(Utf8PathBuf::from("/path/something"))
         );
 
-        // Preserves trailing slash (this path can only we used as a folder, never a file)
+        assert_eq!(
+            "path:/path/to/../something".parse::<RemotePath>().unwrap(),
+            RemotePath(Utf8PathBuf::from("/path/something"))
+        );
+
+        // Preserves trailing slash (this path can only be used as a folder, never a file)
         assert_eq!(
             RemotePath::from_str("path:/path/with/trailing/slash/")
                 .unwrap()
@@ -125,12 +136,30 @@ mod tests {
 
         let r = RemotePath::from_str("path-/a/path");
         assert!(r.is_err());
+        let e = r.unwrap_err();
+        assert!(matches!(e.source, ParseErrorKind::NoRemotePathPrefix));
+        assert_eq!(
+            e.to_string(),
+            "Cannot parse from string 'path-/a/path': no RemotePath prefix, missing `path:`"
+        );
 
         let r = RemotePath::from_str("path:relative/path");
         assert!(r.is_err());
+        let e = r.unwrap_err();
+        assert!(matches!(e.source, ParseErrorKind::Other { .. }));
+        assert_eq!(
+            e.to_string(),
+            "Cannot parse from string 'path:relative/path': RemotePath only accepts absolute paths"
+        );
 
         let r = RemotePath::from_str("path:/../outside/path");
         assert!(r.is_err());
+        let e = r.unwrap_err();
+        assert!(matches!(e.source, ParseErrorKind::Other { .. }));
+        assert_eq!(
+            e.to_string(),
+            "Cannot parse from string 'path:/../outside/path': RemotePath cannot start outside root folder"
+        );
     }
 
     #[test]
