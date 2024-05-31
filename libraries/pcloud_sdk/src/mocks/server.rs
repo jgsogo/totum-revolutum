@@ -102,7 +102,7 @@ impl PCloudServerMock {
     ) -> (Mock, Mock, Mock, Mock, Mock, Mock, Mock) {
         self.fd_count += 1;
         let fd = self.fd_count;
-        let fileid = folder.0 + fd;
+        let fileid = folder.inner() + fd;
 
         let read_content_len = read_content.len();
         assert!(
@@ -115,7 +115,7 @@ impl PCloudServerMock {
             when.method(GET)
                 .path(file_open::ENDPOINT)
                 .query_param("access_token", "token")
-                .query_param("folderid", folder.0.to_string())
+                .query_param("folderid", folder.inner().to_string())
                 .query_param("name", name)
                 .query_param_exists("flags");
 

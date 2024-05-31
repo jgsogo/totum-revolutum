@@ -25,4 +25,7 @@ pub enum Error {
 
     #[error("Cannot parse '{string}' to FileID. Use format 'fileid:<id>'.")]
     ParseFileIDError { string: String },
+
+    #[error(transparent)]
+    Other(#[from] anyhow::Error), // source and Display delegate to anyhow::Error
 }

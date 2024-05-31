@@ -48,8 +48,8 @@ mod tests {
     #[test]
     fn test_params_with_ids_noname() {
         let input = SourceAndTargetFolder {
-            source: FolderID(1234).into(),
-            target: TargetLocation::FolderAndName((FolderID(4321), None)),
+            source: FolderID::new(1234).into(),
+            target: TargetLocation::FolderAndName((FolderID::new(4321), None)),
         };
         let params = input.into_params().unwrap();
         assert_eq!(params.len(), 2);
@@ -60,8 +60,8 @@ mod tests {
     #[test]
     fn test_params_with_ids_with_name() {
         let input = SourceAndTargetFolder {
-            source: FolderID(1234).into(),
-            target: TargetLocation::FolderAndName((FolderID(4321), Some("name".to_string()))),
+            source: FolderID::new(1234).into(),
+            target: TargetLocation::FolderAndName((FolderID::new(4321), Some("name".to_string()))),
         };
         let params = input.into_params().unwrap();
         assert_eq!(params.len(), 3);
@@ -100,7 +100,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid, FolderID(230807));
+                assert_eq!(data.metadata.folderid, FolderID::new(230807));
             }
         }
     }

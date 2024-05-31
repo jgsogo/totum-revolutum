@@ -22,13 +22,13 @@ impl Params for TargetLocation {
     fn add_to_params(&self, params: &mut HashMap<String, String>) -> Result<()> {
         match self {
             TargetLocation::FolderAndName((folderid, name)) => {
-                params.insert("tofolderid".to_string(), folderid.0.to_string());
+                params.insert("tofolderid".to_string(), folderid.inner().to_string());
                 if let Some(name) = name {
                     params.insert("toname".to_string(), name.clone());
                 }
             }
             TargetLocation::RemotePath(p) => {
-                params.insert("topath".to_string(), p.path().to_string());
+                params.insert("topath".to_string(), p.as_path().to_string());
             }
         }
         Ok(())

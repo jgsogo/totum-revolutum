@@ -125,7 +125,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid, FolderID(4075092622));
+                assert_eq!(data.metadata.folderid, FolderID::new(4075092622));
             }
         }
     }

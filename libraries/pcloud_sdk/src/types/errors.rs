@@ -1,0 +1,86 @@
+use thiserror::Error;
+
+/// An error that can be returned when creating a [`RemotePath`] from other type. Returned from
+/// [`TryFrom`] implementations.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+#[error("InvalidRemotePath {source}")]
+pub struct InvalidRemotePath {
+    pub(crate) source: InvalidRemotePathKind,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum InvalidRemotePathKind {
+    #[error("no absolute path")]
+    NoAbsolutePath,
+
+    #[error("resolved path is outside root folder")]
+    OutsideRootFolder,
+
+    #[error("not usable as a path to a file")]
+    NotAFile,
+}
+
+/// An error that can be returned when creating a [`File`] from other type. Returned from
+/// [`TryFrom`] implementations.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+#[error("InvalidFile {source}")]
+pub struct InvalidFile {
+    pub(crate) source: InvalidFileKind,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum InvalidFileKind {
+    #[error(transparent)]
+    InvalidRemotePath(#[from] InvalidRemotePath),
+}
+
+/// An error that can be returned when creating a [`Folder`] from other type. Returned from
+/// [`TryFrom`] implementations.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+#[error("InvalidFolder {source}")]
+pub struct InvalidFolder {
+    pub(crate) source: InvalidFolderKind,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum InvalidFolderKind {
+    #[error(transparent)]
+    InvalidRemotePath(#[from] InvalidRemotePath),
+}
+
+/// An error that can be returned when parsing some element from a string. Returned from [`FromStr`]
+/// trait implementations.
+#[derive(Debug, Error)]
+#[error("Cannot parse from string '{string}': {source}")]
+pub struct ParseError {
+    pub(crate) string: String,
+    pub(crate) source: ParseErrorKind,
+}
+
+/// Additional information for [`ParseError`] error
+#[derive(Debug, Error)]
+pub enum ParseErrorKind {
+    #[error("no FileID prefix, missing `fileid:`")]
+    NoFileIDPrefix,
+
+    #[error("no FolderID prefix, missing `folderid:`")]
+    NoFolderIDPrefix,
+
+    #[error("no RemotePath prefix, missing `path:`")]
+    NoRemotePathPrefix,
+
+    #[error("Not valid integer value")]
+    ParseInt(#[from] std::num::ParseIntError),
+
+    #[error(transparent)]
+    InvalidRemotePath(#[from] InvalidRemotePath),
+
+    #[error(transparent)]
+    InvalidFile(#[from] InvalidFile),
+
+    #[error(transparent)]
+    InvalidFolder(#[from] InvalidFolder),
+
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}

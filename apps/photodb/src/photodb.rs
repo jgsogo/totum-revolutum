@@ -82,7 +82,7 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
             debug!(" - sha256 '{}'", sha256);
             let (c1, rest) = sha256.split_at(4);
             let (c2, rest) = rest.split_at(4);
-            let folder_path = self.remote_dir.path().join(SHA256_BASE_PATH).join(c1).join(c2);
+            let folder_path = self.remote_dir.as_path().join(SHA256_BASE_PATH).join(c1).join(c2);
             (
                 RemotePath::from_str(&format!("path:/{}", folder_path))?,
                 format!("{}.png", rest),
@@ -101,12 +101,12 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
             .pcloud
             .uploadfile(&photo, UploadFileParams::new(Folder::RemotePath(folder), filename))
             .await?;
-        let file_id = FileID(*r.fileids.first().unwrap());
+        let file_id = FileID::new(*r.fileids.first().unwrap());
 
         // Store the data in the database
         use crate::schema::photos;
         let new_photo = models::NewPhoto {
-            fileid: &(file_id.0 as i64),
+            fileid: &(file_id.inner() as i64),
         };
         let photo = diesel::insert_into(photos::table)
             .values(&new_photo)

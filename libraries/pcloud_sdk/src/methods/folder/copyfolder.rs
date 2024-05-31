@@ -33,10 +33,10 @@ impl Params for CopyFolderInput {
         self.source.add_to_params(params)?;
         match &self.target {
             Folder::FolderID(fid) => {
-                params.insert("tofolderid".to_string(), fid.0.to_string());
+                params.insert("tofolderid".to_string(), fid.inner().to_string());
             }
             Folder::RemotePath(p) => {
-                params.insert("topath".to_string(), p.path().to_string());
+                params.insert("topath".to_string(), p.as_path().to_string());
             }
         }
         if self.noover {
@@ -89,8 +89,8 @@ mod tests {
     #[test]
     fn test_params_with_ids() {
         let input = CopyFolderInput {
-            source: FolderID(1234).into(),
-            target: FolderID(4321).into(),
+            source: FolderID::new(1234).into(),
+            target: FolderID::new(4321).into(),
             noover: true,
             skipexisting: true,
             copycontentonly: true,
@@ -133,7 +133,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid, FolderID(230807));
+                assert_eq!(data.metadata.folderid, FolderID::new(230807));
             }
         }
     }

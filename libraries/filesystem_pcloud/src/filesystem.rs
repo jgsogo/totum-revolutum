@@ -129,7 +129,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     type Metadata = RemoteMetadata;
 
     fn root(&self) -> &Utf8Path {
-        self.root_path.path()
+        self.root_path.as_path()
     }
 
     async fn walk_directory(
@@ -174,10 +174,10 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         let path: RemotePath = path.try_into()?;
 
         let filename = path
-            .path()
+            .as_path()
             .file_name()
             .ok_or(anyhow!("No filename can be guess from path '{path}'"))?;
-        let folderid = match path.path().parent() {
+        let folderid = match path.as_path().parent() {
             None => self.root_folderid.clone(),
             Some(p) => self.pcloud.get_folderid(&p.try_into()?).await?,
         };
@@ -274,7 +274,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -326,7 +326,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             },
         );
@@ -343,7 +343,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
                     fd: 42,
-                    fileid: FileID(1234),
+                    fileid: FileID::new(1234),
                 })
             },
         );
@@ -408,7 +408,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             },
         );
@@ -424,7 +424,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
                     fd: 42,
-                    fileid: FileID(1234),
+                    fileid: FileID::new(1234),
                 })
             },
         );
@@ -510,7 +510,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -526,7 +526,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
                     fd: 42,
-                    fileid: FileID(1234),
+                    fileid: FileID::new(1234),
                 })
             },
         );
@@ -571,7 +571,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -588,7 +588,7 @@ mod tests {
 
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -615,7 +615,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -629,7 +629,7 @@ mod tests {
 
                 Ok(DeleteFile {
                     id: "1234-0".to_string(),
-                    metadata: MetadataFile::default(FileID(1234)),
+                    metadata: MetadataFile::default(FileID::new(1234)),
                 })
             },
         );
@@ -656,7 +656,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -670,7 +670,7 @@ mod tests {
 
                 Ok(DeleteFolder {
                     id: "1234-0".to_string(),
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             },
         );
@@ -697,7 +697,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 

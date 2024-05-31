@@ -30,8 +30,8 @@ mod tests {
     #[test]
     fn test_params_with_ids_noname() {
         let input = SourceAndTargetFile {
-            source: FileID(1234).into(),
-            target: TargetLocation::FolderAndName((FolderID(4321), None)),
+            source: FileID::new(1234).into(),
+            target: TargetLocation::FolderAndName((FolderID::new(4321), None)),
         };
         let params = input.into_params().unwrap();
         assert_eq!(params.len(), 2);
@@ -42,8 +42,8 @@ mod tests {
     #[test]
     fn test_params_with_ids_with_name() {
         let input = SourceAndTargetFile {
-            source: FileID(1234).into(),
-            target: TargetLocation::FolderAndName((FolderID(4321), Some("name".to_string()))),
+            source: FileID::new(1234).into(),
+            target: TargetLocation::FolderAndName((FolderID::new(4321), Some("name".to_string()))),
         };
         let params = input.into_params().unwrap();
         assert_eq!(params.len(), 3);
