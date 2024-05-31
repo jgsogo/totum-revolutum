@@ -8,7 +8,6 @@ use filesystem_pcloud::FilesystemPCloud;
 use filesystem_pcloud::CHUNK_SIZE;
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::PCloudClientImpl;
-use pcloud_sdk::handy::GetFolderID;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::{FolderID, RemotePath};
 

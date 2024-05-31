@@ -5,7 +5,6 @@ use std::str::FromStr;
 use filesystem::actions::copy;
 use filesystem::Filesystem;
 use filesystem_pcloud::FilesystemPCloud;
-use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::methods::oauth2;
 use pcloud_sdk::types::RemotePath;
