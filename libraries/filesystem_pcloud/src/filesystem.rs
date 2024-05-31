@@ -59,7 +59,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
             while let Ok(msg) = rx.recv_async().await {
                 match msg {
                     FileCloseMessage::FileDescriptor(fd) => {
-                        if let Err(e) = pcloud_clone.file_close(fd).await {
+                        if let Err(e) = pcloud_clone.file_close(fd.clone()).await {
                             warn!("Error closing file '{fd}': {e}");
                         }
                     }
@@ -267,7 +267,10 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
+                // let mut params = HashMap::new();
+                // query.add_to_params(&mut params);
+
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
@@ -289,7 +292,7 @@ mod tests {
     async fn test_root_not_exists() -> Result<()> {
         let mut client = MockLocalClient::new();
         client.expect_get::<ListFolder, _>().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
@@ -319,7 +322,7 @@ mod tests {
 
         // Expectation for FilesystemPCloud::new
         client.expect_get::<ListFolder, _>().times(2).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
@@ -334,7 +337,7 @@ mod tests {
 
         // Expectation for create
         client.expect_get::<FileOpen, _>().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, file_open::ENDPOINT);
                 assert_eq!(params.len(), 3);
                 let flags = (Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC).bits().to_string();
@@ -343,7 +346,7 @@ mod tests {
                 assert_eq!(params.get("name"), Some(&"file".to_string()));
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
-                    fd: 42,
+                    fd: FileDescriptor::new(42),
                     fileid: FileID::new(1234),
                 })
             },
@@ -351,7 +354,7 @@ mod tests {
 
         // Expectation for write_all
         client.expect_post().times(1).returning(
-            move |endpoint, headers: HeaderMap, params: HashMap<_, _>, posted_data: Vec<u8>| {
+            move |endpoint, headers: HeaderMap, params: &HashMap<_, _>, posted_data: Vec<u8>| {
                 assert_eq!(endpoint, file_write::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
@@ -371,7 +374,7 @@ mod tests {
         client
             .expect_get::<(), _>()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
@@ -403,7 +406,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
@@ -419,7 +422,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, file_open::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 let flags = (Flags::empty()).bits().to_string();
@@ -427,7 +430,7 @@ mod tests {
                 assert_eq!(params.get("path"), Some(&"/the/path/file".to_string()));
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
-                    fd: 42,
+                    fd: FileDescriptor::new(42),
                     fileid: FileID::new(1234),
                 })
             });
@@ -443,7 +446,7 @@ mod tests {
                     count == CHUNK_SIZE
                 }
             })
-            .returning(move |endpoint, params: HashMap<_, _>| {
+            .returning(move |endpoint, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, file_read::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
@@ -460,7 +463,7 @@ mod tests {
                     count == CHUNK_SIZE - file_content.len()
                 }
             })
-            .returning(move |endpoint, params: HashMap<_, _>| {
+            .returning(move |endpoint, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, file_read::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
@@ -471,7 +474,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
@@ -505,7 +508,7 @@ mod tests {
         client
             .expect_get()
             .times(2) // One on filesystem::new, another to check folder for file being created
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert!(params.contains_key("path"));
@@ -521,7 +524,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, file_open::ENDPOINT);
                 assert_eq!(params.len(), 3);
                 let flags = (Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC).bits().to_string();
@@ -530,7 +533,7 @@ mod tests {
                 assert_eq!(params.get("name"), Some(&"myfile.txt".to_string()));
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
-                    fd: 42,
+                    fd: FileDescriptor::new(42),
                     fileid: FileID::new(1234),
                 })
             });
@@ -539,7 +542,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, file_close::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
@@ -567,7 +570,7 @@ mod tests {
         client
             .expect_get()
             .times(1) // One on filesystem::new, another to check folder for file being created
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
@@ -583,7 +586,7 @@ mod tests {
         client
             .expect_get()
             .times(2) // One for each folder
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, createfolderifnotexists::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert!(params.contains_key("folderid"));
@@ -611,7 +614,7 @@ mod tests {
         client
             .expect_get()
             .times(1) // One on filesystem::new, another to check folder for file being created
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
@@ -627,7 +630,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, deletefile::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert!(params.contains_key("path"));
@@ -653,7 +656,7 @@ mod tests {
         client
             .expect_get()
             .times(1) // One on filesystem::new, another to check folder for file being created
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
@@ -669,7 +672,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, deletefolder::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert!(params.contains_key("path"));
@@ -695,7 +698,7 @@ mod tests {
         client
             .expect_get()
             .times(1) // One on filesystem::new, another to check folder for file being created
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
@@ -711,7 +714,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, deletefolderrecursive::ENDPOINT);
                 assert_eq!(params.len(), 1);
                 assert!(params.contains_key("path"));

@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::Params;
 use crate::structures::MetadataFile;
 use crate::types::File;
 
@@ -26,9 +25,7 @@ pub trait GetDeleteFile {
 #[async_trait]
 impl<T: PCloudClient> GetDeleteFile for T {
     async fn deletefile(&self, input: File) -> Result<DeleteFile> {
-        let ret =
-            RESTClient::get::<DeleteFile, _>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 

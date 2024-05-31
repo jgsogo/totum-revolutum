@@ -1,13 +1,15 @@
 use anyhow::Result;
 use async_trait::async_trait;
+use collections::HashMap;
 use http::HeaderMap;
+use http_utils::AddToParams;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use std::collections;
 
 use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
 
@@ -39,13 +41,12 @@ impl ListFolderInput {
     }
 }
 
-impl Params for ListFolderInput {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        self.folder.add_to_params(params)?;
+impl AddToParams for ListFolderInput {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
+        self.folder.add_to_params(params);
         if self.recursive {
             params.insert("recursive".to_string(), "1".to_string());
         }
-        Ok(())
     }
 }
 
@@ -74,7 +75,8 @@ impl<T: PCloudClient> GetListFolder for T {
         list_folder: ListFolderInput,
         filtermeta: Vec<&str>,
     ) -> Result<ListFolder> {
-        let mut params = list_folder.create_params()?;
+        let mut params = HashMap::new();
+        list_folder.add_to_params(&mut params);
         let mut filtermeta = filtermeta;
 
         // TODO: I'm afraid not all the fields are valid here... search some docs or try/error and
@@ -93,7 +95,7 @@ impl<T: PCloudClient> GetListFolder for T {
 
         let filtermeta = filtermeta.into_iter().unique().collect::<Vec<_>>().join(",");
         params.insert("filtermeta".to_string(), filtermeta);
-        RESTClient::get(self, ENDPOINT, HeaderMap::default(), params).await
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &params).await
     }
 }
 

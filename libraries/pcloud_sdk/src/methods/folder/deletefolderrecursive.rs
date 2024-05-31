@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::Params;
 use crate::types::Folder;
 
 pub const ENDPOINT: &str = "/deletefolderrecursive";
@@ -25,7 +24,7 @@ pub trait GetDeleteFolderRecursive {
 #[async_trait]
 impl<T: PCloudClient> GetDeleteFolderRecursive for T {
     async fn deletefolderrecursive(&self, input: Folder) -> Result<DeleteFolderRecursive> {
-        RESTClient::get(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 

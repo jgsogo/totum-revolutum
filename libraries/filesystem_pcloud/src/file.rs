@@ -38,7 +38,10 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Remot
 impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Drop for RemoteFile<HttpClient> {
     fn drop(&mut self) {
         // The filesystem takes care of closing the file
-        if let Err(e) = self.tx_file_close.send(FileCloseMessage::FileDescriptor(self.file.fd)) {
+        if let Err(e) = self
+            .tx_file_close
+            .send(FileCloseMessage::FileDescriptor(self.file.fd.clone()))
+        {
             warn!("Error closing the file on drop action: {e}");
         }
     }
@@ -93,17 +96,17 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File 
     }
 
     async fn read(&mut self, mut buf: &mut [u8]) -> Result<usize> {
-        let content = self.pcloud.file_read(self.file.fd, buf.len() as u64).await?;
+        let content = self.pcloud.file_read(self.file.fd.clone(), buf.len() as u64).await?;
         buf.write_all(&content.bytes)?;
         Ok(content.bytes.len())
     }
 
     async fn write_all(&mut self, buf: &[u8]) -> Result<()> {
-        let _r = self.pcloud.file_write(self.file.fd, buf).await?;
+        let _r = self.pcloud.file_write(self.file.fd.clone(), buf).await?;
         Ok(())
     }
 
     async fn sync_all(&mut self) -> Result<()> {
-        self.pcloud.file_close(self.file.fd).await
+        self.pcloud.file_close(self.file.fd.clone()).await
     }
 }

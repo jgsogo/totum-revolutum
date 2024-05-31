@@ -9,7 +9,7 @@ use reqwest;
 use serde::de::DeserializeOwned;
 
 use http_utils::rest::RESTClient;
-use http_utils::HttpClient;
+use http_utils::{AddToParams, HttpClient};
 
 use crate::access_token;
 use crate::methods::oauth2;
@@ -18,10 +18,10 @@ use crate::utils::http::create_response;
 
 #[async_trait]
 pub trait PCloudClient: RESTClient {
-    async fn get_bytes<TParams: Into<HashMap<String, String>> + Send + 'static>(
+    async fn get_bytes<TParams: AddToParams + Sync + 'static>(
         &self,
         endpoint: &str,
-        params: TParams,
+        params: &TParams,
     ) -> Result<Vec<u8>>;
 }
 
@@ -72,7 +72,8 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
         headers
     }
 
-    fn params(&self, mut params: HashMap<String, String>) -> HashMap<String, String> {
+    fn params(&self) -> HashMap<String, String> {
+        let mut params = HashMap::new();
         let access_token = self.oauth2_token.access_token();
         params.insert("access_token".to_string(), access_token.to_string());
         params
@@ -83,15 +84,12 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> PCloudClient
     for PCloudClientImpl<Token>
 {
-    async fn get_bytes<TParams: Into<HashMap<String, String>> + Send + 'static>(
-        &self,
-        endpoint: &str,
-        params: TParams,
-    ) -> Result<Vec<u8>> {
+    async fn get_bytes<TParams: AddToParams + Sync>(&self, endpoint: &str, query: &TParams) -> Result<Vec<u8>> {
         let url = self.build_url(endpoint);
-        let mut params = params.into();
-        let access_token = self.oauth2_token.access_token();
-        params.insert("access_token".to_string(), access_token.to_string());
+
+        let mut params = self.params();
+        query.add_to_params(&mut params);
+
         http::get_bytes(self.http_client.clone(), &url, params).await
     }
 }

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::{Params, SourceAndTargetFolder};
+use crate::methods::params::SourceAndTargetFolder;
 use crate::structures::MetadataFolder;
 
 pub const ENDPOINT: &str = "/renamefolder";
@@ -25,18 +25,20 @@ pub trait GetRenameFolder {
 #[async_trait]
 impl<T: PCloudClient> GetRenameFolder for T {
     async fn copyfile(&self, input: SourceAndTargetFolder) -> Result<RenameFolder> {
-        RESTClient::get(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
     use std::str::FromStr;
 
     use camino::Utf8Path;
+    use http_utils::AddToParams;
 
     use crate::methods::params::TargetLocation;
     use crate::types::{Folder, FolderID, RemotePath};
@@ -50,7 +52,9 @@ mod tests {
             source: FolderID::new(1234).into(),
             target: TargetLocation::FolderAndName((FolderID::new(4321), None)),
         };
-        let params = input.create_params().unwrap();
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -62,7 +66,9 @@ mod tests {
             source: FolderID::new(1234).into(),
             target: TargetLocation::FolderAndName((FolderID::new(4321), Some("name".to_string()))),
         };
-        let params = input.create_params().unwrap();
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
         assert_eq!(params.len(), 3);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -75,7 +81,9 @@ mod tests {
             source: Folder::from_str("path:/from/path").unwrap(),
             target: TargetLocation::RemotePath(RemotePath::from_str("path:/to/path").unwrap()),
         };
-        let params = input.create_params().unwrap();
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("path"), Some(&"/from/path".to_string()));
         assert_eq!(params.get("topath"), Some(&"/to/path".to_string()));

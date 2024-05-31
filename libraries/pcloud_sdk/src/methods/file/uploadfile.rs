@@ -3,14 +3,15 @@ use async_trait::async_trait;
 use camino::Utf8Path;
 use headers::HeaderMapExt;
 use http::HeaderMap;
+use http_utils::AddToParams;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFile;
 use crate::types::FolderID;
 use crate::utils;
@@ -44,13 +45,12 @@ impl UploadFileParams {
     }
 }
 
-impl Params for UploadFileParams {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        self.folderid.add_to_params(params)?;
+impl AddToParams for UploadFileParams {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
+        self.folderid.add_to_params(params);
         if let Some(progresshash) = &self.progresshash {
             params.insert("progresshash".to_string(), progresshash.clone());
         }
-        Ok(())
     }
 }
 
@@ -88,6 +88,6 @@ impl<T: PCloudClient> PostUploadFile for T {
 
         let filename = upload_params.filename.clone();
         let data = utils::http::create_file_data(local_filename, &filename)?;
-        RESTClient::post(self, ENDPOINT, headers, upload_params.create_params()?, data).await
+        RESTClient::post(self, ENDPOINT, headers, &upload_params, data).await
     }
 }

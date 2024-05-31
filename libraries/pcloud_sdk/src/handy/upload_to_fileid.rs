@@ -25,7 +25,7 @@ impl<T: GetFileOpen + PostFileWrite + GetFileClose + Sync> UploadToFileID for T 
         let mut buffer = Vec::new();
         let bytes_read = File::open(local_path)?.read_to_end(&mut buffer)?;
 
-        let bytes_count = self.file_write(fd.fd, &buffer).await?;
+        let bytes_count = self.file_write(fd.fd.clone(), &buffer).await?;
         assert_eq!(bytes_count.bytes, bytes_read as u64);
         self.file_close(fd.fd).await?;
 
