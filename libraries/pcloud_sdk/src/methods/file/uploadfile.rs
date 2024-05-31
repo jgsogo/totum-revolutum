@@ -74,7 +74,7 @@ pub trait PostUploadFile {
     /// Only `folderid`+`name` alternative is implemented as it's the one recommended in the
     /// documentation.
     ///
-    /// Link: https://docs.pcloud.com/methods/file/uploadfile.html
+    /// Link: <https://docs.pcloud.com/methods/file/uploadfile.html>
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile>;
 }
 

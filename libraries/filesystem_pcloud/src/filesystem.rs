@@ -27,8 +27,6 @@ use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 use crate::file::RemoteFile;
 use crate::RemoteMetadata;
 
-const ROOT_PATH: &str = "/";
-
 pub type PCloudHttpClient = pcloud_sdk::client::PCloudClientImpl<OAuth2TokenImpl>;
 
 pub enum FileCloseMessage {
@@ -39,6 +37,7 @@ pub enum FileCloseMessage {
 pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone> {
     // Root folder for this filesystem
     root_folderid: FolderID,
+    root_path: RemotePath,
 
     // TODO: This shouldn't be an `Arc<HttpClient>`. It should be just `HttpClient`
     pcloud: Arc<HttpClient>,
@@ -48,7 +47,7 @@ pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone> {
 }
 
 impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpClient> {
-    pub async fn new(root_folderid: FolderID, pcloud: HttpClient) -> Result<Self> {
+    pub async fn new(root_path: RemotePath, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
         let (tx, rx) = flume::unbounded::<FileCloseMessage>();
 
@@ -72,8 +71,10 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
             }
         });
 
+        let root_folderid = pcloud.get_folderid(&root_path).await?;
         Ok(Self {
             root_folderid,
+            root_path,
             pcloud,
             tx_file_close: tx,
             thread_file_close: Some(t),
@@ -128,7 +129,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     type Metadata = RemoteMetadata;
 
     fn root(&self) -> &Utf8Path {
-        Utf8Path::new(ROOT_PATH)
+        self.root_path.as_path()
     }
 
     async fn walk_directory(
@@ -207,7 +208,9 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
         let folderid = self.root_folderid.clone();
-        self.pcloud.createfolderifnotexists_all(&folderid, path).await?;
+        // Get the relative path starting in the root
+        let rel_path = path.strip_prefix(self.root())?;
+        self.pcloud.createfolderifnotexists_all(&folderid, rel_path).await?;
         Ok(())
     }
 
@@ -260,6 +263,7 @@ mod tests {
     #[tokio::test]
     async fn test_root() -> Result<()> {
         let mut client = MockLocalClient::new();
+
         client
             .expect_get()
             .times(1)
@@ -276,8 +280,7 @@ mod tests {
             });
 
         let root = RemotePath::from_str("path:/the/path")?;
-        let root_folderid = client.get_folderid(&root).await?;
-        let fs = FilesystemPCloud::new(root_folderid, client).await?;
+        let fs = FilesystemPCloud::new(root, client).await?;
         assert_eq!(Utf8Path::new("/the/path"), fs.root());
         Ok(())
     }
@@ -301,8 +304,7 @@ mod tests {
         );
 
         let root = RemotePath::from_str("path:/the/path")?;
-        let root_folderid = client.get_folderid(&root).await?;
-        let r = FilesystemPCloud::new(root_folderid, client).await;
+        let r = client.get_folderid(&root).await;
         assert!(r.is_err());
         assert_eq!(
             r.err().unwrap().to_string(),
@@ -379,8 +381,7 @@ mod tests {
 
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
-        let root_folderid = client.get_folderid(&root).await?;
-        let mut fs = FilesystemPCloud::new(root_folderid, client).await?;
+        let mut fs = FilesystemPCloud::new(root, client).await?;
 
         let filepath = Utf8Path::new("file");
         let content: Vec<u8> = b"Hello, world!".to_vec();
@@ -478,8 +479,7 @@ mod tests {
 
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
-        let root_folderid = client.get_folderid(&root).await?;
-        let mut fs = FilesystemPCloud::new(root_folderid, client).await?;
+        let mut fs = FilesystemPCloud::new(root, client).await?;
 
         let filepath = Utf8Path::new("file");
 
@@ -545,7 +545,7 @@ mod tests {
             });
 
         // Create the filesystem
-        let mut fs = FilesystemPCloud::new(&root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(root_path, client).await?;
         {
             let filepath = Utf8Path::new("nested/nested2/myfile.txt");
             let r = fs.create(&filepath).await;
@@ -579,7 +579,7 @@ mod tests {
         // Expectation for create_dir_all
         client
             .expect_get::<CreateFolderIfNotExists>()
-            .times(5) // One for each folder
+            .times(2) // One for each folder
             .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
                 assert_eq!(endpoint, createfolderifnotexists::ENDPOINT);
                 assert_eq!(params.len(), 2);
@@ -593,7 +593,7 @@ mod tests {
                 })
             });
 
-        let fs = FilesystemPCloud::new(&root_path, client).await?;
+        let fs = FilesystemPCloud::new(root_path, client).await?;
 
         fs.create_dir_all(Utf8Path::new("nested/nested2")).await?;
         Ok(())
@@ -635,7 +635,7 @@ mod tests {
             },
         );
 
-        let fs = FilesystemPCloud::new(&root_path, client).await?;
+        let fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_file(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }
@@ -676,7 +676,7 @@ mod tests {
             },
         );
 
-        let fs = FilesystemPCloud::new(&root_path, client).await?;
+        let fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_dir(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }
@@ -717,7 +717,7 @@ mod tests {
             },
         );
 
-        let fs = FilesystemPCloud::new(&root_path, client).await?;
+        let fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_dir_all(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }

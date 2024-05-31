@@ -1,7 +1,6 @@
-use std::str::FromStr;
-
 use anyhow::Result;
 use camino::Utf8Path;
+use std::str::FromStr;
 
 use filesystem::actions::copy;
 use filesystem::Filesystem;
@@ -25,12 +24,8 @@ async fn main() -> Result<()> {
         let userinfo = pcloud.userinfo().await?;
         println!("{:#?}", userinfo);
 
-        // let base_path = RemotePath::from_str("path:/backup_file")?;
-        let root_folderid = pcloud.get_folderid(RemotePath::root()).await?;
-        let folderid = pcloud
-            .createfolderifnotexists_all(&root_folderid, "backup_file")
-            .await?;
-        FilesystemPCloud::new(&base_path, pcloud).await?
+        let root_path = RemotePath::from_str("path:/backup_file")?;
+        FilesystemPCloud::new(root_path, pcloud).await?
     };
 
     // Creates a file in the origin

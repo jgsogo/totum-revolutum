@@ -29,7 +29,7 @@ impl<Client: GetFolderID + GetCreateFolderIfNotExists + Sync> GetCreateFolderIfN
 
         // Check path components
         if any(path.as_ref().components(), |c| {
-            matches!(c, Utf8Component::Normal { .. })
+            !matches!(c, Utf8Component::Normal { .. })
         }) {
             bail!("Input argument `path` invalid: only regular path components are allowed")
         }

@@ -25,7 +25,7 @@ pub trait GetCreateFolderIfNotExists {
     /// Only the `folderid`+`name` alternative is implemented as it's the one recommended in the
     /// documentation.
     ///
-    /// Link: https://docs.pcloud.com/methods/folder/createfolderifnotexists.html
+    /// Link: <https://docs.pcloud.com/methods/folder/createfolderifnotexists.html>
     async fn createfolderifnotexists(&self, folder_id: &FolderID, name: &str) -> Result<CreateFolderIfNotExists>;
 }
 

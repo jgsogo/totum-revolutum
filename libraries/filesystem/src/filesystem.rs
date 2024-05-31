@@ -16,7 +16,7 @@ where
 
     fn root(&self) -> &Utf8Path;
 
-    /// Checks that the given path relies within the filesystem. Returns the absolute path or
+    /// Checks that the given path stays within the filesystem. Returns the absolute path or
     /// an error
     fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
         // TODO: Here we cannot join with ROOT. Doing that we are leaking information to consumers.
