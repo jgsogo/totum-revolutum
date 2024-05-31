@@ -33,7 +33,7 @@ mod tests {
             source: FolderID::new(1234).into(),
             target: TargetLocation::FolderAndName((FolderID::new(4321), None)),
         };
-        let params = input.into_params().unwrap();
+        let params = input.create_params().unwrap();
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -45,7 +45,7 @@ mod tests {
             source: FolderID::new(1234).into(),
             target: TargetLocation::FolderAndName((FolderID::new(4321), Some("name".to_string()))),
         };
-        let params = input.into_params().unwrap();
+        let params = input.create_params().unwrap();
         assert_eq!(params.len(), 3);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -58,7 +58,7 @@ mod tests {
             source: Folder::from_str("path:/from/path").unwrap(),
             target: TargetLocation::RemotePath(RemotePath::from_str("path:/to/path").unwrap()),
         };
-        let params = input.into_params().unwrap();
+        let params = input.create_params().unwrap();
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("path"), Some(&"/from/path".to_string()));
         assert_eq!(params.get("topath"), Some(&"/to/path".to_string()));

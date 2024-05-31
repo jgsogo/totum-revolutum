@@ -21,7 +21,7 @@ pub trait GetFileRead {
 #[async_trait]
 impl<T: PCloudClient> GetFileRead for T {
     async fn file_read(&self, descriptor: FileDescriptor, count: u64) -> Result<FileRead> {
-        let mut params = descriptor.into_params()?;
+        let mut params = descriptor.create_params()?;
         params.insert("count".to_string(), count.to_string());
 
         let bytes = self.get_bytes(ENDPOINT, params).await?;

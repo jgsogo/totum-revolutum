@@ -48,8 +48,8 @@ pub enum InvalidFolderKind {
     InvalidRemotePath(#[from] InvalidRemotePath),
 }
 
-/// An error that can be returned when parsing some element from a string. Returned from [`FromStr`]
-/// trait implementations.
+/// An error that can be returned when parsing some element from a string. Returned from
+/// [`std::str::FromStr`] trait implementations.
 #[derive(Debug, Error)]
 #[error("Cannot parse from string '{string}': {source}")]
 pub struct ParseError {

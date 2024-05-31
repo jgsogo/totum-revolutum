@@ -106,9 +106,12 @@ async fn main() -> Result<()> {
                 Commands::Initialize => PCloudDatabase::initialize(client, db_path).await?,
                 _ => {
                     let (db, done) = PCloudDatabase::new(client.clone(), db_path.clone()).await?;
-                    let photodb = PhotoDB::new(db, client, &app_dir, db_path);
+                    let r = match PhotoDB::new(db, client, &app_dir, db_path).await {
+                        Ok(photodb) => db_commands(cli.command, photodb).await,
+                        Err(e) => Err(e),
+                    };
 
-                    if let Err(e) = db_commands(cli.command, photodb).await {
+                    if let Err(e) = r {
                         error!("{}", e);
                     }
 

@@ -74,7 +74,7 @@ impl<T: PCloudClient> GetListFolder for T {
         list_folder: ListFolderInput,
         filtermeta: Vec<&str>,
     ) -> Result<ListFolder> {
-        let mut params = list_folder.into_params()?;
+        let mut params = list_folder.create_params()?;
         let mut filtermeta = filtermeta;
 
         // TODO: I'm afraid not all the fields are valid here... search some docs or try/error and

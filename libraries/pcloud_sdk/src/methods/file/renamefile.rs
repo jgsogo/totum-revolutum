@@ -26,7 +26,7 @@ pub trait GetRenameFile {
 #[async_trait]
 impl<T: PCloudClient> GetRenameFile for T {
     async fn renamefile(&self, input: SourceAndTargetFile) -> Result<RenameFile> {
-        let ret = RESTClient::get::<RenameFile>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
+        let ret = RESTClient::get::<RenameFile>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
         Ok(ret)
     }
 }

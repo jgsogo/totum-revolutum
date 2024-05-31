@@ -25,8 +25,9 @@ pub trait GetDeleteFolderRecursive {
 #[async_trait]
 impl<T: PCloudClient> GetDeleteFolderRecursive for T {
     async fn deletefolderrecursive(&self, input: Folder) -> Result<DeleteFolderRecursive> {
-        let ret = RESTClient::get::<DeleteFolderRecursive>(self, ENDPOINT, HeaderMap::default(), input.into_params()?)
-            .await?;
+        let ret =
+            RESTClient::get::<DeleteFolderRecursive>(self, ENDPOINT, HeaderMap::default(), input.create_params()?)
+                .await?;
         Ok(ret)
     }
 }

@@ -24,7 +24,7 @@ pub trait GetCopyFile {
 #[async_trait]
 impl<T: PCloudClient> GetCopyFile for T {
     async fn copyfile(&self, input: SourceAndTargetFile) -> Result<CopyFile> {
-        let ret = RESTClient::get::<CopyFile>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
+        let ret = RESTClient::get::<CopyFile>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
         Ok(ret)
     }
 }

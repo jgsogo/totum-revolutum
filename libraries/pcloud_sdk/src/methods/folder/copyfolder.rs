@@ -67,7 +67,7 @@ pub trait GetCopyFolder {
 #[async_trait]
 impl<T: PCloudClient> GetCopyFolder for T {
     async fn copyfile(&self, input: CopyFolderInput) -> Result<CopyFolder> {
-        let ret = RESTClient::get::<CopyFolder>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
+        let ret = RESTClient::get::<CopyFolder>(self, ENDPOINT, HeaderMap::default(), input.create_params()?).await?;
         Ok(ret)
     }
 }
@@ -95,7 +95,7 @@ mod tests {
             skipexisting: true,
             copycontentonly: true,
         };
-        let params = input.into_params().unwrap();
+        let params = input.create_params().unwrap();
         assert_eq!(params.len(), 5);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -113,7 +113,7 @@ mod tests {
             skipexisting: false,
             copycontentonly: false,
         };
-        let params = input.into_params().unwrap();
+        let params = input.create_params().unwrap();
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("path"), Some(&"/source/path".to_string()));
         assert_eq!(params.get("topath"), Some(&"/target/path".to_string()));

@@ -17,6 +17,10 @@ const REMOTEPATH_PREFIX: &str = "path:";
 pub struct RemotePath(Utf8PathBuf);
 
 impl RemotePath {
+    pub fn root() -> Self {
+        Self(Utf8PathBuf::from("/"))
+    }
+
     pub fn as_path(&self) -> &Utf8Path {
         &self.0
     }
@@ -24,7 +28,7 @@ impl RemotePath {
     /// Creates a new [`RemotePath`] by extending `self` with the given `path`. It can fail if the
     /// resulting path doesn't satisfy the constraints of [`RemotePath`].
     ///
-    /// Behaviour is the same as of [`Utf8PathBuf::join`]. It's important to note that if `path`
+    /// Behaviour is the same as of [`Utf8Path::join`]. It's important to note that if `path`
     /// is absolute, it replaces the current path.
     pub fn join(&self, path: impl AsRef<Utf8Path>) -> Result<Self, InvalidRemotePath> {
         let path = self.0.join(path);
