@@ -24,7 +24,7 @@ trait _HelperTrait: GetFolderID {
             None => {
                 let remote_root = RemotePath::from_str("path:/")?;
                 let root_folderid = self.get_folderid(&remote_root).await?;
-                Ok((root_folderid, remote_root.join(path)))
+                Ok((root_folderid, remote_root.join_with_remote_path(path)))
             }
             Some(fid) => Ok((fid, path.clone())),
         }

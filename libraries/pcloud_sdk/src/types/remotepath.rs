@@ -21,14 +21,18 @@ impl RemotePath {
         &self.0
     }
 
-    /// Creates a new [`RemotePath`] by appending the given `other` to `self`. It can fail if the
+    /// Creates a new [`RemotePath`] by extending `self` with the given `path`. It can fail if the
     /// resulting path doesn't satisfy the constraints of [`RemotePath`].
-    pub fn join_p(&self, other: impl AsRef<Utf8Path>) -> Result<Self, InvalidRemotePath> {
-        let path = self.0.join(other);
+    ///
+    /// Behaviour is the same as of [`Utf8PathBuf::join]. It's important to note that if `path`
+    /// is absolute, it replaces the current path.
+    pub fn join(&self, path: impl AsRef<Utf8Path>) -> Result<Self, InvalidRemotePath> {
+        let path = self.0.join(path);
         path.try_into()
     }
 
-    pub fn join(&self, other: &RemotePath) -> Self {
+    // #[deprecated(note = "please use `RemotePath::join` instead")]
+    pub fn join_with_remote_path(&self, other: &RemotePath) -> Self {
         let has_trailing = {
             let other_str = other.0.to_string();
             other_str != "/" && other_str.ends_with('/')
@@ -44,6 +48,7 @@ impl RemotePath {
         }
     }
 
+    /// Returns the [`Utf8Components`] of the path
     pub fn components(&self) -> Utf8Components {
         self.0.components()
     }
@@ -193,32 +198,59 @@ mod tests {
     }
 
     #[test]
-    fn test_join() {
+    fn test_join_with_remote_path() {
         {
             let lhs = RemotePath::from_str("path:/left/hand/side").unwrap();
             let rhs = RemotePath::from_str("path:/rhs").unwrap();
-            assert_eq!(lhs.join(&rhs).to_string(), "path:/left/hand/side/rhs");
+            assert_eq!(lhs.join_with_remote_path(&rhs).to_string(), "path:/left/hand/side/rhs");
         }
 
         {
             // Trailing on lhs
             let lhs = RemotePath::from_str("path:/left/hand/side/with/trailing/").unwrap();
             let rhs = RemotePath::from_str("path:/rhs").unwrap();
-            assert_eq!(lhs.join(&rhs).to_string(), "path:/left/hand/side/with/trailing/rhs");
+            assert_eq!(
+                lhs.join_with_remote_path(&rhs).to_string(),
+                "path:/left/hand/side/with/trailing/rhs"
+            );
         }
 
         {
             // Trailing on rhs
             let lhs = RemotePath::from_str("path:/lhs").unwrap();
             let rhs = RemotePath::from_str("path:/rhs/with/trailing/").unwrap();
-            assert_eq!(lhs.join(&rhs).to_string(), "path:/lhs/rhs/with/trailing/");
+            assert_eq!(
+                lhs.join_with_remote_path(&rhs).to_string(),
+                "path:/lhs/rhs/with/trailing/"
+            );
         }
 
         {
             // Weird case -- noop
             let lhs = RemotePath::from_str("path:/").unwrap();
             let rhs = RemotePath::from_str("path:/").unwrap();
-            assert_eq!(lhs.join(&rhs).to_string(), "path:/");
+            assert_eq!(lhs.join_with_remote_path(&rhs).to_string(), "path:/");
         }
+    }
+
+    #[test]
+    fn test_join() {
+        let lhs = RemotePath::from_str("path:/left/hand/side").unwrap();
+
+        assert_eq!(lhs.join("rhs").unwrap().to_string(), "path:/left/hand/side/rhs");
+        assert_eq!(lhs.join("rhs/").unwrap().to_string(), "path:/left/hand/side/rhs/");
+        assert_eq!(lhs.join("../rhs").unwrap().to_string(), "path:/left/hand/rhs");
+        assert_eq!(lhs.join("../rhs/").unwrap().to_string(), "path:/left/hand/rhs/");
+        assert_eq!(lhs.join("/rhs").unwrap().to_string(), "path:/rhs");
+
+        let lhs = RemotePath::from_str("path:/left/hand/side/with/trailing/").unwrap();
+        assert_eq!(
+            lhs.join("rhs").unwrap().to_string(),
+            "path:/left/hand/side/with/trailing/rhs"
+        );
+
+        let lhs = RemotePath::from_str("path:/").unwrap();
+        assert_eq!(lhs.join("rhs").unwrap().to_string(), "path:/rhs");
+        assert_eq!(lhs.join("/").unwrap().to_string(), "path:/");
     }
 }
