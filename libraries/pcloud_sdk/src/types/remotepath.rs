@@ -166,7 +166,7 @@ mod tests {
         assert!(matches!(e.source, ParseErrorKind::InvalidRemotePath { .. }));
         assert_eq!(
             e.to_string(),
-            "Cannot parse from string 'path:relative/path': RemotePath only accepts absolute paths"
+            "Cannot parse from string 'path:relative/path': InvalidRemotePath no absolute path"
         );
 
         let r = RemotePath::from_str("path:/../outside/path");
@@ -175,7 +175,7 @@ mod tests {
         assert!(matches!(e.source, ParseErrorKind::InvalidRemotePath { .. }));
         assert_eq!(
             e.to_string(),
-            "Cannot parse from string 'path:/../outside/path': RemotePath cannot start outside root folder"
+            "Cannot parse from string 'path:/../outside/path': InvalidRemotePath resolved path is outside root folder"
         );
     }
 

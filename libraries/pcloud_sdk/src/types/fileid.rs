@@ -59,14 +59,14 @@ mod tests {
 
     #[test]
     fn test_fileid() {
-        let fileid = FileID(23);
+        let fileid = FileID::new(23);
         assert_eq!(fileid.to_string(), "fileid:23");
         assert_eq!(format!("{fileid:?}"), "fileid:23");
     }
 
     #[test]
     fn test_parse_fileid() {
-        assert_eq!(FileID::from_str("fileid:123").unwrap(), FileID(123));
+        assert_eq!(FileID::from_str("fileid:123").unwrap(), FileID::new(123));
         assert!(FileID::from_str("fileid-123").is_err());
     }
 

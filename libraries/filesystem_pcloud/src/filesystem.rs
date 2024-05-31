@@ -274,7 +274,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -326,7 +326,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             },
         );
@@ -343,7 +343,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
                     fd: 42,
-                    fileid: FileID(1234),
+                    fileid: FileID::new(1234),
                 })
             },
         );
@@ -408,7 +408,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             },
         );
@@ -424,7 +424,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
                     fd: 42,
-                    fileid: FileID(1234),
+                    fileid: FileID::new(1234),
                 })
             },
         );
@@ -510,7 +510,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -526,7 +526,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 Ok(FileOpen {
                     fd: 42,
-                    fileid: FileID(1234),
+                    fileid: FileID::new(1234),
                 })
             },
         );
@@ -571,7 +571,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -588,7 +588,7 @@ mod tests {
 
                 Ok(CreateFolderIfNotExists {
                     created: Some(true),
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -615,7 +615,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -629,7 +629,7 @@ mod tests {
 
                 Ok(DeleteFile {
                     id: "1234-0".to_string(),
-                    metadata: MetadataFile::default(FileID(1234)),
+                    metadata: MetadataFile::default(FileID::new(1234)),
                 })
             },
         );
@@ -656,7 +656,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 
@@ -670,7 +670,7 @@ mod tests {
 
                 Ok(DeleteFolder {
                     id: "1234-0".to_string(),
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             },
         );
@@ -697,7 +697,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
-                    metadata: MetadataFolder::default(FolderID(1234)),
+                    metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
 

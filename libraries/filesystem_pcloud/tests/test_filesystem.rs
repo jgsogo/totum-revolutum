@@ -33,7 +33,7 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
     };
 
     // Add mock so we can create a file
-    let folderid = FolderID(1234);
+    let folderid = FolderID::new(1234);
     let name = String::from("myfile.txt");
     let write_bytes = 100;
     let content = "the content".as_bytes().to_vec();

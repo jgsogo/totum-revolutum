@@ -61,14 +61,14 @@ mod tests {
 
     #[test]
     fn test_folderid() {
-        let folderid = FolderID(23);
+        let folderid = FolderID::new(23);
         assert_eq!(folderid.to_string(), "folderid:23");
         assert_eq!(format!("{folderid:?}"), "folderid:23");
     }
 
     #[test]
     fn test_parse_folderid() {
-        assert_eq!(FolderID::from_str("folderid:123").unwrap(), FolderID(123));
+        assert_eq!(FolderID::from_str("folderid:123").unwrap(), FolderID::new(123));
         assert!(FolderID::from_str("folderid-123").is_err());
     }
 
