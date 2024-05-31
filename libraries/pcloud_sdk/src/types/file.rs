@@ -1,13 +1,13 @@
-use anyhow::anyhow;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
+use anyhow::anyhow;
 use camino::Utf8PathBuf;
 
-use crate::types::errors::{InvalidFile, InvalidRemotePath, InvalidRemotePathKind};
-use crate::types::{ParseError, ParseErrorKind, RemotePath};
+use crate::types::errors::{InvalidFileError, InvalidRemotePathError, InvalidRemotePathKind};
+use crate::types::errors::{ParseError, ParseErrorKind};
 
-use super::FileID;
+use super::{FileID, RemotePath};
 
 /// A file in pCloud is represented by either a [`FileID`] or a [`RemotePath`]
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -23,27 +23,27 @@ impl From<FileID> for File {
 }
 
 impl TryFrom<RemotePath> for File {
-    type Error = InvalidFile;
+    type Error = InvalidFileError;
 
     fn try_from(value: RemotePath) -> Result<Self, Self::Error> {
         if !value.to_string().ends_with('/') {
             Ok(File::RemotePath(value))
         } else {
-            let source = InvalidRemotePath {
+            let source = InvalidRemotePathError {
                 source: InvalidRemotePathKind::NotAFile,
             };
-            Err(InvalidFile { source: source.into() })
+            Err(InvalidFileError { source: source.into() })
         }
     }
 }
 
 impl TryFrom<Utf8PathBuf> for File {
-    type Error = InvalidFile;
+    type Error = InvalidFileError;
 
     fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
         let r: RemotePath = value
             .try_into()
-            .map_err(|source: InvalidRemotePath| InvalidFile { source: source.into() })?;
+            .map_err(|source: InvalidRemotePathError| InvalidFileError { source: source.into() })?;
         r.try_into()
     }
 }

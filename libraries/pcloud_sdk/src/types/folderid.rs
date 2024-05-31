@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
-use super::{ParseError, ParseErrorKind};
+use crate::types::errors::{ParseError, ParseErrorKind};
 
 const FOLDERID_PREFIX: &str = "folderid:";
 pub type InnerType = u64;

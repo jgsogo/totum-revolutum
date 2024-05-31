@@ -4,10 +4,10 @@ use std::str::FromStr;
 use anyhow::anyhow;
 use camino::Utf8PathBuf;
 
-use crate::types::errors::{InvalidFolder, InvalidRemotePath};
-use crate::types::{ParseError, ParseErrorKind, RemotePath};
+use crate::types::errors::{InvalidFolderError, InvalidRemotePathError};
+use crate::types::errors::{ParseError, ParseErrorKind};
 
-use super::FolderID;
+use super::{FolderID, RemotePath};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Folder {
@@ -28,12 +28,12 @@ impl From<RemotePath> for Folder {
 }
 
 impl TryFrom<Utf8PathBuf> for Folder {
-    type Error = InvalidFolder;
+    type Error = InvalidFolderError;
 
     fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
         let r: RemotePath = value
             .try_into()
-            .map_err(|source: InvalidRemotePath| InvalidFolder { source: source.into() })?;
+            .map_err(|source: InvalidRemotePathError| InvalidFolderError { source: source.into() })?;
         Ok(r.into())
     }
 }
