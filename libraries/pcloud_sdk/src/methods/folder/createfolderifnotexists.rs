@@ -1,37 +1,16 @@
 use anyhow::Result;
 use async_trait::async_trait;
-use camino::Utf8PathBuf;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
 use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::{Params, ParamsType};
+use crate::methods::params::Params;
 use crate::structures::MetadataFolder;
 use crate::types::FolderID;
 
-pub const ENDPOINT: &str = "/createfolderifnotexists";
-
-pub enum TargetFolder {
-    FolderAndName((FolderID, String)),
-    Path(Utf8PathBuf), // FIXME: Is this a RemotePath?
-}
-
-impl Params for TargetFolder {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        match &self {
-            TargetFolder::Path(p) => {
-                params.insert("path".to_string(), p.to_string());
-            }
-            TargetFolder::FolderAndName((folderid, name)) => {
-                folderid.add_to_params(params)?;
-                params.insert("name".to_string(), name.clone());
-            }
-        }
-        Ok(())
-    }
-}
+const ENDPOINT: &str = "/createfolderifnotexists";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderIfNotExists {
@@ -41,49 +20,31 @@ pub struct CreateFolderIfNotExists {
 
 #[async_trait]
 pub trait GetCreateFolderIfNotExists {
-    /// Creates the given directory (if it doesn't exists) and returns its metadata. It can only
-    /// create one folder at a time, for nested ones you will need to call the function several
-    /// times.
-    async fn createfolderifnotexists(&self, input: TargetFolder) -> Result<CreateFolderIfNotExists>;
+    /// Creates the given directory (if it doesn't exist) and returns its metadata
+    ///
+    /// Only the `folderid`+`name` alternative is implemented as it's the one recommended in the
+    /// documentation.
+    ///
+    /// Link: https://docs.pcloud.com/methods/folder/createfolderifnotexists.html
+    async fn createfolderifnotexists(&self, folder_id: &FolderID, name: &str) -> Result<CreateFolderIfNotExists>;
 }
 
 #[async_trait]
 impl<T: PCloudClient> GetCreateFolderIfNotExists for T {
-    async fn createfolderifnotexists(&self, input: TargetFolder) -> Result<CreateFolderIfNotExists> {
-        RESTClient::get::<CreateFolderIfNotExists>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await
+    async fn createfolderifnotexists(&self, folder_id: &FolderID, name: &str) -> Result<CreateFolderIfNotExists> {
+        let mut params = folder_id.create_params()?;
+        params.insert("name".to_string(), name.to_string());
+        RESTClient::get::<CreateFolderIfNotExists>(self, ENDPOINT, HeaderMap::default(), params).await
     }
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-    use std::str::FromStr;
 
     use crate::mocks::client::MockLocalClient;
 
     use super::*;
-
-    #[tokio::test]
-    async fn test_with_path() -> Result<()> {
-        let mut client = MockLocalClient::new();
-        client
-            .expect_get()
-            .times(1)
-            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
-                assert_eq!(endpoint, "/createfolderifnotexists");
-                assert_eq!(params.len(), 1);
-                assert_eq!(params.get("path"), Some(&"the/path/to/folder".to_string()));
-                assert_eq!(headers.len(), 0);
-                Ok(CreateFolderIfNotExists {
-                    created: Some(true),
-                    metadata: MetadataFolder::default(FolderID::new(1234)),
-                })
-            });
-        let input = TargetFolder::Path(Utf8PathBuf::from_str("the/path/to/folder")?);
-        let r = client.createfolderifnotexists(input).await?;
-        assert_eq!(r.created.unwrap(), true);
-        Ok(())
-    }
 
     #[tokio::test]
     async fn test_with_folderid_and_name() -> Result<()> {
@@ -102,8 +63,7 @@ mod tests {
                     metadata: MetadataFolder::default(FolderID::new(1234)),
                 })
             });
-        let input = TargetFolder::FolderAndName((FolderID::new(1234), "name.txt".to_string()));
-        let r = client.createfolderifnotexists(input).await?;
+        let r = client.createfolderifnotexists(&FolderID::new(1234), "name.txt").await?;
         assert_eq!(r.created.unwrap(), true);
         Ok(())
     }

@@ -7,7 +7,7 @@ pub type ParamsType = HashMap<String, String>;
 pub trait Params {
     fn add_to_params(&self, params: &mut ParamsType) -> Result<()>;
 
-    fn into_params(self) -> Result<ParamsType>
+    fn create_params(&self) -> Result<ParamsType>
     where
         Self: Sized,
     {

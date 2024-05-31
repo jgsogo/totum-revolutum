@@ -3,15 +3,14 @@ use super::models;
 use super::utils::sha256_string_from_file;
 use super::AppDirs;
 use anyhow::{anyhow, bail, Result};
-use camino::Utf8PathBuf;
+use camino::{Utf8Path, Utf8PathBuf};
 use diesel::{RunQueryDsl, SelectableHelper};
 use oxipng::{optimize, Options};
 use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::Exists;
 use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
+use pcloud_sdk::handy::{Exists, GetFolderID};
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
-use pcloud_sdk::types::{FileID, Folder, RemotePath};
-use std::str::FromStr;
+use pcloud_sdk::types::{FileID, FolderID, RemotePath};
 use tracing::{debug, info};
 
 // Path inside the remote folder to locate files using sha256 filename
@@ -22,21 +21,22 @@ pub struct PhotoDB<'a, T: Database, PCloud: PCloudClient> {
     pcloud: PCloud,
     db: T,
     app_dir: &'a AppDirs,
-    remote_dir: RemotePath,
+    folder_id: FolderID,
 }
 
 impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
-    pub fn new(db: T, pcloud: PCloud, app_dir: &'a AppDirs, remote_dir: RemotePath) -> Self {
+    pub async fn new(db: T, pcloud: PCloud, app_dir: &'a AppDirs, remote_dir: RemotePath) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote directory '{}'",
             app_dir, remote_dir
         );
-        Self {
+        let folder_id = pcloud.get_folderid(&remote_dir).await?;
+        Ok(Self {
             pcloud,
             db,
             app_dir,
-            remote_dir,
-        }
+            folder_id,
+        })
     }
 
     fn to_tmp_storage(&self, input: Utf8PathBuf) -> Result<Utf8PathBuf> {
@@ -82,24 +82,24 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
             debug!(" - sha256 '{}'", sha256);
             let (c1, rest) = sha256.split_at(4);
             let (c2, rest) = rest.split_at(4);
-            let folder_path = self.remote_dir.as_path().join(SHA256_BASE_PATH).join(c1).join(c2);
-            (
-                RemotePath::from_str(&format!("path:/{}", folder_path))?,
-                format!("{}.png", rest),
-            )
+            let folder_path = Utf8Path::new(SHA256_BASE_PATH).join(c1).join(c2);
+            (folder_path, format!("{}.png", rest))
         };
         debug!("Upload to '{}/{}'", folder, filename);
-        let folderid = self.pcloud.createfolderifnotexists_all(None, &folder).await?;
+        let folderid = self
+            .pcloud
+            .createfolderifnotexists_all(&self.folder_id, &folder)
+            .await?;
 
         // FIXME: Handle file sha256 collision
-        let exists = self.pcloud.exists(folderid, &filename).await?;
+        let exists = self.pcloud.exists(folderid.clone(), &filename).await?;
         if exists.is_some() {
             bail!("A file with the same sha256 already exists!");
         }
 
         let r = self
             .pcloud
-            .uploadfile(&photo, UploadFileParams::new(Folder::RemotePath(folder), filename))
+            .uploadfile(&photo, UploadFileParams::new(folderid, filename))
             .await?;
         let file_id = FileID::new(*r.fileids.first().unwrap());
 

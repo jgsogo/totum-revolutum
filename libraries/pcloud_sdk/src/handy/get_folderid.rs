@@ -14,8 +14,7 @@ pub trait GetFolderID {
 impl<T: listfolder::GetListFolder + Sync> GetFolderID for T {
     async fn get_folderid(&self, path: &RemotePath) -> Result<FolderID> {
         let input = ListFolderInput::new(path.clone().into());
-        let filtermeta = vec!["folderid"];
-        let r = self.listfolder_with_filtermeta(input, filtermeta).await?;
+        let r = self.listfolder_with_filtermeta(input, vec!["folderid"]).await?;
         Ok(r.metadata.folderid)
     }
 }

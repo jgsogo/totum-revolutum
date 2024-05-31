@@ -12,7 +12,7 @@ use http_utils::rest::RESTClient;
 
 use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFile;
-use crate::types::Folder;
+use crate::types::FolderID;
 use crate::utils;
 use crate::utils::http::BOUNDARY;
 
@@ -20,7 +20,7 @@ pub const ENDPOINT: &str = "/uploadfile";
 
 #[derive(Debug, Clone)]
 pub struct UploadFileParams {
-    folder: Folder,
+    folderid: FolderID,
     filename: String,
     // Optional parameters
     pub nopartial: bool,
@@ -31,9 +31,9 @@ pub struct UploadFileParams {
 }
 
 impl UploadFileParams {
-    pub fn new(folder: Folder, filename: String) -> UploadFileParams {
+    pub fn new(folderid: FolderID, filename: String) -> UploadFileParams {
         UploadFileParams {
-            folder,
+            folderid,
             filename,
             nopartial: false,
             progresshash: None,
@@ -46,7 +46,7 @@ impl UploadFileParams {
 
 impl Params for UploadFileParams {
     fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        self.folder.add_to_params(params)?;
+        self.folderid.add_to_params(params)?;
         if let Some(progresshash) = &self.progresshash {
             params.insert("progresshash".to_string(), progresshash.clone());
         }
@@ -69,6 +69,12 @@ pub struct UploadFile {
 
 #[async_trait]
 pub trait PostUploadFile {
+    /// Uploads a local file to the given [`FolderID`]
+    ///
+    /// Only `folderid`+`name` alternative is implemented as it's the one recommended in the
+    /// documentation.
+    ///
+    /// Link: https://docs.pcloud.com/methods/file/uploadfile.html
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile>;
 }
 
@@ -82,7 +88,7 @@ impl<T: PCloudClient> PostUploadFile for T {
 
         let filename = upload_params.filename.clone();
         let data = utils::http::create_file_data(local_filename, &filename)?;
-        let ret = RESTClient::post::<UploadFile>(self, ENDPOINT, headers, upload_params.into_params()?, data).await?;
+        let ret = RESTClient::post::<UploadFile>(self, ENDPOINT, headers, upload_params.create_params()?, data).await?;
         Ok(ret)
     }
 }

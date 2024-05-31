@@ -14,7 +14,7 @@ use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::progress_bar::ProgressBarBuilder;
-use pcloud_sdk::types::{FileID, RemotePath};
+use pcloud_sdk::types::FileID;
 use pcloud_sdk::types::{Folder, FolderID};
 
 use crate::output::{progressbar_for_progresshash, Print, PrintVariant};
@@ -77,17 +77,14 @@ async fn upload(
             .file_name()
             .ok_or(anyhow!("Cannot get remote filename from {remote_path_filename}"))?;
         debug!("Upload file '{abs_file_to_upload}' to remote at '{remote_path}'");
-        let remote_path = RemotePath::try_from(remote_path)?;
-        (remote_path, remote_filename.to_string())
+        (remote_path.to_path_buf(), remote_filename.to_string())
     };
 
     // Create folder if it doesn't exist
-    let remote_folder_id = pcloud
-        .createfolderifnotexists_all(Some(folder.clone()), &remote_folder_path)
-        .await?;
+    let remote_folder_id = pcloud.createfolderifnotexists_all(folder, remote_folder_path).await?;
 
     // Get all the inputs we need for the operation
-    let mut upload_params = UploadFileParams::new(remote_folder_id.into(), remote_filename.to_string());
+    let mut upload_params = UploadFileParams::new(remote_folder_id, remote_filename.to_string());
     let progresshash = {
         let mut s = DefaultHasher::new();
         file_to_upload.to_string().hash(&mut s);

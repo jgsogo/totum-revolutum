@@ -208,9 +208,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
         let folderid = self.root_folderid.clone();
-        self.pcloud
-            .createfolderifnotexists_all(Some(folderid), &path.try_into()?)
-            .await?;
+        self.pcloud.createfolderifnotexists_all(&folderid, path).await?;
         Ok(())
     }
 
