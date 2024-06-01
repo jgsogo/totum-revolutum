@@ -23,7 +23,10 @@ pub trait GetRenameFile {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetRenameFile for T {
+impl<T: PCloudClient> GetRenameFile for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn renamefile(&self, input: SourceAndTargetFile) -> Result<RenameFile> {
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }

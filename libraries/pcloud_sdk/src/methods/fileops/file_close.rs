@@ -15,7 +15,10 @@ pub trait GetFileClose {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetFileClose for T {
+impl<T: PCloudClient> GetFileClose for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn file_close(&self, descriptor: FileDescriptor) -> Result<()> {
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &descriptor).await
     }

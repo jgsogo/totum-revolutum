@@ -60,7 +60,10 @@ pub struct ProxiedFile<PCloud: PCloudClient + Send + 'static> {
     upload_on_drop: UploadSideTaskType<PCloud>,
 }
 
-impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
+impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud>
+where
+    PCloud: http_utils::HttpClient<Error = crate::Error>,
+{
     /// Return the path to the local file
     pub fn get_local_filepath(temp_dir: &TempDir) -> PathBuf {
         temp_dir.path().join("proxied_file.tmp")

@@ -22,7 +22,10 @@ pub trait GetStat {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetStat for T {
+impl<T: PCloudClient> GetStat for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn stat(&self, input: File) -> Result<Stat> {
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }

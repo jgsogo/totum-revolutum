@@ -37,7 +37,10 @@ pub struct PCloudDatabase<PCloud: PCloudClient + Send + 'static> {
     _proxied_file: ProxiedFile<PCloud>,
 }
 
-impl<PCloud: PCloudClient + Send + Clone + 'static> PCloudDatabase<PCloud> {
+impl<PCloud: PCloudClient + Send + Clone + 'static> PCloudDatabase<PCloud>
+where
+    PCloud: http_utils::HttpClient<Error = pcloud_sdk::Error>,
+{
     /// Initializes the database and pushes it to the remote pCloud storage. It will fail if the
     /// remote file already exists
     pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<Receiver<Result<(), (TempDir, PathBuf)>>> {

@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 filesystem = { path = "../../libraries/filesystem" }
 pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
+http_utils = { path = "../../libraries/http_utils" }
 
 anyhow = { workspace = true }
 async-trait = { workspace = true }

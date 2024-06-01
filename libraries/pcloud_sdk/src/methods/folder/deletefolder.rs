@@ -21,7 +21,10 @@ pub trait GetDeleteFolder {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetDeleteFolder for T {
+impl<T: PCloudClient> GetDeleteFolder for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn deletefolder(&self, input: Folder) -> Result<DeleteFolder> {
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }

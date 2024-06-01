@@ -20,7 +20,10 @@ pub trait GetFileRead {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetFileRead for T {
+impl<T: PCloudClient> GetFileRead for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn file_read(&self, descriptor: FileDescriptor, count: u64) -> Result<FileRead> {
         let mut params = HashMap::new();
         descriptor.add_to_params(&mut params);

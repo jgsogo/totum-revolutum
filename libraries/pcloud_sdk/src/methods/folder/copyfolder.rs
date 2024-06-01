@@ -65,7 +65,10 @@ pub trait GetCopyFolder {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetCopyFolder for T {
+impl<T: PCloudClient> GetCopyFolder for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn copyfile(&self, input: CopyFolderInput) -> Result<CopyFolder> {
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }

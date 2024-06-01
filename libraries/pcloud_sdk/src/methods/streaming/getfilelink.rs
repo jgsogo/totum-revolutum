@@ -76,7 +76,10 @@ pub trait GetFileLink {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetFileLink for T {
+impl<T: PCloudClient> GetFileLink for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn getfilelink(&self, file_link: GetFileLinkInput) -> Result<FileLink> {
         debug!("pcloud::getfilelink - file '{}'", file_link.file);
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &file_link).await

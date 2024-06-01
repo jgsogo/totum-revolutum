@@ -18,7 +18,10 @@ pub trait GetAPIServer {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetAPIServer for T {
+impl<T: PCloudClient> GetAPIServer for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn getapiserver(&self) -> Result<APIServer> {
         RESTClient::get(self, "/getapiserver", HeaderMap::default(), &HashMap::new()).await
     }

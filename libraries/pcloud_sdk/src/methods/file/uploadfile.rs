@@ -79,7 +79,10 @@ pub trait PostUploadFile {
 }
 
 #[async_trait]
-impl<T: PCloudClient> PostUploadFile for T {
+impl<T: PCloudClient> PostUploadFile for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile> {
         let mut headers = HeaderMap::default();
         let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();

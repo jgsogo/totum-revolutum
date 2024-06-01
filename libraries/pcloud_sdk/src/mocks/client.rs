@@ -37,13 +37,11 @@ mock! {
     #[allow(dead_code)]
     #[async_trait]
     impl RESTClient for LocalClient {
-        type RESTClientError = Error;
-
-        fn parse_response<T>(result: String) -> Result<T>
+        fn parse_response<T>(result: String) -> std::result::Result<T, <MockLocalClient as HttpClient>::Error>
         where
             T: DeserializeOwned + 'static;
 
-        async fn get<T, TParams: AddToParams + Sync + 'static>(&self, endpoint: &str, headers: HeaderMap, params: &TParams) -> std::result::Result<T, Error>
+        async fn get<T, TParams: AddToParams + Sync + 'static>(&self, endpoint: &str, headers: HeaderMap, params: &TParams) -> std::result::Result<T, <MockLocalClient as HttpClient>::Error>
         where
             T: DeserializeOwned + 'static;
 
@@ -53,7 +51,7 @@ mock! {
             headers: HeaderMap,
             params: &TParams,
             data: Vec<u8>,
-        ) -> std::result::Result<T, Error>
+        ) -> std::result::Result<T, <MockLocalClient as HttpClient>::Error>
         where
             T: DeserializeOwned + 'static;
     }

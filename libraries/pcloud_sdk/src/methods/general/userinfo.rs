@@ -47,7 +47,10 @@ pub trait GetUserInfo {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetUserInfo for T {
+impl<T: PCloudClient> GetUserInfo for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn userinfo(&self) -> Result<UserInfo> {
         RESTClient::get(self, "/userinfo", HeaderMap::default(), &HashMap::new()).await
     }

@@ -65,10 +65,10 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 
 /// Any command that uses the DB is executed here. This way we can guarantee that the Receiver work
 /// (store the database back to pCloud if anything fails) is always executed
-async fn db_commands<T: Database, PCloud: PCloudClient>(
-    command: Commands,
-    photodb: PhotoDB<'_, T, PCloud>,
-) -> Result<()> {
+async fn db_commands<T: Database, PCloud>(command: Commands, photodb: PhotoDB<'_, T, PCloud>) -> Result<()>
+where
+    PCloud: PCloudClient + http_utils::HttpClient<Error = pcloud_sdk::Error>,
+{
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,
         c => bail!("Unexpected command {:?}", c),

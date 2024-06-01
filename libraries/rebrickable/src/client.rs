@@ -3,7 +3,7 @@ use http_utils::rest::RESTClient;
 use http_utils::HttpClient;
 use std::collections::HashMap;
 
-pub trait RebrickableClient: RESTClient<RESTClientError = Error> {}
+pub trait RebrickableClient: RESTClient {}
 
 #[derive(Debug)]
 pub struct RebrickableClientImpl {
@@ -29,9 +29,7 @@ impl HttpClient for RebrickableClientImpl {
     }
 }
 
-impl RESTClient for RebrickableClientImpl {
-    type RESTClientError = Error;
-}
+impl RESTClient for RebrickableClientImpl {}
 
 impl RebrickableClient for RebrickableClientImpl {}
 

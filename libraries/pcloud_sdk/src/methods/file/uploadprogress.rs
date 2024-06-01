@@ -25,7 +25,10 @@ pub trait UploadProgress {
 }
 
 #[async_trait]
-impl<T: PCloudClient> UploadProgress for T {
+impl<T: PCloudClient> UploadProgress for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData> {
         let mut params = HashMap::new();
         params.insert("progresshash".to_string(), progresshash.to_string());

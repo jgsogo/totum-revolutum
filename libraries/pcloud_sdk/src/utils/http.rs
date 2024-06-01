@@ -10,7 +10,7 @@ use reqwest;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use crate::error::{Error, Result};
+use crate::error::{DeserializationError, DeserializationErrorKind, Error, Result};
 
 pub const BOUNDARY: &str = "ea3bbcf87c101592";
 
@@ -27,17 +27,26 @@ pub fn create_response<T>(result: String) -> Result<T>
 where
     T: DeserializeOwned,
 {
-    let r = serde_json::from_str::<ApiResult<T>>(&result)?;
-
-    match r.result {
-        0 => match r.data {
-            Some(data) => Ok(data),
-            None => Err(Error::EmptyDataError),
+    match serde_json::from_str::<ApiResult<T>>(&result) {
+        Ok(r) => match r.result {
+            0 => match r.data {
+                Some(data) => Ok(data),
+                None => Err(DeserializationError {
+                    string: result,
+                    source: DeserializationErrorKind::EmptyDataField,
+                }
+                .into()),
+            },
+            _ => Err(Error::PCloudError {
+                code: r.result,
+                message: r.error.unwrap_or_else(|| "Error message not available".into()),
+            }),
         },
-        _ => Err(Error::PCloudError {
-            code: r.result,
-            message: r.error.unwrap_or_else(|| "Error message not available".into()),
-        }),
+        Err(e) => Err(DeserializationError {
+            string: result,
+            source: e.into(),
+        }
+        .into()),
     }
 }
 
@@ -142,7 +151,18 @@ mod tests {
     fn create_response_serialization_error() {
         let r = create_response::<UserInfo>("this is not serializable".into());
         assert!(r.is_err());
-        assert_eq!(r.unwrap_err().to_string(), "expected ident at line 1 column 2");
+        // TODO: Write a NOTE about this: we don't really care about the actual message printed by
+        // TODO: the error, we care about the kind of error and the data it contains. The message
+        // TODO: could change/improve, but the data inside is based on inputs. This is what we
+        // TODO: care about! Test all errors this way!
+        // TODO: Use assert_matches! here once it is stabilized.
+        assert!(matches!(
+            r.unwrap_err(),
+            Error::DeserializationError(DeserializationError {
+                source: DeserializationErrorKind::SerdeError { .. },
+                string: ref msg,
+            })if msg == "this is not serializable"
+        ));
     }
 
     #[test]

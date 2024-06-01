@@ -16,7 +16,7 @@ use crate::utils::http::create_response;
 use crate::{access_token, Error, Result};
 
 #[async_trait]
-pub trait PCloudClient: RESTClient<RESTClientError = Error> {
+pub trait PCloudClient: RESTClient {
     async fn get_bytes<TParams: AddToParams + Sync + 'static>(
         &self,
         endpoint: &str,
@@ -98,8 +98,6 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> RESTClient
     for PCloudClientImpl<Token>
 {
-    type RESTClientError = Error;
-
     fn parse_response<T>(result: String) -> std::result::Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,

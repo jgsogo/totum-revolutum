@@ -9,7 +9,7 @@ use crate::AddToParams;
 #[async_trait]
 /// A reusable HTTP client
 pub trait HttpClient: Sync {
-    type Error: From<reqwest::Error>;
+    type Error: From<crate::Error>;
 
     /// Build the URL to call from the given endpoint and internal data (schema and hostname).
     fn build_url(&self, endpoint: &str) -> String;
@@ -34,7 +34,7 @@ pub trait HttpClient: Sync {
         endpoint: &str,
         headers: HeaderMap,
         query: &T,
-    ) -> std::result::Result<Response, Self::Error> {
+    ) -> Result<Response, Self::Error> {
         let url = self.build_url(endpoint);
         tracing::debug!("GET '{url}'");
 
@@ -47,7 +47,8 @@ pub trait HttpClient: Sync {
             .headers(self.headers(headers))
             .query(&params);
 
-        request.send().await.map_err(|e| e.into())
+        let r = request.send().await.map_err(|e| e.into())?;
+        Ok(r)
     }
 
     /// Runs POST request to the given `endpoint` (URL will be built using [`self.build_url`])
@@ -57,7 +58,7 @@ pub trait HttpClient: Sync {
         headers: HeaderMap,
         query: &T,
         data: Vec<u8>,
-    ) -> std::result::Result<Response, Self::Error> {
+    ) -> Result<Response, Self::Error> {
         let url = self.build_url(endpoint);
         tracing::debug!("POST '{url}'");
 
@@ -71,6 +72,7 @@ pub trait HttpClient: Sync {
             .query(&params)
             .body(reqwest::Body::from(data));
 
-        request.send().await.map_err(|e| e.into())
+        let r = request.send().await.map_err(|e| e.into())?;
+        Ok(r)
     }
 }

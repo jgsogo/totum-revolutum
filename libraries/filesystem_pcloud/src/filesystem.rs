@@ -46,7 +46,10 @@ pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone> {
     thread_file_close: Option<JoinHandle<()>>,
 }
 
-impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpClient> {
+impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpClient>
+where
+    HttpClient: http_utils::HttpClient<Error = pcloud_sdk::Error>,
+{
     pub async fn new(root_path: RemotePath, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
         let (tx, rx) = flume::unbounded::<FileCloseMessage>();
@@ -125,7 +128,10 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
 }
 
 #[async_trait]
-impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
+impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient>
+where
+    HttpClient: http_utils::HttpClient<Error = pcloud_sdk::Error>,
+{
     type Metadata = RemoteMetadata;
 
     fn root(&self) -> &Utf8Path {

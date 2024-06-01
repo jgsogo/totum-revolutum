@@ -31,7 +31,10 @@ pub trait GetCreateFolderIfNotExists {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetCreateFolderIfNotExists for T {
+impl<T: PCloudClient> GetCreateFolderIfNotExists for T
+where
+    T: http_utils::HttpClient<Error = crate::Error>,
+{
     async fn createfolderifnotexists(&self, folder_id: &FolderID, name: &str) -> Result<CreateFolderIfNotExists> {
         let mut params = HashMap::new();
         folder_id.add_to_params(&mut params);
