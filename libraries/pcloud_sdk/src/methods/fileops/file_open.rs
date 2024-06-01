@@ -41,10 +41,7 @@ pub trait GetFileOpen {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetFileOpen for T
-where
-    T: http_utils::HttpClient<Error = Error>,
-{
+impl<T: PCloudClient> GetFileOpen for T {
     async fn file_open(&self, flags: Flags, path: FileOpenPath) -> Result<FileOpen> {
         let mut params = HashMap::new();
         params.insert("flags".to_string(), flags.bits().to_string());

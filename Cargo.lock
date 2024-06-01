@@ -2630,7 +2630,6 @@ dependencies = [
  "dotenvy",
  "filesystem",
  "home",
- "http_utils",
  "image",
  "log",
  "oxipng",

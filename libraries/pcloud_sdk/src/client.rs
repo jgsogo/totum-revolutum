@@ -16,7 +16,7 @@ use crate::utils::http::create_response;
 use crate::{access_token, Error, Result};
 
 #[async_trait]
-pub trait PCloudClient: RESTClient {
+pub trait PCloudClient: RESTClient + HttpClient<Error = Error> {
     async fn get_bytes<TParams: AddToParams + Sync + 'static>(
         &self,
         endpoint: &str,

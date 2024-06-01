@@ -24,10 +24,7 @@ pub struct PhotoDB<'a, T: Database, PCloud: PCloudClient> {
     folder_id: FolderID,
 }
 
-impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud>
-where
-    PCloud: http_utils::HttpClient<Error = pcloud_sdk::Error>,
-{
+impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
     pub async fn new(db: T, pcloud: PCloud, app_dir: &'a AppDirs, remote_dir: RemotePath) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote directory '{}'",

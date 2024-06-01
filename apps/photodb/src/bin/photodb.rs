@@ -67,7 +67,7 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 /// (store the database back to pCloud if anything fails) is always executed
 async fn db_commands<T: Database, PCloud>(command: Commands, photodb: PhotoDB<'_, T, PCloud>) -> Result<()>
 where
-    PCloud: PCloudClient + http_utils::HttpClient<Error = pcloud_sdk::Error>,
+    PCloud: PCloudClient,
 {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,

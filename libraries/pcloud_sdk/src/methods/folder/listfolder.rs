@@ -67,10 +67,7 @@ pub trait GetListFolder {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetListFolder for T
-where
-    T: http_utils::HttpClient<Error = crate::Error>,
-{
+impl<T: PCloudClient> GetListFolder for T {
     async fn listfolder_with_filtermeta(
         &self,
         list_folder: ListFolderInput,

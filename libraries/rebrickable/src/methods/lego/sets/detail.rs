@@ -27,10 +27,7 @@ pub trait GetSetDetail {
 }
 
 #[async_trait]
-impl<T: RebrickableClient> GetSetDetail for T
-where
-    T: http_utils::HttpClient<Error = crate::Error>,
-{
+impl<T: RebrickableClient> GetSetDetail for T {
     async fn sets_detail(&self, set_num: String) -> Result<SetDetail> {
         let endpoint = format!("/lego/sets/{set_num}");
         RESTClient::get(self, &endpoint, HeaderMap::default(), &HashMap::new()).await

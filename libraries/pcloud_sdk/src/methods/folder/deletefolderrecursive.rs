@@ -20,10 +20,7 @@ pub trait GetDeleteFolderRecursive {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetDeleteFolderRecursive for T
-where
-    T: http_utils::HttpClient<Error = crate::Error>,
-{
+impl<T: PCloudClient> GetDeleteFolderRecursive for T {
     async fn deletefolderrecursive(&self, input: Folder) -> Result<DeleteFolderRecursive> {
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
