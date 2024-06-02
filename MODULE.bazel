@@ -4,7 +4,7 @@ module(
     compatibility_level = 1,
 )
 
-bazel_dep(name = "bazel_skylib", version = "1.6.1")
+bazel_dep(name = "bazel_skylib", version = "1.7.0")
 bazel_dep(name = "platforms", version = "0.0.10")
 
 bazel_dep(name = "rules_python", version = "0.32.2", dev_dependency = True)
@@ -47,7 +47,7 @@ python.toolchain(
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
     edition = "2021",
-    versions = ["1.75.0"],
+    versions = ["1.78.0"],
 )
 use_repo(rust, "rust_toolchains")
 
@@ -64,10 +64,10 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 http_archive(
     name = "diesel_cli",
     build_file = "//bazel/external:BUILD.diesel_cli.bazel",
-    sha256 = "ed0d26f384b697e94535595644e2826fb04cc83bf0949283f535f2d9c65ed31e",
-    strip_prefix = "diesel_cli-2.1.1",
+    sha256 = "4306582adc17f767b451db2357701175c74b7dfc4b45e29b2eca74c3a9f6bc52",
+    strip_prefix = "diesel_cli-2.2.0",
     type = "tar.gz",
-    urls = ["https://crates.io/api/v1/crates/diesel_cli/2.1.1/download"],
+    urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.0/download"],
 )
 
 crate.from_cargo(
