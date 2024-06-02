@@ -23,7 +23,7 @@ pub trait GetCopyFile {
 }
 
 #[async_trait]
-impl<T: PCloudClient> GetCopyFile<pCloud client::Error> for T {
+impl<T: PCloudClient> GetCopyFile<PCloudClient::Error> for T {
     async fn copyfile(&self, input: SourceAndTargetFile) -> std:: result::Result<CopyFile, Self::Error> {
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
