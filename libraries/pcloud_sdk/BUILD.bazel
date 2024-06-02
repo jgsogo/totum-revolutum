@@ -7,6 +7,11 @@ rust_library_tests_and_docs(
     srcs = glob(["src/**/*.rs"]),
     aliases = aliases(),
     all_features = {
+        "bin": [
+            "bin",
+            "cli",
+            "use_indicatif",
+        ],
         "cli": [
             "cli",
             "use_indicatif",
@@ -33,6 +38,7 @@ rust_binary(
     aliases = aliases(),
     crate_features = [
         "bin",
+        "cli",
         "use_indicatif",
     ],
     proc_macro_deps = all_crate_deps(

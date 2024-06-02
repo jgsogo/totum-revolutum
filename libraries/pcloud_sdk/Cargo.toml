@@ -7,7 +7,7 @@ edition = "2021"
 ### The `cli` feature is required for the CLI binary. It also provides structs and methods to handle and
 ### store app authentication. We need to add it ot the "default" features as they are the ones enabled
 ### while building the CLI "binary"
-default = ["cli"]
+default = ["bin"]
 cli = ["dep:clap-verbosity-flag", "dep:tracing-subscriber", "dep:log", "dep:clap", "use_indicatif"]
 use_indicatif = ["dep:indicatif"]
 test_utils = ["dep:mockall", "dep:httpmock"]
@@ -76,4 +76,4 @@ tracing-subscriber = { workspace = true }
 name = "pcloud_sdk"
 path = "src/bin/pcloud_sdk/main.rs"
 # Waiting for https://github.com/rust-lang/cargo/issues/4663 (and related: https://github.com/rust-lang/rfcs/pull/3374)
-required-features = ["cli", "bin"]
+required-features = ["bin"]

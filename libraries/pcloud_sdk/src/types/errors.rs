@@ -1,7 +1,7 @@
 use thiserror::Error;
 
-/// An error that can be returned when creating a [`RemotePath`] from other type. Returned from
-/// [`TryFrom`] implementations.
+/// An error that can be returned when creating a [`crate::types::RemotePath`] from other type.
+/// Returned from [`TryFrom`] implementations.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 #[error("InvalidRemotePath {source}")]
 pub struct InvalidRemotePathError {
@@ -20,8 +20,8 @@ pub enum InvalidRemotePathKind {
     NotAFile,
 }
 
-/// An error that can be returned when creating a [`File`] from other type. Returned from
-/// [`TryFrom`] implementations.
+/// An error that can be returned when creating a [`crate::types::File`] from other type. Returned
+/// from [`TryFrom`] implementations.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 #[error("InvalidFile {source}")]
 pub struct InvalidFileError {
@@ -34,8 +34,8 @@ pub enum InvalidFileKind {
     InvalidRemotePath(#[from] InvalidRemotePathError),
 }
 
-/// An error that can be returned when creating a [`Folder`] from other type. Returned from
-/// [`TryFrom`] implementations.
+/// An error that can be returned when creating a [`crate::types::Folder`] from other type. Returned
+/// from [`TryFrom`] implementations.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 #[error("InvalidFolder {source}")]
 pub struct InvalidFolderError {
