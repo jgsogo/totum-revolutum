@@ -1,7 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-use anyhow::anyhow;
 use camino::Utf8PathBuf;
 
 use crate::types::errors::{InvalidFileError, InvalidRemotePathError, InvalidRemotePathKind};
@@ -58,7 +57,7 @@ impl FromStr for File {
             } else if let Ok(p) = RemotePath::from_str(s) {
                 p.try_into().map_err(ParseErrorKind::InvalidFile)
             } else {
-                Err(ParseErrorKind::Other(anyhow!("can't parse into FileID or RemotePath")))
+                Err(ParseErrorKind::InvalidFileIDOrRemotePath)
             }
         }
         .map_err(|source| ParseError {
@@ -95,6 +94,21 @@ mod tests {
         assert!(File::from_str("path:/path/to/file").is_ok());
         assert!(File::from_str("path:/path/to/folder/").is_err());
         Ok(())
+    }
+
+    #[test]
+    fn test_parse_errors() {
+        let r = File::from_str("fileid:123a");
+        assert!(r.is_err());
+        assert!(
+            matches!(r.unwrap_err(), ParseError {ref string, source: ParseErrorKind::InvalidFileIDOrRemotePath} if string == "fileid:123a")
+        );
+
+        let r = File::from_str("path:/invalid/as/file/");
+        assert!(r.is_err());
+        assert!(
+            matches!(r.unwrap_err(), ParseError {ref string, source: ParseErrorKind::InvalidRemotePath(InvalidRemotePathError{source: InvalidRemotePathKind::NotAFile})} if string == "path:/invalid/as/file/")
+        );
     }
 
     #[test]

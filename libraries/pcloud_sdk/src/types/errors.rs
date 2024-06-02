@@ -81,6 +81,9 @@ pub enum ParseErrorKind {
     #[error(transparent)]
     InvalidFolder(#[from] InvalidFolderError),
 
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
+    #[error("Input can't be parsed as FileID or RemotePath")]
+    InvalidFileIDOrRemotePath,
+
+    #[error("Input can't be parsed as FolderID or RemotePath")]
+    InvalidFolderIDOrRemotePath,
 }
