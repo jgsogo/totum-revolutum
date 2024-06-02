@@ -1,15 +1,18 @@
+use collections::HashMap;
+use std::collections;
+
+use async_trait::async_trait;
+use http::HeaderMap;
+use itertools::Itertools;
+use serde::{Deserialize, Serialize};
+
+use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
+
 use crate::client::PCloudClient;
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
 use crate::Result;
-use async_trait::async_trait;
-use collections::HashMap;
-use http::HeaderMap;
-use http_utils::rest::RESTClient;
-use http_utils::AddToParams;
-use itertools::Itertools;
-use serde::{Deserialize, Serialize};
-use std::collections;
 
 pub const ENDPOINT: &str = "/listfolder";
 

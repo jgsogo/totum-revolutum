@@ -1,14 +1,13 @@
 use std::collections::HashMap;
 use std::str::FromStr;
 
-use anyhow::Result;
-
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::{Folder, FolderID};
+use pcloud_sdk::Result;
 
 #[tokio::test]
 async fn test_listfolder() -> Result<()> {

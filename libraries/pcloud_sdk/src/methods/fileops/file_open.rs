@@ -1,16 +1,17 @@
 use std::collections::HashMap;
 
+use async_trait::async_trait;
+use bitflags::bitflags;
+use http::HeaderMap;
+use serde::{Deserialize, Serialize};
+
+use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
+
 use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;
 use crate::types::{File, FileID, FolderID};
 use crate::{Error, Result};
-use anyhow::anyhow;
-use async_trait::async_trait;
-use bitflags::bitflags;
-use http::HeaderMap;
-use http_utils::rest::RESTClient;
-use http_utils::AddToParams;
-use serde::{Deserialize, Serialize};
 
 pub const ENDPOINT: &str = "/file_open";
 
@@ -57,9 +58,9 @@ impl<T: PCloudClient> GetFileOpen for T {
                     path.add_to_params(&mut params);
                 }
                 _ => {
-                    return Err(Error::Other(anyhow!(
-                        "If O_CREATE is set, provide either folderid+name or path"
-                    )))
+                    return Err(Error::InputDataEror(
+                        "If O_CREATE is set, provide either folderid+name or path".to_string(),
+                    ))
                 }
             }
         } else {
@@ -67,9 +68,9 @@ impl<T: PCloudClient> GetFileOpen for T {
             match path {
                 FileOpenPath::File(file) => file.add_to_params(&mut params),
                 _ => {
-                    return Err(Error::Other(anyhow!(
-                        "If O_CREATE is not set, provide either fileid or path"
-                    )))
+                    return Err(Error::InputDataEror(
+                        "If O_CREATE is not set, provide either fileid or path".to_string(),
+                    ))
                 }
             }
         }
@@ -96,9 +97,8 @@ mod tests {
                 .file_open(flags, FileOpenPath::File(FileID::new(42).into()))
                 .await;
             assert!(r.is_err());
-            assert_eq!(
-                r.unwrap_err().to_string(),
-                "If O_CREATE is set, provide either folderid+name or path"
+            assert!(
+                matches!(r.unwrap_err(), Error::InputDataEror(ref message) if message == "If O_CREATE is set, provide either folderid+name or path")
             );
         }
 
@@ -167,9 +167,8 @@ mod tests {
                 )
                 .await;
             assert!(r.is_err());
-            assert_eq!(
-                r.unwrap_err().to_string(),
-                "If O_CREATE is not set, provide either fileid or path"
+            assert!(
+                matches!(r.unwrap_err(), Error::InputDataEror(ref message) if message == "If O_CREATE is not set, provide either fileid or path")
             );
         }
 

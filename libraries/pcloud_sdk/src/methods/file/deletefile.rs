@@ -2,9 +2,9 @@ use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
+use crate::client::PCloudClient;
 use crate::structures::MetadataFile;
 use crate::types::File;
 use crate::Result;

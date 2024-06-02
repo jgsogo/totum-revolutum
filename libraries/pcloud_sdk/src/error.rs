@@ -13,13 +13,37 @@ pub enum Error {
     DeserializationError(#[from] DeserializationError),
 
     #[error(transparent)]
+    SerializationError(#[from] SerializationError),
+
+    #[error(transparent)]
     IoError(#[from] io::Error),
+
+    #[error(transparent)]
+    ParseError(#[from] crate::types::errors::ParseError),
+
+    #[error("The file already exists")]
+    FileAlreadyExists,
 
     #[error("Error from PCloud {code}: {message}")]
     PCloudError { code: u16, message: String },
 
+    #[error("Wrong input data: {0}")]
+    InputDataEror(String),
+}
+
+/// An error that can be returned when serializing data.
+#[derive(Debug, Error)]
+#[error("Cannot deserialize string '{string}': {source}")]
+pub struct SerializationError {
+    pub string: String,
+    pub source: SerializationErrorKind,
+}
+
+/// Additional information for [`SerializationError`] error
+#[derive(Debug, Error)]
+pub enum SerializationErrorKind {
     #[error(transparent)]
-    Other(#[from] anyhow::Error), // source and Display delegate to anyhow::Error
+    SerdeError(#[from] serde_json::Error),
 }
 
 /// An error that can be returned when deserializing data.

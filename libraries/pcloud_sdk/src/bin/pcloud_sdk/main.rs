@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::{anyhow, Result};
 use camino::Utf8PathBuf;
 use clap::{Parser, Subcommand};
 use tracing::debug;
@@ -89,8 +89,10 @@ async fn main() -> Result<()> {
 
     // Go ahead!
     match &cli.command {
-        Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await,
-        Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input).await,
+        Commands::Auth(input) => auth::handle_auth(&cli.token_file, input).await.map_err(|e| anyhow!(e)),
+        Commands::AuthFile(input) => auth::handle_auth_file(&cli.token_file, input)
+            .await
+            .map_err(|e| anyhow!(e)),
         _ => {
             let token = auth::read_from_file(&cli.token_file)?;
             let client = PCloudClientImpl::new(token, true);
@@ -99,7 +101,7 @@ async fn main() -> Result<()> {
                 Commands::Listfolder(params) => listfolder::handle(client, &output, params, cli.common).await,
                 Commands::Download(params) => download::handle(client, &output, params, cli.common).await,
                 Commands::Upload(params) => upload::handle(client, &output, params, cli.common).await,
-                c => bail!("Unexpected command {:?}", c),
+                _ => unreachable!("All commands should've been consumed above"),
             }
         }
     }

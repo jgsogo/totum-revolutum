@@ -78,17 +78,17 @@ impl Display for File {
 
 #[cfg(test)]
 mod tests {
-    use anyhow::Result;
-    use camino::Utf8PathBuf;
-
     use super::*;
+    use crate::types::errors::InvalidFileKind;
+    use crate::Result;
+    use camino::Utf8PathBuf;
 
     #[test]
     fn test_parse_str() -> Result<()> {
         assert_eq!(File::from_str("fileid:123")?, FileID::new(123).into());
         assert_eq!(
             File::from_str("path:/fileid-123")?,
-            File::RemotePath(Utf8PathBuf::from_str("/fileid-123")?.try_into()?)
+            File::RemotePath(Utf8PathBuf::from_str("/fileid-123").unwrap().try_into().unwrap())
         );
 
         assert!(File::from_str("path:/path/to/file").is_ok());
@@ -107,7 +107,7 @@ mod tests {
         let r = File::from_str("path:/invalid/as/file/");
         assert!(r.is_err());
         assert!(
-            matches!(r.unwrap_err(), ParseError {ref string, source: ParseErrorKind::InvalidRemotePath(InvalidRemotePathError{source: InvalidRemotePathKind::NotAFile})} if string == "path:/invalid/as/file/")
+            matches!(r.unwrap_err(), ParseError {ref string, source: ParseErrorKind::InvalidFile(InvalidFileError{ source: InvalidFileKind::InvalidRemotePath(InvalidRemotePathError{source: InvalidRemotePathKind::NotAFile})})} if string == "path:/invalid/as/file/")
         );
     }
 

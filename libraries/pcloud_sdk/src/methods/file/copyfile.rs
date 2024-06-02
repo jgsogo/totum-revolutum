@@ -1,9 +1,10 @@
-use crate::client::PCloudClient;
 use async_trait::async_trait;
 use http::HeaderMap;
-use http_utils::rest::RESTClient;
 use serde::{Deserialize, Serialize};
 
+use http_utils::rest::RESTClient;
+
+use crate::client::PCloudClient;
 use crate::methods::params::SourceAndTargetFile;
 use crate::structures::MetadataFile;
 use crate::Result;
@@ -29,10 +30,11 @@ impl<T: PCloudClient> GetCopyFile for T {
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs;
     use std::io::BufReader;
+
+    use camino::Utf8Path;
 
     use crate::types::FileID;
     use crate::utils::http::ApiResult;

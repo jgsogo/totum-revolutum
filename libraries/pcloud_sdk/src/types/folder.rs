@@ -70,7 +70,7 @@ impl Display for Folder {
 mod tests {
     use super::*;
     use crate::types::errors::{InvalidFolderKind, InvalidRemotePathKind};
-    use anyhow::Result;
+    use crate::Result;
 
     #[test]
     fn test_parse_str() -> Result<()> {

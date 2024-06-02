@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
-use crate::error::Error;
-use anyhow::Result;
 use reqwest;
 use serde::de::DeserializeOwned;
 
 use crate::utils::http::create_response;
+use crate::Result;
 
 use super::{AppClientData, OAuth2Token};
 
@@ -16,7 +15,7 @@ pub(crate) async fn exchange_oauth2_token<Token: OAuth2Token + DeserializeOwned>
     app: AppClientData,
     hostname: String,
     code: String,
-) -> Result<Token, Error> {
+) -> Result<Token> {
     let params = {
         let mut params = HashMap::new();
         params.insert("client_id".to_string(), app.client_id().to_string());

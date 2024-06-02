@@ -1,11 +1,13 @@
+use async_trait::async_trait;
+use http::HeaderMap;
+use serde::{Deserialize, Serialize};
+
+use http_utils::rest::RESTClient;
+
 use crate::client::PCloudClient;
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
 use crate::Result;
-use async_trait::async_trait;
-use http::HeaderMap;
-use http_utils::rest::RESTClient;
-use serde::{Deserialize, Serialize};
 
 pub const ENDPOINT: &str = "/deletefolder";
 

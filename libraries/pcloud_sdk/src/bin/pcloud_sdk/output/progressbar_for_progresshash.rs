@@ -55,9 +55,10 @@ mod tests {
     use std::cell::RefCell;
     use std::sync::Arc;
 
-    use anyhow::anyhow;
+    use anyhow::bail;
     use async_trait::async_trait;
-    use pcloud_sdk::{Error, Result};
+
+    use crate::Result;
 
     use super::*;
 
@@ -128,7 +129,7 @@ mod tests {
     impl UploadProgress for MockUploadProgress {
         async fn uploadprogress(&self, _progresshash: &str) -> Result<UploadProgressData> {
             if self.error {
-                return Err(Error::Other(anyhow!("Returning error as expected")));
+                bail!("Returning error as expected");
             }
 
             if self.data.borrow().up_total > self.data.borrow().up_progress {

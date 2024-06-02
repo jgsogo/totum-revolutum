@@ -1,16 +1,18 @@
-use crate::client::PCloudClient;
-use crate::utils::http::BOUNDARY;
-use crate::Result;
+use std::str::FromStr;
+
 use async_trait::async_trait;
 use headers::HeaderMapExt;
 use http::HeaderMap;
-use http_utils::rest::RESTClient;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
 
+use http_utils::rest::RESTClient;
+
+use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;
 use crate::utils;
+use crate::utils::http::BOUNDARY;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/file_write";
 
@@ -28,7 +30,7 @@ pub trait PostFileWrite {
 impl<T: PCloudClient> PostFileWrite for T {
     async fn file_write(&self, descriptor: FileDescriptor, data: &[u8]) -> Result<FileWrite> {
         let mut headers = HeaderMap::default();
-        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
+        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={}", BOUNDARY)).unwrap();
         let content_type = headers::ContentType::from(mime_multipart);
         headers.typed_insert(content_type);
 
@@ -39,7 +41,6 @@ impl<T: PCloudClient> PostFileWrite for T {
 
 #[cfg(test)]
 mod tests {
-
     use crate::mocks::client::MockLocalClient;
 
     use super::*;

@@ -32,7 +32,7 @@ rust_binary(
     srcs = glob(["src/bin/pcloud_sdk/**/*.rs"]),
     aliases = aliases(),
     crate_features = [
-        "cli",
+        "bin",
         "use_indicatif",
     ],
     proc_macro_deps = all_crate_deps(

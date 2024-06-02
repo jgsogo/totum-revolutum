@@ -1,4 +1,3 @@
-use anyhow::Result;
 use camino::Utf8Path;
 
 use pcloud_sdk::client::PCloudClientImpl;
@@ -9,6 +8,7 @@ use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::FolderID;
+use pcloud_sdk::Result;
 
 #[tokio::test]
 async fn test_fileops() -> Result<()> {

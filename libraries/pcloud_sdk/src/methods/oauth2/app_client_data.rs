@@ -1,8 +1,9 @@
-use camino::Utf8Path;
 use std::fs::File;
 use std::io::BufReader;
 
-use anyhow::Result;
+use crate::error::{DeserializationError, DeserializationErrorKind};
+use crate::{Error, Result};
+use camino::Utf8Path;
 use serde::{Deserialize, Serialize};
 
 /// Stores the information required to perform an authorization request. It can be
@@ -27,8 +28,12 @@ impl AppClientData {
     pub fn read_from_file<P: AsRef<Utf8Path>>(path: P) -> Result<AppClientData> {
         let file = File::open(path.as_ref().as_std_path())?;
         let reader = BufReader::new(file);
-        let u = serde_json::from_reader(reader)?;
-        Ok(u)
+        serde_json::from_reader(reader).map_err(|e| {
+            Error::DeserializationError(DeserializationError {
+                string: format!("Can't deserialize from file {}", path.as_ref()),
+                source: DeserializationErrorKind::SerdeError(e),
+            })
+        })
     }
 
     pub fn client_id(&self) -> &str {

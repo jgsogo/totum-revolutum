@@ -1,21 +1,22 @@
-use crate::Result;
+use std::collections::HashMap;
+use std::str::FromStr;
+
 use async_trait::async_trait;
 use camino::Utf8Path;
 use headers::HeaderMapExt;
 use http::HeaderMap;
-use http_utils::AddToParams;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::str::FromStr;
+
+use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
 
 use crate::client::PCloudClient;
-use http_utils::rest::RESTClient;
-
 use crate::structures::MetadataFile;
 use crate::types::FolderID;
 use crate::utils;
 use crate::utils::http::BOUNDARY;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/uploadfile";
 
@@ -82,7 +83,7 @@ pub trait PostUploadFile {
 impl<T: PCloudClient> PostUploadFile for T {
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile> {
         let mut headers = HeaderMap::default();
-        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
+        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={}", BOUNDARY)).unwrap();
         let content_type = headers::ContentType::from(mime_multipart);
         headers.typed_insert(content_type);
 

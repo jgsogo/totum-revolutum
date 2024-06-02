@@ -1,15 +1,16 @@
-use crate::Result;
-use async_trait::async_trait;
-use http::HeaderMap;
-use http_utils::AddToParams;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::client::PCloudClient;
-use http_utils::rest::RESTClient;
+use async_trait::async_trait;
+use http::HeaderMap;
+use serde::{Deserialize, Serialize};
 
+use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
+
+use crate::client::PCloudClient;
 use crate::structures::MetadataFolder;
 use crate::types::FolderID;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/createfolderifnotexists";
 
