@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::methods::params::SourceAndTargetFile;
 use crate::structures::MetadataFile;
-use crate::Result;
 
 pub const ENDPOINT: &str = "/copyfile";
 
@@ -17,12 +16,16 @@ pub struct CopyFile {
 
 #[async_trait]
 pub trait GetCopyFile {
-    async fn copyfile(&self, input: SourceAndTargetFile) -> Result<CopyFile>;
+    type Error;
+
+    async fn copyfile(&self, input: SourceAndTargetFile) -> Result<CopyFile, Self::Error>;
 }
 
 #[async_trait]
 impl<T: PCloudClient> GetCopyFile for T {
-    async fn copyfile(&self, input: SourceAndTargetFile) -> Result<CopyFile> {
+    type Error = <dyn PCloudClient as http_utils::HttpClient>::Error;
+
+    async fn copyfile(&self, input: SourceAndTargetFile) -> Result<CopyFile, Self::Error> {
         RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
