@@ -9,6 +9,7 @@ use crate::utils::{
     versioned_data::VersionedData,
 };
 use crate::utils::{mut_find_or_insert, to_absolute_path};
+use anyhow::Result;
 
 const FILENAME: &str = "cron.yaml";
 
@@ -19,24 +20,24 @@ pub struct Directory {
 }
 
 impl Directory {
-    pub fn new(path: &Utf8Path, expression: &str, tz: &chrono_tz::Tz) -> Self {
+    pub fn new(path: &Utf8Path, expression: &str, tz: &chrono_tz::Tz) -> Result<Self> {
         let path = to_absolute_path(path);
 
-        Self {
+        Ok(Self {
             path: path.to_string(),
-            cron: CronTz::new(expression, tz),
-        }
+            cron: CronTz::new(expression, tz)?,
+        })
     }
 
     pub fn upcoming(&self) -> Option<chrono::DateTime<chrono_tz::Tz>> {
-        self.cron.upcoming()
+        self.cron.upcoming().ok()
     }
 
     pub fn next<Tz>(&self, previous: &chrono::DateTime<Tz>) -> Option<chrono::DateTime<Tz>>
     where
         Tz: chrono::TimeZone,
     {
-        self.cron.next(previous)
+        self.cron.next(previous).ok()
     }
 
     pub fn path(&self) -> Utf8PathBuf {
@@ -113,7 +114,7 @@ mod tests {
     }
 
     #[test]
-    fn test_update_or_create() {
+    fn test_update_or_create() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
         let path = DirectoriesFile::path(utf8_path);
@@ -126,10 +127,11 @@ mod tests {
                 Utf8Path::new("path/to/dir"),
                 "*/2 * * * *",
                 &chrono_tz::Tz::from_str("UTC").unwrap(),
-            ))
+            )?)
         }
 
         let directories_lock = DirectoriesFile::read(&path).unwrap();
         assert_eq!(directories_lock.content.data.directories.len(), 1);
+        Ok(())
     }
 }

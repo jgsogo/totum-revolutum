@@ -1,3 +1,4 @@
+use crate::Result;
 use camino::Utf8Path;
 use std::fmt::Debug;
 
@@ -12,13 +13,13 @@ pub trait FileMetadata: Clone + Send + Sync + Debug {
     fn path(&self) -> &Utf8Path;
 
     /// The size of the file
-    fn size(&self) -> u64;
+    fn size(&self) -> Result<u64>;
 
     /// A hash computed from the contents of the file
-    fn hash(&self) -> String;
+    fn hash(&self) -> Result<String>;
 
     /// Equality at [`FileMetadata`] level: checks only size and hash
-    fn eq<T: FileMetadata>(&self, other: &T) -> bool {
-        self.size() == other.size() && self.hash() == other.hash()
+    fn eq<T: FileMetadata>(&self, other: &T) -> Result<bool> {
+        Ok(self.size()? == other.size()? && self.hash()? == other.hash()?)
     }
 }

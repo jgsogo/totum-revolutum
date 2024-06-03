@@ -1,7 +1,7 @@
 use camino::{Utf8Path, Utf8PathBuf};
 use ignore::DirEntry;
 
-use crate::FileMetadata;
+use crate::{Error, FileMetadata, Result};
 
 #[derive(Debug, Clone)]
 pub struct LocalMetadata {
@@ -14,12 +14,12 @@ impl FileMetadata for LocalMetadata {
         &self.relative_path
     }
 
-    fn size(&self) -> u64 {
-        self.entry.metadata().unwrap().len()
+    fn size(&self) -> Result<u64> {
+        Ok(self.entry.metadata().map_err(|e| Error::Other(e.to_string()))?.len())
     }
 
-    fn hash(&self) -> String {
-        sha256::try_digest(self.entry.path()).unwrap()
+    fn hash(&self) -> Result<String> {
+        sha256::try_digest(self.entry.path()).map_err(|e| Error::Other(e.to_string()))
     }
 }
 

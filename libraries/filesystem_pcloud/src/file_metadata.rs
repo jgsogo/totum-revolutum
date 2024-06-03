@@ -1,6 +1,6 @@
 use camino::{Utf8Path, Utf8PathBuf};
 
-use filesystem::FileMetadata;
+use filesystem::{FileMetadata, Result};
 use pcloud_sdk::structures::MetadataFile;
 
 #[derive(Debug, Clone)]
@@ -14,12 +14,18 @@ impl FileMetadata for RemoteMetadata {
         &self.relative_path
     }
 
-    fn size(&self) -> u64 {
-        *self.metadata.size.as_ref().unwrap()
+    fn size(&self) -> Result<u64> {
+        match self.metadata.size {
+            None => Err(filesystem::Error::Other("metadata.size not available".into())),
+            Some(s) => Ok(s),
+        }
     }
 
-    fn hash(&self) -> String {
-        self.metadata.hash.as_ref().unwrap().to_string()
+    fn hash(&self) -> Result<String> {
+        match self.metadata.hash {
+            None => Err(filesystem::Error::Other("metadata.size not available".into())),
+            Some(h) => Ok(h.to_string()),
+        }
     }
 }
 

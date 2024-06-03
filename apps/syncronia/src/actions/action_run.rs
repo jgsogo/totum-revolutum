@@ -13,7 +13,7 @@ pub trait ActionRun<FsLhsMetadata: FileMetadata + 'static, FsRhsMetadata: FileMe
                 lhs: Some(lhs),
                 rhs: Some(rhs),
             } => {
-                if lhs.eq(&rhs) {
+                if lhs.eq(&rhs)? {
                     self.run_with_both_eq(&lhs, &rhs).await
                 } else {
                     self.run_with_both(&lhs, &rhs).await

@@ -31,7 +31,7 @@ pub fn handle(home: &Utf8Path, params: &AddParams) -> Result<()> {
         &path,
         &params.cron_expression,
         &chrono_tz::Tz::from_str(&params.cron_tz).unwrap(),
-    );
+    )?;
 
     let directories_file_path = storage::cron::DirectoriesFile::path(home);
     let mut lock = storage::cron::DirectoriesFile::update(&directories_file_path)?;
