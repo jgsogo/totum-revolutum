@@ -1,3 +1,4 @@
+use camino::Utf8PathBuf;
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 use tracing::error;
 
@@ -5,11 +6,12 @@ use crate::local::LocalMetadata;
 
 struct Visitor {
     tx: flume::Sender<LocalMetadata>,
+    base_path: Utf8PathBuf,
 }
 
 impl Visitor {
-    pub fn new(tx: flume::Sender<LocalMetadata>) -> Visitor {
-        Visitor { tx }
+    pub fn new(tx: flume::Sender<LocalMetadata>, base_path: Utf8PathBuf) -> Visitor {
+        Visitor { tx, base_path }
     }
 }
 
@@ -17,7 +19,7 @@ impl ParallelVisitor for Visitor {
     fn visit(&mut self, entry: Result<ignore::DirEntry, ignore::Error>) -> WalkState {
         let entry = entry.unwrap();
         if entry.file_type().unwrap().is_file() {
-            let data: LocalMetadata = entry.into();
+            let data = LocalMetadata::new(self.base_path.clone(), entry);
             if let Err(e) = self.tx.send(data) {
                 error!("Error sending direntry metadata: {e}. Quit visiting.");
                 return WalkState::Quit;
@@ -29,16 +31,17 @@ impl ParallelVisitor for Visitor {
 
 pub(crate) struct VisitorBuilder {
     tx: flume::Sender<LocalMetadata>,
+    base_path: Utf8PathBuf,
 }
 
 impl VisitorBuilder {
-    pub fn new(tx: flume::Sender<LocalMetadata>) -> VisitorBuilder {
-        VisitorBuilder { tx }
+    pub fn new(tx: flume::Sender<LocalMetadata>, base_path: Utf8PathBuf) -> VisitorBuilder {
+        VisitorBuilder { tx, base_path }
     }
 }
 
 impl<'s> ParallelVisitorBuilder<'s> for VisitorBuilder {
     fn build(&mut self) -> Box<dyn ParallelVisitor + 's> {
-        Box::new(Visitor::new(self.tx.clone()))
+        Box::new(Visitor::new(self.tx.clone(), self.base_path.clone()))
     }
 }

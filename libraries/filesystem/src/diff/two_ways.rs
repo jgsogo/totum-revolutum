@@ -36,7 +36,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
             tokio::select! {
                 Ok(lhs_metadata) = lhs_rx.recv_async() => {
                     trace!("LHS received {:?}", lhs_metadata);
-                    let key = lhs_metadata.id().to_string();
+                    let key = lhs_metadata.path().to_string();
                     match files.remove(&key) {
                         Some(mut v) => {
                             v.lhs = Some(lhs_metadata);
@@ -52,7 +52,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
                 },
                 Ok(rhs_metadata) = rhs_rx.recv_async() => {
                     trace!("RHS received {:?}", rhs_metadata);
-                    let key = rhs_metadata.id().to_string();
+                    let key = rhs_metadata.path().to_string();
                     match files.remove(&key) {
                         Some(mut v) => {
                             v.rhs = Some(rhs_metadata);

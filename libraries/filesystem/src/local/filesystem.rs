@@ -52,7 +52,7 @@ impl Filesystem for FilesystemLocal {
 
         info!("Start local visitor");
         let start = Instant::now();
-        let mut builder = parallel_visitor::VisitorBuilder::new(tx);
+        let mut builder = parallel_visitor::VisitorBuilder::new(tx, self.root().into());
         walker.visit(&mut builder);
         info!("Finished local visitor in {:?}", start.elapsed());
         Ok(())

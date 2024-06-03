@@ -26,6 +26,7 @@ impl<LHS: FileMetadata, RHS: FileMetadata> FilePair<LHS, RHS> {
     pub fn id(&self) -> &str {
         self.lhs
             .as_ref()
-            .map_or_else(|| self.rhs.as_ref().unwrap().id(), |v| v.id())
+            .map_or_else(|| self.rhs.as_ref().unwrap().path(), |v| v.path())
+            .as_str()
     }
 }

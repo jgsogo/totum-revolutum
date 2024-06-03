@@ -1,18 +1,15 @@
+use camino::Utf8Path;
 use std::fmt::Debug;
 
 /// Allows access to file metadata. This is useful in case the information
 /// is not already available or it is preferred to compute it on-demand (computing
 /// hash can take some time)
-pub trait FileMetadata: Clone + Send + Sync + From<Self::DirEntry> + Debug {
-    type DirEntry;
-
-    /// Unique identifier for the file (inside the filesystem). This identifier should be usable
-    /// in both directions. Given a file, it's possible to get its unique identifier and the other
-    /// way around: given an identifier, it's possible to find the file.
+pub trait FileMetadata: Clone + Send + Sync + Debug {
+    /// Path inside the [`crate::Filesystem`]
     ///
-    /// More important, the same file in differen [`Filesystem`]s should be represented by the
-    /// same id. Typically, this id will just be the path in the filesystem.
-    fn id(&self) -> &str;
+    /// This path identifies one-to-one every file inside a filesystem. It should be the
+    /// **relative path** starting from the root of the filesystem.
+    fn path(&self) -> &Utf8Path;
 
     /// The size of the file
     fn size(&self) -> u64;

@@ -106,7 +106,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
-                    let data: RemoteMetadata = (path, m.clone()).into();
+                    let data = RemoteMetadata::new(path, m.clone());
                     tx.send(data).map_err(|e| Error::Other(e.to_string()))?;
                 }
                 Metadata::MetadataFolder(m) => {

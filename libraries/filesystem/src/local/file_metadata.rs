@@ -1,18 +1,17 @@
+use camino::{Utf8Path, Utf8PathBuf};
 use ignore::DirEntry;
 
 use crate::FileMetadata;
 
 #[derive(Debug, Clone)]
 pub struct LocalMetadata {
-    id: String,
+    relative_path: Utf8PathBuf,
     entry: DirEntry,
 }
 
 impl FileMetadata for LocalMetadata {
-    type DirEntry = DirEntry;
-
-    fn id(&self) -> &str {
-        &self.id
+    fn path(&self) -> &Utf8Path {
+        &self.relative_path
     }
 
     fn size(&self) -> u64 {
@@ -24,12 +23,9 @@ impl FileMetadata for LocalMetadata {
     }
 }
 
-impl From<DirEntry> for LocalMetadata {
-    fn from(entry: DirEntry) -> Self {
-        Self {
-            id: entry.path().to_str().unwrap().to_string(),
-            entry,
-        }
+impl LocalMetadata {
+    pub fn new(relative_path: Utf8PathBuf, entry: DirEntry) -> Self {
+        Self { relative_path, entry }
     }
 }
 
