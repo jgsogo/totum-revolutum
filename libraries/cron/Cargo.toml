@@ -10,3 +10,4 @@ chrono = { workspace = true, features = ["serde"] }
 chrono-tz = { workspace = true }
 cron-parser = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }

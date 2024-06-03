@@ -792,6 +792,7 @@ dependencies = [
  "chrono-tz",
  "cron-parser",
  "serde",
+ "thiserror",
 ]
 
 [[package]]
