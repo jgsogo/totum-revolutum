@@ -1,4 +1,3 @@
-use anyhow::anyhow;
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 use tracing::error;
 
@@ -21,8 +20,8 @@ impl ParallelVisitor for Visitor {
         let entry = entry.unwrap();
         if entry.file_type().unwrap().is_file() {
             let data: LocalMetadata = entry.into();
-            if let Err(e) = self.tx.send(data).map_err(|e| anyhow!("Error sending metadata: {e}")) {
-                error!("Error sending direntry: {e}. Quit visiting.");
+            if let Err(e) = self.tx.send(data) {
+                error!("Error sending direntry metadata: {e}. Quit visiting.");
                 return WalkState::Quit;
             }
         }

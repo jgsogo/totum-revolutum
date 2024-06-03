@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use camino::Utf8Path;
 use flume::Sender;
@@ -8,7 +7,8 @@ use tokio::task::JoinHandle;
 use tokio::time::Instant;
 use tracing::{info, trace, warn};
 
-use filesystem::{File, Filesystem};
+use filesystem::Result;
+use filesystem::{Error, File, Filesystem};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
@@ -22,6 +22,7 @@ use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::structures::Metadata;
+use pcloud_sdk::types::errors::{InvalidFileError, InvalidFolderError, InvalidRemotePathError};
 use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 
 use crate::file::RemoteFile;
@@ -71,7 +72,10 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
             }
         });
 
-        let root_folderid = pcloud.get_folderid(&root_path).await?;
+        let root_folderid = pcloud
+            .get_folderid(&root_path)
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
         Ok(Self {
             root_folderid,
             root_path,
@@ -86,8 +90,9 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
         if self.tx_file_close.send(FileCloseMessage::Stop).is_ok() {
             self.thread_file_close
                 .take()
-                .ok_or_else(|| anyhow!("Thread is already closed!"))?
-                .await?;
+                .ok_or_else(|| Error::Other("Thread is already closed!".to_string()))?
+                .await
+                .map_err(|e| Error::Other(e.to_string()))?;
         }
         Ok(())
     }
@@ -105,7 +110,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
                     let data: RemoteMetadata = (path, m.clone()).into();
-                    tx.send(data)?;
+                    tx.send(data).map_err(|e| Error::Other(e.to_string()))?;
                 }
                 Metadata::MetadataFolder(m) => {
                     let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
@@ -165,21 +170,35 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         let path = self.check_path(path)?;
-        let _r = self.pcloud.stat(path.try_into()?).await?;
+        let input_file: pcloud_sdk::types::File = path
+            .try_into()
+            .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
+        let _r = self
+            .pcloud
+            .stat(input_file)
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
         Ok(true)
     }
 
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
-        let path: RemotePath = path.try_into()?;
+        let path: RemotePath = path
+            .try_into()
+            .map_err(|e: InvalidRemotePathError| Error::Other(e.to_string()))?;
 
-        let filename = path
-            .as_path()
-            .file_name()
-            .ok_or(anyhow!("No filename can be guess from path '{path}'"))?;
+        let filename = path.as_path().file_name().ok_or(Error::NotAFilepath)?;
         let folderid = match path.as_path().parent() {
             None => self.root_folderid.clone(),
-            Some(p) => self.pcloud.get_folderid(&p.try_into()?).await?,
+            Some(p) => {
+                let remote_path: RemotePath = p
+                    .try_into()
+                    .map_err(|e: InvalidRemotePathError| Error::Other(e.to_string()))?;
+                self.pcloud
+                    .get_folderid(&remote_path)
+                    .await
+                    .map_err(|e| Error::Other(e.to_string()))?
+            }
         };
 
         let fd = self
@@ -188,7 +207,8 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
                 Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
                 FileOpenPath::FolderAndName(folderid, filename.to_string()),
             )
-            .await?;
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
 
         let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
         Ok(Box::new(f))
@@ -196,10 +216,16 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
 
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
-        let path: PCloudFile = path.try_into()?;
+        let path: PCloudFile = path
+            .try_into()
+            .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
 
         //let relative_path = v.strip_prefix(self.root())?;
-        let fd = self.pcloud.file_open(Flags::empty(), FileOpenPath::File(path)).await?;
+        let fd = self
+            .pcloud
+            .file_open(Flags::empty(), FileOpenPath::File(path))
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
 
         let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone(), self.tx_file_close.clone());
         Ok(Box::new(f))
@@ -209,26 +235,49 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         let path = self.check_path(path)?;
         let folderid = self.root_folderid.clone();
         // Get the relative path starting in the root
-        let rel_path = path.strip_prefix(self.root())?;
-        self.pcloud.createfolderifnotexists_all(&folderid, rel_path).await?;
+        let rel_path = path
+            .strip_prefix(self.root())
+            .map_err(|_| Error::PathOutsideFilesystem)?;
+        self.pcloud
+            .createfolderifnotexists_all(&folderid, rel_path)
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
 
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-        self.pcloud.deletefile(path.try_into()?).await?;
+        let input_file = path
+            .try_into()
+            .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
+        self.pcloud
+            .deletefile(input_file)
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-        self.pcloud.deletefolder(path.try_into()?).await?;
+        let input_folder = path
+            .try_into()
+            .map_err(|e: InvalidFolderError| Error::Other(e.to_string()))?;
+        self.pcloud
+            .deletefolder(input_folder)
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-        self.pcloud.deletefolderrecursive(path.try_into()?).await?;
+        let input_folder = path
+            .try_into()
+            .map_err(|e: InvalidFolderError| Error::Other(e.to_string()))?;
+        self.pcloud
+            .deletefolderrecursive(input_folder)
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
 }
@@ -261,7 +310,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn test_root() -> Result<()> {
+    async fn test_root() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
 
         client
@@ -289,7 +338,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_root_not_exists() -> Result<()> {
+    async fn test_root_not_exists() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
         client.expect_get::<ListFolder, _>().times(1).returning(
             move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
@@ -317,7 +366,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_create_write_all() -> Result<()> {
+    async fn test_create_write_all() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
 
         // Expectation for FilesystemPCloud::new
@@ -397,7 +446,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_open_read_all() -> Result<()> {
+    async fn test_open_read_all() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
 
         // Expectation for FilesystemPCloud::new
@@ -497,7 +546,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_create_in_subfolder() -> Result<()> {
+    async fn test_create_in_subfolder() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
         let root_path = RemotePath::from_str("path:/the/root/path")?;
 
@@ -558,7 +607,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_create_dir_all() -> Result<()> {
+    async fn test_create_dir_all() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
         let root_path = RemotePath::from_str("path:/the/root/path")?;
 
@@ -602,7 +651,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_remove_file() -> Result<()> {
+    async fn test_remove_file() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
         let root_path = RemotePath::from_str("path:/the/root/path")?;
 
@@ -645,7 +694,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_remove_folder() -> Result<()> {
+    async fn test_remove_folder() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
         let root_path = RemotePath::from_str("path:/the/root/path")?;
 
@@ -686,7 +735,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_remove_folder_recursive() -> Result<()> {
+    async fn test_remove_folder_recursive() -> anyhow::Result<()> {
         let mut client = MockLocalClient::new();
         let root_path = RemotePath::from_str("path:/the/root/path")?;
 

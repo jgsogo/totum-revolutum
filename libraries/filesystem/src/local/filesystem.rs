@@ -1,16 +1,15 @@
-use camino::{Utf8Path, Utf8PathBuf};
 use std::fs;
 
-use anyhow::{anyhow, bail, Result};
-use async_trait::async_trait;
-use flume::Sender;
-use tokio::time::Instant;
-
 use async_std::fs::File as AsyncFile;
+use async_trait::async_trait;
+use camino::{Utf8Path, Utf8PathBuf};
+use flume::Sender;
 use ignore::WalkBuilder;
+use tokio::time::Instant;
 use tracing::info;
 
 use crate::local::LocalMetadata;
+use crate::{Error, Result};
 use crate::{File, Filesystem};
 
 use super::file::LocalFile;
@@ -23,11 +22,12 @@ pub struct FilesystemLocal {
 impl FilesystemLocal {
     pub fn new(path: &Utf8Path) -> Result<Self> {
         if !path.exists() {
-            bail!("Given path doesn't exist: {path}");
+            Err(Error::PathDoesNotExist)
+        } else {
+            Ok(Self {
+                path: path.to_path_buf(),
+            })
         }
-        Ok(Self {
-            path: path.to_path_buf(),
-        })
     }
 }
 
@@ -78,25 +78,25 @@ impl Filesystem for FilesystemLocal {
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
-        fs::create_dir_all(path).map_err(|e| anyhow!("Error creating the directory: {e}"))
+        fs::create_dir_all(path).map_err(Error::IoError)
     }
 
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.check_path(path)?;
-        fs::remove_file(path).map_err(|e| anyhow!("Error removing a file: {e}"))
+        fs::remove_file(path).map_err(Error::IoError)
     }
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.check_path(path)?;
-        fs::remove_dir(path).map_err(|e| anyhow!("Error removing a directory: {e}"))
+        fs::remove_dir(path).map_err(Error::IoError)
     }
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.check_path(path)?;
-        fs::remove_dir_all(path).map_err(|e| anyhow!("Error removing a directory: {e}"))
+        fs::remove_dir_all(path).map_err(Error::IoError)
     }
 }
 

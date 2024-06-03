@@ -1231,7 +1231,6 @@ dependencies = [
 name = "filesystem"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-std",
  "async-trait",
  "camino",
@@ -1241,6 +1240,7 @@ dependencies = [
  "ignore",
  "sha256",
  "tempfile",
+ "thiserror",
  "tokio",
  "tracing",
 ]

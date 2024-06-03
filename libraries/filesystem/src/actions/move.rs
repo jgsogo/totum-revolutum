@@ -1,9 +1,9 @@
 use camino::Utf8Path;
 
-use anyhow::Result;
+use crate::Filesystem;
+use crate::Result;
 
 use super::copy::copy;
-use crate::Filesystem;
 
 pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     lhs_fs: &'action FsLhs,
