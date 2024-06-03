@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
 
-use anyhow::Result;
 use async_trait::async_trait;
 use headers::HeaderMap;
 use headers::HeaderMapExt;
@@ -9,16 +8,20 @@ use reqwest;
 use serde::de::DeserializeOwned;
 
 use http_utils::rest::RESTClient;
-use http_utils::HttpClient;
+use http_utils::{AddToParams, HttpClient};
 
-use crate::access_token;
 use crate::methods::oauth2;
 use crate::utils::http;
 use crate::utils::http::create_response;
+use crate::{access_token, Error, Result};
 
 #[async_trait]
-pub trait PCloudClient: RESTClient {
-    async fn get_bytes(&self, endpoint: &str, params: HashMap<String, String>) -> Result<Vec<u8>>;
+pub trait PCloudClient: RESTClient + HttpClient<Error = Error> {
+    async fn get_bytes<TParams: AddToParams + Sync + 'static>(
+        &self,
+        endpoint: &str,
+        params: &TParams,
+    ) -> Result<Vec<u8>>;
 }
 
 #[derive(Debug)]
@@ -53,6 +56,8 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> HttpClient
     for PCloudClientImpl<Token>
 {
+    type Error = Error;
+
     fn build_url(&self, endpoint: &str) -> String {
         let schema = if self.secure { "https" } else { "http" };
         format!("{}://{}{}", schema, self.oauth2_token.hostname(), endpoint)
@@ -68,7 +73,8 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
         headers
     }
 
-    fn params(&self, mut params: HashMap<String, String>) -> HashMap<String, String> {
+    fn params(&self) -> HashMap<String, String> {
+        let mut params = HashMap::new();
         let access_token = self.oauth2_token.access_token();
         params.insert("access_token".to_string(), access_token.to_string());
         params
@@ -79,10 +85,12 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> PCloudClient
     for PCloudClientImpl<Token>
 {
-    async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>> {
+    async fn get_bytes<TParams: AddToParams + Sync>(&self, endpoint: &str, query: &TParams) -> Result<Vec<u8>> {
         let url = self.build_url(endpoint);
-        let access_token = self.oauth2_token.access_token();
-        params.insert("access_token".to_string(), access_token.to_string());
+
+        let mut params = self.params();
+        query.add_to_params(&mut params);
+
         http::get_bytes(self.http_client.clone(), &url, params).await
     }
 }
@@ -90,7 +98,7 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
 impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static> RESTClient
     for PCloudClientImpl<Token>
 {
-    fn parse_response<T>(result: String) -> Result<T>
+    fn parse_response<T>(result: String) -> std::result::Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {

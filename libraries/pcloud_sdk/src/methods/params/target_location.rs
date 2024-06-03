@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
-use anyhow::Result;
+use http_utils::AddToParams;
 
 use crate::types::{FolderID, RemotePath};
-
-use super::Params;
 
 /// Provides a target location identification, using either
 ///
@@ -18,19 +16,18 @@ pub enum TargetLocation {
     RemotePath(RemotePath),
 }
 
-impl Params for TargetLocation {
-    fn add_to_params(&self, params: &mut HashMap<String, String>) -> Result<()> {
+impl AddToParams for TargetLocation {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
         match self {
             TargetLocation::FolderAndName((folderid, name)) => {
-                params.insert("tofolderid".to_string(), folderid.0.to_string());
+                params.insert("tofolderid".to_string(), folderid.inner().to_string());
                 if let Some(name) = name {
                     params.insert("toname".to_string(), name.clone());
                 }
             }
             TargetLocation::RemotePath(p) => {
-                params.insert("topath".to_string(), p.path().to_string());
+                params.insert("topath".to_string(), p.as_path().to_string());
             }
         }
-        Ok(())
     }
 }

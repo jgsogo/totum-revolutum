@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "974c63d2d21eaa2043f6823561b4d3592a4faebe57fe17bf7065c27057c9a2a8",
+  "moduleFileHash": "499528650ce6e5a3df9a522f1653cb3e21d54e33cb30237575f1d28870ff8f22",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -61,11 +61,11 @@
               "tagName": "@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
               "attributeValues": {
                 "build_file": "//bazel/external:BUILD.diesel_cli.bazel",
-                "sha256": "ed0d26f384b697e94535595644e2826fb04cc83bf0949283f535f2d9c65ed31e",
-                "strip_prefix": "diesel_cli-2.1.1",
+                "sha256": "4306582adc17f767b451db2357701175c74b7dfc4b45e29b2eca74c3a9f6bc52",
+                "strip_prefix": "diesel_cli-2.2.0",
                 "type": "tar.gz",
                 "urls": [
-                  "https://crates.io/api/v1/crates/diesel_cli/2.1.1/download"
+                  "https://crates.io/api/v1/crates/diesel_cli/2.2.0/download"
                 ],
                 "name": "diesel_cli"
               },
@@ -128,7 +128,7 @@
               "attributeValues": {
                 "edition": "2021",
                 "versions": [
-                  "1.75.0"
+                  "1.78.0"
                 ]
               },
               "devDependency": false,
@@ -189,7 +189,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "platforms": "platforms@0.0.10",
         "rules_python": "rules_python@0.32.2",
         "rules_rust": "rules_rust@0.45.1",
@@ -199,10 +199,10 @@
         "local_config_platform": "local_config_platform@_"
       }
     },
-    "bazel_skylib@1.6.1": {
+    "bazel_skylib@1.7.0": {
       "name": "bazel_skylib",
-      "version": "1.6.1",
-      "key": "bazel_skylib@1.6.1",
+      "version": "1.7.0",
+      "key": "bazel_skylib@1.7.0",
       "repoName": "bazel_skylib",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [
@@ -212,6 +212,7 @@
       "extensionUsages": [],
       "deps": {
         "platforms": "platforms@0.0.10",
+        "rules_license": "rules_license@0.0.8",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
@@ -220,9 +221,9 @@
         "ruleClassName": "http_archive",
         "attributes": {
           "urls": [
-            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.6.1/bazel-skylib-1.6.1.tar.gz"
+            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.7.0/bazel-skylib-1.7.0.tar.gz"
           ],
-          "integrity": "sha256-nziIakBUjG6WwQa3UvJCEw7hGqoGila6flb0UR8z5PI=",
+          "integrity": "sha256-0A8Tie4gtgAY6SZE4JSOFuNQp3ByGeejkPsKmbbskmI=",
           "strip_prefix": "",
           "remote_patches": {},
           "remote_patch_strip": 0
@@ -398,7 +399,7 @@
       ],
       "deps": {
         "bazel_features": "bazel_features@1.9.1",
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "rules_cc": "rules_cc@0.0.9",
         "platforms": "platforms@0.0.10",
         "rules_proto": "rules_proto@6.0.0-rc1",
@@ -612,7 +613,7 @@
       ],
       "deps": {
         "bazel_features": "bazel_features@1.9.1",
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "platforms": "platforms@0.0.10",
         "rules_cc": "rules_cc@0.0.9",
         "rules_license": "rules_license@0.0.8",
@@ -680,7 +681,7 @@
       ],
       "deps": {
         "aspect_bazel_lib": "aspect_bazel_lib@2.7.7",
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "rules_python": "rules_python@0.32.2",
         "platforms": "platforms@0.0.10",
         "bazel_tools": "bazel_tools@_",
@@ -839,7 +840,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "platforms": "platforms@0.0.10",
         "io_bazel_stardoc": "stardoc@0.5.4",
         "bazel_tools": "bazel_tools@_",
@@ -1081,7 +1082,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
@@ -1160,7 +1161,7 @@
       "extensionUsages": [],
       "deps": {
         "rules_license": "rules_license@0.0.8",
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
@@ -1231,7 +1232,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "rules_python": "rules_python@0.32.2",
         "rules_cc": "rules_cc@0.0.9",
         "rules_proto": "rules_proto@6.0.0-rc1",
@@ -1294,7 +1295,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "platforms": "platforms@0.0.10",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
@@ -1408,7 +1409,7 @@
         "aspect_bazel_lib": "aspect_bazel_lib@2.7.7",
         "aspect_rules_lint": "aspect_rules_lint@0.12.0",
         "bazel_features": "bazel_features@1.9.1",
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "rules_nodejs": "rules_nodejs@5.8.2",
         "platforms": "platforms@0.0.10",
         "bazel_tools": "bazel_tools@_",
@@ -1439,7 +1440,7 @@
       "toolchainsToRegister": [],
       "extensionUsages": [],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "rules_java": "rules_java@7.4.0",
         "rules_license": "rules_license@0.0.8",
         "bazel_tools": "bazel_tools@_",
@@ -1539,7 +1540,7 @@
       "deps": {
         "platforms": "platforms@0.0.10",
         "rules_cc": "rules_cc@0.0.9",
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "rules_proto": "rules_proto@6.0.0-rc1",
         "rules_license": "rules_license@0.0.8",
         "bazel_tools": "bazel_tools@_",
@@ -1666,7 +1667,7 @@
       "extensionUsages": [],
       "deps": {
         "rules_python": "rules_python@0.32.2",
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "rules_license": "rules_license@0.0.8",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
@@ -1726,7 +1727,7 @@
       "toolchainsToRegister": [],
       "extensionUsages": [],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "rules_proto": "rules_proto@6.0.0-rc1",
         "com_google_protobuf": "protobuf@21.7",
         "com_google_absl": "abseil-cpp@20211102.0",
@@ -1815,7 +1816,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "io_bazel_stardoc": "stardoc@0.5.4",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
@@ -1876,7 +1877,7 @@
       "deps": {
         "aspect_bazel_lib": "aspect_bazel_lib@2.7.7",
         "aspect_rules_js": "aspect_rules_js@1.39.0",
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "platforms": "platforms@0.0.10",
         "rules_proto": "rules_proto@6.0.0-rc1",
         "rules_buf": "rules_buf@0.1.1",
@@ -1943,7 +1944,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "platforms": "platforms@0.0.10",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
@@ -2126,7 +2127,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "platforms": "platforms@0.0.10",
         "rules_proto": "rules_proto@6.0.0-rc1",
         "com_google_protobuf": "protobuf@21.7",
@@ -2249,7 +2250,7 @@
         }
       ],
       "deps": {
-        "bazel_skylib": "bazel_skylib@1.6.1",
+        "bazel_skylib": "bazel_skylib@1.7.0",
         "com_google_protobuf": "protobuf@21.7",
         "io_bazel_rules_go": "rules_go@0.39.1",
         "rules_proto": "rules_proto@6.0.0-rc1",
@@ -3491,7 +3492,7 @@
     },
     "@@rules_nodejs~//nodejs:extensions.bzl%node": {
       "general": {
-        "bzlTransitiveDigest": "F+yMPMVIHZ96+T+i+JnDgMOx1lqiX+OT8ZkUy165uVU=",
+        "bzlTransitiveDigest": "Bz0jFXnlfjiZEYqK5XZxUIHCdUZiRAmSiofUTf0m8ts=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -4209,7 +4210,7 @@
     },
     "@@rules_rust~//rust:extensions.bzl%rust": {
       "general": {
-        "bzlTransitiveDigest": "uumtffWTyWYPdVO+XepCOibSj3/SIqfH8rSwK3s9uDg=",
+        "bzlTransitiveDigest": "8cresA7qNxwK/4lNeyqg4iijMWLDrx3Z/G3HBPB6mvI=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -4239,7 +4240,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-wasi",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4264,7 +4265,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-wasi",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4289,7 +4290,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-wasi",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4314,7 +4315,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-unknown-unknown",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4358,7 +4359,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "aarch64-unknown-linux-gnu",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4446,7 +4447,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-wasi",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4501,7 +4502,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "x86_64-unknown-linux-gnu",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4526,7 +4527,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "aarch64-pc-windows-msvc",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4572,6 +4573,21 @@
               ]
             }
           },
+          "rust_analyzer_1.78.0_tools": {
+            "bzlFile": "@@rules_rust~//rust:repositories.bzl",
+            "ruleClassName": "rust_analyzer_toolchain_tools_repository",
+            "attributes": {
+              "version": "1.78.0",
+              "iso_date": "",
+              "sha256s": {},
+              "urls": [
+                "https://static.rust-lang.org/dist/{}.tar.xz"
+              ],
+              "auth": {},
+              "netrc": "",
+              "auth_patterns": []
+            }
+          },
           "rust_windows_x86_64__x86_64-pc-windows-msvc__stable_tools": {
             "bzlFile": "@@rules_rust~//rust:repositories.bzl",
             "ruleClassName": "rust_toolchain_tools_repository",
@@ -4581,7 +4597,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "x86_64-pc-windows-msvc",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4606,7 +4622,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "x86_64-unknown-freebsd",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4765,7 +4781,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-unknown-unknown",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4790,7 +4806,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-unknown-unknown",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4815,7 +4831,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-unknown-unknown",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4861,16 +4877,6 @@
               ]
             }
           },
-          "rust_analyzer_1.75.0": {
-            "bzlFile": "@@rules_rust~//rust:repositories.bzl",
-            "ruleClassName": "toolchain_repository_proxy",
-            "attributes": {
-              "toolchain": "@rust_analyzer_1.75.0_tools//:rust_analyzer_toolchain",
-              "toolchain_type": "@rules_rust//rust/rust_analyzer:toolchain_type",
-              "exec_compatible_with": [],
-              "target_compatible_with": []
-            }
-          },
           "rust_darwin_x86_64__x86_64-apple-darwin__stable": {
             "bzlFile": "@@rules_rust~//rust:repositories.bzl",
             "ruleClassName": "toolchain_repository_proxy",
@@ -4899,7 +4905,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-unknown-unknown",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -4924,7 +4930,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-wasi",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -5012,7 +5018,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-wasi",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -5124,7 +5130,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-unknown-unknown",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -5165,7 +5171,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "aarch64-apple-darwin",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -5190,7 +5196,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-wasi",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -5218,21 +5224,6 @@
                 "@platforms//os:freebsd"
               ],
               "target_compatible_with": []
-            }
-          },
-          "rust_analyzer_1.75.0_tools": {
-            "bzlFile": "@@rules_rust~//rust:repositories.bzl",
-            "ruleClassName": "rust_analyzer_toolchain_tools_repository",
-            "attributes": {
-              "version": "1.75.0",
-              "iso_date": "",
-              "sha256s": {},
-              "urls": [
-                "https://static.rust-lang.org/dist/{}.tar.xz"
-              ],
-              "auth": {},
-              "netrc": "",
-              "auth_patterns": []
             }
           },
           "rustfmt_nightly-2024-05-02__x86_64-unknown-linux-gnu_tools": {
@@ -5400,12 +5391,22 @@
               ]
             }
           },
+          "rust_analyzer_1.78.0": {
+            "bzlFile": "@@rules_rust~//rust:repositories.bzl",
+            "ruleClassName": "toolchain_repository_proxy",
+            "attributes": {
+              "toolchain": "@rust_analyzer_1.78.0_tools//:rust_analyzer_toolchain",
+              "toolchain_type": "@rules_rust//rust/rust_analyzer:toolchain_type",
+              "exec_compatible_with": [],
+              "target_compatible_with": []
+            }
+          },
           "rust_toolchains": {
             "bzlFile": "@@rules_rust~//rust/private:repository_utils.bzl",
             "ruleClassName": "toolchain_repository_hub",
             "attributes": {
               "toolchain_names": [
-                "rust_analyzer_1.75.0",
+                "rust_analyzer_1.78.0",
                 "rust_darwin_aarch64__aarch64-apple-darwin__stable",
                 "rust_darwin_aarch64__wasm32-unknown-unknown__stable",
                 "rust_darwin_aarch64__wasm32-wasi__stable",
@@ -5436,7 +5437,7 @@
                 "rustfmt_nightly-2024-05-02__x86_64-unknown-linux-gnu"
               ],
               "toolchain_labels": {
-                "rust_analyzer_1.75.0": "@rust_analyzer_1.75.0_tools//:rust_analyzer_toolchain",
+                "rust_analyzer_1.78.0": "@rust_analyzer_1.78.0_tools//:rust_analyzer_toolchain",
                 "rust_darwin_aarch64__aarch64-apple-darwin__stable": "@rust_darwin_aarch64__aarch64-apple-darwin__stable_tools//:rust_toolchain",
                 "rust_darwin_aarch64__wasm32-unknown-unknown__stable": "@rust_darwin_aarch64__wasm32-unknown-unknown__stable_tools//:rust_toolchain",
                 "rust_darwin_aarch64__wasm32-wasi__stable": "@rust_darwin_aarch64__wasm32-wasi__stable_tools//:rust_toolchain",
@@ -5467,7 +5468,7 @@
                 "rustfmt_nightly-2024-05-02__x86_64-unknown-linux-gnu": "@rustfmt_nightly-2024-05-02__x86_64-unknown-linux-gnu_tools//:rustfmt_toolchain"
               },
               "toolchain_types": {
-                "rust_analyzer_1.75.0": "@rules_rust//rust/rust_analyzer:toolchain_type",
+                "rust_analyzer_1.78.0": "@rules_rust//rust/rust_analyzer:toolchain_type",
                 "rust_darwin_aarch64__aarch64-apple-darwin__stable": "@rules_rust//rust:toolchain",
                 "rust_darwin_aarch64__wasm32-unknown-unknown__stable": "@rules_rust//rust:toolchain",
                 "rust_darwin_aarch64__wasm32-wasi__stable": "@rules_rust//rust:toolchain",
@@ -5498,7 +5499,7 @@
                 "rustfmt_nightly-2024-05-02__x86_64-unknown-linux-gnu": "@rules_rust//rust/rustfmt:toolchain_type"
               },
               "exec_compatible_with": {
-                "rust_analyzer_1.75.0": [],
+                "rust_analyzer_1.78.0": [],
                 "rust_darwin_aarch64__aarch64-apple-darwin__stable": [
                   "@platforms//cpu:aarch64",
                   "@platforms//os:osx"
@@ -5613,7 +5614,7 @@
                 ]
               },
               "target_compatible_with": {
-                "rust_analyzer_1.75.0": [],
+                "rust_analyzer_1.78.0": [],
                 "rust_darwin_aarch64__aarch64-apple-darwin__stable": [
                   "@platforms//cpu:aarch64",
                   "@platforms//os:osx"
@@ -5717,7 +5718,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "wasm32-unknown-unknown",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -5742,7 +5743,7 @@
               "global_allocator_library": "@rules_rust//ffi/cc/global_allocator_library",
               "target_triple": "x86_64-apple-darwin",
               "iso_date": "",
-              "version": "1.75.0",
+              "version": "1.78.0",
               "rustfmt_version": "nightly/2024-05-02",
               "edition": "2021",
               "dev_components": false,
@@ -5795,7 +5796,7 @@
     },
     "@@rules_rust~//rust/private:extensions.bzl%i": {
       "general": {
-        "bzlTransitiveDigest": "mfltOUsNdFuiJF+n+Ov2PC1pXEZakLs10OObdEvepqs=",
+        "bzlTransitiveDigest": "BSl7l2fGq7d1ttc8jo/Ex6fu1zh/IXe3bYBqQzh3WmA=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

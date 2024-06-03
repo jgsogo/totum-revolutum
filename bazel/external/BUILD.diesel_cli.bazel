@@ -19,6 +19,9 @@ rust_binary(
         "@crates_libraries//:diesel_migrations",
         "@crates_libraries//:diesel_table_macro_syntax",
         "@crates_libraries//:chrono",
+        "@crates_libraries//:thiserror",
+        "@crates_libraries//:tracing",
+        "@crates_libraries//:tracing-subscriber",
     ],
     data = [
         "src/default_files/diesel.toml",

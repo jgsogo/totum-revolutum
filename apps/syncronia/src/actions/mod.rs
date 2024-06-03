@@ -1,6 +1,7 @@
 use std::time::Instant;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
+use futures::TryFutureExt;
 use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 
@@ -92,8 +93,12 @@ pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
     let rhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(rhs_fs.root());
 
     if let Err(e) = tokio::try_join!(
-        lhs_fs.walk_directory(lhs, 6, &lhs_ignore_filepath),
-        rhs_fs.walk_directory(rhs, 6, &rhs_ignore_filepath),
+        lhs_fs
+            .walk_directory(lhs, 6, &lhs_ignore_filepath)
+            .map_err(|e| anyhow!(e)),
+        rhs_fs
+            .walk_directory(rhs, 6, &rhs_ignore_filepath)
+            .map_err(|e| anyhow!(e)),
         work_on_results(differ, &action_run),
     ) {
         error!("Error on workers loop: {e}");

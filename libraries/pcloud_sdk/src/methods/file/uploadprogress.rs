@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
-use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
+use crate::client::PCloudClient;
 use crate::structures::MetadataFile;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/uploadprogress";
 
@@ -31,7 +31,6 @@ impl<T: PCloudClient> UploadProgress for T {
     async fn uploadprogress(&self, progresshash: &str) -> Result<UploadProgressData> {
         let mut params = HashMap::new();
         params.insert("progresshash".to_string(), progresshash.to_string());
-        let ret = RESTClient::get::<UploadProgressData>(self, ENDPOINT, HeaderMap::default(), params).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &params).await
     }
 }

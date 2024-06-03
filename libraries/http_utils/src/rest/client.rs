@@ -1,42 +1,52 @@
-use crate::HttpClient;
-use anyhow::Result;
+use crate::error::DeserializationError;
+use crate::{AddToParams, HttpClient};
 use async_trait::async_trait;
 use headers::HeaderMap;
 use serde::de::DeserializeOwned;
-use std::collections::HashMap;
 
 #[async_trait]
 pub trait RESTClient: HttpClient {
     /// Deserialize API call result to return type
-    fn parse_response<T>(result: String) -> Result<T>
+    fn parse_response<T>(result: String) -> Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {
-        let r = serde_json::from_str::<T>(&result)?;
+        let r = serde_json::from_str::<T>(&result).map_err(|e| {
+            DeserializationError {
+                string: result,
+                source: e.into(),
+            }
+            .into()
+        })?;
         Ok(r)
     }
 
     /// Runs GET request to the given `endpoint` (URL will be built using [`self.build_url`]) with
     /// some `params`
-    async fn get<T>(&self, endpoint: &str, headers: HeaderMap, params: HashMap<String, String>) -> Result<T>
+    async fn get<T, TParams: AddToParams + Sync + 'static>(
+        &self,
+        endpoint: &str,
+        headers: HeaderMap,
+        params: &TParams,
+    ) -> Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {
         let response = HttpClient::get(self, endpoint, headers, params).await?;
-        Self::parse_response(response.text().await?)
+        Self::parse_response(response.text().await.map_err(|e| e.into())?)
     }
 
-    async fn post<T>(
+    async fn post<T, TParams: AddToParams + Sync + 'static>(
         &self,
         endpoint: &str,
         headers: HeaderMap,
-        params: HashMap<String, String>,
+        params: &TParams,
         data: Vec<u8>,
-    ) -> Result<T>
+    ) -> Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {
         let response = HttpClient::post(self, endpoint, headers, params, data).await?;
-        Self::parse_response(response.text().await?)
+        Self::parse_response(response.text().await.map_err(|e| e.into())?)
     }
 }

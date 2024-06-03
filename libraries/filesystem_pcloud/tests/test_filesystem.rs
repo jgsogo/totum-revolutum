@@ -27,13 +27,13 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
 
         let pcloud = PCloudClientImpl::new(server_token, false);
         let root_path_remote = RemotePath::try_from(root_path.as_path())?;
-        let r = FilesystemPCloud::new(&root_path_remote, pcloud).await?;
+        let r = FilesystemPCloud::new(root_path_remote, pcloud).await?;
         root_folder_mock.assert();
         r
     };
 
     // Add mock so we can create a file
-    let folderid = FolderID(1234);
+    let folderid = FolderID::new(1234);
     let name = String::from("myfile.txt");
     let write_bytes = 100;
     let content = "the content".as_bytes().to_vec();

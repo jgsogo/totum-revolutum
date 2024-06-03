@@ -6,6 +6,14 @@ rust_library_tests_and_docs(
     name = "rebrickable",
     srcs = glob(["src/**/*.rs"]),
     aliases = aliases(),
+    all_features = {
+        "cli": [
+            "cli",
+            "use_indicatif",
+        ],
+        "use_indicatif": ["use_indicatif"],
+        "test_utils": ["test_utils"],
+    },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),

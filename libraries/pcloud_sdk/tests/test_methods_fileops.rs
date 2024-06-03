@@ -1,4 +1,3 @@
-use anyhow::Result;
 use camino::Utf8Path;
 
 use pcloud_sdk::client::PCloudClientImpl;
@@ -9,6 +8,7 @@ use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::FolderID;
+use pcloud_sdk::Result;
 
 #[tokio::test]
 async fn test_fileops() -> Result<()> {
@@ -19,7 +19,7 @@ async fn test_fileops() -> Result<()> {
     let pcloud = PCloudClientImpl::new(oauth2_token, false);
 
     // Add mock so we can create a file
-    let folderid = FolderID(42);
+    let folderid = FolderID::new(42);
     let root_path = Utf8Path::new("the/root/path");
     let name = String::from("myfile.txt");
     let write_bytes = 100;
@@ -44,11 +44,13 @@ async fn test_fileops() -> Result<()> {
             .await?;
         create.assert();
 
-        let bytes_count = pcloud.file_write(fd.fd, &"eaeaeaea".as_bytes().to_vec()).await?;
+        let bytes_count = pcloud
+            .file_write(fd.fd.clone(), &"eaeaeaea".as_bytes().to_vec())
+            .await?;
         assert_eq!(bytes_count.bytes, write_bytes);
         write.assert();
 
-        pcloud.file_close(fd.fd).await?;
+        pcloud.file_close(fd.fd.clone()).await?;
         close.assert();
 
         open_with_path.assert_hits(0);
@@ -62,16 +64,16 @@ async fn test_fileops() -> Result<()> {
             .await?;
         open.assert();
 
-        let r = pcloud.file_read(fd.fd, chunk_size as u64).await?;
+        let r = pcloud.file_read(fd.fd.clone(), chunk_size as u64).await?;
         assert_eq!(String::from_utf8_lossy(&*r.bytes), String::from_utf8_lossy(&*content));
         read.assert();
 
         let remain_count = chunk_size - content.len();
-        let r = pcloud.file_read(fd.fd, remain_count as u64).await?;
+        let r = pcloud.file_read(fd.fd.clone(), remain_count as u64).await?;
         assert_eq!(String::from_utf8_lossy(&*r.bytes), "");
         read_eof.assert();
 
-        pcloud.file_close(fd.fd).await?;
+        pcloud.file_close(fd.fd.clone()).await?;
         close.assert_hits(2);
     }
 

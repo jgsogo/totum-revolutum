@@ -1,11 +1,12 @@
-use camino::Utf8Path;
 use std::fs::File;
 use std::io::BufReader;
 
-use anyhow::Result;
+use camino::Utf8Path;
 use serde::{Deserialize, Serialize};
 
 use crate::access_token::OAuth2Token;
+use crate::error::{DeserializationError, DeserializationErrorKind};
+use crate::{Error, Result};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct OAuth2TokenImpl {
@@ -23,8 +24,12 @@ impl OAuth2TokenImpl {
     pub fn read_from_file<P: AsRef<Utf8Path>>(path: P) -> Result<OAuth2TokenImpl> {
         let file = File::open(path.as_ref().as_std_path())?;
         let reader = BufReader::new(file);
-        let u = serde_json::from_reader(reader)?;
-        Ok(u)
+        serde_json::from_reader(reader).map_err(|e| {
+            Error::DeserializationError(DeserializationError {
+                string: format!("Can't deserialize from file {}", path.as_ref()),
+                source: DeserializationErrorKind::SerdeError(e),
+            })
+        })
     }
 }
 

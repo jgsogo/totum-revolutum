@@ -1,14 +1,13 @@
-use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::Params;
+use crate::client::PCloudClient;
 use crate::methods::params::SourceAndTargetFile;
 use crate::structures::MetadataFile;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/renamefile";
 
@@ -26,8 +25,7 @@ pub trait GetRenameFile {
 #[async_trait]
 impl<T: PCloudClient> GetRenameFile for T {
     async fn renamefile(&self, input: SourceAndTargetFile) -> Result<RenameFile> {
-        let ret = RESTClient::get::<RenameFile>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 
@@ -58,7 +56,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.fileid, FileID(1729212));
+                assert_eq!(data.metadata.fileid, FileID::new(1729212));
             }
         }
     }

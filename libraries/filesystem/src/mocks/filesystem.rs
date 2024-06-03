@@ -1,11 +1,10 @@
-use camino::Utf8Path;
-
-use anyhow::Result;
 use async_trait::async_trait;
+use camino::Utf8Path;
 use flume::Sender;
 use tempfile::{tempdir, TempDir};
 
 use crate::local::FilesystemLocal;
+use crate::Result;
 use crate::{File, Filesystem};
 
 /// Mocks a filesystem using a temporal directory that is removed on drop

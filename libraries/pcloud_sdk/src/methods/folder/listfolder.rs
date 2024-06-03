@@ -1,15 +1,18 @@
-use anyhow::Result;
+use collections::HashMap;
+use std::collections;
+
 use async_trait::async_trait;
 use http::HeaderMap;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
 
-use crate::methods::params::{Params, ParamsType};
+use crate::client::PCloudClient;
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/listfolder";
 
@@ -39,13 +42,12 @@ impl ListFolderInput {
     }
 }
 
-impl Params for ListFolderInput {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        self.folder.add_to_params(params)?;
+impl AddToParams for ListFolderInput {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
+        self.folder.add_to_params(params);
         if self.recursive {
             params.insert("recursive".to_string(), "1".to_string());
         }
-        Ok(())
     }
 }
 
@@ -74,7 +76,8 @@ impl<T: PCloudClient> GetListFolder for T {
         list_folder: ListFolderInput,
         filtermeta: Vec<&str>,
     ) -> Result<ListFolder> {
-        let mut params = list_folder.into_params()?;
+        let mut params = HashMap::new();
+        list_folder.add_to_params(&mut params);
         let mut filtermeta = filtermeta;
 
         // TODO: I'm afraid not all the fields are valid here... search some docs or try/error and
@@ -93,8 +96,7 @@ impl<T: PCloudClient> GetListFolder for T {
 
         let filtermeta = filtermeta.into_iter().unique().collect::<Vec<_>>().join(",");
         params.insert("filtermeta".to_string(), filtermeta);
-        let ret = RESTClient::get::<ListFolder>(self, ENDPOINT, HeaderMap::default(), params).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &params).await
     }
 }
 
@@ -125,7 +127,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid, FolderID(4075092622));
+                assert_eq!(data.metadata.folderid, FolderID::new(4075092622));
             }
         }
     }

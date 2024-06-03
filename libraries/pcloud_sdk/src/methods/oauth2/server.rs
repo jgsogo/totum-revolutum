@@ -3,7 +3,6 @@ use std::io;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 
-use anyhow::Result;
 use http_body_util::Full;
 use hyper::body::{Bytes, Incoming};
 use hyper::server::conn::http1;
@@ -15,6 +14,8 @@ use serde::de::DeserializeOwned;
 use tokio::net::TcpListener;
 use tokio::sync::oneshot::Sender;
 use url::Url;
+
+use crate::Result;
 
 use super::exchange_oauth2_token::exchange_oauth2_token;
 use super::{AppClientData, OAuth2Token};

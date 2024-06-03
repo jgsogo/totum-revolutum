@@ -4,6 +4,7 @@ pub use folder::Folder;
 pub use folderid::FolderID;
 pub use remotepath::RemotePath;
 
+pub mod errors;
 mod file;
 mod fileid;
 mod folder;

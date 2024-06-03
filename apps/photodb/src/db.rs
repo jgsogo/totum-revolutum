@@ -5,7 +5,7 @@ use diesel::r2d2::Pool;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
+use pcloud_sdk::handy::GetFolderID;
 use pcloud_sdk::progress_bar::ProgressBarBuilder;
 use pcloud_sdk::types::RemotePath;
 use pcloud_sdk::ProxiedFile;
@@ -41,8 +41,7 @@ impl<PCloud: PCloudClient + Send + Clone + 'static> PCloudDatabase<PCloud> {
     /// Initializes the database and pushes it to the remote pCloud storage. It will fail if the
     /// remote file already exists
     pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<Receiver<Result<(), (TempDir, PathBuf)>>> {
-        // Create the remote folder and check if file exists
-        let folderid = pcloud.createfolderifnotexists_all(None, &path).await?;
+        let folderid = pcloud.get_folderid(&path).await?; // TODO: Create if not exists?
         let (proxied_file, created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
         if !created {
             bail!("Remote file already exists!");

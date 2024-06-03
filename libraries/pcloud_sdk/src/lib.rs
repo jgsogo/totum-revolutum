@@ -14,4 +14,5 @@ pub mod structures;
 pub mod types;
 pub mod utils;
 
+pub use error::{Error, Result};
 pub use proxied_file::ProxiedFile;

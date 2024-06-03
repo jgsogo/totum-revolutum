@@ -11,7 +11,6 @@ filesystem = { path = "../filesystem" }
 http_utils = { path = "../http_utils" }
 pcloud_sdk = { path = "../pcloud_sdk" }
 
-anyhow = { workspace = true }
 async-trait = { workspace = true }
 camino = { workspace = true }
 flume = { workspace = true }
@@ -21,6 +20,7 @@ tracing = { workspace = true }
 
 [dev-dependencies]
 pcloud_sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
+anyhow = { workspace = true }
 
 
 [[example]]

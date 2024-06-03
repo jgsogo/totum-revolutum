@@ -1,13 +1,13 @@
-use crate::client::PCloudClient;
-use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
-use http_utils::rest::RESTClient;
 use serde::{Deserialize, Serialize};
 
-use crate::methods::params::Params;
+use http_utils::rest::RESTClient;
+
+use crate::client::PCloudClient;
 use crate::methods::params::SourceAndTargetFile;
 use crate::structures::MetadataFile;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/copyfile";
 
@@ -24,17 +24,17 @@ pub trait GetCopyFile {
 #[async_trait]
 impl<T: PCloudClient> GetCopyFile for T {
     async fn copyfile(&self, input: SourceAndTargetFile) -> Result<CopyFile> {
-        let ret = RESTClient::get::<CopyFile>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::env;
     use std::fs;
     use std::io::BufReader;
+
+    use camino::Utf8Path;
 
     use crate::types::FileID;
     use crate::utils::http::ApiResult;
@@ -55,7 +55,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.fileid, FileID(1732283));
+                assert_eq!(data.metadata.fileid, FileID::new(1732283));
             }
         }
     }

@@ -1,21 +1,24 @@
+use anyhow::{anyhow, bail, Result};
+use camino::{Utf8Path, Utf8PathBuf};
+use diesel::prelude::*;
+use diesel::{RunQueryDsl, SelectableHelper};
+use oxipng::{optimize, Options};
+use tracing::{debug, error, info};
+
+use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
+use pcloud_sdk::handy::{Exists, GetFolderID};
+use pcloud_sdk::methods::file::stat::GetStat;
+use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
+use pcloud_sdk::types::{FileID, FolderID, RemotePath};
+use pcloud_sdk::Error;
+
+use crate::models::Photo;
+
 use super::db::Database;
 use super::models;
 use super::utils::sha256_string_from_file;
 use super::AppDirs;
-use crate::models::Photo;
-use anyhow::{anyhow, bail, Result};
-use camino::Utf8PathBuf;
-use diesel::prelude::*;
-use diesel::{RunQueryDsl, SelectableHelper};
-use oxipng::{optimize, Options};
-use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::Exists;
-use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
-use pcloud_sdk::methods::file::stat::GetStat;
-use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
-use pcloud_sdk::types::{FileID, Folder, RemotePath};
-use std::str::FromStr;
-use tracing::{debug, error, info};
 
 // Path inside the remote folder to locate files using sha256 filename
 const SHA256_BASE_PATH: &str = "_sha256";
@@ -25,21 +28,22 @@ pub struct PhotoDB<'a, T: Database, PCloud: PCloudClient + Clone + Send + 'stati
     pcloud: PCloud,
     db: T,
     app_dir: &'a AppDirs,
-    remote_dir: RemotePath,
+    folder_id: FolderID,
 }
 
 impl<'a, T: Database, PCloud: PCloudClient + Clone + Send + 'static> PhotoDB<'a, T, PCloud> {
-    pub fn new(db: T, pcloud: PCloud, app_dir: &'a AppDirs, remote_dir: RemotePath) -> Self {
+    pub async fn new(db: T, pcloud: PCloud, app_dir: &'a AppDirs, remote_dir: RemotePath) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote directory '{}'",
             app_dir, remote_dir
         );
-        Self {
+        let folder_id = pcloud.get_folderid(&remote_dir).await?;
+        Ok(Self {
             pcloud,
             db,
             app_dir,
-            remote_dir,
-        }
+            folder_id,
+        })
     }
 
     fn to_tmp_storage(&self, input: Utf8PathBuf) -> Result<Utf8PathBuf> {
@@ -85,31 +89,31 @@ impl<'a, T: Database, PCloud: PCloudClient + Clone + Send + 'static> PhotoDB<'a,
             debug!(" - sha256 '{}'", sha256);
             let (c1, rest) = sha256.split_at(4);
             let (c2, rest) = rest.split_at(4);
-            let folder_path = self.remote_dir.path().join(SHA256_BASE_PATH).join(c1).join(c2);
-            (
-                RemotePath::from_str(&format!("path:/{}", folder_path))?,
-                format!("{}.png", rest),
-            )
+            let folder_path = Utf8Path::new(SHA256_BASE_PATH).join(c1).join(c2);
+            (folder_path, format!("{}.png", rest))
         };
         debug!("Upload to '{}/{}'", folder, filename);
-        let folderid = self.pcloud.createfolderifnotexists_all(None, &folder).await?;
+        let folderid = self
+            .pcloud
+            .createfolderifnotexists_all(&self.folder_id, &folder)
+            .await?;
 
         // FIXME: Handle file sha256 collision
-        let exists = self.pcloud.exists(folderid, &filename).await?;
+        let exists = self.pcloud.exists(folderid.clone(), &filename).await?;
         if exists.is_some() {
             bail!("A file with the same sha256 already exists!");
         }
 
         let r = self
             .pcloud
-            .uploadfile(&photo, UploadFileParams::new(Folder::RemotePath(folder), filename))
+            .uploadfile(&photo, UploadFileParams::new(folderid, filename))
             .await?;
-        let file_id = FileID(*r.fileids.first().unwrap());
+        let file_id = FileID::new(*r.fileids.first().unwrap());
 
         // Store the data in the database
         use crate::schema::photos;
         let new_photo = models::NewPhoto {
-            fileid: &(file_id.0 as i64),
+            fileid: &(file_id.inner() as i64),
         };
         let photo = diesel::insert_into(photos::table)
             .values(&new_photo)
@@ -154,24 +158,18 @@ impl<'a, T: Database, PCloud: PCloudClient + Clone + Send + 'static> PhotoDB<'a,
             let tx = db_remove_tx.clone();
             let pcloud = self.pcloud.clone();
             set.spawn(async move {
-                let fileid_ = FileID(r.fileid as u64);
+                let fileid_ = FileID::new(r.fileid as u64);
                 debug!("Check if '{fileid_}' exists");
                 match pcloud.stat(fileid_.clone().into()).await {
                     Ok(_) => None,
                     Err(e) => {
                         debug!("Error for {fileid_}: {e}");
-                        // TODO: Simpler way to get the underlying error. Anyhow is not good here. Probably the `pcloud_sdk` crate should use `Result<T, pcloud_skd::Error>`
-                        if let Some(p) = e.downcast_ref::<pcloud_sdk::error::Error>() {
-                            match p {
-                                pcloud_sdk::error::Error::ApiError { code, message: _ } => {
-                                    if *code == 2009 {
-                                        tx.send(r.id).await.ok();
-                                        Some(r.id)
-                                    } else {
-                                        None
-                                    }
-                                }
-                                _ => None,
+                        if let Error::PCloudError { code, .. } = e {
+                            if code == 2009 {
+                                tx.send(r.id).await.ok();
+                                Some(r.id)
+                            } else {
+                                None
                             }
                         } else {
                             None

@@ -1,26 +1,28 @@
-use anyhow::Result;
+use std::collections::HashMap;
+use std::str::FromStr;
+
 use async_trait::async_trait;
 use camino::Utf8Path;
 use headers::HeaderMapExt;
 use http::HeaderMap;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
+
+use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
 
 use crate::client::PCloudClient;
-use http_utils::rest::RESTClient;
-
-use crate::methods::params::{Params, ParamsType};
 use crate::structures::MetadataFile;
-use crate::types::Folder;
+use crate::types::FolderID;
 use crate::utils;
 use crate::utils::http::BOUNDARY;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/uploadfile";
 
 #[derive(Debug, Clone)]
 pub struct UploadFileParams {
-    folder: Folder,
+    folderid: FolderID,
     filename: String,
     // Optional parameters
     pub nopartial: bool,
@@ -31,9 +33,9 @@ pub struct UploadFileParams {
 }
 
 impl UploadFileParams {
-    pub fn new(folder: Folder, filename: String) -> UploadFileParams {
+    pub fn new(folderid: FolderID, filename: String) -> UploadFileParams {
         UploadFileParams {
-            folder,
+            folderid,
             filename,
             nopartial: false,
             progresshash: None,
@@ -44,13 +46,12 @@ impl UploadFileParams {
     }
 }
 
-impl Params for UploadFileParams {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        self.folder.add_to_params(params)?;
+impl AddToParams for UploadFileParams {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
+        self.folderid.add_to_params(params);
         if let Some(progresshash) = &self.progresshash {
             params.insert("progresshash".to_string(), progresshash.clone());
         }
-        Ok(())
     }
 }
 
@@ -69,6 +70,12 @@ pub struct UploadFile {
 
 #[async_trait]
 pub trait PostUploadFile {
+    /// Uploads a local file to the given [`FolderID`]
+    ///
+    /// Only `folderid`+`name` alternative is implemented as it's the one recommended in the
+    /// documentation.
+    ///
+    /// Link: <https://docs.pcloud.com/methods/file/uploadfile.html>
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile>;
 }
 
@@ -76,13 +83,12 @@ pub trait PostUploadFile {
 impl<T: PCloudClient> PostUploadFile for T {
     async fn uploadfile(&self, local_filename: &Utf8Path, upload_params: UploadFileParams) -> Result<UploadFile> {
         let mut headers = HeaderMap::default();
-        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={BOUNDARY}")).unwrap();
+        let mime_multipart = Mime::from_str(&format!("multipart/form-data; boundary={}", BOUNDARY)).unwrap();
         let content_type = headers::ContentType::from(mime_multipart);
         headers.typed_insert(content_type);
 
         let filename = upload_params.filename.clone();
         let data = utils::http::create_file_data(local_filename, &filename)?;
-        let ret = RESTClient::post::<UploadFile>(self, ENDPOINT, headers, upload_params.into_params()?, data).await?;
-        Ok(ret)
+        RESTClient::post(self, ENDPOINT, headers, &upload_params, data).await
     }
 }

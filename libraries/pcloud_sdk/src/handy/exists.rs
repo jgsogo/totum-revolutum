@@ -1,9 +1,9 @@
-use anyhow::Result;
 use async_trait::async_trait;
 
 use crate::methods::folder::{listfolder, ListFolderInput};
 use crate::structures::Metadata;
 use crate::types::{FileID, Folder, FolderID};
+use crate::Result;
 
 #[async_trait]
 /// Checks if the given `filename` exists withing the `folder_id`. Returns the [`FileID`] if it exists

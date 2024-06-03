@@ -1,15 +1,17 @@
-use anyhow::Result;
+use std::collections::HashMap;
+
 use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tracing::debug;
 
-use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
 
-use crate::methods::params::{Params, ParamsType};
+use crate::client::PCloudClient;
 use crate::types::File;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/getfilelink";
 
@@ -42,9 +44,9 @@ impl GetFileLinkInput {
     }
 }
 
-impl Params for GetFileLinkInput {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        self.file.add_to_params(params)?;
+impl AddToParams for GetFileLinkInput {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
+        self.file.add_to_params(params);
         if self.forcedownload {
             params.insert("forcedownload".to_string(), "1".to_string());
         }
@@ -57,7 +59,6 @@ impl Params for GetFileLinkInput {
         if self.skipfilename {
             params.insert("skipfilename".to_string(), "1".to_string());
         }
-        Ok(())
     }
 }
 
@@ -78,14 +79,12 @@ pub trait GetFileLink {
 impl<T: PCloudClient> GetFileLink for T {
     async fn getfilelink(&self, file_link: GetFileLinkInput) -> Result<FileLink> {
         debug!("pcloud::getfilelink - file '{}'", file_link.file);
-        let ret = RESTClient::get::<FileLink>(self, ENDPOINT, HeaderMap::default(), file_link.into_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &file_link).await
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
     use std::env;
     use std::fs::File as FsFile;
     use std::io::BufReader;
@@ -95,7 +94,7 @@ mod tests {
     use time::macros::datetime;
 
     use crate::mocks::client::MockLocalClient;
-    use crate::types::FileID;
+    use crate::types::{FileID, RemotePath};
     use crate::utils::http::ApiResult;
 
     use super::*;
@@ -150,16 +149,17 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &GetFileLinkInput| {
                 assert_eq!(endpoint, "/getfilelink");
-                assert_eq!(params.len(), 5);
-                assert_eq!(params.get("fileid"), None);
-                assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
-                assert_eq!(params.get("forcedownload"), Some(&"1".to_string()));
-                assert_eq!(params.get("contenttype"), Some(&"<contenttype>".to_string()));
-                assert_eq!(params.get("maxspeed"), Some(&"200".to_string()));
-                assert_eq!(params.get("skipfilename"), Some(&"1".to_string()));
                 assert_eq!(headers.len(), 0);
+                assert_eq!(
+                    params.file,
+                    File::RemotePath(RemotePath::from_str("path:/the/path").unwrap())
+                );
+                assert_eq!(params.forcedownload, true);
+                assert_eq!(params.contenttype, Some("<contenttype>".to_string()));
+                assert_eq!(params.maxspeed, Some(200));
+                assert_eq!(params.skipfilename, true);
 
                 Ok(FileLink {
                     path: "<path>".to_string(),
@@ -178,19 +178,21 @@ mod tests {
 
     #[tokio::test]
     async fn test_getfilelink_from_fileid() -> Result<()> {
-        let input = GetFileLinkInput::new(FileID(42).into());
+        let input = GetFileLinkInput::new(FileID::new(42).into());
 
         let utc_now = OffsetDateTime::now_utc();
         let mut client = MockLocalClient::new();
         client
             .expect_get()
             .times(1)
-            .returning(move |endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(move |endpoint, headers: HeaderMap, params: &GetFileLinkInput| {
                 assert_eq!(endpoint, "/getfilelink");
-                assert_eq!(params.len(), 1);
-                assert_eq!(params.get("fileid"), Some(&"42".to_string()));
-                assert_eq!(params.get("path"), None);
                 assert_eq!(headers.len(), 0);
+                assert_eq!(params.file, File::FileID(FileID::new(42)));
+                assert_eq!(params.forcedownload, false);
+                assert_eq!(params.contenttype, None);
+                assert_eq!(params.maxspeed, None);
+                assert_eq!(params.skipfilename, false);
 
                 Ok(FileLink {
                     path: "<path>".to_string(),

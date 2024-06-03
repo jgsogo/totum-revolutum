@@ -30,7 +30,7 @@ pub struct Params {
 /// Computes a local path (always inside `output_folder`) using `input` as a relative path to
 /// concatenate to `output_folder`.
 fn local_path_from_remote_file(output_folder: &Utf8Path, input: &RemotePath) -> Result<Utf8PathBuf> {
-    let rel_path = input.path().strip_prefix("/")?;
+    let rel_path = input.as_path().strip_prefix("/")?;
     let abs_path = to_absolute_path(&output_folder.join(rel_path));
     Ok(abs_path)
 }

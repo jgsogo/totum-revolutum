@@ -1,16 +1,17 @@
 use std::collections::HashMap;
 
-use anyhow::{bail, Result};
 use async_trait::async_trait;
 use bitflags::bitflags;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
 
+use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;
 use crate::types::{File, FileID, FolderID};
+use crate::{Error, Result};
 
 pub const ENDPOINT: &str = "/file_open";
 
@@ -50,29 +51,31 @@ impl<T: PCloudClient> GetFileOpen for T {
             // When creating a file, folderid+name OR path need to be provided
             match path {
                 FileOpenPath::FolderAndName(folderid, name) => {
-                    params.insert("folderid".to_string(), folderid.0.to_string());
+                    folderid.add_to_params(&mut params);
                     params.insert("name".to_string(), name);
                 }
                 FileOpenPath::File(File::RemotePath(path)) => {
-                    params.insert("path".to_string(), path.path().to_string());
+                    path.add_to_params(&mut params);
                 }
-                _ => bail!("If O_CREATE is set, provide either folderid+name or path"),
+                _ => {
+                    return Err(Error::InputDataEror(
+                        "If O_CREATE is set, provide either folderid+name or path".to_string(),
+                    ))
+                }
             }
         } else {
             // If the file exists, fileid or path need to be provided
             match path {
-                FileOpenPath::File(File::FileID(fileid)) => {
-                    params.insert("fileid".to_string(), fileid.0.to_string());
+                FileOpenPath::File(file) => file.add_to_params(&mut params),
+                _ => {
+                    return Err(Error::InputDataEror(
+                        "If O_CREATE is not set, provide either fileid or path".to_string(),
+                    ))
                 }
-                FileOpenPath::File(File::RemotePath(path)) => {
-                    params.insert("path".to_string(), path.path().to_string());
-                }
-                _ => bail!("If O_CREATE is not set, provide either fileid or path"),
             }
         }
 
-        let ret = RESTClient::get::<FileOpen>(self, ENDPOINT, HeaderMap::default(), params).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &params).await
     }
 }
 
@@ -90,11 +93,12 @@ mod tests {
         {
             let flags = Flags::O_CREAT;
             let client = MockLocalClient::new();
-            let r = client.file_open(flags, FileOpenPath::File(FileID(42).into())).await;
+            let r = client
+                .file_open(flags, FileOpenPath::File(FileID::new(42).into()))
+                .await;
             assert!(r.is_err());
-            assert_eq!(
-                r.unwrap_err().to_string(),
-                "If O_CREATE is set, provide either folderid+name or path"
+            assert!(
+                matches!(r.unwrap_err(), Error::InputDataEror(ref message) if message == "If O_CREATE is set, provide either folderid+name or path")
             );
         }
 
@@ -105,7 +109,7 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 3);
                     assert_eq!(params.get("flags"), Some(&"64".to_string()));
@@ -113,14 +117,14 @@ mod tests {
                     assert_eq!(params.get("name"), Some(&"name".to_string()));
                     assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
-                        fd: 42,
-                        fileid: FileID(42),
+                        fd: FileDescriptor::new(42),
+                        fileid: FileID::new(42),
                     })
                 });
-            let input = FileOpenPath::FolderAndName(FolderID(42), "name".to_string());
+            let input = FileOpenPath::FolderAndName(FolderID::new(42), "name".to_string());
             let r = client.file_open(flags, input).await?;
-            assert_eq!(r.fd, 42);
-            assert_eq!(r.fileid, FileID(42));
+            assert_eq!(r.fd, FileDescriptor::new(42));
+            assert_eq!(r.fileid, FileID::new(42));
         }
 
         // test O_CREAT with path
@@ -130,21 +134,21 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"1088".to_string()));
                     assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                     assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
-                        fd: 42,
-                        fileid: FileID(42),
+                        fd: FileDescriptor::new(42),
+                        fileid: FileID::new(42),
                     })
                 });
-            let input = FileOpenPath::File(File::from_str("path:/the/path")?);
+            let input = FileOpenPath::File(File::from_str("path:/the/path").unwrap());
             let r = client.file_open(flags, input).await?;
-            assert_eq!(r.fd, 42);
-            assert_eq!(r.fileid, FileID(42));
+            assert_eq!(r.fd, FileDescriptor::new(42));
+            assert_eq!(r.fileid, FileID::new(42));
         }
 
         Ok(())
@@ -157,12 +161,14 @@ mod tests {
             let flags = Flags::empty();
             let client = MockLocalClient::new();
             let r = client
-                .file_open(flags, FileOpenPath::FolderAndName(FolderID(42), "name".to_string()))
+                .file_open(
+                    flags,
+                    FileOpenPath::FolderAndName(FolderID::new(42), "name".to_string()),
+                )
                 .await;
             assert!(r.is_err());
-            assert_eq!(
-                r.unwrap_err().to_string(),
-                "If O_CREATE is not set, provide either fileid or path"
+            assert!(
+                matches!(r.unwrap_err(), Error::InputDataEror(ref message) if message == "If O_CREATE is not set, provide either fileid or path")
             );
         }
 
@@ -173,21 +179,21 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"0".to_string()));
                     assert_eq!(params.get("fileid"), Some(&"42".to_string()));
                     assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
-                        fd: 42,
-                        fileid: FileID(42),
+                        fd: FileDescriptor::new(42),
+                        fileid: FileID::new(42),
                     })
                 });
-            let input = FileOpenPath::File(FileID(42).into());
+            let input = FileOpenPath::File(FileID::new(42).into());
             let r = client.file_open(flags, input).await?;
-            assert_eq!(r.fd, 42);
-            assert_eq!(r.fileid, FileID(42));
+            assert_eq!(r.fd, FileDescriptor::new(42));
+            assert_eq!(r.fileid, FileID::new(42));
         }
 
         // test ~O_CREAT with path
@@ -198,21 +204,21 @@ mod tests {
             client
                 .expect_get()
                 .times(1)
-                .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+                .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                     assert_eq!(endpoint, "/file_open");
                     assert_eq!(params.len(), 2);
                     assert_eq!(params.get("flags"), Some(&"128".to_string()));
                     assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                     assert_eq!(headers.len(), 0);
                     Ok(FileOpen {
-                        fd: 42,
-                        fileid: FileID(42),
+                        fd: FileDescriptor::new(42),
+                        fileid: FileID::new(42),
                     })
                 });
-            let input = FileOpenPath::File(File::from_str("path:/the/path")?);
+            let input = FileOpenPath::File(File::from_str("path:/the/path").unwrap());
             let r = client.file_open(flags, input).await?;
-            assert_eq!(r.fd, 42);
-            assert_eq!(r.fileid, FileID(42));
+            assert_eq!(r.fd, FileDescriptor::new(42));
+            assert_eq!(r.fileid, FileID::new(42));
         }
 
         Ok(())

@@ -1,12 +1,12 @@
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use anyhow::{anyhow, Result};
 use async_std::fs::File as AsyncFile;
 use async_std::io::{ReadExt, WriteExt};
 use async_trait::async_trait;
 
 use crate::File;
+use crate::{Error, Result};
 
 pub struct LocalFile {
     file: AsyncFile,
@@ -21,19 +21,19 @@ impl LocalFile {
 #[async_trait]
 impl File for LocalFile {
     async fn read_to_end(&mut self, buf: &mut Vec<u8>) -> Result<usize> {
-        self.file.read_to_end(buf).await.map_err(|e| anyhow!(e))
+        self.file.read_to_end(buf).await.map_err(Error::IoError)
     }
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
-        self.file.read(buf).await.map_err(|e| anyhow!(e))
+        self.file.read(buf).await.map_err(Error::IoError)
     }
 
     async fn write_all(&mut self, buf: &[u8]) -> Result<()> {
-        self.file.write_all(buf).await.map_err(|e| anyhow!(e))
+        self.file.write_all(buf).await.map_err(Error::IoError)
     }
 
     async fn sync_all(&mut self) -> Result<()> {
-        self.file.sync_all().await.map_err(|e| anyhow!(e))
+        self.file.sync_all().await.map_err(Error::IoError)
     }
 }
 

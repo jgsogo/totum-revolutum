@@ -1,9 +1,9 @@
-use anyhow::Result;
 use time::macros::datetime;
 
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::mocks::server::PCloudServerMock;
+use pcloud_sdk::Result;
 
 #[tokio::test]
 async fn test_userinfo_get() -> Result<()> {

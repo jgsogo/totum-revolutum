@@ -1,13 +1,13 @@
-use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client::PCloudClient;
 use http_utils::rest::RESTClient;
 
-use crate::methods::params::{Params, SourceAndTargetFolder};
+use crate::client::PCloudClient;
+use crate::methods::params::SourceAndTargetFolder;
 use crate::structures::MetadataFolder;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/renamefolder";
 
@@ -25,19 +25,21 @@ pub trait GetRenameFolder {
 #[async_trait]
 impl<T: PCloudClient> GetRenameFolder for T {
     async fn copyfile(&self, input: SourceAndTargetFolder) -> Result<RenameFolder> {
-        let ret = RESTClient::get::<RenameFolder>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use std::env;
     use std::fs::File;
     use std::io::BufReader;
     use std::str::FromStr;
 
     use camino::Utf8Path;
+
+    use http_utils::AddToParams;
 
     use crate::methods::params::TargetLocation;
     use crate::types::{Folder, FolderID, RemotePath};
@@ -48,10 +50,12 @@ mod tests {
     #[test]
     fn test_params_with_ids_noname() {
         let input = SourceAndTargetFolder {
-            source: FolderID(1234).into(),
-            target: TargetLocation::FolderAndName((FolderID(4321), None)),
+            source: FolderID::new(1234).into(),
+            target: TargetLocation::FolderAndName((FolderID::new(4321), None)),
         };
-        let params = input.into_params().unwrap();
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -60,10 +64,12 @@ mod tests {
     #[test]
     fn test_params_with_ids_with_name() {
         let input = SourceAndTargetFolder {
-            source: FolderID(1234).into(),
-            target: TargetLocation::FolderAndName((FolderID(4321), Some("name".to_string()))),
+            source: FolderID::new(1234).into(),
+            target: TargetLocation::FolderAndName((FolderID::new(4321), Some("name".to_string()))),
         };
-        let params = input.into_params().unwrap();
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
         assert_eq!(params.len(), 3);
         assert_eq!(params.get("folderid"), Some(&"1234".to_string()));
         assert_eq!(params.get("tofolderid"), Some(&"4321".to_string()));
@@ -76,7 +82,9 @@ mod tests {
             source: Folder::from_str("path:/from/path").unwrap(),
             target: TargetLocation::RemotePath(RemotePath::from_str("path:/to/path").unwrap()),
         };
-        let params = input.into_params().unwrap();
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
         assert_eq!(params.len(), 2);
         assert_eq!(params.get("path"), Some(&"/from/path".to_string()));
         assert_eq!(params.get("topath"), Some(&"/to/path".to_string()));
@@ -100,7 +108,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid, FolderID(230807));
+                assert_eq!(data.metadata.folderid, FolderID::new(230807));
             }
         }
     }

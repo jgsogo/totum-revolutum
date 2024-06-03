@@ -114,7 +114,7 @@ mod tests {
                 assert_eq!(data.common.isshared, Some(false));
                 assert_eq!(data.common.name, Some("Simple image.jpg".to_string()));
                 assert_eq!(data.common.id, Some("f1729212".to_string()));
-                assert_eq!(data.fileid, FileID(1729212));
+                assert_eq!(data.fileid, FileID::new(1729212));
                 assert_eq!(data.deletedfileid, None);
                 assert_eq!(data.common.created, Some(datetime!(2013-10-02 14:29:11 UTC)));
                 assert_eq!(data.common.modified, None);

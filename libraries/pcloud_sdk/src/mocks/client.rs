@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use anyhow::Result;
+use crate::{Error, Result};
 use async_trait::async_trait;
 use headers::HeaderMap;
 use mockall::mock;
 use serde::de::DeserializeOwned;
 
 use http_utils::rest::RESTClient;
-use http_utils::HttpClient;
+use http_utils::{AddToParams, HttpClient};
 
 use crate::client::PCloudClient;
 
@@ -23,35 +23,35 @@ mock! {
     #[allow(dead_code)]
     #[async_trait]
     impl HttpClient for LocalClient {
+        type Error = Error;
+
         fn build_url(&self, endpoint: &str) -> String;
 
         fn http_client(&self) -> &reqwest::Client;
 
         fn headers(&self, headers: HeaderMap) -> HeaderMap;
 
-        fn params(&self, params: HashMap<String, String>) -> HashMap<String, String>;
-
-
+        fn params(&self) -> HashMap<String, String>;
     }
 
     #[allow(dead_code)]
     #[async_trait]
     impl RESTClient for LocalClient {
-        fn parse_response<T>(result: String) -> Result<T>
+        fn parse_response<T>(result: String) -> std::result::Result<T, <MockLocalClient as HttpClient>::Error>
         where
             T: DeserializeOwned + 'static;
 
-        async fn get<T>(&self, endpoint: &str, headers: HeaderMap, params: HashMap<String, String>) -> Result<T>
+        async fn get<T, TParams: AddToParams + Sync + 'static>(&self, endpoint: &str, headers: HeaderMap, params: &TParams) -> std::result::Result<T, <MockLocalClient as HttpClient>::Error>
         where
             T: DeserializeOwned + 'static;
 
-        async fn post<T>(
+        async fn post<T, TParams: AddToParams + Sync + 'static>(
             &self,
             endpoint: &str,
             headers: HeaderMap,
-            params: HashMap<String, String>,
+            params: &TParams,
             data: Vec<u8>,
-        ) -> Result<T>
+        ) -> std::result::Result<T, <MockLocalClient as HttpClient>::Error>
         where
             T: DeserializeOwned + 'static;
     }
@@ -59,6 +59,6 @@ mock! {
     #[allow(dead_code)]
     #[async_trait]
     impl PCloudClient for LocalClient {
-        async fn get_bytes(&self, endpoint: &str, mut params: HashMap<String, String>) -> Result<Vec<u8>>;
+        async fn get_bytes<TParams: AddToParams + Sync + 'static>(&self, endpoint: &str, mut params: &TParams) -> Result<Vec<u8>>;
     }
 }
