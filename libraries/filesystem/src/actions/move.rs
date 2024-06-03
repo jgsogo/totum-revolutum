@@ -3,8 +3,12 @@ use camino::Utf8Path;
 use crate::Filesystem;
 use crate::Result;
 
-use super::copy::copy;
+use super::copy::copy_file;
 
+/// Moves the content of the `origin` file in `lhs_fs` [`Filesystem`] to the `target` file
+/// in the `rhs_fs` [`Filesystem`].
+///
+/// This action is implemented in terms of [`copy_file`].
 pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action FsRhs,
@@ -12,7 +16,7 @@ pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     target: &Utf8Path,
     force: bool,
 ) -> Result<()> {
-    copy(lhs_fs, rhs_fs, origin, target, force).await?;
+    copy_file(lhs_fs, rhs_fs, origin, target, force).await?;
     lhs_fs.remove_file(origin).await
 }
 
