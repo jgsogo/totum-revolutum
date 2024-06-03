@@ -28,10 +28,6 @@ impl Default for FilesystemMock {
 impl Filesystem for FilesystemMock {
     type Metadata = <FilesystemLocal as Filesystem>::Metadata;
 
-    fn root(&self) -> &Utf8Path {
-        self.local.root()
-    }
-
     async fn walk_directory(
         &self,
         tx: Sender<Self::Metadata>,

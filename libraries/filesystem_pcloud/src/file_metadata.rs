@@ -1,21 +1,17 @@
-use camino::Utf8PathBuf;
+use camino::{Utf8Path, Utf8PathBuf};
 
 use filesystem::FileMetadata;
 use pcloud_sdk::structures::MetadataFile;
 
-pub type RemoteMetadataEntry = (Utf8PathBuf, MetadataFile);
-
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {
-    id: String,
+    relative_path: Utf8PathBuf,
     metadata: MetadataFile,
 }
 
 impl FileMetadata for RemoteMetadata {
-    type DirEntry = RemoteMetadataEntry;
-
-    fn id(&self) -> &str {
-        &self.id
+    fn path(&self) -> &Utf8Path {
+        &self.relative_path
     }
 
     fn size(&self) -> u64 {
@@ -27,11 +23,10 @@ impl FileMetadata for RemoteMetadata {
     }
 }
 
-impl From<RemoteMetadataEntry> for RemoteMetadata {
-    fn from(entry: RemoteMetadataEntry) -> Self {
-        let (path, metadata) = entry;
+impl RemoteMetadata {
+    pub fn new(relative_path: Utf8PathBuf, metadata: MetadataFile) -> Self {
         Self {
-            id: path.to_string(),
+            relative_path,
             metadata,
         }
     }

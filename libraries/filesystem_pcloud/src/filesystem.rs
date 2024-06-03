@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::Utf8Path;
+use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use tokio::task::JoinHandle;
 use tokio::time::Instant;
@@ -35,7 +35,7 @@ pub(crate) enum FileCloseMessage {
 pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone> {
     // Root folder for this filesystem
     root_folderid: FolderID,
-    root_path: RemotePath,
+    root_path: Utf8PathBuf,
 
     // TODO: This shouldn't be an `Arc<HttpClient>`. It should be just `HttpClient`
     pcloud: Arc<HttpClient>,
@@ -75,7 +75,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(Self {
             root_folderid,
-            root_path,
+            root_path: root_path.as_path().into(),
             pcloud,
             tx_file_close: tx,
             thread_file_close: Some(t),
@@ -106,7 +106,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
-                    let data: RemoteMetadata = (path, m.clone()).into();
+                    let data = RemoteMetadata::new(path, m.clone());
                     tx.send(data).map_err(|e| Error::Other(e.to_string()))?;
                 }
                 Metadata::MetadataFolder(m) => {
@@ -129,10 +129,6 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
 #[async_trait]
 impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
     type Metadata = RemoteMetadata;
-
-    fn root(&self) -> &Utf8Path {
-        self.root_path.as_path()
-    }
 
     async fn walk_directory(
         &self,
@@ -157,7 +153,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(tx, self.root(), contents, 0)?,
+            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(tx, &self.root_path, contents, 0)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -166,7 +162,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        let path = self.check_path(path)?;
+        let path = self.root_path.join(self.check_path(path)?);
         let input_file: pcloud_sdk::types::File = path
             .try_into()
             .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
@@ -179,16 +175,19 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     }
 
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
-        let path = self.check_path(path)?;
-        let path: RemotePath = path
-            .try_into()
-            .map_err(|e: InvalidRemotePathError| Error::Other(e.to_string()))?;
+        let rel_path = self.check_path(path)?;
+        let filename = rel_path.file_name().ok_or(Error::NotAFilepath)?;
 
-        let filename = path.as_path().file_name().ok_or(Error::NotAFilepath)?;
-        let folderid = match path.as_path().parent() {
+        let rel_path = rel_path
+            .parent()
+            .map_or_else(|| None, |v| if v.as_str() == "" { None } else { Some(v) });
+
+        let folder_id = match rel_path {
             None => self.root_folderid.clone(),
-            Some(p) => {
-                let remote_path: RemotePath = p
+            Some(parent) => {
+                println!("There is a parent!!!: {}", parent);
+                let parent = self.root_path.join(parent);
+                let remote_path = parent
                     .try_into()
                     .map_err(|e: InvalidRemotePathError| Error::Other(e.to_string()))?;
                 self.pcloud
@@ -202,7 +201,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .pcloud
             .file_open(
                 Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
-                FileOpenPath::FolderAndName(folderid, filename.to_string()),
+                FileOpenPath::FolderAndName(folder_id, filename.to_string()),
             )
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
@@ -212,7 +211,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     }
 
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
-        let path = self.check_path(path)?;
+        let path = self.root_path.join(self.check_path(path)?);
         let path: PCloudFile = path
             .try_into()
             .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
@@ -229,21 +228,16 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     }
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
-        let folderid = self.root_folderid.clone();
-        // Get the relative path starting in the root
-        let rel_path = path
-            .strip_prefix(self.root())
-            .map_err(|_| Error::PathOutsideFilesystem)?;
+        let rel_path = self.check_path(path)?;
         self.pcloud
-            .createfolderifnotexists_all(&folderid, rel_path)
+            .createfolderifnotexists_all(&self.root_folderid, rel_path)
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
 
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
+        let path = self.root_path.join(self.check_path(path)?);
         let input_file = path
             .try_into()
             .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
@@ -255,7 +249,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     }
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
+        let path = self.root_path.join(self.check_path(path)?);
         let input_folder = path
             .try_into()
             .map_err(|e: InvalidFolderError| Error::Other(e.to_string()))?;
@@ -267,7 +261,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     }
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
+        let path = self.root_path.join(self.check_path(path)?);
         let input_folder = path
             .try_into()
             .map_err(|e: InvalidFolderError| Error::Other(e.to_string()))?;
@@ -318,10 +312,10 @@ mod tests {
                 // query.add_to_params(&mut params);
 
                 assert_eq!(endpoint, listfolder::ENDPOINT);
+                assert_eq!(headers.len(), 0);
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
                 assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
-                assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
                     metadata: MetadataFolder::default(FolderID::new(1234)),
@@ -330,7 +324,8 @@ mod tests {
 
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(root, client).await?;
-        assert_eq!(Utf8Path::new("/the/path"), fs.root());
+        assert_eq!(Utf8Path::new("/the/path"), fs.root_path); // Root is always '/'
+        assert_eq!(FolderID::new(1234), fs.root_folderid);
         Ok(())
     }
 
@@ -355,9 +350,8 @@ mod tests {
         let root = RemotePath::from_str("path:/the/path")?;
         let r = client.get_folderid(&root).await;
         assert!(r.is_err());
-        assert_eq!(
-            r.err().unwrap().to_string(),
-            "Error from PCloud 9999: Mock: the folder doesn't exist".to_string()
+        assert!(
+            matches!(r.unwrap_err(), pcloud_sdk::Error::PCloudError { code: 9999, ref message} if message == "Mock: the folder doesn't exist")
         );
         Ok(())
     }
@@ -367,7 +361,7 @@ mod tests {
         let mut client = MockLocalClient::new();
 
         // Expectation for FilesystemPCloud::new
-        client.expect_get::<ListFolder, _>().times(2).returning(
+        client.expect_get::<ListFolder, _>().times(1).returning(
             move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(params.len(), 2);
@@ -430,15 +424,16 @@ mod tests {
         let root = RemotePath::from_str("path:/the/path")?;
         let mut fs = FilesystemPCloud::new(root, client).await?;
 
-        let filepath = Utf8Path::new("file");
-        let content: Vec<u8> = b"Hello, world!".to_vec();
-
-        // Create and write_all
         {
+            let filepath = Utf8Path::new("file");
             let mut f = fs.create(&filepath).await?;
+
+            let content: Vec<u8> = b"Hello, world!".to_vec();
             f.write_all(&content).await?;
         }
+
         fs.flush().await?;
+
         Ok(())
     }
 

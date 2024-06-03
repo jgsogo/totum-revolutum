@@ -2,7 +2,7 @@
 //!
 
 pub use file::CHUNK_SIZE;
-pub use file_metadata::{RemoteMetadata, RemoteMetadataEntry};
+pub use file_metadata::RemoteMetadata;
 
 pub use self::filesystem::FilesystemPCloud;
 

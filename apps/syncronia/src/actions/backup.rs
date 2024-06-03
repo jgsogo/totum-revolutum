@@ -1,5 +1,3 @@
-use camino::Utf8Path;
-
 use async_trait::async_trait;
 use tracing::info;
 
@@ -30,11 +28,11 @@ impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> ActionRu
     async fn run_with_both(&self, lhs: &FsLhs::Metadata, rhs: &FsRhs::Metadata) -> anyhow::Result<()> {
         match self.on_conflict {
             OnConflict::OverrideRemote => {
-                info!("Override remote '{}'", lhs.id());
+                info!("Override remote '{}'", lhs.path());
                 // let _r = remote_basepoint.copy(&lhs, Some(rhs)).await?;
             }
             OnConflict::RenameRemote => {
-                info!("Rename remote and copy '{}'", rhs.id());
+                info!("Rename remote and copy '{}'", rhs.path());
                 // let _ = remote_basepoint.rename(rhs).await?;
                 // let _r = remote_basepoint.copy(&lhs, None).await?;
             }
@@ -43,11 +41,11 @@ impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> ActionRu
         Ok(())
     }
 
-    async fn run_with_lhs(&self, lhs: &FsLhs::Metadata) -> anyhow::Result<()> {
-        let lhs_path = Utf8Path::new(lhs.id());
-        let relative_path = self._lhs_fs.rel_path(lhs_path)?;
-        info!("Copy to remote '{relative_path}'");
+    async fn run_with_lhs(&self, _lhs: &FsLhs::Metadata) -> anyhow::Result<()> {
+        todo!("not impl");
+        // let relative_path = self._lhs_fs.rel_path(lhs.path())?;
+        // info!("Copy to remote '{relative_path}'");
         // let rhs_file = self._rhs_fs.create()
-        Ok(())
+        // Ok(())
     }
 }
