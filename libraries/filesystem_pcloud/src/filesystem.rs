@@ -20,7 +20,6 @@ use pcloud_sdk::methods::folder::deletefolder::GetDeleteFolder;
 use pcloud_sdk::methods::folder::deletefolderrecursive::GetDeleteFolderRecursive;
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
-use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::errors::{InvalidFileError, InvalidFolderError, InvalidRemotePathError};
 use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
@@ -28,9 +27,7 @@ use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 use crate::file::RemoteFile;
 use crate::RemoteMetadata;
 
-pub type PCloudHttpClient = pcloud_sdk::client::PCloudClientImpl<OAuth2TokenImpl>;
-
-pub enum FileCloseMessage {
+pub(crate) enum FileCloseMessage {
     FileDescriptor(FileDescriptor),
     Stop,
 }

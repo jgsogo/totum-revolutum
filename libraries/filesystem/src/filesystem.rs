@@ -5,22 +5,20 @@ use super::utils::normalize_path;
 use super::{Error, Result};
 use super::{File, FileMetadata};
 
-/// Abstract a filesystem, either local or remote and provide methods to access their files
+/// Abstraction of a filesystem (it can be local or remote) and methods to access their files
 #[async_trait]
-pub trait Filesystem
-where
-    Self: Sync,
-{
+pub trait Filesystem: Sync {
     type Metadata: FileMetadata;
 
+    /// Returns the root of the filesystem
+    /// FIXME: It only makes sense in local filesystems.... we need to hide this method.
     fn root(&self) -> &Utf8Path;
 
     /// Checks that the given path stays within the filesystem. Returns the absolute path or
     /// an error
+    /// FIXME: Here we cannot join with ROOT. Doing that we are leaking information to consumers.
+    /// FIXME: We need to return an absolute path starting from ROOT.
     fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        // TODO: Here we cannot join with ROOT. Doing that we are leaking information to consumers.
-        // TODO: We need to return an absolute path starting from ROOT.
-
         let path = if path.is_absolute() {
             path.to_path_buf()
         } else {

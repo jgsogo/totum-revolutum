@@ -135,7 +135,7 @@ impl<'a, T: Database, PCloud: PCloudClient + Clone + Send + 'static> PhotoDB<'a,
         let mut conn = self.db.get_connection()?;
         tokio::spawn(async move {
             loop {
-                // TODO: Hide receiver behind an iterator, take a batch. FIXME: this `recv_many` returns as soon as there is one message available
+                // TODO: Hide receiver behind an iterator, take a batch
                 match db_remove_rx.recv().await {
                     None => break,
                     Some(row_id) => {

@@ -12,7 +12,6 @@ use crate::local::LocalMetadata;
 use crate::{Error, Result};
 use crate::{File, Filesystem};
 
-use super::file::LocalFile;
 use super::parallel_visitor;
 
 pub struct FilesystemLocal {
@@ -67,13 +66,13 @@ impl Filesystem for FilesystemLocal {
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
         let f = AsyncFile::create(path.into_std_path_buf()).await?;
-        Ok(Box::new(LocalFile::new(f)))
+        Ok(Box::new(f))
     }
 
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.check_path(path)?;
         let f = AsyncFile::open(path.into_std_path_buf()).await?;
-        Ok(Box::new(LocalFile::new(f)))
+        Ok(Box::new(f))
     }
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {

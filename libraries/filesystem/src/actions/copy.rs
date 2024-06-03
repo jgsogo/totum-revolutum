@@ -1,22 +1,10 @@
 use camino::Utf8Path;
 
-use crate::Result;
 use crate::{Error, Filesystem};
+use crate::{File, Result};
 
-pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
-    lhs_fs: &'action FsLhs,
-    rhs_fs: &'action FsRhs,
-    origin: &Utf8Path,
-    target: &Utf8Path,
-    force: bool,
-) -> Result<()> {
-    if !force && rhs_fs.exists(target).await? {
-        return Err(Error::TargetFileExists);
-    }
-
-    let mut lhs_file = lhs_fs.open(origin).await?;
-    let mut rhs_file = rhs_fs.create(target).await?;
-
+/// Copies the contents of the `lhs_file` into the `rhs_file`.
+pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mut Box<dyn File>) -> Result<()> {
     let mut buf: [u8; 100] = [0; 100]; // TODO: Configure buffer size
     loop {
         match lhs_file.read(&mut buf).await {
@@ -32,6 +20,24 @@ pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     Ok(())
 }
 
+/// Copy a file from `origin` path in the `lhs_fs` [`Filesystem`] to the `target` path in the
+/// `rhs_fs` [`Filesystem`]. The method can fail if the `target` file already exists and
+/// `force` is false.
+pub async fn copy_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
+    lhs_fs: &'action FsLhs,
+    rhs_fs: &'action FsRhs,
+    origin: &Utf8Path,
+    target: &Utf8Path,
+    force: bool,
+) -> Result<()> {
+    if !force && rhs_fs.exists(target).await? {
+        return Err(Error::TargetFileExists);
+    }
+
+    let mut target_file = rhs_fs.create(target).await?;
+    copy(&mut lhs_fs.open(origin).await?, &mut target_file).await
+}
+
 #[cfg(test)]
 mod tests {
     use camino::Utf8PathBuf;
@@ -40,23 +46,24 @@ mod tests {
 
     use super::*;
 
+    async fn get_filesystem_mock_with_file(lhs_path: &Utf8Path, content: &[u8]) -> FilesystemMock {
+        let fs = FilesystemMock::default();
+        let mut f1 = fs.create(&lhs_path).await.unwrap();
+        f1.write_all(&content).await.unwrap();
+        fs
+    }
+
     #[tokio::test]
     async fn test_copy_no_force() -> Result<()> {
         let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
         let lhs_path = Utf8PathBuf::from("file.txt");
 
-        let lhs_fs = {
-            let fs = FilesystemMock::default();
-            let mut f1 = fs.create(&lhs_path).await?;
-            f1.write_all(&file_content).await?;
-            fs
-        };
-
+        let lhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
         let rhs_fs = FilesystemMock::default();
         let rhs_path = Utf8PathBuf::from("the_copy.txt");
         assert!(rhs_fs.open(&rhs_path).await.is_err());
 
-        copy(&lhs_fs, &rhs_fs, &lhs_path, &rhs_path, false).await?;
+        copy_file(&lhs_fs, &rhs_fs, &lhs_path, &rhs_path, false).await?;
 
         // We can read the file from the RHS
         let mut rhs_file = rhs_fs.open(&rhs_path).await?;
@@ -72,22 +79,11 @@ mod tests {
         let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
         let lhs_path = Utf8PathBuf::from("file.txt");
 
-        let lhs_fs = {
-            let fs = FilesystemMock::default();
-            let mut f1 = fs.create(&lhs_path).await?;
-            f1.write_all(&file_content).await?;
-            fs
-        };
-
-        let rhs_fs = {
-            let fs = FilesystemMock::default();
-            let mut f1 = fs.create(&lhs_path).await?;
-            f1.write_all(b"Any other content").await?;
-            fs
-        };
+        let lhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
+        let rhs_fs = get_filesystem_mock_with_file(&lhs_path, b"Any other content").await;
 
         // File already exists
-        let r = copy(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, false).await;
+        let r = copy_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, false).await;
         assert!(r.is_err());
         // ... with a different content
         let mut rhs_current_content = Vec::new();
@@ -99,7 +95,7 @@ mod tests {
         assert_ne!(file_content, &*rhs_current_content);
 
         // We copy and now we get the same content
-        let r = copy(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, true).await;
+        let r = copy_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, true).await;
         assert!(r.is_ok());
         let mut rhs_current_content = Vec::new();
         rhs_fs
