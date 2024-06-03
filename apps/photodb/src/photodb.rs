@@ -1,30 +1,37 @@
+use anyhow::{anyhow, bail, Result};
+use camino::{Utf8Path, Utf8PathBuf};
+use diesel::prelude::*;
+use diesel::{RunQueryDsl, SelectableHelper};
+use oxipng::{optimize, Options};
+use tracing::{debug, error, info};
+
+use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
+use pcloud_sdk::handy::{Exists, GetFolderID};
+use pcloud_sdk::methods::file::stat::GetStat;
+use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
+use pcloud_sdk::types::{FileID, FolderID, RemotePath};
+use pcloud_sdk::Error;
+
+use crate::models::Photo;
+
 use super::db::Database;
 use super::models;
 use super::utils::sha256_string_from_file;
 use super::AppDirs;
-use anyhow::{anyhow, bail, Result};
-use camino::{Utf8Path, Utf8PathBuf};
-use diesel::{RunQueryDsl, SelectableHelper};
-use oxipng::{optimize, Options};
-use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::GetCreateFolderIfNotExistsAll;
-use pcloud_sdk::handy::{Exists, GetFolderID};
-use pcloud_sdk::methods::file::uploadfile::{PostUploadFile, UploadFileParams};
-use pcloud_sdk::types::{FileID, FolderID, RemotePath};
-use tracing::{debug, info};
 
 // Path inside the remote folder to locate files using sha256 filename
 const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
-pub struct PhotoDB<'a, T: Database, PCloud: PCloudClient> {
+pub struct PhotoDB<'a, T: Database, PCloud: PCloudClient + Clone + Send + 'static> {
     pcloud: PCloud,
     db: T,
     app_dir: &'a AppDirs,
     folder_id: FolderID,
 }
 
-impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
+impl<'a, T: Database, PCloud: PCloudClient + Clone + Send + 'static> PhotoDB<'a, T, PCloud> {
     pub async fn new(db: T, pcloud: PCloud, app_dir: &'a AppDirs, remote_dir: RemotePath) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote directory '{}'",
@@ -110,12 +117,77 @@ impl<'a, T: Database, PCloud: PCloudClient> PhotoDB<'a, T, PCloud> {
         };
         let photo = diesel::insert_into(photos::table)
             .values(&new_photo)
-            .returning(models::Photo::as_returning())
+            .returning(Photo::as_returning())
             .get_result(&mut self.db.get_connection()?)?;
         // TODO: Handle scenario if the insert fails: duplicate fileid
 
         debug!("Photo inserted into database: {}", photo.id);
 
+        Ok(())
+    }
+
+    pub async fn clean_fileids(&self) -> Result<()> {
+        // Iterate all the entires in the photos table, check if the corresponding file_id exists,
+        // remove if it doesn't
+
+        let (db_remove_tx, mut db_remove_rx) = tokio::sync::mpsc::channel(100);
+
+        let mut conn = self.db.get_connection()?;
+        tokio::spawn(async move {
+            loop {
+                // TODO: Hide receiver behind an iterator, take a batch. FIXME: this `recv_many` returns as soon as there is one message available
+                match db_remove_rx.recv().await {
+                    None => break,
+                    Some(row_id) => {
+                        if let Err(e) = diesel::delete(photos.filter(id.eq(row_id))).execute(&mut conn) {
+                            error!("Error removing row {row_id}: {e}");
+                        }
+                    }
+                }
+            }
+        });
+
+        // TODO: Write some abstraction to use an iterator (pagination hidden) to iterate over the full table. See https://github.com/diesel-rs/diesel/issues/1087
+        use crate::schema::photos::dsl::*;
+        let results = photos.select(Photo::as_select()).load(&mut self.db.get_connection()?)?;
+
+        // Create tokio tasks, so they can run in parallel
+        let mut set = tokio::task::JoinSet::new();
+
+        for r in results {
+            let tx = db_remove_tx.clone();
+            let pcloud = self.pcloud.clone();
+            set.spawn(async move {
+                let fileid_ = FileID::new(r.fileid as u64);
+                debug!("Check if '{fileid_}' exists");
+                match pcloud.stat(fileid_.clone().into()).await {
+                    Ok(_) => None,
+                    Err(e) => {
+                        debug!("Error for {fileid_}: {e}");
+                        if let Error::PCloudError { code, .. } = e {
+                            if code == 2009 {
+                                tx.send(r.id).await.ok();
+                                Some(r.id)
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
+                    }
+                }
+            });
+        }
+
+        while let Some(res) = set.join_next().await {
+            match res {
+                Ok(Some(id_)) => {
+                    debug! {"Requested removal of photo.id {id_}"}
+                }
+                Ok(None) => {}
+                Err(e) => error!("Error running task: {e}"),
+            }
+        }
         Ok(())
     }
 }
