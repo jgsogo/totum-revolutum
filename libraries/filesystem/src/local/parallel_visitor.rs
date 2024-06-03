@@ -3,9 +3,7 @@ use tracing::error;
 
 use crate::local::LocalMetadata;
 
-// FIXME: This doesn't probably belongs to this crate
-
-pub struct Visitor {
+struct Visitor {
     tx: flume::Sender<LocalMetadata>,
 }
 
@@ -29,7 +27,7 @@ impl ParallelVisitor for Visitor {
     }
 }
 
-pub struct VisitorBuilder {
+pub(crate) struct VisitorBuilder {
     tx: flume::Sender<LocalMetadata>,
 }
 

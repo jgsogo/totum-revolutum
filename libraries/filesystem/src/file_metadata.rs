@@ -6,7 +6,9 @@ use std::fmt::Debug;
 pub trait FileMetadata: Clone + Send + Sync + From<Self::DirEntry> + Debug {
     type DirEntry;
 
-    /// Unique identifier for the file (inside the filesystem)
+    /// Unique identifier for the file (inside the filesystem). This identifier should be usable
+    /// in both directions. Given a file, it's possible to get its unique identifier and the other
+    /// way around: given an identifier, it's possible to find the file.
     fn id(&self) -> &str;
 
     /// The size of the file

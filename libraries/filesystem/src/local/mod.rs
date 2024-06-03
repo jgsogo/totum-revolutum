@@ -1,4 +1,4 @@
-pub use file_metadata::{LocalFileMetadata, LocalMetadata};
+pub use file_metadata::LocalMetadata;
 pub use filesystem::FilesystemLocal;
 
 mod file;
