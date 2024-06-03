@@ -1,6 +1,7 @@
 use std::time::Instant;
 
 use anyhow::{anyhow, Result};
+use camino::Utf8PathBuf;
 use futures::TryFutureExt;
 use serde::{Deserialize, Serialize};
 use tracing::{error, info};
@@ -89,8 +90,10 @@ pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
     let (lhs, rhs, differ) = two_ways_run::<FsLhs::Metadata, FsRhs::Metadata>().await;
     // TODO: This is not right
-    let lhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(lhs_fs.root());
-    let rhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(rhs_fs.root());
+    // let lhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(lhs_fs.root());
+    // let rhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(rhs_fs.root());
+    let lhs_ignore_filepath = Utf8PathBuf::from("/");
+    let rhs_ignore_filepath = Utf8PathBuf::from("/");
 
     if let Err(e) = tokio::try_join!(
         lhs_fs

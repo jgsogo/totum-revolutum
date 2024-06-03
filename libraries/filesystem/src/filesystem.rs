@@ -10,40 +10,15 @@ use super::{File, FileMetadata};
 pub trait Filesystem: Sync {
     type Metadata: FileMetadata;
 
-    /// Returns the root of the filesystem
-    /// FIXME: It only makes sense in local filesystems.... we need to hide this method.
-    fn root(&self) -> &Utf8Path;
-
-    /// Checks that the given path stays within the filesystem. Returns the absolute path or
-    /// an error
-    /// FIXME: Here we cannot join with ROOT. Doing that we are leaking information to consumers.
-    /// FIXME: We need to return an absolute path starting from ROOT.
+    /// Normalizes the given `path` ensuring that it is a relative path that doesn't goes outside
+    /// its root folder. Returns the normalized version of that path
     fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        let path = if path.is_absolute() {
-            path.to_path_buf()
-        } else {
-            self.root().join(path)
-        };
         let path = normalize_path(path);
-        if !path.starts_with(self.root()) {
-            let e = if path == self.root() {
-                Error::PathIsRoot
-            } else {
-                Error::PathOutsideFilesystem
-            };
-            Err(e)
+        if path.starts_with("../") {
+            Err(Error::PathOutsideFilesystem)
         } else {
             Ok(path)
         }
-    }
-
-    /// Returns the relative path for any given one
-    fn rel_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        let abs_path = self.check_path(path)?;
-        let r = abs_path
-            .strip_prefix(self.root())
-            .map_err(|_| Error::PathOutsideFilesystem);
-        r.map(|p| p.to_path_buf())
     }
 
     /// Walk files in the filesystem, for each file found it will send it via `tx`

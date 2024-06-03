@@ -41,10 +41,11 @@ impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> ActionRu
         Ok(())
     }
 
-    async fn run_with_lhs(&self, lhs: &FsLhs::Metadata) -> anyhow::Result<()> {
-        let relative_path = self._lhs_fs.rel_path(lhs.path())?;
-        info!("Copy to remote '{relative_path}'");
+    async fn run_with_lhs(&self, _lhs: &FsLhs::Metadata) -> anyhow::Result<()> {
+        todo!("not impl");
+        // let relative_path = self._lhs_fs.rel_path(lhs.path())?;
+        // info!("Copy to remote '{relative_path}'");
         // let rhs_file = self._rhs_fs.create()
-        Ok(())
+        // Ok(())
     }
 }

@@ -63,5 +63,7 @@ mod path_normalize_tests {
         check("/home/dys/../../../test", "/../test");
         check("π/2", "π/2");
         check("/home/dys/dev/broot/../../../canop/test", "/home/canop/test");
+        check("a/path/xxx/../to/something", "a/path/to/something");
+        check("a/../../to/outside", "../to/outside");
     }
 }
