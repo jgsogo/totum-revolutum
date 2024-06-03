@@ -2,9 +2,9 @@ use crate::FileMetadata;
 
 /// Contains a pair of [`FileMetadata`]
 ///
-/// It is used tipically on a two way diff algorithm to return the results from the diff, where
-/// the tuple contains one file (`lhs`) from the LHS filesystem, and the other file (`rhs`) from
-/// the RHS filesystem.
+/// It is used typically on a two way diff algorithm to return the results from the diff, where
+/// the tuple contains one file (`lhs`) from the LHS [`crate::Filesystem`], and the other file
+/// (`rhs`) from the RHS [`crate::Filesystem`].
 pub struct FilePair<LHS: FileMetadata, RHS: FileMetadata> {
     pub lhs: Option<LHS>,
     pub rhs: Option<RHS>,

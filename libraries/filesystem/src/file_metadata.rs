@@ -9,6 +9,9 @@ pub trait FileMetadata: Clone + Send + Sync + From<Self::DirEntry> + Debug {
     /// Unique identifier for the file (inside the filesystem). This identifier should be usable
     /// in both directions. Given a file, it's possible to get its unique identifier and the other
     /// way around: given an identifier, it's possible to find the file.
+    ///
+    /// More important, the same file in differen [`Filesystem`]s should be represented by the
+    /// same id. Typically, this id will just be the path in the filesystem.
     fn id(&self) -> &str;
 
     /// The size of the file

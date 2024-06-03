@@ -11,10 +11,10 @@ const MAX_BUFFER: usize = 100;
 
 /// Creates the channels for a two ways diffs and implements the main algorithm. Returns
 /// the endpoints for:
-///  * `lhs_sender`: this endpoint should be used by the lhs filesystem to send the [`FileMetadata`]
-///     for the files in the working directory
-///  * `rhs_sender`: this endpoint should be used by the rhs filesystem to send the [`FileMetadata`]
-///     for the files in the working directory
+///  * `lhs_sender`: this endpoint should be used by the LHS [`Filesystem`] to send
+///     the [`FileMetadata`] for the files in the working directory
+///  * `rhs_sender`: this endpoint should be used by the RHS [`Filesystem`] to send
+///     the [`FileMetadata`] for the files in the working directory
 ///  * `file_pair_receiver`: this endpoint will consume the [`FilePair`]s tuples composed based on the
 ///     inputs of the other two senders. It will also receive orphan pairs, that is, files that appears
 ///     just on one of the filesystems.
@@ -46,7 +46,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
                             }
                         },
                         None => {
-                            assert!(files.insert(key, FilePair::<LHS, RHS>::new_from_lhs(lhs_metadata)).is_none());
+                            let _ = files.insert(key, FilePair::<LHS, RHS>::new_from_lhs(lhs_metadata));
                         }
                     }
                 },
@@ -62,7 +62,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
                             }
                         },
                         None => {
-                            assert!(files.insert(key, FilePair::<LHS, RHS>::new_from_rhs(rhs_metadata)).is_none());
+                            let _ = files.insert(key, FilePair::<LHS, RHS>::new_from_rhs(rhs_metadata));
                         }
                     }
                 },
