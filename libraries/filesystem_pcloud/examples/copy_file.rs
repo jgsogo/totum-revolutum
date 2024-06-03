@@ -2,7 +2,7 @@ use anyhow::Result;
 use camino::Utf8Path;
 use std::str::FromStr;
 
-use filesystem::actions::copy;
+use filesystem::actions::copy_file;
 use filesystem::Filesystem;
 use filesystem_pcloud::FilesystemPCloud;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
@@ -48,7 +48,7 @@ async fn main() -> Result<()> {
     // Now copies origin to target
     let target = Utf8Path::new("target.txt");
     println!("Copies from origin '{origin}' to target '{target}'");
-    copy(&fs, &fs, &origin, &target, false).await?;
+    copy_file(&fs, &fs, &origin, &target, false).await?;
 
     // And let's read target
     let data = {

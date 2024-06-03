@@ -4,7 +4,7 @@
 pub use file::CHUNK_SIZE;
 pub use file_metadata::{RemoteMetadata, RemoteMetadataEntry};
 
-pub use self::filesystem::{FilesystemPCloud, PCloudHttpClient};
+pub use self::filesystem::FilesystemPCloud;
 
 mod file;
 mod file_metadata;

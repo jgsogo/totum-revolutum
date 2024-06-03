@@ -3,16 +3,17 @@ use camino::{Utf8Path, Utf8PathBuf};
 use anyhow::{anyhow, bail, Result};
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, Utc};
+use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use serde::{Deserialize, Serialize};
 
 use crate::actions::{Actions, OnConflict};
 use crate::utils::locked_file::{LockedFile, ReadWrite};
 use crate::utils::versioned_data::VersionedData;
-use filesystem_pcloud::PCloudHttpClient;
 
 use super::apps;
 use super::INSIDE_PROJECT_DIRECTORY;
 
+type PCloudHttpClient = pcloud_sdk::client::PCloudClientImpl<OAuth2TokenImpl>;
 const FILENAME: &str = "config";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
