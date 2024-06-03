@@ -361,6 +361,7 @@ dependencies = [
  "anyhow",
  "log",
  "testing_logger",
+ "thiserror",
  "tokio",
 ]
 

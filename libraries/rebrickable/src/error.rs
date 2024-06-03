@@ -9,9 +9,6 @@ pub enum Error {
 
     #[error(transparent)]
     SerializationError(#[from] DeserializationError),
-
-    #[error(transparent)]
-    Other(#[from] anyhow::Error), // source and Display delegate to anyhow::Error
 }
 
 /// An error that can be returned when deserializing data.

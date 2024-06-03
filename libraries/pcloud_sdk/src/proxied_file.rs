@@ -18,7 +18,7 @@ use crate::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use crate::methods::streaming::getfilelink::GetFileLinkInput;
 use crate::progress_bar::ProgressBarBuilder;
 use crate::types::{FileID, FolderID};
-use crate::{Error, Result};
+use crate::Result;
 
 // TODO: Some 'Output' should arrive from outside. Remove this struct NoProgressBarBuilder
 struct NoProgressBarBuilder;
@@ -140,8 +140,7 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
         }
 
         // Create side task (upload and remove on drop) and return to user
-        let (upload_on_drop, upload_receiver) = SideTask::new(force_boxed(Self::upload_and_remove), None)
-            .map_err(|e| Error::InputDataEror(e.to_string()))?;
+        let (upload_on_drop, upload_receiver) = SideTask::new(force_boxed(Self::upload_and_remove), None);
         Ok((
             Self {
                 pcloud: Some(pcloud),
