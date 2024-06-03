@@ -1,9 +1,8 @@
+use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 
-use anyhow::{anyhow, Result};
-use async_trait::async_trait;
-
 use super::utils::normalize_path;
+use super::{Error, Result};
 use super::{File, FileMetadata};
 
 /// Abstract a filesystem, either local or remote and provide methods to access their files
@@ -29,10 +28,12 @@ where
         };
         let path = normalize_path(path);
         if !path.starts_with(self.root()) {
-            Err(anyhow!(
-                "Path '{path}' is outside filesystem (root '{}'), or it's the root itself",
-                self.root()
-            ))
+            let e = if path == self.root() {
+                Error::PathIsRoot
+            } else {
+                Error::PathOutsideFilesystem
+            };
+            Err(e)
         } else {
             Ok(path)
         }
@@ -41,7 +42,9 @@ where
     /// Returns the relative path for any given one
     fn rel_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
         let abs_path = self.check_path(path)?;
-        let r = abs_path.strip_prefix(self.root()).map_err(|e| anyhow!(e));
+        let r = abs_path
+            .strip_prefix(self.root())
+            .map_err(|_| Error::PathOutsideFilesystem);
         r.map(|p| p.to_path_buf())
     }
 
@@ -68,12 +71,12 @@ where
 
     /// Copy
     async fn copy(&self, _origin: &Utf8Path, _target: &Utf8Path) -> Result<()> {
-        Err(anyhow!("A default `copy` using existing methods is not implemented"))
+        todo!("A default `copy` using existing methods is not implemented")
     }
 
     /// Rename
     async fn rename(&self, _origin: &Utf8Path, _target: &Utf8Path) -> Result<()> {
-        Err(anyhow!("A default `rename` using existing methods is not implemented"))
+        todo!("A default `rename` using existing methods is not implemented")
     }
 
     /// Removes a file from the filesystem.

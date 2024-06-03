@@ -1,6 +1,5 @@
 use std::net::SocketAddr;
 
-use anyhow::Result;
 use reqwest;
 use serde::de::DeserializeOwned;
 
@@ -8,6 +7,7 @@ pub use app_client_data::AppClientData;
 pub use oauth2token::OAuth2TokenImpl;
 
 use crate::access_token::OAuth2Token;
+use crate::Result;
 
 mod app_client_data;
 mod exchange_oauth2_token;

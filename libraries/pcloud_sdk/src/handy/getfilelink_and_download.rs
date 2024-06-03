@@ -2,7 +2,6 @@ use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
 
-use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use camino::Utf8Path;
 use futures_util::StreamExt;
@@ -10,6 +9,7 @@ use tracing::debug;
 
 use crate::methods::streaming::getfilelink;
 use crate::progress_bar;
+use crate::{Error, Result};
 
 #[async_trait]
 pub trait GetFileLinkAndDownload {
@@ -35,15 +35,10 @@ impl<T: getfilelink::GetFileLink + Sync> GetFileLinkAndDownload for T {
 
         // Reqwest setup
         // TODO: it should use underlying reqwest::Client
-        let res = reqwest::ClientBuilder::default()
-            .build()?
-            .get(url)
-            .send()
-            .await
-            .map_err(|e| anyhow!("Failed to GET from '{url}': {e}"))?;
+        let res = reqwest::ClientBuilder::default().build()?.get(url).send().await?;
         let total_size = res
             .content_length()
-            .ok_or_else(|| anyhow!("Failed to get content length from '{}'", &url))?;
+            .ok_or_else(|| Error::InputDataEror(format!("Failed to get content length from '{}'", &url)))?;
 
         // Progress bar setup
         let pb = pb_builder.build(total_size);
@@ -55,14 +50,13 @@ impl<T: getfilelink::GetFileLink + Sync> GetFileLinkAndDownload for T {
             std::fs::create_dir_all(p)?;
         }
         // download chunks
-        let mut file = File::create(path).map_err(|e| anyhow!("Failed to create file '{path}': {e}"))?;
+        let mut file = File::create(path).map_err(Error::IoError)?;
         let mut downloaded: u64 = 0;
         let mut stream = res.bytes_stream();
 
         while let Some(item) = stream.next().await {
-            let chunk = item.map_err(|e| anyhow!("Error while downloading file: {e}"))?;
-            file.write_all(&chunk)
-                .map_err(|e| anyhow!("Error while writing to file: {e}"))?;
+            let chunk = item?;
+            file.write_all(&chunk)?;
             downloaded = min(downloaded + (chunk.len() as u64), total_size);
             pb.set_position(downloaded);
         }

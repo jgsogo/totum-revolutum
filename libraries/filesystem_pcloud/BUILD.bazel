@@ -9,6 +9,12 @@ rust_library_tests_and_docs(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    test_deps = [
+        "@crates_libraries//:anyhow",
+    ],
+    test_suite_deps = [
+        "@crates_libraries//:anyhow",
+    ],
     deps = all_crate_deps(
         normal = True,
     ) + [
@@ -28,6 +34,7 @@ rust_binary(
         normal = True,
     ) + [
         ":filesystem_pcloud",
+        "@crates_libraries//:anyhow",
         "@totum//libraries/filesystem",
         "@totum//libraries/http_utils",
         "@totum//libraries/pcloud_sdk",

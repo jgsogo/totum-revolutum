@@ -361,6 +361,7 @@ dependencies = [
  "anyhow",
  "log",
  "testing_logger",
+ "thiserror",
  "tokio",
 ]
 
@@ -1230,7 +1231,6 @@ dependencies = [
 name = "filesystem"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-std",
  "async-trait",
  "camino",
@@ -1240,6 +1240,7 @@ dependencies = [
  "ignore",
  "sha256",
  "tempfile",
+ "thiserror",
  "tokio",
  "tracing",
 ]
@@ -1679,12 +1680,12 @@ dependencies = [
 name = "http_utils"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "async-trait",
  "headers",
  "reqwest",
  "serde",
  "serde_json",
+ "thiserror",
  "tracing",
 ]
 

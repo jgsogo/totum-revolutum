@@ -1,5 +1,5 @@
+use crate::error::DeserializationError;
 use crate::{AddToParams, HttpClient};
-use anyhow::Result;
 use async_trait::async_trait;
 use headers::HeaderMap;
 use serde::de::DeserializeOwned;
@@ -7,11 +7,17 @@ use serde::de::DeserializeOwned;
 #[async_trait]
 pub trait RESTClient: HttpClient {
     /// Deserialize API call result to return type
-    fn parse_response<T>(result: String) -> Result<T>
+    fn parse_response<T>(result: String) -> Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {
-        let r = serde_json::from_str::<T>(&result)?;
+        let r = serde_json::from_str::<T>(&result).map_err(|e| {
+            DeserializationError {
+                string: result,
+                source: e.into(),
+            }
+            .into()
+        })?;
         Ok(r)
     }
 
@@ -22,12 +28,12 @@ pub trait RESTClient: HttpClient {
         endpoint: &str,
         headers: HeaderMap,
         params: &TParams,
-    ) -> Result<T>
+    ) -> Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {
         let response = HttpClient::get(self, endpoint, headers, params).await?;
-        Self::parse_response(response.text().await?)
+        Self::parse_response(response.text().await.map_err(|e| e.into())?)
     }
 
     async fn post<T, TParams: AddToParams + Sync + 'static>(
@@ -36,11 +42,11 @@ pub trait RESTClient: HttpClient {
         headers: HeaderMap,
         params: &TParams,
         data: Vec<u8>,
-    ) -> Result<T>
+    ) -> Result<T, Self::Error>
     where
         T: DeserializeOwned + 'static,
     {
         let response = HttpClient::post(self, endpoint, headers, params, data).await?;
-        Self::parse_response(response.text().await?)
+        Self::parse_response(response.text().await.map_err(|e| e.into())?)
     }
 }

@@ -1,8 +1,8 @@
-use anyhow::Result;
 use async_trait::async_trait;
 
 use crate::methods::folder::{listfolder, ListFolderInput};
 use crate::types::{FolderID, RemotePath};
+use crate::Result;
 
 #[async_trait]
 /// Returns the `FolderID` for the given path. It will fail if the folder doesn't exist.

@@ -1,10 +1,10 @@
-use crate::methods::folder::createfolderifnotexists::GetCreateFolderIfNotExists;
-use anyhow::{bail, Result};
 use async_trait::async_trait;
 use camino::{Utf8Component, Utf8Path};
 use itertools::any;
 
+use crate::methods::folder::createfolderifnotexists::GetCreateFolderIfNotExists;
 use crate::types::FolderID;
+use crate::{Error, Result};
 
 use super::GetFolderID;
 
@@ -31,7 +31,9 @@ impl<Client: GetFolderID + GetCreateFolderIfNotExists + Sync> GetCreateFolderIfN
         if any(path.as_ref().components(), |c| {
             !matches!(c, Utf8Component::Normal { .. })
         }) {
-            bail!("Input argument `path` invalid: only regular path components are allowed")
+            return Err(Error::InputDataEror(
+                "Input argument `path` invalid: only regular path components are allowed".to_string(),
+            ));
         }
 
         // Create all the directories

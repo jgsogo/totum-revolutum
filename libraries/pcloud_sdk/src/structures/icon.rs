@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-// use std::fmt::{Debug, Display, Formatter};
 use strum_macros::Display;
 
 /// Name of the icon to display (one of document, database, archive, web, gis,

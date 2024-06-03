@@ -1,11 +1,13 @@
-use anyhow::Result;
-use async_trait::async_trait;
-use http_utils::AddToParams;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+
+use http_utils::AddToParams;
 
 use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/file_read";
 

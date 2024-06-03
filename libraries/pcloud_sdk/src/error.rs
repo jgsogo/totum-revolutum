@@ -1,31 +1,85 @@
+use std::io;
+
 use thiserror::Error;
+
+pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Error)]
 pub enum Error {
     #[error(transparent)]
     ReqwestError(#[from] reqwest::Error),
 
-    #[error("Serialization error '{error}': {content:?}")]
-    SerializationError { error: serde_json::Error, content: String },
-
-    #[error("API error {code}: {message}")]
-    ApiError { code: u16, message: String },
-
-    #[error("Cannot parse '{string}' to folder. Provide a 'folderid:<id>' or 'path:/absolute/path/'")]
-    ParseFolderError { string: String },
-
-    #[error("Cannot parse '{string}' to FolderID. Use format 'folderid:<id>'.")]
-    ParseFolderIDError { string: String },
-
-    #[error("Cannot parse '{string}' to RemotePath. Use format 'path:/absolute/path'.")]
-    ParseRemotePathError { string: String },
-
-    #[error("Cannot parse '{string}' to file. Provide a 'fileid:<id>' or 'path:/absolute/path'")]
-    ParseFileError { string: String },
-
-    #[error("Cannot parse '{string}' to FileID. Use format 'fileid:<id>'.")]
-    ParseFileIDError { string: String },
+    #[error(transparent)]
+    DeserializationError(#[from] DeserializationError),
 
     #[error(transparent)]
-    Other(#[from] anyhow::Error), // source and Display delegate to anyhow::Error
+    SerializationError(#[from] SerializationError),
+
+    #[error(transparent)]
+    IoError(#[from] io::Error),
+
+    #[error(transparent)]
+    ParseError(#[from] crate::types::errors::ParseError),
+
+    #[error("The file already exists")]
+    FileAlreadyExists,
+
+    #[error("Error from PCloud {code}: {message}")]
+    PCloudError { code: u16, message: String },
+
+    #[error("Wrong input data: {0}")]
+    InputDataEror(String),
+}
+
+/// An error that can be returned when serializing data.
+#[derive(Debug, Error)]
+#[error("Cannot deserialize string '{string}': {source}")]
+pub struct SerializationError {
+    pub string: String,
+    pub source: SerializationErrorKind,
+}
+
+/// Additional information for [`SerializationError`] error
+#[derive(Debug, Error)]
+pub enum SerializationErrorKind {
+    #[error(transparent)]
+    SerdeError(#[from] serde_json::Error),
+}
+
+/// An error that can be returned when deserializing data.
+#[derive(Debug, Error)]
+#[error("Cannot deserialize string '{string}': {source}")]
+pub struct DeserializationError {
+    pub string: String,
+    pub source: DeserializationErrorKind,
+}
+
+/// Additional information for [`DeserializationError`] error
+#[derive(Debug, Error)]
+pub enum DeserializationErrorKind {
+    #[error(transparent)]
+    SerdeError(#[from] serde_json::Error),
+
+    #[error("Data field is empty")]
+    EmptyDataField,
+}
+
+impl From<http_utils::Error> for Error {
+    fn from(value: http_utils::Error) -> Self {
+        match value {
+            http_utils::Error::ReqwestError(r) => r.into(),
+            http_utils::Error::DeserializationError(r) => {
+                let source = match r.source {
+                    http_utils::error::DeserializationErrorKind::SerdeError(r) => {
+                        DeserializationErrorKind::SerdeError(r)
+                    }
+                };
+                DeserializationError {
+                    string: r.string,
+                    source,
+                }
+                .into()
+            }
+        }
+    }
 }

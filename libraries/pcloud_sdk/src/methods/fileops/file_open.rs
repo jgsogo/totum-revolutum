@@ -1,16 +1,17 @@
 use std::collections::HashMap;
 
-use anyhow::{bail, Result};
 use async_trait::async_trait;
 use bitflags::bitflags;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
+use http_utils::rest::RESTClient;
+use http_utils::AddToParams;
+
 use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;
 use crate::types::{File, FileID, FolderID};
-use http_utils::rest::RESTClient;
-use http_utils::AddToParams;
+use crate::{Error, Result};
 
 pub const ENDPOINT: &str = "/file_open";
 
@@ -56,13 +57,21 @@ impl<T: PCloudClient> GetFileOpen for T {
                 FileOpenPath::File(File::RemotePath(path)) => {
                     path.add_to_params(&mut params);
                 }
-                _ => bail!("If O_CREATE is set, provide either folderid+name or path"),
+                _ => {
+                    return Err(Error::InputDataEror(
+                        "If O_CREATE is set, provide either folderid+name or path".to_string(),
+                    ))
+                }
             }
         } else {
             // If the file exists, fileid or path need to be provided
             match path {
                 FileOpenPath::File(file) => file.add_to_params(&mut params),
-                _ => bail!("If O_CREATE is not set, provide either fileid or path"),
+                _ => {
+                    return Err(Error::InputDataEror(
+                        "If O_CREATE is not set, provide either fileid or path".to_string(),
+                    ))
+                }
             }
         }
 
@@ -88,9 +97,8 @@ mod tests {
                 .file_open(flags, FileOpenPath::File(FileID::new(42).into()))
                 .await;
             assert!(r.is_err());
-            assert_eq!(
-                r.unwrap_err().to_string(),
-                "If O_CREATE is set, provide either folderid+name or path"
+            assert!(
+                matches!(r.unwrap_err(), Error::InputDataEror(ref message) if message == "If O_CREATE is set, provide either folderid+name or path")
             );
         }
 
@@ -137,7 +145,7 @@ mod tests {
                         fileid: FileID::new(42),
                     })
                 });
-            let input = FileOpenPath::File(File::from_str("path:/the/path")?);
+            let input = FileOpenPath::File(File::from_str("path:/the/path").unwrap());
             let r = client.file_open(flags, input).await?;
             assert_eq!(r.fd, FileDescriptor::new(42));
             assert_eq!(r.fileid, FileID::new(42));
@@ -159,9 +167,8 @@ mod tests {
                 )
                 .await;
             assert!(r.is_err());
-            assert_eq!(
-                r.unwrap_err().to_string(),
-                "If O_CREATE is not set, provide either fileid or path"
+            assert!(
+                matches!(r.unwrap_err(), Error::InputDataEror(ref message) if message == "If O_CREATE is not set, provide either fileid or path")
             );
         }
 
@@ -208,7 +215,7 @@ mod tests {
                         fileid: FileID::new(42),
                     })
                 });
-            let input = FileOpenPath::File(File::from_str("path:/the/path")?);
+            let input = FileOpenPath::File(File::from_str("path:/the/path").unwrap());
             let r = client.file_open(flags, input).await?;
             assert_eq!(r.fd, FileDescriptor::new(42));
             assert_eq!(r.fileid, FileID::new(42));

@@ -1,8 +1,7 @@
 use camino::Utf8Path;
 
-use anyhow::{bail, Result};
-
-use crate::Filesystem;
+use crate::Result;
+use crate::{Error, Filesystem};
 
 pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     lhs_fs: &'action FsLhs,
@@ -12,7 +11,7 @@ pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     force: bool,
 ) -> Result<()> {
     if !force && rhs_fs.exists(target).await? {
-        bail!("Target file already exists. Use 'force' to override it");
+        return Err(Error::TargetFileExists);
     }
 
     let mut lhs_file = lhs_fs.open(origin).await?;
@@ -27,7 +26,7 @@ pub async fn copy<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
             Ok(n) => {
                 rhs_file.write_all(&buf[..n]).await?;
             }
-            Err(e) => bail!("Error reading from source: {e}"),
+            Err(_) => return Err(Error::SourceFileDoesNotExist),
         }
     }
     Ok(())

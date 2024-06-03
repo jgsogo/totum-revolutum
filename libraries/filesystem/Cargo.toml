@@ -9,10 +9,10 @@ local = ["dep:async-std", "dep:ignore", "dep:futures", "dep:sha256"]
 test_utils = ["local", "dep:tempfile"]
 
 [dependencies]
-anyhow = { workspace = true }
 async-trait = { workspace = true }
 camino = { workspace = true }
 flume = { workspace = true }
+thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 

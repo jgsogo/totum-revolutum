@@ -9,6 +9,7 @@ rust_library_tests_and_docs(
         proc_macro = True,
     ),
     test_deps = [
+        "@crates_libraries//:anyhow",
         "@crates_libraries//:testing_logger",
     ],
     deps = all_crate_deps(

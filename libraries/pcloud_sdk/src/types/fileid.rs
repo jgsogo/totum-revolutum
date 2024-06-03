@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
-use super::{ParseError, ParseErrorKind};
+use crate::types::errors::{ParseError, ParseErrorKind};
 
 const FILEID_PREFIX: &str = "fileid:";
 pub type InnerType = u64;

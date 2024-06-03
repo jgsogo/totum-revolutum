@@ -1,13 +1,14 @@
-use crate::methods::fileops::file_close::GetFileClose;
-use crate::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
-use crate::methods::fileops::file_write::PostFileWrite;
-use anyhow::Result;
-use async_trait::async_trait;
-use camino::Utf8Path;
 use std::fs::File;
 use std::io::Read;
 
+use async_trait::async_trait;
+use camino::Utf8Path;
+
+use crate::methods::fileops::file_close::GetFileClose;
+use crate::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
+use crate::methods::fileops::file_write::PostFileWrite;
 use crate::types::FileID;
+use crate::Result;
 
 #[async_trait]
 /// Uploads a local file to the given [`FileID`]

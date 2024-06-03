@@ -1,9 +1,9 @@
-use anyhow::Result;
+use crate::{Error, Result};
 use http_utils::rest::RESTClient;
 use http_utils::HttpClient;
 use std::collections::HashMap;
 
-pub trait RebrickableClient: RESTClient {}
+pub trait RebrickableClient: RESTClient + HttpClient<Error = Error> {}
 
 #[derive(Debug)]
 pub struct RebrickableClientImpl {
@@ -12,6 +12,8 @@ pub struct RebrickableClientImpl {
 }
 
 impl HttpClient for RebrickableClientImpl {
+    type Error = Error;
+
     fn build_url(&self, endpoint: &str) -> String {
         format!("https://rebrickable.com/api/v3{}", endpoint)
     }

@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use filesystem::utils::normalize_path;
 
-use crate::types::errors::{InvalidRemotePath, InvalidRemotePathKind};
-use crate::types::{ParseError, ParseErrorKind};
+use crate::types::errors::{InvalidRemotePathError, InvalidRemotePathKind};
+use crate::types::errors::{ParseError, ParseErrorKind};
 
 const REMOTEPATH_PREFIX: &str = "path:";
 
@@ -30,7 +30,7 @@ impl RemotePath {
     ///
     /// Behaviour is the same as of [`Utf8Path::join`]. It's important to note that if `path`
     /// is absolute, it replaces the current path.
-    pub fn join(&self, path: impl AsRef<Utf8Path>) -> Result<Self, InvalidRemotePath> {
+    pub fn join(&self, path: impl AsRef<Utf8Path>) -> Result<Self, InvalidRemotePathError> {
         let path = self.0.join(path);
         path.try_into()
     }
@@ -73,7 +73,7 @@ impl Debug for RemotePath {
 }
 
 impl TryFrom<Utf8PathBuf> for RemotePath {
-    type Error = InvalidRemotePath;
+    type Error = InvalidRemotePathError;
 
     fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
         RemotePath::try_from(value.as_path())
@@ -81,7 +81,7 @@ impl TryFrom<Utf8PathBuf> for RemotePath {
 }
 
 impl TryFrom<&Utf8Path> for RemotePath {
-    type Error = InvalidRemotePath;
+    type Error = InvalidRemotePathError;
 
     fn try_from(value: &Utf8Path) -> Result<Self, Self::Error> {
         let value = normalize_path(value);
@@ -95,7 +95,7 @@ impl TryFrom<&Utf8Path> for RemotePath {
                 Ok(RemotePath(value))
             }
         }
-        .map_err(|source| InvalidRemotePath { source })
+        .map_err(|source| InvalidRemotePathError { source })
     }
 }
 

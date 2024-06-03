@@ -1,18 +1,18 @@
 use std::io::Write;
 use std::sync::Arc;
 
-use anyhow::Result;
 use async_trait::async_trait;
 use flume::Sender;
 use tracing::warn;
 
+use filesystem::Result;
+use filesystem::{Error, File};
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::FileOpen;
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
 
 use crate::filesystem::FileCloseMessage;
-use filesystem::File;
 
 pub const CHUNK_SIZE: usize = 512; // Just a guess of _optimal package size over a network_
 
@@ -96,17 +96,28 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File 
     }
 
     async fn read(&mut self, mut buf: &mut [u8]) -> Result<usize> {
-        let content = self.pcloud.file_read(self.file.fd.clone(), buf.len() as u64).await?;
+        let content = self
+            .pcloud
+            .file_read(self.file.fd.clone(), buf.len() as u64)
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
         buf.write_all(&content.bytes)?;
         Ok(content.bytes.len())
     }
 
     async fn write_all(&mut self, buf: &[u8]) -> Result<()> {
-        let _r = self.pcloud.file_write(self.file.fd.clone(), buf).await?;
+        let _r = self
+            .pcloud
+            .file_write(self.file.fd.clone(), buf)
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
 
     async fn sync_all(&mut self) -> Result<()> {
-        self.pcloud.file_close(self.file.fd.clone()).await
+        self.pcloud
+            .file_close(self.file.fd.clone())
+            .await
+            .map_err(|e| Error::Other(e.to_string()))
     }
 }

@@ -1,13 +1,12 @@
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
-use anyhow::anyhow;
 use camino::Utf8PathBuf;
 
-use crate::types::errors::{InvalidFolder, InvalidRemotePath};
-use crate::types::{ParseError, ParseErrorKind, RemotePath};
+use crate::types::errors::{InvalidFolderError, InvalidRemotePathError};
+use crate::types::errors::{ParseError, ParseErrorKind};
 
-use super::FolderID;
+use super::{FolderID, RemotePath};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Folder {
@@ -28,12 +27,12 @@ impl From<RemotePath> for Folder {
 }
 
 impl TryFrom<Utf8PathBuf> for Folder {
-    type Error = InvalidFolder;
+    type Error = InvalidFolderError;
 
     fn try_from(value: Utf8PathBuf) -> Result<Self, Self::Error> {
         let r: RemotePath = value
             .try_into()
-            .map_err(|source: InvalidRemotePath| InvalidFolder { source: source.into() })?;
+            .map_err(|source: InvalidRemotePathError| InvalidFolderError { source: source.into() })?;
         Ok(r.into())
     }
 }
@@ -48,9 +47,7 @@ impl FromStr for Folder {
             } else if let Ok(p) = RemotePath::from_str(s) {
                 Ok(p.into())
             } else {
-                Err(ParseErrorKind::Other(anyhow!(
-                    "can't parse into FolderID or RemotePath"
-                )))
+                Err(ParseErrorKind::InvalidFolderIDOrRemotePath)
             }
         }
         .map_err(|source| ParseError {
@@ -71,9 +68,9 @@ impl Display for Folder {
 
 #[cfg(test)]
 mod tests {
-    use anyhow::Result;
-
     use super::*;
+    use crate::types::errors::{InvalidFolderKind, InvalidRemotePathKind};
+    use crate::Result;
 
     #[test]
     fn test_parse_str() -> Result<()> {
@@ -82,6 +79,27 @@ mod tests {
         let remote_path = Folder::from_str("path:/path/to/something")?;
         assert!(matches!(remote_path, Folder::RemotePath { .. }));
         Ok(())
+    }
+
+    #[test]
+    fn test_parse_errors() {
+        let r = Folder::from_str("folderid:123a");
+        assert!(r.is_err());
+        assert!(
+            matches!(r.unwrap_err(), ParseError {ref string, source: ParseErrorKind::InvalidFolderIDOrRemotePath} if string == "folderid:123a")
+        );
+
+        let path = Utf8PathBuf::from_str("/../rel/path/").unwrap();
+        let r = Folder::try_from(path);
+        assert!(r.is_err());
+        assert!(matches!(
+            r.unwrap_err(),
+            InvalidFolderError {
+                source: InvalidFolderKind::InvalidRemotePath(InvalidRemotePathError {
+                    source: InvalidRemotePathKind::OutsideRootFolder
+                })
+            }
+        ));
     }
 
     #[test]
