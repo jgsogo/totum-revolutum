@@ -10,7 +10,7 @@ use tracing::{info, trace, warn};
 use filesystem::Result;
 use filesystem::{Error, File, Filesystem};
 use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
+use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
 use pcloud_sdk::methods::file::stat::GetStat;
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
@@ -161,17 +161,40 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        let path = self.root_path.join(self.check_path(path)?);
-        let input_file: pcloud_sdk::types::File = path
-            .try_into()
-            .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
-        let _r = self
+    async fn get_metadata(&self, path: &Utf8Path) -> Result<Self::Metadata> {
+        let path = self.check_path(path)?;
+        let remote_path = {
+            let abs_path = self.root_path.join(&path);
+            RemotePath::try_from(abs_path).map_err(|e| Error::Other(e.to_string()))?
+        };
+        let metadata = self
             .pcloud
-            .stat(input_file)
+            .stat(pcloud_sdk::types::File::RemotePath(remote_path))
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(true)
+        Ok(RemoteMetadata::new(path, metadata.metadata))
+    }
+
+    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
+        let path = self.check_path(path)?;
+        let parent_folderid = match path.parent() {
+            None => self.root_folderid.clone(),
+            Some(p) => {
+                let abspath = self.root_path.join(p);
+                let rp = RemotePath::try_from(abspath).map_err(|e| Error::Other(e.to_string()))?;
+                self.pcloud
+                    .get_folderid(&rp)
+                    .await
+                    .map_err(|e| Error::Other(e.to_string()))?
+            }
+        };
+
+        let r = self
+            .pcloud
+            .exists(parent_folderid, path.file_name().unwrap())
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(r.is_some())
     }
 
     async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {

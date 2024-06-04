@@ -6,7 +6,7 @@ edition = "2021"
 [features]
 diff = []
 local = ["dep:async-std", "dep:ignore", "dep:futures", "dep:sha256"]
-test_utils = ["local", "dep:tempfile"]
+local_temp = ["dep:uuid", "dep:tempfile", "local"]
 
 [dependencies]
 async-trait = { workspace = true }
@@ -22,6 +22,7 @@ futures = { workspace = true, optional = true }
 ignore = { workspace = true, optional = true }
 sha256 = { workspace = true, optional = true }
 tempfile = { workspace = true, optional = true }
+uuid = { workspace = true, optional = true, features = ["v4"] }
 
 [dev-dependencies]
-filesystem = { path = ".", features = ["test_utils", "diff"] }
+filesystem = { path = ".", features = ["local_temp", "diff"] }

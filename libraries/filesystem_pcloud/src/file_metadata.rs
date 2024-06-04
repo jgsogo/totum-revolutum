@@ -2,6 +2,7 @@ use camino::{Utf8Path, Utf8PathBuf};
 
 use filesystem::{FileMetadata, Result};
 use pcloud_sdk::structures::MetadataFile;
+use pcloud_sdk::types::FileID;
 
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {
@@ -35,5 +36,9 @@ impl RemoteMetadata {
             relative_path,
             metadata,
         }
+    }
+
+    pub fn fileid(&self) -> &FileID {
+        &self.metadata.fileid
     }
 }

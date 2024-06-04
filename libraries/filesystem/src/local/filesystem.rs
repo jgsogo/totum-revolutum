@@ -54,6 +54,12 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
+    async fn get_metadata(&self, _path: &Utf8Path) -> Result<Self::Metadata> {
+        // It doesn't make much sense that the `Self::Metadata` contains an `ignore::DirEntry`, we
+        // need something more identificable as metadata in a local filesystem
+        todo!("Not implemented")
+    }
+
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         let path = self.root.join(self.check_path(path)?);
         Ok(path.exists())

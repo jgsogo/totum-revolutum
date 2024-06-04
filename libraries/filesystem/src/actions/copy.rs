@@ -5,7 +5,7 @@ use crate::{File, Result};
 
 /// Copies the contents of the `lhs_file` into the `rhs_file`.
 pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mut Box<dyn File>) -> Result<()> {
-    let mut buf: [u8; 100] = [0; 100]; // TODO: Configure buffer size
+    let mut buf: [u8; 100] = [0; 100]; // TODO: Configure buffer size. Maybe make it adaptative: https://stackoverflow.com/questions/304249/is-there-an-optimal-byte-size-for-sending-data-over-a-network
     loop {
         match lhs_file.read(&mut buf).await {
             Ok(0) => {
@@ -42,12 +42,12 @@ pub async fn copy_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
 mod tests {
     use camino::Utf8PathBuf;
 
-    use crate::mocks::filesystem::FilesystemMock;
+    use crate::local_temp::FilesystemLocalTemp;
 
     use super::*;
 
-    async fn get_filesystem_mock_with_file(lhs_path: &Utf8Path, content: &[u8]) -> FilesystemMock {
-        let fs = FilesystemMock::default();
+    async fn get_filesystem_mock_with_file(lhs_path: &Utf8Path, content: &[u8]) -> FilesystemLocalTemp {
+        let fs = FilesystemLocalTemp::default();
         let mut f1 = fs.create(&lhs_path).await.unwrap();
         f1.write_all(&content).await.unwrap();
         fs
@@ -59,7 +59,7 @@ mod tests {
         let lhs_path = Utf8PathBuf::from("file.txt");
 
         let lhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
-        let rhs_fs = FilesystemMock::default();
+        let rhs_fs = FilesystemLocalTemp::default();
         let rhs_path = Utf8PathBuf::from("the_copy.txt");
         assert!(rhs_fs.open(&rhs_path).await.is_err());
 

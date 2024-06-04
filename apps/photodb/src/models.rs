@@ -7,6 +7,7 @@ use diesel::prelude::*;
 #[diesel(table_name = crate::schema::photos)]
 pub struct NewPhoto<'a> {
     pub fileid: &'a i64,
+    pub path: &'a str,
 }
 
 #[derive(Queryable, Selectable)]
@@ -15,4 +16,5 @@ pub struct NewPhoto<'a> {
 pub struct Photo {
     pub id: i32,
     pub fileid: i64,
+    pub path: String,
 }

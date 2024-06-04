@@ -29,6 +29,9 @@ pub trait Filesystem: Sync {
         custom_ignore_filename: &Utf8Path,
     ) -> Result<()>;
 
+    /// Returns the [`Self::Metadata`] for the given `path`
+    async fn get_metadata(&self, path: &Utf8Path) -> Result<Self::Metadata>;
+
     /// Returns true if the path points at an existing entity.
     async fn exists(&self, path: &Utf8Path) -> Result<bool>;
 

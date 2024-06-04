@@ -8,8 +8,8 @@ rust_library_tests_and_docs(
     all_features = {
         "diff": ["diff"],
         "local": ["local"],
-        "test_utils": [
-            "test_utils",
+        "local_temp": [
+            "local_temp",
             "local",
         ],
     },
