@@ -18,7 +18,7 @@ pub struct Photo {
     /// Autoincrement ID as database index
     pub id: i32,
 
-    /// The [`FileID`] of this file in the PCloud storage
+    /// The [`pcloud_sdk::types::FileID`] of this file in the PCloud storage
     pub fileid: i64,
 
     /// The relative path of this file in the PCloud storage
