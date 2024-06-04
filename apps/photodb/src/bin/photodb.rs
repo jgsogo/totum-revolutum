@@ -48,8 +48,8 @@ enum Commands {
     /// Adds (and backups) a photo to the database
     Add(Add),
 
-    /// Cleans the database
-    Clean(Clean),
+    /// Syncs the database with the remote storage
+    Sync(Sync),
 }
 
 #[derive(Args, Debug)]
@@ -58,10 +58,14 @@ struct Add {
 }
 
 #[derive(Args, Debug)]
-struct Clean {
-    /// Remove DB entries that are no longer in the storage
+struct Sync {
+    /// Remove DB entries that are no longer in the remote storage
     #[clap(long, default_value_t = true)]
-    clean_file_id: bool,
+    remove_missing_files: bool,
+
+    /// Add entries to the DB for new files discovered in the remote
+    #[clap(long, default_value_t = true)]
+    collect_new_files: bool,
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -83,11 +87,8 @@ async fn db_commands<T: Database, RemoteStorage: Filesystem<Metadata = RemoteMet
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,
-        Commands::Clean(clean) => {
-            if clean.clean_file_id {
-                todo!("not impl")
-                // photodb.clean_fileids().await?;
-            }
+        Commands::Sync(sync) => {
+            photodb.sync(sync.collect_new_files, sync.remove_missing_files).await?;
             Ok(())
         }
         c => bail!("Unexpected command {:?}", c),

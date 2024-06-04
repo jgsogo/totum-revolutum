@@ -108,6 +108,16 @@ impl<'a, T: Database, RemoteStorage: Filesystem<Metadata = RemoteMetadata>> Phot
         Ok(())
     }
 
+    /// Iterates all the files in the DB and the files in the remote storage performing these
+    /// actions (if they are activated by the corresponding input arguments):
+    ///  * `collect_new_files`: New files found in the remote storage will be added to the DB,
+    ///     these file won't be processed (`processed` flag in the DB set to False)
+    ///  * `remove_missing_files`: Entries in the DB that correspond to files that are no longer
+    ///     in the remote storage will be removed.
+    pub async fn sync(&self, _collect_new_files: bool, _remove_missing_files: bool) -> Result<()> {
+        todo!("not impl")
+    }
+
     // pub async fn clean_fileids(&self) -> Result<()> {
     //     // Iterate all the entires in the photos table, check if the corresponding file_id exists,
     //     // remove if it doesn't
