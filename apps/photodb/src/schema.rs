@@ -5,5 +5,6 @@ diesel::table! {
         id -> Integer,
         fileid -> BigInt,
         path -> Text,
+        processed -> Bool,
     }
 }

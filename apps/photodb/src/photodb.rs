@@ -95,6 +95,7 @@ impl<'a, T: Database, RemoteStorage: Filesystem<Metadata = RemoteMetadata>> Phot
         let new_photo = models::NewPhoto {
             fileid: &(metadata.fileid().inner() as i64),
             path: filepath.as_str(),
+            processed: &true,
         };
         let photo = diesel::insert_into(photos::table)
             .values(&new_photo)
