@@ -55,11 +55,11 @@ repos:
   # Some local scripts
   - repo: local
     hooks:
-      #      - id: branch-updated
-      #        name: Branch up-to-date with master
-      #        entry: scripts/branch_updated.sh
-      #        language: script
-      #        always_run: true
+      - id: branch-updated
+        name: Branch up-to-date with master
+        entry: scripts/branch_updated.sh
+        language: script
+        always_run: true
       - id: bazel-update
         name: Run all Bazel targets with 'update' tag (update workspace files)
         entry: scripts/bazel_run_update_targets.sh
