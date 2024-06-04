@@ -84,7 +84,10 @@ impl<'a, T: Database, RemoteStorage: Filesystem<Metadata = RemoteMetadata>> Phot
                 .join(format!("{}.png", rest))
         };
         debug!("Upload to '{}'", filepath);
+        debug!("Create intermediate directories '{}'", filepath.parent().unwrap());
+        self.storage.create_dir_all(filepath.parent().unwrap()).await?;
         filesystem::actions::copy_file(&tmp_filesystem, &self.storage, &photo, &filepath, false).await?;
+        debug!("Get metadata from uploaded file");
         let metadata = self.storage.get_metadata(&filepath).await?;
 
         // Store the data in the database
