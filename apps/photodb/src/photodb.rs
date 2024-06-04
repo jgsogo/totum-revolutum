@@ -95,6 +95,7 @@ impl<'a, T: Database, RemoteStorage: Filesystem<Metadata = RemoteMetadata>> Phot
         let new_photo = models::NewPhoto {
             fileid: &(metadata.fileid().inner() as i64),
             path: filepath.as_str(),
+            processed: &true,
         };
         let photo = diesel::insert_into(photos::table)
             .values(&new_photo)
@@ -105,6 +106,16 @@ impl<'a, T: Database, RemoteStorage: Filesystem<Metadata = RemoteMetadata>> Phot
         debug!("Photo inserted into database: {}", photo.id);
 
         Ok(())
+    }
+
+    /// Iterates all the files in the DB and the files in the remote storage performing these
+    /// actions (if they are activated by the corresponding input arguments):
+    ///  * `collect_new_files`: New files found in the remote storage will be added to the DB,
+    ///     these file won't be processed (`processed` flag in the DB set to False)
+    ///  * `remove_missing_files`: Entries in the DB that correspond to files that are no longer
+    ///     in the remote storage will be removed.
+    pub async fn sync(&self, _collect_new_files: bool, _remove_missing_files: bool) -> Result<()> {
+        todo!("not impl")
     }
 
     // pub async fn clean_fileids(&self) -> Result<()> {
