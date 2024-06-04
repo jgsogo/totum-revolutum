@@ -1,11 +1,13 @@
 use anyhow::{anyhow, bail, Result};
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
+use filesystem::Filesystem;
+use filesystem_pcloud::{FilesystemPCloud, RemoteMetadata};
 use std::str::FromStr;
 use tracing::{debug, error};
 
 use pcloud_sdk::cli::auth;
-use pcloud_sdk::client::{PCloudClient, PCloudClientImpl};
+use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::RemotePath;
 use photodb::db::{Database, PCloudDatabase};
@@ -75,15 +77,16 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 
 /// Any command that uses the DB is executed here. This way we can guarantee that the Receiver work
 /// (store the database back to pCloud if anything fails) is always executed
-async fn db_commands<T: Database, PCloud: PCloudClient + Clone + Send + 'static>(
+async fn db_commands<T: Database, RemoteStorage: Filesystem<Metadata = RemoteMetadata>>(
     command: Commands,
-    photodb: PhotoDB<'_, T, PCloud>,
+    photodb: PhotoDB<'_, T, RemoteStorage>,
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,
         Commands::Clean(clean) => {
             if clean.clean_file_id {
-                photodb.clean_fileids().await?;
+                todo!("not impl")
+                // photodb.clean_fileids().await?;
             }
             Ok(())
         }
@@ -121,8 +124,9 @@ async fn main() -> Result<()> {
             let done = match &cli.command {
                 Commands::Initialize => PCloudDatabase::initialize(client, db_path).await?,
                 _ => {
-                    let (db, done) = PCloudDatabase::new(client.clone(), db_path.clone()).await?;
-                    let r = match PhotoDB::new(db, client, &app_dir, db_path).await {
+                    let remote_storage = FilesystemPCloud::new(db_path.clone(), client.clone()).await?;
+                    let (db, done) = PCloudDatabase::new(client, db_path).await?;
+                    let r = match PhotoDB::new(db, remote_storage, &app_dir).await {
                         Ok(photodb) => db_commands(cli.command, photodb).await,
                         Err(e) => Err(e),
                     };

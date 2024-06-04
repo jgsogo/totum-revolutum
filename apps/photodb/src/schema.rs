@@ -4,5 +4,6 @@ diesel::table! {
     photos (id) {
         id -> Integer,
         fileid -> BigInt,
+        path -> Text,
     }
 }

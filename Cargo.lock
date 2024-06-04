@@ -1244,6 +1244,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
+ "uuid",
 ]
 
 [[package]]
@@ -2691,6 +2692,7 @@ dependencies = [
  "dirs",
  "dotenvy",
  "filesystem",
+ "filesystem_pcloud",
  "home",
  "image",
  "log",
@@ -2701,7 +2703,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "uuid",
 ]
 
 [[package]]

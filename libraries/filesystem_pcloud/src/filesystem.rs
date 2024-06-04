@@ -161,6 +161,16 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
+    async fn get_metadata(&self, path: &Utf8Path) -> Result<Self::Metadata> {
+        let remote_path = RemotePath::try_from(path).map_err(|e| Error::Other(e.to_string()))?;
+        let metadata = self
+            .pcloud
+            .stat(pcloud_sdk::types::File::RemotePath(remote_path))
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(RemoteMetadata::new(path.into(), metadata.metadata))
+    }
+
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         let path = self.root_path.join(self.check_path(path)?);
         let input_file: pcloud_sdk::types::File = path

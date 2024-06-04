@@ -6,8 +6,9 @@ edition = "2021"
 [features]
 
 [dependencies]
-filesystem = { path = "../../libraries/filesystem" }
+filesystem = { path = "../../libraries/filesystem", features = ["local_temp"] }
 pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
+filesystem_pcloud = { path = "../../libraries/filesystem_pcloud" } # This is only required for the binary?
 
 anyhow = { workspace = true }
 async-trait = { workspace = true }
@@ -29,10 +30,6 @@ tempfile = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-uuid = { workspace = true, features = ["v4"] }
-
-[dev-dependencies]
-filesystem = { path = "../../libraries/filesystem", features = ["local", "test_utils"] }
 
 [[bin]]
 name = "photodb"

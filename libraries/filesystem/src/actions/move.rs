@@ -24,7 +24,7 @@ pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
 mod tests {
     use camino::Utf8PathBuf;
 
-    use crate::mocks::filesystem::FilesystemMock;
+    use crate::local_temp::FilesystemLocalTemp;
 
     use super::*;
 
@@ -34,13 +34,13 @@ mod tests {
         let lhs_path = Utf8PathBuf::from("file.txt");
 
         let lhs_fs = {
-            let fs = FilesystemMock::default();
+            let fs = FilesystemLocalTemp::default();
             let mut f1 = fs.create(&lhs_path).await?;
             f1.write_all(&file_content).await?;
             fs
         };
 
-        let rhs_fs = FilesystemMock::default();
+        let rhs_fs = FilesystemLocalTemp::default();
         let rhs_path = Utf8PathBuf::from("the_target.txt");
         assert!(!rhs_fs.exists(&rhs_path).await?);
 
@@ -57,14 +57,14 @@ mod tests {
         let lhs_path = Utf8PathBuf::from("file.txt");
 
         let lhs_fs = {
-            let fs = FilesystemMock::default();
+            let fs = FilesystemLocalTemp::default();
             let mut f1 = fs.create(&lhs_path).await?;
             f1.write_all(&file_content).await?;
             fs
         };
 
         let rhs_fs = {
-            let fs = FilesystemMock::default();
+            let fs = FilesystemLocalTemp::default();
             let mut f1 = fs.create(&lhs_path).await?;
             f1.write_all(&file_content).await?;
             fs
