@@ -4,7 +4,7 @@
 def _run_copy_to_workspace_impl(ctx):
     ctx.actions.write(
         output = ctx.outputs.executable,
-        content = "echo $BUILD_WORKSPACE_DIRECTORY && cd $BUILD_WORKSPACE_DIRECTORY && cp -fv {} {}".format(ctx.file.origin.path, ctx.file.target.path),
+        content = "cd $BUILD_WORKSPACE_DIRECTORY && cp -fv {} {}".format(ctx.file.origin.path, ctx.file.target.path),
         is_executable = True,
     )
 
