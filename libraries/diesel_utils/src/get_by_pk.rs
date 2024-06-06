@@ -4,47 +4,73 @@ use diesel::associations::HasTable;
 use diesel::query_dsl::methods::{FindDsl, LimitDsl};
 use diesel::{Identifiable, SqliteConnection};
 
+pub type GetByPkOutput<'a, T> =
+    <<<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as LimitDsl>::Output;
+
 pub trait GetByPk<'a>
 where
     &'a Self: Identifiable,
     Self: 'a,
     Self: Sized,
+    <&'a Self as HasTable>::Table: FindDsl<<&'a Self as Identifiable>::Id>,
+    <<&'a Self as HasTable>::Table as FindDsl<<&'a Self as Identifiable>::Id>>::Output: LimitDsl,
 {
     type Error: From<ObjectDoesNotExist>;
     type Output;
 
-    fn get_by_pk(conn: &mut SqliteConnection, pk: <&'a Self as Identifiable>::Id) -> Result<Self::Output, Self::Error>;
-}
-
-impl<'a, T> GetByPk<'a> for T
-where
-    &'a T: Identifiable,
-    T: 'a,
-    &'a T: HasTable,
-    // T::Table: FindDsl<<&'a T as Identifiable>::Id>,
-    <&'a T as HasTable>::Table: FindDsl<<&'a T as Identifiable>::Id>,
-    // <&'a T as HasTable>::Table: LimitDsl
-    <<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: LimitDsl, // <<T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: Table,
-                                                                                            // <<<T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as AsQuery>::Query: Table,
-                                                                                            // <<<<T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as AsQuery>::Query as AsQuery>::Query: Table
-                                                                                            // T::Table: Table
-                                                                                            // T: FindDsl<i32>
-                                                                                            // <<T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: RunQueryDsl<SqliteConnection> + Table
-{
-    type Error = ObjectDoesNotExist;
-    type Output = <<<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as LimitDsl>::Output;
-
     fn get_by_pk(
         _conn: &mut SqliteConnection,
         pk: <&'a Self as Identifiable>::Id,
-    ) -> Result<Self::Output, Self::Error> {
-        let table = <&'a T>::table();
+    ) -> Result<GetByPkOutput<'a, Self>, Self::Error> {
+        let table = <&'a Self>::table();
         let select_statement = FindDsl::find(table, pk);
         let first = select_statement.limit(1);
         // todo!()
         Ok(first)
     }
 }
+
+impl<'a, T> GetByPk<'a> for T
+where
+    &'a T: Identifiable,
+    T: 'a,
+    T: Sized,
+    <&'a T as HasTable>::Table: FindDsl<<&'a T as Identifiable>::Id>,
+    <<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: LimitDsl,
+{
+    type Error = ObjectDoesNotExist;
+    type Output = <<<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as LimitDsl>::Output;
+}
+
+// impl<'a, T> GetByPk<'a> for T
+// where
+//     &'a T: Identifiable,
+//     T: 'a,
+//     // &'a T: HasTable,
+//     // T::Table: FindDsl<<&'a T as Identifiable>::Id>,
+//     <&'a T as HasTable>::Table: FindDsl<<&'a T as Identifiable>::Id>,
+//     // <&'a T as HasTable>::Table: LimitDsl
+//     <<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: LimitDsl, // <<T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: Table,
+//                                                                                             // <<<T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as AsQuery>::Query: Table,
+//                                                                                             // <<<<T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as AsQuery>::Query as AsQuery>::Query: Table
+//                                                                                             // T::Table: Table
+//                                                                                             // T: FindDsl<i32>
+//                                                                                             // <<T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: RunQueryDsl<SqliteConnection> + Table
+// {
+//     type Error = ObjectDoesNotExist;
+//     type Output = <<<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as LimitDsl>::Output;
+//
+//     fn get_by_pk(
+//         _conn: &mut SqliteConnection,
+//         pk: <&'a Self as Identifiable>::Id,
+//     ) -> Result<Self::Output, Self::Error> {
+//         let table = <&'a T>::table();
+//         let select_statement = FindDsl::find(table, pk);
+//         let first = select_statement.limit(1);
+//         // todo!()
+//         Ok(first)
+//     }
+// }
 
 // pub trait GetByPk<'a>: Sized
 //     where

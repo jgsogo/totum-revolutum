@@ -16,9 +16,9 @@ fn get_by_pk() {
     let r = table.find(1);
     let r = r.limit(1);
     let r = r.get_result(connection);
-    let r: common::models::User = r.unwrap();
+    let _r: common::models::User = r.unwrap();
 
-    let r = common::models::User::get_by_pk(connection, &1);
+    let _r = common::models::User::get_by_pk(connection, &1);
     //
     // let expected_data = vec![
     //     ("Sean".to_string(), None::<String>),
