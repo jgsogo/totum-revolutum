@@ -4,6 +4,9 @@ use thiserror::Error;
 pub enum Error {
     #[error(transparent)]
     ObjectDoesNotExist(ObjectDoesNotExist),
+
+    #[error(transparent)]
+    DieselError(#[from] diesel::result::Error),
 }
 
 #[derive(Debug, Error)]

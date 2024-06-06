@@ -1,8 +1,9 @@
-use crate::error::ObjectDoesNotExist;
+use crate::error::{Error, ObjectDoesNotExist};
 use diesel::associations::HasTable;
 
 use diesel::query_dsl::methods::{FindDsl, LimitDsl};
-use diesel::{Identifiable, SqliteConnection};
+use diesel::query_dsl::LoadQuery;
+use diesel::{Identifiable, RunQueryDsl};
 
 pub type GetByPkOutput<'a, T> =
     <<<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as LimitDsl>::Output;
@@ -15,18 +16,25 @@ where
     <&'a Self as HasTable>::Table: FindDsl<<&'a Self as Identifiable>::Id>,
     <<&'a Self as HasTable>::Table as FindDsl<<&'a Self as Identifiable>::Id>>::Output: LimitDsl,
 {
-    type Error: From<ObjectDoesNotExist>;
-    type Output;
-
-    fn get_by_pk(
-        _conn: &mut SqliteConnection,
-        pk: <&'a Self as Identifiable>::Id,
-    ) -> Result<GetByPkOutput<'a, Self>, Self::Error> {
+    fn get_by_pk_query(pk: <&'a Self as Identifiable>::Id) -> GetByPkOutput<'a, Self> {
         let table = <&'a Self>::table();
         let select_statement = FindDsl::find(table, pk);
-        let first = select_statement.limit(1);
-        // todo!()
-        Ok(first)
+        select_statement.limit(1)
+    }
+
+    fn get_by_pk<Conn>(conn: &mut Conn, pk: <&'a Self as Identifiable>::Id) -> Result<Self, Error>
+    where
+        GetByPkOutput<'a, Self>: RunQueryDsl<Conn>,
+        GetByPkOutput<'a, Self>: LoadQuery<'a, Conn, Self>,
+    {
+        let query = Self::get_by_pk_query(pk);
+        match query.get_result(conn) {
+            Ok(r) => Ok(r),
+            Err(diesel::result::Error::NotFound) => {
+                Err(Error::ObjectDoesNotExist(ObjectDoesNotExist { model: "".to_string() }))
+            }
+            Err(e) => Err(e.into()),
+        }
     }
 }
 
@@ -38,8 +46,6 @@ where
     <&'a T as HasTable>::Table: FindDsl<<&'a T as Identifiable>::Id>,
     <<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: LimitDsl,
 {
-    type Error = ObjectDoesNotExist;
-    type Output = <<<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as LimitDsl>::Output;
 }
 
 // impl<'a, T> GetByPk<'a> for T

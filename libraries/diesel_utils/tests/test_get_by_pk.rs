@@ -5,10 +5,8 @@ use diesel::*;
 use diesel_utils::GetByPk;
 #[test]
 fn get_by_pk() {
-    use common::schema::users::dsl::*;
-
     let connection = &mut common::connection::connection();
-    diesel::sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
+    sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
         .execute(connection)
         .unwrap();
 
@@ -18,7 +16,9 @@ fn get_by_pk() {
     let r = r.get_result(connection);
     let _r: common::models::User = r.unwrap();
 
-    let _r = common::models::User::get_by_pk(connection, &1);
+    let _r = common::models::User::get_by_pk_query(&1);
+    let r = common::models::User::get_by_pk(connection, &1);
+    let _r: common::models::User = r.unwrap();
     //
     // let expected_data = vec![
     //     ("Sean".to_string(), None::<String>),
