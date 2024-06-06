@@ -1,6 +1,6 @@
-mod common;
-
 use diesel::*;
+
+mod common;
 
 #[test]
 fn selecting_basic_data() {

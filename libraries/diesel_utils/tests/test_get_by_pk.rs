@@ -1,9 +1,10 @@
-mod common;
-
-use common::models::User;
 use diesel::associations::HasTable;
 use diesel::*;
+
+use common::models::User;
 use diesel_utils::GetByPk;
+
+mod common;
 
 #[test]
 fn get_by_pk() {

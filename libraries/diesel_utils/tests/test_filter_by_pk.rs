@@ -1,10 +1,12 @@
-mod common;
+use diesel::associations::HasTable;
+use diesel::*;
+
+use diesel_utils::FilterByPk;
 
 use crate::common::models::User;
 use crate::common::schema::users;
-use diesel::associations::HasTable;
-use diesel::*;
-use diesel_utils::GetByPk;
+
+mod common;
 
 #[test]
 fn filter_by_pk() {
@@ -16,7 +18,9 @@ fn filter_by_pk() {
     let user_ids = vec![1, 2];
 
     // filter_by_pk
-    // let _r = common::models::User::filter_by_pk(&user_ids);
+    let actual_data = User::filter_by_pk(&user_ids).load::<User>(connection).unwrap();
+    let actual_data = actual_data.into_iter().map(|u| u.id).collect::<Vec<_>>();
+    assert_eq!(user_ids, actual_data);
 
     // diesel provided tools
     let actual_data = User::table()
