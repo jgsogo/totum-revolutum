@@ -5,20 +5,19 @@ use diesel::query_dsl::filter_dsl::FilterDsl;
 use diesel::sql_types::SqlType;
 use diesel::{ExpressionMethods, Table};
 
-pub trait FilterByPk<'a, PK, Values> {
+pub trait FilterByPk<PK, Values> {
     type QueryOutput;
 
     fn filter_by_pk(pk: Values) -> Self::QueryOutput;
 }
 
-impl<'a, PK, T, Values> FilterByPk<'a, PK, Values> for T
+impl<PK, T, Values> FilterByPk<PK, Values> for T
 where
     // &'a T: Identifiable, // Not really needed
     T: HasTable,
-    T::Table: Table<PrimaryKey = PK>,
-    PK: ExpressionMethods + 'a,
+    T::Table: Table<PrimaryKey = PK> + FilterDsl<EqAny<PK, Values>>,
+    PK: ExpressionMethods,
     <PK as diesel::Expression>::SqlType: SqlType,
-    T::Table: FilterDsl<EqAny<PK, Values>>,
     Values: AsInExpression<<PK as diesel::Expression>::SqlType>,
 {
     type QueryOutput = <<T as HasTable>::Table as FilterDsl<EqAny<PK, Values>>>::Output;
@@ -27,6 +26,6 @@ where
         let table = T::table();
         let primary_key = table.primary_key();
         let predicate = primary_key.eq_any(pks);
-        FilterDsl::filter(table, predicate)
+        table.filter(predicate)
     }
 }
