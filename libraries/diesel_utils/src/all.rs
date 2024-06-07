@@ -3,14 +3,15 @@ use diesel::query_dsl::methods::SelectDsl;
 use diesel::query_dsl::LoadQuery;
 use diesel::{Expression, QueryDsl, RunQueryDsl};
 
-// TODO: Write docs with example usage
-
+/// Helper trait that adds a method to return all the objects of a given model. This should be
+/// blanked-implemented for the vast majority of diesel tables.
 // TODO: The `Output` type should be inferred from the `Selection`, it's known at compile time. If
 // TODO: manage to define it here, the caller doesn't need to be explicit about the type returned
 // TODO: in the iterator.
 pub trait All<Output, Selection: Expression, Conn> {
     type Error: From<diesel::result::Error>;
 
+    /// Returns an iterator with all the objects in the database
     fn all(selection: Selection, conn: &mut Conn) -> Result<impl Iterator<Item = Output>, Self::Error>;
 }
 
