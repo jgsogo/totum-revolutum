@@ -128,14 +128,17 @@ mod tests {
     use super::*;
     use anyhow::anyhow;
     use log::{info, Level};
-    use std::time::Duration;
-    use testing_logger;
-    use tokio::time::sleep;
 
     async fn task(value: i32) -> i32 {
         info!("Task executed with value {value}");
         value * 2
     }
+
+    async fn task_with_sender(sender: Sender<()>) {
+        info!("Task (with sender) executed");
+        let _ = sender.send(());
+    }
+
     async fn task_return_error(_value: i32) -> anyhow::Result<()> {
         info!("Task fail: execute");
         Err(anyhow!("Error from task"))
@@ -238,13 +241,14 @@ mod tests {
         testing_logger::setup();
 
         // Variable `_` ignores the output and it's immediately dropped
-        let (_, _) = SideTask::new(task, Some(60));
-        // We need to sleep so the task has time to finish
-        sleep(Duration::from_millis(200)).await;
+        let (tx, rx) = channel();
+        let (_, _) = SideTask::new(task_with_sender, Some(tx));
+        // Wait for the task to finish
+        let _ = rx.await.unwrap();
 
         testing_logger::validate(|captured_logs| {
             assert_eq!(captured_logs.len(), 2);
-            assert_eq!(captured_logs[0].body, "Task executed with value 60");
+            assert_eq!(captured_logs[0].body, "Task (with sender) executed");
             assert_eq!(captured_logs[0].level, Level::Info);
             assert_eq!(
                 captured_logs[1].body,
