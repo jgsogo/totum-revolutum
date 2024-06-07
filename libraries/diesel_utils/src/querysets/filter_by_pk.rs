@@ -10,7 +10,9 @@ use diesel::{ExpressionMethods, Table};
 pub trait FilterByPkQuerySet<PK, Values> {
     type QueryOutput;
 
-    /// Returns a query to get all the rows for the given set of primary keys (`pks`)
+    /// Returns a query to get all the rows for the given set of primary keys (`pks`). Because it
+    /// works in the primary_key, it won't return duplicated values, but it could return fewer
+    /// values if some pks are not found.
     fn filter_by_pk(pks: Values) -> Self::QueryOutput;
 }
 

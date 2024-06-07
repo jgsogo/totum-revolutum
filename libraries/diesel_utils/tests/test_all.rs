@@ -1,5 +1,4 @@
 use crate::common::models::User;
-use crate::common::schema::users::dsl::users;
 use crate::common::schema::users::*;
 use diesel::*;
 
@@ -38,12 +37,4 @@ fn manager_all() {
     // all (some fields)
     let r = User::all((name, hair_color), connection).unwrap();
     assert_eq!(r.collect::<Vec<(String, Option<String>)>>(), expected_data);
-
-    // select some fields
-    let actual_data: Vec<_> = users.select((name, hair_color)).load(connection).unwrap();
-    assert_eq!(expected_data, actual_data);
-
-    // select all fields
-    let actual_data: Vec<_> = users.select(User::as_select()).load(connection).unwrap();
-    assert_eq!(expected_data_users, actual_data);
 }

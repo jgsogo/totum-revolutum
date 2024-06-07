@@ -4,9 +4,11 @@ use diesel::query_dsl::LoadQuery;
 use diesel::RunQueryDsl;
 use std::any::type_name;
 
+/// Declares a manager that executes [`crate::querysets::GetByPkQuerySet`]
 pub trait GetByPkManager<PK, Conn>: Sized {
     type Error: From<diesel::result::Error>;
 
+    /// Returns the object matching the primary key `pk`
     fn get_by_pk(pk: PK, conn: &mut Conn) -> Result<Self, Self::Error>;
 }
 
