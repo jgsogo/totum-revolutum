@@ -19,6 +19,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    tags (tag) {
+        tag -> Text,
+        parent -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     users (id) {
         id -> Integer,
         name -> Text,
@@ -29,5 +36,6 @@ diesel::table! {
 diesel::allow_tables_to_appear_in_same_query!(
     comments,
     posts,
+    tags,
     users,
 );

@@ -1,13 +1,13 @@
 use diesel::associations::HasTable;
 use diesel::*;
 
-use common::models::User;
+use common::models::{Tag, User};
 use diesel_utils::GetByPk;
 
 mod common;
 
 #[test]
-fn get_by_pk() {
+fn integer_pk() {
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
         .execute(connection)
@@ -21,5 +21,22 @@ fn get_by_pk() {
 
     // diesel provided tools
     let u: User = User::table().find(1).limit(1).get_result(connection).unwrap();
+    assert_eq!(u, r);
+}
+
+#[test]
+fn string_pk() {
+    let connection = &mut common::connection::connection();
+    sql_query("INSERT INTO tags (tag) VALUES ('tag1'), ('tag2')")
+        .execute(connection)
+        .unwrap();
+
+    // get_by_pk
+    let r: Tag = Tag::get_by_pk("tag1").get_result(connection).unwrap();
+    assert_eq!(r.tag, "tag1".to_string());
+    assert_eq!(r.parent, None);
+
+    // diesel provided tools
+    let u: Tag = Tag::table().find("tag1").limit(1).get_result(connection).unwrap();
     assert_eq!(u, r);
 }
