@@ -17,7 +17,6 @@ where
 
     fn get_by_pk(pk: PK, conn: &mut Conn) -> Result<Self, Self::Error> {
         let qs = <T as crate::queryset::GetByPk<PK>>::get_by_pk(pk);
-        let r = qs.get_result(conn)?;
-        Ok(r)
+        Ok(qs.get_result(conn)?)
     }
 }
