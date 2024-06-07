@@ -1,0 +1,17 @@
+[package]
+name = "diesel_utils"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["sqlite"]
+sqlite = []
+
+
+[dependencies]
+diesel = { workspace = true, features = ["sqlite", "r2d2", "returning_clauses_for_sqlite_3_35"] }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+diesel_migrations = { workspace = true, features = ["sqlite"] }

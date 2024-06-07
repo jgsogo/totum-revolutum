@@ -951,6 +951,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "diesel_utils"
+version = "0.1.0"
+dependencies = [
+ "diesel",
+ "diesel_migrations",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
 name = "diffy"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

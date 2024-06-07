@@ -157,6 +157,8 @@ labels:
     color: "000000"
   - name: cmp:libraries/cron
     color: "000000"
+  - name: cmp:libraries/diesel_utils
+    color: "000000"
   - name: cmp:libraries/filesystem
     color: "000000"
   - name: cmp:libraries/filesystem_pcloud

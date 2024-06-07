@@ -26,7 +26,7 @@ run_copy_to_workspace = rule(
             mandatory = True,
         ),
         "target": attr.label(
-            doc = "File to be overriden in the workspace",
+            doc = "File to be overridden in the workspace",
             mandatory = True,
             allow_single_file = True,
         ),
