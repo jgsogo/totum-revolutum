@@ -1,13 +1,13 @@
-use diesel::associations::HasTable;
 use diesel::*;
 
 use common::models::{PostTag, Tag, User};
-use diesel_utils::GetByPk;
-
+use diesel_utils::error::{Error, ObjectDoesNotExist};
 mod common;
 
 #[test]
-fn integer_pk() {
+fn queryset_with_integer_pk() {
+    use diesel_utils::querysets::GetByPkQuerySet;
+
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
         .execute(connection)
@@ -18,14 +18,12 @@ fn integer_pk() {
     assert_eq!(r.id, 1);
     assert_eq!(r.name, "Sean".to_string());
     assert_eq!(r.hair_color, None);
-
-    // diesel provided tools
-    let u: User = User::table().find(1).limit(1).get_result(connection).unwrap();
-    assert_eq!(u, r);
 }
 
 #[test]
-fn string_pk() {
+fn queryset_with_string_pk() {
+    use diesel_utils::querysets::GetByPkQuerySet;
+
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO tags (tag) VALUES ('tag1'), ('tag2')")
         .execute(connection)
@@ -35,14 +33,12 @@ fn string_pk() {
     let r: Tag = Tag::get_by_pk("tag1").get_result(connection).unwrap();
     assert_eq!(r.tag, "tag1".to_string());
     assert_eq!(r.parent, None);
-
-    // diesel provided tools
-    let u: Tag = Tag::table().find("tag1").limit(1).get_result(connection).unwrap();
-    assert_eq!(u, r);
 }
 
 #[test]
-fn tuple_pk() {
+fn queryset_with_tuple_pk() {
+    use diesel_utils::querysets::GetByPkQuerySet;
+
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
         .execute(connection)
@@ -61,12 +57,28 @@ fn tuple_pk() {
     let r: PostTag = PostTag::get_by_pk((1, "tag1")).get_result(connection).unwrap();
     assert_eq!(r.post_id, 1);
     assert_eq!(r.tag, "tag1".to_string());
+}
 
-    // diesel provided tools
-    let u: PostTag = PostTag::table()
-        .find((1, "tag1"))
-        .limit(1)
-        .get_result(connection)
+#[test]
+fn manager_with_integer_pk() {
+    use diesel_utils::managers::GetByPkManager;
+
+    let connection = &mut common::connection::connection();
+    sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
+        .execute(connection)
         .unwrap();
-    assert_eq!(u, r);
+
+    // get_by_pk
+    let r: User = User::get_by_pk(1, connection).unwrap();
+    assert_eq!(r.id, 1);
+    assert_eq!(r.name, "Sean".to_string());
+    assert_eq!(r.hair_color, None);
+
+    // test errors
+    let r = User::get_by_pk(10, connection);
+    assert!(r.is_err());
+    assert!(matches!(
+        r.unwrap_err(),
+        Error::ObjectDoesNotExist(ObjectDoesNotExist{ref model}) if model.ends_with("common::models::User")
+    ))
 }
