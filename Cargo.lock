@@ -956,8 +956,9 @@ version = "0.1.0"
 dependencies = [
  "diesel",
  "diesel_migrations",
+ "log",
+ "testing_logger",
  "thiserror",
- "tracing",
 ]
 
 [[package]]
