@@ -3,4 +3,4 @@
 pub mod error;
 
 pub mod managers;
-pub mod queryset;
+pub mod querysets;

@@ -8,7 +8,7 @@ mod common;
 
 #[test]
 fn queryset_with_integer_pk() {
-    use diesel_utils::queryset::FilterByPk;
+    use diesel_utils::querysets::FilterByPkQuerySet;
 
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
@@ -33,7 +33,7 @@ fn queryset_with_integer_pk() {
 
 #[test]
 fn queryset_with_string_pk() {
-    use diesel_utils::queryset::FilterByPk;
+    use diesel_utils::querysets::FilterByPkQuerySet;
 
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO tags (tag) VALUES ('tag1'), ('tag2')")

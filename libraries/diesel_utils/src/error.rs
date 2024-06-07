@@ -6,7 +6,7 @@ pub enum Error {
     ObjectDoesNotExist(ObjectDoesNotExist),
 
     #[error(transparent)]
-    DieselError(#[from] diesel::result::Error),
+    OtherDieselError(#[from] diesel::result::Error),
 }
 
 #[derive(Debug, Error)]

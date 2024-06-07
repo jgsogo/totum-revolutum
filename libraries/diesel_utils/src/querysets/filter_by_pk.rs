@@ -7,14 +7,14 @@ use diesel::{ExpressionMethods, Table};
 
 /// Helper trait that adds a method to return all the objects for a given set of primary key
 /// values. This should be blanked-implemented for the vast majority of diesel tables.
-pub trait FilterByPk<PK, Values> {
+pub trait FilterByPkQuerySet<PK, Values> {
     type QueryOutput;
 
     /// Returns a query to get all the rows for the given set of primary keys (`pks`)
     fn filter_by_pk(pks: Values) -> Self::QueryOutput;
 }
 
-impl<PK, T, Values> FilterByPk<PK, Values> for T
+impl<PK, T, Values> FilterByPkQuerySet<PK, Values> for T
 where
     // &'a T: Identifiable, // Not really needed
     T: HasTable,

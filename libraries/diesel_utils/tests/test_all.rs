@@ -7,7 +7,7 @@ mod common;
 
 #[test]
 fn manager_all() {
-    use diesel_utils::managers::All;
+    use diesel_utils::managers::AllManager;
 
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")

@@ -1,12 +1,12 @@
 use diesel::*;
 
 use common::models::{PostTag, Tag, User};
-use diesel_utils::error::Error;
+use diesel_utils::error::{Error, ObjectDoesNotExist};
 mod common;
 
 #[test]
 fn queryset_with_integer_pk() {
-    use diesel_utils::queryset::GetByPk;
+    use diesel_utils::querysets::GetByPkQuerySet;
 
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
@@ -22,7 +22,7 @@ fn queryset_with_integer_pk() {
 
 #[test]
 fn queryset_with_string_pk() {
-    use diesel_utils::queryset::GetByPk;
+    use diesel_utils::querysets::GetByPkQuerySet;
 
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO tags (tag) VALUES ('tag1'), ('tag2')")
@@ -37,7 +37,7 @@ fn queryset_with_string_pk() {
 
 #[test]
 fn queryset_with_tuple_pk() {
-    use diesel_utils::queryset::GetByPk;
+    use diesel_utils::querysets::GetByPkQuerySet;
 
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
@@ -79,6 +79,6 @@ fn manager_with_integer_pk() {
     assert!(r.is_err());
     assert!(matches!(
         r.unwrap_err(),
-        Error::DieselError(diesel::result::Error::NotFound)
+        Error::ObjectDoesNotExist(ObjectDoesNotExist{ref model}) if model.ends_with("common::models::User")
     ))
 }

@@ -8,14 +8,14 @@ use diesel::{Expression, QueryDsl, RunQueryDsl};
 // TODO: The `Output` type should be inferred from the `Selection`, it's known at compile time. If
 // TODO: manage to define it here, the caller doesn't need to be explicit about the type returned
 // TODO: in the iterator.
-pub trait All<Output, Selection: Expression, Conn> {
+pub trait AllManager<Output, Selection: Expression, Conn> {
     type Error: From<diesel::result::Error>;
 
     /// Returns an iterator with all the objects in the database
     fn all(selection: Selection, conn: &mut Conn) -> Result<impl Iterator<Item = Output>, Self::Error>;
 }
 
-impl<T, Output, Selection, Conn> All<Output, Selection, Conn> for T
+impl<T, Output, Selection, Conn> AllManager<Output, Selection, Conn> for T
 where
     T: HasTable,
     Selection: Expression,
