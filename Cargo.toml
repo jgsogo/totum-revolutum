@@ -8,6 +8,7 @@ members = [
     "libraries/constants",
     "libraries/diesel_utils",
     "libraries/filesystem",
+    "libraries/filesystem_database",
     "libraries/filesystem_pcloud",
     "libraries/http_utils",
     "libraries/pcloud_sdk",

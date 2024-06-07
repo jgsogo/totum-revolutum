@@ -1259,6 +1259,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "filesystem_database"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "camino",
+ "diesel",
+ "diesel_utils",
+ "filesystem",
+ "tracing",
+]
+
+[[package]]
 name = "filesystem_pcloud"
 version = "0.1.0"
 dependencies = [

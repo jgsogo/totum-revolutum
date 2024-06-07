@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "0345435746ae29eb601003655b760714b5e43539827f17fe967c6e01b3301599",
+  "moduleFileHash": "47a8a0f359d9d6a85ef1ee90f79c078f6ae3a0f5a40a3807adabc44f79d9df02",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -170,6 +170,7 @@
                   "//libraries/cron:Cargo.toml",
                   "//libraries/diesel_utils:Cargo.toml",
                   "//libraries/filesystem:Cargo.toml",
+                  "//libraries/filesystem_database:Cargo.toml",
                   "//libraries/filesystem_pcloud:Cargo.toml",
                   "//libraries/http_utils:Cargo.toml",
                   "//libraries/pcloud_sdk:Cargo.toml",

@@ -82,6 +82,7 @@ crate.from_cargo(
         "//libraries/cron:Cargo.toml",
         "//libraries/diesel_utils:Cargo.toml",
         "//libraries/filesystem:Cargo.toml",
+        "//libraries/filesystem_database:Cargo.toml",
         "//libraries/filesystem_pcloud:Cargo.toml",
         "//libraries/http_utils:Cargo.toml",
         "//libraries/pcloud_sdk:Cargo.toml",
