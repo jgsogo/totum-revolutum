@@ -1,15 +1,15 @@
 use diesel::associations::HasTable;
 use diesel::*;
 
-use diesel_utils::FilterByPk;
-
 use crate::common::models::{Tag, User};
 use crate::common::schema::{tags, users};
 
 mod common;
 
 #[test]
-fn integer_pk() {
+fn queryset_with_integer_pk() {
+    use diesel_utils::queryset::FilterByPk;
+
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
         .execute(connection)
@@ -32,7 +32,9 @@ fn integer_pk() {
 }
 
 #[test]
-fn string_pk() {
+fn queryset_with_string_pk() {
+    use diesel_utils::queryset::FilterByPk;
+
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO tags (tag) VALUES ('tag1'), ('tag2')")
         .execute(connection)

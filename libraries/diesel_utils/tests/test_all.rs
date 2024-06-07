@@ -1,12 +1,13 @@
 use crate::common::models::User;
+use crate::common::schema::users::dsl::users;
+use crate::common::schema::users::*;
 use diesel::*;
-use diesel_utils::managers::All;
 
 mod common;
 
 #[test]
-fn all() {
-    use common::schema::users::dsl::*;
+fn manager_all() {
+    use diesel_utils::managers::All;
 
     let connection = &mut common::connection::connection();
     sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")

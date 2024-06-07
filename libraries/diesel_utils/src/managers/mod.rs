@@ -5,5 +5,7 @@
 //! We can think about them in terms of the **Repository pattern** as well.
 
 pub use all::All;
+pub use get_by_pk::GetByPkManager;
 
 mod all;
+mod get_by_pk;
