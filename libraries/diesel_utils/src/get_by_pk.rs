@@ -2,6 +2,7 @@ use diesel::associations::HasTable;
 use diesel::query_dsl::filter_dsl::FindDsl;
 use diesel::query_dsl::limit_dsl::LimitDsl;
 
+// TODO: Write docs with example usage
 pub trait GetByPk<PK> {
     type QueryOutput;
 

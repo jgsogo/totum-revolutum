@@ -7,7 +7,7 @@ fn selecting_basic_data() {
     use common::schema::users::dsl::*;
 
     let connection = &mut common::connection::connection();
-    diesel::sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
+    sql_query("INSERT INTO users (name) VALUES ('Sean'), ('Tess')")
         .execute(connection)
         .unwrap();
 

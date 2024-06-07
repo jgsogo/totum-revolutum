@@ -5,6 +5,7 @@ use diesel::query_dsl::filter_dsl::FilterDsl;
 use diesel::sql_types::SqlType;
 use diesel::{ExpressionMethods, Table};
 
+// TODO: Write docs with example usage
 pub trait FilterByPk<PK, Values> {
     type QueryOutput;
 
