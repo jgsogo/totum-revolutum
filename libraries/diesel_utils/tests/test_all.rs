@@ -1,7 +1,6 @@
 use crate::common::models::User;
-use crate::common::schema;
 use diesel::*;
-use diesel_utils::All;
+use diesel_utils::managers::All;
 
 mod common;
 

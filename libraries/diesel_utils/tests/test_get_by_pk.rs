@@ -2,7 +2,7 @@ use diesel::associations::HasTable;
 use diesel::*;
 
 use common::models::{PostTag, Tag, User};
-use diesel_utils::GetByPk;
+use diesel_utils::queryset::{FilterByPk, GetByPk};
 
 mod common;
 
