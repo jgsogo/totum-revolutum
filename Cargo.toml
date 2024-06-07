@@ -6,6 +6,7 @@ members = [
     "libraries/cron",
     "libraries/async_utils",
     "libraries/constants",
+    "libraries/diesel_utils",
     "libraries/filesystem",
     "libraries/filesystem_pcloud",
     "libraries/http_utils",

@@ -2,3 +2,8 @@
 
 max_width = 120
 
+# TODO: Only supported in nightly. Meanwhile, we are patching the generated schema.rs files to skip rustfmt
+#ignore = [
+#    "apps/photodb/src/schema.rs",
+#    "libraries/diesel_utils/tests/common/schema.rs",
+#]

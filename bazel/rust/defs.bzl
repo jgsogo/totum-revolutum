@@ -74,7 +74,8 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
     test_suite_deps = test_suite_deps or []
     rust_test_suite(
         name = "integration_tests",
-        srcs = native.glob(["tests/**"]),
+        crate_features = collect_all_features,
+        srcs = native.glob(["tests/**/test_*.rs"]),
         data = test_data,
         deps = deps + test_suite_deps + [":{}".format(name)],
     )
