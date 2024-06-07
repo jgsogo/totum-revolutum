@@ -1,6 +1,8 @@
 use crate::common::models::User;
+use crate::common::schema;
 use diesel::*;
 use diesel_utils::All;
+
 mod common;
 
 #[test]
@@ -24,19 +26,20 @@ fn all() {
             hair_color: None,
         },
     ];
-
-    // all (objects)
-    let r = User::all(User::as_select(), connection);
-    assert!(r.is_ok());
-    assert_eq!(r.unwrap().collect::<Vec<_>>(), expected_data_users);
-
-    // all (some fields)
-
-    // select some fields
     let expected_data = vec![
         ("Sean".to_string(), None::<String>),
         ("Tess".to_string(), None::<String>),
     ];
+
+    // all (objects)
+    let r = User::all(User::as_select(), connection).unwrap();
+    assert_eq!(r.collect::<Vec<_>>(), expected_data_users);
+
+    // all (some fields)
+    let r = User::all((name, hair_color), connection).unwrap();
+    assert_eq!(r.collect::<Vec<(String, Option<String>)>>(), expected_data);
+
+    // select some fields
     let actual_data: Vec<_> = users.select((name, hair_color)).load(connection).unwrap();
     assert_eq!(expected_data, actual_data);
 
