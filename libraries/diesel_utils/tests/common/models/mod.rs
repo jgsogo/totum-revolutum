@@ -20,3 +20,11 @@ pub struct Tag {
     pub tag: String,
     pub parent: Option<String>,
 }
+
+#[derive(PartialEq, Eq, Debug, Clone, Queryable, Identifiable, Insertable, QueryableByName, Selectable)]
+#[diesel(table_name = m2m_posts_tags)]
+#[diesel(primary_key(post_id, tag))]
+pub struct PostTag {
+    pub post_id: i32,
+    pub tag: String,
+}

@@ -10,6 +10,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    m2m_posts_tags (post_id, tag) {
+        post_id -> Integer,
+        tag -> Text,
+    }
+}
+
+diesel::table! {
     posts (id) {
         id -> Integer,
         user_id -> Integer,
@@ -33,8 +40,12 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(m2m_posts_tags -> posts (post_id));
+diesel::joinable!(m2m_posts_tags -> tags (tag));
+
 diesel::allow_tables_to_appear_in_same_query!(
     comments,
+    m2m_posts_tags,
     posts,
     tags,
     users,
