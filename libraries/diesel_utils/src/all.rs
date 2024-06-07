@@ -4,6 +4,10 @@ use diesel::query_dsl::LoadQuery;
 use diesel::{Expression, QueryDsl, RunQueryDsl};
 
 // TODO: Write docs with example usage
+
+// TODO: The `Output` type should be inferred from the `Selection`, it's known at compile time. If
+// TODO: manage to define it here, the caller doesn't need to be explicit about the type returned
+// TODO: in the iterator.
 pub trait All<Output, Selection: Expression, Conn> {
     type Error: From<diesel::result::Error>;
 
@@ -15,7 +19,6 @@ where
     T: HasTable,
     Selection: Expression,
     T::Table: QueryDsl + SelectDsl<Selection>,
-    // Conn: diesel::connection::LoadConnection,
     <<T as HasTable>::Table as SelectDsl<Selection>>::Output: RunQueryDsl<Conn>,
     for<'query> <<T as HasTable>::Table as SelectDsl<Selection>>::Output: LoadQuery<'query, Conn, Output>,
 {
@@ -23,40 +26,9 @@ where
 
     fn all(selection: Selection, conn: &mut Conn) -> Result<impl Iterator<Item = Output>, Self::Error> {
         let table = T::table();
-        /*
-        fn select<Selection>(self, selection: Selection) -> Select<Self, Selection>
-        where
-            Selection: Expression,
-            Self: methods::SelectDsl<Selection>,
-        {
-            methods::SelectDsl::select(self, selection)
-        }
-
-        impl<T, Selection> SelectDsl<Selection> for T
-        where
-            Selection: Expression,
-            T: Table,
-            T::Query: SelectDsl<Selection>,
-        {
-            type Output = <T::Query as SelectDsl<Selection>>::Output;
-
-            fn select(self, selection: Selection) -> Self::Output {
-                self.as_query().select(selection)
-            }
-        }
-
-
-        */
-
+        // TODO: Implement pagination here, that's the only reason why I'm passing the connection to
+        // TODO: this function, so it can run several queries
         let r = SelectDsl::select(table, selection);
-        /*
-        fn load<'query, U>(self, conn: &mut Conn) -> QueryResult<Vec<U>>
-        where
-            Self: LoadQuery<'query, Conn, U>,
-        {
-            self.internal_load(conn)?.collect()
-        }
-        */
         let r = r.load(conn)?;
         Ok(r.into_iter())
     }
