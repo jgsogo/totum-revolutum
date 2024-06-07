@@ -1,9 +1,14 @@
 load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
+load("@totum//bazel:defs.bzl", "run_copy_to_workspace")
 load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("@totum//bazel/rust/diesel:defs.bzl", "diesel_print_schema", "diesel_setup")
 
 rust_library_tests_and_docs(
     name = "filesystem_database",
-    srcs = glob(["src/**/*.rs"]),
+    srcs = glob(
+        ["src/**/*.rs"],
+        exclude = ["src/diesel/schema.rs"],
+    ) + [":schema"],
     aliases = aliases(),
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
@@ -20,4 +25,32 @@ rust_library_tests_and_docs(
         "@totum//libraries/diesel_utils",
         "@totum//libraries/filesystem",
     ],
+)
+
+# Create the schema.rs file for integration tests
+filegroup(
+    name = "diesel_config",
+    srcs = ["src/diesel/diesel.toml"],
+)
+
+diesel_setup(
+    name = "setup",
+    config_file = ":diesel_config",
+    database_url = "db.sqlite3",
+    migrations = glob(["src/diesel/migrations/**/*.sql"]),
+)
+
+diesel_print_schema(
+    name = "schema",
+    config_file = ":diesel_config",
+    database_url = ":setup",
+    schema = "src/diesel/schema.rs",
+)
+
+# We need to run this rule so we can build using Cargo
+run_copy_to_workspace(
+    name = "schema.update",
+    origin = ":schema",
+    tags = ["update"],
+    target = "src/diesel/schema.rs",
 )

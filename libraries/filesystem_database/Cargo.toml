@@ -12,7 +12,7 @@ filesystem = { path = "../filesystem" }
 
 async-trait = { workspace = true }
 camino = { workspace = true }
-# flume = { workspace = true }
+ flume = { workspace = true }
 # headers = { workspace = true }
 # tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }

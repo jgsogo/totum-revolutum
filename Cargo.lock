@@ -1267,6 +1267,7 @@ dependencies = [
  "diesel",
  "diesel_utils",
  "filesystem",
+ "flume",
  "tracing",
 ]
 
