@@ -10,7 +10,7 @@ use async_trait::async_trait;
 ///
 /// The method [`Self::sync_all`] is provided so the user can wait and receive any error that
 /// might happen while closing the file.
-pub trait File {
+pub trait File: Send {
     /// Reads all bytes from the byte stream.
     ///
     /// All bytes read from this stream will be appended to the specified buffer `buf`.

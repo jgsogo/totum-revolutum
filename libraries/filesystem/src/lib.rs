@@ -5,6 +5,7 @@ pub use error::{Error, Result};
 pub use file::File;
 pub use file_metadata::FileMetadata;
 pub use filesystem::Filesystem;
+pub use filesystem_cloned::FilesystemCloned;
 
 mod file;
 mod file_metadata;
@@ -22,3 +23,4 @@ pub mod local;
 #[cfg(feature = "diff")]
 pub mod diff;
 pub mod error;
+mod filesystem_cloned;
