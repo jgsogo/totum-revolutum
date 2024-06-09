@@ -1,4 +1,4 @@
-pub use database::{DBFileMetadata, Database};
+pub use database::DBFileMetadata;
 pub use database_backup::DatabaseBackup;
 pub use database_sync::DatabaseSync;
 
