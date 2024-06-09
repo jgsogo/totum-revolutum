@@ -3,17 +3,46 @@ use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use filesystem::{File, FileMetadata, Result};
 
-pub trait Database: Sync {
+pub trait Database: Sync + Send + Clone + 'static {
+    // FIXME: This is basically the Filesystem trait... without the `open` and `create` methods. It´s
+    // FIXME: much better to rely on the DB implementing the `Filesystme` trait and return a
+    // FIXME: `NonUsableFile` from those methods. With this approach the mirror can be implemented
+    // FIXME: between any two Filesystem implementors: something that runs the same operation on
+    // FIXME: both (only need to generalize the `Drop` signal sending).
+    // FIXME:
+    // FIXME: Of course, if it´s just a mirror, it should be implemented in the `filesystem` crate.
+
+    /// Returns an iterator through all the files
     fn all_files(&self) -> Result<impl Iterator<Item = DBFileMetadata>>;
 
-    fn get_file(&self, id: &Utf8Path) -> Result<DBFileMetadata>;
+    /// Returns a file given a path
+    fn get_file(&self, path: &Utf8Path) -> Result<DBFileMetadata>;
 
-    fn file_exists(&self, id: &Utf8Path) -> Result<bool>;
+    /// Returns if a file given a path exists
+    fn file_exists(&self, path: &Utf8Path) -> Result<bool>;
 
-    fn create_dir(&self, obj: DBDirectory) -> Result<()>;
+    /// Creates or updates the file at the given path. It has to recompute all the information associated to the file
+    fn create_or_update_file(&self, path: &Utf8Path) -> Result<DBFileMetadata>;
+
+    /// Copies entry in the database
+    /// // TODO: file?
+    fn copy(&self, origin: &Utf8Path, target: &Utf8Path) -> Result<()>;
+
+    /// Moves entry in the database
+    /// /// // TODO: file?
+    fn rename(&self, origin: &Utf8Path, target: &Utf8Path) -> Result<()>;
+
+    fn remove_file(&self, path: &Utf8Path) -> Result<()>;
+
+    /// Removes an empty directory
+    fn remove_dir(&self, path: &Utf8Path) -> Result<()>;
+
+    /// Removes an empty directory
+    fn remove_dir_all(&self, path: &Utf8Path) -> Result<()>;
+
+    /// Creates a directory (and any intermediate one)
+    fn create_dir(&self, path: &Utf8Path) -> Result<()>;
 }
-
-pub struct DBDirectory;
 
 #[derive(Debug, Clone)]
 pub struct DBFileMetadata;
