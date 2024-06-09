@@ -1,5 +1,5 @@
 use super::DBFileMetadata;
-use crate::database::{DBDirectory, DBFile, ObjectManager};
+use crate::database::{DBDirectory, DBFile, Database};
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use filesystem::{Error, File, Filesystem, Result};
@@ -11,14 +11,9 @@ use tracing::info;
 ///
 /// Note that the database and the storage may get out-of-sync if some files are added/removed to
 /// the storage without updating the database (see [`super::DatabaseSync`]).
-pub struct DatabaseBackup<
-    DbFiles: ObjectManager<DBFileMetadata, Utf8Path>,
-    DbDirs: ObjectManager<DBDirectory, Utf8Path>,
-    FLS: Filesystem,
-> {
-    db_files: DbFiles,
-    db_directories: DbDirs,
-    filesystem: FLS,
+pub struct DatabaseBackup<TDatabase: Database, TFilesystem: Filesystem> {
+    database: TDatabase,
+    filesystem: TFilesystem,
 
     tx_file_close: flume::Sender<FileCloseMessage>,
     //vthread_file_close: Option<JoinHandle<()>>,
@@ -29,13 +24,8 @@ pub(crate) enum FileCloseMessage {
     Stop,
 }
 
-impl<
-        DbFiles: ObjectManager<DBFileMetadata, Utf8Path>,
-        DbDirs: ObjectManager<DBDirectory, Utf8Path>,
-        FLS: Filesystem,
-    > DatabaseBackup<DbFiles, DbDirs, FLS>
-{
-    pub fn new(db_files: DbFiles, db_directories: DbDirs, filesystem: FLS) -> Self {
+impl<TDatabase: Database, TFilesystem: Filesystem> DatabaseBackup<TDatabase, TFilesystem> {
+    pub fn new(database: TDatabase, filesystem: TFilesystem) -> Self {
         let (tx, rx) = flume::unbounded::<FileCloseMessage>();
 
         // This async loop will take care of calling the 'file_close' method when RemoteFiles go out
@@ -56,8 +46,7 @@ impl<
         });
 
         Self {
-            db_files,
-            db_directories,
+            database,
             filesystem,
             tx_file_close: tx,
             //thread_file_close: Some(t),
@@ -65,24 +54,14 @@ impl<
     }
 }
 
-impl<
-        DbFiles: ObjectManager<DBFileMetadata, Utf8Path>,
-        DbDirs: ObjectManager<DBDirectory, Utf8Path>,
-        FLS: Filesystem,
-    > Drop for DatabaseBackup<DbFiles, DbDirs, FLS>
-{
+impl<TDatabase: Database, TFilesystem: Filesystem> Drop for DatabaseBackup<TDatabase, TFilesystem> {
     fn drop(&mut self) {
         let _ = self.tx_file_close.send(FileCloseMessage::Stop);
     }
 }
 
 #[async_trait]
-impl<
-        DbFiles: ObjectManager<DBFileMetadata, Utf8Path>,
-        DbDirs: ObjectManager<DBDirectory, Utf8Path>,
-        FLS: Filesystem,
-    > Filesystem for DatabaseBackup<DbFiles, DbDirs, FLS>
-{
+impl<TDatabase: Database, TFilesystem: Filesystem> Filesystem for DatabaseBackup<TDatabase, TFilesystem> {
     type Metadata = DBFileMetadata;
 
     /// Walk files in the filesystem, for each file found it will send it via `tx`
@@ -92,7 +71,7 @@ impl<
         _threads: usize,
         _custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
-        for it in self.db_files.all()? {
+        for it in self.database.all_files()? {
             tx.send(it)
                 .map_err(|e| Error::Other(format!("Error sending metadata: {e}")))?
         }
@@ -101,12 +80,12 @@ impl<
 
     /// Returns the [`Self::Metadata`] for the given `path`
     async fn get_metadata(&self, path: &Utf8Path) -> Result<Self::Metadata> {
-        self.db_files.get(path)
+        self.database.get_file(path)
     }
 
     /// Returns true if the path points at an existing entity.
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        self.db_files.exists(path)
+        self.database.file_exists(path)
     }
 
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.
@@ -135,7 +114,7 @@ impl<
     /// Creates the given directory and any intermediate one
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         self.filesystem.create_dir_all(path).await?;
-        self.db_directories.create(DBDirectory)
+        self.database.create_dir(DBDirectory)
     }
 
     /// Copy

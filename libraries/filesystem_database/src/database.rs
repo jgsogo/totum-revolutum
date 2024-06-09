@@ -3,15 +3,14 @@ use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use filesystem::{File, FileMetadata, Result};
 
-// FIXME: Probably move closer to some database_utils
-pub trait ObjectManager<Object, ID: ?Sized>: Sync {
-    fn all(&self) -> Result<impl Iterator<Item = Object>>;
+pub trait Database: Sync {
+    fn all_files(&self) -> Result<impl Iterator<Item = DBFileMetadata>>;
 
-    fn get(&self, id: &ID) -> Result<Object>;
+    fn get_file(&self, id: &Utf8Path) -> Result<DBFileMetadata>;
 
-    fn exists(&self, id: &ID) -> Result<bool>;
+    fn file_exists(&self, id: &Utf8Path) -> Result<bool>;
 
-    fn create(&self, obj: Object) -> Result<()>;
+    fn create_dir(&self, obj: DBDirectory) -> Result<()>;
 }
 
 pub struct DBDirectory;
