@@ -11,11 +11,12 @@ enum FileCloseMessage {
     Stop,
 }
 
-/// A
+/// Applies the same changes to two [`Filesystem`] implementations. Changes are applied on the first
+/// one and then mirrored to the second.
 ///
 /// Note.- It´s up to the user to ensure that both [`Filesystem`] instances contain the same files
 /// (or the operations running on them, only touch files that are present on both).
-pub struct FilesystemCloned<TFilesystem1: Filesystem, TFilesystem2: Filesystem> {
+pub struct FilesystemMirror<TFilesystem1: Filesystem, TFilesystem2: Filesystem> {
     filesystem1: TFilesystem1,
     filesystem2: TFilesystem2,
 
@@ -57,9 +58,11 @@ impl File for FileCloned {
     }
 }
 
-pub trait FilesystemMirror: Filesystem + Send + Clone + 'static {}
+pub trait FilesystemMirrorTrait: Filesystem + Send + Clone + 'static {}
 
-impl<TFilesystem1: FilesystemMirror, TFilesystem2: FilesystemMirror> FilesystemCloned<TFilesystem1, TFilesystem2> {
+impl<TFilesystem1: FilesystemMirrorTrait, TFilesystem2: FilesystemMirrorTrait>
+    FilesystemMirror<TFilesystem1, TFilesystem2>
+{
     pub fn new(filesystem1: TFilesystem1, filesystem2: TFilesystem2) -> Self {
         let (tx, rx) = flume::unbounded::<FileCloseMessage>();
 
@@ -103,7 +106,7 @@ impl<TFilesystem1: FilesystemMirror, TFilesystem2: FilesystemMirror> FilesystemC
     }
 }
 
-impl<TFilesystem1: Filesystem, TFilesystem2: Filesystem> Drop for FilesystemCloned<TFilesystem1, TFilesystem2> {
+impl<TFilesystem1: Filesystem, TFilesystem2: Filesystem> Drop for FilesystemMirror<TFilesystem1, TFilesystem2> {
     fn drop(&mut self) {
         // Send the close signal... in case it was not already closed
         let _ = self.tx_file_close.send(FileCloseMessage::Stop);
@@ -111,7 +114,7 @@ impl<TFilesystem1: Filesystem, TFilesystem2: Filesystem> Drop for FilesystemClon
 }
 
 #[async_trait]
-impl<TFilesystem1: Filesystem, TFilesystem2: Filesystem> Filesystem for FilesystemCloned<TFilesystem1, TFilesystem2> {
+impl<TFilesystem1: Filesystem, TFilesystem2: Filesystem> Filesystem for FilesystemMirror<TFilesystem1, TFilesystem2> {
     type Metadata = TFilesystem1::Metadata;
 
     async fn walk_directory(
