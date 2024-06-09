@@ -44,6 +44,13 @@ pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone> {
     thread_file_close: Option<JoinHandle<()>>,
 }
 
+impl<HttpClient: PCloudClient + Clone> Drop for FilesystemPCloud<HttpClient> {
+    fn drop(&mut self) {
+        // Send the close signal... in case it was not already closed
+        let _ = self.tx_file_close.send(FileCloseMessage::Stop);
+    }
+}
+
 impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpClient> {
     pub async fn new(root_path: RemotePath, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
