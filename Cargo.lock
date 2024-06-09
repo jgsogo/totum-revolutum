@@ -1268,6 +1268,7 @@ dependencies = [
  "diesel_utils",
  "filesystem",
  "flume",
+ "tokio",
  "tracing",
 ]
 

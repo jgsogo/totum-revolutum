@@ -7,6 +7,6 @@ use diesel::*;
 #[diesel(table_name = directories)]
 pub struct Directory {
     pub id: i32,
-    pub name: String,
     pub parent_id: Option<i32>,
+    pub full_path: String,
 }

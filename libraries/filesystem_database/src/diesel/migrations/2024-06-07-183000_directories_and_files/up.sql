@@ -2,12 +2,15 @@
 CREATE TABLE directories
 (
     id        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    name      VARCHAR NOT NULL,
     parent_id INTEGER,
+
+    -- Full path (relative to root)
+    full_path      VARCHAR NOT NULL,
+
     FOREIGN KEY (parent_id) REFERENCES directories (id)
 );
 
-INSERT INTO directories (id, name) VALUES (0, '/');
+INSERT INTO directories (id, full_path) VALUES (0, '');
 
 -- Files
 CREATE TABLE files
@@ -16,9 +19,10 @@ CREATE TABLE files
     name         VARCHAR NOT NULL,
     directory_id INTEGER NOT NULL,
 
-    --- Some properties (the ones required by FileMetadata)
-    -- hash
-    -- size
+    -- Computed hash of the file contents
+    hash VARCHAR NOT NULL ,
+    -- Size of the file
+    size INTEGER NOT NULL,
 
     --- Constraints
     UNIQUE (name, directory_id) ON CONFLICT ABORT

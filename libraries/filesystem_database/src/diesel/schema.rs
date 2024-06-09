@@ -4,8 +4,8 @@
 diesel::table! {
     directories (id) {
         id -> Integer,
-        name -> Text,
         parent_id -> Nullable<Integer>,
+        full_path -> Text,
     }
 }
 
@@ -14,6 +14,8 @@ diesel::table! {
         id -> Integer,
         name -> Text,
         directory_id -> Integer,
+        hash -> Text,
+        size -> Integer,
     }
 }
 

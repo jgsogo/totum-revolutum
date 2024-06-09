@@ -7,6 +7,8 @@ use diesel::*;
 #[diesel(table_name = files)]
 pub struct File {
     pub id: i32,
-    pub name: Option<String>,
+    pub name: String,
     pub directory_id: i32,
+    pub hash: String,
+    pub size: i32,
 }
