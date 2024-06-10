@@ -7,7 +7,7 @@ use tokio::sync::oneshot::Receiver;
 
 use crate::actions::copy_file;
 use crate::filesystem_async_drop::FilesystemAsyncDrop;
-use crate::{File, Filesystem, Result};
+use crate::{File, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 struct FileMirror {
     file: Box<dyn File>,
@@ -31,10 +31,11 @@ impl File for FileMirror {
 }
 
 /// Applies the same changes to two [`Filesystem`] implementations. Changes are applied on the first
-/// one and then mirrored to the second.
+/// one and then mirrored to the second. If the action on the first fails, the second won't be
+/// executed, but the action won't be rolled back on the first if the second fails.
 ///
 /// Note.- It´s up to the user to ensure that both [`Filesystem`] instances contain the same files
-/// (or the operations running on them, only touch files that are present on both).
+/// (or the operations running on them only touch files that are present on both).
 pub struct FilesystemMirror<TFilesystem1: Filesystem, TFilesystem2: Filesystem> {
     filesystem1: Option<Arc<TFilesystem1>>,
     filesystem2: Option<Arc<TFilesystem2>>,
@@ -42,8 +43,10 @@ pub struct FilesystemMirror<TFilesystem1: Filesystem, TFilesystem2: Filesystem> 
     fs_async_drop: FilesystemAsyncDrop<FileMirror>,
 }
 
-impl<TFilesystem1: Filesystem + Send + 'static, TFilesystem2: Filesystem + Send + 'static>
-    FilesystemMirror<TFilesystem1, TFilesystem2>
+impl<
+        TFilesystem1: Filesystem + FilesystemRead + Sync + Send + 'static,
+        TFilesystem2: Filesystem + FilesystemRead + FilesystemWrite + Sync + Send + 'static,
+    > FilesystemMirror<TFilesystem1, TFilesystem2>
 {
     pub fn new(filesystem1: TFilesystem1, filesystem2: TFilesystem2) -> Self {
         let filesystem1 = Arc::new(filesystem1);
@@ -79,7 +82,39 @@ impl<TFilesystem1: Filesystem + Send + 'static, TFilesystem2: Filesystem + Send 
 }
 
 #[async_trait]
-impl<TFilesystem1: Filesystem + Send, TFilesystem2: Filesystem + Send> Filesystem
+impl<TFilesystem1: Filesystem + Sync + Send, TFilesystem2: Filesystem + Sync + Send> Filesystem
+    for FilesystemMirror<TFilesystem1, TFilesystem2>
+{
+    async fn sync_all(self) -> Result<()> {
+        // TODO: Execute sync_all in both filesystems.... after closing the thread
+        todo!("not imple")
+    }
+}
+
+#[async_trait]
+impl<
+        TFilesystem1: Filesystem + FilesystemWrite + Sync + Send,
+        TFilesystem2: Filesystem + FilesystemWrite + Sync + Send,
+    > FilesystemWrite for FilesystemMirror<TFilesystem1, TFilesystem2>
+{
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
+        let (file, closed_fs1_rx) = self.filesystem1.as_ref().unwrap().create(path).await?;
+        let file_mirror = FileMirror {
+            file,
+            path: path.to_path_buf(),
+            fs1_rx_closed: closed_fs1_rx,
+        };
+        Ok(self.fs_async_drop.file_wrapped(file_mirror))
+    }
+
+    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+        self.filesystem1.as_ref().unwrap().create_dir_all(path).await?;
+        self.filesystem2.as_ref().unwrap().create_dir_all(path).await
+    }
+}
+
+#[async_trait]
+impl<TFilesystem1: Filesystem + FilesystemRead + Sync + Send, TFilesystem2: Filesystem + Sync + Send> FilesystemRead
     for FilesystemMirror<TFilesystem1, TFilesystem2>
 {
     type Metadata = TFilesystem1::Metadata;
@@ -105,27 +140,19 @@ impl<TFilesystem1: Filesystem + Send, TFilesystem2: Filesystem + Send> Filesyste
         self.filesystem1.as_ref().unwrap().exists(path).await
     }
 
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
-        let (file, closed_fs1_rx) = self.filesystem1.as_ref().unwrap().create(path).await?;
-        let file_mirror = FileMirror {
-            file,
-            path: path.to_path_buf(),
-            fs1_rx_closed: closed_fs1_rx,
-        };
-        Ok(self.fs_async_drop.file_wrapped(file_mirror))
-    }
-
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         // It's read-only, I don't need to do anything on the other filesystem, just return the
         // file object from the "master" filesystem
         self.filesystem1.as_ref().unwrap().open(path).await
     }
+}
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem1.as_ref().unwrap().create_dir_all(path).await?;
-        self.filesystem2.as_ref().unwrap().create_dir_all(path).await
-    }
-
+#[async_trait]
+impl<
+        TFilesystem1: Filesystem + FilesystemRemove + Sync + Send,
+        TFilesystem2: Filesystem + FilesystemRemove + Sync + Send,
+    > FilesystemRemove for FilesystemMirror<TFilesystem1, TFilesystem2>
+{
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         self.filesystem1.as_ref().unwrap().remove_file(path).await?;
         self.filesystem2.as_ref().unwrap().remove_file(path).await
@@ -139,11 +166,6 @@ impl<TFilesystem1: Filesystem + Send, TFilesystem2: Filesystem + Send> Filesyste
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         self.filesystem1.as_ref().unwrap().remove_dir_all(path).await?;
         self.filesystem2.as_ref().unwrap().remove_dir_all(path).await
-    }
-
-    async fn sync_all(mut self) -> Result<()> {
-        // TODO: Execute sync_all in both filesystems.... after closing the thread
-        todo!("not imple")
     }
 }
 

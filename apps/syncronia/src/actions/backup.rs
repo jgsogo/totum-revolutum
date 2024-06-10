@@ -3,7 +3,7 @@ use tracing::info;
 
 use crate::actions::action_run::ActionRun;
 use crate::actions::OnConflict;
-use filesystem::{FileMetadata, Filesystem};
+use filesystem::{FileMetadata, Filesystem, FilesystemRead};
 
 pub struct Backup<'action, FsLhs: Filesystem, FsRhs: Filesystem> {
     _lhs_fs: &'action FsLhs,
@@ -22,8 +22,11 @@ impl<'action, FsLhs: Filesystem, FsRhs: Filesystem> Backup<'action, FsLhs, FsRhs
 }
 
 #[async_trait]
-impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> ActionRun<FsLhs::Metadata, FsRhs::Metadata>
-    for Backup<'action, FsLhs, FsRhs>
+impl<
+        'action,
+        FsLhs: Filesystem + FilesystemRead + Sync + 'static,
+        FsRhs: Filesystem + FilesystemRead + Sync + 'static,
+    > ActionRun<FsLhs::Metadata, FsRhs::Metadata> for Backup<'action, FsLhs, FsRhs>
 {
     async fn run_with_both(&self, lhs: &FsLhs::Metadata, rhs: &FsRhs::Metadata) -> anyhow::Result<()> {
         match self.on_conflict {

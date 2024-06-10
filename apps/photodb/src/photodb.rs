@@ -1,12 +1,11 @@
 use anyhow::{anyhow, Result};
 use camino::{Utf8Path, Utf8PathBuf};
 use diesel::{RunQueryDsl, SelectableHelper};
-// use diesel::prelude::*;
 use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
 use filesystem::local_temp::FilesystemLocalTemp;
-use filesystem::Filesystem;
+use filesystem::{FilesystemRead, FilesystemWrite};
 use filesystem_pcloud::RemoteMetadata;
 
 use super::db::Database;
@@ -19,13 +18,15 @@ use super::AppDirs;
 const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
-pub struct PhotoDB<'a, T: Database, RemoteStorage: Filesystem<Metadata = RemoteMetadata>> {
+pub struct PhotoDB<'a, T: Database, RemoteStorage: FilesystemRead<Metadata = RemoteMetadata>> {
     db: T,
     app_dir: &'a AppDirs,
     storage: RemoteStorage,
 }
 
-impl<'a, T: Database, RemoteStorage: Filesystem<Metadata = RemoteMetadata>> PhotoDB<'a, T, RemoteStorage> {
+impl<'a, T: Database, RemoteStorage: FilesystemRead<Metadata = RemoteMetadata> + FilesystemWrite>
+    PhotoDB<'a, T, RemoteStorage>
+{
     pub async fn new(db: T, storage: RemoteStorage, app_dir: &'a AppDirs) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote storage",

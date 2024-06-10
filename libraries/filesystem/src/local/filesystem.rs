@@ -10,7 +10,7 @@ use tokio::time::Instant;
 use tracing::info;
 
 use crate::filesystem_async_drop::FilesystemAsyncDrop;
-use crate::{Error, Result};
+use crate::{Error, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 use crate::{File, Filesystem};
 
 use super::file_metadata::LocalMetadata;
@@ -43,6 +43,27 @@ impl FilesystemLocal {
 
 #[async_trait]
 impl Filesystem for FilesystemLocal {
+    async fn sync_all(mut self) -> Result<()> {
+        self.fs_async_drop.flush().await
+    }
+}
+
+#[async_trait]
+impl FilesystemWrite for FilesystemLocal {
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
+        let path = self.root.join(self.check_path(path)?);
+        let f = AsyncFile::create(path.into_std_path_buf()).await?;
+        Ok(self.fs_async_drop.file_wrapped(f))
+    }
+
+    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+        let path = self.root.join(self.check_path(path)?);
+        fs::create_dir_all(path).map_err(Error::IoError)
+    }
+}
+
+#[async_trait]
+impl FilesystemRead for FilesystemLocal {
     type Metadata = LocalMetadata;
 
     async fn walk_directory(
@@ -76,12 +97,6 @@ impl Filesystem for FilesystemLocal {
         Ok(path.exists())
     }
 
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
-        let path = self.root.join(self.check_path(path)?);
-        let f = AsyncFile::create(path.into_std_path_buf()).await?;
-        Ok(self.fs_async_drop.file_wrapped(f))
-    }
-
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.root.join(self.check_path(path)?);
         let f = AsyncFile::open(path.into_std_path_buf()).await?;
@@ -90,12 +105,10 @@ impl Filesystem for FilesystemLocal {
         let (file, _) = self.fs_async_drop.file_wrapped(f);
         Ok(file)
     }
+}
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        let path = self.root.join(self.check_path(path)?);
-        fs::create_dir_all(path).map_err(Error::IoError)
-    }
-
+#[async_trait]
+impl FilesystemRemove for FilesystemLocal {
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.root.join(self.check_path(path)?);
@@ -112,10 +125,6 @@ impl Filesystem for FilesystemLocal {
         // Do not resolve symlinks
         let path = self.root.join(self.check_path(path)?);
         fs::remove_dir_all(path).map_err(Error::IoError)
-    }
-
-    async fn sync_all(mut self) -> Result<()> {
-        self.fs_async_drop.flush().await
     }
 }
 

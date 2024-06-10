@@ -5,8 +5,8 @@ use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 
 use crate::local::FilesystemLocal;
-use crate::Result;
 use crate::{File, Filesystem};
+use crate::{FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 /// Implementation of [`Filesystem`] using a temporal directory in the host filesystem
 pub struct FilesystemLocalTemp {
@@ -39,7 +39,25 @@ impl Default for FilesystemLocalTemp {
 
 #[async_trait]
 impl Filesystem for FilesystemLocalTemp {
-    type Metadata = <FilesystemLocal as Filesystem>::Metadata;
+    async fn sync_all(self) -> Result<()> {
+        self.local.sync_all().await
+    }
+}
+
+#[async_trait]
+impl FilesystemWrite for FilesystemLocalTemp {
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
+        self.local.create(path).await
+    }
+
+    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+        self.local.create_dir_all(path).await
+    }
+}
+
+#[async_trait]
+impl FilesystemRead for FilesystemLocalTemp {
+    type Metadata = <FilesystemLocal as FilesystemRead>::Metadata;
 
     async fn walk_directory(
         &self,
@@ -58,18 +76,13 @@ impl Filesystem for FilesystemLocalTemp {
         self.local.exists(path).await
     }
 
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
-        self.local.create(path).await
-    }
-
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         self.local.open(path).await
     }
+}
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        self.local.create_dir_all(path).await
-    }
-
+#[async_trait]
+impl FilesystemRemove for FilesystemLocalTemp {
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         self.local.remove_file(path).await
     }
@@ -80,9 +93,5 @@ impl Filesystem for FilesystemLocalTemp {
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         self.local.remove_dir_all(path).await
-    }
-
-    async fn sync_all(self) -> Result<()> {
-        self.local.sync_all().await
     }
 }

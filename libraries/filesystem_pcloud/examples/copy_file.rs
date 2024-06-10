@@ -1,9 +1,10 @@
-use anyhow::Result;
-use camino::Utf8Path;
 use std::str::FromStr;
 
+use anyhow::Result;
+use camino::Utf8Path;
+
 use filesystem::actions::copy_file;
-use filesystem::Filesystem;
+use filesystem::{FilesystemRead, FilesystemWrite};
 use filesystem_pcloud::FilesystemPCloud;
 use pcloud_sdk::methods::general::userinfo::GetUserInfo;
 use pcloud_sdk::methods::oauth2;

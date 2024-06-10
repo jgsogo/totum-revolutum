@@ -4,7 +4,7 @@
 pub use error::{Error, Result};
 pub use file::File;
 pub use file_metadata::FileMetadata;
-pub use filesystem::Filesystem;
+pub use filesystem::{Filesystem, FilesystemRead, FilesystemReadAndWrite, FilesystemRemove, FilesystemWrite};
 
 mod file;
 mod file_metadata;

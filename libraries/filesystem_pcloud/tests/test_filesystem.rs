@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use anyhow::Result;
 use camino::Utf8PathBuf;
 
-use filesystem::Filesystem;
+use filesystem::{FilesystemRead, FilesystemWrite};
 use filesystem_pcloud::FilesystemPCloud;
 use filesystem_pcloud::CHUNK_SIZE;
 use pcloud_sdk::access_token::OAuth2Token;
