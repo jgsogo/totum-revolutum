@@ -32,8 +32,8 @@ pub trait File: Send {
     /// Write an entire buffer into the file
     async fn write_all(&mut self, buf: &[u8]) -> Result<()>;
 
-    /// This function ensures that all in-memory data reaches the filesystem. After executing this
-    /// method it can be assumed that `Drop` will close the file successfully (or without any
-    /// loss of information).
-    async fn sync_all(&mut self) -> Result<()>;
+    // /// This function ensures that all in-memory data reaches the filesystem. After executing this
+    // /// method it can be assumed that `Drop` will close the file successfully (or without any
+    // /// loss of information).
+    // async fn sync_all(&mut self) -> Result<()>;
 }

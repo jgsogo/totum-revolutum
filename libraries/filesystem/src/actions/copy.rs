@@ -1,4 +1,5 @@
 use camino::Utf8Path;
+use tokio::sync::oneshot::Receiver;
 
 use crate::{Error, Filesystem};
 use crate::{File, Result};
@@ -29,13 +30,14 @@ pub async fn copy_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     origin: &Utf8Path,
     target: &Utf8Path,
     force: bool,
-) -> Result<()> {
+) -> Result<Receiver<Result<()>>> {
     if !force && rhs_fs.exists(target).await? {
         return Err(Error::TargetFileExists);
     }
 
-    let mut target_file = rhs_fs.create(target).await?;
-    copy(&mut lhs_fs.open(origin).await?, &mut target_file).await
+    let (mut target_file, rx) = rhs_fs.create(target).await?;
+    copy(&mut lhs_fs.open(origin).await?, &mut target_file).await?;
+    Ok(rx)
 }
 
 #[cfg(test)]
@@ -48,8 +50,12 @@ mod tests {
 
     async fn get_filesystem_mock_with_file(lhs_path: &Utf8Path, content: &[u8]) -> FilesystemLocalTemp {
         let fs = FilesystemLocalTemp::default();
-        let mut f1 = fs.create(&lhs_path).await.unwrap();
-        f1.write_all(&content).await.unwrap();
+        let rx = {
+            let (mut f1, rx) = fs.create(&lhs_path).await.unwrap();
+            f1.write_all(&content).await.unwrap();
+            rx
+        };
+        let _ = rx.await;
         fs
     }
 

@@ -12,6 +12,7 @@ rust_library_tests_and_docs(
             "local_temp",
             "local",
         ],
+        "mirror": ["mirror"],
     },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,

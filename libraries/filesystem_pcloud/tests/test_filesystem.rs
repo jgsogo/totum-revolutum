@@ -48,10 +48,12 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
 
     let p = Utf8PathBuf::from(name.clone());
     // Create and write
-    {
-        let mut f = fs.create(&*p).await?;
+    let rx = {
+        let (mut f, rx) = fs.create(&*p).await?;
         f.write_all(&content).await?;
-    }
+        rx
+    };
+    let _ = rx.await?;
 
     // Open and read
     {

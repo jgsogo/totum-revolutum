@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use tempfile::{tempdir, TempDir};
+use tokio::sync::oneshot::Receiver;
 
 use crate::local::FilesystemLocal;
 use crate::Result;
@@ -57,7 +58,7 @@ impl Filesystem for FilesystemLocalTemp {
         self.local.exists(path).await
     }
 
-    async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
         self.local.create(path).await
     }
 
@@ -79,5 +80,9 @@ impl Filesystem for FilesystemLocalTemp {
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
         self.local.remove_dir_all(path).await
+    }
+
+    async fn sync_all(self) -> Result<()> {
+        self.local.sync_all().await
     }
 }

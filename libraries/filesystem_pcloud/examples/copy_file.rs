@@ -29,9 +29,9 @@ async fn main() -> Result<()> {
 
     // Creates a file in the origin
     let origin = Utf8Path::new("origin.txt");
-    {
+    let rx = {
         println!("Creates file in origin: {origin}");
-        let mut origin_file = fs.create(&origin).await?;
+        let (mut origin_file, rx) = fs.create(&origin).await?;
         origin_file
             .write_all(
                 b"Lorem ipsum dolor sit amet, consectetur adipiscing elit, \
@@ -43,7 +43,9 @@ async fn main() -> Result<()> {
             culpa qui officia deserunt mollit anim id est laborum.",
             )
             .await?;
-    }
+        rx
+    };
+    let _ = rx.await?;
 
     // Now copies origin to target
     let target = Utf8Path::new("target.txt");
