@@ -52,6 +52,7 @@ impl<FileImpl: File + 'static> FilesystemAsyncDrop<FileImpl> {
 
     /// Send a stop message to the thread and waits for it to join
     pub async fn flush(&mut self) -> Result<()> {
+        // TODO: Consume 'self' here? Is this object usable anymore?
         if self.tx_file_close.send(FileCloseMessage::Stop).is_ok() {
             self.thread_file_close
                 .take()
