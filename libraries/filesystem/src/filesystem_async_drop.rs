@@ -50,7 +50,7 @@ impl<FileImpl: File + 'static> FilesystemAsyncDrop<FileImpl> {
         }
     }
 
-    /// Send [`FileCloseMessage::Stop`] message to the thread and waits for it to join
+    /// Send a stop message to the thread and waits for it to join
     pub async fn flush(&mut self) -> Result<()> {
         if self.tx_file_close.send(FileCloseMessage::Stop).is_ok() {
             self.thread_file_close
@@ -67,49 +67,6 @@ impl<FileImpl: File + 'static> FilesystemAsyncDrop<FileImpl> {
         (Box::new(file), rx)
     }
 }
-//
-// #[async_trait]
-// pub trait FilesystemAsyncDrop<FileImpl: File + 'static> {
-//     fn start_thread_file_close<F, Fut>(func: F) -> (Sender<FileCloseMessage<FileImpl>>, JoinHandle<()>)
-//         where
-//             F: Fn(FileImpl) -> Fut + Send + 'static,
-//             Fut: Future<Output=Result<()>> + Send + 'static,
-//     {
-//         // Spawns a thread that will execute async operation called from File drop
-//         let (tx, rx) = flume::unbounded::<FileCloseMessage<FileImpl>>();
-//         let t = tokio::spawn(async move {
-//             while let Ok(msg) = rx.recv_async().await {
-//                 match msg {
-//                     FileCloseMessage::FileCloseMessage((file_impl, sender)) => {
-//                         let r = func(file_impl).await;
-//                         if let Err(_) = sender.send(r) {
-//                             debug!("Error sending file close result. Receiver might have been dropped (and it's fine)")
-//                         };
-//                     }
-//                     FileCloseMessage::Stop => {
-//                         info!("Received STOP message");
-//                         break;
-//                     }
-//                 }
-//             }
-//         });
-//         (tx, t)
-//     }
-//
-//     fn get_tx_file_close(&self) -> &Sender<FileCloseMessage<FileImpl>>;
-//
-//     fn take_thread_file_close(&mut self) -> Result<JoinHandle<()>>;
-//
-//     /// Send [`FileCloseMessage::Stop`] message to the thread and waits for it to join
-//     async fn flush(&mut self) -> Result<()> {
-//         let tx_file_close = self.get_tx_file_close();
-//         if tx_file_close.send(FileCloseMessage::Stop).is_ok() {
-//             let thread = self.take_thread_file_close()?;
-//             thread.await.map_err(|e| Error::Other(e.to_string()))?;
-//         }
-//         Ok(())
-//     }
-// }
 
 struct FileAsyncDrop<FileImpl: File> {
     /// The object representing the file

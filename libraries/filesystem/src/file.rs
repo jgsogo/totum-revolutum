@@ -3,13 +3,6 @@ use async_trait::async_trait;
 
 #[async_trait]
 /// An object providing access to an opened file inside a [`crate::Filesystem`]
-///
-/// When the object is dropped, the underlying file will automatically be closed. However, it's up
-/// to the specific implementations to define how [`Drop`] is implemented and/or close is
-/// unconditionally guaranteed even if the application dies.
-///
-/// The method [`Self::sync_all`] is provided so the user can wait and receive any error that
-/// might happen while closing the file.
 pub trait File: Send {
     /// Reads all bytes from the byte stream.
     ///
@@ -31,9 +24,4 @@ pub trait File: Send {
 
     /// Write an entire buffer into the file
     async fn write_all(&mut self, buf: &[u8]) -> Result<()>;
-
-    // /// This function ensures that all in-memory data reaches the filesystem. After executing this
-    // /// method it can be assumed that `Drop` will close the file successfully (or without any
-    // /// loss of information).
-    // async fn sync_all(&mut self) -> Result<()>;
 }
