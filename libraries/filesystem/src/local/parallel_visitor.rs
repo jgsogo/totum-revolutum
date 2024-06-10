@@ -2,7 +2,7 @@ use camino::Utf8PathBuf;
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 use tracing::error;
 
-use crate::local::LocalMetadata;
+use super::file_metadata::LocalMetadata;
 
 struct Visitor {
     tx: flume::Sender<LocalMetadata>,

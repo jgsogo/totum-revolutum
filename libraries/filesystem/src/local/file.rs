@@ -21,8 +21,4 @@ impl File for AsyncFile {
             .await
             .map_err(Error::IoError)
     }
-
-    async fn sync_all(&mut self) -> Result<()> {
-        AsyncFile::sync_all(self).await.map_err(Error::IoError)
-    }
 }

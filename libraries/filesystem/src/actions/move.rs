@@ -1,4 +1,5 @@
 use camino::Utf8Path;
+use tokio::sync::oneshot::Receiver;
 
 use crate::Filesystem;
 use crate::Result;
@@ -6,7 +7,8 @@ use crate::Result;
 use super::copy::copy_file;
 
 /// Moves the content of the `origin` file in `lhs_fs` [`Filesystem`] to the `target` file
-/// in the `rhs_fs` [`Filesystem`].
+/// in the `rhs_fs` [`Filesystem`]. This action returns a [`Receiver`] that the caller can
+/// use to wait for any async operation to finish.
 ///
 /// This action is implemented in terms of [`copy_file`].
 pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
@@ -15,9 +17,10 @@ pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     origin: &Utf8Path,
     target: &Utf8Path,
     force: bool,
-) -> Result<()> {
-    copy_file(lhs_fs, rhs_fs, origin, target, force).await?;
-    lhs_fs.remove_file(origin).await
+) -> Result<Receiver<Result<()>>> {
+    let rx = copy_file(lhs_fs, rhs_fs, origin, target, force).await?;
+    lhs_fs.remove_file(origin).await?;
+    Ok(rx)
 }
 
 #[cfg(test)]
@@ -28,17 +31,23 @@ mod tests {
 
     use super::*;
 
+    async fn get_filesystem_mock_with_file(lhs_path: &Utf8Path, content: &[u8]) -> FilesystemLocalTemp {
+        let fs = FilesystemLocalTemp::default();
+        let rx = {
+            let (mut f1, rx) = fs.create(&lhs_path).await.unwrap();
+            f1.write_all(&content).await.unwrap();
+            rx
+        };
+        let _ = rx.await;
+        fs
+    }
+
     #[tokio::test]
     async fn test_move_no_force() -> Result<()> {
         let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
         let lhs_path = Utf8PathBuf::from("file.txt");
 
-        let lhs_fs = {
-            let fs = FilesystemLocalTemp::default();
-            let mut f1 = fs.create(&lhs_path).await?;
-            f1.write_all(&file_content).await?;
-            fs
-        };
+        let lhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
 
         let rhs_fs = FilesystemLocalTemp::default();
         let rhs_path = Utf8PathBuf::from("the_target.txt");
@@ -56,19 +65,9 @@ mod tests {
         let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
         let lhs_path = Utf8PathBuf::from("file.txt");
 
-        let lhs_fs = {
-            let fs = FilesystemLocalTemp::default();
-            let mut f1 = fs.create(&lhs_path).await?;
-            f1.write_all(&file_content).await?;
-            fs
-        };
+        let lhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
+        let rhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
 
-        let rhs_fs = {
-            let fs = FilesystemLocalTemp::default();
-            let mut f1 = fs.create(&lhs_path).await?;
-            f1.write_all(&file_content).await?;
-            fs
-        };
         assert!(lhs_fs.exists(&lhs_path).await?);
         assert!(rhs_fs.exists(&lhs_path).await?);
 

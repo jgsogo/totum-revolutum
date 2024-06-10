@@ -1,14 +1,15 @@
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
+use tokio::sync::oneshot::Receiver;
 
 use super::utils::normalize_path;
 use super::{Error, Result};
 use super::{File, FileMetadata};
 
-/// Abstraction of a filesystem (it can be local or remote) and methods to access their files
+/// Abstraction of a filesystem with methods to access their files
 #[async_trait]
 pub trait Filesystem: Sync {
-    type Metadata: FileMetadata;
+    type Metadata: FileMetadata; // TODO: Associated type of just return `Box<dyn FileMetadata>`?
 
     /// Normalizes the given `path` ensuring that it is a relative path that doesn't goes outside
     /// its root folder. Returns the normalized version of that path
@@ -36,7 +37,11 @@ pub trait Filesystem: Sync {
     async fn exists(&self, path: &Utf8Path) -> Result<bool>;
 
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.
-    async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>>;
+    /// This method returns the [`File`] object and a [`Receiver`]. This
+    /// receiver will be called after the file is dropped and any pending task is run by the
+    /// underlying filesystem (some [`Filesystem`] implementations may run async functions after
+    /// the file is dropped).
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)>;
 
     /// Tries to open the file requested by the argument `path` in read-only mode. Returns an object implementing
     /// a [`File`] or an error.
@@ -63,4 +68,7 @@ pub trait Filesystem: Sync {
 
     /// Removes a directory at this path, after removing all its contents. Use carefully!
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()>;
+
+    /// Waits for any pending operation and finishes this filesystem.
+    async fn sync_all(self) -> Result<()>;
 }

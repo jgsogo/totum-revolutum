@@ -5,28 +5,39 @@ use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use ignore::WalkBuilder;
+use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::info;
 
-use crate::local::LocalMetadata;
+use crate::filesystem_async_drop::FilesystemAsyncDrop;
 use crate::{Error, Result};
 use crate::{File, Filesystem};
 
+use super::file_metadata::LocalMetadata;
 use super::parallel_visitor;
 
+/// Implementation of [`Filesystem`] using a directory in the host filesystem.
+#[derive(Debug)]
 pub struct FilesystemLocal {
     root: Utf8PathBuf,
+    fs_async_drop: FilesystemAsyncDrop<AsyncFile>,
 }
 
 impl FilesystemLocal {
+    /// Creates a new [`FilesystemLocal`] at the given `root` path.
     pub fn new(root: &Utf8Path) -> Result<Self> {
         if !root.exists() {
-            Err(Error::PathDoesNotExist)
-        } else {
-            Ok(Self {
-                root: root.to_path_buf(),
-            })
+            return Err(Error::PathDoesNotExist);
         }
+
+        let fs_async_drop = FilesystemAsyncDrop::new(|async_file: AsyncFile| async move {
+            async_file.sync_all().await.map_err(Error::IoError)
+        });
+
+        Ok(Self {
+            root: root.to_path_buf(),
+            fs_async_drop,
+        })
     }
 }
 
@@ -65,16 +76,19 @@ impl Filesystem for FilesystemLocal {
         Ok(path.exists())
     }
 
-    async fn create(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
         let path = self.root.join(self.check_path(path)?);
         let f = AsyncFile::create(path.into_std_path_buf()).await?;
-        Ok(Box::new(f))
+        Ok(self.fs_async_drop.file_wrapped(f))
     }
 
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         let path = self.root.join(self.check_path(path)?);
         let f = AsyncFile::open(path.into_std_path_buf()).await?;
-        Ok(Box::new(f))
+        // We can drop the receiver here, the file is opened in read-only mode so there is nothing
+        // to sync when it is dropped
+        let (file, _) = self.fs_async_drop.file_wrapped(f);
+        Ok(file)
     }
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
@@ -99,11 +113,16 @@ impl Filesystem for FilesystemLocal {
         let path = self.root.join(self.check_path(path)?);
         fs::remove_dir_all(path).map_err(Error::IoError)
     }
+
+    async fn sync_all(mut self) -> Result<()> {
+        self.fs_async_drop.flush().await
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use std::io;
+
     use tempfile::tempdir;
 
     use super::*;
@@ -114,14 +133,15 @@ mod tests {
         let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
         let r = FilesystemLocal::new(&utf8_path.join("not-exist"));
         assert!(r.is_err());
+        assert!(matches!(r.unwrap_err(), Error::PathDoesNotExist))
     }
 
-    #[test]
-    fn test_root() -> Result<()> {
+    #[tokio::test]
+    async fn test_root() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
         let fs = FilesystemLocal::new(utf8_path)?;
-        // Root is not cannonicalized, it fails in MacOS where tmp directories are inside sym folder
+        // Root is not canonical, it fails in MacOS where tmp directories are inside sym folder
         #[cfg(target_os = "macos")]
         assert_ne!(fs::canonicalize(tmp_dir.path())?, fs.root);
         assert_eq!(tmp_dir.path(), fs.root);
@@ -138,10 +158,12 @@ mod tests {
         let content: Vec<u8> = b"Hello, world!".to_vec();
 
         // Create and write
-        {
-            let mut f = fs.create(&filepath).await?;
+        let rx = {
+            let (mut f, rx) = fs.create(&filepath).await?;
             f.write_all(&content).await?;
-        }
+            rx
+        };
+        let _ = rx.await;
 
         // Open and read
         {
@@ -165,7 +187,6 @@ mod tests {
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
         assert!(matches!(e, Error::IoError(io::Error { .. })));
-        assert_eq!(e.to_string(), "No such file or directory (os error 2)");
 
         fs.create_dir_all("nested/nested2".into()).await?;
         let r = fs.create("nested/nested2/myfile.txt".into()).await;

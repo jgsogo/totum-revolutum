@@ -22,4 +22,9 @@ pub mod local;
 #[cfg(feature = "diff")]
 pub mod diff;
 pub mod error;
+mod filesystem_async_drop;
+
+#[cfg(feature = "mirror")]
 pub mod mirror;
+
+pub use filesystem_async_drop::FilesystemAsyncDrop;

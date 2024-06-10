@@ -7,6 +7,7 @@ edition = "2021"
 diff = []
 local = ["dep:async-std", "dep:ignore", "dep:futures", "dep:sha256"]
 local_temp = ["dep:uuid", "dep:tempfile", "local"]
+mirror = []
 
 [dependencies]
 async-trait = { workspace = true }
@@ -25,4 +26,4 @@ tempfile = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true, features = ["v4"] }
 
 [dev-dependencies]
-filesystem = { path = ".", features = ["local_temp", "diff"] }
+filesystem = { path = ".", features = ["local_temp", "diff", "mirror"] }

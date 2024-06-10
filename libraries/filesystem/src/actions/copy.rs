@@ -1,9 +1,10 @@
 use camino::Utf8Path;
+use tokio::sync::oneshot::Receiver;
 
 use crate::{Error, Filesystem};
 use crate::{File, Result};
 
-/// Copies the contents of the `lhs_file` into the `rhs_file`.
+/// Copies the contents of the `lhs_file` [`File`] into the `rhs_file` [`File`]
 pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mut Box<dyn File>) -> Result<()> {
     let mut buf: [u8; 100] = [0; 100]; // TODO: Configure buffer size. Maybe make it adaptative: https://stackoverflow.com/questions/304249/is-there-an-optimal-byte-size-for-sending-data-over-a-network
     loop {
@@ -20,22 +21,23 @@ pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mu
     Ok(())
 }
 
-/// Copy a file from `origin` path in the `lhs_fs` [`Filesystem`] to the `target` path in the
-/// `rhs_fs` [`Filesystem`]. The method can fail if the `target` file already exists and
-/// `force` is false.
+/// Copy a file from one [`Filesystem`] to another. Both instances of [`Filesystem`], the `origin` path and the
+/// `target` path are provided as argument. This method returns a [`Receiver`] that the caller can use to await
+/// for the operation to complete (target file is dropped and underlying filesystem has performed any async action).
 pub async fn copy_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action FsRhs,
     origin: &Utf8Path,
     target: &Utf8Path,
     force: bool,
-) -> Result<()> {
+) -> Result<Receiver<Result<()>>> {
     if !force && rhs_fs.exists(target).await? {
         return Err(Error::TargetFileExists);
     }
 
-    let mut target_file = rhs_fs.create(target).await?;
-    copy(&mut lhs_fs.open(origin).await?, &mut target_file).await
+    let (mut target_file, rx) = rhs_fs.create(target).await?;
+    copy(&mut lhs_fs.open(origin).await?, &mut target_file).await?;
+    Ok(rx)
 }
 
 #[cfg(test)]
@@ -48,8 +50,12 @@ mod tests {
 
     async fn get_filesystem_mock_with_file(lhs_path: &Utf8Path, content: &[u8]) -> FilesystemLocalTemp {
         let fs = FilesystemLocalTemp::default();
-        let mut f1 = fs.create(&lhs_path).await.unwrap();
-        f1.write_all(&content).await.unwrap();
+        let rx = {
+            let (mut f1, rx) = fs.create(&lhs_path).await.unwrap();
+            f1.write_all(&content).await.unwrap();
+            rx
+        };
+        let _ = rx.await;
         fs
     }
 

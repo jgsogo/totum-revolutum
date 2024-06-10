@@ -2,8 +2,6 @@ use std::io::Write;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use flume::Sender;
-use tracing::warn;
 
 use filesystem::Result;
 use filesystem::{Error, File};
@@ -12,40 +10,40 @@ use pcloud_sdk::methods::fileops::file_open::FileOpen;
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
 use pcloud_sdk::methods::fileops::file_write::PostFileWrite;
 
-use crate::filesystem::FileCloseMessage;
-
 pub const CHUNK_SIZE: usize = 512; // Just a guess of _optimal package size over a network_
 
-pub struct RemoteFile<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> {
+pub(crate) struct RemoteFile<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> {
     // TODO: This should be a reference &HttpClient, as every file can live as long as
     //  its filesystem will live... and the filesystem is one-to-one relationship with
     //  the httpclient used to connect to it.
     pcloud: Arc<HttpClient>,
     file: FileOpen,
-    tx_file_close: Sender<FileCloseMessage>,
 }
 
 impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> RemoteFile<HttpClient> {
-    pub fn new(file: FileOpen, pcloud: Arc<HttpClient>, tx_file_close: Sender<FileCloseMessage>) -> Self {
-        Self {
-            file,
-            pcloud,
-            tx_file_close,
-        }
+    pub fn new(file: FileOpen, pcloud: Arc<HttpClient>) -> Self {
+        Self { file, pcloud }
+    }
+
+    pub async fn sync_all(self) -> Result<()> {
+        self.pcloud
+            .file_close(self.file.fd.clone())
+            .await
+            .map_err(|e| Error::Other(e.to_string()))
     }
 }
 
-impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Drop for RemoteFile<HttpClient> {
-    fn drop(&mut self) {
-        // The filesystem takes care of closing the file
-        if let Err(e) = self
-            .tx_file_close
-            .send(FileCloseMessage::FileDescriptor(self.file.fd.clone()))
-        {
-            warn!("Error closing the file on drop action: {e}");
-        }
-    }
-}
+// impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Drop for RemoteFile<HttpClient> {
+//     fn drop(&mut self) {
+//         // The filesystem takes care of closing the file
+//         if let Err(e) = self
+//             .tx_file_close
+//             .send(FileCloseMessage::FileDescriptor(self.file.fd.clone()))
+//         {
+//             warn!("Error closing the file on drop action: {e}");
+//         }
+//     }
+// }
 
 #[async_trait]
 impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File for RemoteFile<HttpClient> {
@@ -114,10 +112,10 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File 
         Ok(())
     }
 
-    async fn sync_all(&mut self) -> Result<()> {
-        self.pcloud
-            .file_close(self.file.fd.clone())
-            .await
-            .map_err(|e| Error::Other(e.to_string()))
-    }
+    // async fn sync_all(&mut self) -> Result<()> {
+    //     self.pcloud
+    //         .file_close(self.file.fd.clone())
+    //         .await
+    //         .map_err(|e| Error::Other(e.to_string()))
+    // }
 }
