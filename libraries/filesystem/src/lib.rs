@@ -22,3 +22,4 @@ pub mod local;
 #[cfg(feature = "diff")]
 pub mod diff;
 pub mod error;
+pub mod mirror;
