@@ -7,7 +7,8 @@ use crate::Result;
 use super::copy::copy_file;
 
 /// Moves the content of the `origin` file in `lhs_fs` [`Filesystem`] to the `target` file
-/// in the `rhs_fs` [`Filesystem`].
+/// in the `rhs_fs` [`Filesystem`]. This action returns a [`Receiver`] that the caller can
+/// use to wait for any async operation to finish.
 ///
 /// This action is implemented in terms of [`copy_file`].
 pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: Filesystem>(

@@ -6,10 +6,10 @@ use super::utils::normalize_path;
 use super::{Error, Result};
 use super::{File, FileMetadata};
 
-/// Abstraction of a filesystem (it can be local or remote) and methods to access their files
+/// Abstraction of a filesystem with methods to access their files
 #[async_trait]
 pub trait Filesystem: Sync {
-    type Metadata: FileMetadata;
+    type Metadata: FileMetadata; // TODO: Associated type of just return `Box<dyn FileMetadata>`?
 
     /// Normalizes the given `path` ensuring that it is a relative path that doesn't goes outside
     /// its root folder. Returns the normalized version of that path

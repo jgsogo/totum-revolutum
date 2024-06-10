@@ -8,7 +8,7 @@ use crate::local::FilesystemLocal;
 use crate::Result;
 use crate::{File, Filesystem};
 
-/// Mocks a filesystem using a temporal directory that is removed on drop
+/// Implementation of [`Filesystem`] using a temporal directory in the host filesystem
 pub struct FilesystemLocalTemp {
     tmp_dir: TempDir,
     local: FilesystemLocal,

@@ -10,12 +10,13 @@ use tokio::time::Instant;
 use tracing::info;
 
 use crate::filesystem_async_drop::FilesystemAsyncDrop;
-use crate::local::LocalMetadata;
 use crate::{Error, Result};
 use crate::{File, Filesystem};
 
+use super::file_metadata::LocalMetadata;
 use super::parallel_visitor;
 
+/// Implementation of [`Filesystem`] using a directory in the host filesystem.
 #[derive(Debug)]
 pub struct FilesystemLocal {
     root: Utf8PathBuf,
@@ -23,6 +24,7 @@ pub struct FilesystemLocal {
 }
 
 impl FilesystemLocal {
+    /// Creates a new [`FilesystemLocal`] at the given `root` path.
     pub fn new(root: &Utf8Path) -> Result<Self> {
         if !root.exists() {
             return Err(Error::PathDoesNotExist);

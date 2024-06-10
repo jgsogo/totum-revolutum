@@ -13,6 +13,9 @@ enum FileCloseMessage<FileImpl: File> {
     Stop,
 }
 
+/// An object that runs a thread in the background to execute a function on the generic `FileImpl` objects.
+/// These messages are sent when the [`File`] objects returned from [`FilesystemAsyncDrop::file_wrapped`]
+/// are dropped.
 #[derive(Debug)]
 pub struct FilesystemAsyncDrop<FileImpl: File + 'static> {
     tx_file_close: Sender<FileCloseMessage<FileImpl>>,
@@ -20,12 +23,13 @@ pub struct FilesystemAsyncDrop<FileImpl: File + 'static> {
 }
 
 impl<FileImpl: File + 'static> FilesystemAsyncDrop<FileImpl> {
+    /// Spawn a thread listening to drop messages from the [`File`] objects returned from [`FilesystemAsyncDrop::file_wrapped`].
+    /// The wrapped files are passed to the `func` given in the argument.
     pub fn new<F, Fut>(func: F) -> Self
     where
         F: Fn(FileImpl) -> Fut + Send + 'static,
         Fut: Future<Output = Result<()>> + Send + 'static,
     {
-        // Spawns a thread that will execute async operation called from File drop
         let (tx, rx) = flume::unbounded::<FileCloseMessage<FileImpl>>();
         let t = tokio::spawn(async move {
             while let Ok(msg) = rx.recv_async().await {
@@ -69,6 +73,7 @@ impl<FileImpl: File + 'static> FilesystemAsyncDrop<FileImpl> {
     }
 }
 
+/// A wrapper over [`FileImpl`] that sends the message to [`FilesystemAsyncDrop`] when it is dropped.
 struct FileAsyncDrop<FileImpl: File> {
     /// The object representing the file
     file: Option<FileImpl>,
