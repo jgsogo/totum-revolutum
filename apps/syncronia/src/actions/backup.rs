@@ -26,9 +26,9 @@ impl<
         'action,
         FsLhs: Filesystem + FilesystemRead + Sync + 'static,
         FsRhs: Filesystem + FilesystemRead + Sync + 'static,
-    > ActionRun<FsLhs::Metadata, FsRhs::Metadata> for Backup<'action, FsLhs, FsRhs>
+    > ActionRun for Backup<'action, FsLhs, FsRhs>
 {
-    async fn run_with_both(&self, lhs: &FsLhs::Metadata, rhs: &FsRhs::Metadata) -> anyhow::Result<()> {
+    async fn run_with_both(&self, lhs: &dyn FileMetadata, rhs: &dyn FileMetadata) -> anyhow::Result<()> {
         match self.on_conflict {
             OnConflict::OverrideRemote => {
                 info!("Override remote '{}'", lhs.path());
@@ -44,7 +44,7 @@ impl<
         Ok(())
     }
 
-    async fn run_with_lhs(&self, _lhs: &FsLhs::Metadata) -> anyhow::Result<()> {
+    async fn run_with_lhs(&self, _lhs: &dyn FileMetadata) -> anyhow::Result<()> {
         todo!("not impl");
         // let relative_path = self._lhs_fs.rel_path(lhs.path())?;
         // info!("Copy to remote '{relative_path}'");

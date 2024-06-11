@@ -5,21 +5,21 @@ use crate::FileMetadata;
 /// It is used typically on a two way diff algorithm to return the results from the diff, where
 /// the tuple contains one file (`lhs`) from the LHS [`crate::Filesystem`], and the other file
 /// (`rhs`) from the RHS [`crate::Filesystem`].
-pub struct FilePair<LHS: FileMetadata, RHS: FileMetadata> {
-    pub lhs: Option<LHS>,
-    pub rhs: Option<RHS>,
+pub struct FilePair {
+    pub lhs: Option<Box<dyn FileMetadata>>,
+    pub rhs: Option<Box<dyn FileMetadata>>,
 }
 
-impl<LHS: FileMetadata, RHS: FileMetadata> FilePair<LHS, RHS> {
-    fn new(lhs: Option<LHS>, rhs: Option<RHS>) -> FilePair<LHS, RHS> {
-        FilePair::<LHS, RHS> { lhs, rhs }
+impl FilePair {
+    fn new(lhs: Option<Box<dyn FileMetadata>>, rhs: Option<Box<dyn FileMetadata>>) -> FilePair {
+        FilePair { lhs, rhs }
     }
 
-    pub fn new_from_lhs(lhs: LHS) -> FilePair<LHS, RHS> {
+    pub fn new_from_lhs(lhs: Box<dyn FileMetadata>) -> FilePair {
         Self::new(Some(lhs), None)
     }
 
-    pub fn new_from_rhs(rhs: RHS) -> FilePair<LHS, RHS> {
+    pub fn new_from_rhs(rhs: Box<dyn FileMetadata>) -> FilePair {
         Self::new(None, Some(rhs))
     }
 

@@ -46,7 +46,9 @@ async fn main() -> Result<()> {
             .await?;
         rx
     };
-    let _ = rx.await?;
+    if let Some(rx) = rx {
+        rx.await??;
+    }
 
     // Now copies origin to target
     let target = Utf8Path::new("target.txt");

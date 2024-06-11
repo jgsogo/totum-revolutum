@@ -1,9 +1,7 @@
 use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
 
-use crate::filesystem::{FilesystemRead, FilesystemWrite};
-use crate::Error;
-use crate::{File, Result};
+use crate::{Error, File, FilesystemRead, FilesystemWrite, Result};
 
 /// Copies the contents of the `lhs_file` [`File`] into the `rhs_file` [`File`]
 pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mut Box<dyn File>) -> Result<()> {
@@ -25,13 +23,13 @@ pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mu
 /// Copy a file from one filesystem to another. Both instances of filesystem, the `origin` path and the
 /// `target` path are provided as argument. This method returns a [`Receiver`] that the caller can use to await
 /// for the operation to complete (target file is dropped and underlying filesystem has performed any async action).
-pub async fn copy_file<'action, FsLhs: FilesystemRead, FsRhs: FilesystemRead + FilesystemWrite>(
+pub async fn copy_file<'action, FsLhs: FilesystemRead + ?Sized, FsRhs: FilesystemRead + FilesystemWrite + ?Sized>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action FsRhs,
     origin: &Utf8Path,
     target: &Utf8Path,
     force: bool,
-) -> Result<Receiver<Result<()>>> {
+) -> Result<Option<Receiver<Result<()>>>> {
     if !force && rhs_fs.exists(target).await? {
         return Err(Error::TargetFileExists);
     }
@@ -56,7 +54,9 @@ mod tests {
             f1.write_all(&content).await.unwrap();
             rx
         };
-        let _ = rx.await;
+        if let Some(rx) = rx {
+            rx.await.unwrap().unwrap();
+        }
         fs
     }
 
@@ -102,8 +102,7 @@ mod tests {
         assert_ne!(file_content, &*rhs_current_content);
 
         // We copy and now we get the same content
-        let r = copy_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, true).await?;
-        let _ = r.await.unwrap();
+        copy_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, true).await?;
 
         let mut rhs_current_content = Vec::new();
         rhs_fs

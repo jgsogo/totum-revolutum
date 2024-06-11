@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 /// An object providing access to an opened file inside a [`crate::Filesystem`]
-pub trait File: Send {
+pub trait File: Send + Sync {
     /// Reads all bytes from the byte stream.
     ///
     /// All bytes read from this stream will be appended to the specified buffer `buf`.
@@ -24,4 +24,10 @@ pub trait File: Send {
 
     /// Write an entire buffer into the file
     async fn write_all(&mut self, buf: &[u8]) -> Result<()>;
+
+    /// Synchronizes any buffered content and metadata.
+    ///
+    /// This can be used to handle errors that would otherwise only be caught when the file
+    /// is closed. When a file is dropped, errors in synchronizing this in-memory data are ignored.
+    async fn sync_all(&self) -> Result<()>;
 }

@@ -6,7 +6,6 @@ use tracing::{debug, info};
 
 use filesystem::impls::FilesystemLocalTemp;
 use filesystem::{FilesystemRead, FilesystemWrite};
-use filesystem_pcloud::RemoteMetadata;
 
 use super::db::Database;
 use super::models;
@@ -18,15 +17,13 @@ use super::AppDirs;
 const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
-pub struct PhotoDB<'a, T: Database, RemoteStorage: FilesystemRead<Metadata = RemoteMetadata>> {
+pub struct PhotoDB<'a, T: Database, RemoteStorage: FilesystemRead> {
     db: T,
     app_dir: &'a AppDirs,
     storage: RemoteStorage,
 }
 
-impl<'a, T: Database, RemoteStorage: FilesystemRead<Metadata = RemoteMetadata> + FilesystemWrite>
-    PhotoDB<'a, T, RemoteStorage>
-{
+impl<'a, T: Database, RemoteStorage: FilesystemRead + FilesystemWrite> PhotoDB<'a, T, RemoteStorage> {
     pub async fn new(db: T, storage: RemoteStorage, app_dir: &'a AppDirs) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote storage",
@@ -89,12 +86,12 @@ impl<'a, T: Database, RemoteStorage: FilesystemRead<Metadata = RemoteMetadata> +
         self.storage.create_dir_all(filepath.parent().unwrap()).await?;
         filesystem::actions::copy_file(&tmp_filesystem, &self.storage, &photo, &filepath, false).await?;
         debug!("Get metadata from uploaded file");
-        let metadata = self.storage.get_metadata(&filepath).await?;
+        let _metadata = self.storage.get_metadata(&filepath).await?;
 
         // Store the data in the database
         use crate::schema::photos;
         let new_photo = models::NewPhoto {
-            fileid: &(metadata.fileid().inner() as i64),
+            fileid: &(0i64), // FIXME: I need the fileid here
             path: filepath.as_str(),
             processed: &true,
         };

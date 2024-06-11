@@ -53,7 +53,9 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
         f.write_all(&content).await?;
         rx
     };
-    let _ = rx.await?;
+    if let Some(rx) = rx {
+        rx.await??;
+    }
 
     // Open and read
     {

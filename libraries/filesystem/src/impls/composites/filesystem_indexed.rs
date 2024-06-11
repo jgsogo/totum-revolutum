@@ -20,6 +20,10 @@ impl File for FileToIndex {
     async fn write_all(&mut self, _buf: &[u8]) -> crate::Result<()> {
         todo!()
     }
+
+    async fn sync_all(&self) -> crate::Result<()> {
+        todo!()
+    }
 }
 
 /// A filesystem implementation that uses an index and a storage. Read operations are done in the

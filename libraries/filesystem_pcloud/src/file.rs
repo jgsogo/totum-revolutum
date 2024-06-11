@@ -24,13 +24,6 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Remot
     pub fn new(file: FileOpen, pcloud: Arc<HttpClient>) -> Self {
         Self { file, pcloud }
     }
-
-    pub async fn sync_all(self) -> Result<()> {
-        self.pcloud
-            .file_close(self.file.fd.clone())
-            .await
-            .map_err(|e| Error::Other(e.to_string()))
-    }
 }
 
 // impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Drop for RemoteFile<HttpClient> {
@@ -112,10 +105,10 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File 
         Ok(())
     }
 
-    // async fn sync_all(&mut self) -> Result<()> {
-    //     self.pcloud
-    //         .file_close(self.file.fd.clone())
-    //         .await
-    //         .map_err(|e| Error::Other(e.to_string()))
-    // }
+    async fn sync_all(&self) -> Result<()> {
+        self.pcloud
+            .file_close(self.file.fd.clone())
+            .await
+            .map_err(|e| Error::Other(e.to_string()))
+    }
 }

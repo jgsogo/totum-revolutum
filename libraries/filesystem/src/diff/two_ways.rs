@@ -18,20 +18,20 @@ const MAX_BUFFER: usize = 100;
 ///  * `file_pair_receiver`: this endpoint will consume the [`FilePair`]s tuples composed based on the
 ///     inputs of the other two senders. It will also receive orphan pairs, that is, files that appears
 ///     just on one of the filesystems.
-pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> (
-    flume::Sender<LHS>,
-    flume::Sender<RHS>,
-    flume::Receiver<FilePair<LHS, RHS>>,
+pub async fn run() -> (
+    flume::Sender<Box<dyn FileMetadata>>,
+    flume::Sender<Box<dyn FileMetadata>>,
+    flume::Receiver<FilePair>,
 ) {
-    let (lhs_tx, lhs_rx) = flume::bounded::<LHS>(MAX_BUFFER);
-    let (rhs_tx, rhs_rx) = flume::bounded::<RHS>(MAX_BUFFER);
+    let (lhs_tx, lhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
+    let (rhs_tx, rhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
 
-    let (report_tx, report_rx) = flume::bounded::<FilePair<LHS, RHS>>(MAX_BUFFER);
+    let (report_tx, report_rx) = flume::bounded::<FilePair>(MAX_BUFFER);
 
     tokio::spawn(async move {
         info!("Start receiving loop");
         let start = Instant::now();
-        let mut files: HashMap<String, FilePair<LHS, RHS>> = HashMap::new();
+        let mut files: HashMap<String, FilePair> = HashMap::new();
         loop {
             tokio::select! {
                 Ok(lhs_metadata) = lhs_rx.recv_async() => {
@@ -46,7 +46,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
                             }
                         },
                         None => {
-                            let _ = files.insert(key, FilePair::<LHS, RHS>::new_from_lhs(lhs_metadata));
+                            let _ = files.insert(key, FilePair::new_from_lhs(lhs_metadata));
                         }
                     }
                 },
@@ -62,7 +62,7 @@ pub async fn run<LHS: FileMetadata + 'static, RHS: FileMetadata + 'static>() -> 
                             }
                         },
                         None => {
-                            let _ = files.insert(key, FilePair::<LHS, RHS>::new_from_rhs(rhs_metadata));
+                            let _ = files.insert(key, FilePair::new_from_rhs(rhs_metadata));
                         }
                     }
                 },
