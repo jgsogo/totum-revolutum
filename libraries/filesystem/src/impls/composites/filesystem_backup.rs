@@ -11,6 +11,44 @@ use crate::actions::copy_file;
 use crate::wrappers::AsyncFileDropImpl;
 use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
+async fn backup_file<
+    LHS: FilesystemRead + FilesystemWrite + Send + 'static,
+    RHS: FilesystemRead + FilesystemWrite + Send + 'static,
+>(
+    file: Box<dyn File>,
+    rx_filesystem: Option<Receiver<Result<()>>>,
+    fs_lhs: Arc<Mutex<Option<LHS>>>,
+    fs_rhs: Arc<Mutex<Option<RHS>>>,
+    path: Utf8PathBuf,
+) -> Result<()> {
+    // Write everything down
+    file.sync_all().await?;
+    drop(file);
+    if let Some(r) = rx_filesystem {
+        r.await
+            .map_err(|e| Error::Other(format!("Error receiving drop result from rx_filesystem: {e}")))??;
+    }
+
+    // Now copy from the lhs filesystem to the rhs filesystem
+    let fs_lhs = fs_lhs.lock().await;
+    let fs_rhs = fs_rhs.lock().await;
+    let rx_rhs = copy_file(
+        fs_lhs.as_ref().unwrap(),
+        fs_rhs.deref().as_ref().unwrap(),
+        &path,
+        &path,
+        true,
+    )
+    .await?;
+
+    match rx_rhs {
+        Some(rx_rhs) => rx_rhs
+            .await
+            .map_err(|e| Error::Other(format!("Error receiving drop result from rx_copy_file: {e}")))?,
+        None => Ok(()),
+    }
+}
+
 /// Implements [`Filesystem`] traits operating on two filesystems at the same time. All changes are
 /// applied first to the LHS filesystem and then applied to the RHS filesystem:
 ///  * Read operations only run on the LHS
@@ -46,35 +84,7 @@ impl<
                       fs_lhs: Arc<Mutex<Option<LHS>>>,
                       path: Utf8PathBuf| {
                     let filesytem_rhs = filesytem_rhs.clone();
-                    async move {
-                        // Write everything down
-                        file.sync_all().await?;
-                        drop(file);
-                        if let Some(r) = rx_filesystem {
-                            r.await.map_err(|e| {
-                                Error::Other(format!("Error receiving drop result from rx_filesystem: {e}"))
-                            })??;
-                        }
-
-                        // Now copy from the lhs filesystem to the rhs filesystem
-                        let fs_lhs = fs_lhs.lock().await;
-                        let fs_rhs = filesytem_rhs.lock().await;
-                        let rx_rhs = copy_file(
-                            fs_lhs.as_ref().unwrap(),
-                            fs_rhs.deref().as_ref().unwrap(),
-                            &path,
-                            &path,
-                            true,
-                        )
-                        .await?;
-
-                        match rx_rhs {
-                            Some(rx_rhs) => rx_rhs.await.map_err(|e| {
-                                Error::Other(format!("Error receiving drop result from rx_copy_file: {e}"))
-                            })?,
-                            None => Ok(()),
-                        }
-                    }
+                    async move { backup_file(file, rx_filesystem, fs_lhs, filesytem_rhs, path).await }
                 },
             ),
         );
