@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 
 use filesystem::diff::{two_ways_run, FilePair};
-use filesystem::{FileMetadata, Filesystem};
+use filesystem::{FileMetadata, Filesystem, FilesystemRead};
 
 use crate::actions::action_run::ActionRun;
 use crate::storage::config;
@@ -73,7 +73,10 @@ async fn work_on_results<FsLhsMetadata: FileMetadata + 'static, FsRhsMetadata: F
     Ok(())
 }
 
-pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
+pub async fn run<
+    FsLhs: Filesystem + FilesystemRead + Sync + 'static,
+    FsRhs: Filesystem + FilesystemRead + Sync + 'static,
+>(
     lhs_fs: FsLhs,
     rhs_fs: FsRhs,
     config: &config::Config,

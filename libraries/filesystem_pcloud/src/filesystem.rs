@@ -7,7 +7,7 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
-use filesystem::{Error, File, Filesystem};
+use filesystem::{Error, File, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite};
 use filesystem::{FilesystemAsyncDrop, Result};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
@@ -89,6 +89,13 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
 
 #[async_trait]
 impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
+    async fn sync_all(mut self) -> Result<()> {
+        self.fs_async_drop.flush().await
+    }
+}
+
+#[async_trait]
+impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for FilesystemPCloud<HttpClient> {
     type Metadata = RemoteMetadata;
 
     async fn walk_directory(
@@ -158,6 +165,29 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(r.is_some())
     }
 
+    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+        let path = self.root_path.join(self.check_path(path)?);
+        let path: PCloudFile = path
+            .try_into()
+            .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
+
+        //let relative_path = v.strip_prefix(self.root())?;
+        let fd = self
+            .pcloud
+            .file_open(Flags::empty(), FileOpenPath::File(path))
+            .await
+            .map_err(|e| Error::Other(e.to_string()))?;
+
+        let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
+        // We can drop the receiver here, the file is opened in read-only mode so there is nothing
+        // to sync when it is dropped
+        let (file, _) = self.fs_async_drop.file_wrapped(f);
+        Ok(file)
+    }
+}
+
+#[async_trait]
+impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemWrite for FilesystemPCloud<HttpClient> {
     async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
         let rel_path = self.check_path(path)?;
         let filename = rel_path.file_name().ok_or(Error::NotAFilepath)?;
@@ -194,26 +224,6 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(self.fs_async_drop.file_wrapped(f))
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
-        let path = self.root_path.join(self.check_path(path)?);
-        let path: PCloudFile = path
-            .try_into()
-            .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
-
-        //let relative_path = v.strip_prefix(self.root())?;
-        let fd = self
-            .pcloud
-            .file_open(Flags::empty(), FileOpenPath::File(path))
-            .await
-            .map_err(|e| Error::Other(e.to_string()))?;
-
-        let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
-        // We can drop the receiver here, the file is opened in read-only mode so there is nothing
-        // to sync when it is dropped
-        let (file, _) = self.fs_async_drop.file_wrapped(f);
-        Ok(file)
-    }
-
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
         let rel_path = self.check_path(path)?;
         self.pcloud
@@ -222,7 +232,10 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
+}
 
+#[async_trait]
+impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRemove for FilesystemPCloud<HttpClient> {
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
         let path = self.root_path.join(self.check_path(path)?);
         let input_file = path
@@ -257,10 +270,6 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
-    }
-
-    async fn sync_all(mut self) -> Result<()> {
-        self.fs_async_drop.flush().await
     }
 }
 

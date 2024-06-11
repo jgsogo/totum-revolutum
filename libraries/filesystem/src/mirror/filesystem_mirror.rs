@@ -4,10 +4,11 @@ use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use tokio::sync::oneshot::Receiver;
+use tokio::sync::Mutex;
 
 use crate::actions::copy_file;
 use crate::filesystem_async_drop::FilesystemAsyncDrop;
-use crate::{File, Filesystem, Result};
+use crate::{Error, File, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 struct FileMirror {
     file: Box<dyn File>,
@@ -31,27 +32,36 @@ impl File for FileMirror {
 }
 
 /// Applies the same changes to two [`Filesystem`] implementations. Changes are applied on the first
-/// one and then mirrored to the second.
+/// one and then mirrored to the second. If the action on the first fails, the second won't be
+/// executed, but the action won't be rolled back on the first if the second fails.
 ///
 /// Note.- It´s up to the user to ensure that both [`Filesystem`] instances contain the same files
-/// (or the operations running on them, only touch files that are present on both).
+/// (or the operations running on them only touch files that are present on both). See method
+/// [`FilesystemMirror::sync`].
 pub struct FilesystemMirror<TFilesystem1: Filesystem, TFilesystem2: Filesystem> {
-    filesystem1: Option<Arc<TFilesystem1>>,
-    filesystem2: Option<Arc<TFilesystem2>>,
+    filesystem1: Arc<Mutex<Option<TFilesystem1>>>,
+    filesystem2: Arc<Mutex<Option<TFilesystem2>>>,
 
     fs_async_drop: FilesystemAsyncDrop<FileMirror>,
 }
 
-impl<TFilesystem1: Filesystem + Send + 'static, TFilesystem2: Filesystem + Send + 'static>
-    FilesystemMirror<TFilesystem1, TFilesystem2>
+impl<
+        TFilesystem1: Filesystem + FilesystemRead + Sync + Send + 'static,
+        TFilesystem2: Filesystem + FilesystemRead + FilesystemWrite + Sync + Send + 'static,
+    > FilesystemMirror<TFilesystem1, TFilesystem2>
 {
+    /// Creates a new [`FileMirror`] using the given filesystems with default behavior: after a file
+    /// is created in `filesystem1`, the function [`copy_file`] is executed to copy the contents to
+    /// `filesystem2`.
     pub fn new(filesystem1: TFilesystem1, filesystem2: TFilesystem2) -> Self {
-        let filesystem1 = Arc::new(filesystem1);
-        let filesystem2 = Arc::new(filesystem2);
+        let filesystem1 = Arc::new(Mutex::new(Some(filesystem1)));
+        let filesystem2 = Arc::new(Mutex::new(Some(filesystem2)));
 
         let fs1 = filesystem1.clone();
         let fs2 = filesystem2.clone();
         let fs_async_drop = FilesystemAsyncDrop::new(move |file_mirror: FileMirror| {
+            // TODO: It would be great to implement this "copy" in terms of streaming: the data
+            // TODO: is being copied to filesystem2 at the same time it is copied to filesytem1.
             let fs1 = fs1.clone();
             let fs2 = fs2.clone();
             async move {
@@ -62,7 +72,14 @@ impl<TFilesystem1: Filesystem + Send + 'static, TFilesystem2: Filesystem + Send 
                 let _ = file_mirror.fs1_rx_closed.await;
 
                 // Copy contents to filesystem2
-                let rx = copy_file(fs1.as_ref(), fs2.as_ref(), &file_mirror.path, &file_mirror.path, true).await?;
+                let rx = copy_file(
+                    fs1.lock().await.as_ref().unwrap(),
+                    fs2.lock().await.as_ref().unwrap(),
+                    &file_mirror.path,
+                    &file_mirror.path,
+                    true,
+                )
+                .await?;
                 // Wait until file is closed and synced in filesystem2
                 let _ = rx.await;
 
@@ -71,15 +88,78 @@ impl<TFilesystem1: Filesystem + Send + 'static, TFilesystem2: Filesystem + Send 
         });
 
         Self {
-            filesystem1: Some(filesystem1),
-            filesystem2: Some(filesystem2),
+            filesystem1,
+            filesystem2,
             fs_async_drop,
         }
+    }
+
+    /// Syncs the contents of both filesystems. In this [`FilesystemMirror`] it means that all the
+    /// files from one filesystem will be available in the other and viceversa (running this method
+    /// can take a while if many files need to be copied).
+    pub fn sync(&self) -> Result<()> {
+        todo!("not implemented")
+        // FIXME: Implement in terms of some external `action`: backup, sync, mirror,...
     }
 }
 
 #[async_trait]
-impl<TFilesystem1: Filesystem + Send, TFilesystem2: Filesystem + Send> Filesystem
+impl<TFilesystem1: Filesystem + Sync + Send, TFilesystem2: Filesystem + Sync + Send> Filesystem
+    for FilesystemMirror<TFilesystem1, TFilesystem2>
+{
+    async fn sync_all(mut self) -> Result<()> {
+        self.fs_async_drop.flush().await?;
+
+        let fs1 = self.filesystem1.lock().await.take().unwrap();
+        let r1 = fs1.sync_all().await;
+
+        let fs2 = self.filesystem2.lock().await.take().unwrap();
+        let r2 = fs2.sync_all().await;
+
+        if r1.is_err() || r2.is_err() {
+            // TODO: Return the content of the error
+            return Err(Error::Other("Error executing sync_all on filesystems".to_string()));
+        }
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl<
+        TFilesystem1: Filesystem + FilesystemWrite + Sync + Send,
+        TFilesystem2: Filesystem + FilesystemWrite + Sync + Send,
+    > FilesystemWrite for FilesystemMirror<TFilesystem1, TFilesystem2>
+{
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
+        let (file, closed_fs1_rx) = self.filesystem1.lock().await.as_ref().unwrap().create(path).await?;
+        let file_mirror = FileMirror {
+            file,
+            path: path.to_path_buf(),
+            fs1_rx_closed: closed_fs1_rx,
+        };
+        Ok(self.fs_async_drop.file_wrapped(file_mirror))
+    }
+
+    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+        self.filesystem1
+            .lock()
+            .await
+            .as_ref()
+            .unwrap()
+            .create_dir_all(path)
+            .await?;
+        self.filesystem2
+            .lock()
+            .await
+            .as_ref()
+            .unwrap()
+            .create_dir_all(path)
+            .await
+    }
+}
+
+#[async_trait]
+impl<TFilesystem1: Filesystem + FilesystemRead + Sync + Send, TFilesystem2: Filesystem + Sync + Send> FilesystemRead
     for FilesystemMirror<TFilesystem1, TFilesystem2>
 {
     type Metadata = TFilesystem1::Metadata;
@@ -91,6 +171,8 @@ impl<TFilesystem1: Filesystem + Send, TFilesystem2: Filesystem + Send> Filesyste
         custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
         self.filesystem1
+            .lock()
+            .await
             .as_ref()
             .unwrap()
             .walk_directory(tx, threads, custom_ignore_filename)
@@ -98,59 +180,62 @@ impl<TFilesystem1: Filesystem + Send, TFilesystem2: Filesystem + Send> Filesyste
     }
 
     async fn get_metadata(&self, path: &Utf8Path) -> Result<Self::Metadata> {
-        self.filesystem1.as_ref().unwrap().get_metadata(path).await
+        self.filesystem1.lock().await.as_ref().unwrap().get_metadata(path).await
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        self.filesystem1.as_ref().unwrap().exists(path).await
-    }
-
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
-        let (file, closed_fs1_rx) = self.filesystem1.as_ref().unwrap().create(path).await?;
-        let file_mirror = FileMirror {
-            file,
-            path: path.to_path_buf(),
-            fs1_rx_closed: closed_fs1_rx,
-        };
-        Ok(self.fs_async_drop.file_wrapped(file_mirror))
+        self.filesystem1.lock().await.as_ref().unwrap().exists(path).await
     }
 
     async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
         // It's read-only, I don't need to do anything on the other filesystem, just return the
         // file object from the "master" filesystem
-        self.filesystem1.as_ref().unwrap().open(path).await
+        self.filesystem1.lock().await.as_ref().unwrap().open(path).await
     }
+}
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem1.as_ref().unwrap().create_dir_all(path).await?;
-        self.filesystem2.as_ref().unwrap().create_dir_all(path).await
-    }
-
+#[async_trait]
+impl<
+        TFilesystem1: Filesystem + FilesystemRemove + Sync + Send,
+        TFilesystem2: Filesystem + FilesystemRemove + Sync + Send,
+    > FilesystemRemove for FilesystemMirror<TFilesystem1, TFilesystem2>
+{
     async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem1.as_ref().unwrap().remove_file(path).await?;
-        self.filesystem2.as_ref().unwrap().remove_file(path).await
+        self.filesystem1
+            .lock()
+            .await
+            .as_ref()
+            .unwrap()
+            .remove_file(path)
+            .await?;
+        self.filesystem2.lock().await.as_ref().unwrap().remove_file(path).await
     }
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem1.as_ref().unwrap().remove_dir(path).await?;
-        self.filesystem2.as_ref().unwrap().remove_dir(path).await
+        self.filesystem1.lock().await.as_ref().unwrap().remove_dir(path).await?;
+        self.filesystem2.lock().await.as_ref().unwrap().remove_dir(path).await
     }
 
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem1.as_ref().unwrap().remove_dir_all(path).await?;
-        self.filesystem2.as_ref().unwrap().remove_dir_all(path).await
-    }
-
-    async fn sync_all(mut self) -> Result<()> {
-        // TODO: Execute sync_all in both filesystems.... after closing the thread
-        todo!("not imple")
+        self.filesystem1
+            .lock()
+            .await
+            .as_ref()
+            .unwrap()
+            .remove_dir_all(path)
+            .await?;
+        self.filesystem2
+            .lock()
+            .await
+            .as_ref()
+            .unwrap()
+            .remove_dir_all(path)
+            .await
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::time;
-
     use tempfile::tempdir;
 
     use crate::local::FilesystemLocal;
@@ -195,9 +280,9 @@ mod tests {
         };
         let _ = rx.await;
 
-        // TODO: I need to sleep here so the changes are propagated to the other filesystem. Instead, I should return
-        // TODO: receiver so I can await on it until all the tasks are done.
-        tokio::time::sleep(time::Duration::from_millis(2000)).await;
+        // // TODO: I need to sleep here so the changes are propagated to the other filesystem. Instead, I should return
+        // // TODO: receiver so I can await on it until all the tasks are done.
+        // tokio::time::sleep(time::Duration::from_millis(2000)).await;
 
         let fs1_filepath = fs1_root.join(&filepath);
         let c1 = std::fs::read(&fs1_filepath).unwrap();
