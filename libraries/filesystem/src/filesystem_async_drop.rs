@@ -17,7 +17,7 @@ enum FileCloseMessage<FileImpl: File> {
 /// These messages are sent when the [`File`] objects returned from [`FilesystemAsyncDrop::file_wrapped`]
 /// are dropped.
 ///
-/// TODO: Make this a wrapper over [`Filesystem`]. That way we can just wrap any Filesystem implementation
+/// TODO: Make this a wrapper over [`crate::Filesystem`]. That way we can just wrap any Filesystem implementation
 /// TODO: in a transparent way and the user only needs to provide the function to execute when the
 /// TODO: files are dropped.
 #[derive(Debug)]

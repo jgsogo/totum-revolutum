@@ -50,7 +50,7 @@ impl<
         TFilesystem2: Filesystem + FilesystemRead + FilesystemWrite + Sync + Send + 'static,
     > FilesystemMirror<TFilesystem1, TFilesystem2>
 {
-    /// Creates a new [`FileMirror`] using the given filesystems with default behavior: after a file
+    /// Creates a new [`FilesystemMirror`] using the given filesystems with default behavior: after a file
     /// is created in `filesystem1`, the function [`copy_file`] is executed to copy the contents to
     /// `filesystem2`.
     pub fn new(filesystem1: TFilesystem1, filesystem2: TFilesystem2) -> Self {
