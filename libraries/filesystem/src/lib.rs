@@ -14,9 +14,6 @@ pub mod utils;
 
 pub mod actions;
 
-#[cfg(feature = "local_temp")]
-pub mod local_temp;
-
 #[cfg(feature = "diff")]
 pub mod diff;
 pub mod error;

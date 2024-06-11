@@ -45,7 +45,7 @@ pub async fn copy_file<'action, FsLhs: FilesystemRead, FsRhs: FilesystemRead + F
 mod tests {
     use camino::Utf8PathBuf;
 
-    use crate::local_temp::FilesystemLocalTemp;
+    use crate::impls::FilesystemLocalTemp;
 
     use super::*;
 

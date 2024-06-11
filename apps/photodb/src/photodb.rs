@@ -4,7 +4,7 @@ use diesel::{RunQueryDsl, SelectableHelper};
 use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
-use filesystem::local_temp::FilesystemLocalTemp;
+use filesystem::impls::FilesystemLocalTemp;
 use filesystem::{FilesystemRead, FilesystemWrite};
 use filesystem_pcloud::RemoteMetadata;
 
