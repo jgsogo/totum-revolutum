@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use camino::Utf8PathBuf;
-use filesystem::local_temp::FilesystemLocalTemp;
+use filesystem::impls::FilesystemLocalTemp;
 use std::fmt::{Display, Formatter};
 
 /// Manage all the directories related to a [`super::PhotoDB`] application

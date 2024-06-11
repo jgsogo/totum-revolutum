@@ -11,15 +11,16 @@ rust_library_tests_and_docs(
     ),
     test_deps = [
         "@crates_libraries//:anyhow",
+        "@crates_libraries//:headers",
     ],
     test_suite_deps = [
         "@crates_libraries//:anyhow",
+        "@crates_libraries//:headers",
     ],
     deps = all_crate_deps(
         normal = True,
     ) + [
         "@totum//libraries/filesystem",
-        "@totum//libraries/http_utils",
         "@totum//libraries/pcloud_sdk",
     ],
 )
@@ -36,7 +37,6 @@ rust_binary(
         ":filesystem_pcloud",
         "@crates_libraries//:anyhow",
         "@totum//libraries/filesystem",
-        "@totum//libraries/http_utils",
         "@totum//libraries/pcloud_sdk",
     ],
 )

@@ -28,7 +28,7 @@ impl File for FileToIndex {
 /// We only want to hit the storage to read the actual content of the files and to save them, but
 /// every other operation runs against the database to save time/bandwidth.
 ///
-/// This implementation is very similar to [`crate::mirror::FilesystemMirror`], it only changes the
+/// This implementation is very similar to [`crate::impls::composites::FilesystemMirror`], it only changes the
 /// preferred filesystem used depending on the operation.
 pub struct FilesystemIndexed<TFilesystem1: Filesystem, TFilesystem2: Filesystem> {
     _index: Arc<Mutex<Option<TFilesystem1>>>,
