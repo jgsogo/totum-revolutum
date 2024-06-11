@@ -19,5 +19,5 @@ pub mod diff;
 pub mod error;
 mod filesystem_async_drop;
 
+pub mod composites;
 pub mod impls;
-pub mod workflows;
