@@ -16,6 +16,10 @@ enum FileCloseMessage<FileImpl: File> {
 /// An object that runs a thread in the background to execute a function on the generic `FileImpl` objects.
 /// These messages are sent when the [`File`] objects returned from [`FilesystemAsyncDrop::file_wrapped`]
 /// are dropped.
+///
+/// TODO: Make this a wrapper over [`Filesystem`]. That way we can just wrap any Filesystem implementation
+/// TODO: in a transparent way and the user only needs to provide the function to execute when the
+/// TODO: files are dropped.
 #[derive(Debug)]
 pub struct FilesystemAsyncDrop<FileImpl: File + 'static> {
     tx_file_close: Sender<FileCloseMessage<FileImpl>>,

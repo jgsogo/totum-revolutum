@@ -20,5 +20,4 @@ pub mod error;
 mod filesystem_async_drop;
 
 pub mod impls;
-pub mod indexed;
 pub mod workflows;
