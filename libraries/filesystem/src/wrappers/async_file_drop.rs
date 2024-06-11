@@ -17,8 +17,10 @@ type FileCloseMessageData = (
     Utf8PathBuf,
     Sender<Result<()>>,
 );
+
 enum FileCloseMessage {
-    FileCloseMessage(FileCloseMessageData),
+    FromReadOnlyFile(FileCloseMessageData),
+    FromWriteFile(FileCloseMessageData),
     Stop,
 }
 
@@ -29,6 +31,9 @@ pub struct AsyncFileDropImpl<T: FilesystemWrite> {
 
     tx_file_close: flume::Sender<FileCloseMessage>,
     thread_file_close: Option<JoinHandle<()>>,
+
+    wrap_create: bool,
+    wrap_open: bool,
 }
 
 impl<T: FilesystemWrite + 'static> AsyncFileDropImpl<T> {
@@ -38,19 +43,28 @@ impl<T: FilesystemWrite + 'static> AsyncFileDropImpl<T> {
     ///     [`FilesystemWrite::create`] is the method that we are actually wrapping here
     ///
     ///  * `func`: Function to execute on the file just before it's dropped.
-    pub fn new<F, Fut>(filesystem: T, func: F) -> Self
+    pub fn new<F, Fut>(filesystem: T, func_for_readonly_file: Option<F>, func_for_write_file: Option<F>) -> Self
     where
         F: Fn(Box<dyn File>, Option<Receiver<Result<()>>>, Arc<Mutex<Option<T>>>, Utf8PathBuf) -> Fut + Send + 'static,
         Fut: Future<Output = Result<()>> + Send + 'static,
     {
+        let wrap_open = func_for_readonly_file.is_some();
+        let wrap_create = func_for_write_file.is_some();
+
         let filesystem = Arc::new(Mutex::new(Some(filesystem)));
         let fs = filesystem.clone();
         let (tx, rx) = flume::unbounded::<FileCloseMessage>();
         let t = tokio::spawn(async move {
             while let Ok(msg) = rx.recv_async().await {
                 match msg {
-                    FileCloseMessage::FileCloseMessage((file, rx_filesystem, path, sender)) => {
-                        let r = func(file, rx_filesystem, fs.clone(), path).await;
+                    FileCloseMessage::FromReadOnlyFile((file, rx_filesystem, path, sender)) => {
+                        let r = func_for_readonly_file.as_ref().unwrap()(file, rx_filesystem, fs.clone(), path).await;
+                        if sender.send(r).is_err() {
+                            debug!("Error sending file close result. Receiver might have been dropped (and it's fine)")
+                        };
+                    }
+                    FileCloseMessage::FromWriteFile((file, rx_filesystem, path, sender)) => {
+                        let r = func_for_write_file.as_ref().unwrap()(file, rx_filesystem, fs.clone(), path).await;
                         if sender.send(r).is_err() {
                             debug!("Error sending file close result. Receiver might have been dropped (and it's fine)")
                         };
@@ -67,22 +81,23 @@ impl<T: FilesystemWrite + 'static> AsyncFileDropImpl<T> {
             filesystem,
             tx_file_close: tx,
             thread_file_close: Some(t),
+            wrap_open,
+            wrap_create,
         }
     }
 
     pub fn new_call_sync_all(filesystem: T) -> Self {
-        Self::new(
-            filesystem,
-            |file: Box<dyn File>, rx_filesystem: Option<Receiver<Result<()>>>, _fs, _path| async move {
-                file.sync_all().await?;
-                drop(file);
-                if let Some(r) = rx_filesystem {
-                    r.await
-                        .map_err(|e| Error::Other(format!("Error receiving drop result from rx_filesystem: {e}")))??;
-                }
-                Ok(())
-            },
-        )
+        let sync_all = |file: Box<dyn File>, rx_filesystem: Option<Receiver<Result<()>>>, _fs, _path| async move {
+            file.sync_all().await?;
+            drop(file);
+            if let Some(r) = rx_filesystem {
+                r.await
+                    .map_err(|e| Error::Other(format!("Error receiving drop result from rx_filesystem: {e}")))??;
+            }
+            Ok(())
+        };
+
+        Self::new(filesystem, Some(sync_all), Some(sync_all))
     }
 }
 
@@ -104,16 +119,21 @@ impl<T: Filesystem + FilesystemWrite> Filesystem for AsyncFileDropImpl<T> {
 #[async_trait]
 impl<T: FilesystemWrite> FilesystemWrite for AsyncFileDropImpl<T> {
     async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        let (file, rx_filesystem) = self.filesystem.lock().await.as_ref().unwrap().create(path).await?;
-        let (tx, rx) = tokio::sync::oneshot::channel();
-        let ret = FileAsyncDrop {
-            file: Some(file),
-            rx_filesystem,
-            path: Some(path.to_path_buf()),
-            tx_filesystem_close: self.tx_file_close.clone(),
-            tx_file_close: Some(tx),
-        };
-        Ok((Box::new(ret), Some(rx)))
+        if self.wrap_create {
+            let (file, rx_filesystem) = self.filesystem.lock().await.as_ref().unwrap().create(path).await?;
+            let (tx, rx) = tokio::sync::oneshot::channel();
+            let ret = FileAsyncDrop {
+                file: Some(file),
+                rx_filesystem,
+                path: Some(path.to_path_buf()),
+                tx_filesystem_close: self.tx_file_close.clone(),
+                tx_file_close: Some(tx),
+                is_readonly: false,
+            };
+            Ok((Box::new(ret), Some(rx)))
+        } else {
+            self.filesystem.lock().await.as_ref().unwrap().create(path).await
+        }
     }
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
@@ -151,8 +171,21 @@ impl<T: FilesystemWrite + FilesystemRead> FilesystemRead for AsyncFileDropImpl<T
         self.filesystem.lock().await.as_ref().unwrap().exists(path).await
     }
     async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        // I'm not wrapping the returned file here. This wrapper works only on the FilesystemWrite::create
-        self.filesystem.lock().await.as_ref().unwrap().open(path).await
+        if self.wrap_open {
+            let (file, rx_filesystem) = self.filesystem.lock().await.as_ref().unwrap().open(path).await?;
+            let (tx, rx) = tokio::sync::oneshot::channel();
+            let ret = FileAsyncDrop {
+                file: Some(file),
+                rx_filesystem,
+                path: Some(path.to_path_buf()),
+                tx_filesystem_close: self.tx_file_close.clone(),
+                tx_file_close: Some(tx),
+                is_readonly: true,
+            };
+            Ok((Box::new(ret), Some(rx)))
+        } else {
+            self.filesystem.lock().await.as_ref().unwrap().open(path).await
+        }
     }
 }
 
@@ -185,6 +218,9 @@ struct FileAsyncDrop {
     /// The receiver returned together with the file from the filesystem
     rx_filesystem: Option<Receiver<Result<()>>>,
 
+    /// Whether the file was opened in read-only mode or not.
+    is_readonly: bool,
+
     /// Path to the file
     path: Option<Utf8PathBuf>,
 
@@ -200,12 +236,18 @@ struct FileAsyncDrop {
 
 impl Drop for FileAsyncDrop {
     fn drop(&mut self) {
-        let msg = FileCloseMessage::FileCloseMessage((
+        let data = (
             self.file.take().unwrap(),
             self.rx_filesystem.take(),
             self.path.take().unwrap(),
             self.tx_file_close.take().unwrap(),
-        ));
+        );
+        let msg = if self.is_readonly {
+            FileCloseMessage::FromReadOnlyFile(data)
+        } else {
+            FileCloseMessage::FromWriteFile(data)
+        };
+
         if let Err(e) = self.tx_filesystem_close.send(msg) {
             error!("Failed to send FileCloseMessage: {e}");
         }

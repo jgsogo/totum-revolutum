@@ -2,7 +2,7 @@ use std::ops::Deref;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::Utf8Path;
+use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
@@ -37,37 +37,47 @@ impl<
         let fs_rhs = Arc::new(Mutex::new(Some(fs_rhs)));
 
         let filesytem_rhs = fs_rhs.clone();
-        let fs_with_create_backup = AsyncFileDropImpl::new(fs_lhs, move |file, rx_filesystem, fs_lhs, path| {
-            let filesytem_rhs = filesytem_rhs.clone();
-            async move {
-                // Write everything down
-                file.sync_all().await?;
-                drop(file);
-                if let Some(r) = rx_filesystem {
-                    r.await
-                        .map_err(|e| Error::Other(format!("Error receiving drop result from rx_filesystem: {e}")))??;
-                }
+        let fs_with_create_backup = AsyncFileDropImpl::new(
+            fs_lhs,
+            None,
+            Some(
+                move |file: Box<dyn File>,
+                      rx_filesystem: Option<Receiver<Result<()>>>,
+                      fs_lhs: Arc<Mutex<Option<LHS>>>,
+                      path: Utf8PathBuf| {
+                    let filesytem_rhs = filesytem_rhs.clone();
+                    async move {
+                        // Write everything down
+                        file.sync_all().await?;
+                        drop(file);
+                        if let Some(r) = rx_filesystem {
+                            r.await.map_err(|e| {
+                                Error::Other(format!("Error receiving drop result from rx_filesystem: {e}"))
+                            })??;
+                        }
 
-                // Now copy from the lhs filesystem to the rhs filesystem
-                let fs_lhs = fs_lhs.lock().await;
-                let fs_rhs = filesytem_rhs.lock().await;
-                let rx_rhs = copy_file(
-                    fs_lhs.as_ref().unwrap(),
-                    fs_rhs.deref().as_ref().unwrap(),
-                    &path,
-                    &path,
-                    true,
-                )
-                .await?;
+                        // Now copy from the lhs filesystem to the rhs filesystem
+                        let fs_lhs = fs_lhs.lock().await;
+                        let fs_rhs = filesytem_rhs.lock().await;
+                        let rx_rhs = copy_file(
+                            fs_lhs.as_ref().unwrap(),
+                            fs_rhs.deref().as_ref().unwrap(),
+                            &path,
+                            &path,
+                            true,
+                        )
+                        .await?;
 
-                match rx_rhs {
-                    Some(rx_rhs) => rx_rhs
-                        .await
-                        .map_err(|e| Error::Other(format!("Error receiving drop result from rx_copy_file: {e}")))?,
-                    None => Ok(()),
-                }
-            }
-        });
+                        match rx_rhs {
+                            Some(rx_rhs) => rx_rhs.await.map_err(|e| {
+                                Error::Other(format!("Error receiving drop result from rx_copy_file: {e}"))
+                            })?,
+                            None => Ok(()),
+                        }
+                    }
+                },
+            ),
+        );
 
         Self {
             lhs: fs_with_create_backup,
