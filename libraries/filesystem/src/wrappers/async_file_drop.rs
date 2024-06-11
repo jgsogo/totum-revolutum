@@ -150,7 +150,8 @@ impl<T: FilesystemWrite + FilesystemRead> FilesystemRead for AsyncFileDropImpl<T
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         self.filesystem.lock().await.as_ref().unwrap().exists(path).await
     }
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+        // I'm not wrapping the returned file here. This wrapper works only on the FilesystemWrite::create
         self.filesystem.lock().await.as_ref().unwrap().open(path).await
     }
 }

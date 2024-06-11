@@ -34,8 +34,9 @@ pub async fn copy_file<'action, FsLhs: FilesystemRead + ?Sized, FsRhs: Filesyste
         return Err(Error::TargetFileExists);
     }
 
+    let (mut origin_file, _) = lhs_fs.open(origin).await?;
     let (mut target_file, rx) = rhs_fs.create(target).await?;
-    copy(&mut lhs_fs.open(origin).await?, &mut target_file).await?;
+    copy(&mut origin_file, &mut target_file).await?;
     Ok(rx)
 }
 
@@ -73,7 +74,7 @@ mod tests {
         copy_file(&lhs_fs, &rhs_fs, &lhs_path, &rhs_path, false).await?;
 
         // We can read the file from the RHS
-        let mut rhs_file = rhs_fs.open(&rhs_path).await?;
+        let (mut rhs_file, _) = rhs_fs.open(&rhs_path).await?;
         let mut content_read = Vec::new();
         rhs_file.read_to_end(&mut content_read).await?;
         assert_eq!(file_content, &*content_read);
@@ -94,22 +95,16 @@ mod tests {
         assert!(r.is_err());
         // ... with a different content
         let mut rhs_current_content = Vec::new();
-        rhs_fs
-            .open(&lhs_path)
-            .await?
-            .read_to_end(&mut rhs_current_content)
-            .await?;
+        let (mut file, _) = rhs_fs.open(&lhs_path).await?;
+        file.read_to_end(&mut rhs_current_content).await?;
         assert_ne!(file_content, &*rhs_current_content);
 
         // We copy and now we get the same content
         copy_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, true).await?;
 
         let mut rhs_current_content = Vec::new();
-        rhs_fs
-            .open(&lhs_path)
-            .await?
-            .read_to_end(&mut rhs_current_content)
-            .await?;
+        let (mut file, _) = rhs_fs.open(&lhs_path).await?;
+        file.read_to_end(&mut rhs_current_content).await?;
         assert_eq!(file_content, &*rhs_current_content);
 
         Ok(())

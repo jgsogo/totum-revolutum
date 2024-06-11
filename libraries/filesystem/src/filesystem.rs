@@ -43,9 +43,10 @@ pub trait FilesystemRead {
     /// Returns true if the path points at an existing entity.
     async fn exists(&self, path: &Utf8Path) -> Result<bool>;
 
-    /// Tries to open the file requested by the argument `path` in read-only mode. Returns an object implementing
-    /// a [`File`] or an error.
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>>;
+    /// Tries to open the file requested by the argument `path` in read-only mode. Returns an
+    /// object implementing a [`File`] or an error. Some implementations may return a [`Receiver`]
+    /// that the caller can await to receive any error that may happen from the file drop procedure.
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
 }
 
 /// Filesystem abstraction, only methods that require **write access**
@@ -56,7 +57,6 @@ pub trait FilesystemWrite: Send + Sync {
     /// return a [`Receiver`] that the caller can await for a couple of reasons:
     ///  * to receive any error that may happen from the file drop procedure
     ///  * to ensure that all the in-memory data is written to the file.
-    ///
     async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
 
     /// Creates the given directory and any intermediate one

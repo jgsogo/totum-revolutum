@@ -156,7 +156,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for Files
         Ok(r.is_some())
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let path = self.root_path.join(self.check_path(path)?);
         let path: PCloudFile = path
             .try_into()
@@ -170,7 +170,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for Files
             .map_err(|e| Error::Other(e.to_string()))?;
 
         let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
-        Ok(Box::new(f))
+        Ok((Box::new(f), None))
     }
 }
 
@@ -265,6 +265,7 @@ mod tests {
     use std::collections::HashMap;
     use std::str::FromStr;
 
+    use filesystem::wrappers::AsyncFileDropImpl;
     use headers::HeaderMap;
 
     use pcloud_sdk::error::Error;
@@ -410,6 +411,7 @@ mod tests {
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(root, client).await?;
+        let fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
         let rx = {
             let filepath = Utf8Path::new("file");
@@ -514,16 +516,19 @@ mod tests {
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(root, client).await?;
+        let fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
         let filepath = Utf8Path::new("file");
 
         // Open and read
-        {
-            let mut file = fs.open(&filepath).await?;
+        let rx = {
+            let (mut file, rx) = fs.open(&filepath).await?;
             let mut content_read = Vec::new();
             file.read_to_end(&mut content_read).await?;
             assert_eq!(file_content.to_vec(), content_read);
-        }
+            rx.unwrap()
+        };
+        rx.await??;
         fs.sync_all().await?;
         Ok(())
     }
@@ -580,11 +585,13 @@ mod tests {
 
         // Create the filesystem
         let fs = FilesystemPCloud::new(root_path, client).await?;
-        {
+        let fs = AsyncFileDropImpl::new_call_sync_all(fs);
+        let rx = {
             let filepath = Utf8Path::new("nested/nested2/myfile.txt");
-            let r = fs.create(&filepath).await;
-            assert!(r.is_ok());
-        }
+            let (_, rx) = fs.create(filepath).await?;
+            rx.unwrap()
+        };
+        rx.await??;
         fs.sync_all().await?;
         Ok(())
     }

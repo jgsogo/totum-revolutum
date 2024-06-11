@@ -85,10 +85,10 @@ impl FilesystemRead for FilesystemLocal {
         let path = self.root.join(self.check_path(path)?);
         Ok(path.exists())
     }
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let path = self.root.join(self.check_path(path)?);
         let f = AsyncFile::open(path.into_std_path_buf()).await?;
-        Ok(Box::new(f))
+        Ok((Box::new(f), None))
     }
 }
 
@@ -163,7 +163,7 @@ mod tests {
 
         // Open and read
         {
-            let mut file = fs.open(&filepath).await?;
+            let (mut file, _) = fs.open(&filepath).await?;
             let mut content_read = Vec::new();
             file.read_to_end(&mut content_read).await?;
             assert_eq!(content, content_read);

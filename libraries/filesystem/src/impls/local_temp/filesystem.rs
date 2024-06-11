@@ -72,7 +72,7 @@ impl FilesystemRead for FilesystemLocalTemp {
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         self.local.exists(path).await
     }
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.local.open(path).await
     }
 }

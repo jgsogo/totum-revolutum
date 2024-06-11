@@ -111,7 +111,7 @@ impl<LHS: FilesystemWrite + FilesystemRead, RHS: FilesystemWrite> FilesystemRead
         self.lhs.exists(path).await
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.lhs.open(path).await
     }
 }
