@@ -4,7 +4,7 @@ use flume::Sender;
 use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 
-use crate::local::FilesystemLocal;
+use crate::impls::FilesystemLocal;
 use crate::{File, Filesystem};
 use crate::{FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 

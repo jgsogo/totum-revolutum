@@ -238,7 +238,7 @@ impl<
 mod tests {
     use tempfile::tempdir;
 
-    use crate::local::FilesystemLocal;
+    use crate::impls::FilesystemLocal;
 
     use super::*;
 

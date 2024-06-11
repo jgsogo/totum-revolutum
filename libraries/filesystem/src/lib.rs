@@ -17,9 +17,6 @@ pub mod actions;
 #[cfg(feature = "local_temp")]
 pub mod local_temp;
 
-#[cfg(feature = "local")]
-pub mod local;
-
 #[cfg(feature = "diff")]
 pub mod diff;
 pub mod error;
@@ -27,4 +24,5 @@ mod filesystem_async_drop;
 
 pub mod mirror;
 
+pub mod impls;
 pub mod indexed;
