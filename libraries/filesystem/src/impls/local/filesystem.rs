@@ -9,7 +9,7 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::info;
 
-use crate::filesystem_async_drop::FilesystemAsyncDrop;
+use crate::wrappers::FilesystemAsyncDrop;
 use crate::{Error, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 use crate::{File, Filesystem};
 

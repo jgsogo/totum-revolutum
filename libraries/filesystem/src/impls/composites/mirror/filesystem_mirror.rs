@@ -7,7 +7,7 @@ use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
 use crate::actions::copy_file;
-use crate::filesystem_async_drop::FilesystemAsyncDrop;
+use crate::wrappers::FilesystemAsyncDrop;
 use crate::{Error, File, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 struct FileMirror {

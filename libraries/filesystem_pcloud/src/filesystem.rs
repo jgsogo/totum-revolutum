@@ -7,8 +7,8 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
-use filesystem::{Error, File, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite};
-use filesystem::{FilesystemAsyncDrop, Result};
+use filesystem::wrappers::FilesystemAsyncDrop;
+use filesystem::{Error, File, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;

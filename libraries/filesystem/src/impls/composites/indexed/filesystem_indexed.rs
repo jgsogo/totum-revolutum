@@ -1,4 +1,5 @@
-use crate::{File, Filesystem, FilesystemAsyncDrop};
+use crate::wrappers::FilesystemAsyncDrop;
+use crate::{File, Filesystem};
 use async_trait::async_trait;
 use std::sync::Arc;
 use tokio::sync::Mutex;
