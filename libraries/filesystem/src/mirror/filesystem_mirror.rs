@@ -36,7 +36,8 @@ impl File for FileMirror {
 /// executed, but the action won't be rolled back on the first if the second fails.
 ///
 /// Note.- It´s up to the user to ensure that both [`Filesystem`] instances contain the same files
-/// (or the operations running on them only touch files that are present on both).
+/// (or the operations running on them only touch files that are present on both). See method
+/// [`FilesystemMirror::sync`].
 pub struct FilesystemMirror<TFilesystem1: Filesystem, TFilesystem2: Filesystem> {
     filesystem1: Arc<Mutex<Option<TFilesystem1>>>,
     filesystem2: Arc<Mutex<Option<TFilesystem2>>>,
@@ -52,13 +53,15 @@ impl<
     /// Creates a new [`FileMirror`] using the given filesystems with default behavior: after a file
     /// is created in `filesystem1`, the function [`copy_file`] is executed to copy the contents to
     /// `filesystem2`.
-    pub fn new_with_copy(filesystem1: TFilesystem1, filesystem2: TFilesystem2) -> Self {
+    pub fn new(filesystem1: TFilesystem1, filesystem2: TFilesystem2) -> Self {
         let filesystem1 = Arc::new(Mutex::new(Some(filesystem1)));
         let filesystem2 = Arc::new(Mutex::new(Some(filesystem2)));
 
         let fs1 = filesystem1.clone();
         let fs2 = filesystem2.clone();
         let fs_async_drop = FilesystemAsyncDrop::new(move |file_mirror: FileMirror| {
+            // TODO: It would be great to implement this "copy" in terms of streaming: the data
+            // TODO: is being copied to filesystem2 at the same time it is copied to filesytem1.
             let fs1 = fs1.clone();
             let fs2 = fs2.clone();
             async move {
@@ -89,6 +92,14 @@ impl<
             filesystem2,
             fs_async_drop,
         }
+    }
+
+    /// Syncs the contents of both filesystems. In this [`FilesystemMirror`] it means that all the
+    /// files from one filesystem will be available in the other and viceversa (running this method
+    /// can take a while if many files need to be copied).
+    pub fn sync(&self) -> Result<()> {
+        todo!("not implemented")
+        // FIXME: Implement in terms of some external `action`: backup, sync, mirror,...
     }
 }
 
@@ -251,8 +262,8 @@ mod tests {
             (FilesystemLocal::new(&path).unwrap(), path)
         };
 
-        let fs23 = FilesystemMirror::new_with_copy(fs2, fs3);
-        let fs12 = FilesystemMirror::new_with_copy(fs1, fs23);
+        let fs23 = FilesystemMirror::new(fs2, fs3);
+        let fs12 = FilesystemMirror::new(fs1, fs23);
 
         // If I work in fs12, changes will be available in fs1, fs2 and fs3
 

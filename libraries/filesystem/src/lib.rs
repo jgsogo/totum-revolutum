@@ -5,6 +5,7 @@ pub use error::{Error, Result};
 pub use file::File;
 pub use file_metadata::FileMetadata;
 pub use filesystem::{Filesystem, FilesystemRead, FilesystemReadAndWrite, FilesystemRemove, FilesystemWrite};
+pub use filesystem_async_drop::FilesystemAsyncDrop;
 
 mod file;
 mod file_metadata;
@@ -24,7 +25,6 @@ pub mod diff;
 pub mod error;
 mod filesystem_async_drop;
 
-#[cfg(feature = "mirror")]
 pub mod mirror;
 
-pub use filesystem_async_drop::FilesystemAsyncDrop;
+pub mod indexed;
