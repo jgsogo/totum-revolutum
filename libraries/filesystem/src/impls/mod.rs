@@ -5,6 +5,7 @@ pub use local::FilesystemLocal;
 #[cfg(feature = "local_temp")]
 pub use local_temp::FilesystemLocalTemp;
 
+pub mod composites;
 #[cfg(feature = "local")]
 mod local;
 #[cfg(feature = "local_temp")]
