@@ -8,6 +8,7 @@ rust_library_tests_and_docs(
     all_features = {
         "filesystem": ["filesystem"],
         "async": ["async"],
+        "http": ["http"],
     },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,

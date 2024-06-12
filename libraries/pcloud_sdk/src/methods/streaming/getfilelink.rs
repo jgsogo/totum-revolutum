@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tracing::debug;
 
-use http_utils::rest::RESTClient;
-use http_utils::AddToParams;
+use utils::http::rest::RESTClient;
+use utils::http::AddToParams;
 
 use crate::client::PCloudClient;
 use crate::types::File;

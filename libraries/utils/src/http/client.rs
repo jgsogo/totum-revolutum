@@ -4,12 +4,12 @@ use async_trait::async_trait;
 use headers::HeaderMap;
 use reqwest::Response;
 
-use crate::AddToParams;
+use super::{AddToParams, Error};
 
 #[async_trait]
 /// A reusable HTTP client
 pub trait HttpClient: Sync {
-    type Error: From<crate::Error>;
+    type Error: From<Error>;
 
     /// Build the URL to call from the given endpoint and internal data (schema and hostname).
     fn build_url(&self, endpoint: &str) -> String;

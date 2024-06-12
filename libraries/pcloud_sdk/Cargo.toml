@@ -15,8 +15,7 @@ bin = ["dep:anyhow", "cli"]
 
 
 [dependencies]
-http_utils = { path = "../http_utils" }
-utils = { path = "../utils", features = ["filesystem", "async"] }
+utils = { path = "../utils", features = ["filesystem", "async", "http"] }
 
 async-trait = { workspace = true }
 bitflags = { workspace = true }

@@ -7,7 +7,6 @@ members = [
     "libraries/constants",
     "libraries/diesel_utils",
     "libraries/filesystem",
-    "libraries/http_utils",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
     "libraries/utils",

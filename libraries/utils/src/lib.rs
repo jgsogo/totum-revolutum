@@ -3,3 +3,6 @@ pub mod filesystem;
 
 #[cfg(feature = "async")]
 pub mod r#async;
+
+#[cfg(feature = "http")]
+pub mod http;

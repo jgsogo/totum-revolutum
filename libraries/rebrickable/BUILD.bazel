@@ -20,7 +20,7 @@ rust_library_tests_and_docs(
     deps = all_crate_deps(
         normal = True,
     ) + [
-        "@totum//libraries/http_utils",
+        "@totum//libraries/utils",
     ],
 )
 
@@ -35,6 +35,6 @@ rust_binary(
         normal = True,
     ) + [
         ":rebrickable",
-        "@totum//libraries/http_utils",
+        "@totum//libraries/utils",
     ],
 )

@@ -6,16 +6,25 @@ edition = "2021"
 [features]
 filesystem = ["dep:camino"]
 async = ["dep:tokio"]
+http = ["dep:async-trait", "dep:headers", "dep:reqwest", "dep:serde", "dep:serde_json"]
 
 [dependencies]
 log = { workspace = true }
 thiserror = { workspace = true }
+tracing = { workspace = true }
 
 # filesystem
 camino = { workspace = true, optional = true }
 
 # async
 tokio = { workspace = true, features = ["full"], optional = true }
+
+# http
+async-trait = { workspace = true, optional = true }
+headers = { workspace = true, optional = true }
+reqwest = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }

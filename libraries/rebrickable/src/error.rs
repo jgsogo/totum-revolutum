@@ -29,13 +29,13 @@ pub enum DeserializationErrorKind {
     EmptyDataField,
 }
 
-impl From<http_utils::Error> for Error {
-    fn from(value: http_utils::Error) -> Self {
+impl From<utils::http::Error> for Error {
+    fn from(value: utils::http::Error) -> Self {
         match value {
-            http_utils::Error::ReqwestError(r) => r.into(),
-            http_utils::Error::DeserializationError(r) => {
+            utils::http::Error::ReqwestError(r) => r.into(),
+            utils::http::Error::DeserializationError(r) => {
                 let source = match r.source {
-                    http_utils::error::DeserializationErrorKind::SerdeError(r) => {
+                    utils::http::error::DeserializationErrorKind::SerdeError(r) => {
                         DeserializationErrorKind::SerdeError(r)
                     }
                 };

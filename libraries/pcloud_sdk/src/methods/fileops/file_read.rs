@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use http_utils::AddToParams;
+use utils::http::AddToParams;
 
 use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;

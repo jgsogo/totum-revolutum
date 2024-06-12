@@ -6,7 +6,7 @@ use http::HeaderMap;
 use mime::Mime;
 use serde::{Deserialize, Serialize};
 
-use http_utils::rest::RESTClient;
+use ::utils::http::rest::RESTClient;
 
 use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;

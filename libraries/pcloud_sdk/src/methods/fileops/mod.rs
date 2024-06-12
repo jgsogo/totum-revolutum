@@ -1,7 +1,7 @@
-use http_utils::AddToParams;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
+use utils::http::AddToParams;
 
 pub mod file_close;
 pub mod file_open;

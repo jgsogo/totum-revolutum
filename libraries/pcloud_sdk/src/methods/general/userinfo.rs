@@ -5,7 +5,7 @@ use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
-use http_utils::rest::RESTClient;
+use utils::http::rest::RESTClient;
 
 use crate::client::PCloudClient;
 use crate::Result;

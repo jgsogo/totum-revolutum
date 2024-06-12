@@ -7,8 +7,8 @@ use headers::HeaderMapExt;
 use reqwest;
 use serde::de::DeserializeOwned;
 
-use http_utils::rest::RESTClient;
-use http_utils::{AddToParams, HttpClient};
+use utils::http::rest::RESTClient;
+use utils::http::{AddToParams, HttpClient};
 
 use crate::methods::oauth2;
 use crate::utils::http;

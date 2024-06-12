@@ -1,5 +1,5 @@
-use crate::error::DeserializationError;
-use crate::{AddToParams, HttpClient};
+use crate::http::error::DeserializationError;
+use crate::http::{AddToParams, HttpClient};
 use async_trait::async_trait;
 use headers::HeaderMap;
 use serde::de::DeserializeOwned;

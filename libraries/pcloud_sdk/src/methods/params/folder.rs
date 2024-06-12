@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use http_utils::AddToParams;
+use utils::http::AddToParams;
 
 use crate::types::{Folder, FolderID};
 

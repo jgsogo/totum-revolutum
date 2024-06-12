@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use http::HeaderMap;
 
-use http_utils::rest::RESTClient;
+use utils::http::rest::RESTClient;
 
 use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;
