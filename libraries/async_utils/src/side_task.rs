@@ -244,7 +244,7 @@ mod tests {
         let (tx, rx) = channel();
         let (_, _) = SideTask::new(task_with_sender, Some(tx));
         // Wait for the task to finish
-        let _ = rx.await.unwrap();
+        rx.await.unwrap();
 
         testing_logger::validate(|captured_logs| {
             assert_eq!(captured_logs.len(), 2);
@@ -260,6 +260,8 @@ mod tests {
 
     #[tokio::test]
     async fn receiver_dropped_but_thread_joined() -> anyhow::Result<()> {
+        testing_logger::setup();
+
         let (mut task, _) = SideTask::new(task, Some(110));
         let j = task.start(None)?;
         // Wait for the thread to join. Task is finished.

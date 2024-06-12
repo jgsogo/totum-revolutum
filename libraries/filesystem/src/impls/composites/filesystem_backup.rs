@@ -11,6 +11,9 @@ use crate::actions::copy_file;
 use crate::wrappers::AsyncFileDropImpl;
 use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
+/// Function call from [`FilesystemBackup`] when the file from the LHS filesystem is being dropped. This function
+/// calls [`File::sync_all`], drops the `file`, awaits for any pending action in the drop procedure using `rx_filesystem`
+/// and finally copies the file to the RHS filesystem (using the given `path`).
 async fn backup_file<
     LHS: FilesystemRead + FilesystemWrite + Send + 'static,
     RHS: FilesystemRead + FilesystemWrite + Send + 'static,

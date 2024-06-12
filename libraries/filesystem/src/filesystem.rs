@@ -81,7 +81,7 @@ pub trait FilesystemRemove {
 /// [`FilesystemRemove::remove_file`], however, specific implementations can override it if there
 /// is a more performant way to run these operations.
 #[async_trait]
-pub trait FilesystemInnerOperations: Filesystem + FilesystemRead + FilesystemWrite + FilesystemRemove {
+pub trait FilesystemInnerOperations: FilesystemRead + FilesystemWrite + FilesystemRemove {
     /// Copy
     async fn copy(&self, origin: &Utf8Path, target: &Utf8Path, force: bool) -> Result<Option<Receiver<Result<()>>>> {
         copy_file(self, self, origin, target, force).await

@@ -24,8 +24,26 @@ enum FileCloseMessage {
     Stop,
 }
 
-/// A wrapper for a filesystem that implements [`FilesystemWrite`]. This wrapper will execute a
-/// function after a file is dropped
+/// A function to be used together with [`AsyncFileDropImpl`]. This function calls [`File::sync_all`] in the given `file`,
+/// then drops it and awaits for `rx_filesystem`.
+pub async fn call_sync_all<T: FilesystemWrite + 'static>(
+    file: Box<dyn File>,
+    rx_filesystem: Option<Receiver<Result<()>>>,
+    _fs: Arc<Mutex<Option<T>>>,
+    _path: Utf8PathBuf,
+) -> Result<()> {
+    file.sync_all().await?;
+    drop(file);
+    if let Some(r) = rx_filesystem {
+        r.await
+            .map_err(|e| Error::Other(format!("Error receiving drop result from rx_filesystem: {e}")))??;
+    }
+    Ok(())
+}
+
+/// A wrapper for a filesystem that executes a function when the files returned by [`FilesystemRead::open`]
+/// and [`FilesystemWrite::create`] are dropped. This wrapper implements the same traits as the underlying
+/// filesystem.
 pub struct AsyncFileDropImpl<T: FilesystemWrite> {
     filesystem: Arc<Mutex<Option<T>>>,
 
@@ -38,11 +56,15 @@ pub struct AsyncFileDropImpl<T: FilesystemWrite> {
 
 impl<T: FilesystemWrite + 'static> AsyncFileDropImpl<T> {
     /// Args:
-    ///  * `filesystem`: Filesystem to wrap. It needs to implement [`Filesystem`] and
-    ///     [`FilesystemWrite`] traits. [`Filesystem::sync_all`] is used to close the thread and
-    ///     [`FilesystemWrite::create`] is the method that we are actually wrapping here
+    ///  * `filesystem`: Filesystem to wrap.
+    ///  * `func_for_readonly_file`: Function to be executed when a [`File`] created using [`FilesystemRead::open`]
+    ///     is dropped. If no function is provided, it will just forward the call to the underlying filesystem
+    ///  * `func_for_write_file`: Function to be executed when a [`File`] created using [`FilesystemWrite::create`]
+    ///     is dropped. If no function is provided, it will just forward the call to the underlying filesystem
     ///
-    ///  * `func`: Function to execute on the file just before it's dropped.
+    /// The functions receive several arguments when the file is about to drop: the [`File`] itself, the optional
+    /// [`Receiver`] returned when the file was created by the underlying filesystem, the underlying [`Filesystem`]
+    /// itself and the [`Utf8PathBuf`] used when the file was created.
     pub fn new<F, Fut>(filesystem: T, func_for_readonly_file: Option<F>, func_for_write_file: Option<F>) -> Self
     where
         F: Fn(Box<dyn File>, Option<Receiver<Result<()>>>, Arc<Mutex<Option<T>>>, Utf8PathBuf) -> Fut + Send + 'static,
@@ -86,18 +108,10 @@ impl<T: FilesystemWrite + 'static> AsyncFileDropImpl<T> {
         }
     }
 
+    /// Returns a new [`AsyncFileDropImpl`] that wraps the given `filesystem` with the same default behavior for all files opened
+    /// to read or write: it just calls [`call_sync_all`] function.
     pub fn new_call_sync_all(filesystem: T) -> Self {
-        let sync_all = |file: Box<dyn File>, rx_filesystem: Option<Receiver<Result<()>>>, _fs, _path| async move {
-            file.sync_all().await?;
-            drop(file);
-            if let Some(r) = rx_filesystem {
-                r.await
-                    .map_err(|e| Error::Other(format!("Error receiving drop result from rx_filesystem: {e}")))??;
-            }
-            Ok(())
-        };
-
-        Self::new(filesystem, Some(sync_all), Some(sync_all))
+        Self::new(filesystem, Some(call_sync_all), Some(call_sync_all))
     }
 }
 
@@ -210,7 +224,7 @@ impl<T: FilesystemWrite + FilesystemRemove> FilesystemRemove for AsyncFileDropIm
     }
 }
 
-/// A wrapper over [`FileImpl`] that sends the message to [`AsyncFileDropImpl`] when it is dropped.
+/// A wrapper over [`File`] that sends the message to [`AsyncFileDropImpl`] when it is dropped.
 struct FileAsyncDrop {
     /// The object representing the file
     file: Option<Box<dyn File>>,
