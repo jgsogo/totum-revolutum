@@ -5,7 +5,7 @@ use std::fmt::Debug;
 /// Allows access to file metadata. This is useful in case the information
 /// is not already available or it is preferred to compute it on-demand (computing
 /// hash can take some time)
-pub trait FileMetadata: Clone + Send + Sync + Debug {
+pub trait FileMetadata: Send + Sync + Debug {
     /// Path inside the [`crate::Filesystem`]
     ///
     /// This path identifies one-to-one every file inside a filesystem. It should be the
@@ -19,7 +19,7 @@ pub trait FileMetadata: Clone + Send + Sync + Debug {
     fn hash(&self) -> Result<String>;
 
     /// Equality at [`FileMetadata`] level: checks only size and hash
-    fn eq<T: FileMetadata>(&self, other: &T) -> Result<bool> {
+    fn eq(&self, other: &dyn FileMetadata) -> Result<bool> {
         Ok(self.size()? == other.size()? && self.hash()? == other.hash()?)
     }
 }

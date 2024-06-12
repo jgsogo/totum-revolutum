@@ -9,18 +9,15 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::info;
 
-use crate::filesystem_async_drop::FilesystemAsyncDrop;
-use crate::{Error, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
+use crate::{Error, FileMetadata, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 use crate::{File, Filesystem};
 
-use super::file_metadata::LocalMetadata;
 use super::parallel_visitor;
 
 /// Implementation of [`Filesystem`] using a directory in the host filesystem.
 #[derive(Debug)]
 pub struct FilesystemLocal {
     root: Utf8PathBuf,
-    fs_async_drop: FilesystemAsyncDrop<AsyncFile>,
 }
 
 impl FilesystemLocal {
@@ -30,13 +27,8 @@ impl FilesystemLocal {
             return Err(Error::PathDoesNotExist);
         }
 
-        let fs_async_drop = FilesystemAsyncDrop::new(|async_file: AsyncFile| async move {
-            async_file.sync_all().await.map_err(Error::IoError)
-        });
-
         Ok(Self {
             root: root.to_path_buf(),
-            fs_async_drop,
         })
     }
 }
@@ -44,16 +36,16 @@ impl FilesystemLocal {
 #[async_trait]
 impl Filesystem for FilesystemLocal {
     async fn sync_all(mut self) -> Result<()> {
-        self.fs_async_drop.flush().await
+        Ok(())
     }
 }
 
 #[async_trait]
 impl FilesystemWrite for FilesystemLocal {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let path = self.root.join(self.check_path(path)?);
         let f = AsyncFile::create(path.into_std_path_buf()).await?;
-        Ok(self.fs_async_drop.file_wrapped(f))
+        Ok((Box::new(f), None))
     }
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
@@ -64,11 +56,9 @@ impl FilesystemWrite for FilesystemLocal {
 
 #[async_trait]
 impl FilesystemRead for FilesystemLocal {
-    type Metadata = LocalMetadata;
-
     async fn walk_directory(
         &self,
-        tx: Sender<Self::Metadata>,
+        tx: Sender<Box<dyn FileMetadata>>,
         threads: usize,
         custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
@@ -85,8 +75,7 @@ impl FilesystemRead for FilesystemLocal {
         info!("Finished local visitor in {:?}", start.elapsed());
         Ok(())
     }
-
-    async fn get_metadata(&self, _path: &Utf8Path) -> Result<Self::Metadata> {
+    async fn get_metadata(&self, _path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
         // It doesn't make much sense that the `Self::Metadata` contains an `ignore::DirEntry`, we
         // need something more identificable as metadata in a local filesystem
         todo!("Not implemented")
@@ -96,14 +85,10 @@ impl FilesystemRead for FilesystemLocal {
         let path = self.root.join(self.check_path(path)?);
         Ok(path.exists())
     }
-
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let path = self.root.join(self.check_path(path)?);
         let f = AsyncFile::open(path.into_std_path_buf()).await?;
-        // We can drop the receiver here, the file is opened in read-only mode so there is nothing
-        // to sync when it is dropped
-        let (file, _) = self.fs_async_drop.file_wrapped(f);
-        Ok(file)
+        Ok((Box::new(f), None))
     }
 }
 
@@ -172,11 +157,13 @@ mod tests {
             f.write_all(&content).await?;
             rx
         };
-        let _ = rx.await;
+        if let Some(rx) = rx {
+            rx.await.unwrap().unwrap();
+        }
 
         // Open and read
         {
-            let mut file = fs.open(&filepath).await?;
+            let (mut file, _) = fs.open(&filepath).await?;
             let mut content_read = Vec::new();
             file.read_to_end(&mut content_read).await?;
             assert_eq!(content, content_read);

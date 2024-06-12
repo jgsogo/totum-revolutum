@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 
 use filesystem::diff::{two_ways_run, FilePair};
-use filesystem::{FileMetadata, Filesystem, FilesystemRead};
+use filesystem::{Filesystem, FilesystemRead};
 
 use crate::actions::action_run::ActionRun;
 use crate::storage::config;
@@ -59,10 +59,7 @@ pub enum OnConflict {
     KeepLatest,
 }
 
-async fn work_on_results<FsLhsMetadata: FileMetadata + 'static, FsRhsMetadata: FileMetadata + 'static>(
-    rx: flume::Receiver<FilePair<FsLhsMetadata, FsRhsMetadata>>,
-    action: &dyn ActionRun<FsLhsMetadata, FsRhsMetadata>,
-) -> Result<()> {
+async fn work_on_results(rx: flume::Receiver<FilePair>, action: &dyn ActionRun) -> Result<()> {
     info!("Start backup receiving loop");
     let start = Instant::now();
     while let Ok(file_pair) = rx.recv_async().await {
@@ -91,7 +88,7 @@ pub async fn run<
     };
 
     // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
-    let (lhs, rhs, differ) = two_ways_run::<FsLhs::Metadata, FsRhs::Metadata>().await;
+    let (lhs, rhs, differ) = two_ways_run().await;
     // TODO: This is not right
     // let lhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(lhs_fs.root());
     // let rhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(rhs_fs.root());

@@ -1,3 +1,4 @@
+use crate::actions::{copy_file, move_file};
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use tokio::sync::oneshot::Receiver;
@@ -8,7 +9,7 @@ use super::{File, FileMetadata};
 
 /// Abstraction of a filesystem with methods to access its files
 #[async_trait]
-pub trait Filesystem {
+pub trait Filesystem: Send + Sync {
     /// Normalizes the given `path` ensuring that it is a relative path that doesn't go outside
     /// its root folder. Returns the normalized version of that path
     fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
@@ -27,36 +28,36 @@ pub trait Filesystem {
 /// Filesystem abstraction, only method that require READ access
 #[async_trait]
 pub trait FilesystemRead {
-    type Metadata: FileMetadata; // TODO: Associated type or just return `Box<dyn FileMetadata>`?
-
-    /// Walk files in the filesystem, for each file found it will send it via `tx`
+    /// Walk files in the filesystem, for each file found it will send it via `tx`. This belongs
+    /// to the [`FilesystemRead`] because it **reads** the contents of the directories.
     async fn walk_directory(
         &self,
-        tx: flume::Sender<Self::Metadata>,
+        tx: flume::Sender<Box<dyn FileMetadata>>,
         threads: usize,
         custom_ignore_filename: &Utf8Path,
     ) -> Result<()>;
 
-    /// Returns the [`Self::Metadata`] for the given `path`
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Self::Metadata>;
+    /// Returns the [`FileMetadata`] for the given `path`
+    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>>;
 
     /// Returns true if the path points at an existing entity.
     async fn exists(&self, path: &Utf8Path) -> Result<bool>;
 
-    /// Tries to open the file requested by the argument `path` in read-only mode. Returns an object implementing
-    /// a [`File`] or an error.
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>>;
+    /// Tries to open the file requested by the argument `path` in read-only mode. Returns an
+    /// object implementing a [`File`] or an error. Some implementations may return a [`Receiver`]
+    /// that the caller can await to receive any error that may happen from the file drop procedure.
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
 }
 
-/// Filesystem abstraction, only method that require **write access**
+/// Filesystem abstraction, only methods that require **write access**
 #[async_trait]
-pub trait FilesystemWrite {
+pub trait FilesystemWrite: Send + Sync {
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.
-    /// This method returns the [`File`] object and a [`Receiver`]. This
-    /// receiver will be called after the file is dropped and any pending task is run by the
-    /// underlying filesystem (some [`Filesystem`] implementations may run async functions after
-    /// the file is dropped).
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)>;
+    /// This method returns an object implementing the [`File`] trait. Some implementations may
+    /// return a [`Receiver`] that the caller can await for a couple of reasons:
+    ///  * to receive any error that may happen from the file drop procedure
+    ///  * to ensure that all the in-memory data is written to the file.
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
 
     /// Creates the given directory and any intermediate one
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()>;
@@ -75,16 +76,19 @@ pub trait FilesystemRemove {
     async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()>;
 }
 
-/// Filesystem abstraction, method that requires **read and write access**
+/// Filesystem abstraction, method that requires **read and write access**. Default implementation
+/// relies on [`FilesystemRead::open`], [`FilesystemWrite::create`] and
+/// [`FilesystemRemove::remove_file`], however, specific implementations can override it if there
+/// is a more performant way to run these operations.
 #[async_trait]
-pub trait FilesystemReadAndWrite: FilesystemRead + FilesystemWrite {
+pub trait FilesystemInnerOperations: FilesystemRead + FilesystemWrite + FilesystemRemove {
     /// Copy
-    async fn copy(&self, _origin: &Utf8Path, _target: &Utf8Path) -> Result<()> {
-        todo!("A default `copy` using existing methods is not implemented")
+    async fn copy(&self, origin: &Utf8Path, target: &Utf8Path, force: bool) -> Result<Option<Receiver<Result<()>>>> {
+        copy_file(self, self, origin, target, force).await
     }
 
     /// Rename
-    async fn rename(&self, _origin: &Utf8Path, _target: &Utf8Path) -> Result<()> {
-        todo!("A default `rename` using existing methods is not implemented")
+    async fn rename(&self, origin: &Utf8Path, target: &Utf8Path, force: bool) -> Result<Option<Receiver<Result<()>>>> {
+        move_file(self, self, origin, target, force).await
     }
 }

@@ -5,7 +5,7 @@ use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 
 use crate::impls::FilesystemLocal;
-use crate::{File, Filesystem};
+use crate::{File, FileMetadata, Filesystem};
 use crate::{FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 /// Implementation of [`Filesystem`] using a temporal directory in the host filesystem
@@ -46,7 +46,7 @@ impl Filesystem for FilesystemLocalTemp {
 
 #[async_trait]
 impl FilesystemWrite for FilesystemLocalTemp {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.local.create(path).await
     }
 
@@ -57,26 +57,22 @@ impl FilesystemWrite for FilesystemLocalTemp {
 
 #[async_trait]
 impl FilesystemRead for FilesystemLocalTemp {
-    type Metadata = <FilesystemLocal as FilesystemRead>::Metadata;
-
     async fn walk_directory(
         &self,
-        tx: Sender<Self::Metadata>,
+        tx: Sender<Box<dyn FileMetadata>>,
         threads: usize,
         custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
         self.local.walk_directory(tx, threads, custom_ignore_filename).await
     }
-
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Self::Metadata> {
+    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
         self.local.get_metadata(path).await
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         self.local.exists(path).await
     }
-
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.local.open(path).await
     }
 }

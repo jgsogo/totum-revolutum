@@ -1,8 +1,7 @@
 use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
 
-use crate::filesystem::{FilesystemRead, FilesystemRemove, FilesystemWrite};
-use crate::Result;
+use crate::{FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 use super::copy::copy_file;
 
@@ -11,16 +10,20 @@ use super::copy::copy_file;
 /// use to wait for any async operation to finish.
 ///
 /// This action is implemented in terms of [`copy_file`].
-pub async fn move_file<'action, FsLhs: FilesystemRead + FilesystemRemove, FsRhs: FilesystemRead + FilesystemWrite>(
+pub async fn move_file<
+    'action,
+    FsLhs: FilesystemRead + FilesystemRemove + ?Sized,
+    FsRhs: FilesystemRead + FilesystemWrite + ?Sized,
+>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action FsRhs,
     origin: &Utf8Path,
     target: &Utf8Path,
     force: bool,
-) -> Result<Receiver<Result<()>>> {
-    let rx = copy_file(lhs_fs, rhs_fs, origin, target, force).await?;
+) -> Result<Option<Receiver<Result<()>>>> {
+    let r = copy_file(lhs_fs, rhs_fs, origin, target, force).await?;
     lhs_fs.remove_file(origin).await?;
-    Ok(rx)
+    Ok(r)
 }
 
 #[cfg(test)]
@@ -38,7 +41,9 @@ mod tests {
             f1.write_all(&content).await.unwrap();
             rx
         };
-        let _ = rx.await;
+        if let Some(rx) = rx {
+            rx.await.unwrap().unwrap();
+        }
         fs
     }
 

@@ -1,4 +1,5 @@
-use crate::{File, Filesystem, FilesystemAsyncDrop};
+use crate::wrappers::FilesystemAsyncDrop;
+use crate::{File, Filesystem};
 use async_trait::async_trait;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -17,6 +18,10 @@ impl File for FileToIndex {
     }
 
     async fn write_all(&mut self, _buf: &[u8]) -> crate::Result<()> {
+        todo!()
+    }
+
+    async fn sync_all(&self) -> crate::Result<()> {
         todo!()
     }
 }

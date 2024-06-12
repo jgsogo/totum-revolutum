@@ -46,7 +46,9 @@ async fn main() -> Result<()> {
             .await?;
         rx
     };
-    let _ = rx.await?;
+    if let Some(rx) = rx {
+        rx.await??;
+    }
 
     // Now copies origin to target
     let target = Utf8Path::new("target.txt");
@@ -56,7 +58,7 @@ async fn main() -> Result<()> {
     // And let's read target
     let data = {
         println!("Reads content from target '{target}'");
-        let mut target_file = fs.open(target).await?;
+        let (mut target_file, _) = fs.open(target).await?;
         let mut data = Vec::new();
         target_file.read_to_end(&mut data).await?;
         data

@@ -1,9 +1,7 @@
 use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
 
-use crate::filesystem::{FilesystemRead, FilesystemWrite};
-use crate::Error;
-use crate::{File, Result};
+use crate::{Error, File, FilesystemRead, FilesystemWrite, Result};
 
 /// Copies the contents of the `lhs_file` [`File`] into the `rhs_file` [`File`]
 pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mut Box<dyn File>) -> Result<()> {
@@ -25,19 +23,20 @@ pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mu
 /// Copy a file from one filesystem to another. Both instances of filesystem, the `origin` path and the
 /// `target` path are provided as argument. This method returns a [`Receiver`] that the caller can use to await
 /// for the operation to complete (target file is dropped and underlying filesystem has performed any async action).
-pub async fn copy_file<'action, FsLhs: FilesystemRead, FsRhs: FilesystemRead + FilesystemWrite>(
+pub async fn copy_file<'action, FsLhs: FilesystemRead + ?Sized, FsRhs: FilesystemRead + FilesystemWrite + ?Sized>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action FsRhs,
     origin: &Utf8Path,
     target: &Utf8Path,
     force: bool,
-) -> Result<Receiver<Result<()>>> {
+) -> Result<Option<Receiver<Result<()>>>> {
     if !force && rhs_fs.exists(target).await? {
         return Err(Error::TargetFileExists);
     }
 
+    let (mut origin_file, _) = lhs_fs.open(origin).await?;
     let (mut target_file, rx) = rhs_fs.create(target).await?;
-    copy(&mut lhs_fs.open(origin).await?, &mut target_file).await?;
+    copy(&mut origin_file, &mut target_file).await?;
     Ok(rx)
 }
 
@@ -56,7 +55,9 @@ mod tests {
             f1.write_all(&content).await.unwrap();
             rx
         };
-        let _ = rx.await;
+        if let Some(rx) = rx {
+            rx.await.unwrap().unwrap();
+        }
         fs
     }
 
@@ -73,7 +74,7 @@ mod tests {
         copy_file(&lhs_fs, &rhs_fs, &lhs_path, &rhs_path, false).await?;
 
         // We can read the file from the RHS
-        let mut rhs_file = rhs_fs.open(&rhs_path).await?;
+        let (mut rhs_file, _) = rhs_fs.open(&rhs_path).await?;
         let mut content_read = Vec::new();
         rhs_file.read_to_end(&mut content_read).await?;
         assert_eq!(file_content, &*content_read);
@@ -94,23 +95,16 @@ mod tests {
         assert!(r.is_err());
         // ... with a different content
         let mut rhs_current_content = Vec::new();
-        rhs_fs
-            .open(&lhs_path)
-            .await?
-            .read_to_end(&mut rhs_current_content)
-            .await?;
+        let (mut file, _) = rhs_fs.open(&lhs_path).await?;
+        file.read_to_end(&mut rhs_current_content).await?;
         assert_ne!(file_content, &*rhs_current_content);
 
         // We copy and now we get the same content
-        let r = copy_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, true).await?;
-        let _ = r.await.unwrap();
+        copy_file(&lhs_fs, &rhs_fs, &lhs_path, &lhs_path, true).await?;
 
         let mut rhs_current_content = Vec::new();
-        rhs_fs
-            .open(&lhs_path)
-            .await?
-            .read_to_end(&mut rhs_current_content)
-            .await?;
+        let (mut file, _) = rhs_fs.open(&lhs_path).await?;
+        file.read_to_end(&mut rhs_current_content).await?;
         assert_eq!(file_content, &*rhs_current_content);
 
         Ok(())

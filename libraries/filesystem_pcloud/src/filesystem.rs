@@ -7,8 +7,7 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
-use filesystem::{Error, File, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite};
-use filesystem::{FilesystemAsyncDrop, Result};
+use filesystem::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
@@ -32,16 +31,11 @@ pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone + Send + 'static> {
 
     // TODO: This shouldn't be an `Arc<HttpClient>`. It should be just `HttpClient`
     pcloud: Arc<HttpClient>,
-
-    fs_async_drop: FilesystemAsyncDrop<RemoteFile<HttpClient>>,
 }
 
 impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpClient> {
     pub async fn new(root_path: RemotePath, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
-
-        let fs_async_drop =
-            FilesystemAsyncDrop::new(|remote_file: RemoteFile<HttpClient>| async move { remote_file.sync_all().await });
 
         let root_folderid = pcloud
             .get_folderid(&root_path)
@@ -51,12 +45,11 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
             root_folderid,
             root_path: root_path.as_path().into(),
             pcloud,
-            fs_async_drop,
         })
     }
 
     fn work_on_contents(
-        tx: Sender<RemoteMetadata>,
+        tx: Sender<Box<dyn FileMetadata>>,
         base_path: &Utf8Path,
         contents: &[Metadata],
         depth: usize,
@@ -68,7 +61,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
                     let data = RemoteMetadata::new(path, m.clone());
-                    tx.send(data).map_err(|e| Error::Other(e.to_string()))?;
+                    tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
                 }
                 Metadata::MetadataFolder(m) => {
                     let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
@@ -90,17 +83,15 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
 #[async_trait]
 impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for FilesystemPCloud<HttpClient> {
     async fn sync_all(mut self) -> Result<()> {
-        self.fs_async_drop.flush().await
+        Ok(())
     }
 }
 
 #[async_trait]
 impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for FilesystemPCloud<HttpClient> {
-    type Metadata = RemoteMetadata;
-
     async fn walk_directory(
         &self,
-        tx: Sender<Self::Metadata>,
+        tx: Sender<Box<dyn FileMetadata>>,
         _threads: usize,
         _custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
@@ -129,7 +120,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for Files
         Ok(())
     }
 
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Self::Metadata> {
+    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
         let path = self.check_path(path)?;
         let remote_path = {
             let abs_path = self.root_path.join(&path);
@@ -140,7 +131,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for Files
             .stat(pcloud_sdk::types::File::RemotePath(remote_path))
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(RemoteMetadata::new(path, metadata.metadata))
+        Ok(Box::new(RemoteMetadata::new(path, metadata.metadata)))
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
@@ -165,7 +156,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for Files
         Ok(r.is_some())
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<Box<dyn File>> {
+    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let path = self.root_path.join(self.check_path(path)?);
         let path: PCloudFile = path
             .try_into()
@@ -179,16 +170,13 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for Files
             .map_err(|e| Error::Other(e.to_string()))?;
 
         let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
-        // We can drop the receiver here, the file is opened in read-only mode so there is nothing
-        // to sync when it is dropped
-        let (file, _) = self.fs_async_drop.file_wrapped(f);
-        Ok(file)
+        Ok((Box::new(f), None))
     }
 }
 
 #[async_trait]
 impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemWrite for FilesystemPCloud<HttpClient> {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Receiver<Result<()>>)> {
+    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let rel_path = self.check_path(path)?;
         let filename = rel_path.file_name().ok_or(Error::NotAFilepath)?;
 
@@ -220,8 +208,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemWrite for File
             .map_err(|e| Error::Other(e.to_string()))?;
 
         let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
-
-        Ok(self.fs_async_drop.file_wrapped(f))
+        Ok((Box::new(f), None))
     }
 
     async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
@@ -278,6 +265,7 @@ mod tests {
     use std::collections::HashMap;
     use std::str::FromStr;
 
+    use filesystem::wrappers::AsyncFileDropImpl;
     use headers::HeaderMap;
 
     use pcloud_sdk::error::Error;
@@ -423,6 +411,7 @@ mod tests {
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(root, client).await?;
+        let fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
         let rx = {
             let filepath = Utf8Path::new("file");
@@ -432,7 +421,9 @@ mod tests {
             f.write_all(&content).await?;
             rx
         };
-        let _ = rx.await?;
+        if let Some(rx) = rx {
+            rx.await??;
+        }
 
         fs.sync_all().await?;
 
@@ -525,16 +516,19 @@ mod tests {
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(root, client).await?;
+        let fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
         let filepath = Utf8Path::new("file");
 
         // Open and read
-        {
-            let mut file = fs.open(&filepath).await?;
+        let rx = {
+            let (mut file, rx) = fs.open(&filepath).await?;
             let mut content_read = Vec::new();
             file.read_to_end(&mut content_read).await?;
             assert_eq!(file_content.to_vec(), content_read);
-        }
+            rx.unwrap()
+        };
+        rx.await??;
         fs.sync_all().await?;
         Ok(())
     }
@@ -591,11 +585,13 @@ mod tests {
 
         // Create the filesystem
         let fs = FilesystemPCloud::new(root_path, client).await?;
-        {
+        let fs = AsyncFileDropImpl::new_call_sync_all(fs);
+        let rx = {
             let filepath = Utf8Path::new("nested/nested2/myfile.txt");
-            let r = fs.create(&filepath).await;
-            assert!(r.is_ok());
-        }
+            let (_, rx) = fs.create(filepath).await?;
+            rx.unwrap()
+        };
+        rx.await??;
         fs.sync_all().await?;
         Ok(())
     }

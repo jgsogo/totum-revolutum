@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use anyhow::Result;
 use camino::Utf8PathBuf;
 
+use filesystem::wrappers::AsyncFileDropImpl;
 use filesystem::{FilesystemRead, FilesystemWrite};
 use filesystem_pcloud::FilesystemPCloud;
 use filesystem_pcloud::CHUNK_SIZE;
@@ -29,7 +30,9 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
         let root_path_remote = RemotePath::try_from(root_path.as_path())?;
         let r = FilesystemPCloud::new(root_path_remote, pcloud).await?;
         root_folder_mock.assert();
-        r
+
+        // Use AsyncFileDropImpl so the [`File::sync_all`] method is called when created files are dropped
+        AsyncFileDropImpl::new_call_sync_all(r)
     };
 
     // Add mock so we can create a file
@@ -49,15 +52,17 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
     let p = Utf8PathBuf::from(name.clone());
     // Create and write
     let rx = {
-        let (mut f, rx) = fs.create(&*p).await?;
+        let (mut f, rx) = fs.create(&p).await?;
         f.write_all(&content).await?;
         rx
     };
-    let _ = rx.await?;
+    if let Some(rx) = rx {
+        rx.await??;
+    }
 
     // Open and read
     {
-        let mut file = fs.open(&*p).await?;
+        let (mut file, _) = fs.open(&*p).await?;
         let mut content_read = Vec::new();
         file.read_to_end(&mut content_read).await?;
         assert_eq!(content, content_read);
