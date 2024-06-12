@@ -9,7 +9,6 @@ pub use filesystem::{Filesystem, FilesystemInnerOperations, FilesystemRead, File
 mod file;
 mod file_metadata;
 mod filesystem;
-pub mod utils;
 
 pub mod actions;
 

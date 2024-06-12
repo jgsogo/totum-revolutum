@@ -12,11 +12,23 @@ rust_library_tests_and_docs(
             "local_temp",
             "local",
         ],
+        "pcloud": ["pcloud"],
+        "test_utils": ["test_utils"],
     },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    test_deps = [
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:headers",
+    ],
+    test_suite_deps = [
+        "@crates_libraries//:anyhow",
+    ],
     deps = all_crate_deps(
         normal = True,
-    ),
+    ) + [
+        "@totum//libraries/pcloud_sdk",
+        "@totum//libraries/utils",
+    ],
 )

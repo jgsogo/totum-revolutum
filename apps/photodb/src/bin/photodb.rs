@@ -1,8 +1,8 @@
 use anyhow::{anyhow, bail, Result};
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
+use filesystem::impls::FilesystemPCloud;
 use filesystem::{FilesystemRead, FilesystemWrite};
-use filesystem_pcloud::FilesystemPCloud;
 use std::str::FromStr;
 use tracing::{debug, error};
 

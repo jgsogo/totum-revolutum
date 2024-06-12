@@ -3,9 +3,9 @@ use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use tokio::sync::oneshot::Receiver;
 
-use super::utils::normalize_path;
 use super::{Error, Result};
 use super::{File, FileMetadata};
+use utils::filesystem::normalize_path;
 
 /// Abstraction of a filesystem with methods to access its files
 #[async_trait]

@@ -7,7 +7,7 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
-use filesystem::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
+use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
@@ -21,8 +21,8 @@ use pcloud_sdk::structures::Metadata;
 use pcloud_sdk::types::errors::{InvalidFileError, InvalidFolderError, InvalidRemotePathError};
 use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 
-use crate::file::RemoteFile;
-use crate::RemoteMetadata;
+use crate::impls::pcloud::file::RemoteFile;
+use crate::impls::pcloud::file_metadata::RemoteMetadata;
 
 pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone + Send + 'static> {
     // Root folder for this filesystem
@@ -265,7 +265,7 @@ mod tests {
     use std::collections::HashMap;
     use std::str::FromStr;
 
-    use filesystem::wrappers::AsyncFileDropImpl;
+    use crate::wrappers::AsyncFileDropImpl;
     use headers::HeaderMap;
 
     use pcloud_sdk::error::Error;
@@ -284,7 +284,7 @@ mod tests {
     use pcloud_sdk::types::{FileID, Folder};
     use pcloud_sdk::utils;
 
-    use crate::file::CHUNK_SIZE;
+    use crate::impls::pcloud::file::CHUNK_SIZE;
 
     use super::*;
 

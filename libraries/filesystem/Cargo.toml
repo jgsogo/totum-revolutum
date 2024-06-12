@@ -7,8 +7,12 @@ edition = "2021"
 diff = []
 local = ["dep:async-std", "dep:ignore", "dep:futures", "dep:sha256"]
 local_temp = ["dep:uuid", "dep:tempfile", "local"]
+pcloud = ["dep:pcloud_sdk"]
+test_utils = []
 
 [dependencies]
+utils = { path = "../utils", features = ["filesystem"] }
+
 async-trait = { workspace = true }
 camino = { workspace = true }
 flume = { workspace = true }
@@ -24,5 +28,12 @@ sha256 = { workspace = true, optional = true }
 tempfile = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true, features = ["v4"] }
 
+# Feature "pcloud"
+pcloud_sdk = { path = "../pcloud_sdk", optional = true }
+
+
 [dev-dependencies]
-filesystem = { path = ".", features = ["local_temp", "diff"] }
+pcloud_sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
+
+anyhow = { workspace = true }
+headers = { workspace = true }

@@ -1,6 +1,6 @@
 use camino::{Utf8Path, Utf8PathBuf};
 
-use filesystem::{FileMetadata, Result};
+use crate::{Error, FileMetadata, Result};
 use pcloud_sdk::structures::MetadataFile;
 use pcloud_sdk::types::FileID;
 
@@ -17,14 +17,14 @@ impl FileMetadata for RemoteMetadata {
 
     fn size(&self) -> Result<u64> {
         match self.metadata.size {
-            None => Err(filesystem::Error::Other("metadata.size not available".into())),
+            None => Err(Error::Other("metadata.size not available".into())),
             Some(s) => Ok(s),
         }
     }
 
     fn hash(&self) -> Result<String> {
         match self.metadata.hash {
-            None => Err(filesystem::Error::Other("metadata.size not available".into())),
+            None => Err(Error::Other("metadata.hash not available".into())),
             Some(h) => Ok(h.to_string()),
         }
     }
@@ -38,6 +38,7 @@ impl RemoteMetadata {
         }
     }
 
+    #[allow(dead_code)]
     pub fn fileid(&self) -> &FileID {
         &self.metadata.fileid
     }

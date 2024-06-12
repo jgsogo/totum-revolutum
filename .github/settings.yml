@@ -161,13 +161,13 @@ labels:
     color: "000000"
   - name: cmp:libraries/filesystem
     color: "000000"
-  - name: cmp:libraries/filesystem_pcloud
-    color: "000000"
   - name: cmp:libraries/http_utils
     color: "000000"
   - name: cmp:libraries/pcloud_sdk
     color: "000000"
   - name: cmp:libraries/rebrickable
+    color: "000000"
+  - name: cmp:libraries/utils
     color: "000000"
   - name: cmp:notes
     color: "000000"

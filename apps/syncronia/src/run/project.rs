@@ -2,8 +2,7 @@ use anyhow::Result;
 use camino::Utf8Path;
 use tracing::info;
 
-use filesystem::impls::FilesystemLocal;
-use filesystem_pcloud::FilesystemPCloud;
+use filesystem::impls::{FilesystemLocal, FilesystemPCloud};
 use pcloud_sdk::types::RemotePath;
 
 use crate::actions;

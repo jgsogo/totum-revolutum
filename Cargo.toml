@@ -8,10 +8,10 @@ members = [
     "libraries/constants",
     "libraries/diesel_utils",
     "libraries/filesystem",
-    "libraries/filesystem_pcloud",
     "libraries/http_utils",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
+    "libraries/utils",
     # A placeholder to depend on _external_ crates (see [this note](./notes/2024-05-04-1923.md))
     "bazel/external",
 ]

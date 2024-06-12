@@ -1,6 +1,6 @@
 use camino::{Utf8Path, Utf8PathBuf};
 
-use crate::utils::current_path;
+use crate::filesystem::current_path;
 
 /// Returns path as absolute. If it's a relative path it will join it to [`current_path()`]
 pub fn to_absolute_path(path: &Utf8Path) -> Utf8PathBuf {

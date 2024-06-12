@@ -4,7 +4,7 @@ use std::str::FromStr;
 use camino::{Utf8Components, Utf8Path, Utf8PathBuf};
 use serde::{Deserialize, Serialize};
 
-use filesystem::utils::normalize_path;
+use utils::filesystem::normalize_path;
 
 use crate::types::errors::{InvalidRemotePathError, InvalidRemotePathKind};
 use crate::types::errors::{ParseError, ParseErrorKind};

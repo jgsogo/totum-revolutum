@@ -82,10 +82,10 @@ crate.from_cargo(
         "//libraries/cron:Cargo.toml",
         "//libraries/diesel_utils:Cargo.toml",
         "//libraries/filesystem:Cargo.toml",
-        "//libraries/filesystem_pcloud:Cargo.toml",
         "//libraries/http_utils:Cargo.toml",
         "//libraries/pcloud_sdk:Cargo.toml",
         "//libraries/rebrickable:Cargo.toml",
+        "//libraries/utils:Cargo.toml",
         # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
         "//bazel/external:Cargo.toml",
     ],

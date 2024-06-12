@@ -3,8 +3,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
-use filesystem::Result;
-use filesystem::{Error, File};
+use crate::{Error, File, Result};
 use pcloud_sdk::methods::fileops::file_close::GetFileClose;
 use pcloud_sdk::methods::fileops::file_open::FileOpen;
 use pcloud_sdk::methods::fileops::file_read::GetFileRead;
