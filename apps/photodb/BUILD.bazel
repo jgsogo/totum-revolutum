@@ -55,7 +55,6 @@ rust_library_tests_and_docs(
         normal = True,
     ) + [
         "//libraries/filesystem",
-        "//libraries/filesystem_pcloud",
         "//libraries/pcloud_sdk",
     ],
 )
@@ -71,7 +70,6 @@ rust_binary(
     ) + [
         ":photodb_lib",
         "//libraries/filesystem",
-        "//libraries/filesystem_pcloud",
         "//libraries/pcloud_sdk",
     ],
 )

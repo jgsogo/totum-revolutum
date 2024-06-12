@@ -6,9 +6,8 @@ edition = "2021"
 [features]
 
 [dependencies]
-filesystem = { path = "../../libraries/filesystem", features = ["local_temp"] }
+filesystem = { path = "../../libraries/filesystem", features = ["local_temp", "pcloud"] } # pcloud only required for the binary?
 pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
-filesystem_pcloud = { path = "../../libraries/filesystem_pcloud" } # This is only required for the binary?
 
 anyhow = { workspace = true }
 async-trait = { workspace = true }

@@ -3,13 +3,15 @@
 load("@totum//bazel/rust/docs:defs.bzl", "rust_docs")
 
 ALL_LIBRARIES = [
+    "async_utils",
     "constants",
     "cron",
+    "diesel_utils",
     "filesystem",
-    "filesystem_pcloud",
     "http_utils",
     "pcloud_sdk",
     "rebrickable",
+    "utils",
 ]
 
 rust_docs(

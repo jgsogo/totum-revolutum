@@ -3,10 +3,10 @@ use std::collections::HashMap;
 use anyhow::Result;
 use camino::Utf8PathBuf;
 
+use filesystem::impls::FilesystemPCloud;
+use filesystem::impls::PCLOUD_CHUNK_SIZE;
 use filesystem::wrappers::AsyncFileDropImpl;
 use filesystem::{FilesystemRead, FilesystemWrite};
-use filesystem_pcloud::FilesystemPCloud;
-use filesystem_pcloud::CHUNK_SIZE;
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::mocks::server::PCloudServerMock;
@@ -46,7 +46,7 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
         &root_path,
         write_bytes,
         content.clone(),
-        CHUNK_SIZE,
+        PCLOUD_CHUNK_SIZE,
     );
 
     let p = Utf8PathBuf::from(name.clone());

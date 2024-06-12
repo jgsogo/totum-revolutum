@@ -27,8 +27,8 @@ rust_library_tests_and_docs(
         normal = True,
     ) + [
         "@totum//libraries/async_utils",
-        "@totum//libraries/filesystem",
         "@totum//libraries/http_utils",
+        "@totum//libraries/utils",
     ],
 )
 
@@ -48,7 +48,8 @@ rust_binary(
         normal = True,
     ) + [
         ":pcloud_sdk",
-        "@totum//libraries/filesystem",
+        "@totum//libraries/async_utils",
         "@totum//libraries/http_utils",
+        "@totum//libraries/utils",
     ],
 )
