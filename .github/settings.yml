@@ -167,6 +167,8 @@ labels:
     color: "000000"
   - name: cmp:libraries/rebrickable
     color: "000000"
+  - name: cmp:libraries/utils
+    color: "000000"
   - name: cmp:notes
     color: "000000"
   - name: cmp:scripts
