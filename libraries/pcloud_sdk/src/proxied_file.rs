@@ -9,7 +9,7 @@ use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 use tracing::{debug, error};
 
-use async_utils::SideTask;
+use utils::r#async::SideTask;
 
 use crate::client::PCloudClient;
 use crate::handy::Exists;

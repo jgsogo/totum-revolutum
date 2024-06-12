@@ -354,17 +354,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async_utils"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "log",
- "testing_logger",
- "thiserror",
- "tokio",
-]
-
-[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2684,7 +2673,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "async_utils",
  "bitflags 2.5.0",
  "bytes",
  "camino",
@@ -4210,7 +4198,12 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 name = "utils"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "camino",
+ "log",
+ "testing_logger",
+ "thiserror",
+ "tokio",
 ]
 
 [[package]]

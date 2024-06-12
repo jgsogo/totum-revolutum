@@ -3,7 +3,6 @@
 load("@totum//bazel/rust/docs:defs.bzl", "rust_docs")
 
 ALL_LIBRARIES = [
-    "async_utils",
     "constants",
     "cron",
     "diesel_utils",

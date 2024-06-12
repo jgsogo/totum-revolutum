@@ -4,7 +4,6 @@ members = [
     "apps/photodb",
     "apps/syncronia",
     "libraries/cron",
-    "libraries/async_utils",
     "libraries/constants",
     "libraries/diesel_utils",
     "libraries/filesystem",

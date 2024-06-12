@@ -1,7 +1,7 @@
 use std::future::Future;
 use std::marker::PhantomData;
 
-use crate::{Error, Result};
+use crate::r#async::{Error, Result};
 use log::{debug, error};
 use tokio::sync::oneshot::{channel, Receiver, Sender};
 use tokio::task::JoinHandle;

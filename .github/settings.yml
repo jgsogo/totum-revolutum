@@ -151,8 +151,6 @@ labels:
     color: "000000"
   - name: cmp:docs
     color: "000000"
-  - name: cmp:libraries/async_utils
-    color: "000000"
   - name: cmp:libraries/constants
     color: "000000"
   - name: cmp:libraries/cron
