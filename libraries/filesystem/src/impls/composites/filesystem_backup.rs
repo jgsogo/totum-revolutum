@@ -1,4 +1,3 @@
-use std::ops::Deref;
 use std::sync::Arc;
 
 use async_trait::async_trait;
@@ -11,12 +10,12 @@ use crate::actions::copy_file;
 use crate::wrappers::AsyncFileDropImpl;
 use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
-/// Function call from [`FilesystemBackup`] when the file from the LHS filesystem is being dropped. This function
+/// Function called from [`FilesystemBackup`] when the file from the LHS filesystem is being dropped. This function
 /// calls [`File::sync_all`], drops the `file`, awaits for any pending action in the drop procedure using `rx_filesystem`
 /// and finally copies the file to the RHS filesystem (using the given `path`).
 async fn backup_file<
-    LHS: FilesystemRead + FilesystemWrite + Send + 'static,
-    RHS: FilesystemRead + FilesystemWrite + Send + 'static,
+    LHS: FilesystemRead + FilesystemWrite + 'static,
+    RHS: FilesystemRead + FilesystemWrite + 'static,
 >(
     file: Box<dyn File>,
     rx_filesystem: Option<Receiver<Result<()>>>,
@@ -35,14 +34,7 @@ async fn backup_file<
     // Now copy from the lhs filesystem to the rhs filesystem
     let fs_lhs = fs_lhs.lock().await;
     let fs_rhs = fs_rhs.lock().await;
-    let rx_rhs = copy_file(
-        fs_lhs.as_ref().unwrap(),
-        fs_rhs.deref().as_ref().unwrap(),
-        &path,
-        &path,
-        true,
-    )
-    .await?;
+    let rx_rhs = copy_file(fs_lhs.as_ref().unwrap(), fs_rhs.as_ref().unwrap(), &path, &path, true).await?;
 
     match rx_rhs {
         Some(rx_rhs) => rx_rhs
@@ -69,10 +61,8 @@ pub struct FilesystemBackup<LHS: FilesystemWrite, RHS: FilesystemWrite> {
     rhs: Arc<Mutex<Option<RHS>>>,
 }
 
-impl<
-        LHS: FilesystemRead + FilesystemWrite + Send + 'static,
-        RHS: FilesystemRead + FilesystemWrite + Send + 'static,
-    > FilesystemBackup<LHS, RHS>
+impl<LHS: FilesystemRead + FilesystemWrite + 'static, RHS: FilesystemRead + FilesystemWrite + 'static>
+    FilesystemBackup<LHS, RHS>
 {
     pub fn new(fs_lhs: LHS, fs_rhs: RHS) -> Self {
         let fs_rhs = Arc::new(Mutex::new(Some(fs_rhs)));

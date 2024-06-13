@@ -27,7 +27,7 @@ pub trait Filesystem: Send + Sync {
 
 /// Filesystem abstraction, only method that require READ access
 #[async_trait]
-pub trait FilesystemRead {
+pub trait FilesystemRead: Send + Sync {
     /// Walk files in the filesystem, for each file found it will send it via `tx`. This belongs
     /// to the [`FilesystemRead`] because it **reads** the contents of the directories.
     async fn walk_directory(

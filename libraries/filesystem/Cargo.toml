@@ -9,6 +9,7 @@ local = ["dep:async-std", "dep:ignore", "dep:futures", "dep:sha256"]
 local_temp = ["dep:uuid", "dep:tempfile", "local"]
 pcloud = ["dep:pcloud_sdk"]
 test_utils = []
+diesel = ["dep:diesel", "dep:diesel_utils", "dep:diesel_migrations"]
 
 [dependencies]
 utils = { path = "../utils", features = ["filesystem"] }
@@ -30,6 +31,11 @@ uuid = { workspace = true, optional = true, features = ["v4"] }
 
 # Feature "pcloud"
 pcloud_sdk = { path = "../pcloud_sdk", optional = true }
+
+# Feature "diesel"
+diesel = { workspace = true, optional = true, features = ["sqlite", "r2d2", "returning_clauses_for_sqlite_3_35"] }
+diesel_migrations = { workspace = true, optional = true, features = ["sqlite"] }
+diesel_utils = { path = "../diesel_utils", optional = true }
 
 
 [dev-dependencies]
