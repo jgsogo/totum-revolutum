@@ -7,7 +7,8 @@ CREATE TABLE directories
     -- Full path (relative to root)
     full_path      VARCHAR NOT NULL,
 
-    FOREIGN KEY (parent_id) REFERENCES directories (id)
+    FOREIGN KEY (parent_id) REFERENCES directories (id),
+    UNIQUE (full_path) ON CONFLICT ABORT
 );
 
 INSERT INTO directories (id, full_path) VALUES (0, '');

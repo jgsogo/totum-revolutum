@@ -10,3 +10,10 @@ pub struct Directory {
     pub parent_id: Option<i32>,
     pub full_path: String,
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = directories)]
+pub struct NewDirectory<'a> {
+    pub parent_id: Option<i32>,
+    pub full_path: &'a str,
+}

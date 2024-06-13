@@ -1,8 +1,7 @@
 use std::fmt::Debug;
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
-use diesel::dsl::exists;
+use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
@@ -13,11 +12,15 @@ use tokio::sync::oneshot::Receiver;
 
 use diesel_utils::managers::AllManager;
 
-use crate::impls::composites::diesel_indexed::{models, schema};
+use crate::impls::composites::diesel_indexed::models;
 use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
+// use crate::impls::composites::diesel_indexed::schema::directories::dsl::directories;
+// use crate::impls::composites::diesel_indexed::schema::directories::full_path;
+
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
-const ROOT_DIRECTORY: &str = "/";
+const ROOT_DIRECTORY: &str = "";
+
 pub struct Database {
     pool: Pool<ConnectionManager<SqliteConnection>>,
 }
@@ -40,6 +43,58 @@ impl Database {
             .map_err(|e| Error::Other(format!("Failed to connect to DB: {e}")))?;
 
         Ok(Self { pool })
+    }
+
+    fn get_directory(&self, dirname: &Utf8Path) -> Result<Option<models::Directory>> {
+        use super::schema::directories::dsl::*;
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let directory = directories
+            .filter(full_path.eq(dirname.to_string()))
+            .select(models::Directory::as_select())
+            .first(&mut conn)
+            .optional()
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(directory)
+    }
+
+    fn create_directory(&self, dirname: &Utf8Path) -> Result<models::Directory> {
+        use super::schema::directories::dsl::*;
+
+        let parent_: Option<i32> = match dirname.parent() {
+            None => None,
+            Some(parent_dir) => {
+                let parent = self
+                    .get_directory(parent_dir)?
+                    .ok_or(Error::Other("Failed to get the parent directory".to_string()))?;
+                Some(parent.id)
+            }
+        };
+
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let new_directory = models::NewDirectory {
+            parent_id: parent_,
+            full_path: dirname.as_str(),
+        };
+        let dir = diesel::insert_into(directories)
+            .values(&new_directory)
+            .returning(models::Directory::as_returning())
+            .get_result(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(dir)
+    }
+
+    fn get_or_create_directory(&self, dirname: &Utf8Path) -> Result<(models::Directory, bool)> {
+        let directory = self.get_directory(dirname);
+        match directory {
+            Ok(d) => match d {
+                None => {
+                    let d = self.create_directory(dirname)?;
+                    Ok((d, true))
+                }
+                Some(d) => Ok((d, false)),
+            },
+            Err(e) => Err(e),
+        }
     }
 }
 
@@ -86,22 +141,19 @@ impl FilesystemRead for Database {
     }
 
     async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
-        use super::schema::directories::dsl::*;
         use super::schema::files::dsl::*;
 
         let path = self.check_path(path)?;
         let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
         let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
 
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        let directory: i32 = directories
-            .filter(full_path.eq(dirname.to_string()))
-            .select(schema::directories::dsl::id)
-            .first(&mut conn)
-            .map_err(|e| Error::Other(e.to_string()))?;
+        let directory = self
+            .get_directory(dirname)?
+            .ok_or(Error::Other("Not found".to_string()))?;
 
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
         let file = files
-            .filter(name.eq(filename).and(directory_id.eq(directory)))
+            .filter(name.eq(filename).and(directory_id.eq(directory.id)))
             .select(models::File::as_select())
             .first(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
@@ -114,24 +166,19 @@ impl FilesystemRead for Database {
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        use super::schema::directories::dsl::*;
         use super::schema::files::dsl::*;
 
         let path = self.check_path(path)?;
         let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
 
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        let directory = directories
-            .filter(full_path.eq(dirname.to_string()))
-            .select(schema::directories::dsl::id)
-            .load(&mut conn)
-            .map_err(|e| Error::Other(e.to_string()))?;
-
-        if directory.is_empty() {
+        let directory = self.get_directory(dirname)?;
+        if directory.is_none() {
             return Ok(false);
         }
+        let directory: i32 = directory.unwrap().id;
 
         let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
         let file = files
             .filter(name.eq(filename).and(directory_id.eq(directory)))
             .select(models::File::as_select())
@@ -148,10 +195,24 @@ impl FilesystemRead for Database {
 #[async_trait]
 impl FilesystemWrite for Database {
     async fn create(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        todo!()
+        // I need all the FileMetadata information from the file
+        Err(Error::Forbidden)
     }
 
-    async fn create_dir_all(&self, _path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+        let path = self.check_path(path)?;
+        let mut current_path = Utf8Path::new(ROOT_DIRECTORY).to_path_buf();
+        for it in path.components() {
+            match it {
+                Utf8Component::Normal(c) => {
+                    current_path = current_path.join(c);
+                    // FIXME: Each call to `get_or_create_directory` is running another call to
+                    // FIXME: get the `id` of the parent directory.
+                    let _ = self.get_or_create_directory(&current_path)?;
+                }
+                _ => {}
+            }
+        }
         todo!()
     }
 }
