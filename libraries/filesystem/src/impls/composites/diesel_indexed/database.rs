@@ -15,9 +15,6 @@ use diesel_utils::managers::AllManager;
 use crate::impls::composites::diesel_indexed::models;
 use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
-// use crate::impls::composites::diesel_indexed::schema::directories::dsl::directories;
-// use crate::impls::composites::diesel_indexed::schema::directories::full_path;
-
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
 const ROOT_DIRECTORY: &str = "";
 
