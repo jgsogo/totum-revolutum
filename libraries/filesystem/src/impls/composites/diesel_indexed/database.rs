@@ -2,6 +2,7 @@ use std::fmt::Debug;
 
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
+use diesel::dsl::exists;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
@@ -112,8 +113,31 @@ impl FilesystemRead for Database {
         Ok(Box::new(db_file))
     }
 
-    async fn exists(&self, _path: &Utf8Path) -> Result<bool> {
-        todo!()
+    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
+        use super::schema::directories::dsl::*;
+        use super::schema::files::dsl::*;
+
+        let path = self.check_path(path)?;
+        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let directory = directories
+            .filter(full_path.eq(dirname.to_string()))
+            .select(schema::directories::dsl::id)
+            .load(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+
+        if directory.is_empty() {
+            return Ok(false);
+        }
+
+        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
+        let file = files
+            .filter(name.eq(filename).and(directory_id.eq(directory)))
+            .select(models::File::as_select())
+            .load(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(!file.is_empty())
     }
 
     async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
