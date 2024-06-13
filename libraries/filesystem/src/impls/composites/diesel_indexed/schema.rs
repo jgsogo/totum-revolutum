@@ -19,6 +19,8 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(files -> directories (directory_id));
+
 diesel::allow_tables_to_appear_in_same_query!(
     directories,
     files,

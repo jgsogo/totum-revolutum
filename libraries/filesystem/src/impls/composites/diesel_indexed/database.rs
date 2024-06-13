@@ -42,6 +42,10 @@ impl Database {
         conn.run_pending_migrations(MIGRATIONS)
             .map_err(|e| Error::Other(format!("Failed to connect to DB: {e}")))?;
 
+        diesel::sql_query("PRAGMA foreign_keys = ON") // Enables foreign keys support: https://www.sqlite.org/foreignkeys.html
+            .execute(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+
         Ok(Self { pool })
     }
 
@@ -213,22 +217,80 @@ impl FilesystemWrite for Database {
                 _ => {}
             }
         }
-        todo!()
+        Ok(())
     }
 }
 
 #[async_trait]
 impl FilesystemRemove for Database {
-    async fn remove_file(&self, _path: &Utf8Path) -> Result<()> {
-        todo!()
+    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
+        use super::schema::files::dsl::*;
+
+        let path = self.check_path(path)?;
+        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
+
+        let directory = self
+            .get_directory(dirname)?
+            .ok_or(Error::Other("Directory not found".to_string()))?;
+
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let _ = diesel::delete(files.filter(directory_id.eq(directory.id).and(name.eq(filename))))
+            .execute(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+
+        Ok(())
     }
 
-    async fn remove_dir(&self, _path: &Utf8Path) -> Result<()> {
-        todo!()
+    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
+        use super::schema::directories::dsl::*;
+        use super::schema::files::dsl::*;
+
+        let path = self.check_path(path)?;
+
+        let directory = self
+            .get_directory(&path)?
+            .ok_or(Error::Other("Directory not found".to_string()))?;
+
+        // I need to check if this directory has children
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let children = directories
+            .filter(parent_id.eq(directory.id))
+            .select(models::Directory::as_select())
+            .load(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        if !children.is_empty() {
+            return Err(Error::Other("Directory has other children".to_string()));
+        }
+
+        // I need to check if it contains files
+        let files_in_dir = files
+            .filter(directory_id.eq(directory.id))
+            .select(models::File::as_select())
+            .load(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        if !files_in_dir.is_empty() {
+            return Err(Error::Other("Directory is not empty".to_string()));
+        }
+
+        let _ = diesel::delete(directories.filter(super::schema::directories::dsl::id.eq(directory.id)))
+            .execute(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(())
     }
 
-    async fn remove_dir_all(&self, _path: &Utf8Path) -> Result<()> {
-        todo!()
+    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+        use super::schema::directories::dsl::*;
+        let path = self.check_path(path)?;
+
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        // DELETE ON CASCADE will take care of files when their corresponding directory is removed,
+        // and DELETE ON CASCADE also handles recursion for the `directories` table (see tests below)
+        let _ = diesel::delete(directories.filter(full_path.eq(path.as_str())))
+            .execute(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+
+        Ok(())
     }
 }
 

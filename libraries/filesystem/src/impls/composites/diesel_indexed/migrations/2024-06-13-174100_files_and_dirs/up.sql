@@ -7,7 +7,7 @@ CREATE TABLE directories
     -- Full path (relative to root)
     full_path      VARCHAR NOT NULL,
 
-    FOREIGN KEY (parent_id) REFERENCES directories (id),
+    FOREIGN KEY (parent_id) REFERENCES directories (id) ON DELETE CASCADE,
     UNIQUE (full_path) ON CONFLICT ABORT
 );
 
@@ -26,5 +26,6 @@ CREATE TABLE files
     size INTEGER NOT NULL,
 
     --- Constraints
+    FOREIGN KEY (directory_id) REFERENCES directories (id) ON DELETE CASCADE,
     UNIQUE (name, directory_id) ON CONFLICT ABORT
 );
