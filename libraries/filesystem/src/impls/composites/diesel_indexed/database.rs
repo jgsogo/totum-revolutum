@@ -12,11 +12,11 @@ use tokio::sync::oneshot::Receiver;
 
 use diesel_utils::managers::AllManager;
 
-use crate::impls::composites::diesel_indexed::models;
+use crate::impls::composites::diesel_indexed::{models, schema};
 use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
-
+const ROOT_DIRECTORY: &str = "/";
 pub struct Database {
     pool: Pool<ConnectionManager<SqliteConnection>>,
 }
@@ -81,11 +81,35 @@ impl FilesystemRead for Database {
                 tx.send(Box::new(db_file)).map_err(|e| Error::Other(e.to_string()))?;
             }
         }
-        todo!()
+        Ok(())
     }
 
-    async fn get_metadata(&self, _path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
-        todo!()
+    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
+        use super::schema::directories::dsl::*;
+        use super::schema::files::dsl::*;
+
+        let path = self.check_path(path)?;
+        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
+
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let directory: i32 = directories
+            .filter(full_path.eq(dirname.to_string()))
+            .select(schema::directories::dsl::id)
+            .first(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+
+        let file = files
+            .filter(name.eq(filename).and(directory_id.eq(directory)))
+            .select(models::File::as_select())
+            .first(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        let db_file = DatabaseFile {
+            path,
+            size: file.size as u64,
+            hash: file.hash,
+        };
+        Ok(Box::new(db_file))
     }
 
     async fn exists(&self, _path: &Utf8Path) -> Result<bool> {
@@ -93,7 +117,7 @@ impl FilesystemRead for Database {
     }
 
     async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        todo!()
+        Err(Error::Forbidden)
     }
 }
 

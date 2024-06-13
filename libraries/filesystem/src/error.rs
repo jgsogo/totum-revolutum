@@ -23,6 +23,9 @@ pub enum Error {
     #[error("Given path is not a path to a file")]
     NotAFilepath,
 
+    #[error("Operation forbidden")]
+    Forbidden,
+
     #[error(transparent)]
     IoError(#[from] io::Error),
 
