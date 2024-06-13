@@ -4,9 +4,9 @@ use crate::client::RebrickableClient;
 use crate::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
-use http_utils::rest::RESTClient;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use utils::http::rest::RESTClient;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SetDetail {

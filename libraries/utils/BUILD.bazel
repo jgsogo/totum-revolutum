@@ -7,10 +7,16 @@ rust_library_tests_and_docs(
     aliases = aliases(),
     all_features = {
         "filesystem": ["filesystem"],
+        "async": ["async"],
+        "http": ["http"],
     },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    test_deps = [
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:testing_logger",
+    ],
     deps = all_crate_deps(
         normal = True,
     ),

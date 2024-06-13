@@ -5,8 +5,8 @@ use bitflags::bitflags;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use http_utils::rest::RESTClient;
-use http_utils::AddToParams;
+use utils::http::rest::RESTClient;
+use utils::http::AddToParams;
 
 use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;

@@ -1,5 +1,5 @@
-use http_utils::AddToParams;
 use std::collections::HashMap;
+use utils::http::AddToParams;
 
 use crate::types::RemotePath;
 

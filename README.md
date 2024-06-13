@@ -34,11 +34,9 @@ Applications in this repository:
 
 You can find the following libraries in this repository:
 
-* [async_utils](libraries/async_utils/): utilities for async
 * [constants](libraries/constants/): compile-time constants definition
 * [cron](libraries/cron/): utilities related to cron expressions
 * [filesystem](libraries/filesystem/): abstraction of filesystem and files. Implementation for many different storages.
-* [http_utils](libraries/http_utils/): utilities related to HTTP (vanilla client, REST client,...)
 * [pcloud_sdk](libraries/pcloud_sdk/): pCloud SDK.
 * [rebrickable](libraries/rebrickable/): API for https://rebrickable.com/
 * [utils](libraries/utils/): generic utilities used by several libraries

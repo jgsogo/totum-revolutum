@@ -354,17 +354,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async_utils"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "log",
- "testing_logger",
- "thiserror",
- "tokio",
-]
-
-[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1665,19 +1654,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "http_utils"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "headers",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tracing",
-]
-
-[[package]]
 name = "httparse"
 version = "1.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2684,7 +2660,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "async_utils",
  "bitflags 2.5.0",
  "bytes",
  "camino",
@@ -2698,7 +2673,6 @@ dependencies = [
  "http 1.1.0",
  "http-body 1.0.0",
  "http-body-util",
- "http_utils",
  "httpmock",
  "hyper 1.3.1",
  "hyper-util",
@@ -3147,7 +3121,6 @@ dependencies = [
  "http 1.1.0",
  "http-body 1.0.0",
  "http-body-util",
- "http_utils",
  "httpmock",
  "indicatif",
  "itertools 0.13.0",
@@ -3165,6 +3138,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "utils",
 ]
 
 [[package]]
@@ -4210,7 +4184,18 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 name = "utils"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "async-trait",
  "camino",
+ "headers",
+ "log",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "testing_logger",
+ "thiserror",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]

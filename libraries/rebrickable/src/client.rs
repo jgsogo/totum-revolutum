@@ -1,7 +1,7 @@
 use crate::{Error, Result};
-use http_utils::rest::RESTClient;
-use http_utils::HttpClient;
 use std::collections::HashMap;
+use utils::http::rest::RESTClient;
+use utils::http::HttpClient;
 
 pub trait RebrickableClient: RESTClient + HttpClient<Error = Error> {}
 
