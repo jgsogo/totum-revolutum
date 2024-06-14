@@ -132,9 +132,9 @@ impl<T: Filesystem + FilesystemWrite> Filesystem for AsyncFileDropImpl<T> {
 
 #[async_trait]
 impl<T: FilesystemWrite> FilesystemWrite for AsyncFileDropImpl<T> {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         if self.wrap_create {
-            let (file, rx_filesystem) = self.filesystem.lock().await.as_ref().unwrap().create(path).await?;
+            let (file, rx_filesystem) = self.filesystem.lock().await.as_mut().unwrap().create(path).await?;
             let (tx, rx) = tokio::sync::oneshot::channel();
             let ret = FileAsyncDrop {
                 file: Some(file),
@@ -146,15 +146,15 @@ impl<T: FilesystemWrite> FilesystemWrite for AsyncFileDropImpl<T> {
             };
             Ok((Box::new(ret), Some(rx)))
         } else {
-            self.filesystem.lock().await.as_ref().unwrap().create(path).await
+            self.filesystem.lock().await.as_mut().unwrap().create(path).await
         }
     }
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.filesystem
             .lock()
             .await
-            .as_ref()
+            .as_mut()
             .unwrap()
             .create_dir_all(path)
             .await
@@ -205,19 +205,19 @@ impl<T: FilesystemWrite + FilesystemRead> FilesystemRead for AsyncFileDropImpl<T
 
 #[async_trait]
 impl<T: FilesystemWrite + FilesystemRemove> FilesystemRemove for AsyncFileDropImpl<T> {
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem.lock().await.as_ref().unwrap().remove_file(path).await
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+        self.filesystem.lock().await.as_mut().unwrap().remove_file(path).await
     }
 
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem.lock().await.as_ref().unwrap().remove_dir(path).await
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+        self.filesystem.lock().await.as_mut().unwrap().remove_dir(path).await
     }
 
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.filesystem
             .lock()
             .await
-            .as_ref()
+            .as_mut()
             .unwrap()
             .remove_dir_all(path)
             .await

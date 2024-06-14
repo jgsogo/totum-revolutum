@@ -83,7 +83,7 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 /// (store the database back to pCloud if anything fails) is always executed
 async fn db_commands<T: Database, RemoteStorage: FilesystemRead + FilesystemWrite>(
     command: Commands,
-    photodb: PhotoDB<'_, T, RemoteStorage>,
+    mut photodb: PhotoDB<'_, T, RemoteStorage>,
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,

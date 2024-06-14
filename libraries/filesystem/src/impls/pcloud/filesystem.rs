@@ -176,7 +176,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for Files
 
 #[async_trait]
 impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemWrite for FilesystemPCloud<HttpClient> {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let rel_path = self.check_path(path)?;
         let filename = rel_path.file_name().ok_or(Error::NotAFilepath)?;
 
@@ -211,7 +211,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemWrite for File
         Ok((Box::new(f), None))
     }
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         let rel_path = self.check_path(path)?;
         self.pcloud
             .createfolderifnotexists_all(&self.root_folderid, rel_path)
@@ -223,7 +223,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemWrite for File
 
 #[async_trait]
 impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRemove for FilesystemPCloud<HttpClient> {
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         let path = self.root_path.join(self.check_path(path)?);
         let input_file = path
             .try_into()
@@ -235,7 +235,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRemove for Fil
         Ok(())
     }
 
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
         let path = self.root_path.join(self.check_path(path)?);
         let input_folder = path
             .try_into()
@@ -247,7 +247,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRemove for Fil
         Ok(())
     }
 
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         let path = self.root_path.join(self.check_path(path)?);
         let input_folder = path
             .try_into()
@@ -411,7 +411,7 @@ mod tests {
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(root, client).await?;
-        let fs = AsyncFileDropImpl::new_call_sync_all(fs);
+        let mut fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
         let rx = {
             let filepath = Utf8Path::new("file");
@@ -585,7 +585,7 @@ mod tests {
 
         // Create the filesystem
         let fs = FilesystemPCloud::new(root_path, client).await?;
-        let fs = AsyncFileDropImpl::new_call_sync_all(fs);
+        let mut fs = AsyncFileDropImpl::new_call_sync_all(fs);
         let rx = {
             let filepath = Utf8Path::new("nested/nested2/myfile.txt");
             let (_, rx) = fs.create(filepath).await?;
@@ -634,7 +634,7 @@ mod tests {
                 })
             });
 
-        let fs = FilesystemPCloud::new(root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(root_path, client).await?;
 
         fs.create_dir_all(Utf8Path::new("nested/nested2")).await?;
         Ok(())
@@ -678,7 +678,7 @@ mod tests {
             },
         );
 
-        let fs = FilesystemPCloud::new(root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_file(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }
@@ -719,7 +719,7 @@ mod tests {
                 })
             });
 
-        let fs = FilesystemPCloud::new(root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_dir(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }
@@ -760,7 +760,7 @@ mod tests {
                 })
             });
 
-        let fs = FilesystemPCloud::new(root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(root_path, client).await?;
         fs.remove_dir_all(Utf8Path::new("nested/nested2")).await?;
         Ok(())
     }

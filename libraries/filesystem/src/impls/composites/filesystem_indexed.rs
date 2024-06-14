@@ -1,13 +1,14 @@
-use crate::actions::copy_file;
-use crate::wrappers::AsyncFileDropImpl;
-use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
+use std::sync::Arc;
+
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
-use std::ops::Deref;
-use std::sync::Arc;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
+
+use crate::actions::copy_file;
+use crate::wrappers::AsyncFileDropImpl;
+use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 /// Function called from [`FilesystemIndexed`] when a file opened in write mode is being dropped.
 /// This function calls [`File::sync_all`], drops the `file`, awaits for any pending action in the
@@ -33,16 +34,9 @@ async fn index_file<
     // Now update or create the entry in the INDEX filesystem (copy from storage to index)
     // FIXME: copy_file is not suitable here. Probably the DB/INDEX implementation only wants the
     // FIXME: metadata (to store in the DB) and it can just get metadata using `fs.get_metadata`
-    let index = index.lock().await;
+    let mut index = index.lock().await;
     let storage = storage.lock().await;
-    let rx_index = copy_file(
-        storage.as_ref().unwrap(),
-        index.deref().as_ref().unwrap(),
-        &path,
-        &path,
-        true,
-    )
-    .await?;
+    let rx_index = copy_file(storage.as_ref().unwrap(), index.as_mut().unwrap(), &path, &path, true).await?;
 
     match rx_index {
         Some(rx_index) => rx_index
@@ -146,15 +140,15 @@ impl<TIndex: FilesystemRead, TStorage: FilesystemWrite> FilesystemRead for Files
 impl<TIndex: FilesystemWrite + FilesystemRead, TStorage: FilesystemWrite> FilesystemWrite
     for FilesystemIndexed<TIndex, TStorage>
 {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         // Only the file in the storage needs to be created, the INDEX will be synced when the
         // file is dropped.
         self.storage.create(path).await
     }
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.storage.create_dir_all(path).await?;
-        self.index.lock().await.as_ref().unwrap().create_dir_all(path).await
+        self.index.lock().await.as_mut().unwrap().create_dir_all(path).await
     }
 }
 
@@ -162,18 +156,159 @@ impl<TIndex: FilesystemWrite + FilesystemRead, TStorage: FilesystemWrite> Filesy
 impl<TIndex: FilesystemRead + FilesystemWrite + FilesystemRemove, TStorage: FilesystemWrite + FilesystemRemove>
     FilesystemRemove for FilesystemIndexed<TIndex, TStorage>
 {
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         self.storage.remove_file(path).await?;
-        self.index.lock().await.as_ref().unwrap().remove_file(path).await
+        self.index.lock().await.as_mut().unwrap().remove_file(path).await
     }
 
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
         self.storage.remove_dir(path).await?;
-        self.index.lock().await.as_ref().unwrap().remove_dir(path).await
+        self.index.lock().await.as_mut().unwrap().remove_dir(path).await
     }
 
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.storage.remove_dir_all(path).await?;
-        self.index.lock().await.as_ref().unwrap().remove_dir_all(path).await
+        self.index.lock().await.as_mut().unwrap().remove_dir_all(path).await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use camino::{Utf8Component, Utf8PathBuf};
+
+    use crate::Filesystem;
+
+    use super::*;
+
+    /// Something that implements the index
+    #[derive(Default)]
+    struct IndexImpl {
+        /// Maps the path to the files
+        files: HashMap<Utf8PathBuf, IndexImplFile>,
+
+        /// Path to directories
+        directories: Vec<Utf8PathBuf>,
+    }
+
+    #[derive(Debug, Clone)]
+    struct IndexImplFile {
+        path: Utf8PathBuf,
+        hash: String,
+        size: u64,
+    }
+
+    impl FileMetadata for IndexImplFile {
+        fn path(&self) -> &Utf8Path {
+            &self.path
+        }
+
+        fn size(&self) -> Result<u64> {
+            Ok(self.size)
+        }
+
+        fn hash(&self) -> Result<String> {
+            Ok(self.hash.clone())
+        }
+    }
+
+    #[async_trait]
+    impl Filesystem for IndexImpl {
+        async fn sync_all(self) -> Result<()> {
+            Ok(())
+        }
+    }
+
+    #[async_trait]
+    impl FilesystemRead for IndexImpl {
+        async fn walk_directory(
+            &self,
+            tx: Sender<Box<dyn FileMetadata>>,
+            _threads: usize,
+            _custom_ignore_filename: &Utf8Path,
+        ) -> Result<()> {
+            for it in self.files.values() {
+                tx.send(Box::new(it.clone())).unwrap();
+            }
+            Ok(())
+        }
+
+        async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
+            match self.files.get(path) {
+                None => Err(Error::PathDoesNotExist),
+                Some(f) => Ok(Box::new(f.clone())),
+            }
+        }
+
+        async fn exists(&self, path: &Utf8Path) -> Result<bool> {
+            Ok(self.files.contains_key(path) || self.directories.contains(&path.to_path_buf()))
+        }
+
+        async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+            Err(Error::Forbidden)
+        }
+    }
+
+    #[async_trait]
+    impl FilesystemWrite for IndexImpl {
+        async fn create(&mut self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+            // We can compute the hash and size! We can't introduce it in the database
+            Err(Error::Forbidden)
+        }
+
+        async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+            let mut current_path = Utf8PathBuf::from("");
+            for it in path.components() {
+                if let Utf8Component::Normal(p) = it {
+                    current_path = current_path.join(p);
+                }
+                self.directories.push(current_path.clone());
+            }
+            Ok(())
+        }
+    }
+
+    #[async_trait]
+    impl FilesystemRemove for IndexImpl {
+        async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+            let _ = self.files.remove(path);
+            Ok(())
+        }
+
+        async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+            let found = self
+                .directories
+                .iter()
+                .filter(|d| d.starts_with(path))
+                .collect::<Vec<_>>();
+            match found.len() {
+                0 => Err(Error::PathDoesNotExist),
+                1 => {
+                    let pos = found.into_iter().position(|p| p.eq(path));
+                    match pos {
+                        None => Err(Error::PathDoesNotExist),
+                        Some(pos) => {
+                            self.directories.remove(pos);
+                            Ok(())
+                        }
+                    }
+                }
+                _ => Err(Error::Other("Multiple found. Directory is not empty".to_string())),
+            }
+        }
+
+        async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+            let path_with_trailing_slash = Utf8PathBuf::from(path.to_string() + "/");
+            let _ = self
+                .directories
+                .retain(|d| !d.starts_with(&path_with_trailing_slash) && !d.eq(path));
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn test_index_impl() {
+        let _index = IndexImpl::default();
     }
 }

@@ -33,8 +33,8 @@ async fn backup_file<
 
     // Now copy from the lhs filesystem to the rhs filesystem
     let fs_lhs = fs_lhs.lock().await;
-    let fs_rhs = fs_rhs.lock().await;
-    let rx_rhs = copy_file(fs_lhs.as_ref().unwrap(), fs_rhs.as_ref().unwrap(), &path, &path, true).await?;
+    let mut fs_rhs = fs_rhs.lock().await;
+    let rx_rhs = copy_file(fs_lhs.as_ref().unwrap(), fs_rhs.as_mut().unwrap(), &path, &path, true).await?;
 
     match rx_rhs {
         Some(rx_rhs) => rx_rhs
@@ -131,15 +131,15 @@ impl<LHS: FilesystemWrite + FilesystemRead, RHS: FilesystemWrite> FilesystemRead
 
 #[async_trait]
 impl<LHS: FilesystemWrite + FilesystemRead, RHS: FilesystemWrite> FilesystemWrite for FilesystemBackup<LHS, RHS> {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         // The file on the RHS filesystem will be created when the returned one is dropped. This is
         // the magic implemented in this FilesystemBackup.
         self.lhs.create(path).await
     }
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.lhs.create_dir_all(path).await?;
-        self.rhs.lock().await.as_ref().unwrap().create_dir_all(path).await
+        self.rhs.lock().await.as_mut().unwrap().create_dir_all(path).await
     }
 }
 
@@ -147,19 +147,19 @@ impl<LHS: FilesystemWrite + FilesystemRead, RHS: FilesystemWrite> FilesystemWrit
 impl<LHS: FilesystemWrite + FilesystemRemove, RHS: FilesystemWrite + FilesystemRemove> FilesystemRemove
     for FilesystemBackup<LHS, RHS>
 {
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         self.lhs.remove_file(path).await?;
-        self.rhs.lock().await.as_ref().unwrap().remove_file(path).await
+        self.rhs.lock().await.as_mut().unwrap().remove_file(path).await
     }
 
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
         self.lhs.remove_dir(path).await?;
-        self.rhs.lock().await.as_ref().unwrap().remove_dir(path).await
+        self.rhs.lock().await.as_mut().unwrap().remove_dir(path).await
     }
 
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.lhs.remove_dir_all(path).await?;
-        self.rhs.lock().await.as_ref().unwrap().remove_dir_all(path).await
+        self.rhs.lock().await.as_mut().unwrap().remove_dir_all(path).await
     }
 }
 
@@ -193,7 +193,7 @@ mod tests {
         };
 
         let fs23 = FilesystemBackup::new(fs2, fs3);
-        let fs12 = FilesystemBackup::new(fs1, fs23);
+        let mut fs12 = FilesystemBackup::new(fs1, fs23);
 
         // If I work in fs12, changes will be available in fs1, fs2 and fs3
 

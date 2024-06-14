@@ -13,8 +13,6 @@ use tokio::sync::oneshot::Receiver;
 use diesel_utils::managers::AllManager;
 
 use crate::impls::composites::diesel_indexed::models;
-use crate::impls::composites::diesel_indexed::schema::files::directory_id;
-use crate::impls::composites::diesel_indexed::schema::files::dsl::files;
 use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
@@ -130,7 +128,7 @@ impl FilesystemRead for Database {
         let all_directories = models::Directory::all(models::Directory::as_select(), &mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
         for dir in all_directories {
-            let dir_path = Utf8PathBuf::from(dir.full_path);
+            let dir_path = Utf8PathBuf::from(&dir.full_path);
 
             let all_files = self.get_files_in_directory(&dir)?;
             for file in all_files {
@@ -199,12 +197,12 @@ impl FilesystemRead for Database {
 
 #[async_trait]
 impl FilesystemWrite for Database {
-    async fn create(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         // I need all the FileMetadata information from the file
         Err(Error::Forbidden)
     }
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
         let mut current_path = Utf8Path::new(ROOT_DIRECTORY).to_path_buf();
         for it in path.components() {
@@ -224,7 +222,7 @@ impl FilesystemWrite for Database {
 
 #[async_trait]
 impl FilesystemRemove for Database {
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         use super::schema::files::dsl::*;
 
         let path = self.check_path(path)?;
@@ -243,7 +241,7 @@ impl FilesystemRemove for Database {
         Ok(())
     }
 
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
         use super::schema::directories::dsl::*;
 
         let path = self.check_path(path)?;
@@ -275,7 +273,7 @@ impl FilesystemRemove for Database {
         Ok(())
     }
 
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         use super::schema::directories::dsl::*;
         let path = self.check_path(path)?;
 
