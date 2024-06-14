@@ -13,6 +13,8 @@ use tokio::sync::oneshot::Receiver;
 use diesel_utils::managers::AllManager;
 
 use crate::impls::composites::diesel_indexed::models;
+use crate::impls::composites::diesel_indexed::schema::files::directory_id;
+use crate::impls::composites::diesel_indexed::schema::files::dsl::files;
 use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
@@ -24,7 +26,6 @@ pub struct Database {
 
 impl Database {
     pub fn new(database_url: &str) -> Result<Self> {
-        // Create a connection pool using the local temp file
         let pool = {
             let manager = ConnectionManager::<SqliteConnection>::new(database_url);
             Pool::builder()
@@ -97,6 +98,16 @@ impl Database {
             Err(e) => Err(e),
         }
     }
+
+    fn get_files_in_directory(&self, directory: &models::Directory) -> Result<Vec<models::File>> {
+        use super::schema::files::dsl::*;
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        files
+            .filter(directory_id.eq(directory.id))
+            .select(models::File::as_select())
+            .load(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))
+    }
 }
 
 #[async_trait]
@@ -114,21 +125,14 @@ impl FilesystemRead for Database {
         _threads: usize,
         _custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
-        use super::schema::files::dsl::*;
-
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        let mut conn2 = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
 
         let all_directories = models::Directory::all(models::Directory::as_select(), &mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
         for dir in all_directories {
             let dir_path = Utf8PathBuf::from(dir.full_path);
 
-            let all_files = files
-                .filter(directory_id.eq(dir.id))
-                .select(models::File::as_select())
-                .load(&mut conn2)
-                .map_err(|e| Error::Other(e.to_string()))?;
+            let all_files = self.get_files_in_directory(&dir)?;
             for file in all_files {
                 let db_file = DatabaseFile {
                     path: dir_path.join(file.name),
@@ -241,7 +245,6 @@ impl FilesystemRemove for Database {
 
     async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
         use super::schema::directories::dsl::*;
-        use super::schema::files::dsl::*;
 
         let path = self.check_path(path)?;
 
@@ -261,11 +264,7 @@ impl FilesystemRemove for Database {
         }
 
         // I need to check if it contains files
-        let files_in_dir = files
-            .filter(directory_id.eq(directory.id))
-            .select(models::File::as_select())
-            .load(&mut conn)
-            .map_err(|e| Error::Other(e.to_string()))?;
+        let files_in_dir = self.get_files_in_directory(&directory)?;
         if !files_in_dir.is_empty() {
             return Err(Error::Other("Directory is not empty".to_string()));
         }
