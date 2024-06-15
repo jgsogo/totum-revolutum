@@ -35,7 +35,7 @@ data-encoding = "2.6.0"
 diesel = { version = "2.2.0", default-features = false, features = ["sqlite", "r2d2"] }
 diesel_migrations = { version = "2.2.0", default-features = false, features = ["sqlite"] }
 diesel_table_macro_syntax = "0.2.0"
-diffy = "0.3.0"
+diffy = "0.4.0"
 dirs = { version = "5.0.1" }
 dotenvy = "0.15.7"
 dyn-clone = "1.0.17"
