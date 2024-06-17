@@ -8,15 +8,12 @@ use tokio::sync::Mutex;
 
 use crate::actions::copy_file;
 use crate::wrappers::AsyncFileDropImpl;
-use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
+use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 /// Function called from [`FilesystemIndexed`] when a file opened in write mode is being dropped.
 /// This function calls [`File::sync_all`], drops the `file`, awaits for any pending action in the
 /// drop procedure using `rx_filesystem` and finally creates or updates the entry in the index.
-async fn index_file<
-    LHS: FilesystemRead + FilesystemWrite + 'static,
-    RHS: FilesystemRead + FilesystemWrite + 'static,
->(
+async fn index_file<LHS: Filesystem + 'static, RHS: Filesystem + 'static>(
     file: Box<dyn File>,
     rx_filesystem: Option<Receiver<Result<()>>>,
     index: Arc<Mutex<Option<LHS>>>,
@@ -52,14 +49,12 @@ async fn index_file<
 /// This is the typical scenario where there is a database indexing the files in a remote storage.
 /// We only want to hit the storage to read the actual content of the files and to save them, but
 /// every other operation runs against the database to save time/bandwidth.
-pub struct FilesystemIndexed<TIndex: FilesystemRead, TStorage: FilesystemWrite> {
+pub struct FilesystemIndexed<TIndex: Filesystem, TStorage: Filesystem> {
     index: Arc<Mutex<Option<TIndex>>>,
     storage: AsyncFileDropImpl<TStorage>,
 }
 
-impl<TIndex: FilesystemWrite + FilesystemRead + 'static, TStorage: FilesystemWrite + FilesystemRead + 'static>
-    FilesystemIndexed<TIndex, TStorage>
-{
+impl<TIndex: Filesystem + 'static, TStorage: Filesystem + 'static> FilesystemIndexed<TIndex, TStorage> {
     pub fn new(index: TIndex, storage: TStorage) -> Self {
         let index = Arc::new(Mutex::new(Some(index)));
 
@@ -95,19 +90,12 @@ impl<TIndex: FilesystemWrite + FilesystemRead + 'static, TStorage: FilesystemWri
 }
 
 #[async_trait]
-impl<
-        TIndex: Filesystem + FilesystemWrite + FilesystemRead,
-        TStorage: Filesystem + FilesystemWrite + FilesystemRead,
-    > Filesystem for FilesystemIndexed<TIndex, TStorage>
-{
+impl<TIndex: Filesystem, TStorage: Filesystem> Filesystem for FilesystemIndexed<TIndex, TStorage> {
     async fn sync_all(self) -> Result<()> {
         self.storage.sync_all().await?;
         self.index.lock().await.take().unwrap().sync_all().await
     }
-}
 
-#[async_trait]
-impl<TIndex: FilesystemRead, TStorage: FilesystemWrite> FilesystemRead for FilesystemIndexed<TIndex, TStorage> {
     async fn walk_directory(
         &self,
         tx: Sender<Box<dyn FileMetadata>>,
@@ -134,12 +122,7 @@ impl<TIndex: FilesystemRead, TStorage: FilesystemWrite> FilesystemRead for Files
     async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.index.lock().await.as_ref().unwrap().open(path).await
     }
-}
 
-#[async_trait]
-impl<TIndex: FilesystemWrite + FilesystemRead, TStorage: FilesystemWrite> FilesystemWrite
-    for FilesystemIndexed<TIndex, TStorage>
-{
     async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         // Only the file in the storage needs to be created, the INDEX will be synced when the
         // file is dropped.
@@ -150,12 +133,7 @@ impl<TIndex: FilesystemWrite + FilesystemRead, TStorage: FilesystemWrite> Filesy
         self.storage.create_dir_all(path).await?;
         self.index.lock().await.as_mut().unwrap().create_dir_all(path).await
     }
-}
 
-#[async_trait]
-impl<TIndex: FilesystemRead + FilesystemWrite + FilesystemRemove, TStorage: FilesystemWrite + FilesystemRemove>
-    FilesystemRemove for FilesystemIndexed<TIndex, TStorage>
-{
     async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         self.storage.remove_file(path).await?;
         self.index.lock().await.as_mut().unwrap().remove_file(path).await
@@ -218,10 +196,7 @@ mod tests {
         async fn sync_all(self) -> Result<()> {
             Ok(())
         }
-    }
 
-    #[async_trait]
-    impl FilesystemRead for IndexImpl {
         async fn walk_directory(
             &self,
             tx: Sender<Box<dyn FileMetadata>>,
@@ -248,10 +223,7 @@ mod tests {
         async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
             Err(Error::Forbidden)
         }
-    }
 
-    #[async_trait]
-    impl FilesystemWrite for IndexImpl {
         async fn create(&mut self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
             // We can compute the hash and size! We can't introduce it in the database
             Err(Error::Forbidden)
@@ -267,10 +239,7 @@ mod tests {
             }
             Ok(())
         }
-    }
 
-    #[async_trait]
-    impl FilesystemRemove for IndexImpl {
         async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
             let _ = self.files.remove(path);
             Ok(())

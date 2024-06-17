@@ -2,7 +2,7 @@
 //! with `diesel` crate.
 
 use crate::impls::composites::FilesystemIndexed;
-use crate::{FilesystemRead, FilesystemWrite, Result};
+use crate::{Filesystem, Result};
 use database::Database;
 pub(self) mod database;
 pub(self) mod models;
@@ -12,7 +12,7 @@ mod schema;
 pub struct FilesystemIndexedDB;
 
 impl FilesystemIndexedDB {
-    pub async fn new<TStorage: FilesystemRead + FilesystemWrite + 'static>(
+    pub async fn new<TStorage: Filesystem + 'static>(
         database_url: &str,
         storage: TStorage,
         do_initial_indexing: bool,

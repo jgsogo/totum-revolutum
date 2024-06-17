@@ -13,7 +13,7 @@ use tokio::sync::oneshot::Receiver;
 use diesel_utils::managers::AllManager;
 
 use crate::impls::composites::diesel_indexed::models;
-use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
+use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
 const ROOT_DIRECTORY: &str = "";
@@ -113,10 +113,7 @@ impl Filesystem for Database {
     async fn sync_all(self) -> Result<()> {
         Ok(())
     }
-}
 
-#[async_trait]
-impl FilesystemRead for Database {
     async fn walk_directory(
         &self,
         tx: Sender<Box<dyn FileMetadata>>,
@@ -193,10 +190,7 @@ impl FilesystemRead for Database {
     async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         Err(Error::Forbidden)
     }
-}
 
-#[async_trait]
-impl FilesystemWrite for Database {
     async fn create(&mut self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         // I need all the FileMetadata information from the file
         Err(Error::Forbidden)
@@ -218,10 +212,7 @@ impl FilesystemWrite for Database {
         }
         Ok(())
     }
-}
 
-#[async_trait]
-impl FilesystemRemove for Database {
     async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         use super::schema::files::dsl::*;
 
