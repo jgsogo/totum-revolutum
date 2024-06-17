@@ -6,14 +6,14 @@ use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
-use crate::actions::copy_file;
+use crate::filesystem::FilesystemOps;
 use crate::wrappers::AsyncFileDropImpl;
 use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 /// Function called from [`FilesystemBackup`] when the file from the LHS filesystem is being dropped. This function
 /// calls [`File::sync_all`], drops the `file`, awaits for any pending action in the drop procedure using `rx_filesystem`
 /// and finally copies the file to the RHS filesystem (using the given `path`).
-async fn backup_file<LHS: Filesystem + 'static, RHS: Filesystem + 'static>(
+async fn backup_file<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static>(
     file: Box<dyn File>,
     rx_filesystem: Option<Receiver<Result<()>>>,
     fs_lhs: Arc<Mutex<Option<LHS>>>,
@@ -31,7 +31,11 @@ async fn backup_file<LHS: Filesystem + 'static, RHS: Filesystem + 'static>(
     // Now copy from the lhs filesystem to the rhs filesystem
     let fs_lhs = fs_lhs.lock().await;
     let mut fs_rhs = fs_rhs.lock().await;
-    let rx_rhs = copy_file(fs_lhs.as_ref().unwrap(), fs_rhs.as_mut().unwrap(), &path, &path, true).await?;
+    let rx_rhs = fs_rhs
+        .as_mut()
+        .unwrap()
+        .copy_from(&path, fs_lhs.as_ref().unwrap(), &path, true)
+        .await?;
 
     match rx_rhs {
         Some(rx_rhs) => rx_rhs
@@ -58,7 +62,7 @@ pub struct FilesystemBackup<LHS: Filesystem, RHS: Filesystem> {
     rhs: Arc<Mutex<Option<RHS>>>,
 }
 
-impl<LHS: Filesystem + 'static, RHS: Filesystem + 'static> FilesystemBackup<LHS, RHS> {
+impl<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static> FilesystemBackup<LHS, RHS> {
     pub fn new(fs_lhs: LHS, fs_rhs: RHS) -> Self {
         let fs_rhs = Arc::new(Mutex::new(Some(fs_rhs)));
 
@@ -84,7 +88,7 @@ impl<LHS: Filesystem + 'static, RHS: Filesystem + 'static> FilesystemBackup<LHS,
     }
 
     /// Syncs the contents of both filesystems. In this [`FilesystemBackup`] it means that all the
-    /// files from one filesystem will be available in the other and viceversa (running this method
+    /// files from one filesystem will be available in the other and _vice versa_ (running this method
     /// can take a while if many files need to be copied).
     pub async fn sync(&self) -> Result<()> {
         // TODO: Implement a method to do the initial sync. Leverage on some external `action`: backup, sync, mirror,...
@@ -144,6 +148,38 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
     async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.lhs.remove_dir_all(path).await?;
         self.rhs.lock().await.as_mut().unwrap().remove_dir_all(path).await
+    }
+
+    async fn internal_copy(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        self.lhs.internal_copy(origin, target, force).await?;
+        self.rhs
+            .lock()
+            .await
+            .as_mut()
+            .unwrap()
+            .internal_copy(origin, target, force)
+            .await
+    }
+
+    async fn internal_move(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        self.lhs.internal_move(origin, target, force).await?;
+        self.rhs
+            .lock()
+            .await
+            .as_mut()
+            .unwrap()
+            .internal_move(origin, target, force)
+            .await
     }
 }
 

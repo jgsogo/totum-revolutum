@@ -38,17 +38,6 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        let path = self.root.join(self.check_path(path)?);
-        let f = AsyncFile::create(path.into_std_path_buf()).await?;
-        Ok((Box::new(f), None))
-    }
-
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.root.join(self.check_path(path)?);
-        fs::create_dir_all(path).map_err(Error::IoError)
-    }
-
     async fn walk_directory(
         &self,
         tx: Sender<Box<dyn FileMetadata>>,
@@ -68,6 +57,7 @@ impl Filesystem for FilesystemLocal {
         info!("Finished local visitor in {:?}", start.elapsed());
         Ok(())
     }
+
     async fn get_metadata(&self, _path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
         // It doesn't make much sense that the `Self::Metadata` contains an `ignore::DirEntry`, we
         // need something more identificable as metadata in a local filesystem
@@ -82,6 +72,16 @@ impl Filesystem for FilesystemLocal {
         let path = self.root.join(self.check_path(path)?);
         let f = AsyncFile::open(path.into_std_path_buf()).await?;
         Ok((Box::new(f), None))
+    }
+
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+        let path = self.root.join(self.check_path(path)?);
+        let f = AsyncFile::create(path.into_std_path_buf()).await?;
+        Ok((Box::new(f), None))
+    }
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+        let path = self.root.join(self.check_path(path)?);
+        fs::create_dir_all(path).map_err(Error::IoError)
     }
 
     async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
@@ -100,6 +100,38 @@ impl Filesystem for FilesystemLocal {
         // Do not resolve symlinks
         let path = self.root.join(self.check_path(path)?);
         fs::remove_dir_all(path).map_err(Error::IoError)
+    }
+
+    async fn internal_copy(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        let origin = self.root.join(self.check_path(origin)?);
+        let target = self.root.join(self.check_path(target)?);
+        if !force && self.exists(&target).await? {
+            return Err(Error::TargetFileExists);
+        }
+        let _ = fs::copy(&origin, &target).map_err(Error::IoError)?;
+        Ok(None)
+    }
+
+    async fn internal_move(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        let origin = self.root.join(self.check_path(origin)?);
+        let target = self.root.join(self.check_path(target)?);
+
+        if !force && self.exists(&target).await? {
+            return Err(Error::TargetFileExists);
+        }
+
+        fs::rename(&origin, &target).map_err(Error::IoError)?;
+        Ok(None)
     }
 }
 

@@ -80,4 +80,22 @@ impl Filesystem for FilesystemLocalTemp {
     async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.local.remove_dir_all(path).await
     }
+
+    async fn internal_copy(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        self.local.internal_copy(origin, target, force).await
+    }
+
+    async fn internal_move(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        self.local.internal_move(origin, target, force).await
+    }
 }

@@ -2,9 +2,12 @@ use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use tokio::sync::oneshot::Receiver;
 
+use utils::filesystem::normalize_path;
+
+use crate::actions::copy;
+
 use super::{Error, Result};
 use super::{File, FileMetadata};
-use utils::filesystem::normalize_path;
 
 /// Abstraction of a filesystem with methods to access its files
 #[async_trait]
@@ -61,4 +64,103 @@ pub trait Filesystem: Send + Sync {
 
     /// Removes a directory at this path, after removing all its contents. Use carefully!
     async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()>;
+
+    /// Copies a file inside this same [`Filesystem`] from `origin` to `target` path.
+    ///
+    /// This method is default-implemented using [`Filesystem::open`] and [`Filesystem::create`], it
+    /// should be overridden by [`Filesystem`] implementations that can optimize this copy.
+    async fn internal_copy(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        if !force && self.exists(target).await? {
+            return Err(Error::TargetFileExists);
+        }
+
+        let (mut origin_file, _) = self.open(origin).await?;
+        let (mut target_file, rx) = self.create(target).await?;
+        copy(&mut origin_file, &mut target_file).await?;
+        Ok(rx)
+    }
+
+    /// Moves a file inside this same [`Filesystem`] from `origin` to `target` path.
+    ///
+    /// This method is default-implemented using [`Filesystem::open`], [`Filesystem::create`] and
+    /// [`Filesystem::remove_file`]. It should be overridden by [`Filesystem`] implementations
+    /// that can optimize this copy and remove.
+    async fn internal_move(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        if !force && self.exists(target).await? {
+            return Err(Error::TargetFileExists);
+        }
+
+        let r = self.internal_copy(origin, target, force).await?;
+        self.remove_file(origin).await?;
+        Ok(r)
+    }
 }
+
+/// Declares operations in a filesystem that involve other filesystems
+#[async_trait]
+pub trait FilesystemOps: Filesystem + Sized {
+    fn is_same(&self, other: &dyn Filesystem) -> bool {
+        let lhs: *const dyn Filesystem = self;
+        let rhs: *const dyn Filesystem = other;
+        std::ptr::addr_eq(lhs, rhs)
+    }
+
+    /// Copies a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
+    /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
+    async fn copy_from(
+        &mut self,
+        target: &Utf8Path,
+        origin: &dyn Filesystem,
+        origin_path: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        if self.is_same(origin) {
+            self.internal_copy(target, origin_path, force).await
+        } else {
+            if !force && self.exists(target).await? {
+                return Err(Error::TargetFileExists);
+            }
+
+            let (mut origin_file, _) = origin.open(origin_path).await?;
+            let (mut target_file, rx) = self.create(target).await?;
+            copy(&mut origin_file, &mut target_file).await?;
+            Ok(rx)
+        }
+    }
+
+    /// Moves a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
+    /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
+    async fn move_from(
+        &mut self,
+        target: &Utf8Path,
+        origin: &mut dyn Filesystem,
+        origin_path: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        if self.is_same(origin) {
+            self.internal_move(target, origin_path, force).await
+        } else {
+            if !force && self.exists(target).await? {
+                return Err(Error::TargetFileExists);
+            }
+
+            let (mut origin_file, _) = origin.open(origin_path).await?;
+            let (mut target_file, rx) = self.create(target).await?;
+            copy(&mut origin_file, &mut target_file).await?;
+            origin.remove_file(origin_path).await?;
+            Ok(rx)
+        }
+    }
+}
+
+impl<T: Filesystem + Sized> FilesystemOps for T {}

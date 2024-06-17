@@ -249,6 +249,26 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
+
+    // TODO: Implement using some new endpoint
+    // async fn internal_copy(
+    //     &mut self,
+    //     origin: &Utf8Path,
+    //     target: &Utf8Path,
+    //     force: bool,
+    // ) -> Result<Option<Receiver<Result<()>>>> {
+    //     todo!("impl internal_copy for PCloud. It probably needs some new endpoint")
+    // }
+    //
+    // TODO: Implement using some new endpoint
+    // async fn internal_move(
+    //     &mut self,
+    //     origin: &Utf8Path,
+    //     target: &Utf8Path,
+    //     force: bool,
+    // ) -> Result<Option<Receiver<Result<()>>>> {
+    //     todo!("impl internal_move for PCloud. It probably needs some new endpoint")
+    // }
 }
 
 #[cfg(test)]
