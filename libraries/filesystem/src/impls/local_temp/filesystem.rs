@@ -46,11 +46,11 @@ impl Filesystem for FilesystemLocalTemp {
 
 #[async_trait]
 impl FilesystemWrite for FilesystemLocalTemp {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.local.create(path).await
     }
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.local.create_dir_all(path).await
     }
 }
@@ -79,15 +79,15 @@ impl FilesystemRead for FilesystemLocalTemp {
 
 #[async_trait]
 impl FilesystemRemove for FilesystemLocalTemp {
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         self.local.remove_file(path).await
     }
 
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
         self.local.remove_dir(path).await
     }
 
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.local.remove_dir_all(path).await
     }
 }

@@ -42,13 +42,13 @@ impl Filesystem for FilesystemLocal {
 
 #[async_trait]
 impl FilesystemWrite for FilesystemLocal {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let path = self.root.join(self.check_path(path)?);
         let f = AsyncFile::create(path.into_std_path_buf()).await?;
         Ok((Box::new(f), None))
     }
 
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         let path = self.root.join(self.check_path(path)?);
         fs::create_dir_all(path).map_err(Error::IoError)
     }
@@ -94,19 +94,19 @@ impl FilesystemRead for FilesystemLocal {
 
 #[async_trait]
 impl FilesystemRemove for FilesystemLocal {
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.root.join(self.check_path(path)?);
         fs::remove_file(path).map_err(Error::IoError)
     }
 
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.root.join(self.check_path(path)?);
         fs::remove_dir(path).map_err(Error::IoError)
     }
 
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         // Do not resolve symlinks
         let path = self.root.join(self.check_path(path)?);
         fs::remove_dir_all(path).map_err(Error::IoError)
@@ -146,7 +146,7 @@ mod tests {
     async fn test_create_write_read() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
-        let fs = FilesystemLocal::new(utf8_path)?;
+        let mut fs = FilesystemLocal::new(utf8_path)?;
 
         let filepath = utf8_path.join("myfile");
         let content: Vec<u8> = b"Hello, world!".to_vec();
@@ -176,7 +176,7 @@ mod tests {
     async fn test_create_in_subfolder() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
-        let fs = FilesystemLocal::new(utf8_path)?;
+        let mut fs = FilesystemLocal::new(utf8_path)?;
 
         // I can't create a file in a subfolder (if the folder doesn't exist yet)
         let r = fs.create("nested/nested2/myfile.txt".into()).await;

@@ -1,4 +1,3 @@
-use crate::actions::{copy_file, move_file};
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use tokio::sync::oneshot::Receiver;
@@ -27,7 +26,7 @@ pub trait Filesystem: Send + Sync {
 
 /// Filesystem abstraction, only method that require READ access
 #[async_trait]
-pub trait FilesystemRead {
+pub trait FilesystemRead: Send + Sync {
     /// Walk files in the filesystem, for each file found it will send it via `tx`. This belongs
     /// to the [`FilesystemRead`] because it **reads** the contents of the directories.
     async fn walk_directory(
@@ -57,38 +56,21 @@ pub trait FilesystemWrite: Send + Sync {
     /// return a [`Receiver`] that the caller can await for a couple of reasons:
     ///  * to receive any error that may happen from the file drop procedure
     ///  * to ensure that all the in-memory data is written to the file.
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
 
     /// Creates the given directory and any intermediate one
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()>;
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()>;
 }
 
 /// Filesystem abstraction, only methods that require **remove access**
 #[async_trait]
 pub trait FilesystemRemove {
     /// Removes a file from the filesystem.
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()>;
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()>;
 
     /// Removes an empty directory.
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()>;
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()>;
 
     /// Removes a directory at this path, after removing all its contents. Use carefully!
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()>;
-}
-
-/// Filesystem abstraction, method that requires **read and write access**. Default implementation
-/// relies on [`FilesystemRead::open`], [`FilesystemWrite::create`] and
-/// [`FilesystemRemove::remove_file`], however, specific implementations can override it if there
-/// is a more performant way to run these operations.
-#[async_trait]
-pub trait FilesystemInnerOperations: FilesystemRead + FilesystemWrite + FilesystemRemove {
-    /// Copy
-    async fn copy(&self, origin: &Utf8Path, target: &Utf8Path, force: bool) -> Result<Option<Receiver<Result<()>>>> {
-        copy_file(self, self, origin, target, force).await
-    }
-
-    /// Rename
-    async fn rename(&self, origin: &Utf8Path, target: &Utf8Path, force: bool) -> Result<Option<Receiver<Result<()>>>> {
-        move_file(self, self, origin, target, force).await
-    }
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()>;
 }

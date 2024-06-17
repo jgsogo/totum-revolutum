@@ -16,7 +16,7 @@ use pcloud_sdk::types::{FolderID, RemotePath};
 async fn test_create_write_read_in_root_folder() -> Result<()> {
     let root_path = Utf8PathBuf::from("/the/root/path");
     let mut server = PCloudServerMock::default();
-    let fs = {
+    let mut fs = {
         let server_token = server.token();
         let root_folder_mock = {
             let mut qparams = HashMap::new();
