@@ -88,7 +88,7 @@ impl<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static> FilesystemBackup<L
     }
 
     /// Syncs the contents of both filesystems. In this [`FilesystemBackup`] it means that all the
-    /// files from one filesystem will be available in the other and viceversa (running this method
+    /// files from one filesystem will be available in the other and _vice versa_ (running this method
     /// can take a while if many files need to be copied).
     pub async fn sync(&self) -> Result<()> {
         // TODO: Implement a method to do the initial sync. Leverage on some external `action`: backup, sync, mirror,...
@@ -148,6 +148,38 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
     async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.lhs.remove_dir_all(path).await?;
         self.rhs.lock().await.as_mut().unwrap().remove_dir_all(path).await
+    }
+
+    async fn internal_copy(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        self.lhs.internal_copy(origin, target, force).await?;
+        self.rhs
+            .lock()
+            .await
+            .as_mut()
+            .unwrap()
+            .internal_copy(origin, target, force)
+            .await
+    }
+
+    async fn internal_move(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        self.lhs.internal_move(origin, target, force).await?;
+        self.rhs
+            .lock()
+            .await
+            .as_mut()
+            .unwrap()
+            .internal_move(origin, target, force)
+            .await
     }
 }
 
