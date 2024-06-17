@@ -719,4 +719,75 @@ mod tests {
 
         Ok(())
     }
+
+    #[tokio::test]
+    async fn test_internal_move() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
+        db.create_file(Utf8Path::new("a/long/dir/file2.txt"), "file2", 32)?;
+
+        // Target directory doesn't exist
+        let r = db
+            .internal_move(
+                Utf8Path::new("a/long/dir/file.txt"),
+                Utf8Path::new("another/place.txt"),
+                true,
+            )
+            .await;
+        assert!(r.is_err());
+        let Err(e) = r else { unreachable!() };
+        assert!(
+            matches!(e, Error::PathDoesNotExist),
+            "Assert failed. Error was: '{}'",
+            e
+        );
+
+        // Target file already exist (force=false)
+        let r = db
+            .internal_move(
+                Utf8Path::new("a/long/dir/file.txt"),
+                Utf8Path::new("a/long/dir/file2.txt"),
+                false,
+            )
+            .await;
+        assert!(r.is_err());
+        let Err(e) = r else { unreachable!() };
+        assert!(
+            matches!(e, Error::TargetFileExists),
+            "Assert failed. Error was: '{}'",
+            e
+        );
+
+        // Target file doesn't exist
+        assert!(!db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
+        let r = db
+            .internal_move(
+                Utf8Path::new("a/long/dir/file.txt"),
+                Utf8Path::new("a/long/dir/file_copy.txt"),
+                false,
+            )
+            .await?;
+        assert!(r.is_none()); // Nothing to wait
+        assert!(db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
+        assert!(!db.exists(Utf8Path::new("a/long/dir/file.txt")).await?);
+
+        // Target file is overridden
+        let r = db
+            .internal_move(
+                Utf8Path::new("a/long/dir/file_copy.txt"),
+                Utf8Path::new("a/long/dir/file2.txt"),
+                true,
+            )
+            .await?;
+        assert!(r.is_none()); // Nothing to wait
+        let metadata = db.get_metadata(Utf8Path::new("a/long/dir/file2.txt")).await?;
+        assert_eq!(metadata.hash()?, "file1");
+        assert_eq!(metadata.size()?, 1);
+        assert!(!db.exists(Utf8Path::new("a/long/dir/file.txt")).await?);
+
+        Ok(())
+    }
 }
