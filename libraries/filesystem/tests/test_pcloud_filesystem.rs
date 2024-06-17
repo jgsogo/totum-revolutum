@@ -6,7 +6,7 @@ use camino::Utf8PathBuf;
 use filesystem::impls::FilesystemPCloud;
 use filesystem::impls::PCLOUD_CHUNK_SIZE;
 use filesystem::wrappers::AsyncFileDropImpl;
-use filesystem::{FilesystemRead, FilesystemWrite};
+use filesystem::Filesystem;
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::mocks::server::PCloudServerMock;

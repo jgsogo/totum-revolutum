@@ -22,13 +22,9 @@ pub trait Filesystem: Send + Sync {
 
     /// Waits for any pending operation and finishes this filesystem.
     async fn sync_all(self) -> Result<()>;
-}
 
-/// Filesystem abstraction, only method that require READ access
-#[async_trait]
-pub trait FilesystemRead: Send + Sync {
     /// Walk files in the filesystem, for each file found it will send it via `tx`. This belongs
-    /// to the [`FilesystemRead`] because it **reads** the contents of the directories.
+    /// to the [`Filesystem`] because it **reads** the contents of the directories.
     async fn walk_directory(
         &self,
         tx: flume::Sender<Box<dyn FileMetadata>>,
@@ -46,11 +42,7 @@ pub trait FilesystemRead: Send + Sync {
     /// object implementing a [`File`] or an error. Some implementations may return a [`Receiver`]
     /// that the caller can await to receive any error that may happen from the file drop procedure.
     async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
-}
 
-/// Filesystem abstraction, only methods that require **write access**
-#[async_trait]
-pub trait FilesystemWrite: Send + Sync {
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.
     /// This method returns an object implementing the [`File`] trait. Some implementations may
     /// return a [`Receiver`] that the caller can await for a couple of reasons:
@@ -60,11 +52,7 @@ pub trait FilesystemWrite: Send + Sync {
 
     /// Creates the given directory and any intermediate one
     async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()>;
-}
 
-/// Filesystem abstraction, only methods that require **remove access**
-#[async_trait]
-pub trait FilesystemRemove {
     /// Removes a file from the filesystem.
     async fn remove_file(&mut self, path: &Utf8Path) -> Result<()>;
 

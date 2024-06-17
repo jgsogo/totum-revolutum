@@ -1,7 +1,7 @@
 use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
 
-use crate::{FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
+use crate::{Filesystem, Result};
 
 use super::copy::copy_file;
 
@@ -10,11 +10,7 @@ use super::copy::copy_file;
 /// use to wait for any async operation to finish.
 ///
 /// This action is implemented in terms of [`copy_file`].
-pub async fn move_file<
-    'action,
-    FsLhs: FilesystemRead + FilesystemRemove + ?Sized,
-    FsRhs: FilesystemRead + FilesystemWrite + ?Sized,
->(
+pub async fn move_file<'action, FsLhs: Filesystem + ?Sized, FsRhs: Filesystem + ?Sized>(
     lhs_fs: &'action mut FsLhs,
     rhs_fs: &'action mut FsRhs,
     origin: &Utf8Path,

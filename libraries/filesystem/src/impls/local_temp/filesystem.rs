@@ -5,8 +5,7 @@ use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 
 use crate::impls::FilesystemLocal;
-use crate::{File, FileMetadata, Filesystem};
-use crate::{FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
+use crate::{File, FileMetadata, Filesystem, Result};
 
 /// Implementation of [`Filesystem`] using a temporal directory in the host filesystem
 pub struct FilesystemLocalTemp {
@@ -42,21 +41,7 @@ impl Filesystem for FilesystemLocalTemp {
     async fn sync_all(self) -> Result<()> {
         self.local.sync_all().await
     }
-}
 
-#[async_trait]
-impl FilesystemWrite for FilesystemLocalTemp {
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        self.local.create(path).await
-    }
-
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-        self.local.create_dir_all(path).await
-    }
-}
-
-#[async_trait]
-impl FilesystemRead for FilesystemLocalTemp {
     async fn walk_directory(
         &self,
         tx: Sender<Box<dyn FileMetadata>>,
@@ -65,6 +50,7 @@ impl FilesystemRead for FilesystemLocalTemp {
     ) -> Result<()> {
         self.local.walk_directory(tx, threads, custom_ignore_filename).await
     }
+
     async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
         self.local.get_metadata(path).await
     }
@@ -75,10 +61,14 @@ impl FilesystemRead for FilesystemLocalTemp {
     async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.local.open(path).await
     }
-}
 
-#[async_trait]
-impl FilesystemRemove for FilesystemLocalTemp {
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+        self.local.create(path).await
+    }
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+        self.local.create_dir_all(path).await
+    }
+
     async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         self.local.remove_file(path).await
     }

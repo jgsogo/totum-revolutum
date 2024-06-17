@@ -7,7 +7,7 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{info, trace};
 
-use crate::{Error, File, FileMetadata, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite, Result};
+use crate::{Error, File, FileMetadata, Filesystem, Result};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
@@ -85,10 +85,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     async fn sync_all(mut self) -> Result<()> {
         Ok(())
     }
-}
 
-#[async_trait]
-impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for FilesystemPCloud<HttpClient> {
     async fn walk_directory(
         &self,
         tx: Sender<Box<dyn FileMetadata>>,
@@ -172,10 +169,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRead for Files
         let f = RemoteFile::<HttpClient>::new(fd, self.pcloud.clone());
         Ok((Box::new(f), None))
     }
-}
 
-#[async_trait]
-impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemWrite for FilesystemPCloud<HttpClient> {
     async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let rel_path = self.check_path(path)?;
         let filename = rel_path.file_name().ok_or(Error::NotAFilepath)?;
@@ -219,10 +213,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemWrite for File
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
-}
 
-#[async_trait]
-impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemRemove for FilesystemPCloud<HttpClient> {
     async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
         let path = self.root_path.join(self.check_path(path)?);
         let input_file = path

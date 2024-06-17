@@ -28,7 +28,7 @@ impl File for AsyncFile {
 }
 
 // TODO: Add a 'local_sync' implementation to Filesystem. The main purpose is to have a implementation
-// TODO: where the [`Receiver`] in the [`FilesystemWrite::create`] doesn't make sense.
+// TODO: where the [`Receiver`] in the [`Filesystem::create`] doesn't make sense.
 // #[async_trait]
 // impl File for std::fs::File {
 //     async fn read_to_end(&mut self, buf: &mut Vec<u8>) -> Result<usize> {

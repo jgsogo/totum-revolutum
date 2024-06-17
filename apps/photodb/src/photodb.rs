@@ -5,7 +5,7 @@ use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
 use filesystem::impls::FilesystemLocalTemp;
-use filesystem::{FilesystemRead, FilesystemWrite};
+use filesystem::Filesystem;
 
 use super::db::Database;
 use super::models;
@@ -17,13 +17,13 @@ use super::AppDirs;
 const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
-pub struct PhotoDB<'a, T: Database, RemoteStorage: FilesystemRead> {
+pub struct PhotoDB<'a, T: Database, RemoteStorage: Filesystem> {
     db: T,
     app_dir: &'a AppDirs,
     storage: RemoteStorage,
 }
 
-impl<'a, T: Database, RemoteStorage: FilesystemRead + FilesystemWrite> PhotoDB<'a, T, RemoteStorage> {
+impl<'a, T: Database, RemoteStorage: Filesystem> PhotoDB<'a, T, RemoteStorage> {
     pub async fn new(db: T, storage: RemoteStorage, app_dir: &'a AppDirs) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote storage",
