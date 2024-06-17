@@ -4,6 +4,7 @@ use flume::Sender;
 use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 
+use crate::filesystem::FilesystemOps;
 use crate::impls::FilesystemLocal;
 use crate::{File, FileMetadata, Filesystem, Result};
 
@@ -99,3 +100,6 @@ impl Filesystem for FilesystemLocalTemp {
         self.local.internal_move(origin, target, force).await
     }
 }
+
+#[async_trait]
+impl FilesystemOps for FilesystemLocalTemp {}

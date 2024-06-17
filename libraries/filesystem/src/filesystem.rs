@@ -117,6 +117,8 @@ pub trait FilesystemOps: Filesystem + Sized {
 
     /// Copies a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
     /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
+    ///
+    /// [`Error:TargetFileExists`]: Error#variant.TargetFileExists
     async fn copy_from(
         &mut self,
         target: &Utf8Path,
@@ -140,6 +142,8 @@ pub trait FilesystemOps: Filesystem + Sized {
 
     /// Moves a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
     /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
+    ///
+    /// [`Error:TargetFileExists`]: Error#variant.TargetFileExists
     async fn move_from(
         &mut self,
         target: &Utf8Path,
@@ -162,5 +166,3 @@ pub trait FilesystemOps: Filesystem + Sized {
         }
     }
 }
-
-impl<T: Filesystem + Sized> FilesystemOps for T {}

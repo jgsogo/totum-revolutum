@@ -6,14 +6,14 @@ use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
-use crate::actions::copy_file;
+use crate::filesystem::FilesystemOps;
 use crate::wrappers::AsyncFileDropImpl;
 use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 /// Function called from [`FilesystemIndexed`] when a file opened in write mode is being dropped.
 /// This function calls [`File::sync_all`], drops the `file`, awaits for any pending action in the
 /// drop procedure using `rx_filesystem` and finally creates or updates the entry in the index.
-async fn index_file<LHS: Filesystem + 'static, RHS: Filesystem + 'static>(
+async fn index_file<LHS: Filesystem + FilesystemOps + 'static, RHS: Filesystem + 'static>(
     file: Box<dyn File>,
     rx_filesystem: Option<Receiver<Result<()>>>,
     index: Arc<Mutex<Option<LHS>>>,
@@ -29,11 +29,13 @@ async fn index_file<LHS: Filesystem + 'static, RHS: Filesystem + 'static>(
     }
 
     // Now update or create the entry in the INDEX filesystem (copy from storage to index)
-    // FIXME: copy_file is not suitable here. Probably the DB/INDEX implementation only wants the
-    // FIXME: metadata (to store in the DB) and it can just get metadata using `fs.get_metadata`
     let mut index = index.lock().await;
     let storage = storage.lock().await;
-    let rx_index = copy_file(storage.as_ref().unwrap(), index.as_mut().unwrap(), &path, &path, true).await?;
+    let rx_index = index
+        .as_mut()
+        .unwrap()
+        .copy_from(&path, storage.as_ref().unwrap(), &path, true)
+        .await?;
 
     match rx_index {
         Some(rx_index) => rx_index
@@ -54,7 +56,7 @@ pub struct FilesystemIndexed<TIndex: Filesystem, TStorage: Filesystem> {
     storage: AsyncFileDropImpl<TStorage>,
 }
 
-impl<TIndex: Filesystem + 'static, TStorage: Filesystem + 'static> FilesystemIndexed<TIndex, TStorage> {
+impl<TIndex: Filesystem + FilesystemOps + 'static, TStorage: Filesystem + 'static> FilesystemIndexed<TIndex, TStorage> {
     pub fn new(index: TIndex, storage: TStorage) -> Self {
         let index = Arc::new(Mutex::new(Some(index)));
 
@@ -149,6 +151,9 @@ impl<TIndex: Filesystem, TStorage: Filesystem> Filesystem for FilesystemIndexed<
         self.index.lock().await.as_mut().unwrap().remove_dir_all(path).await
     }
 }
+
+#[async_trait]
+impl<TIndex: Filesystem, TStorage: Filesystem> FilesystemOps for FilesystemIndexed<TIndex, TStorage> {}
 
 #[cfg(test)]
 mod tests {

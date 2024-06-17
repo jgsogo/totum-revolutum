@@ -12,3 +12,12 @@ pub struct File {
     pub hash: String,
     pub size: i32,
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = files)]
+pub struct NewFile<'a> {
+    pub name: &'a str,
+    pub directory_id: i32,
+    pub hash: &'a str,
+    pub size: i32,
+}

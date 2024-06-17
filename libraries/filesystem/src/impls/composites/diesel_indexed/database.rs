@@ -12,6 +12,7 @@ use tokio::sync::oneshot::Receiver;
 
 use diesel_utils::managers::AllManager;
 
+use crate::filesystem::FilesystemOps;
 use crate::impls::composites::diesel_indexed::models;
 use crate::{Error, File, FileMetadata, Filesystem, Result};
 
@@ -276,6 +277,70 @@ impl Filesystem for Database {
             .map_err(|e| Error::Other(e.to_string()))?;
 
         Ok(())
+    }
+}
+
+#[async_trait]
+impl FilesystemOps for Database {
+    /// Copies a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
+    /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
+    async fn copy_from(
+        &mut self,
+        target: &Utf8Path,
+        origin: &dyn Filesystem,
+        origin_path: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        if self.is_same(origin) {
+            self.internal_copy(target, origin_path, force).await
+        } else {
+            if !force && self.exists(target).await? {
+                return Err(Error::TargetFileExists);
+            }
+
+            let target = self.check_path(target)?;
+            let dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+            let filename = target
+                .file_name()
+                .ok_or(Error::Other("Filename expected".to_string()))?;
+
+            let metadata = origin.get_metadata(origin_path).await?;
+            let dir = self.get_directory(dirname)?.ok_or(Error::PathDoesNotExist)?;
+            let new_file = models::NewFile {
+                name: filename,
+                directory_id: dir.id,
+                hash: &metadata.hash()?,
+                size: metadata.size()? as i32,
+            };
+
+            use super::schema::files::dsl::*;
+            let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+            let _ = diesel::insert_into(files)
+                .values(&new_file)
+                .returning(models::File::as_returning())
+                .get_result(&mut conn)
+                .map_err(|e| Error::Other(e.to_string()))?;
+
+            Ok(None)
+        }
+    }
+
+    /// Moves a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
+    /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
+    async fn move_from(
+        &mut self,
+        target: &Utf8Path,
+        origin: &mut dyn Filesystem,
+        origin_path: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        if self.is_same(origin) {
+            self.internal_copy(target, origin_path, force).await
+        } else {
+            // It doesn't make sense to move a file from another filesystem into this DB
+            // implementation because it only stores the metadata, not the file itself.
+            Err(Error::Forbidden)
+        }
     }
 }
 

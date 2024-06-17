@@ -9,6 +9,7 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::info;
 
+use crate::filesystem::FilesystemOps;
 use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 use super::parallel_visitor;
@@ -134,6 +135,9 @@ impl Filesystem for FilesystemLocal {
         Ok(None)
     }
 }
+
+#[async_trait]
+impl FilesystemOps for FilesystemLocal {}
 
 #[cfg(test)]
 mod tests {
