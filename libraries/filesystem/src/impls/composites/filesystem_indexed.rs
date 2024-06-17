@@ -122,7 +122,7 @@ impl<TIndex: Filesystem, TStorage: Filesystem> Filesystem for FilesystemIndexed<
     }
 
     async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        self.index.lock().await.as_ref().unwrap().open(path).await
+        self.storage.open(path).await
     }
 
     async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
@@ -157,132 +157,171 @@ impl<TIndex: Filesystem, TStorage: Filesystem> FilesystemOps for FilesystemIndex
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
+    use std::ops::Deref;
+    use std::sync::{Arc, RwLock};
 
-    use camino::{Utf8Component, Utf8PathBuf};
+    use camino::Utf8Path;
 
-    use crate::Filesystem;
+    use crate::impls::composites::FilesystemIndexed;
+    use crate::impls::mocks::{FilesystemMock, SUCCESS};
+    use crate::{FileMetadata, Filesystem};
 
-    use super::*;
+    #[tokio::test]
+    async fn test_indexed_impl() {
+        // Here I just want to test that READ operations run on the index while write ones run on
+        // the storage and are synced to the index afterward. I'm using a [`FilesystemMock`] as
+        // an index, that will raise an error whenever is hit. As the storage I'm using a local
+        // filesystem in a temporal directory, so I can use regular `std::fs` to check if some
+        // operations did happened in the host.
+        let index_called = Arc::new(RwLock::new(Vec::new()));
+        let storage_called = Arc::new(RwLock::new(Vec::new()));
+        let mut indexed_filesystem = {
+            let index = FilesystemMock::new("index", index_called.clone());
+            let storage = FilesystemMock::new("storage", storage_called.clone());
+            FilesystemIndexed::new(index, storage)
+        };
 
-    /// Something that implements the index
-    #[derive(Default)]
-    struct IndexImpl {
-        /// Maps the path to the files
-        files: HashMap<Utf8PathBuf, IndexImplFile>,
+        // walk_directory
+        {
+            let (tx, _) = flume::bounded::<Box<dyn FileMetadata>>(0);
+            let r = indexed_filesystem.walk_directory(tx, 10, Utf8Path::new("path")).await;
+            assert!(r.is_err());
+            // index was called
+            assert_eq!(
+                index_called.read().unwrap().deref(),
+                &vec![("walk_directory".to_string(), vec![])]
+            );
+            // storage was not hit
+            assert!(storage_called.read().unwrap().is_empty());
+        };
+        index_called.write().unwrap().clear();
 
-        /// Path to directories
-        directories: Vec<Utf8PathBuf>,
-    }
+        // get_metadata
+        {
+            let r = indexed_filesystem.get_metadata(Utf8Path::new("path")).await;
+            assert!(r.is_err());
+            // index was called
+            assert_eq!(
+                index_called.read().unwrap().deref(),
+                &vec![("get_metadata".to_string(), vec!["path".to_string()])]
+            );
+            // storage was not hit
+            assert!(storage_called.read().unwrap().is_empty());
+        };
+        index_called.write().unwrap().clear();
 
-    #[derive(Debug, Clone)]
-    struct IndexImplFile {
-        path: Utf8PathBuf,
-        hash: String,
-        size: u64,
-    }
+        // exists
+        {
+            let r = indexed_filesystem.exists(Utf8Path::new("path")).await;
+            assert!(r.is_err());
+            // index was called
+            assert_eq!(
+                index_called.read().unwrap().deref(),
+                &vec![("exists".to_string(), vec!["path".to_string()])]
+            );
+            // storage was not hit
+            assert!(storage_called.read().unwrap().is_empty());
+        };
+        index_called.write().unwrap().clear();
 
-    impl FileMetadata for IndexImplFile {
-        fn path(&self) -> &Utf8Path {
-            &self.path
-        }
+        // open
+        {
+            let r = indexed_filesystem.open(Utf8Path::new("path")).await;
+            assert!(r.is_err());
+            // index was not hit (we don't check if the file exists first)
+            assert!(index_called.read().unwrap().is_empty());
+            // storage is returning the file
+            assert_eq!(
+                storage_called.read().unwrap().deref(),
+                &vec![("open".to_string(), vec!["path".to_string()])]
+            );
+        };
+        storage_called.write().unwrap().clear();
 
-        fn size(&self) -> Result<u64> {
-            Ok(self.size)
-        }
+        // create
+        {
+            let r = indexed_filesystem.create(Utf8Path::new("path")).await;
+            assert!(r.is_err());
+            // index was not hit
+            assert!(index_called.read().unwrap().is_empty());
+            // storage is returning the file
+            assert_eq!(
+                storage_called.read().unwrap().deref(),
+                &vec![("create".to_string(), vec!["path".to_string()])]
+            );
+        };
+        storage_called.write().unwrap().clear();
 
-        fn hash(&self) -> Result<String> {
-            Ok(self.hash.clone())
-        }
-    }
+        // create_dir_all
+        {
+            let r = indexed_filesystem.create_dir_all(Utf8Path::new(SUCCESS)).await;
+            assert!(r.is_ok());
+            // index was hit
+            assert_eq!(
+                index_called.read().unwrap().deref(),
+                &vec![("create_dir_all".to_string(), vec![SUCCESS.to_string()])]
+            );
+            // storage is returning the file
+            assert_eq!(
+                storage_called.read().unwrap().deref(),
+                &vec![("create_dir_all".to_string(), vec![SUCCESS.to_string()])]
+            );
+        };
+        index_called.write().unwrap().clear();
+        storage_called.write().unwrap().clear();
 
-    #[async_trait]
-    impl Filesystem for IndexImpl {
-        async fn sync_all(self) -> Result<()> {
-            Ok(())
-        }
+        // remove_file
+        {
+            let r = indexed_filesystem.remove_file(Utf8Path::new(SUCCESS)).await;
+            assert!(r.is_ok());
+            // index was hit
+            assert_eq!(
+                index_called.read().unwrap().deref(),
+                &vec![("remove_file".to_string(), vec![SUCCESS.to_string()])]
+            );
+            // storage is returning the file
+            assert_eq!(
+                storage_called.read().unwrap().deref(),
+                &vec![("remove_file".to_string(), vec![SUCCESS.to_string()])]
+            );
+        };
+        index_called.write().unwrap().clear();
+        storage_called.write().unwrap().clear();
 
-        async fn walk_directory(
-            &self,
-            tx: Sender<Box<dyn FileMetadata>>,
-            _threads: usize,
-            _custom_ignore_filename: &Utf8Path,
-        ) -> Result<()> {
-            for it in self.files.values() {
-                tx.send(Box::new(it.clone())).unwrap();
-            }
-            Ok(())
-        }
+        // remove_dir
+        {
+            let r = indexed_filesystem.remove_dir(Utf8Path::new(SUCCESS)).await;
+            assert!(r.is_ok());
+            // index was hit
+            assert_eq!(
+                index_called.read().unwrap().deref(),
+                &vec![("remove_dir".to_string(), vec![SUCCESS.to_string()])]
+            );
+            // storage is returning the file
+            assert_eq!(
+                storage_called.read().unwrap().deref(),
+                &vec![("remove_dir".to_string(), vec![SUCCESS.to_string()])]
+            );
+        };
+        index_called.write().unwrap().clear();
+        storage_called.write().unwrap().clear();
 
-        async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
-            match self.files.get(path) {
-                None => Err(Error::PathDoesNotExist),
-                Some(f) => Ok(Box::new(f.clone())),
-            }
-        }
-
-        async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-            Ok(self.files.contains_key(path) || self.directories.contains(&path.to_path_buf()))
-        }
-
-        async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-            Err(Error::Forbidden)
-        }
-
-        async fn create(&mut self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-            // We can compute the hash and size! We can't introduce it in the database
-            Err(Error::Forbidden)
-        }
-
-        async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-            let mut current_path = Utf8PathBuf::from("");
-            for it in path.components() {
-                if let Utf8Component::Normal(p) = it {
-                    current_path = current_path.join(p);
-                }
-                self.directories.push(current_path.clone());
-            }
-            Ok(())
-        }
-
-        async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
-            let _ = self.files.remove(path);
-            Ok(())
-        }
-
-        async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
-            let found = self
-                .directories
-                .iter()
-                .filter(|d| d.starts_with(path))
-                .collect::<Vec<_>>();
-            match found.len() {
-                0 => Err(Error::PathDoesNotExist),
-                1 => {
-                    let pos = found.into_iter().position(|p| p.eq(path));
-                    match pos {
-                        None => Err(Error::PathDoesNotExist),
-                        Some(pos) => {
-                            self.directories.remove(pos);
-                            Ok(())
-                        }
-                    }
-                }
-                _ => Err(Error::Other("Multiple found. Directory is not empty".to_string())),
-            }
-        }
-
-        async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-            let path_with_trailing_slash = Utf8PathBuf::from(path.to_string() + "/");
-            let _ = self
-                .directories
-                .retain(|d| !d.starts_with(&path_with_trailing_slash) && !d.eq(path));
-            Ok(())
-        }
-    }
-
-    #[test]
-    fn test_index_impl() {
-        let _index = IndexImpl::default();
+        // remove_dir_all
+        {
+            let r = indexed_filesystem.remove_dir_all(Utf8Path::new(SUCCESS)).await;
+            assert!(r.is_ok());
+            // index was hit
+            assert_eq!(
+                index_called.read().unwrap().deref(),
+                &vec![("remove_dir_all".to_string(), vec![SUCCESS.to_string()])]
+            );
+            // storage is returning the file
+            assert_eq!(
+                storage_called.read().unwrap().deref(),
+                &vec![("remove_dir_all".to_string(), vec![SUCCESS.to_string()])]
+            );
+        };
+        index_called.write().unwrap().clear();
+        storage_called.write().unwrap().clear();
     }
 }
