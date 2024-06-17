@@ -1,23 +1,20 @@
 use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
 
+use crate::filesystem::FilesystemOps;
 use crate::{Filesystem, Result};
-
-use super::copy::copy_file;
 
 /// Moves the content of the `origin` file in `lhs_fs` filesystem to the `target` file
 /// in the `rhs_fs` filesystem. This action returns a [`Receiver`] that the caller can
 /// use to wait for any async operation to finish.
-///
-/// This action is implemented in terms of [`copy_file`].
-pub async fn move_file<'action, FsLhs: Filesystem + ?Sized, FsRhs: Filesystem + ?Sized>(
+pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: FilesystemOps + ?Sized>(
     lhs_fs: &'action mut FsLhs,
     rhs_fs: &'action mut FsRhs,
     origin: &Utf8Path,
     target: &Utf8Path,
     force: bool,
 ) -> Result<Option<Receiver<Result<()>>>> {
-    let r = copy_file(lhs_fs, rhs_fs, origin, target, force).await?;
+    let r = rhs_fs.copy_from(target, lhs_fs, origin, force).await?;
     lhs_fs.remove_file(origin).await?;
     Ok(r)
 }

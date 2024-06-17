@@ -1,6 +1,7 @@
 use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
 
+use crate::filesystem::FilesystemOps;
 use crate::{Error, File, Filesystem, Result};
 
 /// Copies the contents of the `lhs_file` [`File`] into the `rhs_file` [`File`]
@@ -23,21 +24,14 @@ pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mu
 /// Copy a file from one filesystem to another. Both instances of filesystem, the `origin` path and the
 /// `target` path are provided as argument. This method returns a [`Receiver`] that the caller can use to await
 /// for the operation to complete (target file is dropped and underlying filesystem has performed any async action).
-pub async fn copy_file<'action, FsLhs: Filesystem + ?Sized, FsRhs: Filesystem + ?Sized>(
+pub async fn copy_file<'action, FsLhs: Filesystem, FsRhs: FilesystemOps + ?Sized>(
     lhs_fs: &'action FsLhs,
     rhs_fs: &'action mut FsRhs,
     origin: &Utf8Path,
     target: &Utf8Path,
     force: bool,
 ) -> Result<Option<Receiver<Result<()>>>> {
-    if !force && rhs_fs.exists(target).await? {
-        return Err(Error::TargetFileExists);
-    }
-
-    let (mut origin_file, _) = lhs_fs.open(origin).await?;
-    let (mut target_file, rx) = rhs_fs.create(target).await?;
-    copy(&mut origin_file, &mut target_file).await?;
-    Ok(rx)
+    rhs_fs.copy_from(target, lhs_fs, origin, force).await
 }
 
 #[cfg(test)]

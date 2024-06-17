@@ -20,11 +20,13 @@ thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 
-# Optional dependencies
+# Feature "local"
 async-std = { workspace = true, optional = true }
 futures = { workspace = true, optional = true }
 ignore = { workspace = true, optional = true }
 sha256 = { workspace = true, optional = true }
+
+# Feature "local_temp" (requires "local")
 tempfile = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true, features = ["v4"] }
 
