@@ -14,6 +14,7 @@ use diesel_utils::managers::AllManager;
 
 use crate::filesystem::FilesystemOps;
 use crate::impls::composites::diesel_indexed::models;
+use crate::impls::composites::diesel_indexed::models::NewFile;
 use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
@@ -296,6 +297,46 @@ impl Filesystem for Database {
 
         Ok(())
     }
+
+    async fn internal_copy(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        let target_dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+        let target_filename = target
+            .file_name()
+            .ok_or(Error::Other("Filename expected".to_string()))?;
+
+        // Check that target directory does exist
+        let target_dir = self.get_directory(target_dirname)?.ok_or(Error::PathDoesNotExist)?;
+
+        // If not force, check target file doesn't exist
+        if !force && self.exists(target).await? {
+            return Err(Error::TargetFileExists);
+        }
+
+        // Copy row
+        let origin_value = self.get_metadata(origin).await?;
+        let new_file = NewFile {
+            name: target_filename,
+            directory_id: target_dir.id,
+            hash: &origin_value.hash()?,
+            size: origin_value.size()? as i32,
+        };
+
+        use super::schema::files::dsl::*;
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        diesel::insert_into(files)
+            .values(&new_file)
+            .on_conflict((name, directory_id))
+            .do_update()
+            .set((hash.eq(new_file.hash), size.eq(new_file.size)))
+            .execute(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(None)
+    }
 }
 
 #[async_trait]
@@ -333,7 +374,7 @@ impl FilesystemOps for Database {
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         if self.is_same(origin) {
-            self.internal_copy(target, origin_path, force).await
+            self.internal_move(target, origin_path, force).await
         } else {
             // It doesn't make sense to move a file from another filesystem into this DB
             // implementation because it only stores the metadata, not the file itself.
@@ -606,6 +647,75 @@ mod tests {
         assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
         assert!(db.get_directory(Utf8Path::new("a/long"))?.is_none());
         assert!(db.get_directory(Utf8Path::new("a"))?.is_none());
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_internal_copy() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
+        db.create_file(Utf8Path::new("a/long/dir/file2.txt"), "file2", 32)?;
+
+        // Target directory doesn't exist
+        let r = db
+            .internal_copy(
+                Utf8Path::new("a/long/dir/file.txt"),
+                Utf8Path::new("another/place.txt"),
+                true,
+            )
+            .await;
+        assert!(r.is_err());
+        let Err(e) = r else { unreachable!() };
+        assert!(
+            matches!(e, Error::PathDoesNotExist),
+            "Assert failed. Error was: '{}'",
+            e
+        );
+
+        // Target file already exist (force=false)
+        let r = db
+            .internal_copy(
+                Utf8Path::new("a/long/dir/file.txt"),
+                Utf8Path::new("a/long/dir/file2.txt"),
+                false,
+            )
+            .await;
+        assert!(r.is_err());
+        let Err(e) = r else { unreachable!() };
+        assert!(
+            matches!(e, Error::TargetFileExists),
+            "Assert failed. Error was: '{}'",
+            e
+        );
+
+        // Target file doesn't exist
+        assert!(!db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
+        let r = db
+            .internal_copy(
+                Utf8Path::new("a/long/dir/file.txt"),
+                Utf8Path::new("a/long/dir/file_copy.txt"),
+                false,
+            )
+            .await?;
+        assert!(r.is_none()); // Nothing to wait
+        assert!(db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
+
+        // Target file is overridden
+        let r = db
+            .internal_copy(
+                Utf8Path::new("a/long/dir/file.txt"),
+                Utf8Path::new("a/long/dir/file2.txt"),
+                true,
+            )
+            .await?;
+        assert!(r.is_none()); // Nothing to wait
+        let metadata = db.get_metadata(Utf8Path::new("a/long/dir/file2.txt")).await?;
+        assert_eq!(metadata.hash()?, "file1");
+        assert_eq!(metadata.size()?, 1);
 
         Ok(())
     }
