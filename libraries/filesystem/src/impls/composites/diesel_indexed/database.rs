@@ -243,9 +243,7 @@ impl Filesystem for Database {
         let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
         let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
 
-        let directory = self
-            .get_directory(dirname)?
-            .ok_or(Error::Other("Directory not found".to_string()))?;
+        let directory = self.get_directory(dirname)?.ok_or(Error::PathDoesNotExist)?;
 
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
         let _ = diesel::delete(files.filter(directory_id.eq(directory.id).and(name.eq(filename))))
@@ -260,9 +258,7 @@ impl Filesystem for Database {
 
         let path = self.check_path(path)?;
 
-        let directory = self
-            .get_directory(&path)?
-            .ok_or(Error::Other("Directory not found".to_string()))?;
+        let directory = self.get_directory(&path)?.ok_or(Error::PathDoesNotExist)?;
 
         // I need to check if this directory has children
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
@@ -272,13 +268,13 @@ impl Filesystem for Database {
             .load(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
         if !children.is_empty() {
-            return Err(Error::Other("Directory has other children".to_string()));
+            return Err(Error::NotEmptyDirectory);
         }
 
         // I need to check if it contains files
         let files_in_dir = self.get_files_in_directory(&directory)?;
         if !files_in_dir.is_empty() {
-            return Err(Error::Other("Directory is not empty".to_string()));
+            return Err(Error::NotEmptyDirectory);
         }
 
         let _ = diesel::delete(directories.filter(super::schema::directories::dsl::id.eq(directory.id)))
@@ -519,6 +515,98 @@ mod tests {
         let r = db.create(Utf8Path::new("anything")).await;
         let Err(e) = r else { unreachable!() };
         assert!(matches!(e, Error::Forbidden));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_create_dir_all() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+
+        let _ = db.get_directory(Utf8Path::new("a"))?;
+        let _ = db.get_directory(Utf8Path::new("a/long"))?;
+        let _ = db.get_directory(Utf8Path::new("a/long/dir"))?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_remove_file() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let filepath = Utf8Path::new("file1.txt");
+        assert!(!db.exists(filepath).await?);
+        db.create_file(filepath, "file1", 1)?;
+        assert!(db.exists(filepath).await?);
+        db.remove_file(filepath).await?;
+        assert!(!db.exists(filepath).await?);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_remove_dir() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+
+        // A directory without files
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        let r = db.remove_dir(Utf8Path::new("a/long/dir")).await;
+        assert!(r.is_ok());
+        assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
+        assert!(db.get_directory(Utf8Path::new("a/long"))?.is_some());
+
+        // A directory with files
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
+        let r = db.remove_dir(Utf8Path::new("a/long/dir")).await;
+        assert!(r.is_err());
+        let Err(e) = r else { unreachable!() };
+        assert!(
+            matches!(e, Error::NotEmptyDirectory),
+            "Assert failed. Error was: '{}'",
+            e
+        );
+
+        // A directory with child directories
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        let r = db.remove_dir(Utf8Path::new("a/long")).await;
+        assert!(r.is_err());
+        let Err(e) = r else { unreachable!() };
+        assert!(
+            matches!(e, Error::NotEmptyDirectory),
+            "Assert failed. Error was: '{}'",
+            e
+        );
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_remove_dir_all() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+
+        // A directory without files
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        db.remove_dir_all(Utf8Path::new("a/long/dir")).await?;
+        assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
+        assert!(db.get_directory(Utf8Path::new("a/long"))?.is_some());
+
+        // A directory with files
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
+        db.remove_dir_all(Utf8Path::new("a/long/dir")).await?;
+        assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
+        assert!(!db.exists(Utf8Path::new("a/long/dir/file.txt")).await?);
+        assert!(db.get_directory(Utf8Path::new("a/long"))?.is_some());
+
+        // A directory with child directories
+        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        db.remove_dir_all(Utf8Path::new("a")).await?;
+        assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
+        assert!(db.get_directory(Utf8Path::new("a/long"))?.is_none());
+        assert!(db.get_directory(Utf8Path::new("a"))?.is_none());
+
         Ok(())
     }
 }

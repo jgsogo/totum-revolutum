@@ -39,6 +39,7 @@ pub trait Filesystem: Send + Sync {
     async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>>;
 
     /// Returns true if the path points at an existing entity.
+    /// FIXME: Define if it means file, directory or any (probably better to deduplicate method)
     async fn exists(&self, path: &Utf8Path) -> Result<bool>;
 
     /// Tries to open the file requested by the argument `path` in read-only mode. Returns an

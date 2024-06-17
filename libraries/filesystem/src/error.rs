@@ -26,6 +26,9 @@ pub enum Error {
     #[error("Operation forbidden")]
     Forbidden,
 
+    #[error("Directory is not empty")]
+    NotEmptyDirectory,
+
     #[error(transparent)]
     IoError(#[from] io::Error),
 
