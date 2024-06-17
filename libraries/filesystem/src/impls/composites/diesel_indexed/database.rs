@@ -857,8 +857,6 @@ mod tests {
         let db_file = NamedTempFile::new()?;
         let mut db = Database::new(db_file.path().to_str().unwrap())?;
 
-        db.create_file(Utf8Path::new("file.txt"), "file1", 1)?;
-
         // // If it's within the DB filesystem, it's just a `copy_internal`:
         // TODO: I can't get mutable and inmutable borrow at the same time
         // db.copy_from(Utf8Path::new("copy.txt"), &db, Utf8Path::new("file.txt"), true).await?;
@@ -870,6 +868,36 @@ mod tests {
         db.copy_from(Utf8Path::new("copy.txt"), &temp_fs, Utf8Path::new("file.txt"), false)
             .await?;
         assert!(db.exists(Utf8Path::new("copy.txt")).await?);
+        assert!(!db.exists(Utf8Path::new("file.txt")).await?);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_move_from() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+
+        // // If it's within the DB filesystem, it's just a `copy_internal`:
+        // TODO: I can't get mutable and inmutable borrow at the same time
+        // db.move_from(Utf8Path::new("copy.txt"), &db, Utf8Path::new("file.txt"), true).await?;
+        // assert!(db.exists(Utf8Path::new("copy.txt")).await?);
+
+        let mut temp_fs = FilesystemLocalTemp::default();
+        let (_, _) = temp_fs.create(Utf8Path::new("file.txt")).await?;
+
+        let r = db
+            .move_from(
+                Utf8Path::new("copy.txt"),
+                &mut temp_fs,
+                Utf8Path::new("file.txt"),
+                false,
+            )
+            .await;
+        assert!(r.is_err());
+        let Err(e) = r else { unreachable!() };
+        assert!(matches!(e, Error::Forbidden), "Assert failed. Error was: {}", e);
+        assert!(!db.exists(Utf8Path::new("copy.txt")).await?);
+        assert!(temp_fs.exists(Utf8Path::new("file.txt")).await?);
         Ok(())
     }
 }
