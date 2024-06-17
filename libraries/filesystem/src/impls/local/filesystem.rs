@@ -9,6 +9,8 @@ use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::info;
 
+use crate::filesystem::FilesystemOps;
+use crate::impls::local::file_metadata::LocalMetadata;
 use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 use super::parallel_visitor;
@@ -58,10 +60,12 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn get_metadata(&self, _path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
         // It doesn't make much sense that the `Self::Metadata` contains an `ignore::DirEntry`, we
-        // need something more identificable as metadata in a local filesystem
-        todo!("Not implemented")
+        // need something more identifiable as metadata in a local filesystem
+        let path = self.check_path(path)?;
+        let local_metadata = LocalMetadata::from_filesystem(&self.root.join(&path), path)?;
+        Ok(Box::new(local_metadata))
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
@@ -134,6 +138,9 @@ impl Filesystem for FilesystemLocal {
         Ok(None)
     }
 }
+
+#[async_trait]
+impl FilesystemOps for FilesystemLocal {}
 
 #[cfg(test)]
 mod tests {

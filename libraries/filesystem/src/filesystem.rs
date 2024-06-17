@@ -39,6 +39,7 @@ pub trait Filesystem: Send + Sync {
     async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>>;
 
     /// Returns true if the path points at an existing entity.
+    /// FIXME: Define if it means file, directory or any (probably better to deduplicate method)
     async fn exists(&self, path: &Utf8Path) -> Result<bool>;
 
     /// Tries to open the file requested by the argument `path` in read-only mode. Returns an
@@ -117,6 +118,8 @@ pub trait FilesystemOps: Filesystem + Sized {
 
     /// Copies a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
     /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
+    ///
+    /// [`Error:TargetFileExists`]: Error#variant.TargetFileExists
     async fn copy_from(
         &mut self,
         target: &Utf8Path,
@@ -140,6 +143,8 @@ pub trait FilesystemOps: Filesystem + Sized {
 
     /// Moves a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
     /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
+    ///
+    /// [`Error:TargetFileExists`]: Error#variant.TargetFileExists
     async fn move_from(
         &mut self,
         target: &Utf8Path,
@@ -162,5 +167,3 @@ pub trait FilesystemOps: Filesystem + Sized {
         }
     }
 }
-
-impl<T: Filesystem + Sized> FilesystemOps for T {}

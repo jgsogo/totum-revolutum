@@ -1,5 +1,7 @@
 load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
+load("@totum//bazel:defs.bzl", "run_copy_to_workspace")
 load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("@totum//bazel/rust/diesel:defs.bzl", "diesel_print_schema", "diesel_setup")
 
 rust_library_tests_and_docs(
     name = "filesystem",
@@ -15,6 +17,7 @@ rust_library_tests_and_docs(
         "pcloud": ["pcloud"],
         "test_utils": ["test_utils"],
     },
+    compile_data = [":migrations"],
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
@@ -31,4 +34,37 @@ rust_library_tests_and_docs(
         "@totum//libraries/pcloud_sdk",
         "@totum//libraries/utils",
     ],
+)
+
+# For the diesel FilesystemIndexedDB implementation
+filegroup(
+    name = "diesel_config",
+    srcs = ["diesel.toml"],
+)
+
+filegroup(
+    name = "migrations",
+    srcs = glob(["src/impls/composites/diesel_indexed/migrations/**/*.sql"]),
+)
+
+diesel_setup(
+    name = "setup",
+    config_file = ":diesel_config",
+    database_url = "db.sqlite3",
+    migrations = [":migrations"],  # glob(["src/impls/composites/diesel_indexed/migrations/**/*.sql"]),
+)
+
+diesel_print_schema(
+    name = "schema",
+    config_file = ":diesel_config",
+    database_url = ":setup",
+    schema = "src/impls/composites/diesel_indexed/schema.rs",
+)
+
+# We need to run this rule so we can build using Cargo
+run_copy_to_workspace(
+    name = "schema.update",
+    origin = ":schema",
+    tags = ["update"],
+    target = "src/impls/composites/diesel_indexed/schema.rs",
 )

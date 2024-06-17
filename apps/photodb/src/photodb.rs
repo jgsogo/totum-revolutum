@@ -5,7 +5,7 @@ use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
 use filesystem::impls::FilesystemLocalTemp;
-use filesystem::Filesystem;
+use filesystem::{Filesystem, FilesystemOps};
 
 use super::db::Database;
 use super::models;
@@ -23,7 +23,7 @@ pub struct PhotoDB<'a, T: Database, RemoteStorage: Filesystem> {
     storage: RemoteStorage,
 }
 
-impl<'a, T: Database, RemoteStorage: Filesystem> PhotoDB<'a, T, RemoteStorage> {
+impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps> PhotoDB<'a, T, RemoteStorage> {
     pub async fn new(db: T, storage: RemoteStorage, app_dir: &'a AppDirs) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote storage",

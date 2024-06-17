@@ -183,6 +183,9 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
     }
 }
 
+#[async_trait]
+impl<LHS: Filesystem, RHS: Filesystem> FilesystemOps for FilesystemBackup<LHS, RHS> {}
+
 #[cfg(test)]
 mod tests {
     use camino::Utf8PathBuf;

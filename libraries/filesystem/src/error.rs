@@ -23,6 +23,12 @@ pub enum Error {
     #[error("Given path is not a path to a file")]
     NotAFilepath,
 
+    #[error("Operation forbidden")]
+    Forbidden,
+
+    #[error("Directory is not empty")]
+    NotEmptyDirectory,
+
     #[error(transparent)]
     IoError(#[from] io::Error),
 
