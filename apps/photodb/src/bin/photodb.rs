@@ -2,7 +2,7 @@ use anyhow::{anyhow, bail, Result};
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
 use filesystem::impls::FilesystemPCloud;
-use filesystem::{FilesystemRead, FilesystemWrite};
+use filesystem::Filesystem;
 use std::str::FromStr;
 use tracing::{debug, error};
 
@@ -81,9 +81,9 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 
 /// Any command that uses the DB is executed here. This way we can guarantee that the Receiver work
 /// (store the database back to pCloud if anything fails) is always executed
-async fn db_commands<T: Database, RemoteStorage: FilesystemRead + FilesystemWrite>(
+async fn db_commands<T: Database, RemoteStorage: Filesystem>(
     command: Commands,
-    photodb: PhotoDB<'_, T, RemoteStorage>,
+    mut photodb: PhotoDB<'_, T, RemoteStorage>,
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,

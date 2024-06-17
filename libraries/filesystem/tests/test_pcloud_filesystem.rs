@@ -6,7 +6,7 @@ use camino::Utf8PathBuf;
 use filesystem::impls::FilesystemPCloud;
 use filesystem::impls::PCLOUD_CHUNK_SIZE;
 use filesystem::wrappers::AsyncFileDropImpl;
-use filesystem::{FilesystemRead, FilesystemWrite};
+use filesystem::Filesystem;
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::mocks::server::PCloudServerMock;
@@ -16,7 +16,7 @@ use pcloud_sdk::types::{FolderID, RemotePath};
 async fn test_create_write_read_in_root_folder() -> Result<()> {
     let root_path = Utf8PathBuf::from("/the/root/path");
     let mut server = PCloudServerMock::default();
-    let fs = {
+    let mut fs = {
         let server_token = server.token();
         let root_folder_mock = {
             let mut qparams = HashMap::new();

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 
 use filesystem::diff::{two_ways_run, FilePair};
-use filesystem::{Filesystem, FilesystemRead};
+use filesystem::Filesystem;
 
 use crate::actions::action_run::ActionRun;
 use crate::storage::config;
@@ -70,10 +70,7 @@ async fn work_on_results(rx: flume::Receiver<FilePair>, action: &dyn ActionRun) 
     Ok(())
 }
 
-pub async fn run<
-    FsLhs: Filesystem + FilesystemRead + Sync + 'static,
-    FsRhs: Filesystem + FilesystemRead + Sync + 'static,
->(
+pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
     lhs_fs: FsLhs,
     rhs_fs: FsRhs,
     config: &config::Config,

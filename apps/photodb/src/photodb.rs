@@ -5,7 +5,7 @@ use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
 use filesystem::impls::FilesystemLocalTemp;
-use filesystem::{FilesystemRead, FilesystemWrite};
+use filesystem::Filesystem;
 
 use super::db::Database;
 use super::models;
@@ -17,13 +17,13 @@ use super::AppDirs;
 const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
-pub struct PhotoDB<'a, T: Database, RemoteStorage: FilesystemRead> {
+pub struct PhotoDB<'a, T: Database, RemoteStorage: Filesystem> {
     db: T,
     app_dir: &'a AppDirs,
     storage: RemoteStorage,
 }
 
-impl<'a, T: Database, RemoteStorage: FilesystemRead + FilesystemWrite> PhotoDB<'a, T, RemoteStorage> {
+impl<'a, T: Database, RemoteStorage: Filesystem> PhotoDB<'a, T, RemoteStorage> {
     pub async fn new(db: T, storage: RemoteStorage, app_dir: &'a AppDirs) -> Result<Self> {
         info!(
             "New photodb application using local directory '{}' and remote storage",
@@ -57,7 +57,7 @@ impl<'a, T: Database, RemoteStorage: FilesystemRead + FilesystemWrite> PhotoDB<'
         Ok(output_filename)
     }
 
-    pub async fn add(&self, photo_filepath: Utf8PathBuf) -> Result<()> {
+    pub async fn add(&mut self, photo_filepath: Utf8PathBuf) -> Result<()> {
         debug!("Add photo at '{}'", photo_filepath);
         // FIXME: If it is a GIF or some other extension that will loose something (animation,
         // FIXME: video, ...) when converting to PNG we should raise here. Maybe don't
@@ -84,7 +84,7 @@ impl<'a, T: Database, RemoteStorage: FilesystemRead + FilesystemWrite> PhotoDB<'
         debug!("Upload to '{}'", filepath);
         debug!("Create intermediate directories '{}'", filepath.parent().unwrap());
         self.storage.create_dir_all(filepath.parent().unwrap()).await?;
-        filesystem::actions::copy_file(&tmp_filesystem, &self.storage, &photo, &filepath, false).await?;
+        filesystem::actions::copy_file(&tmp_filesystem, &mut self.storage, &photo, &filepath, false).await?;
         debug!("Get metadata from uploaded file");
         let _metadata = self.storage.get_metadata(&filepath).await?;
 

@@ -8,8 +8,7 @@ use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info};
 
-use crate::{Error, File, Filesystem, FilesystemRead, FilesystemRemove, FilesystemWrite};
-use crate::{FileMetadata, Result};
+use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 type FileCloseMessageData = (
     Box<dyn File>,
@@ -26,7 +25,7 @@ enum FileCloseMessage {
 
 /// A function to be used together with [`AsyncFileDropImpl`]. This function calls [`File::sync_all`] in the given `file`,
 /// then drops it and awaits for `rx_filesystem`.
-pub async fn call_sync_all<T: FilesystemWrite + 'static>(
+pub async fn call_sync_all<T: Filesystem + 'static>(
     file: Box<dyn File>,
     rx_filesystem: Option<Receiver<Result<()>>>,
     _fs: Arc<Mutex<Option<T>>>,
@@ -41,10 +40,10 @@ pub async fn call_sync_all<T: FilesystemWrite + 'static>(
     Ok(())
 }
 
-/// A wrapper for a filesystem that executes a function when the files returned by [`FilesystemRead::open`]
-/// and [`FilesystemWrite::create`] are dropped. This wrapper implements the same traits as the underlying
+/// A wrapper for a filesystem that executes a function when the files returned by [`Filesystem::open`]
+/// and [`Filesystem::create`] are dropped. This wrapper implements the same traits as the underlying
 /// filesystem.
-pub struct AsyncFileDropImpl<T: FilesystemWrite> {
+pub struct AsyncFileDropImpl<T: Filesystem> {
     filesystem: Arc<Mutex<Option<T>>>,
 
     tx_file_close: flume::Sender<FileCloseMessage>,
@@ -54,12 +53,12 @@ pub struct AsyncFileDropImpl<T: FilesystemWrite> {
     wrap_open: bool,
 }
 
-impl<T: FilesystemWrite + 'static> AsyncFileDropImpl<T> {
+impl<T: Filesystem + 'static> AsyncFileDropImpl<T> {
     /// Args:
     ///  * `filesystem`: Filesystem to wrap.
-    ///  * `func_for_readonly_file`: Function to be executed when a [`File`] created using [`FilesystemRead::open`]
+    ///  * `func_for_readonly_file`: Function to be executed when a [`File`] created using [`Filesystem::open`]
     ///     is dropped. If no function is provided, it will just forward the call to the underlying filesystem
-    ///  * `func_for_write_file`: Function to be executed when a [`File`] created using [`FilesystemWrite::create`]
+    ///  * `func_for_write_file`: Function to be executed when a [`File`] created using [`Filesystem::create`]
     ///     is dropped. If no function is provided, it will just forward the call to the underlying filesystem
     ///
     /// The functions receive several arguments when the file is about to drop: the [`File`] itself, the optional
@@ -116,7 +115,7 @@ impl<T: FilesystemWrite + 'static> AsyncFileDropImpl<T> {
 }
 
 #[async_trait]
-impl<T: Filesystem + FilesystemWrite> Filesystem for AsyncFileDropImpl<T> {
+impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
     async fn sync_all(mut self) -> Result<()> {
         if self.tx_file_close.send(FileCloseMessage::Stop).is_ok() {
             self.thread_file_close
@@ -128,41 +127,7 @@ impl<T: Filesystem + FilesystemWrite> Filesystem for AsyncFileDropImpl<T> {
 
         self.filesystem.lock().await.take().unwrap().sync_all().await
     }
-}
 
-#[async_trait]
-impl<T: FilesystemWrite> FilesystemWrite for AsyncFileDropImpl<T> {
-    async fn create(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        if self.wrap_create {
-            let (file, rx_filesystem) = self.filesystem.lock().await.as_ref().unwrap().create(path).await?;
-            let (tx, rx) = tokio::sync::oneshot::channel();
-            let ret = FileAsyncDrop {
-                file: Some(file),
-                rx_filesystem,
-                path: Some(path.to_path_buf()),
-                tx_filesystem_close: self.tx_file_close.clone(),
-                tx_file_close: Some(tx),
-                is_readonly: false,
-            };
-            Ok((Box::new(ret), Some(rx)))
-        } else {
-            self.filesystem.lock().await.as_ref().unwrap().create(path).await
-        }
-    }
-
-    async fn create_dir_all(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem
-            .lock()
-            .await
-            .as_ref()
-            .unwrap()
-            .create_dir_all(path)
-            .await
-    }
-}
-
-#[async_trait]
-impl<T: FilesystemWrite + FilesystemRead> FilesystemRead for AsyncFileDropImpl<T> {
     async fn walk_directory(
         &self,
         tx: flume::Sender<Box<dyn FileMetadata>>,
@@ -177,6 +142,7 @@ impl<T: FilesystemWrite + FilesystemRead> FilesystemRead for AsyncFileDropImpl<T
             .walk_directory(tx, threads, custom_ignore_filename)
             .await
     }
+
     async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
         self.filesystem.lock().await.as_ref().unwrap().get_metadata(path).await
     }
@@ -184,6 +150,7 @@ impl<T: FilesystemWrite + FilesystemRead> FilesystemRead for AsyncFileDropImpl<T
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
         self.filesystem.lock().await.as_ref().unwrap().exists(path).await
     }
+
     async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         if self.wrap_open {
             let (file, rx_filesystem) = self.filesystem.lock().await.as_ref().unwrap().open(path).await?;
@@ -201,23 +168,48 @@ impl<T: FilesystemWrite + FilesystemRead> FilesystemRead for AsyncFileDropImpl<T
             self.filesystem.lock().await.as_ref().unwrap().open(path).await
         }
     }
-}
 
-#[async_trait]
-impl<T: FilesystemWrite + FilesystemRemove> FilesystemRemove for AsyncFileDropImpl<T> {
-    async fn remove_file(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem.lock().await.as_ref().unwrap().remove_file(path).await
+    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+        if self.wrap_create {
+            let (file, rx_filesystem) = self.filesystem.lock().await.as_mut().unwrap().create(path).await?;
+            let (tx, rx) = tokio::sync::oneshot::channel();
+            let ret = FileAsyncDrop {
+                file: Some(file),
+                rx_filesystem,
+                path: Some(path.to_path_buf()),
+                tx_filesystem_close: self.tx_file_close.clone(),
+                tx_file_close: Some(tx),
+                is_readonly: false,
+            };
+            Ok((Box::new(ret), Some(rx)))
+        } else {
+            self.filesystem.lock().await.as_mut().unwrap().create(path).await
+        }
     }
 
-    async fn remove_dir(&self, path: &Utf8Path) -> Result<()> {
-        self.filesystem.lock().await.as_ref().unwrap().remove_dir(path).await
-    }
-
-    async fn remove_dir_all(&self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         self.filesystem
             .lock()
             .await
-            .as_ref()
+            .as_mut()
+            .unwrap()
+            .create_dir_all(path)
+            .await
+    }
+
+    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+        self.filesystem.lock().await.as_mut().unwrap().remove_file(path).await
+    }
+
+    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+        self.filesystem.lock().await.as_mut().unwrap().remove_dir(path).await
+    }
+
+    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+        self.filesystem
+            .lock()
+            .await
+            .as_mut()
             .unwrap()
             .remove_dir_all(path)
             .await
