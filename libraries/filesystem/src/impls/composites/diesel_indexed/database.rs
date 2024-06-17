@@ -364,3 +364,51 @@ impl FileMetadata for DatabaseFile {
         Ok(self.hash.clone())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use tempfile::NamedTempFile;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_basic_methods() -> anyhow::Result<()> {
+        let tmpfile = NamedTempFile::new()?;
+        let db = Database::new(tmpfile.path().to_str().unwrap())?;
+
+        let dir_path = Utf8Path::new("dir1");
+        let subdir_path = Utf8Path::new("dir1/subdir");
+        {
+            let dir_not_exists = db.get_directory(dir_path)?;
+            assert!(dir_not_exists.is_none());
+        }
+
+        let dir_created = {
+            let (_, created) = db.get_or_create_directory(dir_path)?;
+            assert!(created);
+
+            let (dir_created, created) = db.get_or_create_directory(dir_path)?;
+            assert!(!created);
+            assert_eq!(dir_created.parent_id, Some(0)); // Root directory is always there
+
+            let dir_get = db.get_directory(dir_path)?;
+            assert!(dir_get.is_some());
+            assert_eq!(dir_created.id, dir_get.as_ref().unwrap().id);
+            assert_eq!(dir_created.full_path, dir_get.as_ref().unwrap().full_path);
+            assert_eq!(dir_created.parent_id, dir_get.as_ref().unwrap().parent_id);
+            dir_created
+        };
+
+        {
+            let files = db.get_files_in_directory(&dir_created)?;
+            assert!(files.is_empty());
+        }
+
+        {
+            let (subdir_created, created) = db.get_or_create_directory(subdir_path)?;
+            assert!(created);
+            assert_eq!(subdir_created.parent_id, Some(dir_created.id));
+        };
+        Ok(())
+    }
+}

@@ -25,3 +25,12 @@ impl FilesystemIndexedDB {
         Ok(filesystem_indexed)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    #[tokio::test]
+    async fn test_filesystem_indexed_db() {
+        // TODO: Implement tests!
+    }
+}
