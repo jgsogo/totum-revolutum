@@ -14,7 +14,6 @@ use diesel_utils::managers::AllManager;
 
 use crate::filesystem::FilesystemOps;
 use crate::impls::composites::diesel_indexed::models;
-use crate::impls::composites::diesel_indexed::models::NewFile;
 use crate::{Error, File, FileMetadata, Filesystem, Result};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
@@ -129,6 +128,32 @@ impl Database {
             .get_result(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))
     }
+
+    fn get_file(&self, path: &Utf8Path) -> Result<models::File> {
+        use super::schema::files::dsl::*;
+
+        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
+
+        let directory = self.get_directory(dirname)?;
+        if directory.is_none() {
+            return Err(Error::PathDoesNotExist);
+        }
+        let directory: i32 = directory.unwrap().id;
+
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let files_found = files
+            .filter(name.eq(filename).and(directory_id.eq(directory)))
+            .select(models::File::as_select())
+            .load(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+
+        if files_found.is_empty() {
+            Err(Error::PathDoesNotExist)
+        } else {
+            Ok(files_found.into_iter().nth(0).unwrap())
+        }
+    }
 }
 
 #[async_trait]
@@ -190,25 +215,15 @@ impl Filesystem for Database {
     }
 
     async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        use super::schema::files::dsl::*;
-
         let path = self.check_path(path)?;
-        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
 
-        let directory = self.get_directory(dirname)?;
-        if directory.is_none() {
-            return Ok(false);
-        }
-        let directory: i32 = directory.unwrap().id;
-
-        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        let file = files
-            .filter(name.eq(filename).and(directory_id.eq(directory)))
-            .select(models::File::as_select())
-            .load(&mut conn)
-            .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(!file.is_empty())
+        self.get_file(&path).map_or_else(
+            |e| match e {
+                Error::PathDoesNotExist => Ok(false),
+                e => Err(e),
+            },
+            |_v| Ok(true),
+        )
     }
 
     async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
@@ -319,7 +334,7 @@ impl Filesystem for Database {
 
         // Copy row
         let origin_value = self.get_metadata(origin).await?;
-        let new_file = NewFile {
+        let new_file = models::NewFile {
             name: target_filename,
             directory_id: target_dir.id,
             hash: &origin_value.hash()?,
@@ -333,6 +348,51 @@ impl Filesystem for Database {
             .on_conflict((name, directory_id))
             .do_update()
             .set((hash.eq(new_file.hash), size.eq(new_file.size)))
+            .execute(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(None)
+    }
+
+    async fn internal_move(
+        &mut self,
+        origin: &Utf8Path,
+        target: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        use super::schema::files::dsl::*;
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+
+        // Get the target directory and filename
+        let (directory_id_, name_) = match self.get_file(target) {
+            // If target exists (and force), then remove
+            Ok(file) => {
+                if !force {
+                    return Err(Error::TargetFileExists);
+                }
+
+                diesel::delete(files.filter(id.eq(file.id)))
+                    .execute(&mut conn)
+                    .map_err(|e| Error::Other(e.to_string()))?;
+
+                (file.directory_id, file.name)
+            }
+            // If it doesn't exist, just return the data
+            Err(Error::PathDoesNotExist) => {
+                let target_dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+                let target_filename = target
+                    .file_name()
+                    .ok_or(Error::Other("Filename expected".to_string()))?;
+
+                let target_dir = self.get_directory(target_dirname)?.ok_or(Error::PathDoesNotExist)?;
+                (target_dir.id, target_filename.to_string())
+            }
+            Err(e) => return Err(e),
+        };
+
+        let origin_file = self.get_file(origin)?;
+        diesel::update(files)
+            .filter(id.eq(origin_file.id))
+            .set((directory_id.eq(directory_id_), name.eq(name_)))
             .execute(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(None)
@@ -462,8 +522,8 @@ mod tests {
         };
 
         {
-            let files = db.get_files_in_directory(&dir_created)?;
-            assert!(files.is_empty());
+            let all_files = db.get_files_in_directory(&dir_created)?;
+            assert!(all_files.is_empty());
         }
 
         {
@@ -786,7 +846,7 @@ mod tests {
         let metadata = db.get_metadata(Utf8Path::new("a/long/dir/file2.txt")).await?;
         assert_eq!(metadata.hash()?, "file1");
         assert_eq!(metadata.size()?, 1);
-        assert!(!db.exists(Utf8Path::new("a/long/dir/file.txt")).await?);
+        assert!(!db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
 
         Ok(())
     }
