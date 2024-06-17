@@ -1,30 +1,33 @@
 use camino::{Utf8Path, Utf8PathBuf};
-use ignore::DirEntry;
 
 use crate::{Error, FileMetadata, Result};
 
 #[derive(Debug, Clone)]
 pub struct LocalMetadata {
-    relative_path: Utf8PathBuf,
-    entry: DirEntry,
+    path: Utf8PathBuf,
+    size: u64,
+    hash: String,
 }
 
 impl FileMetadata for LocalMetadata {
     fn path(&self) -> &Utf8Path {
-        &self.relative_path
+        &self.path
     }
 
     fn size(&self) -> Result<u64> {
-        Ok(self.entry.metadata().map_err(|e| Error::Other(e.to_string()))?.len())
+        Ok(self.size)
     }
 
     fn hash(&self) -> Result<String> {
-        sha256::try_digest(self.entry.path()).map_err(|e| Error::Other(e.to_string()))
+        Ok(self.hash.clone())
     }
 }
 
 impl LocalMetadata {
-    pub fn new(relative_path: Utf8PathBuf, entry: DirEntry) -> Self {
-        Self { relative_path, entry }
+    pub fn from_filesystem(abs_path: &Utf8Path, path: Utf8PathBuf) -> Result<Self> {
+        let size = abs_path.metadata().map_err(Error::IoError)?.len();
+        let hash = sha256::try_digest(abs_path)
+            .map_err(|e| Error::Other(format!("Cannot compute sha256 of given file: {}", e)))?;
+        Ok(LocalMetadata { path, size, hash })
     }
 }

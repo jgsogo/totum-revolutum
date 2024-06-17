@@ -466,6 +466,7 @@ impl FileMetadata for DatabaseFile {
 
 #[cfg(test)]
 mod tests {
+    use crate::impls::FilesystemLocalTemp;
     use tempfile::NamedTempFile;
 
     use super::*;
@@ -848,6 +849,27 @@ mod tests {
         assert_eq!(metadata.size()?, 1);
         assert!(!db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
 
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_copy_from() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+
+        db.create_file(Utf8Path::new("file.txt"), "file1", 1)?;
+
+        // // If it's within the DB filesystem, it's just a `copy_internal`:
+        // TODO: I can't get mutable and inmutable borrow at the same time
+        // db.copy_from(Utf8Path::new("copy.txt"), &db, Utf8Path::new("file.txt"), true).await?;
+        // assert!(db.exists(Utf8Path::new("copy.txt")).await?);
+
+        let mut temp_fs = FilesystemLocalTemp::default();
+        let (_, _) = temp_fs.create(Utf8Path::new("file.txt")).await?;
+
+        db.copy_from(Utf8Path::new("copy.txt"), &temp_fs, Utf8Path::new("file.txt"), false)
+            .await?;
+        assert!(db.exists(Utf8Path::new("copy.txt")).await?);
         Ok(())
     }
 }
