@@ -486,4 +486,39 @@ mod tests {
         assert!(matches!(e, Error::PathDoesNotExist), "Assert failed. Error was: {}", e);
         Ok(())
     }
+
+    #[tokio::test]
+    async fn test_exists() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        populate_db(&mut db).await?;
+
+        let found = db.exists(Utf8Path::new("dir1/subdir1/subsubdir1/file1.txt")).await?;
+        assert!(found);
+
+        let not_found = db.exists(Utf8Path::new("dir1/not-found")).await?;
+        assert!(!not_found);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_open() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let db = Database::new(db_file.path().to_str().unwrap())?;
+        let r = db.open(Utf8Path::new("anything")).await;
+        assert!(r.is_err());
+        let Err(e) = r else { unreachable!() };
+        assert!(matches!(e, Error::Forbidden));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_create() -> anyhow::Result<()> {
+        let db_file = NamedTempFile::new()?;
+        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let r = db.create(Utf8Path::new("anything")).await;
+        let Err(e) = r else { unreachable!() };
+        assert!(matches!(e, Error::Forbidden));
+        Ok(())
+    }
 }
