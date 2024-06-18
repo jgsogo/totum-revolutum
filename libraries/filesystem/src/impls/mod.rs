@@ -1,7 +1,5 @@
 //! This module provides different [`super::Filesystem`] implementations
 
-#[cfg(feature = "diesel")]
-pub use composites::FilesystemIndexedDB;
 #[cfg(feature = "local")]
 pub use local::FilesystemLocal;
 #[cfg(feature = "local_temp")]

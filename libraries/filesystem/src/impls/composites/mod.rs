@@ -2,14 +2,13 @@
 //! however, this helpers implement the same [`crate::Filesystem`] interface, so they can be used
 //! wherever a [`crate::Filesystem`] can be used.
 
-#[cfg(feature = "diesel")]
-pub use diesel_indexed::FilesystemIndexedDB;
 pub use filesystem_backup::FilesystemBackup;
-pub use filesystem_indexed::FilesystemIndexed;
+#[cfg(feature = "diesel")]
+pub use indexed::new_filesystem_indexed_with_db;
+pub use indexed::{
+    FilesystemIndexed, FilesystemIndexedDatabase, FilesystemIndexedDbDirectory, FilesystemIndexedDbFile,
+};
 
 mod filesystem_backup;
 
-mod filesystem_indexed;
-
-#[cfg(feature = "diesel")]
-mod diesel_indexed;
+mod indexed;
