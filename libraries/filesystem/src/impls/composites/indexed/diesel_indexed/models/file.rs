@@ -26,6 +26,7 @@ impl File {
     where
         super::Directory: GetByPkManager<i32, Conn, Error = diesel_utils::error::Error>,
     {
+        // TODO: It would be much better to "prefetch" the data from FK relations
         let dir = super::Directory::get_by_pk(self.directory_id, conn).map_err(|e| Error::Other(e.to_string()))?;
         Ok(dir.full_path().join(&self.name))
     }
