@@ -13,10 +13,10 @@ use tokio::sync::oneshot::Receiver;
 use diesel_utils::managers::AllManager;
 
 use crate::filesystem::FilesystemOps;
-use crate::impls::composites::diesel_indexed::models;
+use crate::impls::composites::indexed::diesel_indexed::models;
 use crate::{Error, File, FileMetadata, Filesystem, Result};
 
-const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/indexed/diesel_indexed/migrations");
 const ROOT_DIRECTORY: &str = "";
 
 /// Implementation of the [`Database`] trait using a sqlite3 database and the models defined in
