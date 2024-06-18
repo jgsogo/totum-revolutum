@@ -3,7 +3,7 @@
 
 use crate::impls::composites::FilesystemIndexed;
 use crate::{Filesystem, Result};
-use database::Database;
+use database::DatabaseImpl;
 pub(self) mod database;
 pub(self) mod models;
 mod schema;
@@ -16,8 +16,8 @@ impl FilesystemIndexedDB {
         database_url: &str,
         storage: TStorage,
         do_initial_indexing: bool,
-    ) -> Result<FilesystemIndexed<Database, TStorage>> {
-        let database = Database::new(database_url)?;
+    ) -> Result<FilesystemIndexed<DatabaseImpl, TStorage>> {
+        let database = DatabaseImpl::new(database_url)?;
         let filesystem_indexed = FilesystemIndexed::new(database, storage);
         if do_initial_indexing {
             filesystem_indexed.sync().await?;

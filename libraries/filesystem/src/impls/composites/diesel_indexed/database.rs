@@ -19,11 +19,13 @@ use crate::{Error, File, FileMetadata, Filesystem, Result};
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/diesel_indexed/migrations");
 const ROOT_DIRECTORY: &str = "";
 
-pub struct Database {
+/// Implementation of the [`Database`] trait using a sqlite3 database and the models defined in
+/// [`models::File`] and [`models::Directory`]. To be used out-of-the-box.
+pub struct DatabaseImpl {
     pool: Pool<ConnectionManager<SqliteConnection>>,
 }
 
-impl Database {
+impl DatabaseImpl {
     pub fn new(database_url: &str) -> Result<Self> {
         let pool = {
             let manager = ConnectionManager::<SqliteConnection>::new(database_url);
@@ -157,7 +159,7 @@ impl Database {
 }
 
 #[async_trait]
-impl Filesystem for Database {
+impl Filesystem for DatabaseImpl {
     async fn sync_all(self) -> Result<()> {
         Ok(())
     }
@@ -400,7 +402,7 @@ impl Filesystem for Database {
 }
 
 #[async_trait]
-impl FilesystemOps for Database {
+impl FilesystemOps for DatabaseImpl {
     /// Copies a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
     /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
     async fn copy_from(
@@ -472,7 +474,7 @@ mod tests {
     use super::*;
 
     /// Populates the given database with some data
-    async fn populate_db(db: &mut Database) -> anyhow::Result<()> {
+    async fn populate_db(db: &mut DatabaseImpl) -> anyhow::Result<()> {
         // Some directories
         db.create_dir_all(Utf8Path::new("dir1/subdir1/subsubdir1"))
             .await
@@ -497,7 +499,7 @@ mod tests {
     #[tokio::test]
     async fn test_basic_methods() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let db = Database::new(db_file.path().to_str().unwrap())?;
+        let db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         let dir_path = Utf8Path::new("dir1");
         let subdir_path = Utf8Path::new("dir1/subdir");
@@ -546,7 +548,7 @@ mod tests {
     #[tokio::test]
     async fn test_walk_directory() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         populate_db(&mut db).await?;
 
         let (tx, rx) = flume::bounded(100);
@@ -560,7 +562,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_metadata() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         populate_db(&mut db).await?;
 
         // File found
@@ -588,7 +590,7 @@ mod tests {
     #[tokio::test]
     async fn test_exists() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         populate_db(&mut db).await?;
 
         let found = db.exists(Utf8Path::new("dir1/subdir1/subsubdir1/file1.txt")).await?;
@@ -602,7 +604,7 @@ mod tests {
     #[tokio::test]
     async fn test_open() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let db = Database::new(db_file.path().to_str().unwrap())?;
+        let db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         let r = db.open(Utf8Path::new("anything")).await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
@@ -613,7 +615,7 @@ mod tests {
     #[tokio::test]
     async fn test_create() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         let r = db.create(Utf8Path::new("anything")).await;
         let Err(e) = r else { unreachable!() };
         assert!(matches!(e, Error::Forbidden));
@@ -623,7 +625,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_dir_all() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
 
         let _ = db.get_directory(Utf8Path::new("a"))?;
@@ -635,7 +637,7 @@ mod tests {
     #[tokio::test]
     async fn test_remove_file() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         let filepath = Utf8Path::new("file1.txt");
         assert!(!db.exists(filepath).await?);
         db.create_file(filepath, "file1", 1)?;
@@ -648,7 +650,7 @@ mod tests {
     #[tokio::test]
     async fn test_remove_dir() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         // A directory without files
         db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
@@ -686,7 +688,7 @@ mod tests {
     #[tokio::test]
     async fn test_remove_dir_all() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         // A directory without files
         db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
@@ -715,7 +717,7 @@ mod tests {
     #[tokio::test]
     async fn test_internal_copy() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
         db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
@@ -784,7 +786,7 @@ mod tests {
     #[tokio::test]
     async fn test_internal_move() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
         db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
@@ -855,7 +857,7 @@ mod tests {
     #[tokio::test]
     async fn test_copy_from() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         // // If it's within the DB filesystem, it's just a `copy_internal`:
         // TODO: I can't get mutable and inmutable borrow at the same time
@@ -875,7 +877,7 @@ mod tests {
     #[tokio::test]
     async fn test_move_from() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = Database::new(db_file.path().to_str().unwrap())?;
+        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         // // If it's within the DB filesystem, it's just a `copy_internal`:
         // TODO: I can't get mutable and inmutable borrow at the same time

@@ -13,3 +13,4 @@ mod filesystem_indexed;
 
 #[cfg(feature = "diesel")]
 mod diesel_indexed;
+mod indexed;
