@@ -26,9 +26,53 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
 
 #[cfg(test)]
 mod tests {
+    use camino::Utf8Path;
+
+    use crate::impls::composites::indexed::diesel_indexed::database::DatabaseImpl;
+    use crate::impls::composites::{new_filesystem_indexed_with_db, FilesystemIndexedDatabase};
+    use crate::impls::FilesystemLocalTemp;
+    use crate::Filesystem;
 
     #[tokio::test]
-    async fn test_filesystem_indexed_db() {
-        // TODO: Implement tests for this 'new_filesystem_indexed_with_db'!
+    async fn test_filesystem_indexed_db() -> anyhow::Result<()> {
+        let database_file = tempfile::NamedTempFile::new()?;
+        let mut fs = {
+            let fs = FilesystemLocalTemp::default();
+            new_filesystem_indexed_with_db(database_file.path().to_str().unwrap(), fs, false).await?
+        };
+
+        // Populate the filesystem with some files and directories
+        {
+            // - a file in the root folder
+            let rx = {
+                let (mut f, rx) = fs.create(Utf8Path::new("file.txt")).await?;
+                f.write_all(b"Some content in the root").await?;
+                f.sync_all().await?;
+                rx.unwrap()
+            };
+            let _ = rx.await.unwrap();
+
+            let rx = {
+                fs.create_dir_all(Utf8Path::new("a/folder")).await?;
+                let (mut f, rx) = fs.create(Utf8Path::new("a/folder/file.txt")).await?;
+                f.write_all(b"Some other content").await?;
+                f.sync_all().await?;
+                rx.unwrap()
+            };
+            let _ = rx.await.unwrap();
+        }
+
+        // The filesystem tell us about the files available
+        let (tx, rx) = flume::bounded(10);
+        fs.walk_directory(tx, 10, Utf8Path::new("")).await?;
+        let all_files = rx.try_iter().collect::<Vec<_>>();
+        assert_eq!(all_files.len(), 2);
+
+        // Now we can go directly to the database and check it
+        let db = DatabaseImpl::new(database_file.path().to_str().unwrap())?;
+        let files = db.all_files()?.collect::<Vec<_>>();
+        assert_eq!(files.len(), 2);
+
+        Ok(())
     }
 }
