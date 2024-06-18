@@ -1,5 +1,9 @@
-use super::super::schema::*;
+use camino::Utf8Path;
 use diesel::*;
+
+use crate::impls::composites::FilesystemIndexedDbDirectory;
+
+use super::super::schema::*;
 
 #[derive(
     PartialEq, Eq, Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, QueryableByName, Selectable,
@@ -16,4 +20,10 @@ pub struct Directory {
 pub struct NewDirectory<'a> {
     pub parent_id: Option<i32>,
     pub full_path: &'a str,
+}
+
+impl FilesystemIndexedDbDirectory for Directory {
+    fn full_path(&self) -> &Utf8Path {
+        &Utf8Path::new(&self.full_path)
+    }
 }

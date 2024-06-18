@@ -1,26 +1,22 @@
-use std::fmt::Debug;
-
-use async_trait::async_trait;
-use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
 use diesel::{QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use flume::Sender;
-use tokio::sync::oneshot::Receiver;
 
 use diesel_utils::managers::AllManager;
 
-use crate::filesystem::FilesystemOps;
 use crate::impls::composites::indexed::diesel_indexed::models;
-use crate::{Error, File, FileMetadata, Filesystem, Result};
+use crate::impls::composites::{FilesystemIndexedDatabase, FilesystemIndexedDbFile};
+use crate::{Error, Result};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/indexed/diesel_indexed/migrations");
 const ROOT_DIRECTORY: &str = "";
 
-/// Implementation of the [`Database`] trait using a sqlite3 database and the models defined in
-/// [`models::File`] and [`models::Directory`]. To be used out-of-the-box.
+/// Implementation of the [`FilesystemIndexedDatabase`] trait using a sqlite3 database and the
+/// models defined in [`models::File`] and [`models::Directory`]. To be used out-of-the-box for the
+/// [`super::super::FilesystemIndexed`] composite implementation
 pub struct DatabaseImpl {
     pool: Pool<ConnectionManager<SqliteConnection>>,
 }
@@ -48,34 +44,32 @@ impl DatabaseImpl {
         Ok(Self { pool })
     }
 
-    fn get_directory(&self, dirname: &Utf8Path) -> Result<Option<models::Directory>> {
-        use super::schema::directories::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        let directory = directories
-            .filter(full_path.eq(dirname.to_string()))
-            .select(models::Directory::as_select())
-            .first(&mut conn)
-            .optional()
-            .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(directory)
-    }
+    fn create_directory(
+        &self,
+        dirname: &Utf8Path,
+        parent_dir: Option<&models::Directory>,
+    ) -> Result<models::Directory> {
+        let parent_dirname = dirname.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
 
-    fn create_directory(&self, dirname: &Utf8Path) -> Result<models::Directory> {
-        use super::schema::directories::dsl::*;
-
-        let parent_: Option<i32> = match dirname.parent() {
-            None => None,
-            Some(parent_dir) => {
-                let parent = self
-                    .get_directory(parent_dir)?
-                    .ok_or(Error::Other("Failed to get the parent directory".to_string()))?;
-                Some(parent.id)
+        let parent_dir_id = match parent_dir {
+            None => {
+                let parent_dir = self.get_directory(parent_dirname)?;
+                parent_dir.id
+            }
+            Some(p) => {
+                if parent_dirname != p.full_path {
+                    return Err(Error::Other(
+                        "Given parent_dir is not a parent of the directory we are creating".to_string(),
+                    ));
+                }
+                p.id
             }
         };
 
+        use super::schema::directories::dsl::*;
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
         let new_directory = models::NewDirectory {
-            parent_id: parent_,
+            parent_id: Some(parent_dir_id),
             full_path: dirname.as_str(),
         };
         let dir = diesel::insert_into(directories)
@@ -85,67 +79,61 @@ impl DatabaseImpl {
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(dir)
     }
+}
 
-    fn get_or_create_directory(&self, dirname: &Utf8Path) -> Result<(models::Directory, bool)> {
-        let directory = self.get_directory(dirname);
-        match directory {
-            Ok(d) => match d {
-                None => {
-                    let d = self.create_directory(dirname)?;
-                    Ok((d, true))
-                }
-                Some(d) => Ok((d, false)),
-            },
-            Err(e) => Err(e),
-        }
+impl FilesystemIndexedDatabase for DatabaseImpl {
+    type File = models::File;
+    type Directory = models::Directory;
+
+    fn all_files(&self) -> Result<impl Iterator<Item = Self::File>> {
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let all_files =
+            models::File::all(models::File::as_select(), &mut conn).map_err(|e| Error::Other(e.to_string()))?;
+        let all_files = all_files.collect::<Vec<_>>();
+        Ok(all_files.into_iter())
     }
 
-    fn get_files_in_directory(&self, directory: &models::Directory) -> Result<Vec<models::File>> {
+    fn all_directories(&self) -> Result<impl Iterator<Item = Self::Directory>> {
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let all_directories = models::Directory::all(models::Directory::as_select(), &mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        let all_directories = all_directories.collect::<Vec<_>>();
+        Ok(all_directories.into_iter())
+    }
+
+    fn get_files_in_directory(&self, dir: &Self::Directory) -> Result<impl Iterator<Item = Self::File>> {
         use super::schema::files::dsl::*;
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        files
-            .filter(directory_id.eq(directory.id))
+        let files_in_dir: Vec<models::File> = files
+            .filter(directory_id.eq(dir.id))
             .select(models::File::as_select())
             .load(&mut conn)
-            .map_err(|e| Error::Other(e.to_string()))
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(files_in_dir.into_iter())
     }
 
-    fn create_file(&self, path: &Utf8Path, hash_value: &str, size_value: i32) -> Result<models::File> {
-        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
-
-        let dir = self.get_directory(dirname)?.ok_or(Error::PathDoesNotExist)?;
-        let new_file = models::NewFile {
-            name: filename,
-            directory_id: dir.id,
-            hash: hash_value,
-            size: size_value,
-        };
-
-        use super::schema::files::dsl::*;
+    fn get_directory(&self, path: &Utf8Path) -> Result<Self::Directory> {
+        use super::schema::directories::dsl::*;
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        diesel::insert_into(files)
-            .values(&new_file)
-            .returning(models::File::as_returning())
-            .get_result(&mut conn)
-            .map_err(|e| Error::Other(e.to_string()))
+        match directories
+            .filter(full_path.eq(path.to_string()))
+            .select(models::Directory::as_select())
+            .first(&mut conn)
+        {
+            Ok(record) => Ok(record),
+            Err(e) => match e {
+                diesel::result::Error::NotFound => Err(Error::PathDoesNotExist),
+                _ => Err(Error::Other(e.to_string())),
+            },
+        }
     }
 
-    fn get_file(&self, path: &Utf8Path) -> Result<models::File> {
+    fn get_file(&self, dir: &Self::Directory, filename: &str) -> Result<Self::File> {
         use super::schema::files::dsl::*;
-
-        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
-
-        let directory = self.get_directory(dirname)?;
-        if directory.is_none() {
-            return Err(Error::PathDoesNotExist);
-        }
-        let directory: i32 = directory.unwrap().id;
 
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
         let files_found = files
-            .filter(name.eq(filename).and(directory_id.eq(directory)))
+            .filter(name.eq(filename).and(directory_id.eq(dir.id)))
             .select(models::File::as_select())
             .load(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
@@ -156,192 +144,101 @@ impl DatabaseImpl {
             Ok(files_found.into_iter().nth(0).unwrap())
         }
     }
-}
 
-#[async_trait]
-impl Filesystem for DatabaseImpl {
-    async fn sync_all(self) -> Result<()> {
-        Ok(())
-    }
-
-    async fn walk_directory(
+    fn get_or_create_directory(
         &self,
-        tx: Sender<Box<dyn FileMetadata>>,
-        _threads: usize,
-        _custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-
-        let all_directories = models::Directory::all(models::Directory::as_select(), &mut conn)
-            .map_err(|e| Error::Other(e.to_string()))?;
-        for dir in all_directories {
-            let dir_path = Utf8PathBuf::from(&dir.full_path);
-
-            let all_files = self.get_files_in_directory(&dir)?;
-            for file in all_files {
-                let db_file = DatabaseFile {
-                    path: dir_path.join(file.name),
-                    size: file.size as u64,
-                    hash: file.hash,
-                };
-                tx.send(Box::new(db_file)).map_err(|e| Error::Other(e.to_string()))?;
+        path: &Utf8Path,
+        parent_dir: Option<&Self::Directory>,
+    ) -> Result<(Self::Directory, bool)> {
+        // Try to get, if found return (any error other than not-found is returned too)
+        match self.get_directory(path) {
+            Ok(dir) => {
+                return Ok((dir, false));
             }
-        }
-        Ok(())
-    }
-
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
-        use super::schema::files::dsl::*;
-
-        let path = self.check_path(path)?;
-        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
-
-        let directory = self.get_directory(dirname)?.ok_or(Error::PathDoesNotExist)?;
-
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        let file = files
-            .filter(name.eq(filename).and(directory_id.eq(directory.id)))
-            .select(models::File::as_select())
-            .first(&mut conn)
-            .map_err(|e| match e {
-                diesel::result::Error::NotFound => Error::PathDoesNotExist,
-                _ => Error::Other(e.to_string()),
-            })?;
-        let db_file = DatabaseFile {
-            path,
-            size: file.size as u64,
-            hash: file.hash,
-        };
-        Ok(Box::new(db_file))
-    }
-
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        let path = self.check_path(path)?;
-
-        self.get_file(&path).map_or_else(
-            |e| match e {
-                Error::PathDoesNotExist => Ok(false),
-                e => Err(e),
-            },
-            |_v| Ok(true),
-        )
-    }
-
-    async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        Err(Error::Forbidden)
-    }
-
-    async fn create(&mut self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        // I need all the FileMetadata information from the file
-        Err(Error::Forbidden)
-    }
-
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
-        let mut current_path = Utf8Path::new(ROOT_DIRECTORY).to_path_buf();
-        for it in path.components() {
-            match it {
-                Utf8Component::Normal(c) => {
-                    current_path = current_path.join(c);
-                    // FIXME: Each call to `get_or_create_directory` is running another call to
-                    // FIXME: get the `id` of the parent directory.
-                    let _ = self.get_or_create_directory(&current_path)?;
+            Err(e) => match e {
+                Error::PathDoesNotExist => {}
+                _ => {
+                    return Err(Error::Other(e.to_string()));
                 }
-                _ => {}
-            }
+            },
         }
-        Ok(())
+
+        // Not found, we need to create it
+        let r = self.create_directory(path, parent_dir)?;
+        Ok((r, true))
     }
 
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+    fn delete_file(&self, file: Self::File) -> Result<()> {
         use super::schema::files::dsl::*;
-
-        let path = self.check_path(path)?;
-        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
-
-        let directory = self.get_directory(dirname)?.ok_or(Error::PathDoesNotExist)?;
-
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        let _ = diesel::delete(files.filter(directory_id.eq(directory.id).and(name.eq(filename))))
+        diesel::delete(files.filter(id.eq(file.id)))
             .execute(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
-
         Ok(())
     }
 
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+    fn get_directories_in_directory(&self, dir: &Self::Directory) -> Result<impl Iterator<Item = Self::Directory>> {
         use super::schema::directories::dsl::*;
-
-        let path = self.check_path(path)?;
-
-        let directory = self.get_directory(&path)?.ok_or(Error::PathDoesNotExist)?;
-
-        // I need to check if this directory has children
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        let children = directories
-            .filter(parent_id.eq(directory.id))
+        let directories_in_dir: Vec<models::Directory> = directories
+            .filter(parent_id.eq(dir.id))
             .select(models::Directory::as_select())
             .load(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
-        if !children.is_empty() {
-            return Err(Error::NotEmptyDirectory);
-        }
-
-        // I need to check if it contains files
-        let files_in_dir = self.get_files_in_directory(&directory)?;
-        if !files_in_dir.is_empty() {
-            return Err(Error::NotEmptyDirectory);
-        }
-
-        let _ = diesel::delete(directories.filter(super::schema::directories::dsl::id.eq(directory.id)))
-            .execute(&mut conn)
-            .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(())
+        Ok(directories_in_dir.into_iter())
     }
 
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    fn delete_directory(&self, dir: Self::Directory) -> Result<()> {
         use super::schema::directories::dsl::*;
-        let path = self.check_path(path)?;
-
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
-        // DELETE ON CASCADE will take care of files when their corresponding directory is removed,
-        // and DELETE ON CASCADE also handles recursion for the `directories` table (see tests below)
-        let _ = diesel::delete(directories.filter(full_path.eq(path.as_str())))
+        diesel::delete(directories.filter(id.eq(dir.id)))
             .execute(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
-
         Ok(())
     }
 
-    async fn internal_copy(
-        &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
-        force: bool,
-    ) -> Result<Option<Receiver<Result<()>>>> {
-        let target_dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-        let target_filename = target
-            .file_name()
-            .ok_or(Error::Other("Filename expected".to_string()))?;
+    fn delete_directory_on_cascade(&self, dir: Self::Directory) -> Result<()> {
+        // TODO: Detect if DELETE ON CASCADE if activated for this DB
+        self.delete_directory(dir)
+    }
 
-        // Check that target directory does exist
-        let target_dir = self.get_directory(target_dirname)?.ok_or(Error::PathDoesNotExist)?;
-
-        // If not force, check target file doesn't exist
-        if !force && self.exists(target).await? {
-            return Err(Error::TargetFileExists);
-        }
-
-        // Copy row
-        let origin_value = self.get_metadata(origin).await?;
-        let new_file = models::NewFile {
-            name: target_filename,
-            directory_id: target_dir.id,
-            hash: &origin_value.hash()?,
-            size: origin_value.size()? as i32,
+    fn upsert_file(
+        &self,
+        dir: &Self::Directory,
+        filename: &str,
+        new_size: Option<u64>,
+        new_hash: Option<&str>,
+    ) -> Result<()> {
+        // Get the size and hash, either from the given value or the existing file
+        let (size_, hash_) = match (new_size, new_hash) {
+            (Some(size_), Some(hash_)) => (size_, hash_.to_string()),
+            _ => match self.get_file(dir, filename) {
+                Ok(file) => (
+                    new_size.unwrap_or(file.size() as u64),
+                    new_hash.unwrap_or(file.hash()).to_string(),
+                ),
+                Err(e) => match e {
+                    Error::PathDoesNotExist => {
+                        return Err(Error::Other(
+                            "If the target file doesn't exist, both values size and hash need to be provided"
+                                .to_string(),
+                        ));
+                    }
+                    _ => {
+                        return Err(Error::Other(e.to_string()));
+                    }
+                },
+            },
         };
+
+        let new_file = models::NewFile {
+            name: filename,
+            directory_id: dir.id,
+            hash: &hash_,
+            size: size_ as i32,
+        };
+
+        // let changes = (hash.eq(hash_), size.eq(size_ as i32));
 
         use super::schema::files::dsl::*;
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
@@ -349,207 +246,104 @@ impl Filesystem for DatabaseImpl {
             .values(&new_file)
             .on_conflict((name, directory_id))
             .do_update()
-            .set((hash.eq(new_file.hash), size.eq(new_file.size)))
+            .set(&new_file)
             .execute(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(None)
+        Ok(())
     }
 
-    async fn internal_move(
-        &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
-        force: bool,
-    ) -> Result<Option<Receiver<Result<()>>>> {
+    fn update_file(
+        &self,
+        file: Self::File,
+        new_directory: Option<&Self::Directory>,
+        new_filename: Option<&str>,
+        new_size: Option<u64>,
+        new_hash: Option<&str>,
+    ) -> Result<Self::File> {
+        let new_file = models::NewFile {
+            name: new_filename.unwrap_or(file.filename()),
+            directory_id: new_directory.map(|v| v.id).unwrap_or(file.directory_id),
+            hash: new_hash.unwrap_or(file.hash()),
+            size: new_size.unwrap_or(file.size()) as i32,
+        };
+
+        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        use super::schema::files::dsl::*;
+        let file_updated = diesel::update(files)
+            .filter(id.eq(file.id))
+            .set(&new_file)
+            .returning(models::File::as_returning())
+            .get_result(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+        Ok(file_updated)
+    }
+
+    fn create_file(&self, dir: &Self::Directory, filename: &str, hash_: &str, size_: i32) -> Result<Self::File> {
         use super::schema::files::dsl::*;
         let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
 
-        // Get the target directory and filename
-        let (directory_id_, name_) = match self.get_file(target) {
-            // If target exists (and force), then remove
-            Ok(file) => {
-                if !force {
-                    return Err(Error::TargetFileExists);
-                }
-
-                diesel::delete(files.filter(id.eq(file.id)))
-                    .execute(&mut conn)
-                    .map_err(|e| Error::Other(e.to_string()))?;
-
-                (file.directory_id, file.name)
-            }
-            // If it doesn't exist, just return the data
-            Err(Error::PathDoesNotExist) => {
-                let target_dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-                let target_filename = target
-                    .file_name()
-                    .ok_or(Error::Other("Filename expected".to_string()))?;
-
-                let target_dir = self.get_directory(target_dirname)?.ok_or(Error::PathDoesNotExist)?;
-                (target_dir.id, target_filename.to_string())
-            }
-            Err(e) => return Err(e),
+        let new_file = models::NewFile {
+            name: filename,
+            directory_id: dir.id,
+            hash: hash_,
+            size: size_,
         };
-
-        let origin_file = self.get_file(origin)?;
-        diesel::update(files)
-            .filter(id.eq(origin_file.id))
-            .set((directory_id.eq(directory_id_), name.eq(name_)))
-            .execute(&mut conn)
+        let file = diesel::insert_into(files)
+            .values(&new_file)
+            .returning(models::File::as_returning())
+            .get_result(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(None)
-    }
-}
-
-#[async_trait]
-impl FilesystemOps for DatabaseImpl {
-    /// Copies a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
-    /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
-    async fn copy_from(
-        &mut self,
-        target: &Utf8Path,
-        origin: &dyn Filesystem,
-        origin_path: &Utf8Path,
-        force: bool,
-    ) -> Result<Option<Receiver<Result<()>>>> {
-        if self.is_same(origin) {
-            self.internal_copy(target, origin_path, force).await
-        } else {
-            if !force && self.exists(target).await? {
-                return Err(Error::TargetFileExists);
-            }
-
-            let target = self.check_path(target)?;
-            let metadata = origin.get_metadata(origin_path).await?;
-            let _ = self.create_file(&target, &metadata.hash()?, metadata.size()? as i32)?;
-            Ok(None)
-        }
-    }
-
-    /// Moves a file from `origin` [`Filesystem`] into `self` [`Filesystem`]. The flag `force` indicates if the
-    /// target file should be overridden or not in case it already exists (raises [`Error:TargetFileExists`]).
-    async fn move_from(
-        &mut self,
-        target: &Utf8Path,
-        origin: &mut dyn Filesystem,
-        origin_path: &Utf8Path,
-        force: bool,
-    ) -> Result<Option<Receiver<Result<()>>>> {
-        if self.is_same(origin) {
-            self.internal_move(target, origin_path, force).await
-        } else {
-            // It doesn't make sense to move a file from another filesystem into this DB
-            // implementation because it only stores the metadata, not the file itself.
-            Err(Error::Forbidden)
-        }
-    }
-}
-
-#[derive(Debug)]
-struct DatabaseFile {
-    path: Utf8PathBuf,
-    size: u64,
-    hash: String,
-}
-
-impl FileMetadata for DatabaseFile {
-    fn path(&self) -> &Utf8Path {
-        &self.path
-    }
-
-    fn size(&self) -> Result<u64> {
-        Ok(self.size)
-    }
-
-    fn hash(&self) -> Result<String> {
-        Ok(self.hash.clone())
+        Ok(file)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::impls::FilesystemLocalTemp;
+    use crate::{Filesystem, FilesystemOps};
     use tempfile::NamedTempFile;
+
+    use crate::impls::FilesystemLocalTemp;
 
     use super::*;
 
-    /// Populates the given database with some data
-    async fn populate_db(db: &mut DatabaseImpl) -> anyhow::Result<()> {
-        // Some directories
-        db.create_dir_all(Utf8Path::new("dir1/subdir1/subsubdir1"))
-            .await
-            .unwrap();
-        db.create_dir_all(Utf8Path::new("dir1/subdir1/subsubdir2"))
-            .await
-            .unwrap();
-        db.create_dir_all(Utf8Path::new("dir1/subdir2")).await.unwrap();
-        db.create_dir_all(Utf8Path::new("dir2/subdir1")).await.unwrap();
-
-        // Some files
-        db.create_file(Utf8Path::new("dir1/subdir1/subsubdir1/file1.txt"), "file1", 1)?;
-        db.create_file(Utf8Path::new("dir1/subdir1/subsubdir1/file2.txt"), "file2", 2)?;
-        db.create_file(Utf8Path::new("dir1/subdir1/subsubdir2/file1.txt"), "file1", 3)?;
-        db.create_file(Utf8Path::new("dir1/subdir1/subsubdir2/file2.txt"), "file2", 4)?;
-        db.create_file(Utf8Path::new("dir1/subdir1/file1.txt"), "file1", 5)?;
-        db.create_file(Utf8Path::new("dir1/subdir2/file1.txt"), "file1", 6)?;
-        db.create_file(Utf8Path::new("dir1/subdir2/file2.txt"), "file2", 7)?;
-        Ok(())
+    /// Creates a directory and return it
+    async fn create_dir_all(db: &mut DatabaseImpl, path: &Utf8Path) -> models::Directory {
+        db.create_dir_all(path).await.unwrap();
+        db.get_directory(path).unwrap()
     }
 
-    #[tokio::test]
-    async fn test_basic_methods() -> anyhow::Result<()> {
-        let db_file = NamedTempFile::new()?;
-        let db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
-
-        let dir_path = Utf8Path::new("dir1");
-        let subdir_path = Utf8Path::new("dir1/subdir");
+    /// Populates the given database with some data
+    async fn populate_db(db: &mut DatabaseImpl) {
+        // Some directories
         {
-            let dir_not_exists = db.get_directory(dir_path)?;
-            assert!(dir_not_exists.is_none());
+            let dir = create_dir_all(db, Utf8Path::new("dir1/subdir1/subsubdir1")).await;
+            db.create_file(&dir, "file1.txt", "file1", 1).unwrap();
+            db.create_file(&dir, "file2.txt", "file2", 2).unwrap();
         }
-
-        let dir_created = {
-            let (_, created) = db.get_or_create_directory(dir_path)?;
-            assert!(created);
-
-            let (dir_created, created) = db.get_or_create_directory(dir_path)?;
-            assert!(!created);
-            assert_eq!(dir_created.parent_id, Some(0)); // Root directory is always there
-
-            let dir_get = db.get_directory(dir_path)?;
-            assert!(dir_get.is_some());
-            assert_eq!(dir_created.id, dir_get.as_ref().unwrap().id);
-            assert_eq!(dir_created.full_path, dir_get.as_ref().unwrap().full_path);
-            assert_eq!(dir_created.parent_id, dir_get.as_ref().unwrap().parent_id);
-            dir_created
-        };
-
         {
-            let all_files = db.get_files_in_directory(&dir_created)?;
-            assert!(all_files.is_empty());
+            let dir = create_dir_all(db, Utf8Path::new("dir1/subdir1/subsubdir2")).await;
+            db.create_file(&dir, "file1.txt", "file1", 3).unwrap();
+            db.create_file(&dir, "file2.txt", "file2", 4).unwrap();
         }
-
         {
-            let (subdir_created, created) = db.get_or_create_directory(subdir_path)?;
-            assert!(created);
-            assert_eq!(subdir_created.parent_id, Some(dir_created.id));
-        };
-
-        {
-            let file_created = db.create_file(&subdir_path.join("file1.txt"), "hash", 32)?;
-            let subdir = db.get_directory(subdir_path)?.unwrap();
-            let files = db.get_files_in_directory(&subdir)?;
-            assert_eq!(files.len(), 1);
-            assert_eq!(files.get(0), Some(&file_created));
+            let dir = db.get_directory(Utf8Path::new("dir1/subdir1")).unwrap();
+            db.create_file(&dir, "file1.txt", "file1", 5).unwrap();
         }
-        Ok(())
+        {
+            let dir = create_dir_all(db, Utf8Path::new("dir1/subdir2")).await;
+            db.create_file(&dir, "file1.txt", "file1", 6).unwrap();
+            db.create_file(&dir, "file2.txt", "file2", 7).unwrap();
+        }
+        {
+            let _ = create_dir_all(db, Utf8Path::new("dir2/subdir1")).await;
+        }
     }
 
     #[tokio::test]
     async fn test_walk_directory() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
-        populate_db(&mut db).await?;
+        populate_db(&mut db).await;
 
         let (tx, rx) = flume::bounded(100);
         db.walk_directory(tx, 0, Utf8Path::new("")).await.unwrap();
@@ -563,7 +357,7 @@ mod tests {
     async fn test_get_metadata() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
-        populate_db(&mut db).await?;
+        populate_db(&mut db).await;
 
         // File found
         let metadata = db
@@ -591,7 +385,7 @@ mod tests {
     async fn test_exists() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
-        populate_db(&mut db).await?;
+        populate_db(&mut db).await;
 
         let found = db.exists(Utf8Path::new("dir1/subdir1/subsubdir1/file1.txt")).await?;
         assert!(found);
@@ -639,9 +433,12 @@ mod tests {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         let filepath = Utf8Path::new("file1.txt");
-        assert!(!db.exists(filepath).await?);
-        db.create_file(filepath, "file1", 1)?;
-        assert!(db.exists(filepath).await?);
+        {
+            assert!(!db.exists(filepath).await?);
+            let root_dir = db.get_directory(Utf8Path::new(ROOT_DIRECTORY))?;
+            db.create_file(&root_dir, "file1.txt", "file1", 1)?;
+            assert!(db.exists(filepath).await?);
+        }
         db.remove_file(filepath).await?;
         assert!(!db.exists(filepath).await?);
         Ok(())
@@ -656,12 +453,12 @@ mod tests {
         db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
         let r = db.remove_dir(Utf8Path::new("a/long/dir")).await;
         assert!(r.is_ok());
-        assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
-        assert!(db.get_directory(Utf8Path::new("a/long"))?.is_some());
+        assert!(db.get_directory(Utf8Path::new("a/long/dir")).is_err());
+        assert!(db.get_directory(Utf8Path::new("a/long")).is_ok());
 
         // A directory with files
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
-        db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
+        let dir = create_dir_all(&mut db, Utf8Path::new("a/long/dir")).await;
+        db.create_file(&dir, "file.txt", "file1", 1)?;
         let r = db.remove_dir(Utf8Path::new("a/long/dir")).await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
@@ -693,23 +490,23 @@ mod tests {
         // A directory without files
         db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
         db.remove_dir_all(Utf8Path::new("a/long/dir")).await?;
-        assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
-        assert!(db.get_directory(Utf8Path::new("a/long"))?.is_some());
+        assert!(db.get_directory(Utf8Path::new("a/long/dir")).is_err());
+        assert!(db.get_directory(Utf8Path::new("a/long")).is_ok());
 
         // A directory with files
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
-        db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
+        let dir = create_dir_all(&mut db, Utf8Path::new("a/long/dir")).await;
+        db.create_file(&dir, "file.txt", "file1", 1)?;
         db.remove_dir_all(Utf8Path::new("a/long/dir")).await?;
-        assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
+        assert!(db.get_directory(Utf8Path::new("a/long/dir")).is_err());
         assert!(!db.exists(Utf8Path::new("a/long/dir/file.txt")).await?);
-        assert!(db.get_directory(Utf8Path::new("a/long"))?.is_some());
+        assert!(db.get_directory(Utf8Path::new("a/long")).is_ok());
 
         // A directory with child directories
         db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
         db.remove_dir_all(Utf8Path::new("a")).await?;
-        assert!(db.get_directory(Utf8Path::new("a/long/dir"))?.is_none());
-        assert!(db.get_directory(Utf8Path::new("a/long"))?.is_none());
-        assert!(db.get_directory(Utf8Path::new("a"))?.is_none());
+        assert!(db.get_directory(Utf8Path::new("a/long/dir")).is_err());
+        assert!(db.get_directory(Utf8Path::new("a/long")).is_err());
+        assert!(db.get_directory(Utf8Path::new("a")).is_err());
 
         Ok(())
     }
@@ -719,9 +516,9 @@ mod tests {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
-        db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
-        db.create_file(Utf8Path::new("a/long/dir/file2.txt"), "file2", 32)?;
+        let dir = create_dir_all(&mut db, Utf8Path::new("a/long/dir")).await;
+        db.create_file(&dir, "file.txt", "file1", 1)?;
+        db.create_file(&dir, "file2.txt", "file2", 32)?;
 
         // Target directory doesn't exist
         let r = db
@@ -788,9 +585,9 @@ mod tests {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
-        db.create_file(Utf8Path::new("a/long/dir/file.txt"), "file1", 1)?;
-        db.create_file(Utf8Path::new("a/long/dir/file2.txt"), "file2", 32)?;
+        let dir = create_dir_all(&mut db, Utf8Path::new("a/long/dir")).await;
+        db.create_file(&dir, "file.txt", "file1", 1)?;
+        db.create_file(&dir, "file2.txt", "file2", 32)?;
 
         // Target directory doesn't exist
         let r = db

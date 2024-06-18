@@ -3,7 +3,7 @@ use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 
-use crate::{Error, Result};
+use crate::{Error, FilesystemOps, Result};
 use crate::{File, FileMetadata, Filesystem};
 
 const ROOT_DIRECTORY: &str = "";
@@ -26,7 +26,7 @@ pub trait FilesystemIndexedDbDirectory {
 
 /// Defines the methods that any type should implement, so it can play like the _index_ in the
 /// [super::FilesystemIndexed] composite. Anything implementing this trait will have a blanket
-/// implementation of the [`Filesystem`] trait
+/// implementation of the [`Filesystem`] trait (isolating the index behavior form the filesystem one)
 pub trait FilesystemIndexedDatabase: Send + Sync {
     type File: FilesystemIndexedDbFile;
     type Directory: FilesystemIndexedDbDirectory;
@@ -51,7 +51,7 @@ pub trait FilesystemIndexedDatabase: Send + Sync {
     fn get_or_create_directory(
         &self,
         path: &Utf8Path,
-        parent_dir: Option<Self::Directory>,
+        parent_dir: Option<&Self::Directory>,
     ) -> Result<(Self::Directory, bool)>;
 
     /// Deletes the given directory
@@ -87,6 +87,9 @@ pub trait FilesystemIndexedDatabase: Send + Sync {
         new_size: Option<u64>,
         new_hash: Option<&str>,
     ) -> Result<Self::File>;
+
+    /// Creates a [`Self::File`] in the given [`Self::Directory`] with the given data
+    fn create_file(&self, dir: &Self::Directory, filename: &str, hash_: &str, size_: i32) -> Result<Self::File>;
 }
 
 #[async_trait]
@@ -145,13 +148,13 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
     async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
         let path = self.check_path(path)?;
         let mut current_path = Utf8Path::new(ROOT_DIRECTORY).to_path_buf();
-        let mut parent_dir = Some(self.get_directory(&current_path)?);
+        let mut parent_dir = self.get_directory(&current_path)?;
 
         for it in path.components() {
             if let Utf8Component::Normal(c) = it {
                 current_path = current_path.join(c);
-                let (dir, _) = self.get_or_create_directory(&current_path, parent_dir)?;
-                parent_dir = Some(dir);
+                let (dir, _) = self.get_or_create_directory(&current_path, Some(&parent_dir))?;
+                parent_dir = dir;
             }
         }
         Ok(())
@@ -290,6 +293,57 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
         let origin_file = self.get_file(&origin_dir, origin_filename)?;
         let _ = self.update_file(origin_file, Some(&target_dir), Some(target_filename), None, None)?;
         Ok(None)
+    }
+}
+
+#[async_trait]
+impl<T: FilesystemIndexedDatabase> FilesystemOps for T {
+    async fn copy_from(
+        &mut self,
+        target: &Utf8Path,
+        origin: &dyn Filesystem,
+        origin_path: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        if self.is_same(origin) {
+            self.internal_copy(target, origin_path, force).await
+        } else {
+            if !force && self.exists(target).await? {
+                return Err(Error::TargetFileExists);
+            }
+
+            let metadata = origin.get_metadata(origin_path).await?;
+
+            let target = self.check_path(target)?;
+            let target_filename = target
+                .file_name()
+                .ok_or(Error::Other("Filename expected".to_string()))?;
+
+            // Check (and return) target directory
+            let target_dir = {
+                let target_dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+                self.get_directory(target_dirname)?
+            };
+
+            let _ = self.create_file(&target_dir, target_filename, &metadata.hash()?, metadata.size()? as i32)?;
+            Ok(None)
+        }
+    }
+
+    async fn move_from(
+        &mut self,
+        target: &Utf8Path,
+        origin: &mut dyn Filesystem,
+        origin_path: &Utf8Path,
+        force: bool,
+    ) -> Result<Option<Receiver<Result<()>>>> {
+        if self.is_same(origin) {
+            self.internal_move(target, origin_path, force).await
+        } else {
+            // It doesn't make sense to move a file from another filesystem into this DB
+            // implementation because it only stores the metadata, not the file itself.
+            Err(Error::Forbidden)
+        }
     }
 }
 
