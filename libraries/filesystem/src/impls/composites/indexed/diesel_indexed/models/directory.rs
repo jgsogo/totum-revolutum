@@ -9,7 +9,7 @@ use super::super::schema::*;
     PartialEq, Eq, Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, QueryableByName, Selectable,
 )]
 #[diesel(table_name = directories)]
-pub struct Directory {
+pub(crate) struct Directory {
     pub id: i32,
     pub parent_id: Option<i32>,
     pub full_path: String,
@@ -17,7 +17,7 @@ pub struct Directory {
 
 #[derive(Insertable)]
 #[diesel(table_name = directories)]
-pub struct NewDirectory<'a> {
+pub(crate) struct NewDirectory<'a> {
     pub parent_id: Option<i32>,
     pub full_path: &'a str,
 }

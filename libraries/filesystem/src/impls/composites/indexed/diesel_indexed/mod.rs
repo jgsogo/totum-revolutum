@@ -11,6 +11,7 @@ mod models;
 mod schema;
 
 /// Creates a new [`FilesystemIndexed`] using a default implementation of a database (SQLite3)
+#[allow(private_interfaces)]
 pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
     database_url: &str,
     storage: TStorage,

@@ -17,7 +17,7 @@ const ROOT_DIRECTORY: &str = "";
 /// Implementation of the [`FilesystemIndexedDatabase`] trait using a sqlite3 database and the
 /// models defined in [`models::File`] and [`models::Directory`]. To be used out-of-the-box for the
 /// [`super::super::FilesystemIndexed`] composite implementation
-pub struct DatabaseImpl {
+pub(crate) struct DatabaseImpl {
     pool: Pool<ConnectionManager<SqliteConnection>>,
 }
 

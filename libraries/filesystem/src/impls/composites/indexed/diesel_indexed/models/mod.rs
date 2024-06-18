@@ -1,5 +1,5 @@
 mod directory;
 mod file;
 
-pub use directory::{Directory, NewDirectory};
-pub use file::{File, NewFile};
+pub(crate) use directory::{Directory, NewDirectory};
+pub(crate) use file::{File, NewFile};
