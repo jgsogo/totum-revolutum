@@ -26,7 +26,7 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
+    use camino::{Utf8Path, Utf8PathBuf};
 
     use crate::impls::composites::indexed::diesel_indexed::database::DatabaseImpl;
     use crate::impls::composites::{new_filesystem_indexed_with_db, FilesystemIndexedDatabase};
@@ -72,6 +72,12 @@ mod tests {
         let db = DatabaseImpl::new(database_file.path().to_str().unwrap())?;
         let files = db.all_files()?.collect::<Vec<_>>();
         assert_eq!(files.len(), 2);
+        let f0 = files.get(0).unwrap();
+        let f1 = files.get(1).unwrap();
+
+        let mut conn = db.get_conn()?;
+        assert_eq!(f0.full_path(&mut conn)?, Utf8PathBuf::from("file.txt"));
+        assert_eq!(f1.full_path(&mut conn)?, Utf8PathBuf::from("a/folder/file.txt"));
 
         Ok(())
     }

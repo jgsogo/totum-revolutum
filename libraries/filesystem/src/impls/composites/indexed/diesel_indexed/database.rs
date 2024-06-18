@@ -1,7 +1,7 @@
 use camino::Utf8Path;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
+use diesel::r2d2::{ConnectionManager, PooledConnection};
 use diesel::{QueryDsl, RunQueryDsl, SelectableHelper, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 
@@ -42,6 +42,12 @@ impl DatabaseImpl {
             .map_err(|e| Error::Other(e.to_string()))?;
 
         Ok(Self { pool })
+    }
+
+    pub fn get_conn(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>> {
+        self.pool
+            .get()
+            .map_err(|e| Error::Other(format!("Failed to get one connection from the pool: {e}")))
     }
 
     fn create_directory(
@@ -299,10 +305,10 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Filesystem, FilesystemOps};
     use tempfile::NamedTempFile;
 
     use crate::impls::FilesystemLocalTemp;
+    use crate::{Filesystem, FilesystemOps};
 
     use super::*;
 

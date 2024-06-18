@@ -1,6 +1,13 @@
-use super::super::schema::*;
-use crate::impls::composites::FilesystemIndexedDbFile;
+use camino::Utf8PathBuf;
+use diesel::connection::LoadConnection;
 use diesel::*;
+
+use diesel_utils::managers::GetByPkManager;
+
+use crate::impls::composites::{FilesystemIndexedDbDirectory, FilesystemIndexedDbFile};
+use crate::{Error, Result};
+
+use super::super::schema::*;
 
 #[derive(
     PartialEq, Eq, Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, QueryableByName, Selectable,
@@ -12,6 +19,16 @@ pub struct File {
     pub directory_id: i32,
     pub hash: String,
     pub size: i32,
+}
+
+impl File {
+    pub fn full_path<Conn: LoadConnection>(&self, conn: &mut Conn) -> Result<Utf8PathBuf>
+    where
+        super::Directory: GetByPkManager<i32, Conn, Error = diesel_utils::error::Error>,
+    {
+        let dir = super::Directory::get_by_pk(self.directory_id, conn).map_err(|e| Error::Other(e.to_string()))?;
+        Ok(dir.full_path().join(&self.name))
+    }
 }
 
 #[derive(Insertable, AsChangeset)]
