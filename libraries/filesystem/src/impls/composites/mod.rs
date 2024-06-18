@@ -5,11 +5,9 @@
 #[cfg(feature = "diesel")]
 pub use diesel_indexed::FilesystemIndexedDB;
 pub use filesystem_backup::FilesystemBackup;
-pub use filesystem_indexed::FilesystemIndexed;
+pub use indexed::FilesystemIndexed;
 
 mod filesystem_backup;
-
-mod filesystem_indexed;
 
 #[cfg(feature = "diesel")]
 mod diesel_indexed;
