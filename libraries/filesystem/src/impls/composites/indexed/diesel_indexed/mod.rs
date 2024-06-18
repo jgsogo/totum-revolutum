@@ -52,6 +52,7 @@ mod tests {
             };
             let _ = rx.await.unwrap();
 
+            // - a file inside some folder
             let rx = {
                 fs.create_dir_all(Utf8Path::new("a/folder")).await?;
                 let (mut f, rx) = fs.create(Utf8Path::new("a/folder/file.txt")).await?;
