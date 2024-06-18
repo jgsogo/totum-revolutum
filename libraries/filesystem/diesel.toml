@@ -6,4 +6,4 @@
 custom_type_derives = ["diesel::query_builder::QueryId"]
 
 [migrations_directory]
-dir = "src/impls/composites/diesel_indexed/migrations"
+dir = "src/impls/composites/indexed/diesel_indexed/migrations"

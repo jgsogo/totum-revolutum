@@ -44,21 +44,21 @@ filegroup(
 
 filegroup(
     name = "migrations",
-    srcs = glob(["src/impls/composites/diesel_indexed/migrations/**/*.sql"]),
+    srcs = glob(["src/impls/composites/indexed/diesel_indexed/migrations/**/*.sql"]),
 )
 
 diesel_setup(
     name = "setup",
     config_file = ":diesel_config",
     database_url = "db.sqlite3",
-    migrations = [":migrations"],  # glob(["src/impls/composites/diesel_indexed/migrations/**/*.sql"]),
+    migrations = [":migrations"],  # glob(["src/impls/composites/indexed/diesel_indexed/migrations/**/*.sql"]),
 )
 
 diesel_print_schema(
     name = "schema",
     config_file = ":diesel_config",
     database_url = ":setup",
-    schema = "src/impls/composites/diesel_indexed/schema.rs",
+    schema = "src/impls/composites/indexed/diesel_indexed/schema.rs",
 )
 
 # We need to run this rule so we can build using Cargo
@@ -66,5 +66,5 @@ run_copy_to_workspace(
     name = "schema.update",
     origin = ":schema",
     tags = ["update"],
-    target = "src/impls/composites/diesel_indexed/schema.rs",
+    target = "src/impls/composites/indexed/diesel_indexed/schema.rs",
 )
