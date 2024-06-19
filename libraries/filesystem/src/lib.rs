@@ -5,7 +5,7 @@ pub use error::{Error, Result};
 pub use file::File;
 pub use file_metadata::FileMetadata;
 pub use filesystem::{Filesystem, FilesystemOps};
-pub use paths::FilenameBuf;
+pub use paths::{DirectoryPathBuf, FilenameBuf};
 
 mod file;
 mod file_metadata;

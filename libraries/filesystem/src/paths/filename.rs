@@ -5,9 +5,11 @@ use std::str::FromStr;
 
 use crate::Error;
 
+/// Validates the input filename. Main purpose is to check it doesn't contain any `/` (it would
+/// become a directory separator)
 fn is_valid_filename(filename: &str) -> bool {
-    const INVALID_CHARS: &str = "<>:\"/\\|?*";
-    INVALID_CHARS.chars().all(|c| !filename.contains(c))
+    const INVALID_CHARS: &str = "<>:\"\\|?*";
+    INVALID_CHARS.chars().all(|c| !filename.contains(c)) && filename.chars().all(|c| !std::path::is_separator(c))
 }
 
 /// An owned, mutable valid UTF-8 filename name (akin to [`String`]).
