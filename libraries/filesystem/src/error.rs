@@ -8,6 +8,9 @@ pub enum Error {
     #[error("Path is outside filesystem")]
     PathOutsideFilesystem,
 
+    #[error("Filename contains invalid characters")]
+    InvalidFilename,
+
     #[error("Path refers to the root itself")]
     PathIsRoot,
 
