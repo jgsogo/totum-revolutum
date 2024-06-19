@@ -8,7 +8,8 @@ use camino::{Utf8Components, Utf8Path, Utf8PathBuf};
 
 use utils::filesystem::normalize_path;
 
-use crate::{Error, Result};
+use crate::paths::filename::Filename;
+use crate::{Error, FilePathBuf, Result};
 
 const ROOT_DIR: &str = "";
 
@@ -19,7 +20,8 @@ fn validate_path(path: &Utf8Path) -> Result<Utf8PathBuf> {
     } else if path.is_absolute() {
         Err(Error::PathIsRoot)
     } else {
-        // TODO: Do we want to validate that all characters are "valid"? What means "valid" here?
+        // Remove trailing slashes and duplicated ones
+        let path = path.components().collect();
         Ok(path)
     }
 }
@@ -58,7 +60,7 @@ impl DirectoryPathBuf {
 
     #[must_use]
     pub fn as_directory_path(&self) -> &DirectoryPath {
-        // SAFETY: every Utf8PathBuf constructor ensures that self is valid UTF-8
+        // SAFETY: every DirectoryPathBuf constructor ensures that self is valid UTF-8 directory path
         unsafe { DirectoryPath::assume_valid(&self.0) }
     }
 }
@@ -121,9 +123,13 @@ impl AsRef<str> for DirectoryPathBuf {
 pub struct DirectoryPath(Utf8Path);
 
 impl DirectoryPath {
+    pub(crate) fn root<'a>() -> &'a DirectoryPath {
+        unsafe { DirectoryPath::assume_valid(Utf8Path::new(ROOT_DIR)) }
+    }
+
     // invariant: DirectoryPath must be guaranteed to be a valid path (it has been constructed using the [`validate_path`] function)
     #[inline]
-    unsafe fn assume_valid(path: &Utf8Path) -> &DirectoryPath {
+    pub(crate) unsafe fn assume_valid(path: &Utf8Path) -> &DirectoryPath {
         // SAFETY: DirectoryPath is marked as #[repr(transparent)] so the conversion from a
         // *const Utf8Path to a *const DirectoryPath is valid.
         &*(path as *const Utf8Path as *const DirectoryPath)
@@ -156,10 +162,9 @@ impl DirectoryPath {
         })
     }
 
-    // pub fn join_filename(&self, filename: impl AsRef<Filename>) -> FilePathBuf {
-    //     let filename = Utf8Path::new(filename.as_ref());
-    //     FilePathBuf(self.0.join(filename))
-    // }
+    pub fn join_filename(&self, filename: impl AsRef<Filename>) -> FilePathBuf {
+        FilePathBuf::new(self, filename)
+    }
 }
 
 impl fmt::Display for DirectoryPath {
@@ -195,6 +200,8 @@ impl AsRef<str> for DirectoryPath {
 #[cfg(test)]
 mod tests {
     use camino::Utf8Component;
+
+    use crate::FilenameBuf;
 
     use super::*;
 
@@ -284,5 +291,37 @@ mod tests {
         let path = DirectoryPathBuf::from_str("a/valid/path").unwrap();
         assert_eq!(path.parent().unwrap().as_str(), "a/valid");
         assert_eq!(DirectoryPathBuf::root().parent(), None);
+
+        // join_filename
+        let filepath = path.join_filename(FilenameBuf::from_str("filename.txt").unwrap());
+        assert_eq!(filepath.as_str(), "a/valid/path/filename.txt");
+
+        // root
+        let root = DirectoryPath::root();
+        assert_eq!(root.as_str(), ROOT_DIR);
+    }
+
+    #[test]
+    fn test_trailing_slash() {
+        assert_eq!(
+            DirectoryPathBuf::from_str("a/../valid/path/").unwrap().as_str(),
+            "valid/path"
+        );
+        assert_eq!(
+            DirectoryPathBuf::from_str("valid/path/").unwrap().as_str(),
+            "valid/path"
+        );
+    }
+
+    #[test]
+    fn test_extra_slashes() {
+        assert_eq!(
+            DirectoryPathBuf::from_str("a/..///valid/path").unwrap().as_str(),
+            "valid/path"
+        );
+        assert_eq!(
+            DirectoryPathBuf::from_str("valid/path//").unwrap().as_str(),
+            "valid/path"
+        );
     }
 }

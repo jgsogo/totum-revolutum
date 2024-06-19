@@ -73,7 +73,7 @@ pub struct Filename(str);
 impl Filename {
     // invariant: Utf8Path must be guaranteed to be a valid path (it has been constructed using the [`is_valid_filename`] function)
     #[inline]
-    unsafe fn assume_valid(filename: &str) -> &Filename {
+    pub(crate) unsafe fn assume_valid(filename: &str) -> &Filename {
         // SAFETY: FilePath is marked as #[repr(transparent)] so the conversion from a
         // *const Utf8Path to a *const FilePath is valid.
         &*(filename as *const str as *const Filename)
