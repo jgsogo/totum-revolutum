@@ -4,7 +4,7 @@ use std::ops::Deref;
 use std::path::Path;
 use std::str::FromStr;
 
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::{Utf8Components, Utf8Path, Utf8PathBuf};
 
 use utils::filesystem::normalize_path;
 
@@ -35,6 +35,25 @@ impl DirectoryPathBuf {
     pub fn root() -> DirectoryPathBuf {
         let root = Utf8PathBuf::from(ROOT_DIR);
         DirectoryPathBuf(root)
+    }
+
+    /// Extends `self` with `path`.
+    ///
+    /// The given `path` should follow certain rules so the resulting `DirectoryPathBuf` is still
+    /// valid according to [`validate_path`] rules.
+    pub fn push(&mut self, path: impl AsRef<Utf8Path>) -> Result<()> {
+        let new_path = self.0.join(path);
+        let new_path = validate_path(&new_path)?;
+        self.0 = new_path;
+        Ok(())
+    }
+
+    /// Truncates `self` to [`self.parent`].
+    ///
+    /// Returns `false` and does nothing if [`self.parent`] is already the root directory.
+    /// Otherwise, returns `true`.
+    pub fn pop(&mut self) -> bool {
+        self.0.pop()
     }
 
     #[must_use]
@@ -74,6 +93,12 @@ impl AsRef<DirectoryPath> for DirectoryPathBuf {
     }
 }
 
+impl AsRef<Utf8Path> for DirectoryPathBuf {
+    fn as_ref(&self) -> &Utf8Path {
+        self.as_utf8_path()
+    }
+}
+
 impl AsRef<Path> for DirectoryPathBuf {
     fn as_ref(&self) -> &Path {
         self.as_std_path()
@@ -104,12 +129,31 @@ impl DirectoryPath {
         &*(path as *const Utf8Path as *const DirectoryPath)
     }
 
+    pub fn as_utf8_path(&self) -> &Utf8Path {
+        &self.0
+    }
+
     pub fn as_std_path(&self) -> &Path {
         self.0.as_std_path()
     }
 
     pub fn as_str(&self) -> &str {
         self.0.as_str()
+    }
+
+    /// Produces an iterator over the [`Utf8Components`] of the path.
+    ///
+    /// Forwards the call to [`Utf8Path::components`]
+    pub fn components(&self) -> Utf8Components {
+        self.0.components()
+    }
+
+    #[must_use]
+    pub fn parent(&self) -> Option<&DirectoryPath> {
+        self.0.parent().map(|path| {
+            // SAFETY: self is valid UTF-8 directory path, so parent is valid UTF-8 directory path as well
+            unsafe { DirectoryPath::assume_valid(path) }
+        })
     }
 
     // pub fn join_filename(&self, filename: impl AsRef<Filename>) -> FilePathBuf {
@@ -130,6 +174,12 @@ impl AsRef<DirectoryPath> for DirectoryPath {
     }
 }
 
+impl AsRef<Utf8Path> for DirectoryPath {
+    fn as_ref(&self) -> &Utf8Path {
+        self.as_utf8_path()
+    }
+}
+
 impl AsRef<Path> for DirectoryPath {
     fn as_ref(&self) -> &Path {
         self.as_std_path()
@@ -144,12 +194,17 @@ impl AsRef<str> for DirectoryPath {
 
 #[cfg(test)]
 mod tests {
+    use camino::Utf8Component;
+
     use super::*;
-    use crate::paths::filename::Filename;
-    use crate::FilenameBuf;
 
     fn take_asref_directory_path(value: impl AsRef<DirectoryPath>, expected: &str) {
         let dir_path: &DirectoryPath = value.as_ref();
+        assert_eq!(dir_path.as_str(), expected);
+    }
+
+    fn take_asref_utf8_path(value: impl AsRef<Utf8Path>, expected: &str) {
+        let dir_path: &Utf8Path = value.as_ref();
         assert_eq!(dir_path.as_str(), expected);
     }
 
@@ -165,6 +220,10 @@ mod tests {
 
     #[test]
     fn test_directory_path_buf() {
+        // root
+        let root = DirectoryPathBuf::root();
+        assert_eq!(root.as_str(), ROOT_DIR);
+
         // valid filenames
         assert!(DirectoryPathBuf::from_str("a/valid/path").is_ok());
         assert!(DirectoryPathBuf::from_str("a/valid/../path").is_ok());
@@ -187,8 +246,23 @@ mod tests {
         // check AsRef<DirectoryPath> implementations
         let dir_path_buf = DirectoryPathBuf::from_str("a/../valid/path").unwrap();
         take_asref_directory_path(&dir_path_buf, "valid/path");
+        take_asref_utf8_path(&dir_path_buf, "valid/path");
         take_asref_std_path(&dir_path_buf, "valid/path");
         take_asref_str(&dir_path_buf, "valid/path");
+
+        // push
+        let mut path = DirectoryPathBuf::root();
+        assert!(path.push("something").is_ok());
+        assert_eq!(path.as_str(), "something");
+        assert!(path.push("../other").is_ok());
+        assert_eq!(path.as_str(), "other");
+        assert!(path.push("/fails").is_err());
+        assert!(path.push("../../fails").is_err());
+
+        // pop
+        assert!(path.pop());
+        assert!(!path.pop());
+        assert_eq!(path.as_str(), ROOT_DIR);
     }
 
     #[test]
@@ -197,7 +271,18 @@ mod tests {
         let directory_path: &DirectoryPath = &directory_path_buf; // this is testing DeRef for FilenameBuf
 
         take_asref_directory_path(directory_path, "valid/path");
+        take_asref_utf8_path(directory_path, "valid/path");
         take_asref_std_path(directory_path, "valid/path");
         take_asref_str(directory_path, "valid/path");
+
+        let mut components = directory_path.components();
+        assert_eq!(components.next(), Some(Utf8Component::Normal("valid")));
+        assert_eq!(components.next(), Some(Utf8Component::Normal("path")));
+        assert_eq!(components.next(), None);
+
+        // parent
+        let path = DirectoryPathBuf::from_str("a/valid/path").unwrap();
+        assert_eq!(path.parent().unwrap().as_str(), "a/valid");
+        assert_eq!(DirectoryPathBuf::root().parent(), None);
     }
 }
