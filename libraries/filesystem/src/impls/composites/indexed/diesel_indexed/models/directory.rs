@@ -2,6 +2,7 @@ use camino::Utf8Path;
 use diesel::*;
 
 use crate::impls::composites::FilesystemIndexedDbDirectory;
+use crate::DirectoryPath;
 
 use super::super::schema::*;
 
@@ -23,7 +24,10 @@ pub(crate) struct NewDirectory<'a> {
 }
 
 impl FilesystemIndexedDbDirectory for Directory {
-    fn full_path(&self) -> &Utf8Path {
-        &Utf8Path::new(&self.full_path)
+    fn full_path(&self) -> &DirectoryPath {
+        // SAFETY. We can assume it is valid as it was valid when the database was populated
+        // FIXME: We can't really make this assumption.
+        // FIXME: We should not use 'unsafe' here, others might want to use the same
+        unsafe { DirectoryPath::assume_valid(Utf8Path::new(&self.full_path)) }
     }
 }

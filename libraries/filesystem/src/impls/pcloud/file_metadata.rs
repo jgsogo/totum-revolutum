@@ -1,17 +1,16 @@
-use camino::{Utf8Path, Utf8PathBuf};
-
-use crate::{Error, FileMetadata, Result};
 use pcloud_sdk::structures::MetadataFile;
 use pcloud_sdk::types::FileID;
 
+use crate::{Error, FileMetadata, FilePath, FilePathBuf, Result};
+
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {
-    relative_path: Utf8PathBuf,
+    relative_path: FilePathBuf,
     metadata: MetadataFile,
 }
 
 impl FileMetadata for RemoteMetadata {
-    fn path(&self) -> &Utf8Path {
+    fn path(&self) -> &FilePath {
         &self.relative_path
     }
 
@@ -31,7 +30,7 @@ impl FileMetadata for RemoteMetadata {
 }
 
 impl RemoteMetadata {
-    pub fn new(relative_path: Utf8PathBuf, metadata: MetadataFile) -> Self {
+    pub fn new(relative_path: FilePathBuf, metadata: MetadataFile) -> Self {
         Self {
             relative_path,
             metadata,

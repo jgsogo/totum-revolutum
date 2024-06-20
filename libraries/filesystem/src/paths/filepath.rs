@@ -106,6 +106,13 @@ impl FilePath {
     pub fn as_str(&self) -> &str {
         self.0.as_str()
     }
+
+    #[inline]
+    #[must_use = "this returns the result of the operation, \
+                  without modifying the original"]
+    pub fn to_filepath_buf(&self) -> FilePathBuf {
+        FilePathBuf(self.0.to_path_buf())
+    }
 }
 
 impl fmt::Display for FilePath {

@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use camino::Utf8PathBuf;
-use filesystem::impls::FilesystemLocalTemp;
+use filesystem::{impls::FilesystemLocalTemp, FilePathBuf};
 use std::fmt::{Display, Formatter};
 
 /// Manage all the directories related to a [`super::PhotoDB`] application
@@ -45,7 +45,7 @@ impl AppDirs {
     ///
     /// User can provide a prefix and suffix for the created filename. This method will add some
     /// randomness (uuid4) to the filename so uniqueness can be assumed.
-    pub fn temp_filename(&self, prefix: Option<&str>, suffix: Option<&str>) -> Utf8PathBuf {
+    pub fn temp_filename(&self, prefix: Option<&str>, suffix: Option<&str>) -> FilePathBuf {
         self.local_tmp_storage.temp_filename(prefix, suffix)
     }
 }

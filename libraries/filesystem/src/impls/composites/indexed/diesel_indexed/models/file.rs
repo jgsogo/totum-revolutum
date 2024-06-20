@@ -1,11 +1,10 @@
-use camino::Utf8PathBuf;
 use diesel::connection::LoadConnection;
 use diesel::*;
 
 use diesel_utils::managers::GetByPkManager;
 
 use crate::impls::composites::{FilesystemIndexedDbDirectory, FilesystemIndexedDbFile};
-use crate::{Error, Result};
+use crate::{Error, FilePathBuf, Filename, Result};
 
 use super::super::schema::*;
 
@@ -22,13 +21,21 @@ pub(crate) struct File {
 }
 
 impl File {
-    pub fn full_path<Conn: LoadConnection>(&self, conn: &mut Conn) -> Result<Utf8PathBuf>
+    pub fn filename(&self) -> &Filename {
+        // SAFETY. We can assume it's a valid filename as it was validated when created
+        // FIXME: We can't assume it's valid
+        // FIXME: Better not to execute 'unsafe' here, other's can't use it
+        unsafe { &Filename::assume_valid(&self.name) }
+    }
+
+    #[allow(dead_code)]
+    pub fn full_path<Conn: LoadConnection>(&self, conn: &mut Conn) -> Result<FilePathBuf>
     where
         super::Directory: GetByPkManager<i32, Conn, Error = diesel_utils::error::Error>,
     {
         // TODO: It would be much better to "prefetch" the data from FK relations
         let dir = super::Directory::get_by_pk(self.directory_id, conn).map_err(|e| Error::Other(e.to_string()))?;
-        Ok(dir.full_path().join(&self.name))
+        Ok(dir.full_path().join_filename(self.filename()))
     }
 }
 
@@ -42,8 +49,11 @@ pub(crate) struct NewFile<'a> {
 }
 
 impl FilesystemIndexedDbFile for File {
-    fn filename(&self) -> &str {
-        &self.name
+    fn filename(&self) -> &Filename {
+        // SAFETY. We can assume it is valid as the DB was populated with valid values
+        // FIXME: We can't make this assumption
+        // FIXME: We should not use 'unsafe' here, others might want to use the same
+        unsafe { Filename::assume_valid(&self.name) }
     }
 
     fn size(&self) -> u64 {

@@ -1,4 +1,3 @@
-use camino::Utf8Path;
 use diesel::prelude::*;
 use diesel::r2d2::Pool;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
@@ -8,11 +7,10 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use diesel_utils::managers::AllManager;
 
 use crate::impls::composites::indexed::diesel_indexed::models;
-use crate::impls::composites::{FilesystemIndexedDatabase, FilesystemIndexedDbFile};
-use crate::{Error, Result};
+use crate::impls::composites::{FilesystemIndexedDatabase, FilesystemIndexedDbDirectory, FilesystemIndexedDbFile};
+use crate::{DirectoryPath, Error, Filename, Result};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/indexed/diesel_indexed/migrations");
-const ROOT_DIRECTORY: &str = "";
 
 /// Implementation of the [`FilesystemIndexedDatabase`] trait using a sqlite3 database and the
 /// models defined in [`models::File`] and [`models::Directory`]. To be used out-of-the-box for the
@@ -52,10 +50,10 @@ impl DatabaseImpl {
 
     fn create_directory(
         &self,
-        dirname: &Utf8Path,
+        dirname: &DirectoryPath,
         parent_dir: Option<&models::Directory>,
     ) -> Result<models::Directory> {
-        let parent_dirname = dirname.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
+        let parent_dirname = dirname.parent().unwrap_or_else(|| DirectoryPath::root());
 
         let parent_dir_id = match parent_dir {
             None => {
@@ -63,7 +61,7 @@ impl DatabaseImpl {
                 parent_dir.id
             }
             Some(p) => {
-                if parent_dirname != p.full_path {
+                if parent_dirname != p.full_path() {
                     return Err(Error::Other(
                         "Given parent_dir is not a parent of the directory we are creating".to_string(),
                     ));
@@ -73,7 +71,7 @@ impl DatabaseImpl {
         };
 
         use super::schema::directories::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         let new_directory = models::NewDirectory {
             parent_id: Some(parent_dir_id),
             full_path: dirname.as_str(),
@@ -92,7 +90,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
     type Directory = models::Directory;
 
     fn all_files(&self) -> Result<impl Iterator<Item = Self::File>> {
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         let all_files =
             models::File::all(models::File::as_select(), &mut conn).map_err(|e| Error::Other(e.to_string()))?;
         let all_files = all_files.collect::<Vec<_>>();
@@ -100,7 +98,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
     }
 
     fn all_directories(&self) -> Result<impl Iterator<Item = Self::Directory>> {
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         let all_directories = models::Directory::all(models::Directory::as_select(), &mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
         let all_directories = all_directories.collect::<Vec<_>>();
@@ -109,7 +107,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 
     fn get_files_in_directory(&self, dir: &Self::Directory) -> Result<impl Iterator<Item = Self::File>> {
         use super::schema::files::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         let files_in_dir: Vec<models::File> = files
             .filter(directory_id.eq(dir.id))
             .select(models::File::as_select())
@@ -118,9 +116,9 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
         Ok(files_in_dir.into_iter())
     }
 
-    fn get_directory(&self, path: &Utf8Path) -> Result<Self::Directory> {
+    fn get_directory(&self, path: &DirectoryPath) -> Result<Self::Directory> {
         use super::schema::directories::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         match directories
             .filter(full_path.eq(path.to_string()))
             .select(models::Directory::as_select())
@@ -134,12 +132,12 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
         }
     }
 
-    fn get_file(&self, dir: &Self::Directory, filename: &str) -> Result<Self::File> {
+    fn get_file(&self, dir: &Self::Directory, filename: &Filename) -> Result<Self::File> {
         use super::schema::files::dsl::*;
 
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         let files_found = files
-            .filter(name.eq(filename).and(directory_id.eq(dir.id)))
+            .filter(name.eq(filename.as_str()).and(directory_id.eq(dir.id)))
             .select(models::File::as_select())
             .load(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
@@ -153,7 +151,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 
     fn get_or_create_directory(
         &self,
-        path: &Utf8Path,
+        path: &DirectoryPath,
         parent_dir: Option<&Self::Directory>,
     ) -> Result<(Self::Directory, bool)> {
         // Try to get, if found return (any error other than not-found is returned too)
@@ -176,7 +174,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 
     fn delete_file(&self, file: Self::File) -> Result<()> {
         use super::schema::files::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         diesel::delete(files.filter(id.eq(file.id)))
             .execute(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
@@ -185,7 +183,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 
     fn get_directories_in_directory(&self, dir: &Self::Directory) -> Result<impl Iterator<Item = Self::Directory>> {
         use super::schema::directories::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         let directories_in_dir: Vec<models::Directory> = directories
             .filter(parent_id.eq(dir.id))
             .select(models::Directory::as_select())
@@ -196,7 +194,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 
     fn delete_directory(&self, dir: Self::Directory) -> Result<()> {
         use super::schema::directories::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         diesel::delete(directories.filter(id.eq(dir.id)))
             .execute(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
@@ -211,7 +209,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
     fn upsert_file(
         &self,
         dir: &Self::Directory,
-        filename: &str,
+        filename: &Filename,
         new_size: Option<u64>,
         new_hash: Option<&str>,
     ) -> Result<()> {
@@ -238,7 +236,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
         };
 
         let new_file = models::NewFile {
-            name: filename,
+            name: filename.as_str(),
             directory_id: dir.id,
             hash: &hash_,
             size: size_ as i32,
@@ -247,7 +245,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
         // let changes = (hash.eq(hash_), size.eq(size_ as i32));
 
         use super::schema::files::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         diesel::insert_into(files)
             .values(&new_file)
             .on_conflict((name, directory_id))
@@ -262,18 +260,18 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
         &self,
         file: Self::File,
         new_directory: Option<&Self::Directory>,
-        new_filename: Option<&str>,
+        new_filename: Option<&Filename>,
         new_size: Option<u64>,
         new_hash: Option<&str>,
     ) -> Result<Self::File> {
         let new_file = models::NewFile {
-            name: new_filename.unwrap_or(file.filename()),
+            name: new_filename.map(|v| v.as_str()).unwrap_or(file.filename().as_str()),
             directory_id: new_directory.map(|v| v.id).unwrap_or(file.directory_id),
             hash: new_hash.unwrap_or(file.hash()),
             size: new_size.unwrap_or(file.size()) as i32,
         };
 
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
         use super::schema::files::dsl::*;
         let file_updated = diesel::update(files)
             .filter(id.eq(file.id))
@@ -284,12 +282,12 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
         Ok(file_updated)
     }
 
-    fn create_file(&self, dir: &Self::Directory, filename: &str, hash_: &str, size_: i32) -> Result<Self::File> {
+    fn create_file(&self, dir: &Self::Directory, filename: &Filename, hash_: &str, size_: i32) -> Result<Self::File> {
         use super::schema::files::dsl::*;
-        let mut conn = self.pool.get().map_err(|e| Error::Other(e.to_string()))?;
+        let mut conn = self.get_conn()?;
 
         let new_file = models::NewFile {
-            name: filename,
+            name: filename.as_str(),
             directory_id: dir.id,
             hash: hash_,
             size: size_,
@@ -305,15 +303,18 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
+    use camino::Utf8Path;
     use tempfile::NamedTempFile;
 
     use crate::impls::FilesystemLocalTemp;
-    use crate::{Filesystem, FilesystemOps};
+    use crate::{DirectoryPath, DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
 
     use super::*;
 
     /// Creates a directory and return it
-    async fn create_dir_all(db: &mut DatabaseImpl, path: &Utf8Path) -> models::Directory {
+    async fn create_dir_all(db: &mut DatabaseImpl, path: &DirectoryPath) -> models::Directory {
         db.create_dir_all(path).await.unwrap();
         db.get_directory(path).unwrap()
     }
@@ -321,27 +322,35 @@ mod tests {
     /// Populates the given database with some data
     async fn populate_db(db: &mut DatabaseImpl) {
         // Some directories
+        let filename1: &Filename = &FilenameBuf::from_str("file1.txt").unwrap();
+        let filename2: &Filename = &FilenameBuf::from_str("file2.txt").unwrap();
+
         {
-            let dir = create_dir_all(db, Utf8Path::new("dir1/subdir1/subsubdir1")).await;
-            db.create_file(&dir, "file1.txt", "file1", 1).unwrap();
-            db.create_file(&dir, "file2.txt", "file2", 2).unwrap();
+            let dir = DirectoryPathBuf::from_str("dir1/subdir1/subsubdir1").unwrap();
+            let dir = create_dir_all(db, &dir).await;
+            db.create_file(&dir, filename1, "file1", 1).unwrap();
+            db.create_file(&dir, filename2, "file2", 2).unwrap();
         }
         {
-            let dir = create_dir_all(db, Utf8Path::new("dir1/subdir1/subsubdir2")).await;
-            db.create_file(&dir, "file1.txt", "file1", 3).unwrap();
-            db.create_file(&dir, "file2.txt", "file2", 4).unwrap();
+            let dir = DirectoryPathBuf::from_str("dir1/subdir1/subsubdir2").unwrap();
+            let dir = create_dir_all(db, &dir).await;
+            db.create_file(&dir, filename1, "file1", 3).unwrap();
+            db.create_file(&dir, filename2, "file2", 4).unwrap();
         }
         {
-            let dir = db.get_directory(Utf8Path::new("dir1/subdir1")).unwrap();
-            db.create_file(&dir, "file1.txt", "file1", 5).unwrap();
+            let dir = DirectoryPathBuf::from_str("dir1/subdir1").unwrap();
+            let dir = db.get_directory(&dir).unwrap();
+            db.create_file(&dir, filename1, "file1", 5).unwrap();
         }
         {
-            let dir = create_dir_all(db, Utf8Path::new("dir1/subdir2")).await;
-            db.create_file(&dir, "file1.txt", "file1", 6).unwrap();
-            db.create_file(&dir, "file2.txt", "file2", 7).unwrap();
+            let dir = DirectoryPathBuf::from_str("dir1/subdir2").unwrap();
+            let dir = create_dir_all(db, &dir).await;
+            db.create_file(&dir, filename1, "file1", 6).unwrap();
+            db.create_file(&dir, filename2, "file2", 7).unwrap();
         }
         {
-            let _ = create_dir_all(db, Utf8Path::new("dir2/subdir1")).await;
+            let dir = DirectoryPathBuf::from_str("dir2/subdir1").unwrap();
+            let _ = create_dir_all(db, &dir).await;
         }
     }
 
@@ -366,21 +375,27 @@ mod tests {
         populate_db(&mut db).await;
 
         // File found
+        let dir = DirectoryPathBuf::from_str("dir1/subdir1/subsubdir1").unwrap();
         let metadata = db
-            .get_metadata(Utf8Path::new("dir1/subdir1/subsubdir1/file1.txt"))
+            .get_metadata(&dir.join_filename(FilenameBuf::from_str("file1.txt").unwrap()))
             .await?;
-        assert_eq!(metadata.path(), "dir1/subdir1/subsubdir1/file1.txt");
+        assert_eq!(metadata.path().as_str(), "dir1/subdir1/subsubdir1/file1.txt");
         assert_eq!(metadata.hash()?, "file1");
         assert_eq!(metadata.size()?, 1);
 
         // Directory doesn't exist
-        let r = db.get_metadata(Utf8Path::new("not/exists")).await;
+        let dir_not_exist = DirectoryPathBuf::from_str("not/exists").unwrap();
+        let r = db
+            .get_metadata(&dir_not_exist.join_filename(FilenameBuf::from_str("whatever").unwrap()))
+            .await;
         assert!(r.is_err());
         let e = r.unwrap_err();
         assert!(matches!(e, Error::PathDoesNotExist), "Assert failed. Error was: {}", e);
 
         // File is not found in directory
-        let r = db.get_metadata(Utf8Path::new("dir1/file-not-found")).await;
+        let r = db
+            .get_metadata(&dir.join_filename(FilenameBuf::from_str("file_not_found").unwrap()))
+            .await;
         assert!(r.is_err());
         let e = r.unwrap_err();
         assert!(matches!(e, Error::PathDoesNotExist), "Assert failed. Error was: {}", e);
@@ -393,10 +408,16 @@ mod tests {
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         populate_db(&mut db).await;
 
-        let found = db.exists(Utf8Path::new("dir1/subdir1/subsubdir1/file1.txt")).await?;
+        let dir = DirectoryPathBuf::from_str("dir1/subdir1/subsubdir1").unwrap();
+        let found = db
+            .exists(&dir.join_filename(FilenameBuf::from_str("file1.txt").unwrap()))
+            .await?;
         assert!(found);
 
-        let not_found = db.exists(Utf8Path::new("dir1/not-found")).await?;
+        let dir = DirectoryPathBuf::from_str("dir1").unwrap();
+        let not_found = db
+            .exists(&dir.join_filename(FilenameBuf::from_str("not-found").unwrap()))
+            .await?;
         assert!(!not_found);
         Ok(())
     }
@@ -405,7 +426,10 @@ mod tests {
     async fn test_open() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
         let db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
-        let r = db.open(Utf8Path::new("anything")).await;
+        let root = DirectoryPathBuf::root();
+        let r = db
+            .open(&root.join_filename(FilenameBuf::from_str("anything").unwrap()))
+            .await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
         assert!(matches!(e, Error::Forbidden));
@@ -415,8 +439,11 @@ mod tests {
     #[tokio::test]
     async fn test_create() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
-        let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
-        let r = db.create(Utf8Path::new("anything")).await;
+        let db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
+        let root = DirectoryPathBuf::root();
+        let r = db
+            .open(&root.join_filename(FilenameBuf::from_str("anything").unwrap()))
+            .await;
         let Err(e) = r else { unreachable!() };
         assert!(matches!(e, Error::Forbidden));
         Ok(())
@@ -426,11 +453,12 @@ mod tests {
     async fn test_create_dir_all() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
+        let long_dir = DirectoryPathBuf::from_str("a/long/dir").unwrap();
+        db.create_dir_all(&long_dir).await?;
 
-        let _ = db.get_directory(Utf8Path::new("a"))?;
-        let _ = db.get_directory(Utf8Path::new("a/long"))?;
-        let _ = db.get_directory(Utf8Path::new("a/long/dir"))?;
+        let _ = db.get_directory(&DirectoryPathBuf::from_str("a").unwrap())?;
+        let _ = db.get_directory(&DirectoryPathBuf::from_str("a/long").unwrap())?;
+        let _ = db.get_directory(&DirectoryPathBuf::from_str("a/long/dir").unwrap())?;
         Ok(())
     }
 
@@ -438,15 +466,17 @@ mod tests {
     async fn test_remove_file() -> anyhow::Result<()> {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
-        let filepath = Utf8Path::new("file1.txt");
+        let root_dir_path = DirectoryPathBuf::root();
+        let filename = FilenameBuf::from_str("file1.txt").unwrap();
+        let filepath = root_dir_path.join_filename(&filename);
         {
-            assert!(!db.exists(filepath).await?);
-            let root_dir = db.get_directory(Utf8Path::new(ROOT_DIRECTORY))?;
-            db.create_file(&root_dir, "file1.txt", "file1", 1)?;
-            assert!(db.exists(filepath).await?);
+            assert!(!db.exists(&filepath).await?);
+            let root_dir = db.get_directory(&root_dir_path)?;
+            db.create_file(&root_dir, &filename, "file1", 1)?;
+            assert!(db.exists(&filepath).await?);
         }
-        db.remove_file(filepath).await?;
-        assert!(!db.exists(filepath).await?);
+        db.remove_file(&filepath).await?;
+        assert!(!db.exists(&filepath).await?);
         Ok(())
     }
 
@@ -456,16 +486,17 @@ mod tests {
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         // A directory without files
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
-        let r = db.remove_dir(Utf8Path::new("a/long/dir")).await;
+        let dir = DirectoryPathBuf::from_str("a/long/dir").unwrap();
+        db.create_dir_all(&dir).await?;
+        let r = db.remove_dir(&dir).await;
         assert!(r.is_ok());
-        assert!(db.get_directory(Utf8Path::new("a/long/dir")).is_err());
-        assert!(db.get_directory(Utf8Path::new("a/long")).is_ok());
+        assert!(db.get_directory(&dir).is_err());
+        assert!(db.get_directory(dir.parent().unwrap()).is_ok());
 
         // A directory with files
-        let dir = create_dir_all(&mut db, Utf8Path::new("a/long/dir")).await;
-        db.create_file(&dir, "file.txt", "file1", 1)?;
-        let r = db.remove_dir(Utf8Path::new("a/long/dir")).await;
+        let dir_object = create_dir_all(&mut db, &dir).await;
+        db.create_file(&dir_object, &FilenameBuf::from_str("file.txt").unwrap(), "file1", 1)?;
+        let r = db.remove_dir(&dir).await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
         assert!(
@@ -475,8 +506,8 @@ mod tests {
         );
 
         // A directory with child directories
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
-        let r = db.remove_dir(Utf8Path::new("a/long")).await;
+        db.create_dir_all(&dir).await?;
+        let r = db.remove_dir(dir.parent().unwrap()).await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
         assert!(
@@ -494,25 +525,27 @@ mod tests {
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
         // A directory without files
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
-        db.remove_dir_all(Utf8Path::new("a/long/dir")).await?;
-        assert!(db.get_directory(Utf8Path::new("a/long/dir")).is_err());
-        assert!(db.get_directory(Utf8Path::new("a/long")).is_ok());
+        let dir = DirectoryPathBuf::from_str("a/long/dir").unwrap();
+        db.create_dir_all(&dir).await?;
+        db.remove_dir_all(&dir).await?;
+        assert!(db.get_directory(&dir).is_err());
+        assert!(db.get_directory(dir.parent().unwrap()).is_ok());
 
         // A directory with files
-        let dir = create_dir_all(&mut db, Utf8Path::new("a/long/dir")).await;
-        db.create_file(&dir, "file.txt", "file1", 1)?;
-        db.remove_dir_all(Utf8Path::new("a/long/dir")).await?;
-        assert!(db.get_directory(Utf8Path::new("a/long/dir")).is_err());
-        assert!(!db.exists(Utf8Path::new("a/long/dir/file.txt")).await?);
-        assert!(db.get_directory(Utf8Path::new("a/long")).is_ok());
+        let dir_object = create_dir_all(&mut db, &dir).await;
+        let filename = FilenameBuf::from_str("file.txt").unwrap();
+        db.create_file(&dir_object, &filename, "file1", 1)?;
+        db.remove_dir_all(&dir).await?;
+        assert!(db.get_directory(&dir).is_err());
+        assert!(!db.exists(&dir.join_filename(&filename)).await?);
+        assert!(db.get_directory(dir.parent().unwrap()).is_ok());
 
         // A directory with child directories
-        db.create_dir_all(Utf8Path::new("a/long/dir")).await?;
-        db.remove_dir_all(Utf8Path::new("a")).await?;
-        assert!(db.get_directory(Utf8Path::new("a/long/dir")).is_err());
-        assert!(db.get_directory(Utf8Path::new("a/long")).is_err());
-        assert!(db.get_directory(Utf8Path::new("a")).is_err());
+        db.create_dir_all(&dir).await?;
+        db.remove_dir_all(dir.parent().unwrap().parent().unwrap()).await?;
+        assert!(db.get_directory(&dir).is_err());
+        assert!(db.get_directory(dir.parent().unwrap()).is_err());
+        assert!(db.get_directory(dir.parent().unwrap().parent().unwrap()).is_err());
 
         Ok(())
     }
@@ -522,15 +555,23 @@ mod tests {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
-        let dir = create_dir_all(&mut db, Utf8Path::new("a/long/dir")).await;
-        db.create_file(&dir, "file.txt", "file1", 1)?;
-        db.create_file(&dir, "file2.txt", "file2", 32)?;
+        let dir = DirectoryPathBuf::from_str("a/long/dir").unwrap();
+        let dir_object = create_dir_all(&mut db, &dir).await;
+        db.create_file(&dir_object, &FilenameBuf::from_str("file.txt").unwrap(), "file1", 1)?;
+        db.create_file(&dir_object, &FilenameBuf::from_str("file2.txt").unwrap(), "file2", 32)?;
+
+        let file_txt = dir.join_filename(FilenameBuf::from_str("file.txt").unwrap());
+        let file2_txt = dir.join_filename(FilenameBuf::from_str("file2.txt").unwrap());
+        let file_copy_txt = dir.join_filename(FilenameBuf::from_str("file_copy.txt").unwrap());
 
         // Target directory doesn't exist
         let r = db
             .internal_copy(
-                Utf8Path::new("a/long/dir/file.txt"),
-                Utf8Path::new("another/place.txt"),
+                &file_txt,
+                &FilePathBuf::new(
+                    DirectoryPathBuf::from_str("another").unwrap(),
+                    FilenameBuf::from_str("place.txt").unwrap(),
+                ),
                 true,
             )
             .await;
@@ -543,13 +584,7 @@ mod tests {
         );
 
         // Target file already exist (force=false)
-        let r = db
-            .internal_copy(
-                Utf8Path::new("a/long/dir/file.txt"),
-                Utf8Path::new("a/long/dir/file2.txt"),
-                false,
-            )
-            .await;
+        let r = db.internal_copy(&file_txt, &file2_txt, false).await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
         assert!(
@@ -559,27 +594,15 @@ mod tests {
         );
 
         // Target file doesn't exist
-        assert!(!db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
-        let r = db
-            .internal_copy(
-                Utf8Path::new("a/long/dir/file.txt"),
-                Utf8Path::new("a/long/dir/file_copy.txt"),
-                false,
-            )
-            .await?;
+        assert!(!db.exists(&file_copy_txt).await?);
+        let r = db.internal_copy(&file_txt, &file_copy_txt, false).await?;
         assert!(r.is_none()); // Nothing to wait
-        assert!(db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
+        assert!(db.exists(&file_copy_txt).await?);
 
         // Target file is overridden
-        let r = db
-            .internal_copy(
-                Utf8Path::new("a/long/dir/file.txt"),
-                Utf8Path::new("a/long/dir/file2.txt"),
-                true,
-            )
-            .await?;
+        let r = db.internal_copy(&file_txt, &file2_txt, true).await?;
         assert!(r.is_none()); // Nothing to wait
-        let metadata = db.get_metadata(Utf8Path::new("a/long/dir/file2.txt")).await?;
+        let metadata = db.get_metadata(&file2_txt).await?;
         assert_eq!(metadata.hash()?, "file1");
         assert_eq!(metadata.size()?, 1);
 
@@ -591,15 +614,23 @@ mod tests {
         let db_file = NamedTempFile::new()?;
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
 
-        let dir = create_dir_all(&mut db, Utf8Path::new("a/long/dir")).await;
-        db.create_file(&dir, "file.txt", "file1", 1)?;
-        db.create_file(&dir, "file2.txt", "file2", 32)?;
+        let dir = DirectoryPathBuf::from_str("a/long/dir").unwrap();
+        let dir_object = create_dir_all(&mut db, &dir).await;
+        db.create_file(&dir_object, &FilenameBuf::from_str("file.txt").unwrap(), "file1", 1)?;
+        db.create_file(&dir_object, &FilenameBuf::from_str("file2.txt").unwrap(), "file2", 32)?;
+
+        let file_txt = dir.join_filename(FilenameBuf::from_str("file.txt").unwrap());
+        let file2_txt = dir.join_filename(FilenameBuf::from_str("file2.txt").unwrap());
+        let file_copy_txt = dir.join_filename(FilenameBuf::from_str("file_copy.txt").unwrap());
 
         // Target directory doesn't exist
         let r = db
             .internal_move(
-                Utf8Path::new("a/long/dir/file.txt"),
-                Utf8Path::new("another/place.txt"),
+                &file_txt,
+                &FilePathBuf::new(
+                    DirectoryPathBuf::from_str("another").unwrap(),
+                    FilenameBuf::from_str("place.txt").unwrap(),
+                ),
                 true,
             )
             .await;
@@ -612,13 +643,7 @@ mod tests {
         );
 
         // Target file already exist (force=false)
-        let r = db
-            .internal_move(
-                Utf8Path::new("a/long/dir/file.txt"),
-                Utf8Path::new("a/long/dir/file2.txt"),
-                false,
-            )
-            .await;
+        let r = db.internal_move(&file_txt, &file2_txt, false).await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
         assert!(
@@ -628,31 +653,19 @@ mod tests {
         );
 
         // Target file doesn't exist
-        assert!(!db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
-        let r = db
-            .internal_move(
-                Utf8Path::new("a/long/dir/file.txt"),
-                Utf8Path::new("a/long/dir/file_copy.txt"),
-                false,
-            )
-            .await?;
+        assert!(!db.exists(&file_copy_txt).await?);
+        let r = db.internal_move(&file_txt, &file_copy_txt, false).await?;
         assert!(r.is_none()); // Nothing to wait
-        assert!(db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
-        assert!(!db.exists(Utf8Path::new("a/long/dir/file.txt")).await?);
+        assert!(db.exists(&file_copy_txt).await?);
+        assert!(!db.exists(&file_txt).await?);
 
         // Target file is overridden
-        let r = db
-            .internal_move(
-                Utf8Path::new("a/long/dir/file_copy.txt"),
-                Utf8Path::new("a/long/dir/file2.txt"),
-                true,
-            )
-            .await?;
+        let r = db.internal_move(&file_copy_txt, &file2_txt, true).await?;
         assert!(r.is_none()); // Nothing to wait
-        let metadata = db.get_metadata(Utf8Path::new("a/long/dir/file2.txt")).await?;
+        let metadata = db.get_metadata(&file2_txt).await?;
         assert_eq!(metadata.hash()?, "file1");
         assert_eq!(metadata.size()?, 1);
-        assert!(!db.exists(Utf8Path::new("a/long/dir/file_copy.txt")).await?);
+        assert!(!db.exists(&file_copy_txt).await?);
 
         Ok(())
     }
@@ -667,13 +680,15 @@ mod tests {
         // db.copy_from(Utf8Path::new("copy.txt"), &db, Utf8Path::new("file.txt"), true).await?;
         // assert!(db.exists(Utf8Path::new("copy.txt")).await?);
 
-        let mut temp_fs = FilesystemLocalTemp::default();
-        let (_, _) = temp_fs.create(Utf8Path::new("file.txt")).await?;
+        let file_txt = DirectoryPathBuf::root().join_filename(FilenameBuf::from_str("file.txt").unwrap());
+        let copy_txt = DirectoryPathBuf::root().join_filename(FilenameBuf::from_str("copy.txt").unwrap());
 
-        db.copy_from(Utf8Path::new("copy.txt"), &temp_fs, Utf8Path::new("file.txt"), false)
-            .await?;
-        assert!(db.exists(Utf8Path::new("copy.txt")).await?);
-        assert!(!db.exists(Utf8Path::new("file.txt")).await?);
+        let mut temp_fs = FilesystemLocalTemp::default();
+        let (_, _) = temp_fs.create(&file_txt).await?;
+
+        db.copy_from(&copy_txt, &temp_fs, &file_txt, false).await?;
+        assert!(db.exists(&copy_txt).await?);
+        assert!(!db.exists(&file_txt).await?);
         Ok(())
     }
 
@@ -687,22 +702,18 @@ mod tests {
         // db.move_from(Utf8Path::new("copy.txt"), &db, Utf8Path::new("file.txt"), true).await?;
         // assert!(db.exists(Utf8Path::new("copy.txt")).await?);
 
-        let mut temp_fs = FilesystemLocalTemp::default();
-        let (_, _) = temp_fs.create(Utf8Path::new("file.txt")).await?;
+        let file_txt = DirectoryPathBuf::root().join_filename(FilenameBuf::from_str("file.txt").unwrap());
+        let copy_txt = DirectoryPathBuf::root().join_filename(FilenameBuf::from_str("copy.txt").unwrap());
 
-        let r = db
-            .move_from(
-                Utf8Path::new("copy.txt"),
-                &mut temp_fs,
-                Utf8Path::new("file.txt"),
-                false,
-            )
-            .await;
+        let mut temp_fs = FilesystemLocalTemp::default();
+        let (_, _) = temp_fs.create(&file_txt).await?;
+
+        let r = db.move_from(&copy_txt, &mut temp_fs, &file_txt, false).await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
         assert!(matches!(e, Error::Forbidden), "Assert failed. Error was: {}", e);
-        assert!(!db.exists(Utf8Path::new("copy.txt")).await?);
-        assert!(temp_fs.exists(Utf8Path::new("file.txt")).await?);
+        assert!(!db.exists(&copy_txt).await?);
+        assert!(temp_fs.exists(&file_txt).await?);
         Ok(())
     }
 }

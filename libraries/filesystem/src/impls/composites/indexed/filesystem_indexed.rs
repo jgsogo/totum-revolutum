@@ -1,14 +1,14 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
 use crate::filesystem::FilesystemOps;
 use crate::wrappers::AsyncFileDropImpl;
-use crate::{Error, File, FileMetadata, Filesystem, Result};
+use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, Filesystem, Result};
 
 /// Function called from [`FilesystemIndexed`] when a file opened in write mode is being dropped.
 /// This function calls [`File::sync_all`], drops the `file`, awaits for any pending action in the
@@ -18,7 +18,7 @@ async fn index_file<LHS: Filesystem + FilesystemOps + 'static, RHS: Filesystem +
     rx_filesystem: Option<Receiver<Result<()>>>,
     index: Arc<Mutex<Option<LHS>>>,
     storage: Arc<Mutex<Option<RHS>>>,
-    path: Utf8PathBuf,
+    path: &FilePath,
 ) -> Result<()> {
     // Write everything down
     file.sync_all().await?;
@@ -34,7 +34,7 @@ async fn index_file<LHS: Filesystem + FilesystemOps + 'static, RHS: Filesystem +
     let rx_index = index
         .as_mut()
         .unwrap()
-        .copy_from(&path, storage.as_ref().unwrap(), &path, true)
+        .copy_from(path, storage.as_ref().unwrap(), path, true)
         .await?;
 
     match rx_index {
@@ -68,10 +68,10 @@ impl<TIndex: Filesystem + FilesystemOps + 'static, TStorage: Filesystem + 'stati
                 move |file: Box<dyn File>,
                       rx_filesystem: Option<Receiver<Result<()>>>,
                       fs_storage: Arc<Mutex<Option<TStorage>>>,
-                      path: Utf8PathBuf| {
+                      path: FilePathBuf| {
                     // Write everything down
                     let index = index.clone();
-                    async move { index_file(file, rx_filesystem, index, fs_storage, path).await }
+                    async move { index_file(file, rx_filesystem, index, fs_storage, &path).await }
                 },
             ),
         );
@@ -113,40 +113,40 @@ impl<TIndex: Filesystem, TStorage: Filesystem> Filesystem for FilesystemIndexed<
             .await
     }
 
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
         self.index.lock().await.as_ref().unwrap().get_metadata(path).await
     }
 
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
+    async fn exists(&self, path: &FilePath) -> Result<bool> {
         self.index.lock().await.as_ref().unwrap().exists(path).await
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn open(&self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.storage.open(path).await
     }
 
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         // Only the file in the storage needs to be created, the INDEX will be synced when the
         // file is dropped.
         self.storage.create(path).await
     }
 
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.storage.create_dir_all(path).await?;
         self.index.lock().await.as_mut().unwrap().create_dir_all(path).await
     }
 
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &FilePath) -> Result<()> {
         self.storage.remove_file(path).await?;
         self.index.lock().await.as_mut().unwrap().remove_file(path).await
     }
 
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &DirectoryPath) -> Result<()> {
         self.storage.remove_dir(path).await?;
         self.index.lock().await.as_mut().unwrap().remove_dir(path).await
     }
 
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.storage.remove_dir_all(path).await?;
         self.index.lock().await.as_mut().unwrap().remove_dir_all(path).await
     }
@@ -158,13 +158,14 @@ impl<TIndex: Filesystem, TStorage: Filesystem> FilesystemOps for FilesystemIndex
 #[cfg(test)]
 mod tests {
     use std::ops::Deref;
+    use std::str::FromStr;
     use std::sync::{Arc, RwLock};
 
     use camino::Utf8Path;
 
     use crate::impls::composites::FilesystemIndexed;
     use crate::impls::mocks::{FilesystemMock, SUCCESS};
-    use crate::{FileMetadata, Filesystem};
+    use crate::{DirectoryPathBuf, FileMetadata, FilePathBuf, FilenameBuf, Filesystem};
 
     #[tokio::test]
     async fn test_indexed_impl() {
@@ -180,6 +181,8 @@ mod tests {
             let storage = FilesystemMock::new("storage", storage_called.clone());
             FilesystemIndexed::new(index, storage)
         };
+
+        let filepath = FilePathBuf::new(&DirectoryPathBuf::root(), FilenameBuf::from_str("path").unwrap());
 
         // walk_directory
         {
@@ -198,7 +201,7 @@ mod tests {
 
         // get_metadata
         {
-            let r = indexed_filesystem.get_metadata(Utf8Path::new("path")).await;
+            let r = indexed_filesystem.get_metadata(&filepath).await;
             assert!(r.is_err());
             // index was called
             assert_eq!(
@@ -212,7 +215,7 @@ mod tests {
 
         // exists
         {
-            let r = indexed_filesystem.exists(Utf8Path::new("path")).await;
+            let r = indexed_filesystem.exists(&filepath).await;
             assert!(r.is_err());
             // index was called
             assert_eq!(
@@ -226,7 +229,7 @@ mod tests {
 
         // open
         {
-            let r = indexed_filesystem.open(Utf8Path::new("path")).await;
+            let r = indexed_filesystem.open(&filepath).await;
             assert!(r.is_err());
             // index was not hit (we don't check if the file exists first)
             assert!(index_called.read().unwrap().is_empty());
@@ -240,7 +243,7 @@ mod tests {
 
         // create
         {
-            let r = indexed_filesystem.create(Utf8Path::new("path")).await;
+            let r = indexed_filesystem.create(&filepath).await;
             assert!(r.is_err());
             // index was not hit
             assert!(index_called.read().unwrap().is_empty());
@@ -252,9 +255,10 @@ mod tests {
         };
         storage_called.write().unwrap().clear();
 
+        let success_directory = DirectoryPathBuf::from_str(SUCCESS).unwrap();
         // create_dir_all
         {
-            let r = indexed_filesystem.create_dir_all(Utf8Path::new(SUCCESS)).await;
+            let r = indexed_filesystem.create_dir_all(&success_directory).await;
             assert!(r.is_ok());
             // index was hit
             assert_eq!(
@@ -270,9 +274,10 @@ mod tests {
         index_called.write().unwrap().clear();
         storage_called.write().unwrap().clear();
 
+        let success_file = FilePathBuf::new(DirectoryPathBuf::root(), FilenameBuf::from_str(SUCCESS).unwrap());
         // remove_file
         {
-            let r = indexed_filesystem.remove_file(Utf8Path::new(SUCCESS)).await;
+            let r = indexed_filesystem.remove_file(&success_file).await;
             assert!(r.is_ok());
             // index was hit
             assert_eq!(
@@ -290,7 +295,7 @@ mod tests {
 
         // remove_dir
         {
-            let r = indexed_filesystem.remove_dir(Utf8Path::new(SUCCESS)).await;
+            let r = indexed_filesystem.remove_dir(&success_directory).await;
             assert!(r.is_ok());
             // index was hit
             assert_eq!(
@@ -308,7 +313,7 @@ mod tests {
 
         // remove_dir_all
         {
-            let r = indexed_filesystem.remove_dir_all(Utf8Path::new(SUCCESS)).await;
+            let r = indexed_filesystem.remove_dir_all(&success_directory).await;
             assert!(r.is_ok());
             // index was hit
             assert_eq!(

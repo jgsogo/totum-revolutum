@@ -11,7 +11,7 @@ use tracing::info;
 
 use crate::filesystem::FilesystemOps;
 use crate::impls::local::file_metadata::LocalMetadata;
-use crate::{Error, File, FileMetadata, Filesystem, Result};
+use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, Filesystem, Result};
 
 use super::parallel_visitor;
 
@@ -60,81 +60,78 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
         // It doesn't make much sense that the `Self::Metadata` contains an `ignore::DirEntry`, we
         // need something more identifiable as metadata in a local filesystem
-        let path = self.check_path(path)?;
-        let local_metadata = LocalMetadata::from_filesystem(&self.root.join(&path), path)?;
+        let local_metadata = LocalMetadata::from_filesystem(&self.root.join(path), path)?;
         Ok(Box::new(local_metadata))
     }
 
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        let path = self.root.join(self.check_path(path)?);
+    async fn exists(&self, path: &FilePath) -> Result<bool> {
+        let path = self.root.join(path);
         Ok(path.exists())
     }
-    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        let path = self.root.join(self.check_path(path)?);
+    async fn open(&self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+        let path = self.root.join(path);
         let f = AsyncFile::open(path.into_std_path_buf()).await?;
         Ok((Box::new(f), None))
     }
 
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        let path = self.root.join(self.check_path(path)?);
+    async fn create(&mut self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+        let path = self.root.join(path);
         let f = AsyncFile::create(path.into_std_path_buf()).await?;
         Ok((Box::new(f), None))
     }
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.root.join(self.check_path(path)?);
+    async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
+        let path = self.root.join(path);
         fs::create_dir_all(path).map_err(Error::IoError)
     }
 
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &FilePath) -> Result<()> {
         // Do not resolve symlinks
-        let path = self.root.join(self.check_path(path)?);
+        let path = self.root.join(path);
         fs::remove_file(path).map_err(Error::IoError)
     }
 
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &DirectoryPath) -> Result<()> {
         // Do not resolve symlinks
-        let path = self.root.join(self.check_path(path)?);
+        let path = self.root.join(path);
         fs::remove_dir(path).map_err(Error::IoError)
     }
 
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         // Do not resolve symlinks
-        let path = self.root.join(self.check_path(path)?);
+        let path = self.root.join(path);
         fs::remove_dir_all(path).map_err(Error::IoError)
     }
 
     async fn internal_copy(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
-        let origin = self.root.join(self.check_path(origin)?);
-        let target = self.root.join(self.check_path(target)?);
-        if !force && self.exists(&target).await? {
+        if !force && self.exists(target).await? {
             return Err(Error::TargetFileExists);
         }
-        let _ = fs::copy(&origin, &target).map_err(Error::IoError)?;
+        let origin = self.root.join(origin);
+        let target = self.root.join(target);
+        let _ = fs::copy(origin, target).map_err(Error::IoError)?;
         Ok(None)
     }
 
     async fn internal_move(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
-        let origin = self.root.join(self.check_path(origin)?);
-        let target = self.root.join(self.check_path(target)?);
-
-        if !force && self.exists(&target).await? {
+        if !force && self.exists(target).await? {
             return Err(Error::TargetFileExists);
         }
-
-        fs::rename(&origin, &target).map_err(Error::IoError)?;
+        let origin = self.root.join(origin);
+        let target = self.root.join(target);
+        fs::rename(origin, target).map_err(Error::IoError)?;
         Ok(None)
     }
 }
@@ -145,7 +142,9 @@ impl FilesystemOps for FilesystemLocal {}
 #[cfg(test)]
 mod tests {
     use std::io;
+    use std::str::FromStr;
 
+    use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
     use tempfile::tempdir;
 
     use super::*;
@@ -177,7 +176,8 @@ mod tests {
         let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
         let mut fs = FilesystemLocal::new(utf8_path)?;
 
-        let filepath = utf8_path.join("myfile");
+        let directory_path = DirectoryPathBuf::root();
+        let filepath = FilePathBuf::new(directory_path, FilenameBuf::from_str("myfile").unwrap());
         let content: Vec<u8> = b"Hello, world!".to_vec();
 
         // Create and write
@@ -207,14 +207,16 @@ mod tests {
         let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
         let mut fs = FilesystemLocal::new(utf8_path)?;
 
+        let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
+        let filepath = FilePathBuf::new(&dir, FilenameBuf::from_str("myfile.txt").unwrap());
         // I can't create a file in a subfolder (if the folder doesn't exist yet)
-        let r = fs.create("nested/nested2/myfile.txt".into()).await;
+        let r = fs.create(&filepath).await;
         assert!(r.is_err());
         let Err(e) = r else { unreachable!() };
         assert!(matches!(e, Error::IoError(io::Error { .. })));
 
-        fs.create_dir_all("nested/nested2".into()).await?;
-        let r = fs.create("nested/nested2/myfile.txt".into()).await;
+        fs.create_dir_all(&dir).await?;
+        let r = fs.create(&filepath).await;
         assert!(r.is_ok());
         Ok(())
     }

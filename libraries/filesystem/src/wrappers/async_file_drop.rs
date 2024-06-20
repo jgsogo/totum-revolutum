@@ -2,18 +2,18 @@ use std::future::Future;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use tokio::sync::oneshot::{Receiver, Sender};
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info};
 
-use crate::{Error, File, FileMetadata, Filesystem, Result};
+use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, Filesystem, Result};
 
 type FileCloseMessageData = (
     Box<dyn File>,
     Option<Receiver<Result<()>>>,
-    Utf8PathBuf,
+    FilePathBuf,
     Sender<Result<()>>,
 );
 
@@ -29,7 +29,7 @@ pub async fn call_sync_all<T: Filesystem + 'static>(
     file: Box<dyn File>,
     rx_filesystem: Option<Receiver<Result<()>>>,
     _fs: Arc<Mutex<Option<T>>>,
-    _path: Utf8PathBuf,
+    _path: FilePathBuf,
 ) -> Result<()> {
     file.sync_all().await?;
     drop(file);
@@ -63,10 +63,10 @@ impl<T: Filesystem + 'static> AsyncFileDropImpl<T> {
     ///
     /// The functions receive several arguments when the file is about to drop: the [`File`] itself, the optional
     /// [`Receiver`] returned when the file was created by the underlying filesystem, the underlying [`Filesystem`]
-    /// itself and the [`Utf8PathBuf`] used when the file was created.
+    /// itself and the [`FilePathBuf`] used when the file was created.
     pub fn new<F, Fut>(filesystem: T, func_for_readonly_file: Option<F>, func_for_write_file: Option<F>) -> Self
     where
-        F: Fn(Box<dyn File>, Option<Receiver<Result<()>>>, Arc<Mutex<Option<T>>>, Utf8PathBuf) -> Fut + Send + 'static,
+        F: Fn(Box<dyn File>, Option<Receiver<Result<()>>>, Arc<Mutex<Option<T>>>, FilePathBuf) -> Fut + Send + 'static,
         Fut: Future<Output = Result<()>> + Send + 'static,
     {
         let wrap_open = func_for_readonly_file.is_some();
@@ -143,22 +143,22 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
             .await
     }
 
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
         self.filesystem.lock().await.as_ref().unwrap().get_metadata(path).await
     }
 
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
+    async fn exists(&self, path: &FilePath) -> Result<bool> {
         self.filesystem.lock().await.as_ref().unwrap().exists(path).await
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn open(&self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         if self.wrap_open {
             let (file, rx_filesystem) = self.filesystem.lock().await.as_ref().unwrap().open(path).await?;
             let (tx, rx) = tokio::sync::oneshot::channel();
             let ret = FileAsyncDrop {
                 file: Some(file),
                 rx_filesystem,
-                path: Some(path.to_path_buf()),
+                path: Some(path.to_filepath_buf()),
                 tx_filesystem_close: self.tx_file_close.clone(),
                 tx_file_close: Some(tx),
                 is_readonly: true,
@@ -169,14 +169,14 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
         }
     }
 
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         if self.wrap_create {
             let (file, rx_filesystem) = self.filesystem.lock().await.as_mut().unwrap().create(path).await?;
             let (tx, rx) = tokio::sync::oneshot::channel();
             let ret = FileAsyncDrop {
                 file: Some(file),
                 rx_filesystem,
-                path: Some(path.to_path_buf()),
+                path: Some(path.to_filepath_buf()),
                 tx_filesystem_close: self.tx_file_close.clone(),
                 tx_file_close: Some(tx),
                 is_readonly: false,
@@ -187,7 +187,7 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
         }
     }
 
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.filesystem
             .lock()
             .await
@@ -197,15 +197,15 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
             .await
     }
 
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &FilePath) -> Result<()> {
         self.filesystem.lock().await.as_mut().unwrap().remove_file(path).await
     }
 
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &DirectoryPath) -> Result<()> {
         self.filesystem.lock().await.as_mut().unwrap().remove_dir(path).await
     }
 
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.filesystem
             .lock()
             .await
@@ -228,7 +228,7 @@ struct FileAsyncDrop {
     is_readonly: bool,
 
     /// Path to the file
-    path: Option<Utf8PathBuf>,
+    path: Option<FilePathBuf>,
 
     /// A sender to be called from drop. The message will arrive [`super::FilesystemLocal`] and it
     /// will take care of calling [`AsyncFile::sync_all`] to ensure that all data is written to

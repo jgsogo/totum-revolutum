@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use anyhow::{anyhow, Result};
 use camino::{Utf8Path, Utf8PathBuf};
 use diesel::{RunQueryDsl, SelectableHelper};
@@ -5,7 +7,7 @@ use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
 use filesystem::impls::FilesystemLocalTemp;
-use filesystem::{Filesystem, FilesystemOps};
+use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
 
 use super::db::Database;
 use super::models;
@@ -32,7 +34,7 @@ impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps> PhotoDB<'a, T, 
         Ok(Self { db, app_dir, storage })
     }
 
-    fn prepare_image_file(input: Utf8PathBuf, filesystem_local: &FilesystemLocalTemp) -> Result<Utf8PathBuf> {
+    fn prepare_image_file(input: Utf8PathBuf, filesystem_local: &FilesystemLocalTemp) -> Result<FilePathBuf> {
         debug!("Convert to PNG format");
         let input = {
             let image = image::io::Reader::open(input)?.decode()?;
@@ -46,7 +48,7 @@ impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps> PhotoDB<'a, T, 
             let input_file = oxipng::InFile::Path(input.to_path_buf());
 
             let tmp_filename = filesystem_local.temp_filename(None, None);
-            let output_file = oxipng::OutFile::from_path(tmp_filename.clone().into_std_path_buf());
+            let output_file = oxipng::OutFile::from_path(tmp_filename.as_std_path().to_path_buf());
 
             optimize(&input_file, &output_file, &Options::from_preset(2))
                 .map_err(|e| anyhow!("Error converting image: {e}"))?;
@@ -76,14 +78,14 @@ impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps> PhotoDB<'a, T, 
             debug!(" - sha256 '{}'", sha256);
             let (c1, rest) = sha256.split_at(4);
             let (c2, rest) = rest.split_at(4);
-            Utf8Path::new(SHA256_BASE_PATH)
-                .join(c1)
-                .join(c2)
-                .join(format!("{}.png", rest))
+
+            let path = Utf8Path::new(SHA256_BASE_PATH).join(c1).join(c2);
+            let path = DirectoryPathBuf::from_str(path.as_str())?;
+            path.join_filename(FilenameBuf::from_str(&format!("{}.png", rest)).unwrap())
         };
         debug!("Upload to '{}'", filepath);
-        debug!("Create intermediate directories '{}'", filepath.parent().unwrap());
-        self.storage.create_dir_all(filepath.parent().unwrap()).await?;
+        debug!("Create intermediate directories '{}'", filepath.directory());
+        self.storage.create_dir_all(filepath.directory()).await?;
         filesystem::actions::copy_file(&tmp_filesystem, &mut self.storage, &photo, &filepath, false).await?;
         debug!("Get metadata from uploaded file");
         let _metadata = self.storage.get_metadata(&filepath).await?;

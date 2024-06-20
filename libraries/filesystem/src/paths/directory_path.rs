@@ -42,7 +42,7 @@ impl DirectoryPathBuf {
     /// Extends `self` with `path`.
     ///
     /// The given `path` should follow certain rules so the resulting `DirectoryPathBuf` is still
-    /// valid according to [`validate_path`] rules.
+    /// valid according to internal rules.
     pub fn push(&mut self, path: impl AsRef<Utf8Path>) -> Result<()> {
         let new_path = self.0.join(path);
         let new_path = validate_path(&new_path)?;
@@ -72,6 +72,15 @@ impl FromStr for DirectoryPathBuf {
         let utf8_path = Utf8PathBuf::from(s);
         let utf8_path = validate_path(&utf8_path)?;
         Ok(Self(utf8_path))
+    }
+}
+
+impl<'a> TryFrom<&'a Utf8Path> for DirectoryPathBuf {
+    type Error = Error;
+
+    fn try_from(value: &'a Utf8Path) -> std::result::Result<Self, Self::Error> {
+        let value = validate_path(value)?;
+        Ok(Self(value))
     }
 }
 
@@ -164,6 +173,11 @@ impl DirectoryPath {
 
     pub fn join_filename(&self, filename: impl AsRef<Filename>) -> FilePathBuf {
         FilePathBuf::new(self, filename)
+    }
+
+    pub fn join(&self, path: impl AsRef<DirectoryPath>) -> DirectoryPathBuf {
+        let pathbuf = self.0.join(path.as_ref());
+        DirectoryPathBuf::try_from(pathbuf.as_path()).unwrap()
     }
 }
 

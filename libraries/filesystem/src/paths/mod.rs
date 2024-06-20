@@ -1,6 +1,7 @@
-pub use directory_path::DirectoryPathBuf;
-pub use filename::FilenameBuf;
-pub use filepath::FilePathBuf;
+pub use directory_path::{DirectoryPath, DirectoryPathBuf};
+pub use filename::{Filename, FilenameBuf};
+pub use filepath::{FilePath, FilePathBuf};
+
 mod directory_path;
 mod filename;
 mod filepath;

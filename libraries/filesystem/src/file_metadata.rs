@@ -1,5 +1,4 @@
-use crate::Result;
-use camino::Utf8Path;
+use crate::{FilePath, Result};
 use std::fmt::Debug;
 
 /// Allows access to file metadata. This is useful in case the information
@@ -10,7 +9,7 @@ pub trait FileMetadata: Send + Sync + Debug {
     ///
     /// This path identifies one-to-one every file inside a filesystem. It should be the
     /// **relative path** starting from the root of the filesystem.
-    fn path(&self) -> &Utf8Path;
+    fn path(&self) -> &FilePath;
 
     /// The size of the file
     /// FIXME: Remove the Result. It can return the u64 directly
