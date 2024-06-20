@@ -27,7 +27,7 @@ impl<'action, FsLhs: Filesystem, FsRhs: Filesystem> Backup<'action, FsLhs, FsRhs
 impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> two_way_diff::Receiver
     for Backup<'action, FsLhs, FsRhs>
 {
-    async fn only_lhs(&self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+    async fn only_lhs(&mut self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
         todo!("not impl");
         // let relative_path = self._lhs_fs.rel_path(lhs.path())?;
         // info!("Copy to remote '{relative_path}'");
@@ -36,7 +36,7 @@ impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> two_way_
     }
 
     async fn diff_files(
-        &self,
+        &mut self,
         lhs_file_metadata: Box<dyn FileMetadata>,
         rhs_file_metadata: Box<dyn FileMetadata>,
     ) -> Result<()> {

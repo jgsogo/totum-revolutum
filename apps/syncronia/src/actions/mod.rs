@@ -56,7 +56,7 @@ pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
     rhs_fs: FsRhs,
     config: &config::Config,
 ) -> Result<()> {
-    let action_run = match config.action.action() {
+    let mut action_run = match config.action.action() {
         Actions::Backup => backup::Backup::new(&lhs_fs, &rhs_fs, *config.action.conflict()),
         Actions::ZipBackup => todo!("impl pending"),
         Actions::Sync => todo!("impl pending"),
@@ -65,7 +65,7 @@ pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
         Actions::MoveDownload => todo!("impl pending"),
     };
 
-    two_way_diff::run(&lhs_fs, &rhs_fs, &action_run).await?;
+    two_way_diff::run(&lhs_fs, &rhs_fs, &mut action_run).await?;
 
     // action_run.stats();
     Ok(())

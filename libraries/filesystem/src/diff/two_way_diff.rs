@@ -1,7 +1,7 @@
-use async_trait::async_trait;
 use std::collections::HashMap;
 use std::time::Instant;
 
+use async_trait::async_trait;
 use camino::Utf8Path;
 use tracing::{debug, error, info, trace};
 
@@ -13,12 +13,12 @@ pub type FileMetadataPair = (Option<Box<dyn FileMetadata>>, Option<Box<dyn FileM
 
 /// Interface to receive the results from the 2-way diff [`run`] function
 #[async_trait]
-pub trait Receiver: Sync {
+pub trait Receiver: Send + Sync {
     /// Receives every [`FileMetadataPair`] from the filesystems we are iterating.
     ///
     /// The default implementation will just forward the call to the right method from
     /// [`Receiver::only_lhs`], [`Receiver::only_rhs`] or [`Receiver::lhs_and_rhs`].
-    async fn on_data(&self, data: FileMetadataPair) -> Result<()> {
+    async fn on_data(&mut self, data: FileMetadataPair) -> Result<()> {
         match data {
             (Some(lhs), None) => self.only_lhs(lhs).await,
             (None, Some(rhs)) => self.only_rhs(rhs).await,
@@ -29,13 +29,13 @@ pub trait Receiver: Sync {
 
     /// Receives the [`FileMetadata`] for the files that are only present in the left-hand-side
     /// filesystem
-    async fn only_lhs(&self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+    async fn only_lhs(&mut self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
         Ok(())
     }
 
     /// Receives the [`FileMetadata`] for the files that are only present in the right-hand-side
     /// filesystem
-    async fn only_rhs(&self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+    async fn only_rhs(&mut self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
         Ok(())
     }
 
@@ -44,7 +44,7 @@ pub trait Receiver: Sync {
     /// The default implementation will forward the call to [`Receiver::equal_files`] or
     /// [`Receiver::diff_files`].
     async fn lhs_and_rhs(
-        &self,
+        &mut self,
         lhs_file_metadata: Box<dyn FileMetadata>,
         rhs_file_metadata: Box<dyn FileMetadata>,
     ) -> Result<()> {
@@ -57,7 +57,7 @@ pub trait Receiver: Sync {
 
     /// Receives the [`FileMetadata`] for the files that are present in both filesystems and are equal
     async fn equal_files(
-        &self,
+        &mut self,
         _lhs_file_metadata: Box<dyn FileMetadata>,
         _rhs_file_metadata: Box<dyn FileMetadata>,
     ) -> Result<()> {
@@ -66,7 +66,7 @@ pub trait Receiver: Sync {
 
     /// Receives the [`FileMetadata`] for the files that are present in both filesystems and are different
     async fn diff_files(
-        &self,
+        &mut self,
         _lhs_file_metadata: Box<dyn FileMetadata>,
         _rhs_file_metadata: Box<dyn FileMetadata>,
     ) -> Result<()> {
@@ -76,7 +76,7 @@ pub trait Receiver: Sync {
 
 async fn work_on_results<TReceiver: Receiver>(
     rx: flume::Receiver<FileMetadataPair>,
-    receiver: &TReceiver,
+    receiver: &mut TReceiver,
 ) -> Result<()> {
     debug!("Start 2-way diff receiving loop");
     let start = Instant::now();
@@ -92,7 +92,7 @@ async fn work_on_results<TReceiver: Receiver>(
 pub async fn run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TReceiver: Receiver>(
     lhs_filesystem: &LHSFilesystem,
     rhs_filesystem: &RHSFilesystem,
-    receiver: &TReceiver,
+    receiver: &mut TReceiver,
 ) -> Result<()> {
     let (lhs_tx, lhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
     let (rhs_tx, rhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
@@ -163,4 +163,113 @@ pub async fn run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TReceiver
     )?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use crate::impls::FilesystemLocalTemp;
+    use crate::wrappers::AsyncFileDropImpl;
+    use crate::{DirectoryPathBuf, Error, FilePath, FilenameBuf};
+
+    use super::*;
+
+    #[derive(Default)]
+    struct ReceiverMock {
+        pub only_lhs: Vec<String>,
+        pub only_rhs: Vec<String>,
+        pub equal: Vec<String>,
+        pub diff: Vec<String>,
+    }
+
+    #[async_trait]
+    impl Receiver for ReceiverMock {
+        async fn only_lhs(&mut self, file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+            self.only_lhs.push(file_metadata.path().to_string());
+            Ok(())
+        }
+        async fn only_rhs(&mut self, file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+            self.only_rhs.push(file_metadata.path().to_string());
+            Ok(())
+        }
+        async fn equal_files(
+            &mut self,
+            lhs_file_metadata: Box<dyn FileMetadata>,
+            rhs_file_metadata: Box<dyn FileMetadata>,
+        ) -> Result<()> {
+            assert_eq!(lhs_file_metadata.path(), rhs_file_metadata.path());
+            assert_eq!(lhs_file_metadata.size()?, rhs_file_metadata.size()?);
+            assert_eq!(lhs_file_metadata.hash()?, rhs_file_metadata.hash()?);
+            self.equal.push(lhs_file_metadata.path().to_string());
+            Ok(())
+        }
+        async fn diff_files(
+            &mut self,
+            lhs_file_metadata: Box<dyn FileMetadata>,
+            rhs_file_metadata: Box<dyn FileMetadata>,
+        ) -> Result<()> {
+            assert_eq!(lhs_file_metadata.path(), rhs_file_metadata.path());
+            self.diff.push(lhs_file_metadata.path().to_string());
+            Ok(())
+        }
+    }
+
+    async fn create_file(filesystem: &mut dyn Filesystem, path: &FilePath, content: &[u8]) -> Result<()> {
+        let rx = {
+            let (mut f, rx) = filesystem.create(path).await?;
+            f.write_all(content).await?;
+            rx.unwrap()
+        };
+
+        rx.await.map_err(|e| Error::Other(e.to_string()))??;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_run() -> Result<()> {
+        let root = DirectoryPathBuf::root();
+        let lhs_only = root.join_filename(FilenameBuf::from_str("lhs_only")?);
+        let rhs_only = root.join_filename(FilenameBuf::from_str("rhs_only")?);
+        let both_equal = root.join_filename(FilenameBuf::from_str("both_equal")?);
+        let diff_hash = root.join_filename(FilenameBuf::from_str("diff_hash")?);
+        let diff_size = root.join_filename(FilenameBuf::from_str("diff_size")?);
+
+        let fs_lhs = {
+            let mut fs = AsyncFileDropImpl::new_call_sync_all(FilesystemLocalTemp::default());
+            create_file(&mut fs, &lhs_only, b"anything").await?;
+            create_file(&mut fs, &both_equal, b"both_equal").await?;
+            create_file(&mut fs, &diff_hash, b"lhs_hash").await?;
+            create_file(&mut fs, &diff_size, b"lhs size").await?;
+            fs
+        };
+
+        let fs_rhs = {
+            let mut fs = AsyncFileDropImpl::new_call_sync_all(FilesystemLocalTemp::default());
+            create_file(&mut fs, &rhs_only, b"anything").await?;
+            create_file(&mut fs, &both_equal, b"both_equal").await?;
+            create_file(&mut fs, &diff_hash, b"rhs_hash").await?;
+            create_file(&mut fs, &diff_size, b"rhs size so it's different").await?;
+            fs
+        };
+
+        let mut receiver = ReceiverMock::default();
+        run(&fs_lhs, &fs_rhs, &mut receiver).await?;
+
+        assert_eq!(receiver.only_lhs.len(), 1);
+        assert_eq!(receiver.only_lhs.get(0).unwrap(), lhs_only.as_str());
+
+        assert_eq!(receiver.only_rhs.len(), 1);
+        assert_eq!(receiver.only_rhs.get(0).unwrap(), rhs_only.as_str());
+
+        assert_eq!(receiver.equal.len(), 1);
+        assert_eq!(receiver.equal.get(0).unwrap(), both_equal.as_str());
+
+        assert_eq!(receiver.diff.len(), 2);
+        receiver.diff.sort();
+        assert_eq!(receiver.diff.get(0).unwrap(), diff_hash.as_str());
+        assert_eq!(receiver.diff.get(1).unwrap(), diff_size.as_str());
+
+        Ok(())
+    }
 }
