@@ -1,7 +1,7 @@
 use std::sync::{Arc, RwLock};
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 
@@ -37,17 +37,6 @@ impl FilesystemMock {
 
 #[async_trait]
 impl Filesystem for FilesystemMock {
-    fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        self.called
-            .write()
-            .unwrap()
-            .push(("check_path".to_string(), vec![path.to_string()]));
-        Err(Error::Other(format!(
-            "FilesystemMock('{}') doesn't execute actual work",
-            self.id
-        )))
-    }
-
     async fn sync_all(self) -> Result<()> {
         self.called.write().unwrap().push(("sync_all".to_string(), vec![]));
         Err(Error::Other(format!(

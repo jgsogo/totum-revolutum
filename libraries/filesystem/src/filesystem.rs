@@ -1,8 +1,6 @@
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
-
-use utils::filesystem::normalize_path;
 
 use crate::actions::copy;
 
@@ -12,18 +10,6 @@ use super::{File, FileMetadata};
 /// Abstraction of a filesystem with methods to access its files
 #[async_trait]
 pub trait Filesystem: Send + Sync {
-    /// Normalizes the given `path` ensuring that it is a relative path that doesn't go outside
-    /// its root folder. Returns the normalized version of that path
-    #[deprecated(note = "Use types from crate::paths everywhere")]
-    fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        let path = normalize_path(path);
-        if path.starts_with("../") {
-            Err(Error::PathOutsideFilesystem)
-        } else {
-            Ok(path)
-        }
-    }
-
     /// Waits for any pending operation and finishes this filesystem.
     async fn sync_all(self) -> Result<()>;
 
@@ -40,7 +26,6 @@ pub trait Filesystem: Send + Sync {
     async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>>;
 
     /// Returns true if the path points at an existing entity.
-    /// FIXME: Define if it means file, directory or any (probably better to deduplicate method)
     async fn exists(&self, path: &FilePath) -> Result<bool>;
 
     /// Tries to open the file requested by the argument `path` in read-only mode. Returns an
