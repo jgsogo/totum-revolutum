@@ -1,10 +1,12 @@
 use async_trait::async_trait;
 use tracing::info;
 
-use crate::actions::action_run::ActionRun;
 use crate::actions::OnConflict;
-use filesystem::{FileMetadata, Filesystem};
+use filesystem::diff::two_way_diff;
+use filesystem::{FileMetadata, Filesystem, Result};
 
+/// Backup behaviour. It can be used as a receiver in the [`two_way_diff::run`]
+/// function.
 pub struct Backup<'action, FsLhs: Filesystem, FsRhs: Filesystem> {
     _lhs_fs: &'action FsLhs,
     _rhs_fs: &'action FsRhs,
@@ -22,28 +24,34 @@ impl<'action, FsLhs: Filesystem, FsRhs: Filesystem> Backup<'action, FsLhs, FsRhs
 }
 
 #[async_trait]
-impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> ActionRun for Backup<'action, FsLhs, FsRhs> {
-    async fn run_with_both(&self, lhs: &dyn FileMetadata, rhs: &dyn FileMetadata) -> anyhow::Result<()> {
+impl<'action, FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static> two_way_diff::Receiver
+    for Backup<'action, FsLhs, FsRhs>
+{
+    async fn only_lhs(&mut self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+        todo!("not impl");
+        // let relative_path = self._lhs_fs.rel_path(lhs.path())?;
+        // info!("Copy to remote '{relative_path}'");
+        // let rhs_file = self._rhs_fs.create()
+        // Ok(())
+    }
+
+    async fn diff_files(
+        &mut self,
+        lhs_file_metadata: Box<dyn FileMetadata>,
+        rhs_file_metadata: Box<dyn FileMetadata>,
+    ) -> Result<()> {
         match self.on_conflict {
             OnConflict::OverrideRemote => {
-                info!("Override remote '{}'", lhs.path());
+                info!("Override remote '{}'", lhs_file_metadata.path());
                 // let _r = remote_basepoint.copy(&lhs, Some(rhs)).await?;
             }
             OnConflict::RenameRemote => {
-                info!("Rename remote and copy '{}'", rhs.path());
+                info!("Rename remote and copy '{}'", rhs_file_metadata.path());
                 // let _ = remote_basepoint.rename(rhs).await?;
                 // let _r = remote_basepoint.copy(&lhs, None).await?;
             }
             s => panic!("Not a valid onConflict for backup: {s:?}"),
         }
         Ok(())
-    }
-
-    async fn run_with_lhs(&self, _lhs: &dyn FileMetadata) -> anyhow::Result<()> {
-        todo!("not impl");
-        // let relative_path = self._lhs_fs.rel_path(lhs.path())?;
-        // info!("Copy to remote '{relative_path}'");
-        // let rhs_file = self._rhs_fs.create()
-        // Ok(())
     }
 }
