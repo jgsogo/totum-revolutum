@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use std::sync::Arc;
 
 use async_trait::async_trait;
@@ -17,13 +18,13 @@ use pcloud_sdk::methods::folder::deletefolderrecursive::GetDeleteFolderRecursive
 use pcloud_sdk::methods::folder::listfolder::GetListFolder;
 use pcloud_sdk::methods::folder::ListFolderInput;
 use pcloud_sdk::structures::Metadata;
-use pcloud_sdk::types::errors::{InvalidFileError, InvalidFolderError, InvalidRemotePathError};
+use pcloud_sdk::types::errors::{InvalidFileError, InvalidFolderError};
 use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 
 use crate::filesystem::FilesystemOps;
 use crate::impls::pcloud::file::RemoteFile;
 use crate::impls::pcloud::file_metadata::RemoteMetadata;
-use crate::{Error, File, FileMetadata, Filesystem, Result};
+use crate::{DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilenameBuf, Filesystem, Result};
 
 pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone + Send + 'static> {
     // Root folder for this filesystem
@@ -51,21 +52,22 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
 
     fn work_on_contents(
         tx: Sender<Box<dyn FileMetadata>>,
-        base_path: &Utf8Path,
+        base_path: &DirectoryPath,
         contents: &[Metadata],
         depth: usize,
     ) -> Result<()> {
         for it in contents.iter() {
             match it {
                 Metadata::MetadataFile(m) => {
-                    let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
-                    trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
+                    let filename = FilenameBuf::from_str(m.common.name.as_ref().unwrap())?;
+                    let filepath = base_path.join_filename(&filename);
+                    trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), filepath);
 
-                    let data = RemoteMetadata::new(path, m.clone());
+                    let data = RemoteMetadata::new(filepath, m.clone());
                     tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
                 }
                 Metadata::MetadataFolder(m) => {
-                    let path = base_path.join(Utf8Path::new(m.common.name.as_ref().unwrap()));
+                    let path = base_path.join(DirectoryPathBuf::from_str(m.common.name.as_ref().unwrap()).unwrap());
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
                     FilesystemPCloud::<HttpClient>::work_on_contents(
@@ -110,7 +112,9 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(tx, &self.root_path, contents, 0)?,
+            Some(contents) => {
+                FilesystemPCloud::<HttpClient>::work_on_contents(tx, &DirectoryPathBuf::root(), contents, 0)?
+            }
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -118,10 +122,9 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
-        let path = self.check_path(path)?;
+    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
         let remote_path = {
-            let abs_path = self.root_path.join(&path);
+            let abs_path = self.root_path.join(path);
             RemotePath::try_from(abs_path).map_err(|e| Error::Other(e.to_string()))?
         };
         let metadata = self
@@ -129,15 +132,15 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .stat(pcloud_sdk::types::File::RemotePath(remote_path))
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(Box::new(RemoteMetadata::new(path, metadata.metadata)))
+        Ok(Box::new(RemoteMetadata::new(path.to_filepath_buf(), metadata.metadata)))
     }
 
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
-        let path = self.check_path(path)?;
-        let parent_folderid = match path.parent() {
+    async fn exists(&self, path: &FilePath) -> Result<bool> {
+        let dir = path.directory();
+        let parent_folderid = match dir.parent() {
             None => self.root_folderid.clone(),
-            Some(p) => {
-                let abspath = self.root_path.join(p);
+            Some(_) => {
+                let abspath = self.root_path.join(dir);
                 let rp = RemotePath::try_from(abspath).map_err(|e| Error::Other(e.to_string()))?;
                 self.pcloud
                     .get_folderid(&rp)
@@ -148,14 +151,14 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
 
         let r = self
             .pcloud
-            .exists(parent_folderid, path.file_name().unwrap())
+            .exists(parent_folderid, path.filename().as_str())
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(r.is_some())
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        let path = self.root_path.join(self.check_path(path)?);
+    async fn open(&self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+        let path = self.root_path.join(path);
         let path: PCloudFile = path
             .try_into()
             .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
@@ -171,23 +174,22 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok((Box::new(f), None))
     }
 
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
-        let rel_path = self.check_path(path)?;
-        let filename = rel_path.file_name().ok_or(Error::NotAFilepath)?;
+    async fn create(&mut self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+        let dir = path.directory();
+        // let rel_path = self.check_path(path)?;
+        // let filename = rel_path.file_name().ok_or(Error::NotAFilepath)?;
+        //
+        // let rel_path = rel_path
+        //     .parent()
+        //     .map_or_else(|| None, |v| if v.as_str() == "" { None } else { Some(v) });
 
-        let rel_path = rel_path
-            .parent()
-            .map_or_else(|| None, |v| if v.as_str() == "" { None } else { Some(v) });
-
-        let folder_id = match rel_path {
+        let folder_id = match dir.parent() {
             None => self.root_folderid.clone(),
-            Some(parent) => {
-                let parent = self.root_path.join(parent);
-                let remote_path = parent
-                    .try_into()
-                    .map_err(|e: InvalidRemotePathError| Error::Other(e.to_string()))?;
+            Some(_) => {
+                let abspath = self.root_path.join(dir);
+                let rp = RemotePath::try_from(abspath).map_err(|e| Error::Other(e.to_string()))?;
                 self.pcloud
-                    .get_folderid(&remote_path)
+                    .get_folderid(&rp)
                     .await
                     .map_err(|e| Error::Other(e.to_string()))?
             }
@@ -197,7 +199,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .pcloud
             .file_open(
                 Flags::O_CREAT | Flags::O_WRITE | Flags::O_TRUNC,
-                FileOpenPath::FolderAndName(folder_id, filename.to_string()),
+                FileOpenPath::FolderAndName(folder_id, path.filename().as_str().to_string()),
             )
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
@@ -206,17 +208,16 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok((Box::new(f), None))
     }
 
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-        let rel_path = self.check_path(path)?;
+    async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.pcloud
-            .createfolderifnotexists_all(&self.root_folderid, rel_path)
+            .createfolderifnotexists_all(&self.root_folderid, path)
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(())
     }
 
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.root_path.join(self.check_path(path)?);
+    async fn remove_file(&mut self, path: &FilePath) -> Result<()> {
+        let path = self.root_path.join(path);
         let input_file = path
             .try_into()
             .map_err(|e: InvalidFileError| Error::Other(e.to_string()))?;
@@ -227,8 +228,8 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.root_path.join(self.check_path(path)?);
+    async fn remove_dir(&mut self, path: &DirectoryPath) -> Result<()> {
+        let path = self.root_path.join(path);
         let input_folder = path
             .try_into()
             .map_err(|e: InvalidFolderError| Error::Other(e.to_string()))?;
@@ -239,8 +240,8 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.root_path.join(self.check_path(path)?);
+    async fn remove_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
+        let path = self.root_path.join(path);
         let input_folder = path
             .try_into()
             .map_err(|e: InvalidFolderError| Error::Other(e.to_string()))?;
@@ -282,6 +283,7 @@ mod tests {
 
     use headers::HeaderMap;
 
+    use crate::FilePathBuf;
     use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::file::deletefile;
     use pcloud_sdk::methods::file::deletefile::DeleteFile;
@@ -327,7 +329,7 @@ mod tests {
 
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(root, client).await?;
-        assert_eq!(Utf8Path::new("/the/path"), fs.root_path); // Root is always '/'
+        assert_eq!("/the/path", fs.root_path.as_str()); // Root is always '/'
         assert_eq!(FolderID::new(1234), fs.root_folderid);
         Ok(())
     }
@@ -429,7 +431,7 @@ mod tests {
         let mut fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
         let rx = {
-            let filepath = Utf8Path::new("file");
+            let filepath = FilePathBuf::new(DirectoryPathBuf::root(), FilenameBuf::from_str("file").unwrap());
             let (mut f, rx) = fs.create(&filepath).await?;
 
             let content: Vec<u8> = b"Hello, world!".to_vec();
@@ -533,7 +535,7 @@ mod tests {
         let fs = FilesystemPCloud::new(root, client).await?;
         let fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
-        let filepath = Utf8Path::new("file");
+        let filepath = FilePathBuf::new(DirectoryPathBuf::root(), FilenameBuf::from_str("file").unwrap());
 
         // Open and read
         let rx = {
@@ -602,8 +604,11 @@ mod tests {
         let fs = FilesystemPCloud::new(root_path, client).await?;
         let mut fs = AsyncFileDropImpl::new_call_sync_all(fs);
         let rx = {
-            let filepath = Utf8Path::new("nested/nested2/myfile.txt");
-            let (_, rx) = fs.create(filepath).await?;
+            let filepath = FilePathBuf::new(
+                DirectoryPathBuf::from_str("nested/nested2").unwrap(),
+                FilenameBuf::from_str("myfile.txt").unwrap(),
+            );
+            let (_, rx) = fs.create(&filepath).await?;
             rx.unwrap()
         };
         rx.await??;
@@ -651,7 +656,8 @@ mod tests {
 
         let mut fs = FilesystemPCloud::new(root_path, client).await?;
 
-        fs.create_dir_all(Utf8Path::new("nested/nested2")).await?;
+        let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
+        fs.create_dir_all(&dir).await?;
         Ok(())
     }
 
@@ -683,7 +689,7 @@ mod tests {
                 assert_eq!(headers.len(), 0);
                 assert_eq!(
                     params,
-                    &pcloud_sdk::types::File::from_str("path:/the/root/path/nested/nested2").unwrap()
+                    &pcloud_sdk::types::File::from_str("path:/the/root/path/nested/nested2/file").unwrap()
                 );
 
                 Ok(DeleteFile {
@@ -694,7 +700,9 @@ mod tests {
         );
 
         let mut fs = FilesystemPCloud::new(root_path, client).await?;
-        fs.remove_file(Utf8Path::new("nested/nested2")).await?;
+        let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
+        fs.remove_file(&dir.join_filename(FilenameBuf::from_str("file").unwrap()))
+            .await?;
         Ok(())
     }
 
@@ -735,7 +743,8 @@ mod tests {
             });
 
         let mut fs = FilesystemPCloud::new(root_path, client).await?;
-        fs.remove_dir(Utf8Path::new("nested/nested2")).await?;
+        let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
+        fs.remove_dir(&dir).await?;
         Ok(())
     }
 
@@ -776,7 +785,8 @@ mod tests {
             });
 
         let mut fs = FilesystemPCloud::new(root_path, client).await?;
-        fs.remove_dir_all(Utf8Path::new("nested/nested2")).await?;
+        let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
+        fs.remove_dir_all(&dir).await?;
         Ok(())
     }
 }

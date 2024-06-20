@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use anyhow::Result;
 use camino::Utf8PathBuf;
@@ -6,7 +7,7 @@ use camino::Utf8PathBuf;
 use filesystem::impls::FilesystemPCloud;
 use filesystem::impls::PCLOUD_CHUNK_SIZE;
 use filesystem::wrappers::AsyncFileDropImpl;
-use filesystem::Filesystem;
+use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem};
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::mocks::server::PCloudServerMock;
@@ -49,7 +50,7 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
         PCLOUD_CHUNK_SIZE,
     );
 
-    let p = Utf8PathBuf::from(name.clone());
+    let p = FilePathBuf::new(DirectoryPathBuf::root(), FilenameBuf::from_str(&name).unwrap());
     // Create and write
     let rx = {
         let (mut f, rx) = fs.create(&p).await?;
@@ -62,7 +63,7 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
 
     // Open and read
     {
-        let (mut file, _) = fs.open(&*p).await?;
+        let (mut file, _) = fs.open(&p).await?;
         let mut content_read = Vec::new();
         file.read_to_end(&mut content_read).await?;
         assert_eq!(content, content_read);

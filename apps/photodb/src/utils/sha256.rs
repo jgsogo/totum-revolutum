@@ -1,9 +1,9 @@
 use anyhow::Result;
-use camino::Utf8Path;
 use data_encoding::HEXLOWER;
 use ring::digest::{Context, Digest, SHA256};
 use std::fs::File;
 use std::io::{BufReader, Read};
+use std::path::Path;
 
 /// Computes the sha256 digest of the given buffer.
 ///
@@ -29,7 +29,7 @@ pub fn sha256_string<R: Read>(reader: R) -> Result<String> {
     Ok(HEXLOWER.encode(digest.as_ref()))
 }
 
-pub fn sha256_string_from_file(file: &Utf8Path) -> Result<String> {
+pub fn sha256_string_from_file(file: impl AsRef<Path>) -> Result<String> {
     let input = File::open(file)?;
     let reader = BufReader::new(input);
     sha256_string(reader)

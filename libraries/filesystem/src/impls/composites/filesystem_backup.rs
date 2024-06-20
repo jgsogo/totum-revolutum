@@ -1,14 +1,14 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
 use crate::filesystem::FilesystemOps;
 use crate::wrappers::AsyncFileDropImpl;
-use crate::{Error, File, FileMetadata, Filesystem, Result};
+use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, Filesystem, Result};
 
 /// Function called from [`FilesystemBackup`] when the file from the LHS filesystem is being dropped. This function
 /// calls [`File::sync_all`], drops the `file`, awaits for any pending action in the drop procedure using `rx_filesystem`
@@ -18,7 +18,7 @@ async fn backup_file<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static>(
     rx_filesystem: Option<Receiver<Result<()>>>,
     fs_lhs: Arc<Mutex<Option<LHS>>>,
     fs_rhs: Arc<Mutex<Option<RHS>>>,
-    path: Utf8PathBuf,
+    path: &FilePath,
 ) -> Result<()> {
     // Write everything down
     file.sync_all().await?;
@@ -34,7 +34,7 @@ async fn backup_file<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static>(
     let rx_rhs = fs_rhs
         .as_mut()
         .unwrap()
-        .copy_from(&path, fs_lhs.as_ref().unwrap(), &path, true)
+        .copy_from(path, fs_lhs.as_ref().unwrap(), path, true)
         .await?;
 
     match rx_rhs {
@@ -74,9 +74,9 @@ impl<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static> FilesystemBackup<L
                 move |file: Box<dyn File>,
                       rx_filesystem: Option<Receiver<Result<()>>>,
                       fs_lhs: Arc<Mutex<Option<LHS>>>,
-                      path: Utf8PathBuf| {
+                      path: FilePathBuf| {
                     let filesytem_rhs = filesytem_rhs.clone();
-                    async move { backup_file(file, rx_filesystem, fs_lhs, filesytem_rhs, path).await }
+                    async move { backup_file(file, rx_filesystem, fs_lhs, filesytem_rhs, &path).await }
                 },
             ),
         );
@@ -112,48 +112,48 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
         self.lhs.walk_directory(tx, threads, custom_ignore_filename).await
     }
 
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
         self.lhs.get_metadata(path).await
     }
 
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
+    async fn exists(&self, path: &FilePath) -> Result<bool> {
         self.lhs.exists(path).await
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn open(&self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.lhs.open(path).await
     }
 
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         // The file on the RHS filesystem will be created when the returned one is dropped. This is
         // the magic implemented in this FilesystemBackup.
         self.lhs.create(path).await
     }
 
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.lhs.create_dir_all(path).await?;
         self.rhs.lock().await.as_mut().unwrap().create_dir_all(path).await
     }
 
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &FilePath) -> Result<()> {
         self.lhs.remove_file(path).await?;
         self.rhs.lock().await.as_mut().unwrap().remove_file(path).await
     }
 
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &DirectoryPath) -> Result<()> {
         self.lhs.remove_dir(path).await?;
         self.rhs.lock().await.as_mut().unwrap().remove_dir(path).await
     }
 
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.lhs.remove_dir_all(path).await?;
         self.rhs.lock().await.as_mut().unwrap().remove_dir_all(path).await
     }
 
     async fn internal_copy(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         self.lhs.internal_copy(origin, target, force).await?;
@@ -168,8 +168,8 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
 
     async fn internal_move(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         self.lhs.internal_move(origin, target, force).await?;
@@ -188,10 +188,12 @@ impl<LHS: Filesystem, RHS: Filesystem> FilesystemOps for FilesystemBackup<LHS, R
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8PathBuf;
+    use std::str::FromStr;
+
     use tempfile::tempdir;
 
     use crate::impls::FilesystemLocal;
+    use crate::{DirectoryPathBuf, FilenameBuf};
 
     use super::*;
 
@@ -221,10 +223,11 @@ mod tests {
         // If I work in fs12, changes will be available in fs1, fs2 and fs3
 
         // - create the directory
-        fs12.create_dir_all(&Utf8PathBuf::from("path/to/folder")).await.unwrap();
+        let dir = DirectoryPathBuf::from_str("path/to/folder").unwrap();
+        fs12.create_dir_all(&dir).await.unwrap();
 
         // - create a file and write to it
-        let filepath = Utf8PathBuf::from("path/to/folder/my_file.txt");
+        let filepath = dir.join_filename(FilenameBuf::from_str("my_file.txt").unwrap());
         let content: Vec<u8> = b"Hello, world!".to_vec();
         let rx = {
             let (mut f, rx) = fs12.create(&filepath).await.unwrap();
@@ -255,7 +258,8 @@ mod tests {
         assert!(!fs3_filepath.exists());
 
         // - remove the directories
-        fs12.remove_dir_all(&Utf8PathBuf::from("path")).await.unwrap();
+        let dir = DirectoryPathBuf::from_str("path").unwrap();
+        fs12.remove_dir_all(&dir).await.unwrap();
         assert!(!fs1_root.join("path").exists());
         assert!(!fs2_root.join("path").exists());
         assert!(!fs3_root.join("path").exists());

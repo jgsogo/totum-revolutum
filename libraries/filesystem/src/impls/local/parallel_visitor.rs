@@ -1,8 +1,10 @@
+use std::str::FromStr;
+
 use camino::{Utf8Path, Utf8PathBuf};
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 use tracing::error;
 
-use crate::FileMetadata;
+use crate::{DirectoryPathBuf, FileMetadata, FilePathBuf, FilenameBuf};
 
 use super::file_metadata::LocalMetadata;
 
@@ -22,9 +24,20 @@ impl ParallelVisitor for Visitor {
         let entry = entry.unwrap();
         if entry.file_type().unwrap().is_file() {
             // FIXME: Is this the full path with or without root?
+            // TODO: Handle this errors
             let entry_path = Utf8Path::from_path(entry.path()).unwrap();
             let relative_path = entry_path.strip_prefix(&self.base_path).unwrap();
-            let data = match LocalMetadata::from_filesystem(entry_path, relative_path.into()) {
+            let dirname = DirectoryPathBuf::try_from(
+                relative_path
+                    .parent()
+                    .unwrap_or(DirectoryPathBuf::root().as_utf8_path()),
+            )
+            .unwrap();
+            let filepath = FilePathBuf::new(
+                dirname,
+                FilenameBuf::from_str(relative_path.file_name().unwrap()).unwrap(),
+            );
+            let data = match LocalMetadata::from_filesystem(entry_path, &filepath) {
                 Ok(metadata) => metadata,
                 Err(e) => {
                     error!("Error building LocalMetadata from path: {e}. Quit visiting.");

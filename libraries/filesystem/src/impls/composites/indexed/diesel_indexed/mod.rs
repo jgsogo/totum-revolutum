@@ -27,12 +27,14 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
 
 #[cfg(test)]
 mod tests {
-    use camino::{Utf8Path, Utf8PathBuf};
+    use std::str::FromStr;
+
+    use camino::Utf8Path;
 
     use crate::impls::composites::indexed::diesel_indexed::database::DatabaseImpl;
     use crate::impls::composites::{new_filesystem_indexed_with_db, FilesystemIndexedDatabase};
     use crate::impls::FilesystemLocalTemp;
-    use crate::Filesystem;
+    use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem};
 
     #[tokio::test]
     async fn test_filesystem_indexed_db() -> anyhow::Result<()> {
@@ -46,7 +48,12 @@ mod tests {
         {
             // - a file in the root folder
             let rx = {
-                let (mut f, rx) = fs.create(Utf8Path::new("file.txt")).await?;
+                let (mut f, rx) = fs
+                    .create(&FilePathBuf::new(
+                        DirectoryPathBuf::root(),
+                        FilenameBuf::from_str("file.txt").unwrap(),
+                    ))
+                    .await?;
                 f.write_all(b"Some content in the root").await?;
                 f.sync_all().await?;
                 rx.unwrap()
@@ -55,8 +62,11 @@ mod tests {
 
             // - a file inside some folder
             let rx = {
-                fs.create_dir_all(Utf8Path::new("a/folder")).await?;
-                let (mut f, rx) = fs.create(Utf8Path::new("a/folder/file.txt")).await?;
+                let folder = DirectoryPathBuf::from_str("a/folder").unwrap();
+                fs.create_dir_all(&folder).await?;
+                let (mut f, rx) = fs
+                    .create(&folder.join_filename(FilenameBuf::from_str("file.txt").unwrap()))
+                    .await?;
                 f.write_all(b"Some other content").await?;
                 f.sync_all().await?;
                 rx.unwrap()
@@ -78,8 +88,8 @@ mod tests {
         let f1 = files.get(1).unwrap();
 
         let mut conn = db.get_conn()?;
-        assert_eq!(f0.full_path(&mut conn)?, Utf8PathBuf::from("file.txt"));
-        assert_eq!(f1.full_path(&mut conn)?, Utf8PathBuf::from("a/folder/file.txt"));
+        assert_eq!(f0.full_path(&mut conn)?.as_str(), "file.txt");
+        assert_eq!(f1.full_path(&mut conn)?.as_str(), "a/folder/file.txt");
 
         Ok(())
     }

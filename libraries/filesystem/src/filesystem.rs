@@ -1,28 +1,15 @@
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
-
-use utils::filesystem::normalize_path;
 
 use crate::actions::copy;
 
-use super::{Error, Result};
+use super::{DirectoryPath, Error, FilePath, Result};
 use super::{File, FileMetadata};
 
 /// Abstraction of a filesystem with methods to access its files
 #[async_trait]
 pub trait Filesystem: Send + Sync {
-    /// Normalizes the given `path` ensuring that it is a relative path that doesn't go outside
-    /// its root folder. Returns the normalized version of that path
-    fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        let path = normalize_path(path);
-        if path.starts_with("../") {
-            Err(Error::PathOutsideFilesystem)
-        } else {
-            Ok(path)
-        }
-    }
-
     /// Waits for any pending operation and finishes this filesystem.
     async fn sync_all(self) -> Result<()>;
 
@@ -36,35 +23,34 @@ pub trait Filesystem: Send + Sync {
     ) -> Result<()>;
 
     /// Returns the [`FileMetadata`] for the given `path`
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>>;
+    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>>;
 
     /// Returns true if the path points at an existing entity.
-    /// FIXME: Define if it means file, directory or any (probably better to deduplicate method)
-    async fn exists(&self, path: &Utf8Path) -> Result<bool>;
+    async fn exists(&self, path: &FilePath) -> Result<bool>;
 
     /// Tries to open the file requested by the argument `path` in read-only mode. Returns an
     /// object implementing a [`File`] or an error. Some implementations may return a [`Receiver`]
     /// that the caller can await to receive any error that may happen from the file drop procedure.
-    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
+    async fn open(&self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
 
     /// Creates a file with this name in write-only mode. If it already exists, it will delete everything on it.
     /// This method returns an object implementing the [`File`] trait. Some implementations may
     /// return a [`Receiver`] that the caller can await for a couple of reasons:
     ///  * to receive any error that may happen from the file drop procedure
     ///  * to ensure that all the in-memory data is written to the file.
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
+    async fn create(&mut self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)>;
 
     /// Creates the given directory and any intermediate one
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()>;
+    async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()>;
 
     /// Removes a file from the filesystem.
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()>;
+    async fn remove_file(&mut self, path: &FilePath) -> Result<()>;
 
     /// Removes an empty directory.
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()>;
+    async fn remove_dir(&mut self, path: &DirectoryPath) -> Result<()>;
 
     /// Removes a directory at this path, after removing all its contents. Use carefully!
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()>;
+    async fn remove_dir_all(&mut self, path: &DirectoryPath) -> Result<()>;
 
     /// Copies a file inside this same [`Filesystem`] from `origin` to `target` path.
     ///
@@ -72,8 +58,8 @@ pub trait Filesystem: Send + Sync {
     /// should be overridden by [`Filesystem`] implementations that can optimize this copy.
     async fn internal_copy(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         if !force && self.exists(target).await? {
@@ -93,8 +79,8 @@ pub trait Filesystem: Send + Sync {
     /// that can optimize this copy and remove.
     async fn internal_move(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         if !force && self.exists(target).await? {
@@ -122,9 +108,9 @@ pub trait FilesystemOps: Filesystem + Sized {
     /// [`Error:TargetFileExists`]: Error#variant.TargetFileExists
     async fn copy_from(
         &mut self,
-        target: &Utf8Path,
+        target: &FilePath,
         origin: &dyn Filesystem,
-        origin_path: &Utf8Path,
+        origin_path: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         if self.is_same(origin) {
@@ -147,9 +133,9 @@ pub trait FilesystemOps: Filesystem + Sized {
     /// [`Error:TargetFileExists`]: Error#variant.TargetFileExists
     async fn move_from(
         &mut self,
-        target: &Utf8Path,
+        target: &FilePath,
         origin: &mut dyn Filesystem,
-        origin_path: &Utf8Path,
+        origin_path: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         if self.is_same(origin) {

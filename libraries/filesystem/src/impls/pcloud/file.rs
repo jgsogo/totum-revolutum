@@ -25,18 +25,6 @@ impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Remot
     }
 }
 
-// impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> Drop for RemoteFile<HttpClient> {
-//     fn drop(&mut self) {
-//         // The filesystem takes care of closing the file
-//         if let Err(e) = self
-//             .tx_file_close
-//             .send(FileCloseMessage::FileDescriptor(self.file.fd.clone()))
-//         {
-//             warn!("Error closing the file on drop action: {e}");
-//         }
-//     }
-// }
-
 #[async_trait]
 impl<HttpClient: GetFileRead + PostFileWrite + GetFileClose + Sync + Send> File for RemoteFile<HttpClient> {
     async fn read_to_end(&mut self, buf: &mut Vec<u8>) -> Result<usize> {

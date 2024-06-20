@@ -1,16 +1,14 @@
 use async_trait::async_trait;
-use camino::{Utf8Component, Utf8Path, Utf8PathBuf};
+use camino::{Utf8Component, Utf8Path};
 use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 
-use crate::{Error, FilesystemOps, Result};
+use crate::{DirectoryPath, DirectoryPathBuf, Error, FilePath, FilePathBuf, Filename, FilesystemOps, Result};
 use crate::{File, FileMetadata, Filesystem};
-
-const ROOT_DIRECTORY: &str = "";
 
 pub trait FilesystemIndexedDbFile {
     /// The filename of this file
-    fn filename(&self) -> &str;
+    fn filename(&self) -> &Filename;
 
     /// The size (bytes) of this file
     fn size(&self) -> u64;
@@ -21,7 +19,7 @@ pub trait FilesystemIndexedDbFile {
 
 pub trait FilesystemIndexedDbDirectory {
     /// Full path of the directory (relative to the root)
-    fn full_path(&self) -> &Utf8Path;
+    fn full_path(&self) -> &DirectoryPath;
 }
 
 /// Defines the methods that any type should implement, so it can play like the _index_ in the
@@ -41,16 +39,16 @@ pub trait FilesystemIndexedDatabase: Send + Sync {
     fn get_files_in_directory(&self, dir: &Self::Directory) -> Result<impl Iterator<Item = Self::File>>;
 
     /// Returns a [`Self::Directory`] given its path.
-    fn get_directory(&self, path: &Utf8Path) -> Result<Self::Directory>;
+    fn get_directory(&self, path: &DirectoryPath) -> Result<Self::Directory>;
 
     /// Returns a [`Self::File`] inside a [`Self::Directory`] given its `filename`
-    fn get_file(&self, dir: &Self::Directory, filename: &str) -> Result<Self::File>;
+    fn get_file(&self, dir: &Self::Directory, filename: &Filename) -> Result<Self::File>;
 
     /// Returns or creates a new [`Self::Directory`]. The caller can pass the parent directory
     /// as an optimization, so we don't need to hit the database to get it.
     fn get_or_create_directory(
         &self,
-        path: &Utf8Path,
+        path: &DirectoryPath,
         parent_dir: Option<&Self::Directory>,
     ) -> Result<(Self::Directory, bool)>;
 
@@ -73,7 +71,7 @@ pub trait FilesystemIndexedDatabase: Send + Sync {
     fn upsert_file(
         &self,
         dir: &Self::Directory,
-        filename: &str,
+        filename: &Filename,
         new_size: Option<u64>,
         new_hash: Option<&str>,
     ) -> Result<()>;
@@ -83,13 +81,13 @@ pub trait FilesystemIndexedDatabase: Send + Sync {
         &self,
         file: Self::File,
         new_directory: Option<&Self::Directory>,
-        new_filename: Option<&str>,
+        new_filename: Option<&Filename>,
         new_size: Option<u64>,
         new_hash: Option<&str>,
     ) -> Result<Self::File>;
 
     /// Creates a [`Self::File`] in the given [`Self::Directory`] with the given data
-    fn create_file(&self, dir: &Self::Directory, filename: &str, hash_: &str, size_: i32) -> Result<Self::File>;
+    fn create_file(&self, dir: &Self::Directory, filename: &Filename, hash_: &str, size_: i32) -> Result<Self::File>;
 }
 
 #[async_trait]
@@ -114,18 +112,14 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
         Ok(())
     }
 
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
-        let path = self.check_path(path)?;
-        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
-
-        let dir = self.get_directory(dirname)?;
-        let file = self.get_file(&dir, filename)?;
+    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
+        let dir = self.get_directory(path.directory())?;
+        let file = self.get_file(&dir, path.filename())?;
         Ok(Box::new(FileWrapper::from(&dir, &file)))
     }
 
     /// Returns if the given `path` corresponds to a file
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
+    async fn exists(&self, path: &FilePath) -> Result<bool> {
         match self.get_metadata(path).await {
             Ok(_) => Ok(true),
             Err(e) => match e {
@@ -136,23 +130,22 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
     }
 
     /// Forbidden. A database cannot open a file.
-    async fn open(&self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn open(&self, _path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         Err(Error::Forbidden)
     }
 
     /// Forbidden. A database cannot create a file.
-    async fn create(&mut self, _path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, _path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         Err(Error::Forbidden)
     }
 
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
-        let mut current_path = Utf8Path::new(ROOT_DIRECTORY).to_path_buf();
+    async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
+        let mut current_path = DirectoryPathBuf::root();
         let mut parent_dir = self.get_directory(&current_path)?;
 
         for it in path.components() {
             if let Utf8Component::Normal(c) = it {
-                current_path = current_path.join(c);
+                current_path.push(c)?;
                 let (dir, _) = self.get_or_create_directory(&current_path, Some(&parent_dir))?;
                 parent_dir = dir;
             }
@@ -160,20 +153,14 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
         Ok(())
     }
 
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
-        let dirname = path.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-        let filename = path.file_name().ok_or(Error::Other("Filename expected".to_string()))?;
-
-        let dir = self.get_directory(dirname)?;
-        let file = self.get_file(&dir, filename)?;
+    async fn remove_file(&mut self, path: &FilePath) -> Result<()> {
+        let dir = self.get_directory(path.directory())?;
+        let file = self.get_file(&dir, path.filename())?;
         self.delete_file(file)
     }
 
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
-
-        let dir = self.get_directory(&path)?;
+    async fn remove_dir(&mut self, path: &DirectoryPath) -> Result<()> {
+        let dir = self.get_directory(path)?;
 
         // Can't delete if it contains files
         if self.get_files_in_directory(&dir)?.next().is_some() {
@@ -188,33 +175,22 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
         self.delete_directory(dir)
     }
 
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
-        let path = self.check_path(path)?;
-        let dir = self.get_directory(&path)?;
+    async fn remove_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
+        let dir = self.get_directory(path)?;
         self.delete_directory_on_cascade(dir)
     }
 
     async fn internal_copy(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
-        let target = self.check_path(target)?;
-        let origin = self.check_path(origin)?;
-
-        let target_filename = target
-            .file_name()
-            .ok_or(Error::Other("Filename expected".to_string()))?;
-
         // Check that target directory exists
-        let target_dir = {
-            let target_dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-            self.get_directory(target_dirname)?
-        };
+        let target_dir = self.get_directory(target.directory())?;
 
         // If not force, check target file doesn't exist
-        match self.get_file(&target_dir, target_filename) {
+        match self.get_file(&target_dir, target.filename()) {
             Ok(_) => {
                 if !force {
                     return Err(Error::TargetFileExists);
@@ -229,17 +205,13 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
         }
 
         let origin_file = {
-            let origin_dirname = origin.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-            let origin_filename = origin
-                .file_name()
-                .ok_or(Error::Other("Filename expected".to_string()))?;
-            let origin_dir = self.get_directory(origin_dirname)?;
-            self.get_file(&origin_dir, origin_filename)?
+            let origin_dir = self.get_directory(origin.directory())?;
+            self.get_file(&origin_dir, origin.filename())?
         };
 
         self.upsert_file(
             &target_dir,
-            target_filename,
+            target.filename(),
             Some(origin_file.size()),
             Some(origin_file.hash()),
         )?;
@@ -248,24 +220,14 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
 
     async fn internal_move(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
-        let target = self.check_path(target)?;
-        let origin = self.check_path(origin)?;
-
-        let target_filename = target
-            .file_name()
-            .ok_or(Error::Other("Filename expected".to_string()))?;
-
         // Check that target directory exists
-        let target_dir = {
-            let target_dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-            self.get_directory(target_dirname)?
-        };
+        let target_dir = self.get_directory(target.directory())?;
 
-        let file = self.get_file(&target_dir, target_filename);
+        let file = self.get_file(&target_dir, target.filename());
         match file {
             // If the target file exists, remove it (if `force`), otherwise return error
             Ok(file) => {
@@ -285,13 +247,9 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
         }
 
         // Update the origin according to the new target values
-        let origin_dirname = origin.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-        let origin_dir = self.get_directory(origin_dirname)?;
-        let origin_filename = origin
-            .file_name()
-            .ok_or(Error::Other("Filename expected".to_string()))?;
-        let origin_file = self.get_file(&origin_dir, origin_filename)?;
-        let _ = self.update_file(origin_file, Some(&target_dir), Some(target_filename), None, None)?;
+        let origin_dir = self.get_directory(origin.directory())?;
+        let origin_file = self.get_file(&origin_dir, origin.filename())?;
+        let _ = self.update_file(origin_file, Some(&target_dir), Some(target.filename()), None, None)?;
         Ok(None)
     }
 }
@@ -300,9 +258,9 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
 impl<T: FilesystemIndexedDatabase> FilesystemOps for T {
     async fn copy_from(
         &mut self,
-        target: &Utf8Path,
+        target: &FilePath,
         origin: &dyn Filesystem,
-        origin_path: &Utf8Path,
+        origin_path: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         if self.is_same(origin) {
@@ -313,28 +271,22 @@ impl<T: FilesystemIndexedDatabase> FilesystemOps for T {
             }
 
             let metadata = origin.get_metadata(origin_path).await?;
-
-            let target = self.check_path(target)?;
-            let target_filename = target
-                .file_name()
-                .ok_or(Error::Other("Filename expected".to_string()))?;
-
-            // Check (and return) target directory
-            let target_dir = {
-                let target_dirname = target.parent().unwrap_or_else(|| Utf8Path::new(ROOT_DIRECTORY));
-                self.get_directory(target_dirname)?
-            };
-
-            let _ = self.create_file(&target_dir, target_filename, &metadata.hash()?, metadata.size()? as i32)?;
+            let target_dir = self.get_directory(target.directory())?;
+            let _ = self.create_file(
+                &target_dir,
+                target.filename(),
+                &metadata.hash()?,
+                metadata.size()? as i32,
+            )?;
             Ok(None)
         }
     }
 
     async fn move_from(
         &mut self,
-        target: &Utf8Path,
+        target: &FilePath,
         origin: &mut dyn Filesystem,
-        origin_path: &Utf8Path,
+        origin_path: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         if self.is_same(origin) {
@@ -349,14 +301,14 @@ impl<T: FilesystemIndexedDatabase> FilesystemOps for T {
 
 #[derive(Debug)]
 struct FileWrapper {
-    path: Utf8PathBuf,
+    path: FilePathBuf,
     size: u64,
     hash: String,
 }
 
 impl FileWrapper {
     pub fn from<D: FilesystemIndexedDbDirectory, F: FilesystemIndexedDbFile>(dir: &D, file: &F) -> Self {
-        let path = dir.full_path().join(file.filename());
+        let path = dir.full_path().join_filename(file.filename());
         Self {
             path,
             size: file.size(),
@@ -366,7 +318,7 @@ impl FileWrapper {
 }
 
 impl FileMetadata for FileWrapper {
-    fn path(&self) -> &Utf8Path {
+    fn path(&self) -> &FilePath {
         &self.path
     }
 

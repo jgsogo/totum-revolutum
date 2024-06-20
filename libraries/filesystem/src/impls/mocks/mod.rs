@@ -1,11 +1,11 @@
 use std::sync::{Arc, RwLock};
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8Path;
 use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 
-use crate::{Error, File, FileMetadata, Filesystem, FilesystemOps, Result};
+use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, Filesystem, FilesystemOps, Result};
 
 pub(crate) const SUCCESS: &str = "success";
 
@@ -37,17 +37,6 @@ impl FilesystemMock {
 
 #[async_trait]
 impl Filesystem for FilesystemMock {
-    fn check_path(&self, path: &Utf8Path) -> Result<Utf8PathBuf> {
-        self.called
-            .write()
-            .unwrap()
-            .push(("check_path".to_string(), vec![path.to_string()]));
-        Err(Error::Other(format!(
-            "FilesystemMock('{}') doesn't execute actual work",
-            self.id
-        )))
-    }
-
     async fn sync_all(self) -> Result<()> {
         self.called.write().unwrap().push(("sync_all".to_string(), vec![]));
         Err(Error::Other(format!(
@@ -72,7 +61,7 @@ impl Filesystem for FilesystemMock {
         )))
     }
 
-    async fn get_metadata(&self, path: &Utf8Path) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
         self.called
             .write()
             .unwrap()
@@ -83,7 +72,7 @@ impl Filesystem for FilesystemMock {
         )))
     }
 
-    async fn exists(&self, path: &Utf8Path) -> Result<bool> {
+    async fn exists(&self, path: &FilePath) -> Result<bool> {
         self.called
             .write()
             .unwrap()
@@ -98,7 +87,7 @@ impl Filesystem for FilesystemMock {
         }
     }
 
-    async fn open(&self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn open(&self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.called
             .write()
             .unwrap()
@@ -109,7 +98,7 @@ impl Filesystem for FilesystemMock {
         )))
     }
 
-    async fn create(&mut self, path: &Utf8Path) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
+    async fn create(&mut self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         self.called
             .write()
             .unwrap()
@@ -120,7 +109,7 @@ impl Filesystem for FilesystemMock {
         )))
     }
 
-    async fn create_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.called
             .write()
             .unwrap()
@@ -135,7 +124,7 @@ impl Filesystem for FilesystemMock {
         }
     }
 
-    async fn remove_file(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_file(&mut self, path: &FilePath) -> Result<()> {
         self.called
             .write()
             .unwrap()
@@ -150,7 +139,7 @@ impl Filesystem for FilesystemMock {
         }
     }
 
-    async fn remove_dir(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir(&mut self, path: &DirectoryPath) -> Result<()> {
         self.called
             .write()
             .unwrap()
@@ -165,7 +154,7 @@ impl Filesystem for FilesystemMock {
         }
     }
 
-    async fn remove_dir_all(&mut self, path: &Utf8Path) -> Result<()> {
+    async fn remove_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
         self.called
             .write()
             .unwrap()
@@ -182,8 +171,8 @@ impl Filesystem for FilesystemMock {
 
     async fn internal_copy(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         self.called.write().unwrap().push((
@@ -202,8 +191,8 @@ impl Filesystem for FilesystemMock {
 
     async fn internal_move(
         &mut self,
-        origin: &Utf8Path,
-        target: &Utf8Path,
+        origin: &FilePath,
+        target: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
         self.called.write().unwrap().push((

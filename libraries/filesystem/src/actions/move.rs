@@ -1,8 +1,7 @@
-use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
 
 use crate::filesystem::FilesystemOps;
-use crate::{Filesystem, Result};
+use crate::{FilePath, Filesystem, Result};
 
 /// Moves the content of the `origin` file in `lhs_fs` filesystem to the `target` file
 /// in the `rhs_fs` filesystem. This action returns a [`Receiver`] that the caller can
@@ -10,8 +9,8 @@ use crate::{Filesystem, Result};
 pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: FilesystemOps + ?Sized>(
     lhs_fs: &'action mut FsLhs,
     rhs_fs: &'action mut FsRhs,
-    origin: &Utf8Path,
-    target: &Utf8Path,
+    origin: &FilePath,
+    target: &FilePath,
     force: bool,
 ) -> Result<Option<Receiver<Result<()>>>> {
     let r = rhs_fs.copy_from(target, lhs_fs, origin, force).await?;
@@ -21,16 +20,17 @@ pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: FilesystemOps + ?Sized
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8PathBuf;
+    use std::str::FromStr;
 
     use crate::impls::FilesystemLocalTemp;
+    use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
 
     use super::*;
 
-    async fn get_filesystem_mock_with_file(lhs_path: &Utf8Path, content: &[u8]) -> FilesystemLocalTemp {
+    async fn get_filesystem_mock_with_file(lhs_path: &FilePath, content: &[u8]) -> FilesystemLocalTemp {
         let mut fs = FilesystemLocalTemp::default();
         let rx = {
-            let (mut f1, rx) = fs.create(&lhs_path).await.unwrap();
+            let (mut f1, rx) = fs.create(lhs_path).await.unwrap();
             f1.write_all(&content).await.unwrap();
             rx
         };
@@ -43,12 +43,12 @@ mod tests {
     #[tokio::test]
     async fn test_move_no_force() -> Result<()> {
         let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
-        let lhs_path = Utf8PathBuf::from("file.txt");
+        let lhs_path = FilePathBuf::new(DirectoryPathBuf::root(), FilenameBuf::from_str("file.txt")?);
 
         let mut lhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
 
         let mut rhs_fs = FilesystemLocalTemp::default();
-        let rhs_path = Utf8PathBuf::from("the_target.txt");
+        let rhs_path = FilePathBuf::new(DirectoryPathBuf::root(), FilenameBuf::from_str("the_target.txt")?);
         assert!(!rhs_fs.exists(&rhs_path).await?);
 
         move_file(&mut lhs_fs, &mut rhs_fs, &lhs_path, &rhs_path, false).await?;
@@ -61,7 +61,7 @@ mod tests {
     #[tokio::test]
     async fn test_move_force() -> Result<()> {
         let file_content: Vec<u8> = b"Hello world! I'm a copy".to_vec();
-        let lhs_path = Utf8PathBuf::from("file.txt");
+        let lhs_path = FilePathBuf::new(DirectoryPathBuf::root(), FilenameBuf::from_str("file.txt")?);
 
         let mut lhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
         let mut rhs_fs = get_filesystem_mock_with_file(&lhs_path, &file_content).await;
