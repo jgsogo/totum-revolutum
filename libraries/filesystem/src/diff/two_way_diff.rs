@@ -9,10 +9,12 @@ use crate::{FileMetadata, Filesystem, Result};
 
 const MAX_BUFFER: usize = 100;
 
-type FileMetadataPair = (Option<Box<dyn FileMetadata>>, Option<Box<dyn FileMetadata>>);
+pub type FileMetadataPair = (Option<Box<dyn FileMetadata>>, Option<Box<dyn FileMetadata>>);
 
+/// Interface to receive the results from the 2-way diff [`run`] function
 #[async_trait]
 pub trait Receiver: Sync {
+    /// Receives every [`FileMetadataPair`] from the filesystems we are iterating
     async fn on_data(&self, data: FileMetadataPair) -> Result<()> {
         match data {
             (Some(lhs), None) => self.only_lhs(lhs).await,
@@ -22,14 +24,19 @@ pub trait Receiver: Sync {
         }
     }
 
+    /// Receives the [`FileMetadata`] for the files that are only present in the left-hand-side
+    /// filesystem
     async fn only_lhs(&self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
         Ok(())
     }
 
+    /// Receives the [`FileMetadata`] for the files that are only present in the right-hand-side
+    /// filesystem
     async fn only_rhs(&self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
         Ok(())
     }
 
+    /// Receives the [`FileMetadata`] for the files that are present in both filesystems
     async fn lhs_and_rhs(
         &self,
         _lhs_file_metadata: Box<dyn FileMetadata>,
@@ -52,6 +59,8 @@ async fn work_on_results<TReceiver: Receiver>(
     Ok(())
 }
 
+/// Executes 2-way diff algorithm. It goes through all the files in both filesystems and send
+/// the information to the provided [`Receiver`]
 pub async fn run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TReceiver: Receiver>(
     lhs_filesystem: &LHSFilesystem,
     rhs_filesystem: &RHSFilesystem,
