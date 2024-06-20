@@ -7,8 +7,8 @@ use std::fmt::Debug;
 pub trait FileMetadata: Send + Sync + Debug {
     /// Path inside the [`crate::Filesystem`]
     ///
-    /// This path identifies one-to-one every file inside a filesystem. It should be the
-    /// **relative path** starting from the root of the filesystem.
+    /// This path identifies one-to-one every file inside a filesystem (it's the relative path
+    /// from the root of the filesystem).
     fn path(&self) -> &FilePath;
 
     /// The size of the file

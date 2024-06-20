@@ -26,7 +26,10 @@ fn validate_path(path: &Utf8Path) -> Result<Utf8PathBuf> {
     }
 }
 
-/// An owned, mutable valid UTF-8 path to a directory (akin to [`String`]).
+/// An owned, mutable valid UTF-8 path to a directory (akin to [`String`]) inside a [`crate::Filesystem`].
+///
+/// This is always a relative path, normalized (all `..` have been resolved) that doesn't start with
+/// `..`, so it's guaranteed that it points to something inside the [`crate::Filesystem`].
 ///
 /// Note.- Implementation taken from [`Utf8PathBuf`].
 #[derive(Debug, Eq, PartialEq, Clone)]
@@ -34,6 +37,7 @@ fn validate_path(path: &Utf8Path) -> Result<Utf8PathBuf> {
 pub struct DirectoryPathBuf(Utf8PathBuf);
 
 impl DirectoryPathBuf {
+    /// Returns the relative path to the root directory: this is just the empty path
     pub fn root() -> DirectoryPathBuf {
         let root = Utf8PathBuf::from(ROOT_DIR);
         DirectoryPathBuf(root)
@@ -122,7 +126,7 @@ impl AsRef<str> for DirectoryPathBuf {
     }
 }
 
-/// A slice of a valid UTF8 path to a directory (akin to str).
+/// A slice of [`DirectoryPathBuf`]: a valid UTF8 path to a directory (akin to [`str`]).
 ///
 /// This type supports a number of operations for inspecting a path.
 ///
@@ -176,8 +180,8 @@ impl DirectoryPath {
     }
 
     pub fn join(&self, path: impl AsRef<DirectoryPath>) -> DirectoryPathBuf {
-        let pathbuf = self.0.join(path.as_ref());
-        DirectoryPathBuf::try_from(pathbuf.as_path()).unwrap()
+        let path_buf = self.0.join(path.as_ref());
+        DirectoryPathBuf::try_from(path_buf.as_path()).unwrap()
     }
 }
 

@@ -329,7 +329,7 @@ mod tests {
 
         let root = RemotePath::from_str("path:/the/path")?;
         let fs = FilesystemPCloud::new(root, client).await?;
-        assert_eq!(Utf8Path::new("/the/path"), fs.root_path); // Root is always '/'
+        assert_eq!("/the/path", fs.root_path.as_str()); // Root is always '/'
         assert_eq!(FolderID::new(1234), fs.root_folderid);
         Ok(())
     }

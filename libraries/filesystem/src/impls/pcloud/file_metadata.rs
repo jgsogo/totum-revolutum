@@ -5,13 +5,13 @@ use crate::{Error, FileMetadata, FilePath, FilePathBuf, Result};
 
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {
-    relative_path: FilePathBuf,
+    path: FilePathBuf,
     metadata: MetadataFile,
 }
 
 impl FileMetadata for RemoteMetadata {
     fn path(&self) -> &FilePath {
-        &self.relative_path
+        &self.path
     }
 
     fn size(&self) -> Result<u64> {
@@ -30,11 +30,8 @@ impl FileMetadata for RemoteMetadata {
 }
 
 impl RemoteMetadata {
-    pub fn new(relative_path: FilePathBuf, metadata: MetadataFile) -> Self {
-        Self {
-            relative_path,
-            metadata,
-        }
+    pub fn new(path: FilePathBuf, metadata: MetadataFile) -> Self {
+        Self { path, metadata }
     }
 
     #[allow(dead_code)]

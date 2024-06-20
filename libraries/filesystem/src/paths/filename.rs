@@ -13,6 +13,9 @@ fn is_valid_filename(filename: &str) -> bool {
 }
 
 /// An owned, mutable valid UTF-8 filename name (akin to [`String`]).
+///
+/// It's guaranteed that the filename contains only valid characters for a filesystem path and it
+/// doesn't contain any path separator in it.
 #[derive(Debug, Eq, PartialEq, Clone)]
 #[repr(transparent)]
 pub struct FilenameBuf(String);
@@ -63,7 +66,7 @@ impl AsRef<str> for FilenameBuf {
     }
 }
 
-/// A slice of a valid UTF8 filename (akin to str).
+/// A slice of a [`FilenameBuf`]: a valid UTF8 filename (akin to [`str`]).
 ///
 /// This type supports a number of operations for inspecting the filename.
 #[derive(Debug, Eq, PartialEq)]
@@ -83,6 +86,7 @@ impl Filename {
         &self.0
     }
 
+    /// Returns the filename without the extension
     pub fn basename(&self) -> &str {
         match self.0.rsplit_once('.') {
             None => &self.0,
@@ -90,6 +94,7 @@ impl Filename {
         }
     }
 
+    /// Returns the extension of the filename if it exists
     pub fn extension(&self) -> Option<&str> {
         match self.0.rsplit_once('.') {
             None => None,

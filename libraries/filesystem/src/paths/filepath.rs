@@ -8,7 +8,10 @@ use camino::{Utf8Path, Utf8PathBuf};
 use crate::paths::directory_path::DirectoryPath;
 use crate::paths::filename::Filename;
 
-/// An owned, mutable valid UTF-8 path to a file (akin to [`String`]).
+/// An owned, mutable valid UTF-8 path to a file (akin to [`String`]) inside a [`crate::Filesystem`].
+///
+/// It's guaranteed that the path to the file belongs to the filesystem itself, all the `..` have
+/// been resolved and the path doesn't start with `..`.
 ///
 /// Note.- Implementation taken from [`Utf8PathBuf`].
 #[derive(Debug, Eq, PartialEq, Clone)]
@@ -16,6 +19,7 @@ use crate::paths::filename::Filename;
 pub struct FilePathBuf(Utf8PathBuf);
 
 impl FilePathBuf {
+    /// Creates a new [`FilePathBuf`] from a [`DirectoryPath`] and a [`Filename`]
     pub fn new(directory: impl AsRef<DirectoryPath>, filename: impl AsRef<Filename>) -> Self {
         let filepath = directory.as_ref().as_utf8_path().join(filename.as_ref().as_str());
         Self(filepath)
@@ -66,7 +70,7 @@ impl AsRef<str> for FilePathBuf {
     }
 }
 
-/// A slice of a valid UTF8 path to a file (akin to str).
+/// A slice of [`FilePathBuf`]: a valid UTF8 path to a file (akin to [`str`]).
 ///
 /// This type supports a number of operations for inspecting a path.
 ///
@@ -84,6 +88,7 @@ impl FilePath {
         &*(path as *const Utf8Path as *const FilePath)
     }
 
+    /// Returns the [`DirectoryPath`] where the file is located
     pub fn directory(&self) -> &DirectoryPath {
         self.0
             .parent()
@@ -91,6 +96,7 @@ impl FilePath {
             .unwrap_or(DirectoryPath::root())
     }
 
+    /// Returns the [`Filename`] of the file
     pub fn filename(&self) -> &Filename {
         unsafe { Filename::assume_valid(self.0.file_name().unwrap()) }
     }
@@ -108,8 +114,7 @@ impl FilePath {
     }
 
     #[inline]
-    #[must_use = "this returns the result of the operation, \
-                  without modifying the original"]
+    #[must_use = "this returns the result of the operation, without modifying the original"]
     pub fn to_filepath_buf(&self) -> FilePathBuf {
         FilePathBuf(self.0.to_path_buf())
     }
