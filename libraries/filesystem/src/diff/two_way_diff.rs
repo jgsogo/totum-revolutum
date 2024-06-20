@@ -14,7 +14,10 @@ pub type FileMetadataPair = (Option<Box<dyn FileMetadata>>, Option<Box<dyn FileM
 /// Interface to receive the results from the 2-way diff [`run`] function
 #[async_trait]
 pub trait Receiver: Sync {
-    /// Receives every [`FileMetadataPair`] from the filesystems we are iterating
+    /// Receives every [`FileMetadataPair`] from the filesystems we are iterating.
+    ///
+    /// The default implementation will just forward the call to the right method from
+    /// [`Receiver::only_lhs`], [`Receiver::only_rhs`] or [`Receiver::lhs_and_rhs`].
     async fn on_data(&self, data: FileMetadataPair) -> Result<()> {
         match data {
             (Some(lhs), None) => self.only_lhs(lhs).await,
@@ -36,8 +39,33 @@ pub trait Receiver: Sync {
         Ok(())
     }
 
-    /// Receives the [`FileMetadata`] for the files that are present in both filesystems
+    /// Receives the [`FileMetadata`] for the files that are present in both filesystems.
+    ///
+    /// The default implementation will forward the call to [`Receiver::equal_files`] or
+    /// [`Receiver::diff_files`].
     async fn lhs_and_rhs(
+        &self,
+        lhs_file_metadata: Box<dyn FileMetadata>,
+        rhs_file_metadata: Box<dyn FileMetadata>,
+    ) -> Result<()> {
+        if lhs_file_metadata.eq(rhs_file_metadata.as_ref())? {
+            self.equal_files(lhs_file_metadata, rhs_file_metadata).await
+        } else {
+            self.diff_files(lhs_file_metadata, rhs_file_metadata).await
+        }
+    }
+
+    /// Receives the [`FileMetadata`] for the files that are present in both filesystems and are equal
+    async fn equal_files(
+        &self,
+        _lhs_file_metadata: Box<dyn FileMetadata>,
+        _rhs_file_metadata: Box<dyn FileMetadata>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// Receives the [`FileMetadata`] for the files that are present in both filesystems and are different
+    async fn diff_files(
         &self,
         _lhs_file_metadata: Box<dyn FileMetadata>,
         _rhs_file_metadata: Box<dyn FileMetadata>,
