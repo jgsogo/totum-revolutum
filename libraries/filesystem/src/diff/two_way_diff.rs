@@ -1,0 +1,129 @@
+use async_trait::async_trait;
+use std::collections::HashMap;
+use std::time::Instant;
+
+use camino::Utf8Path;
+use tracing::{debug, error, info, trace};
+
+use crate::{FileMetadata, Filesystem, Result};
+
+const MAX_BUFFER: usize = 100;
+
+type FileMetadataPair = (Option<Box<dyn FileMetadata>>, Option<Box<dyn FileMetadata>>);
+
+#[async_trait]
+pub trait Receiver: Sync {
+    async fn on_data(&self, data: FileMetadataPair) -> Result<()> {
+        match data {
+            (Some(lhs), None) => self.only_lhs(lhs).await,
+            (None, Some(rhs)) => self.only_rhs(rhs).await,
+            (Some(lhs), Some(rhs)) => self.lhs_and_rhs(lhs, rhs).await,
+            (None, None) => unreachable!(),
+        }
+    }
+
+    async fn only_lhs(&self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+        Ok(())
+    }
+
+    async fn only_rhs(&self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+        Ok(())
+    }
+
+    async fn lhs_and_rhs(
+        &self,
+        _lhs_file_metadata: Box<dyn FileMetadata>,
+        _rhs_file_metadata: Box<dyn FileMetadata>,
+    ) -> Result<()> {
+        Ok(())
+    }
+}
+
+async fn work_on_results<TReceiver: Receiver>(
+    rx: flume::Receiver<FileMetadataPair>,
+    receiver: &TReceiver,
+) -> Result<()> {
+    debug!("Start 2-way diff receiving loop");
+    let start = Instant::now();
+    while let Ok(file_pair) = rx.recv_async().await {
+        receiver.on_data(file_pair).await?;
+    }
+    debug!("Finished 2-way diff receiving loop in {:?}", start.elapsed());
+    Ok(())
+}
+
+pub async fn run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TReceiver: Receiver>(
+    lhs_filesystem: &LHSFilesystem,
+    rhs_filesystem: &RHSFilesystem,
+    receiver: &TReceiver,
+) -> Result<()> {
+    let (lhs_tx, lhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
+    let (rhs_tx, rhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
+
+    let (report_tx, report_rx) = flume::bounded::<FileMetadataPair>(MAX_BUFFER);
+
+    // NOTE: We should never have duplicated files on either local or remote (the same id several
+    //  times in the same local or remote), but shit happens. If someone is operating with the files
+    //  while we are working on them, it can happen that we inform about some file, then remove it
+    //  and that process adds it again and our visitors see it one more time. Is this possible?
+
+    tokio::spawn(async move {
+        info!("Start 2-way diff sending loop");
+        let start = Instant::now();
+        let mut files: HashMap<String, FileMetadataPair> = HashMap::new();
+        loop {
+            tokio::select! {
+                Ok(lhs_metadata) = lhs_rx.recv_async() => {
+                    trace!("LHS received {:?}", lhs_metadata);
+                    let key = lhs_metadata.path().as_str();
+                    match files.remove(key) {
+                        Some((_, rhs_metadata)) => {
+                            if let Err(e) = report_tx.send((Some(lhs_metadata), rhs_metadata)) {
+                                error!("Sending loop early stop. Report receiving end is lost: {e}");
+                                break;
+                            }
+                        },
+                        None => {
+                            let _ = files.insert(key.to_string(), (Some(lhs_metadata), None));
+                        }
+                    }
+                },
+                Ok(rhs_metadata) = rhs_rx.recv_async() => {
+                    trace!("RHS received {:?}", rhs_metadata);
+                    let key = rhs_metadata.path().as_str();
+                    match files.remove(key) {
+                        Some((lhs_metadata, _)) => {
+                            if let Err(e) = report_tx.send((lhs_metadata, Some(rhs_metadata))) {
+                                error!("Sending loop early stop. Report receiving end is lost: {e}");
+                                break;
+                            }
+                        },
+                        None => {
+                            let _ = files.insert(key.to_string(), (None, Some(rhs_metadata)));
+                        }
+                    }
+                },
+                else => {
+                    info!("Break sending loop in {:?}", start.elapsed());
+                    break
+                },
+            }
+        }
+        // Now we need to send the files that are just on one side of the diff
+        debug!("Send remaining {} entries", files.len());
+        for (_, file_diff) in files.drain() {
+            if let Err(e) = report_tx.send(file_diff) {
+                error!("Send error {e}");
+            }
+        }
+        info!("Finished sending loop in {:?}", start.elapsed());
+    });
+
+    let _ = tokio::try_join!(
+        lhs_filesystem.walk_directory(lhs_tx, 6, Utf8Path::new("/")),
+        rhs_filesystem.walk_directory(rhs_tx, 6, Utf8Path::new("/")),
+        work_on_results(report_rx, receiver),
+    )?;
+
+    Ok(())
+}
