@@ -4,7 +4,7 @@ use diesel::prelude::*;
 // TODO: Consider using the FILEID as the unique id
 
 #[derive(Insertable)]
-#[diesel(table_name = super::schema::photos)]
+#[diesel(table_name = crate::database::schema::photos)]
 pub struct NewPhoto<'a> {
     pub fileid: &'a i64,
     pub path: &'a str,
@@ -12,7 +12,7 @@ pub struct NewPhoto<'a> {
 }
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = super::schema::photos)]
+#[diesel(table_name = crate::database::schema::photos)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Photo {
     /// Autoincrement ID as database index
