@@ -1,11 +1,9 @@
 use anyhow::Result;
-use filesystem::diff::two_way_diff;
-use filesystem::Filesystem;
+
+use filesystem::FilesystemOps;
 use serde::{Deserialize, Serialize};
 
 use crate::storage::config;
-
-mod backup;
 
 /// Describes the action to perform
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
@@ -51,22 +49,27 @@ pub enum OnConflict {
     KeepLatest,
 }
 
-pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
+pub async fn run<FsLhs: FilesystemOps, FsRhs: FilesystemOps>(
     lhs_fs: FsLhs,
-    rhs_fs: FsRhs,
+    mut rhs_fs: FsRhs,
     config: &config::Config,
 ) -> Result<()> {
-    let mut action_run = match config.action.action() {
-        Actions::Backup => backup::Backup::new(&lhs_fs, &rhs_fs, *config.action.conflict()),
+    match config.action.action() {
+        Actions::Backup => {
+            let backup_conflict = match config.action.conflict() {
+                OnConflict::OverrideRemote => filesystem::diff::impls::BackupConflict::Override,
+                OnConflict::OverrideLocal => todo!("not impl"),
+                OnConflict::RenameRemote => todo!("not impl"),
+                OnConflict::RenameLocal => todo!("not impl"),
+                OnConflict::KeepLatest => todo!("not impl"),
+            };
+            filesystem::diff::impls::backup(&lhs_fs, &mut rhs_fs, backup_conflict).await?;
+            Ok(())
+        }
         Actions::ZipBackup => todo!("impl pending"),
         Actions::Sync => todo!("impl pending"),
         Actions::Dump => todo!("impl pending"),
         Actions::MoveUpload => todo!("impl pending"),
         Actions::MoveDownload => todo!("impl pending"),
-    };
-
-    two_way_diff::run(&lhs_fs, &rhs_fs, &mut action_run).await?;
-
-    // action_run.stats();
-    Ok(())
+    }
 }

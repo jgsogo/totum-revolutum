@@ -14,7 +14,7 @@ cli = ["dep:clap-verbosity-flag", "dep:log", "dep:tracing-subscriber", "dep:home
 [dependencies]
 pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
 cron = { path = "../../libraries/cron" }
-filesystem = { path = "../../libraries/filesystem", features = ["diff", "local", "pcloud"] }
+filesystem = { path = "../../libraries/filesystem", features = ["local", "pcloud"] }
 
 fs4 = { workspace = true }
 confy = { workspace = true, default-features = false, features = ["yaml_conf"] }

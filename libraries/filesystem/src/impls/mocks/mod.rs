@@ -10,7 +10,7 @@ use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, Filesystem, File
 pub(crate) const SUCCESS: &str = "success";
 
 /// A [`Filesystem`] implementation that only records the methods called and their arguments. All
-/// the methods will return an error unless the given path is equal to `success` (and it's possible
+/// the methods will return an error unless the given path is equal to `"success"` (and it's possible
 /// to return something meaningful).
 pub struct FilesystemMock {
     id: String,

@@ -6,6 +6,7 @@ use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
+use crate::diff::impls::{backup, BackupConflict};
 use crate::filesystem::FilesystemOps;
 use crate::wrappers::AsyncFileDropImpl;
 use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, Filesystem, Result};
@@ -56,7 +57,7 @@ async fn backup_file<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static>(
 ///
 /// Note.- It´s up to the user to ensure that both [`Filesystem`] instances contain the same files
 /// (or the operations running on them only touch files that are present on both). See method
-/// [`FilesystemBackup::sync`].
+/// [`FilesystemBackup::initial_sync`].
 pub struct FilesystemBackup<LHS: Filesystem, RHS: Filesystem> {
     lhs: AsyncFileDropImpl<LHS>,
     rhs: Arc<Mutex<Option<RHS>>>,
@@ -88,11 +89,13 @@ impl<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static> FilesystemBackup<L
     }
 
     /// Syncs the contents of both filesystems. In this [`FilesystemBackup`] it means that all the
-    /// files from one filesystem will be available in the other and _vice versa_ (running this method
+    /// files from the master filesystem will be available in the backup one (running this method
     /// can take a while if many files need to be copied).
-    pub async fn sync(&self) -> Result<()> {
-        // TODO: Implement a method to do the initial sync. Leverage on some external `action`: backup, sync, mirror,...
-        todo!("not impl")
+    ///
+    /// Use the `on_conflict` argument to decide how the conflicts **during this first synchronization**
+    /// should be resolved.
+    pub async fn initial_sync(&self, on_conflict: BackupConflict) -> Result<()> {
+        backup(&self.lhs, self.rhs.lock().await.as_mut().unwrap(), on_conflict).await
     }
 }
 
@@ -235,10 +238,6 @@ mod tests {
             rx.unwrap()
         };
         let _ = rx.await.unwrap();
-
-        // TODO: I need to sleep here so the changes are propagated to the other filesystem. Instead, I should return
-        // TODO: receiver so I can await on it until all the tasks are done.
-        tokio::time::sleep(tokio::time::Duration::from_millis(2000)).await;
 
         let fs1_filepath = fs1_root.join(&filepath);
         let c1 = std::fs::read(&fs1_filepath).unwrap();

@@ -20,7 +20,7 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
     let database = DatabaseImpl::new(database_url)?;
     let fs_indexed = FilesystemIndexed::new(database, storage);
     if do_initial_indexing {
-        fs_indexed.sync().await?;
+        fs_indexed.initial_sync().await?;
     }
     Ok(fs_indexed)
 }
@@ -41,7 +41,7 @@ mod tests {
         let database_file = tempfile::NamedTempFile::new()?;
         let mut fs = {
             let fs = FilesystemLocalTemp::default();
-            new_filesystem_indexed_with_db(database_file.path().to_str().unwrap(), fs, false).await?
+            new_filesystem_indexed_with_db(database_file.path().to_str().unwrap(), fs, true).await?
         };
 
         // Populate the filesystem with some files and directories

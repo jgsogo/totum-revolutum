@@ -13,7 +13,6 @@ mod filesystem;
 
 pub mod actions;
 
-#[cfg(feature = "diff")]
 pub mod diff;
 pub mod error;
 
