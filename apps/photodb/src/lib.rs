@@ -1,6 +1,5 @@
 mod app_dirs;
 pub mod database;
-pub mod db;
 mod photodb;
 pub mod utils;
 

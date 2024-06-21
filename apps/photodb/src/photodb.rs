@@ -10,7 +10,7 @@ use filesystem::impls::FilesystemLocalTemp;
 use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
 
 use super::database::models;
-use super::db::Database;
+use super::database::Database;
 use super::utils::sha256_string_from_file;
 use super::AppDirs;
 

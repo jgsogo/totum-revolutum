@@ -1,25 +1,18 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::Result;
+use anyhow::{anyhow, bail};
 use async_trait::async_trait;
-use diesel::prelude::*;
-use diesel::r2d2::Pool;
-use diesel::r2d2::{ConnectionManager, PooledConnection};
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
+use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::GetFolderID;
-use pcloud_sdk::progress_bar::ProgressBarBuilder;
-use pcloud_sdk::types::RemotePath;
-use pcloud_sdk::ProxiedFile;
-use std::path::PathBuf;
-use tempfile::TempDir;
 use tokio::sync::oneshot::Receiver;
 use tracing::debug;
+
+use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::handy::GetFolderID;
+use pcloud_sdk::types::RemotePath;
+use pcloud_sdk::{ProxiedFile, UploadReturnType};
+
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
-
-// TODO: We need a proper Output for this PhotoDB application
-#[derive(Default)]
-struct Output;
-impl ProgressBarBuilder for Output {}
-
 const DB_FILENAME: &str = "photodb.sqlite3";
 
 /// Manages the connection to the database (Sqlite3)
@@ -32,15 +25,19 @@ pub trait Database {
     // async fn flush(&self) -> Result<()>;
 }
 
+/// The SQLite3 database used by PhotoDB application. The database file is stored in PCloud and it
+/// is retrieved when this object is instantiated. On drop the database file is backed-up to the
+/// PCLoud file (see [`ProxiedFile`]).
 pub struct PCloudDatabase<PCloud: PCloudClient + Send + 'static> {
     pool: Pool<ConnectionManager<SqliteConnection>>,
     _proxied_file: ProxiedFile<PCloud>,
 }
 
-impl<PCloud: PCloudClient + Send + Clone + 'static> PCloudDatabase<PCloud> {
-    /// Initializes the database and pushes it to the remote pCloud storage. It will fail if the
-    /// remote file already exists
-    pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<Receiver<Result<(), (TempDir, PathBuf)>>> {
+impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
+    /// Initializes the database and pushes it to the remote pCloud storage at the given `path`
+    /// location (it creates a file called [`DB_FILENAME`] inside the folder). It will fail if
+    /// the remote file already exists
+    pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<Receiver<UploadReturnType>> {
         let folderid = pcloud.get_folderid(&path).await?; // TODO: Create if not exists?
         let (proxied_file, created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
         if !created {
@@ -58,7 +55,7 @@ impl<PCloud: PCloudClient + Send + Clone + 'static> PCloudDatabase<PCloud> {
 
     /// Creates a new [`PCloudDatabase`] instance. Requires a pCloud client and the folder
     /// path where the database (and files) are located
-    pub async fn new(pcloud: PCloud, path: RemotePath) -> Result<(Self, Receiver<Result<(), (TempDir, PathBuf)>>)> {
+    pub async fn new(pcloud: PCloud, path: RemotePath) -> anyhow::Result<(Self, Receiver<UploadReturnType>)> {
         let folderid = pcloud.get_folderid(&path).await?;
         // TODO: Add a flag to `ProxiedFile` to indicate if it's allowed to create the file or not
         let (proxied_file, _created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
