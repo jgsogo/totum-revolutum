@@ -8,7 +8,7 @@ use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
 use tracing::{debug, error, info};
 
-use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, Filesystem, Result};
+use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, Filesystem, FilesystemOps, Result};
 
 type FileCloseMessageData = (
     Box<dyn File>,
@@ -215,6 +215,9 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
             .await
     }
 }
+
+#[async_trait]
+impl<T: Filesystem> FilesystemOps for AsyncFileDropImpl<T> {}
 
 /// A wrapper over [`File`] that sends the message to [`AsyncFileDropImpl`] when it is dropped.
 struct FileAsyncDrop {

@@ -1,95 +1,25 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use async_trait::async_trait;
 use camino::Utf8Path;
 use tracing::{debug, error, info, trace};
 
+use crate::diff::receiver::{FileMetadataPair, Receiver};
 use crate::{FileMetadata, Filesystem, Result};
 
 const MAX_BUFFER: usize = 100;
 
-pub type FileMetadataPair = (Option<Box<dyn FileMetadata>>, Option<Box<dyn FileMetadata>>);
-
-/// Interface to receive the results from the 2-way diff [`run`] function
-#[async_trait]
-pub trait Receiver: Send + Sync {
-    /// Receives every [`FileMetadataPair`] from the filesystems we are iterating.
-    ///
-    /// The default implementation will just forward the call to the right method from
-    /// [`Receiver::only_lhs`], [`Receiver::only_rhs`] or [`Receiver::lhs_and_rhs`].
-    async fn on_data(&mut self, data: FileMetadataPair) -> Result<()> {
-        match data {
-            (Some(lhs), None) => self.only_lhs(lhs).await,
-            (None, Some(rhs)) => self.only_rhs(rhs).await,
-            (Some(lhs), Some(rhs)) => self.lhs_and_rhs(lhs, rhs).await,
-            (None, None) => unreachable!(),
-        }
-    }
-
-    /// Receives the [`FileMetadata`] for the files that are only present in the left-hand-side
-    /// filesystem
-    async fn only_lhs(&mut self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
-        Ok(())
-    }
-
-    /// Receives the [`FileMetadata`] for the files that are only present in the right-hand-side
-    /// filesystem
-    async fn only_rhs(&mut self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
-        Ok(())
-    }
-
-    /// Receives the [`FileMetadata`] for the files that are present in both filesystems.
-    ///
-    /// The default implementation will forward the call to [`Receiver::equal_files`] or
-    /// [`Receiver::diff_files`].
-    async fn lhs_and_rhs(
-        &mut self,
-        lhs_file_metadata: Box<dyn FileMetadata>,
-        rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
-        if lhs_file_metadata.eq(rhs_file_metadata.as_ref())? {
-            self.equal_files(lhs_file_metadata, rhs_file_metadata).await
-        } else {
-            self.diff_files(lhs_file_metadata, rhs_file_metadata).await
-        }
-    }
-
-    /// Receives the [`FileMetadata`] for the files that are present in both filesystems and are equal
-    async fn equal_files(
-        &mut self,
-        _lhs_file_metadata: Box<dyn FileMetadata>,
-        _rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
-        Ok(())
-    }
-
-    /// Receives the [`FileMetadata`] for the files that are present in both filesystems and are different
-    async fn diff_files(
-        &mut self,
-        _lhs_file_metadata: Box<dyn FileMetadata>,
-        _rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
-        Ok(())
-    }
-}
-
-async fn work_on_results<TReceiver: Receiver>(
-    rx: flume::Receiver<FileMetadataPair>,
-    receiver: &mut TReceiver,
-) -> Result<()> {
-    debug!("Start 2-way diff receiving loop");
-    let start = Instant::now();
-    while let Ok(file_pair) = rx.recv_async().await {
-        receiver.on_data(file_pair).await?;
-    }
-    debug!("Finished 2-way diff receiving loop in {:?}", start.elapsed());
-    Ok(())
-}
-
-/// Executes 2-way diff algorithm. It goes through all the files in both filesystems and send
-/// the information to the provided [`Receiver`]
-pub async fn run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TReceiver: Receiver>(
+/// Executes 2-way diff algorithm. It goes through **all the files in both filesystems** and sends
+/// the information to the provided [`Receiver`].
+///
+/// It will typically require the receiver to record the operations that need to be done in the
+/// filesystems and apply them afterward.
+///
+/// Complexity of this algorithm is `O(N+M + log P)` where `N` and `M` are the number of files in
+/// each filesystem and `log P` represents an overhead introduced by the index that is used to
+/// cross the information from both filesystems. Worst case scenario for this index is to contain
+/// all the entries from the larger filesystem before any data arrives from the other.
+pub async fn full_run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TReceiver: Receiver>(
     lhs_filesystem: &LHSFilesystem,
     rhs_filesystem: &RHSFilesystem,
     receiver: &mut TReceiver,
@@ -165,18 +95,29 @@ pub async fn run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TReceiver
     Ok(())
 }
 
+async fn work_on_results<TReceiver: Receiver>(
+    rx: flume::Receiver<FileMetadataPair>,
+    receiver: &mut TReceiver,
+) -> Result<()> {
+    debug!("Start 2-way diff receiving loop");
+    let start = Instant::now();
+    while let Ok(file_pair) = rx.recv_async().await {
+        receiver.on_data(file_pair).await?;
+    }
+    debug!("Finished 2-way diff receiving loop in {:?}", start.elapsed());
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use async_trait::async_trait;
 
-    use crate::impls::FilesystemLocalTemp;
-    use crate::wrappers::AsyncFileDropImpl;
-    use crate::{DirectoryPathBuf, Error, FilePath, FilenameBuf};
+    use crate::diff::tests::DiffMocks;
 
     use super::*;
 
     #[derive(Default)]
-    struct ReceiverMock {
+    pub(crate) struct ReceiverMock {
         pub only_lhs: Vec<String>,
         pub only_rhs: Vec<String>,
         pub equal: Vec<String>,
@@ -215,60 +156,26 @@ mod tests {
         }
     }
 
-    async fn create_file(filesystem: &mut dyn Filesystem, path: &FilePath, content: &[u8]) -> Result<()> {
-        let rx = {
-            let (mut f, rx) = filesystem.create(path).await?;
-            f.write_all(content).await?;
-            rx.unwrap()
-        };
-
-        rx.await.map_err(|e| Error::Other(e.to_string()))??;
-        Ok(())
-    }
-
     #[tokio::test]
-    async fn test_run() -> Result<()> {
-        let root = DirectoryPathBuf::root();
-        let lhs_only = root.join_filename(FilenameBuf::from_str("lhs_only")?);
-        let rhs_only = root.join_filename(FilenameBuf::from_str("rhs_only")?);
-        let both_equal = root.join_filename(FilenameBuf::from_str("both_equal")?);
-        let diff_hash = root.join_filename(FilenameBuf::from_str("diff_hash")?);
-        let diff_size = root.join_filename(FilenameBuf::from_str("diff_size")?);
-
-        let fs_lhs = {
-            let mut fs = AsyncFileDropImpl::new_call_sync_all(FilesystemLocalTemp::default());
-            create_file(&mut fs, &lhs_only, b"anything").await?;
-            create_file(&mut fs, &both_equal, b"both_equal").await?;
-            create_file(&mut fs, &diff_hash, b"lhs_hash").await?;
-            create_file(&mut fs, &diff_size, b"lhs size").await?;
-            fs
-        };
-
-        let fs_rhs = {
-            let mut fs = AsyncFileDropImpl::new_call_sync_all(FilesystemLocalTemp::default());
-            create_file(&mut fs, &rhs_only, b"anything").await?;
-            create_file(&mut fs, &both_equal, b"both_equal").await?;
-            create_file(&mut fs, &diff_hash, b"rhs_hash").await?;
-            create_file(&mut fs, &diff_size, b"rhs size so it's different").await?;
-            fs
-        };
+    async fn test_full_run() -> Result<()> {
+        let diff_mocks = DiffMocks::new().await?;
 
         let mut receiver = ReceiverMock::default();
-        run(&fs_lhs, &fs_rhs, &mut receiver).await?;
+        full_run(&diff_mocks.fs_lhs, &diff_mocks.fs_rhs, &mut receiver).await?;
 
         assert_eq!(receiver.only_lhs.len(), 1);
-        assert_eq!(receiver.only_lhs.get(0).unwrap(), lhs_only.as_str());
+        assert_eq!(receiver.only_lhs.get(0).unwrap(), diff_mocks.lhs_only.as_str());
 
         assert_eq!(receiver.only_rhs.len(), 1);
-        assert_eq!(receiver.only_rhs.get(0).unwrap(), rhs_only.as_str());
+        assert_eq!(receiver.only_rhs.get(0).unwrap(), diff_mocks.rhs_only.as_str());
 
         assert_eq!(receiver.equal.len(), 1);
-        assert_eq!(receiver.equal.get(0).unwrap(), both_equal.as_str());
+        assert_eq!(receiver.equal.get(0).unwrap(), diff_mocks.both_equal.as_str());
 
         assert_eq!(receiver.diff.len(), 2);
         receiver.diff.sort();
-        assert_eq!(receiver.diff.get(0).unwrap(), diff_hash.as_str());
-        assert_eq!(receiver.diff.get(1).unwrap(), diff_size.as_str());
+        assert_eq!(receiver.diff.get(0).unwrap(), diff_mocks.diff_hash.as_str());
+        assert_eq!(receiver.diff.get(1).unwrap(), diff_mocks.diff_size.as_str());
 
         Ok(())
     }
