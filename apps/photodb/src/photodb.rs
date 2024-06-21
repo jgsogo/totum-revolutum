@@ -9,9 +9,8 @@ use tracing::{debug, info};
 use filesystem::impls::FilesystemLocalTemp;
 use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
 
+use super::database::models;
 use super::db::Database;
-use super::models;
-use super::models::Photo;
 use super::utils::sha256_string_from_file;
 use super::AppDirs;
 
@@ -91,7 +90,7 @@ impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps> PhotoDB<'a, T, 
         let _metadata = self.storage.get_metadata(&filepath).await?;
 
         // Store the data in the database
-        use crate::schema::photos;
+        use crate::database::schema::photos;
         let new_photo = models::NewPhoto {
             fileid: &(0i64), // FIXME: I need the fileid here
             path: filepath.as_str(),
@@ -99,7 +98,7 @@ impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps> PhotoDB<'a, T, 
         };
         let photo = diesel::insert_into(photos::table)
             .values(&new_photo)
-            .returning(Photo::as_returning())
+            .returning(models::Photo::as_returning())
             .get_result(&mut self.db.get_connection()?)?;
         // TODO: Handle scenario if the insert fails: duplicate fileid
 
