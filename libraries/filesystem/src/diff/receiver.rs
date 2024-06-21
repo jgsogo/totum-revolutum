@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 pub type FileMetadataPair = (Option<Box<dyn FileMetadata>>, Option<Box<dyn FileMetadata>>);
 
-/// Interface to receive the results from the 2-way diff [`two_way_diff::full_run`] function
+/// Interface to receive the results from the 2-way diff [`super::full_run`] function
 #[async_trait]
 pub trait Receiver: Send + Sync {
     /// Receives every [`FileMetadataPair`] from the filesystems we are iterating.

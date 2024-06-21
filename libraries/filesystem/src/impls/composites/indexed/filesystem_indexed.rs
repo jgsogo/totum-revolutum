@@ -6,6 +6,7 @@ use flume::Sender;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
+use crate::diff::impls::mirror;
 use crate::filesystem::FilesystemOps;
 use crate::wrappers::AsyncFileDropImpl;
 use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, Filesystem, Result};
@@ -85,9 +86,8 @@ impl<TIndex: Filesystem + FilesystemOps + 'static, TStorage: Filesystem + 'stati
     /// Syncs the contents of both filesystems. In this [`FilesystemIndexed`] it means that all the
     /// files from storage in filesystem2 will be indexed into the filesystem1. Missing files will
     /// be removed from the index.
-    pub async fn sync(&self) -> Result<()> {
-        todo!("not implemented")
-        // FIXME: Implement in terms of some external `action`: backup, sync, mirror,...
+    pub async fn initial_sync(&self) -> Result<()> {
+        mirror(&self.storage, self.index.lock().await.as_mut().unwrap()).await
     }
 }
 

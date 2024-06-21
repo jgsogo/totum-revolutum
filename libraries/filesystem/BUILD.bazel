@@ -8,7 +8,6 @@ rust_library_tests_and_docs(
     srcs = glob(["src/**/*.rs"]),
     aliases = aliases(),
     all_features = {
-        "diff": ["diff"],
         "local": ["local"],
         "local_temp": [
             "local_temp",
