@@ -41,7 +41,7 @@ mod tests {
         let database_file = tempfile::NamedTempFile::new()?;
         let mut fs = {
             let fs = FilesystemLocalTemp::default();
-            new_filesystem_indexed_with_db(database_file.path().to_str().unwrap(), fs, false).await?
+            new_filesystem_indexed_with_db(database_file.path().to_str().unwrap(), fs, true).await?
         };
 
         // Populate the filesystem with some files and directories
