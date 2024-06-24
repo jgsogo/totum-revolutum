@@ -35,6 +35,20 @@ pub enum Error {
     #[error(transparent)]
     IoError(#[from] io::Error),
 
+    #[cfg(feature = "diesel_indexed_impl")]
+    #[error(transparent)]
+    DieselError(#[from] diesel::result::Error),
+
     #[error("{0}")]
     Other(String),
+}
+
+#[cfg(feature = "diesel_indexed_impl")]
+impl From<diesel_utils::error::Error> for Error {
+    fn from(value: diesel_utils::error::Error) -> Self {
+        match value {
+            diesel_utils::error::Error::ObjectDoesNotExist(p) => Error::PathDoesNotExist,
+            diesel_utils::error::Error::OtherDieselError(e) => e.into(),
+        }
+    }
 }

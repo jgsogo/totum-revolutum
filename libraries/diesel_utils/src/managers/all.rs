@@ -1,3 +1,4 @@
+use crate::error::Error;
 use diesel::associations::HasTable;
 use diesel::query_dsl::methods::SelectDsl;
 use diesel::query_dsl::LoadQuery;
@@ -9,10 +10,8 @@ use diesel::{Expression, QueryDsl, RunQueryDsl};
 // TODO: manage to define it here, the caller doesn't need to be explicit about the type returned
 // TODO: in the iterator.
 pub trait AllManager<Output, Selection: Expression, Conn> {
-    type Error: From<diesel::result::Error>;
-
     /// Returns an iterator with all the objects in the database
-    fn all(selection: Selection, conn: &mut Conn) -> Result<impl Iterator<Item = Output>, Self::Error>;
+    fn all(selection: Selection, conn: &mut Conn) -> Result<impl Iterator<Item = Output>, Error>;
 }
 
 impl<T, Output, Selection, Conn> AllManager<Output, Selection, Conn> for T
@@ -23,9 +22,7 @@ where
     <<T as HasTable>::Table as SelectDsl<Selection>>::Output: RunQueryDsl<Conn>,
     for<'query> <<T as HasTable>::Table as SelectDsl<Selection>>::Output: LoadQuery<'query, Conn, Output>,
 {
-    type Error = crate::error::Error;
-
-    fn all(selection: Selection, conn: &mut Conn) -> Result<impl Iterator<Item = Output>, Self::Error> {
+    fn all(selection: Selection, conn: &mut Conn) -> Result<impl Iterator<Item = Output>, Error> {
         let table = T::table();
         // TODO: Implement pagination here, that's the only reason why I'm passing the connection to
         // TODO: this function, so it can run several queries

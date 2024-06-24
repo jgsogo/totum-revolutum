@@ -91,8 +91,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 
     fn all_files(&self) -> Result<impl Iterator<Item = Self::File>> {
         let mut conn = self.get_conn()?;
-        let all_files =
-            models::File::all(models::File::as_select(), &mut conn).map_err(|e| Error::Other(e.to_string()))?;
+        let all_files = models::File::all(models::File::as_select(), &mut conn)?;
         let all_files = all_files.collect::<Vec<_>>();
         Ok(all_files.into_iter())
     }
