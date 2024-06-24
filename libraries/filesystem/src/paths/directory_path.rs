@@ -136,7 +136,7 @@ impl AsRef<str> for DirectoryPathBuf {
 pub struct DirectoryPath(Utf8Path);
 
 impl DirectoryPath {
-    pub(crate) fn root<'a>() -> &'a DirectoryPath {
+    pub fn root<'a>() -> &'a DirectoryPath {
         unsafe { DirectoryPath::assume_valid(Utf8Path::new(ROOT_DIR)) }
     }
 
