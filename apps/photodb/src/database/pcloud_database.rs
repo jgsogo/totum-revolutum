@@ -35,7 +35,7 @@ pub struct PCloudDatabase<PCloud: PCloudClient + Send + 'static> {
 
 impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
     /// Initializes the database and pushes it to the remote pCloud storage at the given `path`
-    /// location (it creates a file called [`DB_FILENAME`] inside the folder). It will fail if
+    /// location (it creates a file called `photodb.sqlite3` inside the folder). It will fail if
     /// the remote file already exists
     pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<Receiver<UploadReturnType>> {
         let folderid = pcloud.get_folderid(&path).await?; // TODO: Create if not exists?

@@ -25,7 +25,7 @@ struct NoProgressBarBuilder;
 
 impl ProgressBarBuilder for NoProgressBarBuilder {}
 
-/// A helper for the return type of the [`ProxiedFile::upload_and_remove`] method. The error type
+/// A helper for the data received when the task is finished. The error type
 /// contains the [`TempDir`] object so the temporal directory is not removed and the path inside
 /// that temp directory that points to the file. This way the caller can take some action before
 /// dropping the [`TempDir`] and everything is removed from disk.
