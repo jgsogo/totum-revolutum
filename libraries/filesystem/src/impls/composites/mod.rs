@@ -3,7 +3,7 @@
 //! wherever a [`crate::Filesystem`] can be used.
 
 pub use filesystem_backup::FilesystemBackup;
-#[cfg(feature = "diesel")]
+#[cfg(feature = "diesel_indexed_impl")]
 pub use indexed::new_filesystem_indexed_with_db;
 pub use indexed::{
     FilesystemIndexed, FilesystemIndexedDatabase, FilesystemIndexedDbDirectory, FilesystemIndexedDbFile,

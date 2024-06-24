@@ -25,7 +25,12 @@ struct NoProgressBarBuilder;
 
 impl ProgressBarBuilder for NoProgressBarBuilder {}
 
-type UploadReturnType = std::result::Result<(), (TempDir, PathBuf)>;
+/// A helper for the data received when the task is finished. The error type
+/// contains the [`TempDir`] object so the temporal directory is not removed and the path inside
+/// that temp directory that points to the file. This way the caller can take some action before
+/// dropping the [`TempDir`] and everything is removed from disk.
+pub type UploadReturnType = std::result::Result<(), (TempDir, PathBuf)>;
+
 type UploadFnType<PCloud> =
     Box<dyn FnOnce((PCloud, FileID, TempDir)) -> Pin<Box<dyn Future<Output = UploadReturnType> + Send>> + Send>;
 

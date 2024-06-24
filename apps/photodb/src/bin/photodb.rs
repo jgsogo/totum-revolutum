@@ -10,7 +10,7 @@ use pcloud_sdk::cli::auth;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::RemotePath;
-use photodb::db::{Database, PCloudDatabase};
+use photodb::database::{Database, PCloudDatabase};
 use photodb::{AppDirs, PhotoDB};
 
 fn application_dir() -> Utf8PathBuf {

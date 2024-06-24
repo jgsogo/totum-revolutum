@@ -8,7 +8,7 @@ local = ["dep:async-std", "dep:ignore", "dep:futures", "dep:sha256"]
 local_temp = ["dep:uuid", "dep:tempfile", "local"]
 pcloud = ["dep:pcloud_sdk"]
 test_utils = []
-diesel = ["dep:diesel", "dep:diesel_utils", "dep:diesel_migrations"]
+diesel_indexed_impl = ["dep:diesel", "dep:diesel_utils", "dep:diesel_migrations"]
 
 [dependencies]
 utils = { path = "../utils", features = ["filesystem"] }
