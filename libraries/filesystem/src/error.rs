@@ -47,7 +47,7 @@ pub enum Error {
 impl From<diesel_utils::error::Error> for Error {
     fn from(value: diesel_utils::error::Error) -> Self {
         match value {
-            diesel_utils::error::Error::ObjectDoesNotExist(p) => Error::PathDoesNotExist,
+            diesel_utils::error::Error::ObjectDoesNotExist(_) => Error::PathDoesNotExist,
             diesel_utils::error::Error::OtherDieselError(e) => e.into(),
         }
     }
