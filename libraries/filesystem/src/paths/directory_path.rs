@@ -140,9 +140,15 @@ impl DirectoryPath {
         unsafe { DirectoryPath::assume_valid(Utf8Path::new(ROOT_DIR)) }
     }
 
-    // invariant: DirectoryPath must be guaranteed to be a valid path (it has been constructed using the [`validate_path`] function)
+    /// Returns a new [`DirectoryPath`]. The caller is responsible for validating that the input `path`
+    /// satisfies all the restrictions. Use [`DirectoryPathBuf::from_str`] to create a new one and
+    /// run all the validations.
+    ///
+    /// # Safety
+    ///
+    /// Given `path` must be guaranteed to be a valid path according to rules defined by [`DirectoryPathBuf::from_str`].
     #[inline]
-    pub(crate) unsafe fn assume_valid(path: &Utf8Path) -> &DirectoryPath {
+    pub unsafe fn assume_valid(path: &Utf8Path) -> &DirectoryPath {
         // SAFETY: DirectoryPath is marked as #[repr(transparent)] so the conversion from a
         // *const Utf8Path to a *const DirectoryPath is valid.
         &*(path as *const Utf8Path as *const DirectoryPath)

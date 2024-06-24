@@ -54,6 +54,7 @@ rust_library_tests_and_docs(
     deps = all_crate_deps(
         normal = True,
     ) + [
+        "//libraries/diesel_utils",
         "//libraries/filesystem",
         "//libraries/pcloud_sdk",
     ],
