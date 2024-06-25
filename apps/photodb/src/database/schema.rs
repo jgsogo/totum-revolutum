@@ -16,9 +16,6 @@ diesel::table! {
         directory_id -> Integer,
         hash -> Text,
         size -> Integer,
-        fileid -> Nullable<BigInt>,
-        format_id -> Nullable<Integer>,
-        processed -> Bool,
     }
 }
 
@@ -58,7 +55,6 @@ diesel::table! {
 }
 
 diesel::joinable!(files -> directories (directory_id));
-diesel::joinable!(files -> formats (format_id));
 diesel::joinable!(photo_files -> files (file_id));
 diesel::joinable!(photo_files -> formats (format_id));
 diesel::joinable!(video_files -> files (file_id));
