@@ -11,4 +11,4 @@ pub use indexed::{
 
 mod filesystem_backup;
 
-mod indexed;
+pub mod indexed;

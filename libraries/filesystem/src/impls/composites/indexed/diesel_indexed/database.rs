@@ -15,7 +15,7 @@ const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/i
 /// Implementation of the [`FilesystemIndexedDatabase`] trait using a sqlite3 database and the
 /// models defined in [`models::File`] and [`models::Directory`]. To be used out-of-the-box for the
 /// [`super::FilesystemIndexed`] composite implementation
-pub(crate) struct DatabaseImpl {
+pub struct DatabaseImpl {
     pool: Pool<ConnectionManager<SqliteConnection>>,
 }
 
@@ -39,7 +39,11 @@ impl DatabaseImpl {
             .execute(&mut conn)
             .map_err(|e| Error::Other(e.to_string()))?;
 
-        Ok(Self { pool })
+        Ok(Self::new_from_connection(pool))
+    }
+
+    pub fn new_from_connection(pool: Pool<ConnectionManager<SqliteConnection>>) -> Self {
+        Self { pool }
     }
 
     pub fn get_conn(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>> {
@@ -217,7 +221,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
             (Some(size_), Some(hash_)) => (size_, hash_.to_string()),
             _ => match self.get_file(dir, filename) {
                 Ok(file) => (
-                    new_size.unwrap_or(file.size() as u64),
+                    new_size.unwrap_or(file.size()),
                     new_hash.unwrap_or(file.hash()).to_string(),
                 ),
                 Err(e) => match e {

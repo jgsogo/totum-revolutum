@@ -21,6 +21,8 @@ pub trait Database {
     /// Returns a connection to the database
     fn get_connection(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>>;
 
+    fn get_pool(&self) -> Pool<ConnectionManager<SqliteConnection>>;
+
     // ///Executes any pending operation
     // async fn flush(&self) -> Result<()>;
 }
@@ -65,6 +67,7 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
             let manager = ConnectionManager::<SqliteConnection>::new(proxied_file.local_filepath().to_str().unwrap());
             Pool::builder().test_on_check_out(true).build(manager)?
         };
+        let _ = pool.clone();
 
         let mut conn = pool.get()?;
         conn.run_pending_migrations(MIGRATIONS)
@@ -85,5 +88,9 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
 impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
     fn get_connection(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>> {
         self.pool.get().map_err(|e| anyhow!(e.to_string()))
+    }
+
+    fn get_pool(&self) -> Pool<ConnectionManager<SqliteConnection>> {
+        self.pool.clone()
     }
 }

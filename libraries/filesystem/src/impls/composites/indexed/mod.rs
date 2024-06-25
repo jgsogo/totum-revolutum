@@ -5,5 +5,5 @@ pub use filesystem_indexed::FilesystemIndexed;
 
 mod database;
 #[cfg(feature = "diesel_indexed_impl")]
-mod diesel_indexed;
+pub mod diesel_indexed;
 mod filesystem_indexed;
