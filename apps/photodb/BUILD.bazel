@@ -21,7 +21,10 @@ diesel_setup(
     name = "setup",
     config_file = ":diesel_config",
     database_url = "db.sqlite3",
-    migrations = glob(["migrations/**/*.sql"]),
+    migrations = [
+        "//libraries/filesystem:migrations",
+        ":migrations",
+    ],
 )
 
 diesel_print_schema(
@@ -54,6 +57,7 @@ rust_library_tests_and_docs(
     deps = all_crate_deps(
         normal = True,
     ) + [
+        "//libraries/diesel_utils",
         "//libraries/filesystem",
         "//libraries/pcloud_sdk",
     ],

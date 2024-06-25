@@ -74,7 +74,13 @@ impl AsRef<str> for FilenameBuf {
 pub struct Filename(str);
 
 impl Filename {
-    // invariant: Utf8Path must be guaranteed to be a valid path (it has been constructed using the [`is_valid_filename`] function)
+    /// Creates a new [`Filename`] from the given string. It won't run any check, so it's up to the
+    /// caller to ensure that the given `filename` satisfy all required rules. Use [`FilenameBuf::from_str`]
+    /// to create a new instance and execute the rules.
+    ///
+    /// # Safety
+    ///
+    /// Given `filename` must be guaranteed to be a valid filename according to rules defined in [`FilenameBuf::from_str`].
     #[inline]
     pub(crate) unsafe fn assume_valid(filename: &str) -> &Filename {
         // SAFETY: FilePath is marked as #[repr(transparent)] so the conversion from a

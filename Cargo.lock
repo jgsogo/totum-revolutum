@@ -2666,6 +2666,7 @@ dependencies = [
  "data-encoding",
  "diesel",
  "diesel_migrations",
+ "diesel_utils",
  "dirs",
  "dotenvy",
  "filesystem",

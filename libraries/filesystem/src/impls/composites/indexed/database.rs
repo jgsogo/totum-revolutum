@@ -25,7 +25,7 @@ pub trait FilesystemIndexedDbDirectory {
 /// Defines the methods that any type should implement, so it can play like the _index_ in the
 /// [super::FilesystemIndexed] composite. Anything implementing this trait will have a blanket
 /// implementation of the [`Filesystem`] trait (isolating the index behavior form the filesystem one)
-pub trait FilesystemIndexedDatabase: Send + Sync {
+pub trait FilesystemIndexedDatabase {
     type File: FilesystemIndexedDbFile;
     type Directory: FilesystemIndexedDbDirectory;
 
@@ -91,7 +91,7 @@ pub trait FilesystemIndexedDatabase: Send + Sync {
 }
 
 #[async_trait]
-impl<T: FilesystemIndexedDatabase> Filesystem for T {
+impl<T: FilesystemIndexedDatabase + Sync + Send> Filesystem for T {
     async fn sync_all(self) -> Result<()> {
         Ok(())
     }
@@ -255,7 +255,7 @@ impl<T: FilesystemIndexedDatabase> Filesystem for T {
 }
 
 #[async_trait]
-impl<T: FilesystemIndexedDatabase> FilesystemOps for T {
+impl<T: FilesystemIndexedDatabase + Sync + Send> FilesystemOps for T {
     async fn copy_from(
         &mut self,
         target: &FilePath,
