@@ -136,7 +136,7 @@ impl AsRef<str> for DirectoryPathBuf {
 pub struct DirectoryPath(Utf8Path);
 
 impl DirectoryPath {
-    pub fn root<'a>() -> &'a DirectoryPath {
+    pub(crate) fn root<'a>() -> &'a DirectoryPath {
         unsafe { DirectoryPath::assume_valid(Utf8Path::new(ROOT_DIR)) }
     }
 
@@ -148,7 +148,7 @@ impl DirectoryPath {
     ///
     /// Given `path` must be guaranteed to be a valid path according to rules defined by [`DirectoryPathBuf::from_str`].
     #[inline]
-    pub unsafe fn assume_valid(path: &Utf8Path) -> &DirectoryPath {
+    pub(crate) unsafe fn assume_valid(path: &Utf8Path) -> &DirectoryPath {
         // SAFETY: DirectoryPath is marked as #[repr(transparent)] so the conversion from a
         // *const Utf8Path to a *const DirectoryPath is valid.
         &*(path as *const Utf8Path as *const DirectoryPath)

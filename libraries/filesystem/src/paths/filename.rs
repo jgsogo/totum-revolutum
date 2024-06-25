@@ -82,7 +82,7 @@ impl Filename {
     ///
     /// Given `filename` must be guaranteed to be a valid filename according to rules defined in [`FilenameBuf::from_str`].
     #[inline]
-    pub unsafe fn assume_valid(filename: &str) -> &Filename {
+    pub(crate) unsafe fn assume_valid(filename: &str) -> &Filename {
         // SAFETY: FilePath is marked as #[repr(transparent)] so the conversion from a
         // *const Utf8Path to a *const FilePath is valid.
         &*(filename as *const str as *const Filename)
