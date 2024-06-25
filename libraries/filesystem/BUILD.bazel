@@ -48,13 +48,14 @@ filegroup(
 filegroup(
     name = "migrations",
     srcs = glob(["src/impls/composites/indexed/diesel_indexed/migrations/**/*.sql"]),
+    visibility = ["//visibility:public"],
 )
 
 diesel_setup(
     name = "setup",
     config_file = ":diesel_config",
     database_url = "db.sqlite3",
-    migrations = [":migrations"],  # glob(["src/impls/composites/indexed/diesel_indexed/migrations/**/*.sql"]),
+    migrations = [":migrations"],
 )
 
 diesel_print_schema(

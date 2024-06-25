@@ -36,11 +36,16 @@ filegroup(
     srcs = ["tests/common/diesel.toml"],
 )
 
+filegroup(
+    name = "migrations",
+    srcs = glob(["tests/common/migrations/**/*.sql"]),
+)
+
 diesel_setup(
     name = "setup",
     config_file = ":diesel_config",
     database_url = "db.sqlite3",
-    migrations = glob(["tests/common/migrations/**/*.sql"]),
+    migrations = [":migrations"],
 )
 
 diesel_print_schema(

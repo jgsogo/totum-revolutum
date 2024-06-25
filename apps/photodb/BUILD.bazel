@@ -21,7 +21,10 @@ diesel_setup(
     name = "setup",
     config_file = ":diesel_config",
     database_url = "db.sqlite3",
-    migrations = glob(["migrations/**/*.sql"]),
+    migrations = [
+        "//libraries/filesystem:migrations",
+        ":migrations",
+    ],
 )
 
 diesel_print_schema(
