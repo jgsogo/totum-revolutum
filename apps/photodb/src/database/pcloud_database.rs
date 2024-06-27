@@ -2,15 +2,19 @@ use anyhow::Result;
 use anyhow::{anyhow, bail};
 use async_trait::async_trait;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
-use diesel::{Connection, SqliteConnection};
+use diesel::ExpressionMethods;
+use diesel::{BoolExpressionMethods, Connection, QueryDsl, RunQueryDsl, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use tokio::sync::oneshot::Receiver;
 use tracing::debug;
 
+use filesystem::{DirectoryPath, FilePath};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::GetFolderID;
 use pcloud_sdk::types::RemotePath;
 use pcloud_sdk::{ProxiedFile, UploadReturnType};
+
+use super::models;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 const DB_FILENAME: &str = "photodb.sqlite3";
@@ -21,7 +25,14 @@ pub trait Database {
     /// Returns a connection to the database
     fn get_connection(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>>;
 
+    /// Returns the connection pool to the database (typically it returns a clone)
     fn get_pool(&self) -> Pool<ConnectionManager<SqliteConnection>>;
+
+    /// Returns the [`models::File`] at the given `path`.
+    fn get_file(&self, path: &FilePath) -> Result<models::File>;
+
+    /// Returns the [`models::Directory`] at the given `path`.
+    fn get_directory(&self, path: &DirectoryPath) -> Result<models::Directory>;
 
     // ///Executes any pending operation
     // async fn flush(&self) -> Result<()>;
@@ -92,5 +103,30 @@ impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
 
     fn get_pool(&self) -> Pool<ConnectionManager<SqliteConnection>> {
         self.pool.clone()
+    }
+
+    fn get_file(&self, filepath: &FilePath) -> Result<models::File> {
+        let mut conn = self.get_connection()?;
+
+        let directory_ = self.get_directory(filepath.directory())?;
+
+        use crate::database::schema::files::dsl::*;
+        let file_ = files
+            .filter(
+                name.eq(filepath.filename().as_str())
+                    .and(directory_id.eq(directory_.id)),
+            )
+            .get_result::<models::File>(&mut conn)?;
+        Ok(file_)
+    }
+
+    fn get_directory(&self, path: &DirectoryPath) -> Result<models::Directory> {
+        let mut conn = self.get_connection()?;
+
+        use crate::database::schema::directories::dsl::*;
+        let directory_ = directories
+            .filter(full_path.eq(path.as_str()))
+            .get_result::<models::Directory>(&mut conn)?;
+        Ok(directory_)
     }
 }

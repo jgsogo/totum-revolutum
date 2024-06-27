@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use anyhow::{anyhow, Result};
 use camino::{Utf8Path, Utf8PathBuf};
-use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
@@ -11,7 +11,7 @@ use filesystem::impls::composites::FilesystemIndexed;
 use filesystem::impls::FilesystemLocalTemp;
 use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
 use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::methods::file::stat::GetStat;
+use pcloud_sdk::handy::GetFileID;
 use pcloud_sdk::types::FileID;
 use pcloud_sdk::types::RemotePath;
 
@@ -117,32 +117,14 @@ impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps + 'static, TPClo
         // FIXME: Previous method should return the "filesystem_db_models::File" object that it has just created
         let mut conn = self.db.get_connection()?;
 
-        let file_ = {
-            let directory_id_: i32 = {
-                use crate::database::schema::directories::dsl::*;
-                directories
-                    .filter(full_path.eq(filepath.directory().as_str()))
-                    .select(id)
-                    .get_result(&mut conn)?
-            };
-            use crate::database::schema::files::dsl::*;
-            files
-                .filter(
-                    name.eq(filepath.filename().as_str())
-                        .and(directory_id.eq(directory_id_)),
-                )
-                .get_result::<models::File>(&mut conn)?
-        };
-
         use crate::database::schema::formats::dsl::*;
         use crate::database::schema::photo_files::dsl::*;
 
+        let file_ = self.db.get_file(&filepath)?;
         let fileid_: FileID = self
             .pcloud
-            .stat(RemotePath::try_from(filepath.as_utf8_path())?.try_into()?)
-            .await?
-            .metadata
-            .fileid;
+            .get_fileid(&RemotePath::try_from(filepath.as_utf8_path())?)
+            .await?;
         let format_: models::Format = formats.filter(format.eq("png")).get_result(&mut conn)?;
         let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true);
         let photo = diesel::insert_into(photo_files)
