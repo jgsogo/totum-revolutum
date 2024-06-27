@@ -21,6 +21,7 @@ diesel = { workspace = true, features = ["sqlite", "r2d2", "returning_clauses_fo
 diesel_migrations = { workspace = true, features = ["sqlite"] }
 dirs = { workspace = true }
 dotenvy = { workspace = true }
+flume = { workspace = true }
 home = { workspace = true }
 image = { workspace = true }
 log = { workspace = true }

@@ -3,13 +3,14 @@ use std::str::FromStr;
 use anyhow::{anyhow, Result};
 use camino::{Utf8Path, Utf8PathBuf};
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
+use log::error;
 use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
 use filesystem::impls::composites::indexed::diesel_indexed::DatabaseImpl;
 use filesystem::impls::composites::FilesystemIndexed;
 use filesystem::impls::{FilesystemLocalTemp, FilesystemPCloud};
-use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem};
+use filesystem::{DirectoryPathBuf, FileMetadata, FilePathBuf, FilenameBuf, Filesystem};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::GetFileID;
 use pcloud_sdk::types::FileID;
@@ -143,12 +144,43 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     /// Iterates all the files in the DB and the files in the remote storage performing
     /// a [`filesystem::diff::impls::mirror`] operation. After it finishes it will iterate all
     /// the [`models::File`] that are not a [`models::PhotoFile`] or VideoFile and process the
-    /// files to create the corresponding entries:
+    /// files to create the corresponding entries.
+    ///
+    /// Note that, for the files that have been removed from the storage, the `mirror` operation
+    /// will remove the [`models::File`] and ON CASCADE the corresponding [`models::PhotoFile`] or
+    /// VideoFile will be removed.
     pub async fn sync(&self) -> Result<()> {
         self.storage.initial_sync().await.map_err(|e| anyhow!(e))
 
         // TODO: Iterate all the [`models::File`] that are not a [`models::PhotoFile`] or VideoFile
         // TODO: and process the files to create the corresponding entries
+    }
+
+    pub async fn list(&self) -> Result<()> {
+        let (tx, rx) = flume::bounded::<Box<dyn FileMetadata>>(32);
+
+        tokio::spawn(async move {
+            let mut count_files = 0;
+            loop {
+                match rx.recv() {
+                    Ok(r) => {
+                        println!("{}", r.path());
+                        count_files += 1;
+                    }
+                    Err(e) => {
+                        error!("Error receiving files: {e}");
+                        break;
+                    }
+                };
+            }
+            println!("{} files total", count_files)
+        });
+
+        if let Err(e) = self.storage.walk_directory(tx, 10, Utf8Path::new("<not used>")).await {
+            error!("Error iterating storage files: {e}");
+        }
+
+        Ok(())
     }
 
     // pub async fn clean_fileids(&self) -> Result<()> {

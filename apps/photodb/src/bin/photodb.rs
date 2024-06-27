@@ -44,6 +44,10 @@ enum Commands {
     /// Initializes the database (fails if file already exists)
     Initialize,
 
+    /// List all the files in the storage
+    /// TODO: Add some filters!
+    List,
+
     /// Adds (and backups) a photo to the database
     Add(Add),
 
@@ -75,10 +79,8 @@ async fn db_commands<T: Database, TPCloudClient: PCloudClient + Clone + Send + '
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,
-        Commands::Sync => {
-            photodb.sync().await?;
-            Ok(())
-        }
+        Commands::Sync => photodb.sync().await,
+        Commands::List => photodb.list().await,
         c => bail!("Unexpected command {:?}", c),
     }
 }
