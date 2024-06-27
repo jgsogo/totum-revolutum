@@ -10,7 +10,7 @@ use crate::impls::composites::indexed::diesel_indexed::models;
 use crate::impls::composites::{FilesystemIndexedDatabase, FilesystemIndexedDbDirectory, FilesystemIndexedDbFile};
 use crate::{DirectoryPath, Error, Filename, Result};
 
-const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/indexed/diesel_indexed/migrations");
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/indexed/diesel_indexed/migrations");
 
 /// Implementation of the [`FilesystemIndexedDatabase`] trait using a sqlite3 database and the
 /// models defined in [`models::File`] and [`models::Directory`]. To be used out-of-the-box for the

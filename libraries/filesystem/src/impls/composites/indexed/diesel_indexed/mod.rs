@@ -1,7 +1,7 @@
 //! Default implementation for [`super::FilesystemIndexedDatabase`] using a database implemented
 //! with the `diesel` crate.
 
-pub use database::DatabaseImpl;
+pub use database::{DatabaseImpl, MIGRATIONS};
 
 use crate::impls::composites::FilesystemIndexed;
 use crate::{Filesystem, Result};

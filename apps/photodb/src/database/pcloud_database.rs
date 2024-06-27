@@ -8,6 +8,7 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use tokio::sync::oneshot::Receiver;
 use tracing::debug;
 
+use filesystem::impls::composites::indexed::diesel_indexed::MIGRATIONS as FILESYSTEM_INDEXED_MIGRATIONS;
 use filesystem::{DirectoryPath, FilePath};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::GetFolderID;
@@ -54,12 +55,16 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         let folderid = pcloud.get_folderid(&path).await?; // TODO: Create if not exists?
         let (proxied_file, created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
         if !created {
+            drop(proxied_file);
+            let _ = upload_done.await?; // Wait for the file to close, discard any error.
             bail!("Remote file already exists!");
         }
 
         // Create the SQLite3 database and run migrations
         debug!("Create the database and/or run pending migrations");
         let mut conn = SqliteConnection::establish(proxied_file.local_filepath().to_str().unwrap())?;
+        conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
+            .map_err(|e| anyhow!("Error {}", e))?;
         conn.run_pending_migrations(MIGRATIONS)
             .map_err(|e| anyhow!("Error {}", e))?;
 
@@ -80,7 +85,10 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         };
         let _ = pool.clone();
 
+        debug!("Run pending migrations");
         let mut conn = pool.get()?;
+        conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
+            .map_err(|e| anyhow!("Error {}", e))?;
         conn.run_pending_migrations(MIGRATIONS)
             .map_err(|e| anyhow!("Error {}", e))?;
 
