@@ -2,12 +2,18 @@ use std::str::FromStr;
 
 use anyhow::{anyhow, Result};
 use camino::{Utf8Path, Utf8PathBuf};
-use diesel::{RunQueryDsl, SelectableHelper};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use oxipng::{optimize, Options};
 use tracing::{debug, info};
 
-use filesystem::impls::FilesystemLocalTemp;
-use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
+use filesystem::impls::composites::indexed::diesel_indexed::DatabaseImpl;
+use filesystem::impls::composites::FilesystemIndexed;
+use filesystem::impls::{FilesystemLocalTemp, FilesystemPCloud};
+use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem};
+use pcloud_sdk::client::PCloudClient;
+use pcloud_sdk::handy::GetFileID;
+use pcloud_sdk::types::FileID;
+use pcloud_sdk::types::RemotePath;
 
 use super::database::models;
 use super::database::Database;
@@ -18,19 +24,43 @@ use super::AppDirs;
 const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
-pub struct PhotoDB<'a, T: Database, RemoteStorage: Filesystem> {
+pub struct PhotoDB<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> {
+    /// The PCloud client.
+    pcloud: TPCloudClient,
+
+    /// An instance of the [`Database`]. This is the same database that the [`Self::storage`] uses to
+    /// index the files.
     db: T,
+
+    /// Directories used by this instance of the PhotoDB application
     app_dir: &'a AppDirs,
-    storage: RemoteStorage,
+
+    /// Indexed storage. Everything saved here will be mirrored to the DB (using the default
+    /// [`filesystem_db_models::File`] and [`filesystem_db_models::Directory`] models).
+    storage: FilesystemIndexed<DatabaseImpl, FilesystemPCloud<TPCloudClient>>,
 }
 
-impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps> PhotoDB<'a, T, RemoteStorage> {
-    pub async fn new(db: T, storage: RemoteStorage, app_dir: &'a AppDirs) -> Result<Self> {
+impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> PhotoDB<'a, T, TPCloudClient> {
+    /// Creates a new instance of [`PhotoDB`] using the given arguments:
+    /// * `db` is the database instance, behind the [`Database`] trait.
+    /// * `db_path` Path inside PCloud to mount the remote storage filesystem.
+    /// * `app_dir`: An [`AppDirs`] reference with local paths to application directories
+    /// * `pcloud`: The [`PCloudClient`] to use for the remote storage filesystem (and other
+    ///   operations that require access to PCloud itself
+    pub async fn new(db: T, db_path: &RemotePath, app_dir: &'a AppDirs, pcloud: TPCloudClient) -> Result<Self> {
         info!(
-            "New photodb application using local directory '{}' and remote storage",
+            "New photodb application using local directory '{}' and remote pcloud storage",
             app_dir
         );
-        Ok(Self { db, app_dir, storage })
+        let database_impl = DatabaseImpl::new_from_connection(db.get_pool());
+        let remote_storage = FilesystemPCloud::new(db_path, pcloud.clone()).await?;
+        let storage = FilesystemIndexed::new(database_impl, remote_storage);
+        Ok(Self {
+            pcloud,
+            db,
+            app_dir,
+            storage,
+        })
     }
 
     fn prepare_image_file(input: Utf8PathBuf, filesystem_local: &FilesystemLocalTemp) -> Result<FilePathBuf> {
@@ -86,23 +116,28 @@ impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps> PhotoDB<'a, T, 
         debug!("Create intermediate directories '{}'", filepath.directory());
         self.storage.create_dir_all(filepath.directory()).await?;
         filesystem::actions::copy_file(&tmp_filesystem, &mut self.storage, &photo, &filepath, false).await?;
-        debug!("Get metadata from uploaded file");
-        let _metadata = self.storage.get_metadata(&filepath).await?;
 
-        // Store the data in the database
-        use crate::database::schema::photos;
-        let new_photo = models::NewPhoto {
-            fileid: &(0i64), // FIXME: I need the fileid here
-            path: filepath.as_str(),
-            processed: &true,
-        };
-        let photo = diesel::insert_into(photos::table)
-            .values(&new_photo)
-            .returning(models::Photo::as_returning())
-            .get_result(&mut self.db.get_connection()?)?;
-        // TODO: Handle scenario if the insert fails: duplicate fileid
+        // TODO: Now we need to populate the 'photo_file' table with the extra information related
+        // TODO: to PhotoDB application: format, fileid,...
+        // FIXME: Previous method should return the "filesystem_db_models::File" object that it has just created
+        let mut conn = self.db.get_connection()?;
 
-        debug!("Photo inserted into database: {}", photo.id);
+        use crate::database::schema::formats::dsl::*;
+        use crate::database::schema::photo_files::dsl::*;
+
+        let file_ = self.db.get_file(&filepath)?;
+        let fileid_: FileID = self
+            .pcloud
+            .get_fileid(&RemotePath::try_from(filepath.as_utf8_path())?)
+            .await?;
+        let format_: models::Format = formats.filter(format.eq("png")).get_result(&mut conn)?;
+        let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true);
+        let photo = diesel::insert_into(photo_files)
+            .values(&new_photo_file)
+            .returning(models::PhotoFile::as_returning())
+            .get_result(&mut conn)?;
+
+        debug!("Photo inserted into database: {}", photo.fileid);
 
         Ok(())
     }

@@ -12,7 +12,7 @@ use super::super::schema::*;
     PartialEq, Eq, Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, QueryableByName, Selectable,
 )]
 #[diesel(table_name = files)]
-pub(crate) struct File {
+pub struct File {
     pub id: i32,
     pub name: String,
     pub directory_id: i32,
@@ -25,7 +25,7 @@ impl File {
         // SAFETY. We can assume it's a valid filename as it was validated when created
         // FIXME: We can't assume it's valid
         // FIXME: Better not to execute 'unsafe' here, other's can't use it
-        unsafe { &Filename::assume_valid(&self.name) }
+        unsafe { Filename::assume_valid(&self.name) }
     }
 
     #[allow(dead_code)]

@@ -36,11 +36,11 @@ pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone + Send + 'static> {
 }
 
 impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpClient> {
-    pub async fn new(root_path: RemotePath, pcloud: HttpClient) -> Result<Self> {
+    pub async fn new(root_path: &RemotePath, pcloud: HttpClient) -> Result<Self> {
         let pcloud = Arc::new(pcloud);
 
         let root_folderid = pcloud
-            .get_folderid(&root_path)
+            .get_folderid(root_path)
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
         Ok(Self {
@@ -328,7 +328,7 @@ mod tests {
             });
 
         let root = RemotePath::from_str("path:/the/path")?;
-        let fs = FilesystemPCloud::new(root, client).await?;
+        let fs = FilesystemPCloud::new(&root, client).await?;
         assert_eq!("/the/path", fs.root_path.as_str()); // Root is always '/'
         assert_eq!(FolderID::new(1234), fs.root_folderid);
         Ok(())
@@ -427,7 +427,7 @@ mod tests {
 
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
-        let fs = FilesystemPCloud::new(root, client).await?;
+        let fs = FilesystemPCloud::new(&root, client).await?;
         let mut fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
         let rx = {
@@ -532,7 +532,7 @@ mod tests {
 
         // Create the filesystem
         let root = RemotePath::from_str("path:/the/path")?;
-        let fs = FilesystemPCloud::new(root, client).await?;
+        let fs = FilesystemPCloud::new(&root, client).await?;
         let fs = AsyncFileDropImpl::new_call_sync_all(fs);
 
         let filepath = FilePathBuf::new(DirectoryPathBuf::root(), FilenameBuf::from_str("file").unwrap());
@@ -601,7 +601,7 @@ mod tests {
             });
 
         // Create the filesystem
-        let fs = FilesystemPCloud::new(root_path, client).await?;
+        let fs = FilesystemPCloud::new(&root_path, client).await?;
         let mut fs = AsyncFileDropImpl::new_call_sync_all(fs);
         let rx = {
             let filepath = FilePathBuf::new(
@@ -654,7 +654,7 @@ mod tests {
                 })
             });
 
-        let mut fs = FilesystemPCloud::new(root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(&root_path, client).await?;
 
         let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
         fs.create_dir_all(&dir).await?;
@@ -699,7 +699,7 @@ mod tests {
             },
         );
 
-        let mut fs = FilesystemPCloud::new(root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(&root_path, client).await?;
         let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
         fs.remove_file(&dir.join_filename(FilenameBuf::from_str("file").unwrap()))
             .await?;
@@ -742,7 +742,7 @@ mod tests {
                 })
             });
 
-        let mut fs = FilesystemPCloud::new(root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(&root_path, client).await?;
         let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
         fs.remove_dir(&dir).await?;
         Ok(())
@@ -784,7 +784,7 @@ mod tests {
                 })
             });
 
-        let mut fs = FilesystemPCloud::new(root_path, client).await?;
+        let mut fs = FilesystemPCloud::new(&root_path, client).await?;
         let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
         fs.remove_dir_all(&dir).await?;
         Ok(())

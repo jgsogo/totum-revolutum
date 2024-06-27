@@ -1,17 +1,16 @@
 //! Default implementation for [`super::FilesystemIndexedDatabase`] using a database implemented
 //! with the `diesel` crate.
 
-use database::DatabaseImpl;
+pub use database::DatabaseImpl;
 
 use crate::impls::composites::FilesystemIndexed;
 use crate::{Filesystem, Result};
 
 mod database;
-mod models;
-mod schema;
+pub mod models;
+pub mod schema;
 
 /// Creates a new [`FilesystemIndexed`] using a default implementation of a database (SQLite3)
-#[allow(private_interfaces)]
 pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
     database_url: &str,
     storage: TStorage,

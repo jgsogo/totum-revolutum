@@ -6,7 +6,7 @@ edition = "2021"
 [features]
 
 [dependencies]
-filesystem = { path = "../../libraries/filesystem", features = ["local_temp", "pcloud"] } # pcloud only required for the binary?
+filesystem = { path = "../../libraries/filesystem", features = ["local_temp", "pcloud", "diesel_indexed_impl"] } # pcloud only required for the binary?
 pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
 diesel_utils = { path = "../../libraries/diesel_utils" }
 

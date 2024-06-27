@@ -1,13 +1,12 @@
+use std::str::FromStr;
+
 use anyhow::{anyhow, bail, Result};
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
-use filesystem::impls::FilesystemPCloud;
-use filesystem::{Filesystem, FilesystemOps};
-use std::str::FromStr;
 use tracing::{debug, error};
 
 use pcloud_sdk::cli::auth;
-use pcloud_sdk::client::PCloudClientImpl;
+use pcloud_sdk::client::{PCloudClient, PCloudClientImpl};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::RemotePath;
 use photodb::database::{Database, PCloudDatabase};
@@ -81,9 +80,9 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 
 /// Any command that uses the DB is executed here. This way we can guarantee that the Receiver work
 /// (store the database back to pCloud if anything fails) is always executed
-async fn db_commands<T: Database, RemoteStorage: Filesystem + FilesystemOps>(
+async fn db_commands<T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static>(
     command: Commands,
-    mut photodb: PhotoDB<'_, T, RemoteStorage>,
+    mut photodb: PhotoDB<'_, T, TPCloudClient>,
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,
@@ -125,9 +124,8 @@ async fn main() -> Result<()> {
             let done = match &cli.command {
                 Commands::Initialize => PCloudDatabase::initialize(client, db_path).await?,
                 _ => {
-                    let remote_storage = FilesystemPCloud::new(db_path.clone(), client.clone()).await?;
-                    let (db, done) = PCloudDatabase::new(client, db_path).await?;
-                    let r = match PhotoDB::new(db, remote_storage, &app_dir).await {
+                    let (db, done) = PCloudDatabase::new(client.clone(), &db_path).await?;
+                    let r = match PhotoDB::new(db, &db_path, &app_dir, client).await {
                         Ok(photodb) => db_commands(cli.command, photodb).await,
                         Err(e) => Err(e),
                     };
