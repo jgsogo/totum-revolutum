@@ -48,23 +48,12 @@ enum Commands {
     Add(Add),
 
     /// Syncs the database with the remote storage
-    Sync(Sync),
+    Sync,
 }
 
 #[derive(Args, Debug)]
 struct Add {
     photo_file: Utf8PathBuf,
-}
-
-#[derive(Args, Debug)]
-struct Sync {
-    /// Remove DB entries that are no longer in the remote storage
-    #[clap(long, default_value_t = true)]
-    remove_missing_files: bool,
-
-    /// Add entries to the DB for new files discovered in the remote
-    #[clap(long, default_value_t = true)]
-    collect_new_files: bool,
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -86,8 +75,8 @@ async fn db_commands<T: Database, TPCloudClient: PCloudClient + Clone + Send + '
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,
-        Commands::Sync(sync) => {
-            photodb.sync(sync.collect_new_files, sync.remove_missing_files).await?;
+        Commands::Sync => {
+            photodb.sync().await?;
             Ok(())
         }
         c => bail!("Unexpected command {:?}", c),

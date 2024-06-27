@@ -55,6 +55,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         let database_impl = DatabaseImpl::new_from_connection(db.get_pool());
         let remote_storage = FilesystemPCloud::new(db_path, pcloud.clone()).await?;
         let storage = FilesystemIndexed::new(database_impl, remote_storage);
+        // TODO: Spawn "self.sync" in parallel - self.sync().await?;
         Ok(Self {
             pcloud,
             db,
@@ -117,9 +118,6 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         self.storage.create_dir_all(filepath.directory()).await?;
         filesystem::actions::copy_file(&tmp_filesystem, &mut self.storage, &photo, &filepath, false).await?;
 
-        // TODO: Now we need to populate the 'photo_file' table with the extra information related
-        // TODO: to PhotoDB application: format, fileid,...
-        // FIXME: Previous method should return the "filesystem_db_models::File" object that it has just created
         let mut conn = self.db.get_connection()?;
 
         use crate::database::schema::formats::dsl::*;
@@ -142,14 +140,15 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         Ok(())
     }
 
-    /// Iterates all the files in the DB and the files in the remote storage performing these
-    /// actions (if they are activated by the corresponding input arguments):
-    ///  * `collect_new_files`: New files found in the remote storage will be added to the DB,
-    ///     these file won't be processed (`processed` flag in the DB set to False)
-    ///  * `remove_missing_files`: Entries in the DB that correspond to files that are no longer
-    ///     in the remote storage will be removed.
-    pub async fn sync(&self, _collect_new_files: bool, _remove_missing_files: bool) -> Result<()> {
-        todo!("not impl")
+    /// Iterates all the files in the DB and the files in the remote storage performing
+    /// a [`filesystem::diff::impls::mirror`] operation. After it finishes it will iterate all
+    /// the [`models::File`] that are not a [`models::PhotoFile`] or VideoFile and process the
+    /// files to create the corresponding entries:
+    pub async fn sync(&self) -> Result<()> {
+        self.storage.initial_sync().await.map_err(|e| anyhow!(e))
+
+        // TODO: Iterate all the [`models::File`] that are not a [`models::PhotoFile`] or VideoFile
+        // TODO: and process the files to create the corresponding entries
     }
 
     // pub async fn clean_fileids(&self) -> Result<()> {
