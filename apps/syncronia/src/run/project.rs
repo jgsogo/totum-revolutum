@@ -28,7 +28,7 @@ pub async fn handle(home: &Utf8Path, path: &Utf8Path) -> Result<()> {
         let pcloud = config.auth.get_pcloud_client(home)?;
         let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();
         let remote_path = RemotePath::try_from(Utf8Path::new(&base_path))?;
-        FilesystemPCloud::new(remote_path, pcloud.clone()).await?
+        FilesystemPCloud::new(&remote_path, pcloud.clone()).await?
     };
 
     actions::run(lhs_fs, rhs_fs, config).await

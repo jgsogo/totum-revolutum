@@ -8,8 +8,8 @@ use tracing::{debug, info};
 
 use filesystem::impls::composites::indexed::diesel_indexed::DatabaseImpl;
 use filesystem::impls::composites::FilesystemIndexed;
-use filesystem::impls::FilesystemLocalTemp;
-use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
+use filesystem::impls::{FilesystemLocalTemp, FilesystemPCloud};
+use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::GetFileID;
 use pcloud_sdk::types::FileID;
@@ -24,7 +24,7 @@ use super::AppDirs;
 const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
-pub struct PhotoDB<'a, T: Database, RemoteStorage: Filesystem, TPCloudClient: PCloudClient> {
+pub struct PhotoDB<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> {
     /// The PCloud client.
     pcloud: TPCloudClient,
 
@@ -37,19 +37,24 @@ pub struct PhotoDB<'a, T: Database, RemoteStorage: Filesystem, TPCloudClient: PC
 
     /// Indexed storage. Everything saved here will be mirrored to the DB (using the default
     /// [`filesystem_db_models::File`] and [`filesystem_db_models::Directory`] models).
-    storage: FilesystemIndexed<DatabaseImpl, RemoteStorage>,
+    storage: FilesystemIndexed<DatabaseImpl, FilesystemPCloud<TPCloudClient>>,
 }
 
-impl<'a, T: Database, RemoteStorage: Filesystem + FilesystemOps + 'static, TPCloudClient: PCloudClient>
-    PhotoDB<'a, T, RemoteStorage, TPCloudClient>
-{
-    pub async fn new(db: T, storage: RemoteStorage, app_dir: &'a AppDirs, pcloud: TPCloudClient) -> Result<Self> {
+impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> PhotoDB<'a, T, TPCloudClient> {
+    /// Creates a new instance of [`PhotoDB`] using the given arguments:
+    /// * `db` is the database instance, behind the [`Database`] trait.
+    /// * `db_path` Path inside PCloud to mount the remote storage filesystem.
+    /// * `app_dir`: An [`AppDirs`] reference with local paths to application directories
+    /// * `pcloud`: The [`PCloudClient`] to use for the remote storage filesystem (and other
+    ///   operations that require access to PCloud itself
+    pub async fn new(db: T, db_path: &RemotePath, app_dir: &'a AppDirs, pcloud: TPCloudClient) -> Result<Self> {
         info!(
-            "New photodb application using local directory '{}' and indexed remote storage",
+            "New photodb application using local directory '{}' and remote pcloud storage",
             app_dir
         );
         let database_impl = DatabaseImpl::new_from_connection(db.get_pool());
-        let storage = FilesystemIndexed::new(database_impl, storage);
+        let remote_storage = FilesystemPCloud::new(db_path, pcloud.clone()).await?;
+        let storage = FilesystemIndexed::new(database_impl, remote_storage);
         Ok(Self {
             pcloud,
             db,

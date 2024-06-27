@@ -68,8 +68,8 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
 
     /// Creates a new [`PCloudDatabase`] instance. Requires a pCloud client and the folder
     /// path where the database (and files) are located
-    pub async fn new(pcloud: PCloud, path: RemotePath) -> anyhow::Result<(Self, Receiver<UploadReturnType>)> {
-        let folderid = pcloud.get_folderid(&path).await?;
+    pub async fn new(pcloud: PCloud, path: &RemotePath) -> anyhow::Result<(Self, Receiver<UploadReturnType>)> {
+        let folderid = pcloud.get_folderid(path).await?;
         // TODO: Add a flag to `ProxiedFile` to indicate if it's allowed to create the file or not
         let (proxied_file, _created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
 
