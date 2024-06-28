@@ -143,17 +143,22 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
 
     /// Iterates all the files in the DB and the files in the remote storage performing
     /// a [`filesystem::diff::impls::mirror`] operation. After it finishes it will iterate all
-    /// the [`models::File`] that are not a [`models::PhotoFile`] or VideoFile and process the
+    /// the [`models::File`] that are not a [`models::PhotoFile`] and process the
     /// files to create the corresponding entries.
     ///
     /// Note that, for the files that have been removed from the storage, the `mirror` operation
-    /// will remove the [`models::File`] and ON CASCADE the corresponding [`models::PhotoFile`] or
-    /// VideoFile will be removed.
+    /// will remove the [`models::File`] and ON CASCADE the corresponding [`models::PhotoFile`]
+    /// will be removed.
     pub async fn sync(&self) -> Result<()> {
-        self.storage.initial_sync().await.map_err(|e| anyhow!(e))
+        self.storage.initial_sync().await.map_err(|e| anyhow!(e))?;
 
-        // TODO: Iterate all the [`models::File`] that are not a [`models::PhotoFile`] or VideoFile
+        // TODO: Iterate all the [`models::File`] that are not a [`models::PhotoFile`]
         // TODO: and process the files to create the corresponding entries
+        let non_identified = self.db.get_orphan_files()?;
+        for it in non_identified {
+            println!("UFO: {}", it.filename());
+        }
+        Ok(())
     }
 
     pub async fn list(&self) -> Result<()> {

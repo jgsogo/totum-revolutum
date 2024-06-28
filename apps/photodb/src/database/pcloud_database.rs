@@ -2,7 +2,7 @@ use anyhow::Result;
 use anyhow::{anyhow, bail};
 use async_trait::async_trait;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
-use diesel::ExpressionMethods;
+use diesel::{sql_query, ExpressionMethods};
 use diesel::{BoolExpressionMethods, Connection, QueryDsl, RunQueryDsl, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use tokio::sync::oneshot::Receiver;
@@ -34,6 +34,9 @@ pub trait Database {
 
     /// Returns the [`models::Directory`] at the given `path`.
     fn get_directory(&self, path: &DirectoryPath) -> Result<models::Directory>;
+
+    /// Returns all the [`models::File`] that are not instances of [`models::PhotoFile`]
+    fn get_orphan_files(&self) -> Result<Vec<models::File>>;
 
     // ///Executes any pending operation
     // async fn flush(&self) -> Result<()>;
@@ -136,5 +139,22 @@ impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
             .filter(full_path.eq(path.as_str()))
             .get_result::<models::Directory>(&mut conn)?;
         Ok(directory_)
+    }
+
+    /// Returns the [`models::File`] that doesn't appear in the FK column of some [`models::PhotoFile`]
+    fn get_orphan_files(&self) -> Result<Vec<models::File>> {
+        let mut conn = self.get_connection()?;
+
+        let orphan_files = sql_query(
+            r#"
+            SELECT * FROM files files_
+            WHERE NOT EXISTS (
+                SELECT 1 FROM photo_files photo_files_
+                WHERE files_.id = photo_files_.file_id
+            );
+        "#,
+        );
+
+        Ok(orphan_files.load::<models::File>(&mut conn)?)
     }
 }
