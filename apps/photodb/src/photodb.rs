@@ -90,6 +90,18 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         Ok(output_filename)
     }
 
+    /// Takes a [`models::File`] and creates (or updates) the corresponding [`models::PhotoFile`].
+    ///
+    /// The file will unconditionally go through all the processes performed by PhotoDB application
+    /// and it will potentially be moved to a different location
+    fn process_stored_file(&self, _file: &models::File) -> Result<()> {
+        // Copy from storage to local folder
+        // Execute all the processing
+        // Upload to remote (compute new paths)
+        // TODO: Not implemented
+        Ok(())
+    }
+
     pub async fn add(&mut self, photo_filepath: Utf8PathBuf) -> Result<()> {
         debug!("Add photo at '{}'", photo_filepath);
         // FIXME: If it is a GIF or some other extension that will loose something (animation,
@@ -152,11 +164,10 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     pub async fn sync(&self) -> Result<()> {
         self.storage.initial_sync().await.map_err(|e| anyhow!(e))?;
 
-        // TODO: Iterate all the [`models::File`] that are not a [`models::PhotoFile`]
-        // TODO: and process the files to create the corresponding entries
         let non_identified = self.db.get_orphan_files()?;
+        debug!("Found {} files not processed", non_identified.len());
         for it in non_identified {
-            println!("UFO: {}", it.filename());
+            self.process_stored_file(&it)?;
         }
         Ok(())
     }
