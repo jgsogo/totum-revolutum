@@ -4,7 +4,7 @@ use async_std::fs::File as AsyncFile;
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
-use ignore::WalkBuilder;
+use ignore::{Match, WalkBuilder};
 use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
@@ -41,12 +41,41 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, _ignore_filter: IgnoreFilter) -> Result<()> {
-        // FIXME: Not sure if WalkBuilder can play together with IgnoreFilter.
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
+        let root = self.root.clone();
+
         let walker = WalkBuilder::new(&self.root)
             .threads(4) // TODO: How to configure this default? Builder patter that accepts this init value?
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
             // .add_custom_ignore_filename(custom_ignore_filename)
+            .filter_entry(move |entry| {
+                if let Some(file_type) = entry.file_type() {
+                    let relative_path = entry
+                        .path()
+                        .strip_prefix(&root)
+                        .expect("File not contained inside root!");
+
+                    if file_type.is_dir() {
+                        ignore_filter.check_dir(relative_path)
+                    } else {
+                        match ignore_filter.match_path(relative_path, false) {
+                            Match::None => true,
+                            Match::Ignore(glob) => {
+                                if glob.from().map_or(true, |f| relative_path.strip_prefix(f).is_ok()) {
+                                    // Positive match (fail)
+                                    false
+                                } else {
+                                    // Positive match, but not in scope (pass)
+                                    true
+                                }
+                            }
+                            Match::Whitelist(_) => true,
+                        }
+                    }
+                } else {
+                    false
+                }
+            })
             .build_parallel();
 
         info!("Start local visitor");
@@ -141,10 +170,23 @@ mod tests {
     use std::io;
     use std::str::FromStr;
 
-    use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
     use tempfile::tempdir;
 
+    use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
+
     use super::*;
+
+    async fn create_file(fs: &mut FilesystemLocal, path: &FilePath, content: &[u8]) -> Result<()> {
+        let rx = {
+            let (mut f, rx) = fs.create(&path).await?;
+            f.write_all(&content).await?;
+            rx
+        };
+        if let Some(rx) = rx {
+            rx.await.unwrap().unwrap();
+        }
+        Ok(())
+    }
 
     #[test]
     fn test_root_not_exists() {
@@ -215,6 +257,140 @@ mod tests {
         fs.create_dir_all(&dir).await?;
         let r = fs.create(&filepath).await;
         assert!(r.is_ok());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_walk_directory() -> Result<()> {
+        let tmp_dir = tempdir().unwrap();
+        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let mut fs = FilesystemLocal::new(utf8_path)?;
+
+        // TODO: Some kind of fixture that could be reused by "all" the tests would be great
+        fs.create_dir_all(&DirectoryPathBuf::from_str("a/path/to/some/folder")?)
+            .await?;
+        fs.create_dir_all(&DirectoryPathBuf::from_str("a/path/to/another/folder")?)
+            .await?;
+        fs.create_dir_all(&DirectoryPathBuf::from_str("another/path/to/some/folder")?)
+            .await?;
+
+        let f1 = FilenameBuf::from_str("file.txt")?;
+        let f2 = FilenameBuf::from_str("other.txt")?;
+        let f3 = FilenameBuf::from_str("file.rs")?;
+        let f4 = FilenameBuf::from_str("other.rs")?;
+        create_file(&mut fs, &FilePathBuf::new(DirectoryPathBuf::from_str("")?, &f1), b"").await?;
+        create_file(&mut fs, &FilePathBuf::new(DirectoryPathBuf::from_str("")?, &f2), b"").await?;
+        create_file(&mut fs, &FilePathBuf::new(DirectoryPathBuf::from_str("")?, &f3), b"").await?;
+        create_file(&mut fs, &FilePathBuf::new(DirectoryPathBuf::from_str("")?, &f4), b"").await?;
+        create_file(
+            &mut fs,
+            &FilePathBuf::new(DirectoryPathBuf::from_str("a/path/to/some/folder")?, &f1),
+            b"",
+        )
+        .await?;
+        create_file(
+            &mut fs,
+            &FilePathBuf::new(DirectoryPathBuf::from_str("a/path/to/some/folder")?, &f3),
+            b"",
+        )
+        .await?;
+        create_file(
+            &mut fs,
+            &FilePathBuf::new(DirectoryPathBuf::from_str("a/path/to/another/folder")?, &f2),
+            b"",
+        )
+        .await?;
+        create_file(
+            &mut fs,
+            &FilePathBuf::new(DirectoryPathBuf::from_str("a/path/to/another/folder")?, &f4),
+            b"",
+        )
+        .await?;
+        create_file(
+            &mut fs,
+            &FilePathBuf::new(DirectoryPathBuf::from_str("another/path/to")?, &f1),
+            b"",
+        )
+        .await?;
+        create_file(
+            &mut fs,
+            &FilePathBuf::new(DirectoryPathBuf::from_str("another/path/to")?, &f3),
+            b"",
+        )
+        .await?;
+
+        // Ignore all "*.rs" files
+        {
+            let mut ignore_filter = IgnoreFilter::empty("");
+            ignore_filter.add_globs(&["*.rs"], None).unwrap();
+
+            let (tx, rx) = flume::bounded(100);
+            fs.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "a/path/to/another/folder/other.txt",
+                    "a/path/to/some/folder/file.txt",
+                    "another/path/to/file.txt",
+                    "file.txt",
+                    "other.txt"
+                ]
+            );
+        }
+
+        // Ignore everything inside "another/" directory (also if nested)
+        {
+            let mut ignore_filter = IgnoreFilter::empty("");
+            ignore_filter.add_globs(&["another/"], None).unwrap();
+
+            let (tx, rx) = flume::bounded(100);
+            fs.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "a/path/to/some/folder/file.rs",
+                    "a/path/to/some/folder/file.txt",
+                    "file.rs",
+                    "file.txt",
+                    "other.rs",
+                    "other.txt"
+                ]
+            );
+        }
+
+        // Ignore everything inside "another/" directory (only if root), and ignore all `.rs` files
+        // inside a/path
+        {
+            let mut ignore_filter = IgnoreFilter::empty("");
+            ignore_filter.add_globs(&["/another/", "a/path/**/*.rs"], None).unwrap();
+
+            let (tx, rx) = flume::bounded(100);
+            fs.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "a/path/to/another/folder/other.txt",
+                    "a/path/to/some/folder/file.txt",
+                    "file.rs",
+                    "file.txt",
+                    "other.rs",
+                    "other.txt"
+                ]
+            );
+        }
+
         Ok(())
     }
 }
