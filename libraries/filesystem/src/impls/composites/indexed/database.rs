@@ -99,7 +99,6 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> Filesystem for T {
     async fn walk_directory(
         &self,
         tx: Sender<Box<dyn FileMetadata>>,
-        _threads: usize,
         _custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
         for dir in self.all_directories()? {

@@ -40,14 +40,9 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn walk_directory(
-        &self,
-        tx: Sender<Box<dyn FileMetadata>>,
-        threads: usize,
-        custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, custom_ignore_filename: &Utf8Path) -> Result<()> {
         let walker = WalkBuilder::new(&self.root)
-            .threads(threads)
+            .threads(4) // TODO: How to configure this default? Builder patter that accepts this init value?
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
             .add_custom_ignore_filename(custom_ignore_filename)
             .build_parallel();

@@ -47,13 +47,8 @@ impl Filesystem for FilesystemLocalTemp {
         self.local.sync_all().await
     }
 
-    async fn walk_directory(
-        &self,
-        tx: Sender<Box<dyn FileMetadata>>,
-        threads: usize,
-        custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
-        self.local.walk_directory(tx, threads, custom_ignore_filename).await
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, custom_ignore_filename: &Utf8Path) -> Result<()> {
+        self.local.walk_directory(tx, custom_ignore_filename).await
     }
 
     async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {

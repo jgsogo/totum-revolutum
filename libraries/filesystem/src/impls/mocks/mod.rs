@@ -48,7 +48,6 @@ impl Filesystem for FilesystemMock {
     async fn walk_directory(
         &self,
         _tx: Sender<Box<dyn FileMetadata>>,
-        _threads: usize,
         _custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
         self.called

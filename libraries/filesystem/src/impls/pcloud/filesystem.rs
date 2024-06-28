@@ -92,7 +92,6 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
     async fn walk_directory(
         &self,
         tx: Sender<Box<dyn FileMetadata>>,
-        _threads: usize,
         _custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
         // TODO: Implement _custom_ignore_filename logic

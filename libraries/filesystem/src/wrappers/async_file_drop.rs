@@ -131,7 +131,6 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
     async fn walk_directory(
         &self,
         tx: flume::Sender<Box<dyn FileMetadata>>,
-        threads: usize,
         custom_ignore_filename: &Utf8Path,
     ) -> Result<()> {
         self.filesystem
@@ -139,7 +138,7 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
             .await
             .as_ref()
             .unwrap()
-            .walk_directory(tx, threads, custom_ignore_filename)
+            .walk_directory(tx, custom_ignore_filename)
             .await
     }
 

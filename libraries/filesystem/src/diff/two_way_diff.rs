@@ -87,8 +87,8 @@ pub async fn full_run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TRec
     });
 
     let _ = tokio::try_join!(
-        lhs_filesystem.walk_directory(lhs_tx, 6, Utf8Path::new("/")),
-        rhs_filesystem.walk_directory(rhs_tx, 6, Utf8Path::new("/")),
+        lhs_filesystem.walk_directory(lhs_tx, Utf8Path::new("/")),
+        rhs_filesystem.walk_directory(rhs_tx, Utf8Path::new("/")),
         work_on_results(report_rx, receiver),
     )?;
 

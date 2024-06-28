@@ -75,7 +75,7 @@ mod tests {
 
         // The filesystem tell us about the files available
         let (tx, rx) = flume::bounded(10);
-        fs.walk_directory(tx, 10, Utf8Path::new("")).await?;
+        fs.walk_directory(tx, Utf8Path::new("")).await?;
         let all_files = rx.try_iter().collect::<Vec<_>>();
         assert_eq!(all_files.len(), 2);
 
