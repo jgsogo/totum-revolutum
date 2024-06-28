@@ -1,7 +1,9 @@
 use anyhow::{anyhow, Result};
-use camino::Utf8PathBuf;
+use camino::{Utf8Path, Utf8PathBuf};
 use filesystem::{impls::FilesystemLocalTemp, FilePathBuf};
 use std::fmt::{Display, Formatter};
+
+const PCLOUD_TOKEN_FILENAME: &str = ".pcloud";
 
 /// Manage all the directories related to a [`super::PhotoDB`] application
 pub struct AppDirs {
@@ -20,6 +22,16 @@ impl AppDirs {
         };
         r.create_all_dirs()?;
         Ok(r)
+    }
+
+    /// Returns the path to the root folder of the application directory.
+    pub fn root(&self) -> &Utf8Path {
+        &self.app_dir
+    }
+
+    /// Returns the path to the token file
+    pub fn pcloud_token(&self) -> Utf8PathBuf {
+        self.app_dir.join(Utf8Path::new(PCLOUD_TOKEN_FILENAME))
     }
 
     /// Execute [`std::fs::create_dir_all`] for all the directories related to the application.
