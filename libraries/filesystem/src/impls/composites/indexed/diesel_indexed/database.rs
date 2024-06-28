@@ -308,7 +308,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 mod tests {
     use std::str::FromStr;
 
-    use camino::Utf8Path;
+    use ignore_files::IgnoreFilter;
     use tempfile::NamedTempFile;
 
     use crate::impls::FilesystemLocalTemp;
@@ -364,7 +364,7 @@ mod tests {
         populate_db(&mut db).await;
 
         let (tx, rx) = flume::bounded(100);
-        db.walk_directory(tx, Utf8Path::new("")).await.unwrap();
+        db.walk_directory(tx, IgnoreFilter::empty("")).await.unwrap();
 
         let all_files = rx.try_iter().collect::<Vec<_>>();
         assert_eq!(all_files.len(), 7);

@@ -2,8 +2,9 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8PathBuf;
 use flume::Sender;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{info, trace};
@@ -89,12 +90,8 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
-    async fn walk_directory(
-        &self,
-        tx: Sender<Box<dyn FileMetadata>>,
-        _custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
-        // TODO: Implement _custom_ignore_filename logic
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, _ignore_filter: IgnoreFilter) -> Result<()> {
+        // TODO: Implement _ignore_filter logic
 
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
@@ -282,7 +279,6 @@ mod tests {
 
     use headers::HeaderMap;
 
-    use crate::FilePathBuf;
     use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::file::deletefile;
     use pcloud_sdk::methods::file::deletefile::DeleteFile;
@@ -301,6 +297,7 @@ mod tests {
 
     use crate::impls::pcloud::file::CHUNK_SIZE;
     use crate::wrappers::AsyncFileDropImpl;
+    use crate::FilePathBuf;
 
     use super::*;
 

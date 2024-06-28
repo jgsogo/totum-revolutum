@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use ignore::WalkBuilder;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::info;
@@ -40,11 +41,12 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, custom_ignore_filename: &Utf8Path) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, _ignore_filter: IgnoreFilter) -> Result<()> {
+        // FIXME: Not sure if WalkBuilder can play together with IgnoreFilter.
         let walker = WalkBuilder::new(&self.root)
             .threads(4) // TODO: How to configure this default? Builder patter that accepts this init value?
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
-            .add_custom_ignore_filename(custom_ignore_filename)
+            // .add_custom_ignore_filename(custom_ignore_filename)
             .build_parallel();
 
         info!("Start local visitor");

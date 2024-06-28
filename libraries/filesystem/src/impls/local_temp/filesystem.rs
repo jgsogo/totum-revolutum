@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use camino::Utf8Path;
 use flume::Sender;
+use ignore_files::IgnoreFilter;
 use std::str::FromStr;
 use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
@@ -47,8 +48,8 @@ impl Filesystem for FilesystemLocalTemp {
         self.local.sync_all().await
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, custom_ignore_filename: &Utf8Path) -> Result<()> {
-        self.local.walk_directory(tx, custom_ignore_filename).await
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
+        self.local.walk_directory(tx, ignore_filter).await
     }
 
     async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {

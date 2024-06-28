@@ -1,6 +1,7 @@
 use async_trait::async_trait;
-use camino::{Utf8Component, Utf8Path};
+use camino::Utf8Component;
 use flume::Sender;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 
 use crate::{DirectoryPath, DirectoryPathBuf, Error, FilePath, FilePathBuf, Filename, FilesystemOps, Result};
@@ -96,11 +97,7 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> Filesystem for T {
         Ok(())
     }
 
-    async fn walk_directory(
-        &self,
-        tx: Sender<Box<dyn FileMetadata>>,
-        _custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, _ignore_filter: IgnoreFilter) -> Result<()> {
         for dir in self.all_directories()? {
             for file in self.get_files_in_directory(&dir)? {
                 let file_wrapper = FileWrapper::from(&dir, &file);

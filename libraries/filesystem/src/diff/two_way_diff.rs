@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use camino::Utf8Path;
+use ignore_files::IgnoreFilter;
 use tracing::{debug, error, info, trace};
 
 use crate::diff::receiver::{FileMetadataPair, Receiver};
@@ -87,8 +87,8 @@ pub async fn full_run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TRec
     });
 
     let _ = tokio::try_join!(
-        lhs_filesystem.walk_directory(lhs_tx, Utf8Path::new("/")),
-        rhs_filesystem.walk_directory(rhs_tx, Utf8Path::new("/")),
+        lhs_filesystem.walk_directory(lhs_tx, IgnoreFilter::empty("")),
+        rhs_filesystem.walk_directory(rhs_tx, IgnoreFilter::empty("")),
         work_on_results(report_rx, receiver),
     )?;
 

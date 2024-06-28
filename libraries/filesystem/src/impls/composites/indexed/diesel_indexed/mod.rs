@@ -28,7 +28,7 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
 mod tests {
     use std::str::FromStr;
 
-    use camino::Utf8Path;
+    use ignore_files::IgnoreFilter;
 
     use crate::impls::composites::indexed::diesel_indexed::database::DatabaseImpl;
     use crate::impls::composites::{new_filesystem_indexed_with_db, FilesystemIndexedDatabase};
@@ -75,7 +75,7 @@ mod tests {
 
         // The filesystem tell us about the files available
         let (tx, rx) = flume::bounded(10);
-        fs.walk_directory(tx, Utf8Path::new("")).await?;
+        fs.walk_directory(tx, IgnoreFilter::empty("")).await?;
         let all_files = rx.try_iter().collect::<Vec<_>>();
         assert_eq!(all_files.len(), 2);
 

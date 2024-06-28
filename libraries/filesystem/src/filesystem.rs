@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use camino::Utf8Path;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 
 use crate::actions::copy;
@@ -16,14 +16,9 @@ pub trait Filesystem: Send + Sync {
     /// Walk files in the filesystem, for each file found it will send it via `tx`. This belongs
     /// to the [`Filesystem`] because it **reads** the contents of the directories.
     ///
-    /// TODO: Probably we need the possibility
-    /// TODO: to choose the starting path and, also, we need to abstract the `custom_ignore_filename`
-    /// TODO: behind something that all the [`Filesystem`] implementations can reuse.
-    async fn walk_directory(
-        &self,
-        tx: flume::Sender<Box<dyn FileMetadata>>,
-        custom_ignore_filename: &Utf8Path,
-    ) -> Result<()>;
+    /// TODO: Probably we need the possibility to choose the starting path
+    async fn walk_directory(&self, tx: flume::Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter)
+        -> Result<()>;
 
     /// Returns the [`FileMetadata`] for the given `path`
     async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>>;
