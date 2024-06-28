@@ -22,6 +22,7 @@ diesel_migrations = { workspace = true, features = ["sqlite"] }
 dirs = { workspace = true }
 dotenvy = { workspace = true }
 home = { workspace = true }
+ignore-files = { workspace = true }
 image = { workspace = true }
 log = { workspace = true }
 oxipng = { workspace = true }

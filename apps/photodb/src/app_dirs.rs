@@ -1,9 +1,13 @@
-use anyhow::{anyhow, Result};
-use camino::{Utf8Path, Utf8PathBuf};
-use filesystem::{impls::FilesystemLocalTemp, FilePathBuf};
 use std::fmt::{Display, Formatter};
 
+use anyhow::{anyhow, Result};
+use camino::{Utf8Path, Utf8PathBuf};
+use ignore_files::{IgnoreFile, IgnoreFilter};
+
+use filesystem::{impls::FilesystemLocalTemp, FilePathBuf};
+
 const PCLOUD_TOKEN_FILENAME: &str = ".pcloud";
+const IGNORE_FILE: &str = ".ignore_file";
 
 /// Manage all the directories related to a [`super::PhotoDB`] application
 pub struct AppDirs {
@@ -32,6 +36,20 @@ impl AppDirs {
     /// Returns the path to the token file
     pub fn pcloud_token(&self) -> Utf8PathBuf {
         self.app_dir.join(Utf8Path::new(PCLOUD_TOKEN_FILENAME))
+    }
+
+    pub async fn ignore_filters(&self) -> Result<IgnoreFilter> {
+        let ignore_file = self.root().join(Utf8Path::new(IGNORE_FILE));
+        if ignore_file.exists() {
+            let ignore_file = IgnoreFile {
+                path: ignore_file.into_std_path_buf(),
+                applies_in: None,
+                applies_to: None,
+            };
+            Ok(IgnoreFilter::new("", &[ignore_file]).await?)
+        } else {
+            Ok(IgnoreFilter::empty(""))
+        }
     }
 
     /// Execute [`std::fs::create_dir_all`] for all the directories related to the application.

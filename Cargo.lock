@@ -2989,6 +2989,7 @@ dependencies = [
  "dotenvy",
  "filesystem",
  "home",
+ "ignore-files",
  "image",
  "log",
  "oxipng",
