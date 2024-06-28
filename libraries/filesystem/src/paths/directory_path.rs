@@ -232,7 +232,7 @@ impl DirectoryPath {
     /// assert_eq!(child.unwrap().as_str(), "path");
     ///
     /// let path_without_child = DirectoryPathBuf::from_str("some").unwrap();
-    /// let (parent, child) = path_with_child.split_parent();
+    /// let (parent, child) = path_without_child.split_parent();
     /// assert_eq!(parent, None);
     /// assert_eq!(child.unwrap().as_str(), "some");
     /// ```
