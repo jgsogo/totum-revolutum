@@ -94,8 +94,14 @@ impl<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static> FilesystemBackup<L
     ///
     /// Use the `on_conflict` argument to decide how the conflicts **during this first synchronization**
     /// should be resolved.
-    pub async fn initial_sync(&self, on_conflict: BackupConflict) -> Result<()> {
-        backup(&self.lhs, self.rhs.lock().await.as_mut().unwrap(), on_conflict).await
+    pub async fn initial_sync(&self, on_conflict: BackupConflict, ignore_file: IgnoreFilter) -> Result<()> {
+        backup(
+            &self.lhs,
+            self.rhs.lock().await.as_mut().unwrap(),
+            on_conflict,
+            ignore_file,
+        )
+        .await
     }
 }
 
@@ -186,9 +192,9 @@ impl<LHS: Filesystem, RHS: Filesystem> FilesystemOps for FilesystemBackup<LHS, R
 
 #[cfg(test)]
 mod tests {
-    use camino::Utf8Path;
     use std::str::FromStr;
 
+    use camino::Utf8Path;
     use tempfile::tempdir;
 
     use crate::impls::FilesystemLocal;

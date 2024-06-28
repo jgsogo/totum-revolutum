@@ -86,8 +86,8 @@ impl<TIndex: Filesystem + FilesystemOps + 'static, TStorage: Filesystem + 'stati
     /// Syncs the contents of both filesystems. In this [`FilesystemIndexed`] it means that all the
     /// files from storage in filesystem2 will be indexed into the filesystem1. Missing files will
     /// be removed from the index.
-    pub async fn initial_sync(&self) -> Result<()> {
-        mirror(&self.storage, self.index.lock().await.as_mut().unwrap()).await
+    pub async fn initial_sync(&self, ignore_filter: IgnoreFilter) -> Result<()> {
+        mirror(&self.storage, self.index.lock().await.as_mut().unwrap(), ignore_filter).await
     }
 }
 
