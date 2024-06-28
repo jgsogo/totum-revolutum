@@ -8,7 +8,7 @@ use diesel_utils::managers::AllManager;
 
 use crate::impls::composites::indexed::diesel_indexed::models;
 use crate::impls::composites::{FilesystemIndexedDatabase, FilesystemIndexedDbDirectory, FilesystemIndexedDbFile};
-use crate::{DirectoryPath, Error, Filename, Result};
+use crate::{DirectoryPath, DirectoryPathBuf, Error, Filename, Result};
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/indexed/diesel_indexed/migrations");
 
@@ -173,6 +173,49 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
         // Not found, we need to create it
         let r = self.create_directory(path, parent_dir)?;
         Ok((r, true))
+    }
+
+    fn get_or_create_directory_all(&self, path: &DirectoryPath) -> Result<(Self::Directory, bool)> {
+        // Get the closest parent that exists
+        let mut current_lookup = path;
+        let mut children = Vec::new();
+        let mut parent_found: Option<Self::Directory>;
+        loop {
+            match self.get_directory(current_lookup) {
+                Ok(found) => {
+                    parent_found = Some(found);
+                    break;
+                }
+                Err(e) => match e {
+                    Error::PathDoesNotExist => {
+                        let (parent, child) = current_lookup.split_parent();
+                        let parent = parent.unwrap_or_else(|| DirectoryPath::root());
+                        children.push(child.unwrap());
+
+                        // Try with parent
+                        current_lookup = parent;
+                    }
+                    _ => {
+                        return Err(Error::Other(e.to_string()));
+                    }
+                },
+            }
+        }
+
+        // It was already created
+        if current_lookup == path {
+            return Ok((parent_found.unwrap(), false));
+        }
+
+        // We have the closest parent that exists (`current_lookup`), now we need to create all the
+        // directories up to the final path
+        let mut path: DirectoryPathBuf = current_lookup.into();
+        while let Some(child) = children.pop() {
+            path = path.join(child);
+            parent_found = Some(self.create_directory(&path, parent_found.as_ref())?);
+        }
+
+        Ok((parent_found.unwrap(), true))
     }
 
     fn delete_file(&self, file: Self::File) -> Result<()> {
@@ -718,5 +761,42 @@ mod tests {
         assert!(!db.exists(&copy_txt).await?);
         assert!(temp_fs.exists(&file_txt).await?);
         Ok(())
+    }
+
+    #[test]
+    fn test_get_or_create_directory_all() {
+        let db_file = NamedTempFile::new().unwrap();
+        let db = DatabaseImpl::new(db_file.path().to_str().unwrap()).unwrap();
+
+        {
+            let path = DirectoryPathBuf::from_str("a/path/to/something").unwrap();
+            let (dir, created) = db.get_or_create_directory_all(&path).unwrap();
+            assert!(created);
+            assert_eq!(dir.full_path().as_str(), "a/path/to/something");
+
+            // all the parents have been created
+            let parent_dir = db.get_directory(path.parent().unwrap()).unwrap();
+            assert_eq!(parent_dir.full_path().as_str(), "a/path/to");
+
+            let parent_dir = db.get_directory(parent_dir.full_path().parent().unwrap()).unwrap();
+            assert_eq!(parent_dir.full_path().as_str(), "a/path");
+
+            let parent_dir = db.get_directory(parent_dir.full_path().parent().unwrap()).unwrap();
+            assert_eq!(parent_dir.full_path().as_str(), "a");
+        }
+
+        {
+            let path = DirectoryPathBuf::from_str("a/path/to").unwrap();
+            let (dir, created) = db.get_or_create_directory_all(&path).unwrap();
+            assert!(!created);
+            assert_eq!(dir.full_path().as_str(), "a/path/to");
+        }
+
+        {
+            let path = DirectoryPathBuf::from_str("a/path/to/something_else").unwrap();
+            let (dir, created) = db.get_or_create_directory_all(&path).unwrap();
+            assert!(created);
+            assert_eq!(dir.full_path().as_str(), "a/path/to/something_else");
+        }
     }
 }

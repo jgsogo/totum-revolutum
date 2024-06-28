@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use camino::Utf8Path;
 use tokio::sync::oneshot::Receiver;
+use tracing::trace;
 
 use crate::actions::copy;
 
@@ -117,10 +118,13 @@ pub trait FilesystemOps: Filesystem + Sized {
         origin_path: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
+        trace!("Copy from {} to {}", origin_path, target);
         if self.is_same(origin) {
+            trace!("Origin and target filesystems are the same");
             self.internal_copy(target, origin_path, force).await
         } else {
             if !force && self.exists(target).await? {
+                trace!("Target already exists. Skip operation");
                 return Err(Error::TargetFileExists);
             }
 

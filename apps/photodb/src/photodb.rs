@@ -161,17 +161,9 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
 
         tokio::spawn(async move {
             let mut count_files = 0;
-            loop {
-                match rx.recv() {
-                    Ok(r) => {
-                        println!("{}", r.path());
-                        count_files += 1;
-                    }
-                    Err(e) => {
-                        error!("Error receiving files: {e}");
-                        break;
-                    }
-                };
+            while let Ok(r) = rx.recv() {
+                println!("{}", r.path());
+                count_files += 1;
             }
             println!("{} files total", count_files)
         });
