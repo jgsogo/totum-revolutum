@@ -62,10 +62,9 @@ impl Filesystem for FilesystemLocal {
                         ignore_filter.visit_directory(directory_path)
                     } else {
                         let (parent_dir, last_cmp) = directory_path.split_parent();
-                        let filepath = FilePathBuf::new(
-                            parent_dir.unwrap(),
-                            FilenameBuf::from_str(last_cmp.unwrap().as_str()).unwrap(),
-                        );
+                        let parent_dir = parent_dir.unwrap_or(DirectoryPath::root());
+                        let filepath =
+                            FilePathBuf::new(parent_dir, FilenameBuf::from_str(last_cmp.unwrap().as_str()).unwrap());
                         ignore_filter.visit_file(&filepath)
                     }
                 } else {
