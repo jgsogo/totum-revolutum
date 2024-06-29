@@ -43,6 +43,7 @@ impl AppDirs {
     pub async fn ignore_filters(&self) -> Result<IgnoreFilter> {
         let ignore_file = self.root().join(Utf8Path::new(IGNORE_FILE));
         if ignore_file.exists() {
+            // TODO: We need to test these filters
             debug!("Use ignore file from {}", ignore_file);
             let origin = PathBuf::from("");
             let ignore_file = IgnoreFile {

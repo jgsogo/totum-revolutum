@@ -5,7 +5,7 @@ use crate::{Error, File, FilePath, Filesystem, Result};
 
 /// Copies the contents of the `lhs_file` [`File`] into the `rhs_file` [`File`]
 pub async fn copy<'copy>(lhs_file: &'copy mut Box<dyn File>, rhs_file: &'copy mut Box<dyn File>) -> Result<()> {
-    let mut buf: [u8; 100] = [0; 100]; // TODO: Configure buffer size. Maybe make it adaptative: https://stackoverflow.com/questions/304249/is-there-an-optimal-byte-size-for-sending-data-over-a-network
+    let mut buf = [0u8; 16 * 1024]; // TODO: Configure buffer size. Maybe make it adaptative: https://stackoverflow.com/questions/304249/is-there-an-optimal-byte-size-for-sending-data-over-a-network
     loop {
         match lhs_file.read(&mut buf).await {
             Ok(0) => {
