@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use camino::Utf8Path;
+use ignore_files::IgnoreFilter;
 use tracing::{debug, error, info, trace};
 
 use crate::diff::receiver::{FileMetadataPair, Receiver};
@@ -23,6 +23,8 @@ pub async fn full_run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TRec
     lhs_filesystem: &LHSFilesystem,
     rhs_filesystem: &RHSFilesystem,
     receiver: &mut TReceiver,
+    lhs_ignore_filter: IgnoreFilter,
+    rhs_ignore_filter: IgnoreFilter,
 ) -> Result<()> {
     let (lhs_tx, lhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
     let (rhs_tx, rhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
@@ -87,8 +89,8 @@ pub async fn full_run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TRec
     });
 
     let _ = tokio::try_join!(
-        lhs_filesystem.walk_directory(lhs_tx, 6, Utf8Path::new("/")),
-        rhs_filesystem.walk_directory(rhs_tx, 6, Utf8Path::new("/")),
+        lhs_filesystem.walk_directory(lhs_tx, lhs_ignore_filter),
+        rhs_filesystem.walk_directory(rhs_tx, rhs_ignore_filter),
         work_on_results(report_rx, receiver),
     )?;
 
@@ -161,7 +163,14 @@ mod tests {
         let diff_mocks = DiffMocks::new().await?;
 
         let mut receiver = ReceiverMock::default();
-        full_run(&diff_mocks.fs_lhs, &diff_mocks.fs_rhs, &mut receiver).await?;
+        full_run(
+            &diff_mocks.fs_lhs,
+            &diff_mocks.fs_rhs,
+            &mut receiver,
+            IgnoreFilter::empty(""),
+            IgnoreFilter::empty(""),
+        )
+        .await?;
 
         assert_eq!(receiver.only_lhs.len(), 1);
         assert_eq!(receiver.only_lhs.get(0).unwrap(), diff_mocks.lhs_only.as_str());

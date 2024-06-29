@@ -2,6 +2,12 @@ load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
+filegroup(
+    name = "test_data",
+    srcs = glob(["resources/**/*.*"]),
+    visibility = ["//libraries:__subpackages__"],
+)
+
 rust_library_tests_and_docs(
     name = "pcloud_sdk",
     srcs = glob(["src/**/*.rs"]),
@@ -22,7 +28,7 @@ rust_library_tests_and_docs(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    test_data = glob(["resources/**/*.*"]),
+    test_data = [":test_data"],
     deps = all_crate_deps(
         normal = True,
     ) + [

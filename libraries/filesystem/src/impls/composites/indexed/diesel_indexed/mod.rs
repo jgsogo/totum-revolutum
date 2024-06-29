@@ -1,6 +1,8 @@
 //! Default implementation for [`super::FilesystemIndexedDatabase`] using a database implemented
 //! with the `diesel` crate.
 
+use ignore_files::IgnoreFilter;
+
 pub use database::DatabaseImpl;
 
 use crate::impls::composites::FilesystemIndexed;
@@ -15,11 +17,12 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
     database_url: &str,
     storage: TStorage,
     do_initial_indexing: bool,
+    ignore_filter: IgnoreFilter,
 ) -> Result<FilesystemIndexed<DatabaseImpl, TStorage>> {
     let database = DatabaseImpl::new(database_url)?;
     let fs_indexed = FilesystemIndexed::new(database, storage);
     if do_initial_indexing {
-        fs_indexed.initial_sync().await?;
+        fs_indexed.initial_sync(ignore_filter).await?;
     }
     Ok(fs_indexed)
 }
@@ -28,7 +31,7 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
 mod tests {
     use std::str::FromStr;
 
-    use camino::Utf8Path;
+    use ignore_files::IgnoreFilter;
 
     use crate::impls::composites::indexed::diesel_indexed::database::DatabaseImpl;
     use crate::impls::composites::{new_filesystem_indexed_with_db, FilesystemIndexedDatabase};
@@ -40,7 +43,13 @@ mod tests {
         let database_file = tempfile::NamedTempFile::new()?;
         let mut fs = {
             let fs = FilesystemLocalTemp::default();
-            new_filesystem_indexed_with_db(database_file.path().to_str().unwrap(), fs, true).await?
+            new_filesystem_indexed_with_db(
+                database_file.path().to_str().unwrap(),
+                fs,
+                true,
+                IgnoreFilter::empty(""),
+            )
+            .await?
         };
 
         // Populate the filesystem with some files and directories
@@ -75,7 +84,7 @@ mod tests {
 
         // The filesystem tell us about the files available
         let (tx, rx) = flume::bounded(10);
-        fs.walk_directory(tx, 10, Utf8Path::new("")).await?;
+        fs.walk_directory(tx, IgnoreFilter::empty("")).await?;
         let all_files = rx.try_iter().collect::<Vec<_>>();
         assert_eq!(all_files.len(), 2);
 

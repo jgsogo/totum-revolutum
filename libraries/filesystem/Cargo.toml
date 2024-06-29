@@ -16,6 +16,7 @@ utils = { path = "../utils", features = ["filesystem"] }
 async-trait = { workspace = true }
 camino = { workspace = true }
 flume = { workspace = true }
+ignore-files = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }

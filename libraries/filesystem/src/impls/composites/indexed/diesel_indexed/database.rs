@@ -308,7 +308,7 @@ impl FilesystemIndexedDatabase for DatabaseImpl {
 mod tests {
     use std::str::FromStr;
 
-    use camino::Utf8Path;
+    use ignore_files::IgnoreFilter;
     use tempfile::NamedTempFile;
 
     use crate::impls::FilesystemLocalTemp;
@@ -363,11 +363,65 @@ mod tests {
         let mut db = DatabaseImpl::new(db_file.path().to_str().unwrap())?;
         populate_db(&mut db).await;
 
-        let (tx, rx) = flume::bounded(100);
-        db.walk_directory(tx, 0, Utf8Path::new("")).await.unwrap();
+        // No filters
+        {
+            let (tx, rx) = flume::bounded(100);
+            db.walk_directory(tx, IgnoreFilter::empty("")).await.unwrap();
 
-        let all_files = rx.try_iter().collect::<Vec<_>>();
-        assert_eq!(all_files.len(), 7);
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "dir1/subdir1/file1.txt",
+                    "dir1/subdir1/subsubdir1/file1.txt",
+                    "dir1/subdir1/subsubdir1/file2.txt",
+                    "dir1/subdir1/subsubdir2/file1.txt",
+                    "dir1/subdir1/subsubdir2/file2.txt",
+                    "dir1/subdir2/file1.txt",
+                    "dir1/subdir2/file2.txt"
+                ]
+            );
+        }
+
+        // Filter all txt files
+        {
+            let mut ignore_filter = IgnoreFilter::empty("");
+            ignore_filter.add_globs(&["*.txt"], None).unwrap();
+
+            let (tx, rx) = flume::bounded(100);
+            db.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+            assert!(all_files_str.is_empty());
+        }
+
+        // Filter '*subdir2/' folders
+        {
+            let mut ignore_filter = IgnoreFilter::empty("");
+            ignore_filter.add_globs(&["*subdir2/"], None).unwrap();
+
+            let (tx, rx) = flume::bounded(100);
+            db.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "dir1/subdir1/file1.txt",
+                    "dir1/subdir1/subsubdir1/file1.txt",
+                    "dir1/subdir1/subsubdir1/file2.txt"
+                ]
+            );
+        }
+
         Ok(())
     }
 

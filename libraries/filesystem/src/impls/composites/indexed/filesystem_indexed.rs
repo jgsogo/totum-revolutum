@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::Utf8Path;
 use flume::Sender;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
@@ -86,8 +86,8 @@ impl<TIndex: Filesystem + FilesystemOps + 'static, TStorage: Filesystem + 'stati
     /// Syncs the contents of both filesystems. In this [`FilesystemIndexed`] it means that all the
     /// files from storage in filesystem2 will be indexed into the filesystem1. Missing files will
     /// be removed from the index.
-    pub async fn initial_sync(&self) -> Result<()> {
-        mirror(&self.storage, self.index.lock().await.as_mut().unwrap()).await
+    pub async fn initial_sync(&self, ignore_filter: IgnoreFilter) -> Result<()> {
+        mirror(&self.storage, self.index.lock().await.as_mut().unwrap(), ignore_filter).await
     }
 }
 
@@ -98,18 +98,13 @@ impl<TIndex: Filesystem, TStorage: Filesystem> Filesystem for FilesystemIndexed<
         self.index.lock().await.take().unwrap().sync_all().await
     }
 
-    async fn walk_directory(
-        &self,
-        tx: Sender<Box<dyn FileMetadata>>,
-        threads: usize,
-        custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
         self.index
             .lock()
             .await
             .as_ref()
             .unwrap()
-            .walk_directory(tx, threads, custom_ignore_filename)
+            .walk_directory(tx, ignore_filter)
             .await
     }
 
@@ -161,7 +156,7 @@ mod tests {
     use std::str::FromStr;
     use std::sync::{Arc, RwLock};
 
-    use camino::Utf8Path;
+    use ignore_files::IgnoreFilter;
 
     use crate::impls::composites::FilesystemIndexed;
     use crate::impls::mocks::{FilesystemMock, SUCCESS};
@@ -187,7 +182,7 @@ mod tests {
         // walk_directory
         {
             let (tx, _) = flume::bounded::<Box<dyn FileMetadata>>(0);
-            let r = indexed_filesystem.walk_directory(tx, 10, Utf8Path::new("path")).await;
+            let r = indexed_filesystem.walk_directory(tx, IgnoreFilter::empty("")).await;
             assert!(r.is_err());
             // index was called
             assert_eq!(
