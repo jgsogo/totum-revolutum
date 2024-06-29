@@ -1,8 +1,10 @@
 use std::fmt::{Display, Formatter};
+use std::path::PathBuf;
 
 use anyhow::{anyhow, Result};
 use camino::{Utf8Path, Utf8PathBuf};
 use ignore_files::{IgnoreFile, IgnoreFilter};
+use tracing::debug;
 
 use filesystem::{impls::FilesystemLocalTemp, FilePathBuf};
 
@@ -41,12 +43,14 @@ impl AppDirs {
     pub async fn ignore_filters(&self) -> Result<IgnoreFilter> {
         let ignore_file = self.root().join(Utf8Path::new(IGNORE_FILE));
         if ignore_file.exists() {
+            debug!("Use ignore file from {}", ignore_file);
+            let origin = PathBuf::from("");
             let ignore_file = IgnoreFile {
                 path: ignore_file.into_std_path_buf(),
-                applies_in: None,
+                applies_in: Some(origin.clone()),
                 applies_to: None,
             };
-            Ok(IgnoreFilter::new("", &[ignore_file]).await?)
+            Ok(IgnoreFilter::new(".", &[ignore_file]).await?)
         } else {
             Ok(IgnoreFilter::empty(""))
         }

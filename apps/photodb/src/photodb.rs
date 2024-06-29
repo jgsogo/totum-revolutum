@@ -5,7 +5,7 @@ use camino::{Utf8Path, Utf8PathBuf};
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
 use log::error;
 use oxipng::{optimize, Options};
-use tracing::{debug, info};
+use tracing::{debug, info, trace};
 
 use filesystem::impls::composites::indexed::diesel_indexed::DatabaseImpl;
 use filesystem::impls::composites::FilesystemIndexed;
@@ -168,6 +168,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         let non_identified = self.db.get_orphan_files()?;
         debug!("Found {} files not processed", non_identified.len());
         for it in non_identified {
+            trace!(" - {}", it.filename());
             self.process_stored_file(&it)?;
         }
         Ok(())
