@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use camino::Utf8Component;
 use flume::Sender;
+use ignore::Match;
 use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 
@@ -97,12 +98,34 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> Filesystem for T {
         Ok(())
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, _ignore_filter: IgnoreFilter) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
         for dir in self.all_directories()? {
-            for file in self.get_files_in_directory(&dir)? {
-                let file_wrapper = FileWrapper::from(&dir, &file);
-                tx.send(Box::new(file_wrapper))
-                    .map_err(|e| Error::Other(e.to_string()))?;
+            if ignore_filter.check_dir(dir.full_path().as_std_path()) {
+                for file in self.get_files_in_directory(&dir)? {
+                    let filepath = FilePathBuf::new(dir.full_path(), file.filename());
+                    let visit = match ignore_filter.match_path(filepath.as_std_path(), false) {
+                        Match::None => true,
+                        Match::Ignore(glob) => {
+                            if glob
+                                .from()
+                                .map_or(true, |f| filepath.as_std_path().strip_prefix(f).is_ok())
+                            {
+                                // Positive match (fail)
+                                false
+                            } else {
+                                // Positive match, but not in scope (pass)
+                                true
+                            }
+                        }
+                        Match::Whitelist(_) => true,
+                    };
+
+                    if visit {
+                        let file_wrapper = FileWrapper::from(&dir, &file);
+                        tx.send(Box::new(file_wrapper))
+                            .map_err(|e| Error::Other(e.to_string()))?;
+                    }
+                }
             }
         }
         Ok(())
