@@ -173,12 +173,33 @@ impl DirectoryPath {
         self.0.components()
     }
 
+    /// Returns the [`DirectoryPath`] without its final component if it is any. Examples:
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use filesystem::{DirectoryPath, DirectoryPathBuf};
+    ///
+    /// let path_with_child = DirectoryPathBuf::from_str("some/path").unwrap();
+    /// assert_eq!(path_with_child.parent().unwrap().as_str(), "some");
+    ///
+    /// let path_without_child = DirectoryPathBuf::from_str("some").unwrap();
+    /// assert_eq!(path_without_child.parent(), None);
+    /// ```
     #[must_use]
     pub fn parent(&self) -> Option<&DirectoryPath> {
-        self.0.parent().map(|path| {
-            // SAFETY: self is valid UTF-8 directory path, so parent is valid UTF-8 directory path as well
-            unsafe { DirectoryPath::assume_valid(path) }
-        })
+        match self.0.parent() {
+            None => None,
+            Some(p) => {
+                if p.as_str() == "" {
+                    None
+                } else {
+                    // SAFETY: self is valid UTF-8 directory path, so parent is valid UTF-8 directory path as well
+                    Some(unsafe { DirectoryPath::assume_valid(p) })
+                }
+            }
+        }
     }
 
     pub fn join_filename(&self, filename: impl AsRef<Filename>) -> FilePathBuf {
@@ -188,6 +209,34 @@ impl DirectoryPath {
     pub fn join(&self, path: impl AsRef<DirectoryPath>) -> DirectoryPathBuf {
         let path_buf = self.0.join(path.as_ref());
         DirectoryPathBuf::try_from(path_buf.as_path()).unwrap()
+    }
+
+    /// Returns a tuple with the parent (as computed by [`Self::parent`]) and the last component of
+    /// the path.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use filesystem::{DirectoryPath, DirectoryPathBuf};
+    ///
+    /// let path_with_child = DirectoryPathBuf::from_str("some/path").unwrap();
+    /// let (parent, child) = path_with_child.split_parent();
+    /// assert_eq!(parent.unwrap().as_str(), "some");
+    /// assert_eq!(child.unwrap().as_str(), "path");
+    ///
+    /// let path_without_child = DirectoryPathBuf::from_str("some").unwrap();
+    /// let (parent, child) = path_without_child.split_parent();
+    /// assert_eq!(parent, None);
+    /// assert_eq!(child.unwrap().as_str(), "some");
+    /// ```
+    pub fn split_parent(&self) -> (Option<&DirectoryPath>, Option<&DirectoryPath>) {
+        let last_element = self
+            .0
+            .iter()
+            .last()
+            .map(|s| unsafe { DirectoryPath::assume_valid(Utf8Path::new(s)) });
+        (self.parent(), last_element)
     }
 }
 
@@ -347,5 +396,54 @@ mod tests {
             DirectoryPathBuf::from_str("valid/path//").unwrap().as_str(),
             "valid/path"
         );
+    }
+
+    #[test]
+    fn test_parent() {
+        let directory = DirectoryPathBuf::from_str("valid/path/to/something").unwrap();
+
+        let parent = directory.parent().unwrap();
+        assert_eq!(parent.as_str(), "valid/path/to");
+
+        let parent = parent.parent().unwrap();
+        assert_eq!(parent.as_str(), "valid/path");
+
+        let parent = parent.parent().unwrap();
+        assert_eq!(parent.as_str(), "valid");
+
+        let parent = parent.parent();
+        assert_eq!(parent, None);
+
+        // For the ROOT path
+        let directory = DirectoryPath::root();
+        let parent = directory.parent();
+        assert_eq!(parent, None);
+    }
+
+    #[test]
+    fn test_split_parent() {
+        let directory = DirectoryPathBuf::from_str("valid/path/to/something").unwrap();
+
+        let (parent, last) = directory.split_parent();
+        assert_eq!(parent.unwrap().as_str(), "valid/path/to");
+        assert_eq!(last.unwrap().as_str(), "something");
+
+        let (parent, last) = parent.unwrap().split_parent();
+        assert_eq!(parent.unwrap().as_str(), "valid/path");
+        assert_eq!(last.unwrap().as_str(), "to");
+
+        let (parent, last) = parent.unwrap().split_parent();
+        assert_eq!(parent.unwrap().as_str(), "valid");
+        assert_eq!(last.unwrap().as_str(), "path");
+
+        let (parent, last) = parent.unwrap().split_parent();
+        assert_eq!(parent, None);
+        assert_eq!(last.unwrap().as_str(), "valid");
+
+        // For the ROOT path
+        let directory = DirectoryPath::root();
+        let (parent, last) = directory.split_parent();
+        assert_eq!(parent, None);
+        assert_eq!(last, None);
     }
 }

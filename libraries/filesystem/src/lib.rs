@@ -16,6 +16,7 @@ pub mod actions;
 pub mod diff;
 pub mod error;
 
+mod ignore_filter;
 pub mod impls;
 mod paths;
 pub mod wrappers;

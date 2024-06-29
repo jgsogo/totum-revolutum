@@ -1,18 +1,20 @@
 use std::fs;
+use std::str::FromStr;
 
 use async_std::fs::File as AsyncFile;
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
-use ignore::{Match, WalkBuilder};
+use ignore::WalkBuilder;
 use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::info;
 
 use crate::filesystem::FilesystemOps;
+use crate::ignore_filter::IgnoreFilterT;
 use crate::impls::local::file_metadata::LocalMetadata;
-use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, Filesystem, Result};
+use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result};
 
 use super::parallel_visitor;
 
@@ -47,30 +49,24 @@ impl Filesystem for FilesystemLocal {
         let walker = WalkBuilder::new(&self.root)
             .threads(4) // TODO: How to configure this default? Builder patter that accepts this init value?
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
-            // .add_custom_ignore_filename(custom_ignore_filename)
             .filter_entry(move |entry| {
                 if let Some(file_type) = entry.file_type() {
                     let relative_path = entry
                         .path()
                         .strip_prefix(&root)
                         .expect("File not contained inside root!");
+                    let directory_path =
+                        unsafe { DirectoryPath::assume_valid(Utf8Path::from_path(relative_path).unwrap()) };
 
                     if file_type.is_dir() {
-                        ignore_filter.check_dir(relative_path)
+                        ignore_filter.visit_directory(directory_path)
                     } else {
-                        match ignore_filter.match_path(relative_path, false) {
-                            Match::None => true,
-                            Match::Ignore(glob) => {
-                                if glob.from().map_or(true, |f| relative_path.strip_prefix(f).is_ok()) {
-                                    // Positive match (fail)
-                                    false
-                                } else {
-                                    // Positive match, but not in scope (pass)
-                                    true
-                                }
-                            }
-                            Match::Whitelist(_) => true,
-                        }
+                        let (parent_dir, last_cmp) = directory_path.split_parent();
+                        let filepath = FilePathBuf::new(
+                            parent_dir.unwrap(),
+                            FilenameBuf::from_str(last_cmp.unwrap().as_str()).unwrap(),
+                        );
+                        ignore_filter.visit_file(&filepath)
                     }
                 } else {
                     false

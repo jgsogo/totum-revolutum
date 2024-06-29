@@ -4,7 +4,6 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use camino::Utf8PathBuf;
 use flume::Sender;
-use ignore::Match;
 use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
@@ -24,6 +23,7 @@ use pcloud_sdk::types::errors::{InvalidFileError, InvalidFolderError};
 use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 
 use crate::filesystem::FilesystemOps;
+use crate::ignore_filter::IgnoreFilterT;
 use crate::impls::pcloud::file::RemoteFile;
 use crate::impls::pcloud::file_metadata::RemoteMetadata;
 use crate::{DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilenameBuf, Filesystem, Result};
@@ -66,24 +66,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     let filepath = base_path.join_filename(&filename);
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), filepath);
 
-                    let visit = match ignore_filter.match_path(filepath.as_std_path(), false) {
-                        Match::None => true,
-                        Match::Ignore(glob) => {
-                            if glob
-                                .from()
-                                .map_or(true, |f| filepath.as_std_path().strip_prefix(f).is_ok())
-                            {
-                                // Positive match (fail)
-                                false
-                            } else {
-                                // Positive match, but not in scope (pass)
-                                true
-                            }
-                        }
-                        Match::Whitelist(_) => true,
-                    };
-
-                    if visit {
+                    if ignore_filter.visit_file(&filepath) {
                         let data = RemoteMetadata::new(filepath, m.clone());
                         tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
                     }
@@ -92,7 +75,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     let path = base_path.join(DirectoryPathBuf::from_str(m.common.name.as_ref().unwrap()).unwrap());
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
-                    if ignore_filter.check_dir(path.as_std_path()) {
+                    if ignore_filter.visit_directory(&path) {
                         FilesystemPCloud::<HttpClient>::work_on_contents(
                             tx.clone(),
                             &path,
