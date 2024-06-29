@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use ignore_files::IgnoreFilter;
 use tracing::error;
 
 use crate::diff::two_way_diff::full_run;
@@ -45,9 +46,17 @@ pub async fn backup<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
     lhs_filesystem: &LHSFilesystem,
     rhs_filesystem: &mut RHSFilesystem,
     on_conflict: BackupConflict,
+    lhs_ignore_filter: IgnoreFilter,
 ) -> Result<()> {
     let mut backup_receiver = BackupReceiver::default();
-    full_run(lhs_filesystem, rhs_filesystem, &mut backup_receiver).await?;
+    full_run(
+        lhs_filesystem,
+        rhs_filesystem,
+        &mut backup_receiver,
+        lhs_ignore_filter,
+        IgnoreFilter::empty(""),
+    )
+    .await?;
 
     let mut set = tokio::task::JoinSet::new();
 
@@ -92,8 +101,9 @@ pub async fn backup<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::diff::tests::DiffMocks;
+
+    use super::*;
 
     #[tokio::test]
     async fn test_backup_override() -> Result<()> {
@@ -104,7 +114,13 @@ mod tests {
         let original_diff_hash_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_hash).await?;
         let original_diff_size_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_size).await?;
 
-        backup(&diff_mocks.fs_lhs, &mut diff_mocks.fs_rhs, BackupConflict::Override).await?;
+        backup(
+            &diff_mocks.fs_lhs,
+            &mut diff_mocks.fs_rhs,
+            BackupConflict::Override,
+            IgnoreFilter::empty(""),
+        )
+        .await?;
 
         // checks
         {
@@ -141,7 +157,13 @@ mod tests {
         let original_diff_hash_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_hash).await?;
         let original_diff_size_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_size).await?;
 
-        backup(&diff_mocks.fs_lhs, &mut diff_mocks.fs_rhs, BackupConflict::Skip).await?;
+        backup(
+            &diff_mocks.fs_lhs,
+            &mut diff_mocks.fs_rhs,
+            BackupConflict::Skip,
+            IgnoreFilter::empty(""),
+        )
+        .await?;
 
         // checks
         {

@@ -2,8 +2,9 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8PathBuf;
 use flume::Sender;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{info, trace};
@@ -22,6 +23,7 @@ use pcloud_sdk::types::errors::{InvalidFileError, InvalidFolderError};
 use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 
 use crate::filesystem::FilesystemOps;
+use crate::ignore_filter::IgnoreFilterT;
 use crate::impls::pcloud::file::RemoteFile;
 use crate::impls::pcloud::file_metadata::RemoteMetadata;
 use crate::{DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilenameBuf, Filesystem, Result};
@@ -55,6 +57,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
         base_path: &DirectoryPath,
         contents: &[Metadata],
         depth: usize,
+        ignore_filter: IgnoreFilter,
     ) -> Result<()> {
         for it in contents.iter() {
             match it {
@@ -63,19 +66,24 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     let filepath = base_path.join_filename(&filename);
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), filepath);
 
-                    let data = RemoteMetadata::new(filepath, m.clone());
-                    tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
+                    if ignore_filter.visit_file(&filepath) {
+                        let data = RemoteMetadata::new(filepath, m.clone());
+                        tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
+                    }
                 }
                 Metadata::MetadataFolder(m) => {
                     let path = base_path.join(DirectoryPathBuf::from_str(m.common.name.as_ref().unwrap()).unwrap());
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
-                    FilesystemPCloud::<HttpClient>::work_on_contents(
-                        tx.clone(),
-                        &path,
-                        m.contents.as_ref().unwrap(),
-                        depth + 1,
-                    )?
+                    if ignore_filter.visit_directory(&path) {
+                        FilesystemPCloud::<HttpClient>::work_on_contents(
+                            tx.clone(),
+                            &path,
+                            m.contents.as_ref().unwrap(),
+                            depth + 1,
+                            ignore_filter.clone(),
+                        )?
+                    }
                 }
             }
         }
@@ -89,14 +97,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
-    async fn walk_directory(
-        &self,
-        tx: Sender<Box<dyn FileMetadata>>,
-        _threads: usize,
-        _custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
-        // TODO: Implement _custom_ignore_filename logic
-
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
         //  and use a thread pool to enter child directories and _recurse_.
@@ -112,9 +113,13 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => {
-                FilesystemPCloud::<HttpClient>::work_on_contents(tx, &DirectoryPathBuf::root(), contents, 0)?
-            }
+            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(
+                tx,
+                &DirectoryPathBuf::root(),
+                contents,
+                0,
+                ignore_filter,
+            )?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -283,7 +288,6 @@ mod tests {
 
     use headers::HeaderMap;
 
-    use crate::FilePathBuf;
     use pcloud_sdk::error::Error;
     use pcloud_sdk::methods::file::deletefile;
     use pcloud_sdk::methods::file::deletefile::DeleteFile;
@@ -302,6 +306,7 @@ mod tests {
 
     use crate::impls::pcloud::file::CHUNK_SIZE;
     use crate::wrappers::AsyncFileDropImpl;
+    use crate::FilePathBuf;
 
     use super::*;
 
@@ -787,6 +792,121 @@ mod tests {
         let mut fs = FilesystemPCloud::new(&root_path, client).await?;
         let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
         fs.remove_dir_all(&dir).await?;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_walk_directory() -> anyhow::Result<()> {
+        let client = pcloud_sdk::mocks::filesystem::filesystem_mocked();
+        let root_path = RemotePath::from_str("path:/mocked_filesystem").unwrap();
+        let fs = FilesystemPCloud::new(&root_path, client).await?;
+
+        // Root directory, empty filters
+        {
+            let ignore_filter = IgnoreFilter::empty("");
+
+            let (tx, rx) = flume::bounded(100);
+            fs.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "dir1/other/file.png",
+                    "dir1/other/file.rs",
+                    "dir1/subdir/file.png",
+                    "dir1/subdir/file.rs",
+                    "dir2/file.png",
+                    "dir2/file.rs",
+                    "file.png",
+                    "file.rs",
+                    "folder1/dir1/file.png",
+                    "folder1/dir1/file.rs",
+                    "folder1/file.png",
+                    "folder1/file.rs"
+                ]
+            );
+        }
+
+        // Ignore all '*.rs' files
+        {
+            let mut ignore_filter = IgnoreFilter::empty("");
+            ignore_filter.add_globs(&["*.rs"], None).unwrap();
+
+            let (tx, rx) = flume::bounded(100);
+            fs.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "dir1/other/file.png",
+                    "dir1/subdir/file.png",
+                    "dir2/file.png",
+                    "file.png",
+                    "folder1/dir1/file.png",
+                    "folder1/file.png"
+                ]
+            );
+        }
+
+        // Ignore everything inside "dir1/" directory (also if nested)
+        {
+            let mut ignore_filter = IgnoreFilter::empty("");
+            ignore_filter.add_globs(&["dir1/"], None).unwrap();
+
+            let (tx, rx) = flume::bounded(100);
+            fs.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "dir2/file.png",
+                    "dir2/file.rs",
+                    "file.png",
+                    "file.rs",
+                    "folder1/file.png",
+                    "folder1/file.rs"
+                ]
+            );
+        }
+
+        // Ignore everything inside "dir1/" directory (only if root), and ignore all `.rs` files
+        // inside folder1/ path
+        {
+            let mut ignore_filter = IgnoreFilter::empty("");
+            ignore_filter.add_globs(&["/dir1/", "folder1/**/*.rs"], None).unwrap();
+
+            let (tx, rx) = flume::bounded(100);
+            fs.walk_directory(tx, ignore_filter).await.unwrap();
+
+            let all_files = rx.try_iter().collect::<Vec<_>>();
+            let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
+            all_files_str.sort();
+
+            assert_eq!(
+                all_files_str,
+                vec![
+                    "dir2/file.png",
+                    "dir2/file.rs",
+                    "file.png",
+                    "file.rs",
+                    "folder1/dir1/file.png",
+                    "folder1/file.png"
+                ]
+            );
+        }
+
         Ok(())
     }
 }

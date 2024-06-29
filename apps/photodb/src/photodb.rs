@@ -162,7 +162,8 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     /// will remove the [`models::File`] and ON CASCADE the corresponding [`models::PhotoFile`]
     /// will be removed.
     pub async fn sync(&self) -> Result<()> {
-        self.storage.initial_sync().await.map_err(|e| anyhow!(e))?;
+        let ignore_filter = self.app_dir.ignore_filters().await?;
+        self.storage.initial_sync(ignore_filter).await.map_err(|e| anyhow!(e))?;
 
         let non_identified = self.db.get_orphan_files()?;
         debug!("Found {} files not processed", non_identified.len());
@@ -184,7 +185,11 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
             println!("{} files total", count_files)
         });
 
-        if let Err(e) = self.storage.walk_directory(tx, 10, Utf8Path::new("<not used>")).await {
+        if let Err(e) = self
+            .storage
+            .walk_directory(tx, self.app_dir.ignore_filters().await?)
+            .await
+        {
             error!("Error iterating storage files: {e}");
         }
 

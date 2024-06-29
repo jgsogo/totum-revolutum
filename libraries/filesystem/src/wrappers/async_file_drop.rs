@@ -2,7 +2,7 @@ use std::future::Future;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::Utf8Path;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::{Receiver, Sender};
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
@@ -131,15 +131,14 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
     async fn walk_directory(
         &self,
         tx: flume::Sender<Box<dyn FileMetadata>>,
-        threads: usize,
-        custom_ignore_filename: &Utf8Path,
+        ignore_filter: IgnoreFilter,
     ) -> Result<()> {
         self.filesystem
             .lock()
             .await
             .as_ref()
             .unwrap()
-            .walk_directory(tx, threads, custom_ignore_filename)
+            .walk_directory(tx, ignore_filter)
             .await
     }
 

@@ -98,17 +98,16 @@ async fn main() -> Result<()> {
     debug!("Tracing level configured to {}", tracing_level);
 
     std::fs::create_dir_all(&cli.app_dir)?;
-    let token_file = cli.app_dir.join(".pcloud");
-    let db_path = RemotePath::from_str("path:/developing")?;
     let app_dir = AppDirs::new(cli.app_dir)?;
+    let db_path = RemotePath::from_str("path:/developing")?;
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli.command {
-        Commands::Auth(input) => auth::handle_auth(&token_file, input).await?,
-        Commands::AuthFile(input) => auth::handle_auth_file(&token_file, input).await?,
+        Commands::Auth(input) => auth::handle_auth(&app_dir.pcloud_token(), input).await?,
+        Commands::AuthFile(input) => auth::handle_auth_file(&app_dir.pcloud_token(), input).await?,
         _ => {
-            let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&token_file)?;
+            let token = auth::read_from_file::<OAuth2TokenImpl, &Utf8PathBuf>(&app_dir.pcloud_token())?;
             let client = PCloudClientImpl::new(token, true);
 
             // I can't raise from these commands, as I always need to execute the backup routine

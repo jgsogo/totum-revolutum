@@ -1,7 +1,8 @@
 use anyhow::Result;
+use ignore_files::IgnoreFilter;
+use serde::{Deserialize, Serialize};
 
 use filesystem::FilesystemOps;
-use serde::{Deserialize, Serialize};
 
 use crate::storage::config;
 
@@ -63,7 +64,7 @@ pub async fn run<FsLhs: FilesystemOps, FsRhs: FilesystemOps>(
                 OnConflict::RenameLocal => todo!("not impl"),
                 OnConflict::KeepLatest => todo!("not impl"),
             };
-            filesystem::diff::impls::backup(&lhs_fs, &mut rhs_fs, backup_conflict).await?;
+            filesystem::diff::impls::backup(&lhs_fs, &mut rhs_fs, backup_conflict, IgnoreFilter::empty("")).await?;
             Ok(())
         }
         Actions::ZipBackup => todo!("impl pending"),

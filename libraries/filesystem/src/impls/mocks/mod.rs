@@ -1,8 +1,8 @@
 use std::sync::{Arc, RwLock};
 
 use async_trait::async_trait;
-use camino::Utf8Path;
 use flume::Sender;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 
 use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, Filesystem, FilesystemOps, Result};
@@ -45,12 +45,7 @@ impl Filesystem for FilesystemMock {
         )))
     }
 
-    async fn walk_directory(
-        &self,
-        _tx: Sender<Box<dyn FileMetadata>>,
-        _threads: usize,
-        _custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
+    async fn walk_directory(&self, _tx: Sender<Box<dyn FileMetadata>>, _ignore_filter: IgnoreFilter) -> Result<()> {
         self.called
             .write()
             .unwrap()

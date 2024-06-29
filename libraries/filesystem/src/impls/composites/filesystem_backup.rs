@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use camino::Utf8Path;
 use flume::Sender;
+use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
@@ -94,8 +94,14 @@ impl<LHS: Filesystem + 'static, RHS: FilesystemOps + 'static> FilesystemBackup<L
     ///
     /// Use the `on_conflict` argument to decide how the conflicts **during this first synchronization**
     /// should be resolved.
-    pub async fn initial_sync(&self, on_conflict: BackupConflict) -> Result<()> {
-        backup(&self.lhs, self.rhs.lock().await.as_mut().unwrap(), on_conflict).await
+    pub async fn initial_sync(&self, on_conflict: BackupConflict, ignore_file: IgnoreFilter) -> Result<()> {
+        backup(
+            &self.lhs,
+            self.rhs.lock().await.as_mut().unwrap(),
+            on_conflict,
+            ignore_file,
+        )
+        .await
     }
 }
 
@@ -106,13 +112,8 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
         self.rhs.lock().await.take().unwrap().sync_all().await
     }
 
-    async fn walk_directory(
-        &self,
-        tx: Sender<Box<dyn FileMetadata>>,
-        threads: usize,
-        custom_ignore_filename: &Utf8Path,
-    ) -> Result<()> {
-        self.lhs.walk_directory(tx, threads, custom_ignore_filename).await
+    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
+        self.lhs.walk_directory(tx, ignore_filter).await
     }
 
     async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
@@ -193,6 +194,7 @@ impl<LHS: Filesystem, RHS: Filesystem> FilesystemOps for FilesystemBackup<LHS, R
 mod tests {
     use std::str::FromStr;
 
+    use camino::Utf8Path;
     use tempfile::tempdir;
 
     use crate::impls::FilesystemLocal;
