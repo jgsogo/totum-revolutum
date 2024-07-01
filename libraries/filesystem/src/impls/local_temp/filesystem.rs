@@ -1,8 +1,9 @@
+use std::str::FromStr;
+
 use async_trait::async_trait;
-use camino::Utf8Path;
+use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use ignore_files::IgnoreFilter;
-use std::str::FromStr;
 use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 
@@ -28,6 +29,13 @@ impl FilesystemLocalTemp {
             DirectoryPath::root(),
             FilenameBuf::from_str(&filename).expect("Generated filename is not valid"),
         )
+    }
+
+    /// Returns the absolute path to the given `filepath`. This path is only valid as long as the
+    /// filesystem is not destroyed.
+    pub fn resolve_filepath(&self, filepath: impl AsRef<FilePath>) -> Utf8PathBuf {
+        let root = Utf8Path::from_path(self._tmp_dir.path()).unwrap();
+        root.join(filepath.as_ref())
     }
 }
 

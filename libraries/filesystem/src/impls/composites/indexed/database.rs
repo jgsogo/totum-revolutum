@@ -3,6 +3,7 @@ use camino::Utf8Component;
 use flume::Sender;
 use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
+use tracing::trace;
 
 use crate::ignore_filter::IgnoreFilterT;
 use crate::{DirectoryPath, DirectoryPathBuf, Error, FilePath, FilePathBuf, Filename, FilesystemOps, Result};
@@ -47,12 +48,19 @@ pub trait FilesystemIndexedDatabase {
     fn get_file(&self, dir: &Self::Directory, filename: &Filename) -> Result<Self::File>;
 
     /// Returns or creates a new [`Self::Directory`]. The caller can pass the parent directory
-    /// as an optimization, so we don't need to hit the database to get it.
+    /// as an optimization, so we don't need to hit the database to get it. Note that this method
+    /// will fail if the parent directory is not already created (see
+    /// [`FilesystemIndexedDatabase::get_or_create_directory_all`]).
     fn get_or_create_directory(
         &self,
         path: &DirectoryPath,
         parent_dir: Option<&Self::Directory>,
     ) -> Result<(Self::Directory, bool)>;
+
+    /// Returns or creates a new [`Self::Directory`]. This method will create all the directories
+    /// in the tree that are not already created. Use method [`FilesystemIndexedDatabase::get_or_create_directory`]
+    /// if you already know the parent directory exists.
+    fn get_or_create_directory_all(&self, path: &DirectoryPath) -> Result<(Self::Directory, bool)>;
 
     /// Deletes the given directory
     fn delete_file(&self, file: Self::File) -> Result<()>;
@@ -265,21 +273,37 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> FilesystemOps for T {
         origin_path: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
+        trace!(
+            "FilesystemIndexedDatabase::copy_from(target={}, origin, origin_path={})",
+            target,
+            origin_path,
+        );
         if self.is_same(origin) {
             self.internal_copy(target, origin_path, force).await
         } else {
-            if !force && self.exists(target).await? {
+            let target_exists = self.exists(target).await?;
+            if !force && target_exists {
+                trace!("Target already exists. Operation skipped");
                 return Err(Error::TargetFileExists);
             }
 
             let metadata = origin.get_metadata(origin_path).await?;
-            let target_dir = self.get_directory(target.directory())?;
-            let _ = self.create_file(
-                &target_dir,
-                target.filename(),
-                &metadata.hash()?,
-                metadata.size()? as i32,
-            )?;
+            if target_exists {
+                // If target does exist, I retrieve the directory and update the file
+                let target_dir = self.get_directory(target.directory())?;
+                let file = self.get_file(&target_dir, target.filename())?;
+                let _ = self.update_file(file, None, None, Some(metadata.size()?), Some(&metadata.hash()?))?;
+            } else {
+                // If target doesn't exist, I create the file (and the directory)
+                let (target_dir, _) = self.get_or_create_directory_all(target.directory())?;
+                let _ = self.create_file(
+                    &target_dir,
+                    target.filename(),
+                    &metadata.hash()?,
+                    metadata.size()? as i32,
+                )?;
+            }
+
             Ok(None)
         }
     }

@@ -126,6 +126,12 @@ impl AsRef<str> for DirectoryPathBuf {
     }
 }
 
+impl From<&DirectoryPath> for DirectoryPathBuf {
+    fn from(value: &DirectoryPath) -> Self {
+        DirectoryPathBuf(value.0.to_path_buf())
+    }
+}
+
 /// A slice of [`DirectoryPathBuf`]: a valid UTF8 path to a directory (akin to [`str`]).
 ///
 /// This type supports a number of operations for inspecting a path.

@@ -7,12 +7,12 @@ use flume::Sender;
 use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
-use tracing::{info, trace};
+use tracing::{info, trace, warn};
 
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
+use pcloud_sdk::methods::file::checksumfile::{ChecksumFile, GetChecksumFile};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
-use pcloud_sdk::methods::file::stat::GetStat;
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::folder::deletefolder::GetDeleteFolder;
 use pcloud_sdk::methods::folder::deletefolderrecursive::GetDeleteFolderRecursive;
@@ -51,44 +51,6 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
             pcloud,
         })
     }
-
-    fn work_on_contents(
-        tx: Sender<Box<dyn FileMetadata>>,
-        base_path: &DirectoryPath,
-        contents: &[Metadata],
-        depth: usize,
-        ignore_filter: IgnoreFilter,
-    ) -> Result<()> {
-        for it in contents.iter() {
-            match it {
-                Metadata::MetadataFile(m) => {
-                    let filename = FilenameBuf::from_str(m.common.name.as_ref().unwrap())?;
-                    let filepath = base_path.join_filename(&filename);
-                    trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), filepath);
-
-                    if ignore_filter.visit_file(&filepath) {
-                        let data = RemoteMetadata::new(filepath, m.clone());
-                        tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
-                    }
-                }
-                Metadata::MetadataFolder(m) => {
-                    let path = base_path.join(DirectoryPathBuf::from_str(m.common.name.as_ref().unwrap()).unwrap());
-                    trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
-
-                    if ignore_filter.visit_directory(&path) {
-                        FilesystemPCloud::<HttpClient>::work_on_contents(
-                            tx.clone(),
-                            &path,
-                            m.contents.as_ref().unwrap(),
-                            depth + 1,
-                            ignore_filter.clone(),
-                        )?
-                    }
-                }
-            }
-        }
-        Ok(())
-    }
 }
 
 #[async_trait]
@@ -103,25 +65,59 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         //  and use a thread pool to enter child directories and _recurse_.
         info!("Start remote visitor");
         let start = Instant::now();
-        let mut list_folder_input = ListFolderInput::new(self.root_folderid.clone().into());
-        list_folder_input.recursive = true;
         let filtermeta = vec!["name", "contents", "size", "hash", "isfolder"];
-        let items = self
-            .pcloud
-            .listfolder_with_filtermeta(list_folder_input, filtermeta)
-            .await
-            .unwrap();
 
-        match &items.metadata.contents {
-            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(
-                tx,
-                &DirectoryPathBuf::root(),
-                contents,
-                0,
-                ignore_filter,
-            )?,
-            None => (),
+        let mut folders = vec![(self.root_folderid.clone(), DirectoryPathBuf::root(), 0)];
+        while let Some((folderid, base_path, depth)) = folders.pop() {
+            let list_folder_input = ListFolderInput::new(folderid.into());
+            let items = self
+                .pcloud
+                .listfolder_with_filtermeta(list_folder_input, filtermeta.clone())
+                .await
+                .map_err(|e| Error::Other(e.to_string()))?;
+
+            if let Some(contents) = items.metadata.contents {
+                for it in contents.into_iter() {
+                    match it {
+                        Metadata::MetadataFile(m) => {
+                            let filename = FilenameBuf::from_str(m.common.name.as_ref().unwrap())?;
+                            let filepath = base_path.join_filename(&filename);
+                            trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), filepath);
+
+                            if ignore_filter.visit_file(&filepath) {
+                                let remote_file = pcloud_sdk::types::File::FileID(m.fileid);
+                                let checksumfile = self
+                                    .pcloud
+                                    .checksumfile(&remote_file)
+                                    .await
+                                    .map_err(|e| Error::Other(e.to_string()))?;
+
+                                if checksumfile.sha256.is_none() || checksumfile.metadata.size.is_none() {
+                                    warn!("sha256 and/or metadata.size are not available");
+                                }
+
+                                let data = RemoteMetadata::new(
+                                    filepath,
+                                    checksumfile.sha256.unwrap(),
+                                    checksumfile.metadata.size.unwrap(),
+                                );
+                                tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
+                            }
+                        }
+                        Metadata::MetadataFolder(m) => {
+                            let path =
+                                base_path.join(DirectoryPathBuf::from_str(m.common.name.as_ref().unwrap()).unwrap());
+                            trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
+
+                            if ignore_filter.visit_directory(&path) {
+                                folders.push((m.folderid, path, depth + 1));
+                            }
+                        }
+                    }
+                }
+            }
         }
+
         info!("Finished remote visitor in {:?}", start.elapsed());
 
         Ok(())
@@ -132,12 +128,34 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             let abs_path = self.root_path.join(path);
             RemotePath::try_from(abs_path).map_err(|e| Error::Other(e.to_string()))?
         };
-        let metadata = self
+        let remote_file = pcloud_sdk::types::File::RemotePath(remote_path);
+
+        // FIXME: Use checksumfile here to get the sha256 of the file
+        let stat = self
             .pcloud
-            .stat(pcloud_sdk::types::File::RemotePath(remote_path))
+            .checksumfile_with_retry(
+                &remote_file,
+                Box::new(|r: pcloud_sdk::Result<ChecksumFile>| match r {
+                    Ok(r) => {
+                        if r.sha256.is_none() || r.metadata.size.is_none() {
+                            Err(pcloud_sdk::Error::InputDataEror(
+                                "Hash and size are not available. Retry".to_string(),
+                            ))
+                        } else {
+                            Ok(r)
+                        }
+                    }
+                    Err(e) => Err(e),
+                }),
+            )
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(Box::new(RemoteMetadata::new(path.to_filepath_buf(), metadata.metadata)))
+
+        Ok(Box::new(RemoteMetadata::new(
+            path.to_filepath_buf(),
+            stat.sha256.unwrap(),
+            stat.metadata.size.unwrap(),
+        )))
     }
 
     async fn exists(&self, path: &FilePath) -> Result<bool> {
@@ -323,9 +341,10 @@ mod tests {
 
                 assert_eq!(endpoint, listfolder::ENDPOINT);
                 assert_eq!(headers.len(), 0);
-                assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.len(), 3);
+                assert_eq!(params.get("path").unwrap(), "/the/path");
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
 
                 Ok(ListFolder {
                     metadata: MetadataFolder::default(FolderID::new(1234)),
@@ -345,9 +364,10 @@ mod tests {
         client.expect_get::<ListFolder, _>().times(1).returning(
             move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
-                assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.len(), 3);
+                assert_eq!(params.get("path").unwrap(), "/the/path");
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
                 Err(Error::PCloudError {
@@ -374,9 +394,10 @@ mod tests {
         client.expect_get::<ListFolder, _>().times(1).returning(
             move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
-                assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.len(), 3);
+                assert_eq!(params.get("path").unwrap(), "/the/path");
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
@@ -462,9 +483,10 @@ mod tests {
             .times(1)
             .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
-                assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"/the/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.len(), 3);
+                assert_eq!(params.get("path").unwrap(), "/the/path");
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
@@ -566,9 +588,10 @@ mod tests {
             .times(2) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
-                assert_eq!(params.len(), 2);
+                assert_eq!(params.len(), 3);
                 assert!(params.contains_key("path"));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
@@ -632,9 +655,10 @@ mod tests {
             .times(1) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
-                assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.len(), 3);
+                assert_eq!(params.get("path").unwrap(), "/the/root/path");
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
@@ -677,9 +701,10 @@ mod tests {
             .times(1) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
-                assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.len(), 3);
+                assert_eq!(params.get("path").unwrap(), "/the/root/path");
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
@@ -698,7 +723,7 @@ mod tests {
                 );
 
                 Ok(DeleteFile {
-                    id: "1234-0".to_string(),
+                    id: Some("1234-0".to_string()),
                     metadata: MetadataFile::default(FileID::new(1234)),
                 })
             },
@@ -722,9 +747,10 @@ mod tests {
             .times(1) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
-                assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.len(), 3);
+                assert_eq!(params.get("path").unwrap(), "/the/root/path");
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {
@@ -764,9 +790,10 @@ mod tests {
             .times(1) // One on filesystem::new, another to check folder for file being created
             .returning(move |endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, listfolder::ENDPOINT);
-                assert_eq!(params.len(), 2);
-                assert_eq!(params.get("path"), Some(&"/the/root/path".to_string()));
-                assert_eq!(params.get("filtermeta"), Some(&"folderid,fileid".to_string()));
+                assert_eq!(params.len(), 3);
+                assert_eq!(params.get("path").unwrap(), "/the/root/path");
+                assert_eq!(params.get("filtermeta").unwrap(), "folderid,fileid");
+                assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
                 Ok(ListFolder {

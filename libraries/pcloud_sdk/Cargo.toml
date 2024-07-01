@@ -47,6 +47,7 @@ time = { workspace = true, features = [
     "macros",
 ] }
 tracing = { workspace = true }
+tryhard = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 url = { workspace = true }
 

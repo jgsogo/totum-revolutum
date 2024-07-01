@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 
 use async_trait::async_trait;
-use headers::HeaderMap;
 use headers::HeaderMapExt;
+use headers::{Header, HeaderMap};
 use reqwest;
 use serde::de::DeserializeOwned;
 
@@ -67,9 +67,17 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
         &self.http_client
     }
 
+    /// Appends common headers: if no `Connection` is already there, it will add `Keep-Alive` one.
     fn headers(&self, mut headers: HeaderMap) -> HeaderMap {
-        let conn = headers::Connection::keep_alive();
-        headers.typed_insert(conn);
+        // FIXME: Probably we should remove this method and each call should set its own headers,
+        // FIXME: AFAIK, only the `pcloud::fileops` ones require to keep the connection open. How
+        // FIXME: does this work when executing things in parallel/async? Can I keep some connections
+        // FIXME: alive while others are closed?
+        if !headers.contains_key(headers::Connection::name()) {
+            let conn = headers::Connection::keep_alive();
+            headers.typed_insert(conn);
+        }
+
         headers
     }
 

@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use ignore_files::IgnoreFilter;
-use tracing::error;
+use tracing::{debug, error};
 
 use crate::diff::two_way_diff::full_run;
 use crate::diff::Receiver;
@@ -58,7 +58,7 @@ pub async fn mirror<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
 
     let mut set = tokio::task::JoinSet::new();
 
-    // Copy missing files to the mirror
+    debug!("Copy missing files to the mirror");
     for file in mirror_receiver.to_copy {
         let rx = rhs_filesystem
             .copy_from(file.path(), lhs_filesystem, file.path(), true)
@@ -68,7 +68,7 @@ pub async fn mirror<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
         }
     }
 
-    // Override files when there is a conflict
+    debug!("Override files when there is a conflict");
     for (lhs_metadata, rhs_metadata) in mirror_receiver.to_override {
         assert_eq!(lhs_metadata.path(), rhs_metadata.path());
         let rx = rhs_filesystem
@@ -79,12 +79,12 @@ pub async fn mirror<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
         }
     }
 
-    // Remove the files that are not in the source
+    debug!("Remove the files that are not in the source");
     for file in mirror_receiver.to_delete {
         rhs_filesystem.remove_file(file.path()).await?;
     }
 
-    // Wait for all the work to finish
+    debug!("Wait for all the work to finish");
     while let Some(r) = set.join_next().await {
         if let Err(e) = r
             .map_err(|e| Error::Other(e.to_string()))?
@@ -99,9 +99,8 @@ pub async fn mirror<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
 
 #[cfg(test)]
 mod tests {
-    use crate::diff::tests::DiffMocks;
-
     use super::*;
+    use crate::diff::tests::DiffMocks;
 
     #[tokio::test]
     async fn test_mirror() -> Result<()> {

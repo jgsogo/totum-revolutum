@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "comments": 0,
+    "contents": [
+      {
+        "category": 1,
+        "comments": 0,
+        "contenttype": "image/png",
+        "created": "Sat, 29 Jun 2024 14:00:14 +0000",
+        "fileid": 46765681989,
+        "hash": 2543652759283584500,
+        "icon": "image",
+        "id": "f46765681989",
+        "isfolder": false,
+        "ismine": true,
+        "isshared": false,
+        "modified": "Sat, 29 Jun 2024 14:00:14 +0000",
+        "name": "file.png",
+        "parentfolderid": 11801915790,
+        "size": 0,
+        "thumb": false
+      },
+      {
+        "category": 0,
+        "comments": 0,
+        "contenttype": "application/rls-services+xml",
+        "created": "Sat, 29 Jun 2024 14:00:09 +0000",
+        "fileid": 46765681983,
+        "hash": 2543652759283584500,
+        "icon": "file",
+        "id": "f46765681983",
+        "isfolder": false,
+        "ismine": true,
+        "isshared": false,
+        "modified": "Sat, 29 Jun 2024 14:00:09 +0000",
+        "name": "file.rs",
+        "parentfolderid": 11801915790,
+        "size": 0,
+        "thumb": false
+      }
+    ],
+    "created": "Sat, 29 Jun 2024 13:59:45 +0000",
+    "folderid": 11801915790,
+    "icon": "folder",
+    "id": "d11801915790",
+    "isfolder": true,
+    "ismine": true,
+    "isshared": false,
+    "modified": "Sat, 29 Jun 2024 13:59:45 +0000",
+    "name": "other",
+    "parentfolderid": 11801913622,
+    "thumb": false
+  },
+  "result": 0
+}

@@ -1,12 +1,10 @@
-use pcloud_sdk::structures::MetadataFile;
-use pcloud_sdk::types::FileID;
-
-use crate::{Error, FileMetadata, FilePath, FilePathBuf, Result};
+use crate::{FileMetadata, FilePath, FilePathBuf, Result};
 
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {
     path: FilePathBuf,
-    metadata: MetadataFile,
+    hash: String,
+    size: u64,
 }
 
 impl FileMetadata for RemoteMetadata {
@@ -15,27 +13,16 @@ impl FileMetadata for RemoteMetadata {
     }
 
     fn size(&self) -> Result<u64> {
-        match self.metadata.size {
-            None => Err(Error::Other("metadata.size not available".into())),
-            Some(s) => Ok(s),
-        }
+        Ok(self.size)
     }
 
     fn hash(&self) -> Result<String> {
-        match self.metadata.hash {
-            None => Err(Error::Other("metadata.hash not available".into())),
-            Some(h) => Ok(h.to_string()),
-        }
+        Ok(self.hash.clone())
     }
 }
 
 impl RemoteMetadata {
-    pub fn new(path: FilePathBuf, metadata: MetadataFile) -> Self {
-        Self { path, metadata }
-    }
-
-    #[allow(dead_code)]
-    pub fn fileid(&self) -> &FileID {
-        &self.metadata.fileid
+    pub fn new(path: FilePathBuf, hash: String, size: u64) -> Self {
+        Self { path, hash, size }
     }
 }

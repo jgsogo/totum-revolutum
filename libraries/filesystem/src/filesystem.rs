@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
+use tracing::trace;
 
 use crate::actions::copy;
 
@@ -20,7 +21,9 @@ pub trait Filesystem: Send + Sync {
     async fn walk_directory(&self, tx: flume::Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter)
         -> Result<()>;
 
-    /// Returns the [`FileMetadata`] for the given `path`
+    /// Returns the [`FileMetadata`] for the given `path`. This operation blocks until the data is
+    /// available (some filesystem implementations might not have this data available right at
+    /// the moment a new file is created).
     async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>>;
 
     /// Returns true if the path points at an existing entity.
@@ -111,10 +114,13 @@ pub trait FilesystemOps: Filesystem + Sized {
         origin_path: &FilePath,
         force: bool,
     ) -> Result<Option<Receiver<Result<()>>>> {
+        trace!("Copy from {} to {}", origin_path, target);
         if self.is_same(origin) {
+            trace!("Origin and target filesystems are the same");
             self.internal_copy(target, origin_path, force).await
         } else {
             if !force && self.exists(target).await? {
+                trace!("Target already exists. Skip operation");
                 return Err(Error::TargetFileExists);
             }
 

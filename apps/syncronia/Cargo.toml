@@ -19,6 +19,7 @@ filesystem = { path = "../../libraries/filesystem", features = ["local", "pcloud
 fs4 = { workspace = true }
 confy = { workspace = true, default-features = false, features = ["yaml_conf"] }
 camino = { workspace = true, features = ["serde1"] }
+flume = { workspace = true }
 ignore-files = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
@@ -38,7 +39,6 @@ anyhow = { workspace = true }
 thiserror = { workspace = true }
 ignore = { workspace = true }
 async-trait = { workspace = true }
-flume = { workspace = true }
 sha256 = { workspace = true }
 futures = { workspace = true }
 async-std = { workspace = true }

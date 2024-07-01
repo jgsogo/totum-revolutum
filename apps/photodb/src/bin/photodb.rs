@@ -44,27 +44,20 @@ enum Commands {
     /// Initializes the database (fails if file already exists)
     Initialize,
 
+    /// List all the files in the storage
+    /// TODO: Add some filters!
+    List,
+
     /// Adds (and backups) a photo to the database
     Add(Add),
 
     /// Syncs the database with the remote storage
-    Sync(Sync),
+    Sync,
 }
 
 #[derive(Args, Debug)]
 struct Add {
     photo_file: Utf8PathBuf,
-}
-
-#[derive(Args, Debug)]
-struct Sync {
-    /// Remove DB entries that are no longer in the remote storage
-    #[clap(long, default_value_t = true)]
-    remove_missing_files: bool,
-
-    /// Add entries to the DB for new files discovered in the remote
-    #[clap(long, default_value_t = true)]
-    collect_new_files: bool,
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
@@ -86,10 +79,8 @@ async fn db_commands<T: Database, TPCloudClient: PCloudClient + Clone + Send + '
 ) -> Result<()> {
     match command {
         Commands::Add(add) => photodb.add(add.photo_file).await,
-        Commands::Sync(sync) => {
-            photodb.sync(sync.collect_new_files, sync.remove_missing_files).await?;
-            Ok(())
-        }
+        Commands::Sync => photodb.sync().await,
+        Commands::List => photodb.list().await,
         c => bail!("Unexpected command {:?}", c),
     }
 }
@@ -140,7 +131,7 @@ async fn main() -> Result<()> {
             if let Err((_tmpdir, localfile)) = done.await? {
                 error!("Failed to execute cleanup task (upload) of proxied file. We save the DB to a local file");
                 let date = chrono::Local::now();
-                let db_filename = format!("{}.sqlite3", date.format("%Y-%m-%d][%H:%M:%S"));
+                let db_filename = format!("{}.sqlite3", date.format("%Y%m%d-%H:%M:%S"));
                 let db_backup_filename = app_dir.db_backups().join(db_filename);
                 std::fs::copy(&localfile, &db_backup_filename).map_err(|e| {
                     anyhow!(

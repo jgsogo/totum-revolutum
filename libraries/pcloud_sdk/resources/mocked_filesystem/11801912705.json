@@ -14,7 +14,6 @@
         "modified": "Sat, 29 Jun 2024 13:59:45 +0000",
         "name": "dir1",
         "parentfolderid": 11801912705,
-        "path": "/mocked_filesystem/dir1",
         "thumb": false
       },
       {
@@ -29,7 +28,6 @@
         "modified": "Sat, 29 Jun 2024 13:59:33 +0000",
         "name": "dir2",
         "parentfolderid": 11801912705,
-        "path": "/mocked_filesystem/dir2",
         "thumb": false
       },
       {
@@ -44,7 +42,6 @@
         "modified": "Sat, 29 Jun 2024 14:10:25 +0000",
         "name": "folder1",
         "parentfolderid": 11801912705,
-        "path": "/mocked_filesystem/folder1",
         "thumb": false
       },
       {
@@ -62,7 +59,6 @@
         "modified": "Sat, 29 Jun 2024 14:00:14 +0000",
         "name": "file.png",
         "parentfolderid": 11801912705,
-        "path": "/mocked_filesystem/file.png",
         "size": 0,
         "thumb": false
       },
@@ -81,7 +77,6 @@
         "modified": "Sat, 29 Jun 2024 14:00:09 +0000",
         "name": "file.rs",
         "parentfolderid": 11801912705,
-        "path": "/mocked_filesystem/file.rs",
         "size": 0,
         "thumb": false
       }
@@ -96,7 +91,6 @@
     "modified": "Sat, 29 Jun 2024 13:59:37 +0000",
     "name": "mocked_filesystem",
     "parentfolderid": 4075092622,
-    "path": "/mocked_filesystem",
     "thumb": false
   },
   "result": 0

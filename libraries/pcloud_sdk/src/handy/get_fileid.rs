@@ -14,7 +14,7 @@ pub trait GetFileID {
 impl<T: GetStat + Sync> GetFileID for T {
     async fn get_fileid(&self, path: &RemotePath) -> Result<FileID> {
         let file = File::RemotePath(path.to_owned());
-        let stats = self.stat(file).await?;
+        let stats = self.stat(&file).await?;
         Ok(stats.metadata.fileid)
     }
 }
