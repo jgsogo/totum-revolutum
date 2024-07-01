@@ -38,6 +38,9 @@ pub trait GetStat {
 #[async_trait]
 impl<T: PCloudClient> GetStat for T {
     async fn stat(&self, input: &File) -> Result<Stat> {
+        // Closing the connection here (expected to work at least on the second call). When I've
+        // just uploaded a file, some optional information (hash) is not available right away. We
+        // need to retry (or maybe just use a new connection)
         let mut headers = HeaderMap::default();
         let conn = headers::Connection::close();
         headers.typed_insert(conn);
