@@ -28,6 +28,11 @@ pub struct PhotoDB<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send +
     /// The PCloud client.
     pcloud: TPCloudClient,
 
+    /// The root folder in the FilesystemPCloud storage. We need it when using `pcloud` directly to
+    /// interact with the files.
+    /// FIXME: Maybe wrap `pcloud` client together with this `root` so we don't need to worry about it
+    root_folder: RemotePath,
+
     /// An instance of the [`Database`]. This is the same database that the [`Self::storage`] uses to
     /// index the files.
     db: T,
@@ -58,6 +63,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         // TODO: Spawn "self.sync" in parallel - self.sync().await?;
         Ok(Self {
             pcloud,
+            root_folder: db_path.clone(),
             db,
             app_dir,
             storage,
@@ -126,14 +132,12 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         // FIXME: Here we need an absolute path to satisfy pcloud's RemotePath... we need to
         // FIXME: consolidate filesystem with pcloud_sdk (maybe the other way around) so they
         // FIXME: both uses a relative path (whatever is root will always be prepended)
-        let remote_abs_filepath = Utf8Path::new("/").join(&remote_filepath);
+        let remote_abs_filepath = self.root_folder.join(&remote_filepath)?;
+        // let remote_path = RemotePath::try_from(remote_abs_filepath)?;
         debug!("Get fileid for {}", remote_abs_filepath);
-        let fileid_: FileID = self
-            .pcloud
-            .get_fileid(&RemotePath::try_from(remote_abs_filepath)?)
-            .await?;
+        let fileid_: FileID = self.pcloud.get_fileid(&remote_abs_filepath).await?;
 
-        debug!("Get the models::File row for {}", remote_filepath);
+        debug!("Get the models::File row for {}", &remote_filepath);
         let file_ = self.db.get_file(&remote_filepath)?;
 
         let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true);

@@ -12,7 +12,7 @@ use tracing::{info, trace};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
-use pcloud_sdk::methods::file::stat::GetStat;
+use pcloud_sdk::methods::file::stat::{GetStat, Stat};
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::folder::deletefolder::GetDeleteFolder;
 use pcloud_sdk::methods::folder::deletefolderrecursive::GetDeleteFolderRecursive;
@@ -132,12 +132,30 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             let abs_path = self.root_path.join(path);
             RemotePath::try_from(abs_path).map_err(|e| Error::Other(e.to_string()))?
         };
-        let metadata = self
+        let remote_file = pcloud_sdk::types::File::RemotePath(remote_path);
+
+        // FIXME: Use checksumfile here to get the sha256 of the file
+        let stat = self
             .pcloud
-            .stat(pcloud_sdk::types::File::RemotePath(remote_path))
+            .stat_with_retry(
+                &remote_file,
+                Box::new(|r: pcloud_sdk::Result<Stat>| match r {
+                    Ok(r) => {
+                        if r.metadata.hash.is_none() || r.metadata.size.is_none() {
+                            Err(pcloud_sdk::Error::InputDataEror(
+                                "Hash and size are not available. Retry".to_string(),
+                            ))
+                        } else {
+                            Ok(r)
+                        }
+                    }
+                    Err(e) => Err(e),
+                }),
+            )
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
-        Ok(Box::new(RemoteMetadata::new(path.to_filepath_buf(), metadata.metadata)))
+
+        Ok(Box::new(RemoteMetadata::new(path.to_filepath_buf(), stat.metadata)))
     }
 
     async fn exists(&self, path: &FilePath) -> Result<bool> {
@@ -698,7 +716,7 @@ mod tests {
                 );
 
                 Ok(DeleteFile {
-                    id: "1234-0".to_string(),
+                    id: Some("1234-0".to_string()),
                     metadata: MetadataFile::default(FileID::new(1234)),
                 })
             },

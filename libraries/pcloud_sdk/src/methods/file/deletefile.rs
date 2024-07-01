@@ -13,7 +13,7 @@ pub const ENDPOINT: &str = "/deletefile";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteFile {
-    pub id: String,
+    pub id: Option<String>,
     pub metadata: MetadataFile,
 }
 
@@ -58,7 +58,7 @@ mod tests {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
                 assert_eq!(data.metadata.fileid, FileID::new(1736716));
-                assert_eq!(data.id, "139-0".to_string());
+                assert_eq!(data.id, Some("139-0".to_string()));
             }
         }
     }

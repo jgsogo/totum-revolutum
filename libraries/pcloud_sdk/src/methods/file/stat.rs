@@ -1,4 +1,7 @@
+use std::time::Duration;
+
 use async_trait::async_trait;
+use headers::HeaderMapExt;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
@@ -18,14 +21,50 @@ pub struct Stat {
 
 #[async_trait]
 pub trait GetStat {
-    async fn stat(&self, input: File) -> Result<Stat>;
+    /// Calls the `stat` endpoint. It returns information about a file.
+    async fn stat(&self, input: &File) -> Result<Stat>;
+
+    /// Calls the `stat` endpoint. Use `retry_condition` to decide if the method should be
+    /// called again or not (return Err or Ok), this can be useful when some optional data is not
+    /// available yet, and we want to give the server a bit more time to compute it (like
+    /// `metadata.hash` and `metadata.size`.
+    async fn stat_with_retry(
+        &self,
+        input: &File,
+        retry_condition: Box<dyn Fn(Result<Stat>) -> Result<Stat> + Send + Sync>,
+    ) -> Result<Stat>;
 }
 
 #[async_trait]
 impl<T: PCloudClient> GetStat for T {
-    async fn stat(&self, input: File) -> Result<Stat> {
-        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
+    async fn stat(&self, input: &File) -> Result<Stat> {
+        let mut headers = HeaderMap::default();
+        let conn = headers::Connection::close();
+        headers.typed_insert(conn);
+
+        RESTClient::get(self, ENDPOINT, headers, input).await
     }
+
+    async fn stat_with_retry(
+        &self,
+        input: &File,
+        retry_condition: Box<dyn Fn(Result<Stat>) -> Result<Stat> + Send + Sync>,
+    ) -> Result<Stat> {
+        tryhard::retry_fn(|| stat_with_retry(self, input, &retry_condition))
+            .retries(10)
+            .exponential_backoff(Duration::from_millis(100))
+            .max_delay(Duration::from_secs(5))
+            .await
+    }
+}
+
+async fn stat_with_retry<T: PCloudClient>(
+    client: &T,
+    input: &File,
+    retry_condition: &(dyn Fn(Result<Stat>) -> Result<Stat> + Send + Sync),
+) -> Result<Stat> {
+    let r = client.stat(input).await;
+    retry_condition(r)
 }
 
 #[cfg(test)]
