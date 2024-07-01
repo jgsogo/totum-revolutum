@@ -25,6 +25,7 @@ flume = { workspace = true }
 home = { workspace = true }
 ignore-files = { workspace = true }
 image = { workspace = true }
+kamadak-exif = { workspace = true }
 log = { workspace = true }
 oxipng = { workspace = true }
 ring = { workspace = true }
