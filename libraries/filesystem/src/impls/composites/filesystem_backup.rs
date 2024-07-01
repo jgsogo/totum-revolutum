@@ -112,11 +112,11 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
         self.rhs.lock().await.take().unwrap().sync_all().await
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         self.lhs.walk_directory(tx, ignore_filter).await
     }
 
-    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<FileMetadata> {
         self.lhs.get_metadata(path).await
     }
 

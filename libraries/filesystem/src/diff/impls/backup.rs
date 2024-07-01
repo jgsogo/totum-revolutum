@@ -19,22 +19,18 @@ pub enum BackupConflict {
 
 #[derive(Default)]
 struct BackupReceiver {
-    to_copy: Vec<Box<dyn FileMetadata>>,
-    conflicts: Vec<(Box<dyn FileMetadata>, Box<dyn FileMetadata>)>,
+    to_copy: Vec<FileMetadata>,
+    conflicts: Vec<(FileMetadata, FileMetadata)>,
 }
 
 #[async_trait]
 impl Receiver for BackupReceiver {
-    async fn only_lhs(&mut self, file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+    async fn only_lhs(&mut self, file_metadata: FileMetadata) -> Result<()> {
         self.to_copy.push(file_metadata);
         Ok(())
     }
 
-    async fn diff_files(
-        &mut self,
-        lhs_file_metadata: Box<dyn FileMetadata>,
-        rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
+    async fn diff_files(&mut self, lhs_file_metadata: FileMetadata, rhs_file_metadata: FileMetadata) -> Result<()> {
         self.conflicts.push((lhs_file_metadata, rhs_file_metadata));
         Ok(())
     }
@@ -128,21 +124,21 @@ mod tests {
             assert!(diff_mocks.fs_rhs.exists(&diff_mocks.lhs_only).await?);
             let rhs_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.lhs_only).await?;
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.lhs_only).await?;
-            assert!(rhs_metadata.eq(lhs_metadata.as_ref())?);
+            assert_eq!(rhs_metadata, lhs_metadata);
         }
         {
             // diff_hash file has changed
             let rhs_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_hash).await?;
-            assert!(!rhs_metadata.eq(original_diff_hash_metadata.as_ref())?);
+            assert_ne!(rhs_metadata, original_diff_hash_metadata);
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_hash).await?;
-            assert!(rhs_metadata.eq(lhs_metadata.as_ref())?);
+            assert_eq!(rhs_metadata, lhs_metadata);
         }
         {
             // diff_size file now is equal
             let rhs_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_size).await?;
-            assert!(!rhs_metadata.eq(original_diff_size_metadata.as_ref())?);
+            assert_ne!(rhs_metadata, original_diff_size_metadata);
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_size).await?;
-            assert!(rhs_metadata.eq(lhs_metadata.as_ref())?);
+            assert_eq!(rhs_metadata, lhs_metadata);
         }
 
         Ok(())
@@ -171,21 +167,21 @@ mod tests {
             assert!(diff_mocks.fs_rhs.exists(&diff_mocks.lhs_only).await?);
             let rhs_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.lhs_only).await?;
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.lhs_only).await?;
-            assert!(rhs_metadata.eq(lhs_metadata.as_ref())?);
+            assert_eq!(rhs_metadata, lhs_metadata);
         }
         {
             // diff_hash file has NOT changed
             let rhs_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_hash).await?;
-            assert!(rhs_metadata.eq(original_diff_hash_metadata.as_ref())?);
+            assert_eq!(rhs_metadata, original_diff_hash_metadata);
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_hash).await?;
-            assert!(!rhs_metadata.eq(lhs_metadata.as_ref())?);
+            assert_ne!(rhs_metadata, lhs_metadata);
         }
         {
             // diff_size file has NOT changed
             let rhs_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_size).await?;
-            assert!(rhs_metadata.eq(original_diff_size_metadata.as_ref())?);
+            assert_eq!(rhs_metadata, original_diff_size_metadata);
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_size).await?;
-            assert!(!rhs_metadata.eq(lhs_metadata.as_ref())?);
+            assert_ne!(rhs_metadata, lhs_metadata);
         }
 
         Ok(())

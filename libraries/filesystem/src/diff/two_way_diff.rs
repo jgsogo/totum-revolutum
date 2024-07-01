@@ -26,8 +26,8 @@ pub async fn full_run<LHSFilesystem: Filesystem, RHSFilesystem: Filesystem, TRec
     lhs_ignore_filter: IgnoreFilter,
     rhs_ignore_filter: IgnoreFilter,
 ) -> Result<()> {
-    let (lhs_tx, lhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
-    let (rhs_tx, rhs_rx) = flume::bounded::<Box<dyn FileMetadata>>(MAX_BUFFER);
+    let (lhs_tx, lhs_rx) = flume::bounded::<FileMetadata>(MAX_BUFFER);
+    let (rhs_tx, rhs_rx) = flume::bounded::<FileMetadata>(MAX_BUFFER);
 
     let (report_tx, report_rx) = flume::bounded::<FileMetadataPair>(MAX_BUFFER);
 
@@ -128,18 +128,18 @@ mod tests {
 
     #[async_trait]
     impl Receiver for ReceiverMock {
-        async fn only_lhs(&mut self, file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+        async fn only_lhs(&mut self, file_metadata: FileMetadata) -> Result<()> {
             self.only_lhs.push(file_metadata.path().to_string());
             Ok(())
         }
-        async fn only_rhs(&mut self, file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+        async fn only_rhs(&mut self, file_metadata: FileMetadata) -> Result<()> {
             self.only_rhs.push(file_metadata.path().to_string());
             Ok(())
         }
         async fn equal_files(
             &mut self,
-            lhs_file_metadata: Box<dyn FileMetadata>,
-            rhs_file_metadata: Box<dyn FileMetadata>,
+            lhs_file_metadata: FileMetadata,
+            rhs_file_metadata: FileMetadata,
         ) -> Result<()> {
             assert_eq!(lhs_file_metadata.path(), rhs_file_metadata.path());
             assert_eq!(lhs_file_metadata.size(), rhs_file_metadata.size());
@@ -147,11 +147,7 @@ mod tests {
             self.equal.push(lhs_file_metadata.path().to_string());
             Ok(())
         }
-        async fn diff_files(
-            &mut self,
-            lhs_file_metadata: Box<dyn FileMetadata>,
-            rhs_file_metadata: Box<dyn FileMetadata>,
-        ) -> Result<()> {
+        async fn diff_files(&mut self, lhs_file_metadata: FileMetadata, rhs_file_metadata: FileMetadata) -> Result<()> {
             assert_eq!(lhs_file_metadata.path(), rhs_file_metadata.path());
             self.diff.push(lhs_file_metadata.path().to_string());
             Ok(())

@@ -128,11 +128,7 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
         self.filesystem.lock().await.take().unwrap().sync_all().await
     }
 
-    async fn walk_directory(
-        &self,
-        tx: flume::Sender<Box<dyn FileMetadata>>,
-        ignore_filter: IgnoreFilter,
-    ) -> Result<()> {
+    async fn walk_directory(&self, tx: flume::Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         self.filesystem
             .lock()
             .await
@@ -142,7 +138,7 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
             .await
     }
 
-    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<FileMetadata> {
         self.filesystem.lock().await.as_ref().unwrap().get_metadata(path).await
     }
 

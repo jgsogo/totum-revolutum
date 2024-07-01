@@ -204,7 +204,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     /// full path. Note that this method iterates the rows in [`models::File`], execute [`Self::sync`]
     /// to ensure that all of them are also [`models::PhotoFile`] rows.
     pub async fn list(&self) -> Result<()> {
-        let (tx, rx) = flume::bounded::<Box<dyn FileMetadata>>(32);
+        let (tx, rx) = flume::bounded::<FileMetadata>(32);
 
         tokio::spawn(async move {
             let mut count_files = 0;

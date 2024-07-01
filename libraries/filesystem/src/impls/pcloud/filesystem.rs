@@ -25,7 +25,6 @@ use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 use crate::filesystem::FilesystemOps;
 use crate::ignore_filter::IgnoreFilterT;
 use crate::impls::pcloud::file::RemoteFile;
-use crate::impls::pcloud::file_metadata::RemoteMetadata;
 use crate::{DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilenameBuf, Filesystem, Result};
 
 pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone + Send + 'static> {
@@ -59,7 +58,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
         //  and use a thread pool to enter child directories and _recurse_.
@@ -96,12 +95,12 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
                                     warn!("sha256 and/or metadata.size are not available");
                                 }
 
-                                let data = RemoteMetadata::new(
-                                    filepath,
-                                    checksumfile.sha256.unwrap(),
-                                    checksumfile.metadata.size.unwrap(),
-                                );
-                                tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
+                                let data = FileMetadata {
+                                    path: filepath,
+                                    hash: checksumfile.sha256.unwrap(),
+                                    size: checksumfile.metadata.size.unwrap(),
+                                };
+                                tx.send(data).map_err(|e| Error::Other(e.to_string()))?;
                             }
                         }
                         Metadata::MetadataFolder(m) => {
@@ -123,7 +122,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
-    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<FileMetadata> {
         let remote_path = {
             let abs_path = self.root_path.join(path);
             RemotePath::try_from(abs_path).map_err(|e| Error::Other(e.to_string()))?
@@ -151,11 +150,11 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
 
-        Ok(Box::new(RemoteMetadata::new(
-            path.to_filepath_buf(),
-            stat.sha256.unwrap(),
-            stat.metadata.size.unwrap(),
-        )))
+        Ok(FileMetadata {
+            path: path.to_filepath_buf(),
+            hash: stat.sha256.unwrap(),
+            size: stat.metadata.size.unwrap(),
+        })
     }
 
     async fn exists(&self, path: &FilePath) -> Result<bool> {

@@ -18,13 +18,12 @@ pub trait Filesystem: Send + Sync {
     /// to the [`Filesystem`] because it **reads** the contents of the directories.
     ///
     /// TODO: Probably we need the possibility to choose the starting path
-    async fn walk_directory(&self, tx: flume::Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter)
-        -> Result<()>;
+    async fn walk_directory(&self, tx: flume::Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()>;
 
     /// Returns the [`FileMetadata`] for the given `path`. This operation blocks until the data is
     /// available (some filesystem implementations might not have this data available right at
     /// the moment a new file is created).
-    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>>;
+    async fn get_metadata(&self, path: &FilePath) -> Result<FileMetadata>;
 
     /// Returns true if the path points at an existing entity.
     async fn exists(&self, path: &FilePath) -> Result<bool>;

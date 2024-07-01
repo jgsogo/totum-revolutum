@@ -13,7 +13,6 @@ use tracing::info;
 
 use crate::filesystem::FilesystemOps;
 use crate::ignore_filter::IgnoreFilterT;
-use crate::impls::local::file_metadata::LocalMetadata;
 use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result};
 
 use super::parallel_visitor;
@@ -43,7 +42,7 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         let root = self.root.clone();
 
         let walker = WalkBuilder::new(&self.root)
@@ -81,11 +80,17 @@ impl Filesystem for FilesystemLocal {
         Ok(())
     }
 
-    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
-        // It doesn't make much sense that the `Self::Metadata` contains an `ignore::DirEntry`, we
-        // need something more identifiable as metadata in a local filesystem
-        let local_metadata = LocalMetadata::from_filesystem(&self.root.join(path), path)?;
-        Ok(Box::new(local_metadata))
+    async fn get_metadata(&self, path: &FilePath) -> Result<FileMetadata> {
+        let abs_path = self.root.join(path);
+        let size = abs_path.metadata().map_err(Error::IoError)?.len();
+        let hash = sha256::try_digest(abs_path)
+            .map_err(|e| Error::Other(format!("Cannot compute sha256 of given file: {}", e)))?;
+
+        Ok(FileMetadata {
+            path: path.to_filepath_buf(),
+            hash,
+            size,
+        })
     }
 
     async fn exists(&self, path: &FilePath) -> Result<bool> {

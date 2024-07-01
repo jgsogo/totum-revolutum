@@ -98,7 +98,7 @@ impl<TIndex: Filesystem, TStorage: Filesystem> Filesystem for FilesystemIndexed<
         self.index.lock().await.take().unwrap().sync_all().await
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         self.index
             .lock()
             .await
@@ -108,7 +108,7 @@ impl<TIndex: Filesystem, TStorage: Filesystem> Filesystem for FilesystemIndexed<
             .await
     }
 
-    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<FileMetadata> {
         self.index.lock().await.as_ref().unwrap().get_metadata(path).await
     }
 
@@ -181,7 +181,7 @@ mod tests {
 
         // walk_directory
         {
-            let (tx, _) = flume::bounded::<Box<dyn FileMetadata>>(0);
+            let (tx, _) = flume::bounded::<FileMetadata>(0);
             let r = indexed_filesystem.walk_directory(tx, IgnoreFilter::empty("")).await;
             assert!(r.is_err());
             // index was called
