@@ -1,4 +1,4 @@
-use crate::{FileMetadata, FilePath, FilePathBuf, Result};
+use crate::{FileMetadata, FilePath, FilePathBuf};
 
 #[derive(Debug, Clone)]
 pub struct RemoteMetadata {
@@ -12,12 +12,12 @@ impl FileMetadata for RemoteMetadata {
         &self.path
     }
 
-    fn size(&self) -> Result<u64> {
-        Ok(self.size)
+    fn size(&self) -> u64 {
+        self.size
     }
 
-    fn hash(&self) -> Result<String> {
-        Ok(self.hash.clone())
+    fn hash(&self) -> &str {
+        &self.hash
     }
 }
 

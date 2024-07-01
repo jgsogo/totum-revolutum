@@ -292,16 +292,11 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> FilesystemOps for T {
                 // If target does exist, I retrieve the directory and update the file
                 let target_dir = self.get_directory(target.directory())?;
                 let file = self.get_file(&target_dir, target.filename())?;
-                let _ = self.update_file(file, None, None, Some(metadata.size()?), Some(&metadata.hash()?))?;
+                let _ = self.update_file(file, None, None, Some(metadata.size()), Some(metadata.hash()))?;
             } else {
                 // If target doesn't exist, I create the file (and the directory)
                 let (target_dir, _) = self.get_or_create_directory_all(target.directory())?;
-                let _ = self.create_file(
-                    &target_dir,
-                    target.filename(),
-                    &metadata.hash()?,
-                    metadata.size()? as i32,
-                )?;
+                let _ = self.create_file(&target_dir, target.filename(), metadata.hash(), metadata.size() as i32)?;
             }
 
             Ok(None)
@@ -348,11 +343,11 @@ impl FileMetadata for FileWrapper {
         &self.path
     }
 
-    fn size(&self) -> Result<u64> {
-        Ok(self.size)
+    fn size(&self) -> u64 {
+        self.size
     }
 
-    fn hash(&self) -> Result<String> {
-        Ok(self.hash.clone())
+    fn hash(&self) -> &str {
+        &self.hash
     }
 }

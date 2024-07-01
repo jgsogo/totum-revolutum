@@ -12,15 +12,13 @@ pub trait FileMetadata: Send + Sync + Debug {
     fn path(&self) -> &FilePath;
 
     /// The size of the file
-    /// FIXME: Remove the Result. It can return the u64 directly
-    fn size(&self) -> Result<u64>;
+    fn size(&self) -> u64;
 
-    /// A hash computed from the contents of the file
-    /// FIXME: Remove the Result. It can return the String directly (maybe &str)
-    fn hash(&self) -> Result<String>;
+    /// A hash (sha256) computed from the contents of the file
+    fn hash(&self) -> &str;
 
     /// Equality at [`FileMetadata`] level: checks only size and hash
     fn eq(&self, other: &dyn FileMetadata) -> Result<bool> {
-        Ok(self.size()? == other.size()? && self.hash()? == other.hash()?)
+        Ok(self.size() == other.size() && self.hash() == other.hash())
     }
 }

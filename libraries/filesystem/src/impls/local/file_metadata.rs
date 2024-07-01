@@ -14,12 +14,12 @@ impl FileMetadata for LocalMetadata {
         &self.path
     }
 
-    fn size(&self) -> Result<u64> {
-        Ok(self.size)
+    fn size(&self) -> u64 {
+        self.size
     }
 
-    fn hash(&self) -> Result<String> {
-        Ok(self.hash.clone())
+    fn hash(&self) -> &str {
+        &self.hash
     }
 }
 

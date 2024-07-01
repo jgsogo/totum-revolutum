@@ -480,8 +480,8 @@ mod tests {
             .get_metadata(&dir.join_filename(FilenameBuf::from_str("file1.txt").unwrap()))
             .await?;
         assert_eq!(metadata.path().as_str(), "dir1/subdir1/subsubdir1/file1.txt");
-        assert_eq!(metadata.hash()?, "file1");
-        assert_eq!(metadata.size()?, 1);
+        assert_eq!(metadata.hash(), "file1");
+        assert_eq!(metadata.size(), 1);
 
         // Directory doesn't exist
         let dir_not_exist = DirectoryPathBuf::from_str("not/exists").unwrap();
@@ -703,8 +703,8 @@ mod tests {
         let r = db.internal_copy(&file_txt, &file2_txt, true).await?;
         assert!(r.is_none()); // Nothing to wait
         let metadata = db.get_metadata(&file2_txt).await?;
-        assert_eq!(metadata.hash()?, "file1");
-        assert_eq!(metadata.size()?, 1);
+        assert_eq!(metadata.hash(), "file1");
+        assert_eq!(metadata.size(), 1);
 
         Ok(())
     }
@@ -763,8 +763,8 @@ mod tests {
         let r = db.internal_move(&file_copy_txt, &file2_txt, true).await?;
         assert!(r.is_none()); // Nothing to wait
         let metadata = db.get_metadata(&file2_txt).await?;
-        assert_eq!(metadata.hash()?, "file1");
-        assert_eq!(metadata.size()?, 1);
+        assert_eq!(metadata.hash(), "file1");
+        assert_eq!(metadata.size(), 1);
         assert!(!db.exists(&file_copy_txt).await?);
 
         Ok(())

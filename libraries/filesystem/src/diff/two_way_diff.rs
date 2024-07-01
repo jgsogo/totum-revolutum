@@ -142,8 +142,8 @@ mod tests {
             rhs_file_metadata: Box<dyn FileMetadata>,
         ) -> Result<()> {
             assert_eq!(lhs_file_metadata.path(), rhs_file_metadata.path());
-            assert_eq!(lhs_file_metadata.size()?, rhs_file_metadata.size()?);
-            assert_eq!(lhs_file_metadata.hash()?, rhs_file_metadata.hash()?);
+            assert_eq!(lhs_file_metadata.size(), rhs_file_metadata.size());
+            assert_eq!(lhs_file_metadata.hash(), rhs_file_metadata.hash());
             self.equal.push(lhs_file_metadata.path().to_string());
             Ok(())
         }
