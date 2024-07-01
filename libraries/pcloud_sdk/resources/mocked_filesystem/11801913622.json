@@ -1,0 +1,47 @@
+{
+  "metadata": {
+    "comments": 0,
+    "contents": [
+      {
+        "comments": 0,
+        "created": "Sat, 29 Jun 2024 13:59:45 +0000",
+        "folderid": 11801915790,
+        "icon": "folder",
+        "id": "d11801915790",
+        "isfolder": true,
+        "ismine": true,
+        "isshared": false,
+        "modified": "Sat, 29 Jun 2024 13:59:45 +0000",
+        "name": "other",
+        "parentfolderid": 11801913622,
+        "thumb": false
+      },
+      {
+        "comments": 0,
+        "created": "Sat, 29 Jun 2024 13:59:42 +0000",
+        "folderid": 11801915311,
+        "icon": "folder",
+        "id": "d11801915311",
+        "isfolder": true,
+        "ismine": true,
+        "isshared": false,
+        "modified": "Sat, 29 Jun 2024 13:59:42 +0000",
+        "name": "subdir",
+        "parentfolderid": 11801913622,
+        "thumb": false
+      }
+    ],
+    "created": "Sat, 29 Jun 2024 13:59:30 +0000",
+    "folderid": 11801913622,
+    "icon": "folder",
+    "id": "d11801913622",
+    "isfolder": true,
+    "ismine": true,
+    "isshared": false,
+    "modified": "Sat, 29 Jun 2024 13:59:45 +0000",
+    "name": "dir1",
+    "parentfolderid": 11801912705,
+    "thumb": false
+  },
+  "result": 0
+}

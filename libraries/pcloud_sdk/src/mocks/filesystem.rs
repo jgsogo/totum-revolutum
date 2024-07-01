@@ -1,17 +1,20 @@
 use std::collections::HashMap;
 use std::fs;
 use std::io::BufReader;
-use std::str::FromStr;
 
 use camino::Utf8Path;
 use http::HeaderMap;
 use serde::de::DeserializeOwned;
 
+use crate::methods::file::checksumfile;
+use crate::methods::file::checksumfile::ChecksumFile;
 use crate::methods::folder::{listfolder, ListFolder};
 use crate::mocks::client::MockLocalClient;
 use crate::mocks::manifest_dir;
+use crate::structures::MetadataFile;
+use crate::types::FileID;
 use crate::utils::http::ApiResult;
-use crate::Result;
+use crate::{Error, Result};
 
 pub fn read_json<T: DeserializeOwned>(p: impl AsRef<Utf8Path>) -> Result<T> {
     let filepath_json = manifest_dir().join("resources").join("mocked_filesystem").join(p);
@@ -54,6 +57,13 @@ pub fn filesystem_mocked() -> MockLocalClient {
             |endpoint: &str, _headers: &HeaderMap, _params: &HashMap<String, String>| endpoint == listfolder::ENDPOINT,
         )
         .returning(move |_endpoint, _headers: HeaderMap, params: &HashMap<_, _>| {
+            assert_eq!(
+                params
+                    .get("recursive")
+                    .ok_or(Error::InputDataEror("'recursive' prams not found".to_string()))?,
+                "0"
+            );
+
             if let Some(path) = params.get(&"path".to_string()) {
                 if path == "/mocked_filesystem" {
                     read_json::<ListFolder>("root.json")
@@ -61,16 +71,44 @@ pub fn filesystem_mocked() -> MockLocalClient {
                     panic!("No mocked filesystem for path {}", path);
                 }
             } else if let Some(folderid) = params.get(&"folderid".to_string()) {
-                let folderid: u64 = u64::from_str(folderid).unwrap();
-                if folderid == 11801912705 {
-                    read_json::<ListFolder>("root.json")
-                } else {
-                    panic!("No mocked filesystem for folderid {}", folderid);
-                }
+                read_json::<ListFolder>(format!("{}.json", folderid))
             } else {
-                panic!("ListFolder called with invalid params {:?}", params);
+                panic!("ListFolder mock called with unexpected params {:?}", params);
             }
         });
+
+    client
+        .expect_get::<ChecksumFile, _>()
+        .withf(
+            |endpoint: &str, _headers: &HeaderMap, _params: &HashMap<String, String>| {
+                endpoint == checksumfile::ENDPOINT
+            },
+        )
+        .returning(
+            move |_endpoint, _headers: HeaderMap, params: &HashMap<String, String>| {
+                if let Some(fileid) = params.get(&"fileid".to_string()) {
+                    Ok(ChecksumFile {
+                        sha1: None,
+                        md5: None,
+                        sha256: Some(format!("sha256 for fileid {}", fileid)),
+                        metadata: MetadataFile {
+                            fileid: FileID::new(fileid.parse().unwrap()),
+                            common: Default::default(),
+                            deletedfileid: None,
+                            category: None,
+                            hash: None,
+                            size: Some(1234),
+                            contenttype: None,
+                            extra_imagefile: None,
+                            extra_audiofile: None,
+                            extra_videofile: None,
+                        },
+                    })
+                } else {
+                    panic!("No mocked pcloud.checksum for params {:?}", params);
+                }
+            },
+        );
 
     client
 }

@@ -8,6 +8,7 @@ use crate::types::errors::{ParseError, ParseErrorKind};
 
 use super::{FolderID, RemotePath};
 
+/// A folder in PCloud is represented by a [`FolderID`] (preferred) or a [`RemotePath`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Folder {
     FolderID(FolderID),

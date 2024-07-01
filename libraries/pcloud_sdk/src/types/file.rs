@@ -8,7 +8,7 @@ use crate::types::errors::{ParseError, ParseErrorKind};
 
 use super::{FileID, RemotePath};
 
-/// A file in pCloud is represented by either a [`FileID`] or a [`RemotePath`]
+/// A file in pCloud is represented by either a [`FileID`] (preferred) or a [`RemotePath`]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum File {
     FileID(FileID),

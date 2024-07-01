@@ -47,6 +47,8 @@ impl AddToParams for ListFolderInput {
         self.folder.add_to_params(params);
         if self.recursive {
             params.insert("recursive".to_string(), "1".to_string());
+        } else {
+            params.insert("recursive".to_string(), "0".to_string());
         }
     }
 }
@@ -74,12 +76,10 @@ impl<T: PCloudClient> GetListFolder for T {
     async fn listfolder_with_filtermeta(
         &self,
         list_folder: ListFolderInput,
-        filtermeta: Vec<&str>,
+        mut filtermeta: Vec<&str>,
     ) -> Result<ListFolder> {
         let mut params = HashMap::new();
         list_folder.add_to_params(&mut params);
-        let mut filtermeta = filtermeta;
-
         // TODO: I'm afraid not all the fields are valid here... search some docs or try/error and
         // TODO: document them manually (and raise if any of them is used)
 
@@ -90,7 +90,7 @@ impl<T: PCloudClient> GetListFolder for T {
         filtermeta.push("fileid");
 
         // Having two elements is also required to prevent a pcloud API bug. If we only use one
-        // element, for example `filtermeta=folderid`, the response JSON is not well formed when
+        // element, for example `filtermeta=folderid`, the response JSON is not well-formed when
         // there are files and folders inside the query directory, it returns some empty lists
         // where empty dictionaries were expected
 

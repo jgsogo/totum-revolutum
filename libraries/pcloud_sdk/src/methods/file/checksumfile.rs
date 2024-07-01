@@ -1,9 +1,11 @@
+use std::collections::HashMap;
 use std::time::Duration;
 
 use async_trait::async_trait;
 use headers::HeaderMapExt;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
+use utils::http::AddToParams;
 
 use utils::http::rest::RESTClient;
 
@@ -46,7 +48,11 @@ impl<T: PCloudClient> GetChecksumFile for T {
         let mut headers = HeaderMap::default();
         let conn = headers::Connection::close();
         headers.typed_insert(conn);
-        RESTClient::get(self, ENDPOINT, headers, input).await
+
+        let mut params = HashMap::new();
+        input.add_to_params(&mut params);
+
+        RESTClient::get(self, ENDPOINT, headers, &params).await
     }
 
     async fn checksumfile_with_retry(
