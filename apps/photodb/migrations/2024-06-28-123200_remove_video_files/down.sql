@@ -1,1 +1,1 @@
--- We are not creating tables again
+-- Sorry, we are not creating tables again

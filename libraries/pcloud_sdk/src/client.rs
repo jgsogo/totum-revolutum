@@ -70,7 +70,9 @@ impl<Token: access_token::OAuth2Token + DeserializeOwned + Sync + Send + 'static
     /// Appends common headers: if no `Connection` is already there, it will add `Keep-Alive` one.
     fn headers(&self, mut headers: HeaderMap) -> HeaderMap {
         // FIXME: Probably we should remove this method and each call should set its own headers,
-        // FIXME: AFAIK, only the `pcloud::fileops` ones require to keep the connection open
+        // FIXME: AFAIK, only the `pcloud::fileops` ones require to keep the connection open. How
+        // FIXME: does this work when executing things in parallel/async? Can I keep some connections
+        // FIXME: alive while others are closed?
         if !headers.contains_key(headers::Connection::name()) {
             let conn = headers::Connection::keep_alive();
             headers.typed_insert(conn);

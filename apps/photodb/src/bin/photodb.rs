@@ -131,7 +131,7 @@ async fn main() -> Result<()> {
             if let Err((_tmpdir, localfile)) = done.await? {
                 error!("Failed to execute cleanup task (upload) of proxied file. We save the DB to a local file");
                 let date = chrono::Local::now();
-                let db_filename = format!("{}.sqlite3", date.format("[%Y-%m-%d][%H:%M:%S]"));
+                let db_filename = format!("{}.sqlite3", date.format("%Y%m%d-%H:%M:%S"));
                 let db_backup_filename = app_dir.db_backups().join(db_filename);
                 std::fs::copy(&localfile, &db_backup_filename).map_err(|e| {
                     anyhow!(

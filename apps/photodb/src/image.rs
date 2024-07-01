@@ -9,7 +9,7 @@ use filesystem::FilePathBuf;
 /// Takes the path to an image file (`input`), applies some transformations and returns the path
 /// to the transformed file (inside the provided `filesystem_local`).
 ///
-/// Currently, the transformation it applies are:
+/// Currently, it applies the following transformations:
 ///  * Convert to PNG using the [`image`] crate.
 ///  * Apply optimization using [`oxipng`] crate.
 pub(crate) fn prepare_image_file(
