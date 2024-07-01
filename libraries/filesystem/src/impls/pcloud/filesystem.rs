@@ -11,8 +11,8 @@ use tracing::{info, trace};
 
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::{Exists, GetCreateFolderIfNotExistsAll, GetFolderID};
+use pcloud_sdk::methods::file::checksumfile::{ChecksumFile, GetChecksumFile};
 use pcloud_sdk::methods::file::deletefile::GetDeleteFile;
-use pcloud_sdk::methods::file::stat::{GetStat, Stat};
 use pcloud_sdk::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
 use pcloud_sdk::methods::folder::deletefolder::GetDeleteFolder;
 use pcloud_sdk::methods::folder::deletefolderrecursive::GetDeleteFolderRecursive;
@@ -67,7 +67,23 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), filepath);
 
                     if ignore_filter.visit_file(&filepath) {
-                        let data = RemoteMetadata::new(filepath, m.clone());
+                        // FIXME: Use checksumfile here
+                        // let abs_filepath = self.root_path.join(&filepath);
+                        // let remote_path =
+                        //     RemotePath::try_from(abs_filepath).map_err(|e| Error::Other(e.to_string()))?;
+                        // let remote_file = pcloud_sdk::types::File::RemotePath(remote_path);
+                        // let checksumfile = self
+                        //     .pcloud
+                        //     .checksumfile(&remote_file)
+                        //     .await
+                        //     .map_err(|e| Error::Other(e.to_string()))?;
+
+                        let data = RemoteMetadata::new(
+                            filepath,
+                            "checksumfile.sha256".to_string(),
+                            // checksumfile.metadata.size.unwrap(),
+                            0,
+                        );
                         tx.send(Box::new(data)).map_err(|e| Error::Other(e.to_string()))?;
                     }
                 }
@@ -76,7 +92,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> FilesystemPCloud<HttpCli
                     trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
 
                     if ignore_filter.visit_directory(&path) {
-                        FilesystemPCloud::<HttpClient>::work_on_contents(
+                        Self::work_on_contents(
                             tx.clone(),
                             &path,
                             m.contents.as_ref().unwrap(),
@@ -113,13 +129,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .unwrap();
 
         match &items.metadata.contents {
-            Some(contents) => FilesystemPCloud::<HttpClient>::work_on_contents(
-                tx,
-                &DirectoryPathBuf::root(),
-                contents,
-                0,
-                ignore_filter,
-            )?,
+            Some(contents) => Self::work_on_contents(tx, &DirectoryPathBuf::root(), contents, 0, ignore_filter)?,
             None => (),
         }
         info!("Finished remote visitor in {:?}", start.elapsed());
@@ -137,11 +147,11 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         // FIXME: Use checksumfile here to get the sha256 of the file
         let stat = self
             .pcloud
-            .stat_with_retry(
+            .checksumfile_with_retry(
                 &remote_file,
-                Box::new(|r: pcloud_sdk::Result<Stat>| match r {
+                Box::new(|r: pcloud_sdk::Result<ChecksumFile>| match r {
                     Ok(r) => {
-                        if r.metadata.hash.is_none() || r.metadata.size.is_none() {
+                        if r.sha256.is_none() || r.metadata.size.is_none() {
                             Err(pcloud_sdk::Error::InputDataEror(
                                 "Hash and size are not available. Retry".to_string(),
                             ))
@@ -155,7 +165,11 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
             .await
             .map_err(|e| Error::Other(e.to_string()))?;
 
-        Ok(Box::new(RemoteMetadata::new(path.to_filepath_buf(), stat.metadata)))
+        Ok(Box::new(RemoteMetadata::new(
+            path.to_filepath_buf(),
+            stat.sha256.unwrap(),
+            stat.metadata.size.unwrap(),
+        )))
     }
 
     async fn exists(&self, path: &FilePath) -> Result<bool> {

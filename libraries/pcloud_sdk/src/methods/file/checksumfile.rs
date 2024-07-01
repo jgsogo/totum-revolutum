@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use async_trait::async_trait;
 use headers::HeaderMapExt;
 use http::HeaderMap;
@@ -23,16 +25,50 @@ pub struct ChecksumFile {
 #[async_trait]
 pub trait GetChecksumFile {
     async fn checksumfile(&self, input: &File) -> Result<ChecksumFile>;
+
+    /// Calls the `checksumfile` endpoint. Use `retry_condition` to decide if the method should be
+    /// called again or not (return Err or Ok), this can be useful when some optional data is not
+    /// available yet, and we want to give the server a bit more time to compute it (like
+    /// `metadata.hash` and `metadata.size`).
+    async fn checksumfile_with_retry(
+        &self,
+        input: &File,
+        retry_condition: Box<dyn Fn(Result<ChecksumFile>) -> Result<ChecksumFile> + Send + Sync>,
+    ) -> Result<ChecksumFile>;
 }
 
 #[async_trait]
 impl<T: PCloudClient> GetChecksumFile for T {
     async fn checksumfile(&self, input: &File) -> Result<ChecksumFile> {
+        // Closing the connection here (expected to work at least on the second call). When I've
+        // just uploaded a file, some optional information (hash) is not available right away. We
+        // need to retry (or maybe just use a new connection)
         let mut headers = HeaderMap::default();
         let conn = headers::Connection::close();
         headers.typed_insert(conn);
         RESTClient::get(self, ENDPOINT, headers, input).await
     }
+
+    async fn checksumfile_with_retry(
+        &self,
+        input: &File,
+        retry_condition: Box<dyn Fn(Result<ChecksumFile>) -> Result<ChecksumFile> + Send + Sync>,
+    ) -> Result<ChecksumFile> {
+        tryhard::retry_fn(|| checksumfile_with_retry(self, input, &retry_condition))
+            .retries(10)
+            .exponential_backoff(Duration::from_millis(100))
+            .max_delay(Duration::from_secs(5))
+            .await
+    }
+}
+
+async fn checksumfile_with_retry<T: PCloudClient>(
+    client: &T,
+    input: &File,
+    retry_condition: &(dyn Fn(Result<ChecksumFile>) -> Result<ChecksumFile> + Send + Sync),
+) -> Result<ChecksumFile> {
+    let r = client.checksumfile(input).await;
+    retry_condition(r)
 }
 
 #[cfg(test)]

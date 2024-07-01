@@ -27,7 +27,7 @@ pub trait GetStat {
     /// Calls the `stat` endpoint. Use `retry_condition` to decide if the method should be
     /// called again or not (return Err or Ok), this can be useful when some optional data is not
     /// available yet, and we want to give the server a bit more time to compute it (like
-    /// `metadata.hash` and `metadata.size`.
+    /// `metadata.hash` and `metadata.size`).
     async fn stat_with_retry(
         &self,
         input: &File,
