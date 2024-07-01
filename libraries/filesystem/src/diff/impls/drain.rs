@@ -16,26 +16,18 @@ pub enum DrainConflict {
 
 #[derive(Default)]
 struct DrainReceiver {
-    to_remove: Vec<(Box<dyn FileMetadata>, Box<dyn FileMetadata>)>,
-    conflicts: Vec<(Box<dyn FileMetadata>, Box<dyn FileMetadata>)>,
+    to_remove: Vec<(FileMetadata, FileMetadata)>,
+    conflicts: Vec<(FileMetadata, FileMetadata)>,
 }
 
 #[async_trait]
 impl Receiver for DrainReceiver {
-    async fn equal_files(
-        &mut self,
-        lhs_file_metadata: Box<dyn FileMetadata>,
-        rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
+    async fn equal_files(&mut self, lhs_file_metadata: FileMetadata, rhs_file_metadata: FileMetadata) -> Result<()> {
         self.to_remove.push((lhs_file_metadata, rhs_file_metadata));
         Ok(())
     }
 
-    async fn diff_files(
-        &mut self,
-        lhs_file_metadata: Box<dyn FileMetadata>,
-        rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
+    async fn diff_files(&mut self, lhs_file_metadata: FileMetadata, rhs_file_metadata: FileMetadata) -> Result<()> {
         self.conflicts.push((lhs_file_metadata, rhs_file_metadata));
         Ok(())
     }
@@ -113,12 +105,12 @@ mod tests {
         {
             // diff_hash file has NOT changed
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_hash).await?;
-            assert!(lhs_metadata.eq(original_diff_hash_metadata.as_ref())?);
+            assert_eq!(lhs_metadata, original_diff_hash_metadata);
         }
         {
             // diff_size file has NOT changed
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_size).await?;
-            assert!(lhs_metadata.eq(original_diff_size_metadata.as_ref())?);
+            assert_eq!(lhs_metadata, original_diff_size_metadata);
         }
 
         Ok(())

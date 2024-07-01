@@ -8,28 +8,24 @@ use crate::{Error, FileMetadata, Filesystem, FilesystemOps, Result};
 
 #[derive(Default)]
 struct MirrorReceiver {
-    to_copy: Vec<Box<dyn FileMetadata>>,
-    to_override: Vec<(Box<dyn FileMetadata>, Box<dyn FileMetadata>)>,
-    to_delete: Vec<Box<dyn FileMetadata>>,
+    to_copy: Vec<FileMetadata>,
+    to_override: Vec<(FileMetadata, FileMetadata)>,
+    to_delete: Vec<FileMetadata>,
 }
 
 #[async_trait]
 impl Receiver for MirrorReceiver {
-    async fn only_lhs(&mut self, file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+    async fn only_lhs(&mut self, file_metadata: FileMetadata) -> Result<()> {
         self.to_copy.push(file_metadata);
         Ok(())
     }
 
-    async fn only_rhs(&mut self, file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+    async fn only_rhs(&mut self, file_metadata: FileMetadata) -> Result<()> {
         self.to_delete.push(file_metadata);
         Ok(())
     }
 
-    async fn diff_files(
-        &mut self,
-        lhs_file_metadata: Box<dyn FileMetadata>,
-        rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
+    async fn diff_files(&mut self, lhs_file_metadata: FileMetadata, rhs_file_metadata: FileMetadata) -> Result<()> {
         self.to_override.push((lhs_file_metadata, rhs_file_metadata));
         Ok(())
     }
@@ -120,16 +116,16 @@ mod tests {
         {
             // diff_hash file has changed
             let rhs_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_hash).await?;
-            assert!(!rhs_metadata.eq(original_diff_hash_metadata.as_ref())?);
+            assert_ne!(rhs_metadata, original_diff_hash_metadata);
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_hash).await?;
-            assert!(rhs_metadata.eq(lhs_metadata.as_ref())?);
+            assert_eq!(rhs_metadata, lhs_metadata);
         }
         {
             // diff_size file now is equal
             let rhs_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_size).await?;
-            assert!(!rhs_metadata.eq(original_diff_size_metadata.as_ref())?);
+            assert_ne!(rhs_metadata, original_diff_size_metadata);
             let lhs_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_size).await?;
-            assert!(rhs_metadata.eq(lhs_metadata.as_ref())?);
+            assert_eq!(rhs_metadata, lhs_metadata);
         }
 
         Ok(())

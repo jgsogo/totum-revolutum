@@ -1,7 +1,7 @@
 use crate::{FileMetadata, Result};
 use async_trait::async_trait;
 
-pub type FileMetadataPair = (Option<Box<dyn FileMetadata>>, Option<Box<dyn FileMetadata>>);
+pub type FileMetadataPair = (Option<FileMetadata>, Option<FileMetadata>);
 
 /// Interface to receive the results from the 2-way diff [`super::full_run`] function
 #[async_trait]
@@ -21,13 +21,13 @@ pub trait Receiver: Send + Sync {
 
     /// Receives the [`FileMetadata`] for the files that are only present in the left-hand-side
     /// filesystem
-    async fn only_lhs(&mut self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+    async fn only_lhs(&mut self, _file_metadata: FileMetadata) -> Result<()> {
         Ok(())
     }
 
     /// Receives the [`FileMetadata`] for the files that are only present in the right-hand-side
     /// filesystem
-    async fn only_rhs(&mut self, _file_metadata: Box<dyn FileMetadata>) -> Result<()> {
+    async fn only_rhs(&mut self, _file_metadata: FileMetadata) -> Result<()> {
         Ok(())
     }
 
@@ -35,12 +35,8 @@ pub trait Receiver: Send + Sync {
     ///
     /// The default implementation will forward the call to [`Receiver::equal_files`] or
     /// [`Receiver::diff_files`].
-    async fn lhs_and_rhs(
-        &mut self,
-        lhs_file_metadata: Box<dyn FileMetadata>,
-        rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
-        if lhs_file_metadata.eq(rhs_file_metadata.as_ref())? {
+    async fn lhs_and_rhs(&mut self, lhs_file_metadata: FileMetadata, rhs_file_metadata: FileMetadata) -> Result<()> {
+        if lhs_file_metadata == rhs_file_metadata {
             self.equal_files(lhs_file_metadata, rhs_file_metadata).await
         } else {
             self.diff_files(lhs_file_metadata, rhs_file_metadata).await
@@ -48,20 +44,12 @@ pub trait Receiver: Send + Sync {
     }
 
     /// Receives the [`FileMetadata`] for the files that are present in both filesystems and are equal
-    async fn equal_files(
-        &mut self,
-        _lhs_file_metadata: Box<dyn FileMetadata>,
-        _rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
+    async fn equal_files(&mut self, _lhs_file_metadata: FileMetadata, _rhs_file_metadata: FileMetadata) -> Result<()> {
         Ok(())
     }
 
     /// Receives the [`FileMetadata`] for the files that are present in both filesystems and are different
-    async fn diff_files(
-        &mut self,
-        _lhs_file_metadata: Box<dyn FileMetadata>,
-        _rhs_file_metadata: Box<dyn FileMetadata>,
-    ) -> Result<()> {
+    async fn diff_files(&mut self, _lhs_file_metadata: FileMetadata, _rhs_file_metadata: FileMetadata) -> Result<()> {
         Ok(())
     }
 }

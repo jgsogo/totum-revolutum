@@ -4,17 +4,15 @@ use camino::{Utf8Path, Utf8PathBuf};
 use ignore::{ParallelVisitor, ParallelVisitorBuilder, WalkState};
 use tracing::error;
 
-use crate::{DirectoryPathBuf, FileMetadata, FilePathBuf, FilenameBuf};
-
-use super::file_metadata::LocalMetadata;
+use crate::{DirectoryPathBuf, Error, FileMetadata, FilePathBuf, FilenameBuf};
 
 struct Visitor {
-    tx: flume::Sender<Box<dyn FileMetadata>>,
+    tx: flume::Sender<FileMetadata>,
     base_path: Utf8PathBuf,
 }
 
 impl Visitor {
-    pub fn new(tx: flume::Sender<Box<dyn FileMetadata>>, base_path: Utf8PathBuf) -> Visitor {
+    pub fn new(tx: flume::Sender<FileMetadata>, base_path: Utf8PathBuf) -> Visitor {
         Visitor { tx, base_path }
     }
 }
@@ -37,15 +35,28 @@ impl ParallelVisitor for Visitor {
                 dirname,
                 FilenameBuf::from_str(relative_path.file_name().unwrap()).unwrap(),
             );
-            let data = match LocalMetadata::from_filesystem(entry_path, &filepath) {
-                Ok(metadata) => metadata,
+
+            let size = match entry_path.metadata().map_err(Error::IoError) {
+                Ok(s) => s.len(),
                 Err(e) => {
-                    error!("Error building LocalMetadata from path: {e}. Quit visiting.");
+                    error!("Error computing size for path {}: {e}", filepath);
                     return WalkState::Quit;
                 }
             };
+            let hash = match sha256::try_digest(entry_path) {
+                Ok(h) => h,
+                Err(e) => {
+                    error!("Error computing hash for path {}: {e}", filepath);
+                    return WalkState::Quit;
+                }
+            };
+            let data = FileMetadata {
+                path: filepath,
+                hash,
+                size,
+            };
 
-            if let Err(e) = self.tx.send(Box::new(data)) {
+            if let Err(e) = self.tx.send(data) {
                 error!("Error sending direntry metadata: {e}. Quit visiting.");
                 return WalkState::Quit;
             }
@@ -55,12 +66,12 @@ impl ParallelVisitor for Visitor {
 }
 
 pub(crate) struct VisitorBuilder {
-    tx: flume::Sender<Box<dyn FileMetadata>>,
+    tx: flume::Sender<FileMetadata>,
     base_path: Utf8PathBuf,
 }
 
 impl VisitorBuilder {
-    pub fn new(tx: flume::Sender<Box<dyn FileMetadata>>, base_path: Utf8PathBuf) -> VisitorBuilder {
+    pub fn new(tx: flume::Sender<FileMetadata>, base_path: Utf8PathBuf) -> VisitorBuilder {
         VisitorBuilder { tx, base_path }
     }
 }

@@ -106,15 +106,18 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> Filesystem for T {
         Ok(())
     }
 
-    async fn walk_directory(&self, tx: Sender<Box<dyn FileMetadata>>, ignore_filter: IgnoreFilter) -> Result<()> {
+    async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         for dir in self.all_directories()? {
             if ignore_filter.visit_directory(dir.full_path()) {
                 for file in self.get_files_in_directory(&dir)? {
                     let filepath = FilePathBuf::new(dir.full_path(), file.filename());
                     if ignore_filter.visit_file(&filepath) {
-                        let file_wrapper = FileWrapper::from(&dir, &file);
-                        tx.send(Box::new(file_wrapper))
-                            .map_err(|e| Error::Other(e.to_string()))?;
+                        let file_wrapper = FileMetadata {
+                            path: filepath,
+                            hash: file.hash().to_string(),
+                            size: file.size(),
+                        };
+                        tx.send(file_wrapper).map_err(|e| Error::Other(e.to_string()))?;
                     }
                 }
             }
@@ -122,10 +125,14 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> Filesystem for T {
         Ok(())
     }
 
-    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<FileMetadata> {
         let dir = self.get_directory(path.directory())?;
         let file = self.get_file(&dir, path.filename())?;
-        Ok(Box::new(FileWrapper::from(&dir, &file)))
+        Ok(FileMetadata {
+            path: dir.full_path().join_filename(file.filename()),
+            hash: file.hash().to_string(),
+            size: file.size(),
+        })
     }
 
     /// Returns if the given `path` corresponds to a file
@@ -292,16 +299,11 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> FilesystemOps for T {
                 // If target does exist, I retrieve the directory and update the file
                 let target_dir = self.get_directory(target.directory())?;
                 let file = self.get_file(&target_dir, target.filename())?;
-                let _ = self.update_file(file, None, None, Some(metadata.size()?), Some(&metadata.hash()?))?;
+                let _ = self.update_file(file, None, None, Some(metadata.size()), Some(metadata.hash()))?;
             } else {
                 // If target doesn't exist, I create the file (and the directory)
                 let (target_dir, _) = self.get_or_create_directory_all(target.directory())?;
-                let _ = self.create_file(
-                    &target_dir,
-                    target.filename(),
-                    &metadata.hash()?,
-                    metadata.size()? as i32,
-                )?;
+                let _ = self.create_file(&target_dir, target.filename(), metadata.hash(), metadata.size() as i32)?;
             }
 
             Ok(None)
@@ -322,37 +324,5 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> FilesystemOps for T {
             // implementation because it only stores the metadata, not the file itself.
             Err(Error::Forbidden)
         }
-    }
-}
-
-#[derive(Debug)]
-struct FileWrapper {
-    path: FilePathBuf,
-    size: u64,
-    hash: String,
-}
-
-impl FileWrapper {
-    pub fn from<D: FilesystemIndexedDbDirectory, F: FilesystemIndexedDbFile>(dir: &D, file: &F) -> Self {
-        let path = dir.full_path().join_filename(file.filename());
-        Self {
-            path,
-            size: file.size(),
-            hash: file.hash().to_string(),
-        }
-    }
-}
-
-impl FileMetadata for FileWrapper {
-    fn path(&self) -> &FilePath {
-        &self.path
-    }
-
-    fn size(&self) -> Result<u64> {
-        Ok(self.size)
-    }
-
-    fn hash(&self) -> Result<String> {
-        Ok(self.hash.clone())
     }
 }

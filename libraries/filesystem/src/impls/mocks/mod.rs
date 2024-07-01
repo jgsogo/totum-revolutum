@@ -45,7 +45,7 @@ impl Filesystem for FilesystemMock {
         )))
     }
 
-    async fn walk_directory(&self, _tx: Sender<Box<dyn FileMetadata>>, _ignore_filter: IgnoreFilter) -> Result<()> {
+    async fn walk_directory(&self, _tx: Sender<FileMetadata>, _ignore_filter: IgnoreFilter) -> Result<()> {
         self.called
             .write()
             .unwrap()
@@ -56,7 +56,7 @@ impl Filesystem for FilesystemMock {
         )))
     }
 
-    async fn get_metadata(&self, path: &FilePath) -> Result<Box<dyn FileMetadata>> {
+    async fn get_metadata(&self, path: &FilePath) -> Result<FileMetadata> {
         self.called
             .write()
             .unwrap()
