@@ -191,7 +191,7 @@ mod tests {
 
     #[test]
     fn test_formats_are_propulated() -> Result<()> {
-        // TODO: Test that Format::find works for all the Formats variants
+        // Test that `Format::find` works for all the `Formats` variants
         let dbfile = NamedTempFile::new()?;
         let dbfile_str = dbfile.path().to_str().unwrap();
         run_migrations(dbfile_str)?;
