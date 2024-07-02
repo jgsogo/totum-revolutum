@@ -129,10 +129,7 @@ mod tests {
     impl UploadProgress for MockUploadProgress {
         async fn uploadprogress(&self, _progresshash: &str) -> Result<UploadProgressData> {
             if self.error {
-                return Err(Error::PCloudError {
-                    code: 9999,
-                    message: "Returning error as expected".to_string(),
-                });
+                return Err(Error::from((9999u16, "Returning error as expected".to_string())));
             }
 
             if self.data.borrow().up_total > self.data.borrow().up_progress {

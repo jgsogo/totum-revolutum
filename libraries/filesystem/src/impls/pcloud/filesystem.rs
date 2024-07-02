@@ -305,7 +305,7 @@ mod tests {
 
     use headers::HeaderMap;
 
-    use pcloud_sdk::error::Error;
+    use pcloud_sdk::error::{Error, PCloudError};
     use pcloud_sdk::methods::file::deletefile;
     use pcloud_sdk::methods::file::deletefile::DeleteFile;
     use pcloud_sdk::methods::fileops::file_open::FileOpen;
@@ -369,19 +369,17 @@ mod tests {
                 assert_eq!(params.get("recursive").unwrap(), "0");
                 assert_eq!(headers.len(), 0);
 
-                Err(Error::PCloudError {
-                    code: 9999,
-                    message: "Mock: the folder doesn't exist".to_string(),
-                })
+                Err(Error::PCloudError(PCloudError::DirectoryDoesNotExist))
             },
         );
 
         let root = RemotePath::from_str("path:/the/path")?;
         let r = client.get_folderid(&root).await;
         assert!(r.is_err());
-        assert!(
-            matches!(r.unwrap_err(), pcloud_sdk::Error::PCloudError { code: 9999, ref message} if message == "Mock: the folder doesn't exist")
-        );
+        assert!(matches!(
+            r.unwrap_err(),
+            pcloud_sdk::Error::PCloudError(PCloudError::DirectoryDoesNotExist)
+        ));
         Ok(())
     }
 

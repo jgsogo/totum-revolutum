@@ -37,10 +37,10 @@ where
                 }
                 .into()),
             },
-            _ => Err(Error::PCloudError {
-                code: r.result,
-                message: r.error.unwrap_or_else(|| "Error message not available".into()),
-            }),
+            _ => Err(Error::from((
+                r.result,
+                r.error.unwrap_or_else(|| "Error message not available".into()),
+            ))),
         },
         Err(e) => Err(DeserializationError {
             string: result,
@@ -70,10 +70,8 @@ pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMa
     // If there is an error, it returns a JSON with the result and error fields
     let as_str = String::from_utf8_lossy(&r);
     if let Ok(r) = serde_json::from_str::<ApiResult<()>>(&as_str) {
-        return Err(Error::PCloudError {
-            code: r.result,
-            message: r.error.unwrap_or_else(|| "Error message not available".into()),
-        });
+        let message = r.error.unwrap_or_else(|| "Error message not available".into());
+        return Err(Error::from((r.result, message)));
     }
 
     // If not, just the bytes
@@ -169,10 +167,7 @@ mod tests {
     fn create_response_api_error() {
         let r = create_response::<UserInfo>("{\"result\": 1234, \"error\": \"message\"}".into());
         assert!(r.is_err());
-        assert_eq!(
-            r.unwrap_err().to_string(),
-            "Error from PCloud 1234: message".to_string()
-        );
+        assert_eq!(r.unwrap_err().to_string(), "1234: message".to_string());
     }
 
     #[test]
@@ -181,7 +176,7 @@ mod tests {
         assert!(r.is_err());
         assert_eq!(
             r.unwrap_err().to_string(),
-            "Error from PCloud 1234: Error message not available".to_string()
+            "1234: Error message not available".to_string()
         );
     }
 }

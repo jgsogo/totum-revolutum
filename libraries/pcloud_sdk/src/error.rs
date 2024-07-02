@@ -24,8 +24,8 @@ pub enum Error {
     #[error("The file already exists")]
     FileAlreadyExists,
 
-    #[error("Error from PCloud {code}: {message}")]
-    PCloudError { code: u16, message: String },
+    #[error(transparent)]
+    PCloudError(#[from] PCloudError),
 
     #[error("Wrong input data: {0}")]
     InputDataEror(String),
@@ -81,5 +81,26 @@ impl From<utils::http::Error> for Error {
                 .into()
             }
         }
+    }
+}
+
+#[derive(Debug, Error)]
+#[error("Cannot deserialize string '{string}': {source}")]
+pub enum PCloudError {
+    #[error("(2005) Directory does not exist")]
+    DirectoryDoesNotExist,
+
+    #[error("{code}: {message}")]
+    UnclassifiedError { code: u16, message: String },
+}
+
+impl From<(u16, String)> for Error {
+    fn from(value: (u16, String)) -> Self {
+        let (code, message) = value;
+        let err = match code {
+            2005 => PCloudError::DirectoryDoesNotExist,
+            _ => PCloudError::UnclassifiedError { code, message },
+        };
+        err.into()
     }
 }
