@@ -1,7 +1,6 @@
 use anyhow::Result;
 use anyhow::{anyhow, bail};
 use async_trait::async_trait;
-use diesel::connection::SimpleConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel::{sql_query, ExpressionMethods};
 use diesel::{BoolExpressionMethods, Connection, QueryDsl, RunQueryDsl, SqliteConnection};
@@ -96,9 +95,6 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         conn.run_pending_migrations(MIGRATIONS)
             .map_err(|e| anyhow!("Error {}", e))?;
 
-        // Enable foreign keys support (required for ON CASCADE DELETE)
-        pool.get()?.batch_execute("PRAGMA foreign_keys = ON;")?;
-
         // Return the instance
         Ok((
             Self {
@@ -113,7 +109,13 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
 #[async_trait]
 impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
     fn get_connection(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>> {
-        self.pool.get().map_err(|e| anyhow!(e.to_string()))
+        let mut conn = self.pool.get()?;
+        // We need to enable foreign-keys per connection! I guess this will execute this statement
+        // several times if the same connection is reused...
+        diesel::sql_query("PRAGMA foreign_keys = ON") // Enables foreign keys support: https://www.sqlite.org/foreignkeys.html
+            .execute(&mut conn)
+            .unwrap();
+        Ok(conn)
     }
 
     fn get_pool(&self) -> Pool<ConnectionManager<SqliteConnection>> {

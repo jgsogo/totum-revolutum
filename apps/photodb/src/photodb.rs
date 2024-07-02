@@ -196,7 +196,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     ///
     /// Note that, for the files that have been removed from the storage, the `mirror` operation
     /// will remove the [`models::File`] and ON CASCADE the corresponding [`models::PhotoFile`]
-    /// will be removed. FIXME: This is not happening!
+    /// will be removed.
     pub async fn sync(&mut self) -> Result<()> {
         let ignore_filter = self.app_dir.ignore_filters().await?;
         self.storage.initial_sync(ignore_filter).await.map_err(|e| anyhow!(e))?;
