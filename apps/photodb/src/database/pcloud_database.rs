@@ -51,13 +51,17 @@ pub struct PCloudDatabase<PCloud: PCloudClient + Send + 'static> {
 }
 
 impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
-    /// Initializes the database and pushes it to the remote pCloud storage at the given `path`
-    /// location (it creates a file called `photodb.sqlite3` inside the folder). It will fail if
-    /// the remote file already exists
-    pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<Receiver<UploadReturnType>> {
-        let folderid = pcloud.get_folderid(&path).await?; // TODO: Create if not exists?
+    /// Returns (or creates) a database file synced with PCloud. It creates the database and run
+    /// the migrations ([`run_migrations`]) as well. If anything fails, this function takes care
+    /// of uploading the file to the remote.
+    async fn get_database_file(
+        pcloud: PCloud,
+        path: &RemotePath,
+        creation_expected: bool,
+    ) -> Result<(ProxiedFile<PCloud>, Receiver<UploadReturnType>)> {
+        let folderid = pcloud.get_folderid(path).await?;
         let (proxied_file, created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
-        if !created {
+        if creation_expected && !created {
             drop(proxied_file);
             let _ = upload_done.await?; // Wait for the file to close, discard any error.
             bail!("Remote file already exists!");
@@ -70,22 +74,21 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
             bail!("Migrations failed to run: {e}");
         }
 
+        Ok((proxied_file, upload_done))
+    }
+
+    /// Initializes the database and pushes it to the remote pCloud storage at the given `path`
+    /// location (it creates a file called `photodb.sqlite3` inside the folder). It will fail if
+    /// the remote file already exists
+    pub async fn initialize(pcloud: PCloud, path: &RemotePath) -> Result<Receiver<UploadReturnType>> {
+        let (_, upload_done) = Self::get_database_file(pcloud, path, true).await?;
         Ok(upload_done)
     }
 
     /// Creates a new [`PCloudDatabase`] instance. Requires a pCloud client and the folder
     /// path where the database (and files) are located
     pub async fn new(pcloud: PCloud, path: &RemotePath) -> anyhow::Result<(Self, Receiver<UploadReturnType>)> {
-        let folderid = pcloud.get_folderid(path).await?;
-        // TODO: Add a flag to `ProxiedFile` to indicate if it's allowed to create the file or not
-        let (proxied_file, _created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
-
-        debug!("Run pending migrations");
-        if let Err(e) = run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
-            drop(proxied_file);
-            let _ = upload_done.await?; // Wait for the file to close, discard any error.
-            bail!("Migrations failed to run: {e}");
-        }
+        let (proxied_file, upload_done) = Self::get_database_file(pcloud, path, false).await?;
 
         // Create a connection pool using the local temp file
         let pool = {
@@ -178,11 +181,13 @@ fn run_migrations(database_url: &str) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::database::models::Format;
     use diesel::{Connection, SqliteConnection};
     use strum::IntoEnumIterator;
     use tempfile::NamedTempFile;
+
+    use crate::database::models::Format;
+
+    use super::*;
 
     #[test]
     fn test_formats_are_propulated() -> Result<()> {

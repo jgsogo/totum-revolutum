@@ -112,7 +112,7 @@ async fn main() -> Result<()> {
 
             // I can't raise from these commands, as I always need to execute the backup routine
             let done = match &cli.command {
-                Commands::Initialize => PCloudDatabase::initialize(client, db_path).await?,
+                Commands::Initialize => PCloudDatabase::initialize(client, &db_path).await?,
                 _ => {
                     let (db, done) = PCloudDatabase::new(client.clone(), &db_path).await?;
                     let r = match PhotoDB::new(db, &db_path, &app_dir, client).await {
