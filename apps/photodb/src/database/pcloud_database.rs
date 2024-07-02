@@ -64,7 +64,7 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         }
 
         debug!("Create the database and/or run pending migrations");
-        if let Err(e) = Self::run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
+        if let Err(e) = run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
             drop(proxied_file);
             let _ = upload_done.await?; // Wait for the file to close, discard any error.
             bail!("Migrations failed to run: {e}");
@@ -81,7 +81,7 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         let (proxied_file, _created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
 
         debug!("Run pending migrations");
-        if let Err(e) = Self::run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
+        if let Err(e) = run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
             drop(proxied_file);
             let _ = upload_done.await?; // Wait for the file to close, discard any error.
             bail!("Migrations failed to run: {e}");
@@ -102,18 +102,6 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
             },
             upload_done,
         ))
-    }
-
-    fn run_migrations(database_url: &str) -> Result<()> {
-        // Create the SQLite3 database and run migrations
-        debug!("Run pending migrations");
-        let mut conn = SqliteConnection::establish(database_url)?;
-        conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
-        conn.run_pending_migrations(MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
-
-        Ok(())
     }
 }
 
@@ -173,5 +161,43 @@ impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
         );
 
         Ok(orphan_files.load::<models::File>(&mut conn)?)
+    }
+}
+
+fn run_migrations(database_url: &str) -> Result<()> {
+    // Create the SQLite3 database and run migrations
+    debug!("Run pending migrations");
+    let mut conn = SqliteConnection::establish(database_url)?;
+    conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
+        .map_err(|e| anyhow!("Error {}", e))?;
+    conn.run_pending_migrations(MIGRATIONS)
+        .map_err(|e| anyhow!("Error {}", e))?;
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::database::models::Format;
+    use diesel::{Connection, SqliteConnection};
+    use strum::IntoEnumIterator;
+    use tempfile::NamedTempFile;
+
+    #[test]
+    fn test_formats_are_propulated() -> Result<()> {
+        // TODO: Test that Format::find works for all the Formats variants
+        let dbfile = NamedTempFile::new()?;
+        let dbfile_str = dbfile.path().to_str().unwrap();
+        run_migrations(dbfile_str)?;
+
+        let mut conn = SqliteConnection::establish(dbfile_str)?;
+        for it in models::Formats::iter() {
+            let f = Format::find(&it, &mut conn)?;
+            let formats_: models::Formats = f.into();
+            assert_eq!(formats_, it);
+        }
+
+        Ok(())
     }
 }

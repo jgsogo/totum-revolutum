@@ -162,7 +162,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
 
         debug!("Now create the PhotoFile entry for {}", remote_filepath);
         let mut conn = self.db.get_connection()?;
-        let format_ = models::Format::find(formats_, &mut conn)?;
+        let format_ = models::Format::find(&formats_, &mut conn)?;
         rx.await??; // Wait for the upload and DB entry creation
 
         // FIXME: Here we need an absolute path to satisfy pcloud's RemotePath... we need to

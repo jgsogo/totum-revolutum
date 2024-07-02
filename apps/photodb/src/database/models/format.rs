@@ -13,7 +13,7 @@ use diesel::*;
 use image::ImageFormat;
 use lazy_static::lazy_static;
 use log::warn;
-use strum_macros::{Display, EnumString};
+use strum_macros::{Display, EnumIter, EnumString};
 
 use super::super::schema::*;
 
@@ -21,7 +21,7 @@ lazy_static! {
     static ref FORMATS_CACHE: Mutex<HashMap<String, Format>> = Mutex::new(HashMap::new());
 }
 
-#[derive(PartialEq, Eq, Display, Debug, Clone, EnumString)]
+#[derive(PartialEq, Eq, Display, Debug, Clone, EnumString, EnumIter)]
 #[allow(clippy::upper_case_acronyms)]
 #[strum(serialize_all = "snake_case")]
 pub enum Formats {
@@ -91,7 +91,7 @@ impl Format {
     /// Looks for the [`Format`] entry for the given `value`.
     ///
     /// This method uses LRU cache, so it won't hit the database for the already queried values.
-    pub fn find<Conn: LoadConnection>(value: Formats, conn: &mut Conn) -> Result<Format>
+    pub fn find<Conn: LoadConnection>(value: &Formats, conn: &mut Conn) -> Result<Format>
     where
         for<'a> <<Self as HasTable>::Table as FilterDsl<Eq<formats::format, &'a str>>>::Output:
             RunQueryDsl<Conn> + LoadQuery<'a, Conn, Self>,
@@ -110,12 +110,14 @@ impl Format {
 
         Ok(values.clone())
     }
+}
 
-    pub fn format(&self) -> Formats {
-        match Formats::from_str(&self.format) {
+impl From<Format> for Formats {
+    fn from(value: Format) -> Self {
+        match Formats::from_str(&value.format) {
             Ok(f) => f,
             Err(_) => {
-                warn!("Format value '{}' not found in Formats enum", self.format);
+                warn!("Format value '{}' not found in Formats enum", value.format);
                 Formats::Unknown
             }
         }
