@@ -10,13 +10,15 @@ use diesel::dsl::Eq;
 use diesel::query_dsl::methods::FilterDsl;
 use diesel::query_dsl::LoadQuery;
 use diesel::*;
+use lazy_static::lazy_static;
 use log::warn;
-use once_cell::sync::OnceCell;
 use strum_macros::{Display, EnumString};
 
 use super::super::schema::*;
 
-static FORMATS_CACHE: OnceCell<Mutex<HashMap<String, Format>>> = OnceCell::new();
+lazy_static! {
+    static ref FORMATS_CACHE: Mutex<HashMap<String, Format>> = Mutex::new(HashMap::new());
+}
 
 #[derive(PartialEq, Eq, Display, Debug, Clone, EnumString)]
 #[allow(clippy::upper_case_acronyms)]
@@ -55,6 +57,8 @@ pub struct NewFormat<'a> {
 
 impl Format {
     /// Looks for the [`Format`] entry for the given `value`.
+    ///
+    /// This method uses LRU cache, so it won't hit the database for the already queried values.
     pub fn find<Conn: LoadConnection>(value: Formats, conn: &mut Conn) -> Result<Format>
     where
         for<'a> <<Self as HasTable>::Table as FilterDsl<Eq<formats::format, &'a str>>>::Output:
@@ -62,7 +66,7 @@ impl Format {
     {
         let str = value.to_string();
 
-        let mut cache_ = FORMATS_CACHE.get().unwrap().lock().unwrap();
+        let mut cache_ = FORMATS_CACHE.lock().unwrap();
         let values = match cache_.entry(value.to_string()) {
             Entry::Occupied(o) => o.into_mut(),
             Entry::Vacant(v) => {

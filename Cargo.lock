@@ -3011,7 +3011,6 @@ dependencies = [
  "kamadak-exif",
  "lazy_static",
  "log",
- "once_cell",
  "oxipng",
  "pcloud_sdk",
  "ring",

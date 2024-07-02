@@ -1,6 +1,7 @@
 use anyhow::Result;
 use anyhow::{anyhow, bail};
 use async_trait::async_trait;
+use diesel::connection::SimpleConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel::{sql_query, ExpressionMethods};
 use diesel::{BoolExpressionMethods, Connection, QueryDsl, RunQueryDsl, SqliteConnection};
@@ -94,6 +95,9 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
             .map_err(|e| anyhow!("Error {}", e))?;
         conn.run_pending_migrations(MIGRATIONS)
             .map_err(|e| anyhow!("Error {}", e))?;
+
+        // Enable foreign keys support (required for ON CASCADE DELETE)
+        pool.get()?.batch_execute("PRAGMA foreign_keys = ON;")?;
 
         // Return the instance
         Ok((

@@ -86,6 +86,8 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         Option<Exif>,
         tokio::sync::oneshot::Receiver<filesystem::Result<()>>,
     )> {
+        info!("Processing file '{}'", original.as_ref());
+
         // Retrieve EXIF data (use original file just in case we lose/modify something in the transformations
         let exif = crate::exif::get_exif_data(original.as_ref()).ok();
 
@@ -115,7 +117,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
                         d = date.day(),
                     ))?;
                     let filename = FilenameBuf::from_str(&format!(
-                        "{y:04}{m:02}{d:02}-{H:02}:{M:02}:{S:02}.{ext}",
+                        "{y:04}-{m:02}-{d:02}-{H:02}{M:02}{S:02}.{ext}",
                         y = date.year(),
                         m = date.month(),
                         d = date.day(),
@@ -194,7 +196,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     ///
     /// Note that, for the files that have been removed from the storage, the `mirror` operation
     /// will remove the [`models::File`] and ON CASCADE the corresponding [`models::PhotoFile`]
-    /// will be removed.
+    /// will be removed. FIXME: This is not happening!
     pub async fn sync(&mut self) -> Result<()> {
         let ignore_filter = self.app_dir.ignore_filters().await?;
         self.storage.initial_sync(ignore_filter).await.map_err(|e| anyhow!(e))?;
