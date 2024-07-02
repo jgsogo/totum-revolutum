@@ -36,11 +36,11 @@ pub(crate) fn prepare_image_file(input: impl AsRef<Utf8Path>) -> Result<(NamedTe
                 Ok(vec) => {
                     let image = image::load_from_memory_with_format(&vec, ImageFormat::Png)?;
                     image.save_with_format(output.path(), ImageFormat::Png)?;
-                    Formats::PNG
+                    Formats::Png
                 }
                 Err(e) => {
                     warn!("Error running oxipng optimizer: {}", e);
-                    fallback(Formats::PNG)? // FIXME: If optimizer fails, is this a PNG?
+                    fallback(Formats::Png)? // FIXME: If optimizer fails, is this a PNG?
                 }
             }
         }

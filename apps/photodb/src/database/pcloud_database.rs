@@ -63,13 +63,12 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
             bail!("Remote file already exists!");
         }
 
-        // Create the SQLite3 database and run migrations
         debug!("Create the database and/or run pending migrations");
-        let mut conn = SqliteConnection::establish(proxied_file.local_filepath().to_str().unwrap())?;
-        conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
-        conn.run_pending_migrations(MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
+        if let Err(e) = Self::run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
+            drop(proxied_file);
+            let _ = upload_done.await?; // Wait for the file to close, discard any error.
+            bail!("Migrations failed to run: {e}");
+        }
 
         Ok(upload_done)
     }
@@ -81,19 +80,19 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         // TODO: Add a flag to `ProxiedFile` to indicate if it's allowed to create the file or not
         let (proxied_file, _created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
 
+        debug!("Run pending migrations");
+        if let Err(e) = Self::run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
+            drop(proxied_file);
+            let _ = upload_done.await?; // Wait for the file to close, discard any error.
+            bail!("Migrations failed to run: {e}");
+        }
+
         // Create a connection pool using the local temp file
         let pool = {
             let manager = ConnectionManager::<SqliteConnection>::new(proxied_file.local_filepath().to_str().unwrap());
             Pool::builder().test_on_check_out(true).build(manager)?
         };
         let _ = pool.clone();
-
-        debug!("Run pending migrations");
-        let mut conn = pool.get()?;
-        conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
-        conn.run_pending_migrations(MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
 
         // Return the instance
         Ok((
@@ -103,6 +102,18 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
             },
             upload_done,
         ))
+    }
+
+    fn run_migrations(database_url: &str) -> Result<()> {
+        // Create the SQLite3 database and run migrations
+        debug!("Run pending migrations");
+        let mut conn = SqliteConnection::establish(database_url)?;
+        conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
+            .map_err(|e| anyhow!("Error {}", e))?;
+        conn.run_pending_migrations(MIGRATIONS)
+            .map_err(|e| anyhow!("Error {}", e))?;
+
+        Ok(())
     }
 }
 

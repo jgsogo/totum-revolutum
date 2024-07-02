@@ -26,7 +26,9 @@ lazy_static! {
 #[strum(serialize_all = "snake_case")]
 pub enum Formats {
     Unknown,
-    PNG,
+    Png,
+    Bmp,
+    Jpeg,
 }
 
 impl Formats {
@@ -34,7 +36,7 @@ impl Formats {
     pub fn as_extension(&self) -> Option<String> {
         match self {
             Formats::Unknown => None,
-            v => Some(v.to_string()),
+            v => Some(v.to_string().to_lowercase()),
         }
     }
 }
@@ -42,7 +44,21 @@ impl Formats {
 impl From<ImageFormat> for Formats {
     fn from(value: ImageFormat) -> Self {
         match value {
-            ImageFormat::Png => Formats::PNG,
+            ImageFormat::Png => Formats::Png,
+            ImageFormat::Jpeg => Formats::Jpeg,
+            // ImageFormat::Gif => {}
+            // ImageFormat::WebP => {}
+            // ImageFormat::Pnm => {}
+            // ImageFormat::Tiff => {}
+            // ImageFormat::Tga => {}
+            // ImageFormat::Dds => {}
+            ImageFormat::Bmp => Formats::Bmp,
+            // ImageFormat::Ico => {}
+            // ImageFormat::Hdr => {}
+            // ImageFormat::OpenExr => {}
+            // ImageFormat::Farbfeld => {}
+            // ImageFormat::Avif => {}
+            // ImageFormat::Qoi => {}
             f => {
                 warn!(
                     "Got {:?} (ImageFormat), cannot translate it to any 'Formats'. It will return Formats::Unknown",
