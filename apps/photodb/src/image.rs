@@ -20,10 +20,10 @@ pub(crate) fn prepare_image_file(input: impl AsRef<Utf8Path>) -> Result<(NamedTe
     let output = NamedTempFile::new()?;
 
     // Define fall-back behavior
-    let fallback = || -> Result<Formats> {
-        warn!("Cannot guess image format. Bypass any transformation and copy to the target destination");
+    let fallback = |format: Formats| -> Result<Formats> {
+        // warn!("Bypass any transformation and copy to the target destination");
         std::fs::copy(input.as_ref(), output.path())?;
-        Ok(Formats::Unknown)
+        Ok(format)
     };
 
     // Now run different operations based on format
@@ -40,11 +40,18 @@ pub(crate) fn prepare_image_file(input: impl AsRef<Utf8Path>) -> Result<(NamedTe
                 }
                 Err(e) => {
                     warn!("Error running oxipng optimizer: {}", e);
-                    fallback()?
+                    fallback(Formats::PNG)? // FIXME: If optimizer fails, is this a PNG?
                 }
             }
         }
-        _ => fallback()?,
+        Some(f) => {
+            debug!("Nothing to do for format {:?}", f);
+            fallback(f.into())?
+        }
+        _ => {
+            warn!("Cannot guess file format. Bypass transformation and copy to the target destination");
+            fallback(Formats::Unknown)?
+        }
     };
 
     Ok((output, format))

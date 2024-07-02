@@ -10,6 +10,7 @@ use diesel::dsl::Eq;
 use diesel::query_dsl::methods::FilterDsl;
 use diesel::query_dsl::LoadQuery;
 use diesel::*;
+use image::ImageFormat;
 use lazy_static::lazy_static;
 use log::warn;
 use strum_macros::{Display, EnumString};
@@ -34,6 +35,21 @@ impl Formats {
         match self {
             Formats::Unknown => None,
             v => Some(v.to_string()),
+        }
+    }
+}
+
+impl From<ImageFormat> for Formats {
+    fn from(value: ImageFormat) -> Self {
+        match value {
+            ImageFormat::Png => Formats::PNG,
+            f => {
+                warn!(
+                    "Got {:?} (ImageFormat), cannot translate it to any 'Formats'. It will return Formats::Unknown",
+                    f
+                );
+                Formats::Unknown
+            }
         }
     }
 }
