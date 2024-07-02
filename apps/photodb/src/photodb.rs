@@ -157,8 +157,8 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         debug!("Add photo from path '{}'", photo_filepath.as_ref());
 
         let (remote_filepath, formats_, _exif, rx) = self.process_and_upload(&photo_filepath).await?;
-        // TODO: Decide what to do with EXIF data. Make sure the processed files contain the
-        // TODO: same exif, we don't want to lose it.
+        // TODO: Decide what to do with EXIF data (upload to JSON file side-by-side to the file?).
+        // TODO: Make sure the processed files contain the same exif, we don't want to lose it.
 
         debug!("Now create the PhotoFile entry for {}", remote_filepath);
         let mut conn = self.db.get_connection()?;
