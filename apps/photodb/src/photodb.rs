@@ -1,19 +1,23 @@
 use std::str::FromStr;
 
-use anyhow::{anyhow, bail, Result};
-use camino::Utf8Path;
-use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper};
+use anyhow::{anyhow, Result};
+use camino::{Utf8Path, Utf8PathBuf};
+use chrono::{Datelike, Timelike};
+use diesel::{RunQueryDsl, SelectableHelper};
+use exif::Exif;
 use log::error;
 use tracing::{debug, info, trace};
 
 use filesystem::impls::composites::indexed::diesel_indexed::DatabaseImpl;
 use filesystem::impls::composites::FilesystemIndexed;
-use filesystem::impls::{FilesystemLocalTemp, FilesystemPCloud};
+use filesystem::impls::{FilesystemLocal, FilesystemLocalTemp, FilesystemPCloud};
 use filesystem::{DirectoryPathBuf, FileMetadata, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::GetFileID;
 use pcloud_sdk::types::FileID;
 use pcloud_sdk::types::RemotePath;
+
+use crate::database::models::Formats;
 
 use super::database::models;
 use super::database::Database;
@@ -76,57 +80,87 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     async fn process_and_upload(
         &mut self,
         original: impl AsRef<Utf8Path>,
-    ) -> Result<(FilePathBuf, tokio::sync::oneshot::Receiver<filesystem::Result<()>>)> {
-        // FIXME: A NamedTempFile would be enough here. No need to create temporary filesystem
-        let tmp_filesystem = FilesystemLocalTemp::default();
+    ) -> Result<(
+        FilePathBuf,
+        Formats,
+        Option<Exif>,
+        tokio::sync::oneshot::Receiver<filesystem::Result<()>>,
+    )> {
+        // Retrieve EXIF data (use original file just in case we lose/modify something in the transformations
+        let exif = crate::exif::get_exif_data(original.as_ref()).ok();
 
         // Execute all the processing
-        // FIXME: If it is a GIF or some other extension that will loose something (animation,
-        // FIXME: video, ...) when converting to PNG we should raise here. Maybe don't
-        // FIXME: convert/optimize and just upload
-        let photo = match crate::image::prepare_image_file(original.as_ref(), &tmp_filesystem) {
-            Ok(photo) => photo,
-            Err(e) => {
-                bail!("Error processing file {}: {e}", original.as_ref());
-            }
-        };
+        let (photo, format) = crate::image::prepare_image_file(original.as_ref())?;
 
-        // Calculate the filepath based on photo properties
-        // TODO: Instead of using a sha256-based storage path, it would be great to use one based
-        // TODO: on datetime when the photo was taken: `<year>/<month>/<day>/...` so it can be
-        // TODO: browsed in pCloud as well.
-        let filepath = {
-            // Compute remote path by chunking sha256 string
-            let photo_fullpath = tmp_filesystem.resolve_filepath(&photo);
-            let sha256 = sha256_string_from_file(photo_fullpath)?;
-            debug!(" - sha256 '{}'", sha256);
+        // Calculate the filepath
+        let extension = format
+            .as_extension()
+            .unwrap_or(original.as_ref().extension().unwrap_or("").to_string());
+        let filepath_from_sha256 = || -> Result<FilePathBuf> {
+            let sha256 = sha256_string_from_file(photo.path())?;
             let (c1, rest) = sha256.split_at(4);
             let (c2, rest) = rest.split_at(4);
 
             let path = Utf8Path::new(SHA256_BASE_PATH).join(c1).join(c2);
             let path = DirectoryPathBuf::from_str(path.as_str())?;
-            path.join_filename(FilenameBuf::from_str(&format!("{}.png", rest)).unwrap())
+            Ok(path.join_filename(FilenameBuf::from_str(&format!("{}.{}", rest, extension)).unwrap()))
         };
-        debug!("Upload to '{}'", filepath);
+        let filepath = match &exif {
+            Some(exif) => match crate::exif::get_creation_date(exif) {
+                Ok(date) => {
+                    let directory = DirectoryPathBuf::from_str(&format!(
+                        "{y:04}/{m:02}/{d:02}",
+                        y = date.year(),
+                        m = date.month(),
+                        d = date.day(),
+                    ))?;
+                    let filename = FilenameBuf::from_str(&format!(
+                        "{y:04}{m:02}{d:02}-{H:02}:{M:02}:{S:02}.{ext}",
+                        y = date.year(),
+                        m = date.month(),
+                        d = date.day(),
+                        H = date.hour(),
+                        M = date.minute(),
+                        S = date.second(),
+                        ext = extension
+                    ))?;
+                    directory.join_filename(filename)
+                }
+                Err(_) => filepath_from_sha256()?,
+            },
+            None => filepath_from_sha256()?,
+        };
 
         // Do the upload
-        self.storage.create_dir_all(filepath.directory()).await?;
-        let rx = filesystem::actions::copy_file(&tmp_filesystem, &mut self.storage, &photo, &filepath, false).await?;
+        info!("Upload to '{}'", filepath);
+        let rx = {
+            let photo_as_filepath = {
+                let directory = Utf8PathBuf::from_path_buf(photo.path().parent().unwrap().to_path_buf()).unwrap();
+                let directory = DirectoryPathBuf::try_from(directory.strip_prefix("/")?)?;
 
-        Ok((filepath, rx.unwrap()))
+                let filename = photo.path().file_name().unwrap().to_str().unwrap();
+                let filename = FilenameBuf::from_str(filename)?;
+
+                FilePathBuf::new(directory, filename)
+            };
+            self.storage.create_dir_all(filepath.directory()).await?;
+            let local_hd = FilesystemLocal::local_hd();
+            filesystem::actions::copy_file(&local_hd, &mut self.storage, &photo_as_filepath, &filepath, false).await?
+        };
+
+        Ok((filepath, format, exif, rx.unwrap()))
     }
 
     pub async fn add(&mut self, photo_filepath: impl AsRef<Utf8Path>) -> Result<()> {
         debug!("Add photo from path '{}'", photo_filepath.as_ref());
 
-        let (remote_filepath, rx) = self.process_and_upload(&photo_filepath).await?;
+        let (remote_filepath, formats_, _exif, rx) = self.process_and_upload(&photo_filepath).await?;
+        // TODO: Decide what to do with EXIF data. Make sure the processed files contain the
+        // TODO: same exif, we don't want to lose it.
 
         debug!("Now create the PhotoFile entry for {}", remote_filepath);
         let mut conn = self.db.get_connection()?;
-
-        use crate::database::schema::formats::dsl::*;
-        let format_: models::Format = formats.filter(format.eq("png")).get_result(&mut conn)?;
-        // FIXME: Hash/size might not be available right away...
+        let format_ = models::Format::find(formats_, &mut conn)?;
         rx.await??; // Wait for the upload and DB entry creation
 
         // FIXME: Here we need an absolute path to satisfy pcloud's RemotePath... we need to
