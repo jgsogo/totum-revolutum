@@ -137,7 +137,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
                 Box::new(|r: pcloud_sdk::Result<ChecksumFile>| match r {
                     Ok(r) => {
                         if r.sha256.is_none() || r.metadata.size.is_none() {
-                            Err(pcloud_sdk::Error::InputDataEror(
+                            Err(pcloud_sdk::Error::InputDataError(
                                 "Hash and size are not available. Retry".to_string(),
                             ))
                         } else {

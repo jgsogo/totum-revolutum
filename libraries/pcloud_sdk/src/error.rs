@@ -28,7 +28,7 @@ pub enum Error {
     PCloudError(#[from] PCloudError),
 
     #[error("Wrong input data: {0}")]
-    InputDataEror(String),
+    InputDataError(String),
 }
 
 /// An error that can be returned when serializing data.

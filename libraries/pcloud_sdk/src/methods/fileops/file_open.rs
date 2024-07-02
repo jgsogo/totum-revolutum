@@ -58,7 +58,7 @@ impl<T: PCloudClient> GetFileOpen for T {
                     path.add_to_params(&mut params);
                 }
                 _ => {
-                    return Err(Error::InputDataEror(
+                    return Err(Error::InputDataError(
                         "If O_CREATE is set, provide either folderid+name or path".to_string(),
                     ))
                 }
@@ -68,7 +68,7 @@ impl<T: PCloudClient> GetFileOpen for T {
             match path {
                 FileOpenPath::File(file) => file.add_to_params(&mut params),
                 _ => {
-                    return Err(Error::InputDataEror(
+                    return Err(Error::InputDataError(
                         "If O_CREATE is not set, provide either fileid or path".to_string(),
                     ))
                 }
@@ -98,7 +98,7 @@ mod tests {
                 .await;
             assert!(r.is_err());
             assert!(
-                matches!(r.unwrap_err(), Error::InputDataEror(ref message) if message == "If O_CREATE is set, provide either folderid+name or path")
+                matches!(r.unwrap_err(), Error::InputDataError(ref message) if message == "If O_CREATE is set, provide either folderid+name or path")
             );
         }
 
@@ -168,7 +168,7 @@ mod tests {
                 .await;
             assert!(r.is_err());
             assert!(
-                matches!(r.unwrap_err(), Error::InputDataEror(ref message) if message == "If O_CREATE is not set, provide either fileid or path")
+                matches!(r.unwrap_err(), Error::InputDataError(ref message) if message == "If O_CREATE is not set, provide either fileid or path")
             );
         }
 

@@ -38,7 +38,7 @@ impl<T: getfilelink::GetFileLink + Sync> GetFileLinkAndDownload for T {
         let res = reqwest::ClientBuilder::default().build()?.get(url).send().await?;
         let total_size = res
             .content_length()
-            .ok_or_else(|| Error::InputDataEror(format!("Failed to get content length from '{}'", &url)))?;
+            .ok_or_else(|| Error::InputDataError(format!("Failed to get content length from '{}'", &url)))?;
 
         // Progress bar setup
         let pb = pb_builder.build(total_size);
