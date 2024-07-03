@@ -10,7 +10,7 @@ use reqwest;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use crate::error::{DeserializationError, DeserializationErrorKind, Error, Result};
+use crate::error::{DeserializationError, DeserializationErrorKind, PCloudError, Result};
 
 pub const BOUNDARY: &str = "ea3bbcf87c101592";
 
@@ -37,10 +37,7 @@ where
                 }
                 .into()),
             },
-            _ => Err(Error::PCloudError {
-                code: r.result,
-                message: r.error.unwrap_or_else(|| "Error message not available".into()),
-            }),
+            _ => Err(PCloudError::from((r.result, r.error)).into()),
         },
         Err(e) => Err(DeserializationError {
             string: result,
@@ -70,14 +67,11 @@ pub(crate) async fn get_bytes(client: reqwest::Client, url: &str, params: HashMa
     // If there is an error, it returns a JSON with the result and error fields
     let as_str = String::from_utf8_lossy(&r);
     if let Ok(r) = serde_json::from_str::<ApiResult<()>>(&as_str) {
-        return Err(Error::PCloudError {
-            code: r.result,
-            message: r.error.unwrap_or_else(|| "Error message not available".into()),
-        });
+        Err(PCloudError::from((r.result, r.error)).into())
+    } else {
+        // If not, just the bytes
+        Ok(r.to_vec())
     }
-
-    // If not, just the bytes
-    Ok(r.to_vec())
 }
 
 pub(crate) fn create_file_data(local_filepath: &Utf8Path, filename: &str) -> io::Result<Vec<u8>> {
@@ -127,9 +121,10 @@ mod tests {
 
     use camino::Utf8Path;
 
-    use crate::methods::general::UserInfo;
-
     use super::*;
+    use crate::error::PCLOUDERROR_MESSAGE_NOT_AVAILABLE;
+    use crate::methods::general::UserInfo;
+    use crate::Error;
 
     #[test]
     fn create_response_success() -> Result<()> {
@@ -151,11 +146,6 @@ mod tests {
     fn create_response_serialization_error() {
         let r = create_response::<UserInfo>("this is not serializable".into());
         assert!(r.is_err());
-        // TODO: Write a NOTE about this: we don't really care about the actual message printed by
-        // TODO: the error, we care about the kind of error and the data it contains. The message
-        // TODO: could change/improve, but the data inside is based on inputs. This is what we
-        // TODO: care about! Test all errors this way!
-        // TODO: Use assert_matches! here once it is stabilized.
         assert!(matches!(
             r.unwrap_err(),
             Error::DeserializationError(DeserializationError {
@@ -169,19 +159,25 @@ mod tests {
     fn create_response_api_error() {
         let r = create_response::<UserInfo>("{\"result\": 1234, \"error\": \"message\"}".into());
         assert!(r.is_err());
-        assert_eq!(
-            r.unwrap_err().to_string(),
-            "Error from PCloud 1234: message".to_string()
-        );
+        assert!(matches!(
+            r.unwrap_err(),
+            Error::PCloudError(PCloudError::UnclassifiedError {
+                code: 1234,
+                message: ref msg,
+            })if msg == "message"
+        ));
     }
 
     #[test]
     fn create_response_api_error_no_message() {
         let r = create_response::<UserInfo>("{\"result\": 1234}".into());
         assert!(r.is_err());
-        assert_eq!(
-            r.unwrap_err().to_string(),
-            "Error from PCloud 1234: Error message not available".to_string()
-        );
+        assert!(matches!(
+            r.unwrap_err(),
+            Error::PCloudError(PCloudError::UnclassifiedError {
+                code: 1234,
+                message: ref msg,
+            })if msg == PCLOUDERROR_MESSAGE_NOT_AVAILABLE
+        ));
     }
 }

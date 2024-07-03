@@ -35,10 +35,6 @@ impl DatabaseImpl {
         conn.run_pending_migrations(MIGRATIONS)
             .map_err(|e| Error::Other(format!("Failed to connect to DB: {e}")))?;
 
-        diesel::sql_query("PRAGMA foreign_keys = ON") // Enables foreign keys support: https://www.sqlite.org/foreignkeys.html
-            .execute(&mut conn)
-            .map_err(|e| Error::Other(e.to_string()))?;
-
         Ok(Self::new_from_connection(pool))
     }
 
@@ -47,9 +43,18 @@ impl DatabaseImpl {
     }
 
     pub fn get_conn(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>> {
-        self.pool
+        let mut conn = self
+            .pool
             .get()
-            .map_err(|e| Error::Other(format!("Failed to get one connection from the pool: {e}")))
+            .map_err(|e| Error::Other(format!("Failed to get one connection from the pool: {e}")))?;
+
+        // We need to enable foreign_keys per connection. This will execute this statement several
+        // times if the connections are reused.
+        diesel::sql_query("PRAGMA foreign_keys = ON") // Enables foreign keys support: https://www.sqlite.org/foreignkeys.html
+            .execute(&mut conn)
+            .map_err(|e| Error::Other(e.to_string()))?;
+
+        Ok(conn)
     }
 
     fn create_directory(

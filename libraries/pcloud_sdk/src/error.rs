@@ -2,6 +2,8 @@ use std::io;
 
 use thiserror::Error;
 
+pub(crate) static PCLOUDERROR_MESSAGE_NOT_AVAILABLE: &str = "Error message not available";
+
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Error)]
@@ -24,11 +26,14 @@ pub enum Error {
     #[error("The file already exists")]
     FileAlreadyExists,
 
-    #[error("Error from PCloud {code}: {message}")]
-    PCloudError { code: u16, message: String },
+    #[error(transparent)]
+    PCloudError(#[from] PCloudError),
 
     #[error("Wrong input data: {0}")]
-    InputDataEror(String),
+    InputDataError(String),
+
+    #[error("The file already exists")]
+    RemotePathRelativeError,
 }
 
 /// An error that can be returned when serializing data.
@@ -80,6 +85,28 @@ impl From<utils::http::Error> for Error {
                 }
                 .into()
             }
+        }
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum PCloudError {
+    #[error("[Error 2005] Directory does not exist")]
+    DirectoryDoesNotExist,
+
+    #[error("[Error {code}] {message}")]
+    UnclassifiedError { code: u16, message: String },
+}
+
+impl From<(u16, Option<String>)> for PCloudError {
+    fn from(value: (u16, Option<String>)) -> Self {
+        let (code, message) = value;
+        match code {
+            2005 => PCloudError::DirectoryDoesNotExist,
+            _ => PCloudError::UnclassifiedError {
+                code,
+                message: message.unwrap_or_else(|| PCLOUDERROR_MESSAGE_NOT_AVAILABLE.into()),
+            },
         }
     }
 }

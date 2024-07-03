@@ -11,7 +11,7 @@ use tracing::debug;
 use filesystem::impls::composites::indexed::diesel_indexed::MIGRATIONS as FILESYSTEM_INDEXED_MIGRATIONS;
 use filesystem::{DirectoryPath, FilePath};
 use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::GetFolderID;
+use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::types::RemotePath;
 use pcloud_sdk::{ProxiedFile, UploadReturnType};
 
@@ -51,35 +51,58 @@ pub struct PCloudDatabase<PCloud: PCloudClient + Send + 'static> {
 }
 
 impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
-    /// Initializes the database and pushes it to the remote pCloud storage at the given `path`
-    /// location (it creates a file called `photodb.sqlite3` inside the folder). It will fail if
-    /// the remote file already exists
-    pub async fn initialize(pcloud: PCloud, path: RemotePath) -> Result<Receiver<UploadReturnType>> {
-        let folderid = pcloud.get_folderid(&path).await?; // TODO: Create if not exists?
+    /// Returns (or creates) a database file synced with PCloud. It creates the database and run
+    /// the migrations ([`run_migrations`]) as well. If anything fails, this function takes care
+    /// of uploading the file to the remote.
+    async fn get_database_file(
+        pcloud: PCloud,
+        path: &RemotePath,
+        creation_expected: bool,
+    ) -> Result<(ProxiedFile<PCloud>, Receiver<UploadReturnType>)> {
+        let folderid = match pcloud.get_folderid(path).await {
+            Ok(folderid) => folderid,
+            Err(pcloud_sdk::Error::PCloudError(pcloud_sdk::error::PCloudError::DirectoryDoesNotExist)) => {
+                if creation_expected {
+                    pcloud.createfolderifnotexists_all_from_root(path).await?
+                } else {
+                    bail!(
+                        "Cannot get the database file from the remote. Path '{}' doesn't exist",
+                        path
+                    );
+                }
+            }
+            Err(e) => bail!(e.to_string()),
+        };
+
         let (proxied_file, created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
-        if !created {
+        if creation_expected && !created {
             drop(proxied_file);
             let _ = upload_done.await?; // Wait for the file to close, discard any error.
             bail!("Remote file already exists!");
         }
 
-        // Create the SQLite3 database and run migrations
         debug!("Create the database and/or run pending migrations");
-        let mut conn = SqliteConnection::establish(proxied_file.local_filepath().to_str().unwrap())?;
-        conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
-        conn.run_pending_migrations(MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
+        if let Err(e) = run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
+            drop(proxied_file);
+            let _ = upload_done.await?; // Wait for the file to close, discard any error.
+            bail!("Migrations failed to run: {e}");
+        }
 
+        Ok((proxied_file, upload_done))
+    }
+
+    /// Initializes the database and pushes it to the remote pCloud storage at the given `path`
+    /// location (it creates a file called `photodb.sqlite3` inside the folder). It will fail if
+    /// the remote file already exists
+    pub async fn initialize(pcloud: PCloud, path: &RemotePath) -> Result<Receiver<UploadReturnType>> {
+        let (_, upload_done) = Self::get_database_file(pcloud, path, true).await?;
         Ok(upload_done)
     }
 
     /// Creates a new [`PCloudDatabase`] instance. Requires a pCloud client and the folder
     /// path where the database (and files) are located
     pub async fn new(pcloud: PCloud, path: &RemotePath) -> anyhow::Result<(Self, Receiver<UploadReturnType>)> {
-        let folderid = pcloud.get_folderid(path).await?;
-        // TODO: Add a flag to `ProxiedFile` to indicate if it's allowed to create the file or not
-        let (proxied_file, _created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
+        let (proxied_file, upload_done) = Self::get_database_file(pcloud, path, false).await?;
 
         // Create a connection pool using the local temp file
         let pool = {
@@ -87,13 +110,6 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
             Pool::builder().test_on_check_out(true).build(manager)?
         };
         let _ = pool.clone();
-
-        debug!("Run pending migrations");
-        let mut conn = pool.get()?;
-        conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
-        conn.run_pending_migrations(MIGRATIONS)
-            .map_err(|e| anyhow!("Error {}", e))?;
 
         // Return the instance
         Ok((
@@ -109,7 +125,13 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
 #[async_trait]
 impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
     fn get_connection(&self) -> Result<PooledConnection<ConnectionManager<SqliteConnection>>> {
-        self.pool.get().map_err(|e| anyhow!(e.to_string()))
+        let mut conn = self.pool.get()?;
+        // We need to enable foreign-keys per connection! I guess this will execute this statement
+        // several times if the same connection is reused...
+        diesel::sql_query("PRAGMA foreign_keys = ON") // Enables foreign keys support: https://www.sqlite.org/foreignkeys.html
+            .execute(&mut conn)
+            .unwrap();
+        Ok(conn)
     }
 
     fn get_pool(&self) -> Pool<ConnectionManager<SqliteConnection>> {
@@ -156,5 +178,45 @@ impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
         );
 
         Ok(orphan_files.load::<models::File>(&mut conn)?)
+    }
+}
+
+fn run_migrations(database_url: &str) -> Result<()> {
+    // Create the SQLite3 database and run migrations
+    debug!("Run pending migrations");
+    let mut conn = SqliteConnection::establish(database_url)?;
+    conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
+        .map_err(|e| anyhow!("Error {}", e))?;
+    conn.run_pending_migrations(MIGRATIONS)
+        .map_err(|e| anyhow!("Error {}", e))?;
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use diesel::{Connection, SqliteConnection};
+    use strum::IntoEnumIterator;
+    use tempfile::NamedTempFile;
+
+    use crate::database::models::Format;
+
+    use super::*;
+
+    #[test]
+    fn test_formats_are_propulated() -> Result<()> {
+        // Test that `Format::find` works for all the `Formats` variants
+        let dbfile = NamedTempFile::new()?;
+        let dbfile_str = dbfile.path().to_str().unwrap();
+        run_migrations(dbfile_str)?;
+
+        let mut conn = SqliteConnection::establish(dbfile_str)?;
+        for it in models::Formats::iter() {
+            let f = Format::find(&it, &mut conn)?;
+            let formats_: models::Formats = f.into();
+            assert_eq!(formats_, it);
+        }
+
+        Ok(())
     }
 }

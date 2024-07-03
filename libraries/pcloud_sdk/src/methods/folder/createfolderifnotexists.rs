@@ -22,7 +22,9 @@ pub struct CreateFolderIfNotExists {
 
 #[async_trait]
 pub trait GetCreateFolderIfNotExists {
-    /// Creates the given directory (if it doesn't exist) and returns its metadata
+    /// Creates a folder with the given `name` inside the folder given by `folder_id`. The call
+    /// will return the metadata associated with the folder and a boolean indicated if it was
+    /// actually created or not.
     ///
     /// Only the `folderid`+`name` alternative is implemented as it's the one recommended in the
     /// documentation.

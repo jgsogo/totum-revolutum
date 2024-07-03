@@ -60,7 +60,7 @@ pub fn filesystem_mocked() -> MockLocalClient {
             assert_eq!(
                 params
                     .get("recursive")
-                    .ok_or(Error::InputDataEror("'recursive' prams not found".to_string()))?,
+                    .ok_or(Error::InputDataError("'recursive' prams not found".to_string()))?,
                 "0"
             );
 

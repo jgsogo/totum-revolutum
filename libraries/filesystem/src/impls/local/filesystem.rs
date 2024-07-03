@@ -34,6 +34,13 @@ impl FilesystemLocal {
             root: root.to_path_buf(),
         })
     }
+
+    /// Creates a new [`FilesystemLocal`] at the `root` of the current hard disk (`/`)
+    pub fn local_hd() -> Self {
+        Self {
+            root: Utf8PathBuf::from_str("/").unwrap(),
+        }
+    }
 }
 
 #[async_trait]
@@ -168,9 +175,10 @@ impl FilesystemOps for FilesystemLocal {}
 #[cfg(test)]
 mod tests {
     use std::io;
+    use std::io::Write;
     use std::str::FromStr;
 
-    use tempfile::tempdir;
+    use tempfile::{tempdir, NamedTempFile};
 
     use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
 
@@ -391,6 +399,40 @@ mod tests {
             );
         }
 
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_local_hd() -> Result<()> {
+        // We create a temporary file in the HD
+        let mut tmpfile = NamedTempFile::new()?;
+        tmpfile.write_all(b"Something")?;
+
+        // Get the FilePath to that file (relative path)
+        let filepath = {
+            let relative_path_to_root = tmpfile.path().to_path_buf().canonicalize().unwrap();
+            let directory = DirectoryPathBuf::from_str(
+                relative_path_to_root
+                    .parent()
+                    .unwrap()
+                    .as_os_str()
+                    .to_str()
+                    .unwrap()
+                    .strip_prefix("/")
+                    .unwrap(),
+            )?;
+            let filename = FilenameBuf::from_str(relative_path_to_root.file_name().unwrap().to_str().unwrap())?;
+            FilePathBuf::new(directory, filename)
+        };
+
+        // We can access the file using a filesystem instantiated with FilesystemLocal::local_hd()
+        let local_hd = FilesystemLocal::local_hd();
+        let (mut file, _) = local_hd.open(&filepath).await?;
+
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer).await?;
+
+        assert_eq!(buffer.as_slice(), b"Something");
         Ok(())
     }
 }

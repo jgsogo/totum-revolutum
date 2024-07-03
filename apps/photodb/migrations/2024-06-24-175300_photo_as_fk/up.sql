@@ -5,7 +5,7 @@ CREATE TABLE photo_files
     -- Fields that are interesting to our application
     fileid BIGINT UNIQUE NOT NULL, -- Identifier inside pcloud
     format_id INTEGER NOT NULL, -- the file format
-    processed BOOLEAN NOT NULL DEFAULT 'FALSE', -- PhotoDB application did it's processing on this file
+    processed BOOLEAN NOT NULL DEFAULT 'FALSE', -- PhotoDB application did its processing on this file
 
     --- Constraints
     FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE,
@@ -19,7 +19,7 @@ CREATE TABLE video_files
     -- Fields that are interesting to our application
     fileid BIGINT UNIQUE NOT NULL, -- Identifier inside pcloud
     format_id INTEGER NOT NULL, -- the file format
-    processed BOOLEAN NOT NULL DEFAULT 'FALSE', -- PhotoDB application did it's processing on this file
+    processed BOOLEAN NOT NULL DEFAULT 'FALSE', -- PhotoDB application did its processing on this file
 
     --- Constraints
     FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE,

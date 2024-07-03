@@ -56,6 +56,15 @@ impl RemotePath {
     pub fn components(&self) -> Utf8Components {
         self.0.components()
     }
+
+    /// Returns a path that, when joined onto `base`, returns `self`. If `base` is not a prefix of
+    /// `self`, return [`crate::Error::RemotePathRelativeError`] (this method is executing
+    /// [`Utf8Path::strip_prefix`] under the hood).
+    pub fn relative_to(&self, base: &RemotePath) -> Result<&Utf8Path, crate::Error> {
+        self.0
+            .strip_prefix(&base.0)
+            .map_err(|_| crate::Error::RemotePathRelativeError)
+    }
 }
 
 impl Display for RemotePath {
