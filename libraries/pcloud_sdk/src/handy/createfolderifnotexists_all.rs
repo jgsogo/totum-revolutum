@@ -3,19 +3,22 @@ use camino::{Utf8Component, Utf8Path};
 use itertools::any;
 
 use crate::methods::folder::createfolderifnotexists::GetCreateFolderIfNotExists;
-use crate::types::FolderID;
+use crate::types::{FolderID, RemotePath};
 use crate::{Error, Result};
 
 use super::GetFolderID;
 
 #[async_trait]
-/// Create the folder given by `path` inside folder given by `folder` (defaults to root)
 pub trait GetCreateFolderIfNotExistsAll {
+    /// Create the folder given by `path` inside folder given by `folderid`
     async fn createfolderifnotexists_all(
         &self,
         folderid: &FolderID,
         path: impl AsRef<Utf8Path> + Send,
     ) -> Result<FolderID>;
+
+    /// Create the folder given by `path` starting from the root folder
+    async fn createfolderifnotexists_all_from_root(&self, path: &RemotePath) -> Result<FolderID>;
 }
 
 #[async_trait]
@@ -46,5 +49,12 @@ impl<Client: GetFolderID + GetCreateFolderIfNotExists + Sync> GetCreateFolderIfN
         }
 
         Ok(folderid)
+    }
+
+    async fn createfolderifnotexists_all_from_root(&self, path: &RemotePath) -> Result<FolderID> {
+        let root = RemotePath::root();
+        let root_folderid = self.get_folderid(&root).await?;
+        self.createfolderifnotexists_all(&root_folderid, path.relative_to(&root)?)
+            .await
     }
 }

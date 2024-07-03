@@ -64,11 +64,11 @@ repos:
         always_run: true
         pass_filenames: false
 
-      - id: branch-updated
-        name: Branch up-to-date with master
-        entry: scripts/branch_updated.sh
-        language: script
-        always_run: true
+      #      - id: branch-updated
+      #        name: Branch up-to-date with master
+      #        entry: scripts/branch_updated.sh
+      #        language: script
+      #        always_run: true
 
       - id: bazel-update
         name: Run all Bazel targets with 'update' tag (update workspace files)

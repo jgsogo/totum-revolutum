@@ -21,6 +21,7 @@ lazy_static! {
     static ref FORMATS_CACHE: Mutex<HashMap<String, Format>> = Mutex::new(HashMap::new());
 }
 
+/// An enumeration of supported formats. All these formats are also available in the database.
 #[derive(PartialEq, Eq, Display, Debug, Clone, EnumString, EnumIter)]
 #[allow(clippy::upper_case_acronyms)]
 #[strum(serialize_all = "snake_case")]
@@ -90,7 +91,8 @@ pub struct NewFormat<'a> {
 impl Format {
     /// Looks for the [`Format`] entry for the given `value`.
     ///
-    /// This method uses LRU cache, so it won't hit the database for the already queried values.
+    /// This method uses a cache, so it won't hit the database for already queried values. Errors are
+    /// not cached, so new values in the database can be retrieved by future calls.
     pub fn find<Conn: LoadConnection>(value: &Formats, conn: &mut Conn) -> Result<Format>
     where
         for<'a> <<Self as HasTable>::Table as FilterDsl<Eq<formats::format, &'a str>>>::Output:

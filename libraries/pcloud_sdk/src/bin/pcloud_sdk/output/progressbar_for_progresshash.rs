@@ -57,7 +57,7 @@ mod tests {
 
     use async_trait::async_trait;
 
-    use pcloud_sdk::Error;
+    use pcloud_sdk::error::PCloudError;
     use pcloud_sdk::Result;
 
     use super::*;
@@ -129,7 +129,7 @@ mod tests {
     impl UploadProgress for MockUploadProgress {
         async fn uploadprogress(&self, _progresshash: &str) -> Result<UploadProgressData> {
             if self.error {
-                return Err(Error::from((9999u16, "Returning error as expected".to_string())));
+                return Err(PCloudError::from((9999u16, Some("Returning error as expected".to_string()))).into());
             }
 
             if self.data.borrow().up_total > self.data.borrow().up_progress {

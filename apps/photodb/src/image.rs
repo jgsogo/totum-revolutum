@@ -21,7 +21,6 @@ pub(crate) fn prepare_image_file(input: impl AsRef<Utf8Path>) -> Result<(NamedTe
 
     // Define fall-back behavior
     let fallback = |format: Formats| -> Result<Formats> {
-        // warn!("Bypass any transformation and copy to the target destination");
         std::fs::copy(input.as_ref(), output.path())?;
         Ok(format)
     };

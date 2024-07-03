@@ -146,8 +146,14 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
                 FilePathBuf::new(directory, filename)
             };
             self.storage.create_dir_all(filepath.directory()).await?;
-            let local_hd = FilesystemLocal::local_hd();
-            filesystem::actions::copy_file(&local_hd, &mut self.storage, &photo_as_filepath, &filepath, false).await?
+            filesystem::actions::copy_file(
+                &FilesystemLocal::local_hd(),
+                &mut self.storage,
+                &photo_as_filepath,
+                &filepath,
+                false,
+            )
+            .await?
         };
 
         Ok((filepath, format, exif, rx.unwrap()))

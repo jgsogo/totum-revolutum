@@ -11,7 +11,7 @@ use tracing::debug;
 use filesystem::impls::composites::indexed::diesel_indexed::MIGRATIONS as FILESYSTEM_INDEXED_MIGRATIONS;
 use filesystem::{DirectoryPath, FilePath};
 use pcloud_sdk::client::PCloudClient;
-use pcloud_sdk::handy::GetFolderID;
+use pcloud_sdk::handy::{GetCreateFolderIfNotExistsAll, GetFolderID};
 use pcloud_sdk::types::RemotePath;
 use pcloud_sdk::{ProxiedFile, UploadReturnType};
 
@@ -59,7 +59,21 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         path: &RemotePath,
         creation_expected: bool,
     ) -> Result<(ProxiedFile<PCloud>, Receiver<UploadReturnType>)> {
-        let folderid = pcloud.get_folderid(path).await?;
+        let folderid = match pcloud.get_folderid(path).await {
+            Ok(folderid) => folderid,
+            Err(pcloud_sdk::Error::PCloudError(pcloud_sdk::error::PCloudError::DirectoryDoesNotExist)) => {
+                if creation_expected {
+                    pcloud.createfolderifnotexists_all_from_root(path).await?
+                } else {
+                    bail!(
+                        "Cannot get the database file from the remote. Path '{}' doesn't exist",
+                        path
+                    );
+                }
+            }
+            Err(e) => bail!(e.to_string()),
+        };
+
         let (proxied_file, created, upload_done) = ProxiedFile::new(pcloud, folderid, DB_FILENAME).await?;
         if creation_expected && !created {
             drop(proxied_file);

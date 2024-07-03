@@ -18,7 +18,7 @@ pub fn get_exif_data_from_memory<R: io::BufRead + io::Seek>(bufreader: &mut R) -
     Ok(exifreader.read_from_container(bufreader)?)
 }
 
-/// Returns the creation data from the EXIF data. It will try the following files in order:
+/// Returns the creation data from the EXIF data. It will try the following EXIF tags in order:
 /// [`Tag::DateTimeOriginal`], [`Tag::DateTime`] and [`Tag::DateTimeDigitized`].
 pub fn get_creation_date(exif: &Exif) -> Result<NaiveDateTime> {
     let date = if let Some(date) = exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
