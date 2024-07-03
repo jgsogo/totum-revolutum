@@ -3,6 +3,7 @@ use std::future::Future;
 use std::io::Write;
 use std::path::PathBuf;
 use std::pin::Pin;
+use std::time::Duration;
 
 use camino::{Utf8Path, Utf8PathBuf};
 use tempfile::{tempdir, TempDir};
@@ -50,7 +51,7 @@ type UploadSideTaskType<PCloud> = SideTask<
 
 /// Keeps a local temporal copy of a remote file. The remote file is fetched (or created) as
 /// soon as this object is instantiated, then you can use the local file as usual. When this
-/// object is dropped, the local content is sent to the remote and the local file is removed.
+/// object is dropped, the local content is sent to the remote and the local file removed.
 pub struct ProxiedFile<PCloud: PCloudClient + Send + 'static> {
     /// The `PCloudClient` used to connect to the remote
     pcloud: Option<PCloud>,
@@ -80,19 +81,21 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
     async fn upload_and_remove(args: (PCloud, FileID, TempDir)) -> UploadReturnType {
         let (pcloud, fileid, temp_dir) = args;
 
-        // Execute upload
-        let local_filepath = Self::get_local_filepath(&temp_dir);
-        let r = pcloud
-            .upload_to_fileid(
-                Utf8Path::from_path(&local_filepath).expect("Every tmp path should be convertible to UTF8Path"),
-                fileid,
-            )
+        // Execute upload (retry for 60 secs)
+        let local_filepath_buf = Self::get_local_filepath(&temp_dir);
+        let local_filepath =
+            Utf8Path::from_path(&local_filepath_buf).expect("Every tmp path should be convertible to UTF8Path");
+
+        let r = tryhard::retry_fn(|| pcloud_upload_to_fileid(&pcloud, local_filepath, fileid.clone()))
+            .retries(10)
+            .exponential_backoff(Duration::from_millis(100))
+            .max_delay(Duration::from_secs(60))
             .await;
 
         // If upload fails, return the `TempDir` and let the user decide what to do
         match r {
             Ok(ok) => Ok(ok),
-            Err(_) => Err((temp_dir, local_filepath)),
+            Err(_) => Err((temp_dir, local_filepath_buf)),
         }
     }
 
@@ -164,7 +167,7 @@ impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
         Self::get_local_filepath(self.temp_dir.as_ref().unwrap())
     }
 
-    /// Returns a reference to a [`std::fs::File`] object. The value is kept inside the
+    /// Returns a reference to a [`File`] object. The value is kept inside the
     /// `ProxiedFile` so it isn't possible to drop it while the file is opened.
     pub fn open(&mut self) -> Result<&File> {
         if self.local_file.is_none() {
@@ -202,4 +205,9 @@ impl<PCloud: PCloudClient + Send + 'static> Drop for ProxiedFile<PCloud> {
             error!("Error starting the SideTask 'upload_and_remove': {e}")
         }
     }
+}
+
+async fn pcloud_upload_to_fileid<PCloud: PCloudClient>(pcloud: &PCloud, path: &Utf8Path, fileid: FileID) -> Result<()> {
+    debug!("Run pcloud.upload_to_fileid for proxied file (possible retry)");
+    pcloud.upload_to_fileid(path, fileid).await
 }
