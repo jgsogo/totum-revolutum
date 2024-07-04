@@ -1,3 +1,4 @@
+mod fields;
 pub mod models;
 mod pcloud_database;
 pub mod schema;

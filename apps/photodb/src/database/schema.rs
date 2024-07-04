@@ -33,6 +33,7 @@ diesel::table! {
         fileid -> BigInt,
         format_id -> Integer,
         processed -> Bool,
+        metadata -> Text,
     }
 }
 

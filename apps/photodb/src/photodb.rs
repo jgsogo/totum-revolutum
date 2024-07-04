@@ -18,6 +18,7 @@ use pcloud_sdk::types::FileID;
 use pcloud_sdk::types::RemotePath;
 
 use crate::database::models::Formats;
+use crate::metadata::PhotoMetadata;
 
 use super::database::models;
 use super::database::Database;
@@ -162,9 +163,13 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     pub async fn add(&mut self, photo_filepath: impl AsRef<Utf8Path>) -> Result<()> {
         debug!("Add photo from path '{}'", photo_filepath.as_ref());
 
-        let (remote_filepath, formats_, _exif, rx) = self.process_and_upload(&photo_filepath).await?;
-        // TODO: Decide what to do with EXIF data (upload to JSON file side-by-side to the file?).
-        // TODO: Make sure the processed files contain the same exif, we don't want to lose it.
+        let mut json_metadata = serde_json::json!({});
+        json_metadata["input_file"] = photo_filepath.as_ref().collect_metadata();
+
+        let (remote_filepath, formats_, exif, rx) = self.process_and_upload(&photo_filepath).await?;
+        if let Some(exif) = exif {
+            json_metadata["exif"] = exif.collect_metadata();
+        }
 
         debug!("Now create the PhotoFile entry for {}", remote_filepath);
         let mut conn = self.db.get_connection()?;
@@ -175,14 +180,13 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         // FIXME: consolidate filesystem with pcloud_sdk (maybe the other way around) so they
         // FIXME: both uses a relative path (whatever is root will always be prepended)
         let remote_abs_filepath = self.root_folder.join(&remote_filepath)?;
-        // let remote_path = RemotePath::try_from(remote_abs_filepath)?;
         debug!("Get fileid for {}", remote_abs_filepath);
         let fileid_: FileID = self.pcloud.get_fileid(&remote_abs_filepath).await?;
 
         debug!("Get the models::File row for {}", &remote_filepath);
         let file_ = self.db.get_file(&remote_filepath)?;
-
-        let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true);
+        info!("Metadata: {}", json_metadata);
+        let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true, json_metadata);
 
         use crate::database::schema::photo_files::dsl::*;
         let photo = diesel::insert_into(photo_files)
@@ -208,7 +212,10 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         self.storage.initial_sync(ignore_filter).await.map_err(|e| anyhow!(e))?;
 
         let non_identified = self.db.get_orphan_files()?;
-        debug!("Found {} files not processed", non_identified.len());
+        debug!(
+            "Found {} files not processed (they appear as models::File, but no models::PhotoFile)",
+            non_identified.len()
+        );
 
         if non_identified.is_empty() {
             return Ok(());

@@ -8,3 +8,4 @@ mod photodb;
 pub mod utils;
 
 pub mod exif;
+mod metadata;

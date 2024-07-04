@@ -2,6 +2,8 @@ use diesel::prelude::*;
 
 use pcloud_sdk::types::FileID;
 
+use crate::database::fields::JSONField;
+
 use super::{File, Format};
 
 #[derive(Insertable)]
@@ -11,6 +13,7 @@ pub struct NewPhotoFile {
     fileid: i64,
     format_id: i32,
     processed: bool,
+    metadata: JSONField,
 }
 
 #[derive(Queryable, Selectable)]
@@ -37,15 +40,24 @@ pub struct PhotoFile {
     /// This flag will also be useful if we added some new processing and we want to work on
     /// all the files again. We just need to update this flag to `false` for all the table.
     pub processed: bool,
+
+    pub metadata: JSONField,
 }
 
 impl PhotoFile {
-    pub fn new_from(file: &File, fileid: &FileID, format: &Format, processed: bool) -> NewPhotoFile {
+    pub fn new_from(
+        file: &File,
+        fileid: &FileID,
+        format: &Format,
+        processed: bool,
+        metadata: serde_json::Value,
+    ) -> NewPhotoFile {
         NewPhotoFile {
             file_id: file.id,
             fileid: fileid.inner() as i64,
             format_id: format.id,
             processed,
+            metadata: JSONField::new(metadata),
         }
     }
 }
