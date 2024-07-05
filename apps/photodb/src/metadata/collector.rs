@@ -61,23 +61,25 @@ impl MetadataCollector {
     /// Inspects all the entries in the metadata, looking for the best candidate date. It applies
     /// several rules:
     ///  * Order of preference: CLI > EXIF > Filepath > ~fs::Metadata~
-    pub fn get_candidate_date(&self) -> Option<String> {
+    pub fn get_candidate_date(&self) -> Option<&str> {
         if let Some(cli) = self.data.get(CLI_CLAP_KEY) {
             if let Some(date) = cli.get("date") {
-                return Some(date.to_string());
-            }
-        } else if let Some(exif) = self.data.get(EXIF_KEY) {
-            for it in &*DATE_FIELDS {
-                if let Some(date) = exif.get(it.to_string()) {
-                    return Some(date.to_string());
-                }
-            }
-        } else if let Some(filepath) = self.data.get(FILEPATH_KEY) {
-            if let Some(date) = filepath.get("date") {
-                return Some(date.to_string());
+                return date.as_str();
             }
         }
-        // TODO: "Created field can be very, very, very misleading... Do we want to take the date from here?
+        if let Some(exif) = self.data.get(EXIF_KEY) {
+            for it in &*DATE_FIELDS {
+                if let Some(date) = exif.get(it.to_string()) {
+                    return date.as_str();
+                }
+            }
+        }
+        if let Some(filepath) = self.data.get(FILEPATH_KEY) {
+            if let Some(date) = filepath.get("date") {
+                return date.as_str();
+            }
+        }
+        // Created/Modified date can be very, very, very misleading...
         // else if let Some(fs_metadata) = self.data.get(FS_METADATA_KEY) {
         //     if let Some(date) = fs_metadata.get("created") {
         //         return Some(date.to_string());
@@ -218,5 +220,70 @@ mod tests {
             a["phone"] = serde_json::json!(1234);
             assert_eq!(collected["a"], a);
         }
+    }
+
+    #[test]
+    fn test_get_candidate_date() {
+        // Test the order of preference of the different alternatives
+
+        let cli_data = serde_json::json!({
+           "date": "cli-date",
+        });
+
+        let mut collector = MetadataCollector::default();
+
+        // No date if metadata is empty
+        assert_eq!(collector.get_candidate_date(), None);
+
+        // No date if `date` is not in the fields
+        collector.add(
+            CLI_CLAP_KEY,
+            serde_json::json!({
+               "other-thing": "other-thing-from-cli",
+            }),
+        );
+        assert_eq!(collector.get_candidate_date(), None);
+
+        // std::fs::Metadata is ignored
+        collector.add(
+            FS_METADATA_KEY,
+            serde_json::json!({
+               "created": "fs_metadata-created",
+                "modified": "fs_metadata-modified",
+            }),
+        );
+        assert_eq!(collector.get_candidate_date(), None);
+
+        // filepath has the lowest precedence
+        collector.add(
+            FILEPATH_KEY,
+            serde_json::json!({
+               "date": "filepath-date",
+            }),
+        );
+        assert_eq!(collector.get_candidate_date().unwrap(), "filepath-date");
+
+        // exif data has higher precedence, check the order for its tags
+        collector.merge(
+            EXIF_KEY,
+            serde_json::json!({"DateTimeDigitized": "exif-DateTimeDigitized"}),
+        );
+        assert_eq!(collector.get_candidate_date().unwrap(), "exif-DateTimeDigitized");
+        collector.add(EXIF_KEY, serde_json::json!({"DateTime": "exif-DateTime"}));
+        assert_eq!(collector.get_candidate_date().unwrap(), "exif-DateTime");
+        collector.add(
+            EXIF_KEY,
+            serde_json::json!({"DateTimeOriginal": "exif-DateTimeOriginal"}),
+        );
+        assert_eq!(collector.get_candidate_date().unwrap(), "exif-DateTimeOriginal");
+
+        // cli has even higher
+        collector.add(
+            CLI_CLAP_KEY,
+            serde_json::json!({
+               "date": "cli-date",
+            }),
+        );
+        assert_eq!(collector.get_candidate_date().unwrap(), "cli-date");
     }
 }
