@@ -1,8 +1,17 @@
 use chrono::NaiveDateTime;
-use exif::Exif;
+use exif::{Exif, Tag};
+use lazy_static::lazy_static;
 
 use crate::metadata::collector::EXIF_KEY;
 use crate::{CollectMetadataFrom, MetadataCollector};
+
+lazy_static! {
+    pub(crate) static ref DATE_FIELDS: Vec<Tag> = vec![
+        exif::Tag::DateTimeOriginal,
+        exif::Tag::DateTime,
+        exif::Tag::DateTimeDigitized,
+    ];
+}
 
 impl CollectMetadataFrom<&Exif> for MetadataCollector {
     /// Collects some selected values from [`Exif`] object
@@ -11,13 +20,8 @@ impl CollectMetadataFrom<&Exif> for MetadataCollector {
 
         // Date fields
         {
-            let date_fields = vec![
-                exif::Tag::DateTimeOriginal,
-                exif::Tag::DateTime,
-                exif::Tag::DateTimeDigitized,
-            ];
-            for it in date_fields {
-                if let Some(field) = source.get_field(it, exif::In::PRIMARY) {
+            for it in &*DATE_FIELDS {
+                if let Some(field) = source.get_field(*it, exif::In::PRIMARY) {
                     let new_value = field.display_value().with_unit(source);
                     let no_timezone = NaiveDateTime::parse_from_str(&new_value.to_string(), "%Y-%m-%d %H:%M:%S")
                         .expect("EXIF datetime format mismatch");

@@ -1,3 +1,5 @@
+use crate::metadata::from_exif::DATE_FIELDS;
+
 pub(crate) static CLI_CLAP_KEY: &str = "cli";
 pub(crate) static EXIF_KEY: &str = "exif";
 pub(crate) static FILEPATH_KEY: &str = "path";
@@ -54,6 +56,35 @@ impl MetadataCollector {
     pub fn merge(&mut self, entry: &str, value: serde_json::Value) {
         let v = self.data.as_object_mut().unwrap();
         merge(v.entry(entry).or_insert(serde_json::Value::Null), value)
+    }
+
+    /// Inspects all the entries in the metadata, looking for the best candidate date. It applies
+    /// several rules:
+    ///  * Order of preference: CLI > EXIF > Filepath > ~fs::Metadata~
+    pub fn get_candidate_date(&self) -> Option<String> {
+        if let Some(cli) = self.data.get(CLI_CLAP_KEY) {
+            if let Some(date) = cli.get("date") {
+                return Some(date.to_string());
+            }
+        } else if let Some(exif) = self.data.get(EXIF_KEY) {
+            for it in &*DATE_FIELDS {
+                if let Some(date) = exif.get(it.to_string()) {
+                    return Some(date.to_string());
+                }
+            }
+        } else if let Some(filepath) = self.data.get(FILEPATH_KEY) {
+            if let Some(date) = filepath.get("date") {
+                return Some(date.to_string());
+            }
+        }
+        // TODO: "Created field can be very, very, very misleading... Do we want to take the date from here?
+        // else if let Some(fs_metadata) = self.data.get(FS_METADATA_KEY) {
+        //     if let Some(date) = fs_metadata.get("created") {
+        //         return Some(date.to_string());
+        //     }
+        // }
+
+        None
     }
 }
 
