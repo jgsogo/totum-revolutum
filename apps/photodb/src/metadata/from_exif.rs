@@ -1,6 +1,7 @@
 use chrono::NaiveDateTime;
 use exif::Exif;
 
+use crate::metadata::collector::EXIF_KEY;
 use crate::{CollectMetadataFrom, MetadataCollector};
 
 impl CollectMetadataFrom<&Exif> for MetadataCollector {
@@ -43,7 +44,7 @@ impl CollectMetadataFrom<&Exif> for MetadataCollector {
         }
 
         if !metadata.as_object().unwrap().is_empty() {
-            self.merge("exif", metadata.clone());
+            self.merge(EXIF_KEY, metadata.clone());
         }
         metadata
     }

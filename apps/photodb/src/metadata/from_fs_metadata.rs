@@ -1,6 +1,9 @@
-use crate::{CollectMetadataFrom, MetadataCollector};
-use chrono::TimeZone;
 use std::time::UNIX_EPOCH;
+
+use chrono::TimeZone;
+
+use crate::metadata::collector::FS_METADATA_KEY;
+use crate::{CollectMetadataFrom, MetadataCollector};
 
 impl CollectMetadataFrom<std::fs::Metadata> for MetadataCollector {
     /// Collects some metadata from [`std::fs::Metadata`]: creation and modification date
@@ -25,7 +28,7 @@ impl CollectMetadataFrom<std::fs::Metadata> for MetadataCollector {
         }
 
         if !metadata.as_object().unwrap().is_empty() {
-            self.merge("filesystem", metadata.clone());
+            self.merge(FS_METADATA_KEY, metadata.clone());
         }
         metadata
     }

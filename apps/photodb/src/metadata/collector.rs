@@ -1,3 +1,8 @@
+pub(crate) static CLI_CLAP_KEY: &str = "cli";
+pub(crate) static EXIF_KEY: &str = "exif";
+pub(crate) static FILEPATH_KEY: &str = "path";
+pub(crate) static FS_METADATA_KEY: &str = "filesystem";
+
 pub trait CollectMetadataFrom<T> {
     /// Collects metadata from the given `source` and stores it into `self`. Additionally, it returns
     /// all the metadata collected.

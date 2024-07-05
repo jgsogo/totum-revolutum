@@ -1,3 +1,4 @@
+use crate::metadata::collector::FILEPATH_KEY;
 use crate::{CollectMetadataFrom, MetadataCollector};
 use camino::Utf8Path;
 use lazy_static::lazy_static;
@@ -57,7 +58,7 @@ impl CollectMetadataFrom<&Utf8Path> for MetadataCollector {
         }
 
         if !metadata.as_object().unwrap().is_empty() {
-            self.merge("path", metadata.clone());
+            self.merge(FILEPATH_KEY, metadata.clone());
         }
         metadata
     }

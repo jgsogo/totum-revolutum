@@ -1,5 +1,6 @@
 use clap::Args;
 
+use crate::metadata::collector::CLI_CLAP_KEY;
 use crate::{CollectMetadataFrom, MetadataCollector};
 
 #[derive(Args, Debug)]
@@ -18,7 +19,7 @@ impl CollectMetadataFrom<&MetadataCLI> for MetadataCollector {
         }
 
         if !metadata.as_object().unwrap().is_empty() {
-            self.merge("cli", metadata.clone());
+            self.merge(CLI_CLAP_KEY, metadata.clone());
         }
         metadata
     }
