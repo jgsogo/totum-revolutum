@@ -15,6 +15,16 @@ impl JSONField {
     pub fn new(value: serde_json::Value) -> Self {
         Self(value)
     }
+
+    pub fn as_json_value(&self) -> &serde_json::Value {
+        &self.0
+    }
+}
+
+impl AsRef<serde_json::Value> for JSONField {
+    fn as_ref(&self) -> &serde_json::Value {
+        self.as_json_value()
+    }
 }
 
 impl<DB: Backend> FromSql<Text, DB> for JSONField
