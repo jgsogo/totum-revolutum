@@ -60,6 +60,52 @@ fn merge(lhs: &mut serde_json::Value, rhs: serde_json::Value) {
     }
 }
 
+/// Parse a single key-value pair (to be used for clap custom types)
+pub fn parse_key_val(
+    s: &str,
+) -> Result<(String, serde_json::Value), Box<dyn std::error::Error + Send + Sync + 'static>> {
+    let pos = s
+        .find('=')
+        .ok_or_else(|| format!("invalid KEY=value: no `=` found in `{s}`"))?;
+
+    let key: String = s[..pos].parse()?;
+
+    let value = {
+        let value: String = s[pos + 1..].parse()?;
+        let (hint, value) = match value.find(':') {
+            None => ("str", value.as_str()),
+            Some(hint_found) => {
+                let hint = &value[..hint_found];
+                let value = &value[hint_found + 1..];
+                (hint, value)
+            }
+        };
+        match hint {
+            "int" | "integer" | "i64" => {
+                let value: i64 = value.parse()?;
+                serde_json::json!(value)
+            }
+            "bool" | "boolean" => {
+                let value: bool = value.parse()?;
+                serde_json::json!(value)
+            }
+            "float" | "f64" => {
+                let value: f64 = value.parse()?;
+                serde_json::json!(value)
+            }
+            "list" | "array" => {
+                // comma-separated list of strings
+                let values: Vec<&str> = value.split(',').collect();
+                serde_json::json!(values)
+            }
+            // Assume string
+            _ => serde_json::json!(value),
+        }
+    };
+
+    Ok((key, value))
+}
+
 pub trait CollectMetadataFrom<T> {
     /// Collects metadata from the given `source` and stores it into `self`. Additionally, it returns
     /// all the metadata collected.
@@ -209,6 +255,45 @@ mod tests {
             let collected = collector.as_json_value();
             a["phone"] = serde_json::json!(1234);
             assert_eq!(collected["a"], a);
+        }
+    }
+
+    #[test]
+    fn test_parse_key_value() {
+        {
+            let (key, value) = parse_key_val("key=value").unwrap();
+            assert_eq!(key, "key");
+            assert_eq!(value, serde_json::json!("value"));
+        }
+        {
+            assert_eq!(parse_key_val("key=int:123").unwrap().1, serde_json::json!(123));
+            assert_eq!(parse_key_val("key=integer:123").unwrap().1, serde_json::json!(123));
+            assert_eq!(parse_key_val("key=i64:-123").unwrap().1, serde_json::json!(-123));
+        }
+        {
+            assert_eq!(parse_key_val("key=bool:true").unwrap().1, serde_json::json!(true));
+            assert_eq!(parse_key_val("key=boolean:true").unwrap().1, serde_json::json!(true));
+            assert_eq!(parse_key_val("key=bool:false").unwrap().1, serde_json::json!(false));
+            assert_eq!(parse_key_val("key=boolean:false").unwrap().1, serde_json::json!(false));
+        }
+        {
+            assert_eq!(parse_key_val("key=float:0.23").unwrap().1, serde_json::json!(0.23f64));
+            assert_eq!(parse_key_val("key=f64:-0.23").unwrap().1, serde_json::json!(-0.23f64));
+            assert_eq!(parse_key_val("key=float:1.e6").unwrap().1, serde_json::json!(1e6f64));
+        }
+        {
+            assert_eq!(
+                parse_key_val("key=list:1,2,3").unwrap().1,
+                serde_json::json!(vec!["1", "2", "3"])
+            );
+            assert_eq!(
+                parse_key_val("key=array:-1,-2,-3").unwrap().1,
+                serde_json::json!(vec!["-1", "-2", "-3"])
+            );
+            assert_eq!(
+                parse_key_val("key=list:tag1,tag2,tag 3").unwrap().1,
+                serde_json::json!(vec!["tag1", "tag2", "tag 3"])
+            );
         }
     }
 }
