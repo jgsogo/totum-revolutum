@@ -82,7 +82,8 @@ impl<PCloud: PCloudClient + Send + 'static> PCloudDatabase<PCloud> {
         }
 
         debug!("Create the database and/or run pending migrations");
-        if let Err(e) = run_migrations(proxied_file.local_filepath().to_str().unwrap()) {
+        let mut conn = SqliteConnection::establish(proxied_file.local_filepath().to_str().unwrap())?;
+        if let Err(e) = run_migrations(&mut conn) {
             drop(proxied_file);
             let _ = upload_done.await?; // Wait for the file to close, discard any error.
             bail!("Migrations failed to run: {e}");
@@ -181,10 +182,9 @@ impl<PCloud: PCloudClient + Send> Database for PCloudDatabase<PCloud> {
     }
 }
 
-fn run_migrations(database_url: &str) -> Result<()> {
+pub(crate) fn run_migrations(conn: &mut SqliteConnection) -> Result<()> {
     // Create the SQLite3 database and run migrations
     debug!("Run pending migrations");
-    let mut conn = SqliteConnection::establish(database_url)?;
     conn.run_pending_migrations(FILESYSTEM_INDEXED_MIGRATIONS)
         .map_err(|e| anyhow!("Error {}", e))?;
     conn.run_pending_migrations(MIGRATIONS)
@@ -208,7 +208,8 @@ mod tests {
         // Test that `Format::find` works for all the `Formats` variants
         let dbfile = NamedTempFile::new()?;
         let dbfile_str = dbfile.path().to_str().unwrap();
-        run_migrations(dbfile_str)?;
+        let mut conn = SqliteConnection::establish(dbfile_str)?;
+        run_migrations(&mut conn)?;
 
         let mut conn = SqliteConnection::establish(dbfile_str)?;
         for it in models::Formats::iter() {
