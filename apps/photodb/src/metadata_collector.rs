@@ -1,4 +1,50 @@
+use std::time::UNIX_EPOCH;
+
+use camino::Utf8Path;
+use chrono::TimeZone;
 use exif::Exif;
+use lazy_static::lazy_static;
+use regex::Regex;
+
+lazy_static! {
+    static ref MONTHS_IN_ENGLISH: Vec<String> = vec![
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
+    .into_iter()
+    .map(|s| s.to_lowercase())
+    .collect();
+    static ref MONTHS_IN_SPANISH: Vec<String> = vec![
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre",
+    ]
+    .into_iter()
+    .map(|s| s.to_lowercase())
+    .collect();
+
+    /// Regex to match YYYY/MM/DD or YYYY-MM-DD or YYYY_MM_DD
+    static ref RE_YYYY_MM_DD: Regex = Regex::new(r"(?<year>\d{4})[/-_](?<month>\d{2})[/-_](?<day>\d{2})").unwrap();
+}
 
 /// Collects metadata from different sources into a [`serde_json::Value`] object. It also offers
 /// some functions and heuristics based on this metadata
@@ -114,8 +160,9 @@ pub trait CollectMetadataFrom<T> {
     fn collect_from(&mut self, source: T) -> serde_json::Value;
 }
 
-impl CollectMetadataFrom<Exif> for MetadataCollector {
-    fn collect_from(&mut self, source: Exif) -> serde_json::Value {
+impl CollectMetadataFrom<&Exif> for MetadataCollector {
+    /// Collects some selected values from [`Exif`] object
+    fn collect_from(&mut self, source: &Exif) -> serde_json::Value {
         let candidate_files = vec![
             exif::Tag::DateTimeOriginal,
             exif::Tag::DateTime,
@@ -130,12 +177,135 @@ impl CollectMetadataFrom<Exif> for MetadataCollector {
         // Store the fields as key-value pairs (using strings)
         for it in candidate_files {
             if let Some(field) = source.get_field(it, exif::In::PRIMARY) {
-                let new_value = field.display_value().with_unit(&source);
+                let new_value = field.display_value().with_unit(source);
                 metadata[it.to_string()] = serde_json::json!(new_value.to_string());
             }
         }
 
         self.merge("exif", metadata.clone());
+        metadata
+    }
+}
+
+impl CollectMetadataFrom<&Utf8Path> for MetadataCollector {
+    /// Collects metadata from a filesystem path: try to guess the date from directory and/or
+    /// filesystem name.
+    fn collect_from(&mut self, source: &Utf8Path) -> serde_json::Value {
+        let mut metadata = serde_json::json!({});
+
+        if let Some(guess) = guess_date_from_str(source.as_str()) {
+            metadata["date"] = serde_json::json!(guess);
+        }
+
+        self.merge("path", metadata.clone());
+        metadata
+    }
+}
+
+/// Tries to guess a date from the string using the regex in [`RE_YYYY_MM_DD`]. With the values
+/// found it returns a string with the `YYYY/MM/DD` format where missing values are filled with
+/// zeroes.
+fn guess_date_from_str(value: &str) -> Option<String> {
+    // Maybe the string contains the hint for a date
+    if let Some(caps) = RE_YYYY_MM_DD.captures(value) {
+        let year = check_candidate_year(&caps["year"]);
+        let month = check_candidate_month(&caps["month"]);
+        let day = check_candidate_day(&caps["day"]);
+        if year.is_some() || month.is_some() || day.is_some() {
+            Some(format!(
+                "{:04}/{:02}/{:02}",
+                year.unwrap_or(0),
+                month.unwrap_or(0),
+                day.unwrap_or(0)
+            ))
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
+
+/// A helper method to parse a year from a string. Expectation is just an u16 between 1900 and 2100
+fn check_candidate_year(year: &str) -> Option<u16> {
+    match year.parse::<u16>() {
+        Ok(year) => {
+            if !(1900..=2100).contains(&year) {
+                None
+            } else {
+                Some(year)
+            }
+        }
+        Err(_) => None,
+    }
+}
+
+/// A helper method to parse a day from a string. Expectation is just an u8 in range [1, 31]
+fn check_candidate_day(day: &str) -> Option<u8> {
+    match day.parse::<u8>() {
+        Ok(day) => {
+            if day == 0 || day > 31 {
+                None
+            } else {
+                Some(day)
+            }
+        }
+        Err(_) => None,
+    }
+}
+
+/// A helper method to parse a month from a string. It will match a number between 1 and 12, but
+/// also month names in Spanish or English
+fn check_candidate_month(month: &str) -> Option<u8> {
+    //  * A number between 1 and 12
+    match month.parse::<u8>() {
+        Ok(month) => {
+            if month == 0 || month > 12 {
+                None
+            } else {
+                Some(month)
+            }
+        }
+        Err(_) => {
+            //  * A string with the month name (english, spanish)
+            let months_lists: Vec<&Vec<String>> = vec![&*MONTHS_IN_ENGLISH, &*MONTHS_IN_SPANISH];
+
+            months_lists.iter().find_map(|month_list| {
+                month_list
+                    .iter()
+                    .position(|v| {
+                        let input = month.to_lowercase();
+                        v.starts_with(&input)
+                    })
+                    .map(|v| v as u8)
+            })
+        }
+    }
+}
+
+impl CollectMetadataFrom<std::fs::Metadata> for MetadataCollector {
+    /// Collects some metadata from [`std::fs::Metadata`]: creation and modification date
+    fn collect_from(&mut self, source: std::fs::Metadata) -> serde_json::Value {
+        let mut metadata = serde_json::json!({});
+
+        if let Ok(created) = source.created() {
+            if let Ok(duration) = created.duration_since(UNIX_EPOCH) {
+                let t = chrono::Utc
+                    .timestamp_opt(duration.as_secs() as i64, duration.subsec_nanos())
+                    .unwrap();
+                metadata["created"] = serde_json::json!(t.to_string());
+            }
+        }
+        if let Ok(modified) = source.modified() {
+            if let Ok(duration) = modified.duration_since(UNIX_EPOCH) {
+                let t = chrono::Utc
+                    .timestamp_opt(duration.as_secs() as i64, duration.subsec_nanos())
+                    .unwrap();
+                metadata["modified"] = serde_json::json!(t.to_string());
+            }
+        }
+
+        self.merge("filesystem", metadata.clone());
         metadata
     }
 }
