@@ -39,8 +39,11 @@ lazy_static! {
     .map(|s| s.to_lowercase())
     .collect();
 
-    /// Regex to match YYYY/MM/DD or YYYY-MM-DD or YYYY_MM_DD
-    static ref RE_YYYY_MM_DD: Regex = Regex::new(r"(?<year>\d{4})[/-_](?<month>\d{2})[/-_](?<day>\d{2})").unwrap();
+    /// Regex to match YYYY/MM/DD or YYYY-MM-DD or YYYY_MM_DD or YYYYMMDD
+    static ref RE_YYYY_MM_DD: Regex = Regex::new(r"(?<year>\d{4})[/\-_]?(?<month>\d{2})[/\-_]?(?<day>\d{2})").unwrap();
+
+    /// Regex to match YYYY/<month>/DD or YYYY-<month>-DD or YYYY_<month>_DD
+    static ref RE_YYYY_MONTH_DD: Regex = Regex::new(r"(?<year>\d{4})[/\-_](?<month>\w+)[/\-_](?<day>\d{2})").unwrap();
 }
 
 impl CollectMetadataFrom<&Utf8Path> for MetadataCollector {
@@ -64,8 +67,22 @@ impl CollectMetadataFrom<&Utf8Path> for MetadataCollector {
 /// found it returns a string with the `YYYY/MM/DD` format where missing values are filled with
 /// zeroes.
 fn guess_date_from_str(value: &str) -> Option<String> {
-    // Maybe the string contains the hint for a date
+    // Numbers: Maybe the string contains the hint for a date
     if let Some(caps) = RE_YYYY_MM_DD.captures(value) {
+        let year = check_candidate_year(&caps["year"]);
+        let month = check_candidate_month(&caps["month"]);
+        let day = check_candidate_day(&caps["day"]);
+        if year.is_some() || month.is_some() || day.is_some() {
+            Some(format!(
+                "{:04}/{:02}/{:02}",
+                year.unwrap_or(0),
+                month.unwrap_or(0),
+                day.unwrap_or(0)
+            ))
+        } else {
+            None
+        }
+    } else if let Some(caps) = RE_YYYY_MONTH_DD.captures(value) {
         let year = check_candidate_year(&caps["year"]);
         let month = check_candidate_month(&caps["month"]);
         let day = check_candidate_day(&caps["day"]);
@@ -135,8 +152,44 @@ fn check_candidate_month(month: &str) -> Option<u8> {
                         let input = month.to_lowercase();
                         v.starts_with(&input)
                     })
-                    .map(|v| v as u8)
+                    .map(|v| (v + 1) as u8)
             })
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::metadata::from_filepath::guess_date_from_str;
+
+    #[test]
+    fn test_guess_date_from_str() {
+        // regex: basic values
+        assert_eq!(&guess_date_from_str("1984/01/01").unwrap(), "1984/01/01");
+        assert_eq!(&guess_date_from_str("1984-01-01").unwrap(), "1984/01/01");
+        assert_eq!(&guess_date_from_str("1984/01/01").unwrap(), "1984/01/01");
+        assert_eq!(&guess_date_from_str("1984-01_01").unwrap(), "1984/01/01");
+        assert_eq!(&guess_date_from_str("19840101").unwrap(), "1984/01/01");
+
+        // regex: trailing data is skipped
+        assert_eq!(&guess_date_from_str("1984010122222").unwrap(), "1984/01/01");
+
+        // regex: day overflow
+        assert_eq!(&guess_date_from_str("19840152").unwrap(), "1984/01/00");
+
+        // regex: month overflow
+        assert_eq!(&guess_date_from_str("19841305").unwrap(), "1984/00/05");
+
+        // regex: year overflow
+        assert_eq!(&guess_date_from_str("18700101").unwrap(), "0000/01/01");
+        assert_eq!(&guess_date_from_str("25000101").unwrap(), "0000/01/01");
+
+        // testing months in english
+        assert_eq!(&guess_date_from_str("1984-jan-01").unwrap(), "1984/01/01");
+        assert_eq!(&guess_date_from_str("1984-october-01").unwrap(), "1984/10/01");
+
+        // testing months in spanish
+        assert_eq!(&guess_date_from_str("1984-abril-01").unwrap(), "1984/04/01");
+        assert_eq!(&guess_date_from_str("1984/dec/01").unwrap(), "1984/12/01");
     }
 }
