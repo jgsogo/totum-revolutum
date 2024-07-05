@@ -18,7 +18,7 @@ use pcloud_sdk::types::FileID;
 use pcloud_sdk::types::RemotePath;
 
 use crate::database::models::Formats;
-use crate::metadata::PhotoMetadata;
+use crate::metadata::{CollectMetadataFrom, MetadataCollector};
 
 use super::database::models;
 use super::database::Database;
@@ -163,12 +163,13 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     pub async fn add(&mut self, photo_filepath: impl AsRef<Utf8Path>) -> Result<()> {
         debug!("Add photo from path '{}'", photo_filepath.as_ref());
 
-        let mut json_metadata = serde_json::json!({});
-        json_metadata["input_file"] = photo_filepath.as_ref().collect_metadata();
+        let mut metadata_collector = MetadataCollector::default();
+        metadata_collector.collect_from(photo_filepath.as_ref());
+        metadata_collector.collect_from(std::fs::metadata(photo_filepath.as_ref())?);
 
         let (remote_filepath, formats_, exif, rx) = self.process_and_upload(&photo_filepath).await?;
         if let Some(exif) = exif {
-            json_metadata["exif"] = exif.collect_metadata();
+            metadata_collector.collect_from(&exif);
         }
 
         debug!("Now create the PhotoFile entry for {}", remote_filepath);
@@ -185,8 +186,8 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
 
         debug!("Get the models::File row for {}", &remote_filepath);
         let file_ = self.db.get_file(&remote_filepath)?;
-        info!("Metadata: {}", json_metadata);
-        let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true, json_metadata);
+        info!("Metadata: {:?}", metadata_collector);
+        let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true, metadata_collector.into());
 
         use crate::database::schema::photo_files::dsl::*;
         let photo = diesel::insert_into(photo_files)

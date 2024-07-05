@@ -10,7 +10,7 @@ use pcloud_sdk::client::{PCloudClient, PCloudClientImpl};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::RemotePath;
 use photodb::database::{Database, PCloudDatabase};
-use photodb::{AppDirs, PhotoDB};
+use photodb::{AppDirs, MetadataCLI, PhotoDB};
 
 fn application_dir() -> Utf8PathBuf {
     let home_dir = dirs::home_dir().expect("Failed to get dirs::home_dir()");
@@ -58,6 +58,9 @@ enum Commands {
 #[derive(Args, Debug)]
 struct Add {
     photo_file: Utf8PathBuf,
+
+    #[clap(flatten)]
+    metadata: MetadataCLI,
 }
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
