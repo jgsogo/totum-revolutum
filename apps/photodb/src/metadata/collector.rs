@@ -226,10 +226,6 @@ mod tests {
     fn test_get_candidate_date() {
         // Test the order of preference of the different alternatives
 
-        let cli_data = serde_json::json!({
-           "date": "cli-date",
-        });
-
         let mut collector = MetadataCollector::default();
 
         // No date if metadata is empty
