@@ -18,11 +18,12 @@ use pcloud_sdk::types::FileID;
 use pcloud_sdk::types::RemotePath;
 
 use crate::database::models::Formats;
+use crate::metadata::{CollectMetadataFrom, MetadataCollector};
 
 use super::database::models;
 use super::database::Database;
 use super::utils::sha256_string_from_file;
-use super::{AppDirs, CollectMetadataFrom, MetadataCollector};
+use super::AppDirs;
 
 // Path inside the remote folder to locate files using sha256 filename
 const SHA256_BASE_PATH: &str = "_sha256";
