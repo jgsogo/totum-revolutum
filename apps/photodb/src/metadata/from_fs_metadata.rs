@@ -12,7 +12,7 @@ impl CollectMetadataFrom<std::fs::Metadata> for MetadataCollector {
                 let t = chrono::Utc
                     .timestamp_opt(duration.as_secs() as i64, duration.subsec_nanos())
                     .unwrap();
-                metadata["created"] = serde_json::json!(t.to_string());
+                metadata["created"] = serde_json::json!(t.format("%Y/%m/%d").to_string());
             }
         }
         if let Ok(modified) = source.modified() {
@@ -20,7 +20,7 @@ impl CollectMetadataFrom<std::fs::Metadata> for MetadataCollector {
                 let t = chrono::Utc
                     .timestamp_opt(duration.as_secs() as i64, duration.subsec_nanos())
                     .unwrap();
-                metadata["modified"] = serde_json::json!(t.to_string());
+                metadata["modified"] = serde_json::json!(t.format("%Y/%m/%d").to_string());
             }
         }
 
