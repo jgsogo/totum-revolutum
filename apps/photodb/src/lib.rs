@@ -1,5 +1,5 @@
 pub use app_dirs::AppDirs;
-pub use metadata::{parse_key_val, CollectMetadataFrom, MetadataCollector};
+pub use metadata::{CollectMetadataFrom, MetadataCLI, MetadataCollector};
 pub use photodb::PhotoDB;
 
 mod app_dirs;
