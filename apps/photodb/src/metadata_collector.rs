@@ -182,7 +182,9 @@ impl CollectMetadataFrom<&Exif> for MetadataCollector {
             }
         }
 
-        self.merge("exif", metadata.clone());
+        if !metadata.as_object().unwrap().is_empty() {
+            self.merge("exif", metadata.clone());
+        }
         metadata
     }
 }
@@ -197,7 +199,9 @@ impl CollectMetadataFrom<&Utf8Path> for MetadataCollector {
             metadata["date"] = serde_json::json!(guess);
         }
 
-        self.merge("path", metadata.clone());
+        if !metadata.as_object().unwrap().is_empty() {
+            self.merge("path", metadata.clone());
+        }
         metadata
     }
 }
@@ -305,7 +309,9 @@ impl CollectMetadataFrom<std::fs::Metadata> for MetadataCollector {
             }
         }
 
-        self.merge("filesystem", metadata.clone());
+        if !metadata.as_object().unwrap().is_empty() {
+            self.merge("filesystem", metadata.clone());
+        }
         metadata
     }
 }

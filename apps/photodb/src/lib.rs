@@ -8,7 +8,6 @@ mod photodb;
 pub mod utils;
 
 pub mod exif;
-mod metadata;
 mod metadata_collector;
 
 pub use metadata_collector::{parse_key_val, CollectMetadataFrom, MetadataCollector};
