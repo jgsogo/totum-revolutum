@@ -3019,7 +3019,6 @@ dependencies = [
  "log",
  "oxipng",
  "pcloud_sdk",
- "regex",
  "ring",
  "serde",
  "serde_json",
@@ -3029,6 +3028,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "utils",
 ]
 
 [[package]]

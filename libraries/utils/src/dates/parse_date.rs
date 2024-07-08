@@ -74,9 +74,9 @@ impl Display for Date {
     }
 }
 
-impl Into<Utf8PathBuf> for Date {
-    fn into(self) -> Utf8PathBuf {
-        Utf8PathBuf::from(self.to_string())
+impl From<Date> for Utf8PathBuf {
+    fn from(value: Date) -> Self {
+        Utf8PathBuf::from(value.to_string())
     }
 }
 
