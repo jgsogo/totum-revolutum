@@ -88,7 +88,8 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     /// Iterates all the files in the DB and the files in the remote storage performing
     /// a [`filesystem::diff::impls::mirror`] operation. After it finishes it will iterate all
     /// the [`models::File`] that are not a [`models::PhotoFile`] and process the
-    /// files to create the corresponding entries.
+    /// files to create the corresponding entries (as a result of this process, files might be
+    /// moved to a different location).
     ///
     /// Note that, for the files that have been removed from the storage, the `mirror` operation
     /// will remove the [`models::File`] and ON CASCADE the corresponding [`models::PhotoFile`]
@@ -124,12 +125,15 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
                 rx.await??;
             }
 
-            debug!("Execute [Self::add_from_file] to process and upload the file");
-            self.add_from_local_file(&local_tmp_filepath, metadata_collector)
+            debug!("Execute [Self::add_from_local_file] to process and upload the file");
+            let photo_path = self
+                .add_from_local_file(&local_tmp_filepath, metadata_collector)
                 .await?;
 
             debug!("Remove the orphan file");
-            self.storage.remove_file(&origin_remote_path).await?;
+            if photo_path != origin_remote_path {
+                self.storage.remove_file(&origin_remote_path).await?;
+            }
         }
 
         Ok(())
@@ -162,7 +166,8 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     }
 
     /// Adds a file from the filesystem to the storage and then creates the corresponding
-    /// [`models::PhotoFile`] entry in the database.
+    /// [`models::PhotoFile`] entry in the database. Returns the location of the final file in the
+    /// storage.
     ///
     /// Note.- The path here might no longer be the original path, so no metadata can be collected
     /// related to the path or filesystem.
@@ -170,7 +175,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         &mut self,
         filepath: P,
         mut metadata_collector: MetadataCollector,
-    ) -> Result<()> {
+    ) -> Result<FilePathBuf> {
         // Retrieve EXIF data (before transformation, just in case)
         let exif = crate::exif::get_exif_data(&filepath).ok();
         if let Some(exif) = exif {
@@ -236,7 +241,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
 
         debug!("Photo inserted into database: {}", photo.fileid);
 
-        Ok(())
+        Ok(filepath)
     }
 }
 
