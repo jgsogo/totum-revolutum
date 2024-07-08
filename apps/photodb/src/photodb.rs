@@ -230,7 +230,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
 
         debug!("Get the models::File row for {}", &filepath);
         let file_ = self.db.get_file(&filepath)?;
-        info!("Metadata: {:?}", metadata);
+        info!("Metadata: {:?}", metadata_collector);
         let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true, metadata_collector.into());
 
         use crate::database::schema::photo_files::dsl::*;
