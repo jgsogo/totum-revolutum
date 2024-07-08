@@ -6,7 +6,7 @@ use camino::{Utf8Path, Utf8PathBuf};
 use ignore_files::{IgnoreFile, IgnoreFilter};
 use tracing::debug;
 
-use filesystem::{impls::FilesystemLocalTemp, FilePathBuf};
+use filesystem::{impls::FilesystemLocalTemp, FilePath, Filesystem, FilesystemOps};
 
 const PCLOUD_TOKEN_FILENAME: &str = ".pcloud";
 const IGNORE_FILE: &str = ".ignore_file";
@@ -76,12 +76,28 @@ impl AppDirs {
         self.app_dir.join("cache")
     }
 
-    /// Returns a filename that will be removed after the application goes out of scope.
+    /// Copies the file from the given path to the internal temporary folder and returns the path
+    /// to the copied file together with the receiver to ensure that all filesystem operations have
+    /// finished.
     ///
-    /// User can provide a prefix and suffix for the created filename. This method will add some
-    /// randomness (uuid4) to the filename so uniqueness can be assumed.
-    pub fn temp_filename(&self, prefix: Option<&str>, suffix: Option<&str>) -> FilePathBuf {
-        self.local_tmp_storage.temp_filename(prefix, suffix)
+    /// This method tries to preserve input path (directory and filename)
+    pub async fn copy_to_tmp<FS: Filesystem>(
+        &mut self,
+        from_filesystem: &FS,
+        from_filepath: &FilePath,
+    ) -> Result<(
+        Utf8PathBuf,
+        Option<tokio::sync::oneshot::Receiver<filesystem::Result<()>>>,
+    )> {
+        let to_filepath = self
+            .local_tmp_storage
+            .unique_filename(from_filepath.directory(), Some(from_filepath.filename()))
+            .await?;
+        let rx = self
+            .local_tmp_storage
+            .copy_from(&to_filepath, from_filesystem, from_filepath, true)
+            .await?;
+        Ok((self.local_tmp_storage.resolve_filepath(&to_filepath), rx))
     }
 }
 

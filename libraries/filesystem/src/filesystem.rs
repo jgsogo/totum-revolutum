@@ -1,11 +1,12 @@
 use async_trait::async_trait;
 use ignore_files::IgnoreFilter;
+use std::str::FromStr;
 use tokio::sync::oneshot::Receiver;
 use tracing::trace;
 
 use crate::actions::copy;
 
-use super::{DirectoryPath, Error, FilePath, Result};
+use super::{DirectoryPath, Error, FilePath, FilePathBuf, Filename, FilenameBuf, Result};
 use super::{File, FileMetadata};
 
 /// Abstraction of a filesystem with methods to access its files
@@ -90,6 +91,59 @@ pub trait Filesystem: Send + Sync {
         let r = self.internal_copy(origin, target, force).await?;
         self.remove_file(origin).await?;
         Ok(r)
+    }
+
+    /// Returns a unique [`FilePathBuf`] inside the given directory. Be aware of typical race conditions
+    /// for this operation: another concurrent job taking the same name while this one hasn't used it
+    /// already.
+    ///
+    /// This method will generate the [`FilePathBuf`] using two different strategies:
+    /// * If `candidate_filename` is provided, it will try first with the candidate basename and
+    ///   extension, and then generate filenames using this pattern: `<basename>_001.<extension>`.
+    /// * If no `candidate_filename` is given, it will generate filenames using `<uuid4>.<extension>`
+    async fn unique_filename(
+        &mut self,
+        directory_path: &DirectoryPath,
+        candidate_filename: Option<&Filename>,
+    ) -> Result<FilePathBuf> {
+        self.create_dir_all(directory_path).await?;
+
+        let (basename, extension) = match candidate_filename {
+            None => (None, "".to_string()),
+            Some(candidate) => {
+                let ext = candidate.extension().map_or("".to_string(), |v| format!(".{}", v));
+                (Some(candidate.basename()), ext)
+            }
+        };
+
+        let mut attempt = 0;
+
+        let mut create_new_candidate = || {
+            let filename = match basename {
+                None => {
+                    let uuid = uuid::Uuid::new_v4();
+                    FilenameBuf::from_str(&format!("{}{}", uuid.to_string().as_str(), extension))?
+                }
+                Some(basename) => {
+                    if attempt == 0 {
+                        FilenameBuf::from_str(&format!("{}{}", basename, extension))?
+                    } else if attempt > 100 {
+                        return Err(Error::Other("Too many retries".to_string()));
+                    } else {
+                        FilenameBuf::from_str(&format!("{}_{:03}{}", basename, attempt, extension))?
+                    }
+                }
+            };
+            attempt += 1;
+            Ok(FilePathBuf::new(directory_path, filename))
+        };
+
+        let mut filepath = create_new_candidate()?;
+        while self.exists(&filepath).await? {
+            filepath = create_new_candidate()?;
+        }
+
+        Ok(filepath)
     }
 }
 

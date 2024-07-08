@@ -29,6 +29,7 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
 
 #[cfg(test)]
 mod tests {
+    use camino_tempfile::NamedUtf8TempFile;
     use std::str::FromStr;
 
     use ignore_files::IgnoreFilter;
@@ -40,16 +41,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_filesystem_indexed_db() -> anyhow::Result<()> {
-        let database_file = tempfile::NamedTempFile::new()?;
+        let database_file = NamedUtf8TempFile::new()?;
         let mut fs = {
             let fs = FilesystemLocalTemp::default();
-            new_filesystem_indexed_with_db(
-                database_file.path().to_str().unwrap(),
-                fs,
-                true,
-                IgnoreFilter::empty(""),
-            )
-            .await?
+            new_filesystem_indexed_with_db(database_file.path().as_str(), fs, true, IgnoreFilter::empty("")).await?
         };
 
         // Populate the filesystem with some files and directories
@@ -89,7 +84,7 @@ mod tests {
         assert_eq!(all_files.len(), 2);
 
         // Now we can go directly to the database and check it
-        let db = DatabaseImpl::new(database_file.path().to_str().unwrap())?;
+        let db = DatabaseImpl::new(database_file.path().as_str())?;
         let files = db.all_files()?.collect::<Vec<_>>();
         assert_eq!(files.len(), 2);
         let f0 = files.get(0).unwrap();

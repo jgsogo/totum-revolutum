@@ -1,13 +1,13 @@
 use std::io;
-use std::path::Path;
 
 use anyhow::{anyhow, Result};
+use camino::Utf8Path;
 use chrono::NaiveDateTime;
 use exif::{Exif, In, Tag};
 
 /// Returns the [`Exif`] data from a file path
-pub fn get_exif_data<P: AsRef<Path>>(path: P) -> Result<Exif> {
-    let file = std::fs::File::open(path)?;
+pub fn get_exif_data<P: AsRef<Utf8Path>>(path: P) -> Result<Exif> {
+    let file = std::fs::File::open(path.as_ref())?;
     let mut bufreader = std::io::BufReader::new(&file);
     get_exif_data_from_memory(&mut bufreader)
 }

@@ -7,6 +7,7 @@ edition = "2021"
 filesystem = ["dep:camino"]
 async = ["dep:tokio"]
 http = ["dep:async-trait", "dep:headers", "dep:reqwest", "dep:serde", "dep:serde_json"]
+dates = ["dep:lazy_static", "dep:regex"]
 
 [dependencies]
 log = { workspace = true }
@@ -25,6 +26,10 @@ headers = { workspace = true, optional = true }
 reqwest = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
+
+# dates
+lazy_static = { workspace = true, optional = true }
+regex = { workspace = true, optional = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }

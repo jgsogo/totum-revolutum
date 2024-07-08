@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
 use async_trait::async_trait;
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8PathBuf;
+use camino_tempfile::{tempdir, Utf8TempDir};
 use flume::Sender;
 use ignore_files::IgnoreFilter;
-use tempfile::{tempdir, TempDir};
 use tokio::sync::oneshot::Receiver;
 
 use crate::filesystem::FilesystemOps;
@@ -13,7 +13,7 @@ use crate::{DirectoryPath, File, FileMetadata, FilePath, FilePathBuf, FilenameBu
 
 /// Implementation of [`Filesystem`] using a temporal directory in the host filesystem
 pub struct FilesystemLocalTemp {
-    _tmp_dir: TempDir,
+    _tmp_dir: Utf8TempDir,
     local: FilesystemLocal,
 }
 
@@ -34,17 +34,15 @@ impl FilesystemLocalTemp {
     /// Returns the absolute path to the given `filepath`. This path is only valid as long as the
     /// filesystem is not destroyed.
     pub fn resolve_filepath(&self, filepath: impl AsRef<FilePath>) -> Utf8PathBuf {
-        let root = Utf8Path::from_path(self._tmp_dir.path()).unwrap();
-        root.join(filepath.as_ref())
+        self._tmp_dir.path().join(filepath.as_ref())
     }
 }
 
 impl Default for FilesystemLocalTemp {
     fn default() -> Self {
         let tmp_dir = tempdir().unwrap();
-        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
         Self {
-            local: FilesystemLocal::new(utf8_path).expect("Temporary directory is not usable!"),
+            local: FilesystemLocal::new(tmp_dir.path()).expect("Temporary directory is not usable!"),
             _tmp_dir: tmp_dir,
         }
     }
@@ -111,3 +109,64 @@ impl Filesystem for FilesystemLocalTemp {
 
 #[async_trait]
 impl FilesystemOps for FilesystemLocalTemp {}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use crate::impls::FilesystemLocalTemp;
+    use crate::{DirectoryPathBuf, FilenameBuf, Filesystem};
+
+    #[tokio::test]
+    async fn test_unique_filename() {
+        let mut fs = FilesystemLocalTemp::default();
+
+        let directory_path = DirectoryPathBuf::from_str("a/b/c").unwrap();
+
+        // No candidate filename
+        let f1 = fs.unique_filename(&directory_path, None).await.unwrap();
+        assert_eq!(f1.directory().as_str(), directory_path.as_str());
+        assert!(uuid::Uuid::parse_str(f1.filename().as_str()).ok().is_some());
+
+        // Candidate without extension
+        let filename_buf = FilenameBuf::from_str("candidate").unwrap();
+        let f1 = fs.unique_filename(&directory_path, Some(&filename_buf)).await.unwrap();
+        assert_eq!(f1.filename().as_str(), "candidate");
+        fs.create(&f1).await.unwrap();
+        let f2 = fs.unique_filename(&directory_path, Some(&filename_buf)).await.unwrap();
+        assert_eq!(f2.filename().as_str(), "candidate_001");
+
+        // Candidate with extension
+        let filename_buf = FilenameBuf::from_str("candidate.ext").unwrap();
+        let f1 = fs.unique_filename(&directory_path, Some(&filename_buf)).await.unwrap();
+        assert_eq!(f1.filename().as_str(), "candidate.ext");
+        fs.create(&f1).await.unwrap();
+        let f2 = fs.unique_filename(&directory_path, Some(&filename_buf)).await.unwrap();
+        assert_eq!(f2.filename().as_str(), "candidate_001.ext");
+    }
+
+    #[test]
+    fn test_temp_filename() {
+        let fs = FilesystemLocalTemp::default();
+
+        let f1 = fs.temp_filename(None, None);
+        assert_eq!(f1.directory().as_str(), "");
+        assert!(uuid::Uuid::parse_str(f1.filename().as_str()).ok().is_some());
+
+        let f1 = fs.temp_filename(Some("prefix"), None);
+        assert_eq!(f1.directory().as_str(), "");
+        let rest = f1.filename().as_str().strip_prefix("prefix").unwrap();
+        assert!(uuid::Uuid::parse_str(rest).ok().is_some());
+
+        let f1 = fs.temp_filename(None, Some("suffix"));
+        assert_eq!(f1.directory().as_str(), "");
+        let rest = f1.filename().as_str().strip_suffix("suffix").unwrap();
+        assert!(uuid::Uuid::parse_str(rest).ok().is_some());
+
+        let f1 = fs.temp_filename(Some("prefix"), Some("suffix"));
+        assert_eq!(f1.directory().as_str(), "");
+        let rest = f1.filename().as_str().strip_prefix("prefix").unwrap();
+        let rest = rest.strip_suffix("suffix").unwrap();
+        assert!(uuid::Uuid::parse_str(rest).ok().is_some());
+    }
+}

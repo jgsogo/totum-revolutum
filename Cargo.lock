@@ -556,6 +556,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "camino-tempfile"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb905055fa81e4d427f919b2cd0d76a998267de7d225ea767a1894743a5263c2"
+dependencies = [
+ "camino",
+ "tempfile",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.104"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1232,6 +1242,7 @@ dependencies = [
  "async-std",
  "async-trait",
  "camino",
+ "camino-tempfile",
  "diesel",
  "diesel_migrations",
  "diesel_utils",
@@ -1242,7 +1253,6 @@ dependencies = [
  "ignore-files",
  "pcloud_sdk",
  "sha256",
- "tempfile",
  "thiserror",
  "tokio",
  "tracing",
@@ -3000,6 +3010,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "camino",
+ "camino-tempfile",
  "chrono",
  "clap",
  "clap-verbosity-flag",
@@ -3019,7 +3030,6 @@ dependencies = [
  "log",
  "oxipng",
  "pcloud_sdk",
- "regex",
  "ring",
  "serde",
  "serde_json",
@@ -3029,6 +3039,8 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "utils",
+ "uuid",
 ]
 
 [[package]]
@@ -4527,7 +4539,9 @@ dependencies = [
  "async-trait",
  "camino",
  "headers",
+ "lazy_static",
  "log",
+ "regex",
  "reqwest",
  "serde",
  "serde_json",

@@ -5,7 +5,7 @@ edition = "2021"
 
 [features]
 local = ["dep:async-std", "dep:ignore", "dep:futures", "dep:sha256"]
-local_temp = ["dep:uuid", "dep:tempfile", "local"]
+local_temp = ["dep:uuid", "dep:camino-tempfile", "local"]
 pcloud = ["dep:pcloud_sdk"]
 test_utils = []
 diesel_indexed_impl = ["dep:diesel", "dep:diesel_utils", "dep:diesel_migrations"]
@@ -28,8 +28,8 @@ ignore = { workspace = true, optional = true }
 sha256 = { workspace = true, optional = true }
 
 # Feature "local_temp" (requires "local")
-tempfile = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true, features = ["v4"] }
+camino-tempfile = { workspace = true, optional = true }
 
 # Feature "pcloud"
 pcloud_sdk = { path = "../pcloud_sdk", optional = true }

@@ -194,8 +194,7 @@ impl<LHS: Filesystem, RHS: Filesystem> FilesystemOps for FilesystemBackup<LHS, R
 mod tests {
     use std::str::FromStr;
 
-    use camino::Utf8Path;
-    use tempfile::tempdir;
+    use camino_tempfile::tempdir;
 
     use crate::impls::FilesystemLocal;
     use crate::{DirectoryPathBuf, FilenameBuf};
@@ -205,7 +204,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_write_read() {
         let tmp = tempdir().unwrap();
-        let root = Utf8Path::from_path(tmp.path()).unwrap();
+        let root = tmp.path();
         let (fs1, fs1_root) = {
             let path = root.join("fs1");
             std::fs::create_dir_all(&path).unwrap();
