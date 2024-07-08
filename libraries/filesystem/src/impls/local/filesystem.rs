@@ -13,7 +13,10 @@ use tracing::info;
 
 use crate::filesystem::FilesystemOps;
 use crate::ignore_filter::IgnoreFilterT;
-use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result};
+use crate::paths::FilesystemPath;
+use crate::{
+    DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result,
+};
 
 use super::parallel_visitor;
 
@@ -39,6 +42,29 @@ impl FilesystemLocal {
     pub fn local_hd() -> Self {
         Self {
             root: Utf8PathBuf::from_str("/").unwrap(),
+        }
+    }
+
+    /// Takes an absolute path (it will convert it to absolute one using [`utils::filesystem::to_absolute_path`]
+    /// if needed) and results the corresponding path inside `self` filesystem.
+    pub fn relativize_path<P: AsRef<Utf8Path>>(&self, path: P) -> Result<FilesystemPath> {
+        let path = utils::filesystem::to_absolute_path(path);
+        let rel_path = path
+            .strip_prefix(&self.root)
+            .map_err(|_| Error::Other("Input path is not inside this filesystem".to_string()))?;
+        if path.is_dir() {
+            Ok(FilesystemPath::DirectoryPath(DirectoryPathBuf::try_from(rel_path)?))
+        } else {
+            let filename = rel_path.file_name().expect("It should contain at least the filename");
+            let filename = FilenameBuf::from_str(filename)?;
+            let filepath = match rel_path.parent() {
+                None => FilePathBuf::new(DirectoryPathBuf::root(), filename),
+                Some(d) => {
+                    let directory = DirectoryPathBuf::try_from(d)?;
+                    FilePathBuf::new(directory, filename)
+                }
+            };
+            Ok(FilesystemPath::FilePath(filepath))
         }
     }
 }
@@ -174,10 +200,11 @@ impl FilesystemOps for FilesystemLocal {}
 
 #[cfg(test)]
 mod tests {
-    use camino_tempfile::{tempdir, NamedUtf8TempFile};
     use std::io;
     use std::io::Write;
     use std::str::FromStr;
+
+    use camino_tempfile::{tempdir, NamedUtf8TempFile};
 
     use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
 
