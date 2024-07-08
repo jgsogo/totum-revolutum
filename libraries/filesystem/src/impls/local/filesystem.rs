@@ -46,13 +46,16 @@ impl FilesystemLocal {
     }
 
     /// Takes an absolute path (it will convert it to absolute one using [`utils::filesystem::to_absolute_path`]
-    /// if needed) and results the corresponding path inside `self` filesystem.
+    /// if needed) and returns the corresponding path inside `self` filesystem. If the path doesn't
+    /// exist it will return a [`Error::IoError`] error.
     pub fn relativize_path<P: AsRef<Utf8Path>>(&self, path: P) -> Result<FilesystemPath> {
         let path = utils::filesystem::to_absolute_path(path);
         let rel_path = path
             .strip_prefix(&self.root)
             .map_err(|_| Error::Other("Input path is not inside this filesystem".to_string()))?;
-        if path.is_dir() {
+
+        let fs_metadata = std::fs::metadata(path.as_std_path())?;
+        if fs_metadata.is_dir() {
             Ok(FilesystemPath::DirectoryPath(DirectoryPathBuf::try_from(rel_path)?))
         } else {
             let filename = rel_path.file_name().expect("It should contain at least the filename");
@@ -459,6 +462,45 @@ mod tests {
         file.read_to_end(&mut buffer).await?;
 
         assert_eq!(buffer.as_slice(), b"Something");
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_relative_path() -> Result<()> {
+        let tmp_path = tempdir()?;
+        let mut fs = FilesystemLocal::new(tmp_path.path())?;
+
+        {
+            let r = fs.relativize_path(tmp_path.path().join("a/path/to/something"));
+            assert!(r.is_err());
+            assert!(matches!(r.unwrap_err(), Error::IoError(..)));
+        }
+
+        {
+            let dirpath = DirectoryPathBuf::from_str("a/path/to")?;
+            fs.create_dir_all(&dirpath).await?;
+            let filename = FilenameBuf::from_str("something")?;
+            let filepath = FilePathBuf::new(dirpath, filename);
+            fs.create(&filepath).await?;
+
+            let r = fs.relativize_path(tmp_path.path().join(filepath.as_utf8_path()))?;
+            let FilesystemPath::FilePath(computed) = r else {
+                unreachable!()
+            };
+            assert_eq!(computed.as_str(), filepath.as_str());
+        }
+
+        {
+            let dirpath = DirectoryPathBuf::from_str("a/path/to")?;
+            fs.create_dir_all(&dirpath).await?;
+
+            let r = fs.relativize_path(tmp_path.path().join(dirpath.as_utf8_path()))?;
+            let FilesystemPath::DirectoryPath(computed) = r else {
+                unreachable!()
+            };
+            assert_eq!(computed.as_str(), dirpath.as_str());
+        }
+
         Ok(())
     }
 }
