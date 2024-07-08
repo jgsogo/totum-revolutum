@@ -186,17 +186,19 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         let (photo, format) = crate::image::prepare_image_file(&filepath)?;
 
         // Compute the target directory path and filename
-        let diretory_path = match get_directory_from_metadata(&metadata_collector) {
-            None => get_directory_using_sha256(photo.path())?,
-            Some(d) => d,
+        let target_filepath = {
+            let directory_path = match get_directory_from_metadata(&metadata_collector) {
+                None => get_directory_using_sha256(photo.path())?,
+                Some(d) => d,
+            };
+            let filename = FilenameBuf::from_str(filepath.as_ref().file_name().unwrap())?;
+            self.storage.unique_filename(&directory_path, Some(&filename)).await?
         };
-        let filename = FilenameBuf::from_str(filepath.as_ref().file_name().unwrap())?;
-        let filepath = FilePathBuf::new(diretory_path, filename);
 
         // Do the upload (creates the corresponding [`models::File`] entry)
-        info!("Upload to '{}'", filepath);
+        info!("Upload to '{}'", target_filepath);
         let rx = {
-            let photo_as_filepath = {
+            let origin_filepath = {
                 let directory = photo.path().parent().unwrap();
                 let directory = DirectoryPathBuf::try_from(directory.strip_prefix("/")?)?;
 
@@ -205,18 +207,17 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
 
                 FilePathBuf::new(directory, filename)
             };
-            self.storage.create_dir_all(filepath.directory()).await?;
             filesystem::actions::copy_file(
                 &FilesystemLocal::local_hd(),
                 &mut self.storage,
-                &photo_as_filepath,
-                &filepath,
+                &origin_filepath,
+                &target_filepath,
                 false,
             )
             .await?
         };
 
-        debug!("Now create the PhotoFile entry for {}", filepath);
+        debug!("Now create the PhotoFile entry for {}", target_filepath);
         let mut conn = self.db.get_connection()?;
         let format_ = models::Format::find(&format, &mut conn)?;
         rx.unwrap().await??; // Wait for the upload and DB entry creation
@@ -224,12 +225,12 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         // FIXME: Here we need an absolute path to satisfy pcloud's RemotePath... we need to
         // FIXME: consolidate filesystem with pcloud_sdk (maybe the other way around) so they
         // FIXME: both uses a relative path (whatever is root will always be prepended)
-        let remote_abs_filepath = self.root_folder.join(&filepath)?;
+        let remote_abs_filepath = self.root_folder.join(&target_filepath)?;
         debug!("Get fileid for {}", remote_abs_filepath);
         let fileid_: FileID = self.pcloud.get_fileid(&remote_abs_filepath).await?;
 
-        debug!("Get the models::File row for {}", &filepath);
-        let file_ = self.db.get_file(&filepath)?;
+        debug!("Get the models::File row for {}", &target_filepath);
+        let file_ = self.db.get_file(&target_filepath)?;
         info!("Metadata: {:?}", metadata_collector);
         let new_photo_file = models::PhotoFile::new_from(&file_, &fileid_, &format_, true, metadata_collector.into());
 
@@ -241,7 +242,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
 
         debug!("Photo inserted into database: {}", photo.fileid);
 
-        Ok(filepath)
+        Ok(target_filepath)
     }
 }
 

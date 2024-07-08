@@ -9,9 +9,7 @@ use tokio::sync::oneshot::Receiver;
 
 use crate::filesystem::FilesystemOps;
 use crate::impls::FilesystemLocal;
-use crate::{
-    DirectoryPath, Error, File, FileMetadata, FilePath, FilePathBuf, Filename, FilenameBuf, Filesystem, Result,
-};
+use crate::{DirectoryPath, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result};
 
 /// Implementation of [`Filesystem`] using a temporal directory in the host filesystem
 pub struct FilesystemLocalTemp {
@@ -31,59 +29,6 @@ impl FilesystemLocalTemp {
             DirectoryPath::root(),
             FilenameBuf::from_str(&filename).expect("Generated filename is not valid"),
         )
-    }
-
-    /// Returns a unique [`FilePathBuf`] inside the given directory. Be aware of typical race conditions
-    /// for this operation: another concurrent job taking the same name while this one hasn't used it
-    /// already.
-    ///
-    /// This method will generate the [`FilePathBuf`] using two different strategies:
-    /// * If `candidate_filename` is provided, it will try first with the candidate basename and
-    ///   extension, and then generate filenames using this pattern: `<basename>_001.<extension>`.
-    /// * If no `candidate_filename` is given, it will generate filenames using `<uuid4>.<extension>`
-    pub async fn unique_filename(
-        &mut self,
-        directory_path: &DirectoryPath,
-        candidate_filename: Option<&Filename>,
-    ) -> Result<FilePathBuf> {
-        self.create_dir_all(directory_path).await?;
-
-        let (basename, extension) = match candidate_filename {
-            None => (None, "".to_string()),
-            Some(candidate) => {
-                let ext = candidate.extension().map_or("".to_string(), |v| format!(".{}", v));
-                (Some(candidate.basename()), ext)
-            }
-        };
-
-        let mut attempt = 0;
-
-        let mut create_new_candidate = || {
-            let filename = match basename {
-                None => {
-                    let uuid = uuid::Uuid::new_v4();
-                    FilenameBuf::from_str(&format!("{}{}", uuid.to_string().as_str(), extension))?
-                }
-                Some(basename) => {
-                    if attempt == 0 {
-                        FilenameBuf::from_str(&format!("{}{}", basename, extension))?
-                    } else if attempt > 100 {
-                        return Err(Error::Other("Too many retries".to_string()));
-                    } else {
-                        FilenameBuf::from_str(&format!("{}_{:03}{}", basename, attempt, extension))?
-                    }
-                }
-            };
-            attempt += 1;
-            Ok(FilePathBuf::new(directory_path, filename))
-        };
-
-        let mut filepath = create_new_candidate()?;
-        while self.exists(&filepath).await? {
-            filepath = create_new_candidate()?;
-        }
-
-        Ok(filepath)
     }
 
     /// Returns the absolute path to the given `filepath`. This path is only valid as long as the
