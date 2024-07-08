@@ -101,7 +101,7 @@ async fn main() -> Result<()> {
     debug!("Tracing level configured to {}", tracing_level);
 
     std::fs::create_dir_all(&cli.app_dir)?;
-    let app_dir = AppDirs::new(cli.app_dir)?;
+    let mut app_dir = AppDirs::new(cli.app_dir)?;
     let db_path = RemotePath::from_str("path:/developing")?;
 
     // You can check for the existence of subcommands, and if found use their
@@ -118,7 +118,7 @@ async fn main() -> Result<()> {
                 Commands::Initialize => PCloudDatabase::initialize(client, &db_path).await?,
                 _ => {
                     let (db, done) = PCloudDatabase::new(client.clone(), &db_path).await?;
-                    let r = match PhotoDB::new(db, &db_path, &app_dir, client).await {
+                    let r = match PhotoDB::new(db, &db_path, &mut app_dir, client).await {
                         Ok(photodb) => db_commands(cli.command, photodb).await,
                         Err(e) => Err(e),
                     };

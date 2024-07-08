@@ -1,9 +1,9 @@
 use anyhow::Result;
 use camino::Utf8Path;
+use camino_tempfile::NamedUtf8TempFile;
 use image::ImageFormat;
 use log::warn;
 use oxipng::{optimize_from_memory, Options};
-use tempfile::NamedTempFile;
 use tracing::debug;
 
 use crate::database::models::Formats;
@@ -16,10 +16,10 @@ use crate::database::models::Formats;
 ///     - Apply optimization using [`oxipng`] crate.
 ///
 /// All the other formats are not transformed. The file is just copied to the output.
-pub(crate) fn prepare_image_file(input: impl AsRef<Utf8Path>) -> Result<(NamedTempFile, Formats)> {
-    let output = NamedTempFile::new()?;
+pub(crate) fn prepare_image_file(input: impl AsRef<Utf8Path>) -> Result<(NamedUtf8TempFile, Formats)> {
+    let output = NamedUtf8TempFile::new()?;
 
-    // Define fall-back behavior
+    // Define fall-back behavior: do nothing and copy to a temporary file
     let fallback = |format: Formats| -> Result<Formats> {
         std::fs::copy(input.as_ref(), output.path())?;
         Ok(format)

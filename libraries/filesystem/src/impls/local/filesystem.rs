@@ -174,11 +174,10 @@ impl FilesystemOps for FilesystemLocal {}
 
 #[cfg(test)]
 mod tests {
+    use camino_tempfile::{tempdir, NamedUtf8TempFile};
     use std::io;
     use std::io::Write;
     use std::str::FromStr;
-
-    use tempfile::{tempdir, NamedTempFile};
 
     use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
 
@@ -199,7 +198,7 @@ mod tests {
     #[test]
     fn test_root_not_exists() {
         let tmp_dir = tempdir().unwrap();
-        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let utf8_path = tmp_dir.path();
         let r = FilesystemLocal::new(&utf8_path.join("not-exist"));
         assert!(r.is_err());
         assert!(matches!(r.unwrap_err(), Error::PathDoesNotExist))
@@ -208,9 +207,9 @@ mod tests {
     #[tokio::test]
     async fn test_root() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
-        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let utf8_path = tmp_dir.path();
         let fs = FilesystemLocal::new(utf8_path)?;
-        // Root is not canonical, it fails in MacOS where tmp directories are inside sym folder
+        // Root is not canonical, it fails in macOS where tmp directories are inside sym folder
         #[cfg(target_os = "macos")]
         assert_ne!(fs::canonicalize(tmp_dir.path())?, fs.root);
         assert_eq!(tmp_dir.path(), fs.root);
@@ -220,7 +219,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_write_read() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
-        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let utf8_path = tmp_dir.path();
         let mut fs = FilesystemLocal::new(utf8_path)?;
 
         let directory_path = DirectoryPathBuf::root();
@@ -251,7 +250,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_in_subfolder() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
-        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let utf8_path = tmp_dir.path();
         let mut fs = FilesystemLocal::new(utf8_path)?;
 
         let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
@@ -271,7 +270,7 @@ mod tests {
     #[tokio::test]
     async fn test_walk_directory() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
-        let utf8_path = Utf8Path::from_path(tmp_dir.path()).unwrap();
+        let utf8_path = tmp_dir.path();
         let mut fs = FilesystemLocal::new(utf8_path)?;
 
         // TODO: Some kind of fixture that could be reused by "all" the tests would be great
@@ -405,7 +404,7 @@ mod tests {
     #[tokio::test]
     async fn test_local_hd() -> Result<()> {
         // We create a temporary file in the HD
-        let mut tmpfile = NamedTempFile::new()?;
+        let mut tmpfile = NamedUtf8TempFile::new()?;
         tmpfile.write_all(b"Something")?;
 
         // Get the FilePath to that file (relative path)
