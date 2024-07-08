@@ -55,6 +55,8 @@ impl MetadataCollector {
 
     /// Merges the existing object in `entry` with the given `value`. In case of conflict, values
     /// will be overridden by the ones coming from the input `value`.
+    ///
+    /// FIXME: We want to append to lists (i.e: tags). We don't want to lose metadata
     pub fn merge(&mut self, entry: &str, value: serde_json::Value) {
         let v = self.data.as_object_mut().unwrap();
         merge(v.entry(entry).or_insert(serde_json::Value::Null), value)
