@@ -1,5 +1,7 @@
 use clap::Args;
 
+use utils::dates;
+
 use crate::metadata::collector::CLI_CLAP_KEY;
 use crate::{CollectMetadataFrom, MetadataCollector};
 
@@ -61,6 +63,11 @@ fn parse_key_val(s: &str) -> Result<(String, serde_json::Value), Box<dyn std::er
                 let values: Vec<&str> = value.split(',').collect();
                 serde_json::json!(values)
             }
+            "date" => {
+                let date = dates::guess_date_from_str(value)
+                    .ok_or_else(|| format!("String '{value}' cannot be parsed as date. Use YYYY/MM/DD"))?;
+                serde_json::json!(date.to_string())
+            }
             // Assume string
             _ => serde_json::json!(value),
         }
@@ -108,6 +115,20 @@ mod tests {
             assert_eq!(
                 parse_key_val("key=list:tag1,tag2,tag 3").unwrap().1,
                 serde_json::json!(vec!["tag1", "tag2", "tag 3"])
+            );
+        }
+        {
+            assert_eq!(
+                parse_key_val("key=date:1984/01/01").unwrap().1,
+                serde_json::json!("1984/01/01")
+            );
+            assert_eq!(
+                parse_key_val("key=date:1984/diciembre/01").unwrap().1,
+                serde_json::json!("1984/12/01")
+            );
+            assert_eq!(
+                parse_key_val("key=date:1984/12/52").unwrap().1,
+                serde_json::json!("1984/12/00")
             );
         }
     }

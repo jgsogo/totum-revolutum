@@ -1,3 +1,5 @@
+use utils::dates::Date;
+
 use crate::metadata::from_exif::DATE_FIELDS;
 
 pub(crate) static CLI_CLAP_KEY: &str = "cli";
@@ -61,22 +63,30 @@ impl MetadataCollector {
     /// Inspects all the entries in the metadata, looking for the best candidate date. It applies
     /// several rules:
     ///  * Order of preference: CLI > EXIF > Filepath > ~fs::Metadata~
-    pub fn get_candidate_date(&self) -> Option<&str> {
+    ///
+    /// Return format is `YYYY/MM/DD`. Note that if any of those values is not known, it will
+    /// be filled with zeroes.
+    pub fn get_candidate_date(&self) -> Option<Date> {
+        let parse_and_return = |value: &serde_json::Value| match value.as_str() {
+            None => None,
+            Some(value) => utils::dates::guess_date_from_str(value),
+        };
+
         if let Some(cli) = self.data.get(CLI_CLAP_KEY) {
             if let Some(date) = cli.get("date") {
-                return date.as_str();
+                return parse_and_return(date);
             }
         }
         if let Some(exif) = self.data.get(EXIF_KEY) {
             for it in &*DATE_FIELDS {
                 if let Some(date) = exif.get(it.to_string()) {
-                    return date.as_str();
+                    return parse_and_return(date);
                 }
             }
         }
         if let Some(filepath) = self.data.get(FILEPATH_KEY) {
             if let Some(date) = filepath.get("date") {
-                return date.as_str();
+                return parse_and_return(date);
             }
         }
         // Created/Modified date can be very, very, very misleading...
@@ -224,7 +234,7 @@ mod tests {
 
     #[test]
     fn test_get_candidate_date() {
-        // Test the order of preference of the different alternatives
+        // Test the order of precedence of the different alternatives
 
         let mut collector = MetadataCollector::default();
 
@@ -244,8 +254,8 @@ mod tests {
         collector.add(
             FS_METADATA_KEY,
             serde_json::json!({
-               "created": "fs_metadata-created",
-                "modified": "fs_metadata-modified",
+                "created": "1900/01/01",
+                "modified": "1910/01/01",
             }),
         );
         assert_eq!(collector.get_candidate_date(), None);
@@ -254,32 +264,26 @@ mod tests {
         collector.add(
             FILEPATH_KEY,
             serde_json::json!({
-               "date": "filepath-date",
+               "date": "1920/01/01",
             }),
         );
-        assert_eq!(collector.get_candidate_date().unwrap(), "filepath-date");
+        assert_eq!(collector.get_candidate_date().unwrap().to_string(), "1920/01/01");
 
         // exif data has higher precedence, check the order for its tags
-        collector.merge(
-            EXIF_KEY,
-            serde_json::json!({"DateTimeDigitized": "exif-DateTimeDigitized"}),
-        );
-        assert_eq!(collector.get_candidate_date().unwrap(), "exif-DateTimeDigitized");
-        collector.add(EXIF_KEY, serde_json::json!({"DateTime": "exif-DateTime"}));
-        assert_eq!(collector.get_candidate_date().unwrap(), "exif-DateTime");
-        collector.add(
-            EXIF_KEY,
-            serde_json::json!({"DateTimeOriginal": "exif-DateTimeOriginal"}),
-        );
-        assert_eq!(collector.get_candidate_date().unwrap(), "exif-DateTimeOriginal");
+        collector.merge(EXIF_KEY, serde_json::json!({"DateTimeDigitized": "1930/01/01"}));
+        assert_eq!(collector.get_candidate_date().unwrap().to_string(), "1930/01/01");
+        collector.add(EXIF_KEY, serde_json::json!({"DateTime": "1940/01/01"}));
+        assert_eq!(collector.get_candidate_date().unwrap().to_string(), "1940/01/01");
+        collector.add(EXIF_KEY, serde_json::json!({"DateTimeOriginal": "1950/01/01"}));
+        assert_eq!(collector.get_candidate_date().unwrap().to_string(), "1950/01/01");
 
         // cli has even higher
         collector.add(
             CLI_CLAP_KEY,
             serde_json::json!({
-               "date": "cli-date",
+               "date": "1960/01/01",
             }),
         );
-        assert_eq!(collector.get_candidate_date().unwrap(), "cli-date");
+        assert_eq!(collector.get_candidate_date().unwrap().to_string(), "1960/01/01");
     }
 }
