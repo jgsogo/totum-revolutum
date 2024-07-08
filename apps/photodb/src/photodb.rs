@@ -72,10 +72,13 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
         })
     }
 
-    pub async fn add(&mut self, photo_filepath: impl AsRef<Utf8Path>) -> Result<()> {
+    pub async fn add(
+        &mut self,
+        photo_filepath: impl AsRef<Utf8Path>,
+        mut metadata_collector: MetadataCollector,
+    ) -> Result<()> {
         debug!("Add photo from path '{}'", photo_filepath.as_ref());
 
-        let mut metadata_collector = MetadataCollector::default();
         metadata_collector.collect_from(photo_filepath.as_ref());
         metadata_collector.collect_from(std::fs::metadata(photo_filepath.as_ref())?);
 

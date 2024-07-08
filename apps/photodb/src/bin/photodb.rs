@@ -10,7 +10,7 @@ use pcloud_sdk::client::{PCloudClient, PCloudClientImpl};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::RemotePath;
 use photodb::database::{Database, PCloudDatabase};
-use photodb::{AppDirs, MetadataCLI, PhotoDB};
+use photodb::{AppDirs, CollectMetadataFrom, MetadataCLI, MetadataCollector, PhotoDB};
 
 fn application_dir() -> Utf8PathBuf {
     let home_dir = dirs::home_dir().expect("Failed to get dirs::home_dir()");
@@ -81,7 +81,11 @@ async fn db_commands<T: Database, TPCloudClient: PCloudClient + Clone + Send + '
     mut photodb: PhotoDB<'_, T, TPCloudClient>,
 ) -> Result<()> {
     match command {
-        Commands::Add(add) => photodb.add(add.photo_file).await,
+        Commands::Add(add) => {
+            let mut metadata_collector = MetadataCollector::default();
+            metadata_collector.collect_from(&add.metadata);
+            photodb.add(add.photo_file, metadata_collector).await
+        }
         Commands::Sync => photodb.sync().await,
         Commands::List => photodb.list().await,
         c => bail!("Unexpected command {:?}", c),
