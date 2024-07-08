@@ -9,6 +9,7 @@ rust_library_tests_and_docs(
         "filesystem": ["filesystem"],
         "async": ["async"],
         "http": ["http"],
+        "dates": ["dates"],
     },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
