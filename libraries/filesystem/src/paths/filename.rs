@@ -5,10 +5,11 @@ use std::str::FromStr;
 
 use crate::Error;
 
+const INVALID_CHARS: &str = "<>:\"\\|?*";
+
 /// Validates the input filename. Main purpose is to check it doesn't contain any `/` (it would
 /// become a directory separator)
 fn is_valid_filename(filename: &str) -> bool {
-    const INVALID_CHARS: &str = "<>:\"\\|?*";
     INVALID_CHARS.chars().all(|c| !filename.contains(c)) && filename.chars().all(|c| !std::path::is_separator(c))
 }
 
@@ -25,6 +26,18 @@ impl FilenameBuf {
     pub fn as_filename(&self) -> &Filename {
         // SAFETY: every FilenameBuf constructor ensures that self is a valid filename (it has been constructed using the [`is_valid_filename`] function)
         unsafe { Filename::assume_valid(&self.0) }
+    }
+
+    /// Creates a new [`FilenameBuf`] from the given `filename` string removing all the invalid
+    /// characters. It will error if, after removing invalid characters, it results in an empty string
+    pub fn fix_and_create(filename: &str) -> crate::Result<Self> {
+        let mut filename = filename.to_string();
+        filename.retain(|c| !INVALID_CHARS.contains(c));
+        if filename.is_empty() {
+            Err(Error::InvalidFilename)
+        } else {
+            Ok(Self(filename))
+        }
     }
 }
 
