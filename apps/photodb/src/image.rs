@@ -9,7 +9,7 @@ use tracing::debug;
 use crate::database::models::Formats;
 
 /// Takes the path to an image file (`input`), applies some transformations and returns the path
-/// to the transformed file (inside the provided `filesystem_local`).
+/// to the transformed file.
 ///
 /// Currently, it applies the following transformations:
 ///  * PNG files:
