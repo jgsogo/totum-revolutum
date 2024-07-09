@@ -14,6 +14,7 @@ use crate::{CollectMetadataFrom, MetadataCollector, PhotoDB};
 
 #[async_trait]
 pub trait PhotoDBAdd<FS: Filesystem + Clone + 'static> {
+    /// Adds the file at the give [`FilePath`] from the given `filesystem`.
     async fn add_from_file(
         &mut self,
         filesystem: &FS,
@@ -21,11 +22,15 @@ pub trait PhotoDBAdd<FS: Filesystem + Clone + 'static> {
         metadata_collector: MetadataCollector,
     ) -> Result<()>;
 
+    /// Adds all the files in the given [`DirectoryPath`] from the given `filesystem`.
+    ///
+    /// FIXME: Honor `directory` and `recursive` arguments. Alternative, probably we want to pass
+    /// FIXME: here an IgnoreFilter and use it.
     async fn add_from_directory(
         &mut self,
         filesystem: FS,
-        _directory: &DirectoryPath, // TODO: start in this _directory
-        _recursive: bool,           // TODO: Honor this argument
+        _directory: &DirectoryPath,
+        _recursive: bool,
         metadata_collector: MetadataCollector,
     ) -> Result<()> {
         let (tx, rx) = flume::bounded(10);
