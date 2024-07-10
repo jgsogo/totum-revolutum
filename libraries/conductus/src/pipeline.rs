@@ -1,3 +1,6 @@
+use std::future::Future;
+
+use flume::r#async::RecvStream;
 use log::debug;
 
 pub struct Pipeline<Output> {
@@ -18,6 +21,7 @@ impl<Output: Send + 'static> Pipeline<Output> {
     ///         tx.send(it).unwrap();
     ///     }
     /// }, 2);
+    /// assert_eq!(pl.into_iter().collect::<Vec<_>>(), (0..10).collect::<Vec<_>>());
     /// ```
     pub fn new<F>(func: F, cap: usize) -> Self
     where
@@ -25,7 +29,7 @@ impl<Output: Send + 'static> Pipeline<Output> {
     {
         let (tx, rx) = flume::bounded(cap);
         // For blocking functions, we need to use std::thread, otherwise the sender will block
-        // if there is no capacity left in the channel, and all the asyncronouos runtime will be
+        // if there is no capacity left in the channel, and all the asynchronous runtime will be
         // blocked.
         std::thread::spawn(move || func(tx));
         Self { rx, _cap: cap }
@@ -38,7 +42,8 @@ impl<Output: Send + 'static> Pipeline<Output> {
     /// ```
     /// use conductus::Pipeline;
     ///
-    /// let pl = Pipeline::new((0..100), 2);
+    /// let pl = Pipeline::from(0..10, 5);
+    /// assert_eq!(pl.into_iter().collect::<Vec<_>>(), (0..10).collect::<Vec<_>>());
     /// ```
     pub fn from<I: IntoIterator<Item = Output> + Send + 'static>(source: I, cap: usize) -> Self {
         Self::new(
@@ -68,26 +73,52 @@ impl<Output> IntoIterator for Pipeline<Output> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_new() {
-        let pl = Pipeline::new(
-            |tx| {
-                for it in 0..10 {
-                    tx.send(it).unwrap();
-                }
-            },
-            5,
-        );
-        assert_eq!(pl.into_iter().collect::<Vec<_>>(), (0..10).collect::<Vec<_>>());
+impl<Output: Send + 'static> Pipeline<Output> {
+    /// Creates a new [`Pipeline`] from an async function
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tokio::time::{sleep, Duration};
+    /// use conductus::Pipeline;
+    /// use futures::StreamExt;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let pl = Pipeline::new_async(
+    ///         move |tx| async move {
+    ///             for it in 0..10 {
+    ///                 tx.send_async(it).await.unwrap();
+    ///             }
+    ///         },
+    ///         5,
+    ///     );
+    ///
+    ///     // Collect the results using a stream
+    ///     let mut results = Vec::new();
+    ///     let mut stream = pl.into_stream();
+    ///     while let Some(value) = stream.next().await {
+    ///         results.push(value);
+    ///     }
+    ///     assert_eq!(results, (0..10).collect::<Vec<_>>());
+    /// }
+    /// ```
+    pub fn new_async<F, Fut>(func: F, cap: usize) -> Self
+    where
+        F: Fn(flume::Sender<Output>) -> Fut + Send + 'static,
+        Fut: Future<Output = ()> + Send + 'static,
+    {
+        let (tx, rx) = flume::bounded(cap);
+        tokio::spawn(async move {
+            func(tx).await;
+        });
+        Self { rx, _cap: cap }
     }
 
-    #[test]
-    fn test_from() {
-        let pl = Pipeline::from(0..10, 5);
-        assert_eq!(pl.into_iter().collect::<Vec<_>>(), (0..10).collect::<Vec<_>>());
+    pub fn into_stream(self) -> RecvStream<'static, Output> {
+        self.rx.into_stream()
     }
 }
+
+#[cfg(test)]
+mod tests {}

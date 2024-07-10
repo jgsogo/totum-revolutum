@@ -11,4 +11,7 @@ flume = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
-log = "0.4.22"
+log = { workspace = true }
+
+[dev-dependencies]
+futures = { workspace = true }
