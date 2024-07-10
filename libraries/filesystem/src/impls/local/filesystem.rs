@@ -9,7 +9,7 @@ use ignore::WalkBuilder;
 use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
-use tracing::info;
+use tracing::{error, info};
 
 use crate::filesystem::FilesystemOps;
 use crate::ignore_filter::IgnoreFilterT;
@@ -21,7 +21,7 @@ use crate::{
 use super::parallel_visitor;
 
 /// Implementation of [`Filesystem`] using a directory in the host filesystem.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FilesystemLocal {
     root: Utf8PathBuf,
 }
@@ -70,6 +70,11 @@ impl FilesystemLocal {
             Ok(FilesystemPath::FilePath(filepath))
         }
     }
+
+    /// Returns the absolute path to the given [`FilePath`].
+    pub fn resolve_filepath(&self, filepath: impl AsRef<FilePath>) -> Utf8PathBuf {
+        self.root.join(filepath.as_ref())
+    }
 }
 
 #[async_trait]
@@ -98,9 +103,17 @@ impl Filesystem for FilesystemLocal {
                     } else {
                         let (parent_dir, last_cmp) = directory_path.split_parent();
                         let parent_dir = parent_dir.unwrap_or(DirectoryPath::root());
-                        let filepath =
-                            FilePathBuf::new(parent_dir, FilenameBuf::from_str(last_cmp.unwrap().as_str()).unwrap());
-                        ignore_filter.visit_file(&filepath)
+                        match FilenameBuf::fix_and_create(last_cmp.unwrap().as_str()) {
+                            Ok(filename) => {
+                                let filepath = FilePathBuf::new(parent_dir, filename);
+                                ignore_filter.visit_file(&filepath)
+                            }
+                            Err(Error::InvalidFilename) => {
+                                error!("Invalid filename: {}", last_cmp.unwrap().as_str());
+                                false
+                            }
+                            Err(_) => false,
+                        }
                     }
                 } else {
                     false

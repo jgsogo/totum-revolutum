@@ -26,7 +26,7 @@ use super::AppDirs;
 const SHA256_BASE_PATH: &str = "_sha256";
 
 #[allow(dead_code)]
-pub struct PhotoDB<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> {
+pub struct PhotoDB<'a, T: Database + Send, TPCloudClient: PCloudClient + Clone + Send + 'static> {
     /// The PCloud client.
     pcloud: TPCloudClient,
 
@@ -47,7 +47,7 @@ pub struct PhotoDB<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send +
     storage: FilesystemIndexed<DatabaseImpl, FilesystemPCloud<TPCloudClient>>,
 }
 
-impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> PhotoDB<'a, T, TPCloudClient> {
+impl<'a, T: Database + Send, TPCloudClient: PCloudClient + Clone + Send + 'static> PhotoDB<'a, T, TPCloudClient> {
     /// Creates a new instance of [`PhotoDB`] using the given arguments:
     /// * `db` is the database instance, behind the [`Database`] trait.
     /// * `db_path` Path inside PCloud to mount the remote storage filesystem.
@@ -70,22 +70,6 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
             app_dir,
             storage,
         })
-    }
-
-    pub async fn add(
-        &mut self,
-        photo_filepath: impl AsRef<Utf8Path>,
-        mut metadata_collector: MetadataCollector,
-    ) -> Result<()> {
-        debug!("Add photo from path '{}'", photo_filepath.as_ref());
-
-        metadata_collector.collect_from(photo_filepath.as_ref());
-        metadata_collector.collect_from(std::fs::metadata(photo_filepath.as_ref())?);
-
-        debug!("Execute [Self::add_from_file] to process and upload the file");
-        self.add_from_local_file(photo_filepath, metadata_collector).await?;
-
-        Ok(())
     }
 
     /// Iterates all the files in the DB and the files in the remote storage performing
@@ -174,7 +158,7 @@ impl<'a, T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static> Phot
     ///
     /// Note.- The path here might no longer be the original path, so no metadata can be collected
     /// related to the path or filesystem.
-    async fn add_from_local_file<P: AsRef<Utf8Path>>(
+    pub(crate) async fn add_from_local_file<P: AsRef<Utf8Path>>(
         &mut self,
         filepath: P,
         mut metadata_collector: MetadataCollector,

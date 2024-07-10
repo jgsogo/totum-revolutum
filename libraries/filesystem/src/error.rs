@@ -11,6 +11,9 @@ pub enum Error {
     #[error("Filename contains invalid characters")]
     InvalidFilename,
 
+    #[error("The given path is not valid")]
+    InvalidPath,
+
     #[error("Path refers to the root itself")]
     PathIsRoot,
 

@@ -31,10 +31,10 @@ impl FilesystemLocalTemp {
         )
     }
 
-    /// Returns the absolute path to the given `filepath`. This path is only valid as long as the
+    /// Returns the absolute path to the given [`FilePath`]. This path is only valid as long as the
     /// filesystem is not destroyed.
     pub fn resolve_filepath(&self, filepath: impl AsRef<FilePath>) -> Utf8PathBuf {
-        self._tmp_dir.path().join(filepath.as_ref())
+        self.local.resolve_filepath(filepath)
     }
 }
 
