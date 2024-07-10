@@ -4,3 +4,5 @@ pub use pipeline::Pipeline;
 mod error;
 mod pipeline;
 mod step;
+
+mod pipeline_async;
