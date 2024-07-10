@@ -76,5 +76,6 @@ rust_binary(
         ":photodb_lib",
         "//libraries/filesystem",
         "//libraries/pcloud_sdk",
+        "//libraries/utils",
     ],
 )
