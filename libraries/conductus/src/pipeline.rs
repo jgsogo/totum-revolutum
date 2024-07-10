@@ -1,0 +1,93 @@
+use log::debug;
+
+pub struct Pipeline<Output> {
+    rx: flume::Receiver<Output>,
+    _cap: usize,
+}
+
+impl<Output: Send + 'static> Pipeline<Output> {
+    /// Creates a new [`Pipeline`] from a blocking function
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use conductus::Pipeline;
+    ///
+    /// let pl = Pipeline::new(|tx|{
+    ///     for it in 0..10 {
+    ///         tx.send(it).unwrap();
+    ///     }
+    /// }, 2);
+    /// ```
+    pub fn new<F>(func: F, cap: usize) -> Self
+    where
+        F: FnOnce(flume::Sender<Output>) + Send + 'static,
+    {
+        let (tx, rx) = flume::bounded(cap);
+        // For blocking functions, we need to use std::thread, otherwise the sender will block
+        // if there is no capacity left in the channel, and all the asyncronouos runtime will be
+        // blocked.
+        std::thread::spawn(move || func(tx));
+        Self { rx, _cap: cap }
+    }
+
+    /// Creates a new [`Pipeline`] from an iterator
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use conductus::Pipeline;
+    ///
+    /// let pl = Pipeline::new((0..100), 2);
+    /// ```
+    pub fn from<I: IntoIterator<Item = Output> + Send + 'static>(source: I, cap: usize) -> Self {
+        Self::new(
+            move |tx| {
+                for it in source {
+                    if let Err(e) = tx.send(it) {
+                        debug!("All receivers have been dropped: {e}");
+                    }
+                }
+            },
+            cap,
+        )
+    }
+
+    /// Consumes the pipeline without collecting results
+    pub fn drain(self) {
+        for _ in self {}
+    }
+}
+
+impl<Output> IntoIterator for Pipeline<Output> {
+    type Item = Output;
+    type IntoIter = <flume::Receiver<Output> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.rx.into_iter()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let pl = Pipeline::new(
+            |tx| {
+                for it in 0..10 {
+                    tx.send(it).unwrap();
+                }
+            },
+            5,
+        );
+        assert_eq!(pl.into_iter().collect::<Vec<_>>(), (0..10).collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn test_from() {
+        let pl = Pipeline::from(0..10, 5);
+        assert_eq!(pl.into_iter().collect::<Vec<_>>(), (0..10).collect::<Vec<_>>());
+    }
+}
