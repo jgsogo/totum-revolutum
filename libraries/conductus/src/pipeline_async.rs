@@ -1,6 +1,7 @@
 use std::future::Future;
 
 use flume::r#async::RecvStream;
+use log::debug;
 
 pub struct PipelineAsync<Output> {
     rx: flume::Receiver<Output>,
@@ -47,6 +48,46 @@ impl<Output: Send + 'static> PipelineAsync<Output> {
             func(tx).await;
         });
         Self { rx, _cap: cap }
+    }
+
+    /// Creates a new [`PipelineAsync`] from an iterator
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use conductus::PipelineAsync;
+    /// use futures::StreamExt;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let pl = PipelineAsync::from(0..10, 5);
+    ///
+    ///     // Collect the results using a stream
+    ///     let mut results = Vec::new();
+    ///     let mut stream = pl.into_stream();
+    ///     while let Some(value) = stream.next().await {
+    ///         results.push(value);
+    ///     }
+    ///     assert_eq!(results, (0..10).collect::<Vec<_>>());
+    /// }
+    /// ```
+    pub fn from<I: IntoIterator<Item = Output> + Send + Sync + Clone + 'static>(source: I, cap: usize) -> Self
+    where
+        <I as IntoIterator>::IntoIter: Send,
+    {
+        Self::new(
+            move |tx| {
+                let value = source.clone();
+                async move {
+                    for it in value.into_iter() {
+                        if let Err(e) = tx.send_async(it).await {
+                            debug!("All receivers have been dropped: {e}");
+                        }
+                    }
+                }
+            },
+            cap,
+        )
     }
 
     pub fn into_stream(self) -> RecvStream<'static, Output> {
