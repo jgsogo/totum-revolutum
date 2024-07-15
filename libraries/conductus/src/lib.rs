@@ -1,9 +1,8 @@
 pub use error::{Error, Result};
-pub use pipeline::Pipeline;
-pub use pipeline_async::PipelineAsync;
+pub use r#async::PipelineAsync;
+pub use sync::Pipeline;
 
-mod error;
-mod pipeline;
-mod step;
+pub mod error;
 
-mod pipeline_async;
+pub mod r#async;
+pub mod sync;

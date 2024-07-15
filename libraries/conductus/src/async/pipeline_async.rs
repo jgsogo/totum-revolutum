@@ -3,6 +3,7 @@ use std::future::Future;
 use flume::r#async::RecvStream;
 use log::debug;
 
+/// Implementation of an async pipeline
 pub struct PipelineAsync<Output> {
     rx: flume::Receiver<Output>,
     _cap: usize,

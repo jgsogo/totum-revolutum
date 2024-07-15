@@ -1,5 +1,6 @@
 use log::debug;
 
+/// Implementation of a sync pipeline
 pub struct Pipeline<Output> {
     rx: flume::Receiver<Output>,
     _cap: usize,
