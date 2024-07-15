@@ -5,7 +5,7 @@ use crate::sync::step::PipelineStep;
 /// Implementation of a sync pipeline
 pub struct Pipeline<Output> {
     rx: flume::Receiver<Output>,
-    _cap: usize,
+    cap: usize,
 }
 
 impl<Output: Send + 'static> Pipeline<Output> {
@@ -32,7 +32,7 @@ impl<Output: Send + 'static> Pipeline<Output> {
         // if there is no capacity left in the channel, and all the asynchronous runtime will be
         // blocked.
         std::thread::spawn(move || func(tx));
-        Self { rx, _cap: cap }
+        Self { rx, cap }
     }
 
     /// Creates a new [`Pipeline`] from an iterator
@@ -86,13 +86,13 @@ impl<Output: Send + 'static> Pipeline<Output> {
     where
         Func: FnOnce(flume::IntoIter<Output>, flume::Sender<StepOutput>) + Send + 'static,
     {
-        let cap = self._cap;
+        let cap = self.cap;
         let (tx, rx) = flume::bounded(cap);
         std::thread::spawn(move || {
             func(self.into_iter(), tx);
         });
 
-        Pipeline { rx, _cap: cap }
+        Pipeline { rx, cap }
     }
 
     /// Consumes the pipeline without collecting results
