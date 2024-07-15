@@ -1,5 +1,7 @@
 use log::debug;
 
+use crate::sync::step::PipelineStep;
+
 /// Implementation of a sync pipeline
 pub struct Pipeline<Output> {
     rx: flume::Receiver<Output>,
@@ -54,6 +56,43 @@ impl<Output: Send + 'static> Pipeline<Output> {
             },
             cap,
         )
+    }
+
+    pub fn then<StepOutput: Send + 'static, PS: PipelineStep<Output, StepOutput> + 'static>(
+        self,
+        step: PS,
+    ) -> Pipeline<StepOutput> {
+        self.pipe(move |rx, tx| step.process(rx, tx))
+    }
+
+    /// Pipes one operation after an existing pipeline
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use tracing::error;
+    /// use conductus::Pipeline;
+    ///
+    /// let pl = Pipeline::from(0..4, 2).pipe(|input, tx: flume::Sender<i32>| {
+    ///     for it in input {
+    ///         tx.send(-2 * it).unwrap();
+    ///     }
+    /// });
+    ///
+    /// assert_eq!(pl.into_iter().collect::<Vec<_>>(), vec![0, -2, -4, -6]);
+    /// ```
+    ///
+    pub fn pipe<StepOutput: Send + 'static, Func>(self, func: Func) -> Pipeline<StepOutput>
+    where
+        Func: FnOnce(flume::IntoIter<Output>, flume::Sender<StepOutput>) + Send + 'static,
+    {
+        let cap = self._cap;
+        let (tx, rx) = flume::bounded(cap);
+        std::thread::spawn(move || {
+            func(self.into_iter(), tx);
+        });
+
+        Pipeline { rx, _cap: cap }
     }
 
     /// Consumes the pipeline without collecting results
