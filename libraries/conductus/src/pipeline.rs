@@ -1,8 +1,8 @@
 use log::debug;
 
 pub struct Pipeline<Output> {
-    pub(crate) rx: flume::Receiver<Output>,
-    pub(crate) _cap: usize,
+    rx: flume::Receiver<Output>,
+    _cap: usize,
 }
 
 impl<Output: Send + 'static> Pipeline<Output> {

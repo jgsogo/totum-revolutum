@@ -1,21 +1,25 @@
 use std::future::Future;
 
-use crate::Pipeline;
 use flume::r#async::RecvStream;
 
-impl<Output: Send + 'static> Pipeline<Output> {
-    /// Creates a new [`Pipeline`] from an async function
+pub struct PipelineAsync<Output> {
+    rx: flume::Receiver<Output>,
+    _cap: usize,
+}
+
+impl<Output: Send + 'static> PipelineAsync<Output> {
+    /// Creates a new [`PipelineAsync`] from an async function
     ///
     /// # Examples
     ///
     /// ```
     /// use tokio::time::{sleep, Duration};
-    /// use conductus::Pipeline;
+    /// use conductus::PipelineAsync;
     /// use futures::StreamExt;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let pl = Pipeline::new_async(
+    ///     let pl = PipelineAsync::new(
     ///         move |tx| async move {
     ///             for it in 0..10 {
     ///                 tx.send_async(it).await.unwrap();
@@ -33,7 +37,7 @@ impl<Output: Send + 'static> Pipeline<Output> {
     ///     assert_eq!(results, (0..10).collect::<Vec<_>>());
     /// }
     /// ```
-    pub fn new_async<F, Fut>(func: F, cap: usize) -> Self
+    pub fn new<F, Fut>(func: F, cap: usize) -> Self
     where
         F: Fn(flume::Sender<Output>) -> Fut + Send + 'static,
         Fut: Future<Output = ()> + Send + 'static,
