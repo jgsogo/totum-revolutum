@@ -5,12 +5,14 @@ use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
 use tracing::{debug, error};
 
+use filesystem::impls::FilesystemLocal;
+use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
 use pcloud_sdk::cli::auth;
 use pcloud_sdk::client::{PCloudClient, PCloudClientImpl};
 use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use pcloud_sdk::types::RemotePath;
 use photodb::database::{Database, PCloudDatabase};
-use photodb::{AppDirs, CollectMetadataFrom, MetadataCLI, MetadataCollector, PhotoDB};
+use photodb::{AppDirs, CollectMetadataFrom, MetadataCLI, MetadataCollector, PhotoDB, PhotoDBAdd};
 
 fn application_dir() -> Utf8PathBuf {
     let home_dir = dirs::home_dir().expect("Failed to get dirs::home_dir()");
@@ -57,7 +59,12 @@ enum Commands {
 
 #[derive(Args, Debug)]
 struct Add {
-    photo_file: Utf8PathBuf,
+    /// The path to the file (or directory) to add
+    input_path: Utf8PathBuf,
+
+    /// Whether to recurse subdirectories or not (only if the input is a directory)
+    #[clap(short, long)]
+    norecursive: bool,
 
     #[clap(flatten)]
     metadata: MetadataCLI,
@@ -76,7 +83,7 @@ fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
 
 /// Any command that uses the DB is executed here. This way we can guarantee that the Receiver work
 /// (store the database back to pCloud if anything fails) is always executed
-async fn db_commands<T: Database, TPCloudClient: PCloudClient + Clone + Send + 'static>(
+async fn db_commands<T: Database + Send, TPCloudClient: PCloudClient + Clone + Send + 'static>(
     command: Commands,
     mut photodb: PhotoDB<'_, T, TPCloudClient>,
 ) -> Result<()> {
@@ -84,7 +91,20 @@ async fn db_commands<T: Database, TPCloudClient: PCloudClient + Clone + Send + '
         Commands::Add(add) => {
             let mut metadata_collector = MetadataCollector::default();
             metadata_collector.collect_from(&add.metadata);
-            photodb.add(add.photo_file, metadata_collector).await
+
+            let input_path = utils::filesystem::to_absolute_path(&add.input_path);
+            if std::fs::metadata(input_path.as_std_path())?.is_dir() {
+                let fs = FilesystemLocal::new(&input_path)?;
+                photodb
+                    .add_from_directory(fs, &DirectoryPathBuf::root(), !add.norecursive, metadata_collector)
+                    .await
+            } else {
+                let directory = add.input_path.parent().unwrap();
+                let filename = FilenameBuf::from_str(add.input_path.file_name().unwrap())?;
+                let fs = FilesystemLocal::new(directory)?;
+                let filepath = FilePathBuf::new(DirectoryPathBuf::root(), &filename);
+                photodb.add_from_file(&fs, &filepath, metadata_collector).await
+            }
         }
         Commands::Sync => photodb.sync().await,
         Commands::List => photodb.list().await,

@@ -7,7 +7,7 @@ module(
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "platforms", version = "0.0.10")
 
-bazel_dep(name = "rules_python", version = "0.33.2", dev_dependency = True)
+bazel_dep(name = "rules_python", version = "0.34.0", dev_dependency = True)
 bazel_dep(name = "rules_rust", version = "0.47.1", dev_dependency = True)
 
 bazel_dep(name = "aspect_rules_py", version = "0.7.3")
