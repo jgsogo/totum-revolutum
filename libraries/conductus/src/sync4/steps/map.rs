@@ -25,16 +25,11 @@ impl<Input, Output, Func> PipelineStep<Input, Output> for PipelineStepMap<Input,
 where
     Func: Fn(Input) -> Output,
 {
-    fn run<I: IntoIterator<Item = Message<Input>>>(&self, source: I, target: Sender<Message<Output>>) {
+    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
         for it in source {
-            match it {
-                Message::Data(input) => {
-                    let out = self.map(input);
-                    if let Err(e) = target.send(Message::Data(out)) {
-                        debug!("Error sending from blanket implementation of PipelineStepMap: {e}");
-                    }
-                }
-                Message::Close => break,
+            let out = self.map(it);
+            if let Err(e) = target.send(Message::Data(out)) {
+                debug!("Error sending from blanket implementation of PipelineStepMap: {e}");
             }
         }
     }
@@ -66,7 +61,7 @@ mod tests {
         assert_eq!(step.map(0), 0);
 
         let (tx, rx) = flume::bounded(2);
-        std::thread::spawn(move || step.run((0..10).into_iter().map(|it| Message::Data(it)), tx));
+        std::thread::spawn(move || step.run(0..10, tx));
 
         let r = rx
             .into_iter()
