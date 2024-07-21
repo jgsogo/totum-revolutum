@@ -1,4 +1,3 @@
 mod pipeline;
-mod step;
-
+pub mod steps;
 pub use pipeline::Pipeline;
