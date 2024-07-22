@@ -4,6 +4,7 @@ use flume::Sender;
 use std::marker::PhantomData;
 use tracing::debug;
 
+#[derive(Copy, Clone)]
 pub struct PipelineStepMap<Input, Output, Func>
 where
     Func: Fn(Input) -> Output,
