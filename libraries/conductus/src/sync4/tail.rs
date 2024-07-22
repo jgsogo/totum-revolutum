@@ -1,7 +1,10 @@
 use std::collections::VecDeque;
 
 use crate::sync4::pipeline::Message;
-use crate::sync4::steps::{PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepWindow};
+use crate::sync4::steps::{
+    PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepSyncEnd, PipelineStepSyncStart, PipelineStepWindow,
+    SyncMarked,
+};
 
 pub struct PipelineTail<Output> {
     rx: flume::Receiver<Message<Output>>,
@@ -60,6 +63,18 @@ impl<Output: Send + 'static> PipelineTail<Output> {
         let step = PipelineStepWindow::new(func, window_size);
         self.pipe(step, cap)
     }
+
+    pub fn sync_mark(self) -> PipelineTail<SyncMarked<Output>> {
+        let step = PipelineStepSyncStart;
+        self.pipe(step, 0)
+    }
+}
+
+impl<Output: Send + 'static> PipelineTail<SyncMarked<Output>> {
+    pub fn sync(self) -> PipelineTail<Output> {
+        let step = PipelineStepSyncEnd;
+        self.pipe(step, 0)
+    }
 }
 
 impl<Output: Clone + Send + 'static> PipelineTail<Output> {
@@ -109,8 +124,9 @@ impl<Output> Iterator for PipelineTailIter<Output> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::time::Duration;
+
+    use super::*;
 
     #[test]
     fn test_parallel_pipe() {
@@ -129,5 +145,25 @@ mod tests {
 
         let out = tail.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![1, 2, 3, 10]);
+    }
+
+    #[test]
+    fn test_sync_window() {
+        let (tx, rx) = flume::bounded(0);
+        let step = PipelineStepMap::from(|value: SyncMarked<i32>| {
+            let inner = value.inner();
+            std::thread::sleep(Duration::from_millis((inner * 10) as u64));
+            value
+        });
+        let tail = PipelineTail::new(rx).sync_mark().parallel_pipe(step, 2, 2).sync();
+
+        tx.send(Message::Data(10)).unwrap();
+        tx.send(Message::Data(1)).unwrap();
+        tx.send(Message::Data(2)).unwrap();
+        tx.send(Message::Data(3)).unwrap();
+        drop(tx);
+
+        let out = tail.into_iter().collect::<Vec<_>>();
+        assert_eq!(out, vec![10, 1, 2, 3]);
     }
 }
