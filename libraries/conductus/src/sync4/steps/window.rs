@@ -8,7 +8,6 @@ use crate::sync4::pipeline::Message;
 
 use super::PipelineStep;
 
-#[derive(Copy, Clone)]
 pub struct PipelineStepWindow<Input, Output, Func>
 where
     Func: Fn(&VecDeque<Input>) -> Output,

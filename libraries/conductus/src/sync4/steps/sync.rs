@@ -9,7 +9,6 @@ use crate::sync4::steps::PipelineStep;
 
 pub struct PipelineStepSyncStart;
 
-#[derive(Copy, Clone)]
 pub struct SyncMarked<Input> {
     mark: usize,
     value: Input,

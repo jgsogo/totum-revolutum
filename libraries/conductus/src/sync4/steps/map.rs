@@ -1,10 +1,12 @@
-use super::PipelineStep;
-use crate::sync4::pipeline::Message;
-use flume::Sender;
 use std::marker::PhantomData;
+
+use flume::Sender;
 use tracing::debug;
 
-#[derive(Copy, Clone)]
+use crate::sync4::pipeline::Message;
+
+use super::PipelineStep;
+
 pub struct PipelineStepMap<Input, Output, Func>
 where
     Func: Fn(Input) -> Output,
@@ -47,6 +49,17 @@ where
         }
     }
 }
+
+impl<Input, Output, Func> Clone for PipelineStepMap<Input, Output, Func>
+where
+    Func: Fn(Input) -> Output,
+{
+    fn clone(&self) -> Self {
+        todo!()
+    }
+}
+
+impl<Input, Output, Func> Copy for PipelineStepMap<Input, Output, Func> where Func: Fn(Input) -> Output + Copy {}
 
 #[cfg(test)]
 mod tests {

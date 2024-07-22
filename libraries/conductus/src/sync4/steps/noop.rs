@@ -5,7 +5,7 @@ use crate::sync4::pipeline::Message;
 
 use super::PipelineStep;
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default)]
 pub struct PipelineStepNoop;
 
 impl<Input> PipelineStep<Input, Input> for PipelineStepNoop {

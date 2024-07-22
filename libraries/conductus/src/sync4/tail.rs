@@ -49,6 +49,16 @@ impl<Output: Send + 'static> PipelineTail<Output> {
         self.pipe(step, cap)
     }
 
+    pub fn parallel_map<NextOutput: Send + 'static, Func: Fn(Output) -> NextOutput + Send + 'static + Copy>(
+        self,
+        step: Func,
+        workers: usize,
+        cap: usize,
+    ) -> PipelineTail<NextOutput> {
+        let step: PipelineStepMap<Output, NextOutput, Func> = step.into();
+        self.parallel_pipe(step, workers, cap)
+    }
+
     pub fn buffer(self, cap: usize) -> Self {
         let step = PipelineStepNoop;
         self.pipe(step, cap)
@@ -150,12 +160,18 @@ mod tests {
     #[test]
     fn test_sync_window() {
         let (tx, rx) = flume::bounded(0);
-        let step = PipelineStepMap::from(|value: SyncMarked<i32>| {
-            let inner = value.inner();
-            std::thread::sleep(Duration::from_millis((inner * 10) as u64));
-            value
-        });
-        let tail = PipelineTail::new(rx).sync_mark().parallel_pipe(step, 2, 2).sync();
+        let tail = PipelineTail::new(rx)
+            .sync_mark()
+            .parallel_map(
+                |value| {
+                    let inner = value.inner();
+                    std::thread::sleep(Duration::from_millis((inner * 10) as u64));
+                    value
+                },
+                2,
+                2,
+            )
+            .sync();
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
