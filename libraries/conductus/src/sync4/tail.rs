@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::sync4::pipeline::Message;
-use crate::sync4::steps::{PipelineStep, PipelineStepMap, PipelineStepWindow};
+use crate::sync4::steps::{PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepWindow};
 
 pub struct PipelineTail<Output> {
     rx: flume::Receiver<Message<Output>>,
@@ -32,13 +32,8 @@ impl<Output: Send + 'static> PipelineTail<Output> {
     }
 
     pub fn buffer(self, cap: usize) -> Self {
-        let (tx, rx) = flume::bounded(cap);
-        std::thread::spawn(move || {
-            for it in self.rx {
-                tx.send(it).unwrap()
-            }
-        });
-        PipelineTail::new(rx)
+        let step = PipelineStepNoop;
+        self.pipe(step, cap)
     }
 
     pub fn window<NextOutput: Send + 'static, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(

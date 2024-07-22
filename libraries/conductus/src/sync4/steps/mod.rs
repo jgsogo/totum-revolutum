@@ -1,9 +1,11 @@
 pub use map::PipelineStepMap;
+pub use noop::PipelineStepNoop;
 pub use window::PipelineStepWindow;
 
 use super::pipeline::Message;
 
 mod map;
+mod noop;
 mod window;
 
 pub trait PipelineStep<Input, Output> {
