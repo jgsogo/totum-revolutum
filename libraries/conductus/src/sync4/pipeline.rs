@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::thread::JoinHandle;
 
 use flume::SendError;
@@ -8,7 +9,7 @@ use crate::sync4::{PipelineHead, PipelineTail};
 #[derive(Clone)]
 pub enum Message<Data> {
     Data(Data),
-    Close,
+    Flush,
 }
 pub struct Pipeline<Input, Output> {
     head: PipelineHead<Input>,
@@ -59,6 +60,16 @@ impl<Input: Send + 'static, Output: Send + 'static> Pipeline<Input, Output> {
     pub fn drain(self) -> PipelineTailIter<Output> {
         drop(self.head);
         self.tail.into_iter()
+    }
+
+    pub fn window<NextOutput: Send + 'static, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(
+        self,
+        func: Func,
+        window_size: usize,
+        cap: usize,
+    ) -> Pipeline<Input, NextOutput> {
+        let tail = self.tail.window(func, window_size, cap);
+        Pipeline { head: self.head, tail }
     }
 }
 

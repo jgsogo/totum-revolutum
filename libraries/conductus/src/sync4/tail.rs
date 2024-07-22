@@ -1,5 +1,7 @@
+use std::collections::VecDeque;
+
 use crate::sync4::pipeline::Message;
-use crate::sync4::steps::{PipelineStep, PipelineStepMap};
+use crate::sync4::steps::{PipelineStep, PipelineStepMap, PipelineStepWindow};
 
 pub struct PipelineTail<Output> {
     rx: flume::Receiver<Message<Output>>,
@@ -37,6 +39,16 @@ impl<Output: Send + 'static> PipelineTail<Output> {
             }
         });
         PipelineTail::new(rx)
+    }
+
+    pub fn window<NextOutput: Send + 'static, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(
+        self,
+        func: Func,
+        window_size: usize,
+        cap: usize,
+    ) -> PipelineTail<NextOutput> {
+        let step = PipelineStepWindow::new(func, window_size);
+        self.pipe(step, cap)
     }
 }
 
@@ -78,7 +90,7 @@ impl<Output> Iterator for PipelineTailIter<Output> {
         match self.tail.rx.recv() {
             Ok(msg) => match msg {
                 Message::Data(data) => Some(data),
-                Message::Close => None,
+                Message::Flush => None,
             },
             Err(_) => None,
         }
