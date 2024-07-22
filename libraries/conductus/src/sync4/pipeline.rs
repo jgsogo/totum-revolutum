@@ -1,7 +1,9 @@
+use std::thread::JoinHandle;
+
+use flume::SendError;
+
 use crate::sync4::tail::PipelineTailIter;
 use crate::sync4::{PipelineHead, PipelineTail};
-use flume::SendError;
-use std::thread::JoinHandle;
 
 #[derive(Clone)]
 pub enum Message<Data> {
@@ -52,6 +54,11 @@ impl<Input: Send + 'static, Output: Send + 'static> Pipeline<Input, Output> {
     pub fn buffer(self, cap: usize) -> Self {
         let tail = self.tail.buffer(cap);
         Pipeline { head: self.head, tail }
+    }
+
+    pub fn drain(self) -> PipelineTailIter<Output> {
+        drop(self.head);
+        self.tail.into_iter()
     }
 }
 
@@ -104,6 +111,16 @@ mod tests {
         pipeline.send(2).unwrap();
         let out = pipeline.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![0, 1, 2]);
+    }
+
+    #[test]
+    fn test_drain() {
+        let pipeline = Pipeline::empty(2);
+
+        pipeline.send(0).unwrap();
+        pipeline.send(1).unwrap();
+        let out = pipeline.drain().collect::<Vec<_>>();
+        assert_eq!(out, vec![0, 1]);
     }
 
     #[test]
