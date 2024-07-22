@@ -22,6 +22,21 @@ impl<Output: Send + 'static> PipelineTail<Output> {
         PipelineTail::new(rx)
     }
 
+    pub fn parallel_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
+        self,
+        step: PS,
+        workers: usize,
+        cap: usize,
+    ) -> PipelineTail<NextOutput> {
+        let (tx, rx) = flume::bounded(cap);
+        for _ in 0..workers {
+            let tx = tx.clone();
+            let tail = PipelineTail::new(self.rx.clone());
+            std::thread::spawn(move || step.run(tail, tx));
+        }
+        PipelineTail::new(rx)
+    }
+
     pub fn map<NextOutput: Send + 'static, Func: Fn(Output) -> NextOutput + Send + 'static>(
         self,
         step: Func,
@@ -62,23 +77,6 @@ impl<Output: Clone + Send + 'static> PipelineTail<Output> {
         let tail_lhs = PipelineTail::new(rx_lhs);
         let tail_rhs = PipelineTail::new(rx_rhs);
         (tail_lhs, tail_rhs)
-    }
-}
-
-impl<Output: Send + 'static> PipelineTail<Output> {
-    pub fn parallel_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
-        self,
-        step: PS,
-        workers: usize,
-        cap: usize,
-    ) -> PipelineTail<NextOutput> {
-        let (tx, rx) = flume::bounded(cap);
-        for _ in 0..workers {
-            let tx = tx.clone();
-            let tail = PipelineTail::new(self.rx.clone());
-            std::thread::spawn(move || step.run(tail, tx));
-        }
-        PipelineTail::new(rx)
     }
 }
 
