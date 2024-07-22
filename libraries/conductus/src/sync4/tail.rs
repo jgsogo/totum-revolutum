@@ -41,9 +41,9 @@ impl<Output: Send + 'static> PipelineTail<Output> {
 }
 
 impl<Output: Clone + Send + 'static> PipelineTail<Output> {
-    pub fn split(self, cap_lhs: usize, cap_rhs: usize) -> (PipelineTail<Output>, PipelineTail<Output>) {
-        let (tx_lhs, rx_lhs) = flume::bounded(cap_lhs);
-        let (tx_rhs, rx_rhs) = flume::bounded(cap_rhs);
+    pub fn split(self) -> (PipelineTail<Output>, PipelineTail<Output>) {
+        let (tx_lhs, rx_lhs) = flume::unbounded();
+        let (tx_rhs, rx_rhs) = flume::unbounded();
 
         std::thread::spawn(move || {
             for it in self.rx {

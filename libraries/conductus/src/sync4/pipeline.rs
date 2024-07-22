@@ -106,17 +106,21 @@ mod tests {
         assert_eq!(out, vec![0, 1, 2]);
     }
 
-    // #[test]
-    // fn test_split() {
-    //     let pipeline = Pipeline::empty(2); //.map(|input: i32| input * 2, 2);
-    //     let (p_lhs, p_rhs) = pipeline.split(2, 2);
-    //     p_lhs.send_batch(0..3);
-    //     p_rhs.send_batch(0..2);
-    //
-    //     let out_lhs = p_lhs.into_iter().collect::<Vec<_>>();
-    //     let out_rhs = p_rhs.into_iter().collect::<Vec<_>>();
-    //
-    //     assert_eq!(out_lhs, vec![1]);
-    //     assert_eq!(out_rhs, vec![2]);
-    // }
+    #[test]
+    fn test_split() {
+        let pipeline = Pipeline::empty(2).map(|input: i32| input * 2, 2);
+        let (head, tail) = pipeline.ends();
+        let (t1, t2) = tail.split();
+        let t2 = t2.map(|input| input * 2, 2);
+
+        head.send_batch(0..3);
+
+        drop(head);
+
+        let out_t1 = t1.into_iter().collect::<Vec<_>>();
+        let out_t2 = t2.into_iter().collect::<Vec<_>>();
+
+        assert_eq!(out_t1, vec![0, 2, 4]);
+        assert_eq!(out_t2, vec![0, 4, 8]);
+    }
 }
