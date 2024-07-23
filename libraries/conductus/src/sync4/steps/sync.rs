@@ -15,6 +15,8 @@ pub trait SyncMarkedTrait<Input>: Ord {
     fn inner(&self) -> &Input;
     fn mark(&self) -> usize;
 }
+
+#[derive(Debug)]
 pub struct SyncMarked<Input> {
     mark: usize,
     value: Input,
@@ -71,29 +73,6 @@ impl<Input> PipelineStep<Input, SyncMarked<Input>> for PipelineStepSyncStart {
 }
 
 pub struct PipelineStepSyncEnd;
-//
-// impl<Input> PipelineStep<SyncMarked<Input>, Input> for PipelineStepSyncEnd {
-//     fn run<I: IntoIterator<Item = SyncMarked<Input>>>(&self, source: I, target: Sender<Message<Input>>) {
-//         let mut next = 0;
-//         let mut heap = BinaryHeap::new();
-//         for it in source {
-//             heap.push(it);
-//
-//             while let Some(peek) = heap.peek() {
-//                 if peek.mark == next {
-//                     let item = heap.pop().expect("Already checked above");
-//                     if let Err(e) = target.send(Message::Data(item.value)) {
-//                         debug!("Error sending from blanket implementation of PipelineSyncStart: {e}");
-//                     }
-//                     next += 1;
-//                 } else {
-//                     assert!(peek.mark > next);
-//                     break;
-//                 }
-//             }
-//         }
-//     }
-// }
 
 impl<InnerInput, Input: SyncMarkedTrait<InnerInput>> PipelineStep<Input, InnerInput> for PipelineStepSyncEnd {
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {
@@ -115,5 +94,45 @@ impl<InnerInput, Input: SyncMarkedTrait<InnerInput>> PipelineStep<Input, InnerIn
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sync_step_start() {
+        let sync_start = PipelineStepSyncStart;
+
+        let (tx, rx) = flume::bounded(2);
+        std::thread::spawn(move || sync_start.run(10..12, tx));
+
+        let r = rx
+            .into_iter()
+            .filter_map(|it| match it {
+                Message::Data(d) => Some(d),
+                Message::Flush => None,
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(r, vec![SyncMarked::new(0, 10), SyncMarked::new(1, 11)]);
+    }
+
+    #[test]
+    fn test_sync_step_end() {
+        let sync_end = PipelineStepSyncEnd;
+
+        let (tx, rx) = flume::bounded(2);
+        let data = vec![SyncMarked::new(0, 10), SyncMarked::new(2, 12), SyncMarked::new(1, 11)];
+        std::thread::spawn(move || sync_end.run(data.into_iter(), tx));
+
+        let r = rx
+            .into_iter()
+            .filter_map(|it| match it {
+                Message::Data(d) => Some(d),
+                Message::Flush => None,
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(r, vec![10, 11, 12]);
     }
 }

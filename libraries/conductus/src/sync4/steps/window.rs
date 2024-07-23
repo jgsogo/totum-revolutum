@@ -75,10 +75,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use std::collections::VecDeque;
-
-    use crate::sync4::pipeline::Message;
-    use crate::sync4::steps::{PipelineStep, PipelineStepWindow};
+    use super::*;
 
     #[test]
     fn test_window() {
