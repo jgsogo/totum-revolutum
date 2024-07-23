@@ -3,8 +3,9 @@ use std::thread::JoinHandle;
 
 use flume::SendError;
 
+use crate::sync4::head::PipelineHead;
 use crate::sync4::tail::PipelineTailIter;
-use crate::sync4::{PipelineHead, PipelineTail};
+use crate::sync4::{PipelineHeadImpl, PipelineTail};
 
 #[derive(Clone)]
 pub enum Message<Data> {
@@ -12,7 +13,7 @@ pub enum Message<Data> {
     Flush,
 }
 pub struct Pipeline<Input, Output> {
-    head: PipelineHead<Input>,
+    head: PipelineHeadImpl<Input>,
     tail: PipelineTail<Output>,
 }
 
@@ -20,14 +21,14 @@ impl<Input: Send + 'static> Pipeline<Input, Input> {
     pub fn empty(cap: usize) -> Self {
         let (tx, rx) = flume::bounded(cap);
         Self {
-            head: PipelineHead::new(tx),
+            head: PipelineHeadImpl::new(tx),
             tail: PipelineTail::new(rx),
         }
     }
 }
 
 impl<Input: Send + 'static, Output: Send + 'static> Pipeline<Input, Output> {
-    pub fn ends(self) -> (PipelineHead<Input>, PipelineTail<Output>) {
+    pub fn ends(self) -> (PipelineHeadImpl<Input>, PipelineTail<Output>) {
         let Pipeline { head, tail } = self;
         (head, tail)
     }

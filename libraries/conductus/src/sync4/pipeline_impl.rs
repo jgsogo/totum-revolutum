@@ -1,13 +1,27 @@
-use crate::sync4::steps::PipelineStep;
-use crate::sync4::{PipelineHead, PipelineTailOps};
+use std::thread::JoinHandle;
 
-pub struct PipelineImpl<Input, Output: Send + 'static, Tail: PipelineTailOps<Output = Output>> {
-    head: PipelineHead<Input>,
+use flume::SendError;
+
+use crate::sync4::head::PipelineHead;
+use crate::sync4::steps::PipelineStep;
+use crate::sync4::PipelineTailOps;
+
+pub struct PipelineImpl<
+    Input: Send + 'static,
+    Output: Send + 'static,
+    Head: PipelineHead<Input = Input>,
+    Tail: PipelineTailOps<Output = Output>,
+> {
+    head: Head,
     tail: Tail,
 }
 
-impl<Input: 'static, Output: Send + 'static, Tail: PipelineTailOps<Output = Output>> PipelineTailOps
-    for PipelineImpl<Input, Output, Tail>
+impl<
+        Input: Send + 'static,
+        Output: Send + 'static,
+        Head: PipelineHead<Input = Input> + 'static,
+        Tail: PipelineTailOps<Output = Output>,
+    > PipelineTailOps for PipelineImpl<Input, Output, Head, Tail>
 {
     type Output = Output;
 
@@ -31,5 +45,26 @@ impl<Input: 'static, Output: Send + 'static, Tail: PipelineTailOps<Output = Outp
     ) -> impl PipelineTailOps<Output = NextOutput> + 'static {
         let tail = self.tail.trait_parallel_pipe(step, workers, cap);
         PipelineImpl { head: self.head, tail }
+    }
+}
+
+impl<
+        Input: Send + 'static,
+        Output: Send + 'static,
+        Head: PipelineHead<Input = Input>,
+        Tail: PipelineTailOps<Output = Output>,
+    > PipelineHead for PipelineImpl<Input, Output, Head, Tail>
+{
+    type Input = Input;
+
+    fn send(&self, item: Self::Input) -> Result<(), SendError<Self::Input>> {
+        self.head.send(item)
+    }
+
+    fn send_batch<I: IntoIterator<Item = Self::Input> + Send + 'static>(
+        &self,
+        input: I,
+    ) -> JoinHandle<Result<(), SendError<Self::Input>>> {
+        self.head.send_batch(input)
     }
 }
