@@ -52,10 +52,13 @@ where
 
 impl<Input, Output, Func> Clone for PipelineStepMap<Input, Output, Func>
 where
-    Func: Fn(Input) -> Output,
+    Func: Fn(Input) -> Output + Clone,
 {
     fn clone(&self) -> Self {
-        todo!()
+        Self {
+            func: self.func.clone(),
+            _input: self._input,
+        }
     }
 }
 

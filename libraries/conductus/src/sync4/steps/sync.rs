@@ -9,18 +9,34 @@ use crate::sync4::steps::PipelineStep;
 
 pub struct PipelineStepSyncStart;
 
+pub trait SyncMarkedTrait<Input>: Ord {
+    fn into_inner(self) -> Input;
+
+    fn inner(&self) -> &Input;
+    fn mark(&self) -> usize;
+}
 pub struct SyncMarked<Input> {
     mark: usize,
     value: Input,
 }
 
+impl<Input> SyncMarkedTrait<Input> for SyncMarked<Input> {
+    fn into_inner(self) -> Input {
+        self.value
+    }
+
+    fn inner(&self) -> &Input {
+        &self.value
+    }
+
+    fn mark(&self) -> usize {
+        self.mark
+    }
+}
+
 impl<Input> SyncMarked<Input> {
     pub fn new(i: usize, value: Input) -> Self {
         Self { mark: i, value }
-    }
-
-    pub fn inner(&self) -> &Input {
-        &self.value
     }
 }
 
@@ -55,23 +71,46 @@ impl<Input> PipelineStep<Input, SyncMarked<Input>> for PipelineStepSyncStart {
 }
 
 pub struct PipelineStepSyncEnd;
+//
+// impl<Input> PipelineStep<SyncMarked<Input>, Input> for PipelineStepSyncEnd {
+//     fn run<I: IntoIterator<Item = SyncMarked<Input>>>(&self, source: I, target: Sender<Message<Input>>) {
+//         let mut next = 0;
+//         let mut heap = BinaryHeap::new();
+//         for it in source {
+//             heap.push(it);
+//
+//             while let Some(peek) = heap.peek() {
+//                 if peek.mark == next {
+//                     let item = heap.pop().expect("Already checked above");
+//                     if let Err(e) = target.send(Message::Data(item.value)) {
+//                         debug!("Error sending from blanket implementation of PipelineSyncStart: {e}");
+//                     }
+//                     next += 1;
+//                 } else {
+//                     assert!(peek.mark > next);
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+// }
 
-impl<Input> PipelineStep<SyncMarked<Input>, Input> for PipelineStepSyncEnd {
-    fn run<I: IntoIterator<Item = SyncMarked<Input>>>(&self, source: I, target: Sender<Message<Input>>) {
+impl<InnerInput, Input: SyncMarkedTrait<InnerInput>> PipelineStep<Input, InnerInput> for PipelineStepSyncEnd {
+    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {
         let mut next = 0;
         let mut heap = BinaryHeap::new();
         for it in source {
             heap.push(it);
 
             while let Some(peek) = heap.peek() {
-                if peek.mark == next {
+                if peek.mark() == next {
                     let item = heap.pop().expect("Already checked above");
-                    if let Err(e) = target.send(Message::Data(item.value)) {
+                    if let Err(e) = target.send(Message::Data(item.into_inner())) {
                         debug!("Error sending from blanket implementation of PipelineSyncStart: {e}");
                     }
                     next += 1;
                 } else {
-                    assert!(peek.mark > next);
+                    assert!(peek.mark() > next);
                     break;
                 }
             }

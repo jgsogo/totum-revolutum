@@ -5,9 +5,42 @@ use crate::sync4::steps::{
     PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepSyncEnd, PipelineStepSyncStart, PipelineStepWindow,
     SyncMarked,
 };
+use crate::sync4::PipelineTailOps;
 
 pub struct PipelineTail<Output> {
     rx: flume::Receiver<Message<Output>>,
+}
+
+impl<Output: Send + 'static> PipelineTailOps for PipelineTail<Output> {
+    type Output = Output;
+
+    fn trait_pipe<NextOutput: Send + 'static, PS: PipelineStep<Self::Output, NextOutput> + Send + 'static>(
+        self,
+        step: PS,
+        cap: usize,
+    ) -> impl PipelineTailOps<Output = NextOutput> {
+        let (tx, rx) = flume::bounded(cap);
+        std::thread::spawn(move || step.run(self, tx));
+        PipelineTail::new(rx)
+    }
+
+    fn trait_parallel_pipe<
+        NextOutput: Send + 'static,
+        PS: PipelineStep<Self::Output, NextOutput> + Send + 'static + Copy,
+    >(
+        self,
+        step: PS,
+        workers: usize,
+        cap: usize,
+    ) -> impl PipelineTailOps<Output = NextOutput> {
+        let (tx, rx) = flume::bounded(cap);
+        for _ in 0..workers {
+            let tx = tx.clone();
+            let tail = PipelineTail::new(self.rx.clone());
+            std::thread::spawn(move || step.run(tail, tx));
+        }
+        PipelineTail::new(rx)
+    }
 }
 
 impl<Output: Send + 'static> PipelineTail<Output> {
@@ -134,6 +167,7 @@ impl<Output> Iterator for PipelineTailIter<Output> {
 
 #[cfg(test)]
 mod tests {
+    use crate::sync4::steps::SyncMarkedTrait;
     use std::time::Duration;
 
     use super::*;
