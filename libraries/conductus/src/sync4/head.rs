@@ -3,14 +3,14 @@ use flume::SendError;
 use std::thread::JoinHandle;
 
 pub trait PipelineHead {
-    type Input: Send + 'static;
+    type TInput: Send + 'static;
 
-    fn send(&self, item: Self::Input) -> Result<(), SendError<Self::Input>>;
+    fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>>;
 
-    fn send_batch<I: IntoIterator<Item = Self::Input> + Send + 'static>(
+    fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
-    ) -> JoinHandle<Result<(), SendError<Self::Input>>>;
+    ) -> JoinHandle<Result<(), SendError<Self::TInput>>>;
 }
 pub struct PipelineHeadImpl<Input> {
     tx: flume::Sender<Message<Input>>,
@@ -23,9 +23,9 @@ impl<Input: Send + 'static> PipelineHeadImpl<Input> {
 }
 
 impl<Input: Send + 'static> PipelineHead for PipelineHeadImpl<Input> {
-    type Input = Input;
+    type TInput = Input;
 
-    fn send(&self, item: Self::Input) -> Result<(), SendError<Self::Input>> {
+    fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
         self.tx.send(Message::Data(item)).map_err(|e| {
             let Message::Data(msg) = e.into_inner() else {
                 unreachable!()
@@ -34,10 +34,10 @@ impl<Input: Send + 'static> PipelineHead for PipelineHeadImpl<Input> {
         })
     }
 
-    fn send_batch<I: IntoIterator<Item = Self::Input> + Send + 'static>(
+    fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
-    ) -> JoinHandle<Result<(), SendError<Self::Input>>> {
+    ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
         // TODO: We can send a BatchEnd message, maybe
         let tx = self.tx.clone();
         std::thread::spawn(move || {

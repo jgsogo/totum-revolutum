@@ -4,22 +4,32 @@ use flume::SendError;
 
 use crate::sync4::head::PipelineHead;
 use crate::sync4::steps::PipelineStep;
-use crate::sync4::PipelineTailOps;
+use crate::sync4::{PipelineHeadImpl, PipelineTail, PipelineTailOps};
 
 pub struct PipelineImpl<
     Input: Send + 'static,
     Output: Send + 'static,
-    Head: PipelineHead<Input = Input>,
+    Head: PipelineHead<TInput = Input>,
     Tail: PipelineTailOps<Output = Output>,
 > {
     head: Head,
     tail: Tail,
 }
 
+impl<Input: Send + 'static> PipelineImpl<Input, Input, PipelineHeadImpl<Input>, PipelineTail<Input>> {
+    pub fn empty(cap: usize) -> Self {
+        let (tx, rx) = flume::bounded(cap);
+        Self {
+            head: PipelineHeadImpl::new(tx),
+            tail: PipelineTail::new(rx),
+        }
+    }
+}
+
 impl<
         Input: Send + 'static,
         Output: Send + 'static,
-        Head: PipelineHead<Input = Input> + 'static,
+        Head: PipelineHead<TInput = Input> + 'static,
         Tail: PipelineTailOps<Output = Output>,
     > PipelineTailOps for PipelineImpl<Input, Output, Head, Tail>
 {
@@ -51,20 +61,20 @@ impl<
 impl<
         Input: Send + 'static,
         Output: Send + 'static,
-        Head: PipelineHead<Input = Input>,
+        Head: PipelineHead<TInput = Input>,
         Tail: PipelineTailOps<Output = Output>,
     > PipelineHead for PipelineImpl<Input, Output, Head, Tail>
 {
-    type Input = Input;
+    type TInput = Input;
 
-    fn send(&self, item: Self::Input) -> Result<(), SendError<Self::Input>> {
+    fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
         self.head.send(item)
     }
 
-    fn send_batch<I: IntoIterator<Item = Self::Input> + Send + 'static>(
+    fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
-    ) -> JoinHandle<Result<(), SendError<Self::Input>>> {
+    ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
         self.head.send_batch(input)
     }
 }
