@@ -56,3 +56,33 @@ impl<Input: Send + 'static> PipelineHead for PipelineHeadImpl<Input> {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_send() {
+        let (tx, rx) = flume::bounded(20);
+        let head = PipelineHeadImpl::new(tx);
+
+        head.send(10).unwrap();
+        head.send(42).unwrap();
+        drop(head);
+
+        let received = rx.into_iter().collect::<Vec<_>>();
+        assert_eq!(received, vec![Message::Data(10), Message::Data(42),])
+    }
+
+    #[test]
+    fn test_send_batch() {
+        let (tx, rx) = flume::bounded(20);
+        let head = PipelineHeadImpl::new(tx);
+
+        head.send_batch(1..3);
+        drop(head);
+
+        let received = rx.into_iter().collect::<Vec<_>>();
+        assert_eq!(received, vec![Message::Data(1), Message::Data(2),])
+    }
+}

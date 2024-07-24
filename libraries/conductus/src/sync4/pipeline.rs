@@ -7,7 +7,7 @@ use crate::sync4::head::PipelineHead;
 use crate::sync4::tail::PipelineTailIter;
 use crate::sync4::{PipelineHeadImpl, PipelineTail};
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Message<Data> {
     Data(Data),
     Flush,
