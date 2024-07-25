@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 
 use crate::sync4::pipeline::Message;
+use crate::sync4::pipeline_ops::PipelineTailOpsFamily;
 use crate::sync4::steps::{
     PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepSyncEnd, PipelineStepSyncStart, PipelineStepWindow,
     SyncMarked,
@@ -11,28 +12,31 @@ pub struct PipelineTail<Output> {
     rx: flume::Receiver<Message<Output>>,
 }
 
-impl<Output: Send + 'static> PipelineTailOps for PipelineTail<Output> {
-    type Output = Output;
+pub struct PipelineTailFamily;
 
-    fn trait_pipe<NextOutput: Send + 'static, PS: PipelineStep<Self::Output, NextOutput> + Send + 'static>(
+impl PipelineTailOpsFamily for PipelineTailFamily {
+    type PipelineTailOps<NextOutput: Send + 'static> = PipelineTail<NextOutput>;
+}
+
+impl<Output: Send + 'static> PipelineTailOps<Output> for PipelineTail<Output> {
+    type Family = PipelineTailFamily;
+
+    fn trait_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
         self,
         step: PS,
         cap: usize,
-    ) -> impl PipelineTailOps<Output = NextOutput> {
+    ) -> PipelineTail<NextOutput> {
         let (tx, rx) = flume::bounded(cap);
         std::thread::spawn(move || step.run(self, tx));
         PipelineTail::new(rx)
     }
 
-    fn trait_parallel_pipe<
-        NextOutput: Send + 'static,
-        PS: PipelineStep<Self::Output, NextOutput> + Send + 'static + Copy,
-    >(
+    fn trait_parallel_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
         self,
         step: PS,
         workers: usize,
         cap: usize,
-    ) -> impl PipelineTailOps<Output = NextOutput> {
+    ) -> PipelineTail<NextOutput> {
         let (tx, rx) = flume::bounded(cap);
         for _ in 0..workers {
             let tx = tx.clone();
@@ -167,10 +171,28 @@ impl<Output> Iterator for PipelineTailIter<Output> {
 
 #[cfg(test)]
 mod tests {
-    use crate::sync4::steps::SyncMarkedTrait;
     use std::time::Duration;
 
+    use crate::sync4::steps::SyncMarkedTrait;
+
     use super::*;
+
+    #[test]
+    fn test_pipe() {
+        let (tx, rx) = flume::bounded(0);
+        let step = PipelineStepMap::from(|value| {
+            std::thread::sleep(Duration::from_millis(value * 10u64));
+            value
+        });
+        let tail = PipelineTail::new(rx).trait_pipe(step, 2);
+
+        tx.send(Message::Data(10)).unwrap();
+        tx.send(Message::Data(1)).unwrap();
+        drop(tx);
+
+        let out = tail.into_iter().collect::<Vec<_>>();
+        assert_eq!(out, vec![10, 1]);
+    }
 
     #[test]
     fn test_parallel_pipe() {
@@ -179,7 +201,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let tail = PipelineTail::new(rx).parallel_pipe(step, 2, 2);
+        let tail = PipelineTail::new(rx).trait_parallel_pipe(step, 2, 2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();

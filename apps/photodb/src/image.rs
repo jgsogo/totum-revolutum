@@ -26,7 +26,7 @@ pub(crate) fn prepare_image_file(input: impl AsRef<Utf8Path>) -> Result<(NamedUt
     };
 
     // Now run different operations based on format
-    let image = image::io::Reader::open(input.as_ref())?.with_guessed_format()?;
+    let image = image::ImageReader::open(input.as_ref())?.with_guessed_format()?;
     let format = match image.format() {
         Some(ImageFormat::Png) => {
             debug!("PNG: optimize using oxipng");

@@ -4,66 +4,66 @@ use crate::sync4::steps::{
     PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepSyncEnd, PipelineStepSyncStart, PipelineStepWindow,
     SyncMarked, SyncMarkedTrait,
 };
+pub trait PipelineTailOpsFamily {
+    type PipelineTailOps<NextOutput: Send + 'static>: PipelineTailOps<NextOutput>;
+}
 
-pub trait PipelineTailOps: Sized {
-    type Output: Send + 'static;
+pub trait PipelineTailOps<Output: Send + 'static>: Sized {
+    type Family: PipelineTailOpsFamily;
 
-    fn trait_pipe<NextOutput: Send + 'static, PS: PipelineStep<Self::Output, NextOutput> + Send + 'static>(
+    fn trait_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
         self,
         step: PS,
         cap: usize,
-    ) -> impl PipelineTailOps<Output = NextOutput> + 'static;
+    ) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput>;
 
-    fn trait_parallel_pipe<
-        NextOutput: Send + 'static,
-        PS: PipelineStep<Self::Output, NextOutput> + Send + 'static + Copy,
-    >(
+    fn trait_parallel_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
         self,
         step: PS,
         workers: usize,
         cap: usize,
-    ) -> impl PipelineTailOps<Output = NextOutput> + 'static;
+    ) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput>;
 
-    fn trait_map<NextOutput: Send + 'static, Func: Fn(Self::Output) -> NextOutput + Send + 'static>(
+    fn trait_map<NextOutput: Send + 'static, Func: Fn(Output) -> NextOutput + Send + 'static>(
         self,
         func: Func,
         cap: usize,
-    ) -> impl PipelineTailOps<Output = NextOutput> + 'static {
-        let step: PipelineStepMap<Self::Output, NextOutput, Func> = func.into();
+    ) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput> {
+        let step: PipelineStepMap<Output, NextOutput, Func> = func.into();
         self.trait_pipe(step, cap)
     }
 
-    fn trait_parallel_map<NextOutput: Send + 'static, Func: Fn(Self::Output) -> NextOutput + Send + 'static + Copy>(
+    fn trait_parallel_map<NextOutput: Send + 'static, Func: Fn(Output) -> NextOutput + Send + 'static + Copy>(
         self,
         func: Func,
         workers: usize,
         cap: usize,
-    ) -> impl PipelineTailOps<Output = NextOutput> + 'static {
-        let step: PipelineStepMap<Self::Output, NextOutput, Func> = func.into();
+    ) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput> {
+        let step: PipelineStepMap<Output, NextOutput, Func> = func.into();
         self.trait_parallel_pipe(step, workers, cap)
     }
 
-    fn buffer(self, cap: usize) -> impl PipelineTailOps<Output = Self::Output> + 'static {
+    fn buffer(self, cap: usize) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<Output> {
         self.trait_pipe(PipelineStepNoop, cap)
     }
 
-    fn window<NextOutput: Send + 'static, Func: Fn(&VecDeque<Self::Output>) -> NextOutput + Send + 'static>(
+    fn window<NextOutput: Send + 'static, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(
         self,
         func: Func,
         window_size: usize,
         cap: usize,
-    ) -> impl PipelineTailOps<Output = NextOutput> + 'static {
+    ) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput> {
         let step = PipelineStepWindow::new(func, window_size);
         self.trait_pipe(step, cap)
     }
 
-    fn sync_mark(self) -> impl PipelineTailOps<Output = SyncMarked<Self::Output>> + 'static {
+    fn sync_mark(self) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<SyncMarked<Output>> {
         self.trait_pipe(PipelineStepSyncStart, 0)
     }
 
-    fn sync<InnerOutput: Send + 'static>(self) -> impl PipelineTailOps<Output = InnerOutput> + 'static
+    fn sync<InnerOutput: Send + 'static>(self) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<InnerOutput>
     where
-        Self::Output: SyncMarkedTrait<InnerOutput>,
+        Output: SyncMarkedTrait<InnerOutput>,
     {
         self.trait_pipe(PipelineStepSyncEnd, 0)
     }
