@@ -32,7 +32,6 @@ impl<Input: Send + 'static + Debug> PipelineImpl<Input, Input, PipelineHeadImpl<
 }
 
 pub struct PipelineImplFamily<Output, Head, Tail> {
-    // _input: PhantomData<Input>,
     _output: PhantomData<Output>,
     _head: PhantomData<Head>,
     _tail: PhantomData<Tail>,
@@ -89,28 +88,6 @@ impl<
             _output: PhantomData,
         }
     }
-    //
-    //     // fn trait_pipe<NextOutput: Send + 'static, PS: PipelineStep<Self::Output, NextOutput> + Send + 'static>(
-    //     //     self,
-    //     //     step: PS,
-    //     //     cap: usize,
-    //     // ) -> impl PipelineTailOps<Output = NextOutput> + 'static {
-    //     //     let tail = self.tail.trait_pipe(step, cap);
-    //     //     PipelineImpl { head: self.head, tail }
-    //     // }
-    //
-    //     // fn trait_parallel_pipe<
-    //     //     NextOutput: Send + 'static,
-    //     //     PS: PipelineStep<Self::Output, NextOutput> + Send + 'static + Copy,
-    //     // >(
-    //     //     self,
-    //     //     step: PS,
-    //     //     workers: usize,
-    //     //     cap: usize,
-    //     // ) -> impl PipelineTailOps<Output = NextOutput> + 'static {
-    //     //     let tail = self.tail.trait_parallel_pipe(step, workers, cap);
-    //     //     PipelineImpl { head: self.head, tail }
-    //     // }
 }
 
 impl<
