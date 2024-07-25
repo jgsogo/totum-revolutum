@@ -1,4 +1,5 @@
 use std::collections::VecDeque;
+use std::fmt::Debug;
 use std::marker::PhantomData;
 
 use flume::Sender;
@@ -29,6 +30,7 @@ where
 impl<Input, Output, Func> PipelineStep<Input, Output> for PipelineStepWindow<Input, Output, Func>
 where
     Func: Fn(&VecDeque<Input>) -> Output,
+    Input: Debug,
 {
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
         let mut iter = source.into_iter();
@@ -48,7 +50,10 @@ where
         }
 
         // Permanent flow
-        self.window(&w);
+        let out = self.window(&w);
+        if let Err(e) = target.send(Message::Data(out)) {
+            debug!("Error sending from blanket implementation of PipelineStepWindow: {e}");
+        }
         for it in iter {
             w.pop_front();
             w.push_back(it);

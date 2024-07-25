@@ -1,23 +1,24 @@
 use std::collections::VecDeque;
+use std::fmt::Debug;
 use std::thread::JoinHandle;
 
 use flume::SendError;
 
 use crate::sync4::head::PipelineHead;
 use crate::sync4::tail::PipelineTailIter;
-use crate::sync4::{PipelineHeadImpl, PipelineTail};
+use crate::sync4::{PipelineHeadImpl, PipelineTail, PipelineTailOps};
 
 #[derive(Clone, PartialEq, Debug)]
 pub enum Message<Data> {
     Data(Data),
     Flush,
 }
-pub struct Pipeline<Input, Output> {
+pub struct Pipeline<Input, Output: Debug> {
     head: PipelineHeadImpl<Input>,
     tail: PipelineTail<Output>,
 }
 
-impl<Input: Send + 'static> Pipeline<Input, Input> {
+impl<Input: Send + 'static + Debug> Pipeline<Input, Input> {
     pub fn empty(cap: usize) -> Self {
         let (tx, rx) = flume::bounded(cap);
         Self {
@@ -27,7 +28,7 @@ impl<Input: Send + 'static> Pipeline<Input, Input> {
     }
 }
 
-impl<Input: Send + 'static, Output: Send + 'static> Pipeline<Input, Output> {
+impl<Input: Send + 'static, Output: Send + 'static + Debug> Pipeline<Input, Output> {
     pub fn ends(self) -> (PipelineHeadImpl<Input>, PipelineTail<Output>) {
         let Pipeline { head, tail } = self;
         (head, tail)
@@ -44,12 +45,12 @@ impl<Input: Send + 'static, Output: Send + 'static> Pipeline<Input, Output> {
         self.head.send_batch(input)
     }
 
-    pub fn map<NextOutput: Send + 'static, Func: Fn(Output) -> NextOutput + Send + 'static>(
+    pub fn map<NextOutput: Send + 'static + Debug, Func: Fn(Output) -> NextOutput + Send + 'static>(
         self,
         step: Func,
         cap: usize,
     ) -> Pipeline<Input, NextOutput> {
-        let tail = self.tail.map(step, cap);
+        let tail = self.tail.trait_map(step, cap);
         Pipeline { head: self.head, tail }
     }
 
@@ -63,7 +64,7 @@ impl<Input: Send + 'static, Output: Send + 'static> Pipeline<Input, Output> {
         self.tail.into_iter()
     }
 
-    pub fn window<NextOutput: Send + 'static, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(
+    pub fn window<NextOutput: Send + 'static + Debug, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(
         self,
         func: Func,
         window_size: usize,
@@ -74,7 +75,7 @@ impl<Input: Send + 'static, Output: Send + 'static> Pipeline<Input, Output> {
     }
 }
 
-impl<Input, Output> IntoIterator for Pipeline<Input, Output> {
+impl<Input, Output: Debug> IntoIterator for Pipeline<Input, Output> {
     type Item = Output;
     type IntoIter = PipelineTailIter<Output>;
 
@@ -140,7 +141,7 @@ mod tests {
         let pipeline = Pipeline::empty(2).map(|input: i32| input * 2, 2);
         let (head, tail) = pipeline.ends();
         let (t1, t2) = tail.split();
-        let t2 = t2.map(|input| input * 2, 2);
+        let t2 = t2.trait_map(|input| input * 2, 2);
 
         head.send_batch(0..3);
 

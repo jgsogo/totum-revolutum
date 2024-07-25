@@ -1,30 +1,34 @@
 use std::collections::VecDeque;
+use std::fmt::Debug;
 
 use crate::sync4::steps::{
     PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepSyncEnd, PipelineStepSyncStart, PipelineStepWindow,
     SyncMarked, SyncMarkedTrait,
 };
 pub trait PipelineTailOpsFamily {
-    type PipelineTailOps<NextOutput: Send + 'static>: PipelineTailOps<NextOutput>;
+    type PipelineTailOps<NextOutput: Send + 'static + Debug>: PipelineTailOps<NextOutput>;
 }
 
-pub trait PipelineTailOps<Output: Send + 'static>: Sized {
+pub trait PipelineTailOps<Output: Send + 'static + Debug>: Sized {
     type Family: PipelineTailOpsFamily;
 
-    fn trait_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
+    fn trait_pipe<NextOutput: Send + 'static + Debug, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
         self,
         step: PS,
         cap: usize,
     ) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput>;
 
-    fn trait_parallel_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
+    fn trait_parallel_pipe<
+        NextOutput: Send + 'static + Debug,
+        PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy,
+    >(
         self,
         step: PS,
         workers: usize,
         cap: usize,
     ) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput>;
 
-    fn trait_map<NextOutput: Send + 'static, Func: Fn(Output) -> NextOutput + Send + 'static>(
+    fn trait_map<NextOutput: Send + 'static + Debug, Func: Fn(Output) -> NextOutput + Send + 'static>(
         self,
         func: Func,
         cap: usize,
@@ -33,7 +37,10 @@ pub trait PipelineTailOps<Output: Send + 'static>: Sized {
         self.trait_pipe(step, cap)
     }
 
-    fn trait_parallel_map<NextOutput: Send + 'static, Func: Fn(Output) -> NextOutput + Send + 'static + Copy>(
+    fn trait_parallel_map<
+        NextOutput: Send + 'static + Debug,
+        Func: Fn(Output) -> NextOutput + Send + 'static + Copy,
+    >(
         self,
         func: Func,
         workers: usize,
@@ -47,7 +54,7 @@ pub trait PipelineTailOps<Output: Send + 'static>: Sized {
         self.trait_pipe(PipelineStepNoop, cap)
     }
 
-    fn window<NextOutput: Send + 'static, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(
+    fn window<NextOutput: Send + 'static + Debug, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(
         self,
         func: Func,
         window_size: usize,
@@ -61,7 +68,9 @@ pub trait PipelineTailOps<Output: Send + 'static>: Sized {
         self.trait_pipe(PipelineStepSyncStart, 0)
     }
 
-    fn sync<InnerOutput: Send + 'static>(self) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<InnerOutput>
+    fn sync<InnerOutput: Send + 'static + Debug>(
+        self,
+    ) -> <Self::Family as PipelineTailOpsFamily>::PipelineTailOps<InnerOutput>
     where
         Output: SyncMarkedTrait<InnerOutput>,
     {

@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::thread::JoinHandle;
 
@@ -10,7 +11,7 @@ use crate::sync4::{PipelineHeadImpl, PipelineTail, PipelineTailOps};
 
 pub struct PipelineImpl<
     Input: Send + 'static,
-    Output: Send + 'static,
+    Output: Send + 'static + Debug,
     Head: PipelineHead<TInput = Input>,
     Tail: PipelineTailOps<Output>,
 > {
@@ -19,7 +20,7 @@ pub struct PipelineImpl<
     _output: PhantomData<Output>,
 }
 
-impl<Input: Send + 'static> PipelineImpl<Input, Input, PipelineHeadImpl<Input>, PipelineTail<Input>> {
+impl<Input: Send + 'static + Debug> PipelineImpl<Input, Input, PipelineHeadImpl<Input>, PipelineTail<Input>> {
     pub fn empty(cap: usize) -> Self {
         let (tx, rx) = flume::bounded(cap);
         Self {
@@ -39,25 +40,25 @@ pub struct PipelineImplFamily<Output, Head, Tail> {
 
 impl<
         Input: Send + 'static,
-        Output: Send + 'static,
+        Output: Send + 'static + Debug,
         Head: PipelineHead<TInput = Input> + 'static,
         Tail: PipelineTailOps<Output>,
     > PipelineTailOpsFamily for PipelineImplFamily<Output, Head, Tail>
 {
-    type PipelineTailOps<NextOutput: Send + 'static> =
+    type PipelineTailOps<NextOutput: Send + 'static + Debug> =
         PipelineImpl<Input, NextOutput, Head, <Tail::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput>>;
 }
 
 impl<
         Input: Send + 'static,
-        Output: Send + 'static,
+        Output: Send + 'static + Debug,
         Head: PipelineHead<TInput = Input> + 'static,
         Tail: PipelineTailOps<Output>,
     > PipelineTailOps<Output> for PipelineImpl<Input, Output, Head, Tail>
 {
     type Family = PipelineImplFamily<Output, Head, Tail>;
 
-    fn trait_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
+    fn trait_pipe<NextOutput: Send + 'static + Debug, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
         self,
         step: PS,
         cap: usize,
@@ -71,7 +72,10 @@ impl<
         }
     }
 
-    fn trait_parallel_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
+    fn trait_parallel_pipe<
+        NextOutput: Send + 'static + Debug,
+        PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy,
+    >(
         self,
         step: PS,
         workers: usize,
@@ -111,7 +115,7 @@ impl<
 
 impl<
         Input: Send + 'static,
-        Output: Send + 'static,
+        Output: Send + 'static + Debug,
         Head: PipelineHead<TInput = Input>,
         Tail: PipelineTailOps<Output>,
     > PipelineHead for PipelineImpl<Input, Output, Head, Tail>
