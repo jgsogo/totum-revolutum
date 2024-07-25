@@ -1,12 +1,8 @@
-use std::collections::VecDeque;
 use std::fmt::Debug;
 
 use crate::sync4::pipeline::Message;
 use crate::sync4::pipeline_ops::PipelineTailOpsFamily;
-use crate::sync4::steps::{
-    PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepSyncEnd, PipelineStepSyncStart, PipelineStepWindow,
-    SyncMarked,
-};
+use crate::sync4::steps::PipelineStep;
 use crate::sync4::PipelineTailOps;
 
 pub struct PipelineTail<Output: Debug> {
@@ -54,77 +50,6 @@ impl<Output: Send + 'static + Debug> PipelineTailOps<Output> for PipelineTail<Ou
 impl<Output: Send + 'static + Debug> PipelineTail<Output> {
     pub(crate) fn new(rx: flume::Receiver<Message<Output>>) -> Self {
         Self { rx }
-    }
-
-    // pub fn pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
-    //     self,
-    //     step: PS,
-    //     cap: usize,
-    // ) -> PipelineTail<NextOutput> {
-    //     let (tx, rx) = flume::bounded(cap);
-    //     std::thread::spawn(move || step.run(self, tx));
-    //     PipelineTail::new(rx)
-    // }
-    //
-    // pub fn parallel_pipe<NextOutput: Send + 'static, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
-    //     self,
-    //     step: PS,
-    //     workers: usize,
-    //     cap: usize,
-    // ) -> PipelineTail<NextOutput> {
-    //     let (tx, rx) = flume::bounded(cap);
-    //     for _ in 0..workers {
-    //         let tx = tx.clone();
-    //         let tail = PipelineTail::new(self.rx.clone());
-    //         std::thread::spawn(move || step.run(tail, tx));
-    //     }
-    //     PipelineTail::new(rx)
-    // }
-
-    // pub fn map<NextOutput: Send + 'static, Func: Fn(Output) -> NextOutput + Send + 'static>(
-    //     self,
-    //     step: Func,
-    //     cap: usize,
-    // ) -> PipelineTail<NextOutput> {
-    //     let step: PipelineStepMap<Output, NextOutput, Func> = step.into();
-    //     self.pipe(step, cap)
-    // }
-
-    pub fn parallel_map<NextOutput: Send + 'static + Debug, Func: Fn(Output) -> NextOutput + Send + 'static + Copy>(
-        self,
-        step: Func,
-        workers: usize,
-        cap: usize,
-    ) -> PipelineTail<NextOutput> {
-        let step: PipelineStepMap<Output, NextOutput, Func> = step.into();
-        self.trait_parallel_pipe(step, workers, cap)
-    }
-
-    pub fn buffer(self, cap: usize) -> Self {
-        let step = PipelineStepNoop;
-        self.trait_pipe(step, cap)
-    }
-
-    pub fn window<NextOutput: Send + 'static + Debug, Func: Fn(&VecDeque<Output>) -> NextOutput + Send + 'static>(
-        self,
-        func: Func,
-        window_size: usize,
-        cap: usize,
-    ) -> PipelineTail<NextOutput> {
-        let step = PipelineStepWindow::new(func, window_size);
-        self.trait_pipe(step, cap)
-    }
-
-    pub fn sync_mark(self) -> PipelineTail<SyncMarked<Output>> {
-        let step = PipelineStepSyncStart;
-        self.trait_pipe(step, 0)
-    }
-}
-
-impl<Output: Send + 'static + Debug> PipelineTail<SyncMarked<Output>> {
-    pub fn sync(self) -> PipelineTail<Output> {
-        let step = PipelineStepSyncEnd;
-        self.trait_pipe(step, 0)
     }
 }
 
@@ -287,7 +212,7 @@ mod tests {
         let (tx, rx) = flume::bounded(0);
         let tail = PipelineTail::new(rx)
             .sync_mark()
-            .parallel_map(
+            .trait_parallel_map(
                 |value| {
                     let inner = value.inner();
                     std::thread::sleep(Duration::from_millis((inner * 10) as u64));
