@@ -9,6 +9,12 @@ pub struct PipelineTail<Output: Debug> {
     rx: flume::Receiver<Message<Output>>,
 }
 
+impl<Output: Send + 'static + Debug> PipelineTail<Output> {
+    pub(crate) fn new(rx: flume::Receiver<Message<Output>>) -> Self {
+        Self { rx }
+    }
+}
+
 pub struct PipelineTailFamily;
 
 impl PipelineTailOpsFamily for PipelineTailFamily {
@@ -44,12 +50,6 @@ impl<Output: Send + 'static + Debug> PipelineTailOps<Output> for PipelineTail<Ou
             std::thread::spawn(move || step.run(tail, tx));
         }
         PipelineTail::new(rx)
-    }
-}
-
-impl<Output: Send + 'static + Debug> PipelineTail<Output> {
-    pub(crate) fn new(rx: flume::Receiver<Message<Output>>) -> Self {
-        Self { rx }
     }
 }
 
@@ -102,7 +102,7 @@ impl<Output: Debug> Iterator for PipelineTailIter<Output> {
 mod tests {
     use std::time::Duration;
 
-    use crate::sync4::steps::SyncMarkedTrait;
+    use crate::sync4::steps::{PipelineStepMap, SyncMarkedTrait};
 
     use super::*;
 

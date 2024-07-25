@@ -100,6 +100,6 @@ mod tests {
                 Message::Flush => None,
             })
             .collect::<Vec<_>>();
-        assert_eq!(r, vec![vec![1, 2, 3], vec![2, 3, 4], vec![3, 4, 5]])
+        assert_eq!(r, vec![vec![0, 1, 2], vec![1, 2, 3], vec![2, 3, 4], vec![3, 4, 5]])
     }
 }
