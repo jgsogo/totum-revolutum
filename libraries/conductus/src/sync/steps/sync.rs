@@ -10,7 +10,7 @@ use crate::sync::{Message, PipelineData};
 
 pub struct PipelineStepSyncStart;
 
-pub trait SyncMarkedTrait<Input>: Ord + PipelineData {
+pub trait SyncMarkedTrait<Input: PipelineData>: Ord + PipelineData {
     fn into_inner(self) -> Input;
 
     fn inner(&self) -> &Input;
@@ -18,7 +18,7 @@ pub trait SyncMarkedTrait<Input>: Ord + PipelineData {
 }
 
 #[derive(Debug)]
-pub struct SyncMarked<Input> {
+pub struct SyncMarked<Input: PipelineData> {
     mark: usize,
     value: Input,
 }
@@ -37,33 +37,33 @@ impl<Input: PipelineData> SyncMarkedTrait<Input> for SyncMarked<Input> {
     }
 }
 
-impl<Input> SyncMarked<Input> {
+impl<Input: PipelineData> SyncMarked<Input> {
     pub fn new(i: usize, value: Input) -> Self {
         Self { mark: i, value }
     }
 }
 
-impl<Input> Eq for SyncMarked<Input> {}
+impl<Input: PipelineData> Eq for SyncMarked<Input> {}
 
-impl<Input> PartialEq<Self> for SyncMarked<Input> {
+impl<Input: PipelineData> PartialEq<Self> for SyncMarked<Input> {
     fn eq(&self, other: &Self) -> bool {
         self.mark == other.mark
     }
 }
 
-impl<Input> PartialOrd<Self> for SyncMarked<Input> {
+impl<Input: PipelineData> PartialOrd<Self> for SyncMarked<Input> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl<Input> Ord for SyncMarked<Input> {
+impl<Input: PipelineData> Ord for SyncMarked<Input> {
     fn cmp(&self, other: &Self) -> Ordering {
         other.mark.cmp(&self.mark)
     }
 }
 
-impl<Input> PipelineStep<Input, SyncMarked<Input>> for PipelineStepSyncStart {
+impl<Input: PipelineData> PipelineStep<Input, SyncMarked<Input>> for PipelineStepSyncStart {
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<SyncMarked<Input>>>) {
         for (i, it) in source.into_iter().enumerate() {
             if let Err(e) = target.send(Message::Data(SyncMarked::new(i, it))) {
@@ -75,7 +75,9 @@ impl<Input> PipelineStep<Input, SyncMarked<Input>> for PipelineStepSyncStart {
 
 pub struct PipelineStepSyncEnd;
 
-impl<InnerInput, Input: SyncMarkedTrait<InnerInput>> PipelineStep<Input, InnerInput> for PipelineStepSyncEnd {
+impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStep<Input, InnerInput>
+    for PipelineStepSyncEnd
+{
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {
         let mut next = 0;
         let mut heap = BinaryHeap::new();

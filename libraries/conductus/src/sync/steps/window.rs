@@ -1,36 +1,35 @@
 use std::collections::VecDeque;
-use std::fmt::Debug;
 use std::marker::PhantomData;
 
 use flume::Sender;
 use tracing::{debug, warn};
 
-use crate::sync::Message;
+use crate::sync::{Message, PipelineData};
 
 use super::PipelineStep;
 
-pub struct PipelineStepWindow<Input, Output, Func>
+pub struct PipelineStepWindow<Input: PipelineData, Output: PipelineData, Func>
 where
-    Func: Fn(&VecDeque<Input>) -> Output,
+    Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,
 {
     window_size: usize,
     func: Func,
     _input: PhantomData<Input>,
 }
 
-impl<Input, Output, Func> PipelineStepWindow<Input, Output, Func>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepWindow<Input, Output, Func>
 where
-    Func: Fn(&VecDeque<Input>) -> Output,
+    Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,
 {
     pub fn window(&self, input: &VecDeque<Input>) -> Output {
         (self.func)(input)
     }
 }
 
-impl<Input, Output, Func> PipelineStep<Input, Output> for PipelineStepWindow<Input, Output, Func>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStep<Input, Output>
+    for PipelineStepWindow<Input, Output, Func>
 where
-    Func: Fn(&VecDeque<Input>) -> Output,
-    Input: Debug,
+    Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,
 {
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
         let mut iter = source.into_iter();
@@ -65,9 +64,9 @@ where
     }
 }
 
-impl<Input, Output, Func> PipelineStepWindow<Input, Output, Func>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepWindow<Input, Output, Func>
 where
-    Func: Fn(&VecDeque<Input>) -> Output,
+    Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,
 {
     pub fn new(func: Func, window_size: usize) -> Self {
         Self {

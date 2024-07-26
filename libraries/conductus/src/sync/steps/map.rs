@@ -3,30 +3,31 @@ use std::marker::PhantomData;
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync::Message;
+use crate::sync::{Message, PipelineData};
 
 use super::PipelineStep;
 
-pub struct PipelineStepMap<Input, Output, Func>
+pub struct PipelineStepMap<Input: PipelineData, Output: PipelineData, Func>
 where
-    Func: Fn(Input) -> Output,
+    Func: Fn(Input) -> Output + Send + 'static,
 {
     func: Func,
     _input: PhantomData<Input>,
 }
 
-impl<Input, Output, Func> PipelineStepMap<Input, Output, Func>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepMap<Input, Output, Func>
 where
-    Func: Fn(Input) -> Output,
+    Func: Fn(Input) -> Output + Send + 'static,
 {
     pub fn map(&self, input: Input) -> Output {
         (self.func)(input)
     }
 }
 
-impl<Input, Output, Func> PipelineStep<Input, Output> for PipelineStepMap<Input, Output, Func>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStep<Input, Output>
+    for PipelineStepMap<Input, Output, Func>
 where
-    Func: Fn(Input) -> Output,
+    Func: Fn(Input) -> Output + Send + 'static,
 {
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
         for it in source {
@@ -38,9 +39,9 @@ where
     }
 }
 
-impl<Input, Output, Func> From<Func> for PipelineStepMap<Input, Output, Func>
+impl<Input: PipelineData, Output: PipelineData, Func> From<Func> for PipelineStepMap<Input, Output, Func>
 where
-    Func: Fn(Input) -> Output,
+    Func: Fn(Input) -> Output + Send + 'static,
 {
     fn from(value: Func) -> Self {
         PipelineStepMap {
@@ -50,9 +51,9 @@ where
     }
 }
 
-impl<Input, Output, Func> Clone for PipelineStepMap<Input, Output, Func>
+impl<Input: PipelineData, Output: PipelineData, Func> Clone for PipelineStepMap<Input, Output, Func>
 where
-    Func: Fn(Input) -> Output + Clone,
+    Func: Fn(Input) -> Output + Clone + Send + 'static,
 {
     fn clone(&self) -> Self {
         Self {
@@ -62,7 +63,10 @@ where
     }
 }
 
-impl<Input, Output, Func> Copy for PipelineStepMap<Input, Output, Func> where Func: Fn(Input) -> Output + Copy {}
+impl<Input: PipelineData, Output: PipelineData, Func> Copy for PipelineStepMap<Input, Output, Func> where
+    Func: Fn(Input) -> Output + Copy + Send + 'static
+{
+}
 
 #[cfg(test)]
 mod tests {
