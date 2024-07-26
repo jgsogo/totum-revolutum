@@ -1,9 +1,8 @@
-use log::debug;
-
 use crate::sync::steps::PipelineStep;
 use crate::sync::tail::PipelineTailFamily;
 use crate::sync::PipelineTail;
 use crate::sync::{Message, PipelineData};
+use tracing::debug;
 
 pub struct PipelineTailImpl<Output: PipelineData> {
     rx: flume::Receiver<Message<Output>>,
