@@ -2,6 +2,7 @@ use crate::sync::steps::PipelineStep;
 use crate::sync::tail::PipelineTailFamily;
 use crate::sync::PipelineTail;
 use crate::sync::{Message, PipelineData};
+use tracing::debug;
 
 pub struct PipelineTailImpl<Output: PipelineData> {
     rx: flume::Receiver<Message<Output>>,
@@ -88,9 +89,15 @@ impl<Output: PipelineData> Iterator for PipelineTailIter<Output> {
         match self.tail.rx.recv() {
             Ok(msg) => match msg {
                 Message::Data(data) => Some(data),
-                Message::Flush => None,
+                Message::Stop(reason) => {
+                    debug!("Stop iteration due to data error: {reason}");
+                    None
+                }
             },
-            Err(_) => None,
+            Err(e) => {
+                debug!("Stop iteration due to receive error: {e}");
+                None
+            }
         }
     }
 }

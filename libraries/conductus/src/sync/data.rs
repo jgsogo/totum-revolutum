@@ -4,7 +4,7 @@ use std::fmt::Debug;
 #[derive(Clone, PartialEq, Debug)]
 pub enum Message<Data: PipelineData> {
     Data(Data),
-    Flush,
+    Stop(String),
 }
 
 /// All the traits that must fulfill anything sent through a pipeline in `conductus` library

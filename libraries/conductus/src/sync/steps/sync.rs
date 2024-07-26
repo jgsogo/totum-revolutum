@@ -120,7 +120,7 @@ mod tests {
             .into_iter()
             .filter_map(|it| match it {
                 Message::Data(d) => Some(d),
-                Message::Flush => None,
+                Message::Stop(_) => None,
             })
             .collect::<Vec<_>>();
         assert_eq!(r, vec![SyncMarked::new(0, 10), SyncMarked::new(1, 11)]);
@@ -138,7 +138,7 @@ mod tests {
             .into_iter()
             .filter_map(|it| match it {
                 Message::Data(d) => Some(d),
-                Message::Flush => None,
+                Message::Stop(_) => None,
             })
             .collect::<Vec<_>>();
         assert_eq!(r, vec![10, 11, 12]);

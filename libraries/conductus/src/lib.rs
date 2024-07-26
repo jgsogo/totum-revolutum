@@ -1,7 +1,5 @@
-pub use error::{Error, Result};
 pub use r#async::PipelineAsync;
-
-pub mod error;
+pub use sync::Pipeline as PipelineSync;
 
 pub mod r#async;
 
