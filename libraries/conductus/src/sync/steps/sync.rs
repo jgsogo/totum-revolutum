@@ -8,6 +8,9 @@ use tracing::debug;
 use crate::sync::steps::PipelineStep;
 use crate::sync::{Message, PipelineData};
 
+/// A [`PipelineStep`] that wraps every input into a [`SyncMarked`]. This wrapper contains a
+/// mark that can be used by [`PipelineStepSyncEnd`] to reorder the stream of data to
+/// match the input order.
 pub struct PipelineStepSyncStart;
 
 pub trait SyncMarkedTrait<Input: PipelineData>: Ord + PipelineData {
@@ -73,6 +76,8 @@ impl<Input: PipelineData> PipelineStep<Input, SyncMarked<Input>> for PipelineSte
     }
 }
 
+/// A [`PipelineStep`] that can be added to a pipeline to reorder a stream of [`SyncMarked`] data
+/// following the input order.
 pub struct PipelineStepSyncEnd;
 
 impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStep<Input, InnerInput>

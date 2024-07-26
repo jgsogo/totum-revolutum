@@ -5,6 +5,7 @@ use crate::sync::{Message, PipelineData};
 
 use super::PipelineStep;
 
+/// A [`PipelineStep`] that does nothing
 #[derive(Default)]
 pub struct PipelineStepNoop;
 

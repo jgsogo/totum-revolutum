@@ -7,6 +7,7 @@ use crate::sync::{Message, PipelineData};
 
 use super::PipelineStep;
 
+/// A [`PipelineStep`] that applies a mapping function to every input
 pub struct PipelineStepMap<Input: PipelineData, Output: PipelineData, Func>
 where
     Func: Fn(Input) -> Output + Send + 'static,
