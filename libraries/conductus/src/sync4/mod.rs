@@ -1,12 +1,12 @@
 pub use data::Message;
 pub use head::PipelineHeadImpl;
-pub use pipeline_impl::Pipeline;
+pub use pipeline::Pipeline;
 pub use pipeline_ops::PipelineTailOps;
 pub use tail::PipelineTail;
 
 mod data;
 mod head;
-mod pipeline_impl;
+mod pipeline;
 mod pipeline_ops;
 pub mod steps;
 mod tail;
