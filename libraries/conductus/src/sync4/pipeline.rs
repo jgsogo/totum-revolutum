@@ -5,16 +5,16 @@ use std::thread::JoinHandle;
 use flume::SendError;
 
 use crate::sync4::head::PipelineHead;
-use crate::sync4::pipeline_ops::PipelineTailOpsFamily;
 use crate::sync4::steps::PipelineStep;
-use crate::sync4::tail::PipelineTailIter;
-use crate::sync4::{PipelineHeadImpl, PipelineTailImpl, PipelineTailOps};
+use crate::sync4::tail::PipelineTailFamily;
+use crate::sync4::tail_impl::PipelineTailIter;
+use crate::sync4::{PipelineHeadImpl, PipelineTail, PipelineTailImpl};
 
 pub struct Pipeline<
     Input: Send + 'static,
     Output: Send + 'static + Debug,
     Head: PipelineHead<TInput = Input>,
-    Tail: PipelineTailOps<Output>,
+    Tail: PipelineTail<Output>,
 > {
     head: Head,
     tail: Tail,
@@ -50,19 +50,19 @@ impl<
         Input: Send + 'static,
         Output: Send + 'static + Debug,
         Head: PipelineHead<TInput = Input> + 'static,
-        Tail: PipelineTailOps<Output>,
-    > PipelineTailOpsFamily for PipelineImplFamily<Output, Head, Tail>
+        Tail: PipelineTail<Output>,
+    > PipelineTailFamily for PipelineImplFamily<Output, Head, Tail>
 {
     type PipelineTailOps<NextOutput: Send + 'static + Debug> =
-        Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput>>;
+        Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>>;
 }
 
 impl<
         Input: Send + 'static,
         Output: Send + 'static + Debug,
         Head: PipelineHead<TInput = Input> + 'static,
-        Tail: PipelineTailOps<Output>,
-    > PipelineTailOps<Output> for Pipeline<Input, Output, Head, Tail>
+        Tail: PipelineTail<Output>,
+    > PipelineTail<Output> for Pipeline<Input, Output, Head, Tail>
 {
     type Family = PipelineImplFamily<Output, Head, Tail>;
 
@@ -70,7 +70,7 @@ impl<
         self,
         step: PS,
         cap: usize,
-    ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput>> {
+    ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>> {
         let tail = self.tail.trait_pipe(step, cap);
         Pipeline {
             head: self.head,
@@ -87,7 +87,7 @@ impl<
         step: PS,
         workers: usize,
         cap: usize,
-    ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailOpsFamily>::PipelineTailOps<NextOutput>> {
+    ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>> {
         let tail = self.tail.trait_parallel_pipe(step, workers, cap);
         Pipeline {
             head: self.head,
@@ -101,7 +101,7 @@ impl<
         Input: Send + 'static,
         Output: Send + 'static + Debug,
         Head: PipelineHead<TInput = Input>,
-        Tail: PipelineTailOps<Output>,
+        Tail: PipelineTail<Output>,
     > PipelineHead for Pipeline<Input, Output, Head, Tail>
 {
     type TInput = Input;
@@ -122,7 +122,7 @@ impl<
         Input: Send + 'static,
         Output: Send + 'static + Debug,
         Head: PipelineHead<TInput = Input>,
-        Tail: PipelineTailOps<Output> + IntoIterator<Item = Output>,
+        Tail: PipelineTail<Output> + IntoIterator<Item = Output>,
     > IntoIterator for Pipeline<Input, Output, Head, Tail>
 {
     type Item = Output;
