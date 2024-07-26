@@ -30,7 +30,6 @@ impl<Input: PipelineData> PipelineHead for PipelineHeadImpl<Input> {
         &self,
         input: I,
     ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
-        // TODO: We can send a BatchEnd message, maybe
         let tx = self.tx.clone();
         std::thread::spawn(move || {
             let r: Result<Vec<_>, _> = input
