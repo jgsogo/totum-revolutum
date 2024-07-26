@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
-use crate::sync4::pipeline::Message;
 use crate::sync4::pipeline_ops::PipelineTailOpsFamily;
 use crate::sync4::steps::PipelineStep;
+use crate::sync4::Message;
 use crate::sync4::PipelineTailOps;
 
 pub struct PipelineTail<Output: Debug> {

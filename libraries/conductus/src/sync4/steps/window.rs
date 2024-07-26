@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 use flume::Sender;
 use tracing::{debug, warn};
 
-use crate::sync4::pipeline::Message;
+use crate::sync4::Message;
 
 use super::PipelineStep;
 

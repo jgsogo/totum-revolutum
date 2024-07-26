@@ -4,8 +4,8 @@ use std::collections::BinaryHeap;
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync4::pipeline::Message;
 use crate::sync4::steps::PipelineStep;
+use crate::sync4::Message;
 
 pub struct PipelineStepSyncStart;
 

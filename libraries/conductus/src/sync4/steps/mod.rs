@@ -1,9 +1,8 @@
+use crate::sync4::Message;
 pub use map::PipelineStepMap;
 pub use noop::PipelineStepNoop;
 pub use sync::{PipelineStepSyncEnd, PipelineStepSyncStart, SyncMarked, SyncMarkedTrait};
 pub use window::PipelineStepWindow;
-
-use super::pipeline::Message;
 
 mod map;
 mod noop;
