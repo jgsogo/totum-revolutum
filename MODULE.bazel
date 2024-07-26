@@ -77,6 +77,7 @@ crate.from_cargo(
         "//:Cargo.toml",
         "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
+        "//libraries/conductus:Cargo.toml",
         "//libraries/constants:Cargo.toml",
         "//libraries/cron:Cargo.toml",
         "//libraries/diesel_utils:Cargo.toml",
