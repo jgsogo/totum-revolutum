@@ -1,5 +1,5 @@
-use crate::sync4::head::PipelineHead;
-use crate::sync4::Message;
+use crate::sync::Message;
+use crate::sync::PipelineHead;
 use flume::SendError;
 use std::thread::JoinHandle;
 
@@ -51,7 +51,7 @@ impl<Input: Send + 'static> PipelineHead for PipelineHeadImpl<Input> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sync4::head::PipelineHead;
+    use crate::sync::head::PipelineHead;
 
     #[test]
     fn test_send() {

@@ -1,4 +1,5 @@
 pub use data::Message;
+pub use head::PipelineHead;
 pub use head_impl::PipelineHeadImpl;
 pub use pipeline::Pipeline;
 pub use tail::PipelineTail;

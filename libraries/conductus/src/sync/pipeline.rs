@@ -4,11 +4,10 @@ use std::thread::JoinHandle;
 
 use flume::SendError;
 
-use crate::sync4::head::PipelineHead;
-use crate::sync4::steps::PipelineStep;
-use crate::sync4::tail::PipelineTailFamily;
-use crate::sync4::tail_impl::PipelineTailIter;
-use crate::sync4::{PipelineHeadImpl, PipelineTail, PipelineTailImpl};
+use crate::sync::steps::PipelineStep;
+use crate::sync::tail::PipelineTailFamily;
+use crate::sync::tail_impl::PipelineTailIter;
+use crate::sync::{PipelineHead, PipelineHeadImpl, PipelineTail, PipelineTailImpl};
 
 pub struct Pipeline<
     Input: Send + 'static,
@@ -137,7 +136,7 @@ impl<
 mod tests {
     use std::time::Duration;
 
-    use crate::sync4::steps::PipelineStepMap;
+    use crate::sync::steps::PipelineStepMap;
 
     use super::*;
 

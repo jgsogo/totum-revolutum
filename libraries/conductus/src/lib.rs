@@ -5,4 +5,4 @@ pub mod error;
 
 pub mod r#async;
 
-pub mod sync4;
+pub mod sync;

@@ -1,4 +1,4 @@
-use crate::sync4::Message;
+use crate::sync::Message;
 pub use map::PipelineStepMap;
 pub use noop::PipelineStepNoop;
 pub use sync::{PipelineStepSyncEnd, PipelineStepSyncStart, SyncMarked, SyncMarkedTrait};

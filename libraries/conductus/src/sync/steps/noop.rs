@@ -1,7 +1,7 @@
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync4::Message;
+use crate::sync::Message;
 
 use super::PipelineStep;
 

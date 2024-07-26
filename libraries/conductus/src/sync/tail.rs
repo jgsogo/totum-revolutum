@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::fmt::Debug;
 
-use crate::sync4::steps::{
+use crate::sync::steps::{
     PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepSyncEnd, PipelineStepSyncStart, PipelineStepWindow,
     SyncMarked, SyncMarkedTrait,
 };

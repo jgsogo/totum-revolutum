@@ -1,9 +1,9 @@
 use std::fmt::Debug;
 
-use crate::sync4::steps::PipelineStep;
-use crate::sync4::tail::PipelineTailFamily;
-use crate::sync4::Message;
-use crate::sync4::PipelineTail;
+use crate::sync::steps::PipelineStep;
+use crate::sync::tail::PipelineTailFamily;
+use crate::sync::Message;
+use crate::sync::PipelineTail;
 
 pub struct PipelineTailImpl<Output: Debug> {
     rx: flume::Receiver<Message<Output>>,
@@ -102,7 +102,7 @@ impl<Output: Debug> Iterator for PipelineTailIter<Output> {
 mod tests {
     use std::time::Duration;
 
-    use crate::sync4::steps::{PipelineStepMap, SyncMarkedTrait};
+    use crate::sync::steps::{PipelineStepMap, SyncMarkedTrait};
 
     use super::*;
 
