@@ -89,7 +89,7 @@ mod tests {
             .into_iter()
             .filter_map(|it| match it {
                 Message::Data(d) => Some(d),
-                Message::Flush => None,
+                Message::Stop(_) => None,
             })
             .collect::<Vec<_>>();
         assert_eq!(r, vec![0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
