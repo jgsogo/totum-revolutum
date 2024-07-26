@@ -5,11 +5,11 @@ use crate::sync4::steps::PipelineStep;
 use crate::sync4::Message;
 use crate::sync4::PipelineTailOps;
 
-pub struct PipelineTail<Output: Debug> {
+pub struct PipelineTailImpl<Output: Debug> {
     rx: flume::Receiver<Message<Output>>,
 }
 
-impl<Output: Send + 'static + Debug> PipelineTail<Output> {
+impl<Output: Send + 'static + Debug> PipelineTailImpl<Output> {
     pub(crate) fn new(rx: flume::Receiver<Message<Output>>) -> Self {
         Self { rx }
     }
@@ -18,20 +18,20 @@ impl<Output: Send + 'static + Debug> PipelineTail<Output> {
 pub struct PipelineTailFamily;
 
 impl PipelineTailOpsFamily for PipelineTailFamily {
-    type PipelineTailOps<NextOutput: Send + 'static + Debug> = PipelineTail<NextOutput>;
+    type PipelineTailOps<NextOutput: Send + 'static + Debug> = PipelineTailImpl<NextOutput>;
 }
 
-impl<Output: Send + 'static + Debug> PipelineTailOps<Output> for PipelineTail<Output> {
+impl<Output: Send + 'static + Debug> PipelineTailOps<Output> for PipelineTailImpl<Output> {
     type Family = PipelineTailFamily;
 
     fn trait_pipe<NextOutput: Send + 'static + Debug, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
         self,
         step: PS,
         cap: usize,
-    ) -> PipelineTail<NextOutput> {
+    ) -> PipelineTailImpl<NextOutput> {
         let (tx, rx) = flume::bounded(cap);
         std::thread::spawn(move || step.run(self, tx));
-        PipelineTail::new(rx)
+        PipelineTailImpl::new(rx)
     }
 
     fn trait_parallel_pipe<
@@ -42,19 +42,19 @@ impl<Output: Send + 'static + Debug> PipelineTailOps<Output> for PipelineTail<Ou
         step: PS,
         workers: usize,
         cap: usize,
-    ) -> PipelineTail<NextOutput> {
+    ) -> PipelineTailImpl<NextOutput> {
         let (tx, rx) = flume::bounded(cap);
         for _ in 0..workers {
             let tx = tx.clone();
-            let tail = PipelineTail::new(self.rx.clone());
+            let tail = PipelineTailImpl::new(self.rx.clone());
             std::thread::spawn(move || step.run(tail, tx));
         }
-        PipelineTail::new(rx)
+        PipelineTailImpl::new(rx)
     }
 }
 
-impl<Output: Clone + Send + 'static + Debug> PipelineTail<Output> {
-    pub fn split(self) -> (PipelineTail<Output>, PipelineTail<Output>) {
+impl<Output: Clone + Send + 'static + Debug> PipelineTailImpl<Output> {
+    pub fn split(self) -> (PipelineTailImpl<Output>, PipelineTailImpl<Output>) {
         let (tx_lhs, rx_lhs) = flume::unbounded();
         let (tx_rhs, rx_rhs) = flume::unbounded();
 
@@ -65,13 +65,13 @@ impl<Output: Clone + Send + 'static + Debug> PipelineTail<Output> {
             }
         });
 
-        let tail_lhs = PipelineTail::new(rx_lhs);
-        let tail_rhs = PipelineTail::new(rx_rhs);
+        let tail_lhs = PipelineTailImpl::new(rx_lhs);
+        let tail_rhs = PipelineTailImpl::new(rx_rhs);
         (tail_lhs, tail_rhs)
     }
 }
 
-impl<Output: Debug> IntoIterator for PipelineTail<Output> {
+impl<Output: Debug> IntoIterator for PipelineTailImpl<Output> {
     type Item = Output;
     type IntoIter = PipelineTailIter<Output>;
 
@@ -81,7 +81,7 @@ impl<Output: Debug> IntoIterator for PipelineTail<Output> {
 }
 
 pub struct PipelineTailIter<Output: Debug> {
-    tail: PipelineTail<Output>,
+    tail: PipelineTailImpl<Output>,
 }
 
 impl<Output: Debug> Iterator for PipelineTailIter<Output> {
@@ -113,7 +113,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let tail = PipelineTail::new(rx).trait_pipe(step, 2);
+        let tail = PipelineTailImpl::new(rx).trait_pipe(step, 2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -130,7 +130,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let tail = PipelineTail::new(rx).trait_parallel_pipe(step, 2, 2);
+        let tail = PipelineTailImpl::new(rx).trait_parallel_pipe(step, 2, 2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn test_map() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTail::new(rx).trait_map(|value| value * 2, 2);
+        let tail = PipelineTailImpl::new(rx).trait_map(|value| value * 2, 2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -158,7 +158,7 @@ mod tests {
     #[test]
     fn test_parallel_map() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTail::new(rx).trait_parallel_map(
+        let tail = PipelineTailImpl::new(rx).trait_parallel_map(
             |value| {
                 std::thread::sleep(Duration::from_millis(value * 10u64));
                 value * 2
@@ -180,7 +180,7 @@ mod tests {
     #[test]
     fn test_buffer() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTail::new(rx).trait_map(|value| value, 2).buffer(2);
+        let tail = PipelineTailImpl::new(rx).trait_map(|value| value, 2).buffer(2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -195,7 +195,7 @@ mod tests {
     #[test]
     fn test_window() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTail::new(rx).window(|value| value.into_iter().cloned().collect::<Vec<_>>(), 2, 4);
+        let tail = PipelineTailImpl::new(rx).window(|value| value.into_iter().cloned().collect::<Vec<_>>(), 2, 4);
 
         tx.send(Message::Data(0)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -210,7 +210,7 @@ mod tests {
     #[test]
     fn test_sync() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTail::new(rx)
+        let tail = PipelineTailImpl::new(rx)
             .sync_mark()
             .trait_parallel_map(
                 |value| {

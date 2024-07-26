@@ -8,7 +8,7 @@ use crate::sync4::head::PipelineHead;
 use crate::sync4::pipeline_ops::PipelineTailOpsFamily;
 use crate::sync4::steps::PipelineStep;
 use crate::sync4::tail::PipelineTailIter;
-use crate::sync4::{PipelineHeadImpl, PipelineTail, PipelineTailOps};
+use crate::sync4::{PipelineHeadImpl, PipelineTailImpl, PipelineTailOps};
 
 pub struct Pipeline<
     Input: Send + 'static,
@@ -21,19 +21,19 @@ pub struct Pipeline<
     _output: PhantomData<Output>,
 }
 
-impl<Input: Send + 'static + Debug> Pipeline<Input, Input, PipelineHeadImpl<Input>, PipelineTail<Input>> {
+impl<Input: Send + 'static + Debug> Pipeline<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
     pub fn empty(cap: usize) -> Self {
         let (tx, rx) = flume::bounded(cap);
         Self {
             head: PipelineHeadImpl::new(tx),
-            tail: PipelineTail::new(rx),
+            tail: PipelineTailImpl::new(rx),
             _output: PhantomData,
         }
     }
 }
 
 impl<Input: Send + 'static, Output: Send + 'static + Debug, Head: PipelineHead<TInput = Input>>
-    Pipeline<Input, Output, Head, PipelineTail<Output>>
+    Pipeline<Input, Output, Head, PipelineTailImpl<Output>>
 {
     pub fn drain(self) -> PipelineTailIter<Output> {
         self.tail.into_iter()
