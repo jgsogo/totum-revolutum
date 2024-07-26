@@ -1,6 +1,6 @@
 pub use data::Message;
 pub use head::PipelineHeadImpl;
-pub use pipeline_impl::PipelineImpl;
+pub use pipeline_impl::Pipeline;
 pub use pipeline_ops::PipelineTailOps;
 pub use tail::PipelineTail;
 
