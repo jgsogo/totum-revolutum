@@ -24,7 +24,7 @@ impl PipelineTailFamily for PipelineTailImplFamily {
 impl<Output: PipelineData> PipelineTail<Output> for PipelineTailImpl<Output> {
     type Family = PipelineTailImplFamily;
 
-    fn trait_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
+    fn pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
@@ -34,7 +34,7 @@ impl<Output: PipelineData> PipelineTail<Output> for PipelineTailImpl<Output> {
         PipelineTailImpl::new(rx)
     }
 
-    fn trait_parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
+    fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
@@ -110,7 +110,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let tail = PipelineTailImpl::new(rx).trait_pipe(step, 2);
+        let tail = PipelineTailImpl::new(rx).pipe(step, 2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -127,7 +127,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let tail = PipelineTailImpl::new(rx).trait_parallel_pipe(step, 2, 2);
+        let tail = PipelineTailImpl::new(rx).parallel_pipe(step, 2, 2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -142,7 +142,7 @@ mod tests {
     #[test]
     fn test_map() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTailImpl::new(rx).trait_map(|value| value * 2, 2);
+        let tail = PipelineTailImpl::new(rx).map(|value| value * 2, 2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -155,7 +155,7 @@ mod tests {
     #[test]
     fn test_parallel_map() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTailImpl::new(rx).trait_parallel_map(
+        let tail = PipelineTailImpl::new(rx).parallel_map(
             |value| {
                 std::thread::sleep(Duration::from_millis(value * 10u64));
                 value * 2
@@ -177,7 +177,7 @@ mod tests {
     #[test]
     fn test_buffer() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTailImpl::new(rx).trait_map(|value| value, 2).buffer(2);
+        let tail = PipelineTailImpl::new(rx).map(|value| value, 2).buffer(2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -209,7 +209,7 @@ mod tests {
         let (tx, rx) = flume::bounded(0);
         let tail = PipelineTailImpl::new(rx)
             .sync_mark()
-            .trait_parallel_map(
+            .parallel_map(
                 |value| {
                     let inner = value.inner();
                     std::thread::sleep(Duration::from_millis((inner * 10) as u64));

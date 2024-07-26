@@ -68,12 +68,12 @@ impl<
 {
     type Family = PipelineImplFamily<Output, Head, Tail>;
 
-    fn trait_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
+    fn pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
     ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>> {
-        let tail = self.tail.trait_pipe(step, cap);
+        let tail = self.tail.pipe(step, cap);
         Pipeline {
             head: self.head,
             tail,
@@ -81,13 +81,13 @@ impl<
         }
     }
 
-    fn trait_parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
+    fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
         cap: usize,
     ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>> {
-        let tail = self.tail.trait_parallel_pipe(step, workers, cap);
+        let tail = self.tail.parallel_pipe(step, workers, cap);
         Pipeline {
             head: self.head,
             tail,
@@ -142,7 +142,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = Pipeline::empty(2).trait_pipe(step, 2);
+        let pipeline = Pipeline::empty(2).pipe(step, 2);
 
         pipeline.send(10).unwrap();
         pipeline.send(1).unwrap();
@@ -156,7 +156,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = Pipeline::empty(2).trait_parallel_pipe(step, 2, 2);
+        let pipeline = Pipeline::empty(2).parallel_pipe(step, 2, 2);
 
         pipeline.send(10).unwrap();
         pipeline.send(1).unwrap();
