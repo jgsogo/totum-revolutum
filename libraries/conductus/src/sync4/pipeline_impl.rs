@@ -7,6 +7,7 @@ use flume::SendError;
 use crate::sync4::head::PipelineHead;
 use crate::sync4::pipeline_ops::PipelineTailOpsFamily;
 use crate::sync4::steps::PipelineStep;
+use crate::sync4::tail::PipelineTailIter;
 use crate::sync4::{PipelineHeadImpl, PipelineTail, PipelineTailOps};
 
 pub struct PipelineImpl<
@@ -28,6 +29,14 @@ impl<Input: Send + 'static + Debug> PipelineImpl<Input, Input, PipelineHeadImpl<
             tail: PipelineTail::new(rx),
             _output: PhantomData,
         }
+    }
+}
+
+impl<Input: Send + 'static, Output: Send + 'static + Debug, Head: PipelineHead<TInput = Input>>
+    PipelineImpl<Input, Output, Head, PipelineTail<Output>>
+{
+    pub fn drain(self) -> PipelineTailIter<Output> {
+        self.tail.into_iter()
     }
 }
 
@@ -178,5 +187,14 @@ mod tests {
         pipeline.send_batch(0..3);
         let out = pipeline.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![0, 1, 2]);
+    }
+
+    #[test]
+    fn test_drain() {
+        let pipeline = PipelineImpl::empty(2);
+        pipeline.send_batch(0..5);
+
+        let out = pipeline.drain().collect::<Vec<_>>();
+        assert_eq!(out, vec![0, 1, 2, 3, 4]);
     }
 }
