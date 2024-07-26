@@ -8,6 +8,8 @@ use crate::sync::tail::PipelineTailFamily;
 use crate::sync::tail_impl::PipelineTailIter;
 use crate::sync::{PipelineData, PipelineHead, PipelineHeadImpl, PipelineTail, PipelineTailImpl};
 
+/// Implementation of a pipeline. This object acts both as a [`PipelineHead`] and a
+/// [`PipelineTail`].
 pub struct Pipeline<
     Input: PipelineData,
     Output: PipelineData,
@@ -38,6 +40,8 @@ impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Inpu
     }
 }
 
+/// A helper struct to implement [`PipelineTailFamily`], so that [`Pipeline`] can implement the
+/// [`PipelineTail`] trait.
 pub struct PipelineImplFamily<Output, Head, Tail> {
     _output: PhantomData<Output>,
     _head: PhantomData<Head>,
@@ -64,7 +68,7 @@ impl<
 {
     type Family = PipelineImplFamily<Output, Head, Tail>;
 
-    fn trait_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
+    fn trait_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
@@ -77,7 +81,7 @@ impl<
         }
     }
 
-    fn trait_parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
+    fn trait_parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,

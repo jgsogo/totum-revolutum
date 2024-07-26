@@ -1,11 +1,9 @@
-use std::fmt::Debug;
-
 use crate::sync::steps::PipelineStep;
 use crate::sync::tail::PipelineTailFamily;
 use crate::sync::PipelineTail;
 use crate::sync::{Message, PipelineData};
 
-pub struct PipelineTailImpl<Output: Debug> {
+pub struct PipelineTailImpl<Output: PipelineData> {
     rx: flume::Receiver<Message<Output>>,
 }
 
@@ -15,6 +13,8 @@ impl<Output: PipelineData> PipelineTailImpl<Output> {
     }
 }
 
+/// A helper struct to implement [`PipelineTailFamily`], so that [`PipelineTailImpl`] can implement
+/// the [`PipelineTail`] trait.
 pub struct PipelineTailImplFamily;
 
 impl PipelineTailFamily for PipelineTailImplFamily {
@@ -24,7 +24,7 @@ impl PipelineTailFamily for PipelineTailImplFamily {
 impl<Output: PipelineData> PipelineTail<Output> for PipelineTailImpl<Output> {
     type Family = PipelineTailImplFamily;
 
-    fn trait_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
+    fn trait_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
@@ -34,7 +34,7 @@ impl<Output: PipelineData> PipelineTail<Output> for PipelineTailImpl<Output> {
         PipelineTailImpl::new(rx)
     }
 
-    fn trait_parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
+    fn trait_parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
@@ -68,7 +68,7 @@ impl<Output: Clone + PipelineData> PipelineTailImpl<Output> {
     }
 }
 
-impl<Output: Debug> IntoIterator for PipelineTailImpl<Output> {
+impl<Output: PipelineData> IntoIterator for PipelineTailImpl<Output> {
     type Item = Output;
     type IntoIter = PipelineTailIter<Output>;
 
@@ -77,11 +77,11 @@ impl<Output: Debug> IntoIterator for PipelineTailImpl<Output> {
     }
 }
 
-pub struct PipelineTailIter<Output: Debug> {
+pub struct PipelineTailIter<Output: PipelineData> {
     tail: PipelineTailImpl<Output>,
 }
 
-impl<Output: Debug> Iterator for PipelineTailIter<Output> {
+impl<Output: PipelineData> Iterator for PipelineTailIter<Output> {
     type Item = Output;
 
     fn next(&mut self) -> Option<Self::Item> {

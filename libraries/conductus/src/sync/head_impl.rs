@@ -3,7 +3,8 @@ use crate::sync::{Message, PipelineData};
 use flume::SendError;
 use std::thread::JoinHandle;
 
-pub struct PipelineHeadImpl<Input> {
+/// A default implementation of a pipeline head
+pub struct PipelineHeadImpl<Input: PipelineData> {
     tx: flume::Sender<Message<Input>>,
 }
 
