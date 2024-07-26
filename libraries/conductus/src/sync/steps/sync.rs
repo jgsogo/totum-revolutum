@@ -1,15 +1,16 @@
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
+use std::fmt::Debug;
 
 use flume::Sender;
 use tracing::debug;
 
 use crate::sync::steps::PipelineStep;
-use crate::sync::Message;
+use crate::sync::{Message, PipelineData};
 
 pub struct PipelineStepSyncStart;
 
-pub trait SyncMarkedTrait<Input>: Ord {
+pub trait SyncMarkedTrait<Input>: Ord + PipelineData {
     fn into_inner(self) -> Input;
 
     fn inner(&self) -> &Input;
@@ -22,7 +23,7 @@ pub struct SyncMarked<Input> {
     value: Input,
 }
 
-impl<Input> SyncMarkedTrait<Input> for SyncMarked<Input> {
+impl<Input: PipelineData> SyncMarkedTrait<Input> for SyncMarked<Input> {
     fn into_inner(self) -> Input {
         self.value
     }

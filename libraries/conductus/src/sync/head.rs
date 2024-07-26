@@ -1,8 +1,9 @@
+use crate::sync::PipelineData;
 use flume::SendError;
 use std::thread::JoinHandle;
 
 pub trait PipelineHead {
-    type TInput: Send + 'static;
+    type TInput: PipelineData;
 
     fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>>;
 

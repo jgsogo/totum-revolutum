@@ -1,5 +1,5 @@
-use crate::sync::Message;
 use crate::sync::PipelineHead;
+use crate::sync::{Message, PipelineData};
 use flume::SendError;
 use std::thread::JoinHandle;
 
@@ -7,13 +7,13 @@ pub struct PipelineHeadImpl<Input> {
     tx: flume::Sender<Message<Input>>,
 }
 
-impl<Input: Send + 'static> PipelineHeadImpl<Input> {
+impl<Input: PipelineData> PipelineHeadImpl<Input> {
     pub(crate) fn new(tx: flume::Sender<Message<Input>>) -> Self {
         Self { tx }
     }
 }
 
-impl<Input: Send + 'static> PipelineHead for PipelineHeadImpl<Input> {
+impl<Input: PipelineData> PipelineHead for PipelineHeadImpl<Input> {
     type TInput = Input;
 
     fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {

@@ -2,14 +2,14 @@ use std::fmt::Debug;
 
 use crate::sync::steps::PipelineStep;
 use crate::sync::tail::PipelineTailFamily;
-use crate::sync::Message;
 use crate::sync::PipelineTail;
+use crate::sync::{Message, PipelineData};
 
 pub struct PipelineTailImpl<Output: Debug> {
     rx: flume::Receiver<Message<Output>>,
 }
 
-impl<Output: Send + 'static + Debug> PipelineTailImpl<Output> {
+impl<Output: PipelineData> PipelineTailImpl<Output> {
     pub(crate) fn new(rx: flume::Receiver<Message<Output>>) -> Self {
         Self { rx }
     }
@@ -18,13 +18,13 @@ impl<Output: Send + 'static + Debug> PipelineTailImpl<Output> {
 pub struct PipelineTailImplFamily;
 
 impl PipelineTailFamily for PipelineTailImplFamily {
-    type PipelineTailOps<NextOutput: Send + 'static + Debug> = PipelineTailImpl<NextOutput>;
+    type PipelineTailOps<NextOutput: PipelineData> = PipelineTailImpl<NextOutput>;
 }
 
-impl<Output: Send + 'static + Debug> PipelineTail<Output> for PipelineTailImpl<Output> {
+impl<Output: PipelineData> PipelineTail<Output> for PipelineTailImpl<Output> {
     type Family = PipelineTailImplFamily;
 
-    fn trait_pipe<NextOutput: Send + 'static + Debug, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
+    fn trait_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
         self,
         step: PS,
         cap: usize,
@@ -34,10 +34,7 @@ impl<Output: Send + 'static + Debug> PipelineTail<Output> for PipelineTailImpl<O
         PipelineTailImpl::new(rx)
     }
 
-    fn trait_parallel_pipe<
-        NextOutput: Send + 'static + Debug,
-        PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy,
-    >(
+    fn trait_parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
         self,
         step: PS,
         workers: usize,
@@ -53,7 +50,7 @@ impl<Output: Send + 'static + Debug> PipelineTail<Output> for PipelineTailImpl<O
     }
 }
 
-impl<Output: Clone + Send + 'static + Debug> PipelineTailImpl<Output> {
+impl<Output: Clone + PipelineData> PipelineTailImpl<Output> {
     pub fn split(self) -> (PipelineTailImpl<Output>, PipelineTailImpl<Output>) {
         let (tx_lhs, rx_lhs) = flume::unbounded();
         let (tx_rhs, rx_rhs) = flume::unbounded();

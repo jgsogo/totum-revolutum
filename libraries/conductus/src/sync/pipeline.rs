@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::thread::JoinHandle;
 
@@ -7,11 +6,11 @@ use flume::SendError;
 use crate::sync::steps::PipelineStep;
 use crate::sync::tail::PipelineTailFamily;
 use crate::sync::tail_impl::PipelineTailIter;
-use crate::sync::{PipelineHead, PipelineHeadImpl, PipelineTail, PipelineTailImpl};
+use crate::sync::{PipelineData, PipelineHead, PipelineHeadImpl, PipelineTail, PipelineTailImpl};
 
 pub struct Pipeline<
-    Input: Send + 'static,
-    Output: Send + 'static + Debug,
+    Input: PipelineData,
+    Output: PipelineData,
     Head: PipelineHead<TInput = Input>,
     Tail: PipelineTail<Output>,
 > {
@@ -20,7 +19,7 @@ pub struct Pipeline<
     _output: PhantomData<Output>,
 }
 
-impl<Input: Send + 'static + Debug> Pipeline<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
+impl<Input: PipelineData> Pipeline<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
     pub fn empty(cap: usize) -> Self {
         let (tx, rx) = flume::bounded(cap);
         Self {
@@ -31,7 +30,7 @@ impl<Input: Send + 'static + Debug> Pipeline<Input, Input, PipelineHeadImpl<Inpu
     }
 }
 
-impl<Input: Send + 'static, Output: Send + 'static + Debug, Head: PipelineHead<TInput = Input>>
+impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Input>>
     Pipeline<Input, Output, Head, PipelineTailImpl<Output>>
 {
     pub fn drain(self) -> PipelineTailIter<Output> {
@@ -46,26 +45,26 @@ pub struct PipelineImplFamily<Output, Head, Tail> {
 }
 
 impl<
-        Input: Send + 'static,
-        Output: Send + 'static + Debug,
+        Input: PipelineData,
+        Output: PipelineData,
         Head: PipelineHead<TInput = Input> + 'static,
         Tail: PipelineTail<Output>,
     > PipelineTailFamily for PipelineImplFamily<Output, Head, Tail>
 {
-    type PipelineTailOps<NextOutput: Send + 'static + Debug> =
+    type PipelineTailOps<NextOutput: PipelineData> =
         Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>>;
 }
 
 impl<
-        Input: Send + 'static,
-        Output: Send + 'static + Debug,
+        Input: PipelineData,
+        Output: PipelineData,
         Head: PipelineHead<TInput = Input> + 'static,
         Tail: PipelineTail<Output>,
     > PipelineTail<Output> for Pipeline<Input, Output, Head, Tail>
 {
     type Family = PipelineImplFamily<Output, Head, Tail>;
 
-    fn trait_pipe<NextOutput: Send + 'static + Debug, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
+    fn trait_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Send + 'static>(
         self,
         step: PS,
         cap: usize,
@@ -78,10 +77,7 @@ impl<
         }
     }
 
-    fn trait_parallel_pipe<
-        NextOutput: Send + 'static + Debug,
-        PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy,
-    >(
+    fn trait_parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Send + 'static + Copy>(
         self,
         step: PS,
         workers: usize,
@@ -96,12 +92,8 @@ impl<
     }
 }
 
-impl<
-        Input: Send + 'static,
-        Output: Send + 'static + Debug,
-        Head: PipelineHead<TInput = Input>,
-        Tail: PipelineTail<Output>,
-    > PipelineHead for Pipeline<Input, Output, Head, Tail>
+impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Input>, Tail: PipelineTail<Output>>
+    PipelineHead for Pipeline<Input, Output, Head, Tail>
 {
     type TInput = Input;
 
@@ -118,8 +110,8 @@ impl<
 }
 
 impl<
-        Input: Send + 'static,
-        Output: Send + 'static + Debug,
+        Input: PipelineData,
+        Output: PipelineData,
         Head: PipelineHead<TInput = Input>,
         Tail: PipelineTail<Output> + IntoIterator<Item = Output>,
     > IntoIterator for Pipeline<Input, Output, Head, Tail>
