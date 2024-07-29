@@ -1,6 +1,12 @@
-use super::{PipelineHeadAsync, PipelineTailAsync};
-use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
+use async_trait::async_trait;
 use std::marker::PhantomData;
+
+use flume::SendError;
+use tokio::task::JoinHandle;
+
+use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
+
+use super::{PipelineHeadAsync, PipelineTailAsync};
 
 pub struct PipelineAsync<
     Input: PipelineData,
@@ -21,5 +27,30 @@ impl<Input: PipelineData> PipelineAsync<Input, Input, PipelineHeadImpl<Input>, P
             _tail: PipelineTailImpl::new(rx),
             _output: PhantomData,
         }
+    }
+}
+
+#[async_trait]
+impl<
+        Input: PipelineData,
+        Output: PipelineData + Sync,
+        Head: PipelineHeadAsync<TInput = Input> + Sync,
+        Tail: PipelineTailAsync<Output> + Sync,
+    > PipelineHeadAsync for PipelineAsync<Input, Output, Head, Tail>
+{
+    type TInput = Input;
+
+    async fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
+        self._head.send(item).await
+    }
+
+    async fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+        &self,
+        input: I,
+    ) -> JoinHandle<Result<(), SendError<Self::TInput>>>
+    where
+        <I as IntoIterator>::IntoIter: Send,
+    {
+        self._head.send_detached(input).await
     }
 }

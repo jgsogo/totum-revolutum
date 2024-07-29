@@ -182,7 +182,7 @@ mod tests {
     }
 
     #[test]
-    fn test_send_batch() {
+    fn test_send_detached() {
         let pipeline = PipelineSync::empty(2);
 
         pipeline.send_detached(0..3);
