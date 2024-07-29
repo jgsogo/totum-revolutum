@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use flume::SendError;
 use tokio::task::JoinHandle;
 
+use crate::tail::PipelineTailImplStream;
 use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
 
 use super::steps::PipelineStepAsync;
@@ -112,5 +113,32 @@ impl<
             tail,
             _output: PhantomData,
         }
+    }
+
+    fn into_stream(self) -> PipelineTailImplStream<'static, Output> {
+        self.tail.into_stream()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::super::steps::PipelineStepMap;
+    use super::*;
+    use futures::StreamExt;
+
+    #[tokio::test]
+    async fn test_pipe() {
+        let step = PipelineStepMap::from(move |value| async move {
+            tokio::time::sleep(Duration::from_millis(value * 10u64)).await;
+            value
+        });
+        let pipeline = PipelineAsync::empty(2).pipe(step, 2).await;
+
+        pipeline.send(10).await.unwrap();
+        pipeline.send(1).await.unwrap();
+        let out = pipeline.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![10, 1]);
     }
 }

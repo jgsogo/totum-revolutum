@@ -1,10 +1,12 @@
-use crate::{Message, PipelineData};
+use std::pin::Pin;
+use std::task::{Context, Poll};
+
 use flume::r#async::RecvStream;
 use futures::stream::FusedStream;
 use futures::Stream;
-use std::pin::Pin;
-use std::task::{Context, Poll};
 use tracing::debug;
+
+use crate::{Message, PipelineData};
 
 /// A default implementation of a pipeline head.
 pub struct PipelineTailImpl<Output: PipelineData> {
@@ -16,8 +18,8 @@ impl<Output: PipelineData> PipelineTailImpl<Output> {
         Self { rx }
     }
 
-    pub fn stream(&self) -> PipelineTailImplStream<Output> {
-        PipelineTailImplStream(self.rx.stream())
+    pub fn into_stream(self) -> PipelineTailImplStream<'static, Output> {
+        PipelineTailImplStream(self.rx.into_stream())
     }
 }
 
@@ -73,6 +75,12 @@ impl<Output: PipelineData> Iterator for PipelineTailImplIter<Output> {
 }
 
 pub struct PipelineTailImplStream<'a, Output: PipelineData>(RecvStream<'a, Message<Output>>);
+
+impl<'a, Output: PipelineData> PipelineTailImplStream<'a, Output> {
+    pub fn new(recv: RecvStream<'a, Message<Output>>) -> Self {
+        Self(recv)
+    }
+}
 
 impl<Output: PipelineData> Stream for PipelineTailImplStream<'_, Output> {
     type Item = Output;

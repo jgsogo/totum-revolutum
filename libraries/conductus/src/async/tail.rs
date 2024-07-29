@@ -1,4 +1,5 @@
 use crate::r#async::steps::PipelineStepAsync;
+use crate::tail::PipelineTailImplStream;
 use crate::{PipelineData, PipelineTailImpl};
 use async_trait::async_trait;
 
@@ -34,6 +35,8 @@ pub trait PipelineTailAsync<Output: PipelineData>: Sized {
         workers: usize,
         cap: usize,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
+
+    fn into_stream(self) -> PipelineTailImplStream<'static, Output>;
 }
 
 #[async_trait]
@@ -47,7 +50,7 @@ impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
         let (tx, rx) = flume::bounded(cap);
         tokio::spawn(async move {
-            step.run(self.stream(), tx).await;
+            step.run(self.into_stream(), tx).await;
         });
         PipelineTailImpl::new(rx)
     }
@@ -63,10 +66,14 @@ impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output
             let tx = tx.clone();
             let tail = PipelineTailImpl::new(self.rx.clone());
             tokio::spawn(async move {
-                step.run(tail.stream(), tx).await;
+                step.run(tail.into_stream(), tx).await;
             });
         }
         PipelineTailImpl::new(rx)
+    }
+
+    fn into_stream(self) -> PipelineTailImplStream<'static, Output> {
+        PipelineTailImplStream::new(self.rx.into_stream())
     }
 }
 
@@ -92,7 +99,7 @@ mod tests {
         tx.send_async(Message::Data(1)).await.unwrap();
         drop(tx);
 
-        let out = tail.stream().collect::<Vec<_>>().await;
+        let out = tail.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![10, 1]);
     }
 
@@ -111,7 +118,7 @@ mod tests {
         tx.send_async(Message::Data(3)).await.unwrap();
         drop(tx);
 
-        let out = tail.stream().collect::<Vec<_>>().await;
+        let out = tail.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![1, 2, 3, 10]);
     }
 }
