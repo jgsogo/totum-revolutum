@@ -16,7 +16,7 @@ impl<Output: Send + 'static> PipelineAsync<Output> {
     ///
     /// ```
     /// use tokio::time::{sleep, Duration};
-    /// use conductus::PipelineAsync;
+    /// use conductus::r#async::pipeline_async::PipelineAsync;
     /// use futures::StreamExt;
     ///
     /// #[tokio::main]
@@ -56,7 +56,7 @@ impl<Output: Send + 'static> PipelineAsync<Output> {
     /// # Example
     ///
     /// ```
-    /// use conductus::PipelineAsync;
+    /// use conductus::r#async::pipeline_async::PipelineAsync;
     /// use futures::StreamExt;
     ///
     /// #[tokio::main]
