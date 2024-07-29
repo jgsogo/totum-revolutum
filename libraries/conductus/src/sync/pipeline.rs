@@ -1,13 +1,13 @@
 use std::marker::PhantomData;
 use std::thread::JoinHandle;
 
-use crate::PipelineData;
+use crate::{PipelineData, PipelineTailImpl};
 use flume::SendError;
 
 use crate::sync::steps::PipelineStep;
 use crate::sync::tail::PipelineTailFamily;
-use crate::sync::tail_impl::PipelineTailIter;
-use crate::sync::{PipelineHead, PipelineTail, PipelineTailImpl};
+use crate::sync::{PipelineHead, PipelineTail};
+use crate::tail::PipelineTailIter;
 use crate::PipelineHeadImpl;
 
 /// Implementation of a pipeline. This object acts both as a [`PipelineHead`] and a
