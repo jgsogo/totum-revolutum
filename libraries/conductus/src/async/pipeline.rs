@@ -156,6 +156,16 @@ mod tests {
     #[tokio::test]
     async fn test_send() {
         let pipeline = PipelineAsync::empty(2);
+        pipeline.send(0).await.unwrap();
+        let out = pipeline.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![0]);
+    }
+
+    #[tokio::test]
+    async fn test_send_detached() {
+        let pipeline = PipelineAsync::empty(2);
         pipeline.send_detached(stream::iter(0..5)).await;
+        let out = pipeline.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![0, 1, 2, 3, 4]);
     }
 }
