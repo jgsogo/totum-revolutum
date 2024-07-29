@@ -3,7 +3,7 @@ use crate::{PipelineData, PipelineTailImpl};
 use async_trait::async_trait;
 
 pub trait PipelineTailAsyncFamily {
-    type PipelineTailOps<NextOutput: PipelineData>: PipelineTailAsync<NextOutput>;
+    type PipelineTailOps<NextOutput: PipelineData>: PipelineTailAsync<NextOutput> + Send;
 }
 
 /// A helper struct to implement [`PipelineTailAsyncFamily`], so that [`PipelineTailImpl`] can implement

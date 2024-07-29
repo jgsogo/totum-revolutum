@@ -44,7 +44,7 @@ impl<Input: PipelineData, Output: PipelineData, Head: PipelineHeadSync<TInput = 
 
 /// A helper struct to implement [`PipelineTailSyncFamily`], so that [`PipelineSync`] can implement the
 /// [`PipelineTailSync`] trait.
-pub struct PipelineImplFamily<Output, Head, Tail> {
+pub struct PipelineSyncFamily<Output, Head, Tail> {
     _output: PhantomData<Output>,
     _head: PhantomData<Head>,
     _tail: PhantomData<Tail>,
@@ -55,7 +55,7 @@ impl<
         Output: PipelineData,
         Head: PipelineHeadSync<TInput = Input> + 'static,
         Tail: PipelineTailSync<Output>,
-    > PipelineTailSyncFamily for PipelineImplFamily<Output, Head, Tail>
+    > PipelineTailSyncFamily for PipelineSyncFamily<Output, Head, Tail>
 {
     type PipelineTailOps<NextOutput: PipelineData> =
         PipelineSync<Input, NextOutput, Head, <Tail::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>>;
@@ -68,7 +68,7 @@ impl<
         Tail: PipelineTailSync<Output>,
     > PipelineTailSync<Output> for PipelineSync<Input, Output, Head, Tail>
 {
-    type Family = PipelineImplFamily<Output, Head, Tail>;
+    type Family = PipelineSyncFamily<Output, Head, Tail>;
 
     fn pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
