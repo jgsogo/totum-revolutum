@@ -5,9 +5,8 @@ use crate::{PipelineData, PipelineTailImpl};
 use flume::SendError;
 
 use crate::sync::steps::PipelineStepSync;
-use crate::sync::tail::PipelineTailSyncFamily;
+use crate::sync::tail::{PipelineTailImplIter, PipelineTailSyncFamily};
 use crate::sync::{PipelineHeadSync, PipelineTailSync};
-use crate::tail::PipelineTailImplIter;
 use crate::PipelineHeadImpl;
 
 /// Implementation of a pipeline. This object acts both as a [`PipelineHeadSync`] and a
@@ -98,6 +97,10 @@ impl<
             _output: PhantomData,
         }
     }
+
+    fn into_iter(self) -> PipelineTailImplIter<Output> {
+        self.tail.into_iter()
+    }
 }
 
 impl<
@@ -118,21 +121,6 @@ impl<
         input: I,
     ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
         self.head.send_detached(input)
-    }
-}
-
-impl<
-        Input: PipelineData,
-        Output: PipelineData,
-        Head: PipelineHeadSync<TInput = Input>,
-        Tail: PipelineTailSync<Output> + IntoIterator<Item = Output>,
-    > IntoIterator for PipelineSync<Input, Output, Head, Tail>
-{
-    type Item = Output;
-    type IntoIter = Tail::IntoIter;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.tail.into_iter()
     }
 }
 

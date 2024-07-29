@@ -1,5 +1,3 @@
-use tracing::debug;
-
 use crate::{Message, PipelineData};
 
 /// A default implementation of a pipeline tail.
@@ -28,38 +26,5 @@ impl<Output: Clone + PipelineData> PipelineTailImpl<Output> {
         let tail_lhs = PipelineTailImpl::new(rx_lhs);
         let tail_rhs = PipelineTailImpl::new(rx_rhs);
         (tail_lhs, tail_rhs)
-    }
-}
-
-impl<Output: PipelineData> IntoIterator for PipelineTailImpl<Output> {
-    type Item = Output;
-    type IntoIter = PipelineTailImplIter<Output>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        PipelineTailImplIter { tail: self }
-    }
-}
-
-pub struct PipelineTailImplIter<Output: PipelineData> {
-    tail: PipelineTailImpl<Output>,
-}
-
-impl<Output: PipelineData> Iterator for PipelineTailImplIter<Output> {
-    type Item = Output;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.tail.rx.recv() {
-            Ok(msg) => match msg {
-                Message::Data(data) => Some(data),
-                Message::Stop(reason) => {
-                    debug!("Stop iteration due to data error: {reason}");
-                    None
-                }
-            },
-            Err(e) => {
-                debug!("Stop iteration due to receive error: {e}");
-                None
-            }
-        }
     }
 }

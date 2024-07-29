@@ -9,7 +9,7 @@ use super::PipelineStepSync;
 pub struct PipelineStepNoop;
 
 impl<Input: PipelineData> PipelineStepSync<Input, Input> for PipelineStepNoop {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Input>>) {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<Input>>) {
         for it in source {
             if let Err(e) = target.send(Message::Data(it)) {
                 debug!("Error sending from blanket implementation of PipelineStepBuffer: {e}");

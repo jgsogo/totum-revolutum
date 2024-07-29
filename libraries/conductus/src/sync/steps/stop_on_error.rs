@@ -30,7 +30,7 @@ impl<Input: PipelineData, Func, Error: std::error::Error + Send + 'static> Pipel
 where
     Func: Fn(Error) -> Option<String> + Send + 'static,
 {
-    fn run<I: IntoIterator<Item = Result<Input, Error>>>(&self, source: I, target: Sender<Message<Input>>) {
+    fn run<I: Iterator<Item = Result<Input, Error>>>(&self, source: I, target: Sender<Message<Input>>) {
         for it in source {
             let msg = match it {
                 Ok(v) => Some(Message::Data(v)),

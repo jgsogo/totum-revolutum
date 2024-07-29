@@ -1,5 +1,6 @@
-use crate::{PipelineData, PipelineTailImpl};
+use crate::{Message, PipelineData, PipelineTailImpl};
 use std::collections::VecDeque;
+use tracing::debug;
 
 use crate::sync::steps::{
     PipelineStepMap, PipelineStepNoop, PipelineStepSync, PipelineStepSyncEnd, PipelineStepSyncStart,
@@ -88,6 +89,38 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
     {
         self.pipe(PipelineStepSyncEnd, 0)
     }
+
+    fn into_iter(self) -> PipelineTailImplIter<Output>;
+}
+
+pub struct PipelineTailImplIter<Output: PipelineData> {
+    tail: PipelineTailImpl<Output>,
+}
+
+impl<Output: PipelineData> PipelineTailImplIter<Output> {
+    pub fn new(tail: PipelineTailImpl<Output>) -> Self {
+        Self { tail }
+    }
+}
+
+impl<Output: PipelineData> Iterator for PipelineTailImplIter<Output> {
+    type Item = Output;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.tail.rx.recv() {
+            Ok(msg) => match msg {
+                Message::Data(data) => Some(data),
+                Message::Stop(reason) => {
+                    debug!("Stop iteration due to data error: {reason}");
+                    None
+                }
+            },
+            Err(e) => {
+                debug!("Stop iteration due to receive error: {e}");
+                None
+            }
+        }
+    }
 }
 
 impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output> {
@@ -99,7 +132,7 @@ impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output>
         cap: usize,
     ) -> PipelineTailImpl<NextOutput> {
         let (tx, rx) = flume::bounded(cap);
-        std::thread::spawn(move || step.run(self, tx));
+        std::thread::spawn(move || step.run(self.into_iter(), tx));
         PipelineTailImpl::new(rx)
     }
 
@@ -113,9 +146,13 @@ impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output>
         for _ in 0..workers {
             let tx = tx.clone();
             let tail = PipelineTailImpl::new(self.rx.clone());
-            std::thread::spawn(move || step.run(tail, tx));
+            std::thread::spawn(move || step.run(tail.into_iter(), tx));
         }
         PipelineTailImpl::new(rx)
+    }
+
+    fn into_iter(self) -> PipelineTailImplIter<Output> {
+        PipelineTailImplIter::new(self)
     }
 }
 

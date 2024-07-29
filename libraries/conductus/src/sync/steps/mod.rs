@@ -13,5 +13,5 @@ mod window;
 
 /// Interface for all the steps in the `conductus` library
 pub trait PipelineStepSync<Input: PipelineData, Output: PipelineData>: Send + 'static {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: flume::Sender<Message<Output>>);
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: flume::Sender<Message<Output>>);
 }

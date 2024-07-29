@@ -29,7 +29,7 @@ impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepSync<Input, Ou
 where
     Func: Fn(Input) -> Output + Send + 'static,
 {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
         for it in source {
             let out = self.map(it);
             if let Err(e) = target.send(Message::Data(out)) {

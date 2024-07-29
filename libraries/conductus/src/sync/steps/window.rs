@@ -30,7 +30,7 @@ impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepSync<Input, Ou
 where
     Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,
 {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
         let mut iter = source.into_iter();
 
         // Collect items until the window is full

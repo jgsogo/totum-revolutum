@@ -67,7 +67,7 @@ impl<Input: PipelineData> Ord for SyncMarked<Input> {
 }
 
 impl<Input: PipelineData> PipelineStepSync<Input, SyncMarked<Input>> for PipelineStepSyncStart {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<SyncMarked<Input>>>) {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<SyncMarked<Input>>>) {
         for (i, it) in source.into_iter().enumerate() {
             if let Err(e) = target.send(Message::Data(SyncMarked::new(i, it))) {
                 debug!("Error sending from blanket implementation of PipelineSyncStart: {e}");
@@ -83,7 +83,7 @@ pub struct PipelineStepSyncEnd;
 impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStepSync<Input, InnerInput>
     for PipelineStepSyncEnd
 {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {
         let mut next = 0;
         let mut heap = BinaryHeap::new();
         for it in source {
