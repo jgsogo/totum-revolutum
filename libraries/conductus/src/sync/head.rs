@@ -11,10 +11,20 @@ pub trait PipelineHeadSync {
     /// Sends one item into the head of the pipeline. This is a blocking call.
     fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>>;
 
+    fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+        &self,
+        input: I,
+    ) -> Result<(), SendError<Self::TInput>> {
+        for it in input {
+            self.send(it)?;
+        }
+        Ok(())
+    }
+
     /// Sends several items into the head of the pipeline.
     ///
     /// Implementors should detach the caller from the actual send into the channels.
-    fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+    fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
     ) -> JoinHandle<Result<(), SendError<Self::TInput>>>;
@@ -32,7 +42,7 @@ impl<Input: PipelineData> PipelineHeadSync for PipelineHeadImpl<Input> {
         })
     }
 
-    fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+    fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
     ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
@@ -56,7 +66,6 @@ impl<Input: PipelineData> PipelineHeadSync for PipelineHeadImpl<Input> {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]
@@ -77,7 +86,19 @@ mod tests {
         let (tx, rx) = flume::bounded(20);
         let head = PipelineHeadImpl::new(tx);
 
-        head.send_batch(1..3);
+        head.send_batch(0..3).unwrap();
+        drop(head);
+
+        let received = rx.into_iter().collect::<Vec<_>>();
+        assert_eq!(received, vec![Message::Data(0), Message::Data(1), Message::Data(2),])
+    }
+
+    #[test]
+    fn test_send_detached() {
+        let (tx, rx) = flume::bounded(20);
+        let head = PipelineHeadImpl::new(tx);
+
+        head.send_detached(1..3);
         drop(head);
 
         let received = rx.into_iter().collect::<Vec<_>>();

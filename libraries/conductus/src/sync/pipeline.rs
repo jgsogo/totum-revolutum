@@ -113,11 +113,11 @@ impl<
         self.head.send(item)
     }
 
-    fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+    fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
     ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
-        self.head.send_batch(input)
+        self.head.send_detached(input)
     }
 }
 
@@ -185,7 +185,7 @@ mod tests {
     fn test_send_batch() {
         let pipeline = PipelineSync::empty(2);
 
-        pipeline.send_batch(0..3);
+        pipeline.send_detached(0..3);
         let out = pipeline.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![0, 1, 2]);
     }
@@ -193,7 +193,7 @@ mod tests {
     #[test]
     fn test_drain() {
         let pipeline = PipelineSync::empty(2);
-        pipeline.send_batch(0..5);
+        pipeline.send_detached(0..5);
 
         let out = pipeline.drain().collect::<Vec<_>>();
         assert_eq!(out, vec![0, 1, 2, 3, 4]);

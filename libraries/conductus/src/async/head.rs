@@ -19,7 +19,13 @@ pub trait PipelineHeadAsync {
         input: I,
     ) -> Result<(), SendError<Self::TInput>>
     where
-        <I as IntoIterator>::IntoIter: Send;
+        <I as IntoIterator>::IntoIter: Send,
+    {
+        for it in input {
+            self.send(it).await?;
+        }
+        Ok(())
+    }
 
     async fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
@@ -40,16 +46,6 @@ impl<Input: PipelineData> PipelineHeadAsync for PipelineHeadImpl<Input> {
             };
             SendError(msg)
         })
-    }
-
-    async fn send_batch<I: IntoIterator<Item = Self::TInput> + Send>(&self, input: I) -> Result<(), SendError<Input>>
-    where
-        <I as IntoIterator>::IntoIter: Send,
-    {
-        for it in input {
-            self.send(it).await?;
-        }
-        Ok(())
     }
 
     async fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
