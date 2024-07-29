@@ -40,18 +40,18 @@ impl<Output: Clone + PipelineData> PipelineTailImpl<Output> {
 
 impl<Output: PipelineData> IntoIterator for PipelineTailImpl<Output> {
     type Item = Output;
-    type IntoIter = PipelineTailIter<Output>;
+    type IntoIter = PipelineTailImplIter<Output>;
 
     fn into_iter(self) -> Self::IntoIter {
-        PipelineTailIter { tail: self }
+        PipelineTailImplIter { tail: self }
     }
 }
 
-pub struct PipelineTailIter<Output: PipelineData> {
+pub struct PipelineTailImplIter<Output: PipelineData> {
     tail: PipelineTailImpl<Output>,
 }
 
-impl<Output: PipelineData> Iterator for PipelineTailIter<Output> {
+impl<Output: PipelineData> Iterator for PipelineTailImplIter<Output> {
     type Item = Output;
 
     fn next(&mut self) -> Option<Self::Item> {

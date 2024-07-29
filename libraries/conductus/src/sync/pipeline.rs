@@ -7,7 +7,7 @@ use flume::SendError;
 use crate::sync::steps::PipelineStep;
 use crate::sync::tail::PipelineTailFamily;
 use crate::sync::{PipelineHead, PipelineTail};
-use crate::tail::PipelineTailIter;
+use crate::tail::PipelineTailImplIter;
 use crate::PipelineHeadImpl;
 
 /// Implementation of a pipeline. This object acts both as a [`PipelineHead`] and a
@@ -37,7 +37,7 @@ impl<Input: PipelineData> Pipeline<Input, Input, PipelineHeadImpl<Input>, Pipeli
 impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Input>>
     Pipeline<Input, Output, Head, PipelineTailImpl<Output>>
 {
-    pub fn drain(self) -> PipelineTailIter<Output> {
+    pub fn drain(self) -> PipelineTailImplIter<Output> {
         self.tail.into_iter()
     }
 }
