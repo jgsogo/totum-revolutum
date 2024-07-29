@@ -5,10 +5,17 @@ use crate::sync::steps::{
     PipelineStep, PipelineStepMap, PipelineStepNoop, PipelineStepSyncEnd, PipelineStepSyncStart, PipelineStepWindow,
     SyncMarked, SyncMarkedTrait,
 };
-use crate::tail::PipelineTailImplFamily;
 
 pub trait PipelineTailFamily {
     type PipelineTailOps<NextOutput: PipelineData>: PipelineTail<NextOutput>;
+}
+
+/// A helper struct to implement [`PipelineTailFamily`], so that [`PipelineTailImpl`] can implement
+/// the [`PipelineTail`] trait.
+pub struct PipelineTailSyncImplFamily;
+
+impl PipelineTailFamily for PipelineTailSyncImplFamily {
+    type PipelineTailOps<NextOutput: PipelineData> = PipelineTailImpl<NextOutput>;
 }
 
 /// Interface for the tail of a pipeline
@@ -84,7 +91,7 @@ pub trait PipelineTail<Output: PipelineData>: Sized {
 }
 
 impl<Output: PipelineData> PipelineTail<Output> for PipelineTailImpl<Output> {
-    type Family = PipelineTailImplFamily;
+    type Family = PipelineTailSyncImplFamily;
 
     fn pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
         self,

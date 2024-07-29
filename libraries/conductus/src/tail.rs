@@ -1,5 +1,9 @@
-use crate::sync::PipelineTailFamily;
 use crate::{Message, PipelineData};
+use flume::r#async::RecvStream;
+use futures::stream::FusedStream;
+use futures::Stream;
+use std::pin::Pin;
+use std::task::{Context, Poll};
 use tracing::debug;
 
 pub struct PipelineTailImpl<Output: PipelineData> {
@@ -10,14 +14,10 @@ impl<Output: PipelineData> PipelineTailImpl<Output> {
     pub(crate) fn new(rx: flume::Receiver<Message<Output>>) -> Self {
         Self { rx }
     }
-}
 
-/// A helper struct to implement [`PipelineTailFamily`], so that [`PipelineTailImpl`] can implement
-/// the [`PipelineTail`] trait.
-pub struct PipelineTailImplFamily;
-
-impl PipelineTailFamily for PipelineTailImplFamily {
-    type PipelineTailOps<NextOutput: PipelineData> = PipelineTailImpl<NextOutput>;
+    pub fn stream(&self) -> PipelineTailImplStream<Output> {
+        PipelineTailImplStream(self.rx.stream())
+    }
 }
 
 impl<Output: Clone + PipelineData> PipelineTailImpl<Output> {
@@ -68,5 +68,33 @@ impl<Output: PipelineData> Iterator for PipelineTailIter<Output> {
                 None
             }
         }
+    }
+}
+
+pub struct PipelineTailImplStream<'a, Output: PipelineData>(RecvStream<'a, Message<Output>>);
+
+impl<Output: PipelineData> Stream for PipelineTailImplStream<'_, Output> {
+    type Item = Output;
+
+    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        match Pin::new(&mut self.0).poll_next(cx) {
+            Poll::Ready(m) => match m {
+                None => Poll::Ready(None),
+                Some(v) => match v {
+                    Message::Data(d) => Poll::Ready(Some(d)),
+                    Message::Stop(reason) => {
+                        debug!("Stop iteration due to data error: {reason}");
+                        Poll::Ready(None)
+                    }
+                },
+            },
+            Poll::Pending => Poll::Pending,
+        }
+    }
+}
+
+impl<'a, Output: PipelineData> FusedStream for PipelineTailImplStream<'a, Output> {
+    fn is_terminated(&self) -> bool {
+        self.0.is_terminated()
     }
 }

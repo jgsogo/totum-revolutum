@@ -1,5 +1,5 @@
-use super::{PipelineHead, PipelineTail, PipelineTailImpl};
-use crate::{PipelineData, PipelineHeadImpl};
+use super::{PipelineHead, PipelineTail};
+use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
 use std::marker::PhantomData;
 
 pub struct Pipeline<
