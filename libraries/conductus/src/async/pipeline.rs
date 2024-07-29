@@ -2,6 +2,7 @@ use std::marker::PhantomData;
 
 use async_trait::async_trait;
 use flume::SendError;
+use futures::Stream;
 use tokio::task::JoinHandle;
 
 use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
@@ -45,13 +46,10 @@ impl<
         self.head.send(item).await
     }
 
-    async fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+    async fn send_detached<I: Stream<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
-    ) -> JoinHandle<Result<(), SendError<Self::TInput>>>
-    where
-        <I as IntoIterator>::IntoIter: Send,
-    {
+    ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
         self.head.send_detached(input).await
     }
 }
@@ -125,7 +123,7 @@ mod tests {
 
     use super::super::steps::PipelineStepMap;
     use super::*;
-    use futures::StreamExt;
+    use futures::{stream, StreamExt};
 
     #[tokio::test]
     async fn test_pipe() {
@@ -139,5 +137,25 @@ mod tests {
         pipeline.send(1).await.unwrap();
         let out = pipeline.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![10, 1]);
+    }
+
+    #[tokio::test]
+    async fn test_parallel_pipe() {
+        let step = PipelineStepMap::from(move |value| async move {
+            tokio::time::sleep(Duration::from_millis(value * 10u64)).await;
+            value
+        });
+        let pipeline = PipelineAsync::empty(2).parallel_pipe(step, 2, 2).await;
+
+        pipeline.send(10).await.unwrap();
+        pipeline.send(1).await.unwrap();
+        let out = pipeline.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![1, 10]);
+    }
+
+    #[tokio::test]
+    async fn test_send() {
+        let pipeline = PipelineAsync::empty(2);
+        pipeline.send_detached(stream::iter(0..5)).await;
     }
 }

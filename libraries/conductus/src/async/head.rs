@@ -1,7 +1,9 @@
 use crate::{Message, PipelineData, PipelineHeadImpl};
 use async_trait::async_trait;
 use flume::SendError;
+use futures::{pin_mut, Stream};
 use tokio::task::JoinHandle;
+use tokio_stream::StreamExt;
 
 /// Interface for everything that can act as the head of a pipeline
 #[async_trait]
@@ -14,25 +16,18 @@ pub trait PipelineHeadAsync {
     /// Sends several items into the head of the pipeline.
     ///
     /// Implementors should detach the caller from the actual send into the channels.
-    async fn send_batch<I: IntoIterator<Item = Self::TInput> + Send>(
-        &self,
-        input: I,
-    ) -> Result<(), SendError<Self::TInput>>
-    where
-        <I as IntoIterator>::IntoIter: Send,
-    {
-        for it in input {
-            self.send(it).await?;
+    async fn send_batch<I: Stream<Item = Self::TInput> + Send>(&self, input: I) -> Result<(), SendError<Self::TInput>> {
+        pin_mut!(input);
+        while let Some(d) = input.next().await {
+            self.send(d).await?;
         }
         Ok(())
     }
 
-    async fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+    async fn send_detached<I: Stream<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
-    ) -> JoinHandle<Result<(), SendError<Self::TInput>>>
-    where
-        <I as IntoIterator>::IntoIter: Send;
+    ) -> JoinHandle<Result<(), SendError<Self::TInput>>>;
 }
 
 #[async_trait]
@@ -48,17 +43,15 @@ impl<Input: PipelineData> PipelineHeadAsync for PipelineHeadImpl<Input> {
         })
     }
 
-    async fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+    async fn send_detached<I: Stream<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
-    ) -> JoinHandle<Result<(), SendError<Self::TInput>>>
-    where
-        <I as IntoIterator>::IntoIter: Send,
-    {
+    ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
         let tx = self.tx.clone();
         tokio::spawn(async move {
-            for it in input {
-                tx.send_async(Message::Data(it)).await.map_err(|e| {
+            pin_mut!(input);
+            while let Some(d) = input.next().await {
+                tx.send_async(Message::Data(d)).await.map_err(|e| {
                     let Message::Data(msg) = e.into_inner() else {
                         unreachable!()
                     };
@@ -72,7 +65,7 @@ impl<Input: PipelineData> PipelineHeadAsync for PipelineHeadImpl<Input> {
 
 #[cfg(test)]
 mod tests {
-    use futures::StreamExt;
+    use futures::{stream, StreamExt};
 
     use super::*;
 
@@ -104,7 +97,7 @@ mod tests {
         let (tx, rx) = flume::bounded(20);
         let head = PipelineHeadImpl::new(tx);
 
-        head.send_batch(1..3).await.unwrap();
+        head.send_batch(stream::iter(1..3)).await.unwrap();
         drop(head);
 
         // Collect the results
@@ -117,7 +110,7 @@ mod tests {
         let (tx, rx) = flume::bounded(2);
         let head = PipelineHeadImpl::new(tx);
 
-        head.send_detached(1..5).await;
+        head.send_detached(stream::iter(1..5)).await;
         drop(head);
 
         // Collect the results
