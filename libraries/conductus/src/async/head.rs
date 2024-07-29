@@ -1,4 +1,4 @@
-use crate::sync::PipelineData;
+use crate::PipelineData;
 use async_trait::async_trait;
 use flume::SendError;
 use tokio::task::JoinHandle;

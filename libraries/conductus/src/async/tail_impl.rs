@@ -1,6 +1,7 @@
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
+use crate::{Message, PipelineData};
 use async_trait::async_trait;
 use flume::r#async::RecvStream;
 use futures::stream::FusedStream;
@@ -9,7 +10,6 @@ use tracing::debug;
 
 use crate::r#async::steps::PipelineStep;
 use crate::r#async::tail::{PipelineTail, PipelineTailFamily};
-use crate::sync::{Message, PipelineData};
 
 pub struct PipelineTailImpl<Output: PipelineData> {
     rx: flume::Receiver<Message<Output>>,

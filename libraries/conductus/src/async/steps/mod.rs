@@ -1,10 +1,9 @@
 use async_trait::async_trait;
 use futures::Stream;
 
+use crate::{Message, PipelineData};
 pub use map::PipelineStepMap;
 pub use noop::PipelineStepNoop;
-
-use crate::sync::{Message, PipelineData};
 
 mod map;
 mod noop;

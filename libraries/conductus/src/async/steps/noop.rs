@@ -1,10 +1,9 @@
+use crate::{Message, PipelineData};
 use async_trait::async_trait;
 use flume::Sender;
 use futures::{pin_mut, Stream};
 use tokio_stream::StreamExt;
 use tracing::debug;
-
-use crate::sync::{Message, PipelineData};
 
 use super::PipelineStep;
 

@@ -1,4 +1,4 @@
-use crate::sync::PipelineData;
+use crate::PipelineData;
 use flume::SendError;
 use std::thread::JoinHandle;
 

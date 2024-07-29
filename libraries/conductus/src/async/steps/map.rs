@@ -1,6 +1,7 @@
 use std::future::Future;
 use std::marker::PhantomData;
 
+use crate::{Message, PipelineData};
 use async_trait::async_trait;
 use flume::Sender;
 use futures::{pin_mut, Stream};
@@ -8,7 +9,6 @@ use tokio_stream::StreamExt;
 use tracing::debug;
 
 use crate::r#async::steps::PipelineStep;
-use crate::sync::{Message, PipelineData};
 
 pub struct PipelineStepMap<Input: PipelineData + Sync, Output: PipelineData, Fut, F>
 where

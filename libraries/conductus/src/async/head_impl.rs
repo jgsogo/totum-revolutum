@@ -1,9 +1,9 @@
+use crate::{Message, PipelineData};
 use async_trait::async_trait;
 use flume::SendError;
 use tokio::task::JoinHandle;
 
 use crate::r#async::head::PipelineHead;
-use crate::sync::{Message, PipelineData};
 
 pub struct PipelineHeadImpl<Input: PipelineData> {
     tx: flume::Sender<Message<Input>>,

@@ -1,5 +1,5 @@
 use crate::sync::PipelineHead;
-use crate::sync::{Message, PipelineData};
+use crate::{Message, PipelineData};
 use flume::SendError;
 use std::thread::JoinHandle;
 

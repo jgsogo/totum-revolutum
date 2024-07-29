@@ -2,11 +2,11 @@ use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::fmt::Debug;
 
+use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
 use crate::sync::steps::PipelineStep;
-use crate::sync::{Message, PipelineData};
 
 /// A [`PipelineStep`] that wraps every input into a [`SyncMarked`]. This wrapper contains a
 /// mark that can be used by [`PipelineStepSyncEnd`] to reorder the stream of data to

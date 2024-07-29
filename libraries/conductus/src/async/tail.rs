@@ -1,5 +1,5 @@
 use crate::r#async::steps::PipelineStep;
-use crate::sync::PipelineData;
+use crate::PipelineData;
 use async_trait::async_trait;
 
 pub trait PipelineTailFamily {

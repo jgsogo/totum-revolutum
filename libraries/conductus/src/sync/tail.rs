@@ -1,4 +1,4 @@
-use crate::sync::PipelineData;
+use crate::PipelineData;
 use std::collections::VecDeque;
 
 use crate::sync::steps::{

@@ -1,9 +1,8 @@
 use std::marker::PhantomData;
 
+use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
-
-use crate::sync::{Message, PipelineData};
 
 use super::PipelineStep;
 

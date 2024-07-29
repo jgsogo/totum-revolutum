@@ -1,10 +1,10 @@
 use std::marker::PhantomData;
 
+use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
 use crate::sync::steps::PipelineStep;
-use crate::sync::{Message, PipelineData};
 
 /// A [`PipelineStep`] that can be used to stop a pipeline for certain errors. Return `Some(reason)`
 /// to stop the pipeline, or `None` to ignore and skip the error.
