@@ -1,9 +1,13 @@
-mod noop;
-
-use crate::sync::{Message, PipelineData};
 use async_trait::async_trait;
 use futures::Stream;
+
+pub use map::PipelineStepMap;
 pub use noop::PipelineStepNoop;
+
+use crate::sync::{Message, PipelineData};
+
+mod map;
+mod noop;
 
 #[async_trait]
 pub trait PipelineStep<Input: PipelineData, Output: PipelineData>: Send + 'static {
