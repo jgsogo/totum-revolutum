@@ -4,11 +4,10 @@ use async_trait::async_trait;
 use flume::SendError;
 use tokio::task::JoinHandle;
 
-use crate::tail::PipelineTailImplStream;
 use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
 
 use super::steps::PipelineStepAsync;
-use super::{PipelineHeadAsync, PipelineTailAsync, PipelineTailAsyncFamily};
+use super::{PipelineHeadAsync, PipelineTailAsync, PipelineTailAsyncFamily, PipelineTailImplStream};
 
 pub struct PipelineAsync<
     Input: PipelineData,

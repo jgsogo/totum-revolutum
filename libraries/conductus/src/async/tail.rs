@@ -1,7 +1,12 @@
 use crate::r#async::steps::PipelineStepAsync;
-use crate::tail::PipelineTailImplStream;
-use crate::{PipelineData, PipelineTailImpl};
+use crate::{Message, PipelineData, PipelineTailImpl};
 use async_trait::async_trait;
+use flume::r#async::RecvStream;
+use futures::stream::FusedStream;
+use futures::Stream;
+use std::pin::Pin;
+use std::task::{Context, Poll};
+use tracing::debug;
 
 pub trait PipelineTailAsyncFamily {
     type PipelineTailOps<NextOutput: PipelineData>: PipelineTailAsync<NextOutput> + Send;
@@ -37,6 +42,40 @@ pub trait PipelineTailAsync<Output: PipelineData>: Sized {
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
 
     fn into_stream(self) -> PipelineTailImplStream<'static, Output>;
+}
+
+pub struct PipelineTailImplStream<'a, Output: PipelineData>(RecvStream<'a, Message<Output>>);
+
+impl<'a, Output: PipelineData> PipelineTailImplStream<'a, Output> {
+    pub fn new(recv: RecvStream<'a, Message<Output>>) -> Self {
+        Self(recv)
+    }
+}
+
+impl<Output: PipelineData> Stream for PipelineTailImplStream<'_, Output> {
+    type Item = Output;
+
+    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        match Pin::new(&mut self.0).poll_next(cx) {
+            Poll::Ready(m) => match m {
+                None => Poll::Ready(None),
+                Some(v) => match v {
+                    Message::Data(d) => Poll::Ready(Some(d)),
+                    Message::Stop(reason) => {
+                        debug!("Stop iteration due to data error: {reason}");
+                        Poll::Ready(None)
+                    }
+                },
+            },
+            Poll::Pending => Poll::Pending,
+        }
+    }
+}
+
+impl<'a, Output: PipelineData> FusedStream for PipelineTailImplStream<'a, Output> {
+    fn is_terminated(&self) -> bool {
+        self.0.is_terminated()
+    }
 }
 
 #[async_trait]

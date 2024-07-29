@@ -7,4 +7,4 @@ mod tail;
 
 pub use head::PipelineHeadAsync;
 pub use pipeline::PipelineAsync;
-pub use tail::{PipelineTailAsync, PipelineTailAsyncFamily};
+pub use tail::{PipelineTailAsync, PipelineTailAsyncFamily, PipelineTailImplStream};
