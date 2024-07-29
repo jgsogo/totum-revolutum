@@ -60,10 +60,31 @@ where
     }
 }
 
+impl<Input: PipelineData + Sync, Output: PipelineData, Fut, F> Clone for PipelineStepMap<Input, Output, Fut, F>
+where
+    F: 'static + Fn(Input) -> Fut + Send + Sync + Clone,
+    Fut: 'static + Future<Output = Output> + Send,
+{
+    fn clone(&self) -> Self {
+        Self {
+            func: self.func.clone(),
+            _input: self._input,
+        }
+    }
+}
+
+impl<Input: PipelineData + Sync, Output: PipelineData, Fut, F> Copy for PipelineStepMap<Input, Output, Fut, F>
+where
+    F: Fn(Input) -> Fut + Send + Sync + 'static + Copy,
+    Fut: Future<Output = Output> + Send + 'static,
+{
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use futures::stream;
+
+    use super::*;
 
     async fn double(input: i32) -> i32 {
         input * 2

@@ -97,8 +97,11 @@ impl<'a, Output: PipelineData> FusedStream for PipelineTailImplStream<'a, Output
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use futures::StreamExt;
 
+    use crate::r#async::steps::PipelineStepMap;
     use crate::r#async::steps::PipelineStepNoop;
 
     use super::*;
@@ -117,22 +120,22 @@ mod tests {
         assert_eq!(out, vec![10, 1]);
     }
 
-    // #[tokio::test]
-    // async fn test_parallel_pipe() {
-    //     let (tx, rx) = flume::bounded(0);
-    //     let step = PipelineStepMap::from(|value| {
-    //         std::thread::sleep(Duration::from_millis(value * 10u64));
-    //         value
-    //     });
-    //     let tail = crate::sync::PipelineTailImpl::new(rx).parallel_pipe(step, 2, 2);
-    //
-    //     tx.send(Message::Data(10)).unwrap();
-    //     tx.send(Message::Data(1)).unwrap();
-    //     tx.send(Message::Data(2)).unwrap();
-    //     tx.send(Message::Data(3)).unwrap();
-    //     drop(tx);
-    //
-    //     let out = tail.into_iter().collect::<Vec<_>>();
-    //     assert_eq!(out, vec![1, 2, 3, 10]);
-    // }
+    #[tokio::test]
+    async fn test_parallel_pipe() {
+        let (tx, rx) = flume::bounded(0);
+        let step = PipelineStepMap::from(move |value: u64| async move {
+            tokio::time::sleep(Duration::from_millis(value * 10u64)).await;
+            value
+        });
+        let tail = PipelineTailImpl::new(rx).parallel_pipe(step, 2, 2).await;
+
+        tx.send_async(Message::Data(10)).await.unwrap();
+        tx.send_async(Message::Data(1)).await.unwrap();
+        tx.send_async(Message::Data(2)).await.unwrap();
+        tx.send_async(Message::Data(3)).await.unwrap();
+        drop(tx);
+
+        let out = tail.stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![1, 2, 3, 10]);
+    }
 }
