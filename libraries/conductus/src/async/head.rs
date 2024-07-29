@@ -1,6 +1,7 @@
 use crate::sync::PipelineData;
 use async_trait::async_trait;
 use flume::SendError;
+use tokio::task::JoinHandle;
 
 /// Interface for everything that can act as the head of a pipeline
 #[async_trait]
@@ -13,10 +14,17 @@ pub trait PipelineHead {
     /// Sends several items into the head of the pipeline.
     ///
     /// Implementors should detach the caller from the actual send into the channels.
-    async fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+    async fn send_batch<I: IntoIterator<Item = Self::TInput> + Send>(
         &self,
         input: I,
-    ) -> tokio::task::JoinHandle<Result<(), SendError<Self::TInput>>>
+    ) -> Result<(), SendError<Self::TInput>>
+    where
+        <I as IntoIterator>::IntoIter: Send;
+
+    async fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+        &self,
+        input: I,
+    ) -> JoinHandle<Result<(), SendError<Self::TInput>>>
     where
         <I as IntoIterator>::IntoIter: Send;
 }
