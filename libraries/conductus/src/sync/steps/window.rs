@@ -5,7 +5,7 @@ use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::{debug, warn};
 
-use super::PipelineStep;
+use super::PipelineStepSync;
 
 pub struct PipelineStepWindow<Input: PipelineData, Output: PipelineData, Func>
 where
@@ -25,7 +25,7 @@ where
     }
 }
 
-impl<Input: PipelineData, Output: PipelineData, Func> PipelineStep<Input, Output>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepSync<Input, Output>
     for PipelineStepWindow<Input, Output, Func>
 where
     Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,

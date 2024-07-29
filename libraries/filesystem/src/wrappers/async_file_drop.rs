@@ -228,8 +228,8 @@ struct FileAsyncDrop {
     /// Path to the file
     path: Option<FilePathBuf>,
 
-    /// A sender to be called from drop. The message will arrive [`super::FilesystemLocal`] and it
-    /// will take care of calling [`AsyncFile::sync_all`] to ensure that all data is written to
+    /// A sender to be called from drop. The message will arrive to the wrapped [`Filesystem`] and it
+    /// will take care of calling [`File::sync_all`] to ensure that all data is written to
     /// the filesystem
     tx_filesystem_close: flume::Sender<FileCloseMessage>,
 

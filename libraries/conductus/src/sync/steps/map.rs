@@ -4,9 +4,9 @@ use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
-use super::PipelineStep;
+use super::PipelineStepSync;
 
-/// A [`PipelineStep`] that applies a mapping function to every input
+/// A [`PipelineStepSync`] that applies a mapping function to every input
 pub struct PipelineStepMap<Input: PipelineData, Output: PipelineData, Func>
 where
     Func: Fn(Input) -> Output + Send + 'static,
@@ -24,7 +24,7 @@ where
     }
 }
 
-impl<Input: PipelineData, Output: PipelineData, Func> PipelineStep<Input, Output>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepSync<Input, Output>
     for PipelineStepMap<Input, Output, Func>
 where
     Func: Fn(Input) -> Output + Send + 'static,

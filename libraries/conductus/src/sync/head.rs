@@ -5,7 +5,7 @@ use flume::SendError;
 use crate::{Message, PipelineData, PipelineHeadImpl};
 
 /// Interface for everything that can act as the head of a pipeline
-pub trait PipelineHead {
+pub trait PipelineHeadSync {
     type TInput: PipelineData;
 
     /// Sends one item into the head of the pipeline. This is a blocking call.
@@ -20,7 +20,7 @@ pub trait PipelineHead {
     ) -> JoinHandle<Result<(), SendError<Self::TInput>>>;
 }
 
-impl<Input: PipelineData> PipelineHead for PipelineHeadImpl<Input> {
+impl<Input: PipelineData> PipelineHeadSync for PipelineHeadImpl<Input> {
     type TInput = Input;
 
     fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
@@ -56,7 +56,6 @@ impl<Input: PipelineData> PipelineHead for PipelineHeadImpl<Input> {
 
 #[cfg(test)]
 mod tests {
-    use crate::sync::head::PipelineHead;
 
     use super::*;
 

@@ -65,7 +65,7 @@ pub struct ProxiedFile<PCloud: PCloudClient + Send + 'static> {
     /// The `File` object. It's created on demand when the file is opened.
     local_file: Option<File>,
 
-    /// Stores a task ([`upload`]) that will be executed when this object is dropped
+    /// Stores a task ([`pcloud_upload_to_fileid`]) that will be executed when this object is dropped
     upload_on_drop: UploadSideTaskType<PCloud>,
 }
 

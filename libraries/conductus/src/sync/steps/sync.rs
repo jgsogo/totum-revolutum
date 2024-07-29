@@ -6,9 +6,9 @@ use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync::steps::PipelineStep;
+use crate::sync::steps::PipelineStepSync;
 
-/// A [`PipelineStep`] that wraps every input into a [`SyncMarked`]. This wrapper contains a
+/// A [`PipelineStepSync`] that wraps every input into a [`SyncMarked`]. This wrapper contains a
 /// mark that can be used by [`PipelineStepSyncEnd`] to reorder the stream of data to
 /// match the input order.
 pub struct PipelineStepSyncStart;
@@ -66,7 +66,7 @@ impl<Input: PipelineData> Ord for SyncMarked<Input> {
     }
 }
 
-impl<Input: PipelineData> PipelineStep<Input, SyncMarked<Input>> for PipelineStepSyncStart {
+impl<Input: PipelineData> PipelineStepSync<Input, SyncMarked<Input>> for PipelineStepSyncStart {
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<SyncMarked<Input>>>) {
         for (i, it) in source.into_iter().enumerate() {
             if let Err(e) = target.send(Message::Data(SyncMarked::new(i, it))) {
@@ -76,11 +76,11 @@ impl<Input: PipelineData> PipelineStep<Input, SyncMarked<Input>> for PipelineSte
     }
 }
 
-/// A [`PipelineStep`] that can be added to a pipeline to reorder a stream of [`SyncMarked`] data
+/// A [`PipelineStepSync`] that can be added to a pipeline to reorder a stream of [`SyncMarked`] data
 /// following the input order.
 pub struct PipelineStepSyncEnd;
 
-impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStep<Input, InnerInput>
+impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStepSync<Input, InnerInput>
     for PipelineStepSyncEnd
 {
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {

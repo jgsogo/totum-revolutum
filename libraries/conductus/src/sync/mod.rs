@@ -1,6 +1,6 @@
-pub use head::PipelineHead;
-pub use pipeline::Pipeline;
-pub use tail::{PipelineTail, PipelineTailFamily};
+pub use head::PipelineHeadSync;
+pub use pipeline::PipelineSync;
+pub use tail::{PipelineTailSync, PipelineTailSyncFamily};
 
 mod head;
 mod pipeline;

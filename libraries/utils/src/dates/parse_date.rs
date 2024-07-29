@@ -80,7 +80,7 @@ impl From<Date> for Utf8PathBuf {
     }
 }
 
-/// Tries to guess a date from the string using regex [`RE_YYYY_MM_DD`] or [`crate::dates::parse_date::RE_YYYY_MONTH_DD`].
+/// Tries to guess a date from the string using some regex expressions.
 /// It returns a tuple of optionals with the year, month and day.
 pub fn guess_date_from_str(value: &str) -> Option<Date> {
     // Numbers: Maybe the string contains the hint for a date

@@ -1,14 +1,15 @@
 use std::future::Future;
 use std::marker::PhantomData;
 
-use crate::{Message, PipelineData};
 use async_trait::async_trait;
 use flume::Sender;
 use futures::{pin_mut, Stream};
 use tokio_stream::StreamExt;
 use tracing::debug;
 
-use crate::r#async::steps::PipelineStep;
+use crate::{Message, PipelineData};
+
+use super::PipelineStepAsync;
 
 pub struct PipelineStepMap<Input: PipelineData + Sync, Output: PipelineData, Fut, F>
 where
@@ -30,7 +31,7 @@ where
 }
 
 #[async_trait]
-impl<Input: PipelineData + Sync, Output: PipelineData, Fut, F> PipelineStep<Input, Output>
+impl<Input: PipelineData + Sync, Output: PipelineData, Fut, F> PipelineStepAsync<Input, Output>
     for PipelineStepMap<Input, Output, Fut, F>
 where
     F: Fn(Input) -> Fut + Send + Sync + 'static,

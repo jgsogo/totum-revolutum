@@ -1,19 +1,19 @@
-use super::{PipelineHead, PipelineTail};
+use super::{PipelineHeadAsync, PipelineTailAsync};
 use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
 use std::marker::PhantomData;
 
-pub struct Pipeline<
+pub struct PipelineAsync<
     Input: PipelineData,
     Output: PipelineData,
-    Head: PipelineHead<TInput = Input>,
-    Tail: PipelineTail<Output>,
+    Head: PipelineHeadAsync<TInput = Input>,
+    Tail: PipelineTailAsync<Output>,
 > {
     _head: Head,
     _tail: Tail,
     _output: PhantomData<Output>,
 }
 
-impl<Input: PipelineData> Pipeline<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
+impl<Input: PipelineData> PipelineAsync<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
     pub fn empty(cap: usize) -> Self {
         let (tx, rx) = flume::bounded(cap);
         Self {

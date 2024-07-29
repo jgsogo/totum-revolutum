@@ -5,7 +5,7 @@ use tokio::task::JoinHandle;
 
 /// Interface for everything that can act as the head of a pipeline
 #[async_trait]
-pub trait PipelineHead {
+pub trait PipelineHeadAsync {
     type TInput: PipelineData;
 
     /// Sends one item into the head of the pipeline. This is a blocking call.
@@ -30,7 +30,7 @@ pub trait PipelineHead {
 }
 
 #[async_trait]
-impl<Input: PipelineData> PipelineHead for PipelineHeadImpl<Input> {
+impl<Input: PipelineData> PipelineHeadAsync for PipelineHeadImpl<Input> {
     type TInput = Input;
 
     async fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {

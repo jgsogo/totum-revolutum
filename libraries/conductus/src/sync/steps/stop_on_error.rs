@@ -4,9 +4,9 @@ use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync::steps::PipelineStep;
+use crate::sync::steps::PipelineStepSync;
 
-/// A [`PipelineStep`] that can be used to stop a pipeline for certain errors. Return `Some(reason)`
+/// A [`PipelineStepSync`] that can be used to stop a pipeline for certain errors. Return `Some(reason)`
 /// to stop the pipeline, or `None` to ignore and skip the error.
 pub struct PipelineStepStopOnError<Func, Error: std::error::Error>
 where
@@ -25,7 +25,7 @@ where
     }
 }
 
-impl<Input: PipelineData, Func, Error: std::error::Error + Send + 'static> PipelineStep<Result<Input, Error>, Input>
+impl<Input: PipelineData, Func, Error: std::error::Error + Send + 'static> PipelineStepSync<Result<Input, Error>, Input>
     for PipelineStepStopOnError<Func, Error>
 where
     Func: Fn(Error) -> Option<String> + Send + 'static,

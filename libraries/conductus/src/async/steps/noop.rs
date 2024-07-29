@@ -5,14 +5,14 @@ use futures::{pin_mut, Stream};
 use tokio_stream::StreamExt;
 use tracing::debug;
 
-use super::PipelineStep;
+use super::PipelineStepAsync;
 
-/// A [`PipelineStep`] that does nothing
+/// A [`PipelineStepAsync`] that does nothing
 #[derive(Default)]
 pub struct PipelineStepNoop;
 
 #[async_trait]
-impl<Input: PipelineData> PipelineStep<Input, Input> for PipelineStepNoop {
+impl<Input: PipelineData> PipelineStepAsync<Input, Input> for PipelineStepNoop {
     async fn run<I: Stream<Item = Input> + Send>(&self, source: I, target: Sender<Message<Input>>) {
         pin_mut!(source);
         while let Some(it) = source.next().await {

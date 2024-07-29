@@ -5,6 +5,6 @@ pub mod pipeline_async;
 pub mod steps;
 mod tail;
 
-pub use head::PipelineHead;
-pub use pipeline::Pipeline;
-pub use tail::{PipelineTail, PipelineTailFamily};
+pub use head::PipelineHeadAsync;
+pub use pipeline::PipelineAsync;
+pub use tail::{PipelineTailAsync, PipelineTailAsyncFamily};

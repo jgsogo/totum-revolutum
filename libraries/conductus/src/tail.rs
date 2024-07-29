@@ -6,6 +6,7 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 use tracing::debug;
 
+/// A default implementation of a pipeline head.
 pub struct PipelineTailImpl<Output: PipelineData> {
     pub(crate) rx: flume::Receiver<Message<Output>>,
 }

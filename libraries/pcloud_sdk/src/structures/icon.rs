@@ -5,7 +5,7 @@ use strum_macros::Display;
 /// spreadsheet, font, presentation, image, diskimage, package, executable,
 /// audio, video, file
 ///
-/// Described in https://docs.pcloud.com/structures/metadata.html
+/// Described in <https://docs.pcloud.com/structures/metadata.html>
 #[derive(Serialize, Deserialize, PartialEq, Eq, Display, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 #[allow(clippy::upper_case_acronyms)]

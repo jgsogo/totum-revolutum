@@ -4,26 +4,26 @@ use std::thread::JoinHandle;
 use crate::{PipelineData, PipelineTailImpl};
 use flume::SendError;
 
-use crate::sync::steps::PipelineStep;
-use crate::sync::tail::PipelineTailFamily;
-use crate::sync::{PipelineHead, PipelineTail};
+use crate::sync::steps::PipelineStepSync;
+use crate::sync::tail::PipelineTailSyncFamily;
+use crate::sync::{PipelineHeadSync, PipelineTailSync};
 use crate::tail::PipelineTailImplIter;
 use crate::PipelineHeadImpl;
 
-/// Implementation of a pipeline. This object acts both as a [`PipelineHead`] and a
-/// [`PipelineTail`].
-pub struct Pipeline<
+/// Implementation of a pipeline. This object acts both as a [`PipelineHeadSync`] and a
+/// [`PipelineTailSync`].
+pub struct PipelineSync<
     Input: PipelineData,
     Output: PipelineData,
-    Head: PipelineHead<TInput = Input>,
-    Tail: PipelineTail<Output>,
+    Head: PipelineHeadSync<TInput = Input>,
+    Tail: PipelineTailSync<Output>,
 > {
     head: Head,
     tail: Tail,
     _output: PhantomData<Output>,
 }
 
-impl<Input: PipelineData> Pipeline<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
+impl<Input: PipelineData> PipelineSync<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
     pub fn empty(cap: usize) -> Self {
         let (tx, rx) = flume::bounded(cap);
         Self {
@@ -34,16 +34,16 @@ impl<Input: PipelineData> Pipeline<Input, Input, PipelineHeadImpl<Input>, Pipeli
     }
 }
 
-impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Input>>
-    Pipeline<Input, Output, Head, PipelineTailImpl<Output>>
+impl<Input: PipelineData, Output: PipelineData, Head: PipelineHeadSync<TInput = Input>>
+    PipelineSync<Input, Output, Head, PipelineTailImpl<Output>>
 {
     pub fn drain(self) -> PipelineTailImplIter<Output> {
         self.tail.into_iter()
     }
 }
 
-/// A helper struct to implement [`PipelineTailFamily`], so that [`Pipeline`] can implement the
-/// [`PipelineTail`] trait.
+/// A helper struct to implement [`PipelineTailSyncFamily`], so that [`PipelineSync`] can implement the
+/// [`PipelineTailSync`] trait.
 pub struct PipelineImplFamily<Output, Head, Tail> {
     _output: PhantomData<Output>,
     _head: PhantomData<Head>,
@@ -53,44 +53,46 @@ pub struct PipelineImplFamily<Output, Head, Tail> {
 impl<
         Input: PipelineData,
         Output: PipelineData,
-        Head: PipelineHead<TInput = Input> + 'static,
-        Tail: PipelineTail<Output>,
-    > PipelineTailFamily for PipelineImplFamily<Output, Head, Tail>
+        Head: PipelineHeadSync<TInput = Input> + 'static,
+        Tail: PipelineTailSync<Output>,
+    > PipelineTailSyncFamily for PipelineImplFamily<Output, Head, Tail>
 {
     type PipelineTailOps<NextOutput: PipelineData> =
-        Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>>;
+        PipelineSync<Input, NextOutput, Head, <Tail::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>>;
 }
 
 impl<
         Input: PipelineData,
         Output: PipelineData,
-        Head: PipelineHead<TInput = Input> + 'static,
-        Tail: PipelineTail<Output>,
-    > PipelineTail<Output> for Pipeline<Input, Output, Head, Tail>
+        Head: PipelineHeadSync<TInput = Input> + 'static,
+        Tail: PipelineTailSync<Output>,
+    > PipelineTailSync<Output> for PipelineSync<Input, Output, Head, Tail>
 {
     type Family = PipelineImplFamily<Output, Head, Tail>;
 
-    fn pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
+    fn pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
-    ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>> {
+    ) -> PipelineSync<Input, NextOutput, Head, <Tail::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>>
+    {
         let tail = self.tail.pipe(step, cap);
-        Pipeline {
+        PipelineSync {
             head: self.head,
             tail,
             _output: PhantomData,
         }
     }
 
-    fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
+    fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
         cap: usize,
-    ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>> {
+    ) -> PipelineSync<Input, NextOutput, Head, <Tail::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>>
+    {
         let tail = self.tail.parallel_pipe(step, workers, cap);
-        Pipeline {
+        PipelineSync {
             head: self.head,
             tail,
             _output: PhantomData,
@@ -98,8 +100,12 @@ impl<
     }
 }
 
-impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Input>, Tail: PipelineTail<Output>>
-    PipelineHead for Pipeline<Input, Output, Head, Tail>
+impl<
+        Input: PipelineData,
+        Output: PipelineData,
+        Head: PipelineHeadSync<TInput = Input>,
+        Tail: PipelineTailSync<Output>,
+    > PipelineHeadSync for PipelineSync<Input, Output, Head, Tail>
 {
     type TInput = Input;
 
@@ -118,9 +124,9 @@ impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Inpu
 impl<
         Input: PipelineData,
         Output: PipelineData,
-        Head: PipelineHead<TInput = Input>,
-        Tail: PipelineTail<Output> + IntoIterator<Item = Output>,
-    > IntoIterator for Pipeline<Input, Output, Head, Tail>
+        Head: PipelineHeadSync<TInput = Input>,
+        Tail: PipelineTailSync<Output> + IntoIterator<Item = Output>,
+    > IntoIterator for PipelineSync<Input, Output, Head, Tail>
 {
     type Item = Output;
     type IntoIter = Tail::IntoIter;
@@ -144,7 +150,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = Pipeline::empty(2).pipe(step, 2);
+        let pipeline = PipelineSync::empty(2).pipe(step, 2);
 
         pipeline.send(10).unwrap();
         pipeline.send(1).unwrap();
@@ -158,7 +164,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = Pipeline::empty(2).parallel_pipe(step, 2, 2);
+        let pipeline = PipelineSync::empty(2).parallel_pipe(step, 2, 2);
 
         pipeline.send(10).unwrap();
         pipeline.send(1).unwrap();
@@ -168,7 +174,7 @@ mod tests {
 
     #[test]
     fn test_send() {
-        let pipeline = Pipeline::empty(2);
+        let pipeline = PipelineSync::empty(2);
 
         pipeline.send(3).unwrap();
         let out = pipeline.into_iter().collect::<Vec<_>>();
@@ -177,7 +183,7 @@ mod tests {
 
     #[test]
     fn test_send_batch() {
-        let pipeline = Pipeline::empty(2);
+        let pipeline = PipelineSync::empty(2);
 
         pipeline.send_batch(0..3);
         let out = pipeline.into_iter().collect::<Vec<_>>();
@@ -186,7 +192,7 @@ mod tests {
 
     #[test]
     fn test_drain() {
-        let pipeline = Pipeline::empty(2);
+        let pipeline = PipelineSync::empty(2);
         pipeline.send_batch(0..5);
 
         let out = pipeline.drain().collect::<Vec<_>>();

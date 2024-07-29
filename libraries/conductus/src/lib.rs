@@ -1,7 +1,7 @@
 pub use data::{Message, PipelineData};
 pub use head::PipelineHeadImpl;
-pub use r#async::Pipeline as PipelineAsync;
-pub use sync::Pipeline as PipelineSync;
+pub use r#async::PipelineAsync;
+pub use sync::PipelineSync;
 pub use tail::PipelineTailImpl;
 
 pub mod r#async;

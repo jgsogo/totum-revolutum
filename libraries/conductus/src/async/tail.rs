@@ -1,50 +1,50 @@
-use crate::r#async::steps::PipelineStep;
+use crate::r#async::steps::PipelineStepAsync;
 use crate::{PipelineData, PipelineTailImpl};
 use async_trait::async_trait;
 
-pub trait PipelineTailFamily {
-    type PipelineTailOps<NextOutput: PipelineData>: PipelineTail<NextOutput>;
+pub trait PipelineTailAsyncFamily {
+    type PipelineTailOps<NextOutput: PipelineData>: PipelineTailAsync<NextOutput>;
 }
 
-/// A helper struct to implement [`PipelineTailFamily`], so that [`PipelineTailImpl`] can implement
-/// the [`PipelineTail`] trait.
+/// A helper struct to implement [`PipelineTailAsyncFamily`], so that [`PipelineTailImpl`] can implement
+/// the [`PipelineTailAsync`] trait.
 pub struct PipelineTailAsyncImplFamily;
 
-impl PipelineTailFamily for PipelineTailAsyncImplFamily {
+impl PipelineTailAsyncFamily for PipelineTailAsyncImplFamily {
     type PipelineTailOps<NextOutput: PipelineData> = PipelineTailImpl<NextOutput>;
 }
 
 /// Interface for the tail of a pipeline
 #[async_trait]
-pub trait PipelineTail<Output: PipelineData>: Sized {
-    type Family: PipelineTailFamily;
+pub trait PipelineTailAsync<Output: PipelineData>: Sized {
+    type Family: PipelineTailAsyncFamily;
 
-    /// Adds a [`PipelineStep`] to the pipeline
-    async fn pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
+    /// Adds a [`PipelineStepAsync`] to the pipeline
+    async fn pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
-    ) -> <Self::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>;
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
 
-    /// Adds a [`PipelineStep`] to the pipeline. This step will be executed in parallel using as
+    /// Adds a [`PipelineStepAsync`] to the pipeline. This step will be executed in parallel using as
     /// many workers as given
-    async fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
+    async fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
         cap: usize,
-    ) -> <Self::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>;
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
 }
 
 #[async_trait]
-impl<Output: PipelineData> PipelineTail<Output> for PipelineTailImpl<Output> {
+impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output> {
     type Family = PipelineTailAsyncImplFamily;
 
-    async fn pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
+    async fn pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
-    ) -> <Self::Family as PipelineTailFamily>::PipelineTailOps<NextOutput> {
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
         let (tx, rx) = flume::bounded(cap);
         tokio::spawn(async move {
             step.run(self.stream(), tx).await;
@@ -52,12 +52,12 @@ impl<Output: PipelineData> PipelineTail<Output> for PipelineTailImpl<Output> {
         PipelineTailImpl::new(rx)
     }
 
-    async fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
+    async fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
         cap: usize,
-    ) -> <Self::Family as PipelineTailFamily>::PipelineTailOps<NextOutput> {
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
         let (tx, rx) = flume::bounded(cap);
         for _ in 0..workers {
             let tx = tx.clone();

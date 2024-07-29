@@ -2,13 +2,13 @@ use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
-use super::PipelineStep;
+use super::PipelineStepSync;
 
-/// A [`PipelineStep`] that does nothing
+/// A [`PipelineStepSync`] that does nothing
 #[derive(Default)]
 pub struct PipelineStepNoop;
 
-impl<Input: PipelineData> PipelineStep<Input, Input> for PipelineStepNoop {
+impl<Input: PipelineData> PipelineStepSync<Input, Input> for PipelineStepNoop {
     fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Input>>) {
         for it in source {
             if let Err(e) = target.send(Message::Data(it)) {
