@@ -279,7 +279,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sync() {
+    fn test_synchronize() {
         let (tx, rx) = flume::bounded(0);
         let tail = PipelineTailImpl::new(rx)
             .sync_mark()
