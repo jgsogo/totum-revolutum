@@ -72,7 +72,7 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self.parallel_pipe(step, workers, cap)
     }
 
-    /// Adds a [`PipelineStepNoop`] step with the given buffer.
+    /// Adds a buffer.
     fn buffer(self, cap: usize) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<Output> {
         self.pipe_sync(PipelineStepNoop, cap)
     }
@@ -88,12 +88,12 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self.pipe_sync(step, cap)
     }
 
-    /// Adds a [`PipelineStepSynchronizeStart`] step to the tail of the pipeline
+    /// Adds a synchronization mark to the data in the pipeline
     fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SynchronizeMarked<Output>> {
         self.pipe_sync(PipelineStepSynchronizeStart, 0)
     }
 
-    /// Adds a [`PipelineStepSynchronizeEnd`] step to the tail of the pipeline
+    /// Uses a synchronization mark (see [`PipelineTailSync::sync_mark`]) to reorder the data
     fn sync<InnerOutput: PipelineData>(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<InnerOutput>
     where
         Output: SynchronizeMarkedTrait<InnerOutput>,
