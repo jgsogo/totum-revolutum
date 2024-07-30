@@ -19,9 +19,9 @@ http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_j
 # Bazel-diff: https://github.com/Tinder/bazel-diff
 http_jar(
     name = "bazel_diff",
-    sha256 = "29757a669e321a56c0dd1737a66eb595de07164612a116a1d82ef498a58d6cc3",
+    sha256 = "ed5410288bd7ec5b49b556103f561fb15e4c82f13f12cb41be128d447ecc2d46",
     urls = [
-        "https://github.com/Tinder/bazel-diff/releases/download/7.0.1/bazel-diff_deploy.jar",
+        "https://github.com/Tinder/bazel-diff/releases/download/7.1.1/bazel-diff_deploy.jar",
     ],
 )
 
@@ -47,7 +47,7 @@ python.toolchain(
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
     edition = "2021",
-    versions = ["1.79.0"],
+    versions = ["1.80.0"],
 )
 use_repo(rust, "rust_toolchains")
 
