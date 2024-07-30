@@ -3,12 +3,14 @@ use futures::Stream;
 
 pub use map::PipelineStepMap;
 pub use noop::PipelineStepNoop;
+pub use syncronize::{PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart};
 
 use crate::{Message, PipelineData};
 
 mod map;
 mod noop;
 mod stop_on_error;
+mod syncronize;
 
 #[async_trait]
 pub trait PipelineStepAsync<Input: PipelineData, Output: PipelineData>: Send + 'static {

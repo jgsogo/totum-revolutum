@@ -1,10 +1,11 @@
+use crate::common::syncronize::{SyncronizeMarked, SyncronizeMarkedTrait};
 use crate::{Message, PipelineData, PipelineTailImpl};
 use std::collections::VecDeque;
 use tracing::debug;
 
 use crate::sync::steps::{
-    PipelineStepMap, PipelineStepNoop, PipelineStepSync, PipelineStepSyncEnd, PipelineStepSyncStart,
-    PipelineStepWindow, SyncMarked, SyncMarkedTrait,
+    PipelineStepMap, PipelineStepNoop, PipelineStepSync, PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart,
+    PipelineStepWindow,
 };
 
 pub trait PipelineTailSyncFamily {
@@ -86,17 +87,17 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self.pipe_sync(step, cap)
     }
 
-    /// Adds a [`PipelineStepSyncStart`] step to the tail of the pipeline
-    fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SyncMarked<Output>> {
-        self.pipe_sync(PipelineStepSyncStart, 0)
+    /// Adds a [`PipelineStepSyncronizeStart`] step to the tail of the pipeline
+    fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SyncronizeMarked<Output>> {
+        self.pipe_sync(PipelineStepSyncronizeStart, 0)
     }
 
-    /// Adds a [`PipelineStepSyncEnd`] step to the tail of the pipeline
+    /// Adds a [`PipelineStepSyncronizeEnd`] step to the tail of the pipeline
     fn sync<InnerOutput: PipelineData>(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<InnerOutput>
     where
-        Output: SyncMarkedTrait<InnerOutput>,
+        Output: SyncronizeMarkedTrait<InnerOutput>,
     {
-        self.pipe_sync(PipelineStepSyncEnd, 0)
+        self.pipe_sync(PipelineStepSyncronizeEnd, 0)
     }
 
     fn into_iter(self) -> PipelineTailImplIter<Output>;
@@ -167,7 +168,8 @@ impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output>
 
 #[cfg(test)]
 mod tests {
-    use crate::sync::steps::{PipelineStepMap, SyncMarkedTrait};
+    use crate::common::syncronize::SyncronizeMarkedTrait;
+    use crate::sync::steps::PipelineStepMap;
     use crate::Message;
     use std::time::Duration;
 
