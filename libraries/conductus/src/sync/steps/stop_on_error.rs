@@ -1,10 +1,10 @@
 use std::marker::PhantomData;
 
-use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
 use crate::sync::steps::PipelineStepSync;
+use crate::{Message, PipelineData};
 
 /// A [`PipelineStepSync`] that can be used to stop a pipeline for certain errors. Return `Some(reason)`
 /// to stop the pipeline, or `None` to ignore and skip the error.
@@ -60,8 +60,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::sync::steps::tests::collect_rx;
     use std::fmt::{Debug, Display, Formatter};
+
+    use crate::sync::steps::tests::collect_rx;
 
     use super::*;
 
@@ -94,7 +95,7 @@ mod tests {
         };
         let step: PipelineStepStopOnError<_, MyError> = stop_on_error.into();
 
-        assert_eq!(step.check_error(MyError(2)), None);
+        assert!(step.check_error(MyError(2)).is_none());
         assert!(step.check_error(MyError(3)).is_some());
         assert!(step.check_error(MyError(5)).is_some());
 
