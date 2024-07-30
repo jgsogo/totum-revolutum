@@ -1,14 +1,15 @@
 use async_trait::async_trait;
 use futures::Stream;
 
-pub use map::PipelineStepMap;
-
 use crate::{Message, PipelineData};
+pub use map::PipelineStepMap;
+pub use window::PipelineStepWindow;
 
 mod map;
 mod noop;
 mod stop_on_error;
 mod synchronize;
+mod window;
 
 #[async_trait]
 pub trait PipelineStepAsync<Input: PipelineData, Output: PipelineData>: Send + 'static {

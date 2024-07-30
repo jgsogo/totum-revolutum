@@ -20,6 +20,14 @@ impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepWindow<Input, 
 where
     Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,
 {
+    pub fn new(func: Func, window_size: usize) -> Self {
+        Self {
+            window_size,
+            func,
+            _input: PhantomData,
+        }
+    }
+
     pub fn window(&self, input: &VecDeque<Input>) -> Output {
         (self.func)(input)
     }
@@ -59,19 +67,6 @@ where
             if let Err(e) = target.send(Message::Data(out)) {
                 debug!("Error sending from blanket implementation of PipelineStepWindow: {e}");
             }
-        }
-    }
-}
-
-impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepWindow<Input, Output, Func>
-where
-    Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,
-{
-    pub fn new(func: Func, window_size: usize) -> Self {
-        Self {
-            window_size,
-            func,
-            _input: PhantomData,
         }
     }
 }
