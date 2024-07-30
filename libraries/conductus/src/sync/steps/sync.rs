@@ -108,6 +108,7 @@ impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStepS
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sync::steps::tests::collect_rx;
 
     #[test]
     fn test_sync_step_start() {
@@ -116,13 +117,7 @@ mod tests {
         let (tx, rx) = flume::bounded(2);
         std::thread::spawn(move || sync_start.run(10..12, tx));
 
-        let r = rx
-            .into_iter()
-            .filter_map(|it| match it {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx);
         assert_eq!(r, vec![SyncMarked::new(0, 10), SyncMarked::new(1, 11)]);
     }
 
@@ -134,13 +129,7 @@ mod tests {
         let data = vec![SyncMarked::new(0, 10), SyncMarked::new(2, 12), SyncMarked::new(1, 11)];
         std::thread::spawn(move || sync_end.run(data.into_iter(), tx));
 
-        let r = rx
-            .into_iter()
-            .filter_map(|it| match it {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx);
         assert_eq!(r, vec![10, 11, 12]);
     }
 }

@@ -83,6 +83,7 @@ where
 
 #[cfg(test)]
 mod tests {
+    use crate::r#async::steps::tests::collect_rx;
     use futures::stream;
 
     use super::*;
@@ -102,16 +103,7 @@ mod tests {
         let (tx, rx) = flume::bounded(2);
         tokio::spawn(async move { step.run(stream::iter(0..10), tx).await });
 
-        let r = rx
-            .into_stream()
-            .collect::<Vec<_>>()
-            .await
-            .into_iter()
-            .filter_map(|v| match v {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx).await;
         assert_eq!(r, vec![0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
     }
 }

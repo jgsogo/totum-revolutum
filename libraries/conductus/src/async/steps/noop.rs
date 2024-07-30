@@ -1,9 +1,10 @@
-use crate::{Message, PipelineData};
 use async_trait::async_trait;
 use flume::Sender;
 use futures::{pin_mut, Stream};
 use tokio_stream::StreamExt;
 use tracing::debug;
+
+use crate::{Message, PipelineData};
 
 use super::PipelineStepAsync;
 
@@ -25,8 +26,11 @@ impl<Input: PipelineData> PipelineStepAsync<Input, Input> for PipelineStepNoop {
 
 #[cfg(test)]
 mod tests {
+    use futures::stream;
+
+    use crate::r#async::steps::tests::collect_rx;
+
     use super::*;
-    use futures::{stream, StreamExt};
 
     #[tokio::test]
     async fn test_step_buffer() {
@@ -37,16 +41,7 @@ mod tests {
             step.run(stream::iter(0..10), tx).await;
         });
 
-        let r = rx
-            .into_stream()
-            .collect::<Vec<_>>()
-            .await
-            .into_iter()
-            .filter_map(|v| match v {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx).await;
         assert_eq!(r, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     }
 }
