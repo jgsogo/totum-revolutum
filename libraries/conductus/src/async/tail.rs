@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
@@ -9,8 +10,11 @@ use futures::Stream;
 use tracing::debug;
 
 use crate::common::steps::noop::PipelineStepNoop;
+use crate::common::steps::synchronize::{PipelineStepSynchronizeEnd, PipelineStepSynchronizeStart, SynchronizeMarked};
 use crate::r#async::steps::PipelineStepAsync;
 use crate::r#async::steps::PipelineStepMap;
+use crate::r#async::steps::PipelineStepWindow;
+use crate::sync::steps::SynchronizeMarkedTrait;
 use crate::{Message, PipelineData, PipelineTailImpl};
 
 pub trait PipelineTailAsyncFamily {
@@ -88,6 +92,39 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
 
     async fn buffer(self, cap: usize) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<Output> {
         self.pipe_async(PipelineStepNoop, cap).await
+    }
+
+    /// Adds a [`PipelineStepWindow`] with the function given
+    async fn window<NextOutput: PipelineData + Sync, Fut, F>(
+        self,
+        func: F,
+        window_size: usize,
+        cap: usize,
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>
+    where
+        Output: Clone,
+        F: Fn(VecDeque<Output>) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = NextOutput> + Send + 'static,
+    {
+        let step = PipelineStepWindow::<Output, NextOutput, Fut, F>::new(func, window_size);
+        self.pipe_async(step, cap).await
+    }
+
+    async fn sync_mark(
+        self,
+        cap: usize,
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<SynchronizeMarked<Output>> {
+        self.pipe_async(PipelineStepSynchronizeStart, cap).await
+    }
+
+    async fn sync<InnerOutput: PipelineData + Sync>(
+        self,
+        cap: usize,
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<InnerOutput>
+    where
+        Output: SynchronizeMarkedTrait<InnerOutput>,
+    {
+        self.pipe_async(PipelineStepSynchronizeEnd, cap).await
     }
 }
 
@@ -250,6 +287,56 @@ mod tests {
     async fn test_buffer() {
         let (tx, rx) = flume::bounded(0);
         let tail = PipelineTailImpl::new(rx).buffer(4).await;
+
+        tx.send_async(Message::Data(10)).await.unwrap();
+        tx.send_async(Message::Data(1)).await.unwrap();
+        tx.send_async(Message::Data(2)).await.unwrap();
+        tx.send_async(Message::Data(3)).await.unwrap();
+        drop(tx);
+
+        let out = tail.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![10, 1, 2, 3]);
+    }
+
+    #[tokio::test]
+    async fn test_window() {
+        let (tx, rx) = flume::bounded(0);
+        let tail = PipelineTailImpl::new(rx)
+            .window(
+                move |input: VecDeque<i32>| async move { input.iter().cloned().collect::<Vec<_>>() },
+                3,
+                2,
+            )
+            .await;
+
+        tx.send_async(Message::Data(0)).await.unwrap();
+        tx.send_async(Message::Data(1)).await.unwrap();
+        tx.send_async(Message::Data(2)).await.unwrap();
+        tx.send_async(Message::Data(3)).await.unwrap();
+        drop(tx);
+
+        let out = tail.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![vec![0, 1, 2], vec![1, 2, 3]]);
+    }
+
+    #[tokio::test]
+    async fn test_synchronize() {
+        let (tx, rx) = flume::bounded(0);
+        let tail = PipelineTailImpl::new(rx)
+            .sync_mark(0)
+            .await
+            .parallel_map(
+                move |value| async move {
+                    let inner = value.inner();
+                    tokio::time::sleep(Duration::from_millis(inner * 10u64)).await;
+                    value
+                },
+                2,
+                2,
+            )
+            .await
+            .sync(0)
+            .await;
 
         tx.send_async(Message::Data(10)).await.unwrap();
         tx.send_async(Message::Data(1)).await.unwrap();
