@@ -3,8 +3,8 @@ use std::collections::VecDeque;
 use tracing::debug;
 
 use crate::common::steps::noop::PipelineStepNoop;
-use crate::common::steps::syncronize::{
-    PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart, SyncronizeMarked, SyncronizeMarkedTrait,
+use crate::common::steps::synchronize::{
+    PipelineStepSynchronizeEnd, PipelineStepSynchronizeStart, SynchronizeMarked, SynchronizeMarkedTrait,
 };
 use crate::sync::steps::{PipelineStepMap, PipelineStepSync, PipelineStepWindow};
 use crate::{Message, PipelineData, PipelineTailImpl};
@@ -88,17 +88,17 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self.pipe_sync(step, cap)
     }
 
-    /// Adds a [`PipelineStepSyncronizeStart`] step to the tail of the pipeline
-    fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SyncronizeMarked<Output>> {
-        self.pipe_sync(PipelineStepSyncronizeStart, 0)
+    /// Adds a [`PipelineStepSynchronizeStart`] step to the tail of the pipeline
+    fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SynchronizeMarked<Output>> {
+        self.pipe_sync(PipelineStepSynchronizeStart, 0)
     }
 
-    /// Adds a [`PipelineStepSyncronizeEnd`] step to the tail of the pipeline
+    /// Adds a [`PipelineStepSynchronizeEnd`] step to the tail of the pipeline
     fn sync<InnerOutput: PipelineData>(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<InnerOutput>
     where
-        Output: SyncronizeMarkedTrait<InnerOutput>,
+        Output: SynchronizeMarkedTrait<InnerOutput>,
     {
-        self.pipe_sync(PipelineStepSyncronizeEnd, 0)
+        self.pipe_sync(PipelineStepSynchronizeEnd, 0)
     }
 
     fn into_iter(self) -> PipelineTailImplIter<Output>;
@@ -171,7 +171,7 @@ impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output>
 mod tests {
     use std::time::Duration;
 
-    use crate::common::steps::syncronize::SyncronizeMarkedTrait;
+    use crate::common::steps::synchronize::SynchronizeMarkedTrait;
     use crate::sync::steps::PipelineStepMap;
     use crate::Message;
 

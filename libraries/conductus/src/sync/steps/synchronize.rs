@@ -1,7 +1,7 @@
 use std::collections::BinaryHeap;
 
-use crate::common::steps::syncronize::{
-    PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart, SyncronizeMarked, SyncronizeMarkedTrait,
+use crate::common::steps::synchronize::{
+    PipelineStepSynchronizeEnd, PipelineStepSynchronizeStart, SynchronizeMarked, SynchronizeMarkedTrait,
 };
 use crate::{Message, PipelineData};
 use flume::Sender;
@@ -9,18 +9,18 @@ use tracing::debug;
 
 use crate::sync::steps::PipelineStepSync;
 
-impl<Input: PipelineData> PipelineStepSync<Input, SyncronizeMarked<Input>> for PipelineStepSyncronizeStart {
-    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<SyncronizeMarked<Input>>>) {
+impl<Input: PipelineData> PipelineStepSync<Input, SynchronizeMarked<Input>> for PipelineStepSynchronizeStart {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<SynchronizeMarked<Input>>>) {
         for (i, it) in source.into_iter().enumerate() {
-            if let Err(e) = target.send(Message::Data(SyncronizeMarked::new(i, it))) {
+            if let Err(e) = target.send(Message::Data(SynchronizeMarked::new(i, it))) {
                 debug!("Error sending from blanket implementation of PipelineSyncStart: {e}");
             }
         }
     }
 }
 
-impl<InnerInput: PipelineData, Input: SyncronizeMarkedTrait<InnerInput>> PipelineStepSync<Input, InnerInput>
-    for PipelineStepSyncronizeEnd
+impl<InnerInput: PipelineData, Input: SynchronizeMarkedTrait<InnerInput>> PipelineStepSync<Input, InnerInput>
+    for PipelineStepSynchronizeEnd
 {
     fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {
         let mut next = 0;
@@ -50,25 +50,25 @@ mod tests {
     use crate::sync::steps::tests::collect_rx;
 
     #[test]
-    fn test_syncronize_step_start() {
-        let sync_start = PipelineStepSyncronizeStart;
+    fn test_synchronize_step_start() {
+        let sync_start = PipelineStepSynchronizeStart;
 
         let (tx, rx) = flume::bounded(2);
         std::thread::spawn(move || sync_start.run(10..12, tx));
 
         let r = collect_rx(rx);
-        assert_eq!(r, vec![SyncronizeMarked::new(0, 10), SyncronizeMarked::new(1, 11)]);
+        assert_eq!(r, vec![SynchronizeMarked::new(0, 10), SynchronizeMarked::new(1, 11)]);
     }
 
     #[test]
-    fn test_syncronize_step_end() {
-        let sync_end = PipelineStepSyncronizeEnd;
+    fn test_synchronize_step_end() {
+        let sync_end = PipelineStepSynchronizeEnd;
 
         let (tx, rx) = flume::bounded(2);
         let data = vec![
-            SyncronizeMarked::new(0, 10),
-            SyncronizeMarked::new(2, 12),
-            SyncronizeMarked::new(1, 11),
+            SynchronizeMarked::new(0, 10),
+            SynchronizeMarked::new(2, 12),
+            SynchronizeMarked::new(1, 11),
         ];
         std::thread::spawn(move || sync_end.run(data.into_iter(), tx));
 

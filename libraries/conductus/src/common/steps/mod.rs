@@ -1,2 +1,2 @@
 pub mod noop;
-pub mod syncronize;
+pub mod synchronize;
