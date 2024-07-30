@@ -6,16 +6,19 @@ edition = "2021"
 [features]
 default = ["sync", "tokio-async"]
 sync = []
-tokio-async = []
+tokio-async = ["dep:async-trait", "dep:futures", "dep:tokio", "dep:tokio-stream"]
 
 [dependencies]
-async-trait = { workspace = true }
 flume = { workspace = true }
-thiserror = { workspace = true }
-tokio = { workspace = true, features = ["full"] }
-tokio-stream = { workspace = true }
 tracing = { workspace = true }
 log = { workspace = true }
-futures = { workspace = true }
+
+# sync
+
+# tokio-async
+async-trait = { workspace = true, optional = true }
+futures = { workspace = true, optional = true }
+tokio = { workspace = true, features = ["full"], optional = true }
+tokio-stream = { workspace = true, optional = true }
 
 [dev-dependencies]
