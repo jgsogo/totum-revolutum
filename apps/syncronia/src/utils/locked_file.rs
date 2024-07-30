@@ -3,7 +3,7 @@ use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 
 use anyhow::{anyhow, Result};
-use fs4::FileExt;
+use fs4::fs_std::FileExt;
 use tracing::debug;
 
 use crate::utils::versioned_data::VersionedData;
