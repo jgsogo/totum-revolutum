@@ -1,17 +1,23 @@
-use crate::{Message, PipelineData, PipelineHeadImpl};
 use async_trait::async_trait;
 use flume::SendError;
 use futures::{pin_mut, Stream};
 use tokio::task::JoinHandle;
 use tokio_stream::StreamExt;
 
+use crate::{Message, PipelineData, PipelineHeadImpl};
+
 /// Interface for everything that can act as the head of a pipeline
 #[async_trait]
 pub trait PipelineHeadAsync {
     type TInput: PipelineData;
 
-    /// Sends one item into the head of the pipeline. This is a blocking call.
-    async fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>>;
+    /// Sends one item into the head of the pipeline.
+    async fn send_async(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>>;
+
+    /// Alias to [`PipelineHeadAsync::send_async`]
+    async fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
+        self.send_async(item).await
+    }
 
     /// Sends several items into the head of the pipeline.
     ///
@@ -19,7 +25,7 @@ pub trait PipelineHeadAsync {
     async fn send_batch<I: Stream<Item = Self::TInput> + Send>(&self, input: I) -> Result<(), SendError<Self::TInput>> {
         pin_mut!(input);
         while let Some(d) = input.next().await {
-            self.send(d).await?;
+            self.send_async(d).await?;
         }
         Ok(())
     }
@@ -34,7 +40,7 @@ pub trait PipelineHeadAsync {
 impl<Input: PipelineData> PipelineHeadAsync for PipelineHeadImpl<Input> {
     type TInput = Input;
 
-    async fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
+    async fn send_async(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
         self.tx.send_async(Message::Data(item)).await.map_err(|e| {
             let Message::Data(msg) = e.into_inner() else {
                 unreachable!()
@@ -83,8 +89,8 @@ mod tests {
         let (tx, rx) = flume::bounded(20);
         let head = PipelineHeadImpl::new(tx);
 
-        head.send(10).await.unwrap();
-        head.send(42).await.unwrap();
+        head.send_async(10).await.unwrap();
+        head.send_async(42).await.unwrap();
         drop(head);
 
         // Collect the results
