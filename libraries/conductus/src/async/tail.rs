@@ -8,6 +8,7 @@ use futures::stream::FusedStream;
 use futures::Stream;
 use tracing::debug;
 
+use crate::common::steps::noop::PipelineStepNoop;
 use crate::r#async::steps::PipelineStepAsync;
 use crate::r#async::steps::PipelineStepMap;
 use crate::{Message, PipelineData, PipelineTailImpl};
@@ -83,6 +84,10 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
     {
         let step: PipelineStepMap<Output, NextOutput, Fut, F> = func.into();
         self.parallel_pipe(step, workers, cap).await
+    }
+
+    async fn buffer(self, cap: usize) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<Output> {
+        self.pipe_async(PipelineStepNoop, cap).await
     }
 }
 
@@ -239,5 +244,20 @@ mod tests {
 
         let out = tail.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![2, 4, 6, 20]);
+    }
+
+    #[tokio::test]
+    async fn test_buffer() {
+        let (tx, rx) = flume::bounded(0);
+        let tail = PipelineTailImpl::new(rx).buffer(4).await;
+
+        tx.send_async(Message::Data(10)).await.unwrap();
+        tx.send_async(Message::Data(1)).await.unwrap();
+        tx.send_async(Message::Data(2)).await.unwrap();
+        tx.send_async(Message::Data(3)).await.unwrap();
+        drop(tx);
+
+        let out = tail.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![10, 1, 2, 3]);
     }
 }
