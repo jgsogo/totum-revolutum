@@ -69,13 +69,13 @@ impl<
 {
     type Family = PipelineSyncFamily<Output, Head, Tail>;
 
-    fn pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
+    fn pipe_sync<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
     ) -> PipelineSync<Input, NextOutput, Head, <Tail::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>>
     {
-        let tail = self.tail.pipe(step, cap);
+        let tail = self.tail.pipe_sync(step, cap);
         PipelineSync {
             head: self.head,
             tail,
@@ -138,7 +138,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = PipelineSync::empty(2).pipe(step, 2);
+        let pipeline = PipelineSync::empty(2).pipe_sync(step, 2);
 
         pipeline.send(10).unwrap();
         pipeline.send(1).unwrap();

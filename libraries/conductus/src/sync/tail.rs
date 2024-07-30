@@ -24,11 +24,20 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
     type Family: PipelineTailSyncFamily;
 
     /// Adds a [`PipelineStepSync`] to the pipeline
-    fn pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
+    fn pipe_sync<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>;
+
+    /// An alias to [`PipelineTailSync::pipe_sync`]
+    fn pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
+        self,
+        step: PS,
+        cap: usize,
+    ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
+        self.pipe_sync(step, cap)
+    }
 
     /// Adds a [`PipelineStepSync`] to the pipeline. This step will be executed in parallel using as
     /// many workers as given
@@ -46,7 +55,7 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         cap: usize,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
         let step: PipelineStepMap<Output, NextOutput, Func> = func.into();
-        self.pipe(step, cap)
+        self.pipe_sync(step, cap)
     }
 
     /// Adds a parallel [`PipelineStepMap`] using the function given with as many workers as given
@@ -63,7 +72,7 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
 
     /// Adds a [`PipelineStepNoop`] step with the given buffer.
     fn buffer(self, cap: usize) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<Output> {
-        self.pipe(PipelineStepNoop, cap)
+        self.pipe_sync(PipelineStepNoop, cap)
     }
 
     /// Adds a [`PipelineStepWindow`] executing the function given as argument
@@ -74,12 +83,12 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         cap: usize,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
         let step = PipelineStepWindow::new(func, window_size);
-        self.pipe(step, cap)
+        self.pipe_sync(step, cap)
     }
 
     /// Adds a [`PipelineStepSyncStart`] step to the tail of the pipeline
     fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SyncMarked<Output>> {
-        self.pipe(PipelineStepSyncStart, 0)
+        self.pipe_sync(PipelineStepSyncStart, 0)
     }
 
     /// Adds a [`PipelineStepSyncEnd`] step to the tail of the pipeline
@@ -87,7 +96,7 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
     where
         Output: SyncMarkedTrait<InnerOutput>,
     {
-        self.pipe(PipelineStepSyncEnd, 0)
+        self.pipe_sync(PipelineStepSyncEnd, 0)
     }
 
     fn into_iter(self) -> PipelineTailImplIter<Output>;
@@ -126,7 +135,7 @@ impl<Output: PipelineData> Iterator for PipelineTailImplIter<Output> {
 impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output> {
     type Family = PipelineTailSyncImplFamily;
 
-    fn pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
+    fn pipe_sync<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
@@ -171,7 +180,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let tail = PipelineTailImpl::new(rx).pipe(step, 2);
+        let tail = PipelineTailImpl::new(rx).pipe_sync(step, 2);
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();

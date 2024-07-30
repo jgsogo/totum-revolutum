@@ -1,12 +1,14 @@
-use crate::r#async::steps::PipelineStepAsync;
-use crate::{Message, PipelineData, PipelineTailImpl};
+use std::pin::Pin;
+use std::task::{Context, Poll};
+
 use async_trait::async_trait;
 use flume::r#async::RecvStream;
 use futures::stream::FusedStream;
 use futures::Stream;
-use std::pin::Pin;
-use std::task::{Context, Poll};
 use tracing::debug;
+
+use crate::r#async::steps::PipelineStepAsync;
+use crate::{Message, PipelineData, PipelineTailImpl};
 
 pub trait PipelineTailAsyncFamily {
     type PipelineTailOps<NextOutput: PipelineData>: PipelineTailAsync<NextOutput> + Send;
@@ -26,11 +28,20 @@ pub trait PipelineTailAsync<Output: PipelineData>: Sized {
     type Family: PipelineTailAsyncFamily;
 
     /// Adds a [`PipelineStepAsync`] to the pipeline
-    async fn pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
+    async fn pipe_async<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
+
+    /// An alias to [`PipelineTailAsync::pipe_async`]
+    async fn pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
+        self,
+        step: PS,
+        cap: usize,
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
+        self.pipe_async(step, cap).await
+    }
 
     /// Adds a [`PipelineStepAsync`] to the pipeline. This step will be executed in parallel using as
     /// many workers as given
@@ -82,7 +93,7 @@ impl<'a, Output: PipelineData> FusedStream for PipelineTailImplStream<'a, Output
 impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output> {
     type Family = PipelineTailAsyncImplFamily;
 
-    async fn pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
+    async fn pipe_async<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
@@ -120,11 +131,11 @@ impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output
 mod tests {
     use std::time::Duration;
 
-    use crate::Message;
     use futures::StreamExt;
 
     use crate::r#async::steps::PipelineStepMap;
     use crate::r#async::steps::PipelineStepNoop;
+    use crate::Message;
 
     use super::*;
 
@@ -132,7 +143,7 @@ mod tests {
     async fn test_pipe() {
         let (tx, rx) = flume::bounded(0);
         let step = PipelineStepNoop;
-        let tail = PipelineTailImpl::new(rx).pipe(step, 2).await;
+        let tail = PipelineTailImpl::new(rx).pipe_async(step, 2).await;
 
         tx.send_async(Message::Data(10)).await.unwrap();
         tx.send_async(Message::Data(1)).await.unwrap();

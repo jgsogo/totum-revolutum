@@ -83,13 +83,13 @@ impl<
 {
     type Family = PipelineAsyncFamily<Output, Head, Tail>;
 
-    async fn pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
+    async fn pipe_async<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
     ) -> PipelineAsync<Input, NextOutput, Head, <Tail::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>>
     {
-        let tail = self.tail.pipe(step, cap).await;
+        let tail = self.tail.pipe_async(step, cap).await;
         PipelineAsync {
             head: self.head,
             tail,
@@ -131,7 +131,7 @@ mod tests {
             tokio::time::sleep(Duration::from_millis(value * 10u64)).await;
             value
         });
-        let pipeline = PipelineAsync::empty(2).pipe(step, 2).await;
+        let pipeline = PipelineAsync::empty(2).pipe_async(step, 2).await;
 
         pipeline.send(10).await.unwrap();
         pipeline.send(1).await.unwrap();
