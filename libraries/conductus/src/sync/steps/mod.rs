@@ -1,15 +1,14 @@
 pub use map::PipelineStepMap;
-pub use noop::PipelineStepNoop;
 pub use stop_on_error::PipelineStepStopOnError;
-pub use sync::{PipelineStepSyncEnd, PipelineStepSyncStart, SyncMarked, SyncMarkedTrait};
 pub use window::PipelineStepWindow;
 
+pub use crate::common::steps::synchronize::SynchronizeMarkedTrait;
 use crate::{Message, PipelineData};
 
 mod map;
 mod noop;
 mod stop_on_error;
-mod sync;
+mod synchronize;
 mod window;
 
 /// Interface for all the steps in the `conductus` library

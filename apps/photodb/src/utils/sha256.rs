@@ -8,7 +8,7 @@ use ring::digest::{Context, Digest, SHA256};
 
 /// Computes the sha256 digest of the given buffer.
 ///
-/// Credit: https://rust-lang-nursery.github.io/rust-cookbook/cryptography/hashing.html
+/// Credit: <https://rust-lang-nursery.github.io/rust-cookbook/cryptography/hashing.html>
 pub fn sha256_digest<R: Read>(mut reader: R) -> Result<Digest> {
     let mut context = Context::new(&SHA256);
     let mut buffer = [0; 1024];

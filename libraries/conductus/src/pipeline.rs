@@ -1,5 +1,6 @@
 use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
 
+/// The pipeline object. Start here.
 pub struct Pipeline<Input: PipelineData, Output: PipelineData> {
     pub(crate) head: PipelineHeadImpl<Input>,
     pub(crate) tail: PipelineTailImpl<Output>,

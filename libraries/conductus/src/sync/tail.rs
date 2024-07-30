@@ -1,11 +1,13 @@
-use crate::{Message, PipelineData, PipelineTailImpl};
 use std::collections::VecDeque;
+
 use tracing::debug;
 
-use crate::sync::steps::{
-    PipelineStepMap, PipelineStepNoop, PipelineStepSync, PipelineStepSyncEnd, PipelineStepSyncStart,
-    PipelineStepWindow, SyncMarked, SyncMarkedTrait,
+use crate::common::steps::noop::PipelineStepNoop;
+use crate::common::steps::synchronize::{
+    PipelineStepSynchronizeEnd, PipelineStepSynchronizeStart, SynchronizeMarked, SynchronizeMarkedTrait,
 };
+use crate::sync::steps::{PipelineStepMap, PipelineStepSync, PipelineStepWindow};
+use crate::{Message, PipelineData, PipelineTailImpl};
 
 pub trait PipelineTailSyncFamily {
     type PipelineTailOps<NextOutput: PipelineData>: PipelineTailSync<NextOutput>;
@@ -70,7 +72,7 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self.parallel_pipe(step, workers, cap)
     }
 
-    /// Adds a [`PipelineStepNoop`] step with the given buffer.
+    /// Adds a buffer.
     fn buffer(self, cap: usize) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<Output> {
         self.pipe_sync(PipelineStepNoop, cap)
     }
@@ -86,17 +88,17 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self.pipe_sync(step, cap)
     }
 
-    /// Adds a [`PipelineStepSyncStart`] step to the tail of the pipeline
-    fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SyncMarked<Output>> {
-        self.pipe_sync(PipelineStepSyncStart, 0)
+    /// Adds a synchronization mark to the data in the pipeline
+    fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SynchronizeMarked<Output>> {
+        self.pipe_sync(PipelineStepSynchronizeStart, 0)
     }
 
-    /// Adds a [`PipelineStepSyncEnd`] step to the tail of the pipeline
+    /// Uses a synchronization mark (see [`PipelineTailSync::sync_mark`]) to reorder the data
     fn sync<InnerOutput: PipelineData>(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<InnerOutput>
     where
-        Output: SyncMarkedTrait<InnerOutput>,
+        Output: SynchronizeMarkedTrait<InnerOutput>,
     {
-        self.pipe_sync(PipelineStepSyncEnd, 0)
+        self.pipe_sync(PipelineStepSynchronizeEnd, 0)
     }
 
     fn into_iter(self) -> PipelineTailImplIter<Output>;
@@ -167,9 +169,11 @@ impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output>
 
 #[cfg(test)]
 mod tests {
-    use crate::sync::steps::{PipelineStepMap, SyncMarkedTrait};
-    use crate::Message;
     use std::time::Duration;
+
+    use crate::common::steps::synchronize::SynchronizeMarkedTrait;
+    use crate::sync::steps::PipelineStepMap;
+    use crate::Message;
 
     use super::*;
 
@@ -275,7 +279,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sync() {
+    fn test_synchronize() {
         let (tx, rx) = flume::bounded(0);
         let tail = PipelineTailImpl::new(rx)
             .sync_mark()
