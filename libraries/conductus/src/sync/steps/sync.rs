@@ -2,13 +2,13 @@ use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::fmt::Debug;
 
+use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync::steps::PipelineStep;
-use crate::sync::{Message, PipelineData};
+use crate::sync::steps::PipelineStepSync;
 
-/// A [`PipelineStep`] that wraps every input into a [`SyncMarked`]. This wrapper contains a
+/// A [`PipelineStepSync`] that wraps every input into a [`SyncMarked`]. This wrapper contains a
 /// mark that can be used by [`PipelineStepSyncEnd`] to reorder the stream of data to
 /// match the input order.
 pub struct PipelineStepSyncStart;
@@ -66,8 +66,8 @@ impl<Input: PipelineData> Ord for SyncMarked<Input> {
     }
 }
 
-impl<Input: PipelineData> PipelineStep<Input, SyncMarked<Input>> for PipelineStepSyncStart {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<SyncMarked<Input>>>) {
+impl<Input: PipelineData> PipelineStepSync<Input, SyncMarked<Input>> for PipelineStepSyncStart {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<SyncMarked<Input>>>) {
         for (i, it) in source.into_iter().enumerate() {
             if let Err(e) = target.send(Message::Data(SyncMarked::new(i, it))) {
                 debug!("Error sending from blanket implementation of PipelineSyncStart: {e}");
@@ -76,14 +76,14 @@ impl<Input: PipelineData> PipelineStep<Input, SyncMarked<Input>> for PipelineSte
     }
 }
 
-/// A [`PipelineStep`] that can be added to a pipeline to reorder a stream of [`SyncMarked`] data
+/// A [`PipelineStepSync`] that can be added to a pipeline to reorder a stream of [`SyncMarked`] data
 /// following the input order.
 pub struct PipelineStepSyncEnd;
 
-impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStep<Input, InnerInput>
+impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStepSync<Input, InnerInput>
     for PipelineStepSyncEnd
 {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<InnerInput>>) {
         let mut next = 0;
         let mut heap = BinaryHeap::new();
         for it in source {
@@ -108,6 +108,7 @@ impl<InnerInput: PipelineData, Input: SyncMarkedTrait<InnerInput>> PipelineStep<
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sync::steps::tests::collect_rx;
 
     #[test]
     fn test_sync_step_start() {
@@ -116,13 +117,7 @@ mod tests {
         let (tx, rx) = flume::bounded(2);
         std::thread::spawn(move || sync_start.run(10..12, tx));
 
-        let r = rx
-            .into_iter()
-            .filter_map(|it| match it {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx);
         assert_eq!(r, vec![SyncMarked::new(0, 10), SyncMarked::new(1, 11)]);
     }
 
@@ -134,13 +129,7 @@ mod tests {
         let data = vec![SyncMarked::new(0, 10), SyncMarked::new(2, 12), SyncMarked::new(1, 11)];
         std::thread::spawn(move || sync_end.run(data.into_iter(), tx));
 
-        let r = rx
-            .into_iter()
-            .filter_map(|it| match it {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx);
         assert_eq!(r, vec![10, 11, 12]);
     }
 }

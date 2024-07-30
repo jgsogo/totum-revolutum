@@ -1,14 +1,8 @@
-pub use data::{Message, PipelineData};
-pub use head::PipelineHead;
-pub use head_impl::PipelineHeadImpl;
-pub use pipeline::Pipeline;
-pub use tail::PipelineTail;
-pub use tail_impl::PipelineTailImpl;
+pub use head::PipelineHeadSync;
+pub use pipeline::PipelineSync;
+pub use tail::{PipelineTailSync, PipelineTailSyncFamily};
 
-mod data;
 mod head;
-mod head_impl;
 mod pipeline;
 pub mod steps;
 mod tail;
-mod tail_impl;

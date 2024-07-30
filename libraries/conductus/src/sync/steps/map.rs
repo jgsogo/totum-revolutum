@@ -1,13 +1,12 @@
 use std::marker::PhantomData;
 
+use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync::{Message, PipelineData};
+use super::PipelineStepSync;
 
-use super::PipelineStep;
-
-/// A [`PipelineStep`] that applies a mapping function to every input
+/// A [`PipelineStepSync`] that applies a mapping function to every input
 pub struct PipelineStepMap<Input: PipelineData, Output: PipelineData, Func>
 where
     Func: Fn(Input) -> Output + Send + 'static,
@@ -25,12 +24,12 @@ where
     }
 }
 
-impl<Input: PipelineData, Output: PipelineData, Func> PipelineStep<Input, Output>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepSync<Input, Output>
     for PipelineStepMap<Input, Output, Func>
 where
     Func: Fn(Input) -> Output + Send + 'static,
 {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
         for it in source {
             let out = self.map(it);
             if let Err(e) = target.send(Message::Data(out)) {
@@ -72,6 +71,7 @@ impl<Input: PipelineData, Output: PipelineData, Func> Copy for PipelineStepMap<I
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sync::steps::tests::collect_rx;
 
     #[test]
     fn test_step_map() {
@@ -85,13 +85,7 @@ mod tests {
         let (tx, rx) = flume::bounded(2);
         std::thread::spawn(move || step.run(0..10, tx));
 
-        let r = rx
-            .into_iter()
-            .filter_map(|it| match it {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx);
         assert_eq!(r, vec![0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
     }
 }

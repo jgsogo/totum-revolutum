@@ -3,10 +3,10 @@ use std::marker::PhantomData;
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync::steps::PipelineStep;
-use crate::sync::{Message, PipelineData};
+use crate::sync::steps::PipelineStepSync;
+use crate::{Message, PipelineData};
 
-/// A [`PipelineStep`] that can be used to stop a pipeline for certain errors. Return `Some(reason)`
+/// A [`PipelineStepSync`] that can be used to stop a pipeline for certain errors. Return `Some(reason)`
 /// to stop the pipeline, or `None` to ignore and skip the error.
 pub struct PipelineStepStopOnError<Func, Error: std::error::Error>
 where
@@ -25,12 +25,12 @@ where
     }
 }
 
-impl<Input: PipelineData, Func, Error: std::error::Error + Send + 'static> PipelineStep<Result<Input, Error>, Input>
+impl<Input: PipelineData, Func, Error: std::error::Error + Send + 'static> PipelineStepSync<Result<Input, Error>, Input>
     for PipelineStepStopOnError<Func, Error>
 where
     Func: Fn(Error) -> Option<String> + Send + 'static,
 {
-    fn run<I: IntoIterator<Item = Result<Input, Error>>>(&self, source: I, target: Sender<Message<Input>>) {
+    fn run<I: Iterator<Item = Result<Input, Error>>>(&self, source: I, target: Sender<Message<Input>>) {
         for it in source {
             let msg = match it {
                 Ok(v) => Some(Message::Data(v)),
@@ -61,6 +61,8 @@ where
 #[cfg(test)]
 mod tests {
     use std::fmt::{Debug, Display, Formatter};
+
+    use crate::sync::steps::tests::collect_rx;
 
     use super::*;
 
@@ -93,7 +95,7 @@ mod tests {
         };
         let step: PipelineStepStopOnError<_, MyError> = stop_on_error.into();
 
-        assert_eq!(step.check_error(MyError(2)), None);
+        assert!(step.check_error(MyError(2)).is_none());
         assert!(step.check_error(MyError(3)).is_some());
         assert!(step.check_error(MyError(5)).is_some());
 
@@ -113,13 +115,7 @@ mod tests {
             )
         });
 
-        let r = rx
-            .into_iter()
-            .filter_map(|it| match it {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx);
         assert_eq!(r, vec![1, 2])
     }
 }

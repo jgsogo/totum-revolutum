@@ -1,27 +1,28 @@
 use std::marker::PhantomData;
 use std::thread::JoinHandle;
 
+use crate::{PipelineData, PipelineTailImpl};
 use flume::SendError;
 
-use crate::sync::steps::PipelineStep;
-use crate::sync::tail::PipelineTailFamily;
-use crate::sync::tail_impl::PipelineTailIter;
-use crate::sync::{PipelineData, PipelineHead, PipelineHeadImpl, PipelineTail, PipelineTailImpl};
+use crate::sync::steps::PipelineStepSync;
+use crate::sync::tail::{PipelineTailImplIter, PipelineTailSyncFamily};
+use crate::sync::{PipelineHeadSync, PipelineTailSync};
+use crate::PipelineHeadImpl;
 
-/// Implementation of a pipeline. This object acts both as a [`PipelineHead`] and a
-/// [`PipelineTail`].
-pub struct Pipeline<
+/// Implementation of a pipeline. This object acts both as a [`PipelineHeadSync`] and a
+/// [`PipelineTailSync`].
+pub struct PipelineSync<
     Input: PipelineData,
     Output: PipelineData,
-    Head: PipelineHead<TInput = Input>,
-    Tail: PipelineTail<Output>,
+    Head: PipelineHeadSync<TInput = Input>,
+    Tail: PipelineTailSync<Output>,
 > {
     head: Head,
     tail: Tail,
     _output: PhantomData<Output>,
 }
 
-impl<Input: PipelineData> Pipeline<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
+impl<Input: PipelineData> PipelineSync<Input, Input, PipelineHeadImpl<Input>, PipelineTailImpl<Input>> {
     pub fn empty(cap: usize) -> Self {
         let (tx, rx) = flume::bounded(cap);
         Self {
@@ -32,17 +33,17 @@ impl<Input: PipelineData> Pipeline<Input, Input, PipelineHeadImpl<Input>, Pipeli
     }
 }
 
-impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Input>>
-    Pipeline<Input, Output, Head, PipelineTailImpl<Output>>
+impl<Input: PipelineData, Output: PipelineData, Head: PipelineHeadSync<TInput = Input>>
+    PipelineSync<Input, Output, Head, PipelineTailImpl<Output>>
 {
-    pub fn drain(self) -> PipelineTailIter<Output> {
+    pub fn drain(self) -> PipelineTailImplIter<Output> {
         self.tail.into_iter()
     }
 }
 
-/// A helper struct to implement [`PipelineTailFamily`], so that [`Pipeline`] can implement the
-/// [`PipelineTail`] trait.
-pub struct PipelineImplFamily<Output, Head, Tail> {
+/// A helper struct to implement [`PipelineTailSyncFamily`], so that [`PipelineSync`] can implement the
+/// [`PipelineTailSync`] trait.
+pub struct PipelineSyncFamily<Output, Head, Tail> {
     _output: PhantomData<Output>,
     _head: PhantomData<Head>,
     _tail: PhantomData<Tail>,
@@ -51,53 +52,63 @@ pub struct PipelineImplFamily<Output, Head, Tail> {
 impl<
         Input: PipelineData,
         Output: PipelineData,
-        Head: PipelineHead<TInput = Input> + 'static,
-        Tail: PipelineTail<Output>,
-    > PipelineTailFamily for PipelineImplFamily<Output, Head, Tail>
+        Head: PipelineHeadSync<TInput = Input> + 'static,
+        Tail: PipelineTailSync<Output>,
+    > PipelineTailSyncFamily for PipelineSyncFamily<Output, Head, Tail>
 {
     type PipelineTailOps<NextOutput: PipelineData> =
-        Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>>;
+        PipelineSync<Input, NextOutput, Head, <Tail::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>>;
 }
 
 impl<
         Input: PipelineData,
         Output: PipelineData,
-        Head: PipelineHead<TInput = Input> + 'static,
-        Tail: PipelineTail<Output>,
-    > PipelineTail<Output> for Pipeline<Input, Output, Head, Tail>
+        Head: PipelineHeadSync<TInput = Input> + 'static,
+        Tail: PipelineTailSync<Output>,
+    > PipelineTailSync<Output> for PipelineSync<Input, Output, Head, Tail>
 {
-    type Family = PipelineImplFamily<Output, Head, Tail>;
+    type Family = PipelineSyncFamily<Output, Head, Tail>;
 
-    fn pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput>>(
+    fn pipe_sync<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
-    ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>> {
-        let tail = self.tail.pipe(step, cap);
-        Pipeline {
+    ) -> PipelineSync<Input, NextOutput, Head, <Tail::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>>
+    {
+        let tail = self.tail.pipe_sync(step, cap);
+        PipelineSync {
             head: self.head,
             tail,
             _output: PhantomData,
         }
     }
 
-    fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStep<Output, NextOutput> + Copy>(
+    fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
         cap: usize,
-    ) -> Pipeline<Input, NextOutput, Head, <Tail::Family as PipelineTailFamily>::PipelineTailOps<NextOutput>> {
+    ) -> PipelineSync<Input, NextOutput, Head, <Tail::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>>
+    {
         let tail = self.tail.parallel_pipe(step, workers, cap);
-        Pipeline {
+        PipelineSync {
             head: self.head,
             tail,
             _output: PhantomData,
         }
     }
+
+    fn into_iter(self) -> PipelineTailImplIter<Output> {
+        self.tail.into_iter()
+    }
 }
 
-impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Input>, Tail: PipelineTail<Output>>
-    PipelineHead for Pipeline<Input, Output, Head, Tail>
+impl<
+        Input: PipelineData,
+        Output: PipelineData,
+        Head: PipelineHeadSync<TInput = Input>,
+        Tail: PipelineTailSync<Output>,
+    > PipelineHeadSync for PipelineSync<Input, Output, Head, Tail>
 {
     type TInput = Input;
 
@@ -105,26 +116,11 @@ impl<Input: PipelineData, Output: PipelineData, Head: PipelineHead<TInput = Inpu
         self.head.send(item)
     }
 
-    fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
+    fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
     ) -> JoinHandle<Result<(), SendError<Self::TInput>>> {
-        self.head.send_batch(input)
-    }
-}
-
-impl<
-        Input: PipelineData,
-        Output: PipelineData,
-        Head: PipelineHead<TInput = Input>,
-        Tail: PipelineTail<Output> + IntoIterator<Item = Output>,
-    > IntoIterator for Pipeline<Input, Output, Head, Tail>
-{
-    type Item = Output;
-    type IntoIter = Tail::IntoIter;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.tail.into_iter()
+        self.head.send_detached(input)
     }
 }
 
@@ -142,7 +138,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = Pipeline::empty(2).pipe(step, 2);
+        let pipeline = PipelineSync::empty(2).pipe_sync(step, 2);
 
         pipeline.send(10).unwrap();
         pipeline.send(1).unwrap();
@@ -156,7 +152,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = Pipeline::empty(2).parallel_pipe(step, 2, 2);
+        let pipeline = PipelineSync::empty(2).parallel_pipe(step, 2, 2);
 
         pipeline.send(10).unwrap();
         pipeline.send(1).unwrap();
@@ -166,7 +162,7 @@ mod tests {
 
     #[test]
     fn test_send() {
-        let pipeline = Pipeline::empty(2);
+        let pipeline = PipelineSync::empty(2);
 
         pipeline.send(3).unwrap();
         let out = pipeline.into_iter().collect::<Vec<_>>();
@@ -174,18 +170,18 @@ mod tests {
     }
 
     #[test]
-    fn test_send_batch() {
-        let pipeline = Pipeline::empty(2);
+    fn test_send_detached() {
+        let pipeline = PipelineSync::empty(2);
 
-        pipeline.send_batch(0..3);
+        pipeline.send_detached(0..3);
         let out = pipeline.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![0, 1, 2]);
     }
 
     #[test]
     fn test_drain() {
-        let pipeline = Pipeline::empty(2);
-        pipeline.send_batch(0..5);
+        let pipeline = PipelineSync::empty(2);
+        pipeline.send_detached(0..5);
 
         let out = pipeline.drain().collect::<Vec<_>>();
         assert_eq!(out, vec![0, 1, 2, 3, 4]);

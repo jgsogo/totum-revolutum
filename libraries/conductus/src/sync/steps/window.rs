@@ -1,12 +1,11 @@
 use std::collections::VecDeque;
 use std::marker::PhantomData;
 
+use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::{debug, warn};
 
-use crate::sync::{Message, PipelineData};
-
-use super::PipelineStep;
+use super::PipelineStepSync;
 
 pub struct PipelineStepWindow<Input: PipelineData, Output: PipelineData, Func>
 where
@@ -26,12 +25,12 @@ where
     }
 }
 
-impl<Input: PipelineData, Output: PipelineData, Func> PipelineStep<Input, Output>
+impl<Input: PipelineData, Output: PipelineData, Func> PipelineStepSync<Input, Output>
     for PipelineStepWindow<Input, Output, Func>
 where
     Func: Fn(&VecDeque<Input>) -> Output + Send + 'static,
 {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<Output>>) {
         let mut iter = source.into_iter();
 
         // Collect items until the window is full
@@ -80,6 +79,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sync::steps::tests::collect_rx;
 
     #[test]
     fn test_window() {
@@ -92,13 +92,7 @@ mod tests {
         let (tx, rx) = flume::bounded(2);
         std::thread::spawn(move || step.run(0..6, tx));
 
-        let r = rx
-            .into_iter()
-            .filter_map(|it| match it {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx);
         assert_eq!(r, vec![vec![0, 1, 2], vec![1, 2, 3], vec![2, 3, 4], vec![3, 4, 5]])
     }
 }

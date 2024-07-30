@@ -4,7 +4,7 @@ pub use stop_on_error::PipelineStepStopOnError;
 pub use sync::{PipelineStepSyncEnd, PipelineStepSyncStart, SyncMarked, SyncMarkedTrait};
 pub use window::PipelineStepWindow;
 
-use crate::sync::{Message, PipelineData};
+use crate::{Message, PipelineData};
 
 mod map;
 mod noop;
@@ -13,6 +13,20 @@ mod sync;
 mod window;
 
 /// Interface for all the steps in the `conductus` library
-pub trait PipelineStep<Input: PipelineData, Output: PipelineData>: Send + 'static {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: flume::Sender<Message<Output>>);
+pub trait PipelineStepSync<Input: PipelineData, Output: PipelineData>: Send + 'static {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: flume::Sender<Message<Output>>);
+}
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use crate::{Message, PipelineData};
+
+    pub(crate) fn collect_rx<T: PipelineData>(rx: flume::Receiver<Message<T>>) -> Vec<T> {
+        rx.into_iter()
+            .filter_map(|it| match it {
+                Message::Data(d) => Some(d),
+                Message::Stop(_) => None,
+            })
+            .collect::<Vec<_>>()
+    }
 }

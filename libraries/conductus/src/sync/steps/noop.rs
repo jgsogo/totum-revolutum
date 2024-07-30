@@ -1,16 +1,15 @@
+use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
-use crate::sync::{Message, PipelineData};
+use super::PipelineStepSync;
 
-use super::PipelineStep;
-
-/// A [`PipelineStep`] that does nothing
+/// A [`PipelineStepSync`] that does nothing
 #[derive(Default)]
 pub struct PipelineStepNoop;
 
-impl<Input: PipelineData> PipelineStep<Input, Input> for PipelineStepNoop {
-    fn run<I: IntoIterator<Item = Input>>(&self, source: I, target: Sender<Message<Input>>) {
+impl<Input: PipelineData> PipelineStepSync<Input, Input> for PipelineStepNoop {
+    fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<Input>>) {
         for it in source {
             if let Err(e) = target.send(Message::Data(it)) {
                 debug!("Error sending from blanket implementation of PipelineStepBuffer: {e}");
@@ -22,6 +21,7 @@ impl<Input: PipelineData> PipelineStep<Input, Input> for PipelineStepNoop {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sync::steps::tests::collect_rx;
 
     #[test]
     fn test_step_buffer() {
@@ -30,13 +30,7 @@ mod tests {
         let (tx, rx) = flume::bounded(2);
         std::thread::spawn(move || step.run(0..10, tx));
 
-        let r = rx
-            .into_iter()
-            .filter_map(|it| match it {
-                Message::Data(d) => Some(d),
-                Message::Stop(_) => None,
-            })
-            .collect::<Vec<_>>();
+        let r = collect_rx(rx);
         assert_eq!(r, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     }
 }
