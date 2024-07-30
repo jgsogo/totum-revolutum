@@ -131,10 +131,10 @@ impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output
 mod tests {
     use std::time::Duration;
 
+    use crate::common::steps::noop::PipelineStepNoop;
     use futures::StreamExt;
 
     use crate::r#async::steps::PipelineStepMap;
-    use crate::r#async::steps::PipelineStepNoop;
     use crate::Message;
 
     use super::*;

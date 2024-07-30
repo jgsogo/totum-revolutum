@@ -1,10 +1,8 @@
 pub use map::PipelineStepMap;
-pub use noop::PipelineStepNoop;
 pub use stop_on_error::PipelineStepStopOnError;
-pub use syncronize::{PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart};
 pub use window::PipelineStepWindow;
 
-pub use crate::common::syncronize::SyncronizeMarkedTrait;
+pub use crate::common::steps::syncronize::SyncronizeMarkedTrait;
 use crate::{Message, PipelineData};
 
 mod map;

@@ -1,16 +1,13 @@
 use std::collections::BinaryHeap;
 
-use crate::common::syncronize::{SyncronizeMarked, SyncronizeMarkedTrait};
+use crate::common::steps::syncronize::{
+    PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart, SyncronizeMarked, SyncronizeMarkedTrait,
+};
 use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
 use crate::sync::steps::PipelineStepSync;
-
-/// A [`PipelineStepSync`] that wraps every input into a [`SyncronizeMarked`]. This wrapper contains a
-/// mark that can be used by [`PipelineStepSyncronizeEnd`] to reorder the stream of data to
-/// match the input order.
-pub struct PipelineStepSyncronizeStart;
 
 impl<Input: PipelineData> PipelineStepSync<Input, SyncronizeMarked<Input>> for PipelineStepSyncronizeStart {
     fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<SyncronizeMarked<Input>>>) {
@@ -21,10 +18,6 @@ impl<Input: PipelineData> PipelineStepSync<Input, SyncronizeMarked<Input>> for P
         }
     }
 }
-
-/// A [`PipelineStepSync`] that can be added to a pipeline to reorder a stream of [`SyncronizeMarked`] data
-/// following the input order.
-pub struct PipelineStepSyncronizeEnd;
 
 impl<InnerInput: PipelineData, Input: SyncronizeMarkedTrait<InnerInput>> PipelineStepSync<Input, InnerInput>
     for PipelineStepSyncronizeEnd

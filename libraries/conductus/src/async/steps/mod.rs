@@ -2,7 +2,6 @@ use async_trait::async_trait;
 use futures::Stream;
 
 pub use map::PipelineStepMap;
-pub use noop::PipelineStepNoop;
 pub use syncronize::{PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart};
 
 use crate::{Message, PipelineData};

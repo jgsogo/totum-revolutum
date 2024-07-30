@@ -1,12 +1,9 @@
+use crate::common::steps::noop::PipelineStepNoop;
 use crate::{Message, PipelineData};
 use flume::Sender;
 use tracing::debug;
 
 use super::PipelineStepSync;
-
-/// A [`PipelineStepSync`] that does nothing
-#[derive(Default)]
-pub struct PipelineStepNoop;
 
 impl<Input: PipelineData> PipelineStepSync<Input, Input> for PipelineStepNoop {
     fn run<I: Iterator<Item = Input>>(&self, source: I, target: Sender<Message<Input>>) {

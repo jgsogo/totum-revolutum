@@ -4,13 +4,10 @@ use futures::{pin_mut, Stream};
 use tokio_stream::StreamExt;
 use tracing::debug;
 
+use crate::common::steps::noop::PipelineStepNoop;
 use crate::{Message, PipelineData};
 
 use super::PipelineStepAsync;
-
-/// A [`PipelineStepAsync`] that does nothing
-#[derive(Default)]
-pub struct PipelineStepNoop;
 
 #[async_trait]
 impl<Input: PipelineData> PipelineStepAsync<Input, Input> for PipelineStepNoop {

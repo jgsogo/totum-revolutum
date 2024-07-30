@@ -1,12 +1,13 @@
-use crate::common::syncronize::{SyncronizeMarked, SyncronizeMarkedTrait};
-use crate::{Message, PipelineData, PipelineTailImpl};
 use std::collections::VecDeque;
+
 use tracing::debug;
 
-use crate::sync::steps::{
-    PipelineStepMap, PipelineStepNoop, PipelineStepSync, PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart,
-    PipelineStepWindow,
+use crate::common::steps::noop::PipelineStepNoop;
+use crate::common::steps::syncronize::{
+    PipelineStepSyncronizeEnd, PipelineStepSyncronizeStart, SyncronizeMarked, SyncronizeMarkedTrait,
 };
+use crate::sync::steps::{PipelineStepMap, PipelineStepSync, PipelineStepWindow};
+use crate::{Message, PipelineData, PipelineTailImpl};
 
 pub trait PipelineTailSyncFamily {
     type PipelineTailOps<NextOutput: PipelineData>: PipelineTailSync<NextOutput>;
@@ -168,10 +169,11 @@ impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output>
 
 #[cfg(test)]
 mod tests {
-    use crate::common::syncronize::SyncronizeMarkedTrait;
+    use std::time::Duration;
+
+    use crate::common::steps::syncronize::SyncronizeMarkedTrait;
     use crate::sync::steps::PipelineStepMap;
     use crate::Message;
-    use std::time::Duration;
 
     use super::*;
 

@@ -3,4 +3,6 @@
 /// match the input order.
 pub struct PipelineStepSyncronizeStart;
 
+/// A [`PipelineStepASync`] that can be added to a pipeline to reorder a stream of [`SyncronizeMarked`] data
+/// following the input order.
 pub struct PipelineStepSyncronizeEnd;
