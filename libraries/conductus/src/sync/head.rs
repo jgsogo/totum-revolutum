@@ -9,14 +9,19 @@ pub trait PipelineHeadSync {
     type TInput: PipelineData;
 
     /// Sends one item into the head of the pipeline. This is a blocking call.
-    fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>>;
+    fn send_sync(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>>;
+
+    /// Alias to [`PipelineHeadSync::send_sync`]
+    fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
+        self.send_sync(item)
+    }
 
     fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
     ) -> Result<(), SendError<Self::TInput>> {
         for it in input {
-            self.send(it)?;
+            self.send_sync(it)?;
         }
         Ok(())
     }
@@ -33,7 +38,7 @@ pub trait PipelineHeadSync {
 impl<Input: PipelineData> PipelineHeadSync for PipelineHeadImpl<Input> {
     type TInput = Input;
 
-    fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
+    fn send_sync(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
         self.tx.send(Message::Data(item)).map_err(|e| {
             let Message::Data(msg) = e.into_inner() else {
                 unreachable!()
@@ -73,8 +78,8 @@ mod tests {
         let (tx, rx) = flume::bounded(20);
         let head = PipelineHeadImpl::new(tx);
 
-        head.send(10).unwrap();
-        head.send(42).unwrap();
+        head.send_sync(10).unwrap();
+        head.send_sync(42).unwrap();
         drop(head);
 
         let received = rx.into_iter().collect::<Vec<_>>();

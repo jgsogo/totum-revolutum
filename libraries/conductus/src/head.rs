@@ -25,8 +25,8 @@ mod tests {
         let (tx, rx) = flume::bounded(20);
         let head = PipelineHeadImpl::new(tx);
 
-        PipelineHeadSync::send(&head, 10).unwrap();
-        PipelineHeadAsync::send(&head, 42).await.unwrap();
+        PipelineHeadSync::send_sync(&head, 10).unwrap();
+        PipelineHeadAsync::send_async(&head, 42).await.unwrap();
         drop(head);
 
         let received = rx.into_iter().collect::<Vec<_>>();

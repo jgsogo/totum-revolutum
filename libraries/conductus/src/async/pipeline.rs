@@ -14,8 +14,8 @@ use crate::{Pipeline, PipelineData};
 impl<Input: PipelineData, Output: PipelineData> PipelineHeadAsync for Pipeline<Input, Output> {
     type TInput = Input;
 
-    async fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
-        self.head.send(item).await
+    async fn send_async(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
+        self.head.send_async(item).await
     }
 
     async fn send_detached<I: Stream<Item = Self::TInput> + Send + 'static>(
@@ -80,8 +80,8 @@ mod tests {
         });
         let pipeline = Pipeline::empty(2).pipe_async(step, 2).await;
 
-        pipeline.send(10).await.unwrap();
-        pipeline.send(1).await.unwrap();
+        pipeline.send_async(10).await.unwrap();
+        pipeline.send_async(1).await.unwrap();
         let out = pipeline.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![10, 1]);
     }
@@ -94,8 +94,8 @@ mod tests {
         });
         let pipeline = Pipeline::empty(2).parallel_pipe(step, 2, 2).await;
 
-        pipeline.send(10).await.unwrap();
-        pipeline.send(1).await.unwrap();
+        pipeline.send_async(10).await.unwrap();
+        pipeline.send_async(1).await.unwrap();
         let out = pipeline.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![1, 10]);
     }
@@ -103,7 +103,7 @@ mod tests {
     #[tokio::test]
     async fn test_send() {
         let pipeline = Pipeline::empty(2);
-        pipeline.send(0).await.unwrap();
+        pipeline.send_async(0).await.unwrap();
         let out = pipeline.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![0]);
     }

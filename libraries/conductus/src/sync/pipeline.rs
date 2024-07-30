@@ -11,8 +11,8 @@ use crate::{Pipeline, PipelineData};
 impl<Input: PipelineData, Output: PipelineData> PipelineHeadSync for Pipeline<Input, Output> {
     type TInput = Input;
 
-    fn send(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
-        self.head.send(item)
+    fn send_sync(&self, item: Self::TInput) -> Result<(), SendError<Self::TInput>> {
+        self.head.send_sync(item)
     }
 
     fn send_detached<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
@@ -76,8 +76,8 @@ mod tests {
         });
         let pipeline = Pipeline::empty(2).pipe_sync(step, 2);
 
-        pipeline.send(10).unwrap();
-        pipeline.send(1).unwrap();
+        pipeline.send_sync(10).unwrap();
+        pipeline.send_sync(1).unwrap();
         let out = pipeline.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![10, 1]);
     }
@@ -90,8 +90,8 @@ mod tests {
         });
         let pipeline = Pipeline::empty(2).parallel_pipe(step, 2, 2);
 
-        pipeline.send(10).unwrap();
-        pipeline.send(1).unwrap();
+        pipeline.send_sync(10).unwrap();
+        pipeline.send_sync(1).unwrap();
         let out = pipeline.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![1, 10]);
     }
@@ -100,7 +100,7 @@ mod tests {
     fn test_send() {
         let pipeline = Pipeline::empty(2);
 
-        pipeline.send(3).unwrap();
+        pipeline.send_sync(3).unwrap();
         let out = pipeline.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![3]);
     }
