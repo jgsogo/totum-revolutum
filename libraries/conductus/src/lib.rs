@@ -1,12 +1,13 @@
 pub use data::{Message, PipelineData};
 pub use head::PipelineHeadImpl;
+pub use pipeline::Pipeline;
 pub use r#async::PipelineAsync;
-pub use sync::PipelineSync;
 pub use tail::PipelineTailImpl;
 
 pub mod r#async;
 
 mod data;
 mod head;
+mod pipeline;
 pub mod sync;
 mod tail;
