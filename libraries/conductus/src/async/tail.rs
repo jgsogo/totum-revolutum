@@ -69,6 +69,21 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
         let step: PipelineStepMap<Output, NextOutput, Fut, F> = func.into();
         self.pipe_async(step, cap).await
     }
+
+    /// Adds a parallel [`PipelineStepMap`] with the function given using a number of workers
+    async fn parallel_map<NextOutput: PipelineData + Sync, Fut, F>(
+        self,
+        func: F,
+        workers: usize,
+        cap: usize,
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>
+    where
+        F: Fn(Output) -> Fut + Send + Sync + 'static + Copy,
+        Fut: Future<Output = NextOutput> + Send + 'static,
+    {
+        let step: PipelineStepMap<Output, NextOutput, Fut, F> = func.into();
+        self.parallel_pipe(step, workers, cap).await
+    }
 }
 
 pub struct PipelineTailImplStream<'a, Output: PipelineData>(RecvStream<'a, Message<Output>>);
@@ -200,5 +215,29 @@ mod tests {
 
         let out = tail.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![20, 2]);
+    }
+
+    #[tokio::test]
+    async fn test_parallel_map() {
+        let (tx, rx) = flume::bounded(0);
+        let tail = PipelineTailImpl::new(rx)
+            .parallel_map(
+                move |value: u64| async move {
+                    tokio::time::sleep(Duration::from_millis(value * 10u64)).await;
+                    value * 2
+                },
+                2,
+                2,
+            )
+            .await;
+
+        tx.send_async(Message::Data(10)).await.unwrap();
+        tx.send_async(Message::Data(1)).await.unwrap();
+        tx.send_async(Message::Data(2)).await.unwrap();
+        tx.send_async(Message::Data(3)).await.unwrap();
+        drop(tx);
+
+        let out = tail.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![2, 4, 6, 20]);
     }
 }
