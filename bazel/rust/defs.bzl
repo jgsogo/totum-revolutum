@@ -37,6 +37,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
         name = "{}/vanilla".format(name),
         crate_name = crate_name,
         visibility = ["//visibility:public"],
+        rustc_flags = ["-A", "dead_code"],  # Allow dead_code for vanilla libraries (no features enabled)
         **kwargs
     )
 

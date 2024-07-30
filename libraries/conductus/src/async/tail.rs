@@ -10,11 +10,11 @@ use futures::Stream;
 use tracing::debug;
 
 use crate::common::steps::noop::PipelineStepNoop;
+use crate::common::steps::synchronize::SynchronizeMarkedTrait;
 use crate::common::steps::synchronize::{PipelineStepSynchronizeEnd, PipelineStepSynchronizeStart, SynchronizeMarked};
 use crate::r#async::steps::PipelineStepAsync;
 use crate::r#async::steps::PipelineStepMap;
 use crate::r#async::steps::PipelineStepWindow;
-use crate::sync::steps::SynchronizeMarkedTrait;
 use crate::{Message, PipelineData, PipelineTailImpl};
 
 pub trait PipelineTailAsyncFamily {
