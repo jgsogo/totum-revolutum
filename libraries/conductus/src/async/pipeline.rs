@@ -33,14 +33,14 @@ pub struct PipelineAsyncFamily<Input: PipelineData> {
 }
 
 impl<Input: PipelineData> PipelineTailAsyncFamily for PipelineAsyncFamily<Input> {
-    type PipelineTailOps<NextOutput: PipelineData> = Pipeline<Input, NextOutput>;
+    type PipelineTailOps<NextOutput: PipelineData + Sync> = Pipeline<Input, NextOutput>;
 }
 
 #[async_trait]
-impl<Input: PipelineData, Output: PipelineData> PipelineTailAsync<Output> for Pipeline<Input, Output> {
+impl<Input: PipelineData, Output: PipelineData + Sync> PipelineTailAsync<Output> for Pipeline<Input, Output> {
     type Family = PipelineAsyncFamily<Input>;
 
-    async fn pipe_async<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
+    async fn pipe_async<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
@@ -49,7 +49,7 @@ impl<Input: PipelineData, Output: PipelineData> PipelineTailAsync<Output> for Pi
         Pipeline { head: self.head, tail }
     }
 
-    async fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput> + Copy>(
+    async fn parallel_pipe<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,

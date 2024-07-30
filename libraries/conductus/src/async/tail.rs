@@ -1,3 +1,4 @@
+use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
@@ -8,10 +9,11 @@ use futures::Stream;
 use tracing::debug;
 
 use crate::r#async::steps::PipelineStepAsync;
+use crate::r#async::steps::PipelineStepMap;
 use crate::{Message, PipelineData, PipelineTailImpl};
 
 pub trait PipelineTailAsyncFamily {
-    type PipelineTailOps<NextOutput: PipelineData>: PipelineTailAsync<NextOutput> + Send;
+    type PipelineTailOps<NextOutput: PipelineData + Sync>: PipelineTailAsync<NextOutput> + Send;
 }
 
 /// A helper struct to implement [`PipelineTailAsyncFamily`], so that [`PipelineTailImpl`] can implement
@@ -19,23 +21,23 @@ pub trait PipelineTailAsyncFamily {
 pub struct PipelineTailAsyncImplFamily;
 
 impl PipelineTailAsyncFamily for PipelineTailAsyncImplFamily {
-    type PipelineTailOps<NextOutput: PipelineData> = PipelineTailImpl<NextOutput>;
+    type PipelineTailOps<NextOutput: PipelineData + Sync> = PipelineTailImpl<NextOutput>;
 }
 
 /// Interface for the tail of a pipeline
 #[async_trait]
-pub trait PipelineTailAsync<Output: PipelineData>: Sized {
+pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
     type Family: PipelineTailAsyncFamily;
 
     /// Adds a [`PipelineStepAsync`] to the pipeline
-    async fn pipe_async<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
+    async fn pipe_async<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
 
     /// An alias to [`PipelineTailAsync::pipe_async`]
-    async fn pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
+    async fn pipe<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
@@ -45,7 +47,7 @@ pub trait PipelineTailAsync<Output: PipelineData>: Sized {
 
     /// Adds a [`PipelineStepAsync`] to the pipeline. This step will be executed in parallel using as
     /// many workers as given
-    async fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput> + Copy>(
+    async fn parallel_pipe<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
@@ -53,6 +55,20 @@ pub trait PipelineTailAsync<Output: PipelineData>: Sized {
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
 
     fn into_stream(self) -> PipelineTailImplStream<'static, Output>;
+
+    /// Adds a [`PipelineStepMap`] with the function given
+    async fn map<NextOutput: PipelineData + Sync, Fut, F>(
+        self,
+        func: F,
+        cap: usize,
+    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>
+    where
+        F: Fn(Output) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = NextOutput> + Send + 'static,
+    {
+        let step: PipelineStepMap<Output, NextOutput, Fut, F> = func.into();
+        self.pipe_async(step, cap).await
+    }
 }
 
 pub struct PipelineTailImplStream<'a, Output: PipelineData>(RecvStream<'a, Message<Output>>);
@@ -90,10 +106,10 @@ impl<'a, Output: PipelineData> FusedStream for PipelineTailImplStream<'a, Output
 }
 
 #[async_trait]
-impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output> {
+impl<Output: PipelineData + Sync> PipelineTailAsync<Output> for PipelineTailImpl<Output> {
     type Family = PipelineTailAsyncImplFamily;
 
-    async fn pipe_async<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput>>(
+    async fn pipe_async<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
         cap: usize,
@@ -105,7 +121,7 @@ impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output
         PipelineTailImpl::new(rx)
     }
 
-    async fn parallel_pipe<NextOutput: PipelineData, PS: PipelineStepAsync<Output, NextOutput> + Copy>(
+    async fn parallel_pipe<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput> + Copy>(
         self,
         step: PS,
         workers: usize,
@@ -131,10 +147,9 @@ impl<Output: PipelineData> PipelineTailAsync<Output> for PipelineTailImpl<Output
 mod tests {
     use std::time::Duration;
 
-    use crate::common::steps::noop::PipelineStepNoop;
     use futures::StreamExt;
 
-    use crate::r#async::steps::PipelineStepMap;
+    use crate::common::steps::noop::PipelineStepNoop;
     use crate::Message;
 
     use super::*;
@@ -170,5 +185,20 @@ mod tests {
 
         let out = tail.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![1, 2, 3, 10]);
+    }
+
+    #[tokio::test]
+    async fn test_map() {
+        let (tx, rx) = flume::bounded(0);
+        let tail = PipelineTailImpl::new(rx)
+            .map(move |value: u64| async move { value * 2 }, 2)
+            .await;
+
+        tx.send_async(Message::Data(10)).await.unwrap();
+        tx.send_async(Message::Data(1)).await.unwrap();
+        drop(tx);
+
+        let out = tail.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![20, 2]);
     }
 }
