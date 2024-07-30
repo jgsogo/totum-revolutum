@@ -83,7 +83,7 @@ mod tests {
     impl std::error::Error for MyError {}
 
     #[test]
-    fn test_step_map() {
+    fn test_step_stop_on_error() {
         let stop_on_error = |input: MyError| {
             if input.0 == 3 {
                 Some("Stop because error was 3".to_string())
@@ -100,20 +100,8 @@ mod tests {
         assert!(step.check_error(MyError(5)).is_some());
 
         let (tx, rx) = flume::bounded::<Message<i32>>(2);
-        std::thread::spawn(move || {
-            step.run(
-                (0..5).map(|v| {
-                    if v == 0 {
-                        Err(MyError(v))
-                    } else if v < 3 {
-                        Ok(v)
-                    } else {
-                        Err(MyError(v))
-                    }
-                }),
-                tx,
-            )
-        });
+        let data = vec![Err(MyError(0)), Ok(1), Ok(2), Err(MyError(3))];
+        std::thread::spawn(move || step.run(data.into_iter(), tx));
 
         let r = collect_rx(rx);
         assert_eq!(r, vec![1, 2])

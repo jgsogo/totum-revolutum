@@ -8,6 +8,7 @@ use crate::{Message, PipelineData};
 
 mod map;
 mod noop;
+mod stop_on_error;
 
 #[async_trait]
 pub trait PipelineStepAsync<Input: PipelineData, Output: PipelineData>: Send + 'static {
