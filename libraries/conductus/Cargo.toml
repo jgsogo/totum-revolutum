@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
+default = ["sync", "tokio-async"]
+sync = []
+tokio-async = []
 
 [dependencies]
 async-trait = { workspace = true }
