@@ -43,7 +43,7 @@ impl<Input: PipelineData, Output: PipelineData + Sync> PipelineTailAsync<Output>
     async fn pipe_async<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
         let tail = self.tail.pipe_async(step, cap).await;
         Pipeline { head: self.head, tail }
@@ -53,7 +53,7 @@ impl<Input: PipelineData, Output: PipelineData + Sync> PipelineTailAsync<Output>
         self,
         step: PS,
         workers: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
         let tail = self.tail.parallel_pipe(step, workers, cap).await;
         Pipeline { head: self.head, tail }
@@ -78,7 +78,7 @@ mod tests {
             tokio::time::sleep(Duration::from_millis(value * 10u64)).await;
             value
         });
-        let pipeline = Pipeline::empty(2).pipe_async(step, 2).await;
+        let pipeline = Pipeline::empty(Some(2)).pipe_async(step, Some(2)).await;
 
         pipeline.send_async(10).await.unwrap();
         pipeline.send_async(1).await.unwrap();
@@ -92,7 +92,7 @@ mod tests {
             tokio::time::sleep(Duration::from_millis(value * 10u64)).await;
             value
         });
-        let pipeline = Pipeline::empty(2).parallel_pipe(step, 2, 2).await;
+        let pipeline = Pipeline::empty(Some(2)).parallel_pipe(step, 2, Some(2)).await;
 
         pipeline.send_async(10).await.unwrap();
         pipeline.send_async(1).await.unwrap();
@@ -102,7 +102,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_send() {
-        let pipeline = Pipeline::empty(2);
+        let pipeline = Pipeline::empty(Some(2));
         pipeline.send_async(0).await.unwrap();
         let out = pipeline.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![0]);
@@ -110,7 +110,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_send_detached() {
-        let pipeline = Pipeline::empty(2);
+        let pipeline = Pipeline::empty(Some(2));
         pipeline.send_detached(stream::iter(0..5)).await;
         let out = pipeline.into_stream().collect::<Vec<_>>().await;
         assert_eq!(out, vec![0, 1, 2, 3, 4]);
