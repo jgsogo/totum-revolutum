@@ -11,6 +11,47 @@ impl<Input: PipelineData> Pipeline<Input, Input> {
     ///
     /// A capacity equal to `None` will use an unbounded channel, while `Some(cap)` will create a
     /// bounded channel with capacity `cap` (see [`flume::bounded`] documentation).
+    ///
+    /// # Examples
+    ///
+    /// Example for a sync world
+    ///
+    /// ```
+    /// use conductus::Pipeline;
+    /// use conductus::sync::PipelineHeadSync;
+    /// use conductus::sync::PipelineTailSync;
+    ///
+    /// let pipeline = Pipeline::empty(None).map(|v: i32| v*2, None);
+    ///
+    /// pipeline.send_sync(2).unwrap();
+    /// pipeline.send_sync(3).unwrap();
+    ///
+    /// let out = pipeline.into_iter().collect::<Vec<_>>();
+    /// assert_eq!(out, vec![4, 6]);
+    /// ```
+    ///
+    /// Async example:
+    ///
+    /// ```
+    /// use conductus::Pipeline;
+    /// use conductus::r#async::PipelineHeadAsync;
+    /// use conductus::r#async::PipelineTailAsync;
+    ///
+    /// use futures::StreamExt;
+    /// use futures::FutureExt;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///
+    ///     let pipeline = Pipeline::empty(None).map(move |value| async move { value  *2 }, None).await;
+    ///
+    ///     pipeline.send_async(2).await.unwrap();
+    ///     pipeline.send_async(3).await.unwrap();
+    ///
+    ///     let out = pipeline.into_stream().collect::<Vec<_>>().await;
+    ///     assert_eq!(out, vec![4, 6]);
+    /// }
+    /// ```
     pub fn empty(cap: Option<usize>) -> Self {
         let (tx, rx) = match cap {
             None => flume::unbounded(),
