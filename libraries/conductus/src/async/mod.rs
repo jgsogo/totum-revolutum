@@ -3,7 +3,5 @@ pub use tail::{PipelineTailAsync, PipelineTailAsyncFamily, PipelineTailImplStrea
 
 mod head;
 mod pipeline;
-#[allow(dead_code)]
-pub mod pipeline_async;
 pub mod steps;
 mod tail;

@@ -16,6 +16,7 @@ pub trait PipelineHeadSync {
         self.send_sync(item)
     }
 
+    /// Runs [`PipelineHeadSync::send_sync`] for each item in the iterator.
     fn send_batch<I: IntoIterator<Item = Self::TInput> + Send + 'static>(
         &self,
         input: I,
