@@ -43,7 +43,9 @@ impl<Input: PipelineData> Pipeline<Input, Input> {
     /// #[tokio::main]
     /// async fn main() {
     ///
-    ///     let pipeline = Pipeline::empty(None).map(move |value| async move { value  *2 }, None).await;
+    ///     let pipeline = Pipeline::empty(None)
+    ///         .map(move |value| async move { value  *2 }, None)
+    ///         .await;
     ///
     ///     pipeline.send_async(2).await.unwrap();
     ///     pipeline.send_async(3).await.unwrap();
