@@ -7,7 +7,7 @@ pub struct Pipeline<Input: PipelineData, Output: PipelineData> {
 }
 
 impl<Input: PipelineData> Pipeline<Input, Input> {
-    /// Creates a new [`Pipeline`] with a initial buffer with the given capacity `cap`.
+    /// Creates a new [`Pipeline`] with an initial buffer with the given capacity `cap`.
     ///
     /// A capacity equal to `None` will use an unbounded channel, while `Some(cap)` will create a
     /// bounded channel with capacity `cap` (see [`flume::bounded`] documentation).
