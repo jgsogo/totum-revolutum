@@ -38,14 +38,14 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
     async fn pipe_async<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
 
     /// An alias to [`PipelineTailAsync::pipe_async`]
     async fn pipe<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
         self.pipe_async(step, cap).await
     }
@@ -56,7 +56,7 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
         self,
         step: PS,
         workers: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>;
 
     fn into_stream(self) -> PipelineTailImplStream<'static, Output>;
@@ -65,7 +65,7 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
     async fn map<NextOutput: PipelineData + Sync, Fut, F>(
         self,
         func: F,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>
     where
         F: Fn(Output) -> Fut + Send + Sync + 'static,
@@ -80,7 +80,7 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
         self,
         func: F,
         workers: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>
     where
         F: Fn(Output) -> Fut + Send + Sync + 'static + Copy,
@@ -90,7 +90,7 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
         self.parallel_pipe(step, workers, cap).await
     }
 
-    async fn buffer(self, cap: usize) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<Output> {
+    async fn buffer(self, cap: Option<usize>) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<Output> {
         self.pipe_async(PipelineStepNoop, cap).await
     }
 
@@ -99,7 +99,7 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
         self,
         func: F,
         window_size: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput>
     where
         Output: Clone,
@@ -110,21 +110,17 @@ pub trait PipelineTailAsync<Output: PipelineData + Sync>: Sized {
         self.pipe_async(step, cap).await
     }
 
-    async fn sync_mark(
-        self,
-        cap: usize,
-    ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<SynchronizeMarked<Output>> {
-        self.pipe_async(PipelineStepSynchronizeStart, cap).await
+    async fn sync_mark(self) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<SynchronizeMarked<Output>> {
+        self.pipe_async(PipelineStepSynchronizeStart, Some(0)).await
     }
 
     async fn sync<InnerOutput: PipelineData + Sync>(
         self,
-        cap: usize,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<InnerOutput>
     where
         Output: SynchronizeMarkedTrait<InnerOutput>,
     {
-        self.pipe_async(PipelineStepSynchronizeEnd, cap).await
+        self.pipe_async(PipelineStepSynchronizeEnd, Some(0)).await
     }
 }
 
@@ -169,9 +165,12 @@ impl<Output: PipelineData + Sync> PipelineTailAsync<Output> for PipelineTailImpl
     async fn pipe_async<NextOutput: PipelineData + Sync, PS: PipelineStepAsync<Output, NextOutput>>(
         self,
         step: PS,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
-        let (tx, rx) = flume::bounded(cap);
+        let (tx, rx) = match cap {
+            None => flume::unbounded(),
+            Some(cap) => flume::bounded(cap),
+        };
         tokio::spawn(async move {
             step.run(self.into_stream(), tx).await;
         });
@@ -182,9 +181,12 @@ impl<Output: PipelineData + Sync> PipelineTailAsync<Output> for PipelineTailImpl
         self,
         step: PS,
         workers: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<NextOutput> {
-        let (tx, rx) = flume::bounded(cap);
+        let (tx, rx) = match cap {
+            None => flume::unbounded(),
+            Some(cap) => flume::bounded(cap),
+        };
         for _ in 0..workers {
             let tx = tx.clone();
             let tail = PipelineTailImpl::new(self.rx.clone());
@@ -215,7 +217,7 @@ mod tests {
     async fn test_pipe() {
         let (tx, rx) = flume::bounded(0);
         let step = PipelineStepNoop;
-        let tail = PipelineTailImpl::new(rx).pipe_async(step, 2).await;
+        let tail = PipelineTailImpl::new(rx).pipe_async(step, Some(2)).await;
 
         tx.send_async(Message::Data(10)).await.unwrap();
         tx.send_async(Message::Data(1)).await.unwrap();
@@ -232,7 +234,7 @@ mod tests {
             tokio::time::sleep(Duration::from_millis(value * 10u64)).await;
             value
         });
-        let tail = PipelineTailImpl::new(rx).parallel_pipe(step, 2, 2).await;
+        let tail = PipelineTailImpl::new(rx).parallel_pipe(step, 2, Some(2)).await;
 
         tx.send_async(Message::Data(10)).await.unwrap();
         tx.send_async(Message::Data(1)).await.unwrap();
@@ -248,7 +250,7 @@ mod tests {
     async fn test_map() {
         let (tx, rx) = flume::bounded(0);
         let tail = PipelineTailImpl::new(rx)
-            .map(move |value: u64| async move { value * 2 }, 2)
+            .map(move |value: u64| async move { value * 2 }, Some(2))
             .await;
 
         tx.send_async(Message::Data(10)).await.unwrap();
@@ -269,7 +271,7 @@ mod tests {
                     value * 2
                 },
                 2,
-                2,
+                Some(2),
             )
             .await;
 
@@ -286,7 +288,7 @@ mod tests {
     #[tokio::test]
     async fn test_buffer() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTailImpl::new(rx).buffer(4).await;
+        let tail = PipelineTailImpl::new(rx).buffer(Some(4)).await;
 
         tx.send_async(Message::Data(10)).await.unwrap();
         tx.send_async(Message::Data(1)).await.unwrap();
@@ -305,7 +307,7 @@ mod tests {
             .window(
                 move |input: VecDeque<i32>| async move { input.iter().cloned().collect::<Vec<_>>() },
                 3,
-                2,
+                Some(2),
             )
             .await;
 
@@ -323,7 +325,7 @@ mod tests {
     async fn test_synchronize() {
         let (tx, rx) = flume::bounded(0);
         let tail = PipelineTailImpl::new(rx)
-            .sync_mark(0)
+            .sync_mark()
             .await
             .parallel_map(
                 move |value| async move {
@@ -332,10 +334,10 @@ mod tests {
                     value
                 },
                 2,
-                2,
+                Some(2),
             )
             .await
-            .sync(0)
+            .sync()
             .await;
 
         tx.send_async(Message::Data(10)).await.unwrap();

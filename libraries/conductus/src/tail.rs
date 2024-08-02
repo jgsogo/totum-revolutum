@@ -48,8 +48,8 @@ mod tests {
         let step_sync = PipelineSyncStepMap::from(|value| value);
         let step_async = PipelineAsyncStepMap::from(move |value| async move { value });
         let tail = PipelineTailImpl::new(rx)
-            .pipe_sync(step_sync, 2)
-            .pipe_async(step_async, 2)
+            .pipe_sync(step_sync, Some(2))
+            .pipe_async(step_async, Some(2))
             .await;
 
         tx.send_async(Message::Data(10)).await.unwrap();

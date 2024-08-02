@@ -29,14 +29,14 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
     fn pipe_sync<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>;
 
     /// An alias to [`PipelineTailSync::pipe_sync`]
     fn pipe<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
         self.pipe_sync(step, cap)
     }
@@ -47,14 +47,14 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self,
         step: PS,
         workers: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput>;
 
     /// Adds a [`PipelineStepMap`] with the function given
     fn map<NextOutput: PipelineData, Func: Fn(Output) -> NextOutput + Send + 'static>(
         self,
         func: Func,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
         let step: PipelineStepMap<Output, NextOutput, Func> = func.into();
         self.pipe_sync(step, cap)
@@ -66,14 +66,14 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self,
         func: Func,
         workers: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
         let step: PipelineStepMap<Output, NextOutput, Func> = func.into();
         self.parallel_pipe(step, workers, cap)
     }
 
     /// Adds a buffer.
-    fn buffer(self, cap: usize) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<Output> {
+    fn buffer(self, cap: Option<usize>) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<Output> {
         self.pipe_sync(PipelineStepNoop, cap)
     }
 
@@ -82,7 +82,7 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
         self,
         func: Func,
         window_size: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
         let step = PipelineStepWindow::new(func, window_size);
         self.pipe_sync(step, cap)
@@ -90,7 +90,7 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
 
     /// Adds a synchronization mark to the data in the pipeline
     fn sync_mark(self) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<SynchronizeMarked<Output>> {
-        self.pipe_sync(PipelineStepSynchronizeStart, 0)
+        self.pipe_sync(PipelineStepSynchronizeStart, Some(0))
     }
 
     /// Uses a synchronization mark (see [`PipelineTailSync::sync_mark`]) to reorder the data
@@ -98,7 +98,7 @@ pub trait PipelineTailSync<Output: PipelineData>: Sized {
     where
         Output: SynchronizeMarkedTrait<InnerOutput>,
     {
-        self.pipe_sync(PipelineStepSynchronizeEnd, 0)
+        self.pipe_sync(PipelineStepSynchronizeEnd, Some(0))
     }
 
     fn into_iter(self) -> PipelineTailImplIter<Output>;
@@ -140,9 +140,12 @@ impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output>
     fn pipe_sync<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
-        cap: usize,
+        cap: Option<usize>,
     ) -> PipelineTailImpl<NextOutput> {
-        let (tx, rx) = flume::bounded(cap);
+        let (tx, rx) = match cap {
+            None => flume::unbounded(),
+            Some(cap) => flume::bounded(cap),
+        };
         std::thread::spawn(move || step.run(self.into_iter(), tx));
         PipelineTailImpl::new(rx)
     }
@@ -151,9 +154,12 @@ impl<Output: PipelineData> PipelineTailSync<Output> for PipelineTailImpl<Output>
         self,
         step: PS,
         workers: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> PipelineTailImpl<NextOutput> {
-        let (tx, rx) = flume::bounded(cap);
+        let (tx, rx) = match cap {
+            None => flume::unbounded(),
+            Some(cap) => flume::bounded(cap),
+        };
         for _ in 0..workers {
             let tx = tx.clone();
             let tail = PipelineTailImpl::new(self.rx.clone());
@@ -184,7 +190,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let tail = PipelineTailImpl::new(rx).pipe_sync(step, 2);
+        let tail = PipelineTailImpl::new(rx).pipe_sync(step, Some(2));
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -201,7 +207,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let tail = PipelineTailImpl::new(rx).parallel_pipe(step, 2, 2);
+        let tail = PipelineTailImpl::new(rx).parallel_pipe(step, 2, Some(2));
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -216,7 +222,7 @@ mod tests {
     #[test]
     fn test_map() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTailImpl::new(rx).map(|value| value * 2, 2);
+        let tail = PipelineTailImpl::new(rx).map(|value| value * 2, Some(2));
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -235,7 +241,7 @@ mod tests {
                 value * 2
             },
             2,
-            2,
+            Some(2),
         );
 
         tx.send(Message::Data(10)).unwrap();
@@ -251,7 +257,7 @@ mod tests {
     #[test]
     fn test_buffer() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTailImpl::new(rx).map(|value| value, 2).buffer(2);
+        let tail = PipelineTailImpl::new(rx).map(|value| value, Some(2)).buffer(Some(2));
 
         tx.send(Message::Data(10)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -266,7 +272,7 @@ mod tests {
     #[test]
     fn test_window() {
         let (tx, rx) = flume::bounded(0);
-        let tail = PipelineTailImpl::new(rx).window(|value| value.into_iter().cloned().collect::<Vec<_>>(), 2, 4);
+        let tail = PipelineTailImpl::new(rx).window(|value| value.into_iter().cloned().collect::<Vec<_>>(), 2, Some(4));
 
         tx.send(Message::Data(0)).unwrap();
         tx.send(Message::Data(1)).unwrap();
@@ -290,7 +296,7 @@ mod tests {
                     value
                 },
                 2,
-                2,
+                Some(2),
             )
             .sync();
 

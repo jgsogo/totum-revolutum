@@ -39,7 +39,7 @@ impl<Input: PipelineData, Output: PipelineData> PipelineTailSync<Output> for Pip
     fn pipe_sync<NextOutput: PipelineData, PS: PipelineStepSync<Output, NextOutput>>(
         self,
         step: PS,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
         let tail = self.tail.pipe_sync(step, cap);
         Pipeline { head: self.head, tail }
@@ -49,7 +49,7 @@ impl<Input: PipelineData, Output: PipelineData> PipelineTailSync<Output> for Pip
         self,
         step: PS,
         workers: usize,
-        cap: usize,
+        cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<NextOutput> {
         let tail = self.tail.parallel_pipe(step, workers, cap);
         Pipeline { head: self.head, tail }
@@ -74,7 +74,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = Pipeline::empty(2).pipe_sync(step, 2);
+        let pipeline = Pipeline::empty(Some(2)).pipe_sync(step, Some(2));
 
         pipeline.send_sync(10).unwrap();
         pipeline.send_sync(1).unwrap();
@@ -88,7 +88,7 @@ mod tests {
             std::thread::sleep(Duration::from_millis(value * 10u64));
             value
         });
-        let pipeline = Pipeline::empty(2).parallel_pipe(step, 2, 2);
+        let pipeline = Pipeline::empty(Some(2)).parallel_pipe(step, 2, Some(2));
 
         pipeline.send_sync(10).unwrap();
         pipeline.send_sync(1).unwrap();
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_send() {
-        let pipeline = Pipeline::empty(2);
+        let pipeline = Pipeline::empty(Some(2));
 
         pipeline.send_sync(3).unwrap();
         let out = pipeline.into_iter().collect::<Vec<_>>();
@@ -107,7 +107,7 @@ mod tests {
 
     #[test]
     fn test_send_detached() {
-        let pipeline = Pipeline::empty(2);
+        let pipeline = Pipeline::empty(Some(2));
 
         pipeline.send_detached(0..3);
         let out = pipeline.into_iter().collect::<Vec<_>>();
