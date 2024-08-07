@@ -88,12 +88,15 @@ impl<Output: PipelineData> PipelineTailSyncOps<Output> for PipelineTailImpl<Outp
     }
 
     fn concat<Head: PipelineHeadSync<TInput = Output>>(self, head: Head) {
-        head.send_batch(self.into_iter()).unwrap()
+        head.send_detached(self.into_iter());
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::sync::steps::tests::collect_rx;
+    use crate::PipelineHeadImpl;
+
     use super::*;
 
     #[test]
@@ -134,5 +137,29 @@ mod tests {
         let mut out = tail.into_iter().collect::<Vec<_>>();
         out.sort();
         assert_eq!(out, vec![1, 2, 3, 4]);
+    }
+
+    #[test]
+    fn test_concat() {
+        let (tx, tail) = {
+            let (tx, rx) = flume::bounded(2);
+            let tail = PipelineTailImpl::new(rx);
+            (tx, tail)
+        };
+
+        let (rx, head) = {
+            let (tx, rx) = flume::bounded(2);
+            let head = PipelineHeadImpl::new(tx);
+            (rx, head)
+        };
+
+        tail.concat(head);
+
+        tx.send(Message::Data(3)).unwrap();
+        tx.send(Message::Data(4)).unwrap();
+        drop(tx);
+
+        let out = collect_rx(rx);
+        assert_eq!(out, vec![3, 4]);
     }
 }
