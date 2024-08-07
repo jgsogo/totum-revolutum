@@ -67,6 +67,12 @@ impl<Input: PipelineData> Pipeline<Input, Input> {
     }
 }
 
+impl<Input: PipelineData, Output: PipelineData> Pipeline<Input, Output> {
+    pub fn head_and_tail(self) -> (PipelineHeadImpl<Input>, PipelineTailImpl<Output>) {
+        (self.head, self.tail)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use futures::StreamExt;
@@ -98,7 +104,7 @@ mod tests {
     }
 
     #[test]
-    fn test_unbouded() {
+    fn test_unbounded() {
         let pipeline = Pipeline::empty(None);
         pipeline.send_sync(1).unwrap();
         pipeline.send_sync(2).unwrap();
@@ -108,5 +114,18 @@ mod tests {
 
         let out = pipeline.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![1, 2, 3, 4, 5]);
+    }
+
+    #[test]
+    fn test_head_and_tail() {
+        let pipeline = Pipeline::empty(None);
+
+        let (head, tail) = pipeline.head_and_tail();
+        head.send_sync(1).unwrap();
+        head.send_sync(2).unwrap();
+        drop(head);
+
+        let out = tail.into_iter().collect::<Vec<_>>();
+        assert_eq!(out, vec![1, 2]);
     }
 }
