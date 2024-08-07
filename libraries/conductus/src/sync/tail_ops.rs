@@ -1,10 +1,11 @@
 use crate::sync::tail::PipelineTailSyncImplFamily;
-use crate::sync::{PipelineTailSync, PipelineTailSyncFamily};
+use crate::sync::{PipelineHeadSync, PipelineTailSync, PipelineTailSyncFamily};
 use crate::{Message, PipelineData, PipelineTailImpl};
 
 pub trait PipelineTailSyncOps<Output: PipelineData>: Sized {
     type Family: PipelineTailSyncFamily;
 
+    /// Duplicates the output at this point and sends it to two different tail implementations
     fn split(
         self,
         cap: Option<usize>,
@@ -15,11 +16,17 @@ pub trait PipelineTailSyncOps<Output: PipelineData>: Sized {
     where
         Output: Clone;
 
+    /// Will combine the output from current tail and the `other` one and send them to a single
+    /// tail (no order is guaranteed)
     fn merge(
         self,
         other: <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<Output>,
         cap: Option<usize>,
     ) -> <Self::Family as PipelineTailSyncFamily>::PipelineTailOps<Output>;
+
+    /// Sends all the outputs from this tail to the given [`PipelineHeadSync`] implementation. This
+    /// method consumes both objects as now these two pipeline endpoints are bounded together.
+    fn concat<Head: PipelineHeadSync<TInput = Output>>(self, head: Head);
 }
 
 impl<Output: PipelineData> PipelineTailSyncOps<Output> for PipelineTailImpl<Output> {
@@ -78,5 +85,54 @@ impl<Output: PipelineData> PipelineTailSyncOps<Output> for PipelineTailImpl<Outp
             }
         });
         PipelineTailImpl::new(rx)
+    }
+
+    fn concat<Head: PipelineHeadSync<TInput = Output>>(self, head: Head) {
+        head.send_batch(self.into_iter()).unwrap()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_split() {
+        let (tx, rx) = flume::bounded(0);
+        let tail = PipelineTailImpl::new(rx);
+
+        let (tail1, tail2) = tail.split(Some(2));
+
+        tx.send(Message::Data(10)).unwrap();
+        tx.send(Message::Data(1)).unwrap();
+        drop(tx);
+
+        let out1 = tail1.into_iter().collect::<Vec<_>>();
+        assert_eq!(out1, vec![10, 1]);
+        let out2 = tail2.into_iter().collect::<Vec<_>>();
+        assert_eq!(out2, vec![10, 1]);
+    }
+
+    #[test]
+    fn test_merge() {
+        let (tx1, rx1) = flume::bounded(2);
+        let tail1 = PipelineTailImpl::new(rx1);
+
+        let (tx2, rx2) = flume::bounded(2);
+        let tail2 = PipelineTailImpl::new(rx2);
+
+        tx1.send(Message::Data(1)).unwrap();
+        tx1.send(Message::Data(2)).unwrap();
+        drop(tx1);
+
+        tx2.send(Message::Data(3)).unwrap();
+        tx2.send(Message::Data(4)).unwrap();
+        drop(tx2);
+
+        let tail = tail1.merge(tail2, Some(2));
+
+        let mut out = tail.into_iter().collect::<Vec<_>>();
+        out.sort();
+        assert_eq!(out, vec![1, 2, 3, 4]);
     }
 }
