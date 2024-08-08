@@ -53,8 +53,8 @@ impl<Output: PipelineData> PipelineTailSyncOps<Output> for PipelineTailImpl<Outp
 
         std::thread::spawn(move || {
             for it in self.rx {
-                tx_lhs.send(it.clone()).unwrap();
-                tx_rhs.send(it.clone()).unwrap();
+                let _ = tx_lhs.send(it.clone());
+                let _ = tx_rhs.send(it);
             }
         });
 
