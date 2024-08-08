@@ -26,7 +26,7 @@ pub trait PipelineTailSyncOps<Output: PipelineData>: Sized {
 
     /// Sends all the outputs from this tail to the given [`PipelineHeadSync`] implementation. This
     /// method consumes both objects as now these two pipeline endpoints are bounded together.
-    fn concat<Head: PipelineHeadSync<TInput = Output>>(self, head: Head);
+    fn concat_sync<Head: PipelineHeadSync<TInput = Output>>(self, head: Head);
 }
 
 impl<Output: PipelineData> PipelineTailSyncOps<Output> for PipelineTailImpl<Output> {
@@ -87,7 +87,7 @@ impl<Output: PipelineData> PipelineTailSyncOps<Output> for PipelineTailImpl<Outp
         PipelineTailImpl::new(rx)
     }
 
-    fn concat<Head: PipelineHeadSync<TInput = Output>>(self, head: Head) {
+    fn concat_sync<Head: PipelineHeadSync<TInput = Output>>(self, head: Head) {
         head.send_detached(self.into_iter());
     }
 }
@@ -153,7 +153,7 @@ mod tests {
             (rx, head)
         };
 
-        tail.concat(head);
+        tail.concat_sync(head);
 
         tx.send(Message::Data(3)).unwrap();
         tx.send(Message::Data(4)).unwrap();

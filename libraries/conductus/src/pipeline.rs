@@ -1,3 +1,5 @@
+use crate::r#async::PipelineTailOpsAsync;
+use crate::sync::PipelineTailSyncOps;
 use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
 
 /// The pipeline object. Start here.
@@ -68,8 +70,38 @@ impl<Input: PipelineData> Pipeline<Input, Input> {
 }
 
 impl<Input: PipelineData, Output: PipelineData> Pipeline<Input, Output> {
+    /// Returns the [`PipelineHeadImpl`] and [`PipelineTailImpl`] of the [`Pipeline`]
     pub fn head_and_tail(self) -> (PipelineHeadImpl<Input>, PipelineTailImpl<Output>) {
         (self.head, self.tail)
+    }
+
+    /// Concat this [`Pipeline`] with another one
+    pub fn concat_sync<NextOutput: PipelineData>(
+        self,
+        other: Pipeline<Output, NextOutput>,
+    ) -> Pipeline<Input, NextOutput> {
+        let (other_head, other_tail) = other.head_and_tail();
+        self.tail.concat_sync(other_head);
+        Pipeline {
+            head: self.head,
+            tail: other_tail,
+        }
+    }
+
+    /// Concat this [`Pipeline`] with another one
+    pub async fn concat_async<NextOutput: PipelineData>(
+        self,
+        other: Pipeline<Output, NextOutput>,
+    ) -> Pipeline<Input, NextOutput>
+    where
+        Output: Sync,
+    {
+        let (other_head, other_tail) = other.head_and_tail();
+        self.tail.concat_async(other_head).await;
+        Pipeline {
+            head: self.head,
+            tail: other_tail,
+        }
     }
 }
 
@@ -127,5 +159,19 @@ mod tests {
 
         let out = tail.into_iter().collect::<Vec<_>>();
         assert_eq!(out, vec![1, 2]);
+    }
+
+    #[tokio::test]
+    async fn test_concat() {
+        let pipeline1 = Pipeline::empty(None);
+        let pipeline2 = Pipeline::empty(None);
+        let pipeline3 = Pipeline::empty(None);
+
+        let p12 = pipeline1.concat_sync(pipeline2);
+        let p123 = p12.concat_async(pipeline3).await;
+
+        p123.send_async(1).await.unwrap();
+        let out = p123.into_stream().collect::<Vec<_>>().await;
+        assert_eq!(out, vec![1]);
     }
 }
