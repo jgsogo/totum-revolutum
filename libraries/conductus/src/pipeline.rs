@@ -1,4 +1,6 @@
+#[cfg(feature = "tokio-async")]
 use crate::r#async::PipelineTailOpsAsync;
+#[cfg(feature = "sync")]
 use crate::sync::PipelineTailSyncOps;
 use crate::{PipelineData, PipelineHeadImpl, PipelineTailImpl};
 
@@ -76,6 +78,7 @@ impl<Input: PipelineData, Output: PipelineData> Pipeline<Input, Output> {
     }
 
     /// Concat this [`Pipeline`] with another one
+    #[cfg(feature = "sync")]
     pub fn concat_sync<NextOutput: PipelineData>(
         self,
         other: Pipeline<Output, NextOutput>,
@@ -89,6 +92,7 @@ impl<Input: PipelineData, Output: PipelineData> Pipeline<Input, Output> {
     }
 
     /// Concat this [`Pipeline`] with another one
+    #[cfg(feature = "tokio-async")]
     pub async fn concat_async<NextOutput: PipelineData>(
         self,
         other: Pipeline<Output, NextOutput>,
