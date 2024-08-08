@@ -9,6 +9,7 @@ use crate::{Message, PipelineData, PipelineTailImpl};
 pub trait PipelineTailOpsAsync<Output: PipelineData + Sync>: Sized {
     type Family: PipelineTailAsyncFamily;
 
+    /// Duplicates the output at this point and sends it to two different tail implementations
     async fn split(
         self,
         cap: Option<usize>,
@@ -19,12 +20,16 @@ pub trait PipelineTailOpsAsync<Output: PipelineData + Sync>: Sized {
     where
         Output: Clone;
 
+    /// Will combine the output from current tail and the `other` one and send them to a single
+    /// tail (no order is guaranteed)
     async fn merge(
         self,
         other: <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<Output>,
         cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<Output>;
 
+    /// Sends all the outputs from this tail to the given [`PipelineHeadSync`] implementation. This
+    /// method consumes both objects as now these two pipeline endpoints are bounded together.
     async fn concat<Head: PipelineHeadAsync<TInput = Output> + Send>(self, head: Head);
 }
 
