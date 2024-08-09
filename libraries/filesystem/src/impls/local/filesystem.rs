@@ -20,6 +20,7 @@ use crate::{
 
 use super::parallel_visitor;
 
+/// Extra methods required by [`File`] implementors, so they can be used in [`FilesystemLocal`]
 #[async_trait]
 trait FileExtras: Sized {
     async fn open<P: AsRef<Utf8Path> + Send>(path: P) -> Result<Self>;

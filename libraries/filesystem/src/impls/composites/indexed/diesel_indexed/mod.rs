@@ -29,14 +29,13 @@ pub async fn new_filesystem_indexed_with_db<TStorage: Filesystem + 'static>(
 
 #[cfg(test)]
 mod tests {
-    use camino_tempfile::NamedUtf8TempFile;
     use std::str::FromStr;
 
+    use camino_tempfile::NamedUtf8TempFile;
     use ignore_files::IgnoreFilter;
 
-    use crate::impls::composites::indexed::database::FilesystemIndexedDatabase;
     use crate::impls::composites::indexed::diesel_indexed::database::DatabaseImpl;
-    use crate::impls::composites::new_filesystem_indexed_with_db;
+    use crate::impls::composites::{new_filesystem_indexed_with_db, FilesystemIndexedDatabase};
     use crate::impls::FilesystemLocalTemp;
     use crate::{DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem};
 
