@@ -1,7 +1,7 @@
 //! This module provides different [`super::Filesystem`] implementations
 
 #[cfg(feature = "local")]
-pub use local::FilesystemLocal;
+pub use local::{FilesystemLocalAsync, FilesystemLocalSync};
 #[cfg(feature = "local_temp")]
 pub use local_temp::FilesystemLocalTemp;
 #[cfg(feature = "pcloud")]

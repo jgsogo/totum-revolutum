@@ -5,7 +5,7 @@ use ignore_files::IgnoreFilter;
 use log::error;
 use tracing::{debug, info};
 
-use filesystem::impls::FilesystemLocal;
+use filesystem::impls::FilesystemLocalSync;
 use filesystem::{DirectoryPath, FilePath, Filesystem};
 use pcloud_sdk::client::PCloudClient;
 
@@ -52,12 +52,12 @@ pub trait PhotoDBAdd<FS: Filesystem + Clone + 'static> {
 }
 
 #[async_trait]
-impl<'a, T: Database + Send, TPCloudClient: PCloudClient + Clone + Send + 'static> PhotoDBAdd<FilesystemLocal>
+impl<'a, T: Database + Send, TPCloudClient: PCloudClient + Clone + Send + 'static> PhotoDBAdd<FilesystemLocalSync>
     for PhotoDB<'a, T, TPCloudClient>
 {
     async fn add_from_file(
         &mut self,
-        filesystem: &FilesystemLocal,
+        filesystem: &FilesystemLocalSync,
         filepath: &FilePath,
         mut metadata_collector: MetadataCollector,
     ) -> Result<()> {

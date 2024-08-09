@@ -1,7 +1,7 @@
 use std::fs;
+use std::marker::PhantomData;
 use std::str::FromStr;
 
-use async_std::fs::File as AsyncFile;
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
@@ -20,13 +20,55 @@ use crate::{
 
 use super::parallel_visitor;
 
-/// Implementation of [`Filesystem`] using a directory in the host filesystem.
-#[derive(Debug, Clone)]
-pub struct FilesystemLocal {
-    root: Utf8PathBuf,
+#[async_trait]
+trait FileExtras: Sized {
+    async fn open<P: AsRef<Utf8Path> + Send>(path: P) -> Result<Self>;
+    async fn create<P: AsRef<Utf8Path> + Send>(path: P) -> Result<Self>;
 }
 
-impl FilesystemLocal {
+#[async_trait]
+impl FileExtras for async_std::fs::File {
+    async fn open<P: AsRef<Utf8Path> + Send>(path: P) -> Result<Self> {
+        async_std::fs::File::open(path.as_ref().as_std_path())
+            .await
+            .map_err(Error::IoError)
+    }
+
+    async fn create<P: AsRef<Utf8Path> + Send>(path: P) -> Result<Self> {
+        async_std::fs::File::create(path.as_ref().as_std_path())
+            .await
+            .map_err(Error::IoError)
+    }
+}
+
+#[async_trait]
+impl FileExtras for std::fs::File {
+    async fn open<P: AsRef<Utf8Path> + Send>(path: P) -> Result<Self> {
+        std::fs::File::open(path.as_ref()).map_err(Error::IoError)
+    }
+
+    async fn create<P: AsRef<Utf8Path> + Send>(path: P) -> Result<Self> {
+        std::fs::File::create(path.as_ref()).map_err(Error::IoError)
+    }
+}
+
+/// Implementation of [`Filesystem`] using a directory in the host filesystem.
+#[derive(Debug)]
+pub struct FilesystemLocal<TFile: File> {
+    root: Utf8PathBuf,
+    _filetype: PhantomData<TFile>,
+}
+
+impl<TFile: File> Clone for FilesystemLocal<TFile> {
+    fn clone(&self) -> Self {
+        Self {
+            root: self.root.clone(),
+            _filetype: PhantomData,
+        }
+    }
+}
+
+impl<TFile: File> FilesystemLocal<TFile> {
     /// Creates a new [`FilesystemLocal`] at the given `root` path.
     pub fn new(root: &Utf8Path) -> Result<Self> {
         if !root.exists() {
@@ -35,6 +77,7 @@ impl FilesystemLocal {
 
         Ok(Self {
             root: root.to_path_buf(),
+            _filetype: PhantomData,
         })
     }
 
@@ -42,6 +85,7 @@ impl FilesystemLocal {
     pub fn local_hd() -> Self {
         Self {
             root: Utf8PathBuf::from_str("/").unwrap(),
+            _filetype: PhantomData,
         }
     }
 
@@ -78,7 +122,7 @@ impl FilesystemLocal {
 }
 
 #[async_trait]
-impl Filesystem for FilesystemLocal {
+impl<TFile: File + FileExtras + 'static> Filesystem for FilesystemLocal<TFile> {
     async fn sync_all(mut self) -> Result<()> {
         Ok(())
     }
@@ -148,13 +192,13 @@ impl Filesystem for FilesystemLocal {
     }
     async fn open(&self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let path = self.root.join(path);
-        let f = AsyncFile::open(path.into_std_path_buf()).await?;
+        let f = TFile::open(path).await?;
         Ok((Box::new(f), None))
     }
 
     async fn create(&mut self, path: &FilePath) -> Result<(Box<dyn File>, Option<Receiver<Result<()>>>)> {
         let path = self.root.join(path);
-        let f = AsyncFile::create(path.into_std_path_buf()).await?;
+        let f = TFile::create(path).await?;
         Ok((Box::new(f), None))
     }
     async fn create_dir_all(&mut self, path: &DirectoryPath) -> Result<()> {
@@ -212,7 +256,7 @@ impl Filesystem for FilesystemLocal {
 }
 
 #[async_trait]
-impl FilesystemOps for FilesystemLocal {}
+impl<TFile: File + FileExtras + 'static> FilesystemOps for FilesystemLocal<TFile> {}
 
 #[cfg(test)]
 mod tests {
@@ -226,7 +270,7 @@ mod tests {
 
     use super::*;
 
-    async fn create_file(fs: &mut FilesystemLocal, path: &FilePath, content: &[u8]) -> Result<()> {
+    async fn create_file(fs: &mut FilesystemLocal<async_std::fs::File>, path: &FilePath, content: &[u8]) -> Result<()> {
         let rx = {
             let (mut f, rx) = fs.create(&path).await?;
             f.write_all(&content).await?;
@@ -242,7 +286,7 @@ mod tests {
     fn test_root_not_exists() {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = tmp_dir.path();
-        let r = FilesystemLocal::new(&utf8_path.join("not-exist"));
+        let r = FilesystemLocal::<std::fs::File>::new(&utf8_path.join("not-exist"));
         assert!(r.is_err());
         assert!(matches!(r.unwrap_err(), Error::PathDoesNotExist))
     }
@@ -251,7 +295,7 @@ mod tests {
     async fn test_root() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = tmp_dir.path();
-        let fs = FilesystemLocal::new(utf8_path)?;
+        let fs = FilesystemLocal::<std::fs::File>::new(utf8_path)?;
         // Root is not canonical, it fails in macOS where tmp directories are inside sym folder
         #[cfg(target_os = "macos")]
         assert_ne!(fs::canonicalize(tmp_dir.path())?, fs.root);
@@ -263,7 +307,7 @@ mod tests {
     async fn test_create_write_read() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = tmp_dir.path();
-        let mut fs = FilesystemLocal::new(utf8_path)?;
+        let mut fs = FilesystemLocal::<std::fs::File>::new(utf8_path)?;
 
         let directory_path = DirectoryPathBuf::root();
         let filepath = FilePathBuf::new(directory_path, FilenameBuf::from_str("myfile").unwrap());
@@ -294,7 +338,7 @@ mod tests {
     async fn test_create_in_subfolder() -> Result<()> {
         let tmp_dir = tempdir().unwrap();
         let utf8_path = tmp_dir.path();
-        let mut fs = FilesystemLocal::new(utf8_path)?;
+        let mut fs = FilesystemLocal::<std::fs::File>::new(utf8_path)?;
 
         let dir = DirectoryPathBuf::from_str("nested/nested2").unwrap();
         let filepath = FilePathBuf::new(&dir, FilenameBuf::from_str("myfile.txt").unwrap());
@@ -468,7 +512,7 @@ mod tests {
         };
 
         // We can access the file using a filesystem instantiated with FilesystemLocal::local_hd()
-        let local_hd = FilesystemLocal::local_hd();
+        let local_hd = FilesystemLocal::<std::fs::File>::local_hd();
         let (mut file, _) = local_hd.open(&filepath).await?;
 
         let mut buffer = Vec::new();
@@ -481,7 +525,7 @@ mod tests {
     #[tokio::test]
     async fn test_relative_path() -> Result<()> {
         let tmp_path = tempdir()?;
-        let mut fs = FilesystemLocal::new(tmp_path.path())?;
+        let mut fs = FilesystemLocal::<std::fs::File>::new(tmp_path.path())?;
 
         {
             let r = fs.relativize_path(tmp_path.path().join("a/path/to/something"));

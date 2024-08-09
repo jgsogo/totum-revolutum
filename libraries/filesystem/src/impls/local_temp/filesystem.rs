@@ -8,13 +8,13 @@ use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 
 use crate::filesystem::FilesystemOps;
-use crate::impls::FilesystemLocal;
+use crate::impls::FilesystemLocalSync;
 use crate::{DirectoryPath, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result};
 
 /// Implementation of [`Filesystem`] using a temporal directory in the host filesystem
 pub struct FilesystemLocalTemp {
     _tmp_dir: Utf8TempDir,
-    local: FilesystemLocal,
+    local: FilesystemLocalSync,
 }
 
 impl FilesystemLocalTemp {
@@ -42,7 +42,7 @@ impl Default for FilesystemLocalTemp {
     fn default() -> Self {
         let tmp_dir = tempdir().unwrap();
         Self {
-            local: FilesystemLocal::new(tmp_dir.path()).expect("Temporary directory is not usable!"),
+            local: FilesystemLocalSync::new(tmp_dir.path()).expect("Temporary directory is not usable!"),
             _tmp_dir: tmp_dir,
         }
     }

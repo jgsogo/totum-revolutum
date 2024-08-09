@@ -196,7 +196,7 @@ mod tests {
 
     use camino_tempfile::tempdir;
 
-    use crate::impls::FilesystemLocal;
+    use crate::impls::FilesystemLocalSync;
     use crate::{DirectoryPathBuf, FilenameBuf};
 
     use super::*;
@@ -208,17 +208,17 @@ mod tests {
         let (fs1, fs1_root) = {
             let path = root.join("fs1");
             std::fs::create_dir_all(&path).unwrap();
-            (FilesystemLocal::new(&path).unwrap(), path)
+            (FilesystemLocalSync::new(&path).unwrap(), path)
         };
         let (fs2, fs2_root) = {
             let path = root.join("fs2");
             std::fs::create_dir_all(&path).unwrap();
-            (FilesystemLocal::new(&path).unwrap(), path)
+            (FilesystemLocalSync::new(&path).unwrap(), path)
         };
         let (fs3, fs3_root) = {
             let path = root.join("fs3");
             std::fs::create_dir_all(&path).unwrap();
-            (FilesystemLocal::new(&path).unwrap(), path)
+            (FilesystemLocalSync::new(&path).unwrap(), path)
         };
 
         let fs23 = FilesystemBackup::new(fs2, fs3);
