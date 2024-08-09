@@ -168,7 +168,7 @@ mod tests {
         // the storage and are synced to the index afterward. I'm using a [`FilesystemMock`] as
         // an index, that will raise an error whenever is hit. As the storage I'm using a local
         // filesystem in a temporal directory, so I can use regular `std::fs` to check if some
-        // operations did happened in the host.
+        // operations did happen in the host.
         let index_called = Arc::new(RwLock::new(Vec::new()));
         let storage_called = Arc::new(RwLock::new(Vec::new()));
         let mut indexed_filesystem = {
