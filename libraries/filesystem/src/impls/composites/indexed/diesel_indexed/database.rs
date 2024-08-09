@@ -6,8 +6,9 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 
 use diesel_utils::managers::AllManager;
 
+use crate::impls::composites::indexed::database::FilesystemIndexedDatabase;
 use crate::impls::composites::indexed::diesel_indexed::models;
-use crate::impls::composites::{FilesystemIndexedDatabase, FilesystemIndexedDbDirectory, FilesystemIndexedDbFile};
+use crate::impls::composites::{FilesystemIndexedDbDirectory, FilesystemIndexedDbFile};
 use crate::{DirectoryPath, DirectoryPathBuf, Error, Filename, Result};
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/impls/composites/indexed/diesel_indexed/migrations");

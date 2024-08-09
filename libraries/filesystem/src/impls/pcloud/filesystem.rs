@@ -27,6 +27,7 @@ use crate::ignore_filter::IgnoreFilterT;
 use crate::impls::pcloud::file::RemoteFile;
 use crate::{DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilenameBuf, Filesystem, Result};
 
+/// Implementation of [`Filesystem`] using a PCloud account as storage
 #[derive(Clone)]
 pub struct FilesystemPCloud<HttpClient: PCloudClient + Clone + Send + 'static> {
     // Root folder for this filesystem

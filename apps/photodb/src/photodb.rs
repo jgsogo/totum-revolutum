@@ -8,7 +8,7 @@ use tracing::{debug, info, trace};
 
 use filesystem::impls::composites::indexed::diesel_indexed::DatabaseImpl;
 use filesystem::impls::composites::FilesystemIndexed;
-use filesystem::impls::{FilesystemLocal, FilesystemPCloud};
+use filesystem::impls::{FilesystemLocalSync, FilesystemPCloud};
 use filesystem::{DirectoryPathBuf, FileMetadata, FilePathBuf, FilenameBuf, Filesystem};
 use pcloud_sdk::client::PCloudClient;
 use pcloud_sdk::handy::GetFileID;
@@ -195,7 +195,7 @@ impl<'a, T: Database + Send, TPCloudClient: PCloudClient + Clone + Send + 'stati
                 FilePathBuf::new(directory, filename)
             };
             filesystem::actions::copy_file(
-                &FilesystemLocal::local_hd(),
+                &FilesystemLocalSync::local_hd(),
                 &mut self.storage,
                 &origin_filepath,
                 &target_filepath,

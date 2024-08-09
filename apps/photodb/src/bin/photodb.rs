@@ -5,7 +5,7 @@ use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
 use tracing::{debug, error};
 
-use filesystem::impls::FilesystemLocal;
+use filesystem::impls::FilesystemLocalSync;
 use filesystem::{DirectoryPathBuf, FilePathBuf, FilenameBuf};
 use pcloud_sdk::cli::auth;
 use pcloud_sdk::client::{PCloudClient, PCloudClientImpl};
@@ -94,14 +94,14 @@ async fn db_commands<T: Database + Send, TPCloudClient: PCloudClient + Clone + S
 
             let input_path = utils::filesystem::to_absolute_path(&add.input_path);
             if std::fs::metadata(input_path.as_std_path())?.is_dir() {
-                let fs = FilesystemLocal::new(&input_path)?;
+                let fs = FilesystemLocalSync::new(&input_path)?;
                 photodb
                     .add_from_directory(fs, &DirectoryPathBuf::root(), !add.norecursive, metadata_collector)
                     .await
             } else {
                 let directory = add.input_path.parent().unwrap();
                 let filename = FilenameBuf::from_str(add.input_path.file_name().unwrap())?;
-                let fs = FilesystemLocal::new(directory)?;
+                let fs = FilesystemLocalSync::new(directory)?;
                 let filepath = FilePathBuf::new(DirectoryPathBuf::root(), &filename);
                 photodb.add_from_file(&fs, &filepath, metadata_collector).await
             }
