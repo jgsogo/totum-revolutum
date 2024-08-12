@@ -39,9 +39,16 @@ sveltejs_kit_bin.svelte_kit(
         ":src",
         ":static",
     ],
+    # out_dirs = [".svelte-kit",],
+    outs = [
+        ".svelte-kit/ambient.d.ts",
+        ".svelte-kit/non-ambient.d.ts",
+        ".svelte-kit/tsconfig.json",
+        ".svelte-kit/types/route_meta_data.json",
+        ".svelte-kit/types/src/routes/$types.d.ts",
+    ],
     args = ["sync"],
     chdir = package_name(),
-    out_dirs = [".svelte-kit"],
     visibility = ["//visibility:public"],
 )
 
@@ -122,6 +129,10 @@ vitest_bin.vitest_test(
 
         # Build deps
         ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
     ] + glob(["src/**/*.test.ts"]),
     # grant_sandbox_write_permissions = True,
 )
