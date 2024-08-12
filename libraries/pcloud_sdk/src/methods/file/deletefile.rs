@@ -1,20 +1,19 @@
-use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
-use crate::client::PCloudClient;
-use http_utils::rest::RESTClient;
+use utils::http::rest::RESTClient;
 
-use crate::methods::params::Params;
+use crate::client::PCloudClient;
 use crate::structures::MetadataFile;
 use crate::types::File;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/deletefile";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteFile {
-    pub id: String,
+    pub id: Option<String>,
     pub metadata: MetadataFile,
 }
 
@@ -26,8 +25,7 @@ pub trait GetDeleteFile {
 #[async_trait]
 impl<T: PCloudClient> GetDeleteFile for T {
     async fn deletefile(&self, input: File) -> Result<DeleteFile> {
-        let ret = RESTClient::get::<DeleteFile>(self, ENDPOINT, HeaderMap::default(), input.into_params()?).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &input).await
     }
 }
 
@@ -59,8 +57,8 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.fileid, FileID(1736716));
-                assert_eq!(data.id, "139-0".to_string());
+                assert_eq!(data.metadata.fileid, FileID::new(1736716));
+                assert_eq!(data.id, Some("139-0".to_string()));
             }
         }
     }

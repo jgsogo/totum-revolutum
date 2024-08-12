@@ -2,11 +2,22 @@ load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
+filegroup(
+    name = "test_data",
+    srcs = glob(["resources/**/*.*"]),
+    visibility = ["//libraries:__subpackages__"],
+)
+
 rust_library_tests_and_docs(
     name = "pcloud_sdk",
     srcs = glob(["src/**/*.rs"]),
     aliases = aliases(),
     all_features = {
+        "bin": [
+            "bin",
+            "cli",
+            "use_indicatif",
+        ],
         "cli": [
             "cli",
             "use_indicatif",
@@ -17,20 +28,20 @@ rust_library_tests_and_docs(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    test_data = glob(["resources/**/*.*"]),
+    test_data = [":test_data"],
     deps = all_crate_deps(
         normal = True,
     ) + [
-        "@totum//libraries/filesystem",
-        "@totum//libraries/http_utils",
+        "@totum//libraries/utils",
     ],
 )
 
 rust_binary(
     name = "cli",
-    srcs = glob(["src/cli/**/*.rs"]),
+    srcs = glob(["src/bin/pcloud_sdk/**/*.rs"]),
     aliases = aliases(),
     crate_features = [
+        "bin",
         "cli",
         "use_indicatif",
     ],
@@ -41,7 +52,6 @@ rust_binary(
         normal = True,
     ) + [
         ":pcloud_sdk",
-        "@totum//libraries/filesystem",
-        "@totum//libraries/http_utils",
+        "@totum//libraries/utils",
     ],
 )

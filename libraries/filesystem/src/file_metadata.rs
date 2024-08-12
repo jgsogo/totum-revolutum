@@ -1,18 +1,38 @@
-/// Allows access to file metadata. This is useful in case the information
-/// is not already available or it is preferred to compute it on-demand (computing
-/// hash can take some time)
-pub trait FileMetadata
-where
-    Self: Sync + Send + std::fmt::Debug + Clone + From<Self::DirEntry>,
-{
-    type DirEntry;
+use std::fmt::Debug;
 
-    /// Shared identifier for the file
-    fn id(&self) -> &str;
-    fn size(&self) -> u64;
-    fn hash(&self) -> String;
+use crate::{FilePath, FilePathBuf};
 
-    fn eq<T: FileMetadata>(&self, other: &T) -> bool {
+/// Allows access to file metadata. The information here is enough to compare two files and decide
+/// if they are the same or not.
+#[derive(Debug, Clone)]
+pub struct FileMetadata {
+    pub path: FilePathBuf,
+    pub hash: String,
+    pub size: u64,
+}
+
+impl FileMetadata {
+    /// Path inside the [`crate::Filesystem`]
+    ///
+    /// This path identifies one-to-one every file inside a filesystem (it's the relative path
+    /// from the root of the filesystem).
+    pub fn path(&self) -> &FilePath {
+        &self.path
+    }
+
+    /// The size of the file
+    pub fn size(&self) -> u64 {
+        self.size
+    }
+
+    /// A hash (sha256) computed from the contents of the file
+    pub fn hash(&self) -> &str {
+        &self.hash
+    }
+}
+
+impl PartialEq for FileMetadata {
+    fn eq(&self, other: &Self) -> bool {
         self.size() == other.size() && self.hash() == other.hash()
     }
 }

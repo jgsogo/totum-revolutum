@@ -1,13 +1,12 @@
 use std::collections::HashMap;
 use std::str::FromStr;
 
-use anyhow::Result;
-
 use pcloud_sdk::access_token::OAuth2Token;
 use pcloud_sdk::client::PCloudClientImpl;
 use pcloud_sdk::handy::GetFolderID;
 use pcloud_sdk::mocks::server::PCloudServerMock;
 use pcloud_sdk::types::{FolderID, RemotePath};
+use pcloud_sdk::Result;
 
 #[tokio::test]
 async fn test_get_folderid() -> Result<()> {
@@ -25,7 +24,7 @@ async fn test_get_folderid() -> Result<()> {
     let remote_path = RemotePath::from_str("path:/the/path")?;
     let data = pcloud.get_folderid(&remote_path).await?;
 
-    assert_eq!(data, FolderID(1234));
+    assert_eq!(data, FolderID::new(1234));
 
     listfolder_mock.assert();
     Ok(())

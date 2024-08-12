@@ -5,7 +5,8 @@ Totum revolutum
 >
 > m. revoltijo (‖ conjunto de cosas sin orden).
 >
-> <small>REAL ACADEMIA ESPAÑOLA: Diccionario de la lengua española, 23.ª ed., [versión 23.7 en línea]. <https://dle.rae.es> 2024-04-17.</small>
+> <small>REAL ACADEMIA ESPAÑOLA: Diccionario de la lengua española, 23.ª
+> ed., [versión 23.7 en línea]. <https://dle.rae.es> 2024-04-17.</small>
 
 
 I find myself reinventing the wheel from time to time, I find myself loving it! But many times
@@ -25,19 +26,20 @@ Enjoy the visit!
 
 Applications in this repository:
 
- * [syncronia](apps/syncronia/): a tool to run sync operations between different
-   directories and storages
+* [photodb](app/photodb/): application to backup photos in pCloud storage and access them
+* [syncronia](apps/syncronia/): a tool to run sync operations between different
+  directories and storages
 
 ## Libraries
 
 You can find the following libraries in this repository:
 
- * [constants](libraries/constants/) [Rust]: compile-time constants definition
- * [filesystem](libraries/filesystem/) [Rust]: abstraction of filesystem and files.
-   Implementation for local storage.
- * [filesystem_pcloud](libraries/filesystem_pcloud/): implementation of [filesystem](libraries/filesystem/)
-   for pCloud remote storage.
- * [pcloud_sdk](libraries/pcloud_sdk/) [Rust]: pCloud SDK.
+* [constants](libraries/constants/): compile-time constants definition
+* [cron](libraries/cron/): utilities related to cron expressions
+* [filesystem](libraries/filesystem/): abstraction of filesystem and files. Implementation for many different storages.
+* [pcloud_sdk](libraries/pcloud_sdk/): pCloud SDK.
+* [rebrickable](libraries/rebrickable/): API for https://rebrickable.com/
+* [utils](libraries/utils/): generic utilities used by several libraries
 
 ## Tooling
 

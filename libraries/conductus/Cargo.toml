@@ -1,0 +1,24 @@
+[package]
+name = "conductus"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["sync", "tokio-async"]
+sync = []
+tokio-async = ["dep:async-trait", "dep:futures", "dep:tokio", "dep:tokio-stream"]
+
+[dependencies]
+flume = { workspace = true }
+tracing = { workspace = true }
+log = { workspace = true }
+
+# sync
+
+# tokio-async
+async-trait = { workspace = true, optional = true }
+futures = { workspace = true, optional = true }
+tokio = { workspace = true, features = ["full"], optional = true }
+tokio-stream = { workspace = true, optional = true }
+
+[dev-dependencies]

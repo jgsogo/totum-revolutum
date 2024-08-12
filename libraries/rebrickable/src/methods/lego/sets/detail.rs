@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
 use crate::client::RebrickableClient;
-use anyhow::Result;
+use crate::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
-use http_utils::rest::RESTClient;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use utils::http::rest::RESTClient;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SetDetail {
@@ -30,6 +30,6 @@ pub trait GetSetDetail {
 impl<T: RebrickableClient> GetSetDetail for T {
     async fn sets_detail(&self, set_num: String) -> Result<SetDetail> {
         let endpoint = format!("/lego/sets/{set_num}");
-        RESTClient::get::<SetDetail>(self, &endpoint, HeaderMap::default(), HashMap::new()).await
+        RESTClient::get(self, &endpoint, HeaderMap::default(), &HashMap::new()).await
     }
 }

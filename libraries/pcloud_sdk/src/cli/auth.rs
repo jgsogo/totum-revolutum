@@ -1,16 +1,16 @@
-use anyhow::{anyhow, bail, Result};
-use camino::{Utf8Path, Utf8PathBuf};
-use clap::Args;
-use serde::de::DeserializeOwned;
 use std::fs;
 use std::fs::File;
 use std::io::BufReader;
+
+use camino::{Utf8Path, Utf8PathBuf};
+use clap::Args;
+use serde::de::DeserializeOwned;
 use tracing::info;
 
-use pcloud_sdk::methods::oauth2;
-use pcloud_sdk::methods::oauth2::{AppClientData, OAuth2TokenImpl};
-
-use crate::output::PrintVariant;
+use crate::error::{DeserializationError, DeserializationErrorKind, SerializationError, SerializationErrorKind};
+use crate::methods::oauth2;
+use crate::methods::oauth2::{AppClientData, OAuth2TokenImpl};
+use crate::{Error, Result};
 
 #[derive(Args, Debug)]
 pub struct AuthParams {
@@ -37,8 +37,12 @@ pub struct AuthFileParams {
 pub fn read_from_file<T: DeserializeOwned, P: AsRef<Utf8Path>>(path: P) -> Result<T> {
     let file = File::open(path.as_ref().as_std_path())?;
     let reader = BufReader::new(file);
-    let u = serde_json::from_reader(reader)?;
-    Ok(u)
+    serde_json::from_reader(reader).map_err(|e| {
+        Error::DeserializationError(DeserializationError {
+            string: format!("Can't deserialize from file {}", path.as_ref()),
+            source: DeserializationErrorKind::SerdeError(e),
+        })
+    })
 }
 
 async fn get_user_token(app_client_data: AppClientData) -> Result<OAuth2TokenImpl> {
@@ -49,15 +53,19 @@ async fn get_user_token(app_client_data: AppClientData) -> Result<OAuth2TokenImp
 
 fn write_to_file(token_file: &Utf8Path, token: &OAuth2TokenImpl) -> Result<()> {
     if token_file.exists() {
-        bail!("File '{token_file}' already exists.");
+        return Err(Error::FileAlreadyExists);
     }
-    let data = serde_json::to_string(token)?;
-    fs::write(token_file, data).map_err(|e| anyhow!("Error writing to file: {e}"))
+    let data = serde_json::to_string(token).map_err(|e| {
+        Error::SerializationError(SerializationError {
+            string: "Failed to serialize token".to_string(),
+            source: SerializationErrorKind::SerdeError(e),
+        })
+    })?;
+    fs::write(token_file, data).map_err(Error::IoError)
 }
 
 pub async fn handle_auth_file(token_file: &Utf8Path, input: &AuthFileParams) -> Result<()> {
-    let secrets_file = fs::canonicalize(&input.secrets_file)
-        .map_err(|e| anyhow!("File '{}' cannot be used: {e}", input.secrets_file))?;
+    let secrets_file = fs::canonicalize(&input.secrets_file).map_err(Error::IoError)?;
     let secrets_file = Utf8PathBuf::from_path_buf(secrets_file).unwrap();
 
     let app = read_from_file(&secrets_file)?;
@@ -65,7 +73,7 @@ pub async fn handle_auth_file(token_file: &Utf8Path, input: &AuthFileParams) -> 
     write_to_file(token_file, &token)
 }
 
-pub async fn handle_auth(token_file: &Utf8Path, _output: &PrintVariant, input: &AuthParams) -> Result<()> {
+pub async fn handle_auth(token_file: &Utf8Path, input: &AuthParams) -> Result<()> {
     let client_secret = if input.client_secret_stdin {
         let mut user_input = String::new();
         let stdin = std::io::stdin(); // We get `Stdin` here.

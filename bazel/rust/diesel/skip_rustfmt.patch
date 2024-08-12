@@ -1,0 +1,6 @@
+# Apply this patch to generated schema.rs files so they are ignored by Rustfmt
+#
+#
+@@ -1,1 +1,2 @@
++#![cfg_attr(any(), rustfmt::skip)]
+ // @generated automatically by Diesel CLI.

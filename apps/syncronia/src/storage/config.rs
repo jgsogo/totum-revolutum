@@ -3,16 +3,17 @@ use camino::{Utf8Path, Utf8PathBuf};
 use anyhow::{anyhow, bail, Result};
 use chrono::serde::ts_seconds_option;
 use chrono::{DateTime, Utc};
+use pcloud_sdk::methods::oauth2::OAuth2TokenImpl;
 use serde::{Deserialize, Serialize};
 
 use crate::actions::{Actions, OnConflict};
 use crate::utils::locked_file::{LockedFile, ReadWrite};
 use crate::utils::versioned_data::VersionedData;
-use filesystem_pcloud::PCloudHttpClient;
 
 use super::apps;
 use super::INSIDE_PROJECT_DIRECTORY;
 
+type PCloudHttpClient = pcloud_sdk::client::PCloudClientImpl<OAuth2TokenImpl>;
 const FILENAME: &str = "config";
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
@@ -69,11 +70,11 @@ impl ConfigAction {
     /// Check if the given `action` and `conflict` are compatible
     ///
     /// * `Actions::Backup`: Send local content to remote. Local is never touched and nothing
-    /// will be removed from remote. It can be combined with `OnConflict::OverrideRemote` or
-    /// `OnConflict::RenameRemote`.
+    ///   will be removed from remote. It can be combined with `OnConflict::OverrideRemote` or
+    ///   `OnConflict::RenameRemote`.
     ///
     /// * `Actions::ZipBackup`: Send local content to remote in a zip file. It can only be combined with
-    /// `OnConflict::OverrideRemote` or `OnConflict::RenameRemote`
+    ///   `OnConflict::OverrideRemote` or `OnConflict::RenameRemote`
     ///
     /// * `Actions::Sync`: Keep local and remote synced. It can be combined with:
     ///    * `OnConflict::KeepLatest`: modification time will decide which file to keep
@@ -81,13 +82,13 @@ impl ConfigAction {
     ///    * `OnConflict::OverrideRemote`: remote will always override local
     ///
     /// * `Actions::Dump`: Send remote content to local folder. It can be combined with
-    /// `OnConflict::OverrideLocal` or `OnConflict::RenameLocal`.
+    ///   `OnConflict::OverrideLocal` or `OnConflict::RenameLocal`.
     ///
     /// * `Actions::MoveUpload`: Move local content to remote folder, local will be removed.
-    /// It can be combined with `OnConflict::OverrideRemote` or `OnConflict::RenameRemote`.
+    ///   It can be combined with `OnConflict::OverrideRemote` or `OnConflict::RenameRemote`.
     ///
     /// * `Actions::MoveDownload`: Move remote content to local folder, remote will be removed.
-    /// It can be combined with `OnConflict::OverrideLocal` or `OnConflict::RenameLocal`.
+    ///   It can be combined with `OnConflict::OverrideLocal` or `OnConflict::RenameLocal`.
     pub fn check(action: &Actions, conflict: &OnConflict) -> Result<()> {
         match (action, conflict) {
             (Actions::Backup, OnConflict::OverrideRemote) => Ok(()),

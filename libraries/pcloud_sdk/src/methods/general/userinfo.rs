@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 
-use anyhow::Result;
 use async_trait::async_trait;
 use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
+use utils::http::rest::RESTClient;
+
 use crate::client::PCloudClient;
-use http_utils::rest::RESTClient;
+use crate::Result;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserInfo {
@@ -51,7 +52,7 @@ pub trait GetUserInfo {
 #[async_trait]
 impl<T: PCloudClient> GetUserInfo for T {
     async fn userinfo(&self) -> Result<UserInfo> {
-        RESTClient::get::<UserInfo>(self, "/userinfo", HeaderMap::default(), HashMap::new()).await
+        RESTClient::get(self, "/userinfo", HeaderMap::default(), &HashMap::new()).await
     }
 }
 
@@ -107,7 +108,7 @@ mod tests {
         client
             .expect_get()
             .times(1)
-            .returning(|endpoint, headers: HeaderMap, params: HashMap<_, _>| {
+            .returning(|endpoint, headers: HeaderMap, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, "/userinfo");
                 assert!(params.is_empty());
                 assert_eq!(headers.len(), 0);

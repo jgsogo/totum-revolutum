@@ -1,10 +1,13 @@
-use anyhow::Result;
+use std::collections::HashMap;
+
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
+use utils::http::AddToParams;
+
 use crate::client::PCloudClient;
 use crate::methods::fileops::FileDescriptor;
-use crate::methods::params::Params;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/file_read";
 
@@ -21,10 +24,11 @@ pub trait GetFileRead {
 #[async_trait]
 impl<T: PCloudClient> GetFileRead for T {
     async fn file_read(&self, descriptor: FileDescriptor, count: u64) -> Result<FileRead> {
-        let mut params = descriptor.into_params()?;
+        let mut params = HashMap::new();
+        descriptor.add_to_params(&mut params);
         params.insert("count".to_string(), count.to_string());
 
-        let bytes = self.get_bytes(ENDPOINT, params).await?;
+        let bytes = self.get_bytes(ENDPOINT, &params).await?;
         Ok(FileRead { bytes })
     }
 }
@@ -43,7 +47,7 @@ mod tests {
         client
             .expect_get_bytes()
             .times(1)
-            .returning(|endpoint, params: HashMap<_, _>| {
+            .returning(|endpoint, params: &HashMap<_, _>| {
                 assert_eq!(endpoint, "/file_read");
                 assert_eq!(params.len(), 2);
                 assert_eq!(params.get("fd"), Some(&"42".to_string()));
@@ -51,7 +55,7 @@ mod tests {
                 let r = Vec::<u8>::new();
                 Ok(r)
             });
-        let _r = client.file_read(42, 100).await?;
+        let _r = client.file_read(FileDescriptor::new(42), 100).await?;
         Ok(())
     }
 }

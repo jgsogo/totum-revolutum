@@ -4,24 +4,44 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-diff = []
 local = ["dep:async-std", "dep:ignore", "dep:futures", "dep:sha256"]
-test_utils = ["local", "dep:tempfile"]
+local_temp = ["dep:uuid", "dep:camino-tempfile", "local"]
+pcloud = ["dep:pcloud_sdk"]
+test_utils = []
+diesel_indexed_impl = ["dep:diesel", "dep:diesel_utils", "dep:diesel_migrations"]
 
 [dependencies]
-anyhow = { workspace = true }
+utils = { path = "../utils", features = ["filesystem"] }
+
 async-trait = { workspace = true }
 camino = { workspace = true }
 flume = { workspace = true }
+ignore-files = { workspace = true }
+thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 
-# Optional dependencies
+# Feature "local"
 async-std = { workspace = true, optional = true }
 futures = { workspace = true, optional = true }
 ignore = { workspace = true, optional = true }
 sha256 = { workspace = true, optional = true }
-tempfile = { workspace = true, optional = true }
+
+# Feature "local_temp" (requires "local")
+uuid = { workspace = true, optional = true, features = ["v4"] }
+camino-tempfile = { workspace = true, optional = true }
+
+# Feature "pcloud"
+pcloud_sdk = { path = "../pcloud_sdk", optional = true }
+
+# Feature "diesel"
+diesel = { workspace = true, optional = true, features = ["sqlite", "r2d2", "returning_clauses_for_sqlite_3_35"] }
+diesel_migrations = { workspace = true, optional = true, features = ["sqlite"] }
+diesel_utils = { path = "../diesel_utils", optional = true }
+
 
 [dev-dependencies]
-filesystem = { path = ".", features = ["test_utils", "diff"] }
+pcloud_sdk = { path = "../pcloud_sdk", features = ["test_utils"] }
+
+anyhow = { workspace = true }
+headers = { workspace = true }

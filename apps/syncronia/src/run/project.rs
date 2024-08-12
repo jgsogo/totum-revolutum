@@ -2,8 +2,7 @@ use anyhow::Result;
 use camino::Utf8Path;
 use tracing::info;
 
-use filesystem::local::FilesystemLocal;
-use filesystem_pcloud::FilesystemPCloud;
+use filesystem::impls::{FilesystemLocalSync, FilesystemPCloud};
 use pcloud_sdk::types::RemotePath;
 
 use crate::actions;
@@ -22,13 +21,14 @@ pub async fn handle(home: &Utf8Path, path: &Utf8Path) -> Result<()> {
     let config = &mut lock.content.data;
 
     // TODO: We cannot assume lhs filesystem is the local one
-    let lhs_fs = FilesystemLocal::new(path)?;
+    let lhs_fs = FilesystemLocalSync::new(path)?;
 
     // TODO: We cannot assume rhs filesystem is a remote-pcloud one
     let rhs_fs = {
         let pcloud = config.auth.get_pcloud_client(home)?;
         let base_path = config.auth.remote_path.as_ref().unwrap_or(&"/".to_string()).clone();
-        FilesystemPCloud::new(&RemotePath::try_from(Utf8Path::new(&base_path))?, pcloud.clone()).await?
+        let remote_path = RemotePath::try_from(Utf8Path::new(&base_path))?;
+        FilesystemPCloud::new(&remote_path, pcloud.clone()).await?
     };
 
     actions::run(lhs_fs, rhs_fs, config).await

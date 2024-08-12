@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use anyhow::Result;
 use reqwest;
 use serde::de::DeserializeOwned;
 
 use crate::utils::http::create_response;
+use crate::Result;
 
 use super::{AppClientData, OAuth2Token};
 

@@ -1,0 +1,213 @@
+use std::fs::File;
+use std::future::Future;
+use std::io::Write;
+use std::path::PathBuf;
+use std::pin::Pin;
+use std::time::Duration;
+
+use camino::{Utf8Path, Utf8PathBuf};
+use tempfile::{tempdir, TempDir};
+use tokio::sync::oneshot::Receiver;
+use tracing::{debug, error};
+
+use utils::r#async::SideTask;
+
+use crate::client::PCloudClient;
+use crate::handy::Exists;
+use crate::handy::{GetFileLinkAndDownload, UploadToFileID};
+use crate::methods::fileops::file_open::{FileOpenPath, Flags, GetFileOpen};
+use crate::methods::streaming::getfilelink::GetFileLinkInput;
+use crate::progress_bar::ProgressBarBuilder;
+use crate::types::{FileID, FolderID};
+use crate::Result;
+
+// TODO: Some 'Output' should arrive from outside. Remove this struct NoProgressBarBuilder
+struct NoProgressBarBuilder;
+
+impl ProgressBarBuilder for NoProgressBarBuilder {}
+
+/// A helper for the data received when the task is finished. The error type
+/// contains the [`TempDir`] object so the temporal directory is not removed and the path inside
+/// that temp directory that points to the file. This way the caller can take some action before
+/// dropping the [`TempDir`] and everything is removed from disk.
+pub type UploadReturnType = std::result::Result<(), (TempDir, PathBuf)>;
+
+type UploadFnType<PCloud> =
+    Box<dyn FnOnce((PCloud, FileID, TempDir)) -> Pin<Box<dyn Future<Output = UploadReturnType> + Send>> + Send>;
+
+fn force_boxed<PCloud: PCloudClient + Send + 'static, T>(f: fn((PCloud, FileID, TempDir)) -> T) -> UploadFnType<PCloud>
+where
+    T: Future<Output = UploadReturnType> + Send + 'static,
+{
+    Box::new(move |n| Box::pin(f(n)))
+}
+
+type UploadSideTaskType<PCloud> = SideTask<
+    UploadFnType<PCloud>,
+    Pin<Box<dyn Future<Output = UploadReturnType> + Send + 'static>>,
+    (PCloud, FileID, TempDir),
+    UploadReturnType,
+>;
+
+/// Keeps a local temporal copy of a remote file. The remote file is fetched (or created) as
+/// soon as this object is instantiated, then you can use the local file as usual. When this
+/// object is dropped, the local content is sent to the remote and the local file removed.
+pub struct ProxiedFile<PCloud: PCloudClient + Send + 'static> {
+    /// The `PCloudClient` used to connect to the remote
+    pcloud: Option<PCloud>,
+
+    /// Remote `FileID`
+    file_id: FileID,
+
+    /// The temporal directory where the local file is located. It will be removed after dropped.
+    temp_dir: Option<TempDir>,
+
+    /// The `File` object. It's created on demand when the file is opened.
+    local_file: Option<File>,
+
+    /// Stores a task ([`pcloud_upload_to_fileid`]) that will be executed when this object is dropped
+    upload_on_drop: UploadSideTaskType<PCloud>,
+}
+
+impl<PCloud: PCloudClient + Send + 'static> ProxiedFile<PCloud> {
+    /// Return the path to the local file
+    pub fn get_local_filepath(temp_dir: &TempDir) -> PathBuf {
+        temp_dir.path().join("proxied_file.tmp")
+    }
+
+    /// Uploads file contents to the given [`FileID`]. Note that the file will be removed after
+    /// this function call when [`TempDir`] goes out of scope, this is why in case of error it
+    /// sends the [`TempDir`] to the consumer, so they can back up the file before it is removed.
+    async fn upload_and_remove(args: (PCloud, FileID, TempDir)) -> UploadReturnType {
+        let (pcloud, fileid, temp_dir) = args;
+
+        // Execute upload (retry for 60 secs)
+        let local_filepath_buf = Self::get_local_filepath(&temp_dir);
+        let local_filepath =
+            Utf8Path::from_path(&local_filepath_buf).expect("Every tmp path should be convertible to UTF8Path");
+
+        let r = tryhard::retry_fn(|| pcloud_upload_to_fileid(&pcloud, local_filepath, fileid.clone()))
+            .retries(10)
+            .exponential_backoff(Duration::from_millis(100))
+            .max_delay(Duration::from_secs(60))
+            .await;
+
+        // If upload fails, return the `TempDir` and let the user decide what to do
+        match r {
+            Ok(ok) => Ok(ok),
+            Err(_) => Err((temp_dir, local_filepath_buf)),
+        }
+    }
+
+    /// Creates a local temporal file with the contents of the remote one (it will also create the
+    /// remote one if it doesn't exist yet). Returns a tuple with the [`ProxiedFile`] object,
+    /// a boolean indicating if the remote file was created or not and the [`Receiver`] that will
+    /// be called after the file is uploaded when the [`ProxiedFile`] is dropped.
+    ///
+    /// The [`Receiver`] can be ignored if the user is not interested on any error and the user
+    /// guarantees that the runtime is not destroyed before the underlying task finishes after
+    /// this [`ProxiedFile`] is dropped.
+    pub async fn new(
+        pcloud: PCloud,
+        folder_id: FolderID,
+        filename: &str,
+    ) -> Result<(Self, bool, Receiver<UploadReturnType>)> {
+        let (file_id, created): (FileID, bool) = {
+            let file_id = pcloud.exists(folder_id.clone(), filename).await?;
+
+            // If it exists, return. Otherwise, create the remote file
+            match file_id {
+                None => {
+                    debug!("Remote file {filename} doesn't exist, it will be created");
+                    let r = pcloud
+                        .file_open(
+                            Flags::O_CREAT,
+                            FileOpenPath::FolderAndName(folder_id, filename.to_string()),
+                        )
+                        .await?;
+                    (r.fileid, true)
+                }
+                Some(file_id) => (file_id, false),
+            }
+        };
+
+        // Get the temporal local filename
+        let temp_dir = tempdir()?;
+        let local_filepath = Utf8PathBuf::from_path_buf(Self::get_local_filepath(&temp_dir)).unwrap();
+        debug!("File will be proxied in {}", local_filepath);
+
+        // If not created, download it to the local filesystem
+        if !created {
+            pcloud
+                .getfilelink_and_download(
+                    GetFileLinkInput::new(crate::types::File::FileID(file_id.clone())),
+                    &local_filepath,
+                    &NoProgressBarBuilder,
+                )
+                .await?;
+        }
+
+        // Create side task (upload and remove on drop) and return to user
+        let (upload_on_drop, upload_receiver) = SideTask::new(force_boxed(Self::upload_and_remove), None);
+        Ok((
+            Self {
+                pcloud: Some(pcloud),
+                file_id,
+                temp_dir: Some(temp_dir),
+                local_file: None,
+                upload_on_drop,
+            },
+            created,
+            upload_receiver,
+        ))
+    }
+
+    /// Returns the full path to the local filename
+    pub fn local_filepath(&self) -> PathBuf {
+        Self::get_local_filepath(self.temp_dir.as_ref().unwrap())
+    }
+
+    /// Returns a reference to a [`File`] object. The value is kept inside the
+    /// `ProxiedFile` so it isn't possible to drop it while the file is opened.
+    pub fn open(&mut self) -> Result<&File> {
+        if self.local_file.is_none() {
+            self.local_file = Some(File::open(self.local_filepath())?);
+        }
+        Ok(self.local_file.as_ref().unwrap())
+    }
+}
+
+impl<PCloud: PCloudClient + Send + 'static> Drop for ProxiedFile<PCloud> {
+    /// Before the `ProxiedFile` is dropped it runs a couple of actions:
+    ///
+    /// * the local file is flushed, in case someone has used [`ProxiedFile::open`] to get the
+    ///   handle to the file.
+    /// * the underlying task (upload and remove local file) is started asynchronously. The
+    ///   [`Receiver`] returned from [`ProxiedFile::new`] can be used to get the result from
+    ///   this task.
+    ///
+    /// Note that the runtime shouldn't be destroyed before the tasks finishes. This can be achieved
+    /// by awaiting on the [`Receiver`].
+    fn drop(&mut self) {
+        // If the file is opened, flush its content and close it.
+        if let Some(mut f) = self.local_file.take() {
+            f.flush().unwrap_or_else(|e| {
+                error!("Cannot flush file content: {e}. ProxiedFile will be uploaded, but some content might be lost")
+            });
+        }
+
+        // Trigger `Self::upload_and_remove` with the right arguments
+        if let Err(e) = self.upload_on_drop.start(Some((
+            self.pcloud.take().unwrap(),
+            self.file_id.clone(),
+            self.temp_dir.take().unwrap(),
+        ))) {
+            error!("Error starting the SideTask 'upload_and_remove': {e}")
+        }
+    }
+}
+
+async fn pcloud_upload_to_fileid<PCloud: PCloudClient>(pcloud: &PCloud, path: &Utf8Path, fileid: FileID) -> Result<()> {
+    debug!("Run pcloud.upload_to_fileid for proxied file (possible retry)");
+    pcloud.upload_to_fileid(path, fileid).await
+}

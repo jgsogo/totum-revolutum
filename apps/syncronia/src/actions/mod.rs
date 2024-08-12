@@ -1,17 +1,10 @@
-use std::time::Instant;
-
 use anyhow::Result;
+use ignore_files::IgnoreFilter;
 use serde::{Deserialize, Serialize};
-use tracing::{error, info};
 
-use filesystem::diff::{two_ways_run, FilePair};
-use filesystem::{FileMetadata, Filesystem};
+use filesystem::FilesystemOps;
 
-use crate::actions::action_run::ActionRun;
 use crate::storage::config;
-
-mod action_run;
-mod backup;
 
 /// Describes the action to perform
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
@@ -57,48 +50,27 @@ pub enum OnConflict {
     KeepLatest,
 }
 
-async fn work_on_results<FsLhsMetadata: FileMetadata + 'static, FsRhsMetadata: FileMetadata + 'static>(
-    rx: flume::Receiver<FilePair<FsLhsMetadata, FsRhsMetadata>>,
-    action: &dyn ActionRun<FsLhsMetadata, FsRhsMetadata>,
-) -> Result<()> {
-    info!("Start backup receiving loop");
-    let start = Instant::now();
-    while let Ok(file_pair) = rx.recv_async().await {
-        // TODO: We have independent actions here that can run in parallel!
-        action.run(file_pair).await?;
-    }
-    info!("Finished backup receiving loop in {:?}", start.elapsed());
-    Ok(())
-}
-
-pub async fn run<FsLhs: Filesystem + 'static, FsRhs: Filesystem + 'static>(
+pub async fn run<FsLhs: FilesystemOps, FsRhs: FilesystemOps>(
     lhs_fs: FsLhs,
-    rhs_fs: FsRhs,
+    mut rhs_fs: FsRhs,
     config: &config::Config,
 ) -> Result<()> {
-    let action_run = match config.action.action() {
-        Actions::Backup => backup::Backup::new(&lhs_fs, &rhs_fs, *config.action.conflict()),
+    match config.action.action() {
+        Actions::Backup => {
+            let backup_conflict = match config.action.conflict() {
+                OnConflict::OverrideRemote => filesystem::diff::impls::BackupConflict::Override,
+                OnConflict::OverrideLocal => todo!("not impl"),
+                OnConflict::RenameRemote => todo!("not impl"),
+                OnConflict::RenameLocal => todo!("not impl"),
+                OnConflict::KeepLatest => todo!("not impl"),
+            };
+            filesystem::diff::impls::backup(&lhs_fs, &mut rhs_fs, backup_conflict, IgnoreFilter::empty("")).await?;
+            Ok(())
+        }
         Actions::ZipBackup => todo!("impl pending"),
         Actions::Sync => todo!("impl pending"),
         Actions::Dump => todo!("impl pending"),
         Actions::MoveUpload => todo!("impl pending"),
         Actions::MoveDownload => todo!("impl pending"),
-    };
-
-    // TODO: Better to add all PATHS to the same walker than to instantiate a new one for each: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L610
-    let (lhs, rhs, differ) = two_ways_run::<FsLhs::Metadata, FsRhs::Metadata>().await;
-    // TODO: This is not right
-    let lhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(lhs_fs.root());
-    let rhs_ignore_filepath = crate::storage::ignore_files::IgnoreFiles::path(rhs_fs.root());
-
-    if let Err(e) = tokio::try_join!(
-        lhs_fs.walk_directory(lhs, 6, &lhs_ignore_filepath),
-        rhs_fs.walk_directory(rhs, 6, &rhs_ignore_filepath),
-        work_on_results(differ, &action_run),
-    ) {
-        error!("Error on workers loop: {e}");
     }
-
-    action_run.stats();
-    Ok(())
 }

@@ -1,3 +1,4 @@
+pub mod checksumfile;
 pub mod copyfile;
 pub mod deletefile;
 pub mod renamefile;

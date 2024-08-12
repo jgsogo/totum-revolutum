@@ -1,0 +1,47 @@
+[package]
+name = "photodb"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+
+[dependencies]
+filesystem = { path = "../../libraries/filesystem", features = ["local_temp", "pcloud", "diesel_indexed_impl"] } # pcloud only required for the binary?
+pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
+diesel_utils = { path = "../../libraries/diesel_utils" }
+utils = { path = "../../libraries/utils", features = ["dates"] }
+
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+camino = { workspace = true }
+camino-tempfile = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+clap-verbosity-flag = { workspace = true }
+data-encoding = { workspace = true }
+diesel = { workspace = true, features = ["sqlite", "r2d2", "returning_clauses_for_sqlite_3_35"] }
+diesel_migrations = { workspace = true, features = ["sqlite"] }
+dirs = { workspace = true }
+dotenvy = { workspace = true }
+flume = { workspace = true }
+home = { workspace = true }
+ignore-files = { workspace = true }
+image = { workspace = true }
+kamadak-exif = { workspace = true }
+lazy_static = { workspace = true }
+log = { workspace = true }
+oxipng = { workspace = true }
+ring = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+strum_macros = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { version = "1.9.1", features = ["v4"] }
+
+
+[[bin]]
+name = "photodb"

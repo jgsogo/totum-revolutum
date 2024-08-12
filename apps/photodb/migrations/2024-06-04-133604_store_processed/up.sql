@@ -1,0 +1,2 @@
+ALTER TABLE photos
+    ADD processed BOOLEAN NOT NULL DEFAULT 'FALSE'

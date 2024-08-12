@@ -1,12 +1,11 @@
 use serde::{Deserialize, Serialize};
-// use std::fmt::{Debug, Display, Formatter};
 use strum_macros::Display;
 
 /// Name of the icon to display (one of document, database, archive, web, gis,
 /// spreadsheet, font, presentation, image, diskimage, package, executable,
 /// audio, video, file
 ///
-/// Described in https://docs.pcloud.com/structures/metadata.html
+/// Described in <https://docs.pcloud.com/structures/metadata.html>
 #[derive(Serialize, Deserialize, PartialEq, Eq, Display, Debug, Clone)]
 #[serde(rename_all = "lowercase")]
 #[allow(clippy::upper_case_acronyms)]

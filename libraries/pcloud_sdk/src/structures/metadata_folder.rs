@@ -65,7 +65,7 @@ mod tests {
                 assert_eq!(data.common.isshared, Some(false));
                 assert_eq!(data.common.name, Some("a folder".to_string()));
                 assert_eq!(data.common.id, Some("d1729212".to_string()));
-                assert_eq!(data.folderid, FolderID(1729212));
+                assert_eq!(data.folderid, FolderID::new(1729212));
                 assert_eq!(data.common.created, Some(datetime!(2013-10-02 14:29:11 UTC)));
                 assert_eq!(data.common.modified, None);
                 assert_eq!(data.common.isdeleted, None);

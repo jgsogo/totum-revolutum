@@ -1,0 +1,44 @@
+use async_trait::async_trait;
+use flume::Sender;
+use futures::{pin_mut, Stream};
+use tokio_stream::StreamExt;
+use tracing::debug;
+
+use crate::common::steps::noop::PipelineStepNoop;
+use crate::{Message, PipelineData};
+
+use super::PipelineStepAsync;
+
+#[async_trait]
+impl<Input: PipelineData> PipelineStepAsync<Input, Input> for PipelineStepNoop {
+    async fn run<I: Stream<Item = Input> + Send>(&self, source: I, target: Sender<Message<Input>>) {
+        pin_mut!(source);
+        while let Some(it) = source.next().await {
+            if let Err(e) = target.send_async(Message::Data(it)).await {
+                debug!("Error sending from blanket implementation of PipelineStepBuffer: {e}");
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use futures::stream;
+
+    use crate::r#async::steps::tests::collect_rx;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_step_buffer() {
+        let step = PipelineStepNoop::default();
+
+        let (tx, rx) = flume::bounded(2);
+        tokio::spawn(async move {
+            step.run(stream::iter(0..10), tx).await;
+        });
+
+        let r = collect_rx(rx).await;
+        assert_eq!(r, vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    }
+}

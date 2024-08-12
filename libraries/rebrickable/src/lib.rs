@@ -4,3 +4,4 @@
 pub mod client;
 mod error;
 pub mod methods;
+pub use error::{Error, Result};

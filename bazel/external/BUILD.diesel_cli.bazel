@@ -1,0 +1,30 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+rust_binary(
+    name = "diesel_cli",
+    srcs = glob(["src/**/*.rs"]),
+    crate_features = ["sqlite"],
+    deps = [
+        "@crates_libraries//:diffy",
+        "@crates_libraries//:clap",
+        "@crates_libraries//:serde",
+        "@crates_libraries//:diesel",
+        "@crates_libraries//:syn",
+        "@crates_libraries//:toml",
+        "@crates_libraries//:url",
+        "@crates_libraries//:regex",
+        "@crates_libraries//:dotenvy",
+        "@crates_libraries//:clap_complete",
+        "@crates_libraries//:serde_regex",
+        "@crates_libraries//:diesel_migrations",
+        "@crates_libraries//:diesel_table_macro_syntax",
+        "@crates_libraries//:chrono",
+        "@crates_libraries//:thiserror",
+        "@crates_libraries//:tracing",
+        "@crates_libraries//:tracing-subscriber",
+    ],
+    data = [
+        "src/default_files/diesel.toml",
+    ],
+    visibility = ["//visibility:public"],
+)

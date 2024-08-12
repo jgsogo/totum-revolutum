@@ -1,6 +1,5 @@
 use camino::Utf8Path;
 use std::collections::HashMap;
-use std::env;
 
 use httpmock::prelude::*;
 use httpmock::Mock;
@@ -12,6 +11,7 @@ use crate::methods::folder::listfolder;
 use crate::types::FolderID;
 
 use crate::access_token::OAuth2Token;
+use crate::mocks::manifest_dir;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 struct OAuth2TokenMock {
@@ -74,17 +74,7 @@ impl PCloudServerMock {
         self.server.mock(|when, then| {
             when.method(GET).path("/userinfo").query_param("access_token", "token");
 
-            let manifest_dir = match env::var("BAZEL_TEST") {
-                Ok(_) => {
-                    let current_path = env::current_dir().unwrap();
-                    current_path.join("libraries/pcloud_sdk").to_str().unwrap().to_string()
-                }
-                Err(_) => env::var("CARGO_MANIFEST_DIR").unwrap(),
-            };
-            let userinfo_json = Utf8Path::new(&manifest_dir)
-                .join("resources")
-                .join("testdata")
-                .join("userinfo.json");
+            let userinfo_json = manifest_dir().join("resources").join("testdata").join("userinfo.json");
             then.status(200)
                 .header("content-type", "application/json; charset=UTF-8")
                 .body_from_file(userinfo_json.to_string());
@@ -102,7 +92,7 @@ impl PCloudServerMock {
     ) -> (Mock, Mock, Mock, Mock, Mock, Mock, Mock) {
         self.fd_count += 1;
         let fd = self.fd_count;
-        let fileid = folder.0 + fd;
+        let fileid = folder.inner() + fd;
 
         let read_content_len = read_content.len();
         assert!(
@@ -115,7 +105,7 @@ impl PCloudServerMock {
             when.method(GET)
                 .path(file_open::ENDPOINT)
                 .query_param("access_token", "token")
-                .query_param("folderid", folder.0.to_string())
+                .query_param("folderid", folder.inner().to_string())
                 .query_param("name", name)
                 .query_param_exists("flags");
 

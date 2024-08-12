@@ -1,15 +1,18 @@
-use anyhow::Result;
+use collections::HashMap;
+use std::collections;
+
 use async_trait::async_trait;
 use http::HeaderMap;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::client::PCloudClient;
-use http_utils::rest::RESTClient;
+use utils::http::rest::RESTClient;
+use utils::http::AddToParams;
 
-use crate::methods::params::{Params, ParamsType};
+use crate::client::PCloudClient;
 use crate::structures::MetadataFolder;
 use crate::types::Folder;
+use crate::Result;
 
 pub const ENDPOINT: &str = "/listfolder";
 
@@ -39,13 +42,14 @@ impl ListFolderInput {
     }
 }
 
-impl Params for ListFolderInput {
-    fn add_to_params(&self, params: &mut ParamsType) -> Result<()> {
-        self.folder.add_to_params(params)?;
+impl AddToParams for ListFolderInput {
+    fn add_to_params(&self, params: &mut HashMap<String, String>) {
+        self.folder.add_to_params(params);
         if self.recursive {
             params.insert("recursive".to_string(), "1".to_string());
+        } else {
+            params.insert("recursive".to_string(), "0".to_string());
         }
-        Ok(())
     }
 }
 
@@ -72,10 +76,12 @@ impl<T: PCloudClient> GetListFolder for T {
     async fn listfolder_with_filtermeta(
         &self,
         list_folder: ListFolderInput,
-        filtermeta: Vec<&str>,
+        mut filtermeta: Vec<&str>,
     ) -> Result<ListFolder> {
-        let mut params = list_folder.into_params()?;
-        let mut filtermeta = filtermeta;
+        let mut params = HashMap::new();
+        list_folder.add_to_params(&mut params);
+        // TODO: I'm afraid not all the fields are valid here... search some docs or try/error and
+        // TODO: document them manually (and raise if any of them is used)
 
         // Insert `folderid` and `fileid` always, it is required to parse [`MetadataFolder`] and
         // differentiate it from [`MetadataFile`]. Read about `#[serde(untagged)]` in [`Metadata`]
@@ -84,14 +90,13 @@ impl<T: PCloudClient> GetListFolder for T {
         filtermeta.push("fileid");
 
         // Having two elements is also required to prevent a pcloud API bug. If we only use one
-        // element, for example `filtermeta=folderid`, the response JSON is not well formed when
+        // element, for example `filtermeta=folderid`, the response JSON is not well-formed when
         // there are files and folders inside the query directory, it returns some empty lists
         // where empty dictionaries were expected
 
         let filtermeta = filtermeta.into_iter().unique().collect::<Vec<_>>().join(",");
         params.insert("filtermeta".to_string(), filtermeta);
-        let ret = RESTClient::get::<ListFolder>(self, ENDPOINT, HeaderMap::default(), params).await?;
-        Ok(ret)
+        RESTClient::get(self, ENDPOINT, HeaderMap::default(), &params).await
     }
 }
 
@@ -122,7 +127,7 @@ mod tests {
             Ok(data) => {
                 assert_eq!(data.result, 0);
                 let data = data.data.unwrap();
-                assert_eq!(data.metadata.folderid, FolderID(4075092622));
+                assert_eq!(data.metadata.folderid, FolderID::new(4075092622));
             }
         }
     }

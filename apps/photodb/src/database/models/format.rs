@@ -1,0 +1,127 @@
+use std::collections::hash_map::Entry;
+use std::collections::HashMap;
+use std::str::FromStr;
+use std::sync::Mutex;
+
+use anyhow::Result;
+use diesel::associations::HasTable;
+use diesel::connection::LoadConnection;
+use diesel::dsl::Eq;
+use diesel::query_dsl::methods::FilterDsl;
+use diesel::query_dsl::LoadQuery;
+use diesel::*;
+use image::ImageFormat;
+use lazy_static::lazy_static;
+use log::warn;
+use strum_macros::{Display, EnumIter, EnumString};
+
+use super::super::schema::*;
+
+lazy_static! {
+    static ref FORMATS_CACHE: Mutex<HashMap<String, Format>> = Mutex::new(HashMap::new());
+}
+
+/// An enumeration of supported formats. All these formats are also available in the database.
+#[derive(PartialEq, Eq, Display, Debug, Clone, EnumString, EnumIter)]
+#[allow(clippy::upper_case_acronyms)]
+#[strum(serialize_all = "snake_case")]
+pub enum Formats {
+    Unknown,
+    Png,
+    Bmp,
+    Jpeg,
+}
+
+impl Formats {
+    /// Returns the typical file extension for the given format. [`Formats::Unknown`] returns `None`.
+    pub fn as_extension(&self) -> Option<String> {
+        match self {
+            Formats::Unknown => None,
+            v => Some(v.to_string().to_lowercase()),
+        }
+    }
+}
+
+impl From<ImageFormat> for Formats {
+    fn from(value: ImageFormat) -> Self {
+        match value {
+            ImageFormat::Png => Formats::Png,
+            ImageFormat::Jpeg => Formats::Jpeg,
+            // ImageFormat::Gif => {}
+            // ImageFormat::WebP => {}
+            // ImageFormat::Pnm => {}
+            // ImageFormat::Tiff => {}
+            // ImageFormat::Tga => {}
+            // ImageFormat::Dds => {}
+            ImageFormat::Bmp => Formats::Bmp,
+            // ImageFormat::Ico => {}
+            // ImageFormat::Hdr => {}
+            // ImageFormat::OpenExr => {}
+            // ImageFormat::Farbfeld => {}
+            // ImageFormat::Avif => {}
+            // ImageFormat::Qoi => {}
+            f => {
+                warn!(
+                    "Got {:?} (ImageFormat), cannot translate it to any 'Formats'. It will return Formats::Unknown",
+                    f
+                );
+                Formats::Unknown
+            }
+        }
+    }
+}
+
+#[derive(
+    PartialEq, Eq, Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, QueryableByName, Selectable,
+)]
+#[diesel(table_name = formats)]
+pub struct Format {
+    pub id: i32,
+    pub parent_id: Option<i32>,
+    pub format: String,
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = formats)]
+pub struct NewFormat<'a> {
+    pub parent_id: Option<i32>,
+    pub format: &'a str,
+}
+
+impl Format {
+    /// Looks for the [`Format`] entry for the given `value`.
+    ///
+    /// This method uses a cache, so it won't hit the database for already queried values. Errors are
+    /// not cached, so new values in the database can be retrieved by future calls.
+    pub fn find<Conn: LoadConnection>(value: &Formats, conn: &mut Conn) -> Result<Format>
+    where
+        for<'a> <<Self as HasTable>::Table as FilterDsl<Eq<formats::format, &'a str>>>::Output:
+            RunQueryDsl<Conn> + LoadQuery<'a, Conn, Self>,
+    {
+        let str = value.to_string();
+
+        let mut cache_ = FORMATS_CACHE.lock().unwrap();
+        let values = match cache_.entry(value.to_string()) {
+            Entry::Occupied(o) => o.into_mut(),
+            Entry::Vacant(v) => {
+                use crate::database::schema::formats::dsl::*;
+                let format_: Format = FilterDsl::filter(formats, format.eq(str.as_str())).get_result(conn)?;
+                v.insert(format_)
+            }
+        };
+
+        Ok(values.clone())
+    }
+}
+
+impl From<Format> for Formats {
+    fn from(value: Format) -> Self {
+        match Formats::from_str(&value.format) {
+            Ok(f) => f,
+            Err(_) => {
+                warn!("Format value '{}' not found in Formats enum", value.format);
+                Formats::Unknown
+            }
+        }
+    }
+}
