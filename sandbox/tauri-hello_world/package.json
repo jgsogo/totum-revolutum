@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@tauri-apps/api": "^1.5.3"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.6.0"
+  },
+  "name": "tauri-hello_world",
+  "private": true,
+  "scripts": {},
+  "type": "module",
+  "version": "0.0.1"
+}

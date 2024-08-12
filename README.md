@@ -48,4 +48,11 @@ Tools that can be reused from this repository:
 
 ---
 
+
+You can also find other directories like `sandbox`, `learning` or `experiments` that are meant to one-offs,
+things that I've been trying and I managed to make them work,... in any case, they will only be there as
+long as the maintainance effort is low.
+
+---
+
 [![Build and test](https://github.com/jgsogo/totum-revolutum/actions/workflows/bazel-diff.yaml/badge.svg)](https://github.com/jgsogo/totum-revolutum/actions/workflows/bazel-diff.yaml)
