@@ -1,0 +1,40 @@
+# load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+# load("@npm//@tauri-apps/cli:index.bzl", "tauri")
+load("@npm//sandbox/tauri-hello_world:@tauri-apps/cli/package_json.bzl", tauri_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+tauri_bin.tauri_binary(
+    name = "dev",
+    args = [
+        "dev",
+        # "--help",
+        # "--runner=loloi",
+        "-- -- --help",
+        # "--release",
+        # "--verbose",
+        # "-- --help --outDir=/tmp/aaa"
+        "--no-watch",
+        # "--no-dev-server",
+    ],
+    chdir = package_name(),
+    data = glob(["**"]) + [
+        # "@npm//next",
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+    ],
+)
+
+tauri_bin.tauri_binary(
+    name = "bundle",
+    args = [
+        "build",
+    ],
+    chdir = package_name(),
+    data = glob(["**"]) + [
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+    ],
+)

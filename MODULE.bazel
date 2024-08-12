@@ -107,6 +107,12 @@ use_repo(crate, "crates_libraries")
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
 npm.npm_translate_lock(
     name = "npm",
+    bins = {
+        # This is basically the "bin" entry from `node_modules/<package>/package.json`
+        "vite": [
+            "vite=./bin/vite",
+        ],
+    },
     data = [
         "//sandbox/svelte-social-app:package.json",
     ],
