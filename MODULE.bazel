@@ -10,12 +10,12 @@ bazel_dep(name = "platforms", version = "0.0.10")
 bazel_dep(name = "rules_python", version = "0.34.0", dev_dependency = True)
 bazel_dep(name = "rules_rust", version = "0.49.2", dev_dependency = True)
 
-bazel_dep(name = "rules_nodejs", version = "6.1.0")
+bazel_dep(name = "rules_nodejs", version = "6.2.0")
 bazel_dep(name = "aspect_rules_py", version = "0.7.4")
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.9", dev_dependency = True)
 
-bazel_dep(name = "aspect_rules_js", version = "1.41.2")
+bazel_dep(name = "aspect_rules_js", version = "2.0.0-rc10")
 bazel_dep(name = "aspect_rules_ts", version = "2.2.0")
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
@@ -128,3 +128,9 @@ npm.npm_translate_lock(
     verify_node_modules_ignored = "//:.bazelignore",
 )
 use_repo(npm, "npm")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+
+# Allows developers to use the matching pnpm version, for example:
+# bazel run -- @pnpm --dir /Users/jgsogo/personal/totum-revolutum/sandbox/svelte-social-app install
+use_repo(pnpm, "pnpm")

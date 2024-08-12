@@ -2,6 +2,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//sandbox/svelte-social-app:@sveltejs/kit/package_json.bzl", sveltejs_kit_bin = "bin")
 load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
+load("@npm//sandbox/svelte-social-app:vitest/package_json.bzl", vitest_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -101,4 +102,26 @@ js_run_devserver(
         ":static",
     ],
     grant_sandbox_write_permissions = True,
+)
+
+vitest_bin.vitest_test(
+    name = "vitest",
+    args = [
+        "run",
+        "--config=vite.config.ts",
+    ],
+    chdir = package_name(),
+    data = [
+        ":svelte_kit_sync",
+
+        # Configs
+        "vite.config.ts",
+        "package.json",
+        "tsconfig.json",
+        "svelte.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+    ] + glob(["src/**/*.test.ts"]),
+    # grant_sandbox_write_permissions = True,
 )
