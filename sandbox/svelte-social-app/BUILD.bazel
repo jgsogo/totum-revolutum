@@ -76,10 +76,7 @@ js_run_devserver(
 # Execute the tests using Vitest
 vitest_bin.vitest_test(
     name = "vitest",
-    args = [
-        "run",
-        "--config=vite.config.ts",
-    ],
+    args = ["run --config vite.config.ts"],
     chdir = package_name(),
     data = [
         # Configs
