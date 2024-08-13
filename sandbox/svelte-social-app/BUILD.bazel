@@ -89,8 +89,7 @@ vitest_bin.vitest_test(
         ":node_modules",  # TODO: Use //:node_modules instead
 
         # Sources
-        # ":src",
-        # ":static",
-        "src/index.test.ts",
+        ":src",
+        ":static",
     ],
 )
