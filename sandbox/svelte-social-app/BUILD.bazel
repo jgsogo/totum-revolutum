@@ -1,6 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//sandbox/svelte-social-app:@sveltejs/kit/package_json.bzl", sveltejs_kit_bin = "bin")
 load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
 load("@npm//sandbox/svelte-social-app:vitest/package_json.bzl", vitest_bin = "bin")
 
@@ -20,36 +19,6 @@ filegroup(
 filegroup(
     name = "static",
     srcs = glob(["static/**/*.*"]),
-)
-
-# Executes `svelte-kit sync` which creates `.svelte-kit` folder
-sveltejs_kit_bin.svelte_kit(
-    name = "svelte_kit_sync",
-    srcs = [
-        # Configs
-        "vite.config.ts",
-        "package.json",
-        "tsconfig.json",
-        "svelte.config.js",
-
-        # Build deps
-        ":node_modules",  # TODO: Use //:node_modules instead
-
-        # Sources
-        ":src",
-        ":static",
-    ],
-    # out_dirs = [".svelte-kit",],
-    outs = [
-        ".svelte-kit/ambient.d.ts",
-        ".svelte-kit/non-ambient.d.ts",
-        ".svelte-kit/tsconfig.json",
-        ".svelte-kit/types/route_meta_data.json",
-        ".svelte-kit/types/src/routes/$types.d.ts",
-    ],
-    args = ["sync"],
-    chdir = package_name(),
-    visibility = ["//visibility:public"],
 )
 
 # This target (bazel build) executes 'vite build' and generates an empty 'dist'
@@ -75,7 +44,7 @@ vite_bin.vite(
     ],
     args = ["build --config vite.config.ts"],
     chdir = package_name(),
-    out_dirs = ["dist"],
+    out_dirs = [".svelte-kit/output"],
     visibility = ["//visibility:public"],
 )
 
@@ -93,8 +62,6 @@ js_run_devserver(
     chdir = package_name(),
     command = "./node_modules/.bin/vite",
     data = [
-        ":svelte_kit_sync",
-
         # Configs
         "vite.config.ts",
         "package.json",
@@ -119,8 +86,6 @@ vitest_bin.vitest_test(
     ],
     chdir = package_name(),
     data = [
-        ":svelte_kit_sync",
-
         # Configs
         "vite.config.ts",
         "package.json",
@@ -134,5 +99,4 @@ vitest_bin.vitest_test(
         ":src",
         ":static",
     ] + glob(["src/**/*.test.ts"]),
-    # grant_sandbox_write_permissions = True,
 )
