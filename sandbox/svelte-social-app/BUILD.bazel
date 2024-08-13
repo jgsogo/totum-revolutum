@@ -94,5 +94,5 @@ vitest_bin.vitest_test(
         # Sources
         ":src",
         ":static",
-    ] + glob(["src/**/*.test.ts"]),
+    ],
 )
