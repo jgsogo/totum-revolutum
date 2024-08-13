@@ -5,9 +5,6 @@ load("@npm//sandbox/svelte-social-app:vitest/package_json.bzl", vitest_bin = "bi
 
 npm_link_all_packages(name = "node_modules")
 
-# TODO: Search about using Bazel with Vite
-#  - https://medium.com/@yanirmanor/using-bazel-with-vite-and-vitest-c75b133f4707
-
 # TODO: Some of these rules can be generalized and moved to `bazel/js/svelte`
 # so they are reused by other libraries
 
@@ -21,11 +18,9 @@ filegroup(
     srcs = glob(["static/**/*.*"]),
 )
 
-# This target (bazel build) executes 'vite build' and generates an empty 'dist'
-# folder in 'bazel-bin'. I guess this should create the [build for production](https://vitejs.dev/guide/cli.html#vite-build),
-# but the folder is empty.
-#
-# FIXME: What is the expected output of this command? Is this the equivalent to a 'build'?
+# This target (bazel build) executes 'vite build' and generates the
+# [build for production](https://vitejs.dev/guide/cli.html#vite-build) in the
+# `.svelte-kit/output` directory
 vite_bin.vite(
     name = "svelte-social-app",
     srcs = [
@@ -78,6 +73,7 @@ js_run_devserver(
     grant_sandbox_write_permissions = True,
 )
 
+# Execute the tests using Vitest
 vitest_bin.vitest_test(
     name = "vitest",
     args = [
