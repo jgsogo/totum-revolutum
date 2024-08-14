@@ -114,10 +114,6 @@ npm.npm_translate_lock(
             "vite=./bin/vite",
         ],
     },
-    # custom_postinstalls = {
-    #     "@aspect-test/c": "echo moo > cow.txt",
-    #     "@aspect-test/c@2.0.2": "echo mooo >> cow.txt",
-    # },
     data = [
         "//sandbox/svelte-social-app:package.json",
     ],
