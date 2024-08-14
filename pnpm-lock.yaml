@@ -6,7 +6,7 @@ settings:
 
 importers:
 
-  sandbox/svelte-social-app:
+  sandbox/svelte-hello-world:
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^3.0.0
@@ -1125,7 +1125,7 @@ packages:
       postcss: 8.4.41
       postcss-load-config: 3.1.4(postcss@8.4.41)
       postcss-safe-parser: 6.0.0(postcss@8.4.41)
-      postcss-selector-parser: 6.1.1
+      postcss-selector-parser: 6.1.2
       semver: 7.6.3
       svelte: 4.2.7
       svelte-eslint-parser: 0.41.0(svelte@4.2.7)
@@ -1808,8 +1808,8 @@ packages:
       postcss: 8.4.41
     dev: true
 
-  /postcss-selector-parser@6.1.1:
-    resolution: {integrity: sha512-b4dlw/9V8A71rLIDsSwVmak9z2DuBUB7CA1/wSdelNEzqsjoSPeADTWNO09lpH49Diy3/JIZ2bSPB1dI3LJCHg==}
+  /postcss-selector-parser@6.1.2:
+    resolution: {integrity: sha512-Q8qQfPiZ+THO/3ZrOrO0cJJKfpYCagtMUkXbnEfmgUjwXg6z/WBeOyS9APBBPCTSiDV+s4SwQGu8yFsiMRIudg==}
     engines: {node: '>=4'}
     dependencies:
       cssesc: 3.0.0

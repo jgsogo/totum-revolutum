@@ -1,7 +1,7 @@
 load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
-load("@npm//sandbox/svelte-social-app:vitest/package_json.bzl", vitest_bin = "bin")
+load("@npm//sandbox/svelte-hello-world:vite/package_json.bzl", vite_bin = "bin")
+load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -22,7 +22,7 @@ filegroup(
 # [build for production](https://vitejs.dev/guide/cli.html#vite-build) in the
 # `.svelte-kit/output` directory
 vite_bin.vite(
-    name = "svelte-social-app",
+    name = "svelte-hello-world",
     srcs = [
         # Configs
         "vite.config.ts",
