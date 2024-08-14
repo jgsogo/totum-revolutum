@@ -1,0 +1,95 @@
+load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//sandbox/svelte-hello-world:vite/package_json.bzl", vite_bin = "bin")
+load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+# TODO: Some of these rules can be generalized and moved to `bazel/js/svelte`
+# so they are reused by other libraries
+
+filegroup(
+    name = "src",
+    srcs = glob(["src/**/*.*"]),
+)
+
+filegroup(
+    name = "static",
+    srcs = glob(["static/**/*.*"]),
+)
+
+# This target (bazel build) executes 'vite build' and generates the
+# [build for production](https://vitejs.dev/guide/cli.html#vite-build) in the
+# `.svelte-kit/output` directory
+vite_bin.vite(
+    name = "bundle",
+    srcs = [
+        # Configs
+        "vite.config.ts",
+        "package.json",
+        "tsconfig.json",
+        "svelte.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
+    ],
+    args = ["build --config vite.config.ts"],
+    chdir = package_name(),
+    out_dirs = [".svelte-kit/output"],
+    visibility = ["//visibility:public"],
+)
+
+# This target (use `bazel run`) executes `vite dev` which starts the development server
+# at 'http://localhost:5173/' with live CLI output!.
+#
+# However as Bazel moves its files out of the WORKSPACE into build directories,
+# hot reloading doesn't work.
+#
+# We could use 'ibazel' to rerun this target whenever sources change, but it doesn't work
+# with MODULE.bazel file (FIXME: https://github.com/bazelbuild/bazel-watcher/pull/647)
+js_run_devserver(
+    name = "devserver",
+    args = ["dev --config vite.config.ts"],
+    chdir = package_name(),
+    command = "./node_modules/.bin/vite",
+    data = [
+        # Configs
+        "vite.config.ts",
+        "package.json",
+        "tsconfig.json",
+        "svelte.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
+    ],
+    grant_sandbox_write_permissions = True,
+)
+
+# Execute the tests using Vitest
+vitest_bin.vitest_test(
+    name = "test",
+    args = ["run --config vite.config.ts"],
+    chdir = package_name(),
+    data = [
+        # Configs
+        "vite.config.ts",
+        "package.json",
+        "tsconfig.json",
+        "svelte.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
+    ],
+)
