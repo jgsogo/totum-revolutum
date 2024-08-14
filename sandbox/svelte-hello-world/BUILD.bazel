@@ -22,7 +22,7 @@ filegroup(
 # [build for production](https://vitejs.dev/guide/cli.html#vite-build) in the
 # `.svelte-kit/output` directory
 vite_bin.vite(
-    name = "svelte-hello-world",
+    name = "bundle",
     srcs = [
         # Configs
         "vite.config.ts",
@@ -75,7 +75,7 @@ js_run_devserver(
 
 # Execute the tests using Vitest
 vitest_bin.vitest_test(
-    name = "vitest",
+    name = "test",
     args = ["run --config vite.config.ts"],
     chdir = package_name(),
     data = [
