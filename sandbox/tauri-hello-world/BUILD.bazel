@@ -6,27 +6,6 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
 
-# tauri_bin.tauri_binary(
-#     name = "dev",
-#     args = [
-#         "dev",
-#         # "--help",
-#         # "--runner=loloi",
-#         # "-- -- --help",
-#         # "--release",
-#         # "--verbose",
-#         # "-- --help --outDir=/tmp/aaa"
-#         # "--no-watch",
-#         # "--no-dev-server",
-#     ],
-#     chdir = package_name(),
-#     data = glob(["**"]) + [
-#         # "@npm//next",
-#         # Build deps
-#         ":node_modules",  # TODO: Use //:node_modules instead
-#     ],
-# )
-
 filegroup(
     name = "src",
     srcs = glob(["src/**/*.*"]),
@@ -58,6 +37,27 @@ js_run_devserver(
     ],
     grant_sandbox_write_permissions = True,
 )
+
+# tauri_bin.tauri_binary(
+#     name = "dev",
+#     args = [
+#         "dev",
+#         # "--help",
+#         # "--runner=loloi",
+#         # "-- -- --help",
+#         # "--release",
+#         # "--verbose",
+#         # "-- --help --outDir=/tmp/aaa"
+#         # "--no-watch",
+#         # "--no-dev-server",
+#     ],
+#     chdir = package_name(),
+#     data = glob(["**"]) + [
+#         # "@npm//next",
+#         # Build deps
+#         ":node_modules",  # TODO: Use //:node_modules instead
+#     ],
+# )
 
 # js_run_devserver(
 #     name = "devserver",

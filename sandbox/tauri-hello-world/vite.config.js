@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, searchForWorkspaceRoot } from "vite";
 import { sveltekit } from "@sveltejs/kit/vite";
 
 // @ts-expect-error process is a nodejs global
@@ -27,6 +27,12 @@ export default defineConfig(async () => ({
     watch: {
       // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
+    },
+    fs: {
+      allow: [
+        searchForWorkspaceRoot(process.cwd()),
+        "/private/var/tmp/_bazel_jgsogo/", // TODO: Bazel deploys the node_modules inside this tmp folders
+      ]
     },
   },
 }));
