@@ -1,0 +1,86 @@
+# load("@npm//sandbox/svelte-social-app:vite/package_json.bzl", vite_bin = "bin")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+# load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
+load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+
+npm_link_all_packages(name = "node_modules")
+
+# tauri_bin.tauri_binary(
+#     name = "dev",
+#     args = [
+#         "dev",
+#         # "--help",
+#         # "--runner=loloi",
+#         # "-- -- --help",
+#         # "--release",
+#         # "--verbose",
+#         # "-- --help --outDir=/tmp/aaa"
+#         # "--no-watch",
+#         # "--no-dev-server",
+#     ],
+#     chdir = package_name(),
+#     data = glob(["**"]) + [
+#         # "@npm//next",
+#         # Build deps
+#         ":node_modules",  # TODO: Use //:node_modules instead
+#     ],
+# )
+
+filegroup(
+    name = "src",
+    srcs = glob(["src/**/*.*"]),
+)
+
+filegroup(
+    name = "static",
+    srcs = glob(["static/**/*.*"]),
+)
+
+js_run_devserver(
+    name = "devserver",
+    args = ["dev --config vite.config.js"],
+    chdir = package_name(),
+    command = "./node_modules/.bin/vite",
+    data = [
+        # Configs
+        "vite.config.js",
+        "package.json",
+        "tsconfig.json",
+        "svelte.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
+    ],
+    grant_sandbox_write_permissions = True,
+)
+
+# js_run_devserver(
+#     name = "devserver",
+#     args = ["dev"],
+#     chdir = package_name(),
+#     command = "./node_modules/.bin/vite",
+#     data = glob(["**"]) + [
+#         # "@npm//next",
+#         # Build deps
+#         ":node_modules",  # TODO: Use //:node_modules instead
+#     ],
+#     grant_sandbox_write_permissions = True,
+# )
+
+# js_run_devserver(
+#     name = "devserver2",
+#     args = ["dev"],
+#     chdir = package_name(),
+#     command = "./node_modules/.bin/tauri",
+#     data = glob(["**"]) + [
+#         # "@npm//next",
+#         # Build deps
+#         ":node_modules",  # TODO: Use //:node_modules instead
+#     ],
+#     grant_sandbox_write_permissions = True,
+# )
