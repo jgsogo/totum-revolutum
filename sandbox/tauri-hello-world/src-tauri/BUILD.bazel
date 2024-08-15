@@ -1,0 +1,48 @@
+load("@crates_libraries//:defs.bzl", "all_crate_deps")
+load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+
+cargo_build_script(
+    name = "build",
+    srcs = ["build.rs"],
+    build_script_env = {
+        "DEP_TAURI_DEV": "false",
+    },
+    data = [
+        "Cargo.toml",
+        "tauri.conf.json",
+    ] + glob(["src/**/*.rs"]),
+    deps = [
+        "@crates_libraries//:tauri-build",
+    ],
+)
+
+rust_library(
+    name = "applib",
+    srcs = ["src/lib.rs"],
+    crate_name = "tauri_hello_world_lib",
+    data = [
+        "tauri.conf.json",
+    ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    deps = all_crate_deps(
+        normal = True,
+    ) + [
+        ":build",
+    ],
+)
+
+rust_binary(
+    name = "app",
+    srcs = ["src/main.rs"],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    deps = all_crate_deps(
+        normal = True,
+    ) + [
+        ":applib",
+    ],
+)
