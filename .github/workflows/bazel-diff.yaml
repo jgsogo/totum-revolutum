@@ -16,6 +16,20 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Install some requirements
+        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+        run: |
+          sudo apt-get install \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
       - name: Base from base branch (PR)
         if: ${{ github.event_name == 'pull_request' }}
         run: |

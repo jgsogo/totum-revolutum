@@ -91,6 +91,8 @@ crate.from_cargo(
         "//libraries/utils:Cargo.toml",
         # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
         "//bazel/external:Cargo.toml",
+        # Sandbox apps
+        "//sandbox/tauri-hello-world/src-tauri:Cargo.toml",
     ],
 )
 use_repo(crate, "crates_libraries")
@@ -116,6 +118,7 @@ npm.npm_translate_lock(
     },
     data = [
         "//sandbox/svelte-hello-world:package.json",
+        "//sandbox/tauri-hello-world:package.json",
     ],
     # generate_bzl_library_targets = True,
     npmrc = "//:.npmrc",

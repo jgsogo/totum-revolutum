@@ -1,3 +1,4 @@
+**/src-tauri/gen/
 .DS_Store
 .bazelrc.user
 .idea/

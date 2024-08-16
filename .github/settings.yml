@@ -4,7 +4,7 @@ repository:
   name: totum-revolutum
   description: Monorepo for personal projects
   homepage: https://jgsogo.es/
-  topics: rust, cpp, python, bazel, monorepo
+  topics: rust, cpp, python, bazel, monorepo, svelte, tauri
   private: true
 
   has_issues: true
@@ -151,6 +151,8 @@ labels:
     color: "000000"
   - name: cmp:docs
     color: "000000"
+  - name: cmp:libraries/conductus
+    color: "000000"
   - name: cmp:libraries/constants
     color: "000000"
   - name: cmp:libraries/cron
@@ -166,6 +168,10 @@ labels:
   - name: cmp:libraries/utils
     color: "000000"
   - name: cmp:notes
+    color: "000000"
+  - name: cmp:sandbox/svelte-hello-world
+    color: "000000"
+  - name: cmp:sandbox/tauri-hello-world
     color: "000000"
   - name: cmp:scripts
     color: "000000"
