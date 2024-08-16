@@ -40,6 +40,9 @@ rust_binary(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    visibility = [
+        "//sandbox/tauri-hello-world:__subpackages__",
+    ],
     deps = all_crate_deps(
         normal = True,
     ) + [
