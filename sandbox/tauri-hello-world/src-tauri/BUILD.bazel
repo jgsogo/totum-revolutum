@@ -2,6 +2,41 @@ load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
 
+filegroup(
+    name = "capabilities",
+    srcs = glob(["capabilities/**"]),
+    visibility = [
+        "//sandbox/tauri-hello-world:__subpackages__",
+    ],
+)
+
+filegroup(
+    name = "icons",
+    srcs = glob(["icons/**"]),
+    visibility = [
+        "//sandbox/tauri-hello-world:__subpackages__",
+    ],
+)
+
+filegroup(
+    name = "srcs",
+    srcs = glob(["src/**/*.rs"]),
+    visibility = [
+        "//sandbox/tauri-hello-world:__subpackages__",
+    ],
+)
+
+filegroup(
+    name = "root_files",
+    srcs = [
+        "build.rs",
+        "tauri.conf.json",
+    ],
+    visibility = [
+        "//sandbox/tauri-hello-world:__subpackages__",
+    ],
+)
+
 cargo_build_script(
     name = "build",
     srcs = ["build.rs"],
@@ -11,7 +46,8 @@ cargo_build_script(
     data = [
         "Cargo.toml",
         "tauri.conf.json",
-    ] + glob(["src/**/*.rs"]),
+        ":srcs",
+    ],
     deps = [
         "@crates_libraries//:tauri-build",
     ],
@@ -23,7 +59,9 @@ rust_library(
     crate_name = "tauri_hello_world_lib",
     data = [
         "tauri.conf.json",
-    ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+        ":capabilities",
+        ":icons",
+    ],
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),

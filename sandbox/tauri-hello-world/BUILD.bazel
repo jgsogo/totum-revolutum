@@ -1,5 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//sandbox/tauri-hello-world:@tauri-apps/cli/package_json.bzl", tauri_bin = "bin")
 load("//bazel/tauri:defs.bzl", "tauri_run")
 
 npm_link_all_packages(name = "node_modules")
@@ -40,4 +41,23 @@ tauri_run(
     name = "dev",
     backend = "//sandbox/tauri-hello-world/src-tauri:app",
     frontend = ":devserver",
+)
+
+tauri_bin.tauri_binary(
+    name = "tauri_binary",
+    args = ["build"],
+    data = [
+        # Configs
+        "vite.config.js",
+        "package.json",
+        "tsconfig.json",
+        "svelte.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
+    ],
 )
