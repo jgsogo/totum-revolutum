@@ -129,6 +129,7 @@ npm.npm_translate_lock(
 use_repo(npm, "npm")
 
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+pnpm.pnpm(pnpm_version="9.6.0") # Default in aspect_rules_js 2.0.0 is version 8, but I need 9.6.0 for the workspace catalogs (https://github.com/jgsogo/totum-revolutum/issues/469)
 
 # Allows developers to use the matching pnpm version, for example:
 # bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
