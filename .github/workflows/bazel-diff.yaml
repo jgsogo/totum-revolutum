@@ -16,6 +16,10 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Install some requirements
+        run: |
+          sudo apt-get install libsdl-pango-dev
+
       - name: Base from base branch (PR)
         if: ${{ github.event_name == 'pull_request' }}
         run: |
