@@ -2,6 +2,8 @@ load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
 
+exports_files(["Cargo.toml"])
+
 filegroup(
     name = "capabilities",
     srcs = glob(["capabilities/**"]),

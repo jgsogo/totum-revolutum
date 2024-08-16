@@ -1,6 +1,8 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//sandbox/tauri-hello-world:@tauri-apps/cli/package_json.bzl", tauri_bin = "bin")
+load("//bazel:copy_filegroups.bzl", "copy_filegroups")
 load("//bazel/tauri:defs.bzl", "tauri_run")
 
 npm_link_all_packages(name = "node_modules")
@@ -43,6 +45,34 @@ tauri_run(
     frontend = ":devserver",
 )
 
+### Bundling
+
+copy_filegroups(
+    name = "capabilities",
+    strip_prefix = "sandbox/tauri-hello-world",
+    targeted_filegroups = [
+        "//sandbox/tauri-hello-world/src-tauri:capabilities",
+        "//sandbox/tauri-hello-world/src-tauri:icons",
+        "//sandbox/tauri-hello-world/src-tauri:srcs",
+        "//sandbox/tauri-hello-world/src-tauri:root_files",
+    ],
+)
+
+expand_template(
+    name = "cargo_toml_tpl",
+    out = "Cargo.toml",
+    template = "//sandbox/tauri-hello-world/src-tauri:Cargo.toml",
+)
+
+copy_filegroups(
+    name = "cargo_toml",
+    folder = "src-tauri",
+    strip_prefix = "sandbox/tauri-hello-world",
+    targeted_filegroups = [
+        ":cargo_toml_tpl",
+    ],
+)
+
 tauri_bin.tauri_binary(
     name = "tauri_binary",
     args = ["build"],
@@ -59,5 +89,9 @@ tauri_bin.tauri_binary(
         # Sources
         ":src",
         ":static",
+
+        # Rust
+        ":capabilities",
+        ":cargo_toml",
     ],
 )
