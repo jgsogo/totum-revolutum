@@ -115,9 +115,6 @@ npm.npm_translate_lock(
         "vite": [
             "vite=./bin/vite",
         ],
-        "tauri": [
-            "tauri_apps/cli=./tauri.js",
-        ],
     },
     data = [
         "//sandbox/svelte-hello-world:package.json",
