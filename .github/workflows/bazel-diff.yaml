@@ -17,8 +17,18 @@ jobs:
           fetch-depth: 2
 
       - name: Install some requirements
+        # Required by Tauri: https://tauri.app/v1/guides/getting-started/prerequisites/#1-system-dependencies
         run: |
-          sudo apt-get install libsdl-pango-dev
+          sudo apt-get install \
+            libwebkit2gtk-4.0-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libssl-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
 
       - name: Base from base branch (PR)
         if: ${{ github.event_name == 'pull_request' }}
