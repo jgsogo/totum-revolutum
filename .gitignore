@@ -7,6 +7,7 @@ bazel-bin
 bazel-out
 bazel-testlogs
 bazel-totum-revolutum
+build/
 examples/files/
 node_modules/
 secret.json
