@@ -47,6 +47,8 @@ tauri_run(
 
 ### Bundling
 
+This PR is broken. Prevent accidental merge
+
 copy_filegroups(
     name = "capabilities",
     strip_prefix = "sandbox/tauri-hello-world",
