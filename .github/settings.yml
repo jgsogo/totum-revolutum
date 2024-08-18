@@ -79,6 +79,9 @@ labels:
   - name: type:ux:cli
     color: D4C5F9
     description: User experience related to CLI interface
+  - name: type:quarantine
+    color: D4C5F9
+    description: Something is not working and I don't know how to fix it
 
   - name: cmp:ALL
     color: "000000"

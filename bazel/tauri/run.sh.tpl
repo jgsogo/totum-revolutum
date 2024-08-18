@@ -2,16 +2,13 @@
 
 set -ex
 
-function finish {
-    kill $frontend_pid
-}
-trap finish EXIT
 
 export BAZEL_BINDIR="."
-echo "running frontend"
-frontend_logfile="frontend-log.tmp"
-bash -c "%{frontend_executable} 2>&1 | tee $frontend_logfile" &
-frontend_pid=($!)
 
-backend_logfile="backend-log.tmp"
-bash -c "%{backend_executable}" 2>&1 | tee $backend_logfile
+# Run the backend detached (after one second)
+(sleep 1; %{backend_executable} 2>&1) &
+
+# Run the frontend, blocking call. User will need to Ctrl+C to stop it,
+# but this way we guarantee that the server is closed and the port is available
+# for future invocation
+%{frontend_executable} 2>&1
