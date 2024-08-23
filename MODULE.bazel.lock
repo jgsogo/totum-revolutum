@@ -15,12 +15,13 @@
     "https://bcr.bazel.build/modules/aspect_bazel_lib/1.40.0/MODULE.bazel": "eac4cf71482009e142804f72b2b102fb7e9812c326702d8b7206385b24f7805f",
     "https://bcr.bazel.build/modules/aspect_bazel_lib/1.40.3/MODULE.bazel": "668e6bcb4d957fc0e284316dba546b705c8d43c857f87119619ee83c4555b859",
     "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.7/MODULE.bazel": "491f8681205e31bb57892d67442ce448cda4f472a8e6b3dc062865e29a64f89c",
-    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.8.0/MODULE.bazel": "d1170d33a4f6117ecd61aa7574d3d1f3f1a33ac0e2c1573b6bffa5a51c3753fc",
-    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.8.0/source.json": "1562c277dfa738c29f6bc254228cc5689104a8b76b7c670ad4846066243322a1",
+    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.8.1/MODULE.bazel": "812d2dd42f65dca362152101fbec418029cc8fd34cbad1a2fde905383d705838",
+    "https://bcr.bazel.build/modules/aspect_bazel_lib/2.8.1/source.json": "95a6b56904e2d8bfea164dc6c98ccafe8cb75cb0623cb6ef5b3cfb15fdddabd6",
     "https://bcr.bazel.build/modules/aspect_rules_js/1.33.1/MODULE.bazel": "db3e7f16e471cf6827059d03af7c21859e7a0d2bc65429a3a11f005d46fc501b",
     "https://bcr.bazel.build/modules/aspect_rules_js/1.39.0/MODULE.bazel": "aece421d479e3c31dc3e5f6d49a12acc2700457c03c556650ec7a0ff23fc0d95",
     "https://bcr.bazel.build/modules/aspect_rules_js/2.0.0/MODULE.bazel": "b45b507574aa60a92796e3e13c195cd5744b3b8aff516a9c0cb5ae6a048161c5",
-    "https://bcr.bazel.build/modules/aspect_rules_js/2.0.0/source.json": "a6b09288ab135225982a58ac0b5e2c032c331d88f80553d86596000e894e86b3",
+    "https://bcr.bazel.build/modules/aspect_rules_js/2.0.1/MODULE.bazel": "a09d32aa997ad899fcd88dc6e629188f03351994f0698bc32a9979c5bcfd5c31",
+    "https://bcr.bazel.build/modules/aspect_rules_js/2.0.1/source.json": "62bda0d34f3817af165d1903b890ecbf6e50d652492f8bb83682636e997b5619",
     "https://bcr.bazel.build/modules/aspect_rules_lint/0.12.0/MODULE.bazel": "e767c5dbfeb254ec03275a7701b5cfde2c4d2873676804bc7cb27ddff3728fed",
     "https://bcr.bazel.build/modules/aspect_rules_py/0.7.4/MODULE.bazel": "edba59990576adf8244c167755a144d46f4081e0d803ef2dce01e5742f770227",
     "https://bcr.bazel.build/modules/aspect_rules_py/0.7.4/source.json": "e73293031b01466a117dc24d487e742dbfb6efc9533eb1551ef62dd456f1209b",
@@ -155,8 +156,8 @@
     },
     "@@aspect_bazel_lib~//lib:extensions.bzl%toolchains": {
       "general": {
-        "bzlTransitiveDigest": "4z68+Zupkgvbh3DNKdL/JJXt9QfpOOmPhuzIsf/tfbI=",
-        "usagesDigest": "f2dIsZ63oTGGC/Ir3LfDPHfuHBiowuqEOJldI5FjuBg=",
+        "bzlTransitiveDigest": "o+c8qRBWojmxp6XnxraB8cDLR3egI6E7hjYq4t1rzM8=",
+        "usagesDigest": "l+IEuQCFi9YGeuQ8qqw2f2fqUo4VfsLBdK0OjzbED5o=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -622,8 +623,8 @@
     },
     "@@aspect_rules_js~//npm:extensions.bzl%pnpm": {
       "general": {
-        "bzlTransitiveDigest": "mWy3NNCPxqC9fYpWhjD2JEn8S1mYxyIWUem3uIRLc4A=",
-        "usagesDigest": "ruKHadM9xi/XgllgoCvOJ1iP9gFxXjTq2Ywuxkg6NdQ=",
+        "bzlTransitiveDigest": "CO8jS/Llde//+WLNEESYxCXhuql5OcCu3MU+AznLNkM=",
+        "usagesDigest": "AbPGmjU71n5tvISwqdE9zIL2cBbvLZMEVCTrb8Wn7mI=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -792,7 +793,7 @@
     "@@rules_nodejs~//nodejs:extensions.bzl%node": {
       "general": {
         "bzlTransitiveDigest": "0IJr1Jg3Dns9QKY65MtauFLtHjjP3n1DgN0+ZAjFYXo=",
-        "usagesDigest": "jKukPkR3gFGcIE4XRmIrECGvpuuMzXHneZZQ9erHMmw=",
+        "usagesDigest": "v/jBmt9BF3Fa/HbqgX2W18rATn+/YY+WdVfYfokQRdk=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -922,7 +923,7 @@
     },
     "@@rules_rust~//rust:extensions.bzl%rust": {
       "general": {
-        "bzlTransitiveDigest": "1xolWxAqVA/c9F/xhVbmUX19G19JIJeFIaokzlAZPk0=",
+        "bzlTransitiveDigest": "Lu32kUJ7KBNa2WFE3eoJXZYxnwgP0cNHASMYeo8ATdo=",
         "usagesDigest": "CQ/Y/r08yKdiAo2VzbJAmLrhQ9iX48gf9lMseVyHK10=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
