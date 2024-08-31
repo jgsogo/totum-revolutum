@@ -33,6 +33,14 @@
   </form>
 
   <p>{greetMsg}</p>
+
+  <div class="row">
+    <p>Examples</p>
+    <ul>
+      <li><a href="/datatables">Datatables</a></li>
+    </ul>
+  </div>
+
 </div>
 
 <style>
