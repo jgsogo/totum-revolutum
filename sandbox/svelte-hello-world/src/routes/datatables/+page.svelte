@@ -31,7 +31,7 @@
 		functionCreateDatatable({
 			parData: arrayUsers,
 			parSearchableColumns: ['name', 'city'],
-			parRowsPerPage: '5',
+			parRowsPerPage: '10',
 			parSortBy: 'city',
 			parSearchString: '',
 			parSortOrder: 'ascending',
