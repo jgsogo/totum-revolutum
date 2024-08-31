@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@tauri-apps/api": "2.0.0-rc.3",
-    "@tauri-apps/plugin-shell": "2.0.0-rc.0"
+    "@tauri-apps/plugin-shell": "2.0.0-rc.0",
+    "svelte-datatables-net": "^1.0.10"
   },
   "description": "",
   "devDependencies": {
