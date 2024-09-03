@@ -7,36 +7,28 @@
 		Search,
 		Sort,
 	} from 'svelte-datatables-net';
+    import { invoke } from "@tauri-apps/api/core";
 
-	const arrayUsers = [
-		{ id: 9, name: 'Denzel', age: 24, city: 'Newcastle' },
-		{ id: 12, name: 'Olga', age: 35, city: 'Las Cruces' },
-		{ id: 13, name: 'Barry', age: 27, city: 'Newport' },
-		{ id: 10, name: 'Anthony', age: 47, city: 'Los Banos' },
-		{ id: 2, name: 'Mary', age: 45, city: 'Los Angeles' },
-		{ id: 1, name: 'John', age: 21, city: 'New York' },
-		{ id: 3, name: 'Mark', age: 23, city: 'Boston' },
-		{ id: 5, name: 'Brian', age: 22, city: 'New Orleans' },
-		{ id: 14, name: 'Larry', age: 41, city: 'Los Altos' },
-		{ id: 4, name: 'Cris', age: 32, city: 'Las Vegas' },
-		{ id: 6, name: 'Stuart', age: 46, city: 'Los Gatos' },
-		{ id: 7, name: 'Owen', age: 24, city: 'Boston' },
-		{ id: 8, name: 'Paul', age: 33, city: 'Las Vegas' },
-		{ id: 11, name: 'Fred', age: 25, city: 'Boston' },
-		{ id: 15, name: 'Richard', age: 29, city: 'Boston' },
-		{ id: 16, name: 'Bruna', age: 31, city: 'Las Vegas' },
-	];
+    let stateDatatable = $state();
 
-	let stateDatatable = $state(
-		functionCreateDatatable({
-			parData: arrayUsers,
+    const functionReadData = async function () {
+        const data = await invoke("datatables_table");
+        console.log(data);
+        const arrayData = data.map(function(e) {
+            return {id: e[0], name: e[1], age: e[2], city: e[3]};
+        });
+        console.log(arrayData);
+
+		stateDatatable = functionCreateDatatable({
+			parData: arrayData,
 			parSearchableColumns: ['name', 'city'],
 			parRowsPerPage: '10',
 			parSortBy: 'city',
 			parSearchString: '',
 			parSortOrder: 'ascending',
-		}),
-	);
+		});
+	};
+
 </script>
 
 <svelte:head>
@@ -49,9 +41,12 @@
 </svelte:head>
 
 
-<h1>Datatables example <small>(<a href="/">home</a>)</small></h1>
+<h1>eDatatables example <small>(<a href="/">home</a>)</small></h1>
 <p>Using <a href="https://github.com/joaquimnetocel/svelte-datatables-net/tree/master" target="_blank">svelte-datatables-net</a></p>
 
+{#await functionReadData()}
+READING DATA...
+{:then}
 <Datatable bind:propDatatable={stateDatatable}>
 	<div class="container-sm">
 		<div class="mx-3">
@@ -127,3 +122,4 @@
 		</div>
 	</div>
 </Datatable>
+{/await}
