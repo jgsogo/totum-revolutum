@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@tauri-apps/api": "2.0.0-rc.3",
-    "@tauri-apps/plugin-shell": "2.0.0-rc.0",
+    "@tauri-apps/api": "2.0.0-rc.4",
+    "@tauri-apps/plugin-shell": "2.0.0-rc.1",
     "svelte-datatables-net": "^1.0.10"
   },
   "description": "",
@@ -9,9 +9,9 @@
     "@sveltejs/adapter-static": "^3.0.4",
     "@sveltejs/kit": "^2.5.22",
     "@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
-    "@tauri-apps/cli": "2.0.0-rc.7",
-    "svelte": "5.0.0-next.240",
-    "svelte-check": "^3.8.6",
+    "@tauri-apps/cli": "2.0.0-rc.10",
+    "svelte": "5.0.0-next.243",
+    "svelte-check": "^4.0.0",
     "tslib": "^2.6.3",
     "typescript": "^5.5.4",
     "vite": "^5.4.1"
