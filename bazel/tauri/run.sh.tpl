@@ -4,6 +4,8 @@ set -ex
 
 
 export BAZEL_BINDIR="."
+export RUST_BACKTRACE=1
+export RUST_LOG=debug
 
 # Run the backend detached (after one second)
 (sleep 1; %{backend_executable} 2>&1) &
