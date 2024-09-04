@@ -80,15 +80,15 @@ serde_yaml = "0.9.34"
 sha256 = { version = "1.5" }
 strum = "0.26.3"
 strum_macros = "0.26.2"
-syn = { version = "2.0.68", features = ["visit"] }
+syn = { version = "2.0.77", features = ["visit"] }
 tauri-build = { version = "2.0.0-rc", features = [] }
 tauri = { version = "2.0.0-rc", features = [] }
-tauri-plugin-shell = "2.0.0-rc"
+tauri-plugin-shell = "2.0.0-rc.3"
 tempfile = { version = "3.10.1" }
 testing_logger = "0.1.1"
 thiserror = "1.0.59"
 time = { version = "0.3.36" }
-tokio = { version = "1.39" }
+tokio = { version = "1.40" }
 tokio-stream = "0.1.15"
 toml = "0.8.12"
 tracing = { version = "0.1.40" }
