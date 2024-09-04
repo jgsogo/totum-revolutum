@@ -8,6 +8,8 @@
 		Sort,
 	} from 'svelte-datatables-net';
 
+    console.log('svelte-datatables-net example');
+
 	const arrayUsers = [
 		{ id: 9, name: 'Denzel', age: 24, city: 'Newcastle' },
 		{ id: 12, name: 'Olga', age: 35, city: 'Las Cruces' },
