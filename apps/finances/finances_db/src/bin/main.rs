@@ -22,6 +22,6 @@ pub fn main() {
 
     println!("Displaying {} accounts", results.len());
     for post in results {
-        println!("{}", post.name);
+        println!("{:3} - {}", post.id, post.name);
     }
 }
