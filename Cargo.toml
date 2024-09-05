@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "apps/finances/finances_rs",
     "apps/photodb",
     "apps/syncronia",
     "libraries/cron",

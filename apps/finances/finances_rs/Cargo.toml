@@ -1,0 +1,12 @@
+[package]
+name = "finances"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+name = "finances"
+path = "src/lib.rs"
+
+[[bin]]
+name = "finances"
+path = "src/bin.rs"
