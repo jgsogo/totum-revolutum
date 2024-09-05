@@ -7,14 +7,14 @@
   "description": "",
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.4",
-    "@sveltejs/kit": "^2.5.22",
-    "@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
+    "@sveltejs/kit": "^2.5.26",
+    "@sveltejs/vite-plugin-svelte": "4.0.0-next.7",
     "@tauri-apps/cli": "2.0.0-rc.11",
     "svelte": "5.0.0-next.243",
-    "svelte-check": "^4.0.0",
-    "tslib": "^2.6.3",
+    "svelte-check": "^4.0.1",
+    "tslib": "^2.7.0",
     "typescript": "^5.5.4",
-    "vite": "^5.4.1"
+    "vite": "^5.4.3"
   },
   "license": "MIT",
   "name": "tauri-hello-world",
