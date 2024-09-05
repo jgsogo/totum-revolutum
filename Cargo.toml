@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "apps/finances/finances_rs",
+    "apps/finances/finances_db",
     "apps/photodb",
     "apps/syncronia",
     "libraries/cron",
@@ -37,7 +37,7 @@ clap-verbosity-flag = { version = "2.2" }
 confy = { version = "0.6.1", default-features = false, features = ["yaml_conf"] }
 cron-parser = "0.9.0"
 data-encoding = "2.6.0"
-diesel = { version = "2.2.0", default-features = false, features = ["sqlite", "r2d2"] }
+diesel = { version = "2.2.4", default-features = false, features = ["sqlite", "r2d2"] }
 diesel_migrations = { version = "2.2.0", default-features = false, features = ["sqlite"] }
 diesel_table_macro_syntax = "0.2.0"
 diffy = "0.4.0"
