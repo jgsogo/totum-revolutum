@@ -4,7 +4,10 @@ load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
 rust_library_tests_and_docs(
     name = "finances_db",
-    srcs = ["src/lib.rs"],
+    srcs = glob(
+        ["src/**/*.rs"],
+        exclude = ["src/bin/**/*.rs"],
+    ),
     aliases = aliases(),
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
@@ -16,7 +19,7 @@ rust_library_tests_and_docs(
 
 rust_binary(
     name = "bin",
-    srcs = ["src/bin.rs"],
+    srcs = glob(["src/bin/**/*.rs"]),
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),

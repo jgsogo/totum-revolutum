@@ -1358,8 +1358,12 @@ version = "2.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "158fe8e2e68695bd615d7e4f3227c0727b151330d3e253b525086c348d055d5e"
 dependencies = [
+ "bitflags 2.6.0",
+ "byteorder",
  "diesel_derives",
+ "itoa 1.0.11",
  "libsqlite3-sys",
+ "pq-sys",
  "r2d2",
  "time",
 ]
@@ -1735,6 +1739,7 @@ dependencies = [
  "clap_complete",
  "diesel_table_macro_syntax",
  "diffy",
+ "heck 0.5.0",
  "regex",
  "serde_regex",
  "syn 2.0.77",
@@ -1832,6 +1837,16 @@ dependencies = [
 [[package]]
 name = "finances_db"
 version = "0.0.1"
+dependencies = [
+ "clap",
+ "clap-verbosity-flag",
+ "diesel",
+ "dirs",
+ "home",
+ "log",
+ "tracing",
+ "tracing-subscriber",
+]
 
 [[package]]
 name = "fixedbitset"
@@ -4683,6 +4698,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77957b295656769bb8ad2b6a6b09d897d94f05c41b069aede1fcdaa675eaea04"
 dependencies = [
  "zerocopy",
+]
+
+[[package]]
+name = "pq-sys"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5576e3fa8738e1a71285f7211ff83458514aa4864aa34c2bdb422445448d4c4b"
+dependencies = [
+ "vcpkg",
 ]
 
 [[package]]
