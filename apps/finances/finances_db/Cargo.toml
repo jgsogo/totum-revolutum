@@ -1,0 +1,50 @@
+[package]
+name = "finances_db"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+name = "finances_db"
+path = "src/lib.rs"
+
+[[bin]]
+name = "finances_db"
+path = "src/bin/main.rs"
+
+
+[features]
+
+[dependencies]
+# diesel_utils = { path = "../../../libraries/diesel_utils" }
+# utils = { path = "../../../libraries/utils", features = ["dates"] }
+
+# anyhow = { workspace = true }
+# async-trait = { workspace = true }
+# camino = { workspace = true }
+# camino-tempfile = { workspace = true }
+# chrono = { workspace = true }
+clap = { workspace = true, features = ["derive", "env"] }
+clap-verbosity-flag = { workspace = true }
+# data-encoding = { workspace = true }
+diesel = { workspace = true, features = ["postgres", "r2d2"] }
+# diesel_migrations = { workspace = true, features = ["sqlite"] }
+dirs = { workspace = true }
+# dotenvy = { workspace = true }
+# flume = { workspace = true }
+home = { workspace = true }
+# ignore-files = { workspace = true }
+# image = { workspace = true }
+# kamadak-exif = { workspace = true }
+# lazy_static = { workspace = true }
+log = { workspace = true }
+# oxipng = { workspace = true }
+# ring = { workspace = true }
+# serde = { workspace = true, features = ["derive"] }
+# serde_json = { workspace = true }
+# strum = { workspace = true, features = ["derive"] }
+# strum_macros = { workspace = true }
+# tempfile = { workspace = true }
+# tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+# uuid = { version = "1.9.1", features = ["v4"] }

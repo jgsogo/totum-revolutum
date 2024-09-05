@@ -68,10 +68,10 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 http_archive(
     name = "diesel_cli",
     build_file = "//bazel/external:BUILD.diesel_cli.bazel",
-    sha256 = "4306582adc17f767b451db2357701175c74b7dfc4b45e29b2eca74c3a9f6bc52",
-    strip_prefix = "diesel_cli-2.2.0",
+    sha256 = "929ff6fa154d64b930d84d6c2b65ec03968622f20db947c50bf92a9910edd01c",
+    strip_prefix = "diesel_cli-2.2.4",
     type = "tar.gz",
-    urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.0/download"],
+    urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.4/download"],
 )
 
 crate.from_cargo(
@@ -79,6 +79,7 @@ crate.from_cargo(
     cargo_lockfile = "//:Cargo.lock",
     manifests = [
         "//:Cargo.toml",
+        "//apps/finances/finances_db:Cargo.toml",
         "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
         "//libraries/conductus:Cargo.toml",
