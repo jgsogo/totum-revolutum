@@ -80,6 +80,7 @@ crate.from_cargo(
     manifests = [
         "//:Cargo.toml",
         "//apps/finances/finances_db:Cargo.toml",
+        "//apps/finances/finances-app/src-tauri:Cargo.toml",
         "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
         "//libraries/conductus:Cargo.toml",
