@@ -28,7 +28,7 @@ pub trait PipelineTailOpsAsync<Output: PipelineData + Sync>: Sized {
         cap: Option<usize>,
     ) -> <Self::Family as PipelineTailAsyncFamily>::PipelineTailOps<Output>;
 
-    /// Sends all the outputs from this tail to the given [`PipelineHeadSync`] implementation. This
+    /// Sends all the outputs from this tail to the given [`PipelineHeadAsync`] implementation. This
     /// method consumes both objects as now these two pipeline endpoints are bounded together.
     async fn concat_async<Head: PipelineHeadAsync<TInput = Output> + Send>(self, head: Head);
 }
