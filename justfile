@@ -8,13 +8,14 @@ _just-check:
 update:
     pre-commit autoupdate
     cargo update
-    bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should "englobe" the next pre-project ones
+    bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines
     bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
 
-# Run all the Bazel tests
+# Run all testing
 test:
     bazel test //...
+    cargo check
 
 # Run all the Bazel targets labelled with 'update' tag
 bazel-update:
