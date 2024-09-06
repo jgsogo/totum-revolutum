@@ -41,7 +41,7 @@ rust_binary(
         proc_macro = True,
     ),
     visibility = [
-        "//apps/finances/finances:__subpackages__",
+        "//apps/finances:__subpackages__",
     ],
     deps = all_crate_deps(
         normal = True,

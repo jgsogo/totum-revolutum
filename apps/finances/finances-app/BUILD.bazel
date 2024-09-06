@@ -1,0 +1,43 @@
+load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//bazel/tauri:defs.bzl", "tauri_run")
+
+npm_link_all_packages(name = "node_modules")
+
+filegroup(
+    name = "src",
+    srcs = glob(["src/**/*.*"]),
+)
+
+filegroup(
+    name = "static",
+    srcs = glob(["static/**/*.*"]),
+)
+
+js_run_devserver(
+    name = "devserver",
+    args = ["dev --config vite.config.js"],
+    chdir = package_name(),
+    command = "./node_modules/.bin/vite",
+    data = [
+        # Configs
+        "vite.config.js",
+        "package.json",
+        "tsconfig.json",
+        "svelte.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+
+        # Sources
+        ":src",
+        ":static",
+    ],
+    grant_sandbox_write_permissions = True,
+)
+
+tauri_run(
+    name = "dev",
+    backend = "//apps/finances/finances-app/src-tauri:app",
+    frontend = ":devserver",
+)
