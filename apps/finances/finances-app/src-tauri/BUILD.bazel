@@ -1,6 +1,14 @@
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+load("//bazel/rust/ws:extract_from_workspace.bzl", "extract_from_workspace")
+
+extract_from_workspace(
+    name = "extract",
+    output_cargo_toml = "Cargo2.toml",
+    package = ":Cargo.toml",
+    workspace = "//:Cargo.toml",
+)
 
 cargo_build_script(
     name = "build",
@@ -10,6 +18,15 @@ cargo_build_script(
     },
     data = [
         "Cargo.toml",
+        # "//:Cargo.toml",
+        # ":extract",
+
+        # TODO: ":extract" es un Cargo.toml sin workspace. Diría que aquí necesitamos una rule 'tauri_build_build' que coja este Cargo.toml y
+        # haga lo que tenga que hacer COPIÁNDOSE los ficheros a otro directorio y ejecutando allí sus cosas.
+
+        # La alternativa es generar lo que sea que genere 'tauri_build::build()' via Bazel
+
+        # O también tenemos la opción de exportar más cosas: el root del workspace
         "tauri.conf.json",
     ] + glob(["src/**/*.rs"]),
     deps = [

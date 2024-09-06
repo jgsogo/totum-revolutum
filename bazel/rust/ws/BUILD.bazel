@@ -1,0 +1,13 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+rust_binary(
+    name = "extract_package",
+    srcs = ["extract_package.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:camino",
+        "@crates_libraries//:clap",
+        "@crates_libraries//:toml_edit",
+    ],
+)
