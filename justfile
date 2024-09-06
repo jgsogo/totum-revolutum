@@ -8,6 +8,7 @@ _just-check:
 update:
     pre-commit autoupdate
     cargo update
+    bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should "englobe" the next pre-project ones
     bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
 
