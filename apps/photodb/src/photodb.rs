@@ -43,7 +43,8 @@ pub struct PhotoDB<'a, T: Database + Send, TPCloudClient: PCloudClient + Clone +
     app_dir: &'a mut AppDirs,
 
     /// Indexed storage. Everything saved here will be mirrored to the DB (using the default
-    /// [`filesystem_db_models::File`] and [`filesystem_db_models::Directory`] models).
+    /// [`filesystem::impls::composites::indexed::diesel_indexed::models::File`] and
+    /// [`filesystem::impls::composites::indexed::diesel_indexed::models::Directory`] models).
     storage: FilesystemIndexed<DatabaseImpl, FilesystemPCloud<TPCloudClient>>,
 }
 

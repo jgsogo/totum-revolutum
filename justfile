@@ -21,5 +21,10 @@ test:
 bazel-update:
     scripts/bazel_run_update_targets.sh
 
+# Execute tokei: prints statistics about the repository
 tokei:
     tokei --sort lines --compact
+
+# Shows the documentation
+doc:
+    cargo doc --open --document-private-items --all-features --workspace
