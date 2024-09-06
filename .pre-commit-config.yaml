@@ -49,20 +49,18 @@ repos:
     rev: v1.0
     hooks:
       - id: fmt
-      #      - id: cargo-check
-      #        args: [ '+nightly' ]
+      - id: cargo-check
       - id: clippy
 
   # Some local scripts
   - repo: local
     hooks:
-      # TODO: Replace by above pre-commit-rust (if it works without nightly)
-      - id: cargo-check
-        name: cargo +nightly check
-        entry: cargo +nightly check
-        language: system
-        always_run: true
-        pass_filenames: false
+      # - id: cargo-check
+      #   name: cargo +nightly check
+      #   entry: cargo +nightly check
+      #   language: system
+      #   always_run: true
+      #   pass_filenames: false
 
       #      - id: branch-updated
       #        name: Branch up-to-date with master

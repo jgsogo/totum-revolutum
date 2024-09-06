@@ -4,12 +4,16 @@ _default: _just-check
 _just-check:
     {{ just_executable() }} --unstable --fmt --check
 
-# Updates all the dependencies (except MODULE.bazel)
+# Updates all the dependencies (MODULE.bazel and 3rd parties not included)
 update:
     cargo update
     bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
 
-# Run all the tests
+# Run all the Bazel tests
 test:
     bazel test //...
+
+# Run all the Bazel targets labelled with 'update' tag
+bazel-update:
+    scripts/bazel_run_update_targets.sh
