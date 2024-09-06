@@ -20,3 +20,6 @@ test:
 # Run all the Bazel targets labelled with 'update' tag
 bazel-update:
     scripts/bazel_run_update_targets.sh
+
+tokei:
+    tokei --sort lines --compact
