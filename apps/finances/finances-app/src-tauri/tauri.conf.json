@@ -1,0 +1,34 @@
+{
+  "app": {
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "height": 600,
+        "title": "finances-app",
+        "width": 800
+      }
+    ]
+  },
+  "build": {
+    "beforeBuildCommand": "pnpm build",
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../build"
+  },
+  "bundle": {
+    "active": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "targets": "all"
+  },
+  "identifier": "com.finances-app.app",
+  "productName": "finances-app",
+  "version": "0.1.0"
+}

@@ -80,6 +80,7 @@ crate.from_cargo(
     manifests = [
         "//:Cargo.toml",
         "//apps/finances/finances_db:Cargo.toml",
+        "//apps/finances/finances-app/src-tauri:Cargo.toml",
         "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
         "//libraries/conductus:Cargo.toml",
@@ -118,6 +119,7 @@ npm.npm_translate_lock(
         ],
     },
     data = [
+        "//apps/finances/finances-app:package.json",
         "//sandbox/svelte-hello-world:package.json",
         "//sandbox/tauri-hello-world:package.json",
     ],
