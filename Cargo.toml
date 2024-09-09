@@ -24,7 +24,7 @@ members = [
 # so they are available in the crate_universe.
 [workspace.dependencies]
 anyhow = "1.0.82"
-async-std = { version = "1.12" }
+async-std = { version = "1.13" }
 async-trait = "0.1.80"
 bitflags = "2.5"
 bytes = "1.6.0"
