@@ -1,6 +1,9 @@
 use clap::Parser;
 use diesel::prelude::*;
-use finances_db::{establish_connection, models::Account};
+use finances_db::{
+    establish_connection,
+    models::{Account, AccountHolder, AccountType},
+};
 
 #[derive(Parser, Debug)]
 pub struct Args {
@@ -14,14 +17,23 @@ pub fn main() {
     println!("DB connection string: {}!", args.database_url);
     let mut conn = establish_connection(&args.database_url);
 
-    use finances_db::schema::data_account::dsl::*;
-    let results = data_account
-        .select(Account::as_select())
-        .load(&mut conn)
+    use finances_db::schema::*;
+    let results = data_account::table
+        .inner_join(data_accountholder::table)
+        .inner_join(data_accounttype::table)
+        .select((
+            Account::as_select(),
+            AccountHolder::as_select(),
+            AccountType::as_select(),
+        ))
+        .load::<(Account, AccountHolder, AccountType)>(&mut conn)
         .expect("Error loading accounts");
 
     println!("Displaying {} accounts", results.len());
-    for post in results {
-        println!("{:3} - {}", post.id, post.name);
+    for (account, holder, atype) in results {
+        println!(
+            "{:3} - {:2} - {:30} - {:20} - {}",
+            account.id, holder.owner, holder.name, atype.name, account.name
+        );
     }
 }

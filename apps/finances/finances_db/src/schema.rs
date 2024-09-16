@@ -36,3 +36,13 @@ diesel::table! {
         type_id -> Integer,
     }
 }
+
+
+diesel::joinable!(data_account -> data_accounttype (type_id));
+diesel::joinable!(data_account -> data_accountholder (holder_id));
+
+diesel::allow_tables_to_appear_in_same_query!(
+    data_account,
+    data_accounttype,
+    data_accountholder,
+);
