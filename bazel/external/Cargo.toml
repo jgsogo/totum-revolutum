@@ -18,3 +18,4 @@ clap_complete = { workspace = true }
 serde_regex = { workspace = true }
 diesel_table_macro_syntax = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
+toml_edit = {workspace = true, features = ["serde"]}
