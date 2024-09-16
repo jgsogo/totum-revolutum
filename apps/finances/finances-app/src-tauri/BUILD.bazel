@@ -31,6 +31,7 @@ rust_library(
         normal = True,
     ) + [
         ":build",
+        "//apps/finances/finances_db",
     ],
 )
 
