@@ -1,0 +1,10 @@
+use diesel::prelude::*;
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::schema::data_accountholder)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct AccountHolder {
+    pub id: i32,
+    pub name: String,
+    pub owner: i32,
+}
