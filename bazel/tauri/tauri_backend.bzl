@@ -3,42 +3,92 @@
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+load("//bazel:copy_filegroups.bzl", "copy_filegroups")
 load("//bazel/rust/ws:extract_from_workspace.bzl", "extract_from_workspace")
 
 def tauri_backend(name, visibility):
     """Creates all the rules for the Rust application (backend) in Tarui app
+
+    It assumes the _standard_ layout for a Tauri application
 
     Args:
         name:
         visibility:
     """
 
+    WORKING_FOLDER = "wf-backend"
+
+    native.filegroup(
+        name = "{}-src".format(name),
+        srcs = native.glob(["src/**/*.rs"], exclude = ["src/main.rs"], allow_empty = False),
+    )
+
+    native.filegroup(
+        name = "{}-icons".format(name),
+        srcs = native.glob(["icons/**"], allow_empty = False),
+    )
+
+    native.filegroup(
+        name = "{}-capabilities".format(name),
+        srcs = native.glob(["capabilities/**"], allow_empty = False),
+    )
+
+    native.filegroup(
+        name = "{}-build_rs".format(name),
+        srcs = ["build.rs"],
+    )
+
+    native.filegroup(
+        name = "{}-tauri_conf_json".format(name),
+        srcs = ["tauri.conf.json"],
+    )
+
     extract_from_workspace(
-        name = "{}-extract".format(name),
-        output_cargo_toml = "Cargo2.toml",
+        name = "{}-cargo_toml".format(name),
+        output_cargo_toml = "{}/Cargo.toml".format(WORKING_FOLDER),
         package = ":Cargo.toml",
         workspace = "//:Cargo.toml",
     )
 
+    copy_filegroups(
+        name = "_{}-src".format(name),
+        folder = WORKING_FOLDER,
+        strip_prefix = native.package_name(),
+        targeted_filegroups = [
+            ":{}-src".format(name),
+            ":{}-icons".format(name),
+            ":{}-capabilities".format(name),
+            # ":{}-cargo_toml".format(name),
+            # ":{}-build_rs".format(name),
+            ":{}-tauri_conf_json".format(name),
+        ],
+    )
+
+    copy_filegroups(
+        name = "_{}-build_rs".format(name),
+        folder = WORKING_FOLDER,
+        strip_prefix = native.package_name(),
+        targeted_filegroups = [":{}-build_rs".format(name)],
+    )
+
+    # Excute cargo_build_script on the copied files
+    # FIXME: I guess this is not using the right Cargo.toml file.
     cargo_build_script(
         name = "{}-cargo_build".format(name),
-        srcs = ["build.rs"],
+        srcs = [":_{}-build_rs".format(name)],
+        # rundir = "./{}".format(WORKING_FOLDER),
+        # rundir = "",
         build_script_env = {
             "DEP_TAURI_DEV": "false",
         },
         data = [
-            "Cargo.toml",
-            # "//:Cargo.toml",
-            # ":extract",
-
-            # TODO: ":extract" es un Cargo.toml sin workspace. Diría que aquí necesitamos una rule 'tauri_build_build' que coja este Cargo.toml y
-            # haga lo que tenga que hacer COPIÁNDOSE los ficheros a otro directorio y ejecutando allí sus cosas.
-
-            # La alternativa es generar lo que sea que genere 'tauri_build::build()' via Bazel
-
-            # O también tenemos la opción de exportar más cosas: el root del workspace
-            "tauri.conf.json",
-        ] + native.glob(["src/**/*.rs"]),
+            ":_{}-src".format(name),
+            ":{}-cargo_toml".format(name),
+            # ":_{}-build_rs".format(name),
+        ],
+        compile_data = [
+            ":_{}-build_rs".format(name),
+        ],
         deps = [
             "@crates_libraries//:tauri-build",
         ],

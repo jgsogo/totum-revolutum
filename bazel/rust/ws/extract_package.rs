@@ -84,6 +84,7 @@ pub fn main() -> Result<()> {
     // TODO: The Cargo.toml file is "listed" in the workspace members
 
     let mut output = std::fs::File::create(&args.output).expect("Unable to create file");
+    write!(output, "[workspace]\n\n")?;
     write!(output, "[package]\n")?;
     write!(output, "{}\n", package_config.package.to_string())?;
     write!(output, "[lib]\n")?;
@@ -107,9 +108,11 @@ pub fn main() -> Result<()> {
                 item.insert("version", version.into());
 
                 // take everything else from the package
-                for (k, v) in pkg_item.as_inline_table().unwrap() {
-                    if k != "workspace" {
-                        item.insert(k, v.into());
+                if pkg_item.is_inline_table() {
+                    for (k, v) in pkg_item.as_inline_table().unwrap() {
+                        if k != "workspace" {
+                            item.insert(k, v.into());
+                        }
                     }
                 }
 
