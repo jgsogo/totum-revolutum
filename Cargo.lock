@@ -1808,6 +1808,7 @@ dependencies = [
  "dirs",
  "home",
  "log",
+ "rust_decimal",
  "tracing",
  "tracing-subscriber",
 ]
