@@ -2,8 +2,7 @@ use diesel::prelude::*;
 
 use super::{AccountHolder, AccountType};
 use bigdecimal::BigDecimal;
-use diesel::helper_types::{FindBy, InnerJoin, IntoBoxed};
-use diesel::pg::Pg;
+use diesel::helper_types::{FindBy, InnerJoin};
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::data_account)]
@@ -22,13 +21,9 @@ pub struct Account {
     pub type_id: i32,
 }
 
-type AllWithHolderAndType<'a> = IntoBoxed<
-    'a,
-    InnerJoin<
-        InnerJoin<crate::schema::data_account::table, crate::schema::data_accountholder::table>,
-        crate::schema::data_accounttype::table,
-    >,
-    Pg,
+type AllWithHolderAndType<'a> = InnerJoin<
+    InnerJoin<crate::schema::data_account::table, crate::schema::data_accountholder::table>,
+    crate::schema::data_accounttype::table,
 >;
 
 impl Account {
@@ -42,7 +37,6 @@ impl Account {
         data_account::table
             .inner_join(data_accountholder::table)
             .inner_join(data_accounttype::table)
-            .into_boxed()
     }
 }
 
