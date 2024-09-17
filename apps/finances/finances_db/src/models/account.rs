@@ -1,8 +1,8 @@
 use diesel::prelude::*;
 
-use super::{AccountHolder, AccountType, Snapshot};
+use super::{AccountHolder, AccountType};
 use bigdecimal::BigDecimal;
-use diesel::helper_types::{InnerJoin, IntoBoxed};
+use diesel::helper_types::{FindBy, InnerJoin, IntoBoxed};
 use diesel::pg::Pg;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
@@ -22,7 +22,7 @@ pub struct Account {
     pub type_id: i32,
 }
 
-type QuerySetJoinType<'a> = IntoBoxed<
+type AllWithHolderAndType<'a> = IntoBoxed<
     'a,
     InnerJoin<
         InnerJoin<crate::schema::data_account::table, crate::schema::data_accountholder::table>,
@@ -37,7 +37,7 @@ impl Account {
     //     data_account::table.select(Account::as_select())
     // }
 
-    pub fn all_with_holder_and_type<'a>() -> QuerySetJoinType<'a> {
+    pub fn all_with_holder_and_type<'a>() -> AllWithHolderAndType<'a> {
         use crate::schema::*;
         data_account::table
             .inner_join(data_accountholder::table)
@@ -55,8 +55,11 @@ impl Account {
         todo!("Return the AccountType given an Account")
     }
 
-    pub fn last_snapshot(&self) -> Option<Snapshot> {
-        todo!("Return last snapshot (if any)")
+    pub fn last_snapshot(
+        &self,
+    ) -> FindBy<crate::schema::data_snapshot::table, crate::schema::data_snapshot::account_id, i32> {
+        use crate::schema::*;
+        data_snapshot::table.filter(data_snapshot::account_id.eq(self.id))
     }
 
     pub fn position(&self) -> BigDecimal {
