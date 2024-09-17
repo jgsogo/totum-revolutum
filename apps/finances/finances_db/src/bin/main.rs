@@ -17,10 +17,7 @@ pub fn main() {
     println!("DB connection string: {}!", args.database_url);
     let mut conn = establish_connection(&args.database_url);
 
-    use finances_db::schema::*;
-    let results = data_account::table
-        .inner_join(data_accountholder::table)
-        .inner_join(data_accounttype::table)
+    let results = Account::all_with_holder_and_type()
         .select((
             Account::as_select(),
             AccountHolder::as_select(),

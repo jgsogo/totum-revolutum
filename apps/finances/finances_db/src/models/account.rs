@@ -1,7 +1,9 @@
 use diesel::prelude::*;
 
-use super::{AccountHolder, AccountType};
-use rust_decimal::Decimal;
+use super::{AccountHolder, AccountType, Snapshot};
+use bigdecimal::BigDecimal;
+use diesel::helper_types::{InnerJoin, IntoBoxed};
+use diesel::pg::Pg;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::data_account)]
@@ -20,13 +22,27 @@ pub struct Account {
     pub type_id: i32,
 }
 
-impl Account {
-    pub fn all() -> Vec<Self> {
-        todo!("Implement query to return all accounts")
-    }
+type QuerySetJoinType<'a> = IntoBoxed<
+    'a,
+    InnerJoin<
+        InnerJoin<crate::schema::data_account::table, crate::schema::data_accountholder::table>,
+        crate::schema::data_accounttype::table,
+    >,
+    Pg,
+>;
 
-    pub fn all_with_holder_and_type() -> Vec<(Account, AccountHolder, AccountType)> {
-        todo!("Implement query to return all accounts with holder and type")
+impl Account {
+    // pub fn all() -> Select<crate::schema::data_account::table, AsSelect<Account, Pg>> {
+    //     use crate::schema::*;
+    //     data_account::table.select(Account::as_select())
+    // }
+
+    pub fn all_with_holder_and_type<'a>() -> QuerySetJoinType<'a> {
+        use crate::schema::*;
+        data_account::table
+            .inner_join(data_accountholder::table)
+            .inner_join(data_accounttype::table)
+            .into_boxed()
     }
 }
 
@@ -39,11 +55,15 @@ impl Account {
         todo!("Return the AccountType given an Account")
     }
 
-    pub fn position(&self) -> Decimal {
+    pub fn last_snapshot(&self) -> Option<Snapshot> {
+        todo!("Return last snapshot (if any)")
+    }
+
+    pub fn position(&self) -> BigDecimal {
         todo!("Return the position NOW")
     }
 
-    // pub fn get_position(&self, date: Date) -> Decimal {
+    // pub fn get_position(&self, date: Date) -> BigDecimal {
     //     todo!("Return the position at a given DATE")
     // }
 }

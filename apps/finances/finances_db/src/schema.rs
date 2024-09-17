@@ -37,12 +37,29 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    data_snapshot (id) {
+        id -> Integer,
+        amount -> Nullable<Numeric>,
+        quantity -> Nullable<Integer>,
+        unit_value -> Nullable<Numeric>,
+        // date_value -> Date,
+        account_id -> Integer,
+    }
+}
+
 
 diesel::joinable!(data_account -> data_accounttype (type_id));
 diesel::joinable!(data_account -> data_accountholder (holder_id));
+diesel::joinable!(data_snapshot -> data_account (account_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     data_account,
     data_accounttype,
     data_accountholder,
+);
+
+diesel::allow_tables_to_appear_in_same_query!(
+    data_snapshot,
+    data_account,
 );
