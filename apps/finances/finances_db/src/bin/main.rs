@@ -16,7 +16,8 @@ pub fn main() {
     let args = Args::parse();
 
     println!("DB connection string: {}!", args.database_url);
-    let mut conn = establish_connection(&args.database_url);
+    let pool = establish_connection(&args.database_url);
+    let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let results = Account::all_with_holder_and_type()
         .select((

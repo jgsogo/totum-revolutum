@@ -1807,6 +1807,7 @@ dependencies = [
 name = "finances-app"
 version = "0.1.0"
 dependencies = [
+ "diesel",
  "finances_db",
  "serde",
  "serde_json",

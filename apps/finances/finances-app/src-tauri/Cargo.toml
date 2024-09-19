@@ -17,6 +17,8 @@ tauri-build = { version = "2.0.0-rc", features = [] }
 [dependencies]
 finances_db = { path = "../../finances_db" }
 
+diesel = { version = "2.2.4", features = ["postgres", "r2d2", "numeric"] }
+
 tauri = { version = "2.0.0-rc", features = [] }
 tauri-plugin-shell = "2.0.0-rc"
 serde = { version = "1", features = ["derive"] }
