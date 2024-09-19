@@ -22,7 +22,8 @@ bazel run //apps/finances/finances-app:dev
 > bazel run //apps/finances/finances-app:devserver
 > ```
 
-It is also possible to execute the dev environment using non-Bazel tooling:
+It is also possible to execute the dev environment using non-Bazel tooling. This
+approach is usually better for development as it will apply changes automatically:
 
 ```sh
 bazel run -- @pnpm --dir $(pwd)/apps/finances/finances-app tauri dev
