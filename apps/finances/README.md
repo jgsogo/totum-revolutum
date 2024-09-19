@@ -16,7 +16,8 @@ bazel run //apps/finances/finances-app:dev
 ```
 
 > **Note.-** See [this issue](https://github.com/jgsogo/totum-revolutum/issues/508), sometimes
-> it doesn't work and this commands needs to be run first:
+> it doesn't work and this command needs to be run first:
+
 > ```sh
 > bazel run //apps/finances/finances-app:devserver
 > ```
