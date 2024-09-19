@@ -19,7 +19,10 @@ cargo_build_script(
 
 rust_library(
     name = "applib",
-    srcs = ["src/lib.rs"],
+    srcs = glob(
+        ["src/**/*.rs"],
+        exclude = ["src/main.rs"],
+    ),
     crate_name = "finances_app_lib",
     data = [
         "tauri.conf.json",
@@ -31,6 +34,7 @@ rust_library(
         normal = True,
     ) + [
         ":build",
+        "//apps/finances/finances_db",
     ],
 )
 
