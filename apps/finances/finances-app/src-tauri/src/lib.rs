@@ -10,9 +10,38 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+#[derive(serde::Serialize)]
+struct Account {
+    pub holder: String,
+    pub name: String,
+    pub r#type: String,
+    pub ccy: String,
+
+    pub path: String,
+    pub labels: Vec<String>,
+}
+
 #[tauri::command]
-fn accounts(_pool: State<Pool<ConnectionManager<PgConnection>>>) -> String {
-    "Accounts".into()
+async fn accounts(_pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Result<Vec<Account>, String> {
+    let accounts = vec![
+        Account {
+            holder: "holder".into(),
+            name: "account1".into(),
+            r#type: "type1".into(),
+            ccy: "EUR".into(),
+            path: "/accounts/pk/1".into(),
+            labels: vec!["label1".into(), "label2".into()],
+        },
+        Account {
+            holder: "holder".into(),
+            name: "account2".into(),
+            r#type: "type2".into(),
+            ccy: "EUR".into(),
+            path: "/accounts/pk/2".into(),
+            labels: vec!["label1".into(), "label3".into()],
+        },
+    ];
+    Ok(accounts)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

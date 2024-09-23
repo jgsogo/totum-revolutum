@@ -1,5 +1,10 @@
 // Navigation Sitemap
 
+// import { invoke } from "@tauri-apps/api/core";
+
+// let all_accounts_by_holder: string = "initial value";
+// invoke("accounts").then((message) => all_accounts_by_holder = "lol");
+
 // TODO: These links should be retrieved from the database (based on some categories)
 
 export type List = Array<{ href: string; label: string; keywords: string; badge?: string }>;

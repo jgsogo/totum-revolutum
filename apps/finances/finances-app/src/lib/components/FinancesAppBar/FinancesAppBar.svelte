@@ -49,7 +49,7 @@
 		<div class="flex items-center space-x-4">
 			<!-- Hamburger Menu -->
 			<button on:click={drawerOpen} class="btn-icon btn-icon-sm lg:!hidden">
-				<i class="fa-solid fa-globe text-xl"></i>
+				<i class="fa-solid fa-bars text-xl"></i>
 			</button>
 			<!-- Logo -->
 			<a class="lg:!ml-0 w-[32px] lg:w-auto overflow-hidden" href="/" title="Go to Homepage">

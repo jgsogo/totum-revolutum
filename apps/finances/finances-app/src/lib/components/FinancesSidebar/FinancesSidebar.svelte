@@ -26,6 +26,11 @@
         if (['all'].includes(basePath)) currentRailCategory = '/all';
 	});
 
+    // let stateDatatable = $state();
+
+    // const functionReadData = async function () {
+    // }
+
     // Reactive
 	$: submenu = menuNavLinks[currentRailCategory ?? '/all'];
 	$: listboxItemActive = (href: string) => ($page.url.pathname?.includes(href) ? 'bg-primary-active-token' : '');
