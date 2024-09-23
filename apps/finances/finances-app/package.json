@@ -1,10 +1,12 @@
 {
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
     "@tauri-apps/api": "2.0.0-rc.4",
     "@tauri-apps/plugin-shell": "2.0.0-rc.1"
   },
   "description": "",
   "devDependencies": {
+    "@floating-ui/dom": "^1.6.11",
     "@skeletonlabs/skeleton": "^2.10.2",
     "@skeletonlabs/tw-plugin": "^0.4.0",
     "@sveltejs/adapter-static": "^3.0.4",
