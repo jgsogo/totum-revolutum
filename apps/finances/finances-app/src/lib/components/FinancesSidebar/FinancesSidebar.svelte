@@ -23,6 +23,7 @@
 		if (['investments'].includes(basePath)) currentRailCategory = '/investments';
 		if (['rentals'].includes(basePath)) currentRailCategory = '/rentals';
 		if (['taxes'].includes(basePath)) currentRailCategory = '/taxes';
+        if (['all'].includes(basePath)) currentRailCategory = '/all';
 	});
 
     // Reactive

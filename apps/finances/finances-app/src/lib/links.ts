@@ -9,7 +9,7 @@ export const menuNavLinks: Record<string, Array<{ title: string; list: List }>> 
 		{
 			title: 'ING',
 			list: [
-				{ href: '/all/accounts/ing1', label: 'Cuenta nómina', keywords: 'ing, account' },
+				{ href: '/all/accounts/ing1?section=all', label: 'Cuenta nómina', keywords: 'ing, account' },
 				{ href: '/all/accounts/ing2', label: 'Cuenta naranja', keywords: 'ing, account' }
 			]
 		},
@@ -22,13 +22,13 @@ export const menuNavLinks: Record<string, Array<{ title: string; list: List }>> 
 		{
 			title: 'Indexa',
 			list: [
-				{ href: '/all/accounts/bbva/depo1', label: 'Cuenta corriente', keywords: 'myinvestor, deposit' }
+				{ href: '/all/accounts/index/depo1', label: 'Cuenta corriente', keywords: 'myinvestor, deposit' }
 			]
 		},
 		{
 			title: 'MyInvestor',
 			list: [
-				{ href: '/all/accounts/bbva/depo1', label: 'Cuenta corriente', keywords: 'myinvestor, deposit' }
+				{ href: '/all/accounts/myinvestor/depo1', label: 'Cuenta corriente', keywords: 'myinvestor, deposit' }
 			]
 		}
 	],

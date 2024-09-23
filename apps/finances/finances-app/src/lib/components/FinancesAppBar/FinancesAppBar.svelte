@@ -73,7 +73,6 @@
 				<i class="fa-solid fa-gear text-lg"></i>
 			</a>
 			<div class="btn hover:variant-soft-primary">
-				<!-- <i class="fa-brands fa-discord text-lg"></i> -->
                 <LightSwitch />
             </div>
 		</section>
