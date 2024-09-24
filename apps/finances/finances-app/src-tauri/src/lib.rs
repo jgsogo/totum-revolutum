@@ -4,12 +4,6 @@ use tauri::Manager;
 mod db;
 use tauri::State;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[derive(serde::Serialize)]
 struct Account {
     pub holder: String,
@@ -56,7 +50,7 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![greet, accounts])
+        .invoke_handler(tauri::generate_handler![accounts])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

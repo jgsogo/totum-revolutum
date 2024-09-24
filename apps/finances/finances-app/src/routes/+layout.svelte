@@ -1,7 +1,6 @@
 <script lang="ts">
 	import '../app.postcss';
 	import { AppShell, initializeStores, Toast, Drawer, getDrawerStore, AppBar } from '@skeletonlabs/skeleton';
-    import Navigation from '$lib/Navigation.svelte';
 
     // Finances Components
     import FinancesAppBar from '$lib/components/FinancesAppBar/FinancesAppBar.svelte';
@@ -44,11 +43,6 @@
 	<svelte:fragment slot="sidebarLeft">
 		<FinancesSidebar div_class="hidden lg:grid w-[360px] overflow-hidden" />
 	</svelte:fragment>
-
-    <!-- Sidebar (Left)
-    <svelte:fragment slot="sidebarLeft">
-        <Navigation />
-    </svelte:fragment> -->
 
 	<!-- Page Content -->
 	<slot />
