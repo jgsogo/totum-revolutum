@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
-    "@tauri-apps/api": "2.0.0-rc.4",
+    "@tauri-apps/api": "2.0.0-rc.5",
     "@tauri-apps/plugin-shell": "2.0.0-rc.1"
   },
   "description": "",
@@ -13,7 +13,7 @@
     "@sveltejs/kit": "^2.5.28",
     "@sveltejs/vite-plugin-svelte": "4.0.0-next.7",
     "@tailwindcss/forms": "^0.5.9",
-    "@tauri-apps/cli": "2.0.0-rc.15",
+    "@tauri-apps/cli": "2.0.0-rc.16",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^8.7.0",
     "autoprefixer": "^10.4.20",
