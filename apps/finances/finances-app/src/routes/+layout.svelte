@@ -42,7 +42,7 @@
 
 	<!-- Sidebar (Left) -->
 	<svelte:fragment slot="sidebarLeft">
-		<FinancesSidebar class="hidden lg:grid w-[360px] overflow-hidden" />
+		<FinancesSidebar div_class="hidden lg:grid w-[360px] overflow-hidden" />
 	</svelte:fragment>
 
     <!-- Sidebar (Left)

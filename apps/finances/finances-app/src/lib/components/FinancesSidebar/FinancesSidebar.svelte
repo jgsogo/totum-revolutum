@@ -5,7 +5,7 @@
     import { AppRail, AppRailAnchor, AppRailTile, getDrawerStore } from '@skeletonlabs/skeleton';
 
     // Local
-	let currentRailCategory: keyof typeof menuNavLinks | undefined = undefined;
+	let currentRailCategory: keyof typeof menuNavLinks | undefined = $state(undefined);
 	const drawerStore = getDrawerStore();
 
 	function onClickAnchor(): void {
@@ -32,11 +32,18 @@
     // }
 
     // Reactive
-	$: submenu = menuNavLinks[currentRailCategory ?? '/all'];
-	$: listboxItemActive = (href: string) => ($page.url.pathname?.includes(href) ? 'bg-primary-active-token' : '');
+    const submenu = $derived(menuNavLinks[currentRailCategory ?? '/all'])
+
+    function listboxItemActive(href: string): string {
+        return $page.url.pathname?.includes(href) ? 'bg-primary-active-token' : ''
+    }
+
+    let {div_class}: {div_class: string} = $props();
+	// $: submenu = menuNavLinks[currentRailCategory ?? '/all'];
+	// $: listboxItemActive = (href: string) => ($page.url.pathname?.includes(href) ? 'bg-primary-active-token' : '');
 </script>
 
-<div class="grid grid-cols-[auto_1fr] h-full bg-surface-50-900-token border-r border-surface-500/30 {$$props.class ?? ''}">
+<div class="grid grid-cols-[auto_1fr] h-full bg-surface-50-900-token border-r border-surface-500/30 {div_class}">
     <AppRail background="bg-transparent" border="border-r border-surface-500/30">
 
 		<!-- Mobile Only -->

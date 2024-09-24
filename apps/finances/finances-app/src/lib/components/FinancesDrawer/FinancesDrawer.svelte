@@ -11,7 +11,7 @@
 <Drawer class={classesDrawer}>
 	{#if $drawerStore.id === 'sidenav'}
 		<!-- Doc Sidebar -->
-		<FinancesSidebar embedded={true} />
+		<FinancesSidebar/>
 	{:else}
 		<!-- Fallback Error -->
 		<div class="w-full h-full flex justify-center items-center">
