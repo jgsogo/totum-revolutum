@@ -10,6 +10,7 @@ update:
     cargo update
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines
     bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world update
+    bazel run -- @pnpm --dir $(pwd)/apps/finances/finances-app update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
 
 # Run all testing
