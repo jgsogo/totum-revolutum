@@ -9,12 +9,17 @@ pub fn run() {
     let pool = db::establish_connection(database_url);
 
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout))
+                .build(),
+        )
         .setup(|app| {
             app.manage(pool);
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![menu::accounts])
+        .invoke_handler(tauri::generate_handler![menu::sidebar_menu])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

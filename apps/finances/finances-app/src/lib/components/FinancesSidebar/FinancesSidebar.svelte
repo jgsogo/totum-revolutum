@@ -4,6 +4,11 @@
     import { menuNavLinks } from '$lib/links';
     import { AppRail, AppRailAnchor, AppRailTile, getDrawerStore } from '@skeletonlabs/skeleton';
     import { invoke } from "@tauri-apps/api/core";
+    import { TreeView, TreeViewItem, RecursiveTreeView, type TreeViewNode } from '@skeletonlabs/skeleton';
+    import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+
+
+    import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
 
     // Local
 	let currentRailCategory: keyof typeof menuNavLinks = $state('/all');
@@ -33,18 +38,18 @@
     // }
 
     // Reactive
-    type Account = {
-        holder: string;
+    type SidebarMenuItem = {
         name: string;
-        type: string;
-        ccy: string;
         href: string;
-
-        labels: Array<string>;
+    };
+    type SidebarMenu = {
+        group: string;
+        entries: SidebarMenuItem[];
     };
 
-    const getSubmenu = async function (rail_category: string): Promise<Account[]> {
-        return await invoke("accounts", {category: currentRailCategory});
+    const getSubmenu = async function (rail_category: string): Promise<SidebarMenu[]> {
+        debug('Invoke menu command to retrieve SidebarMenu');
+        return await invoke("sidebar_menu", {category: currentRailCategory});
     };
 
     const submenu = $derived(getSubmenu(currentRailCategory))
@@ -76,6 +81,8 @@
 		<!-- --- / --- -->
 
         <AppRailTile bind:group={currentRailCategory} name="all" value={'/all'}>
+            <!-- TODO: We need a search box here. There are too many accounts -->
+            <!-- TODO: We only return accounts owned by ME. Where can I check "others"? -->
 			<svelte:fragment slot="lead"><i class="fa-solid fa-globe text-2xl"></i></svelte:fragment>
 			<span>All</span>
 		</AppRailTile>
@@ -101,39 +108,38 @@
 
     <!-- Nav Links -->
     <section class="p-4 pb-20 space-y-4 overflow-y-auto">
-        {#await submenu}
-            <p>...waiting</p>
-        {:then menu_items}
-            <!-- Nav List -->
-            <nav class="list-nav">
-                {#each menu_items as menu_item, i}
-                    <li>
-                        <a href="{menu_item.href}" class={listboxItemActive(menu_item.href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
-                            <span class="flex-auto">{@html menu_item.name}</span>
-                        </a>
-                    </li>
-                {/each}
-            </nav>
-        {/await}
 
-        {#each [] as segment, i}
-            <!-- Title -->
-            <p class="font-bold pl-4 text-2xl">{segment.title}</p>
-            <!-- Nav List -->
-            <nav class="list-nav">
-                <ul>
-                    {#each segment.list as { href, label, badge }}
-                        <li>
-                            <a {href} class={listboxItemActive(href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
-                                <span class="flex-auto">{@html label}</span>
-                                {#if badge}<span class="badge variant-filled-secondary">{badge}</span>{/if}
-                            </a>
-                        </li>
-                    {/each}
-                </ul>
-            </nav>
-            <!-- Divider -->
-            {#if i + 1 < submenu.length}<hr class="!my-6 opacity-50" />{/if}
-        {/each}
+
+        {#await submenu}
+            <p>...loading accounts</p>
+        {:then sidebar_menu_items}
+
+            <Accordion>
+                {#each sidebar_menu_items as sidebar_menu, i}
+                    <AccordionItem>
+                        <svelte:fragment slot="lead">
+                            <i class="fa-solid fa-bank text-xl w-6 text-center"></i>
+                        </svelte:fragment>
+                        <svelte:fragment slot="summary"><p class="font-bold">{sidebar_menu.group}</p></svelte:fragment>
+                        <svelte:fragment slot="content">
+                            <!-- Nav List -->
+                            <nav class="list-nav">
+                                <ul>
+                                    {#each sidebar_menu.entries as sidebar_menu_entry}
+                                        <li>
+                                            <a href="{sidebar_menu_entry.href}" class={listboxItemActive(sidebar_menu_entry.href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                                                <span class="flex-auto">{@html sidebar_menu_entry.name}</span>
+                                            </a>
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </nav>
+                        </svelte:fragment>
+                    </AccordionItem>
+                {/each}
+            </Accordion>
+
+            <!-- TODO: Add search in the accordeon, add collapse all -->
+        {/await}
     </section>
 </div>

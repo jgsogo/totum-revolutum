@@ -9,5 +9,7 @@
 	</section>
 </div>
 
+<!-- TODO: We can show here some "favorite" accounts or operations, as quick access links -->
+
 <style lang="postcss">
 </style>
