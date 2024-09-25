@@ -11,19 +11,22 @@ struct Account {
     pub r#type: String,
     pub ccy: String,
 
-    pub path: String,
+    pub href: String,
     pub labels: Vec<String>,
 }
 
 #[tauri::command]
 async fn accounts(_pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Result<Vec<Account>, String> {
+    let ten_millis = std::time::Duration::from_millis(2000);
+    std::thread::sleep(ten_millis);
+
     let accounts = vec![
         Account {
             holder: "holder".into(),
             name: "account1".into(),
             r#type: "type1".into(),
             ccy: "EUR".into(),
-            path: "/accounts/pk/1".into(),
+            href: "/accounts/pk/1".into(),
             labels: vec!["label1".into(), "label2".into()],
         },
         Account {
@@ -31,7 +34,7 @@ async fn accounts(_pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Re
             name: "account2".into(),
             r#type: "type2".into(),
             ccy: "EUR".into(),
-            path: "/accounts/pk/2".into(),
+            href: "/accounts/pk/2".into(),
             labels: vec!["label1".into(), "label3".into()],
         },
     ];

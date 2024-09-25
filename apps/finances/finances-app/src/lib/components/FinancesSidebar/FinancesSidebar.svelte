@@ -3,13 +3,14 @@
 
     import { menuNavLinks } from '$lib/links';
     import { AppRail, AppRailAnchor, AppRailTile, getDrawerStore } from '@skeletonlabs/skeleton';
+    import { invoke } from "@tauri-apps/api/core";
 
     // Local
-	let currentRailCategory: keyof typeof menuNavLinks | undefined = $state(undefined);
+	let currentRailCategory: keyof typeof menuNavLinks = $state('/all');
 	const drawerStore = getDrawerStore();
 
 	function onClickAnchor(): void {
-		currentRailCategory = undefined;
+		currentRailCategory = '/all';
 		drawerStore.close();
 	}
 
@@ -32,13 +33,28 @@
     // }
 
     // Reactive
-    const submenu = $derived(menuNavLinks[currentRailCategory ?? '/all'])
+    type Account = {
+        holder: string;
+        name: string;
+        type: string;
+        ccy: string;
+        href: string;
+
+        labels: Array<string>;
+    };
+
+    const getSubmenu = async function (rail_category: string): Promise<Account[]> {
+        return await invoke("accounts");
+    };
+
+    const submenu = $derived(getSubmenu(currentRailCategory))
 
     function listboxItemActive(href: string): string {
         return $page.url.pathname?.includes(href) ? 'bg-primary-active-token' : ''
     }
 
     let {div_class}: {div_class: string} = $props();
+
 	// $: submenu = menuNavLinks[currentRailCategory ?? '/all'];
 	// $: listboxItemActive = (href: string) => ($page.url.pathname?.includes(href) ? 'bg-primary-active-token' : '');
 </script>
@@ -81,12 +97,26 @@
             <svelte:fragment slot="lead"><i class="fa-solid fa-percent text-2xl"></i></svelte:fragment>
             <span>Taxes</span>
         </AppRailTile>
-
     </AppRail>
 
     <!-- Nav Links -->
     <section class="p-4 pb-20 space-y-4 overflow-y-auto">
-        {#each submenu as segment, i}
+        {#await submenu}
+            <p>...waiting</p>
+        {:then menu_items}
+            <!-- Nav List -->
+            <nav class="list-nav">
+                {#each menu_items as menu_item, i}
+                    <li>
+                        <a href="{menu_item.href}" class={listboxItemActive(menu_item.href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                            <span class="flex-auto">{@html menu_item.name}</span>
+                        </a>
+                    </li>
+                {/each}
+            </nav>
+        {/await}
+
+        {#each [] as segment, i}
             <!-- Title -->
             <p class="font-bold pl-4 text-2xl">{segment.title}</p>
             <!-- Nav List -->

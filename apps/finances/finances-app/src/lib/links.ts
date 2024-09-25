@@ -1,6 +1,24 @@
 // Navigation Sitemap
 
-// import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core";
+
+type Account = {
+    holder: string;
+    name: string;
+    type: string;
+    ccy: string;
+    path: string;
+
+    labels: Array<string>;
+  };
+
+let accounts: Array<Account> = undefined;
+
+const getAccounts = async function () {
+    accounts = await invoke("accounts");
+}
+
+
 
 // let all_accounts_by_holder: string = "initial value";
 // invoke("accounts").then((message) => all_accounts_by_holder = "lol");
