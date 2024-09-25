@@ -44,7 +44,7 @@
     };
 
     const getSubmenu = async function (rail_category: string): Promise<Account[]> {
-        return await invoke("accounts");
+        return await invoke("accounts", {category: currentRailCategory});
     };
 
     const submenu = $derived(getSubmenu(currentRailCategory))
