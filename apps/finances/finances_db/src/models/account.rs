@@ -1,8 +1,6 @@
 use diesel::prelude::*;
 
 use super::{AccountHolder, AccountType};
-use bigdecimal::BigDecimal;
-use diesel::helper_types::{FindBy, InnerJoin};
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::data_account)]
@@ -21,8 +19,8 @@ pub struct Account {
     pub type_id: i32,
 }
 
-type AllWithHolderAndType<'a> = InnerJoin<
-    InnerJoin<crate::schema::data_account::table, crate::schema::data_accountholder::table>,
+pub type AllWithHolderAndType = diesel::dsl::InnerJoin<
+    diesel::dsl::InnerJoin<crate::schema::data_account::table, crate::schema::data_accountholder::table>,
     crate::schema::data_accounttype::table,
 >;
 
@@ -39,31 +37,30 @@ pub type CheckingAccount<'a> = diesel::dsl::Or<
 >;
 
 impl Account {
-    pub fn all_with_holder_and_type<'a>() -> AllWithHolderAndType<'a> {
+    pub fn all_with_holder_and_type() -> AllWithHolderAndType {
         use crate::schema::*;
         data_account::table
             .inner_join(data_accountholder::table)
             .inner_join(data_accounttype::table)
     }
 
-    pub fn opened_with_holder_and_type<'a>() -> diesel::dsl::Filter<AllWithHolderAndType<'a>, Opened> {
-        Self::all_with_holder_and_type().filter(Self::opened())
-    }
-
     pub fn opened() -> Opened {
-        crate::schema::data_account::close
+        use crate::schema::*;
+        data_account::close
             .is_null()
-            .or(crate::schema::data_account::close.ge(diesel::dsl::today))
+            .or(data_account::close.ge(diesel::dsl::today))
     }
 
     pub fn mine() -> Mine {
-        crate::schema::data_accountholder::owner.eq(0)
+        use crate::schema::*;
+        data_accountholder::owner.eq(0)
     }
 
     pub fn checking_account<'a>() -> CheckingAccount<'a> {
-        crate::schema::data_accounttype::name
+        use crate::schema::*;
+        data_accounttype::name
             .eq("Cuenta corriente")
-            .or(crate::schema::data_accounttype::name.eq("Metálico"))
+            .or(data_accounttype::name.eq("Metálico"))
     }
 
     #[diesel::dsl::auto_type(no_type_alias)]
@@ -78,26 +75,26 @@ impl Account {
 }
 
 impl Account {
-    pub fn holder(&self) -> AccountHolder {
-        todo!("Return the AccountHolder given an Account")
-    }
+    //     pub fn holder(&self) -> AccountHolder {
+    //         todo!("Return the AccountHolder given an Account")
+    //     }
 
-    pub fn r#type(&self) -> AccountType {
-        todo!("Return the AccountType given an Account")
-    }
+    //     pub fn r#type(&self) -> AccountType {
+    //         todo!("Return the AccountType given an Account")
+    //     }
 
     pub fn last_snapshot(
         &self,
-    ) -> FindBy<crate::schema::data_snapshot::table, crate::schema::data_snapshot::account_id, i32> {
+    ) -> diesel::dsl::FindBy<crate::schema::data_snapshot::table, crate::schema::data_snapshot::account_id, i32> {
         use crate::schema::*;
         data_snapshot::table.filter(data_snapshot::account_id.eq(self.id))
     }
 
-    pub fn position(&self) -> BigDecimal {
-        todo!("Return the position NOW")
-    }
+    //     pub fn position(&self) -> BigDecimal {
+    //         todo!("Return the position NOW")
+    //     }
 
-    // pub fn get_position(&self, date: Date) -> BigDecimal {
-    //     todo!("Return the position at a given DATE")
-    // }
+    //     // pub fn get_position(&self, date: Date) -> BigDecimal {
+    //     //     todo!("Return the position at a given DATE")
+    //     // }
 }
