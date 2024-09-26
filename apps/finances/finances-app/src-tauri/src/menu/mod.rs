@@ -4,7 +4,6 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_db::models::{Account, AccountHolder, AccountType};
-use finances_db::schema::*;
 use itertools::Itertools;
 use std::collections::hash_map::Entry;
 use tauri::State;
@@ -49,13 +48,13 @@ fn all_accounts(pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Vec<(
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
+        .filter(Account::opened())
         .select((
             Account::as_select(),
             AccountHolder::as_select(),
             AccountType::as_select(),
         ))
-        // TODO: .filter(data_account::is_closed.eq(false))
-        .filter(data_accountholder::owner.eq(0))
+        .filter(Account::mine())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
         .expect("Error loading accounts")
 }
@@ -66,18 +65,14 @@ fn checking_accounts(
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
+        .filter(Account::opened())
         .select((
             Account::as_select(),
             AccountHolder::as_select(),
             AccountType::as_select(),
         ))
-        // TODO: .filter(data_account::is_closed.eq(false))
-        .filter(data_accountholder::owner.eq(0))
-        .filter(
-            data_accounttype::name
-                .eq("Cuenta corriente")
-                .or(data_accounttype::name.eq("Metálico")),
-        )
+        .filter(Account::mine())
+        .filter(Account::checking_account())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
         .expect("Error loading accounts")
 }
@@ -88,20 +83,14 @@ fn investment_accounts(
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
+        .filter(Account::opened())
         .select((
             Account::as_select(),
             AccountHolder::as_select(),
             AccountType::as_select(),
         ))
-        // TODO: .filter(data_account::is_closed.eq(false))
-        .filter(data_accountholder::owner.eq(0))
-        .filter(
-            data_accounttype::name
-                .eq("Plan de pensiones")
-                .or(data_accounttype::name.eq("Fondo de inversión"))
-                .or(data_accounttype::name.eq("Acciones"))
-                .or(data_accounttype::name.eq("Vivienda")),
-        )
+        .filter(Account::mine())
+        .filter(Account::investment())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
         .expect("Error loading accounts")
 }

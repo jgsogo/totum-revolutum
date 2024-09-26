@@ -1346,6 +1346,7 @@ dependencies = [
  "bigdecimal",
  "bitflags 2.6.0",
  "byteorder",
+ "chrono",
  "diesel_derives",
  "itoa 1.0.11",
  "libsqlite3-sys",
@@ -1824,6 +1825,7 @@ name = "finances_db"
 version = "0.0.1"
 dependencies = [
  "bigdecimal",
+ "chrono",
  "clap",
  "clap-verbosity-flag",
  "diesel",

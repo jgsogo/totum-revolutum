@@ -15,8 +15,8 @@ pub struct Account {
     pub name: String,
     pub is_numerable: bool,
     pub ccy: String,
-    // open -> Date,
-    // close -> Option<Date>,
+    pub open: chrono::NaiveDate,
+    pub close: Option<chrono::NaiveDate>,
     pub holder_id: i32,
     pub type_id: i32,
 }
@@ -26,17 +26,54 @@ type AllWithHolderAndType<'a> = InnerJoin<
     crate::schema::data_accounttype::table,
 >;
 
-impl Account {
-    // pub fn all() -> Select<crate::schema::data_account::table, AsSelect<Account, Pg>> {
-    //     use crate::schema::*;
-    //     data_account::table.select(Account::as_select())
-    // }
+pub type Opened = diesel::dsl::Or<
+    diesel::dsl::IsNull<crate::schema::data_account::close>,
+    diesel::dsl::GtEq<crate::schema::data_account::close, diesel::dsl::today>,
+>;
 
+pub type Mine = diesel::dsl::Eq<crate::schema::data_accountholder::owner, i32>;
+
+pub type CheckingAccount<'a> = diesel::dsl::Or<
+    diesel::dsl::Eq<crate::schema::data_accounttype::name, &'a str>,
+    diesel::dsl::Eq<crate::schema::data_accounttype::name, &'a str>,
+>;
+
+impl Account {
     pub fn all_with_holder_and_type<'a>() -> AllWithHolderAndType<'a> {
         use crate::schema::*;
         data_account::table
             .inner_join(data_accountholder::table)
             .inner_join(data_accounttype::table)
+    }
+
+    pub fn opened_with_holder_and_type<'a>() -> diesel::dsl::Filter<AllWithHolderAndType<'a>, Opened> {
+        Self::all_with_holder_and_type().filter(Self::opened())
+    }
+
+    pub fn opened() -> Opened {
+        crate::schema::data_account::close
+            .is_null()
+            .or(crate::schema::data_account::close.ge(diesel::dsl::today))
+    }
+
+    pub fn mine() -> Mine {
+        crate::schema::data_accountholder::owner.eq(0)
+    }
+
+    pub fn checking_account<'a>() -> CheckingAccount<'a> {
+        crate::schema::data_accounttype::name
+            .eq("Cuenta corriente")
+            .or(crate::schema::data_accounttype::name.eq("Metálico"))
+    }
+
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn investment() -> _ {
+        crate::schema::data_accounttype::name
+            .eq("Plan de pensiones")
+            .or(crate::schema::data_accounttype::name.eq("Fondo de inversión"))
+            .or(crate::schema::data_accounttype::name.eq("Acciones"))
+            .or(crate::schema::data_accounttype::name.eq("Vivienda"))
+            .or(crate::schema::data_accounttype::name.eq("Depósito"))
     }
 }
 
