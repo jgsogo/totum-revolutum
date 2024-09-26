@@ -22,10 +22,6 @@
     initializeStores();
 
     const drawerStore = getDrawerStore();
-
-    function drawerOpen(): void {
-        drawerStore.open({});
-    }
 </script>
 
 <Toast />

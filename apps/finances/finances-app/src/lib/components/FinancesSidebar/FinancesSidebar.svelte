@@ -4,11 +4,10 @@
     import { menuNavLinks } from '$lib/links';
     import { AppRail, AppRailAnchor, AppRailTile, getDrawerStore } from '@skeletonlabs/skeleton';
     import { invoke } from "@tauri-apps/api/core";
-    import { TreeView, TreeViewItem, RecursiveTreeView, type TreeViewNode } from '@skeletonlabs/skeleton';
     import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
 
 
-    import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
+    import { debug } from '@tauri-apps/plugin-log';
 
     // Local
 	let currentRailCategory: keyof typeof menuNavLinks = $state('/all');
@@ -31,11 +30,6 @@
 		if (['taxes'].includes(basePath)) currentRailCategory = '/taxes';
         if (['all'].includes(basePath)) currentRailCategory = '/all';
 	});
-
-    // let stateDatatable = $state();
-
-    // const functionReadData = async function () {
-    // }
 
     // Reactive
     type SidebarMenuItem = {
@@ -60,8 +54,6 @@
 
     let {div_class}: {div_class: string} = $props();
 
-	// $: submenu = menuNavLinks[currentRailCategory ?? '/all'];
-	// $: listboxItemActive = (href: string) => ($page.url.pathname?.includes(href) ? 'bg-primary-active-token' : '');
 </script>
 
 <div class="grid grid-cols-[auto_1fr] h-full bg-surface-50-900-token border-r border-surface-500/30 {div_class}">
@@ -81,8 +73,6 @@
 		<!-- --- / --- -->
 
         <AppRailTile bind:group={currentRailCategory} name="all" value={'/all'}>
-            <!-- TODO: We need a search box here. There are too many accounts -->
-            <!-- TODO: We only return accounts owned by ME. Where can I check "others"? -->
 			<svelte:fragment slot="lead"><i class="fa-solid fa-globe text-2xl"></i></svelte:fragment>
 			<span>All</span>
 		</AppRailTile>
