@@ -14,34 +14,10 @@ pub struct SidebarMenuItem {
     pub href: String,
 }
 
-impl PartialOrd for SidebarMenuItem {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for SidebarMenuItem {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.name.cmp(&other.name)
-    }
-}
-
 #[derive(serde::Serialize, Debug, PartialEq, Eq)]
 pub struct SidebarMenu {
     pub group: String,
     pub entries: Vec<SidebarMenuItem>,
-}
-
-impl PartialOrd for SidebarMenu {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for SidebarMenu {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.group.cmp(&other.group)
-    }
 }
 
 fn all_accounts(pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Vec<(Account, AccountHolder, AccountType)> {
@@ -118,11 +94,11 @@ fn group_by_account_holder(accounts: Vec<(Account, AccountHolder, AccountType)>)
     let mut r: Vec<SidebarMenu> = r
         .into_iter()
         .map(|(group, mut entries)| {
-            entries.sort();
+            entries.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
             SidebarMenu { group, entries }
         })
         .collect();
-    r.sort();
+    r.sort_by(|a, b| a.group.to_lowercase().cmp(&b.group.to_lowercase()));
     r
 }
 
