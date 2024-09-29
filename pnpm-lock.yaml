@@ -20,6 +20,9 @@ importers:
       '@tauri-apps/plugin-shell':
         specifier: 2.0.0-rc.1
         version: 2.0.0-rc.1
+      '@vincjo/datatables':
+        specifier: ^1.14.10
+        version: 1.14.10(svelte@5.0.0-next.246)
     devDependencies:
       '@floating-ui/dom':
         specifier: ^1.6.11
@@ -1079,6 +1082,14 @@ packages:
       '@typescript-eslint/types': 8.7.0
       eslint-visitor-keys: 3.4.3
     dev: true
+
+  /@vincjo/datatables@1.14.10(svelte@5.0.0-next.246):
+    resolution: {integrity: sha512-gtojSC/LKDHbh2ZGZeaAQ+lLltcmcSDDLkecgb9WpG7lHmd4b/1HUTtFWAJt43TnaK8SrciGugh9VRRZN53bpw==}
+    peerDependencies:
+      svelte: ^3.56.0 || ^4.0.0 || ^5.0.0-next.120
+    dependencies:
+      svelte: 5.0.0-next.246
+    dev: false
 
   /@vitest/expect@2.1.1:
     resolution: {integrity: sha512-YeueunS0HiHiQxk+KEOnq/QMzlUuOzbU1Go+PgAsHvvv3tUkJPm9xWt+6ITNTlzsMXUjmgm5T+U7KBPK2qQV6w==}
