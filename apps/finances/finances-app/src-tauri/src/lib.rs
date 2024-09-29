@@ -1,6 +1,7 @@
 use tauri::Manager;
 mod db;
 mod menu;
+pub mod views;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -19,7 +20,10 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![menu::sidebar_menu])
+        .invoke_handler(tauri::generate_handler![
+            menu::sidebar_menu,
+            views::account_detail::detail_command,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

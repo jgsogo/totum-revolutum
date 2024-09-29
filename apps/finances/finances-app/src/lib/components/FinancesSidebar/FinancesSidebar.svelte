@@ -34,7 +34,7 @@
     type SidebarMenuItem = {
         group: string;
         name: string;
-        href: string;
+        pk: int;
     };
     type SidebarMenu = {
         group: string;
@@ -123,7 +123,7 @@
                                 <ul>
                                     {#each sidebar_menu.entries as sidebar_menu_entry}
                                         <li>
-                                            <a href="{sidebar_menu_entry.href}" class={listboxItemActive(sidebar_menu_entry.href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                                            <a href="/accounts/{sidebar_menu_entry.pk}/details" class={listboxItemActive("/accounts/" + sidebar_menu_entry.pk + "/details")} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
                                                 <span class="flex-auto">{@html sidebar_menu_entry.name}</span>
                                             </a>
                                         </li>
@@ -139,7 +139,7 @@
                     <ul>
                         {#each sidebar_menu_items.reduce((accumulator, value) => accumulator.concat(value.entries), []).sort((a: SidebarMenuItem, b: SidebarMenuItem) => {return a.name > b.name}) as sidebar_menu_entry}
                         <li>
-                            <a href="{sidebar_menu_entry.href}" class={listboxItemActive(sidebar_menu_entry.href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                            <a href="/accounts/{sidebar_menu_entry.pk}/details" class={listboxItemActive("/accounts/" + sidebar_menu_entry.pk + "/details")} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
                                 <span class="flex-auto">{@html sidebar_menu_entry.name}</span>
                                 <span class="text-xs uppercase">{@html sidebar_menu_entry.group}</span>
                             </a>

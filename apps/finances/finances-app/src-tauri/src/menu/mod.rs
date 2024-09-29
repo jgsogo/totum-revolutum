@@ -12,7 +12,7 @@ use tauri::State;
 pub struct SidebarMenuItem {
     pub group: String,
     pub name: String,
-    pub href: String,
+    pub pk: i32,
 }
 
 #[derive(serde::Serialize, Debug, PartialEq, Eq)]
@@ -98,7 +98,7 @@ fn group_by_account_holder(accounts: Vec<(Account, AccountHolder, AccountType)>)
             .map(|(account, _, _)| SidebarMenuItem {
                 group: key.clone(),
                 name: account.name,
-                href: "href".into(),
+                pk: account.id,
             })
             .collect();
         match r.entry(key) {

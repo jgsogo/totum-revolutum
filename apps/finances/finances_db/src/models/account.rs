@@ -37,6 +37,12 @@ pub type CheckingAccount<'a> = diesel::dsl::Or<
 >;
 
 impl Account {
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn get_with_holder_and_type(pk: i32) -> _ {
+        let all: AllWithHolderAndType = Self::all_with_holder_and_type();
+        all.filter(crate::schema::data_account::id.eq(pk))
+    }
+
     pub fn all_with_holder_and_type() -> AllWithHolderAndType {
         use crate::schema::*;
         data_account::table
