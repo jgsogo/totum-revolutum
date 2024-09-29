@@ -5,9 +5,9 @@
     },
     "windows": [
       {
-        "height": 600,
+        "height": 800,
         "title": "finances-app",
-        "width": 800
+        "width": 1200
       }
     ]
   },

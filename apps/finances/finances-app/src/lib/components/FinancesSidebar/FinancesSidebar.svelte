@@ -1,15 +1,19 @@
 <script lang="ts">
     import { page } from '$app/stores';
 
-    import { menuNavLinks } from '$lib/links';
     import { AppRail, AppRailAnchor, AppRailTile, getDrawerStore } from '@skeletonlabs/skeleton';
+    import { invoke } from "@tauri-apps/api/core";
+    import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+    import { SlideToggle } from '@skeletonlabs/skeleton';
+
+    import { debug } from '@tauri-apps/plugin-log';
 
     // Local
-	let currentRailCategory: keyof typeof menuNavLinks | undefined = $state(undefined);
+	let currentRailCategory: string = $state('/all');
 	const drawerStore = getDrawerStore();
 
 	function onClickAnchor(): void {
-		currentRailCategory = undefined;
+		currentRailCategory = '/all';
 		drawerStore.close();
 	}
 
@@ -26,21 +30,31 @@
         if (['all'].includes(basePath)) currentRailCategory = '/all';
 	});
 
-    // let stateDatatable = $state();
-
-    // const functionReadData = async function () {
-    // }
-
     // Reactive
-    const submenu = $derived(menuNavLinks[currentRailCategory ?? '/all'])
+    type SidebarMenuItem = {
+        group: string;
+        name: string;
+        href: string;
+    };
+    type SidebarMenu = {
+        group: string;
+        entries: SidebarMenuItem[];
+    };
+
+    const getSubmenu = async function (rail_category: string): Promise<SidebarMenu[]> {
+        debug('Invoke menu command to retrieve SidebarMenu');
+        return await invoke("sidebar_menu", {category: rail_category});
+    };
+
+    const submenu = $derived(getSubmenu(currentRailCategory))
 
     function listboxItemActive(href: string): string {
         return $page.url.pathname?.includes(href) ? 'bg-primary-active-token' : ''
     }
 
     let {div_class}: {div_class: string} = $props();
-	// $: submenu = menuNavLinks[currentRailCategory ?? '/all'];
-	// $: listboxItemActive = (href: string) => ($page.url.pathname?.includes(href) ? 'bg-primary-active-token' : '');
+
+    let grouped: boolean = $state(true);
 </script>
 
 <div class="grid grid-cols-[auto_1fr] h-full bg-surface-50-900-token border-r border-surface-500/30 {div_class}">
@@ -72,6 +86,10 @@
 			<svelte:fragment slot="lead"><i class="fa-solid fa-money-bill-trend-up text-2xl"></i></svelte:fragment>
 			<span>Investments</span>
 		</AppRailTile>
+		<AppRailTile bind:group={currentRailCategory} name="retirement" value={'/retirement'}>
+			<svelte:fragment slot="lead"><i class="fa-solid fa-person-shelter text-2xl"></i></svelte:fragment>
+			<span>Retirement</span>
+		</AppRailTile>
 		<AppRailTile bind:group={currentRailCategory} name="rentals" value={'/rentals'}>
 			<svelte:fragment slot="lead"><i class="fa-solid fa-building text-2xl"></i></svelte:fragment>
 			<span>Rentals</span>
@@ -81,29 +99,68 @@
             <svelte:fragment slot="lead"><i class="fa-solid fa-percent text-2xl"></i></svelte:fragment>
             <span>Taxes</span>
         </AppRailTile>
-
     </AppRail>
 
     <!-- Nav Links -->
     <section class="p-4 pb-20 space-y-4 overflow-y-auto">
-        {#each submenu as segment, i}
-            <!-- Title -->
-            <p class="font-bold pl-4 text-2xl">{segment.title}</p>
-            <!-- Nav List -->
-            <nav class="list-nav">
-                <ul>
-                    {#each segment.list as { href, label, badge }}
+
+
+        {#await submenu}
+            <p>...loading accounts</p>
+        {:then sidebar_menu_items}
+
+            {#if grouped}
+            <Accordion>
+                {#each sidebar_menu_items as sidebar_menu, i}
+                    <AccordionItem>
+                        <svelte:fragment slot="lead">
+                            <i class="fa-solid fa-bank text-xl w-6 text-center"></i>
+                        </svelte:fragment>
+                        <svelte:fragment slot="summary"><p class="font-bold">{sidebar_menu.group}</p></svelte:fragment>
+                        <svelte:fragment slot="content">
+                            <!-- Nav List -->
+                            <nav class="list-nav">
+                                <ul>
+                                    {#each sidebar_menu.entries as sidebar_menu_entry}
+                                        <li>
+                                            <a href="{sidebar_menu_entry.href}" class={listboxItemActive(sidebar_menu_entry.href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                                                <span class="flex-auto">{@html sidebar_menu_entry.name}</span>
+                                            </a>
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </nav>
+                        </svelte:fragment>
+                    </AccordionItem>
+                {/each}
+            </Accordion>
+            {:else}
+                <nav class="list-nav">
+                    <ul>
+                        {#each sidebar_menu_items.reduce((accumulator, value) => accumulator.concat(value.entries), []).sort((a: SidebarMenuItem, b: SidebarMenuItem) => {return a.name > b.name}) as sidebar_menu_entry}
                         <li>
-                            <a {href} class={listboxItemActive(href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
-                                <span class="flex-auto">{@html label}</span>
-                                {#if badge}<span class="badge variant-filled-secondary">{badge}</span>{/if}
+                            <a href="{sidebar_menu_entry.href}" class={listboxItemActive(sidebar_menu_entry.href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                                <span class="flex-auto">{@html sidebar_menu_entry.name}</span>
+                                <span class="text-xs uppercase">{@html sidebar_menu_entry.group}</span>
                             </a>
                         </li>
-                    {/each}
-                </ul>
-            </nav>
-            <!-- Divider -->
-            {#if i + 1 < submenu.length}<hr class="!my-6 opacity-50" />{/if}
-        {/each}
+                        {/each}
+                    </ul>
+                </nav>
+            {/if}
+
+        {/await}
+
+        <!-- TODO: Container full vertical -->
+        <div class="align-bottom">
+
+            <hr class="opacity-30" />
+
+            <SlideToggle name="slider-grouped" bind:checked={grouped} size="sm">
+                <span class="inline-block w-[100px] text-left">Grouped {grouped ? 'On' : 'Off'}</span>
+            </SlideToggle>
+
+            <!-- TODO: Add search in the accordeon, add collapse all -->
+        </div>
     </section>
 </div>

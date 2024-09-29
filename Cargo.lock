@@ -1346,6 +1346,7 @@ dependencies = [
  "bigdecimal",
  "bitflags 2.6.0",
  "byteorder",
+ "chrono",
  "diesel_derives",
  "itoa 1.0.11",
  "libsqlite3-sys",
@@ -1809,10 +1810,13 @@ version = "0.1.0"
 dependencies = [
  "diesel",
  "finances_db",
+ "itertools 0.13.0",
+ "log",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
+ "tauri-plugin-log",
  "tauri-plugin-shell",
 ]
 
@@ -1821,6 +1825,7 @@ name = "finances_db"
 version = "0.0.1"
 dependencies = [
  "bigdecimal",
+ "chrono",
  "clap",
  "clap-verbosity-flag",
  "diesel",

@@ -30,8 +30,8 @@ diesel::table! {
         name -> Text,
         is_numerable -> Bool,
         ccy -> Text,
-        // open -> Date,
-        // close -> Nullable<Date>,
+        open -> Date,
+        close -> Nullable<Date>,
         holder_id -> Integer,
         type_id -> Integer,
     }

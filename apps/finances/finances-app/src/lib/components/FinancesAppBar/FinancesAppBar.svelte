@@ -35,6 +35,7 @@
 	// Search
 	function triggerSearch(): void {
         // TODO: https://github.com/skeletonlabs/skeleton/blob/dev/sites/skeleton.dev/src/lib/components/DocsAppBar/DocsAppBar.svelte
+        // TODO: It can search accounts, all of them (including closed and owned by others)
         const t: ToastSettings = {
             message: 'The method triggerSearch is not implemented (see comment in sources).',
             timeout: 5000
