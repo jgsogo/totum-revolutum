@@ -19,6 +19,7 @@ jobs:
       - name: Install some requirements
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
+          sudo apt-get update
           sudo apt-get install \
             libwebkit2gtk-4.1-dev \
             build-essential \
