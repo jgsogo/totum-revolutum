@@ -71,6 +71,24 @@ fn investment_accounts(
         .expect("Error loading accounts")
 }
 
+fn retirement_accounts(
+    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+) -> Vec<(Account, AccountHolder, AccountType)> {
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    Account::all_with_holder_and_type()
+        .filter(Account::opened())
+        .select((
+            Account::as_select(),
+            AccountHolder::as_select(),
+            AccountType::as_select(),
+        ))
+        .filter(Account::mine())
+        .filter(Account::retirement())
+        .load::<(Account, AccountHolder, AccountType)>(&mut conn)
+        .expect("Error loading accounts")
+}
+
 fn group_by_account_holder(accounts: Vec<(Account, AccountHolder, AccountType)>) -> Vec<SidebarMenu> {
     let mut r: HashMap<String, Vec<SidebarMenuItem>> = HashMap::new();
     for (key, chunk) in &accounts.into_iter().chunk_by(|(_, holder, _)| holder.name.clone()) {
@@ -120,6 +138,10 @@ pub async fn sidebar_menu(
     } else if category == "/investments" {
         let investment_accounts = investment_accounts(pool);
         let r = group_by_account_holder(investment_accounts);
+        Ok(r)
+    } else if category == "/retirement" {
+        let retirement_accounts = retirement_accounts(pool);
+        let r = group_by_account_holder(retirement_accounts);
         Ok(r)
     } else if category == "/rentals" {
         // TODO: Return links to views about rented properties

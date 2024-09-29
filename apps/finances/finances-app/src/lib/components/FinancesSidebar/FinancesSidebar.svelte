@@ -1,7 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
 
-    import { menuNavLinks } from '$lib/links';
     import { AppRail, AppRailAnchor, AppRailTile, getDrawerStore } from '@skeletonlabs/skeleton';
     import { invoke } from "@tauri-apps/api/core";
     import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
@@ -10,7 +9,7 @@
     import { debug } from '@tauri-apps/plugin-log';
 
     // Local
-	let currentRailCategory: keyof typeof menuNavLinks = $state('/all');
+	let currentRailCategory: string = $state('/all');
 	const drawerStore = getDrawerStore();
 
 	function onClickAnchor(): void {
@@ -84,6 +83,10 @@
 		<AppRailTile bind:group={currentRailCategory} name="investments" value={'/investments'}>
 			<svelte:fragment slot="lead"><i class="fa-solid fa-money-bill-trend-up text-2xl"></i></svelte:fragment>
 			<span>Investments</span>
+		</AppRailTile>
+		<AppRailTile bind:group={currentRailCategory} name="retirement" value={'/retirement'}>
+			<svelte:fragment slot="lead"><i class="fa-solid fa-person-shelter text-2xl"></i></svelte:fragment>
+			<span>Retirement</span>
 		</AppRailTile>
 		<AppRailTile bind:group={currentRailCategory} name="rentals" value={'/rentals'}>
 			<svelte:fragment slot="lead"><i class="fa-solid fa-building text-2xl"></i></svelte:fragment>

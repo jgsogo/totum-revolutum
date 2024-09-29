@@ -66,11 +66,15 @@ impl Account {
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn investment() -> _ {
         crate::schema::data_accounttype::name
-            .eq("Plan de pensiones")
-            .or(crate::schema::data_accounttype::name.eq("Fondo de inversión"))
+            .eq("Fondo de inversión")
             .or(crate::schema::data_accounttype::name.eq("Acciones"))
             .or(crate::schema::data_accounttype::name.eq("Vivienda"))
             .or(crate::schema::data_accounttype::name.eq("Depósito"))
+    }
+
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn retirement() -> _ {
+        crate::schema::data_accounttype::name.eq("Plan de pensiones")
     }
 }
 
