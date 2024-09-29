@@ -10,6 +10,7 @@ use tauri::State;
 
 #[derive(serde::Serialize, Debug, PartialEq, Eq)]
 pub struct SidebarMenuItem {
+    pub group: String,
     pub name: String,
     pub href: String,
 }
@@ -95,6 +96,7 @@ fn group_by_account_holder(accounts: Vec<(Account, AccountHolder, AccountType)>)
         let mut entries: Vec<SidebarMenuItem> = chunk
             .into_iter()
             .map(|(account, _, _)| SidebarMenuItem {
+                group: key.clone(),
                 name: account.name,
                 href: "href".into(),
             })

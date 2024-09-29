@@ -4,7 +4,7 @@
     import { AppRail, AppRailAnchor, AppRailTile, getDrawerStore } from '@skeletonlabs/skeleton';
     import { invoke } from "@tauri-apps/api/core";
     import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
-
+    import { SlideToggle } from '@skeletonlabs/skeleton';
 
     import { debug } from '@tauri-apps/plugin-log';
 
@@ -32,6 +32,7 @@
 
     // Reactive
     type SidebarMenuItem = {
+        group: string;
         name: string;
         href: string;
     };
@@ -42,7 +43,7 @@
 
     const getSubmenu = async function (rail_category: string): Promise<SidebarMenu[]> {
         debug('Invoke menu command to retrieve SidebarMenu');
-        return await invoke("sidebar_menu", {category: currentRailCategory});
+        return await invoke("sidebar_menu", {category: rail_category});
     };
 
     const submenu = $derived(getSubmenu(currentRailCategory))
@@ -53,6 +54,7 @@
 
     let {div_class}: {div_class: string} = $props();
 
+    let grouped: boolean = $state(true);
 </script>
 
 <div class="grid grid-cols-[auto_1fr] h-full bg-surface-50-900-token border-r border-surface-500/30 {div_class}">
@@ -107,6 +109,7 @@
             <p>...loading accounts</p>
         {:then sidebar_menu_items}
 
+            {#if grouped}
             <Accordion>
                 {#each sidebar_menu_items as sidebar_menu, i}
                     <AccordionItem>
@@ -131,8 +134,33 @@
                     </AccordionItem>
                 {/each}
             </Accordion>
+            {:else}
+                <nav class="list-nav">
+                    <ul>
+                        {#each sidebar_menu_items.reduce((accumulator, value) => accumulator.concat(value.entries), []).sort((a: SidebarMenuItem, b: SidebarMenuItem) => {return a.name > b.name}) as sidebar_menu_entry}
+                        <li>
+                            <a href="{sidebar_menu_entry.href}" class={listboxItemActive(sidebar_menu_entry.href)} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                                <span class="flex-auto">{@html sidebar_menu_entry.name}</span>
+                                <span class="text-xs uppercase">{@html sidebar_menu_entry.group}</span>
+                            </a>
+                        </li>
+                        {/each}
+                    </ul>
+                </nav>
+            {/if}
+
+        {/await}
+
+        <!-- TODO: Container full vertical -->
+        <div class="align-bottom">
+
+            <hr class="opacity-30" />
+
+            <SlideToggle name="slider-grouped" bind:checked={grouped} size="sm">
+                <span class="inline-block w-[100px] text-left">Grouped {grouped ? 'On' : 'Off'}</span>
+            </SlideToggle>
 
             <!-- TODO: Add search in the accordeon, add collapse all -->
-        {/await}
+        </div>
     </section>
 </div>
