@@ -1,153 +1,111 @@
 <script lang="ts">
-    import { DataHandler } from '@vincjo/datatables';
-    import {Account} from '$lib/models/Account';
+  import { DataHandler } from "@vincjo/datatables";
+  import { Account } from "$lib/models/Account";
+  import AccountChart from "$lib/components/Account/AccountChart.svelte"
 
-    let { account = $bindable() } : {account: Account} = $props();
+  // TODO: Trying different line-chart implementations
+  //    https://layercake.graphics/example/MultiLine
+  //   https://www.sveltecharts.com/charts/b92aa052-b9f3-4da0-93f1-199ae898ff6e
+  //  https://medium.com/@stefano.agresti19/building-an-interactive-line-chart-using-svelte-and-d3-71841cf5703c
+  //  https://layercake.graphics/
+  // import LineChart from "$lib/components/Charts/LineChart/LineChart.svelte";
 
-    const movements = [
-        { id: 1, first_name: 'Tobie', last_name: 'Vint', email: 'tvint0@fotki.com' },
-        { id: 2, first_name: 'Zacharias', last_name: 'Cerman', email: 'zcerman1@sciencedirect.com' },
-        { id: 3, first_name: 'Gérianna', last_name: 'Bunn', email: 'gbunn2@foxnews.com' },
-        { id: 4, first_name: 'Bee', last_name: 'Saurin', email: 'bsaurin3@live.com' },
-        { id: 5, first_name: 'Méyère', last_name: 'Granulette', email: 'mgranul4@yellowbook.com' }
-        // ...
-    ]
+  let { account = $bindable() }: { account: Account } = $props();
 
-    const handler = new DataHandler(movements, { rowsPerPage: 5 });
-    const rows = handler.getRows();
 </script>
 
-<div class="container mx-auto px-4 py-4">
-
-    <div role="status" class="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center">
-        <div class="flex items-center justify-center w-2/5 h-48 bg-gray-300 rounded sm:w-96 dark:bg-gray-700">
-            <svg class="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z"/>
-            </svg>
-        </div>
-        <div class="w-3/5">
-            <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-        </div>
-        <span class="sr-only">Loading...</span>
+<div class="flex flex-col p-5">
+  <!-- Title -->
+  <div class="flex w-full gap-4">
+    <div class="basis-8/12">
+      <h2 class="text-2xl leading-7 sm:truncate sm:text-3xl sm:tracking-tight">
+        {account.name}
+      </h2>
     </div>
-</div>
-
-<div class="container mx-auto px-4 py-4">
-    <div role="status" class="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center">
-        <div class="w-full">
-            <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-        </div>
-    </div>
-</div>
-
-<div class="container mx-auto px-4 py-4">
-    <div class="lg:flex lg:items-center lg:justify-between">
-
-        <div class="min-w-0 flex-1">
-
-          <h2 class="text-2xl leading-7 sm:truncate sm:text-3xl sm:tracking-tight">
-            <span class="font-bold text-[color]-900">{account.name}</span>
-            {#if account.identifier}
-            <span class="text-xs px-4">{account.identifier}</span>
-            {/if}
-          </h2>
-
-          <hr class="opacity-30" />
-
-          <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-            <div class="mt-2 flex items-center text-sm text-[color]-500">
-                <i class="fa-solid fa-bank mr-1.5 w-5 flex-shrink-0 text-[color]-400"></i>
-               {account.holder}
-            </div>
-            <div class="mt-2 flex items-center text-sm text-[color]-500">
-              <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-[color]-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" />
-              </svg>
-              {account.type}
-            </div>
-            <div class="mt-2 flex items-center text-sm text-[color]-500">
-              <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-[color]-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path d="M10.75 10.818v2.614A3.13 3.13 0 0011.888 13c.482-.315.612-.648.612-.875 0-.227-.13-.56-.612-.875a3.13 3.13 0 00-1.138-.432zM8.33 8.62c.053.055.115.11.184.164.208.16.46.284.736.363V6.603a2.45 2.45 0 00-.35.13c-.14.065-.27.143-.386.233-.377.292-.514.627-.514.909 0 .184.058.39.202.592.037.051.08.102.128.152z" />
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-6a.75.75 0 01.75.75v.316a3.78 3.78 0 011.653.713c.426.33.744.74.925 1.2a.75.75 0 01-1.395.55 1.35 1.35 0 00-.447-.563 2.187 2.187 0 00-.736-.363V9.3c.698.093 1.383.32 1.959.696.787.514 1.29 1.27 1.29 2.13 0 .86-.504 1.616-1.29 2.13-.576.377-1.261.603-1.96.696v.299a.75.75 0 11-1.5 0v-.3c-.697-.092-1.382-.318-1.958-.695-.482-.315-.857-.717-1.078-1.188a.75.75 0 111.359-.636c.08.173.245.376.54.569.313.205.706.353 1.138.432v-2.748a3.782 3.782 0 01-1.653-.713C6.9 9.433 6.5 8.681 6.5 7.875c0-.805.4-1.558 1.097-2.096a3.78 3.78 0 011.653-.713V4.75A.75.75 0 0110 4z" clip-rule="evenodd" />
-              </svg>
-              {#await account.snapshot()}
-                ..
-              {:then snapshot}
-                {snapshot} (@{snapshot.date_value})
-              {/await}
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-5 flex lg:ml-4 lg:mt-0">
-          <span class="hidden sm:block">
-            <button type="button" class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-              <svg class="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-              </svg>
-              <i class="fa-solid fa-arrow-right-to-bracket mr-1.5 w-5 flex-shrink-0 text-[color]-400"></i>
-              Income
-            </button>
-          </span>
-
-          <span class="ml-3 hidden sm:block">
-            <button type="button" class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-              <svg class="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path d="M12.232 4.232a2.5 2.5 0 013.536 3.536l-1.225 1.224a.75.75 0 001.061 1.06l1.224-1.224a4 4 0 00-5.656-5.656l-3 3a4 4 0 00.225 5.865.75.75 0 00.977-1.138 2.5 2.5 0 01-.142-3.667l3-3z" />
-                <path d="M11.603 7.963a.75.75 0 00-.977 1.138 2.5 2.5 0 01.142 3.667l-3 3a2.5 2.5 0 01-3.536-3.536l1.225-1.224a.75.75 0 00-1.061-1.06l-1.224 1.224a4 4 0 105.656 5.656l3-3a4 4 0 00-.225-5.865z" />
-              </svg>
-              <i class="fa-solid fa-arrow-right-from-bracket mr-1.5 w-5 flex-shrink-0 text-[color]-400"></i>
-              Expense
-            </button>
-          </span>
-
-          <span class="sm:ml-3">
-            <button type="button" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-              </svg>
-              <i class="fa-solid fa-camera mr-1.5 w-5 flex-shrink-0 text-[color]-400"></i>
-              Snapshot
-            </button>
-          </span>
-
-          <!-- Dropdown -->
-          <div class="relative ml-3 sm:hidden">
-            <button type="button" class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:ring-gray-400" id="mobile-menu-button" aria-expanded="false" aria-haspopup="true">
-              More
-              <svg class="-mr-1 ml-1.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <!--
-              Dropdown menu, show/hide based on menu state.
-
-              Entering: "transition ease-out duration-200"
-                From: "transform opacity-0 scale-95"
-                To: "transform opacity-100 scale-100"
-              Leaving: "transition ease-in duration-75"
-                From: "transform opacity-100 scale-100"
-                To: "transform opacity-0 scale-95"
-            -->
-            <div class="absolute right-0 z-10 -mr-1 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="mobile-menu-button" tabindex="-1">
-              <!-- Active: "bg-gray-100", Not Active: "" -->
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="mobile-menu-item-0">Edit</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="mobile-menu-item-1">View</a>
-            </div>
-          </div>
-        </div>
+    <div class="basis-4/12 text-right">
+      <div class="btn-group variant-filled px-2 py-1 mt-1 space-x-2">
+        <i class="fa-solid fa-circle-arrow-up text-[color]-400"></i>
+        <i class="fa-solid fa-circle-arrow-down text-[color]-400"></i>
       </div>
+      <div class="btn variant-filled px-2 py-1 mt-1 space-x-2">
+        <i class="fa-solid fa-camera text-[color]-400"></i>
+      </div>
+    </div>
+  </div>
 
+  <!-- Horizontal rule separation -->
+  <hr class="opacity-30 w-full" />
 
+  <!-- Details -->
+  <div class="flex flex-col mt-1 sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+    <div class="mt-2 flex items-center text-sm text-[color]-500">
+      <i class="fa-solid fa-bank mr-1.5 w-5 flex-shrink-0"></i>
+      {account.holder}
+    </div>
+    <div class="mt-2 flex items-center text-sm text-[color]-500">
+      <i class="fa-solid fa-folder-tree mr-1.5 w-5 flex-shrink-0"></i>
+      {account.type}
+    </div>
+    <div class="mt-2 flex items-center text-sm text-[color]-500">
+      <i class="fa-solid fa-calendar mr-1.5 w-5 flex-shrink-0"></i>
+      {#await account.snapshot()}
+        ..
+      {:then snapshot}
+        {snapshot} (@{snapshot.date_value})
+      {/await}
+    </div>
+  </div>
+
+  <!-- Summary: chart + in/out summary -->
+  <div class="flex flex-col mt-4 sm:mt-4 sm:flex-row sm:flex-wrap">
+    <div class="basis-6/12">
+        <AccountChart/>
+    </div>
+    <div class="basis-6/12">b</div>
+  </div>
+
+  <!-- Movements -->
+  <h3 class="text-xl mt-4 leading-5 sm:truncate sm:text-2xl sm:tracking-tight">
+    Movements
+  </h3>
+  <div class="table-container mt-4">
+    <!-- Native Table Element -->
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Position</th>
+          <th>Name</th>
+          <th>Symbol</th>
+          <th>Weight</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>a1</td>
+          <td>a1</td>
+          <td>a1</td>
+          <td>a1</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="3">Calculated Total Weight</th>
+          <td>totalWeight</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 </div>
+
+<style>
+  /*
+      The wrapper div needs to have an explicit width and height in CSS.
+      It can also be a flexbox child or CSS grid element.
+      The point being it needs dimensions since the <LayerCake> element will
+      expand to fill it.
+    */
+  .chart-container {
+    width: 100%;
+    height: 300px;
+  }
+</style>
