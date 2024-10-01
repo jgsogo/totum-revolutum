@@ -8,6 +8,8 @@ use tauri::State;
 pub struct AccountDetail {
     pub pk: i32,
     pub name: String,
+    pub holder: String,
+    pub r#type: String,
 }
 
 #[tauri::command]
@@ -18,7 +20,7 @@ pub async fn detail_command(
     log::info!("Get Accounts pk {pk}");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    let (account, _holder, _account_type) = Account::get_with_holder_and_type(pk)
+    let (account, holder, account_type) = Account::get_with_holder_and_type(pk)
         .select((
             Account::as_select(),
             AccountHolder::as_select(),
@@ -30,5 +32,7 @@ pub async fn detail_command(
     Ok(AccountDetail {
         pk: account.id,
         name: account.name,
+        holder: holder.name,
+        r#type: account_type.name,
     })
 }

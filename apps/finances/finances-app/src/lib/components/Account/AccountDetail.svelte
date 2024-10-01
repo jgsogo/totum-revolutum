@@ -1,7 +1,8 @@
 <script lang="ts">
     import { DataHandler } from '@vincjo/datatables';
+    import {Account} from '$lib/models/Account';
 
-    let { account = $bindable() } = $props();
+    let { account = $bindable() } : {account: Account} = $props();
 
     const movements = [
         { id: 1, first_name: 'Tobie', last_name: 'Vint', email: 'tvint0@fotki.com' },
@@ -18,20 +19,55 @@
 
 <div class="container mx-auto px-4 py-4">
 
+    <div role="status" class="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center">
+        <div class="flex items-center justify-center w-2/5 h-48 bg-gray-300 rounded sm:w-96 dark:bg-gray-700">
+            <svg class="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z"/>
+            </svg>
+        </div>
+        <div class="w-3/5">
+            <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+        </div>
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 py-4">
+    <div role="status" class="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center">
+        <div class="w-full">
+            <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
+            <div class="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-4 py-4">
     <div class="lg:flex lg:items-center lg:justify-between">
 
         <div class="min-w-0 flex-1">
+
           <h2 class="text-2xl font-bold leading-7 text-[color]-900 sm:truncate sm:text-3xl sm:tracking-tight">{account.name}</h2>
+          <hr class="opacity-30" />
+
           <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div class="mt-2 flex items-center text-sm text-[color]-500">
                 <i class="fa-solid fa-bank mr-1.5 w-5 flex-shrink-0 text-[color]-400"></i>
-               (Holder)
+               {account.holder}
             </div>
             <div class="mt-2 flex items-center text-sm text-[color]-500">
               <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-[color]-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" />
               </svg>
-              (Account type)
+              {account.type}
             </div>
             <div class="mt-2 flex items-center text-sm text-[color]-500">
               <svg class="mr-1.5 h-5 w-5 flex-shrink-0 text-[color]-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
