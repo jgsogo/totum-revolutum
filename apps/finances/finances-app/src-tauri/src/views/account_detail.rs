@@ -29,5 +29,7 @@ pub async fn detail_command(
         r#type: frontend::AccountType {
             name: account_type.name,
         },
+        ccy: account.ccy,
+        identifier: account.identifier,
     })
 }

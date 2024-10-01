@@ -18,4 +18,6 @@ pub struct Account {
     pub name: String,
     pub holder: Holder,
     pub r#type: AccountType,
+    pub ccy: String,
+    pub identifier: Option<String>,
 }
