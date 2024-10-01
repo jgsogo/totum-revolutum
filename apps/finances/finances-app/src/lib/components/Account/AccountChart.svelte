@@ -1,4 +1,5 @@
 <script>
+    // Uses Observable Plot: https://observablehq.com/plot/getting-started
   import { onMount } from "svelte";
   import * as Plot from "@observablehq/plot";
   import * as d3 from "d3";
