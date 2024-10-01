@@ -43,7 +43,7 @@ diesel::table! {
         amount -> Nullable<Numeric>,
         quantity -> Nullable<Integer>,
         unit_value -> Nullable<Numeric>,
-        // date_value -> Date,
+        date_value -> Date,
         account_id -> Integer,
     }
 }

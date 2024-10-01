@@ -22,7 +22,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             menu::sidebar_menu,
-            views::account_detail::detail_command,
+            views::account_detail::account_detail_command,
+            views::account_detail::account_snapshot_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

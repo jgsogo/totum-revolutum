@@ -28,14 +28,32 @@ export class Holder {
 export class Snapshot {
     private _amount: number;
     private _ccy: string;
+    private _quantity?: number;
+    private _unit_value?: number;
+    private _date_value: string;
 
-    constructor(ccy: string, amount: number) {
+    constructor(ccy: string, amount: number, date_value: string, quantity?: number, unit_value?: number) {
         this._amount = amount;
         this._ccy = ccy;
+        this._date_value = date_value;
+        this._quantity = quantity;
+        this._unit_value = unit_value
     }
 
     toString() {
         return `${this._amount} ${this._ccy}`;
+    }
+
+    public get date_value(): string {
+        return this._date_value;
+    }
+
+    public get quantity(): number | undefined {
+        return this._quantity;
+    }
+
+    public get unit_value(): number | undefined {
+        return this._unit_value;
     }
 }
 
@@ -51,7 +69,7 @@ export class Account {
         const instance = new Account();
 
         /** Return the basic data from the account **/
-        const account = await invoke("detail_command", {pk});
+        const account = await invoke("account_detail_command", {pk});
         instance._pk = pk;
         instance._name = account.name;
         instance._holder = new Holder(account.holder.name);
@@ -79,10 +97,8 @@ export class Account {
     }
 
     async snapshot(): Promise<Snapshot> {
-        return new Promise<Snapshot>((resolve) => {
-            resolve(new Snapshot("EUR", 1234.56));
-        });
-        // const snapshot: Snapshot = await invoke("account_snapshot", {pk: this._pk});
-        // return snapshot
+        const snapshot= await invoke("account_snapshot_command", {pk: this._pk});
+        const instance = new Snapshot(this._ccy, snapshot.amount, snapshot.date_value, snapshot.quantity, snapshot.unit_value);
+        return instance;
     }
 }

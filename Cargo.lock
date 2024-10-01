@@ -1808,6 +1808,7 @@ dependencies = [
 name = "finances-app"
 version = "0.1.0"
 dependencies = [
+ "bigdecimal",
  "diesel",
  "finances_db",
  "itertools 0.13.0",
