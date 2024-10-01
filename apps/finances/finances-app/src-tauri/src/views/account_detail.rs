@@ -1,22 +1,15 @@
+use crate::views::frontend;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_db::models::{Account, AccountHolder, AccountType};
 use tauri::State;
 
-#[derive(serde::Serialize, Debug)]
-pub struct AccountDetail {
-    pub pk: i32,
-    pub name: String,
-    pub holder: String,
-    pub r#type: String,
-}
-
 #[tauri::command]
 pub async fn detail_command(
     pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
     pk: i32,
-) -> Result<AccountDetail, String> {
+) -> Result<frontend::Account, String> {
     log::info!("Get Accounts pk {pk}");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
@@ -29,10 +22,12 @@ pub async fn detail_command(
         .first::<(Account, AccountHolder, AccountType)>(&mut conn)
         .expect("Error loading accounts");
 
-    Ok(AccountDetail {
-        pk: account.id,
+    Ok(frontend::Account {
+        // pk: account.id,
         name: account.name,
-        holder: holder.name,
-        r#type: account_type.name,
+        holder: frontend::Holder { name: holder.name },
+        r#type: frontend::AccountType {
+            name: account_type.name,
+        },
     })
 }
