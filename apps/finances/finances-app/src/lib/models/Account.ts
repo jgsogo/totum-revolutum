@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import {invoke} from "@tauri-apps/api/core";
 
 export class AccountType {
     private _name: string;
@@ -69,7 +69,7 @@ export class Account {
         const instance = new Account();
 
         /** Return the basic data from the account **/
-        const account = await invoke("account_detail_command", {pk});
+        const account = await invoke("account_detail", {pk});
         instance._pk = pk;
         instance._name = account.name;
         instance._holder = new Holder(account.holder.name);
@@ -97,7 +97,7 @@ export class Account {
     }
 
     async snapshot(): Promise<Snapshot> {
-        const snapshot= await invoke("account_snapshot_command", {pk: this._pk});
+        const snapshot = await invoke("account_snapshot_latest", {pk: this._pk});
         const instance = new Snapshot(this._ccy, snapshot.amount, snapshot.date_value, snapshot.quantity, snapshot.unit_value);
         return instance;
     }

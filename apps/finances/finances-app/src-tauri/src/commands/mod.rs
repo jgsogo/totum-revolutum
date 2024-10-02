@@ -2,7 +2,7 @@
 //!
 //! It's useful to have all of them in the same file, because their names (without scope) need
 //! to be unique for each Tauri application. We enforce this guarantee if all the commands are
-//! defined in this same module.
+//! defined in the same module.
 
 pub mod menu;
 
@@ -13,7 +13,7 @@ use finances_db::models::{Account, AccountHolder, AccountType, Snapshot};
 use tauri::State;
 
 #[tauri::command]
-pub async fn account_detail_command(
+pub async fn account_detail(
     pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
     pk: i32,
 ) -> Result<crate::models::Account, String> {
@@ -33,7 +33,7 @@ pub async fn account_detail_command(
 }
 
 #[tauri::command]
-pub async fn account_snapshot_command(
+pub async fn account_snapshot_latest(
     pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
     pk: i32,
 ) -> Result<Option<crate::models::Snapshot>, String> {
