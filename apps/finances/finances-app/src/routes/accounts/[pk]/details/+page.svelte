@@ -7,7 +7,7 @@
 </script>
 
 {#await data}
-	asd
+	Loading account data
 {:then account}
 	<AccountDetail bind:account={account.account}/>
 {/await}
