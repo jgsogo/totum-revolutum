@@ -97,6 +97,7 @@ diesel::joinable!(data_account -> data_accounttype (type_id));
 diesel::joinable!(data_account -> data_accountholder (holder_id));
 diesel::joinable!(data_snapshot -> data_account (account_id));
 // diesel::joinable!(data_movementtype -> data_movementtype (parent_id));
+diesel::joinable!(data_movement -> data_account (account_id));
 diesel::joinable!(data_movement -> data_fx (fx_id));
 diesel::joinable!(data_movement -> data_transfer (transfer_id));
 diesel::joinable!(data_movement -> data_movementtype (type_id));
