@@ -1,5 +1,7 @@
 <script>
     // Uses Observable Plot: https://observablehq.com/plot/getting-started
+    // We can create Sankey plots as well!! https://observablehq.com/@ee2dev/making-a-treemap-and-sankey-diagram-with-observable-plot
+
   import { onMount } from "svelte";
   import * as Plot from "@observablehq/plot";
   import * as d3 from "d3";
