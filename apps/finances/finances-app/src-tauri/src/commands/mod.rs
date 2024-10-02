@@ -9,7 +9,7 @@ pub mod menu;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_db::models::{Account, AccountHolder, AccountType, Fx, Movement, MovementType, Snapshot, Transfer};
+use finances_db::models::{Account, AccountHolder, AccountType, Movement, MovementType, Snapshot, Transfer};
 use tauri::State;
 
 #[tauri::command]
@@ -62,6 +62,7 @@ pub async fn account_snapshots(
         .load(&mut conn)
         .expect("Error returning all the snapshots");
 
+    log::info!("Found {} snapshots for account pk {pk}", snapshots.len());
     Ok(snapshots.into_iter().map(|v| v.into()).collect())
 }
 
@@ -76,12 +77,13 @@ pub async fn account_movements(
     let movements = Movement::all_with_related_data(pk)
         .select((
             Movement::as_select(),
-            Fx::as_select(),
+            // Fx::as_select(),
             Transfer::as_select(),
             MovementType::as_select(),
         ))
-        .load::<(Movement, Fx, Transfer, MovementType)>(&mut conn)
+        .load::<(Movement, Transfer, MovementType)>(&mut conn)
         .expect("Error returning all the movements");
 
+    log::info!("Found {} movements for account pk {pk}", movements.len());
     Ok(movements.into_iter().map(|v| v.into()).collect())
 }

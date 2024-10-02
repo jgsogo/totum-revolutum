@@ -2,6 +2,7 @@
   import { DataHandler } from "@vincjo/datatables";
   import { Account } from "$lib/models/Account";
   import AccountChart from "$lib/components/Account/AccountChart.svelte"
+  import {account_movements, account_snapshots} from '$lib/commands'
 
   // TODO: Trying different line-chart implementations
   //    https://layercake.graphics/example/MultiLine
@@ -68,7 +69,22 @@
   <h3 class="text-xl mt-4 leading-5 sm:truncate sm:text-2xl sm:tracking-tight">
     Movements
   </h3>
-  <div class="table-container mt-4">
+
+  {#await account.snapshots()}
+  loading snapshots
+  {:then snapshots}
+  All snapshots:<br/>
+  {snapshots}
+  {/await}
+  <br/><br/>
+  {#await account.movements()}
+  loading movements
+  {:then movements}
+  All movements:<br/>
+  {movements}
+  {/await}
+
+<div class="table-container mt-4">
     <!-- Native Table Element -->
     <table class="table table-hover">
       <thead>

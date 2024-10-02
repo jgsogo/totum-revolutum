@@ -9,7 +9,7 @@ pub enum ParentMovementType {
 pub struct MovementType {
     // pub pk: i32,
     pub name: String,
-    pub level: i32,
+    pub level: i16,
     pub parent: Option<ParentMovementType>,
 }
 

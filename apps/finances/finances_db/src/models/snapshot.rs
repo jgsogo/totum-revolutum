@@ -9,7 +9,7 @@ use bigdecimal::BigDecimal;
 #[diesel(belongs_to(Account, foreign_key = account_id))]
 pub struct Snapshot {
     pub id: i32,
-    pub amount: Option<BigDecimal>,
+    pub amount: BigDecimal,
     pub quantity: Option<i32>,
     pub unit_value: Option<BigDecimal>,
     pub date_value: chrono::NaiveDate,

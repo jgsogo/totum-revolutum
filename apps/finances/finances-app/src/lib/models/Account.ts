@@ -1,6 +1,6 @@
-import {invoke} from "@tauri-apps/api/core";
 import {Snapshot} from "$lib/models/Snapshot";
-import {account_snapshot_latest} from "$lib/commands"
+import {Movement} from "$lib/models/Movement";
+import {account_snapshot_latest, account_snapshots, account_movements} from "$lib/commands"
 
 export class AccountType {
     private readonly name: string;
@@ -46,5 +46,13 @@ export class Account {
 
     async last_snapshot(): Promise<Snapshot> {
         return account_snapshot_latest(this);
+    }
+
+    async snapshots(): Promise<Snapshot[]> {
+        return account_snapshots(this);
+    }
+
+    async movements(): Promise<Movement[]> {
+        return account_movements(this);
     }
 }

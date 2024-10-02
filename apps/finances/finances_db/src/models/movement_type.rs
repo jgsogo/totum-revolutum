@@ -6,6 +6,6 @@ use diesel::prelude::*;
 pub struct MovementType {
     pub id: i32,
     pub name: String,
-    pub level: i32,
+    pub level: i16,
     pub parent_id: Option<i32>,
 }

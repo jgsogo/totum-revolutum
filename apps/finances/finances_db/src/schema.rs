@@ -40,7 +40,7 @@ diesel::table! {
 diesel::table! {
     data_snapshot (id) {
         id -> Integer,
-        amount -> Nullable<Numeric>,
+        amount -> Numeric,
         quantity -> Nullable<Integer>,
         unit_value -> Nullable<Numeric>,
         date_value -> Date,
@@ -52,7 +52,7 @@ diesel::table! {
     data_movementtype (id) {
         id -> Integer,
         name -> Text,
-        level -> Integer,
+        level -> SmallInt,
         parent_id -> Nullable<Integer>,
     }
 }
@@ -61,13 +61,13 @@ diesel::table! {
     data_movement (id) {
         id -> Integer,
         amount -> Numeric,
-        quantity -> Integer,
-        unit_value -> Numeric,
+        quantity -> Nullable<Integer>,
+        unit_value -> Nullable<Numeric>,
         direction -> Integer,
         date -> Date,
         date_value -> Date,
         account_id -> Integer,
-        fx_id -> Integer,
+        fx_id -> Nullable<Integer>,
         transfer_id -> Integer,
         type_id -> Integer, // movementtype
     }
