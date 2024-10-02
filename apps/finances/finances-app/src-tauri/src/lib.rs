@@ -26,6 +26,8 @@ pub fn run() {
             commands::menu::sidebar_menu,
             commands::account_detail,
             commands::account_snapshot_latest,
+            commands::account_snapshots,
+            commands::account_movements,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

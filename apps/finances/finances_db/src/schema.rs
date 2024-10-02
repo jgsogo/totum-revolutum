@@ -53,7 +53,7 @@ diesel::table! {
         id -> Integer,
         name -> Text,
         level -> Integer,
-        parent_id -> Integer,
+        parent_id -> Nullable<Integer>,
     }
 }
 

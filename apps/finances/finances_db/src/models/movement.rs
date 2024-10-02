@@ -17,3 +17,14 @@ pub struct Movement {
     pub transfer_id: i32,
     pub type_id: i32, // movementtype
 }
+
+impl Movement {
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all_with_related_data(account_pk: i32) -> _ {
+        crate::schema::data_movement::table
+            .inner_join(crate::schema::data_fx::table)
+            .inner_join(crate::schema::data_transfer::table)
+            .inner_join(crate::schema::data_movementtype::table)
+            .filter(crate::schema::data_movement::account_id.eq(account_pk))
+    }
+}
