@@ -1,6 +1,7 @@
 use tauri::Manager;
 mod db;
 mod menu;
+mod models;
 pub mod views;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
