@@ -28,12 +28,12 @@ export class Holder {
 }
 
 export class Account {
-    private readonly pk: number;
-    private readonly name: string;
-    private readonly holder: Holder;
-    private readonly type: AccountType;
-    private readonly ccy: string;
-    private readonly identifier?: string;
+    readonly pk: number;
+    readonly name: string;
+    readonly holder: Holder;
+    readonly type: AccountType;
+    readonly ccy: string;
+    readonly identifier?: string;
 
     constructor(pk: number, name: string, holder: Holder, type: AccountType, ccy: string, identifier?: string) {
         this.pk = pk;

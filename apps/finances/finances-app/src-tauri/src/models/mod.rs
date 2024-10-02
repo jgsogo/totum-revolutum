@@ -4,9 +4,11 @@
 mod account;
 mod account_type;
 mod holder;
+mod menu;
 mod snapshot;
 
 pub use account::Account;
 pub use account_type::AccountType;
 pub use holder::Holder;
+pub use menu::MenuGroup;
 pub use snapshot::Snapshot;

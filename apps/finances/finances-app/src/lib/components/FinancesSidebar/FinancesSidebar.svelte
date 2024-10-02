@@ -2,11 +2,12 @@
     import { page } from '$app/stores';
 
     import { AppRail, AppRailAnchor, AppRailTile, getDrawerStore } from '@skeletonlabs/skeleton';
-    import { invoke } from "@tauri-apps/api/core";
     import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
     import { SlideToggle } from '@skeletonlabs/skeleton';
+    import {sidebar_menu} from '$lib/commands'
 
     import { debug } from '@tauri-apps/plugin-log';
+    import type { MenuGroup } from '$lib/models/MenuGroup';
 
     // Local
 	let currentRailCategory: string = $state('/all');
@@ -30,23 +31,7 @@
         if (['all'].includes(basePath)) currentRailCategory = '/all';
 	});
 
-    // Reactive
-    type SidebarMenuItem = {
-        group: string;
-        name: string;
-        pk: int;
-    };
-    type SidebarMenu = {
-        group: string;
-        entries: SidebarMenuItem[];
-    };
-
-    const getSubmenu = async function (rail_category: string): Promise<SidebarMenu[]> {
-        debug('Invoke menu command to retrieve SidebarMenu');
-        return await invoke("sidebar_menu", {category: rail_category});
-    };
-
-    const submenu = $derived(getSubmenu(currentRailCategory))
+    const submenu: MenuGroup[] = $derived(sidebar_menu(currentRailCategory))
 
     function listboxItemActive(href: string): string {
         return $page.url.pathname?.includes(href) ? 'bg-primary-active-token' : ''
@@ -116,15 +101,15 @@
                         <svelte:fragment slot="lead">
                             <i class="fa-solid fa-bank text-xl w-6 text-center"></i>
                         </svelte:fragment>
-                        <svelte:fragment slot="summary"><p class="font-bold">{sidebar_menu.group}</p></svelte:fragment>
+                        <svelte:fragment slot="summary"><p class="font-bold">{sidebar_menu.name}</p></svelte:fragment>
                         <svelte:fragment slot="content">
                             <!-- Nav List -->
                             <nav class="list-nav">
                                 <ul>
-                                    {#each sidebar_menu.entries as sidebar_menu_entry}
+                                    {#each sidebar_menu.accounts as account}
                                         <li>
-                                            <a href="/accounts/{sidebar_menu_entry.pk}/details" class={listboxItemActive("/accounts/" + sidebar_menu_entry.pk + "/details")} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
-                                                <span class="flex-auto">{@html sidebar_menu_entry.name}</span>
+                                            <a href="/accounts/{account.pk}/details" class={listboxItemActive("/accounts/" + account.pk + "/details")} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                                                <span class="flex-auto">{@html account.name}</span>
                                             </a>
                                         </li>
                                     {/each}
@@ -137,11 +122,11 @@
             {:else}
                 <nav class="list-nav">
                     <ul>
-                        {#each sidebar_menu_items.reduce((accumulator, value) => accumulator.concat(value.entries), []).sort((a: SidebarMenuItem, b: SidebarMenuItem) => {return a.name > b.name}) as sidebar_menu_entry}
+                        {#each sidebar_menu_items.reduce((accumulator, value) => accumulator.concat(value.accounts), []).sort((a: Account, b: Account) => {return a.name > b.name}) as account}
                         <li>
-                            <a href="/accounts/{sidebar_menu_entry.pk}/details" class={listboxItemActive("/accounts/" + sidebar_menu_entry.pk + "/details")} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
-                                <span class="flex-auto">{@html sidebar_menu_entry.name}</span>
-                                <span class="text-xs uppercase">{@html sidebar_menu_entry.group}</span>
+                            <a href="/accounts/{account.pk}/details" class={listboxItemActive("/accounts/" + account.pk + "/details")} data-sveltekit-preload-data="hover" on:keypress on:click={drawerStore.close}>
+                                <span class="flex-auto">{@html account.name}</span>
+                                <span class="text-xs uppercase">{@html account.holder}</span>
                             </a>
                         </li>
                         {/each}

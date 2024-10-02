@@ -1,5 +1,12 @@
-use crate::models::{AccountType, Holder};
 use serde::Serialize;
+
+use crate::models::{AccountType, Holder};
+
+type AccountAndRelatedData = (
+    finances_db::models::Account,
+    finances_db::models::AccountHolder,
+    finances_db::models::AccountType,
+);
 
 #[derive(Serialize, Debug)]
 pub struct Account {
@@ -11,20 +18,8 @@ pub struct Account {
     pub identifier: Option<String>,
 }
 
-impl
-    From<(
-        finances_db::models::Account,
-        finances_db::models::AccountHolder,
-        finances_db::models::AccountType,
-    )> for Account
-{
-    fn from(
-        value: (
-            finances_db::models::Account,
-            finances_db::models::AccountHolder,
-            finances_db::models::AccountType,
-        ),
-    ) -> Self {
+impl From<AccountAndRelatedData> for Account {
+    fn from(value: AccountAndRelatedData) -> Self {
         let (account, holder, account_type) = value;
         Self {
             // pk: account.id,
