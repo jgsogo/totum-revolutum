@@ -5,7 +5,6 @@
     "@tauri-apps/api": "2.0.0-rc.6",
     "@tauri-apps/plugin-log": "2.0.0-rc.1",
     "@tauri-apps/plugin-shell": "2.0.0-rc.1",
-    "@vincjo/datatables": "^1.14.10",
     "d3": "^7.9.0"
   },
   "description": "",
@@ -20,6 +19,7 @@
     "@tauri-apps/cli": "2.0.0-rc.17",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^8.7.0",
+    "@vincjo/datatables": "2.0.0-runes.32",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.11.1",
     "eslint-config-prettier": "^9.1.0",
