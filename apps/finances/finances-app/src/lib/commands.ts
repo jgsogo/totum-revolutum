@@ -17,6 +17,11 @@ export const account_snapshot_latest = async (account: Account): Promise<Snapsho
     return new Snapshot(account.ccy, data.amount, data.date_value, data.quantity, data.unit_value);
 };
 
+/**
+ * Returns (a promise to) the Account with the given primary key value
+ * @param {number} pk - The primary key value of the account we are looking for
+ * @returns {Account} The Account instance
+ */
 export const account_detail = async (pk: number): Promise<Account> => {
     const data: {
         name: string,
