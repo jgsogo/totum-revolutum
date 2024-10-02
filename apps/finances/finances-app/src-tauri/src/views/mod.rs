@@ -1,1 +1,1 @@
-pub mod account_detail;
+//! Logic related to specific application views

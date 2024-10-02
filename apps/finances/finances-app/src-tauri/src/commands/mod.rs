@@ -1,3 +1,11 @@
+//! Contains all the Tauri commands that are available to this application.
+//!
+//! It's useful to have all of them in the same file, because their names (without scope) need
+//! to be unique for each Tauri application. We enforce this guarantee if all the commands are
+//! defined in this same module.
+
+pub mod menu;
+
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
