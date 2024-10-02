@@ -48,7 +48,7 @@
     </div>
     <div class="mt-2 flex items-center text-sm text-[color]-500">
       <i class="fa-solid fa-calendar mr-1.5 w-5 flex-shrink-0"></i>
-      {#await account.snapshot()}
+      {#await account.last_snapshot()}
         ..
       {:then snapshot}
         {snapshot} (@{snapshot.date_value})

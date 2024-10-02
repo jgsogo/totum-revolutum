@@ -1,4 +1,6 @@
 import {invoke} from "@tauri-apps/api/core";
+import {Snapshot} from "$lib/models/Snapshot";
+import {account_snapshot_latest} from "$lib/commands"
 
 export class AccountType {
     private _name: string;
@@ -25,38 +27,6 @@ export class Holder {
 
 }
 
-export class Snapshot {
-    private _amount: number;
-    private _ccy: string;
-    private _quantity?: number;
-    private _unit_value?: number;
-    private _date_value: string;
-
-    constructor(ccy: string, amount: number, date_value: string, quantity?: number, unit_value?: number) {
-        this._amount = amount;
-        this._ccy = ccy;
-        this._date_value = date_value;
-        this._quantity = quantity;
-        this._unit_value = unit_value
-    }
-
-    toString() {
-        return `${this._amount} ${this._ccy}`;
-    }
-
-    public get date_value(): string {
-        return this._date_value;
-    }
-
-    public get quantity(): number | undefined {
-        return this._quantity;
-    }
-
-    public get unit_value(): number | undefined {
-        return this._unit_value;
-    }
-}
-
 export class Account {
     private _pk: number;
     private _name: string;
@@ -65,19 +35,17 @@ export class Account {
     private _ccy: string;
     private _identifier?: string;
 
-    static async Create(pk: number): Promise<Account> {
-        const instance = new Account();
+    constructor(pk: number, name: string, holder: Holder, type: AccountType, ccy: string, identifier?: string) {
+        this._pk = pk;
+        this._name = name;
+        this._holder = holder;
+        this._type = type;
+        this._ccy = ccy;
+        this._identifier = identifier;
+    }
 
-        /** Return the basic data from the account **/
-        const account = await invoke("account_detail", {pk});
-        instance._pk = pk;
-        instance._name = account.name;
-        instance._holder = new Holder(account.holder.name);
-        instance._type = new AccountType(account.type.name);
-        instance._ccy = account.ccy;
-        instance._identifier = account.identifier;
-
-        return instance;
+    public get pk(): number {
+        return this._pk;
     }
 
     public get name(): string {
@@ -92,13 +60,16 @@ export class Account {
         return this._type;
     }
 
+    public get ccy(): string {
+        return this._ccy;
+    }
+
     public get identifier(): string | undefined {
         return this._identifier;
     }
 
-    async snapshot(): Promise<Snapshot> {
-        const snapshot = await invoke("account_snapshot_latest", {pk: this._pk});
-        const instance = new Snapshot(this._ccy, snapshot.amount, snapshot.date_value, snapshot.quantity, snapshot.unit_value);
-        return instance;
+    async last_snapshot(): Promise<Snapshot> {
+        return account_snapshot_latest(this);
+        // return Snapshot.last_snapshot(this);
     }
 }
