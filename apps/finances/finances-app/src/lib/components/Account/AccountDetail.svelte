@@ -3,14 +3,6 @@
   import AccountChart from "$lib/components/Account/AccountChart.svelte";
   import AccountMovements from "$lib/components/Account/AccountMovements.svelte";
 
-  import {
-    TableHandler,
-    Datatable,
-    ThSort,
-    ThFilter,
-  } from "@vincjo/datatables";
-  // FIXME: See issue https://github.com/vincjo/datatables/issues/132, we need to pin the dependency
-
   let { account = $bindable() }: { account: Account } = $props();
 </script>
 
