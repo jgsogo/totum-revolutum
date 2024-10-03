@@ -3,6 +3,7 @@ use serde::Serialize;
 
 #[derive(Serialize, Debug)]
 pub struct Snapshot {
+    pub account_id: i32,
     pub amount: f32,
     pub quantity: Option<i32>,
     pub unit_value: Option<f32>,
@@ -12,6 +13,7 @@ pub struct Snapshot {
 impl From<finances_db::models::Snapshot> for Snapshot {
     fn from(value: finances_db::models::Snapshot) -> Self {
         Self {
+            account_id: value.account_id,
             amount: value.amount.to_f32().unwrap(),
             quantity: value.quantity,
             unit_value: value.unit_value.and_then(|v| v.to_f32()),

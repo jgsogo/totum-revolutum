@@ -102,8 +102,8 @@ pub async fn sidebar_menu(
 
     let accounts = accounts
         .into_iter()
-        .map(|v| (v.0.id, v.into()))
-        .collect::<Vec<(i32, crate::models::Account)>>();
+        .map(|v| v.into())
+        .collect::<Vec<crate::models::Account>>();
 
     Ok(crate::models::MenuGroup::new_grouped_by_holder(accounts))
 }

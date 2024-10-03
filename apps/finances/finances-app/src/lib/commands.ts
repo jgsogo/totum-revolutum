@@ -4,7 +4,9 @@ import {Snapshot} from "$lib/models/Snapshot"
 import {MenuGroup} from "$lib/models/MenuGroup";
 import {Movement} from "$lib/models/Movement"
 
+/** The data returned by the backend representing an Account */
 type AccountData = {
+    pk: number,
     name: string,
     holder: { name: string },
     type: { name: string },
@@ -12,20 +14,34 @@ type AccountData = {
     identifier?: string
 };
 
-const create_account = function (pk: number, data: AccountData): Account {
+/**
+ * Converts an {@link AccountData} dictionary into an {@link Account}
+ * @param {AccountData} data - The data returned by the backend
+ * @returns {Account} The parsed instance
+ */
+const create_account = function (data: AccountData): Account {
     let holder = new Holder(data.holder.name);
     let account_type = new AccountType(data.type.name);
-    return new Account(pk, data.name, holder, account_type, data.ccy, data.identifier);
+    return new Account(data.pk, data.name, holder, account_type, data.ccy, data.identifier);
 }
 
+/** The data returned by the backend representing a Snapshot */
 type SnapshotData = {
+    account_id: number,
     amount: number,
     date_value: string,
     quantity?: number,
     unit_value?: number
 };
 
+/**
+ * Converts an {@link SnapshotData} dictionary into an {@link Snapshot}
+ * @param {Account} account - The account this snapshot belongs to
+ * @param {SnapshotData} data - The data returned by the backend
+ * @returns {Snapshot} The parsed instance
+ */
 const create_snapshot = function (account: Account, data: SnapshotData): Snapshot {
+    if (account.pk !== data.account_id) throw new Error("Snapshot mismatch Account");
     return new Snapshot(account.ccy, data.amount, data.date_value, data.quantity, data.unit_value);
 }
 
@@ -35,12 +51,7 @@ const create_snapshot = function (account: Account, data: SnapshotData): Snapsho
  * @returns {Snapshot} Latest snapshot for the given account
  */
 export const account_snapshot_latest = async (account: Account): Promise<Snapshot> => {
-    const data: {
-        amount: number,
-        date_value: string,
-        quantity?: number,
-        unit_value?: number
-    } = await invoke("account_snapshot_latest", {pk: account.pk});
+    const data: SnapshotData = await invoke("account_snapshot_latest", {pk: account.pk});
     return create_snapshot(account, data);
 };
 
@@ -51,7 +62,7 @@ export const account_snapshot_latest = async (account: Account): Promise<Snapsho
  */
 export const account_detail = async (pk: number): Promise<Account> => {
     const data: AccountData = await invoke("account_detail", {pk});
-    return create_account(pk, data);
+    return create_account(data);
 };
 
 /**
@@ -61,10 +72,10 @@ export const account_detail = async (pk: number): Promise<Account> => {
 export const sidebar_menu = async (category: string): Promise<MenuGroup[]> => {
     const data: {
         name: string,
-        accounts: [number, AccountData][],
+        accounts: AccountData[],
     }[] = await invoke("sidebar_menu", {category});
     return data.map((it) => {
-        let accounts = it.accounts.map(([pk, acc]) => create_account(pk, acc))
+        let accounts = it.accounts.map((acc) => create_account(acc))
         return new MenuGroup(it.name, accounts)
     });
 };
@@ -76,12 +87,7 @@ export const sidebar_menu = async (category: string): Promise<MenuGroup[]> => {
  * @returns {Snapshot[]} All the snapshots for the given account
  */
 export const account_snapshots = async (account: Account): Promise<Snapshot[]> => {
-    const data: {
-        amount: number,
-        date_value: string,
-        quantity?: number,
-        unit_value?: number
-    }[] = await invoke("account_snapshots", {pk: account.pk});
+    const data: SnapshotData[] = await invoke("account_snapshots", {pk: account.pk});
     return data.map((it) => {
         return create_snapshot(account, it);
     });

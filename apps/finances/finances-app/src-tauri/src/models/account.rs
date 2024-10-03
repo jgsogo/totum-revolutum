@@ -10,7 +10,7 @@ type AccountAndRelatedData = (
 
 #[derive(Serialize, Debug)]
 pub struct Account {
-    // pub pk: i32,
+    pub pk: i32,
     pub name: String,
     pub holder: Holder,
     pub r#type: AccountType,
@@ -22,7 +22,7 @@ impl From<AccountAndRelatedData> for Account {
     fn from(value: AccountAndRelatedData) -> Self {
         let (account, holder, account_type) = value;
         Self {
-            // pk: account.id,
+            pk: account.id,
             name: account.name,
             holder: holder.into(),
             r#type: account_type.into(),
