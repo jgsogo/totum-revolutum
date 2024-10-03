@@ -36,7 +36,7 @@ pub fn main() {
             .optional()
             .expect("Error returning the last snapshot"); // FIXME: This is n+1 query
         let snapshot_amount = match snapshot {
-            Some(snapshot) => snapshot.amount.unwrap_or(BigDecimal::zero()),
+            Some(snapshot) => snapshot.amount,
             None => BigDecimal::zero(),
         };
         println!(
