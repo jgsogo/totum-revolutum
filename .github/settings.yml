@@ -46,6 +46,9 @@ labels:
     description: Short session, 1-2 hours
 
   # Type
+  - name: type:EPIC
+    color: BBA6DD
+    description: Group of issues 
   - name: type:bug
     color: D4C5F9
     description: Something isn't working
