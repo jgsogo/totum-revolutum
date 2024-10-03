@@ -25,21 +25,21 @@ pub type AllWithHolderAndType = diesel::dsl::InnerJoin<
 >;
 
 impl Account {
-    /// Returns (a query to) all the `Account`s together with their `AccountHolder` and `AccountType`
+    /// Returns (a query to) all the [`Account`]s together with their [`AccountHolder`] and [`AccountType`]
     pub fn all_with_holder_and_type() -> AllWithHolderAndType {
         crate::schema::data_account::table
             .inner_join(crate::schema::data_accountholder::table)
             .inner_join(crate::schema::data_accounttype::table)
     }
 
-    /// Returns (a query to) all the (`Account`, `AccountHolder`, `AccountType`) for a given account primary-key
+    /// Returns (a query to) all the ([`Account`], [`AccountHolder`], [`AccountType`]) for a given account primary-key
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn get_with_holder_and_type(pk: i32) -> _ {
         let all: AllWithHolderAndType = Account::all_with_holder_and_type();
         all.filter(crate::schema::data_account::id.eq(pk))
     }
 
-    /// Returns a query fragment to filter all the `Account`s that are opened as of today
+    /// Returns a query fragment to filter all the [`Account`]s that are opened as of today
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn opened() -> _ {
         crate::schema::data_account::close
@@ -47,13 +47,13 @@ impl Account {
             .or(crate::schema::data_account::close.ge(diesel::dsl::today))
     }
 
-    /// Returns a query fragment to filter all the `Account`s that are owned by ME
+    /// Returns a query fragment to filter all the [`Account`]s that are owned by ME
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn mine() -> _ {
         crate::schema::data_accountholder::owner.eq(0i32)
     }
 
-    /// Returns a query fragment to filter all the `Account`s whose `AccountType` is either
+    /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is either
     /// "Cuenta corriente" or "Metálico"
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn checking_account() -> _ {
@@ -62,7 +62,7 @@ impl Account {
             .or(crate::schema::data_accounttype::name.eq("Metálico"))
     }
 
-    /// Returns a query fragment to filter all the `Account`s whose `AccountType` is either
+    /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is either
     /// "Fondo de inversión", "Acciones", "Vivienda" or "Depósito"
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn investment() -> _ {
@@ -73,7 +73,7 @@ impl Account {
             .or(crate::schema::data_accounttype::name.eq("Depósito"))
     }
 
-    /// Returns a query fragment to filter all the `Account`s whose `AccountType` is
+    /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is
     /// "Plan de pensiones"
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn retirement() -> _ {
@@ -82,15 +82,7 @@ impl Account {
 }
 
 impl Account {
-    //     pub fn holder(&self) -> AccountHolder {
-    //         todo!("Return the AccountHolder given an Account")
-    //     }
-
-    //     pub fn r#type(&self) -> AccountType {
-    //         todo!("Return the AccountType given an Account")
-    //     }
-
-    /// Returns (a query to) the latest snapshot for this account
+    /// Returns (a query to) the latest [`Snapshot`] for this account
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn last_snapshot(&self) -> _ {
         let id: i32 = self.id;
