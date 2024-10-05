@@ -6,8 +6,6 @@
     ThFilter,
   } from "@vincjo/datatables";
 
-  // FIXME: See issue https://github.com/vincjo/datatables/issues/132, we need to pin the dependency
-
   export let data;
   const table = new TableHandler(data, { rowsPerPage: 10 });
 
