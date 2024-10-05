@@ -6,12 +6,12 @@ mod models;
 mod views;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
+pub fn create_app<R: tauri::Runtime>(builder: tauri::Builder<R>) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded string
     let database_url = "postgres://finances_ro:finances_ro@localhost/finances";
     let pool = db::establish_connection(database_url);
 
-    tauri::Builder::default()
+    builder
         .plugin(
             tauri_plugin_log::Builder::new()
                 .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout))
@@ -29,6 +29,6 @@ pub fn run() {
             commands::account_snapshots,
             commands::account_movements,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while running tauri application")
 }
