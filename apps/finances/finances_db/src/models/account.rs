@@ -82,7 +82,7 @@ impl Account {
 }
 
 impl Account {
-    /// Returns (a query to) the latest [`Snapshot`] for this account
+    /// Returns (a query to) the latest [`super::Snapshot`] for this account
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn last_snapshot(&self) -> _ {
         let id: i32 = self.id;

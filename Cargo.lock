@@ -1771,7 +1771,6 @@ dependencies = [
 name = "finances_db"
 version = "0.0.1"
 dependencies = [
- "bigdecimal",
  "chrono",
  "clap",
  "clap-verbosity-flag",

@@ -1,4 +1,3 @@
-use bigdecimal::{BigDecimal, Zero};
 use clap::Parser;
 use diesel::prelude::*;
 use finances_db::{
@@ -37,7 +36,7 @@ pub fn main() {
             .expect("Error returning the last snapshot"); // FIXME: This is n+1 query
         let snapshot_amount = match snapshot {
             Some(snapshot) => snapshot.amount,
-            None => BigDecimal::zero(),
+            None => 0f64,
         };
         println!(
             "{:3} - {:2} - {:30} - {:20} - {:40} - {:9.2}",
