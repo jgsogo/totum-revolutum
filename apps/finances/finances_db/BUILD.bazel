@@ -51,6 +51,12 @@ rust_library_tests_and_docs(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    test_compile_data = [":migrations"],
+    test_deps = [
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:diesel_migrations",
+        "@crates_libraries//:tempfile",
+    ],
     deps = all_crate_deps(
         normal = True,
     ),
