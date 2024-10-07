@@ -29,3 +29,8 @@ tokei:
 # Shows the documentation
 doc:
     cargo doc --open --document-private-items --all-features --workspace
+
+# Removes temporary files (free disk space)
+clean:
+    cargo clean
+    bazel clean
