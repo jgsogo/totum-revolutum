@@ -7,12 +7,10 @@ edition = "2021"
 name = "finances_db"
 path = "src/lib.rs"
 
-[[bin]]
-name = "finances_db"
-path = "src/bin/main.rs"
-
-
 [features]
+default = ["postgres"]
+sqlite = ["diesel/returning_clauses_for_sqlite_3_35",]
+postgres = ["dep:bigdecimal", "diesel/numeric", "diesel/postgres"]
 
 [dependencies]
 # diesel_utils = { path = "../../../libraries/diesel_utils" }
@@ -23,11 +21,12 @@ path = "src/bin/main.rs"
 # camino = { workspace = true }
 # camino-tempfile = { workspace = true }
 # chrono = { workspace = true }
+bigdecimal = {workspace = true, optional = true}
 chrono = { workspace = true }
-clap = { workspace = true, features = ["derive", "env"] }
-clap-verbosity-flag = { workspace = true }
+# clap = { workspace = true, features = ["derive", "env"] }
+# clap-verbosity-flag = { workspace = true }
 # data-encoding = { workspace = true }
-diesel = { workspace = true, features = ["postgres", "r2d2", "numeric", "chrono", "returning_clauses_for_sqlite_3_35"] }
+diesel = { workspace = true, features = ["r2d2", "chrono"] }
 # diesel_migrations = { workspace = true, features = ["sqlite"] }
 dirs = { workspace = true }
 # dotenvy = { workspace = true }
@@ -54,3 +53,4 @@ tracing-subscriber = { workspace = true }
 anyhow = { workspace = true }
 diesel_migrations = { workspace = true }
 tempfile = { workspace = true }
+finances_db = { path = ".", default-features = false, features = ["sqlite"] }

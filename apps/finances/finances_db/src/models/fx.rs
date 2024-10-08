@@ -1,3 +1,4 @@
+use super::types::NumericType;
 use diesel::prelude::*;
 
 #[derive(Queryable, Selectable, PartialEq)]
@@ -7,6 +8,6 @@ pub struct Fx {
     pub id: i32,
     pub foreign: String,
     pub local: String,
-    pub rate: f64,
+    pub rate: NumericType,
     pub date_value: chrono::NaiveDate,
 }

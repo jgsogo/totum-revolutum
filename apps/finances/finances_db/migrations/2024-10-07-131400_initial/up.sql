@@ -1,3 +1,4 @@
+
 CREATE TABLE data_accountholder
 (
     id     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

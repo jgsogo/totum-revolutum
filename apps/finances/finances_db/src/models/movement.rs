@@ -1,3 +1,4 @@
+use super::types::NumericType;
 use diesel::prelude::*;
 
 #[derive(Queryable, Selectable, PartialEq)]
@@ -5,9 +6,9 @@ use diesel::prelude::*;
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Movement {
     pub id: i32,
-    pub amount: f64,
+    pub amount: NumericType,
     pub quantity: Option<i32>,
-    pub unit_value: Option<f64>,
+    pub unit_value: Option<NumericType>,
     pub direction: i32,
     pub date: chrono::NaiveDate,
     pub date_value: chrono::NaiveDate,

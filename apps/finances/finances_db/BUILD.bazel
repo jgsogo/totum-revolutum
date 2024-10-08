@@ -1,7 +1,6 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
-load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@crates_libraries//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test", "rust_test_suite")
 load("@totum//bazel:defs.bzl", "run_copy_to_workspace")
-load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 load("@totum//bazel/rust/diesel:defs.bzl", "diesel_print_schema", "diesel_setup")
 
 # // Working with Diesel requires several targets to create and update the schemas (and an associated database
@@ -41,41 +40,74 @@ run_copy_to_workspace(
     target = "src/schema.rs",
 )
 
-rust_library_tests_and_docs(
+rust_library(
     name = "finances_db",
-    srcs = glob(
-        ["src/**/*.rs"],
-        exclude = ["src/bin/**/*.rs"],
-    ),
-    aliases = aliases(),
-    all_features = {
-        "test": [
-            "test",
-        ],
-    },
+    srcs = glob(["src/**/*.rs"]),
+    crate_features = ["postgres"],
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    test_compile_data = [":migrations"],
-    test_deps = [
-        "@crates_libraries//:anyhow",
-        "@crates_libraries//:diesel_migrations",
-        "@crates_libraries//:tempfile",
-    ],
+    visibility = ["//visibility:public"],
     deps = all_crate_deps(
         normal = True,
     ),
 )
 
-rust_binary(
-    name = "bin",
-    srcs = glob(["src/bin/**/*.rs"]),
+rust_library(
+    name = "finances_db/sqlite",
+    srcs = glob(["src/**/*.rs"]),
+    crate_features = ["sqlite"],
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
     deps = all_crate_deps(
         normal = True,
-    ) + [
-        ":finances_db",
+    ),
+)
+
+# Unittests
+rust_test(
+    name = "tests",
+    compile_data = [":migrations"],
+    crate = ":finances_db/sqlite",
+    crate_features = ["sqlite"],
+    deps = [
+        # ":finances_db/sqlite",
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:diesel_migrations",
+        "@crates_libraries//:tempfile",
     ],
 )
+
+# Integration tests
+rust_test_suite(
+    name = "integration_tests",
+    srcs = glob(["tests/**/test_*.rs"]),
+    compile_data = [":migrations"],
+    crate_features = ["sqlite"],
+    deps = [":finances_db/sqlite"],
+)
+
+# Documentation
+# FIXME: For everything related to docs, there is no way to activate a feature here
+# rust_doc(
+#     name = "doc",
+#     crate = ":finances_db/sqlite",
+#     # crate_features = ["postgres"],
+#     visibility = ["//visibility:public"],
+# )
+#
+# # Documentation - tests
+# rust_doc_test(
+#     name = "doc/tests-sqlite",
+#     crate = ":finances_db/sqlite",
+#     # crate_features = ["sqlite"],
+#     # deps = deps + test_docs_deps,
+# )
+
+# rust_doc_test(
+#     name = "doc/tests-postgres",
+#     crate = ":finances_db/postgres",
+#     # crate_features = ["postgres"],
+#     # deps = deps + test_docs_deps,
+# )

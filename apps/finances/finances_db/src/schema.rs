@@ -2,6 +2,9 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use crate::models::types::Double;
+
     data_account (id) {
         id -> Integer,
         identifier -> Nullable<Text>,
@@ -16,6 +19,9 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use crate::models::types::Double;
+
     data_accountholder (id) {
         id -> Integer,
         name -> Text,
@@ -24,6 +30,9 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use crate::models::types::Double;
+
     data_accounttype (id) {
         id -> Integer,
         name -> Text,
@@ -31,6 +40,9 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use crate::models::types::Double;
+
     data_fx (id) {
         id -> Integer,
         foreign -> Text,
@@ -41,6 +53,9 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use crate::models::types::Double;
+
     data_movement (id) {
         id -> Integer,
         amount -> Double,
@@ -57,6 +72,9 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use crate::models::types::Double;
+
     data_movementtype (id) {
         id -> Integer,
         name -> Text,
@@ -66,6 +84,9 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use crate::models::types::Double;
+
     data_snapshot (id) {
         id -> Integer,
         amount -> Double,
@@ -77,6 +98,9 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use crate::models::types::Double;
+
     data_transfer (id) {
         id -> Integer,
         description -> Text,

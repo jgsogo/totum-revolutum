@@ -1,5 +1,6 @@
 use diesel::prelude::*;
 
+use super::types::NumericType;
 use super::Account;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
@@ -8,9 +9,9 @@ use super::Account;
 #[diesel(belongs_to(Account, foreign_key = account_id))]
 pub struct Snapshot {
     pub id: i32,
-    pub amount: f64,
+    pub amount: NumericType,
     pub quantity: Option<i32>,
-    pub unit_value: Option<f64>,
+    pub unit_value: Option<NumericType>,
     pub date_value: chrono::NaiveDate,
     pub account_id: i32,
 }
