@@ -3,7 +3,7 @@
 
 load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rust_test_suite")
 
-def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_deps = None, test_suite_deps = None, test_docs_deps = None, test_compile_data = None, **kwargs):
+def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_deps = None, test_suite_deps = None, test_docs_deps = None, test_compile_data = None, test_proc_macro_deps = None, **kwargs):
     """Creates a predefined set of targets for the given arguments.
 
     This macro generates the following targets:
@@ -28,6 +28,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
         test_suite_deps (List): dependencies only for the `rust_test_suite` rule
         test_docs_deps (List): dependencies only for the `rust_doc_test` rule
         test_compile_data (List): arguments forwarded to `compile_data` in `rust_test` and `rust_test_suite` rules
+        test_proc_macro_deps (List): argument forwarded to `rust_test` rule into the `proc_macro_deps` arg
         **kwargs: other arguments to use for `rust_library`
     """
 
@@ -71,6 +72,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
         data = test_data,
         deps = test_deps,
         compile_data = test_compile_data,
+        proc_macro_deps = test_proc_macro_deps,
     )
 
     # Integration tests
@@ -83,6 +85,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
         data = test_data,
         deps = deps + test_suite_deps + [":{}".format(name)],
         compile_data = test_compile_data,
+        proc_macro_deps = test_proc_macro_deps,
     )
 
     # Documentation

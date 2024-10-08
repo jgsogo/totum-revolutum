@@ -48,6 +48,11 @@ rust_library_tests_and_docs(
         exclude = ["src/bin/**/*.rs"],
     ),
     aliases = aliases(),
+    all_features = {
+        "test": [
+            "test",
+        ],
+    },
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
