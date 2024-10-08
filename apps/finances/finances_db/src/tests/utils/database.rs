@@ -45,7 +45,6 @@ impl TestDatabase {
         diesel::insert_into(data_account)
             .values(&vec![
                 (
-                    // id.eq(0),
                     identifier.eq("1234"),
                     name.eq("Gastos compartidos"),
                     is_numerable.eq(false),
@@ -56,7 +55,6 @@ impl TestDatabase {
                     type_id.eq(0),
                 ),
                 (
-                    // id.eq(0),
                     identifier.eq("2345"),
                     name.eq("IBM"),
                     is_numerable.eq(true),
@@ -67,7 +65,6 @@ impl TestDatabase {
                     type_id.eq(2),
                 ),
                 (
-                    // id.eq(0),
                     identifier.eq("345 - closed"),
                     name.eq("Netflix"),
                     is_numerable.eq(true),

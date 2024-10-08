@@ -5,12 +5,11 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use tempfile::NamedTempFile;
 use tracing::debug;
 
-// FIXME: Using rstest to create actual fixtures here would be great, but I'm finding some issues trying to use that crate using Bazel.
+// FIXME: Use `rstest` crate to create actual fixtures here (it failed for me in the Bazel build)
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 fn run_migrations(conn: &mut SqliteConnection) -> Result<()> {
-    // Create the SQLite3 database and run migrations
     debug!("Run pending migrations");
     conn.run_pending_migrations(MIGRATIONS)
         .map_err(|e| anyhow!("Error {}", e))?;
