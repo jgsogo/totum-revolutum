@@ -52,6 +52,16 @@ repos:
       - id: cargo-check
       - id: clippy
 
+  # Lint and format SQL files
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.2.2
+    hooks:
+      - id: sqlfluff-lint
+        args: [--dialect, "postgres"]
+      - id: sqlfluff-fix
+        args: [--dialect, "postgres"]
+
+
   # Some local scripts
   - repo: local
     hooks:

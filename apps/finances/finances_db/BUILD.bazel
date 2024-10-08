@@ -69,7 +69,6 @@ rust_test(
     crate = ":finances_db/sqlite",
     crate_features = ["sqlite"],
     deps = [
-        # ":finances_db/sqlite",
         "@crates_libraries//:anyhow",
         "@crates_libraries//:diesel_migrations",
         "@crates_libraries//:tempfile",
