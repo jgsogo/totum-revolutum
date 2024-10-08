@@ -1,6 +1,6 @@
 CREATE TABLE m2m_posts_tags
 (
-    post_id  INT NOT NULL,
+    post_id INT NOT NULL,
     tag VARCHAR NOT NULL,
 
     FOREIGN KEY (post_id) REFERENCES posts (id),

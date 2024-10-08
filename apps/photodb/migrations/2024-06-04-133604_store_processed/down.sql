@@ -1,2 +1,2 @@
 ALTER TABLE photos
-    DROP COLUMN processed
+DROP COLUMN processed
