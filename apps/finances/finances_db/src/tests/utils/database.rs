@@ -47,7 +47,7 @@ impl SqliteTestDatabase {
         use crate::schema::data_accounttype::dsl::*;
         diesel::insert_into(data_accounttype)
             .values(&vec![
-                (id.eq(0), name.eq("Cuenta Corriente")),
+                (id.eq(0), name.eq("Cuenta corriente")),
                 (id.eq(1), name.eq("Depósito")),
                 (id.eq(2), name.eq("Acciones")),
                 (id.eq(3), name.eq("Plan de pensiones")),
@@ -61,6 +61,7 @@ impl SqliteTestDatabase {
         diesel::insert_into(data_account)
             .values(&vec![
                 (
+                    id.eq(0),
                     identifier.eq("1234"),
                     name.eq("Gastos compartidos"),
                     is_numerable.eq(false),
@@ -71,6 +72,7 @@ impl SqliteTestDatabase {
                     type_id.eq(0),
                 ),
                 (
+                    id.eq(1),
                     identifier.eq("2345"),
                     name.eq("IBM"),
                     is_numerable.eq(true),
@@ -81,6 +83,7 @@ impl SqliteTestDatabase {
                     type_id.eq(2),
                 ),
                 (
+                    id.eq(2),
                     identifier.eq("345 - closed"),
                     name.eq("Netflix"),
                     is_numerable.eq(true),
