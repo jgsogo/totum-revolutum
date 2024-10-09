@@ -1,16 +1,32 @@
 use anyhow::Result;
 use diesel::prelude::*;
 use diesel::{RunQueryDsl, SqliteConnection};
+use diesel_migrations::MigrationHarness;
+use diesel_migrations::{embed_migrations, EmbeddedMigrations};
 use tempfile::NamedTempFile;
 
-pub struct TestDatabase {
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
+
+/// An object containing a temporary (file-based) SQLite database and its connection
+pub struct SqliteTestDatabase {
     _file: NamedTempFile,
     pub conn: SqliteConnection,
 }
 
-impl TestDatabase {
-    pub fn new(file: NamedTempFile, conn: SqliteConnection) -> Self {
-        Self { _file: file, conn }
+impl SqliteTestDatabase {
+    /// Creates a new [`SqliteTestDatabase`] instance using a temporary file
+    pub fn new() -> Self {
+        let dbfile = NamedTempFile::new().expect("Failed to create temporary file");
+        let dbfile_str = dbfile.path().to_str().unwrap();
+        let mut conn = SqliteConnection::establish(dbfile_str).expect("Failed to establish connection to database");
+        diesel::sql_query("PRAGMA foreign_keys = ON") // Enables foreign keys support: https://www.sqlite.org/foreignkeys.html
+            .execute(&mut conn)
+            .unwrap();
+
+        conn.run_pending_migrations(MIGRATIONS)
+            .expect("Failed to run migrations");
+
+        Self { _file: dbfile, conn }
     }
 
     pub fn populate_account_holders(&mut self) -> Result<()> {

@@ -1,4 +1,4 @@
-use super::types::NumericType;
+use crate::types::NumericType;
 use diesel::prelude::*;
 
 #[derive(Queryable, Selectable, PartialEq)]

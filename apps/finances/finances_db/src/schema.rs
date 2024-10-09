@@ -3,7 +3,7 @@
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::models::types::Double;
+    use crate::types::Double;
 
     data_account (id) {
         id -> Integer,
@@ -20,7 +20,7 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::models::types::Double;
+    use crate::types::Double;
 
     data_accountholder (id) {
         id -> Integer,
@@ -31,7 +31,7 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::models::types::Double;
+    use crate::types::Double;
 
     data_accounttype (id) {
         id -> Integer,
@@ -41,7 +41,7 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::models::types::Double;
+    use crate::types::Double;
 
     data_fx (id) {
         id -> Integer,
@@ -54,7 +54,7 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::models::types::Double;
+    use crate::types::Double;
 
     data_movement (id) {
         id -> Integer,
@@ -73,7 +73,7 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::models::types::Double;
+    use crate::types::Double;
 
     data_movementtype (id) {
         id -> Integer,
@@ -85,7 +85,7 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::models::types::Double;
+    use crate::types::Double;
 
     data_snapshot (id) {
         id -> Integer,
@@ -99,7 +99,7 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::models::types::Double;
+    use crate::types::Double;
 
     data_transfer (id) {
         id -> Integer,

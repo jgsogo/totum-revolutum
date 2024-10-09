@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 
-use super::types::NumericType;
 use super::Account;
+use crate::types::NumericType;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::data_snapshot)]
