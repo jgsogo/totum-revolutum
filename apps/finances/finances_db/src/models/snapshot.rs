@@ -5,7 +5,7 @@ use crate::types::NumericType;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::data_snapshot)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(check_for_backend(crate::types::BackendType))]
 #[diesel(belongs_to(Account, foreign_key = account_id))]
 pub struct Snapshot {
     pub id: i32,

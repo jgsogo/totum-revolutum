@@ -4,7 +4,7 @@ use super::{AccountHolder, AccountType};
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::data_account)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(check_for_backend(crate::types::BackendType))]
 #[diesel(belongs_to(AccountHolder, foreign_key = holder_id))]
 #[diesel(belongs_to(AccountType, foreign_key = type_id))]
 pub struct Account {
