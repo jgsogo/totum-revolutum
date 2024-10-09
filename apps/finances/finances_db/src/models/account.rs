@@ -82,12 +82,12 @@ impl Account {
 }
 
 impl Account {
-    /// Returns (a query to) the latest [`super::Snapshot`] for this account
-    #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn last_snapshot(&self) -> _ {
-        let id: i32 = self.id;
-        crate::schema::data_snapshot::table.filter(crate::schema::data_snapshot::account_id.eq(id))
-    }
+    // /// Returns (a query to) the latest [`super::Snapshot`] for this account
+    // #[diesel::dsl::auto_type(no_type_alias)]
+    // pub fn last_snapshot(&self) -> _ {
+    //     let id: i32 = self.id;
+    //     crate::schema::data_snapshot::table.filter(crate::schema::data_snapshot::account_id.eq(id))
+    // }
 
     //     pub fn position(&self) -> BigDecimal {
     //         todo!("Return the position NOW")
