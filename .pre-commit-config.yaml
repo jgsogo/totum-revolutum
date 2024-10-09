@@ -57,9 +57,7 @@ repos:
     rev: 3.2.2
     hooks:
       - id: sqlfluff-lint
-        args: [--dialect, "postgres"]
       - id: sqlfluff-fix
-        args: [--dialect, "postgres"]
 
 
   # Some local scripts
