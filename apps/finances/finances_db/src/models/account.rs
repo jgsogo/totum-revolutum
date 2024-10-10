@@ -1,3 +1,6 @@
+use crate::models::account_type::{
+    ACCIONES, CUENTA_CORRIENTE, DEPOSITO, FONDO_INVERSION, METALICO, PLAN_PENSIONES, VIVIENDA,
+};
 use diesel::prelude::*;
 
 use super::{AccountHolder, AccountType};
@@ -54,30 +57,38 @@ impl Account {
     }
 
     /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is either
-    /// "Cuenta corriente" or "Metálico"
+    /// [`CUENTA_CORRIENTE`] or [`METALICO`]
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn checking_account() -> _ {
+    pub fn checking_account<'a>() -> _ {
+        let cuenta_corriente: &'a str = CUENTA_CORRIENTE;
+        let metalico: &'a str = METALICO;
         crate::schema::data_accounttype::name
-            .eq("Cuenta corriente")
-            .or(crate::schema::data_accounttype::name.eq("Metálico"))
+            .eq(cuenta_corriente)
+            .or(crate::schema::data_accounttype::name.eq(metalico))
     }
 
     /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is either
-    /// "Fondo de inversión", "Acciones", "Vivienda" or "Depósito"
+    /// [`FONDO_INVERSION`], [`ACCIONES`], [`VIVIENDA`] or [`DEPOSITO`]
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn investment() -> _ {
+    pub fn investment<'a>() -> _ {
+        let fondo_inversion: &'a str = FONDO_INVERSION;
+        let acciones: &'a str = ACCIONES;
+        let vivienda: &'a str = VIVIENDA;
+        let deposito: &'a str = DEPOSITO;
+
         crate::schema::data_accounttype::name
-            .eq("Fondo de inversión")
-            .or(crate::schema::data_accounttype::name.eq("Acciones"))
-            .or(crate::schema::data_accounttype::name.eq("Vivienda"))
-            .or(crate::schema::data_accounttype::name.eq("Depósito"))
+            .eq(fondo_inversion)
+            .or(crate::schema::data_accounttype::name.eq(acciones))
+            .or(crate::schema::data_accounttype::name.eq(vivienda))
+            .or(crate::schema::data_accounttype::name.eq(deposito))
     }
 
     /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is
     /// "Plan de pensiones"
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn retirement() -> _ {
-        crate::schema::data_accounttype::name.eq("Plan de pensiones")
+    pub fn retirement<'a>() -> _ {
+        let plan_pensiones: &'a str = PLAN_PENSIONES;
+        crate::schema::data_accounttype::name.eq(plan_pensiones)
     }
 }
 

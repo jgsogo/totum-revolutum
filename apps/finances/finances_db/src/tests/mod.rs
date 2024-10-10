@@ -5,4 +5,6 @@
 //! and they have different database types.
 
 mod test_account;
+mod test_movement;
+mod test_snapshot;
 pub mod utils;

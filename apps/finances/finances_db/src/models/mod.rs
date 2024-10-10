@@ -9,9 +9,9 @@ pub use transfer::Transfer;
 
 mod account;
 mod account_holder;
-mod account_type;
+pub(crate) mod account_type;
 mod fx;
 mod movement;
-mod movement_type;
+pub(crate) mod movement_type;
 mod snapshot;
 mod transfer;

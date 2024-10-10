@@ -1,3 +1,4 @@
+use crate::models::account_type::{ACCIONES, CUENTA_CORRIENTE};
 use crate::models::{Account, AccountHolder, AccountType};
 use crate::tests::utils::fixtures::database_with_accounts;
 use diesel::prelude::*;
@@ -24,19 +25,19 @@ fn test_queries() {
             let (acc, holder, acc_type) = all.get(0).unwrap();
             assert_eq!(acc.name, "Netflix");
             assert_eq!(holder.name, "holder2");
-            assert_eq!(acc_type.name, "Acciones");
+            assert_eq!(acc_type.name, ACCIONES);
         }
         {
             let (acc, holder, acc_type) = all.get(1).unwrap();
             assert_eq!(acc.name, "IBM");
             assert_eq!(holder.name, "holder1");
-            assert_eq!(acc_type.name, "Acciones");
+            assert_eq!(acc_type.name, ACCIONES);
         }
         {
             let (acc, holder, acc_type) = all.get(2).unwrap();
             assert_eq!(acc.name, "Gastos compartidos");
             assert_eq!(holder.name, "holder0");
-            assert_eq!(acc_type.name, "Cuenta corriente");
+            assert_eq!(acc_type.name, CUENTA_CORRIENTE);
         }
     }
 
@@ -55,7 +56,7 @@ fn test_queries() {
         let (acc, holder, acc_type) = accounts.get(0).unwrap();
         assert_eq!(acc.name, "Gastos compartidos");
         assert_eq!(holder.name, "holder0");
-        assert_eq!(acc_type.name, "Cuenta corriente");
+        assert_eq!(acc_type.name, CUENTA_CORRIENTE);
     }
 }
 
