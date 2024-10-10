@@ -9,11 +9,12 @@ path = "src/lib.rs"
 
 [features]
 default = ["postgres"]
-sqlite = ["diesel/returning_clauses_for_sqlite_3_35",]
+sqlite = ["diesel/returning_clauses_for_sqlite_3_35", ]
 postgres = ["dep:bigdecimal", "diesel/numeric", "diesel/postgres"]
+test_utils = ["dep:diesel_migrations", "dep:anyhow", "dep:tempfile"]
 
 [dependencies]
-bigdecimal = {workspace = true, optional = true}
+bigdecimal = { workspace = true, optional = true }
 chrono = { workspace = true }
 diesel = { workspace = true, features = ["r2d2", "chrono"] }
 dirs = { workspace = true }
@@ -22,9 +23,9 @@ log = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
-[dev-dependencies]
-finances_db = { path = ".", default-features = false, features = ["sqlite"] }
+diesel_migrations = { workspace = true, optional = true }
+anyhow = { workspace = true, optional = true }
+tempfile = { workspace = true, optional = true }
 
-anyhow = { workspace = true }
-diesel_migrations = { workspace = true }
-tempfile = { workspace = true }
+[dev-dependencies]
+finances_db = { path = ".", default-features = false, features = ["sqlite", "test_utils"] }

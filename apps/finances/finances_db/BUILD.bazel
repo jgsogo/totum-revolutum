@@ -67,7 +67,10 @@ rust_test(
     name = "tests",
     compile_data = [":migrations"],
     crate = ":finances_db/sqlite",
-    crate_features = ["sqlite"],
+    crate_features = [
+        "sqlite",
+        "test_utils",
+    ],
     deps = [
         "@crates_libraries//:anyhow",
         "@crates_libraries//:diesel_migrations",

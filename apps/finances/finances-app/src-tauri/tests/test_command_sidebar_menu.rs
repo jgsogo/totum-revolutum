@@ -1,5 +1,9 @@
+use finances_db::test_utils::fixtures::database_with_accounts;
+
 #[test]
 fn test_category_all() {
+    let database = database_with_accounts();
+
     // TODO: The the actual sidebar_menu command. But to do it, first I need to create a mocked database,
     // and to create the database I need the migrations...
 

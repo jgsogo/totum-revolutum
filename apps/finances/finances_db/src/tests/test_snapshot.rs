@@ -1,5 +1,5 @@
 use crate::models::Snapshot;
-use crate::tests::utils::fixtures::database_with_accounts;
+use crate::test_utils::fixtures::database_with_accounts;
 use diesel::prelude::*;
 
 #[test]

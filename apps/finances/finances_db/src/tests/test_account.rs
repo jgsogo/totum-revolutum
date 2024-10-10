@@ -1,6 +1,6 @@
 use crate::models::account_type::{ACCIONES, CUENTA_CORRIENTE};
 use crate::models::{Account, AccountHolder, AccountType};
-use crate::tests::utils::fixtures::database_with_accounts;
+use crate::test_utils::fixtures::database_with_accounts;
 use diesel::prelude::*;
 
 #[test]
