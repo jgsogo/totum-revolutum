@@ -72,18 +72,12 @@ rust_test(
     data = [
         "tauri.conf.json",
     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
-    # deps = [
-    #     "@crates_libraries//:anyhow",
-    #     "@crates_libraries//:diesel_migrations",
-    #     "@crates_libraries//:tempfile",
-    # ],
 )
 
 # Integration tests
 rust_test_suite(
     name = "integration_tests",
     srcs = glob(["tests/**/test_*.rs"]),
-    # compile_data = ["//apps/finances/finances_db:migrations"],
     crate_features = ["sqlite"],
     deps = all_crate_deps(
         normal = True,

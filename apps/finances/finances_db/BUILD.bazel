@@ -72,7 +72,6 @@ rust_library(
 # Unittests
 rust_test(
     name = "tests",
-    compile_data = [":migrations"],
     crate = ":finances_db/sqlite",
     crate_features = [
         "sqlite",
@@ -89,7 +88,6 @@ rust_test(
 rust_test_suite(
     name = "integration_tests",
     srcs = glob(["tests/**/test_*.rs"]),
-    compile_data = [":migrations"],
     crate_features = ["sqlite"],
     deps = [":finances_db/sqlite"],
 )
