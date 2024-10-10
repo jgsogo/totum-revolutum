@@ -1,15 +1,18 @@
-use diesel::r2d2::{ManageConnection, Pool};
+use diesel::r2d2::{ConnectionManager, Pool};
 use tauri::Manager;
 pub mod commands;
 pub mod db;
 mod menu;
 mod models;
+mod types;
 mod views;
 
+use crate::types::ConnectionType;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn create_app<R: tauri::Runtime, M: ManageConnection>(
+pub fn create_app<R: tauri::Runtime>(
     builder: tauri::Builder<R>,
-    db_pool: Pool<M>,
+    db_pool: Pool<ConnectionManager<ConnectionType>>,
 ) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
 

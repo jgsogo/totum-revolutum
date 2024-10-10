@@ -5,7 +5,10 @@ description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+default = ["postgres"]
+sqlite = ["finances_db/sqlite", "diesel/sqlite", "diesel/returning_clauses_for_sqlite_3_35"]
+postgres = ["finances_db/postgres", "diesel/postgres", "diesel/numeric"]
 
 [lib]
 name = "finances_app_lib"
@@ -18,15 +21,17 @@ tauri-build = { version = "2.0.0-rc", features = [] }
 finances_db = { path = "../../finances_db" }
 
 bigdecimal = "0.4.5"
-diesel = { version = "2.2.4", features = ["postgres", "r2d2", "numeric"] }
+diesel = { version = "2.2.4", features = ["r2d2", "chrono"] }
 
-tauri = { version = "2.0.1", features = ["test"] }
+tauri = { version = "2.0.1", features = [] }
 tauri-plugin-shell = "2.0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = "0.4.21"
-tauri-plugin-log = "2.0.0-rc"
+tauri-plugin-log = "2.0.1"
 itertools = "0.13.0"
 
 [dev-dependencies]
 finances_db = { path = "../../finances_db", default-features = false, features = ["sqlite", "test_utils"] }
+finances-app = { path = ".", default-features = false, features = ["sqlite"] }
+tauri = { version = "2.0.1", features = ["test"] }

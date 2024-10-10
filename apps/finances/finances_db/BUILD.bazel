@@ -11,6 +11,7 @@ filegroup(
 filegroup(
     name = "migrations",
     srcs = glob(["migrations/**/*.sql"]),
+    visibility = ["//apps/finances/finances-app:__subpackages__"],
 )
 
 diesel_setup(
@@ -44,7 +45,7 @@ rust_library(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    visibility = ["//visibility:public"],
+    visibility = ["//apps/finances/finances-app:__subpackages__"],
     deps = all_crate_deps(
         normal = True,
     ),
@@ -53,10 +54,16 @@ rust_library(
 rust_library(
     name = "finances_db/sqlite",
     srcs = glob(["src/**/*.rs"]),
-    crate_features = ["sqlite"],
+    compile_data = [":migrations"],
+    crate_features = [
+        "sqlite",
+        "test_utils",
+    ],
+    crate_name = "finances_db",
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    visibility = ["//apps/finances/finances-app:__subpackages__"],
     deps = all_crate_deps(
         normal = True,
     ),

@@ -15,7 +15,7 @@ const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 /// An object containing a temporary (file-based) SQLite database and its connection
 pub struct SqliteTestDatabase {
-    _file: NamedTempFile,
+    file: NamedTempFile,
     pub conn: SqliteConnection,
 }
 
@@ -32,7 +32,11 @@ impl SqliteTestDatabase {
         conn.run_pending_migrations(MIGRATIONS)
             .expect("Failed to run migrations");
 
-        Self { _file: dbfile, conn }
+        Self { file: dbfile, conn }
+    }
+
+    pub fn filepath(&self) -> &std::path::Path {
+        self.file.path()
     }
 
     pub fn populate_account_holders(&mut self) -> Result<()> {

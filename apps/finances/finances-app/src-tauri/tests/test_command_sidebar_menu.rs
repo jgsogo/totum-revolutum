@@ -3,11 +3,12 @@ use finances_db::test_utils::fixtures::database_with_accounts;
 #[test]
 fn test_category_all() {
     let database = database_with_accounts();
+    let pool = finances_app_lib::db::establish_connection(database.filepath().to_str().unwrap());
 
     // TODO: The the actual sidebar_menu command. But to do it, first I need to create a mocked database,
     // and to create the database I need the migrations...
 
-    let app = finances_app_lib::create_app(tauri::test::mock_builder());
+    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool);
     let webview = tauri::WebviewWindowBuilder::new(&app, "main", Default::default())
         .build()
         .unwrap();

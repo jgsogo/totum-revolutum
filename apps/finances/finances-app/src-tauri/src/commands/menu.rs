@@ -1,10 +1,12 @@
-use diesel::pg::PgConnection;
+use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_db::models::{Account, AccountHolder, AccountType};
 use tauri::State;
 
-fn all_accounts(pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Vec<(Account, AccountHolder, AccountType)> {
+fn all_accounts(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+) -> Vec<(Account, AccountHolder, AccountType)> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -20,7 +22,7 @@ fn all_accounts(pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Vec<(
 }
 
 fn checking_accounts(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
 ) -> Vec<(Account, AccountHolder, AccountType)> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
@@ -38,7 +40,7 @@ fn checking_accounts(
 }
 
 fn investment_accounts(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
 ) -> Vec<(Account, AccountHolder, AccountType)> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
@@ -56,7 +58,7 @@ fn investment_accounts(
 }
 
 fn retirement_accounts(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
 ) -> Vec<(Account, AccountHolder, AccountType)> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
@@ -75,7 +77,7 @@ fn retirement_accounts(
 
 #[tauri::command]
 pub async fn sidebar_menu(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     category: &str,
 ) -> Result<Vec<crate::models::MenuGroup>, String> {
     log::info!("Get Accounts for category {category}");
