@@ -1,15 +1,17 @@
+use diesel::r2d2::{ManageConnection, Pool};
 use tauri::Manager;
 pub mod commands;
-mod db;
+pub mod db;
 mod menu;
 mod models;
 mod views;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn create_app<R: tauri::Runtime>(builder: tauri::Builder<R>) -> tauri::App<R> {
-    // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded string
-    let database_url = "postgres://finances_ro:finances_ro@localhost/finances";
-    let pool = db::establish_connection(database_url);
+pub fn create_app<R: tauri::Runtime, M: ManageConnection>(
+    builder: tauri::Builder<R>,
+    db_pool: Pool<M>,
+) -> tauri::App<R> {
+    // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
 
     builder
         .plugin(
@@ -18,7 +20,7 @@ pub fn create_app<R: tauri::Runtime>(builder: tauri::Builder<R>) -> tauri::App<R
                 .build(),
         )
         .setup(|app| {
-            app.manage(pool);
+            app.manage(db_pool);
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
