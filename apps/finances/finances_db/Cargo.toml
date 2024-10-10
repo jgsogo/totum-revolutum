@@ -8,7 +8,7 @@ name = "finances_db"
 path = "src/lib.rs"
 
 [features]
-default = ["postgres"]
+default = []
 sqlite = ["diesel/returning_clauses_for_sqlite_3_35", ]
 postgres = ["dep:bigdecimal", "diesel/numeric", "diesel/postgres"]
 test_utils = ["dep:diesel_migrations", "dep:anyhow", "dep:tempfile"]

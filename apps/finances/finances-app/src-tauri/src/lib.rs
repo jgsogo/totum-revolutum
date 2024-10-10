@@ -3,7 +3,7 @@ use tauri::Manager;
 pub mod commands;
 pub mod db;
 mod menu;
-mod models;
+pub mod models;
 mod types;
 mod views;
 

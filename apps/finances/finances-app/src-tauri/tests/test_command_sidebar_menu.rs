@@ -1,32 +1,47 @@
 use finances_db::test_utils::fixtures::database_with_accounts;
+use serde_json::json;
+use tauri::Manager;
 
 #[test]
 fn test_category_all() {
     let database = database_with_accounts();
     let pool = finances_app_lib::db::establish_connection(database.filepath().to_str().unwrap());
 
-    // TODO: The the actual sidebar_menu command. But to do it, first I need to create a mocked database,
-    // and to create the database I need the migrations...
-
-    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool);
+    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone());
+    app.manage(pool); // FIXME: The `.manage` inside `create_app` is not working for the mock.
     let webview = tauri::WebviewWindowBuilder::new(&app, "main", Default::default())
         .build()
         .unwrap();
 
+    let body = json!({ "category": "/all" });
     let r = tauri::test::get_ipc_response(
         &webview,
         tauri::webview::InvokeRequest {
-            cmd: "ping".into(),
+            cmd: "sidebar_menu".into(),
             callback: tauri::ipc::CallbackFn(0),
             error: tauri::ipc::CallbackFn(1),
             url: "http://tauri.localhost".parse().unwrap(),
-            body: tauri::ipc::InvokeBody::default(),
+            body: tauri::ipc::InvokeBody::Json(body),
             headers: Default::default(),
             invoke_key: tauri::test::INVOKE_KEY.to_string(),
         },
     )
-    .map(|b| b.deserialize::<String>().unwrap());
+    .map(|b| b.deserialize::<Vec<finances_app_lib::models::MenuGroup>>().unwrap());
 
-    assert!(r.is_err());
-    assert_eq!(r.unwrap_err().as_str(), Some("Command ping not found"));
+    assert!(r.is_ok());
+    let r = r.unwrap();
+    assert_eq!(r.len(), 2);
+
+    {
+        let group = r.get(0).unwrap();
+        assert_eq!(group.name, "holder0");
+        assert_eq!(group.accounts.len(), 1);
+        assert_eq!(group.accounts.get(0).unwrap().name, "Gastos compartidos");
+    }
+    {
+        let group = r.get(1).unwrap();
+        assert_eq!(group.name, "holder1");
+        assert_eq!(group.accounts.len(), 1);
+        assert_eq!(group.accounts.get(0).unwrap().name, "IBM");
+    }
 }

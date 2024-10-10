@@ -6,7 +6,7 @@
 
 pub mod menu;
 
-use diesel::pg::PgConnection;
+use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_db::models::{Account, AccountHolder, AccountType, Movement, MovementType, Snapshot, Transfer};
@@ -14,7 +14,7 @@ use tauri::State;
 
 #[tauri::command]
 pub async fn account_detail(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i32,
 ) -> Result<crate::models::Account, String> {
     log::info!("Get Accounts pk {pk}");
@@ -34,7 +34,7 @@ pub async fn account_detail(
 
 #[tauri::command]
 pub async fn account_snapshot_latest(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i32,
 ) -> Result<Option<crate::models::Snapshot>, String> {
     log::info!("Get (latest) Snapshot for account pk {pk}");
@@ -52,7 +52,7 @@ pub async fn account_snapshot_latest(
 
 #[tauri::command]
 pub async fn account_snapshots(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i32,
 ) -> Result<Vec<crate::models::Snapshot>, String> {
     log::info!("Get all Snapshots for account pk {pk}");
@@ -68,7 +68,7 @@ pub async fn account_snapshots(
 
 #[tauri::command]
 pub async fn account_movements(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i32,
 ) -> Result<Vec<crate::models::Movement>, String> {
     log::info!("Get all Movements for account pk {pk}");
