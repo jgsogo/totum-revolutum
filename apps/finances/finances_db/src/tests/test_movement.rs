@@ -14,7 +14,7 @@ fn test_queries() {
         let all = Movement::all_with_related_data(1)
             .select((Movement::as_select(), Transfer::as_select(), MovementType::as_select()))
             .load::<(Movement, Transfer, MovementType)>(&mut database_with_accounts.conn)
-            .expect("Error loading accounts");
+            .expect("Error loading movements");
 
         assert_eq!(all.len(), 0);
     }
@@ -24,7 +24,7 @@ fn test_queries() {
         let all = Movement::all_with_related_data(0)
             .select((Movement::as_select(), Transfer::as_select(), MovementType::as_select()))
             .load::<(Movement, Transfer, MovementType)>(&mut database_with_accounts.conn)
-            .expect("Error loading accounts");
+            .expect("Error loading movements");
 
         assert_eq!(all.len(), 2);
 

@@ -13,7 +13,7 @@ fn test_queries() {
         let all = Snapshot::all_snapshots(1)
             .select(Snapshot::as_select())
             .load::<Snapshot>(&mut database_with_accounts.conn)
-            .expect("Error loading accounts");
+            .expect("Error loading snapshots");
 
         assert_eq!(all.len(), 0);
     }
@@ -23,7 +23,7 @@ fn test_queries() {
         let all = Snapshot::all_snapshots(0)
             .select(Snapshot::as_select())
             .load::<Snapshot>(&mut database_with_accounts.conn)
-            .expect("Error loading accounts");
+            .expect("Error loading snapshots");
 
         assert_eq!(all.len(), 2);
 

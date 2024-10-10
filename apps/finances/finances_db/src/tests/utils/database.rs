@@ -110,7 +110,6 @@ impl SqliteTestDatabase {
         diesel::insert_into(data_snapshot)
             .values(&vec![
                 (
-                    id.eq(0),
                     amount.eq::<NumericType>(0.into()),
                     quantity.eq::<Option<i32>>(None),
                     unit_value.eq::<Option<NumericType>>(None),
@@ -118,7 +117,6 @@ impl SqliteTestDatabase {
                     account_id.eq(account_pk),
                 ),
                 (
-                    id.eq(1),
                     amount.eq::<NumericType>(1.into()),
                     quantity.eq::<Option<i32>>(None),
                     unit_value.eq::<Option<NumericType>>(None),
@@ -211,7 +209,6 @@ impl SqliteTestDatabase {
         diesel::insert_into(data_movement)
             .values(&vec![
                 (
-                    id.eq(0),
                     amount.eq::<NumericType>(0.into()),
                     quantity.eq::<Option<i32>>(None),
                     unit_value.eq::<Option<NumericType>>(None),
@@ -224,20 +221,6 @@ impl SqliteTestDatabase {
                     type_id.eq::<i32>(0),
                 ),
                 (
-                    id.eq(1),
-                    amount.eq::<NumericType>(0.into()),
-                    quantity.eq::<Option<i32>>(None),
-                    unit_value.eq::<Option<NumericType>>(None),
-                    direction.eq(0),
-                    date.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
-                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
-                    account_id.eq(account_pk),
-                    fx_id.eq::<Option<i32>>(None),
-                    transfer_id.eq::<i32>(0),
-                    type_id.eq::<i32>(0),
-                ),
-                (
-                    id.eq(1),
                     amount.eq::<NumericType>(0.into()),
                     quantity.eq::<Option<i32>>(None),
                     unit_value.eq::<Option<NumericType>>(None),
