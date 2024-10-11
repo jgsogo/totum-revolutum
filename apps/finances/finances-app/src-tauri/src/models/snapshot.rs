@@ -1,7 +1,7 @@
 use bigdecimal::ToPrimitive;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Snapshot {
     pub account_id: i32,
     pub amount: f32,

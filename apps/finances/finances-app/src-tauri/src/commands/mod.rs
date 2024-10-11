@@ -39,15 +39,23 @@ pub async fn account_snapshot_latest(
     log::info!("Get (latest) Snapshot for account pk {pk}");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    let snapshot: Option<Snapshot> = Snapshot::all_snapshots(pk)
+    let snapshot: Result<Option<Snapshot>, String> = Snapshot::all_snapshots(pk)
         .first(&mut conn)
         .optional()
-        .expect("Error returning the last snapshot");
+        .map_err(|e| format!("Error loading last snapshot: {e}"));
+
     match snapshot {
-        Some(snapshot) => Ok(Some(snapshot.into())),
-        None => Ok(None),
+        Ok(snapshot) => Ok(snapshot.map(|v| v.into())),
+        Err(e) => Err(e),
     }
 }
+
+//         .expect("Error returning the last snapshot");
+//     match snapshot {
+//         Some(snapshot) => Ok(Some(snapshot.into())),
+//         None => Ok(None),
+//     }
+// }
 
 #[tauri::command]
 pub async fn account_snapshots(
