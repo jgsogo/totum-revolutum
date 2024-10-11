@@ -6,7 +6,7 @@ use tauri::State;
 
 fn all_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Vec<(Account, AccountHolder, AccountType)> {
+) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -18,12 +18,12 @@ fn all_accounts(
         ))
         .filter(Account::mine())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts")
+        .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn checking_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Vec<(Account, AccountHolder, AccountType)> {
+) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -36,12 +36,12 @@ fn checking_accounts(
         .filter(Account::mine())
         .filter(Account::checking_account())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts")
+        .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn investment_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Vec<(Account, AccountHolder, AccountType)> {
+) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -54,12 +54,12 @@ fn investment_accounts(
         .filter(Account::mine())
         .filter(Account::investment())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts")
+        .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn retirement_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Vec<(Account, AccountHolder, AccountType)> {
+) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -72,7 +72,7 @@ fn retirement_accounts(
         .filter(Account::mine())
         .filter(Account::retirement())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts")
+        .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 #[tauri::command]
@@ -92,20 +92,24 @@ pub async fn sidebar_menu(
         retirement_accounts(pool)
     } else if category == "/rentals" {
         // TODO: Return links to views about rented properties
-        vec![]
+        Ok(vec![])
     } else if category == "/taxes" {
         // TODO: Return links to views about taxes: IRPF, 720,...
-        vec![]
+        Ok(vec![])
     } else {
         log::error!("Unexpected sidebar_menu category '{category}'");
         // FIXME: Return error?
-        vec![]
+        Err(format!("Unexpected sidebar_menu category '{category}'"))
     };
 
-    let accounts = accounts
-        .into_iter()
-        .map(|v| v.into())
-        .collect::<Vec<crate::models::Account>>();
-
-    Ok(crate::models::MenuGroup::new_grouped_by_holder(accounts))
+    match accounts {
+        Ok(accounts) => {
+            let accounts = accounts
+                .into_iter()
+                .map(|v| v.into())
+                .collect::<Vec<crate::models::Account>>();
+            Ok(crate::models::MenuGroup::new_grouped_by_holder(accounts))
+        }
+        Err(e) => Err(e),
+    }
 }
