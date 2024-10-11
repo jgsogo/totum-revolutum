@@ -16,7 +16,7 @@ fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Vec<Menu
             invoke_key: tauri::test::INVOKE_KEY.to_string(),
         },
     )
-    .map(|b| b.deserialize::<Vec<finances_app_lib::models::MenuGroup>>().unwrap())
+    .map(|b| b.deserialize::<Vec<MenuGroup>>().unwrap())
 }
 
 #[test]

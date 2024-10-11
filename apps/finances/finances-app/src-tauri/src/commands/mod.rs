@@ -20,16 +20,15 @@ pub async fn account_detail(
     log::info!("Get Accounts pk {pk}");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    let r = Account::get_with_holder_and_type(pk)
+    Account::get_with_holder_and_type(pk)
         .select((
             Account::as_select(),
             AccountHolder::as_select(),
             AccountType::as_select(),
         ))
         .first::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts");
-
-    Ok(r.into())
+        .map_err(|e| format!("Error loading account: {e}"))
+        .map(|v| v.into())
 }
 
 #[tauri::command]
