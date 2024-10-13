@@ -77,6 +77,7 @@ CREATE TABLE data_movement
     transfer_id INTEGER NOT NULL,
     type_id INTEGER NOT NULL,
 
+    CONSTRAINT quantity_positive CHECK (quantity > 0),
     FOREIGN KEY (account_id) REFERENCES data_account (id) ON DELETE RESTRICT,
     FOREIGN KEY (fx_id) REFERENCES data_fx (id) ON DELETE RESTRICT,
     FOREIGN KEY (transfer_id) REFERENCES data_transfer (id) ON DELETE CASCADE,
