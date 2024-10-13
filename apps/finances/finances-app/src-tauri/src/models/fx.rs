@@ -1,7 +1,7 @@
 use bigdecimal::ToPrimitive;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Fx {
     // pub pk: i32,
     pub foreign: String,

@@ -50,13 +50,6 @@ pub async fn account_snapshot_latest(
     }
 }
 
-//         .expect("Error returning the last snapshot");
-//     match snapshot {
-//         Some(snapshot) => Ok(Some(snapshot.into())),
-//         None => Ok(None),
-//     }
-// }
-
 #[tauri::command]
 pub async fn account_snapshots(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
