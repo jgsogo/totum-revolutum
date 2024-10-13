@@ -1,31 +1,117 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
-load("@rules_rust//rust:defs.bzl", "rust_binary")
-load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("@crates_libraries//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test", "rust_test_suite")
+load("@totum//bazel:defs.bzl", "run_copy_to_workspace")
+load("@totum//bazel/rust/diesel:defs.bzl", "diesel_print_schema", "diesel_setup")
 
-rust_library_tests_and_docs(
-    name = "finances_db",
-    srcs = glob(
-        ["src/**/*.rs"],
-        exclude = ["src/bin/**/*.rs"],
-    ),
-    aliases = aliases(),
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ),
+filegroup(
+    name = "diesel_config",
+    srcs = ["diesel.toml"],
 )
 
-rust_binary(
-    name = "bin",
-    srcs = glob(["src/bin/**/*.rs"]),
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
-        ":finances_db",
+filegroup(
+    name = "migrations",
+    srcs = glob(["migrations/**/*.sql"]),
+    visibility = ["//apps/finances/finances-app:__subpackages__"],
+)
+
+diesel_setup(
+    name = "setup",
+    config_file = ":diesel_config",
+    database_url = "db.sqlite3",
+    migrations = [
+        ":migrations",
     ],
 )
+
+diesel_print_schema(
+    name = "schema",
+    config_file = ":diesel_config",
+    database_url = ":setup",
+    schema = "src/schema.rs",
+)
+
+# We need to run this rule so we can build using Cargo
+run_copy_to_workspace(
+    name = "schema.update",
+    origin = ":schema",
+    tags = ["update"],
+    target = "src/schema.rs",
+)
+
+rust_library(
+    name = "finances_db",
+    srcs = glob(["src/**/*.rs"]),
+    crate_features = ["postgres"],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    visibility = ["//apps/finances/finances-app:__subpackages__"],
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)
+
+rust_library(
+    name = "finances_db/sqlite",
+    srcs = glob(["src/**/*.rs"]),
+    compile_data = [":migrations"],
+    crate_features = [
+        "sqlite",
+        "test_utils",
+    ],
+    crate_name = "finances_db",
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    visibility = ["//apps/finances/finances-app:__subpackages__"],
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)
+
+# Unittests
+rust_test(
+    name = "tests",
+    crate = ":finances_db/sqlite",
+    crate_features = [
+        "sqlite",
+        "test_utils",
+    ],
+    deps = [
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:diesel_migrations",
+        "@crates_libraries//:tempfile",
+    ],
+)
+
+# Integration tests
+rust_test_suite(
+    name = "integration_tests",
+    srcs = glob(["tests/**/test_*.rs"]),
+    crate_features = ["sqlite"],
+    deps = [":finances_db/sqlite"],
+)
+
+# Documentation
+# FIXME: For everything related to docs, there is no way to activate a feature here
+# rust_doc(
+#     name = "doc",
+#     crate = ":finances_db/sqlite",
+#     # crate_features = ["postgres"],
+#     visibility = ["//visibility:public"],
+# )
+#
+# # Documentation - tests
+# rust_doc_test(
+#     name = "doc/tests-sqlite",
+#     crate = ":finances_db/sqlite",
+#     # crate_features = ["sqlite"],
+#     # deps = deps + test_docs_deps,
+# )
+
+# rust_doc_test(
+#     name = "doc/tests-postgres",
+#     crate = ":finances_db/postgres",
+#     # crate_features = ["postgres"],
+#     # deps = deps + test_docs_deps,
+# )

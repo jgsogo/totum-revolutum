@@ -1,11 +1,11 @@
 CREATE TABLE photo_files
 (
-    file_id           INTEGER PRIMARY KEY NOT NULL,
+    file_id INTEGER PRIMARY KEY NOT NULL,
 
     -- Fields that are interesting to our application
     fileid BIGINT UNIQUE NOT NULL, -- Identifier inside pcloud
     format_id INTEGER NOT NULL, -- the file format
-    processed BOOLEAN NOT NULL DEFAULT 'FALSE', -- PhotoDB application did its processing on this file
+    processed BOOLEAN NOT NULL DEFAULT 'FALSE', -- PhotoDB application processed this file
 
     --- Constraints
     FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE,
@@ -14,12 +14,12 @@ CREATE TABLE photo_files
 
 CREATE TABLE video_files
 (
-    file_id           INTEGER PRIMARY KEY NOT NULL,
+    file_id INTEGER PRIMARY KEY NOT NULL,
 
     -- Fields that are interesting to our application
     fileid BIGINT UNIQUE NOT NULL, -- Identifier inside pcloud
     format_id INTEGER NOT NULL, -- the file format
-    processed BOOLEAN NOT NULL DEFAULT 'FALSE', -- PhotoDB application did its processing on this file
+    processed BOOLEAN NOT NULL DEFAULT 'FALSE', -- PhotoDB application processed this file
 
     --- Constraints
     FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE,
@@ -28,10 +28,10 @@ CREATE TABLE video_files
 
 CREATE TABLE formats
 (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    parent_id   INTEGER,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    parent_id INTEGER,
 
-    format         VARCHAR NOT NULL,
+    format VARCHAR NOT NULL,
 
     FOREIGN KEY (parent_id) REFERENCES formats (id) ON DELETE CASCADE,
     UNIQUE (format) ON CONFLICT ABORT

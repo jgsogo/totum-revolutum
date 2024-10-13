@@ -1,17 +1,17 @@
 use diesel::prelude::*;
 
 use super::Account;
-use bigdecimal::BigDecimal;
+use crate::types::NumericType;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::data_snapshot)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(check_for_backend(crate::types::BackendType))]
 #[diesel(belongs_to(Account, foreign_key = account_id))]
 pub struct Snapshot {
     pub id: i32,
-    pub amount: BigDecimal,
+    pub amount: NumericType,
     pub quantity: Option<i32>,
-    pub unit_value: Option<BigDecimal>,
+    pub unit_value: Option<NumericType>,
     pub date_value: chrono::NaiveDate,
     pub account_id: i32,
 }

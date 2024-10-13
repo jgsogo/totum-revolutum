@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::models::{AccountType, Holder};
 
@@ -8,7 +8,7 @@ type AccountAndRelatedData = (
     finances_db::models::AccountType,
 );
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Account {
     pub pk: i32,
     pub name: String,

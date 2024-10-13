@@ -1,11 +1,11 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum ParentMovementType {
     Id(i32),
     MovementType(Box<MovementType>),
 }
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MovementType {
     // pub pk: i32,
     pub name: String,

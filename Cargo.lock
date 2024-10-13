@@ -1756,6 +1756,7 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "diesel",
+ "finances-app",
  "finances_db",
  "itertools 0.13.0",
  "log",
@@ -1771,14 +1772,16 @@ dependencies = [
 name = "finances_db"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "bigdecimal",
  "chrono",
- "clap",
- "clap-verbosity-flag",
  "diesel",
+ "diesel_migrations",
  "dirs",
+ "finances_db",
  "home",
  "log",
+ "tempfile",
  "tracing",
  "tracing-subscriber",
 ]

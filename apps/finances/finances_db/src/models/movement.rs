@@ -1,14 +1,14 @@
-use bigdecimal::BigDecimal;
+use crate::types::NumericType;
 use diesel::prelude::*;
 
-#[derive(Queryable, Selectable, PartialEq, Eq)]
+#[derive(Queryable, Selectable, PartialEq)]
 #[diesel(table_name = crate::schema::data_movement)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(check_for_backend(crate::types::BackendType))]
 pub struct Movement {
     pub id: i32,
-    pub amount: BigDecimal,
+    pub amount: NumericType,
     pub quantity: Option<i32>,
-    pub unit_value: Option<BigDecimal>,
+    pub unit_value: Option<NumericType>,
     pub direction: i32,
     pub date: chrono::NaiveDate,
     pub date_value: chrono::NaiveDate,

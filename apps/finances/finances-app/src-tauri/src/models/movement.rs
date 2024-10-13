@@ -1,5 +1,5 @@
 use bigdecimal::ToPrimitive;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::models::{Account, Fx, MovementType, Transfer};
 
@@ -10,13 +10,13 @@ type MovementAndRelatedData = (
     finances_db::models::MovementType,
 );
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum MovementAccount {
     Id(i32),
     Account(Account),
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Movement {
     // pub pk: i32,
     pub amount: f32,

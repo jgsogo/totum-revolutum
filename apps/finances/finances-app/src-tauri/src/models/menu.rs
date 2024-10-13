@@ -1,9 +1,9 @@
 use itertools::Itertools;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::Account;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MenuGroup {
     /// The name of the group
     pub name: String,

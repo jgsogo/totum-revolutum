@@ -1,10 +1,12 @@
-use diesel::pg::PgConnection;
+use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_db::models::{Account, AccountHolder, AccountType};
 use tauri::State;
 
-fn all_accounts(pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Vec<(Account, AccountHolder, AccountType)> {
+fn all_accounts(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -16,12 +18,12 @@ fn all_accounts(pool: State<'_, Pool<ConnectionManager<PgConnection>>>) -> Vec<(
         ))
         .filter(Account::mine())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts")
+        .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn checking_accounts(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
-) -> Vec<(Account, AccountHolder, AccountType)> {
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -34,12 +36,12 @@ fn checking_accounts(
         .filter(Account::mine())
         .filter(Account::checking_account())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts")
+        .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn investment_accounts(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
-) -> Vec<(Account, AccountHolder, AccountType)> {
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -52,12 +54,12 @@ fn investment_accounts(
         .filter(Account::mine())
         .filter(Account::investment())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts")
+        .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn retirement_accounts(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
-) -> Vec<(Account, AccountHolder, AccountType)> {
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all_with_holder_and_type()
@@ -70,12 +72,12 @@ fn retirement_accounts(
         .filter(Account::mine())
         .filter(Account::retirement())
         .load::<(Account, AccountHolder, AccountType)>(&mut conn)
-        .expect("Error loading accounts")
+        .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 #[tauri::command]
 pub async fn sidebar_menu(
-    pool: State<'_, Pool<ConnectionManager<PgConnection>>>,
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     category: &str,
 ) -> Result<Vec<crate::models::MenuGroup>, String> {
     log::info!("Get Accounts for category {category}");
@@ -90,20 +92,24 @@ pub async fn sidebar_menu(
         retirement_accounts(pool)
     } else if category == "/rentals" {
         // TODO: Return links to views about rented properties
-        vec![]
+        Ok(vec![])
     } else if category == "/taxes" {
         // TODO: Return links to views about taxes: IRPF, 720,...
-        vec![]
+        Ok(vec![])
     } else {
         log::error!("Unexpected sidebar_menu category '{category}'");
         // FIXME: Return error?
-        vec![]
+        Err(format!("Unexpected sidebar_menu category '{category}'"))
     };
 
-    let accounts = accounts
-        .into_iter()
-        .map(|v| v.into())
-        .collect::<Vec<crate::models::Account>>();
-
-    Ok(crate::models::MenuGroup::new_grouped_by_holder(accounts))
+    match accounts {
+        Ok(accounts) => {
+            let accounts = accounts
+                .into_iter()
+                .map(|v| v.into())
+                .collect::<Vec<crate::models::Account>>();
+            Ok(crate::models::MenuGroup::new_grouped_by_holder(accounts))
+        }
+        Err(e) => Err(e),
+    }
 }

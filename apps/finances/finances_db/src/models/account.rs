@@ -1,10 +1,13 @@
+use crate::models::account_type::{
+    ACCIONES, CUENTA_CORRIENTE, DEPOSITO, FONDO_INVERSION, METALICO, PLAN_PENSIONES, VIVIENDA,
+};
 use diesel::prelude::*;
 
 use super::{AccountHolder, AccountType};
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::data_account)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(check_for_backend(crate::types::BackendType))]
 #[diesel(belongs_to(AccountHolder, foreign_key = holder_id))]
 #[diesel(belongs_to(AccountType, foreign_key = type_id))]
 pub struct Account {
@@ -54,40 +57,48 @@ impl Account {
     }
 
     /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is either
-    /// "Cuenta corriente" or "Metálico"
+    /// [`CUENTA_CORRIENTE`] or [`METALICO`]
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn checking_account() -> _ {
+    pub fn checking_account<'a>() -> _ {
+        let cuenta_corriente: &'a str = CUENTA_CORRIENTE;
+        let metalico: &'a str = METALICO;
         crate::schema::data_accounttype::name
-            .eq("Cuenta corriente")
-            .or(crate::schema::data_accounttype::name.eq("Metálico"))
+            .eq(cuenta_corriente)
+            .or(crate::schema::data_accounttype::name.eq(metalico))
     }
 
     /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is either
-    /// "Fondo de inversión", "Acciones", "Vivienda" or "Depósito"
+    /// [`FONDO_INVERSION`], [`ACCIONES`], [`VIVIENDA`] or [`DEPOSITO`]
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn investment() -> _ {
+    pub fn investment<'a>() -> _ {
+        let fondo_inversion: &'a str = FONDO_INVERSION;
+        let acciones: &'a str = ACCIONES;
+        let vivienda: &'a str = VIVIENDA;
+        let deposito: &'a str = DEPOSITO;
+
         crate::schema::data_accounttype::name
-            .eq("Fondo de inversión")
-            .or(crate::schema::data_accounttype::name.eq("Acciones"))
-            .or(crate::schema::data_accounttype::name.eq("Vivienda"))
-            .or(crate::schema::data_accounttype::name.eq("Depósito"))
+            .eq(fondo_inversion)
+            .or(crate::schema::data_accounttype::name.eq(acciones))
+            .or(crate::schema::data_accounttype::name.eq(vivienda))
+            .or(crate::schema::data_accounttype::name.eq(deposito))
     }
 
     /// Returns a query fragment to filter all the [`Account`]s whose [`AccountType`] is
     /// "Plan de pensiones"
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn retirement() -> _ {
-        crate::schema::data_accounttype::name.eq("Plan de pensiones")
+    pub fn retirement<'a>() -> _ {
+        let plan_pensiones: &'a str = PLAN_PENSIONES;
+        crate::schema::data_accounttype::name.eq(plan_pensiones)
     }
 }
 
 impl Account {
-    /// Returns (a query to) the latest [`Snapshot`] for this account
-    #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn last_snapshot(&self) -> _ {
-        let id: i32 = self.id;
-        crate::schema::data_snapshot::table.filter(crate::schema::data_snapshot::account_id.eq(id))
-    }
+    // /// Returns (a query to) the latest [`super::Snapshot`] for this account
+    // #[diesel::dsl::auto_type(no_type_alias)]
+    // pub fn last_snapshot(&self) -> _ {
+    //     let id: i32 = self.id;
+    //     crate::schema::data_snapshot::table.filter(crate::schema::data_snapshot::account_id.eq(id))
+    // }
 
     //     pub fn position(&self) -> BigDecimal {
     //         todo!("Return the position NOW")
