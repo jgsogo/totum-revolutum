@@ -1,6 +1,6 @@
 use crate::models::account_type::{ACCIONES, CUENTA_CORRIENTE};
 use crate::models::{Account, AccountHolder, AccountType};
-use crate::test_utils::fixtures::database_with_accounts;
+use crate::test_utils::fixtures::{database, database_with_accounts};
 use diesel::prelude::*;
 
 #[test]
@@ -112,6 +112,131 @@ fn test_filters() {
             .get_result(&mut database_with_accounts.conn)
             .expect("Error loading accounts");
         assert_eq!(accounts, 0);
+    }
+}
+
+#[test]
+fn test_required_fields() {
+    let mut database = database();
+
+    // 'name' is required
+    {
+        let r = diesel::insert_into(crate::schema::data_account::dsl::data_account)
+            .values((
+                crate::schema::data_account::ccy.eq("ccy"),
+                crate::schema::data_account::open.eq(chrono::NaiveDate::from_ymd_opt(2250, 10, 13).unwrap()),
+                crate::schema::data_account::holder_id.eq(0),
+                crate::schema::data_account::type_id.eq(0),
+            ))
+            .execute(&mut database.conn);
+
+        assert!(r.is_err());
+        let e = r.unwrap_err();
+        match e {
+            diesel::result::Error::DatabaseError(kind, info) => {
+                assert!(matches!(kind, diesel::result::DatabaseErrorKind::NotNullViolation));
+                assert_eq!(info.message(), "NOT NULL constraint failed: data_account.name");
+                assert!(info.table_name().is_none());
+                assert!(info.constraint_name().is_none());
+            }
+            _ => panic!("Test failed!"),
+        }
+    }
+
+    // 'ccy' is required
+    {
+        let r = diesel::insert_into(crate::schema::data_account::dsl::data_account)
+            .values((
+                crate::schema::data_account::name.eq("name"),
+                crate::schema::data_account::open.eq(chrono::NaiveDate::from_ymd_opt(2250, 10, 13).unwrap()),
+                crate::schema::data_account::holder_id.eq(0),
+                crate::schema::data_account::type_id.eq(0),
+            ))
+            .execute(&mut database.conn);
+
+        assert!(r.is_err());
+        let e = r.unwrap_err();
+        match e {
+            diesel::result::Error::DatabaseError(kind, info) => {
+                assert!(matches!(kind, diesel::result::DatabaseErrorKind::NotNullViolation));
+                assert_eq!(info.message(), "NOT NULL constraint failed: data_account.ccy");
+                assert!(info.table_name().is_none());
+                assert!(info.constraint_name().is_none());
+            }
+            _ => panic!("Test failed!"),
+        }
+    }
+
+    // 'open' is required
+    {
+        let r = diesel::insert_into(crate::schema::data_account::dsl::data_account)
+            .values((
+                crate::schema::data_account::name.eq("name"),
+                crate::schema::data_account::ccy.eq("ccy"),
+                crate::schema::data_account::holder_id.eq(0),
+                crate::schema::data_account::type_id.eq(0),
+            ))
+            .execute(&mut database.conn);
+
+        assert!(r.is_err());
+        let e = r.unwrap_err();
+        match e {
+            diesel::result::Error::DatabaseError(kind, info) => {
+                assert!(matches!(kind, diesel::result::DatabaseErrorKind::NotNullViolation));
+                assert_eq!(info.message(), "NOT NULL constraint failed: data_account.open");
+                assert!(info.table_name().is_none());
+                assert!(info.constraint_name().is_none());
+            }
+            _ => panic!("Test failed!"),
+        }
+    }
+
+    // 'holder_id' is required
+    {
+        let r = diesel::insert_into(crate::schema::data_account::dsl::data_account)
+            .values((
+                crate::schema::data_account::name.eq("name"),
+                crate::schema::data_account::ccy.eq("ccy"),
+                crate::schema::data_account::open.eq(chrono::NaiveDate::from_ymd_opt(2250, 10, 13).unwrap()),
+                crate::schema::data_account::type_id.eq(0),
+            ))
+            .execute(&mut database.conn);
+
+        assert!(r.is_err());
+        let e = r.unwrap_err();
+        match e {
+            diesel::result::Error::DatabaseError(kind, info) => {
+                assert!(matches!(kind, diesel::result::DatabaseErrorKind::NotNullViolation));
+                assert_eq!(info.message(), "NOT NULL constraint failed: data_account.holder_id");
+                assert!(info.table_name().is_none());
+                assert!(info.constraint_name().is_none());
+            }
+            _ => panic!("Test failed!"),
+        }
+    }
+
+    // 'type_id' is required
+    {
+        let r = diesel::insert_into(crate::schema::data_account::dsl::data_account)
+            .values((
+                crate::schema::data_account::name.eq("name"),
+                crate::schema::data_account::ccy.eq("ccy"),
+                crate::schema::data_account::open.eq(chrono::NaiveDate::from_ymd_opt(2250, 10, 13).unwrap()),
+                crate::schema::data_account::holder_id.eq(0),
+            ))
+            .execute(&mut database.conn);
+
+        assert!(r.is_err());
+        let e = r.unwrap_err();
+        match e {
+            diesel::result::Error::DatabaseError(kind, info) => {
+                assert!(matches!(kind, diesel::result::DatabaseErrorKind::NotNullViolation));
+                assert_eq!(info.message(), "NOT NULL constraint failed: data_account.type_id");
+                assert!(info.table_name().is_none());
+                assert!(info.constraint_name().is_none());
+            }
+            _ => panic!("Test failed!"),
+        }
     }
 }
 

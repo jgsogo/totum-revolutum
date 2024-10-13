@@ -209,6 +209,8 @@ impl SqliteTestDatabase {
 
     /// Populates some movements for the given account
     pub fn populate_movements(&mut self, account_pk: i32) -> Result<()> {
+        self.populate_fx(account_pk * 10)?;
+
         use crate::schema::data_movement::dsl::*;
         diesel::insert_into(data_movement)
             .values(&vec![
@@ -220,7 +222,7 @@ impl SqliteTestDatabase {
                     date.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
                     date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
                     account_id.eq(account_pk),
-                    fx_id.eq::<Option<i32>>(None),
+                    fx_id.eq::<Option<i32>>(Some(account_pk * 10)),
                     transfer_id.eq::<i32>(0),
                     type_id.eq::<i32>(0),
                 ),
@@ -232,9 +234,47 @@ impl SqliteTestDatabase {
                     date.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
                     date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
                     account_id.eq(account_pk),
-                    fx_id.eq::<Option<i32>>(None),
+                    fx_id.eq::<Option<i32>>(Some(account_pk * 10 + 1)),
                     transfer_id.eq::<i32>(0),
                     type_id.eq::<i32>(0),
+                ),
+            ])
+            .execute(&mut self.conn)?;
+        Ok(())
+    }
+
+    /// Populates some FX values
+    pub fn populate_fx(&mut self, start_id: i32) -> Result<()> {
+        use crate::schema::data_fx::dsl::*;
+        diesel::insert_into(data_fx)
+            .values(&vec![
+                (
+                    id.eq(start_id),
+                    foreign.eq("USD"),
+                    local.eq("EUR"),
+                    rate.eq::<NumericType>(1.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
+                ),
+                (
+                    id.eq(start_id + 1),
+                    foreign.eq("USD"),
+                    local.eq("EUR"),
+                    rate.eq::<NumericType>(2.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
+                ),
+                (
+                    id.eq(start_id + 2),
+                    foreign.eq("USD"),
+                    local.eq("EUR"),
+                    rate.eq::<NumericType>(3.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 8).unwrap()),
+                ),
+                (
+                    id.eq(start_id + 3),
+                    foreign.eq("USD"),
+                    local.eq("EUR"),
+                    rate.eq::<NumericType>(4.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 9).unwrap()),
                 ),
             ])
             .execute(&mut self.conn)?;

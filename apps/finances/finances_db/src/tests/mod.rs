@@ -6,4 +6,5 @@
 
 mod test_account;
 mod test_movement;
+mod test_movement_type;
 mod test_snapshot;
