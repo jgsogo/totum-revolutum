@@ -18,6 +18,8 @@ bazel_dep(name = "aspect_bazel_lib", version = "2.9.1", dev_dependency = True)
 bazel_dep(name = "aspect_rules_js", version = "2.1.0")
 bazel_dep(name = "aspect_rules_ts", version = "3.2.1")
 
+bazel_dep(name = "rules_uv", version = "0.21.0", dev_dependency = True)
+
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
 # Bazel-diff: https://github.com/Tinder/bazel-diff
@@ -41,6 +43,14 @@ python.toolchain(
     configure_coverage_tool = True,
     python_version = "3.12",
 )
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "py_deps",
+    python_version = "3.12",
+    requirements_lock = "//bazel/third_party:requirements.lock",
+)
+use_repo(pip, "py_deps")
 
 ######
 # Rust
@@ -80,7 +90,7 @@ crate.from_cargo(
     manifests = [
         "//:Cargo.toml",
         "//apps/finances/finances_db:Cargo.toml",
-        "//apps/finances/finances-app/src-tauri:Cargo.toml",
+        "//apps/finances/tauri/src-tauri:Cargo.toml",
         "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
         "//libraries/conductus:Cargo.toml",
@@ -119,7 +129,7 @@ npm.npm_translate_lock(
         ],
     },
     data = [
-        "//apps/finances/finances-app:package.json",
+        "//apps/finances/tauri:package.json",
         "//sandbox/svelte-hello-world:package.json",
         "//sandbox/tauri-hello-world:package.json",
     ],

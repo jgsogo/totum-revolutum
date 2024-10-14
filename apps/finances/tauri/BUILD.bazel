@@ -38,6 +38,6 @@ js_run_devserver(
 
 tauri_run(
     name = "dev",
-    backend = "//apps/finances/finances-app/src-tauri:app",
+    backend = "//apps/finances/tauri/src-tauri:app",
     frontend = ":devserver",
 )

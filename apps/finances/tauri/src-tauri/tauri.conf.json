@@ -6,7 +6,7 @@
     "windows": [
       {
         "height": 800,
-        "title": "finances-app",
+        "title": "finances",
         "width": 1200
       }
     ]
@@ -28,7 +28,7 @@
     ],
     "targets": "all"
   },
-  "identifier": "com.finances-app.app",
-  "productName": "finances-app",
+  "identifier": "com.finances.app",
+  "productName": "finances",
   "version": "0.1.0"
 }

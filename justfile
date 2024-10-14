@@ -10,12 +10,14 @@ update:
     cargo update
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines
     bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world update
-    bazel run -- @pnpm --dir $(pwd)/apps/finances/finances-app update
+    bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
+    bazel run @@//bazel/third_party:python_requirements
 
 # Run all testing
 test:
     cargo check
+    cargo clippy
     bazel test //...
 
 # Build everything
