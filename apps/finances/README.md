@@ -11,7 +11,7 @@ At this moment there are two applications here:
 
 ## Developer docs
 
-### Dev environment
+### Tauri - Dev environment
 
 The following command starts the application from the workspace:
 
@@ -32,11 +32,19 @@ It is also possible to execute the dev environment using non-Bazel tooling:
 bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri tauri dev
 ```
 
-### Create bundle to install the application
+### Tauri - Create bundle to install the application
 
 Right now, I don't know how to create the application bundle using Bazel ([issue](https://github.com/jgsogo/totum-revolutum/issues/507)),
 however, the non-Bazel approach works:
 
 ```sh
 bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri tauri build
+```
+
+### Django - Dev environment
+
+Django-adming can be executed with the following command:
+
+```sh
+bazel run //bazel/python/django:admin -- runserver --pythonpath=$(pwd)/apps/finances/django/ --settings=finances.settings
 ```
