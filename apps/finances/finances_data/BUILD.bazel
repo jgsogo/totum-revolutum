@@ -1,0 +1,12 @@
+load("@aspect_rules_py//py:defs.bzl", "py_library")
+load("@py_deps//:requirements.bzl", "requirement")
+
+py_library(
+    name = "finances_data",
+    srcs = glob(["**/*.py"]),
+    imports = ["../"],
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("django"),
+    ],
+)

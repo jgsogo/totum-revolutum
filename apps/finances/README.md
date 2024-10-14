@@ -43,7 +43,14 @@ bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri tauri build
 
 ### Django - Dev environment
 
-Django-adming can be executed with the following command:
+To run the development server, use:
+
+```sh
+
+```
+
+
+Django-admin can be executed with the following command:
 
 ```sh
 bazel run //bazel/python/django:admin -- runserver --pythonpath=$(pwd)/apps/finances/django/ --settings=finances.settings
