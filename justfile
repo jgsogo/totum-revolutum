@@ -15,8 +15,13 @@ update:
 
 # Run all testing
 test:
-    bazel test //...
     cargo check
+    bazel test //...
+
+# Build everything
+build:
+    cargo build
+    bazel build //...
 
 # Run all the Bazel targets labelled with 'update' tag
 bazel-update:
@@ -34,3 +39,6 @@ doc:
 clean:
     cargo clean
     bazel clean
+
+# Reset: removes all temporary files and recreates the workspace (Cargo and Bazel). This can take a while
+reset: clean build test
