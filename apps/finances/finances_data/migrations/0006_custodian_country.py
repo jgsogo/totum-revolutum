@@ -7,14 +7,14 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finances_data', '0005_account_is_numerable_and_more'),
+        ("finances_data", "0005_account_is_numerable_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='custodian',
-            name='country',
-            field=django_countries.fields.CountryField(default='ES', max_length=2),
+            model_name="custodian",
+            name="country",
+            field=django_countries.fields.CountryField(default="ES", max_length=2),
             preserve_default=False,
         ),
     ]

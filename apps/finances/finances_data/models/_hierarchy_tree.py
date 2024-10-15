@@ -1,13 +1,14 @@
 from django.db import models
 from treenode.models import TreeNodeModel
-from django.utils.translation import gettext_lazy as _
 
 
 class _HierarchyTree(TreeNodeModel):
     # parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    is_abstract = models.BooleanField(default=False, help_text="If the category can be instantiated or not")
+    is_abstract = models.BooleanField(
+        default=False, help_text="If the category can be instantiated or not"
+    )
     # level = models.PositiveSmallIntegerField(editable=False, validators=[MinValueValidator(0)])
 
     treenode_display_field = "name"

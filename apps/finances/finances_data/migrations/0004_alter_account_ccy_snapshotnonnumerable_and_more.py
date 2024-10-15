@@ -9,42 +9,83 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finances_data', '0003_rename_accountholders_accountholderrole_account_ccy_and_more'),
+        ("finances_data", "0003_rename_accountholders_accountholderrole_account_ccy_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='account',
-            name='ccy',
-            field=djmoney.models.fields.CurrencyField(choices=[('EUR', 'Euro'), ('USD', 'US Dollar')], default=None, max_length=3),
+            model_name="account",
+            name="ccy",
+            field=djmoney.models.fields.CurrencyField(
+                choices=[("EUR", "Euro"), ("USD", "US Dollar")], default=None, max_length=3
+            ),
         ),
         migrations.CreateModel(
-            name='SnapshotNonNumerable',
+            name="SnapshotNonNumerable",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_value', models.DateField()),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=14, validators=[django.core.validators.MinValueValidator(0)])),
-                ('account', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='finances_data.account')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("date_value", models.DateField()),
+                (
+                    "amount",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=14,
+                        validators=[django.core.validators.MinValueValidator(0)],
+                    ),
+                ),
+                (
+                    "account",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="finances_data.account"
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-date_value'],
-                'abstract': False,
-                'unique_together': {('account', 'date_value')},
+                "ordering": ["-date_value"],
+                "abstract": False,
+                "unique_together": {("account", "date_value")},
             },
         ),
         migrations.CreateModel(
-            name='SnapshotNumerable',
+            name="SnapshotNumerable",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_value', models.DateField()),
-                ('quantity', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(0)])),
-                ('unit_value', models.DecimalField(decimal_places=4, max_digits=14, validators=[django.core.validators.MinValueValidator(0)])),
-                ('account', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='finances_data.account')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("date_value", models.DateField()),
+                (
+                    "quantity",
+                    models.PositiveIntegerField(
+                        validators=[django.core.validators.MinValueValidator(0)]
+                    ),
+                ),
+                (
+                    "unit_value",
+                    models.DecimalField(
+                        decimal_places=4,
+                        max_digits=14,
+                        validators=[django.core.validators.MinValueValidator(0)],
+                    ),
+                ),
+                (
+                    "account",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="finances_data.account"
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-date_value'],
-                'abstract': False,
-                'unique_together': {('account', 'date_value')},
+                "ordering": ["-date_value"],
+                "abstract": False,
+                "unique_together": {("account", "date_value")},
             },
         ),
     ]

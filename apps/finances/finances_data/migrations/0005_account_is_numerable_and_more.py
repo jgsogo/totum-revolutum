@@ -7,18 +7,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finances_data', '0004_alter_account_ccy_snapshotnonnumerable_and_more'),
+        ("finances_data", "0004_alter_account_ccy_snapshotnonnumerable_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='account',
-            name='is_numerable',
-            field=models.BooleanField(default=False, help_text="Account with stocks is numerable (units), a bank account isn't"),
+            model_name="account",
+            name="is_numerable",
+            field=models.BooleanField(
+                default=False,
+                help_text="Account with stocks is numerable (units), a bank account isn't",
+            ),
         ),
         migrations.AlterField(
-            model_name='snapshotnumerable',
-            name='quantity',
-            field=models.DecimalField(decimal_places=4, help_text='Typically this will be an integer, but some accounts allow fractional units', max_digits=14, validators=[django.core.validators.MinValueValidator(0)]),
+            model_name="snapshotnumerable",
+            name="quantity",
+            field=models.DecimalField(
+                decimal_places=4,
+                help_text="Typically this will be an integer, but some accounts allow fractional units",
+                max_digits=14,
+                validators=[django.core.validators.MinValueValidator(0)],
+            ),
         ),
     ]
