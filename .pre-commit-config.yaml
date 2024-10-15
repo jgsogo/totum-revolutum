@@ -71,7 +71,7 @@ repos:
     rev: 7.1.0
     hooks:
       - id: flake8
-        exclude: "migrations/"
+        exclude: "migrations/"  # Python regex
         args:
           - "--max-line-length=100"
 
