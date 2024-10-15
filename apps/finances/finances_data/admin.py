@@ -39,7 +39,7 @@ class TransferTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
 admin.site.register(MovementType, MovementTypeModelAdmin)
 admin.site.register(AccountType, AccountTypeModelAdmin)
 admin.site.register(TransferType, TransferTypeModelAdmin)
-admin.site.register(Custodian)
+
 admin.site.register(Transfer)
 admin.site.register(SnapshotNonNumerable)
 admin.site.register(SnapshotNumerable)
@@ -85,3 +85,10 @@ class AccountHolderModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     inlines = (AccountHolderRoleInline,)
 
 admin.site.register(AccountHolder, AccountHolderModelAdmin)
+
+
+class CustodianModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
+    change_form_help_text = "<strong>Note.-</strong>. ."
+
+
+admin.site.register(Custodian, CustodianModelAdmin)
