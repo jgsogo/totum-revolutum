@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third parties
+    'treenode',
+
+    # My apps
+    'finances_data',
 ]
 
 MIDDLEWARE = [
@@ -76,8 +83,8 @@ WSGI_APPLICATION = 'finances.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'NAME': os.environ.get("DATABASE_SQLITE3", BASE_DIR / 'db.sqlite3'),
+    },
 }
 
 

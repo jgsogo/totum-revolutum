@@ -46,7 +46,7 @@ bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri tauri build
 To run the development server, use:
 
 ```sh
-
+bazel run //apps/finances/django:runserver
 ```
 
 

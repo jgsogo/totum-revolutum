@@ -1,12 +1,27 @@
 load("@aspect_rules_py//py:defs.bzl", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
 
+filegroup(
+    name = "fixtures",
+    srcs = glob(["fixtures/**/*.py"]),
+)
+
+filegroup(
+    name = "static",
+    srcs = glob(["static/**/*.py"]),
+)
+
 py_library(
     name = "finances_data",
     srcs = glob(["**/*.py"]),
+    data = [
+        ":fixtures",
+        ":static",
+    ],
     imports = ["../"],
     visibility = ["//visibility:public"],
     deps = [
         requirement("django"),
+        requirement("django-treenode"),
     ],
 )

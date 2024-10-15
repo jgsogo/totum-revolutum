@@ -1,14 +1,40 @@
 load("@aspect_rules_py//py:defs.bzl", "py_binary")
 load("@py_deps//:requirements.bzl", "requirement")
 
+APPS = [
+    "//apps/finances/finances_data",
+]
+
+# Use this target to execute commands on this project:
+#
+# ```
+# bazel run //apps/finances/django:admin -- --help
+# ```
 py_binary(
-    name = "finances-admin",
+    name = "admin",
     srcs = glob(["**/*.py"]),
-    args = ["runserver"],
+    env = {
+        "DATABASE_SQLITE3": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
+    },
     imports = ["."],
     main = "manage.py",
-    deps = [
-        "//apps/finances/finances_data",
+    deps = APPS + [
         requirement("django"),
+        requirement("PyYAML"),
+    ],
+)
+
+py_binary(
+    name = "runserver",
+    srcs = glob(["**/*.py"]),
+    args = ["runserver"],
+    env = {
+        "DATABASE_SQLITE3": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
+    },
+    imports = ["."],
+    main = "manage.py",
+    deps = APPS + [
+        requirement("django"),
+        requirement("PyYAML"),
     ],
 )
