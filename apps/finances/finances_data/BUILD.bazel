@@ -3,12 +3,17 @@ load("@py_deps//:requirements.bzl", "requirement")
 
 filegroup(
     name = "fixtures",
-    srcs = glob(["fixtures/**/*.py"]),
+    srcs = glob(["fixtures/**/*.json"]),
 )
 
 filegroup(
     name = "static",
     srcs = glob(["static/**/*.py"]),
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob(["templates/**/*.html"]),
 )
 
 py_library(
@@ -17,11 +22,14 @@ py_library(
     data = [
         ":fixtures",
         ":static",
+        ":templates",
     ],
     imports = ["../"],
-    visibility = ["//visibility:public"],
+    visibility = ["//apps/finances/django:__subpackages__"],
     deps = [
         requirement("django"),
         requirement("django-treenode"),
+        requirement("django-money"),
+        requirement("django-countries"),
     ],
 )

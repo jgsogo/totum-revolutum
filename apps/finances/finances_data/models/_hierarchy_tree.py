@@ -1,6 +1,7 @@
 from django.db import models
-from django.core.validators import MinValueValidator
 from treenode.models import TreeNodeModel
+from django.utils.translation import gettext_lazy as _
+
 
 class _HierarchyTree(TreeNodeModel):
     # parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)

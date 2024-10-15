@@ -41,6 +41,8 @@ INSTALLED_APPS = [
 
     # Third parties
     'treenode',
+    'djmoney',
+    'django_countries',
 
     # My apps
     'finances_data',
@@ -118,6 +120,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+DATE_FORMAT = 'Y-m-d'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -128,3 +132,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# Configure django-money
+BASE_CURRENCY = 'EUR'
+CURRENCIES = ('EUR', 'USD')
+
+# TODO: Add exchange rates (and near-time): https://stackoverflow.com/questions/1139393/what-is-the-best-django-model-field-to-use-to-represent-a-us-dollar-amount
+
+# Configure django-countries
+COUNTRIES_ONLY = ["ES", "US", "NL"]
