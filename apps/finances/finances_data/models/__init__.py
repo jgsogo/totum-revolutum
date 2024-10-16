@@ -4,7 +4,7 @@ from .account_type import AccountType
 from .custodian import Custodian
 from .movement_type import MovementType
 from .snapshot import SnapshotNonNumerable, SnapshotNumerable
-from .transfer import Transfer, TransferType
+from .transaction import Transaction, TransactionType
 
 __all__ = [
     "AccountHolder",
@@ -14,6 +14,6 @@ __all__ = [
     "MovementType",
     "SnapshotNonNumerable",
     "SnapshotNumerable",
-    "Transfer",
-    "TransferType",
+    "Transaction",
+    "TransactionType",
 ]

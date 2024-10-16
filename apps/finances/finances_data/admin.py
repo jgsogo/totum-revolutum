@@ -10,8 +10,8 @@ from .models import (
     MovementType,
     SnapshotNonNumerable,
     SnapshotNumerable,
-    Transfer,
-    TransferType,
+    Transaction,
+    TransactionType,
 )
 from .models.account import AccountHolderRole
 
@@ -42,15 +42,15 @@ class MovementTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
 
 
-class TransferTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
+class TransactionTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
 
 
 admin.site.register(MovementType, MovementTypeModelAdmin)
 admin.site.register(AccountType, AccountTypeModelAdmin)
-admin.site.register(TransferType, TransferTypeModelAdmin)
+admin.site.register(TransactionType, TransactionTypeModelAdmin)
 
-admin.site.register(Transfer)
+admin.site.register(Transaction)
 admin.site.register(SnapshotNonNumerable)
 admin.site.register(SnapshotNumerable)
 
