@@ -29,16 +29,18 @@ class Account(models.Model):
     custodian = models.ForeignKey(Custodian, on_delete=models.PROTECT)
     type = models.ForeignKey(AccountType, on_delete=models.PROTECT)
     identifier = models.CharField(
-        max_length=255, help_text=_("Official account identifier"), null=True, blank=True
+        max_length=255,
+        help_text=_("Official account identifier"),
+        null=True,
+        blank=True,
     )
 
     holders = models.ManyToManyField(AccountHolder, through="AccountHolderRole")
 
-    # FIXME, Maybe the AccountType already contains this information?
-    is_numerable = models.BooleanField(
-        default=False, help_text=_("Account with stocks is numerable (units), a bank account isn't")
-    )
     ccy = CurrencyField(default=DEFAULT_CURRENCY, choices=CURRENCY_CHOICES)
 
     open = models.DateField()
     close = models.DateField(blank=True, null=True)
+
+    def __str__(self) -> str:
+        return f"{self.custodian} - {self.name}"

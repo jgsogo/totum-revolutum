@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class AccountHolder(models.Model):
@@ -9,3 +10,9 @@ class AccountHolder(models.Model):
     """
 
     name = models.CharField(max_length=255, unique=True)
+    is_company = models.BooleanField(
+        default=True, help_text=_("Whether the holder is a company or a physical person")
+    )
+
+    def __str__(self) -> str:
+        return self.name

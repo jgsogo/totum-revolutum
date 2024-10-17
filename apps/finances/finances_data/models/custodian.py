@@ -12,3 +12,6 @@ class Custodian(models.Model):
     description = models.TextField(null=True, blank=True)
 
     country = CountryField()
+
+    def __str__(self) -> str:
+        return self.name

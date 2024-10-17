@@ -36,6 +36,8 @@ class HierarchyTreeModelAdmin(TreeNodeModelAdmin):
 
 class AccountTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
+    list_filter = HierarchyTreeModelAdmin.list_filter + ("is_numerable",)
+    list_display = HierarchyTreeModelAdmin.list_display + ("is_numerable",)
 
 
 class MovementTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
@@ -70,9 +72,20 @@ class AccountHolderRoleInline(admin.TabularInline):
     extra = 1
 
 
+class AccountHolderRoleInline(admin.TabularInline):
+    model = AccountHolderRole
+    extra = 1
+
+
 class AccountModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
-    inlines = (AccountHolderRoleInline,)
+    inlines = (
+        AccountHolderRoleInline,
+        SnapshotNumerableInline,
+        SnapshotNonNumerableInline,
+    )
+    list_display = ("name", "custodian", "type", "open", "close")
+    list_filter = ("custodian", "type__name", "close")
 
     def get_inline_instances(self, request, obj=None):
         # Return no inlines when obj is being created
@@ -80,24 +93,20 @@ class AccountModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
             return []
         unfiltered = super().get_inline_instances(request, obj)
         # filter out the Inlines you don't want
-        if obj.is_numerable:
+        if obj.type.is_numerable:
             filter = [AccountHolderRoleInline, SnapshotNumerableInline]
         else:
             filter = [AccountHolderRoleInline, SnapshotNonNumerableInline]
-        return [x for x in unfiltered if any(isinstance(x, it) for it in filter)]
+        return [x for x in unfiltered if any([isinstance(x, it) for it in filter])]
 
 
 admin.site.register(Account, AccountModelAdmin)
 
 
-class AccountHolderRoleInline(admin.TabularInline):
-    model = AccountHolderRole
-    extra = 1
-
-
 class AccountHolderModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
     inlines = (AccountHolderRoleInline,)
+    list_display = ("name", "is_company")
 
 
 admin.site.register(AccountHolder, AccountHolderModelAdmin)
@@ -105,6 +114,10 @@ admin.site.register(AccountHolder, AccountHolderModelAdmin)
 
 class CustodianModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
+    list_display = (
+        "name",
+        "country",
+    )
 
 
 admin.site.register(Custodian, CustodianModelAdmin)
