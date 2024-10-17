@@ -11,7 +11,7 @@ from .models import (
     SnapshotNonNumerable,
     SnapshotNumerable,
     Transaction,
-    TransactionType,
+    TransactionGroup,
 )
 from .models.account import AccountHolderRole
 
@@ -44,15 +44,23 @@ class MovementTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
 
 
-class TransactionTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
+class TransactionGroupModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
+    list_display = ("name", "cadence", "start")
+    list_filter = ("cadence", "start")
+
+
+class TransactionModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
+    change_form_help_text = "<strong>Note.-</strong>. ."
+    list_display = ("name", "group")
+    list_filter = ("group",)
 
 
 admin.site.register(MovementType, MovementTypeModelAdmin)
 admin.site.register(AccountType, AccountTypeModelAdmin)
-admin.site.register(TransactionType, TransactionTypeModelAdmin)
+admin.site.register(TransactionGroup, TransactionGroupModelAdmin)
 
-admin.site.register(Transaction)
+admin.site.register(Transaction, TransactionModelAdmin)
 admin.site.register(SnapshotNonNumerable)
 admin.site.register(SnapshotNumerable)
 
@@ -64,11 +72,6 @@ class SnapshotNonNumerableInline(admin.TabularInline):
 
 class SnapshotNumerableInline(admin.TabularInline):
     model = SnapshotNumerable
-    extra = 1
-
-
-class AccountHolderRoleInline(admin.TabularInline):
-    model = AccountHolderRole
     extra = 1
 
 
