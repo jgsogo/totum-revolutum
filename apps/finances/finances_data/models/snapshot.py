@@ -15,17 +15,22 @@ class Snapshot(models.Model):
         ordering = ["-date_value"]
 
 
+class SnapshotNonNumerable(Snapshot):
+    """Snapshot for a non-numerable account"""
+
+    amount = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+
+
 class SnapshotNumerable(Snapshot):
+    """Snapshot for a numerable account"""
+    
     quantity = models.DecimalField(
         max_digits=14,
         decimal_places=4,
         validators=[MinValueValidator(0)],
-        help_text=_("Typically this will be an integer, but some accounts allow fractional units"),
+        help_text=_("Number of units own. Typically this will be an integer, but some accounts allow fractional units"),
     )
     unit_value = models.DecimalField(
-        max_digits=14, decimal_places=4, validators=[MinValueValidator(0)]
+        max_digits=14, decimal_places=4, validators=[MinValueValidator(0)], help_text=_("Value of each of the units (use the currency of the account)")
     )
 
-
-class SnapshotNonNumerable(Snapshot):
-    amount = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])

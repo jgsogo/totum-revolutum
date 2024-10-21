@@ -12,6 +12,10 @@ from .models import (
     SnapshotNumerable,
     Transaction,
     TransactionGroup,
+    MovementNumerable,
+    MovementNonNumerable,
+    MovementDividend,
+    Fx
 )
 from .models.account import AccountHolderRole
 
@@ -49,11 +53,23 @@ class TransactionGroupModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     list_display = ("name", "cadence", "start")
     list_filter = ("cadence", "start")
 
+class MovementNonNumerableInline(admin.TabularInline):
+    model = MovementNonNumerable
+    extra = 1
+
+class MovementNumerableInline(admin.TabularInline):
+    model = MovementNumerable
+    extra = 1
+
+class MovementDividendInline(admin.TabularInline):
+    model = MovementDividend
+    extra = 1
 
 class TransactionModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
     list_display = ("name", "group")
     list_filter = ("group",)
+    inlines = [MovementNonNumerableInline, MovementNumerableInline, MovementDividendInline]
 
 
 admin.site.register(MovementType, MovementTypeModelAdmin)
@@ -124,3 +140,21 @@ class CustodianModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
 
 
 admin.site.register(Custodian, CustodianModelAdmin)
+
+
+class FxModelAdmin(admin.ModelAdmin):
+    list_display = ('local', 'foreign', 'date_value',)
+    list_filter = ('date_value',)
+    readonly_fields = ('local',)
+
+admin.site.register(Fx, FxModelAdmin)
+
+
+class MovementAdmin(admin.ModelAdmin):
+    list_display = ('date_value', 'direction', 'account', 'transaction__group', 'type', 'get_amount')
+    list_filter = ('account', 'type', 'date_value', 'direction')
+    search_fields = ("transaction__group", )
+
+admin.site.register(MovementNonNumerable, MovementAdmin)
+admin.site.register(MovementNumerable, MovementAdmin)
+admin.site.register(MovementDividend, MovementAdmin)
