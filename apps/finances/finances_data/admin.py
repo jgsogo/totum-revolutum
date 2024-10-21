@@ -151,7 +151,7 @@ admin.site.register(Fx, FxModelAdmin)
 
 
 class MovementAdmin(admin.ModelAdmin):
-    list_display = ('date_value', 'direction', 'account', 'transaction__group', 'type', 'get_amount')
+    list_display = ('account', 'date_value', 'direction', 'transaction__group', 'type', 'get_amount')
     list_filter = ('account', 'type', 'date_value', 'direction')
     search_fields = ("transaction__group", )
 

@@ -83,6 +83,6 @@ class MovementDividend(Movement):
     )
 
     def get_amount(self):
-        snapshot = self.account.snapshot_numerable_set.filter(date_value__lte=self.ex_dividend_date).first()
+        snapshot = self.account.snapshotnumerable_set.filter(date_value__lte=self.ex_dividend_date).first()
         return self.unit_value * snapshot.quantity
     
