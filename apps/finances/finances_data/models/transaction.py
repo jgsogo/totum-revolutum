@@ -65,33 +65,36 @@ class Transaction(models.Model):
 
     def clean(self):
         super().clean()
-        ins = []
-        outs = []
 
-        from .movement import Direction
+        # Validate movements (only if the transaction actually exists)
+        if self.pk:
+            ins = []
+            outs = []
 
-        def collect_mov(mov):
-            amount = mov.get_amount()
-            if mov.direction == Direction.IN:
-                ins.append(amount)
-            else:
-                outs.append(amount)
+            from .movement import Direction
 
-        for mov in self.movementnonnumerable_set.all():
-            collect_mov(mov)
+            def collect_mov(mov):
+                amount = mov.get_amount()
+                if mov.direction == Direction.IN:
+                    ins.append(amount)
+                else:
+                    outs.append(amount)
 
-        for mov in self.movementnumerable_set.all():
-            collect_mov(mov)
+            for mov in self.movementnonnumerable_set.all():
+                collect_mov(mov)
 
-        for mov in self.movementdividend_set.all():
-            collect_mov(mov)
+            for mov in self.movementnumerable_set.all():
+                collect_mov(mov)
 
-        ins = sum(ins)
-        outs = sum(outs)
+            for mov in self.movementdividend_set.all():
+                collect_mov(mov)
 
-        money_tolerance = getattr(settings, "MONEY_TOLERANCE", 0)
-        if abs(ins - outs) > money_tolerance:
-            raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
+            ins = sum(ins)
+            outs = sum(outs)
+
+            money_tolerance = getattr(settings, "MONEY_TOLERANCE", 0)
+            if abs(ins - outs) > money_tolerance:
+                raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
 
     def __str__(self) -> str:
         if self.group:
