@@ -3,14 +3,15 @@
     "fields": {
       "description": "Los activos son los recursos que dispone una empresa, ya sean tangibles o intangibles, que permitan a esta obtener beneficios econ\u00f3micos a futuro.",
       "is_abstract": true,
+      "is_numerable": false,
       "name": "Activos",
       "tn_ancestors_count": 0,
       "tn_ancestors_pks": "",
-      "tn_children_count": 2,
-      "tn_children_pks": "3,4",
+      "tn_children_count": 3,
+      "tn_children_pks": "3,4,23",
       "tn_depth": 3,
-      "tn_descendants_count": 15,
-      "tn_descendants_pks": "3,9,10,11,20,21,22,4,5,6,7,8,17,18,19",
+      "tn_descendants_count": 18,
+      "tn_descendants_pks": "3,9,10,11,20,21,22,24,25,4,17,18,19,23,5,6,7,8",
       "tn_index": 0,
       "tn_level": 1,
       "tn_order": 0,
@@ -26,6 +27,7 @@
     "fields": {
       "description": "Los pasivos son los gastos o deudas que la empresa posee a terceros, estos pueden ser pagos a bancos, salarios a empleados, entre otros.",
       "is_abstract": true,
+      "is_numerable": false,
       "name": "Pasivos",
       "tn_ancestors_count": 0,
       "tn_ancestors_pks": "",
@@ -36,7 +38,7 @@
       "tn_descendants_pks": "12,14,13,15,16",
       "tn_index": 1,
       "tn_level": 1,
-      "tn_order": 16,
+      "tn_order": 19,
       "tn_parent": null,
       "tn_priority": 0,
       "tn_siblings_count": 1,
@@ -49,21 +51,22 @@
     "fields": {
       "description": "Tambi\u00e9n llamados activos l\u00edquidos son los bienes o posesiones que se pueden convertir r\u00e1pidamente en dinero (efectivo).",
       "is_abstract": true,
+      "is_numerable": false,
       "name": "Corrientes",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "1",
-      "tn_children_count": 6,
-      "tn_children_pks": "9,10,11,20,21,22",
+      "tn_children_count": 8,
+      "tn_children_pks": "9,10,11,20,21,22,24,25",
       "tn_depth": 1,
-      "tn_descendants_count": 6,
-      "tn_descendants_pks": "9,10,11,20,21,22",
+      "tn_descendants_count": 8,
+      "tn_descendants_pks": "9,10,11,20,21,22,24,25",
       "tn_index": 0,
       "tn_level": 2,
       "tn_order": 1,
       "tn_parent": 1,
       "tn_priority": 0,
-      "tn_siblings_count": 1,
-      "tn_siblings_pks": "4"
+      "tn_siblings_count": 2,
+      "tn_siblings_pks": "4,23"
     },
     "model": "finances_data.accounttype",
     "pk": 3
@@ -72,21 +75,22 @@
     "fields": {
       "description": "Llamados tambi\u00e9n activos fijos y son aquellos pertenecientes al ente econ\u00f3mico y adquiridos con la intenci\u00f3n de utilizarlos en la producci\u00f3n de bienes y servicios propios de la actividad econ\u00f3mica desarrollada. No est\u00e1n destinados para la venta y su vida \u00fatil excede de un a\u00f1o.",
       "is_abstract": true,
+      "is_numerable": false,
       "name": "No corrientes",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "1",
-      "tn_children_count": 5,
-      "tn_children_pks": "5,6,7,8,17",
+      "tn_children_count": 1,
+      "tn_children_pks": "17",
       "tn_depth": 2,
-      "tn_descendants_count": 7,
-      "tn_descendants_pks": "5,6,7,8,17,18,19",
+      "tn_descendants_count": 3,
+      "tn_descendants_pks": "17,18,19",
       "tn_index": 1,
       "tn_level": 2,
-      "tn_order": 8,
+      "tn_order": 10,
       "tn_parent": 1,
       "tn_priority": 0,
-      "tn_siblings_count": 1,
-      "tn_siblings_pks": "3"
+      "tn_siblings_count": 2,
+      "tn_siblings_pks": "3,23"
     },
     "model": "finances_data.accounttype",
     "pk": 4
@@ -95,9 +99,10 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Terrenos",
       "tn_ancestors_count": 2,
-      "tn_ancestors_pks": "1,4",
+      "tn_ancestors_pks": "1,23",
       "tn_children_count": 0,
       "tn_children_pks": "",
       "tn_depth": 0,
@@ -105,11 +110,11 @@
       "tn_descendants_pks": "",
       "tn_index": 0,
       "tn_level": 3,
-      "tn_order": 9,
-      "tn_parent": 4,
+      "tn_order": 15,
+      "tn_parent": 23,
       "tn_priority": 0,
-      "tn_siblings_count": 4,
-      "tn_siblings_pks": "6,7,8,17"
+      "tn_siblings_count": 3,
+      "tn_siblings_pks": "6,7,8"
     },
     "model": "finances_data.accounttype",
     "pk": 5
@@ -118,9 +123,10 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Bienes inmuebles",
       "tn_ancestors_count": 2,
-      "tn_ancestors_pks": "1,4",
+      "tn_ancestors_pks": "1,23",
       "tn_children_count": 0,
       "tn_children_pks": "",
       "tn_depth": 0,
@@ -128,11 +134,11 @@
       "tn_descendants_pks": "",
       "tn_index": 1,
       "tn_level": 3,
-      "tn_order": 10,
-      "tn_parent": 4,
+      "tn_order": 16,
+      "tn_parent": 23,
       "tn_priority": 0,
-      "tn_siblings_count": 4,
-      "tn_siblings_pks": "5,7,8,17"
+      "tn_siblings_count": 3,
+      "tn_siblings_pks": "5,7,8"
     },
     "model": "finances_data.accounttype",
     "pk": 6
@@ -141,9 +147,10 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Veh\u00edculos",
       "tn_ancestors_count": 2,
-      "tn_ancestors_pks": "1,4",
+      "tn_ancestors_pks": "1,23",
       "tn_children_count": 0,
       "tn_children_pks": "",
       "tn_depth": 0,
@@ -151,11 +158,11 @@
       "tn_descendants_pks": "",
       "tn_index": 2,
       "tn_level": 3,
-      "tn_order": 11,
-      "tn_parent": 4,
+      "tn_order": 17,
+      "tn_parent": 23,
       "tn_priority": 0,
-      "tn_siblings_count": 4,
-      "tn_siblings_pks": "5,6,8,17"
+      "tn_siblings_count": 3,
+      "tn_siblings_pks": "5,6,8"
     },
     "model": "finances_data.accounttype",
     "pk": 7
@@ -164,9 +171,10 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Colecciones",
       "tn_ancestors_count": 2,
-      "tn_ancestors_pks": "1,4",
+      "tn_ancestors_pks": "1,23",
       "tn_children_count": 0,
       "tn_children_pks": "",
       "tn_depth": 0,
@@ -174,11 +182,11 @@
       "tn_descendants_pks": "",
       "tn_index": 3,
       "tn_level": 3,
-      "tn_order": 12,
-      "tn_parent": 4,
+      "tn_order": 18,
+      "tn_parent": 23,
       "tn_priority": 0,
-      "tn_siblings_count": 4,
-      "tn_siblings_pks": "5,6,7,17"
+      "tn_siblings_count": 3,
+      "tn_siblings_pks": "5,6,7"
     },
     "model": "finances_data.accounttype",
     "pk": 8
@@ -187,7 +195,8 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "name": "Efectivo (cash)",
+      "is_numerable": false,
+      "name": "Efectivo/Met\u00e1lico/Cash",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
       "tn_children_count": 0,
@@ -200,8 +209,8 @@
       "tn_order": 2,
       "tn_parent": 3,
       "tn_priority": 0,
-      "tn_siblings_count": 5,
-      "tn_siblings_pks": "10,11,20,21,22"
+      "tn_siblings_count": 7,
+      "tn_siblings_pks": "10,11,20,21,22,24,25"
     },
     "model": "finances_data.accounttype",
     "pk": 9
@@ -210,6 +219,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Cuenta bancaria",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -223,8 +233,8 @@
       "tn_order": 3,
       "tn_parent": 3,
       "tn_priority": 0,
-      "tn_siblings_count": 5,
-      "tn_siblings_pks": "9,11,20,21,22"
+      "tn_siblings_count": 7,
+      "tn_siblings_pks": "9,11,20,21,22,24,25"
     },
     "model": "finances_data.accounttype",
     "pk": 10
@@ -233,6 +243,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Dep\u00f3sito",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -246,8 +257,8 @@
       "tn_order": 4,
       "tn_parent": 3,
       "tn_priority": 0,
-      "tn_siblings_count": 5,
-      "tn_siblings_pks": "9,10,20,21,22"
+      "tn_siblings_count": 7,
+      "tn_siblings_pks": "9,10,20,21,22,24,25"
     },
     "model": "finances_data.accounttype",
     "pk": 11
@@ -256,6 +267,7 @@
     "fields": {
       "description": "",
       "is_abstract": true,
+      "is_numerable": false,
       "name": "Cr\u00e9dito",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "2",
@@ -266,7 +278,7 @@
       "tn_descendants_pks": "14",
       "tn_index": 0,
       "tn_level": 2,
-      "tn_order": 17,
+      "tn_order": 20,
       "tn_parent": 2,
       "tn_priority": 0,
       "tn_siblings_count": 1,
@@ -279,6 +291,7 @@
     "fields": {
       "description": "Un pr\u00e9stamo facilita todo el dinero de una sola vez en el mismo momento de la concesi\u00f3n",
       "is_abstract": true,
+      "is_numerable": false,
       "name": "Pr\u00e9stamo",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "2",
@@ -289,7 +302,7 @@
       "tn_descendants_pks": "15,16",
       "tn_index": 1,
       "tn_level": 2,
-      "tn_order": 19,
+      "tn_order": 22,
       "tn_parent": 2,
       "tn_priority": 0,
       "tn_siblings_count": 1,
@@ -302,6 +315,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Tarjeta de cr\u00e9dito",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "2,12",
@@ -312,7 +326,7 @@
       "tn_descendants_pks": "",
       "tn_index": 0,
       "tn_level": 3,
-      "tn_order": 18,
+      "tn_order": 21,
       "tn_parent": 12,
       "tn_priority": 0,
       "tn_siblings_count": 0,
@@ -325,6 +339,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Pr\u00e9stamo personal",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "2,13",
@@ -335,7 +350,7 @@
       "tn_descendants_pks": "",
       "tn_index": 0,
       "tn_level": 3,
-      "tn_order": 20,
+      "tn_order": 23,
       "tn_parent": 13,
       "tn_priority": 0,
       "tn_siblings_count": 1,
@@ -348,6 +363,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": false,
       "name": "Hipoteca",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "2,13",
@@ -358,7 +374,7 @@
       "tn_descendants_pks": "",
       "tn_index": 1,
       "tn_level": 3,
-      "tn_order": 21,
+      "tn_order": 24,
       "tn_parent": 13,
       "tn_priority": 0,
       "tn_siblings_count": 1,
@@ -371,6 +387,7 @@
     "fields": {
       "description": "",
       "is_abstract": true,
+      "is_numerable": false,
       "name": "Plan de pensiones",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,4",
@@ -379,13 +396,13 @@
       "tn_depth": 1,
       "tn_descendants_count": 2,
       "tn_descendants_pks": "18,19",
-      "tn_index": 4,
+      "tn_index": 0,
       "tn_level": 3,
-      "tn_order": 13,
+      "tn_order": 11,
       "tn_parent": 4,
       "tn_priority": 0,
-      "tn_siblings_count": 4,
-      "tn_siblings_pks": "5,6,7,8"
+      "tn_siblings_count": 0,
+      "tn_siblings_pks": ""
     },
     "model": "finances_data.accounttype",
     "pk": 17
@@ -394,6 +411,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": true,
       "name": "Individual",
       "tn_ancestors_count": 3,
       "tn_ancestors_pks": "1,4,17",
@@ -404,7 +422,7 @@
       "tn_descendants_pks": "",
       "tn_index": 0,
       "tn_level": 4,
-      "tn_order": 14,
+      "tn_order": 12,
       "tn_parent": 17,
       "tn_priority": 0,
       "tn_siblings_count": 1,
@@ -417,6 +435,7 @@
     "fields": {
       "description": "Son aquellos en los que el promotor es una empresa y los part\u00edcipes son exclusivamente los trabajadores de esa empresa.",
       "is_abstract": false,
+      "is_numerable": true,
       "name": "Empleo",
       "tn_ancestors_count": 3,
       "tn_ancestors_pks": "1,4,17",
@@ -427,7 +446,7 @@
       "tn_descendants_pks": "",
       "tn_index": 1,
       "tn_level": 4,
-      "tn_order": 15,
+      "tn_order": 13,
       "tn_parent": 17,
       "tn_priority": 0,
       "tn_siblings_count": 1,
@@ -440,6 +459,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": true,
       "name": "Acciones",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -453,8 +473,8 @@
       "tn_order": 5,
       "tn_parent": 3,
       "tn_priority": 0,
-      "tn_siblings_count": 5,
-      "tn_siblings_pks": "9,10,11,21,22"
+      "tn_siblings_count": 7,
+      "tn_siblings_pks": "9,10,11,21,22,24,25"
     },
     "model": "finances_data.accounttype",
     "pk": 20
@@ -463,6 +483,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": true,
       "name": "ETFs",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -476,8 +497,8 @@
       "tn_order": 6,
       "tn_parent": 3,
       "tn_priority": 0,
-      "tn_siblings_count": 5,
-      "tn_siblings_pks": "9,10,11,20,22"
+      "tn_siblings_count": 7,
+      "tn_siblings_pks": "9,10,11,20,22,24,25"
     },
     "model": "finances_data.accounttype",
     "pk": 21
@@ -486,6 +507,7 @@
     "fields": {
       "description": "",
       "is_abstract": false,
+      "is_numerable": true,
       "name": "Fondo de inversi\u00f3n",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -499,10 +521,82 @@
       "tn_order": 7,
       "tn_parent": 3,
       "tn_priority": 0,
-      "tn_siblings_count": 5,
-      "tn_siblings_pks": "9,10,11,20,21"
+      "tn_siblings_count": 7,
+      "tn_siblings_pks": "9,10,11,20,21,24,25"
     },
     "model": "finances_data.accounttype",
     "pk": 22
+  },
+  {
+    "fields": {
+      "description": "",
+      "is_abstract": true,
+      "is_numerable": true,
+      "name": "Patrimonio",
+      "tn_ancestors_count": 1,
+      "tn_ancestors_pks": "1",
+      "tn_children_count": 4,
+      "tn_children_pks": "5,6,7,8",
+      "tn_depth": 1,
+      "tn_descendants_count": 4,
+      "tn_descendants_pks": "5,6,7,8",
+      "tn_index": 2,
+      "tn_level": 2,
+      "tn_order": 14,
+      "tn_parent": 1,
+      "tn_priority": 0,
+      "tn_siblings_count": 2,
+      "tn_siblings_pks": "3,4"
+    },
+    "model": "finances_data.accounttype",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "description": "",
+      "is_abstract": false,
+      "is_numerable": false,
+      "name": "Flujo de caja",
+      "tn_ancestors_count": 2,
+      "tn_ancestors_pks": "1,3",
+      "tn_children_count": 0,
+      "tn_children_pks": "",
+      "tn_depth": 0,
+      "tn_descendants_count": 0,
+      "tn_descendants_pks": "",
+      "tn_index": 6,
+      "tn_level": 3,
+      "tn_order": 8,
+      "tn_parent": 3,
+      "tn_priority": 0,
+      "tn_siblings_count": 7,
+      "tn_siblings_pks": "9,10,11,20,21,22,25"
+    },
+    "model": "finances_data.accounttype",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "description": "",
+      "is_abstract": false,
+      "is_numerable": false,
+      "name": "Vales descuento, cupones, tarjetas regalo",
+      "tn_ancestors_count": 2,
+      "tn_ancestors_pks": "1,3",
+      "tn_children_count": 0,
+      "tn_children_pks": "",
+      "tn_depth": 0,
+      "tn_descendants_count": 0,
+      "tn_descendants_pks": "",
+      "tn_index": 7,
+      "tn_level": 3,
+      "tn_order": 9,
+      "tn_parent": 3,
+      "tn_priority": 0,
+      "tn_siblings_count": 7,
+      "tn_siblings_pks": "9,10,11,20,21,22,24"
+    },
+    "model": "finances_data.accounttype",
+    "pk": 25
   }
 ]
