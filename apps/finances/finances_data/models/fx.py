@@ -19,7 +19,7 @@ class Fx(models.Model):
     rate = models.DecimalField(
         max_digits=14,
         decimal_places=4,
-        validators=[MinValueValidator(0)],
+        validators=[MinValueValidator(0, "Rate should be equal or greater than 0")],
         help_text=_("How many 'foreign' you need to take a 'local'"),
     )
     date_value = models.DateField(help_text=_("Date when this FX was observed"))
@@ -27,9 +27,12 @@ class Fx(models.Model):
     class Meta:
         ordering = ["-date_value"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.local}/{self.foreign} = {self.rate} ({self.date_value})"
 
     def clean(self):
         if self.foreign == self.local:
             raise ValidationError(_("Equal local and foreign currencies makes no sense"))
+
+    def inverse(self) -> float:
+        return 1 / self.rate

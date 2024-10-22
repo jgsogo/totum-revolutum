@@ -18,23 +18,25 @@ py_binary(
     },
     imports = ["."],
     main = "manage.py",
+    visibility = ["//apps/finances:__subpackages__"],
     deps = APPS + [
         requirement("django"),
         requirement("PyYAML"),
     ],
 )
 
-py_binary(
-    name = "runserver",
-    srcs = glob(["**/*.py"]),
-    args = ["runserver"],
-    env = {
-        "DATABASE_SQLITE3": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
-    },
-    imports = ["."],
-    main = "manage.py",
-    deps = APPS + [
-        requirement("django"),
-        requirement("PyYAML"),
-    ],
-)
+# FIXME: If we want rules for custom commands, have a look to the django_test implementation
+# py_binary(
+#     name = "runserver",
+#     srcs = glob(["**/*.py"]),
+#     args = ["runserver"],
+#     env = {
+#         "DATABASE_SQLITE3": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
+#     },
+#     imports = ["."],
+#     main = "manage.py",
+#     deps = APPS + [
+#         requirement("django"),
+#         requirement("PyYAML"),
+#     ],
+# )
