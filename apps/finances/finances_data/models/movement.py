@@ -96,7 +96,7 @@ class MovementDividend(Movement):
     ex_dividend_date = models.DateField(
         help_text=_(
             "Date when the dividend is assigned. This data is used to"
-            " retrieved the number of stocks"
+            " retrieve the number of stocks"
         )
     )
 
