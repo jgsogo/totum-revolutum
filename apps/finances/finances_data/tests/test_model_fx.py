@@ -5,7 +5,7 @@ from django.test import TestCase
 from finances_data.models import Fx
 
 
-class AnimalTestCase(TestCase):
+class FxTestCase(TestCase):
     def test_basic(self):
         fx = Fx.objects.create(local="EUR", foreign="USD", date_value=date(1900, 12, 31), rate=1.25)
         self.assertEqual(str(fx), "EUR/USD = 1.25 (1900-12-31)")

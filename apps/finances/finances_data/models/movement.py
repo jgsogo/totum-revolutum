@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -86,4 +87,9 @@ class MovementDividend(Movement):
         snapshot = self.account.snapshotnumerable_set.filter(
             date_value__lte=self.ex_dividend_date
         ).first()
-        return self.unit_value * snapshot.quantity
+        if not snapshot:
+            raise ObjectDoesNotExist(
+                "Associated account doesn't have any Snapshot previous to the dividend ex_date"
+            )
+
+        return self.unit_value * float(snapshot.quantity)
