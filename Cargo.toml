@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
     "apps/finances/finances_db",
-    "apps/finances/finances-app/src-tauri",
+    "apps/finances/tauri/src-tauri",
     "apps/photodb",
     "apps/syncronia",
     "libraries/cron",

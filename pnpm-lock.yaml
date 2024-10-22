@@ -6,7 +6,7 @@ settings:
 
 importers:
 
-  apps/finances/finances-app:
+  apps/finances/tauri:
     dependencies:
       '@fortawesome/fontawesome-free':
         specifier: ^6.6.0

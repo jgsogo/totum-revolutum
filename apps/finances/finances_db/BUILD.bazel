@@ -11,7 +11,7 @@ filegroup(
 filegroup(
     name = "migrations",
     srcs = glob(["migrations/**/*.sql"]),
-    visibility = ["//apps/finances/finances-app:__subpackages__"],
+    visibility = ["//apps/finances/tauri:__subpackages__"],
 )
 
 diesel_setup(
@@ -45,7 +45,7 @@ rust_library(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    visibility = ["//apps/finances/finances-app:__subpackages__"],
+    visibility = ["//apps/finances/tauri:__subpackages__"],
     deps = all_crate_deps(
         normal = True,
     ),
@@ -63,7 +63,7 @@ rust_library(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    visibility = ["//apps/finances/finances-app:__subpackages__"],
+    visibility = ["//apps/finances/tauri:__subpackages__"],
     deps = all_crate_deps(
         normal = True,
     ),

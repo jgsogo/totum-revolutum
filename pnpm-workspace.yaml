@@ -2,4 +2,4 @@
 packages:
   - 'sandbox/svelte-hello-world'
   - 'sandbox/tauri-hello-world'
-  - 'apps/finances/finances-app'
+  - 'apps/finances/tauri'

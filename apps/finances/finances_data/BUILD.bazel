@@ -1,0 +1,47 @@
+load("@aspect_rules_py//py:defs.bzl", "py_library")
+load("@py_deps//:requirements.bzl", "requirement")
+load("//bazel/python/django:django_test.bzl", "django_test")
+
+filegroup(
+    name = "fixtures",
+    srcs = glob(["fixtures/**/*.json"]),
+)
+
+filegroup(
+    name = "static",
+    srcs = glob(["static/**/*.py"]),
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob(["templates/**/*.html"]),
+)
+
+py_library(
+    name = "finances_data",
+    srcs = glob(
+        ["**/*.py"],
+        exclude = ["tests/**/*.*"],  # Test files are not part of the library
+    ),
+    data = [
+        ":fixtures",
+        ":static",
+        ":templates",
+    ],
+    imports = ["../"],
+    visibility = ["//apps/finances/django:__subpackages__"],
+    deps = [
+        requirement("django"),
+        requirement("django-treenode"),
+        requirement("django-money"),
+        requirement("django-countries"),
+    ],
+)
+
+django_test(
+    name = "unittests",
+    srcs = glob(["tests/**/*.py"]),  # Include the test files here
+    app_label = "finances_data",
+    # This is a django-admin for a project that includes our application. Django applications cannot be tested without a project
+    django_admin_tool = "//apps/finances/django:admin",
+)
