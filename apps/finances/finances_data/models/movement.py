@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from djmoney.settings import BASE_CURRENCY
 
 from ._amount import AmountNonNumerableMixin, AmountNumerableMixin
 from .account import Account
@@ -54,15 +55,27 @@ class Movement(models.Model):
         ordering = ["-date_value"]
 
     def clean(self):
+        super().clean()
         if self.fx:
             if self.date_value != self.fx.date_value:
                 raise ValidationError("Date_value for FX and Movement didn't match")
-            if self.fx.local != self.account.ccy:
-                raise ValidationError("FX local currency and Account currency didn't match")
+            if self.fx.foreign != self.account.ccy:
+                raise ValidationError("FX foreign currency and Account currency didn't match")
         if self.date_value < self.account.open:
             raise ValidationError("Movement date_value should be after Account open")
         if self.account.close and self.date_value > self.account.close:
             raise ValidationError("Movement date_vale cannot be after account is closed")
+
+        if self.account.ccy != BASE_CURRENCY:
+            if not self.fx:
+                raise ValidationError("FX is required if the account is not in base currency")
+
+    def local_amount(self) -> float:
+        amount = self.get_amount()
+        if self.fx:
+            return amount * self.fx.inverse()
+        else:
+            return amount
 
 
 class MovementNonNumerable(Movement, AmountNonNumerableMixin):

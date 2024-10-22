@@ -31,6 +31,7 @@ class Fx(models.Model):
         return f"{self.local}/{self.foreign} = {self.rate} ({self.date_value})"
 
     def clean(self):
+        super().clean()
         if self.foreign == self.local:
             raise ValidationError(_("Equal local and foreign currencies makes no sense"))
 

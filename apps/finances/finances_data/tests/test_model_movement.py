@@ -31,14 +31,12 @@ class BaseMovementTestCase(TestCase):
             custodian=self.custodian,
             type=self.acctype,
             open=date(1900, 1, 1),
-            ccy="EUR",
         )
         self.account2 = Account.objects.create(
             name="acc2",
             custodian=self.custodian,
             type=self.acctype,
             open=date(1900, 1, 1),
-            ccy="EUR",
         )
 
         self.movtype = MovementType.objects.create(name="movtype")
@@ -75,6 +73,28 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
 
         all_movs = MovementNonNumerable.objects.all()
         self.assertListEqual(list(all_movs), [mov2, mov1])
+
+    def test_local_amount(self):
+        account_usd = Account.objects.create(
+            name="acc1",
+            custodian=self.custodian,
+            type=self.acctype,
+            open=date(1900, 1, 1),
+            ccy="USD",
+        )
+        fx = Fx.objects.create(foreign="USD", date_value=date(1900, 12, 31), rate=2)
+        mov = MovementNonNumerable.objects.create(
+            transaction=self.transaction,
+            type=self.movtype,
+            direction=Direction.OUT,
+            account=account_usd,
+            date_value=date(1900, 12, 31),
+            amount=1000,
+            fx=fx,
+        )
+
+        self.assertEqual(mov.get_amount(), 1000)
+        self.assertEqual(mov.local_amount(), 500)
 
     """
     The following tests only run in one of the variants, as they share the source code logic
@@ -133,7 +153,7 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
 
     def test_fx_protect(self):
         d = date(1900, 1, 1)
-        fx = Fx.objects.create(local="EUR", foreign="USD", date_value=d, rate=1.25)
+        fx = Fx.objects.create(foreign="USD", date_value=d, rate=1.25)
         MovementNonNumerable.objects.create(
             transaction=self.transaction,
             type=self.movtype,
@@ -156,7 +176,7 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
 
     def test_validation_fx_date_movement(self):
         # FX date_value has to match movement date
-        fx = Fx.objects.create(local="EUR", foreign="USD", date_value=date(1900, 1, 1), rate=1.25)
+        fx = Fx.objects.create(foreign="USD", date_value=date(1900, 1, 1), rate=1.25)
         m = MovementNonNumerable.objects.create(
             transaction=self.transaction,
             type=self.movtype,
@@ -174,7 +194,7 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
 
     def test_validation_fx_ccy(self):
         # FX foreign has to match account.ccy
-        fx = Fx.objects.create(local="USD", foreign="EUR", date_value=date(1900, 1, 1), rate=1.25)
+        fx = Fx.objects.create(foreign="USD", date_value=date(1900, 1, 1), rate=1.25)
         m = MovementNonNumerable.objects.create(
             transaction=self.transaction,
             type=self.movtype,
@@ -189,7 +209,7 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
             m.full_clean()
 
         self.assertListEqual(
-            cm.exception.messages, ["FX local currency and Account currency didn't match"]
+            cm.exception.messages, ["FX foreign currency and Account currency didn't match"]
         )
 
     def test_validate_date(self):
@@ -200,7 +220,6 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
             type=self.acctype,
             open=date(1900, 1, 1),
             close=date(1901, 1, 1),
-            ccy="EUR",
         )
 
         m = MovementNonNumerable(
@@ -235,6 +254,29 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
             cm.exception.messages, ["Movement date_vale cannot be after account is closed"]
         )
 
+    def test_validate_xccy_account(self):
+        account_usd = Account.objects.create(
+            name="acc2",
+            custodian=self.custodian,
+            type=self.acctype,
+            open=date(1900, 1, 1),
+            ccy="USD",
+        )
+        m = MovementNonNumerable.objects.create(
+            transaction=self.transaction,
+            type=self.movtype,
+            direction=Direction.OUT,
+            account=account_usd,
+            date_value=date(1900, 1, 1),
+            amount=1000,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            m.full_clean()
+
+        self.assertListEqual(
+            cm.exception.messages, ["FX is required if the account is not in base currency"]
+        )
+
 
 class MovementNumerableTestCase(AmountNumerableTestsMixin, BaseMovementTestCase):
 
@@ -248,6 +290,29 @@ class MovementNumerableTestCase(AmountNumerableTestsMixin, BaseMovementTestCase)
             quantity=quantity,
             unit_value=unit_value,
         )
+
+    def test_local_amount(self):
+        account_usd = Account.objects.create(
+            name="acc1",
+            custodian=self.custodian,
+            type=self.acctype,
+            open=date(1900, 1, 1),
+            ccy="USD",
+        )
+        fx = Fx.objects.create(foreign="USD", date_value=date(1900, 12, 31), rate=2)
+        mov = MovementNumerable.objects.create(
+            transaction=self.transaction,
+            type=self.movtype,
+            direction=Direction.OUT,
+            account=account_usd,
+            date_value=date(1900, 12, 31),
+            quantity=1000,
+            unit_value=1,
+            fx=fx,
+        )
+
+        self.assertEqual(mov.get_amount(), 1000)
+        self.assertEqual(mov.local_amount(), 500)
 
 
 class MovementDividendTestCase(BaseMovementTestCase):
@@ -284,6 +349,33 @@ class MovementDividendTestCase(BaseMovementTestCase):
         )
         self.assertEqual(mov.get_amount(), 23.10)
 
+    def test_local_amount(self):
+        account_usd = Account.objects.create(
+            name="acc1",
+            custodian=self.custodian,
+            type=self.acctype,
+            open=date(1900, 1, 1),
+            ccy="USD",
+        )
+        SnapshotNumerable.objects.create(
+            account=account_usd, date_value=date(1910, 1, 1), quantity=100, unit_value=1
+        )
+
+        fx = Fx.objects.create(foreign="USD", date_value=date(1900, 12, 31), rate=2)
+        mov = MovementDividend.objects.create(
+            transaction=self.transaction,
+            type=self.movtype,
+            direction=Direction.OUT,
+            account=account_usd,
+            date_value=date(1900, 1, 1),
+            ex_dividend_date=date(1910, 1, 1),
+            unit_value=2,
+            fx=fx,
+        )
+
+        self.assertEqual(mov.get_amount(), 200)
+        self.assertEqual(mov.local_amount(), 100)
+
     def test_validate_unit_value(self):
         mov = MovementDividend(
             transaction=self.transaction,
@@ -309,7 +401,6 @@ class MovementDividendTestCase(BaseMovementTestCase):
             type=self.acctype,
             open=date(1900, 1, 1),
             close=date(1901, 1, 1),
-            ccy="EUR",
         )
 
         m = MovementDividend(

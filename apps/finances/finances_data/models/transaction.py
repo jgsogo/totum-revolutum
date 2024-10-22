@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -7,6 +8,8 @@ CADENCE_CHOICES = [
     ("month", "Every month"),
     ("quarter", "Every quarter"),
 ]
+
+MONEY_TOLERANCE = 0
 
 
 class TransactionGroup(models.Model):
@@ -19,7 +22,10 @@ class TransactionGroup(models.Model):
      * Why we are giving away certain gift
      * All transactions related to some specific vacations
 
-    Based on these groups, we can create reports
+    Based on these groups, we can create reports. The 'start' date of
+    a TransactionGroup should match the actual start date of the event,
+    however some transactions associated to this group might happen
+    before.
     """
 
     name = models.CharField(max_length=255)
@@ -57,6 +63,35 @@ class Transaction(models.Model):
         blank=True,
         help_text=_("Which group (if any) this transaction belongs to"),
     )
+
+    def clean(self):
+        super().clean()
+        ins = []
+        outs = []
+
+        from .movement import Direction
+
+        def collect_mov(mov):
+            amount = mov.get_amount()
+            if mov.direction == Direction.IN:
+                ins.append(amount)
+            else:
+                outs.append(amount)
+
+        for mov in self.movementnonnumerable_set.all():
+            collect_mov(mov)
+
+        for mov in self.movementnumerable_set.all():
+            collect_mov(mov)
+
+        for mov in self.movementdividend_set.all():
+            collect_mov(mov)
+
+        ins = sum(ins)
+        outs = sum(outs)
+
+        if abs(ins - outs) > MONEY_TOLERANCE:  # FIXME: Add some tolerance?
+            raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
 
     def __str__(self) -> str:
         if self.group:

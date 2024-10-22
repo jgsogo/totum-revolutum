@@ -24,7 +24,6 @@ class SnapshotTestCase(TestCase):
             custodian=self.custodian,
             type=self.acctype,
             open=date(1900, 1, 1),
-            ccy="EUR",
         )
 
 
@@ -83,7 +82,6 @@ class SnapshotNonNumerableTestCase(AmountNonNumerableTestMixin, SnapshotTestCase
             type=self.acctype,
             open=date(1900, 1, 1),
             close=date(2000, 1, 1),
-            ccy="EUR",
         )
         with self.assertRaises(ValidationError) as cm:
             s = SnapshotNonNumerable.objects.create(

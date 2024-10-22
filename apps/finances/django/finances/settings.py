@@ -136,6 +136,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 BASE_CURRENCY = "EUR"
 CURRENCIES = ("EUR", "USD")
 
+
 # TODO: Add exchange rates (and near-time): https://stackoverflow.com/questions/1139393/what-is-the-best-django-model-field-to-use-to-represent-a-us-dollar-amount  # noqa: E501
 
 # Configure django-countries

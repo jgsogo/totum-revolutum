@@ -23,6 +23,7 @@ class Snapshot(models.Model):
         ordering = ["-date_value"]
 
     def clean(self):
+        super().clean()
         if self.date_value < self.account.open:
             raise ValidationError("Snapshot date_vale cannot be before account is opened")
         if self.account.close and self.date_value > self.account.close:

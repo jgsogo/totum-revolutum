@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from djmoney.models.fields import CurrencyField
-from djmoney.settings import CURRENCY_CHOICES, DEFAULT_CURRENCY
+from djmoney.settings import BASE_CURRENCY, CURRENCY_CHOICES
 
 from .account_holder import AccountHolder
 from .account_type import AccountType
@@ -47,7 +47,7 @@ class Account(models.Model):
 
     holders = models.ManyToManyField(AccountHolder, through="AccountHolderRole")
 
-    ccy = CurrencyField(default=DEFAULT_CURRENCY, choices=CURRENCY_CHOICES)
+    ccy = CurrencyField(default=BASE_CURRENCY, choices=CURRENCY_CHOICES)
 
     open = models.DateField(
         help_text=_(
