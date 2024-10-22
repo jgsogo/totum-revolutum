@@ -1,7 +1,5 @@
 from django.core.exceptions import ValidationError
 
-# TODO: These could be mixins that are incorporated into other tests
-
 
 class AmountNumerableTestsMixin:
     def _create_instance(self, quantity: float, unit_value: float):

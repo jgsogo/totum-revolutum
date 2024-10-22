@@ -1,4 +1,4 @@
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -53,6 +53,17 @@ class Movement(models.Model):
         abstract = True
         ordering = ["-date_value"]
 
+    def clean(self):
+        if self.fx:
+            if self.date_value != self.fx.date_value:
+                raise ValidationError("Date_value for FX and Movement didn't match")
+            if self.fx.local != self.account.ccy:
+                raise ValidationError("FX local currency and Account currency didn't match")
+        if self.date_value < self.account.open:
+            raise ValidationError("Movement date_value should be after Account open")
+        if self.account.close and self.date_value > self.account.close:
+            raise ValidationError("Movement date_vale cannot be after account is closed")
+
 
 class MovementNonNumerable(Movement, AmountNonNumerableMixin):
     """A movement that only involves an amount"""
@@ -82,6 +93,15 @@ class MovementDividend(Movement):
         validators=[MinValueValidator(0, "Unit value should be equal or greater than 0")],
         help_text=_("Dividen per stock"),
     )
+
+    def clean(self):
+        super().clean()
+        if self.ex_dividend_date < self.account.open:
+            raise ValidationError("MovementDividend ex_dividend_date should be after Account open")
+        if self.account.close and self.ex_dividend_date > self.account.close:
+            raise ValidationError(
+                "MovementDividend ex_dividend_date cannot be after account is closed"
+            )
 
     def get_amount(self):
         snapshot = self.account.snapshotnumerable_set.filter(
