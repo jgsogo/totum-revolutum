@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -9,6 +11,30 @@ CADENCE_CHOICES = [
     ("month", "Every month"),
     ("quarter", "Every quarter"),
 ]
+
+
+def validate_movements(movs):
+    ins = []
+    outs = []
+
+    from .movement import Direction
+
+    def collect_mov(mov):
+        amount = mov.get_amount()
+        if mov.direction == Direction.IN:
+            ins.append(amount)
+        else:
+            outs.append(amount)
+
+    for mov in movs:
+        collect_mov(mov)
+
+    ins = sum(ins)
+    outs = sum(outs)
+
+    money_tolerance = getattr(settings, "MONEY_TOLERANCE", 0)
+    if abs(ins - outs) > money_tolerance:
+        raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
 
 
 class TransactionGroup(models.Model):
@@ -68,33 +94,12 @@ class Transaction(models.Model):
 
         # Validate movements (only if the transaction actually exists)
         if self.pk:
-            ins = []
-            outs = []
-
-            from .movement import Direction
-
-            def collect_mov(mov):
-                amount = mov.get_amount()
-                if mov.direction == Direction.IN:
-                    ins.append(amount)
-                else:
-                    outs.append(amount)
-
-            for mov in self.movementnonnumerable_set.all():
-                collect_mov(mov)
-
-            for mov in self.movementnumerable_set.all():
-                collect_mov(mov)
-
-            for mov in self.movementdividend_set.all():
-                collect_mov(mov)
-
-            ins = sum(ins)
-            outs = sum(outs)
-
-            money_tolerance = getattr(settings, "MONEY_TOLERANCE", 0)
-            if abs(ins - outs) > money_tolerance:
-                raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
+            all_movs = chain(
+                self.movementnonnumerable_set.all(),
+                self.movementnumerable_set.all(),
+                self.movementdividend_set.all(),
+            )
+            validate_movements(all_movs)
 
     def __str__(self) -> str:
         if self.group:
