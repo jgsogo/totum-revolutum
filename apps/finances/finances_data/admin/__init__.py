@@ -14,86 +14,70 @@ from finances_data.models import (
     Transaction,
     TransactionGroup,
 )
-from finances_data.models.account import AccountHolderRole
-from treenode.admin import TreeNodeModelAdmin
-from treenode.forms import TreeNodeForm
 
+from ._hierarchy_tree_model_admin import HierarchyTreeModelAdmin
 from ._render_change_form_mixin import RenderChangeFormMixin
+from .inlines import (
+    AccountHolderRoleInline,
+    MovementDividendInline,
+    MovementNonNumerableInline,
+    MovementNumerableInline,
+    SnapshotNonNumerableInline,
+    SnapshotNumerableInline,
+)
 
-
-class HierarchyTreeModelAdmin(TreeNodeModelAdmin):
-    list_display = ("is_abstract",)
-    search_fields = ["name"]
-    list_filter = ("is_abstract",)
-
-    treenode_display_mode = TreeNodeModelAdmin.TREENODE_DISPLAY_MODE_ACCORDION
-    form = TreeNodeForm
+admin.site.register(SnapshotNonNumerable)
+admin.site.register(SnapshotNumerable)
 
 
 class AccountTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
-    change_form_help_text = "<strong>Note.-</strong>. ."
+    change_form_help_text = (
+        "<strong>Note.-</strong>. The hierarchy of account types is used to group several"
+        " accounts into categories and create reports. Modifying this hierarchy or adding"
+        " accounts outside it may have consequences on other applications"
+    )
     list_filter = HierarchyTreeModelAdmin.list_filter + ("is_numerable",)
     list_display = HierarchyTreeModelAdmin.list_display + ("is_numerable",)
 
 
+admin.site.register(AccountType, AccountTypeModelAdmin)
+
+
 class MovementTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
-    change_form_help_text = "<strong>Note.-</strong>. ."
+    change_form_help_text = (
+        "<strong>Note.-</strong>. The hierarchy of movement types is"
+        " used to group movements together and create reports."
+        " Modifying this hierarchy or adding types outside the"
+        " proposed one may have consequences in other applications."
+    )
+
+
+admin.site.register(MovementType, MovementTypeModelAdmin)
 
 
 class TransactionGroupModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
-    change_form_help_text = "<strong>Note.-</strong>. ."
+    change_form_help_text = (
+        "<strong>Note.-</strong>. Write only meaningful groups, do"
+        " not overuse them. Ideally these groups will be used to create"
+        " reports."
+    )
     list_display = ("name", "cadence", "start")
     list_filter = ("cadence", "start")
 
 
-class MovementNonNumerableInline(admin.TabularInline):
-    model = MovementNonNumerable
-    extra = 1
+admin.site.register(TransactionGroup, TransactionGroupModelAdmin)
 
 
-class MovementNumerableInline(admin.TabularInline):
-    model = MovementNumerable
-    extra = 1
-
-
-class MovementDividendInline(admin.TabularInline):
-    model = MovementDividend
-    extra = 1
-
-
-class TransactionModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
-    change_form_help_text = "<strong>Note.-</strong>. ."
+class TransactionModelAdmin(admin.ModelAdmin):
     list_display = ("name", "group")
     list_filter = ("group",)
     inlines = [MovementNonNumerableInline, MovementNumerableInline, MovementDividendInline]
 
 
-admin.site.register(MovementType, MovementTypeModelAdmin)
-admin.site.register(AccountType, AccountTypeModelAdmin)
-admin.site.register(TransactionGroup, TransactionGroupModelAdmin)
-
 admin.site.register(Transaction, TransactionModelAdmin)
-admin.site.register(SnapshotNonNumerable)
-admin.site.register(SnapshotNumerable)
 
 
-class SnapshotNonNumerableInline(admin.TabularInline):
-    model = SnapshotNonNumerable
-    extra = 1
-
-
-class SnapshotNumerableInline(admin.TabularInline):
-    model = SnapshotNumerable
-    extra = 1
-
-
-class AccountHolderRoleInline(admin.TabularInline):
-    model = AccountHolderRole
-    extra = 1
-
-
-class AccountModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
-    change_form_help_text = "<strong>Note.-</strong>. ."
+class AccountModelAdmin(admin.ModelAdmin):
     inlines = (
         AccountHolderRoleInline,
         SnapshotNumerableInline,
@@ -118,8 +102,7 @@ class AccountModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
 admin.site.register(Account, AccountModelAdmin)
 
 
-class AccountHolderModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
-    change_form_help_text = "<strong>Note.-</strong>. ."
+class AccountHolderModelAdmin(admin.ModelAdmin):
     inlines = (AccountHolderRoleInline,)
     list_display = ("name", "is_company")
 
@@ -127,8 +110,7 @@ class AccountHolderModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
 admin.site.register(AccountHolder, AccountHolderModelAdmin)
 
 
-class CustodianModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
-    change_form_help_text = "<strong>Note.-</strong>. ."
+class CustodianModelAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "country",
