@@ -1,6 +1,6 @@
 from datetime import date
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.test import TestCase
 from finances_data.models import (
     Account,
@@ -14,6 +14,8 @@ from finances_data.models import (
     Transaction,
 )
 from finances_data.models.movement import Direction
+
+from .test_model__amount import AmountNonNumerableTestMixin, AmountNumerableTestsMixin
 
 
 class BaseMovementTestCase(TestCase):
@@ -29,20 +31,19 @@ class BaseMovementTestCase(TestCase):
             name="acc2", custodian=custodian, type=acctype, open=date(1900, 1, 1), ccy="EUR"
         )
 
+        self.movtype = MovementType.objects.create(name="movtype")
 
-class MovementNonNumerableTestCase(BaseMovementTestCase):
-    def test_get_amount(self):
-        movtype = MovementType.objects.create(name="movtype")
-        mov = MovementNonNumerable(
+
+class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTestCase):
+    def _create_instance(self, amount: float):
+        return MovementNonNumerable(
             transaction=self.transaction,
-            type=movtype,
+            type=self.movtype,
             direction=Direction.OUT,
             account=self.account1,
             date_value=date(1900, 1, 1),
-            amount=1000.50,
+            amount=amount,
         )
-
-        self.assertEqual(mov.get_amount(), 1000.50)
 
     def test_default_ordering(self):
         movtype = MovementType.objects.create(name="movtype")
@@ -65,6 +66,10 @@ class MovementNonNumerableTestCase(BaseMovementTestCase):
 
         all_movs = MovementNonNumerable.objects.all()
         self.assertListEqual(list(all_movs), [mov2, mov1])
+
+    """
+    The following tests only run in one of the variants, as they share the source code logic
+    """
 
     def test_transaction_cascade(self):
         # TODO:
@@ -89,28 +94,25 @@ class MovementNonNumerableTestCase(BaseMovementTestCase):
         pass
 
 
-class MovementNumerableTestCase(BaseMovementTestCase):
-    def test_get_amount(self):
-        movtype = MovementType.objects.create(name="movtype")
-        mov = MovementNumerable(
+class MovementNumerableTestCase(AmountNumerableTestsMixin, BaseMovementTestCase):
+
+    def _create_instance(self, quantity: float, unit_value: float):
+        return MovementNumerable(
             transaction=self.transaction,
-            type=movtype,
+            type=self.movtype,
             direction=Direction.OUT,
             account=self.account1,
             date_value=date(1900, 1, 1),
-            quantity=10.5,
-            unit_value=2.2,
+            quantity=quantity,
+            unit_value=unit_value,
         )
-
-        self.assertEqual(mov.get_amount(), 23.10)
 
 
 class MovementDividendTestCase(BaseMovementTestCase):
     def test_get_amount(self):
-        movtype = MovementType.objects.create(name="movtype")
         mov = MovementDividend(
             transaction=self.transaction,
-            type=movtype,
+            type=self.movtype,
             direction=Direction.OUT,
             account=self.account1,
             date_value=date(1900, 1, 1),
@@ -140,6 +142,23 @@ class MovementDividendTestCase(BaseMovementTestCase):
         )
         self.assertEqual(mov.get_amount(), 23.10)
 
-    def test_validation(self):
-        # TODO: unit_value is >=0
+    def test_validate_unit_value(self):
+        mov = MovementDividend(
+            transaction=self.transaction,
+            type=self.movtype,
+            direction=Direction.OUT,
+            account=self.account1,
+            date_value=date(1900, 1, 1),
+            ex_dividend_date=date(1910, 1, 1),
+            unit_value=-2,
+        )
+        with self.assertRaises(ValidationError) as cm:
+            mov.full_clean()
+
+        self.assertListEqual(
+            cm.exception.messages, ["Unit value should be equal or greater than 0"]
+        )
+
+    def test_validate_ex_date(self):
+        # TODO: 3) ex-date inside [account.open, account.close]
         pass

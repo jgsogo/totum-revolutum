@@ -9,7 +9,7 @@ class AmountNonNumerableMixin(models.Model):
     amount = models.DecimalField(
         max_digits=14,
         decimal_places=2,
-        validators=[MinValueValidator(0)],
+        validators=[MinValueValidator(0, "Amount should be equal or greater than 0")],
         help_text=_("Amount in object's currency"),
     )
 
@@ -26,7 +26,7 @@ class AmountNumerableMixin(models.Model):
     quantity = models.DecimalField(
         max_digits=14,
         decimal_places=4,
-        validators=[MinValueValidator(0)],
+        validators=[MinValueValidator(0, "Quantity should be equal or greater than 0")],
         help_text=_(
             "Number of units. Typically this will be an integer, but some accounts allow"
             " fractional units"
@@ -35,7 +35,7 @@ class AmountNumerableMixin(models.Model):
     unit_value = models.DecimalField(
         max_digits=14,
         decimal_places=4,
-        validators=[MinValueValidator(0)],
+        validators=[MinValueValidator(0, "Unit value should be equal or greater than 0")],
         help_text=_("Value per unit in object's currency"),
     )
 

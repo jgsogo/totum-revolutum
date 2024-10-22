@@ -79,7 +79,7 @@ class MovementDividend(Movement):
     unit_value = models.DecimalField(
         max_digits=14,
         decimal_places=4,
-        validators=[MinValueValidator(0)],
+        validators=[MinValueValidator(0, "Unit value should be equal or greater than 0")],
         help_text=_("Dividen per stock"),
     )
 
