@@ -131,6 +131,8 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# finances-data
+MONEY_TOLERANCE = 0
 
 # Configure django-money
 BASE_CURRENCY = "EUR"

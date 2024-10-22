@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -8,8 +9,6 @@ CADENCE_CHOICES = [
     ("month", "Every month"),
     ("quarter", "Every quarter"),
 ]
-
-MONEY_TOLERANCE = 0
 
 
 class TransactionGroup(models.Model):
@@ -90,7 +89,8 @@ class Transaction(models.Model):
         ins = sum(ins)
         outs = sum(outs)
 
-        if abs(ins - outs) > MONEY_TOLERANCE:  # FIXME: Add some tolerance?
+        money_tolerance = getattr(settings, "MONEY_TOLERANCE", 0)
+        if abs(ins - outs) > money_tolerance:
             raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
 
     def __str__(self) -> str:
