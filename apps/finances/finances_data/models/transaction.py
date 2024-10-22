@@ -29,7 +29,7 @@ class TransactionGroup(models.Model):
         max_length=10,
         choices=CADENCE_CHOICES,
         default="once",
-        help_text=_("How often this same group is rescheduled"),
+        help_text=_("How often this same transaction group is rescheduled"),
     )
     start = models.DateField(
         help_text=_(
@@ -39,7 +39,7 @@ class TransactionGroup(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.name} ({self.cadence})"
 
 
 class Transaction(models.Model):
@@ -59,4 +59,7 @@ class Transaction(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.name
+        if self.group:
+            return f"{self.name} ({self.group.name})"
+        else:
+            return self.name

@@ -15,12 +15,27 @@ class Direction(models.IntegerChoices):
 
 
 class Movement(models.Model):
-    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
+    transaction = models.ForeignKey(
+        Transaction,
+        on_delete=models.CASCADE,
+        help_text=_(
+            "Every movement is associated to a transaction,"
+            " the transaction contains its counterparts"
+        ),
+    )
     type = models.ForeignKey(MovementType, on_delete=models.PROTECT)
-    direction = models.IntegerField(choices=Direction.choices)
+    direction = models.IntegerField(
+        choices=Direction.choices,
+        help_text=_(
+            "Whether the movement substracts an amount from the related"
+            " account (OUT) or increases it (IN)"
+        ),
+    )
 
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
-    date_value = models.DateField()
+    date_value = models.DateField(
+        help_text=_("Date when the movement is annotated in the associated account")
+    )
 
     fx = models.ForeignKey(
         Fx,
@@ -53,7 +68,12 @@ class MovementNumerable(Movement, AmountNumerableMixin):
 class MovementDividend(Movement):
     """(Only for 'Stock' accounts) Dividend paid by an account"""
 
-    ex_dividend_date = models.DateField(help_text=_("Date when the dividend is assigned"))
+    ex_dividend_date = models.DateField(
+        help_text=_(
+            "Date when the dividend is assigned. This data is used to"
+            " retrieved the number of stocks"
+        )
+    )
 
     unit_value = models.DecimalField(
         max_digits=14,

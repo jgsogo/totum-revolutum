@@ -7,9 +7,13 @@ from djmoney.settings import BASE_CURRENCY, CURRENCY_CHOICES
 
 
 class Fx(models.Model):
+    """FX exchange rate from a 'foreign' currency to the local one"""
+
     foreign = CurrencyField(choices=CURRENCY_CHOICES, help_text=_("Foreign (quoted) currency"))
     local = CurrencyField(
-        choices=CURRENCY_CHOICES, default=BASE_CURRENCY, help_text=_("Local/foreign currency")
+        choices=CURRENCY_CHOICES,
+        default=BASE_CURRENCY,
+        help_text=_("Local currency (FX is quoted as local/foreign)"),
     )
 
     rate = models.DecimalField(
@@ -18,7 +22,7 @@ class Fx(models.Model):
         validators=[MinValueValidator(0)],
         help_text=_("How many 'foreign' you need to take a 'local'"),
     )
-    date_value = models.DateField()
+    date_value = models.DateField(help_text=_("Date when this FX was observed"))
 
     class Meta:
         ordering = ["-date_value"]
