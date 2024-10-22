@@ -2,6 +2,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from ._amount import AmountNonNumerableMixin, AmountNumerableMixin
 from .account import Account
 from .fx import Fx
 from .movement_type import MovementType
@@ -36,39 +37,18 @@ class Movement(models.Model):
         abstract = True
         ordering = ["-date_value"]
 
-    def get_amount(self):
-        raise NotImplementedError
 
-
-class MovementNonNumerable(Movement):
+class MovementNonNumerable(Movement, AmountNonNumerableMixin):
     """A movement that only involves an amount"""
 
-    amount = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+    pass
 
-    def get_amount(self):
-        return self.amount
 
-class MovementNumerable(Movement):
+class MovementNumerable(Movement, AmountNumerableMixin):
     """A movement that modifies the number of units in a numerable account (buy/sell units)"""
 
-    quantity = models.DecimalField(
-        max_digits=14,
-        decimal_places=4,
-        validators=[MinValueValidator(0)],
-        help_text=_(
-            "Number of units. Typically this will be an integer, but some accounts allow"
-            " fractional units"
-        ),
-    )
-    unit_value = models.DecimalField(
-        max_digits=14,
-        decimal_places=4,
-        validators=[MinValueValidator(0)],
-        help_text=_("Value per unit"),
-    )
+    pass
 
-    def get_amount(self):
-        return self.quantity * self.unit_value
 
 class MovementDividend(Movement):
     """(Only for 'Stock' accounts) Dividend paid by an account"""
@@ -83,6 +63,7 @@ class MovementDividend(Movement):
     )
 
     def get_amount(self):
-        snapshot = self.account.snapshotnumerable_set.filter(date_value__lte=self.ex_dividend_date).first()
+        snapshot = self.account.snapshotnumerable_set.filter(
+            date_value__lte=self.ex_dividend_date
+        ).first()
         return self.unit_value * snapshot.quantity
-    

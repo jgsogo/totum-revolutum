@@ -1,13 +1,20 @@
-from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from ._amount import AmountNonNumerableMixin, AmountNumerableMixin
 from .account import Account
 
 
 class Snapshot(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.PROTECT)
-    date_value = models.DateField()
+    account = models.ForeignKey(
+        Account, on_delete=models.PROTECT, help_text=_("Account this snapshot refers to")
+    )
+    date_value = models.DateField(
+        help_text=_(
+            "Date corresponding to this snapshot. It should be a working day,"
+            " so the FX can be retrieved from official sources"
+        )
+    )
 
     class Meta:
         abstract = True
@@ -15,22 +22,13 @@ class Snapshot(models.Model):
         ordering = ["-date_value"]
 
 
-class SnapshotNonNumerable(Snapshot):
+class SnapshotNonNumerable(Snapshot, AmountNonNumerableMixin):
     """Snapshot for a non-numerable account"""
 
-    amount = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+    pass
 
 
-class SnapshotNumerable(Snapshot):
+class SnapshotNumerable(Snapshot, AmountNumerableMixin):
     """Snapshot for a numerable account"""
-    
-    quantity = models.DecimalField(
-        max_digits=14,
-        decimal_places=4,
-        validators=[MinValueValidator(0)],
-        help_text=_("Number of units own. Typically this will be an integer, but some accounts allow fractional units"),
-    )
-    unit_value = models.DecimalField(
-        max_digits=14, decimal_places=4, validators=[MinValueValidator(0)], help_text=_("Value of each of the units (use the currency of the account)")
-    )
 
+    pass
