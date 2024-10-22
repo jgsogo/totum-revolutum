@@ -44,6 +44,50 @@ class MovementNonNumerableTestCase(BaseMovementTestCase):
 
         self.assertEqual(mov.get_amount(), 1000.50)
 
+    def test_default_ordering(self):
+        movtype = MovementType.objects.create(name="movtype")
+        mov1 = MovementNonNumerable.objects.create(
+            transaction=self.transaction,
+            type=movtype,
+            direction=Direction.OUT,
+            account=self.account1,
+            date_value=date(1900, 1, 1),
+            amount=1000.50,
+        )
+        mov2 = MovementNonNumerable.objects.create(
+            transaction=self.transaction,
+            type=movtype,
+            direction=Direction.OUT,
+            account=self.account1,
+            date_value=date(2000, 1, 1),
+            amount=1000.50,
+        )
+
+        all_movs = MovementNonNumerable.objects.all()
+        self.assertListEqual(list(all_movs), [mov2, mov1])
+
+    def test_transaction_cascade(self):
+        # TODO:
+        pass
+
+    def test_type_protect(self):
+        # TODO:
+        pass
+
+    def test_account_protect(self):
+        # TODO:
+        pass
+
+    def test_fx_cascade(self):
+        # TODO:
+        pass
+
+    def test_validation_fx(self):
+        # TODO:  1) FX date_value has to match movement date
+        # TODO:  2) FX foreign has to match account.ccy
+        # TODO:  3) date_value inside [account.open, account.close] dates
+        pass
+
 
 class MovementNumerableTestCase(BaseMovementTestCase):
     def test_get_amount(self):
@@ -95,3 +139,7 @@ class MovementDividendTestCase(BaseMovementTestCase):
             account=self.account1, date_value=date(1910, 1, 1), quantity=10.5, unit_value=2.2
         )
         self.assertEqual(mov.get_amount(), 23.10)
+
+    def test_validation(self):
+        # TODO: unit_value is >=0
+        pass
