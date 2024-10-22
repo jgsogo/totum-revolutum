@@ -2,6 +2,7 @@ from datetime import date
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.db.models import ProtectedError
 from django.test import TestCase
 from finances_data.models import (
     Account,
@@ -95,8 +96,19 @@ class SnapshotNonNumerableTestCase(AmountNonNumerableTestMixin, SnapshotTestCase
         )
 
     def test_account_protect(self):
-        # TODO:
-        pass
+        # We cannot remove an account with Snapshots
+        SnapshotNonNumerable.objects.create(
+            account=self.account, date_value=date(2010, 1, 1), amount=1
+        )
+        with self.assertRaises(ProtectedError) as cm:
+            self.account.delete()
+
+        self.assertEqual(
+            str(cm.exception),
+            "(\"Cannot delete some instances of model 'Account' because they are referenced"
+            " through protected foreign keys: 'SnapshotNonNumerable.account'.\","
+            " {<SnapshotNonNumerable: SnapshotNonNumerable object (1)>})",
+        )
 
 
 class SnapshotNumerableTestCase(AmountNumerableTestsMixin, SnapshotTestCase):
