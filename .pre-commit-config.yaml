@@ -54,7 +54,7 @@ repos:
 
   # Lint and format SQL files
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.2.3
+    rev: 3.2.4
     hooks:
       - id: sqlfluff-lint
       - id: sqlfluff-fix
