@@ -1,32 +1,24 @@
 from django.contrib import admin
-from treenode.admin import TreeNodeModelAdmin
-from treenode.forms import TreeNodeForm
-
-from .models import (
+from finances_data.models import (
     Account,
     AccountHolder,
     AccountType,
     Custodian,
+    Fx,
+    MovementDividend,
+    MovementNonNumerable,
+    MovementNumerable,
     MovementType,
     SnapshotNonNumerable,
     SnapshotNumerable,
     Transaction,
     TransactionGroup,
-    MovementNumerable,
-    MovementNonNumerable,
-    MovementDividend,
-    Fx
 )
-from .models.account import AccountHolderRole
+from finances_data.models.account import AccountHolderRole
+from treenode.admin import TreeNodeModelAdmin
+from treenode.forms import TreeNodeForm
 
-
-class RenderChangeFormMixin:
-    def render_change_form(self, request, context, *args, **kwargs):
-        self.change_form_template = "admin/finances_data/change_form.html"
-        extra = {"help_text": self.change_form_help_text}
-
-        context.update(extra)
-        return super().render_change_form(request, context, *args, **kwargs)
+from ._render_change_form_mixin import RenderChangeFormMixin
 
 
 class HierarchyTreeModelAdmin(TreeNodeModelAdmin):
@@ -53,17 +45,21 @@ class TransactionGroupModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     list_display = ("name", "cadence", "start")
     list_filter = ("cadence", "start")
 
+
 class MovementNonNumerableInline(admin.TabularInline):
     model = MovementNonNumerable
     extra = 1
+
 
 class MovementNumerableInline(admin.TabularInline):
     model = MovementNumerable
     extra = 1
 
+
 class MovementDividendInline(admin.TabularInline):
     model = MovementDividend
     extra = 1
+
 
 class TransactionModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
     change_form_help_text = "<strong>Note.-</strong>. ."
@@ -143,17 +139,30 @@ admin.site.register(Custodian, CustodianModelAdmin)
 
 
 class FxModelAdmin(admin.ModelAdmin):
-    list_display = ('local', 'foreign', 'date_value',)
-    list_filter = ('date_value',)
-    readonly_fields = ('local',)
+    list_display = (
+        "local",
+        "foreign",
+        "date_value",
+    )
+    list_filter = ("date_value",)
+    readonly_fields = ("local",)
+
 
 admin.site.register(Fx, FxModelAdmin)
 
 
 class MovementAdmin(admin.ModelAdmin):
-    list_display = ('account', 'date_value', 'direction', 'transaction__group', 'type', 'get_amount')
-    list_filter = ('account', 'type', 'date_value', 'direction')
-    search_fields = ("transaction__group", )
+    list_display = (
+        "account",
+        "date_value",
+        "direction",
+        "transaction__group",
+        "type",
+        "get_amount",
+    )
+    list_filter = ("account", "type", "date_value", "direction")
+    search_fields = ("transaction__group",)
+
 
 admin.site.register(MovementNonNumerable, MovementAdmin)
 admin.site.register(MovementNumerable, MovementAdmin)
