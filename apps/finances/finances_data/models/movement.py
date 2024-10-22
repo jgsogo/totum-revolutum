@@ -102,6 +102,8 @@ class MovementDividend(Movement):
             raise ValidationError(
                 "MovementDividend ex_dividend_date cannot be after account is closed"
             )
+        if self.ex_dividend_date > self.date_value:
+            raise ValidationError("MovementDividend ex_dividend_date should be before date_value")
 
     def get_amount(self):
         snapshot = self.account.snapshotnumerable_set.filter(

@@ -290,7 +290,7 @@ class MovementDividendTestCase(BaseMovementTestCase):
             type=self.movtype,
             direction=Direction.OUT,
             account=self.account1,
-            date_value=date(1900, 1, 1),
+            date_value=date(1910, 1, 1),
             ex_dividend_date=date(1910, 1, 1),
             unit_value=-2,
         )
@@ -346,4 +346,23 @@ class MovementDividendTestCase(BaseMovementTestCase):
         self.assertListEqual(
             cm.exception.messages,
             ["MovementDividend ex_dividend_date cannot be after account is closed"],
+        )
+
+        # ex-dividen-date before date_value
+        m = MovementDividend(
+            transaction=self.transaction,
+            type=self.movtype,
+            direction=Direction.OUT,
+            account=self.account1,
+            date_value=date(1900, 1, 1),
+            ex_dividend_date=date(1902, 1, 1),
+            unit_value=1,
+        )
+
+        with self.assertRaises(ValidationError) as cm:
+            m.full_clean()
+
+        self.assertListEqual(
+            cm.exception.messages,
+            ["MovementDividend ex_dividend_date should be before date_value"],
         )
