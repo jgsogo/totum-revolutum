@@ -17,7 +17,7 @@ filegroup(
 )
 
 py_library(
-    name = "finances_data",
+    name = "django_finances_accounts",
     srcs = glob(
         ["**/*.py"],
         exclude = [
@@ -51,7 +51,7 @@ py_binary(
     imports = ["."],
     main = "run_local.py",
     deps = [
-        ":finances_data",
+        ":django_finances_accounts",
     ],
 )
 
@@ -60,14 +60,14 @@ py_binary(
     srcs = glob(["tests/**/*.py"]) + ["run_local.py"],  # Include the test files here
     args = [
         "makemigrations",
-        "finances_accounts",
+        "finances_accounts",  # appconfig.label
     ],
     imports = ["."],
     main = "run_local.py",
     deps = [
-        ":finances_data",
+        ":django_finances_accounts",
     ],
-    # TODO: Create a 'update' rule to copy the generated migration into the workspace
+    # TODO: Create an 'update' rule to copy the generated migration into the workspace
 )
 
 # django_test(
