@@ -2,7 +2,7 @@ load("@aspect_rules_py//py:defs.bzl", "py_binary")
 load("@py_deps//:requirements.bzl", "requirement")
 
 APPS = [
-    "//libraries/finances/accounts/django_finances_accounts",
+    "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
 ]
 
 # Use this target to execute commands on this project:
