@@ -1,57 +1,16 @@
-load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+load("@aspect_rules_py//py:defs.bzl", "py_binary")
 load("@py_deps//:requirements.bzl", "requirement")
+load("//bazel/python/django:django_app.bzl", "django_app")
 
-filegroup(
-    name = "fixtures",
-    srcs = glob(["fixtures/**/*.json"]),
-)
-
-filegroup(
-    name = "static",
-    srcs = glob(["static/**/*.py"]),
-)
-
-filegroup(
-    name = "templates",
-    srcs = glob(["templates/**/*.html"]),
-)
-
-py_library(
-    name = "django_finances_accounts",
-    srcs = glob(
-        ["**/*.py"],
-        exclude = [
-            "tests/**/*.*",
-            "run_local.py",
-        ],  # Test files are not part of the library
-    ),
-    data = [
-        ":fixtures",
-        ":static",
-        ":templates",
-    ],
-    imports = ["../"],
-    visibility = ["//apps/finances/django:__subpackages__"],
+django_app(
+    name = "finances_accounts",
+    visibility = ["//visibility:public"],
     deps = [
-        requirement("django"),
+        # requirement("django"),
         requirement("django-treenode"),
         requirement("django-money"),
         requirement("django-countries"),
         requirement("django-appconf"),
-    ],
-)
-
-py_binary(
-    name = "unittests",
-    srcs = glob(["tests/**/*.py"]) + ["run_local.py"],  # Include the test files here
-    args = [
-        "test",
-        "tests",
-    ],
-    imports = ["."],
-    main = "run_local.py",
-    deps = [
-        ":django_finances_accounts",
     ],
 )
 
@@ -65,7 +24,7 @@ py_binary(
     imports = ["."],
     main = "run_local.py",
     deps = [
-        ":django_finances_accounts",
+        ":finances_accounts",
     ],
     # TODO: Create an 'update' rule to copy the generated migration into the workspace
 )

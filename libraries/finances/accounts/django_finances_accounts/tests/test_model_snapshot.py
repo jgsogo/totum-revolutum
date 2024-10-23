@@ -46,8 +46,8 @@ class SnapshotNonNumerableTestCase(AmountNonNumerableTestMixin, SnapshotTestCase
 
         self.assertEqual(
             str(cm.exception),
-            "UNIQUE constraint failed: django_finances_accounts_snapshotnonnumerable.account_id,"
-            " django_finances_accounts_snapshotnonnumerable.date_value",
+            "UNIQUE constraint failed: finances_accounts_snapshotnonnumerable.account_id,"
+            " finances_accounts_snapshotnonnumerable.date_value",
         )
 
     def test_validate_default_order(self):
