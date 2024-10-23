@@ -1,9 +1,9 @@
 from itertools import chain
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_finances_accounts.conf import settings
 
 CADENCE_CHOICES = [
     ("once", "Once in a lifetime"),
@@ -32,7 +32,7 @@ def validate_movements(movs):
     ins = sum(ins)
     outs = sum(outs)
 
-    money_tolerance = getattr(settings, "MONEY_TOLERANCE", 0)
+    money_tolerance = settings.FINANCES_MONEY_TOLERANCE
     if abs(ins - outs) > money_tolerance:
         raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
 

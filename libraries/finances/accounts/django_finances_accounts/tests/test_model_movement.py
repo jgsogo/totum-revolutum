@@ -3,7 +3,7 @@ from datetime import date
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import ProtectedError
 from django.test import TestCase
-from finances_data.models import (
+from django_finances_accounts.models import (
     Account,
     AccountType,
     Custodian,
@@ -15,7 +15,7 @@ from finances_data.models import (
     SnapshotNumerable,
     Transaction,
 )
-from finances_data.models.movement import Direction
+from django_finances_accounts.models.movement import Direction
 
 from .test_model__amount import AmountNonNumerableTestMixin, AmountNumerableTestsMixin
 

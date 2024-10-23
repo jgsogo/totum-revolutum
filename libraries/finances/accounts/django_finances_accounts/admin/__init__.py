@@ -1,5 +1,5 @@
 from django.contrib import admin
-from finances_data.models import (
+from django_finances_accounts.models import (
     Account,
     AccountHolder,
     AccountType,

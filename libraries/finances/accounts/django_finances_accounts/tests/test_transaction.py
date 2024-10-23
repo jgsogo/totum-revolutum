@@ -2,7 +2,7 @@ from datetime import date
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from finances_data.models import (
+from django_finances_accounts.models import (
     Account,
     AccountType,
     Custodian,
@@ -11,7 +11,7 @@ from finances_data.models import (
     MovementType,
     Transaction,
 )
-from finances_data.models.movement import Direction
+from django_finances_accounts.models.movement import Direction
 
 
 class TransactionTestCase(TestCase):
