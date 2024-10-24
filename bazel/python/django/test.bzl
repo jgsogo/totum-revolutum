@@ -6,7 +6,7 @@ def _django_test_impl(ctx):
 
     ctx.actions.write(
         output = ctx.outputs.executable,
-        content = "{} test {}".format(ctx.executable.django_admin_tool.short_path, ctx.attr.app_label),
+        content = "{} test {}".format(ctx.executable.django_admin_tool.short_path, ctx.attr.test_label),
         is_executable = True,
     )
 
@@ -20,8 +20,8 @@ def _django_test_impl(ctx):
 django_test = rule(
     _django_test_impl,
     attrs = {
-        "app_label": attr.string(
-            doc = "Name of the application to test",
+        "test_label": attr.string(
+            doc = "Module paths to test; can be modulename, modulename.TestCase or modulename.TestCase.test_method",
             mandatory = True,
         ),
         "srcs": attr.label_list(

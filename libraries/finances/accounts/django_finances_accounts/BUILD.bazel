@@ -1,4 +1,3 @@
-load("@aspect_rules_py//py:defs.bzl", "py_binary")
 load("@py_deps//:requirements.bzl", "requirement")
 load("//bazel/python/django:django_app.bzl", "django_app")
 
@@ -14,20 +13,20 @@ django_app(
     ],
 )
 
-py_binary(
-    name = "makemigrations",
-    srcs = glob(["tests/**/*.py"]) + ["run_local.py"],  # Include the test files here
-    args = [
-        "makemigrations",
-        "finances_accounts",  # appconfig.label
-    ],
-    imports = ["."],
-    main = "run_local.py",
-    deps = [
-        ":finances_accounts",
-    ],
-    # TODO: Create an 'update' rule to copy the generated migration into the workspace
-)
+# py_binary(
+#     name = "makemigrations",
+#     srcs = glob(["tests/**/*.py"]) + ["run_local.py"],  # Include the test files here
+#     args = [
+#         "makemigrations",
+#         "finances_accounts",  # appconfig.label
+#     ],
+#     imports = ["."],
+#     main = "run_local.py",
+#     deps = [
+#         ":finances_accounts",
+#     ],
+#     # TODO: Create an 'update' rule to copy the generated migration into the workspace
+# )
 
 # django_test(
 #     name = "unittests",

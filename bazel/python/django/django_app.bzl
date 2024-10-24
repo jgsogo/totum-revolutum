@@ -2,9 +2,10 @@
 
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
-load("//bazel/python/django:django_test.bzl", "django_test")
+load("//bazel/python/django:makemigrations.bzl", "django_makemigrations")
+load("//bazel/python/django:test.bzl", "django_test")
 
-def django_app(name, deps = None, visibility = None):
+def django_app(name, deps = None, visibility = None, app_label = None):
     """
     A very opinionated macro to create a Django application.
 
@@ -19,7 +20,10 @@ def django_app(name, deps = None, visibility = None):
         name(str): The name of the application
         deps(list): A list of dependencies
         visibility: The visibility for the py_library
+        app_label: Short name for the application
     """
+
+    app_label = app_label or name
 
     native.filegroup(
         name = "{}/fixtures".format(name),
@@ -73,8 +77,13 @@ def django_app(name, deps = None, visibility = None):
     django_test(
         name = "unittests",
         srcs = native.glob(["tests/**/*.py"]),  # Include the test files here
-        app_label = "tests",
+        test_label = "tests",
         django_admin_tool = ":django-admin",
     )
 
-    # TODO: Add makemigrations
+    # Add makemigrations
+    django_makemigrations(
+        name = "makemigrations",
+        app_label = app_label,
+        django_admin_tool = ":django-admin",
+    )

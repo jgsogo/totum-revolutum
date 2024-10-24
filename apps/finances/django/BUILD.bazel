@@ -18,7 +18,6 @@ py_binary(
     },
     imports = ["."],
     main = "manage.py",
-    # visibility = ["//apps/finances:__subpackages__"],
     deps = APPS + [
         requirement("django"),
         requirement("PyYAML"),
