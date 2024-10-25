@@ -97,9 +97,16 @@ repos:
       #        language: script
       #        always_run: true
 
+      - id: bazel-check
+        name: Run all Bazel targets with 'check' tag
+        entry: scripts/bazel_run_targets.sh check
+        language: script
+        always_run: true
+        require_serial: true
+
       - id: bazel-update
         name: Run all Bazel targets with 'update' tag (update workspace files)
-        entry: scripts/bazel_run_update_targets.sh
+        entry: scripts/bazel_run_targets.sh update
         language: script
         always_run: true
         require_serial: true

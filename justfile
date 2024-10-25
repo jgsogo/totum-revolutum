@@ -27,7 +27,7 @@ build:
 
 # Run all the Bazel targets labelled with 'update' tag
 bazel-update:
-    scripts/bazel_run_update_targets.sh
+    scripts/bazel_run_targets.sh update
 
 # Execute tokei: prints statistics about the repository
 tokei:

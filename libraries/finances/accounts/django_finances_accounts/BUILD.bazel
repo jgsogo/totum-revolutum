@@ -5,33 +5,9 @@ django_app(
     name = "finances_accounts",
     visibility = ["//visibility:public"],
     deps = [
-        # requirement("django"),
         requirement("django-treenode"),
         requirement("django-money"),
         requirement("django-countries"),
         requirement("django-appconf"),
     ],
 )
-
-# py_binary(
-#     name = "makemigrations",
-#     srcs = glob(["tests/**/*.py"]) + ["run_local.py"],  # Include the test files here
-#     args = [
-#         "makemigrations",
-#         "finances_accounts",  # appconfig.label
-#     ],
-#     imports = ["."],
-#     main = "run_local.py",
-#     deps = [
-#         ":finances_accounts",
-#     ],
-#     # TODO: Create an 'update' rule to copy the generated migration into the workspace
-# )
-
-# django_test(
-#     name = "unittests",
-#     srcs = glob(["tests/**/*.py"]),  # Include the test files here
-#     app_label = "finances_data",
-#     # This is a django-admin for a project that includes our application. Django applications cannot be tested without a project
-#     django_admin_tool = "//apps/finances/django:admin",
-# )
