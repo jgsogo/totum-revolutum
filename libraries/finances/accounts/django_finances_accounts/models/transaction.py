@@ -13,14 +13,14 @@ CADENCE_CHOICES = [
 ]
 
 
-def validate_movements(movs):
+def validate_movements(movs, money_tolerance: float):
     ins = []
     outs = []
 
     from .movement import Direction
 
     def collect_mov(mov):
-        amount = mov.get_amount()
+        amount = mov.local_amount()
         if mov.direction == Direction.IN:
             ins.append(amount)
         else:
@@ -32,9 +32,10 @@ def validate_movements(movs):
     ins = sum(ins)
     outs = sum(outs)
 
-    money_tolerance = settings.FINANCES_MONEY_TOLERANCE
     if abs(ins - outs) > money_tolerance:
-        raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
+        raise ValidationError(
+            f"INs ({ins}) has to be equal to OUTs ({outs}) with tolerance '{money_tolerance}'"
+        )
 
 
 class TransactionGroup(models.Model):
@@ -102,7 +103,7 @@ class Transaction(models.Model):
                 self.movementnumerable_set.all(),
                 self.movementdividend_set.all(),
             )
-            validate_movements(all_movs)
+            validate_movements(all_movs, settings.FINANCES_MONEY_TOLERANCE)
 
     def __str__(self) -> str:
         if self.group:

@@ -102,7 +102,6 @@ def django_app(name, deps = None, visibility = None, app_label = None):
     django_test(
         name = "unittests",
         srcs = native.glob(["tests/**/*.py"]),  # Include the test files here
-        test_label = "tests",
         django_admin_tool = ":django-admin",
     )
 

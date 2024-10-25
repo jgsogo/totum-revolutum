@@ -22,7 +22,7 @@ django_test = rule(
     attrs = {
         "test_label": attr.string(
             doc = "Module paths to test; can be modulename, modulename.TestCase or modulename.TestCase.test_method",
-            mandatory = True,
+            default = "tests",
         ),
         "srcs": attr.label_list(
             allow_files = True,
