@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import ProtectedError
 from django.test import TestCase
-from finances_data.models import (
+from django_finances_accounts.models import (
     Account,
     AccountType,
     Custodian,
@@ -46,8 +46,8 @@ class SnapshotNonNumerableTestCase(AmountNonNumerableTestMixin, SnapshotTestCase
 
         self.assertEqual(
             str(cm.exception),
-            "UNIQUE constraint failed: finances_data_snapshotnonnumerable.account_id,"
-            " finances_data_snapshotnonnumerable.date_value",
+            "UNIQUE constraint failed: finances_accounts_snapshotnonnumerable.account_id,"
+            " finances_accounts_snapshotnonnumerable.date_value",
         )
 
     def test_validate_default_order(self):

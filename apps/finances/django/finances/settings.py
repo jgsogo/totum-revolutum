@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "djmoney",
     "django_countries",
     # My apps
-    "finances_data",
+    "django_finances_accounts.apps.FinancesAccountsConfig",
 ]
 
 MIDDLEWARE = [

@@ -17,7 +17,12 @@ django==5.1.2 \
     --hash=sha256:f11aa87ad8d5617171e3f77e1d5d16f004b79a2cf5d2e1d2b97a6a1f8e9ba5ed
     # via
     #   -r bazel/third_party/requirements.in
+    #   django-appconf
     #   django-money
+django-appconf==1.0.6 \
+    --hash=sha256:c3ae442fba1ff7ec830412c5184b17169a7a1e71cf0864a4c3f93cf4c98a1993 \
+    --hash=sha256:cfe87ea827c4ee04b9a70fab90b86d704cb02f2981f89da8423cb0fabf88efbf
+    # via -r bazel/third_party/requirements.in
 django-countries==7.6.1 \
     --hash=sha256:1ed20842fe0f6194f91faca21076649513846a8787c9eb5aeec3cbe1656b8acc \
     --hash=sha256:c772d4e3e54afcc5f97a018544e96f246c6d9f1db51898ab0c15cd57e19437cf

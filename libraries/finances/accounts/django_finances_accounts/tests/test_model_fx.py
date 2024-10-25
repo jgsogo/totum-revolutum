@@ -2,7 +2,7 @@ from datetime import date
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from finances_data.models import Fx
+from django_finances_accounts.models import Fx
 
 
 class FxTestCase(TestCase):

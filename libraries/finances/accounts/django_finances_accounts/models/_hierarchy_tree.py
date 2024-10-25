@@ -19,4 +19,9 @@ class _HierarchyTree(TreeNodeModel):
         unique_together = [["tn_parent", "name"]]
 
     def __str__(self):
-        return " / ".join([it.name for it in self.get_breadcrumbs(attr=None)])
+        try:
+            # This 'it.name' can fail while populating the fixtures because the parent
+            # might not have been added yet to the database
+            return " / ".join([it.name for it in self.get_breadcrumbs(attr=None)])
+        except:  # noqa: E722
+            return self.name

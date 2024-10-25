@@ -1,9 +1,9 @@
 from itertools import chain
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_finances_accounts.conf import settings
 
 CADENCE_CHOICES = [
     ("once", "Once in a lifetime"),
@@ -13,14 +13,14 @@ CADENCE_CHOICES = [
 ]
 
 
-def validate_movements(movs):
+def validate_movements(movs, money_tolerance: float):
     ins = []
     outs = []
 
     from .movement import Direction
 
     def collect_mov(mov):
-        amount = mov.get_amount()
+        amount = mov.local_amount()
         if mov.direction == Direction.IN:
             ins.append(amount)
         else:
@@ -32,9 +32,10 @@ def validate_movements(movs):
     ins = sum(ins)
     outs = sum(outs)
 
-    money_tolerance = getattr(settings, "MONEY_TOLERANCE", 0)
     if abs(ins - outs) > money_tolerance:
-        raise ValidationError(f"INs ({ins}) has to be equal to OUTs ({outs})")
+        raise ValidationError(
+            f"INs ({ins}) has to be equal to OUTs ({outs}) with tolerance '{money_tolerance}'"
+        )
 
 
 class TransactionGroup(models.Model):
@@ -102,7 +103,7 @@ class Transaction(models.Model):
                 self.movementnumerable_set.all(),
                 self.movementdividend_set.all(),
             )
-            validate_movements(all_movs)
+            validate_movements(all_movs, settings.FINANCES_MONEY_TOLERANCE)
 
     def __str__(self) -> str:
         if self.group:
