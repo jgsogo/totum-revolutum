@@ -135,8 +135,8 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
         self.assertEqual(
             str(cm.exception),
             "(\"Cannot delete some instances of model 'MovementType' because they are referenced"
-            " through protected foreign keys: 'MovementNonNumerable.type'.\","
-            " {<MovementNonNumerable: MovementNonNumerable object (1)>})",
+            " through protected foreign keys: 'Movement.type'.\","
+            " {<Movement: Movement object (1)>})",
         )
 
     def test_account_protect(self):
@@ -147,8 +147,8 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
         self.assertEqual(
             str(cm.exception),
             "(\"Cannot delete some instances of model 'Account' because they are referenced"
-            " through protected foreign keys: 'MovementNonNumerable.account'.\","
-            " {<MovementNonNumerable: MovementNonNumerable object (1)>})",
+            " through protected foreign keys: 'Movement.account'.\","
+            " {<Movement: Movement object (1)>})",
         )
 
     def test_fx_protect(self):
@@ -170,8 +170,8 @@ class MovementNonNumerableTestCase(AmountNonNumerableTestMixin, BaseMovementTest
         self.assertEqual(
             str(cm.exception),
             "(\"Cannot delete some instances of model 'Fx' because they are referenced"
-            " through protected foreign keys: 'MovementNonNumerable.fx'.\","
-            " {<MovementNonNumerable: MovementNonNumerable object (1)>})",
+            " through protected foreign keys: 'Movement.fx'.\","
+            " {<Movement: Movement object (1)>})",
         )
 
     def test_validation_fx_date_movement(self):

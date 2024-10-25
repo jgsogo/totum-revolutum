@@ -1,5 +1,3 @@
-from itertools import chain
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -95,14 +93,7 @@ class Transaction(models.Model):
 
         # Validate movements (only if the transaction actually exists)
         if self.pk:
-            # FIXME: If new movements arrive, we will need to add them here... and
-            # they might belong to other applications!!!! Probably here we need
-            # inheritance at database level, so we can query just one model.
-            all_movs = chain(
-                self.movementnonnumerable_set.all(),
-                self.movementnumerable_set.all(),
-                self.movementdividend_set.all(),
-            )
+            all_movs = self.movement_set.all()
             validate_movements(all_movs, settings.FINANCES_MONEY_TOLERANCE)
 
     def __str__(self) -> str:

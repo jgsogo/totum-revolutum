@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from djmoney.settings import BASE_CURRENCY
 
-from ._amount import AmountNonNumerableMixin, AmountNumerableMixin
+from ._amount import AmountNumerableMixin
 from .account import Account
 from .fx import Fx
 from .movement_type import MovementType
@@ -50,8 +50,15 @@ class Movement(models.Model):
         ),
     )
 
+    amount = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        validators=[MinValueValidator(0, "Amount should be equal or greater than 0")],
+        help_text=_("Amount in object's currency"),
+        blank=True,
+    )
+
     class Meta:
-        abstract = True
         ordering = ["-date_value"]
 
     def clean(self):
@@ -70,6 +77,9 @@ class Movement(models.Model):
             if not self.fx:
                 raise ValidationError("FX is required if the account is not in base currency")
 
+    def get_amount(self):
+        return self.amount
+
     def local_amount(self) -> float:
         amount = self.get_amount()
         if self.fx:
@@ -78,16 +88,16 @@ class Movement(models.Model):
             return amount
 
 
-class MovementNonNumerable(Movement, AmountNonNumerableMixin):
+class MovementNonNumerable(Movement):
     """A movement that only involves an amount"""
 
-    pass
 
-
-class MovementNumerable(Movement, AmountNumerableMixin):
+class MovementNumerable(AmountNumerableMixin, Movement):
     """A movement that modifies the number of units in a numerable account (buy/sell units)"""
 
-    pass
+    def save(self, *args, **kwargs):
+        self.amount = self.get_amount()
+        super().save(*args, **kwargs)
 
 
 class MovementDividend(Movement):
@@ -107,6 +117,10 @@ class MovementDividend(Movement):
         help_text=_("Dividen per stock"),
     )
 
+    def save(self, *args, **kwargs):
+        self.amount = self.get_amount()
+        super().save(*args, **kwargs)
+
     def clean(self):
         super().clean()
         if self.ex_dividend_date < self.account.open:
@@ -118,7 +132,7 @@ class MovementDividend(Movement):
         if self.ex_dividend_date > self.date_value:
             raise ValidationError("MovementDividend ex_dividend_date should be before date_value")
 
-    def get_amount(self):
+    def _snapshot(self):
         snapshot = self.account.snapshotnumerable_set.filter(
             date_value__lte=self.ex_dividend_date
         ).first()
@@ -126,5 +140,8 @@ class MovementDividend(Movement):
             raise ObjectDoesNotExist(
                 "Associated account doesn't have any Snapshot previous to the dividend ex_date"
             )
+        return snapshot
 
+    def get_amount(self):
+        snapshot = self._snapshot()
         return self.unit_value * float(snapshot.quantity)
