@@ -5,6 +5,7 @@ from django_finances_accounts.models import (
     AccountType,
     Custodian,
     Fx,
+    Movement,
     MovementDividend,
     MovementNonNumerable,
     MovementNumerable,
@@ -16,6 +17,7 @@ from django_finances_accounts.models import (
 )
 
 from ._hierarchy_tree_model_admin import HierarchyTreeModelAdmin
+from ._readonly_mixin import ReadOnlyAdminMixin
 from ._render_change_form_mixin import RenderChangeFormMixin
 from .inlines import (
     AccountHolderRoleInline,
@@ -140,12 +142,17 @@ class MovementAdmin(admin.ModelAdmin):
         "direction",
         "transaction__group",
         "type",
-        "get_amount",
+        "amount",
     )
     list_filter = ("account", "type", "date_value", "direction")
     search_fields = ("transaction__group",)
 
 
+class ReadOnlyMovementAdmin(ReadOnlyAdminMixin, MovementAdmin):
+    pass
+
+
 admin.site.register(MovementNonNumerable, MovementAdmin)
 admin.site.register(MovementNumerable, MovementAdmin)
 admin.site.register(MovementDividend, MovementAdmin)
+admin.site.register(Movement, ReadOnlyMovementAdmin)

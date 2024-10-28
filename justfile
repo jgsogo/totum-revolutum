@@ -15,7 +15,7 @@ update:
     bazel run @@//bazel/third_party:python_requirements
 
 # Run all testing
-test:
+test: build
     cargo check
     cargo clippy
     bazel test //...
