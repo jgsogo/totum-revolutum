@@ -3,7 +3,12 @@ from .account_holder import AccountHolder
 from .account_type import AccountType
 from .custodian import Custodian
 from .fx import Fx
-from .movement import MovementDividend, MovementNonNumerable, MovementNumerable
+from .movement import (
+    Movement,
+    MovementDividend,
+    MovementNonNumerable,
+    MovementNumerable,
+)
 from .movement_type import MovementType
 from .snapshot import SnapshotNonNumerable, SnapshotNumerable
 from .transaction import Transaction, TransactionGroup
@@ -22,4 +27,5 @@ __all__ = [
     "MovementNonNumerable",
     "MovementNumerable",
     "MovementDividend",
+    "Movement",
 ]
