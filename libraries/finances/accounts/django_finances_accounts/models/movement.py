@@ -1,9 +1,9 @@
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from djmoney.settings import BASE_CURRENCY
 
+from ._amount import AmountMixin
 from .account import Account
 from .fx import Fx
 from .movement_type import MovementType
@@ -15,7 +15,7 @@ class Direction(models.IntegerChoices):
     OUT = 1, _("OUT")
 
 
-class Movement(models.Model):
+class Movement(AmountMixin):
     transaction = models.ForeignKey(
         Transaction,
         on_delete=models.CASCADE,
@@ -49,14 +49,6 @@ class Movement(models.Model):
         ),
     )
 
-    amount = models.DecimalField(
-        max_digits=14,
-        decimal_places=2,
-        validators=[MinValueValidator(0, "Amount should be equal or greater than 0")],
-        help_text=_("Amount in object's currency"),
-        blank=True,
-    )
-
     class Meta:
         ordering = ["-date_value"]
 
@@ -85,7 +77,3 @@ class Movement(models.Model):
             return amount * self.fx.inverse()
         else:
             return amount
-
-
-class MovementNonNumerable(Movement):
-    """A movement that only involves an amount"""

@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class AmountNonNumerableMixin(models.Model):
+class AmountMixin(models.Model):
     """A mixin for a model storing an 'amount' (non numerable amount)"""
 
     amount = models.DecimalField(

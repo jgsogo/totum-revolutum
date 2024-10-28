@@ -6,23 +6,17 @@ from django_finances_accounts.models import (
     Custodian,
     Fx,
     Movement,
-    MovementNonNumerable,
     MovementType,
-    SnapshotNonNumerable,
+    Snapshot,
     Transaction,
     TransactionGroup,
 )
 
 from ._hierarchy_tree_model_admin import HierarchyTreeModelAdmin
-from ._readonly_mixin import ReadOnlyAdminMixin
 from ._render_change_form_mixin import RenderChangeFormMixin
-from .inlines import (
-    AccountHolderRoleInline,
-    MovementNonNumerableInline,
-    SnapshotNonNumerableInline,
-)
+from .inlines import AccountHolderRoleInline, MovementInline, SnapshotInline
 
-admin.site.register(SnapshotNonNumerable)
+admin.site.register(Snapshot)
 
 
 class AccountTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
@@ -67,7 +61,7 @@ class TransactionModelAdmin(admin.ModelAdmin):
     list_display = ("name", "group")
     list_filter = ("group",)
     inlines = [
-        MovementNonNumerableInline,
+        MovementInline,
     ]
 
 
@@ -77,7 +71,7 @@ admin.site.register(Transaction, TransactionModelAdmin)
 class AccountModelAdmin(admin.ModelAdmin):
     inlines = (
         AccountHolderRoleInline,
-        SnapshotNonNumerableInline,
+        SnapshotInline,
     )
     list_display = ("name", "custodian", "type", "open", "close")
     list_filter = ("custodian", "type__name", "close")
@@ -88,7 +82,7 @@ class AccountModelAdmin(admin.ModelAdmin):
             return []
         unfiltered = super().get_inline_instances(request, obj)
         # filter out the Inlines you don't want
-        filter = [AccountHolderRoleInline, SnapshotNonNumerableInline]
+        filter = [AccountHolderRoleInline, SnapshotInline]
         return [x for x in unfiltered if any([isinstance(x, it) for it in filter])]
 
 
@@ -139,9 +133,4 @@ class MovementAdmin(admin.ModelAdmin):
     search_fields = ("transaction__group",)
 
 
-class ReadOnlyMovementAdmin(ReadOnlyAdminMixin, MovementAdmin):
-    pass
-
-
-admin.site.register(MovementNonNumerable, MovementAdmin)
-admin.site.register(Movement, ReadOnlyMovementAdmin)
+admin.site.register(Movement, MovementAdmin)

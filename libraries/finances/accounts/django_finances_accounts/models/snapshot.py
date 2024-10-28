@@ -2,11 +2,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from ._amount import AmountNonNumerableMixin
+from ._amount import AmountMixin
 from .account import Account
 
 
-class Snapshot(models.Model):
+class Snapshot(AmountMixin):
     account = models.ForeignKey(
         Account, on_delete=models.PROTECT, help_text=_("Account this snapshot refers to")
     )
@@ -18,7 +18,6 @@ class Snapshot(models.Model):
     )
 
     class Meta:
-        abstract = True
         unique_together = [["account", "date_value"]]
         ordering = ["-date_value"]
 
@@ -28,9 +27,3 @@ class Snapshot(models.Model):
             raise ValidationError("Snapshot date_vale cannot be before account is opened")
         if self.account.close and self.date_value > self.account.close:
             raise ValidationError("Snapshot date_vale cannot be after account is closed")
-
-
-class SnapshotNonNumerable(Snapshot, AmountNonNumerableMixin):
-    """Snapshot for a non-numerable account"""
-
-    pass

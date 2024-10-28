@@ -7,7 +7,7 @@ from django_finances_accounts.models import (
     AccountType,
     Custodian,
     Fx,
-    MovementNonNumerable,
+    Movement,
     MovementType,
     Transaction,
 )
@@ -37,7 +37,7 @@ class TransactionTestCase(TestCase):
 
     def test_movements_mismatch(self):
         t = Transaction.objects.create(name="transaction")
-        MovementNonNumerable.objects.create(
+        Movement.objects.create(
             transaction=t,
             type=self.movtype,
             direction=Direction.OUT,
@@ -45,7 +45,7 @@ class TransactionTestCase(TestCase):
             date_value=date(1999, 1, 1),
             amount=1000,
         )
-        MovementNonNumerable.objects.create(
+        Movement.objects.create(
             transaction=t,
             type=self.movtype,
             direction=Direction.IN,
@@ -72,7 +72,7 @@ class TransactionTestCase(TestCase):
             ccy="USD",
         )
 
-        MovementNonNumerable.objects.create(
+        Movement.objects.create(
             transaction=t,
             type=self.movtype,
             direction=Direction.OUT,
@@ -81,7 +81,7 @@ class TransactionTestCase(TestCase):
             amount=1000,
         )
         fx = Fx.objects.create(foreign="USD", date_value=date(1999, 1, 1), rate=2)
-        MovementNonNumerable.objects.create(
+        Movement.objects.create(
             transaction=t,
             type=self.movtype,
             direction=Direction.IN,
@@ -109,7 +109,7 @@ class TransactionTestCase(TestCase):
             ccy="USD",
         )
 
-        m1 = MovementNonNumerable.objects.create(
+        m1 = Movement.objects.create(
             transaction=t,
             type=self.movtype,
             direction=Direction.OUT,
@@ -118,7 +118,7 @@ class TransactionTestCase(TestCase):
             amount=1000,
         )
         fx = Fx.objects.create(foreign="USD", date_value=date(1999, 1, 1), rate=0.5)
-        m2 = MovementNonNumerable.objects.create(
+        m2 = Movement.objects.create(
             transaction=t,
             type=self.movtype,
             direction=Direction.IN,
