@@ -1,11 +1,5 @@
 from django.contrib import admin
-from django_finances_accounts.models import (
-    MovementDividend,
-    MovementNonNumerable,
-    MovementNumerable,
-    SnapshotNonNumerable,
-    SnapshotNumerable,
-)
+from django_finances_accounts.models import MovementNonNumerable, SnapshotNonNumerable
 from django_finances_accounts.models.account import AccountHolderRole
 
 
@@ -14,23 +8,8 @@ class MovementNonNumerableInline(admin.TabularInline):
     extra = 1
 
 
-class MovementNumerableInline(admin.TabularInline):
-    model = MovementNumerable
-    extra = 1
-
-
-class MovementDividendInline(admin.TabularInline):
-    model = MovementDividend
-    extra = 1
-
-
 class SnapshotNonNumerableInline(admin.TabularInline):
     model = SnapshotNonNumerable
-    extra = 1
-
-
-class SnapshotNumerableInline(admin.TabularInline):
-    model = SnapshotNumerable
     extra = 1
 
 

@@ -6,12 +6,9 @@ from django_finances_accounts.models import (
     Custodian,
     Fx,
     Movement,
-    MovementDividend,
     MovementNonNumerable,
-    MovementNumerable,
     MovementType,
     SnapshotNonNumerable,
-    SnapshotNumerable,
     Transaction,
     TransactionGroup,
 )
@@ -21,15 +18,11 @@ from ._readonly_mixin import ReadOnlyAdminMixin
 from ._render_change_form_mixin import RenderChangeFormMixin
 from .inlines import (
     AccountHolderRoleInline,
-    MovementDividendInline,
     MovementNonNumerableInline,
-    MovementNumerableInline,
     SnapshotNonNumerableInline,
-    SnapshotNumerableInline,
 )
 
 admin.site.register(SnapshotNonNumerable)
-admin.site.register(SnapshotNumerable)
 
 
 class AccountTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
@@ -38,8 +31,8 @@ class AccountTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
         " accounts into categories and create reports. Modifying this hierarchy or adding"
         " accounts outside it may have consequences on other applications"
     )
-    list_filter = HierarchyTreeModelAdmin.list_filter + ("is_numerable",)
-    list_display = HierarchyTreeModelAdmin.list_display + ("is_numerable",)
+    list_filter = HierarchyTreeModelAdmin.list_filter
+    list_display = HierarchyTreeModelAdmin.list_display
 
 
 admin.site.register(AccountType, AccountTypeModelAdmin)
@@ -73,7 +66,9 @@ admin.site.register(TransactionGroup, TransactionGroupModelAdmin)
 class TransactionModelAdmin(admin.ModelAdmin):
     list_display = ("name", "group")
     list_filter = ("group",)
-    inlines = [MovementNonNumerableInline, MovementNumerableInline, MovementDividendInline]
+    inlines = [
+        MovementNonNumerableInline,
+    ]
 
 
 admin.site.register(Transaction, TransactionModelAdmin)
@@ -82,7 +77,6 @@ admin.site.register(Transaction, TransactionModelAdmin)
 class AccountModelAdmin(admin.ModelAdmin):
     inlines = (
         AccountHolderRoleInline,
-        SnapshotNumerableInline,
         SnapshotNonNumerableInline,
     )
     list_display = ("name", "custodian", "type", "open", "close")
@@ -94,10 +88,7 @@ class AccountModelAdmin(admin.ModelAdmin):
             return []
         unfiltered = super().get_inline_instances(request, obj)
         # filter out the Inlines you don't want
-        if obj.type.is_numerable:
-            filter = [AccountHolderRoleInline, SnapshotNumerableInline]
-        else:
-            filter = [AccountHolderRoleInline, SnapshotNonNumerableInline]
+        filter = [AccountHolderRoleInline, SnapshotNonNumerableInline]
         return [x for x in unfiltered if any([isinstance(x, it) for it in filter])]
 
 
@@ -153,6 +144,4 @@ class ReadOnlyMovementAdmin(ReadOnlyAdminMixin, MovementAdmin):
 
 
 admin.site.register(MovementNonNumerable, MovementAdmin)
-admin.site.register(MovementNumerable, MovementAdmin)
-admin.site.register(MovementDividend, MovementAdmin)
 admin.site.register(Movement, ReadOnlyMovementAdmin)

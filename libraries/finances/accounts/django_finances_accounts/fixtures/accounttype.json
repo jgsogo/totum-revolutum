@@ -3,7 +3,6 @@
     "fields": {
       "description": "Los activos son los recursos que dispone una empresa, ya sean tangibles o intangibles, que permitan a esta obtener beneficios econ\u00f3micos a futuro.",
       "is_abstract": true,
-      "is_numerable": false,
       "name": "Activos",
       "tn_ancestors_count": 0,
       "tn_ancestors_pks": "",
@@ -27,7 +26,6 @@
     "fields": {
       "description": "Los pasivos son los gastos o deudas que la empresa posee a terceros, estos pueden ser pagos a bancos, salarios a empleados, entre otros.",
       "is_abstract": true,
-      "is_numerable": false,
       "name": "Pasivos",
       "tn_ancestors_count": 0,
       "tn_ancestors_pks": "",
@@ -51,7 +49,6 @@
     "fields": {
       "description": "Tambi\u00e9n llamados activos l\u00edquidos son los bienes o posesiones que se pueden convertir r\u00e1pidamente en dinero (efectivo).",
       "is_abstract": true,
-      "is_numerable": false,
       "name": "Corrientes",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "1",
@@ -75,7 +72,6 @@
     "fields": {
       "description": "Llamados tambi\u00e9n activos fijos y son aquellos pertenecientes al ente econ\u00f3mico y adquiridos con la intenci\u00f3n de utilizarlos en la producci\u00f3n de bienes y servicios propios de la actividad econ\u00f3mica desarrollada. No est\u00e1n destinados para la venta y su vida \u00fatil excede de un a\u00f1o.",
       "is_abstract": true,
-      "is_numerable": false,
       "name": "No corrientes",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "1",
@@ -99,7 +95,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Terrenos",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,23",
@@ -123,7 +118,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Bienes inmuebles",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,23",
@@ -147,7 +141,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Veh\u00edculos",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,23",
@@ -171,7 +164,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Colecciones",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,23",
@@ -195,7 +187,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Efectivo/Met\u00e1lico/Cash",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -219,7 +210,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Cuenta bancaria",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -243,7 +233,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Dep\u00f3sito",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -267,7 +256,6 @@
     "fields": {
       "description": "",
       "is_abstract": true,
-      "is_numerable": false,
       "name": "Cr\u00e9dito",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "2",
@@ -291,7 +279,6 @@
     "fields": {
       "description": "Un pr\u00e9stamo facilita todo el dinero de una sola vez en el mismo momento de la concesi\u00f3n",
       "is_abstract": true,
-      "is_numerable": false,
       "name": "Pr\u00e9stamo",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "2",
@@ -315,7 +302,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Tarjeta de cr\u00e9dito",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "2,12",
@@ -339,7 +325,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Pr\u00e9stamo personal",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "2,13",
@@ -363,7 +348,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Hipoteca",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "2,13",
@@ -387,7 +371,6 @@
     "fields": {
       "description": "",
       "is_abstract": true,
-      "is_numerable": false,
       "name": "Plan de pensiones",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,4",
@@ -411,7 +394,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": true,
       "name": "Individual",
       "tn_ancestors_count": 3,
       "tn_ancestors_pks": "1,4,17",
@@ -435,7 +417,6 @@
     "fields": {
       "description": "Son aquellos en los que el promotor es una empresa y los part\u00edcipes son exclusivamente los trabajadores de esa empresa.",
       "is_abstract": false,
-      "is_numerable": true,
       "name": "Empleo",
       "tn_ancestors_count": 3,
       "tn_ancestors_pks": "1,4,17",
@@ -459,7 +440,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": true,
       "name": "Acciones",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -483,7 +463,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": true,
       "name": "ETFs",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -507,7 +486,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": true,
       "name": "Fondo de inversi\u00f3n",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -531,7 +509,6 @@
     "fields": {
       "description": "",
       "is_abstract": true,
-      "is_numerable": true,
       "name": "Patrimonio",
       "tn_ancestors_count": 1,
       "tn_ancestors_pks": "1",
@@ -555,7 +532,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Flujo de caja",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",
@@ -579,7 +555,6 @@
     "fields": {
       "description": "",
       "is_abstract": false,
-      "is_numerable": false,
       "name": "Vales descuento, cupones, tarjetas regalo",
       "tn_ancestors_count": 2,
       "tn_ancestors_pks": "1,3",

@@ -9,10 +9,9 @@ from django_finances_accounts.models import (
     AccountType,
     Custodian,
     SnapshotNonNumerable,
-    SnapshotNumerable,
 )
 
-from .test_model__amount import AmountNonNumerableTestMixin, AmountNumerableTestsMixin
+from .test_model__amount import AmountNonNumerableTestMixin
 
 
 class SnapshotTestCase(TestCase):
@@ -106,14 +105,4 @@ class SnapshotNonNumerableTestCase(AmountNonNumerableTestMixin, SnapshotTestCase
             "(\"Cannot delete some instances of model 'Account' because they are referenced"
             " through protected foreign keys: 'SnapshotNonNumerable.account'.\","
             " {<SnapshotNonNumerable: SnapshotNonNumerable object (1)>})",
-        )
-
-
-class SnapshotNumerableTestCase(AmountNumerableTestsMixin, SnapshotTestCase):
-    def _create_instance(self, quantity: float, unit_value: float):
-        return SnapshotNumerable(
-            account=self.account,
-            date_value=date(1900, 1, 1),
-            quantity=quantity,
-            unit_value=unit_value,
         )
