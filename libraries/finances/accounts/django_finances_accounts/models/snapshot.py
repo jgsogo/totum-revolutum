@@ -6,7 +6,7 @@ from ._amount import AmountMixin
 from .account import Account
 
 
-class Snapshot(AmountMixin):
+class BaseSnapshot(models.Model):
     account = models.ForeignKey(
         Account, on_delete=models.PROTECT, help_text=_("Account this snapshot refers to")
     )
@@ -18,6 +18,7 @@ class Snapshot(AmountMixin):
     )
 
     class Meta:
+        abstract = True
         unique_together = [["account", "date_value"]]
         ordering = ["-date_value"]
 
@@ -27,3 +28,9 @@ class Snapshot(AmountMixin):
             raise ValidationError("Snapshot date_vale cannot be before account is opened")
         if self.account.close and self.date_value > self.account.close:
             raise ValidationError("Snapshot date_vale cannot be after account is closed")
+
+
+class Snapshot(BaseSnapshot, AmountMixin):
+    """Snapshot for an account"""
+
+    pass

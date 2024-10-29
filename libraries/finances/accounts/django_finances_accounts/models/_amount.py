@@ -11,6 +11,7 @@ class AmountMixin(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0, "Amount should be equal or greater than 0")],
         help_text=_("Amount in object's currency"),
+        blank=True,
     )
 
     class Meta:
