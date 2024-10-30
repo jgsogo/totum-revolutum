@@ -24,6 +24,10 @@ class AccountTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
         "<strong>Note.-</strong>. The hierarchy of account types is used to group several"
         " accounts into categories and create reports. Modifying this hierarchy or adding"
         " accounts outside it may have consequences on other applications"
+        "\n\n"
+        "Also note that some of these entries are being added as migrations"
+        " and some of them with a very specific `unique_name` that is used"
+        " across the source code to implement some features."
     )
     list_filter = HierarchyTreeModelAdmin.list_filter
     list_display = HierarchyTreeModelAdmin.list_display
@@ -38,6 +42,10 @@ class MovementTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
         " used to group movements together and create reports."
         " Modifying this hierarchy or adding types outside the"
         " proposed one may have consequences in other applications."
+        "\n\n"
+        "Also note that some of these entries are being added as migrations"
+        " and some of them with a very specific `unique_name` that is used"
+        " across the source code to implement some features."
     )
 
 
