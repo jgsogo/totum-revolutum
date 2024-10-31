@@ -148,3 +148,19 @@ pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 # Allows developers to use the matching pnpm version, for example:
 # bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
 use_repo(pnpm, "pnpm")
+
+#####
+# OCI
+#####
+
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+oci.pull(
+    name = "postgres17",
+    digest = "sha256:c92692786bdc336dd7abac4da89abc710abbe426821a1d053b178f77c1f697a3",
+    image = "postgres:17.0",
+    platforms = [
+        "linux/amd64",
+        "linux/arm64/v8",
+    ],
+)
+use_repo(oci, "postgres17")

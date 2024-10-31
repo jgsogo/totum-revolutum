@@ -1,0 +1,11 @@
+load("@rules_oci//oci:defs.bzl", "oci_load")
+
+oci_load(
+    name = "postgres",
+    image = "@postgres17",
+    repo_tags = ["postgres:totum-revolutum-latest"],
+    tags = [
+        "manual",
+    ],
+    # visibility = ["//visibility:public"],
+)

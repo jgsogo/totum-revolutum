@@ -24,3 +24,6 @@ build --action_env=CARGO_PKG_AUTHORS=mock --action_env=CARGO_PKG_DESCRIPTION=moc
 
 # Always show errors from testing
 test --verbose_failures --test_output=errors
+
+
+common --credential_helper=docker.io=%workspace%/tools/auth.sh
