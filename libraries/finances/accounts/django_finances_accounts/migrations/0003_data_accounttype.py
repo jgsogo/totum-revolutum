@@ -9,7 +9,7 @@ def populate_required_accounttypes(apps, schema_editor):
     AccountType = apps.get_model("finances_accounts", "AccountType")
 
     # /
-    activos, _ = AccountType.objects.bulk_create(
+    activos, _1 = AccountType.objects.bulk_create(
         [
             AccountType(
                 name=_("Activos"),
@@ -56,12 +56,10 @@ def populate_optional_accounttypes(apps, schema_editor):
 
     AccountType = apps.get_model("finances_accounts", "AccountType")
 
-    pasivos = AccountType.objects.get(unique_name=AccountsAccountTypeConstants.LIABILITIES)
-    activos_corrientes = AccountType.objects.get(
-        unique_name=AccountsAccountTypeConstants.ASSETS_CURRENT
-    )
+    pasivos = AccountType.objects.get(unique_name=AccountTypeConstants.LIABILITIES)
+    activos_corrientes = AccountType.objects.get(unique_name=AccountTypeConstants.ASSETS_CURRENT)
     activos_no_corrientes = AccountType.objects.get(
-        unique_name=AccountsAccountTypeConstants.ASSETS_NONCURRENT
+        unique_name=AccountTypeConstants.ASSETS_NONCURRENT
     )
 
     # / Activos / Corrientes

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import migrations
 from django.utils.translation import gettext_lazy as _
 from django_finances_accounts.constants import MovementTypeConstants
@@ -7,7 +8,7 @@ def populate_required_movementtypes(apps, schema_editor):
     MovementType = apps.get_model("finances_accounts", "MovementType")
 
     # /
-    _, _, _, tributos = MovementType.objects.bulk_create(
+    _1, _2, _3, tributos = MovementType.objects.bulk_create(
         [
             MovementType(name=_("Gastos"), unique_name=MovementTypeConstants.EXPENSE),
             MovementType(name=_("Ingresos"), unique_name=MovementTypeConstants.INCOME),
@@ -29,7 +30,7 @@ def populate_required_movementtypes(apps, schema_editor):
     )
 
     # / Tributos
-    _, impuestos, _ = MovementType.objects.bulk_create(
+    _4, impuestos, _5 = MovementType.objects.bulk_create(
         [
             MovementType(
                 tn_parent=tributos,
@@ -87,33 +88,41 @@ def populate_optional_movementtypes(apps, schema_editor):
 
     MovementType = apps.get_model("finances_accounts", "MovementType")
 
-    gastos = MovementType.objects.get(unique_name=AccountsMovementTypeConstants.EXPENSE)
-    ingresos = MovementType.objects.get(unique_name=AccountsMovementTypeConstants.INCOME)
-    operaciones = MovementType.objects.get(unique_name=AccountsMovementTypeConstants.OPERATIONS)
-    tributos = MovementType.objects.get(unique_name=AccountsMovementTypeConstants.TAXES)
+    gastos = MovementType.objects.get(unique_name=MovementTypeConstants.EXPENSE)
+    ingresos = MovementType.objects.get(unique_name=MovementTypeConstants.INCOME)
+    operaciones = MovementType.objects.get(unique_name=MovementTypeConstants.OPERATIONS)
+    tributos = MovementType.objects.get(unique_name=MovementTypeConstants.TAXES)
 
-    impuestos_directos = MovementType.objects.get(
-        unique_name=AccountsMovementTypeConstants.DIRECT_TAXES
-    )
+    impuestos_directos = MovementType.objects.get(unique_name=MovementTypeConstants.DIRECT_TAXES)
     impuestos_indirectos = MovementType.objects.get(
-        unique_name=AccountsMovementTypeConstants.INDIRECT_TAXES
+        unique_name=MovementTypeConstants.INDIRECT_TAXES
     )
 
     # / Tributos / Impuestos / Directos
-    impuestos_locales, impuestos_comunidad, impuestos_estado = MovementType.objects.bulk_create(
+    (impuestos_directos_spain,) = MovementType.objects.bulk_create(
         [
             MovementType(
                 tn_parent=impuestos_directos,
+                name=_("España"),
+            ),
+        ]
+    )
+
+    # / Tributos / Impuestos / Directos / España
+    impuestos_locales, impuestos_comunidad, impuestos_estado = MovementType.objects.bulk_create(
+        [
+            MovementType(
+                tn_parent=impuestos_directos_spain,
                 name=_("Locales"),
                 description=_("Exigidos por los Ayuntamientos o Diputaciones Provinciales"),
             ),
             MovementType(
-                tn_parent=impuestos_directos,
+                tn_parent=impuestos_directos_spain,
                 name=_("Comunidad Autónoma"),
                 description=_("Impuestos cedidos a las comunidades"),
             ),
             MovementType(
-                tn_parent=impuestos_directos,
+                tn_parent=impuestos_directos_spain,
                 name=_("Estado"),
                 description=_("Impuestos recaudados por la administración central"),
             ),
@@ -175,16 +184,27 @@ def populate_optional_movementtypes(apps, schema_editor):
             MovementType(tn_parent=irpf, name=_("Ganancias y pérdidas patrimoniales")),
         ]
     )
+
     # / Tributos / Impuestos / Indirectos
-    iva, _ = MovementType.objects.bulk_create(
+    (impuestos_indirectos_spain,) = MovementType.objects.bulk_create(
         [
             MovementType(
                 tn_parent=impuestos_indirectos,
+                name=_("España"),
+            ),
+        ]
+    )
+
+    # / Tributos / Impuestos / Indirectos / España
+    iva, _1 = MovementType.objects.bulk_create(
+        [
+            MovementType(
+                tn_parent=impuestos_indirectos_spain,
                 name="IVA",
                 description=_("Impuesto sobre el Valor Añadido"),
             ),
             MovementType(
-                tn_parent=impuestos_indirectos,
+                tn_parent=impuestos_indirectos_spain,
                 name=_("Transmisiones patrimoniales y AJD"),
                 description=_(
                     "Impuesto sobre Transmisiones Patrimoniales y Actos Jurídicos Documentados.\n\nEste impuesto tiene un ámbito de aplicación muy amplio y se subdivide en varias modalidades. Muy resumidamente, puede decirse que se aplica a las transmisiones (compraventas) de todo tipo de bienes y derechos, a determinadas operaciones que realizan las empresas y a actos que se tienen que documentar oficialmente (escritura de una casa y otros documentos notariales). La persona que tiene que pagar el impuesto es el adquirente (comprador), no el que transmite el bien o derecho (vendedor). Finalmente, es un impuesto cedido a las Comunidades Autónomas."
@@ -284,7 +304,7 @@ def populate_optional_movementtypes(apps, schema_editor):
     MovementType.objects.bulk_create(
         [
             MovementType(tn_parent=mascotas, name=_("Comida")),
-            MovementType(tn_parent=educacion, name=_("Veterinario")),
+            MovementType(tn_parent=mascotas, name=_("Veterinario")),
         ]
     )
     # / Gastos / Salud e higiene
@@ -296,7 +316,7 @@ def populate_optional_movementtypes(apps, schema_editor):
         ]
     )
     # / Gastos / Transporte
-    _, coche = MovementType.objects.bulk_create(
+    _2, coche = MovementType.objects.bulk_create(
         [
             MovementType(tn_parent=transporte, name=_("Transporte público")),
             MovementType(tn_parent=transporte, name=_("Coche")),
@@ -319,7 +339,7 @@ def populate_optional_movementtypes(apps, schema_editor):
         ]
     )
     # / Gastos / Transporte / Vivienda
-    _, suministros, _, comunidad, _ = MovementType.objects.bulk_create(
+    _3, suministros, _4, comunidad, _5 = MovementType.objects.bulk_create(
         [
             MovementType(tn_parent=vivienda, name=_("Alquiler")),
             MovementType(tn_parent=vivienda, name=_("Suministros")),
