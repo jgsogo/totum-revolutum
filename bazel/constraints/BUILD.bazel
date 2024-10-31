@@ -1,0 +1,7 @@
+constraint_setting(name = "glibc_version")
+
+constraint_value(
+    name = "glibc_2_28",
+    constraint_setting = ":glibc_version",
+    visibility = ["//visibility:public"],
+)

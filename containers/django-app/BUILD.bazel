@@ -1,0 +1,25 @@
+load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
+load("@configure_buildx//:defs.bzl", "BUILDER_NAME", "TARGET_COMPATIBLE_WITH")
+
+run_binary(
+    name = "django-app",
+    srcs = ["Dockerfile"],
+    args = [
+        "build",
+        "./containers/django-app",
+        "--builder",
+        BUILDER_NAME,
+        "--output=type=oci,tar=false,dest=$@",
+    ],
+    execution_requirements = {"local": "1"},
+    mnemonic = "BuildDocker",
+    out_dirs = ["django-app"],
+    tags = [
+        "manual",
+    ],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    tool = "//bazel/containers:buildx",
+    visibility = [
+        "//apps:__subpackages__",
+    ],
+)

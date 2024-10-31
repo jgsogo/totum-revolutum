@@ -1,5 +1,8 @@
+load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@aspect_rules_py//py:defs.bzl", "py_binary")
 load("@py_deps//:requirements.bzl", "requirement")
+load("@rules_oci//oci:defs.bzl", "oci_load")
+load("//bazel/containers:py_layer.bzl", "py_oci_image")
 
 APPS = [
     "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
@@ -40,3 +43,71 @@ py_binary(
 #         requirement("PyYAML"),
 #     ],
 # )
+
+py_oci_image(
+    name = "_container",
+    base = "//containers/django-app",
+    binary = ":admin",
+    entrypoint = ["/apps/finances/django/admin"],
+    # group = "1000890000",
+    # user = "1000890000",
+    tags = [
+        "manual",
+    ],
+    # user = "1001",  # FIXME: Required?
+)
+
+# oci_tarball(
+#     name = "container",
+#     image = ":image",
+#     repo_tags = ["finances:latest"],
+# )
+
+# py_oci_image(
+#     name = "_container",
+#     base = "@ubi_minimal_container",
+#     binary = ":py_entrypoint_binary",
+#     entrypoint = ["/job_executor/container/py_entrypoint_binary"],
+#     tags = [
+#         "manual",
+#         "no-remote-cache",
+#     ],
+#     tars = [":exp_params_tar"],
+#     visibility = ["//visibility:public"],
+# )
+
+platform_transition_filegroup(
+    name = "container",
+    srcs = [":_container"],
+    tags = [
+        # "ci",
+        "manual",
+        # "no-remote-cache",
+    ],
+    target_platform = select({
+        "@platforms//cpu:arm64": "//bazel/platforms:linux_x86_64",
+        "@platforms//cpu:x86_64": "//bazel/platforms:linux_x86_64",
+    }),
+    # visibility = ["//visibility:public"],
+)
+
+# container_structure_test(
+#     name = "structure_test",
+#     configs = ["test.yaml"],
+#     image = ":container",
+#     tags = [
+#         "ci",
+#         "manual",
+#     ],
+# )
+
+oci_load(
+    name = "load",
+    image = ":container",
+    repo_tags = ["django_finances:latest"],
+    tags = [
+        "manual",
+        # "no-remote-cache",
+    ],
+    # visibility = ["//visibility:public"],
+)
