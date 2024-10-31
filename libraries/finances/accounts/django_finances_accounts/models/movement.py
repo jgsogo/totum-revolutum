@@ -1,10 +1,9 @@
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from djmoney.settings import BASE_CURRENCY
 
-from ._amount import AmountNumerableMixin
+from ._amount import AmountMixin
 from .account import Account
 from .fx import Fx
 from .movement_type import MovementType
@@ -16,7 +15,7 @@ class Direction(models.IntegerChoices):
     OUT = 1, _("OUT")
 
 
-class Movement(models.Model):
+class Movement(AmountMixin):
     transaction = models.ForeignKey(
         Transaction,
         on_delete=models.CASCADE,
@@ -50,14 +49,6 @@ class Movement(models.Model):
         ),
     )
 
-    amount = models.DecimalField(
-        max_digits=14,
-        decimal_places=2,
-        validators=[MinValueValidator(0, "Amount should be equal or greater than 0")],
-        help_text=_("Amount in object's currency"),
-        blank=True,
-    )
-
     class Meta:
         ordering = ["-date_value"]
 
@@ -86,62 +77,3 @@ class Movement(models.Model):
             return amount * self.fx.inverse()
         else:
             return amount
-
-
-class MovementNonNumerable(Movement):
-    """A movement that only involves an amount"""
-
-
-class MovementNumerable(AmountNumerableMixin, Movement):
-    """A movement that modifies the number of units in a numerable account (buy/sell units)"""
-
-    def save(self, *args, **kwargs):
-        self.amount = self.get_amount()
-        super().save(*args, **kwargs)
-
-
-class MovementDividend(Movement):
-    """(Only for 'Stock' accounts) Dividend paid by an account"""
-
-    ex_dividend_date = models.DateField(
-        help_text=_(
-            "Date when the dividend is assigned. This data is used to"
-            " retrieve the number of stocks"
-        )
-    )
-
-    unit_value = models.DecimalField(
-        max_digits=14,
-        decimal_places=4,
-        validators=[MinValueValidator(0, "Unit value should be equal or greater than 0")],
-        help_text=_("Dividen per stock"),
-    )
-
-    def save(self, *args, **kwargs):
-        self.amount = self.get_amount()
-        super().save(*args, **kwargs)
-
-    def clean(self):
-        super().clean()
-        if self.ex_dividend_date < self.account.open:
-            raise ValidationError("MovementDividend ex_dividend_date should be after Account open")
-        if self.account.close and self.ex_dividend_date > self.account.close:
-            raise ValidationError(
-                "MovementDividend ex_dividend_date cannot be after account is closed"
-            )
-        if self.ex_dividend_date > self.date_value:
-            raise ValidationError("MovementDividend ex_dividend_date should be before date_value")
-
-    def _snapshot(self):
-        snapshot = self.account.snapshotnumerable_set.filter(
-            date_value__lte=self.ex_dividend_date
-        ).first()
-        if not snapshot:
-            raise ObjectDoesNotExist(
-                "Associated account doesn't have any Snapshot previous to the dividend ex_date"
-            )
-        return snapshot
-
-    def get_amount(self):
-        snapshot = self._snapshot()
-        return self.unit_value * float(snapshot.quantity)

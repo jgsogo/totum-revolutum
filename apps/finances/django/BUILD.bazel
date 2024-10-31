@@ -3,6 +3,7 @@ load("@py_deps//:requirements.bzl", "requirement")
 
 APPS = [
     "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
+    "//libraries/finances/investments/django_finances_investments:finances_investments",
 ]
 
 # Use this target to execute commands on this project:

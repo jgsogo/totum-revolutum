@@ -5,6 +5,14 @@ from treenode.models import TreeNodeModel
 
 class _HierarchyTree(TreeNodeModel):
     name = models.CharField(max_length=255, help_text=_("Name of the element"))
+    unique_name = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        unique=True,
+        editable=False,
+        help_text=_("A unique name for this element. Machine readable."),
+    )
     description = models.TextField(
         null=True, blank=True, help_text=_("A description of the element")
     )
