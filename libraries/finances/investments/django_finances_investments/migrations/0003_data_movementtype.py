@@ -17,6 +17,7 @@ def populate_required_movementtypes(apps, schema_editor):
                 tn_parent=incomes,
                 name=_("Inversiones"),
                 unique_name=MovementTypeConstants.INVESTMENTS,
+                is_abstract=True,
             ),
         ]
     )
@@ -51,17 +52,19 @@ def populate_optional_movementtypes(apps, schema_editor):
     # / Operaciones
     MovementType.objects.bulk_create(
         [
-            MovementType(tn_parent=operations, name=_("Compra/Venta acciones")),
-            MovementType(tn_parent=operations, name=_("Compra/Venta fondos")),
-            MovementType(tn_parent=operations, name=_("Compra/Venta patrimonio")),
-            MovementType(tn_parent=operations, name=_("Compra/Venta ETFs")),
+            MovementType(tn_parent=operations, name=_("Compra (inversión)")),
+            MovementType(tn_parent=operations, name=_("Venta (desinversión)")),
         ]
     )
 
     # / Tributos / Impuestos / Directos
     (usa_taxes,) = MovementType.objects.bulk_create(
         [
-            MovementType(tn_parent=impuestos_directos, name=_("USA")),
+            MovementType(
+                tn_parent=impuestos_directos,
+                name=_("USA"),
+                is_abstract=True,
+            ),
         ]
     )
 

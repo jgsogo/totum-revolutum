@@ -10,14 +10,23 @@ def populate_required_movementtypes(apps, schema_editor):
     # /
     _1, _2, _3, tributos = MovementType.objects.bulk_create(
         [
-            MovementType(name=_("Gastos"), unique_name=MovementTypeConstants.EXPENSE),
-            MovementType(name=_("Ingresos"), unique_name=MovementTypeConstants.INCOME),
+            MovementType(
+                name=_("Gastos"),
+                unique_name=MovementTypeConstants.EXPENSE,
+                is_abstract=True,
+            ),
+            MovementType(
+                name=_("Ingresos"),
+                unique_name=MovementTypeConstants.INCOME,
+                is_abstract=True,
+            ),
             MovementType(
                 name=_("Operaciones"),
                 unique_name=MovementTypeConstants.OPERATIONS,
                 description=_(
                     "No suponen una salida ni entrada de dinero en las finanzas personales, simplemente un movimiento de una cuenta a otra"
                 ),
+                is_abstract=True,
             ),
             MovementType(
                 name=_("Tributos"),
@@ -25,6 +34,7 @@ def populate_required_movementtypes(apps, schema_editor):
                 description=_(
                     "Prestaciones dinerarias que los ciudadanos están obligados por ley a pagar"
                 ),
+                is_abstract=True,
             ),
         ]
     )
@@ -47,6 +57,7 @@ def populate_required_movementtypes(apps, schema_editor):
                 description=_(
                     "Tributos exigidos sin contraprestación directa, cuyo hecho imponible está constituido por negocios, actos o hechos que ponen de manifiesto la capacidad económica del contribuyente como consecuencia de la riqueza que posee (patrimonio), de los ingresos que obtiene (renta) o de lo que consume."
                 ),
+                is_abstract=True,
             ),
             MovementType(
                 tn_parent=tributos,
@@ -69,6 +80,7 @@ def populate_required_movementtypes(apps, schema_editor):
                 description=_(
                     "Son impuestos directos los que se aplican sobre una manifestación directa o inmediata de la capacidad económica: la posesión de un patrimonio y la obtención de una renta. Los impuestos directos gravan la riqueza en sí misma."
                 ),
+                is_abstract=True,
             ),
             MovementType(
                 tn_parent=impuestos,
@@ -77,6 +89,7 @@ def populate_required_movementtypes(apps, schema_editor):
                 description=_(
                     "Son impuestos indirectos, por el contrario, los que se aplican sobre una manifestación indirecta o mediata de la capacidad económica: la circulación de la riqueza, bien por actos de consumo o bien por actos de transmisión. Gravan la utilización de esa riqueza."
                 ),
+                is_abstract=True,
             ),
         ]
     )
@@ -104,6 +117,7 @@ def populate_optional_movementtypes(apps, schema_editor):
             MovementType(
                 tn_parent=impuestos_directos,
                 name=_("España"),
+                is_abstract=True,
             ),
         ]
     )
@@ -115,16 +129,19 @@ def populate_optional_movementtypes(apps, schema_editor):
                 tn_parent=impuestos_directos_spain,
                 name=_("Locales"),
                 description=_("Exigidos por los Ayuntamientos o Diputaciones Provinciales"),
+                is_abstract=True,
             ),
             MovementType(
                 tn_parent=impuestos_directos_spain,
                 name=_("Comunidad Autónoma"),
                 description=_("Impuestos cedidos a las comunidades"),
+                is_abstract=True,
             ),
             MovementType(
                 tn_parent=impuestos_directos_spain,
                 name=_("Estado"),
                 description=_("Impuestos recaudados por la administración central"),
+                is_abstract=True,
             ),
         ]
     )
@@ -173,6 +190,7 @@ def populate_optional_movementtypes(apps, schema_editor):
                 tn_parent=impuestos_estado,
                 name="IRPF",
                 description=_("Impuesto sobre la Renta de las Personas Físicas"),
+                is_abstract=True,
             ),
         ]
     )
@@ -191,6 +209,7 @@ def populate_optional_movementtypes(apps, schema_editor):
             MovementType(
                 tn_parent=impuestos_indirectos,
                 name=_("España"),
+                is_abstract=True,
             ),
         ]
     )
@@ -202,6 +221,7 @@ def populate_optional_movementtypes(apps, schema_editor):
                 tn_parent=impuestos_indirectos_spain,
                 name="IVA",
                 description=_("Impuesto sobre el Valor Añadido"),
+                is_abstract=True,
             ),
             MovementType(
                 tn_parent=impuestos_indirectos_spain,
@@ -251,14 +271,22 @@ def populate_optional_movementtypes(apps, schema_editor):
         comisiones,
     ) = MovementType.objects.bulk_create(
         [
-            MovementType(tn_parent=gastos, name=_("Alimentación")),
+            MovementType(
+                tn_parent=gastos,
+                name=_("Alimentación"),
+                is_abstract=True,
+            ),
             MovementType(tn_parent=gastos, name=_("Diversión/Ocio")),
             MovementType(tn_parent=gastos, name=_("Educación/Formación")),
             MovementType(tn_parent=gastos, name=_("Hijos")),
             MovementType(tn_parent=gastos, name=_("Mascotas")),
             MovementType(tn_parent=gastos, name=_("Ropa y calzado")),
             MovementType(tn_parent=gastos, name=_("Salud e higiene")),
-            MovementType(tn_parent=gastos, name=_("Transporte")),
+            MovementType(
+                tn_parent=gastos,
+                name=_("Transporte"),
+                is_abstract=True,
+            ),
             MovementType(tn_parent=gastos, name=_("Vacaciones")),
             MovementType(tn_parent=gastos, name=_("Vivienda")),
             MovementType(tn_parent=gastos, name=_("Comisiones")),
@@ -342,9 +370,17 @@ def populate_optional_movementtypes(apps, schema_editor):
     _3, suministros, _4, comunidad, _5 = MovementType.objects.bulk_create(
         [
             MovementType(tn_parent=vivienda, name=_("Alquiler")),
-            MovementType(tn_parent=vivienda, name=_("Suministros")),
+            MovementType(
+                tn_parent=vivienda,
+                name=_("Suministros"),
+                is_abstract=True,
+            ),
             MovementType(tn_parent=vivienda, name=_("Reparaciones y mantenimiento")),
-            MovementType(tn_parent=vivienda, name=_("Comunidad")),
+            MovementType(
+                tn_parent=vivienda,
+                name=_("Comunidad"),
+                is_abstract=True,
+            ),
             MovementType(tn_parent=vivienda, name=_("Seguros")),
         ]
     )

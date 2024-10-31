@@ -24,8 +24,16 @@ def populate_accounttype(apps, schema_editor):
     # / Activos / No corrientes
     plan_pensiones, bienes_inmuebles, _1, _2 = AccountType.objects.bulk_create(
         [
-            AccountType(tn_parent=activos_no_corrientes, name=_("Plan de pensiones")),
-            AccountType(tn_parent=activos_no_corrientes, name=_("Bienes inmuebles")),
+            AccountType(
+                tn_parent=activos_no_corrientes,
+                name=_("Plan de pensiones"),
+                is_abstract=True,
+            ),
+            AccountType(
+                tn_parent=activos_no_corrientes,
+                name=_("Bienes inmuebles"),
+                is_abstract=True,
+            ),
             AccountType(tn_parent=activos_no_corrientes, name=_("Colecciones/Arte")),
             AccountType(tn_parent=activos_no_corrientes, name=_("Vehículo")),
         ]

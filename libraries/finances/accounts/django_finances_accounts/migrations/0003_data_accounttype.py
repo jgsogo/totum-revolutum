@@ -17,6 +17,7 @@ def populate_required_accounttypes(apps, schema_editor):
                 description=_(
                     "Los activos son los recursos que dispone una empresa, ya sean tangibles o intangibles, que permitan a esta obtener beneficios económicos a futuro."
                 ),
+                is_abstract=True,
             ),
             AccountType(
                 name=_("Pasivos"),
@@ -24,6 +25,7 @@ def populate_required_accounttypes(apps, schema_editor):
                 description=_(
                     "Los pasivos son los gastos o deudas que la empresa posee a terceros, estos pueden ser pagos a bancos, salarios a empleados, entre otros."
                 ),
+                is_abstract=True,
             ),
         ]
     )
@@ -37,6 +39,7 @@ def populate_required_accounttypes(apps, schema_editor):
                 description=_(
                     "También llamados activos líquidos son los bienes o posesiones que se pueden convertir rápidamente en dinero (efectivo)."
                 ),
+                is_abstract=True,
             ),
             AccountType(
                 tn_parent=activos,
@@ -45,6 +48,7 @@ def populate_required_accounttypes(apps, schema_editor):
                 description=_(
                     "Llamados también activos fijos y son aquellos pertenecientes al ente económico y adquiridos con la intención de utilizarlos en la producción de bienes y servicios propios de la actividad económica desarrollada. No están destinados para la venta y su vida útil excede de un año."
                 ),
+                is_abstract=True,
             ),
         ]
     )
@@ -82,13 +86,18 @@ def populate_optional_accounttypes(apps, schema_editor):
     # / Pasivos
     pasivo_credito, pasivo_prestamo = AccountType.objects.bulk_create(
         [
-            AccountType(tn_parent=pasivos, name=_("Crédito")),
+            AccountType(
+                tn_parent=pasivos,
+                name=_("Crédito"),
+                is_abstract=True,
+            ),
             AccountType(
                 tn_parent=pasivos,
                 name=_("Préstamo"),
                 description=_(
                     "Un préstamo facilita todo el dinero de una sola vez en el mismo momento de la concesión"
                 ),
+                is_abstract=True,
             ),
         ]
     )
