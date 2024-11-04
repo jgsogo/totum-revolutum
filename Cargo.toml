@@ -60,7 +60,7 @@ http-body = "1.0.0"
 http-body-util = "0.1.1"
 httpmock = { version = "0.7" }
 hyper = { version = "1.4.0" }
-hyper-util = { version = "0.1.6" }
+hyper-util = { version = "0.1.10" }
 ignore = { version = "0.4.22" }
 ignore-files = "3.0.1"
 image = { version = "0.25.1" }
