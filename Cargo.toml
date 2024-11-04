@@ -23,7 +23,7 @@ members = [
 # List all the dependencies. In the Bazel world we need all the dependencies here
 # so they are available in the crate_universe.
 [workspace.dependencies]
-anyhow = "1.0.82"
+anyhow = "1.0.92"
 async-std = { version = "1.12" }
 async-trait = "0.1.80"
 bigdecimal = "0.4.5"
