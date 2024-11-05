@@ -1,12 +1,10 @@
 import os
 
 import docker
+import requests
 
 # from testcontainers.core.container import DockerContainer
 from testcontainers.compose import DockerCompose
-
-# import requests
-
 
 IMAGE_NAME = "django_finances:latest"
 
@@ -42,31 +40,35 @@ def test_app():
     with DockerCompose(
         context=DOCKER_COMPOSE_PATH, compose_file_name="docker-compose.yaml"
     ) as compose:
-        # host = compose.get_service_host("web", 4444)
-        # port = compose.get_service_port("web", 4444)
+        print(">" * 50)
+        import time
 
+        time.sleep(20)  # FIXME: Add some wait-until-ready patter (in docker itself)
+        host, port = compose.get_service_host_and_port("web", 8080)
+        print(host)
+        print(port)
+
+        import ssl
+
+        print(ssl.OPENSSL_VERSION)
+
+        url = f"http://{host}:{port}/data"  # FIXME: It's http call (non SSL)
+        print(f"url: {url}")
+        r = requests.get(url)
+        assert r.status_code == 200
+
+        # print(r)
+        # import selenium
         # driver = webdriver.Remote(
         #     command_executor=("http://{}:{}/wd/hub".format(host,port)),
-        #     desired_capabilities=CHROME,
+        #     desired_capabilities=selenium.CHROME,
         # )
-        # driver.get("http://automation-remarks.com")
+        # r = driver.get("http://localhost:8000/data")
+        print(r)
         stdout, stderr = compose.get_logs()
 
-        print(">" * 50)
-        print(stdout)
-        print(stderr)
-        # if stderr:
-        #     print("Errors\\n:{}".format(stderr))
+    print(">" * 50)
+    print(stdout)
+    print(stderr)
 
-    # with DockerContainer(IMAGE_NAME).with_bind_ports(host=9000, container=8080) as container:
-    #     # get_exposed_port waits for the container to be ready
-    #     # https://github.com/testcontainers/testcontainers-python/blob/2bcb931063e84da1364aa26937778f0e45708000/core/testcontainers/core/container.py#L107-L108  # noqa: E501
-    #     port = container.get_exposed_port(8080)
-    #     assert port
-
-    #     # TODO(alexeagle): have the application inside the container listen on a
-    #     # port so we can use it as a test fixture
-    #     r = requests.get("http://localhost:8080")
-    #     print(r)
-
-    assert 1 == 2
+    # assert 1 == 2
