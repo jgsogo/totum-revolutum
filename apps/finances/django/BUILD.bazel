@@ -31,8 +31,21 @@ py_binary(
 )
 
 filegroup(
+    name = "docker-compose-yaml",
+    srcs = [":docker-compose.yaml"],
+    visibility = [":__subpackages__"],
+)
+
+filegroup(
+    name = "env-dev",
+    srcs = [":.env.dev"],
+    visibility = [":__subpackages__"],
+)
+
+filegroup(
     name = "_entrypoint",
     srcs = [":entrypoint.sh"],
+    visibility = [":__subpackages__"],
 )
 
 pkg_tar(

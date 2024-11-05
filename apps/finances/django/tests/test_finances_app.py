@@ -40,11 +40,7 @@ def test_app():
 
     DOCKER_COMPOSE_PATH = os.getenv("TEST_SRCDIR") + "/_main/apps/finances/django"
     with DockerCompose(
-        DOCKER_COMPOSE_PATH,
-        compose_file_name=[
-            "docker-compose.yaml",
-        ],
-        pull=False,
+        context=DOCKER_COMPOSE_PATH, compose_file_name="docker-compose.yaml"
     ) as compose:
         # host = compose.get_service_host("web", 4444)
         # port = compose.get_service_port("web", 4444)
