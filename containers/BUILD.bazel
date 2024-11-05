@@ -7,5 +7,15 @@ oci_load(
     tags = [
         "manual",
     ],
-    # visibility = ["//visibility:public"],
+    visibility = ["//apps:__subpackages__"],
+)
+
+# We need this rule so 'oci_load' actually creates the tarball,
+# see https://github.com/bazel-contrib/rules_oci/blob/main/docs/load.md#build-outputs
+# for more info
+filegroup(
+    name = "postgres_tarball",
+    srcs = [":postgres"],
+    output_group = "tarball",
+    visibility = ["//apps:__subpackages__"],
 )

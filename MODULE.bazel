@@ -13,6 +13,8 @@ bazel_dep(name = "rules_rust", version = "0.53.0", dev_dependency = True)
 bazel_dep(name = "rules_oci", version = "2.0.0")
 bazel_dep(name = "rules_nodejs", version = "6.3.1")
 bazel_dep(name = "aspect_rules_py", version = "0.9.1")
+bazel_dep(name = "rules_multirun", version = "0.9.0")
+bazel_dep(name = "rules_pkg", version = "1.0.1")
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.9.3", dev_dependency = True)
 
@@ -50,7 +52,19 @@ pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "py_deps",
     python_version = "3.12",
-    requirements_lock = "//bazel/third_party:requirements.lock",
+    requirements_darwin = "//bazel/third_party:requirements_macos.lock",
+    requirements_linux = "//bazel/third_party:requirements_linux.lock",
+    # The requirements files for each platform that we want to support.
+    # requirements_by_platform = {
+    #     # Default requirements file for needs to explicitly provide the platforms
+    #     "//:requirements_lock_3_10.txt": "linux_*,osx_*",
+    #     # This API allows one to specify additional platforms that the users
+    #     # configure the toolchains for themselves. In this example we add
+    #     # `windows_aarch64` to illustrate that `rules_python` won't fail to
+    #     # process the value, but it does not mean that this example will work
+    #     # on Windows ARM.
+    #     "//:requirements_windows_3_10.txt": "windows_x86_64,windows_aarch64",
+    # },
 )
 use_repo(pip, "py_deps")
 

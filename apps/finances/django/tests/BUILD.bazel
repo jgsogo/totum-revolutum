@@ -1,0 +1,28 @@
+load("@aspect_rules_py//py:defs.bzl", "py_pytest_main")
+load("@py_deps//:requirements.bzl", "requirement")
+
+py_pytest_main(
+    name = "__test__",
+)
+
+py_test(
+    name = "tests",
+    srcs = [
+        "__test__.py",
+        "test_finances_app.py",
+    ],
+    data = [
+        "//apps/finances/django:tarball",
+        "//containers:postgres_tarball",
+    ],
+    main = ":__test__.py",
+    tags = [
+        "requires-docker",
+        "requires-network",
+    ],
+    deps = [
+        requirement("docker"),
+        requirement("pytest"),
+        requirement("testcontainers"),
+    ],
+)

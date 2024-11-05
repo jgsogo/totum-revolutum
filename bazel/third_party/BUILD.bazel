@@ -1,9 +1,39 @@
+load("@rules_multirun//:defs.bzl", "multirun")
 load("@rules_uv//uv:pip.bzl", "pip_compile")
 
 pip_compile(
-    name = "python_requirements",
-    python_platform = "x86_64-unknown-linux-gnu",
-    requirements_in = ":requirements.in",
-    requirements_txt = "requirements.lock",
-    tags = ["no-sandbox"],
+    name = "generate_requirements_linux_txt",
+    # python_platform = "x86_64-unknown-linux-gnu",
+    python_platform = "linux",
+    requirements_in = "requirements.in",
+    requirements_txt = "requirements_linux.lock",
+    # args = ["--python-platform=linux"],
 )
+
+pip_compile(
+    name = "generate_requirements_macos_txt",
+    # python_platform = "aarch64-apple-darwin",
+    python_platform = "macos",
+    requirements_in = "requirements.in",
+    requirements_txt = "requirements_macos.lock",
+    # args = ["--python-platform=macos"],
+)
+
+multirun(
+    name = "generate_requirements_lock",
+    commands = [
+        ":generate_requirements_linux_txt",
+        ":generate_requirements_macos_txt",
+    ],
+    # Running in a single threaded mode allows consecutive `uv` invocations to benefit
+    # from the `uv` cache from the first run.
+    jobs = 1,
+)
+
+# pip_compile(
+#     name = "python_requirements",
+#     python_platform = "x86_64-unknown-linux-gnu",
+#     requirements_in = ":requirements.in",
+#     requirements_txt = "requirements.lock",
+#     tags = ["no-sandbox"],
+# )

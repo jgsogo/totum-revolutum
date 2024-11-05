@@ -1,4 +1,7 @@
-FROM python:3.11.4-slim-buster
+FROM python:3.12-bookworm
+
+RUN apt-get update
+RUN apt-get install -y netcat-openbsd
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
