@@ -47,7 +47,7 @@ dirs = { version = "5.0.1" }
 dotenvy = "0.15.7"
 dyn-clone = "1.0.17"
 env_logger = "0.11.3"
-kamadak-exif = "0.5.5"  # FIXME: v0.6 requires https://github.com/kamadak/exif-rs/issues/46
+kamadak-exif = "0.6.1"
 flume = "0.11.0"
 fs4 = { version = "0.11.0" }
 futures = { version = "0.3.30" }
