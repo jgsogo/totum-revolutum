@@ -14,5 +14,4 @@ fi
 /apps/finances/django/admin flush --no-input
 /apps/finances/django/admin migrate
 
-# /apps/finances/django/admin runserver 0.0.0.0:8080
 /apps/finances/django/gunicorn finances.wsgi:application --bind 0.0.0.0:8000

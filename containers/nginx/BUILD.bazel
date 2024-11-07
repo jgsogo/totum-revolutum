@@ -1,0 +1,46 @@
+load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
+load("@configure_buildx//:defs.bzl", "BUILDER_NAME", "TARGET_COMPATIBLE_WITH")
+load("@rules_oci//oci:defs.bzl", "oci_load")
+
+run_binary(
+    name = "nginx",
+    srcs = ["Dockerfile"],
+    args = [
+        "build",
+        "./containers/nginx",
+        "--builder",
+        BUILDER_NAME,
+        "--output=type=oci,tar=false,dest=$@",
+    ],
+    execution_requirements = {"local": "1"},
+    mnemonic = "BuildDocker",
+    out_dirs = ["nginx"],
+    tags = [
+        "manual",
+    ],
+    target_compatible_with = TARGET_COMPATIBLE_WITH,
+    tool = "//bazel/containers:buildx",
+    visibility = [
+        "//apps:__subpackages__",
+    ],
+)
+
+oci_load(
+    name = "load",
+    image = ":nginx",
+    repo_tags = ["nginx:totum-revolutum-latest"],
+    tags = [
+        "manual",
+    ],
+    visibility = ["//apps:__subpackages__"],
+)
+
+# We need this rule so 'oci_load' actually creates the tarball,
+# see https://github.com/bazel-contrib/rules_oci/blob/main/docs/load.md#build-outputs
+# for more info
+filegroup(
+    name = "tarball",
+    srcs = [":load"],
+    output_group = "tarball",
+    visibility = ["//apps:__subpackages__"],
+)

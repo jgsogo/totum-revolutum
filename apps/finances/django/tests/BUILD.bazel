@@ -17,6 +17,7 @@ py_test(
         "//apps/finances/django:env-dev",
         "//apps/finances/django:tarball",
         "//containers:postgres_tarball",
+        "//containers/nginx:tarball",
     ],
     main = ":__test__.py",
     tags = [
