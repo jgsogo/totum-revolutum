@@ -4,7 +4,10 @@ load("@rules_oci//oci:defs.bzl", "oci_load")
 
 run_binary(
     name = "nginx",
-    srcs = ["Dockerfile"],
+    srcs = [
+        "Dockerfile",
+        "nginx.conf",
+    ],
     args = [
         "build",
         "./containers/nginx",

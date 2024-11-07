@@ -105,6 +105,7 @@ py_oci_image(
     tars = [
         ":entrypoint",
     ],
+    user = "app:app",
 )
 
 platform_transition_filegroup(

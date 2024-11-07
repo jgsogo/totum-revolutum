@@ -3,7 +3,7 @@
 # Credit:
 # https://github.com/aspect-build/bazel-examples/blob/a25b6c0ba307545aff6c4b5feb4ae875d7d507f1/oci_python_image/py_layer.bzl
 
-load("@aspect_bazel_lib//lib:tar.bzl", "mtree_spec", "tar")
+load("@aspect_bazel_lib//lib:tar.bzl", "mtree_mutate", "mtree_spec", "tar")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 
 # match *only* external repositories that have the string "python"
@@ -16,7 +16,7 @@ PY_INTERPRETER_REGEX = "\\.runfiles/.*python.*-.*"
 # match *only* external pip like repositories that contain the string "site-packages"
 SITE_PACKAGES_REGEX = "\\.runfiles/.*/site-packages/.*"
 
-def py_layers(name, binaries):
+def py_layers(name, binaries, user):
     """Create three layers for a py_binary target: interpreter, third-party dependencies, and application code.
 
     This allows a container image to have smaller uploads, since the application layer usually changes more
@@ -39,16 +39,22 @@ def py_layers(name, binaries):
         srcs = binaries,
     )
 
+    mtree_mutate(
+        name = name + ".change_owner",
+        mtree = name + ".mf",
+        owner = "1234",
+    )
+
     native.genrule(
         name = name + ".interpreter_tar_manifest",
-        srcs = [name + ".mf"],
+        srcs = [name + ".change_owner"],
         outs = [name + ".interpreter_tar_manifest.spec"],
         cmd = "grep -v '{}' $< | grep '{}' >$@".format(SITE_PACKAGES_REGEX, PY_INTERPRETER_REGEX),
     )
 
     native.genrule(
         name = name + ".packages_tar_manifest",
-        srcs = [name + ".mf"],
+        srcs = [name + ".change_owner"],
         outs = [name + ".packages_tar_manifest.spec"],
         cmd = "grep '{}' $< >$@".format(SITE_PACKAGES_REGEX),
     )
@@ -56,7 +62,7 @@ def py_layers(name, binaries):
     # Any lines that didn't match one of the two grep above
     native.genrule(
         name = name + ".app_tar_manifest",
-        srcs = [name + ".mf"],
+        srcs = [name + ".change_owner"],
         outs = [name + ".app_tar_manifest.spec"],
         cmd = "grep -v '{}' $< | grep -v '{}' >$@".format(SITE_PACKAGES_REGEX, PY_INTERPRETER_REGEX),
     )
@@ -76,8 +82,10 @@ def py_layers(name, binaries):
 def py_oci_image(name, binaries, tars = [], **kwargs):
     "Wrapper around oci_image that splits the py_binary into layers."
 
+    user = kwargs.pop("user", None)
     oci_image(
         name = name,
-        tars = tars + py_layers(name, binaries),
+        tars = tars + py_layers(name, binaries, user),
+        user = user,
         **kwargs
     )
