@@ -9,6 +9,7 @@ services:
       - db
     volumes:
       - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
 
   db:
     image: postgres:17
@@ -25,7 +26,9 @@ services:
       - web
     volumes:
       - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
 
 volumes:
   postgres_data:
   static_volume:
+  media_volume:
