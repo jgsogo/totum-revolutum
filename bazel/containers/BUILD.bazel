@@ -1,0 +1,18 @@
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+
+# Rule and dependent files (an example) taken from this example: https://github.com/bazel-contrib/rules_oci/tree/0be4040c5ef5b72b9bb9829b6e4408a1098183ea/examples/dockerfile
+native_binary(
+    name = "buildx",
+    src = select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@buildx_linux_amd64//file",
+        "@bazel_tools//src/conditions:darwin_arm64": "@buildx_darwin_arm64//file",
+        "@bazel_tools//src/conditions:darwin_x86_64": "@buildx_darwin_amd64//file",
+    }),
+    out = "buildx",
+    tags = [
+        "manual",
+    ],
+    visibility = [
+        "//containers:__subpackages__",
+    ],
+)
