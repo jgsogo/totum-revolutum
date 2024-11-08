@@ -1,0 +1,14 @@
+load("//bazel/containers:image_from_dockerfile.bzl", "image_from_dockerfile")
+
+image_from_dockerfile(
+    name = "app",
+    srcs = [
+        "Dockerfile",
+    ],
+    tags = [
+        "manual",
+    ],
+    visibility = [
+        "//apps:__subpackages__",
+    ],
+)
