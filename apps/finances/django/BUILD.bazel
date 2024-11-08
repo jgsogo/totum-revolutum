@@ -19,6 +19,10 @@ py_library(
     ],
 )
 
+# FIXME: We don't need `manage.py`, `asgi.py` or `wsgi.py` files here. They will always be the same for all the
+# FIXME: applications. The only difference is the envvar 'DJANGO_SETTINGS_MODULE'. We can create django_rules
+# FIXME: that provide the functionality and ensure we are passing this envvar.
+
 # The application django-admin
 py_binary(
     name = "admin",
