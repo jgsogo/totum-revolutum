@@ -1,4 +1,4 @@
-load("//bazel/containers:image_from_dockerfile.bzl", "image_from_dockerfile")
+load("//bazel/containers/buildx:image_from_dockerfile.bzl", "image_from_dockerfile")
 
 image_from_dockerfile(
     name = "nginx",
