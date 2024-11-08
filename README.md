@@ -26,20 +26,33 @@ Enjoy the visit!
 
 Applications in this repository:
 
+* [finances](app/finances/): application to track personal finances
 * [photodb](app/photodb/): application to backup photos in pCloud storage and access them
 * [syncronia](apps/syncronia/): a tool to run sync operations between different
   directories and storages
+
+## Containers
+
+Provides some docker containers that can be reused by other applications
 
 ## Libraries
 
 You can find the following libraries in this repository:
 
+* [conductus](libraries/conductus/): provides sync and async pipelines
 * [constants](libraries/constants/): compile-time constants definition
 * [cron](libraries/cron/): utilities related to cron expressions
+* [diesel_utils](libraries/diesel_utils/): utilities for diesel Rust library
 * [filesystem](libraries/filesystem/): abstraction of filesystem and files. Implementation for many different storages.
+* [finances](libraries/finances/): reusable modules for the finances application
 * [pcloud_sdk](libraries/pcloud_sdk/): pCloud SDK.
 * [rebrickable](libraries/rebrickable/): API for https://rebrickable.com/
 * [utils](libraries/utils/): generic utilities used by several libraries
+
+## Scripts
+
+Shell scripts with some handy functionality (check [justfile](justfile) too).
+
 
 ## Tooling
 
