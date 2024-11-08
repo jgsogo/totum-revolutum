@@ -15,7 +15,7 @@ py_library(
     deps = APPS + [
         requirement("django"),
         requirement("PyYAML"),
-        requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
+        # requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
     ],
 )
 
