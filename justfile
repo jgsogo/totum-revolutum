@@ -15,19 +15,23 @@ update:
     bazel run @@//bazel/third_party:python_requirements
 
 # Run all testing
-test: build
+test: bazel-check build
     cargo check
     cargo clippy
     bazel test //...
 
 # Build everything
-build:
+build: bazel-update
     cargo build
     bazel build //...
 
 # Run all the Bazel targets labelled with 'update' tag
 bazel-update:
     scripts/bazel_run_targets.sh update
+
+# Run all the Bazel targets labelled with 'check' tag
+bazel-check:
+    scripts/bazel_run_targets.sh check
 
 # Execute tokei: prints statistics about the repository
 tokei:

@@ -83,7 +83,7 @@ repos:
 
   # Some local scripts
   - repo: local
-    hooks:
+    hooks: []
       # - id: cargo-check
       #   name: cargo +nightly check
       #   entry: cargo +nightly check
@@ -97,16 +97,18 @@ repos:
       #        language: script
       #        always_run: true
 
-      - id: bazel-check
-        name: Run all Bazel targets with 'check' tag
-        entry: scripts/bazel_run_targets.sh check
-        language: script
-        always_run: true
-        require_serial: true
+      # Takes too long to run... maybe if we can enable it again if we can execute it in the current workspace
+      # - id: bazel-check
+      #   name: Run all Bazel targets with 'check' tag
+      #   entry: scripts/bazel_run_targets.sh check
+      #   language: script
+      #   always_run: true
+      #   require_serial: true
 
-      - id: bazel-update
-        name: Run all Bazel targets with 'update' tag (update workspace files)
-        entry: scripts/bazel_run_targets.sh update
-        language: script
-        always_run: true
-        require_serial: true
+      # Takes too long to run... maybe if we can enable it again if we can execute it in the current workspace
+      # - id: bazel-update
+      #   name: Run all Bazel targets with 'update' tag (update workspace files)
+      #   entry: scripts/bazel_run_targets.sh update
+      #   language: script
+      #   always_run: true
+      #   require_serial: true
