@@ -43,6 +43,7 @@ python.toolchain(
     configure_coverage_tool = True,
     python_version = "3.12",
 )
+# use_repo(python, python_3 = "python_3_12") # Adds target @python_3//:python3, which is the Python interpreter
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
