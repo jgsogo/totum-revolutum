@@ -1,42 +1,73 @@
-load("@aspect_rules_py//py:defs.bzl", "py_binary")
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
+load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
 
 APPS = [
     "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
     "//libraries/finances/investments/django_finances_investments:finances_investments",
 ]
 
-# Use this target to execute commands on this project:
-#
-# ```
-# bazel run //apps/finances/django:admin -- --help
-# ```
-py_binary(
-    name = "admin",
-    srcs = glob(["**/*.py"]),
-    env = {
-        "DATABASE_SQLITE3": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
-    },
+# The library, with all the application files
+py_library(
+    name = "applib",
+    srcs = glob(["finances/**/*.py"]),
     imports = ["."],
-    main = "manage.py",
     deps = APPS + [
         requirement("django"),
         requirement("PyYAML"),
+        requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
     ],
 )
 
-# FIXME: If we want rules for custom commands, have a look to the django_test implementation
-# py_binary(
-#     name = "runserver",
-#     srcs = glob(["**/*.py"]),
-#     args = ["runserver"],
-#     env = {
-#         "DATABASE_SQLITE3": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
-#     },
-#     imports = ["."],
-#     main = "manage.py",
-#     deps = APPS + [
-#         requirement("django"),
-#         requirement("PyYAML"),
+# The application django-admin
+py_binary(
+    name = "admin",
+    srcs = ["manage.py"],
+    env = {
+        "SQL_DATABASE": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
+        "DJANGO_ALLOWED_HOSTS": "localhost 127.0.0.1 0.0.0.0 [::1]",
+        "DEBUG": "1",
+        "SECRET_KEY": "buu",
+    },
+    main = "manage.py",
+    deps = [
+        ":applib",
+        # requirement("gunicorn"),  # FIXME: Required for the deployments
+    ],
+)
+
+gunicorn_binary(
+    name = "gunicorn",
+    args = [
+        "finances.wsgi:application",
+        "--bind 0.0.0.0:8000",
+        "--access-logfile '-'",
+    ],
+    env = {
+        "SQL_DATABASE": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
+        "DJANGO_ALLOWED_HOSTS": "localhost 127.0.0.1 0.0.0.0 [::1]",
+        "DEBUG": "1",
+        "SECRET_KEY": "buu",
+    },
+    deps = [
+        ":applib",
+    ],
+)
+
+# py_oci_image(
+#     name = "container",
+#     base = "//containers/django/app",
+#     binaries = [
+#         ":gunicorn",
+#         ":admin",
 #     ],
+#     entrypoint = ["/entrypoint.sh"],
+#     exposed_ports = ["8080"],
+#     tags = [
+#         "manual",
+#     ],
+#     tars = [
+#         ":entrypoint",
+#     ],
+#     user = "app:app",
 # )
