@@ -14,7 +14,7 @@ bazel_dep(name = "rules_nodejs", version = "6.3.1")
 bazel_dep(name = "aspect_rules_py", version = "0.9.1")
 bazel_dep(name = "rules_oci", version = "2.0.0")
 
-bazel_dep(name = "rules_java", version = "7.8.0", dev_dependency = True)
+bazel_dep(name = "rules_java", version = "8.3.1", dev_dependency = True)
 bazel_dep(name = "aspect_bazel_lib", version = "2.9.3", dev_dependency = True)
 
 bazel_dep(name = "aspect_rules_js", version = "2.1.0")
