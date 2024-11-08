@@ -1,9 +1,0 @@
-"""External fetches for OCI base images.
-
-This file is similar to how bazel_gazelle can manage go_repository calls
-by writing them to a generated macro in a .bzl file.
-"""
-
-load("//bazel/containers:buildx.bzl", "fetch_buildx")
-
-fetch_buildx()

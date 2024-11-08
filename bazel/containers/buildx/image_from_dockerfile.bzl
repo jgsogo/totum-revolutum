@@ -34,7 +34,7 @@ def image_from_dockerfile(name, srcs, image_tag = None, **kwargs):
         mnemonic = "BuildDocker",
         out_dirs = [name],
         target_compatible_with = TARGET_COMPATIBLE_WITH,
-        tool = "//bazel/containers:buildx",
+        tool = "//bazel/containers/buildx",
         **kwargs
     )
 
