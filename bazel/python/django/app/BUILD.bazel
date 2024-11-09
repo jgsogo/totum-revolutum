@@ -1,4 +1,3 @@
-
 exports_files([
     "makemigrations.check.tpl.sh",
     "makemigrations.update.tpl.sh",

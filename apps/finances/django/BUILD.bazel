@@ -2,7 +2,6 @@ load("@aspect_rules_py//py:defs.bzl", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
 load("//bazel/python/django/project:django_project.bzl", "django_project")
 
-
 APPS = [
     "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
     "//libraries/finances/investments/django_finances_investments:finances_investments",
@@ -22,14 +21,14 @@ py_library(
 
 django_project(
     name = "app",
-    settings_module = "finances.settings",
-    deps = [
-        ":applib"
-    ],
     env = {
         "SQL_DATABASE": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
         "DJANGO_ALLOWED_HOSTS": "localhost 127.0.0.1 0.0.0.0 [::1]",
         "DEBUG": "1",
         "SECRET_KEY": "buu",
     },
+    settings_module = "finances.settings",
+    deps = [
+        ":applib",
+    ],
 )
