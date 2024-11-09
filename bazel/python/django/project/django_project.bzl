@@ -4,7 +4,7 @@ load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
-load("@rules_oci//oci:defs.bzl", "oci_load")
+load("@rules_oci//oci:defs.bzl", "oci_load", "oci_push")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
@@ -148,10 +148,34 @@ def django_project(name, deps, **kwargs):
     #     ],
     # )
 
+    image_name = native.package_name().replace("/", "_")
+    repository = "ghcr.io/jgsogo/{}".format(image_name)
+
+    oci_push(
+        name = "{}-release".format(name),
+        image = ":{}-container".format(name),
+        remote_tags = "//:stable_build_scm_revision",
+        repository = repository,
+        tags = [
+            "manual",
+            "no-remote-cache",
+            "release",
+        ],
+    )
+
+    native.genrule(
+        name = "{}-repo_tags".format(name),
+        outs = ["repo_tags.txt"],
+        cmd_bash = """
+            echo "{}:$$(cat $(location //:stable_build_scm_revision))" > $@
+        """.format(repository),
+        srcs = ["//:stable_build_scm_revision"],
+    )
+
     oci_load(
         name = "{}-load".format(name),
         image = ":{}-container".format(name),
-        repo_tags = ["{}/{}:bazel-latest".format(native.package_name(), name)],  # FIXME: Create a file (stamped) to be used by all the repository
+        repo_tags = ":{}-repo_tags".format(name),
         tags = [
             "manual",
         ],
