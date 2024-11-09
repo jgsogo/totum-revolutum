@@ -87,9 +87,12 @@ jobs:
         run: bazel build //docs
 
       # Release containers
+      # FIXME: Release only modified images! Filter from the ${{ runner.temp }}/impacted-targets.txt list
       - name: Release to GHCR
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         env:
           CR_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
           bazel run //bazel/python/django/containers/nginx:release
+          bazel run //apps/finances/django:app-release
