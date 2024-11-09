@@ -1,42 +1,37 @@
-load("@aspect_rules_py//py:defs.bzl", "py_binary")
+load("@aspect_rules_py//py:defs.bzl", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
+load("//bazel/python/django/project:django_project.bzl", "django_project")
 
 APPS = [
     "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
     "//libraries/finances/investments/django_finances_investments:finances_investments",
 ]
 
-# Use this target to execute commands on this project:
-#
-# ```
-# bazel run //apps/finances/django:admin -- --help
-# ```
-py_binary(
-    name = "admin",
-    srcs = glob(["**/*.py"]),
-    env = {
-        "DATABASE_SQLITE3": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
-    },
+# The library, with all the application files
+py_library(
+    name = "applib",
+    srcs = [
+        "settings.py",
+        "urls.py",
+    ],
     imports = ["."],
-    main = "manage.py",
     deps = APPS + [
         requirement("django"),
-        requirement("PyYAML"),
+        # requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
     ],
 )
 
-# FIXME: If we want rules for custom commands, have a look to the django_test implementation
-# py_binary(
-#     name = "runserver",
-#     srcs = glob(["**/*.py"]),
-#     args = ["runserver"],
-#     env = {
-#         "DATABASE_SQLITE3": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
-#     },
-#     imports = ["."],
-#     main = "manage.py",
-#     deps = APPS + [
-#         requirement("django"),
-#         requirement("PyYAML"),
-#     ],
-# )
+# All the other targets for a Django project
+django_project(
+    name = "app",
+    env = {
+        "SQL_DATABASE": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
+        "DJANGO_ALLOWED_HOSTS": "localhost 127.0.0.1 0.0.0.0 [::1]",
+        "DEBUG": "1",
+        "SECRET_KEY": "buu",
+    },
+    settings_module = "settings",
+    deps = [
+        ":applib",
+    ],
+)

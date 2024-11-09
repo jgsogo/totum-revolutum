@@ -46,12 +46,12 @@ bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri tauri build
 To run the development server, use:
 
 ```sh
-bazel run //apps/finances/django:runserver
+bazel run //apps/finances/django:app-admin -- runserver
 ```
 
+Note, that you can use this target to run other Django admin commands:
 
-Django-admin can be executed with the following command:
-
-```sh
-bazel run //bazel/python/django:admin -- runserver --pythonpath=$(pwd)/apps/finances/django/ --settings=finances.settings
+```
+bazel run //apps/finances/django:app-admin -- migrate
+DJANGO_SUPERUSER_PASSWORD=django bazel run //apps/finances/django:app-admin -- createsuperuser --email=superuser@app.com --username=django --noinput
 ```

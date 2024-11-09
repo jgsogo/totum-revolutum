@@ -48,7 +48,7 @@ labels:
   # Type
   - name: type:EPIC
     color: BBA6DD
-    description: Group of issues 
+    description: Group of issues
   - name: type:bug
     color: D4C5F9
     description: Something isn't working

@@ -1270,7 +1270,7 @@
     },
     "@@rules_oci~//oci:extensions.bzl%oci": {
       "general": {
-        "bzlTransitiveDigest": "BArfDZdqaIWwpgWFPBnkIGXIcf2Qy95HOG5XlKzu7ns=",
+        "bzlTransitiveDigest": "w1CTKxBw1iiOCCuFyOK6FOHGxe5b8W/19WCSVWKf7UM=",
         "usagesDigest": "+yGXQrRdAWK8QnYDTyKE+f6J5AfOaeEdDD4T5LtvJg8=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -1286,9 +1286,20 @@
             "ruleClassName": "globals_repo",
             "attributes": {
               "globals": {
+                "CcSharedLibraryInfo": "6.0.0-pre.20220630.1",
+                "CcSharedLibraryHintInfo": "7.0.0-pre.20230316.2",
+                "PackageSpecificationInfo": "6.4.0",
                 "RunEnvironmentInfo": "5.3.0",
                 "DefaultInfo": "0.0.1",
                 "__TestingOnly_NeverAvailable": "1000000000.0.0"
+              },
+              "legacy_globals": {
+                "JavaInfo": "8.0.0",
+                "JavaPluginInfo": "8.0.0",
+                "ProtoInfo": "8.0.0",
+                "PyCcLinkParamsProvider": "8.0.0",
+                "PyInfo": "8.0.0",
+                "PyRuntimeInfo": "8.0.0"
               }
             }
           },
@@ -1717,7 +1728,7 @@
     },
     "@@rules_rust~//rust:extensions.bzl%rust": {
       "general": {
-        "bzlTransitiveDigest": "wJ7RdecGIVaVQkbVPLcQloLNEuNgLX93skwQahdaUsU=",
+        "bzlTransitiveDigest": "lJCMevJ3WbZ/nKdH95n9OKmMkTeHN7ree+KRyGuOie0=",
         "usagesDigest": "RIIRIYtuDn3pVlTjKUc/1HHny479rzwuCbkbmwAoGFQ=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -3485,7 +3496,7 @@
     },
     "@@rules_rust~//rust/private:extensions.bzl%i": {
       "general": {
-        "bzlTransitiveDigest": "NbskxzA8wGjSNLxAsLuPoCLHX58gAs0+6jYmF5UYIe4=",
+        "bzlTransitiveDigest": "l3YsTwoNDoGnlhawjXMa5FoWiU2yuODZmcuZRjVe4qI=",
         "usagesDigest": "36stfzhXqs0CV8IAGCDdg7qEI8aTtX0kty8QOJffBmo=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

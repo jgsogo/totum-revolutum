@@ -2,8 +2,8 @@
 
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
-load("//bazel/python/django:makemigrations.bzl", "django_makemigrations_check", "django_makemigrations_update")
-load("//bazel/python/django:test.bzl", "django_test")
+load("//bazel/python/django/app:makemigrations.bzl", "django_makemigrations_check", "django_makemigrations_update")
+load("//bazel/python/django/app:test.bzl", "django_test")
 
 def django_app(name, deps = None, visibility = None, app_label = None):
     """
@@ -14,7 +14,7 @@ def django_app(name, deps = None, visibility = None, app_label = None):
 
     ```
     load("@py_deps//:requirements.bzl", "requirement")
-    load("//bazel/python/django:django_app.bzl", "django_app")
+    load("//bazel/python/django/app:django_app.bzl", "django_app")
 
     django_app(
         name = "myapp",

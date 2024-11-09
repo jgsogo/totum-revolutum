@@ -1,4 +1,4 @@
-load("//bazel/python/django:django_app.bzl", "django_app")
+load("//bazel/python/django/app:django_app.bzl", "django_app")
 
 django_app(
     name = "finances_investments",
