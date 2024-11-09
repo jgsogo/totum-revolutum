@@ -1,0 +1,23 @@
+name: Create Release
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          echo "No dependencies to install"
+
+      - name: Build
+        run: |
+          echo "${{ inputs.release_tag }}"
+          gh release create --help
