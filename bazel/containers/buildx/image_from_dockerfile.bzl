@@ -1,5 +1,6 @@
 """A rule to generate an OCI image from a dockerfile"""
 
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
 load("@configure_buildx//:defs.bzl", "BUILDER_NAME", "TARGET_COMPATIBLE_WITH")
 load("@rules_oci//oci:defs.bzl", "oci_load")
@@ -20,12 +21,17 @@ def image_from_dockerfile(name, srcs, image_tag = None, **kwargs):
     """
     image_tag = image_tag or "bazel-latest"
 
+    copy_to_directory(
+        name = "{}-docker-files".format(name),
+        srcs = srcs,
+    )
+
     run_binary(
         name = name,
-        srcs = srcs,
+        srcs = [":{}-docker-files".format(name)],
         args = [
             "build",
-            "./{}".format(native.package_name()),
+            "$(BINDIR)/{}/{}-docker-files".format(native.package_name(), name),
             "--builder",
             BUILDER_NAME,
             "--output=type=oci,tar=false,dest=$@",

@@ -12,6 +12,6 @@ native_binary(
         "manual",
     ],
     visibility = [
-        "//containers:__subpackages__",
+        "//visibility:public",
     ],
 )
