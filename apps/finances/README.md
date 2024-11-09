@@ -53,5 +53,5 @@ bazel run //apps/finances/django:runserver
 Django-admin can be executed with the following command:
 
 ```sh
-bazel run //bazel/python/django:admin -- runserver --pythonpath=$(pwd)/apps/finances/django/ --settings=finances.settings
+bazel run //bazel/python/django/app:admin -- runserver --pythonpath=$(pwd)/apps/finances/django/ --settings=finances.settings
 ```

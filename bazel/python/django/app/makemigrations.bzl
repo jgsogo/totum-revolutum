@@ -57,7 +57,7 @@ def django_makemigrations_update(name, *args, **kwargs):
     """Executes makemigrations and copies the generated migrations into the workspace"""
     django_makemigrations(
         name = name,
-        run_template = "//bazel/python/django:makemigrations.update.tpl.sh",
+        run_template = "//bazel/python/django/app:makemigrations.update.tpl.sh",
         *args,
         **kwargs
     )
@@ -66,7 +66,7 @@ def django_makemigrations_check(name, *args, **kwargs):
     """Executes makemigrations testing if there is anything pending"""
     django_makemigrations(
         name = name,
-        run_template = "//bazel/python/django:makemigrations.check.tpl.sh",
+        run_template = "//bazel/python/django/app:makemigrations.check.tpl.sh",
         *args,
         **kwargs
     )

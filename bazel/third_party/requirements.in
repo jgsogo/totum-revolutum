@@ -5,4 +5,4 @@ django-money~=3.5.3
 django-treenode~=0.22.1
 gunicorn~=23.0.0
 psycopg~=3.2.0
-pyyaml~=6.0.2
+# pyyaml~=6.0.2

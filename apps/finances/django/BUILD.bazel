@@ -1,6 +1,7 @@
-load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+load("@aspect_rules_py//py:defs.bzl", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
-load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
+load("//bazel/python/django/project:django_project.bzl", "django_project")
+
 
 APPS = [
     "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
@@ -14,38 +15,16 @@ py_library(
     imports = ["."],
     deps = APPS + [
         requirement("django"),
-        requirement("PyYAML"),
+        # requirement("PyYAML"),  # TODO: This is only for yaml fixtures?
         # requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
     ],
 )
 
-# FIXME: We don't need `manage.py`, `asgi.py` or `wsgi.py` files here. They will always be the same for all the
-# FIXME: applications. The only difference is the envvar 'DJANGO_SETTINGS_MODULE'. We can create django_rules
-# FIXME: that provide the functionality and ensure we are passing this envvar.
-
-# The application django-admin
-py_binary(
-    name = "admin",
-    srcs = ["manage.py"],
-    env = {
-        "SQL_DATABASE": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
-        "DJANGO_ALLOWED_HOSTS": "localhost 127.0.0.1 0.0.0.0 [::1]",
-        "DEBUG": "1",
-        "SECRET_KEY": "buu",
-    },
-    main = "manage.py",
+django_project(
+    name = "app",
+    settings_module = "finances.settings",
     deps = [
-        ":applib",
-        # requirement("gunicorn"),  # FIXME: Required for the deployments
-    ],
-)
-
-gunicorn_binary(
-    name = "gunicorn",
-    args = [
-        "finances.wsgi:application",
-        "--bind 0.0.0.0:8000",
-        "--access-logfile '-'",
+        ":applib"
     ],
     env = {
         "SQL_DATABASE": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
@@ -53,25 +32,4 @@ gunicorn_binary(
         "DEBUG": "1",
         "SECRET_KEY": "buu",
     },
-    deps = [
-        ":applib",
-    ],
 )
-
-# py_oci_image(
-#     name = "container",
-#     base = "//containers/django/app",
-#     binaries = [
-#         ":gunicorn",
-#         ":admin",
-#     ],
-#     entrypoint = ["/entrypoint.sh"],
-#     exposed_ports = ["8080"],
-#     tags = [
-#         "manual",
-#     ],
-#     tars = [
-#         ":entrypoint",
-#     ],
-#     user = "app:app",
-# )
