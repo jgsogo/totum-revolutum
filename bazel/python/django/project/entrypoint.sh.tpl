@@ -17,4 +17,4 @@ fi
 
 # DJANGO_SUPERUSER_PASSWORD=django /apps/finances/django/app-admin createsuperuser --email=superuser@app.com --username=django --noinput
 
-/apps/finances/django/app-gunicorn bazel.python.django.project.wsgi:application --bind 0.0.0.0:8000
+/apps/finances/django/app-gunicorn bazel.python.django.project.wsgi:application --bind 0.0.0.0:%DJANGO_PORT%
