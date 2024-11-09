@@ -119,6 +119,10 @@ def django_project(name, deps, **kwargs):
             "SQL_DATABASE": "/home/{}/web/db.sqlite3".format(USER),
         },
         user = USER_UID,
+        # Docs about the docker LABEL: https://docs.docker.com/reference/dockerfile/#label
+        labels = {
+            "org.opencontainers.image.source": "https://github.com/jgsogo/totum-revolutum",  # Associates this container with this repository
+        },
     )
 
     platform_transition_filegroup(

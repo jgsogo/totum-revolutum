@@ -1,5 +1,7 @@
 FROM python:3.12-bookworm
 
+LABEL org.opencontainers.image.source=https://github.com/jgsogo/totum-revolutum
+
 RUN apt-get update
 RUN apt-get install -y netcat-openbsd
 

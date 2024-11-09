@@ -5,6 +5,7 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 # bazel-bin/node_modules/.aspect_rules_js since /pnpm-lock.yaml is the root of the pnpm workspace
 npm_link_all_packages(name = "node_modules")
 
+# If stamped, contains the commit SHA, if not, just the string "totum-revolutum"
 genrule(
     name = "stable_build_scm_revision",
     outs = ["stable_build_scm_revision.txt"],

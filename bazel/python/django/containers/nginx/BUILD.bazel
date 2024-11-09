@@ -31,7 +31,7 @@ oci_push(
     name = "release",
     image = ":nginx",
     remote_tags = "//:stable_build_scm_revision",
-    repository = "ghcr.io/jgsogo/ngind",
+    repository = "ghcr.io/jgsogo/nginx",
     tags = [
         "manual",
         "no-remote-cache",
