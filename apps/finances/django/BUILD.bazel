@@ -17,7 +17,6 @@ py_library(
     imports = ["."],
     deps = APPS + [
         requirement("django"),
-        # requirement("PyYAML"),  # TODO: This is only for yaml fixtures?
         # requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
     ],
 )
