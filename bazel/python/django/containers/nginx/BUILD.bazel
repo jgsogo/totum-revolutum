@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("@rules_oci//oci:defs.bzl", "oci_push")
 load("//bazel/containers/buildx:image_from_dockerfile.bzl", "image_from_dockerfile")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER")
 
@@ -23,5 +24,17 @@ image_from_dockerfile(
     ],
     visibility = [
         "//visibility:public",
+    ],
+)
+
+oci_push(
+    name = "release",
+    image = ":nginx",
+    remote_tags = "//:stable_build_scm_revision",
+    repository = "ghcr.io/jgsogo/ngind",
+    tags = [
+        "manual",
+        "no-remote-cache",
+        "release",
     ],
 )
