@@ -11,10 +11,13 @@ then
     echo "PostgreSQL started"
 fi
 
-/apps/finances/django/app-admin flush --no-input
 /apps/finances/django/app-admin migrate
 /apps/finances/django/app-admin collectstatic --no-input --clear
 
-# DJANGO_SUPERUSER_PASSWORD=django /apps/finances/django/app-admin createsuperuser --email=superuser@app.com --username=django --noinput
+if [ -n "${DJANGO_SUPERUSER_PASSWORD}" ]; then
+    # If the username is already taken, this command will fail, but the script will continue
+    echo "Creating superuser '$DJANGO_SUPERUSER_USERNAME'"
+    /apps/finances/django/app-admin createsuperuser --noinput
+fi
 
 /apps/finances/django/app-gunicorn bazel.python.django.project.wsgi:application --bind 0.0.0.0:%DJANGO_PORT%
