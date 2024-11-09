@@ -1,0 +1,57 @@
+alias(
+    name = "linux_amd64",
+    actual = ":linux_x86_64",
+)
+
+alias(
+    name = "macos_amd64",
+    actual = ":macos_x86_64",
+)
+
+alias(
+    name = "linux_aarch64",
+    actual = ":linux_arm64",
+)
+
+alias(
+    name = "macos_aarch64",
+    actual = ":macos_arm64",
+)
+
+platform(
+    name = "linux_x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        "//bazel/constraints:glibc_2_28",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+platform(
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+        "//bazel/constraints:glibc_2_28",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+platform(
+    name = "macos_arm64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:arm64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+platform(
+    name = "macos_x86_64",
+    constraint_values = [
+        "@platforms//os:macos",
+        "@platforms//cpu:x86_64",
+    ],
+    visibility = ["//visibility:public"],
+)

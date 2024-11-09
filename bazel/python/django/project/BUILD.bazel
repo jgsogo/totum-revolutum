@@ -2,4 +2,5 @@ exports_files([
     "manage.py",
     "wsgi.py",
     "asgi.py",
+    "entrypoint.sh",
 ])
