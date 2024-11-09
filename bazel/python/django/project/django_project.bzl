@@ -33,10 +33,9 @@ def django_project(name, settings_module, **kwargs):
     )
 
     py_binary(
-        name = "{}-runserver".format(name),
+        name = "{}-admin".format(name),
         srcs = ["//bazel/python/django/project:manage.py"],
         main = "manage.py",
-        args = ["runserver"],
         deps = [
             ":{}-wsgi".format(name),
         ],
