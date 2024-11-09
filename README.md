@@ -31,10 +31,6 @@ Applications in this repository:
 * [syncronia](apps/syncronia/): a tool to run sync operations between different
   directories and storages
 
-## Containers
-
-Provides some docker containers that can be reused by other applications
-
 ## Libraries
 
 You can find the following libraries in this repository:

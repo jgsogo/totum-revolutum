@@ -1,0 +1,27 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("//bazel/containers/buildx:image_from_dockerfile.bzl", "image_from_dockerfile")
+load("//bazel/python/django/containers:defs.bzl", "GROUP", "USER", "USER_UID")
+
+expand_template(
+    name = "dockerfile",
+    out = "Dockerfile",
+    substitutions = {
+        "%USER%": USER,
+        "%USER_UID%": USER_UID,
+        "%GROUP%": GROUP,
+    },
+    template = ":Dockerfile.tpl",
+)
+
+image_from_dockerfile(
+    name = "deploy",
+    srcs = [
+        ":dockerfile",
+    ],
+    tags = [
+        "manual",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)

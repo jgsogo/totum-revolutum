@@ -72,7 +72,7 @@ def django_project(name, settings_module, **kwargs):
 
     py_oci_image(
         name = "{}-_container".format(name),
-        base = "//containers/django/app",  # TODO: Move this inside /bazel/python/django/container
+        base = "//bazel/python/django/containers/deploy",  # TODO: Move this inside /bazel/python/django/container
         binaries = [
             ":{}-gunicorn".format(name),
             ":{}-admin".format(name),

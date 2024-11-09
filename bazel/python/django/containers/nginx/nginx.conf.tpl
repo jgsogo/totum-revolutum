@@ -1,5 +1,5 @@
 upstream django_application {
-    server web:8000;
+    server web:%DJANGO_PORT%;
 }
 
 server {
@@ -7,11 +7,11 @@ server {
     listen 80;
 
     location /static/ {
-        alias /home/app/web/staticfiles/;
+        alias /home/%USER%/web/staticfiles/;
     }
 
     location /media/ {
-        alias /home/app/web/mediafiles/;
+        alias /home/%USER%/web/mediafiles/;
     }
 
     location / {

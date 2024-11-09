@@ -1,0 +1,29 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("//bazel/containers/buildx:image_from_dockerfile.bzl", "image_from_dockerfile")
+load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "GROUP", "USER", "USER_UID")
+
+expand_template(
+    name = "nginx_conf",
+    out = "nginx.conf",
+    substitutions = {
+        "%USER%": USER,
+        "%USER_UID%": USER_UID,
+        "%GROUP%": GROUP,
+        "%DJANGO_PORT%": DJANGO_PORT,
+    },
+    template = ":nginx.conf.tpl",
+)
+
+image_from_dockerfile(
+    name = "nginx",
+    srcs = [
+        "Dockerfile",
+        ":nginx_conf",
+    ],
+    tags = [
+        "manual",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)
