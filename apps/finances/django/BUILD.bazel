@@ -25,7 +25,6 @@ py_library(
 django_project(
     name = "app",
     env = {
-        # "SQL_DATABASE": "/Users/jgsogo/personal/totum-revolutum/finances.sqlite3",
         "DJANGO_ALLOWED_HOSTS": "localhost 127.0.0.1 0.0.0.0 [::1]",
         "DEBUG": "1",
         "SECRET_KEY": "buu",
