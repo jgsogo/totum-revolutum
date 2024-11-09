@@ -121,7 +121,7 @@ def django_project(name, deps, **kwargs):
         user = USER_UID,
         # Docs about the docker LABEL: https://docs.docker.com/reference/dockerfile/#label
         labels = {
-            "org.opencontainers.image.source": "https://github.com/jgsogo/totum-revolutum",  # Associates this container with this repository
+            "org.opencontainers.image.source": "https://github.com/jgsogo/totum-revolutum",  # Associates this container with this repository # FIXME: Make it global for all the repo
         },
     )
 
@@ -149,7 +149,7 @@ def django_project(name, deps, **kwargs):
     # )
 
     image_name = native.package_name().replace("/", "_")
-    repository = "ghcr.io/jgsogo/{}".format(image_name)
+    repository = "ghcr.io/jgsogo/{}".format(image_name)  # FIXME: Make it global for all the repo
 
     oci_push(
         name = "{}-release".format(name),
