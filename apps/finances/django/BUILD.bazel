@@ -10,7 +10,10 @@ APPS = [
 # The library, with all the application files
 py_library(
     name = "applib",
-    srcs = glob(["finances/**/*.py"]),
+    srcs = [
+        "settings.py",
+        "urls.py",
+    ],
     imports = ["."],
     deps = APPS + [
         requirement("django"),
@@ -19,6 +22,7 @@ py_library(
     ],
 )
 
+# All the other targets for a Django project
 django_project(
     name = "app",
     env = {
@@ -27,7 +31,7 @@ django_project(
         "DEBUG": "1",
         "SECRET_KEY": "buu",
     },
-    settings_module = "finances.settings",
+    settings_module = "settings",
     deps = [
         ":applib",
     ],
