@@ -1,36 +1,9 @@
-load("@aspect_rules_py//py:defs.bzl", "py_library")
-load("@py_deps//:requirements.bzl", "requirement")
 load("//bazel/python/django/project:django_project.bzl", "django_project")
 
-APPS = [
-    "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
-    "//libraries/finances/investments/django_finances_investments:finances_investments",
-]
-
-# The library, with all the application files
-py_library(
-    name = "applib",
-    srcs = [
-        "settings.py",
-        "urls.py",
-    ],
-    imports = ["."],
-    deps = APPS + [
-        requirement("django"),
-        # requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
-    ],
-)
-
-# All the other targets for a Django project
 django_project(
     name = "app",
-    env = {
-        "DJANGO_ALLOWED_HOSTS": "localhost 127.0.0.1 0.0.0.0 [::1]",
-        "DEBUG": "1",
-        "SECRET_KEY": "buu",
-    },
-    settings_module = "apps.finances.django.settings",
     deps = [
-        ":applib",
+        "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
+        "//libraries/finances/investments/django_finances_investments:finances_investments",
     ],
 )

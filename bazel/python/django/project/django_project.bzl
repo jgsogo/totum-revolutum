@@ -3,38 +3,55 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+load("@py_deps//:requirements.bzl", "requirement")
 load("@rules_oci//oci:defs.bzl", "oci_load")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
 
-def django_project(name, settings_module, **kwargs):
+def django_project(name, deps, **kwargs):
     """
     An opinionated macro to create a Django project.
 
     Args:
         name(str): A name for the project
-        settings_module(str): The module with the Django settings (i.e.: "project_name.settings")
+        deps(List[str]): List of dependencies.
         **kwargs(dict): Other arguments for the rules
     """
+    settings_module = native.package_name().replace("/", ".")
 
     env = kwargs.pop("env", {})
     env["DJANGO_SETTINGS_MODULE"] = settings_module
+    env["DJANGO_ALLOWED_HOSTS"] = "localhost 127.0.0.1 0.0.0.0 [::1]"
+    env["DEBUG"] = "1"
+    env["SECRET_KEY"] = "4niv*0w++!1y%x59x(ma165cni2-0%m-jmx-7rpav1zmgp#no9-{}".format(settings_module)
 
-    deps = kwargs.pop("deps")
+    # The library, with all the application files
+    py_library(
+        name = "{}-project".format(name),
+        srcs = [
+            "settings.py",
+            "urls.py",
+        ],
+        imports = ["."],
+        deps = deps + [
+            requirement("django"),
+            # requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
+        ],
+    )
 
     py_library(
         name = "{}-wsgi".format(name),
         srcs = ["//bazel/python/django/project:wsgi.py"],
-        deps = deps,
+        deps = [":{}-project".format(name)],
         **kwargs
     )
 
     py_library(
         name = "{}-asgi".format(name),
         srcs = ["//bazel/python/django/project:asgi.py"],
-        deps = deps,
+        deps = [":{}-project".format(name)],
         **kwargs
     )
 
