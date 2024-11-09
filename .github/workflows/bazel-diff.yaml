@@ -88,6 +88,8 @@ jobs:
 
       # Release containers
       - name: Release to GHCR
+        env:
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo $GITHUB_TOKEN | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
+          echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
           bazel run //bazel/python/django/containers/nginx:release
