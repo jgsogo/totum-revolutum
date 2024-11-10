@@ -3,6 +3,10 @@ load("@rules_oci//oci:defs.bzl", "oci_push")
 load("//bazel/containers/buildx:image_from_dockerfile.bzl", "image_from_dockerfile")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER")
 
+image_name = "nginx_django"
+
+repository = "ghcr.io/jgsogo/{}".format(image_name)  # FIXME: Make it global for all the repo
+
 expand_template(
     name = "nginx_conf",
     out = "nginx.conf",
@@ -13,14 +17,13 @@ expand_template(
     template = ":nginx.conf.tpl",
 )
 
-image_name = "nginx_django"
-
 image_from_dockerfile(
-    name = image_name,
+    name = "nginx",
     srcs = [
         "Dockerfile",
         ":nginx_conf",
     ],
+    repository = repository,
     tags = [
         "manual",
     ],
@@ -33,7 +36,7 @@ oci_push(
     name = "release",
     image = ":nginx",
     remote_tags = "//:stable_build_scm_revision",
-    repository = "ghcr.io/jgsogo/{}".format(image_name),
+    repository = repository,
     tags = [
         "manual",
         "no-remote-cache",
