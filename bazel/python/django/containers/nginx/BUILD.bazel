@@ -13,8 +13,10 @@ expand_template(
     template = ":nginx.conf.tpl",
 )
 
+image_name = "nginx_django"
+
 image_from_dockerfile(
-    name = "nginx",
+    name = image_name,
     srcs = [
         "Dockerfile",
         ":nginx_conf",
@@ -31,7 +33,7 @@ oci_push(
     name = "release",
     image = ":nginx",
     remote_tags = "//:stable_build_scm_revision",
-    repository = "ghcr.io/jgsogo/nginx",
+    repository = "ghcr.io/jgsogo/{}".format(image_name),
     tags = [
         "manual",
         "no-remote-cache",
