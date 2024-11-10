@@ -17,7 +17,25 @@ jobs:
         run: |
           echo "No dependencies to install"
 
-      - name: Build
+      - name: Create the release
         run: |
           echo "${{ inputs.release_tag }}"
-          gh release create --help
+          gh release create ${{ inputs.release_tag }} --generate-notes
+
+      # - name: Upload artifacts
+      #   run: |
+      #     echo "${{ inputs.release_tag }}"
+      #     gh release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
+
+      # Release containers
+      # FIXME: Release only modified images!
+      # TODO: Filter from the ${{ runner.temp }}/impacted-targets.txt list
+      # TODO: Stamp the generated images with the image_tag!
+      - name: Release to GHCR
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        env:
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
+          bazel run //bazel/python/django/containers/nginx:release
+          bazel run //apps/finances/django:app-release
