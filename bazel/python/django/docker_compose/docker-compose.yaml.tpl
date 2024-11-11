@@ -5,6 +5,8 @@ services:
     expose:
       - %DJANGO_PORT%
     environment:
+      # Docs: See interpolation and env-files: https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/#env-file
+      # Django
       - DEBUG=${DEV_MODE:-true}
       - SECRET_KEY=  # Make this compulsory
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 0.0.0.0 [::1]  # TODO: Sure I can remove some of them
