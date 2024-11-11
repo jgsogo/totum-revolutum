@@ -25,3 +25,7 @@ def docker_compose(name, app_image):
         },
         template = "//bazel/python/django/docker_compose:docker-compose.yaml.tpl",
     )
+
+    ####
+    # The release target
+    ####
