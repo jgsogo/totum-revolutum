@@ -20,7 +20,7 @@ def django_project(name, deps, **kwargs):
         deps(List[str]): List of dependencies.
         **kwargs(dict): Other arguments for the rules
     """
-    settings_module = native.package_name().replace("/", ".")
+    settings_module = "{}.settings".format(native.package_name().replace("/", "."))
 
     env = kwargs.pop("env", {})
     env["DJANGO_SETTINGS_MODULE"] = settings_module
