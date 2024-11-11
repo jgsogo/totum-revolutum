@@ -11,6 +11,8 @@ on:
 jobs:
   bazel-diff-test:
     runs-on: ubuntu-24.04
+    env:
+      BAZEL_CONFIG: "--config=ci"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,14 +58,14 @@ jobs:
 
       - name: Generate hashes from base
         run: |
-          bazel run //bazel/diff -- generate-hashes -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
+          bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
           cat ${{ runner.temp }}/base-hashes.json
 
       - name: Generate hashes from current
-        run: bazel run //bazel/diff -- generate-hashes -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
+        run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
 
       - name: Compute impacted targets
-        run: bazel run //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
+        run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
 
       - name: Test impacted targets
         run: |
@@ -76,7 +78,7 @@ jobs:
 
           # Do not fail for next command
           set +e
-          bazel test $one_liner
+          bazel test $BAZEL_CONFIG $one_liner
 
           # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
           err=$? ; if (( $err != 4 )) ; then exit $err ; fi
@@ -84,15 +86,4 @@ jobs:
       # It's fine to build this docs target only in master. The individual ones have already been tested ('doc/tests' are building 'doc')
       - name: Build docs
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        run: bazel build //docs
-
-      # Release containers
-      # FIXME: Release only modified images! Filter from the ${{ runner.temp }}/impacted-targets.txt list
-      - name: Release to GHCR
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        env:
-          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-          bazel run //bazel/python/django/containers/nginx:release
-          bazel run //apps/finances/django:app-release
+        run: bazel build $BAZEL_CONFIG //docs

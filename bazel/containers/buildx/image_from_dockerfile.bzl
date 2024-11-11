@@ -5,13 +5,13 @@ load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
 load("@configure_buildx//:defs.bzl", "BUILDER_NAME", "TARGET_COMPATIBLE_WITH")
 load("@rules_oci//oci:defs.bzl", "oci_load")
 
-def image_from_dockerfile(name, srcs, image_tag = None, **kwargs):
+def image_from_dockerfile(name, srcs, repository, **kwargs):
     """Generates an OCI image from a Dockerfile
 
     Args:
         name(str): Name of the generated image
         srcs(List[str]): List of sources (it should include the Dockerfile)
-        image_tag(str): The tag to use for the generated image if it's loaded into the docker registry (defaults to "bazel-latest")
+        repository(str): Repository
         **kwargs(dict): Arguments common to all the generated targets (tags, visibility,...)
 
     This rule generates the following targets:
@@ -19,8 +19,6 @@ def image_from_dockerfile(name, srcs, image_tag = None, **kwargs):
      * <name>-load: Execute this rule to load the image into the docker registry
      * <name>-tarball: A tarball with the OCI image. Use it to load the image into a registry at runtime
     """
-    image_tag = image_tag or "bazel-latest"
-
     copy_to_directory(
         name = "{}-docker-files".format(name),
         srcs = srcs,
@@ -44,10 +42,19 @@ def image_from_dockerfile(name, srcs, image_tag = None, **kwargs):
         **kwargs
     )
 
+    native.genrule(
+        name = "{}-repo_tags".format(name),
+        outs = ["repo_tags.txt"],
+        cmd_bash = """
+            echo "{}:$$(cat $(location //:stable_build_scm_revision))" > $@
+        """.format(repository),
+        srcs = ["//:stable_build_scm_revision"],
+    )
+
     oci_load(
         name = "{}-load".format(name),
         image = ":{}".format(name),
-        repo_tags = ["{}:{}".format(name, image_tag)],
+        repo_tags = [":{}-repo_tags".format(name)],
         **kwargs
     )
 
