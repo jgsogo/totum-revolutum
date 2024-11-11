@@ -5,14 +5,18 @@ _just-check:
     {{ just_executable() }} --unstable --fmt --check
 
 # Updates all the dependencies (MODULE.bazel and 3rd parties not included)
-update:
+update: update-deps
     pre-commit autoupdate
+
+# Updates only the dependencies
+update-deps:
     cargo update
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines
     bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world update
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
     bazel run @@//bazel/third_party:python_requirements
+
 
 # Run all testing
 test: build bazel-check

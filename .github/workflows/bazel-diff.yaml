@@ -67,6 +67,12 @@ jobs:
       - name: Compute impacted targets
         run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
 
+      - name: Save impacted-targets as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: impacted-targets.txt
+          path: ${{ runner.temp }}/impacted-targets.txt
+
       - name: Test impacted targets
         run: |
           impacted_targets=()
