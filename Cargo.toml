@@ -85,7 +85,7 @@ sha256 = { version = "1.5" }
 strum = "0.26.3"
 strum_macros = "0.26.2"
 syn = { version = "2.0.87", features = ["visit"] }
-tauri-build = { version = "2.0.1", features = [] }
+tauri-build = { version = "2.0.3", features = [] }
 tauri = { version = "2.0.3", features = [] }
 tauri-plugin-shell = "2.0.1"
 tempfile = { version = "3.10.1" }
