@@ -10,6 +10,7 @@ load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
 load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
+load("//bazel/tools/gh:release.bzl", "gh_release")
 
 def django_project(name, deps, **kwargs):
     """
@@ -201,6 +202,19 @@ def django_project(name, deps, **kwargs):
     native.alias(
         name = "{}-nginx".format(name),
         actual = "//bazel/python/django/containers/nginx:nginx-load",
+        tags = [
+            "manual",
+            "release",
+        ],
+    )
+
+    gh_release(
+        name = "{}-release-docker-compose".format(name),
+        tag = "??",
+        display_label = "{}-docker-compose".format(image_name),
+        data = [
+            ":{}-docker_compose".format(name),
+        ],
         tags = [
             "manual",
             "release",

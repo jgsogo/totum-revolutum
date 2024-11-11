@@ -7,7 +7,7 @@ genrule(
     name = "sh",
     srcs = [":all-files"],
     outs = ["gh.sh",],
-    cmd = "echo 'gh $@' >$@"
+    cmd = "echo 'gh $$@' >$@"
 )
 
 sh_binary(
