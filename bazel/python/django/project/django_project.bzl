@@ -194,5 +194,15 @@ def django_project(name, deps, **kwargs):
 
     #######
     ## Docker compose
+    #######
 
     docker_compose(name = "{}-docker_compose".format(name), app_image = image_name)
+
+    native.alias(
+        name = "{}-nginx".format(name),
+        actual = "//bazel/python/django/containers/nginx:nginx-load",
+        tags = [
+            "manual",
+            "release",
+        ],
+    )
