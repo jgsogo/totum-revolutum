@@ -8,6 +8,7 @@ load("@rules_oci//oci:defs.bzl", "oci_load", "oci_push")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
+load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
 
 def django_project(name, deps, **kwargs):
@@ -37,7 +38,7 @@ def django_project(name, deps, **kwargs):
         imports = ["."],
         deps = deps + [
             requirement("django"),
-            # requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
+            requirement("psycopg"),  # Required because deployments can use Postgres
         ],
     )
 
@@ -190,3 +191,8 @@ def django_project(name, deps, **kwargs):
         output_group = "tarball",
         visibility = [":__subpackages__"],
     )
+
+    #######
+    ## Docker compose
+
+    docker_compose(name = "{}-docker_compose".format(name), app_image = image_name)
