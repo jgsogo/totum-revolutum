@@ -9,14 +9,19 @@ update: update-deps
     pre-commit autoupdate
 
 # Updates only the dependencies
-update-deps:
+update-deps: update-cargo update-npm update-python
+
+update-cargo:
     cargo update
+
+update-npm:
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines
     bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world update
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
-    bazel run @@//bazel/third_party:python_requirements
 
+update-python:
+    bazel run @@//bazel/third_party:python_requirements
 
 # Run all testing
 test: build bazel-check
