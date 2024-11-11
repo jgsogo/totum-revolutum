@@ -2,40 +2,88 @@ name: Create Release
 on:
   workflow_dispatch:
     inputs:
+      app:
+        type: choice
+        description: The application to tag
+        options:
+        - finances
+        - photodb
+        - syncronia
       release_tag:
         required: true
         type: string
+        description: The [semver] version number to create (Note.- Do not include leading 'v')
 
 jobs:
   release:
     runs-on: ubuntu-24.04
+    env:
+      BAZEL_CONFIG: "--config=ci"
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Install some requirements
+        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
-          echo "No dependencies to install"
+          sudo apt-get update
+          sudo apt-get install \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Validate the release
+        id: release-validator
+        run: |
+          NEW_RELEASE=${{ inputs.app }}-v${{ inputs.release_tag }}
+          echo "NEW_RELEASE=$NEW_RELEASE" >> $GITHUB_OUTPUT
+
+          echo "New release requested: $NEW_RELEASE"
+          echo "TODO: Validate release format"
+          echo "TODO: Get the previous release for this application"
+          gh release list --exclude-drafts --exclude-pre-releases
+          PREV_RELEASE="<prev-release>"
+          echo "PREV_RELEASE=$PREV_RELEASE" >> $GITHUB_OUTPUT
+          echo "TODO: Evaluate if the requested release is >= than previous one"
+
+      - name: Build the artifacts
+        env:
+          NEW_RELEASE: ${{ steps.release-validator.outputs.RELEASE }}
+        run: |
+          echo "NEW_RELEASE = $NEW_RELEASE"
+          bazel query $BAZEL_CONFIG "attr('tags', 'release', '//apps/${{ inputs.app }}/...')"
 
       - name: Create the release
+        env:
+          NEW_RELEASE: ${{ steps.release-validator.outputs.NEW_RELEASE }}
+          PREV_RELEASE: ${{ steps.release-validator.outputs.PREV_RELEASE }}
         run: |
-          echo "${{ inputs.release_tag }}"
-          gh release create ${{ inputs.release_tag }} --generate-notes
+          echo "NEW_RELEASE = $NEW_RELEASE"
+          echo "PREV_RELEASE = $PREV_RELEASE"
+          echo "TODO: Create the release and generate notes from the prev one"
+          echo "gh release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE"
+
 
       # - name: Upload artifacts
       #   run: |
       #     echo "${{ inputs.release_tag }}"
       #     gh release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
 
-      # Release containers
-      # FIXME: Release only modified images!
-      # TODO: Filter from the ${{ runner.temp }}/impacted-targets.txt list
-      # TODO: Stamp the generated images with the image_tag!
-      - name: Release to GHCR
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        env:
-          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-          bazel run //bazel/python/django/containers/nginx:release
-          bazel run //apps/finances/django:app-release
+      # # Release containers (stamped + optimized build)
+      # # FIXME: Release only modified images!
+      # # TODO: Filter from the ${{ runner.temp }}/impacted-targets.txt list
+      # # TODO: Stamp the generated images with the image_tag!
+      # - name: Release to GHCR
+      #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      #   env:
+      #     CR_PAT: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
+      #     bazel run $BAZEL_CONFIG --config=opt --stamp //bazel/python/django/containers/nginx:release
+      #     bazel run $BAZEL_CONFIG --config=opt --stamp //apps/finances/django:app-release
