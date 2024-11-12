@@ -15,21 +15,12 @@ py_test(
         "//apps/finances/django:app-tarball",
         "//bazel/python/django/containers/nginx:nginx-tarball",
     ],
-    # data = [
-    #     "//apps/finances/django:_entrypoint",
-    #     "//apps/finances/django:docker-compose-yaml",
-    #     "//apps/finances/django:env-dev",
-    #     "//apps/finances/django:tarball",
-    #     "//containers:postgres_tarball",
-    #     "//containers/nginx:tarball",
-    # ],
     main = ":__test__.py",
     tags = [
         "requires-docker",
         "requires-network",
     ],
     deps = [
-        # requirement("docker"),
         requirement("pytest"),
         requirement("testcontainers"),
     ],

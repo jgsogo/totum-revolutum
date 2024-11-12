@@ -26,8 +26,3 @@ def docker_compose(name, app_image, **kwargs):
         template = "//bazel/python/django/docker_compose:docker-compose.yaml.tpl",
         **kwargs
     )
-
-    ####
-    # The release target
-    ####
-    # TODO: Use some 'gh_relase' rule to publish this docker-container
