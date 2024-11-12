@@ -50,6 +50,16 @@ do_gh_release = rule(
 )
 
 def gh_release(name, tag, data, display_label = None, **kwargs):
+    """Uploads a new artifact to the given GitHub release (tag)
+
+    Args
+        name(str): The name for the do_gh_release target
+        tag(str): The GitHub tag/release
+        data(List[Label]): The list of labels and/or files that will be packaged to create the artifact
+        display_label(str): The label that will be displayed for the uploaded file
+        **kwargs: Other Bazel common arguments for the do_gh_release rule
+    """
+
     pkg_tar(
         name = "{}-files".format(name),
         srcs = data,

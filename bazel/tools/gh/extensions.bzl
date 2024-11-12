@@ -5,15 +5,6 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 GH_VERSION = "2.61.0"
 
 def _fetch_gh_impl(_ctx):
-    # http_archive(
-    #     name = "diesel_cli",
-    #     build_file = "//bazel/external:BUILD.diesel_cli.bazel",
-    #     sha256 = "929ff6fa154d64b930d84d6c2b65ec03968622f20db947c50bf92a9910edd01c",
-    #     strip_prefix = "diesel_cli-2.2.4",
-    #     type = "tar.gz",
-    #     urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.4/download"],
-    # )
-
     http_archive(
         name = "gh_linux_amd64",
         urls = [
