@@ -9,9 +9,10 @@ test --verbose_failures --test_output=errors
 # CI Specific flags
 ###################
 
-# common:ci --workspace_status_command=bazel/workspace_status.sh
+common:stamp --workspace_status_command=bazel/workspace_status.sh
 
 build:ci --verbose_failures --show_progress_rate_limit=10
+build:stamp --stamp
 
 test:ci --verbose_failures --test_output=all --keep_going
 

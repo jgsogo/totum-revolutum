@@ -1,0 +1,17 @@
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+
+native_binary(
+    name = "gh",
+    src = select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@gh_linux_amd64//:gh",
+        "@bazel_tools//src/conditions:darwin_arm64": "@gh_darwin_arm64//:gh",
+        "@bazel_tools//src/conditions:darwin_x86_64": "@gh_darwin_amd64//:gh",
+    }),
+    out = "gh",
+    tags = [
+        "manual",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)

@@ -8,7 +8,9 @@ load("@rules_oci//oci:defs.bzl", "oci_load", "oci_push")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
+load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
+load("//bazel/tools/gh:release.bzl", "gh_release")
 
 def django_project(name, deps, **kwargs):
     """
@@ -19,7 +21,7 @@ def django_project(name, deps, **kwargs):
         deps(List[str]): List of dependencies.
         **kwargs(dict): Other arguments for the rules
     """
-    settings_module = native.package_name().replace("/", ".")
+    settings_module = "{}.settings".format(native.package_name().replace("/", "."))
 
     env = kwargs.pop("env", {})
     env["DJANGO_SETTINGS_MODULE"] = settings_module
@@ -37,7 +39,7 @@ def django_project(name, deps, **kwargs):
         imports = ["."],
         deps = deps + [
             requirement("django"),
-            # requirement("psycopg"),  # FIXME: This is required because some of the deployments are using Postgres
+            requirement("psycopg"),  # Required because deployments can use Postgres
         ],
     )
 
@@ -189,4 +191,32 @@ def django_project(name, deps, **kwargs):
         srcs = [":{}-load".format(name)],
         output_group = "tarball",
         visibility = [":__subpackages__"],
+    )
+
+    #######
+    ## Docker compose
+    #######
+
+    docker_compose(name = "{}-docker_compose".format(name), app_image = image_name, visibility = [":__subpackages__"])
+
+    native.alias(
+        name = "{}-nginx".format(name),
+        actual = "//bazel/python/django/containers/nginx:nginx-load",
+        tags = [
+            "manual",
+            "release",
+        ],
+    )
+
+    gh_release(
+        name = "{}-release-docker-compose".format(name),
+        tag = "??",
+        display_label = "{}-docker-compose".format(image_name),
+        data = [
+            ":{}-docker_compose".format(name),
+        ],
+        tags = [
+            "manual",
+            "release",
+        ],
     )

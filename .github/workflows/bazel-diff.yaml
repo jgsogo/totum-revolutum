@@ -11,6 +11,12 @@ on:
 jobs:
   bazel-diff-test:
     runs-on: ubuntu-24.04
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --shm-size=2g
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
     env:
       BAZEL_CONFIG: "--config=ci"
     steps:
@@ -22,7 +28,7 @@ jobs:
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
           sudo apt-get update
-          sudo apt-get install \
+          sudo apt-get install -y \
             libwebkit2gtk-4.1-dev \
             build-essential \
             curl \

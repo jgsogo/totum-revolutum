@@ -54,7 +54,7 @@ def image_from_dockerfile(name, srcs, repository, **kwargs):
     oci_load(
         name = "{}-load".format(name),
         image = ":{}".format(name),
-        repo_tags = [":{}-repo_tags".format(name)],
+        repo_tags = ":{}-repo_tags".format(name),
         **kwargs
     )
 

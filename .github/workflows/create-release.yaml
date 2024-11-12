@@ -20,7 +20,7 @@ jobs:
   release:
     runs-on: ubuntu-24.04
     env:
-      BAZEL_CONFIG: "--config=ci"
+      BAZEL_CONFIG: "--config=ci --config=stamp --config=opt"
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
           echo "New release requested: $NEW_RELEASE"
           echo "TODO: Validate release format"
           echo "TODO: Get the previous release for this application"
-          gh release list --exclude-drafts --exclude-pre-releases
+          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --exclude-pre-releases
           PREV_RELEASE="<prev-release>"
           echo "PREV_RELEASE=$PREV_RELEASE" >> $GITHUB_OUTPUT
           echo "TODO: Evaluate if the requested release is >= than previous one"
@@ -72,7 +72,7 @@ jobs:
           echo "NEW_RELEASE = $NEW_RELEASE"
           echo "PREV_RELEASE = $PREV_RELEASE"
           echo "TODO: Create the release and generate notes from the prev one"
-          echo "gh release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE"
+          echo "bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE"
 
 
       # - name: Upload artifacts
@@ -80,7 +80,7 @@ jobs:
       #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   run: |
       #     echo "${{ inputs.release_tag }}"
-      #     gh release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
+      #     bazel run $BAZEL_CONFIG //bazel/tools/gh -- release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
 
       # # Release containers (stamped + optimized build)
       # # FIXME: Release only modified images!
@@ -92,5 +92,5 @@ jobs:
       #     CR_PAT: ${{ secrets.GITHUB_TOKEN }}
       #   run: |
       #     echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-      #     bazel run $BAZEL_CONFIG --config=opt --stamp //bazel/python/django/containers/nginx:release
-      #     bazel run $BAZEL_CONFIG --config=opt --stamp //apps/finances/django:app-release
+      #     bazel run $BAZEL_CONFIG  //bazel/python/django/containers/nginx:release
+      #     bazel run $BAZEL_CONFIG  //apps/finances/django:app-release

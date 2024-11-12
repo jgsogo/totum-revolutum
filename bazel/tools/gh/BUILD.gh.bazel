@@ -1,0 +1,17 @@
+filegroup(
+    name = "all-files",
+    srcs = glob(["**/*"]),
+)
+
+genrule(
+    name = "sh",
+    srcs = [":all-files"],
+    outs = ["gh.sh",],
+    cmd = "echo 'gh $$@' >$@"
+)
+
+sh_binary(
+  name = "gh",
+  srcs = [":sh"],
+  visibility = ["//visibility:public"],
+)
