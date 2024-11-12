@@ -3,7 +3,7 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER")
 
-def docker_compose(name, app_image):
+def docker_compose(name, app_image, **kwargs):
     expand_template(
         name = name,
         out = "docker-compose.yaml",
@@ -24,8 +24,10 @@ def docker_compose(name, app_image):
             "%ENV_DB_FILE%": ".env.prod.db",
         },
         template = "//bazel/python/django/docker_compose:docker-compose.yaml.tpl",
+        **kwargs
     )
 
     ####
     # The release target
     ####
+    # TODO: Use some 'gh_relase' rule to publish this docker-container

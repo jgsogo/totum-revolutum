@@ -1,0 +1,36 @@
+load("@aspect_rules_py//py:defs.bzl", "py_pytest_main")
+load("@py_deps//:requirements.bzl", "requirement")
+
+py_pytest_main(
+    name = "__test__",
+)
+
+py_test(
+    name = "tests",
+    srcs = [
+        "__test__.py",
+    ] + glob(["**/*.py"]),
+    data = [
+        "//apps/finances/django:app-docker_compose",
+        "//apps/finances/django:app-tarball",
+        "//bazel/python/django/containers/nginx:nginx-tarball",
+    ],
+    # data = [
+    #     "//apps/finances/django:_entrypoint",
+    #     "//apps/finances/django:docker-compose-yaml",
+    #     "//apps/finances/django:env-dev",
+    #     "//apps/finances/django:tarball",
+    #     "//containers:postgres_tarball",
+    #     "//containers/nginx:tarball",
+    # ],
+    main = ":__test__.py",
+    tags = [
+        "requires-docker",
+        "requires-network",
+    ],
+    deps = [
+        # requirement("docker"),
+        requirement("pytest"),
+        requirement("testcontainers"),
+    ],
+)
