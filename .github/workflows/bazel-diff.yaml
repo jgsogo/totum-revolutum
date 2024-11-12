@@ -24,18 +24,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: "Shortcut test (TODO: Remove)"
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          which docker
-          bazel run $BAZEL_CONFIG //bazel/python/django/containers/nginx:nginx-load
-          bazel run $BAZEL_CONFIG //apps/finances/django:app-load
-          bazel build //apps/finances/django:app-docker_compose
-          cat bazel-bin/apps/finances/django/docker-compose.yaml
-          echo "SECRET_KEY=1234" >> ${{ runner.temp }}/env.file
-          docker compose --file=$(pwd)/bazel-bin/apps/finances/django/docker-compose.yaml --env-file=${{ runner.temp }}/env.file up
-          bazel test $BAZEL_CONFIG //apps/finances/django/tests:tests
-
       - name: Install some requirements
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
