@@ -188,6 +188,10 @@ requests==2.32.3 \
     --hash=sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760 \
     --hash=sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6
     # via docker
+semver==3.0.2 \
+    --hash=sha256:6253adb39c70f6e51afed2fa7152bcd414c411286088fb4b9effb133885ab4cc \
+    --hash=sha256:b1ea4686fe70b981f85359eda33199d60c53964284e0cfb4977d243e37cf4bf4
+    # via -r bazel/third_party/requirements.in
 setuptools==75.1.0 \
     --hash=sha256:35ab7fd3bcd95e6b7fd704e4a1539513edad446c097797f2985e0e4b960772f2 \
     --hash=sha256:d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538

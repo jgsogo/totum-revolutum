@@ -50,9 +50,10 @@ jobs:
 
           echo "New release requested: $NEW_RELEASE"
           echo "TODO: Validate release format"
+
           echo "TODO: Get the previous release for this application"
-          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --exclude-pre-releases
-          PREV_RELEASE="<prev-release>"
+          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --exclude-pre-releases --json tagName,name | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
+          PREV_RELEASE=${{ inputs.app }}-v0.0.0
           echo "PREV_RELEASE=$PREV_RELEASE" >> $GITHUB_OUTPUT
           echo "TODO: Evaluate if the requested release is >= than previous one"
 
@@ -72,7 +73,7 @@ jobs:
           echo "NEW_RELEASE = $NEW_RELEASE"
           echo "PREV_RELEASE = $PREV_RELEASE"
           echo "TODO: Create the release and generate notes from the prev one"
-          echo "bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE"
+          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE
 
 
       # - name: Upload artifacts
