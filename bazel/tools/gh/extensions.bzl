@@ -20,7 +20,7 @@ def _fetch_gh_impl(_ctx):
             "https://github.com/cli/cli/releases/download/v{version}/gh_{version}_linux_amd64.tar.gz".format(version = GH_VERSION),
         ],
         type = "tar.gz",
-        sha256 = "929ff6fa154d64b930d84d6c2b65ec03968622f20db947c50bf92a9910edd01c",
+        sha256 = "e2fe1a63cef003093eb1f8e4a669e9e763bd0b747de8abb3253411b408ef6ede",
         strip_prefix = "gh_{version}_linux_amd64".format(version = GH_VERSION),
         build_file = "//bazel/tools/gh:BUILD.gh.bazel",
     )
