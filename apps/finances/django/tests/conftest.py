@@ -39,9 +39,6 @@ def docker_compose(django_image_loaded, nginx_image_loaded, env_file):
     with DockerCompose(
         context=DOCKER_COMPOSE_PATH, compose_file_name="docker-compose.yaml", env_file=env_file
     ) as compose:
-        import time
-
-        time.sleep(20)  # FIXME: Implement docker-compose wait/ready tooling
         yield compose
         stdout, stderr = compose.get_logs()
     print(">" * 50)

@@ -26,6 +26,12 @@ services:
     volumes:
       - static_volume:/home/%USER%/web/staticfiles
       - media_volume:/home/%USER%/web/mediafiles
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:%DJANGO_PORT%/admin"]
+        interval: 10s
+        retries: 5
+        start_period: 30s
+        timeout: 10s
 
   db:
     image: postgres:17
@@ -35,6 +41,12 @@ services:
       - POSTGRES_USER=${SQL_USER:-hello_django}
       - POSTGRES_PASSWORD=${SQL_PASSWORD:-hello_django}
       - POSTGRES_DB=${SQL_DATABASE:-hello_django_dev}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   nginx:
     image: ghcr.io/jgsogo/nginx_django:%NGINX_DJANGO_TAG%
