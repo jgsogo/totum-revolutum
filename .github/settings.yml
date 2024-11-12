@@ -127,6 +127,12 @@ labels:
   - name: tech:math/geometry
     color: CDF7F7
     description: Geometry
+  - name: tech:django
+    color: CDF7F7
+    description: Django
+  - name: tech:docker
+    color: CDF7F7
+    description: Docker
 
   # Architectures
   - name: arch:windows
