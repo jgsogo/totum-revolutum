@@ -42,7 +42,7 @@ services:
       - POSTGRES_PASSWORD=${SQL_PASSWORD:-hello_django}
       - POSTGRES_DB=${SQL_DATABASE:-hello_django_dev}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       retries: 5
       start_period: 30s
