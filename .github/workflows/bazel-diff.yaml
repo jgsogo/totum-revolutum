@@ -27,8 +27,12 @@ jobs:
       - name: "Shortcut test (TODO: Remove)"
         if: ${{ github.event_name == 'pull_request' }}
         run: |
+          which docker
           bazel run $BAZEL_CONFIG //bazel/python/django/containers/nginx:nginx-load
           bazel run $BAZEL_CONFIG //apps/finances/django:app-load
+          bazel build //apps/finances/django:app-docker_compose
+          cat bazel-bin/apps/finances/django/docker-compose.yaml
+          docker compose --file=$(pwd)/bazel-bin/apps/finances/django/docker-compose.yaml up -e SECRET_KEY=lol
           bazel test $BAZEL_CONFIG //apps/finances/django/tests:tests
 
       - name: Install some requirements
