@@ -3,6 +3,7 @@ import logging
 import sys
 
 from bazel.tools.semver.bump import VersionComponent, bump_version
+from bazel.tools.semver.max_version import max_version
 from bazel.tools.semver.min_version import min_version
 
 logger = logging.getLogger(__name__)
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         help="Returns the maximum version in the given list",
     )
     max_version_parser.add_argument("versions", nargs="+", default=[])
-    max_version_parser.set_defaults(func=min_version)
+    max_version_parser.set_defaults(func=max_version)
 
     args = parser.parse_args()
 

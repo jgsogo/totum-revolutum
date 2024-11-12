@@ -8,6 +8,7 @@ RE_VERSION = re.compile(r"^(?P<prefix>\w+)-v(?P<version_str>.*)$")
 
 def parse_version(version: str) -> Tuple[str, semver.Version]:
     """Parses a version into a 'semver.Version' object"""
+    version = version.strip("\"'")
     m = RE_VERSION.match(version)
     if not m:
         raise ValueError(f"Version '{version}' doesn't match patther {RE_VERSION}")

@@ -46,16 +46,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           NEW_RELEASE=${{ inputs.app }}-v${{ inputs.release_tag }}
-          echo "NEW_RELEASE=$NEW_RELEASE" >> $GITHUB_OUTPUT
 
-          echo "New release requested: $NEW_RELEASE"
           echo "TODO: Validate release format"
 
-          echo "TODO: Get the previous release for this application"
           bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --exclude-pre-releases --json tagName,name | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
-          PREV_RELEASE=${{ inputs.app }}-v0.0.0
-          echo "PREV_RELEASE=$PREV_RELEASE" >> $GITHUB_OUTPUT
+          PREV_RELEASE=bazel run //bazel/tools/semver:bin -- max $(<${{ runner.temp }}/${{ inputs.app }}-releases.json)
+
           echo "TODO: Evaluate if the requested release is >= than previous one"
+
+          echo "NEW_RELEASE=$NEW_RELEASE" >> $GITHUB_OUTPUT
+          echo "PREV_RELEASE=$PREV_RELEASE" >> $GITHUB_OUTPUT
+
 
       - name: Build the artifacts
         env:
