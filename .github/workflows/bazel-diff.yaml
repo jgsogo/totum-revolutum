@@ -18,6 +18,18 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: "Install some requirements (TODO: Remove)"
+        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install \
+            docker.io
+
+      - name: "Shortcut test (TODO: Remove)"
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          bazel test $BAZEL_CONFIG //apps/finances/django/tests:tests
+
       - name: Install some requirements
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
