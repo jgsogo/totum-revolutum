@@ -22,8 +22,7 @@ jobs:
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
           sudo apt-get update
-          sudo apt-get install \
-            docker.io
+          sudo apt-get install -y docker.io
 
       - name: "Shortcut test (TODO: Remove)"
         if: ${{ github.event_name == 'pull_request' }}
@@ -34,7 +33,7 @@ jobs:
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
           sudo apt-get update
-          sudo apt-get install \
+          sudo apt-get install -y \
             libwebkit2gtk-4.1-dev \
             build-essential \
             curl \
