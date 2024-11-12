@@ -9,6 +9,15 @@ from testcontainers.compose import DockerCompose
 
 
 @pytest.fixture(scope="session")
+def env_file():
+    with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
+        fp.write(b"SECRET_KEY=testing-app")
+        fp.write(b"SQL_DATABASE=hello_django_finances_tests")
+        fp.close()
+        yield fp.name
+
+
+@pytest.fixture(scope="session")
 def docker_client():
     yield docker.from_env()
 
@@ -22,14 +31,6 @@ def _load_latest_tarball(docker_tarball, docker_client):
     """
     with open(docker_tarball, "rb") as f:
         docker_client.images.load(f)
-
-
-@pytest.fixture(scope="session")
-def env_file():
-    with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
-        fp.write(b"SECRET_KEY=testing-app")
-        fp.close()
-        yield fp.name
 
 
 @pytest.fixture(scope="session")
