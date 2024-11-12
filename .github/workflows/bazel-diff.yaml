@@ -27,6 +27,8 @@ jobs:
       - name: "Shortcut test (TODO: Remove)"
         if: ${{ github.event_name == 'pull_request' }}
         run: |
+          bazel run $BAZEL_CONFIG //bazel/python/django/containers/nginx:nginx-load
+          bazel run $BAZEL_CONFIG //apps/finances/django:app-load
           bazel test $BAZEL_CONFIG //apps/finances/django/tests:tests
 
       - name: Install some requirements
