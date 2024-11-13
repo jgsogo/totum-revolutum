@@ -41,6 +41,14 @@ if __name__ == "__main__":
         help="Which version component to bump",
         required=True,
     )
+    bump_parser.add_argument(
+        "--prerelease",
+        action="store_true",
+        help=(
+            "If it should result in a prerelease or not"
+            " (it is implicit if '--component prerelease')"
+        ),
+    )
     bump_parser.set_defaults(func=bump_version)
 
     # Compute min version

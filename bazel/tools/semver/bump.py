@@ -13,12 +13,13 @@ class VersionComponent(Enum):
 
 def bump_version(args: argparse.Namespace):
     component = VersionComponent[args.component.upper()]
-    version = _bump_version(version=args.version, component=component)
+    version = _bump_version(version=args.version, component=component, prerelease=args.prerelease)
     print(version)
 
 
-def _bump_version(version: str, component: VersionComponent):
+def _bump_version(version: str, component: VersionComponent, prerelease: bool):
     prefix, version = parse_version(version=version)
+    prerelease = prerelease or component == VersionComponent.PRERELEASE
 
     match component:
         case VersionComponent.MAJOR:
@@ -28,11 +29,12 @@ def _bump_version(version: str, component: VersionComponent):
         case VersionComponent.PATCH:
             version = version.bump_patch()
         case VersionComponent.PRERELEASE:
-            if version.prerelease:
-                version = version.bump_prerelease()
-            else:
-                version = version.bump_patch().bump_prerelease()
+            if not version.prerelease:
+                version = version.bump_patch()
         case _:
             raise ValueError(f"Unknow version component '{component}'")
+
+    if prerelease:
+        version = version.bump_prerelease()
 
     return compose_version(prefix=prefix, version=version)
