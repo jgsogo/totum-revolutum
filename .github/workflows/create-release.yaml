@@ -15,12 +15,20 @@ on:
         required: true
         type: string
         description: The [semver] version number to create (Note.- Do not include leading 'v')
+      bump_component:
+        type: choice
+        description: Version component to bump
+        options:
+        - major
+        - minor
+        - patch
+        - prerelease
 
 jobs:
   release:
     runs-on: ubuntu-24.04
     env:
-      BAZEL_CONFIG: "--config=ci --config=stamp --config=opt"
+      BAZEL_CONFIG: "--config=ci --config=stamp -c opt"
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -45,16 +53,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          NEW_RELEASE=${{ inputs.app }}-v${{ inputs.release_tag }}
-          echo "NEW_RELEASE=$NEW_RELEASE" >> $GITHUB_OUTPUT
+          echo "Get latest release for application ${{ inputs.app }}""
+          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --json tagName,name | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
+          PREV_RELEASE=bazel run //bazel/tools/semver:bin -- max --filter-prefix=${{ inputs.app }} $(<${{ runner.temp }}/${{ inputs.app }}-releases.json)
+          echo "PREV_RELEASE=$PREV_RELEASE"
 
-          echo "New release requested: $NEW_RELEASE"
-          echo "TODO: Validate release format"
-          echo "TODO: Get the previous release for this application"
-          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --exclude-pre-releases
-          PREV_RELEASE="<prev-release>"
+          echo "Compute new release"
+          NEW_RELEASE=bazel run //bazel/tools/semver:bin -- bump --component ${{ inputs.bump_component }} $PREV_RELEASE
+          echo "NEW_RELEASE=$NEW_RELEASE"
+
+          echo "NEW_RELEASE=$NEW_RELEASE" >> $GITHUB_OUTPUT
           echo "PREV_RELEASE=$PREV_RELEASE" >> $GITHUB_OUTPUT
-          echo "TODO: Evaluate if the requested release is >= than previous one"
+
 
       - name: Build the artifacts
         env:
@@ -71,8 +81,8 @@ jobs:
         run: |
           echo "NEW_RELEASE = $NEW_RELEASE"
           echo "PREV_RELEASE = $PREV_RELEASE"
-          echo "TODO: Create the release and generate notes from the prev one"
-          echo "bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE"
+          echo "Create new release ($NEW_RELEASE) and generate notes from the prev one"
+          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE
 
 
       # - name: Upload artifacts

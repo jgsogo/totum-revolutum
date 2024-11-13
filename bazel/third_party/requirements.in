@@ -6,4 +6,5 @@ django-treenode~=0.22.1
 gunicorn~=23.0.0
 psycopg~=3.2.0
 pytest~=8.3.0
+semver~=3.0.2
 testcontainers~=4.8.2

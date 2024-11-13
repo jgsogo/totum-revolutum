@@ -1,0 +1,31 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+load("@py_deps//:requirements.bzl", "requirement")
+
+py_library(
+    name = "semver",
+    srcs = glob(["**/*.py"]),
+    # imports = ["src"],
+    visibility = [
+        ":__subpackages__",
+    ],
+    deps = [
+        requirement("semver"),
+        #     "//tooling/bazel:tooling_bazel",
+        #     "//tooling/git:tooling_git",
+        #     "//tooling/github:tooling_github",
+    ],
+)
+
+py_binary(
+    name = "bin",
+    srcs = [
+        "main.py",
+    ],
+    main = "main.py",
+    visibility = [
+        "//visibility:private",
+    ],
+    deps = [
+        ":semver",
+    ],
+)
