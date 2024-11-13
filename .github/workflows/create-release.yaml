@@ -11,10 +11,6 @@ on:
         - finances
         - photodb
         - syncronia
-      release_tag:
-        required: true
-        type: string
-        description: The [semver] version number to create (Note.- Do not include leading 'v')
       bump_component:
         type: choice
         description: Version component to bump
