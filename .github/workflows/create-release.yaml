@@ -24,7 +24,8 @@ jobs:
   release:
     runs-on: ubuntu-24.04
     env:
-      BAZEL_CONFIG: "--config=ci --config=stamp -c opt"
+      BAZEL_CONFIG: "--config=ci --config=stamp"
+      BAZEL_COMPILATION_MODE: "-c opt"
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -77,7 +78,7 @@ jobs:
         run: |
           echo "NEW_RELEASE = $NEW_RELEASE"
           echo "PREV_RELEASE = $PREV_RELEASE"
-          echo "Create new release ($NEW_RELEASE) and generate notes from the prev one"
+          echo "Create new release ($NEW_RELEASE) and generate notes starting on the prev one ($PREV_RELEASE)"
           bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE
 
 
@@ -86,7 +87,7 @@ jobs:
       #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   run: |
       #     echo "${{ inputs.release_tag }}"
-      #     bazel run $BAZEL_CONFIG //bazel/tools/gh -- release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
+      #     bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE //bazel/tools/gh -- release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
 
       # # Release containers (stamped + optimized build)
       # # FIXME: Release only modified images!
@@ -98,5 +99,5 @@ jobs:
       #     CR_PAT: ${{ secrets.GITHUB_TOKEN }}
       #   run: |
       #     echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-      #     bazel run $BAZEL_CONFIG  //bazel/python/django/containers/nginx:release
-      #     bazel run $BAZEL_CONFIG  //apps/finances/django:app-release
+      #     bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE  //bazel/python/django/containers/nginx:release
+      #     bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE  //apps/finances/django:app-release
