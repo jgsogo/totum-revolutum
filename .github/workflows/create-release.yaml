@@ -44,8 +44,8 @@ jobs:
             libayatana-appindicator3-dev \
             librsvg2-dev
 
-      - name: Validate the release
-        id: release-validator
+      - name: Compute new release
+        id: release-new
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -64,16 +64,16 @@ jobs:
 
       - name: Build the artifacts
         env:
-          NEW_RELEASE: ${{ steps.release-validator.outputs.RELEASE }}
+          NEW_RELEASE: ${{ steps.release-new.outputs.NEW_RELEASE }}
         run: |
-          echo "NEW_RELEASE = $NEW_RELEASE"
+          echo "NEW_RELEASE=$NEW_RELEASE"
           bazel query $BAZEL_CONFIG "attr('tags', 'release', '//apps/${{ inputs.app }}/...')"
 
       - name: Create the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NEW_RELEASE: ${{ steps.release-validator.outputs.NEW_RELEASE }}
-          PREV_RELEASE: ${{ steps.release-validator.outputs.PREV_RELEASE }}
+          NEW_RELEASE: ${{ steps.release-new.outputs.NEW_RELEASE }}
+          PREV_RELEASE: ${{ steps.release-new.outputs.PREV_RELEASE }}
         run: |
           echo "NEW_RELEASE = $NEW_RELEASE"
           echo "PREV_RELEASE = $PREV_RELEASE"
