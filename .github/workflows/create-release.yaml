@@ -68,7 +68,7 @@ jobs:
           NEW_RELEASE: ${{ steps.release-new.outputs.NEW_RELEASE }}
         run: |
           echo "NEW_RELEASE=$NEW_RELEASE"
-          bazel query $BAZEL_CONFIG "attr('tags', 'release', '//apps/${{ inputs.app }}/...')"
+          bazel query "attr('tags', 'release', '//apps/${{ inputs.app }}/...')"
 
       - name: Create the release
         env:
