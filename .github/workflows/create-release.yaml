@@ -79,7 +79,11 @@ jobs:
           echo "NEW_RELEASE = $NEW_RELEASE"
           echo "PREV_RELEASE = $PREV_RELEASE"
           echo "Create new release ($NEW_RELEASE) and generate notes starting on the prev one ($PREV_RELEASE)"
-          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE
+          if [ "${{ inputs.bump_component }}" == "prerelease" ]; then
+              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --draft --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
+          else
+              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --draft --generate-notes --notes-start-tag $PREV_RELEASE
+          fi
 
 
       # - name: Upload artifacts
