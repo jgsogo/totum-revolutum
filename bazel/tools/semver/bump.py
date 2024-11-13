@@ -28,7 +28,10 @@ def _bump_version(version: str, component: VersionComponent):
         case VersionComponent.PATCH:
             version = version.bump_patch()
         case VersionComponent.PRERELEASE:
-            version = version.bump_prerelease()
+            if version.prerelease:
+                version = version.bump_prerelease()
+            else:
+                version = version.bump_patch().bump_prerelease()
         case _:
             raise ValueError(f"Unknow version component '{component}'")
 
