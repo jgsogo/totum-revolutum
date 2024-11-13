@@ -50,7 +50,7 @@ jobs:
           echo "TODO: Validate release format"
 
           bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --exclude-pre-releases --json tagName,name | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
-          PREV_RELEASE=bazel run //bazel/tools/semver:bin -- max $(<${{ runner.temp }}/${{ inputs.app }}-releases.json)
+          PREV_RELEASE=bazel run //bazel/tools/semver:bin -- max --filter-prefix=${{ inputs.app }} $(<${{ runner.temp }}/${{ inputs.app }}-releases.json)
 
           echo "TODO: Evaluate if the requested release is >= than previous one"
 

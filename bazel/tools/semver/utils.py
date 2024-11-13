@@ -1,5 +1,5 @@
 import re
-from typing import Tuple
+from typing import List, Optional, Tuple
 
 import semver
 
@@ -20,3 +20,21 @@ def parse_version(version: str) -> Tuple[str, semver.Version]:
 
 def compose_version(prefix: str, version: semver.Version) -> str:
     return f"{prefix}-v{version}"
+
+
+def sanitize_version_list(
+    versions: List[str], filter_prefix: Optional[str] = None, raise_if_empty: Optional[bool] = False
+) -> List[Tuple[str, semver.Version]]:
+    """Sanitize a list of versions checking that all are valid Semver"""
+    versions = [parse_version(v) for v in versions]
+    if filter_prefix:
+        versions = [(p, v) for p, v in versions if p == filter_prefix]
+
+    if raise_if_empty and not versions:
+        raise ValueError("Empty version list")
+
+    prefixes = [p for (p, _) in versions]
+    if prefixes and prefixes.count(prefixes[0]) != len(prefixes):
+        raise ValueError("Not all versions have the same prefix")
+
+    return versions

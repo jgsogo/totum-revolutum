@@ -51,6 +51,11 @@ if __name__ == "__main__":
         help="Returns the minimal version in the given list",
     )
     min_version_parser.add_argument("versions", nargs="+", default=[])
+    min_version_parser.add_argument(
+        "--filter-prefix",
+        type=str,
+        help="If provided, it will consider only versions with the given prefix",
+    )
     min_version_parser.set_defaults(func=min_version)
 
     # Compute max version
@@ -61,6 +66,11 @@ if __name__ == "__main__":
         help="Returns the maximum version in the given list",
     )
     max_version_parser.add_argument("versions", nargs="+", default=[])
+    max_version_parser.add_argument(
+        "--filter-prefix",
+        type=str,
+        help="If provided, it will consider only versions with the given prefix",
+    )
     max_version_parser.set_defaults(func=max_version)
 
     args = parser.parse_args()
