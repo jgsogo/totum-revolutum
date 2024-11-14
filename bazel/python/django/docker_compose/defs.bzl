@@ -8,7 +8,6 @@ def docker_compose(name, app_repository, app_image_tag_stamped, **kwargs):
         name = name,
         out = "docker-compose.yaml",
         substitutions = {
-            "%APP_NAME%": native.package_name().replace("/", "_"),
             "%APP_REPOSITORY%": app_repository,  # TODO: Better name
             "%USER%": USER,
             "%APP_IMAGE_TAG%": native.module_name(),

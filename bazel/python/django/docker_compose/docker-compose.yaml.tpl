@@ -1,4 +1,3 @@
-name: %APP_NAME%
 services:
   web:
     image: %APP_REPOSITORY%:%APP_IMAGE_TAG%
