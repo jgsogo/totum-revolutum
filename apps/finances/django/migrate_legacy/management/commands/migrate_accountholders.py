@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 
 # from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+from tqdm import tqdm
 
 
 class Command(BaseCommand):
@@ -19,10 +20,17 @@ class Command(BaseCommand):
         # session = Session(engine)
 
         with engine.connect() as c:
+            self.stdout.write("Migrate AccountHolder")
+            total = c.execute(text("SELECT COUNT(*) FROM data_accountholder")).scalar()
+
             statement = text("SELECT * FROM data_accountholder")
             results = c.execute(statement)
-            for row in results:
-                self.stdout.write(str(row))
+
+            for row in tqdm(results, total=total, desc="data/accountholder"):
+                # tqdm.write(str(row))
+                import time
+
+                time.sleep(1)
 
         # rs = session.query(statement)
         # for row in rs:

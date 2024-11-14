@@ -3,6 +3,7 @@ load("//bazel/python/django/project:django_project.bzl", "django_project")
 django_project(
     name = "app",
     deps = [
+        "//apps/finances/django/migrate_legacy",
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
         "//libraries/finances/investments/django_finances_investments:finances_investments",
     ],
