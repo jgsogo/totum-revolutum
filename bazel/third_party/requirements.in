@@ -7,4 +7,5 @@ gunicorn~=23.0.0
 psycopg~=3.2.0
 pytest~=8.3.0
 semver~=3.0.2
+SQLAlchemy~=2.0.36  # Remove if //apps/finances/django/migrate_legacy is removed
 testcontainers~=4.8.2
