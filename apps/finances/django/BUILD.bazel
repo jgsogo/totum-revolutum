@@ -17,8 +17,7 @@ django_project(
     ],
 )
 
-# Release related targets, listed here so it's easier to understand
-
+# Release the docker container with the django project
 oci_push(
     name = "release-app",
     image = ":app-container",
@@ -31,6 +30,8 @@ oci_push(
     ],
 )
 
+# An alias to find the nging-release target inside this //apps/finances directory. Useful so we ensure we capture
+# everything that needs to be released when querying //apps/finances dir.
 alias(
     name = "release-nginx",
     actual = "//bazel/python/django/containers/nginx:nginx-release",
@@ -40,13 +41,24 @@ alias(
     ],
 )
 
+# Release the docker-compose file matching the released docker contianers (see rules above)
+genrule(
+    name = "gh_tagname",
+    srcs = ["//apps/finances:version"],
+    outs = ["gh_tagname.txt"],
+    cmd_bash = """
+        echo "finances-$$(cat $(location //apps/finances:version))" > $@
+    """,
+    tags = ["manual"],
+)
+
 gh_release(
     name = "release-docker-compose",
     data = [
         ":app-docker_compose",
     ],
-    display_label = "finances-django-docker-compose",
-    tag = "//apps/finances:version",
+    display_label = "django-docker-compose.tar",
+    tag = ":gh_tagname",
     tags = [
         "manual",
         "release",
