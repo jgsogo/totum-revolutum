@@ -11,8 +11,8 @@ def docker_compose(name, app_image, app_image_tag_stamped, **kwargs):
             "%APP_NAME%": app_image,  # TODO: Better name
             "%USER%": USER,
             "%APP_IMAGE%": app_image,
-            "%APP_IMAGE_TAG%": "totum-revolutum",
-            "%NGINX_DJANGO_TAG%": "totum-revolutum",
+            "%APP_IMAGE_TAG%": native.module_name(),
+            "%NGINX_DJANGO_TAG%": native.module_name(),
             "%ENV_FILE%": ".env.dev",
             "%ENV_DB_FILE%": ".env.dev.db",
             "%DJANGO_PORT%": DJANGO_PORT,

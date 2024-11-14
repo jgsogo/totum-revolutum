@@ -8,7 +8,7 @@ npm_link_all_packages(name = "node_modules")
 
 value_from_stable_status(
     name = "stable_build_scm_revision",
-    default = "totum-revolutum",
+    default = module_name(),
     key = "STABLE_BUILD_SCM_REVISION",
     visibility = ["//:__subpackages__"],
 )
