@@ -34,7 +34,7 @@ oci_push(
 # everything that needs to be released when querying //apps/finances dir.
 alias(
     name = "release-nginx",
-    actual = "//bazel/python/django/containers/nginx:nginx-release",
+    actual = "//bazel/python/django/containers/nginx:release",
     tags = [
         "manual",
         "release",
