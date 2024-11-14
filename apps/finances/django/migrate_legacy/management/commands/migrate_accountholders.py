@@ -1,9 +1,8 @@
+from typing import Dict
+
 from django.core.management.base import BaseCommand  # , CommandError
-
-# from polls.models import Question as Poll
+from django_finances_accounts.models import AccountHolder
 from sqlalchemy import create_engine
-
-# from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from tqdm import tqdm
 
@@ -17,24 +16,35 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         database_url = options["DATABASE_URL"]
         engine = create_engine(f"postgresql+psycopg:{database_url}")
-        # session = Session(engine)
 
         with engine.connect() as c:
-            self.stdout.write("Migrate AccountHolder")
-            total = c.execute(text("SELECT COUNT(*) FROM data_accountholder")).scalar()
+            account_holders: Dict[int, AccountHolder] = self.migrate_accountholders(c)
+            assert account_holders
 
-            statement = text("SELECT * FROM data_accountholder")
-            results = c.execute(statement)
+    def migrate_accountholders(self, conn):
+        tqdm.file = self.stdout
 
-            for row in tqdm(results, total=total, desc="data/accountholder"):
-                # tqdm.write(str(row))
-                import time
+        total = conn.execute(text("SELECT COUNT(*) FROM data_accountholder")).scalar()
+        tqdm.write("Migrate AccountHolders")
 
-                time.sleep(1)
+        statement = text("SELECT * FROM data_accountholder")
+        results = conn.execute(statement)
 
-        # rs = session.query(statement)
-        # for row in rs:
-        #     self.stdout.write(row)
+        mapping = {}
+        total_created = 0
+        for pk, name, owner in tqdm(results, total=total, desc="data/accountholder"):
+            owner = "ME" if owner == 0 else "OUT"
+            tqdm.write(f"{name} - {owner}")
+
+            account_holder, created = AccountHolder.objects.get_or_create(
+                name=name, defaults={"is_company": owner == 0}
+            )  # TODO: is_company random?
+            mapping[pk] = account_holder
+            if created:
+                total_created += 1
+
+        tqdm.write(f"Total: {total}, Created: {total_created}")
+        return mapping
 
 
 #  public | data_account                  | table | finances
