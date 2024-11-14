@@ -1,7 +1,7 @@
 name: %APP_NAME%
 services:
   web:
-    image: ghcr.io/jgsogo/%APP_IMAGE%:%APP_IMAGE_TAG%
+    image: %APP_REPOSITORY%:%APP_IMAGE_TAG%
     expose:
       - %DJANGO_PORT%
     environment:

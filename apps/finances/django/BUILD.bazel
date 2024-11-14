@@ -1,11 +1,54 @@
+load("@rules_oci//oci:defs.bzl", "oci_push")
 load("//bazel/python/django/project:django_project.bzl", "django_project")
+load("//bazel/tools/gh:release.bzl", "gh_release")
+
+image_name = package_name().replace("/", "_")
+
+repository = "ghcr.io/jgsogo/{}".format(image_name)  # FIXME: Make it global for all the repo
 
 django_project(
     name = "app",
     app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
+    repository = repository,
     version = "//apps/finances:version",
     deps = [
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
         "//libraries/finances/investments/django_finances_investments:finances_investments",
+    ],
+)
+
+# Release related targets, listed here so it's easier to understand
+
+oci_push(
+    name = "release-app",
+    image = ":app-container",
+    remote_tags = "//apps/finances:version",
+    repository = repository,
+    tags = [
+        "manual",
+        "no-remote-cache",
+        "release",
+    ],
+)
+
+alias(
+    name = "release-nginx",
+    actual = "//bazel/python/django/containers/nginx:nginx-release",
+    tags = [
+        "manual",
+        "release",
+    ],
+)
+
+gh_release(
+    name = "release-docker-compose",
+    data = [
+        ":app-docker_compose",
+    ],
+    display_label = "finances-django-docker-compose",
+    tag = "//apps/finances:version",
+    tags = [
+        "manual",
+        "release",
     ],
 )
