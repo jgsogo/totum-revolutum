@@ -12,13 +12,15 @@ load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
 load("//bazel/tools/gh:release.bzl", "gh_release")
 
-def django_project(name, deps, **kwargs):
+def django_project(name, deps, version, app_image_tag_stamped, **kwargs):
     """
     An opinionated macro to create a Django project.
 
     Args:
         name(str): A name for the project
         deps(List[str]): List of dependencies.
+        version(Target): The target that contains the application version
+        app_image_tag_stamped(str): The key inside the stable-status file to use to label the application image (when stamped)
         **kwargs(dict): Other arguments for the rules
     """
     settings_module = "{}.settings".format(native.package_name().replace("/", "."))
@@ -156,7 +158,7 @@ def django_project(name, deps, **kwargs):
     oci_push(
         name = "{}-release".format(name),
         image = ":{}-container".format(name),
-        remote_tags = "//:stable_build_scm_revision",
+        remote_tags = version,
         repository = repository,
         tags = [
             "manual",
@@ -169,9 +171,9 @@ def django_project(name, deps, **kwargs):
         name = "{}-repo_tags".format(name),
         outs = ["repo_tags.txt"],
         cmd_bash = """
-            echo "{}:$$(cat $(location //:stable_build_scm_revision))" > $@
-        """.format(repository),
-        srcs = ["//:stable_build_scm_revision"],
+            echo "{}:$$(cat $(location {}))" > $@
+        """.format(repository, version),
+        srcs = [version],
     )
 
     oci_load(
@@ -197,7 +199,7 @@ def django_project(name, deps, **kwargs):
     ## Docker compose
     #######
 
-    docker_compose(name = "{}-docker_compose".format(name), app_image = image_name, visibility = [":__subpackages__"])
+    docker_compose(name = "{}-docker_compose".format(name), app_image = image_name, app_image_tag_stamped = app_image_tag_stamped, visibility = [":__subpackages__"])
 
     native.alias(
         name = "{}-nginx".format(name),
@@ -210,7 +212,7 @@ def django_project(name, deps, **kwargs):
 
     gh_release(
         name = "{}-release-docker-compose".format(name),
-        tag = "??",
+        tag = version,
         display_label = "{}-docker-compose".format(image_name),
         data = [
             ":{}-docker_compose".format(name),

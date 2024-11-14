@@ -2,6 +2,14 @@ load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 load("@totum//bazel/rust/docs:defs.bzl", "rust_docs")
+load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
+
+value_from_stable_status(
+    name = "version",
+    default = "totum-revolutum",
+    key = "STABLE_SYNCRONIA_VERSION",
+    visibility = [":__subpackages__"],
+)
 
 rust_library_tests_and_docs(
     name = "syncronia_lib",

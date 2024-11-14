@@ -2,6 +2,8 @@ load("//bazel/python/django/project:django_project.bzl", "django_project")
 
 django_project(
     name = "app",
+    app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
+    version = "//apps/finances:version",
     deps = [
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
         "//libraries/finances/investments/django_finances_investments:finances_investments",
