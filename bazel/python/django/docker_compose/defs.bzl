@@ -3,22 +3,21 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER")
 
-def docker_compose(name, app_image, **kwargs):
+def docker_compose(name, app_repository, app_image_tag_stamped, **kwargs):
     expand_template(
         name = name,
         out = "docker-compose.yaml",
         substitutions = {
-            "%APP_NAME%": app_image,  # TODO: Better name
+            "%APP_REPOSITORY%": app_repository,  # TODO: Better name
             "%USER%": USER,
-            "%APP_IMAGE%": app_image,
-            "%APP_IMAGE_TAG%": "totum-revolutum",
-            "%NGINX_DJANGO_TAG%": "totum-revolutum",
+            "%APP_IMAGE_TAG%": native.module_name(),
+            "%NGINX_DJANGO_TAG%": native.module_name(),
             "%ENV_FILE%": ".env.dev",
             "%ENV_DB_FILE%": ".env.dev.db",
             "%DJANGO_PORT%": DJANGO_PORT,
         },
         stamp_substitutions = {
-            "%APP_IMAGE_TAG%": "{{STABLE_BUILD_SCM_REVISION}}",
+            "%APP_IMAGE_TAG%": app_image_tag_stamped,
             "%NGINX_DJANGO_TAG%": "{{STABLE_BUILD_SCM_REVISION}}",
             "%ENV_FILE%": ".env.prod",
             "%ENV_DB_FILE%": ".env.prod.db",

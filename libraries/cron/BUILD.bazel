@@ -1,5 +1,5 @@
 load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
-load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
 rust_library_tests_and_docs(
     name = "cron",

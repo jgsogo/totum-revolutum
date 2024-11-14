@@ -42,4 +42,7 @@ oci_push(
         "no-remote-cache",
         "release",
     ],
+    visibility = [
+        "//apps:__subpackages__",
+    ],
 )

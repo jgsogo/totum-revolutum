@@ -3,7 +3,7 @@
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 
 def _gh_release_impl(ctx):
-    runfiles = ctx.runfiles(files = [ctx.executable._gh_tool, ctx.file.data])
+    runfiles = ctx.runfiles(files = [ctx.executable._gh_tool, ctx.file.data, ctx.file.tag])
     runfiles = runfiles.merge(ctx.attr._gh_tool[DefaultInfo].default_runfiles)
 
     file_path = ctx.file.data.short_path
@@ -12,7 +12,7 @@ def _gh_release_impl(ctx):
 
     ctx.actions.write(
         output = ctx.outputs.executable,
-        content = "{} --repo={} release upload {} {}".format(ctx.executable._gh_tool.short_path, ctx.attr.repo, ctx.attr.tag, file_path),
+        content = "{} --repo={} release upload $(cat {}) {}".format(ctx.executable._gh_tool.short_path, ctx.attr.repo, ctx.file.tag.short_path, file_path),
         is_executable = True,
     )
 
@@ -34,11 +34,12 @@ do_gh_release = rule(
         "data": attr.label(
             allow_single_file = True,
         ),
-        # "clobber"
+        # TODO: "clobber" argument?
         "display_label": attr.string(
             doc = "Display label for the uploaded asset",
         ),
-        "tag": attr.string(
+        "tag": attr.label(
+            allow_single_file = True,
             doc = "Tag of the target GitHub release",
         ),
         "repo": attr.string(

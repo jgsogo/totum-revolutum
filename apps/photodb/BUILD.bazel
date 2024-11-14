@@ -1,8 +1,16 @@
 load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
-load("@totum//bazel:defs.bzl", "run_copy_to_workspace")
-load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
-load("@totum//bazel/rust/diesel:defs.bzl", "diesel_print_schema", "diesel_setup")
+load("//bazel:run_copy_to_workspace.bzl", "run_copy_to_workspace")
+load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
+load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("//bazel/rust/diesel:defs.bzl", "diesel_print_schema", "diesel_setup")
+
+value_from_stable_status(
+    name = "version",
+    default = module_name(),
+    key = "STABLE_PHOTODB_VERSION",
+    visibility = [":__subpackages__"],
+)
 
 # // Working with Diesel requires several targets to create and update the schemas (and an associated database
 # // because these schemas are created from the database)

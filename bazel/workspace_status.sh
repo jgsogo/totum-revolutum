@@ -9,3 +9,11 @@ git diff-index --quiet HEAD -- || {
     tree_status="Modified"
 }
 echo "STABLE_BUILD_SCM_STATUS ${tree_status}"
+
+# These are all the applications we have here
+echo "STABLE_FINANCES_VERSION $(git describe --tags --abbrev=0 --match 'finances*' | cut -d 'v' -f 2)"
+echo "STABLE_PHOTODB_VERSION $(git describe --tags --abbrev=0 --match 'photodb*' | cut -d 'v' -f 2)"
+echo "STABLE_SYNCRONIA_VERSION $(git describe --tags --abbrev=0 --match 'syncronia*' | cut -d 'v' -f 2)"
+
+# Just print something at the end so the previous line is created even if empty
+echo "---"
