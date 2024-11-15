@@ -9,6 +9,9 @@ def populate_movementtypes(apps, schema_editor):
     MovementType = apps.get_model("finances_accounts", "MovementType")
 
     operations = MovementType.objects.get(unique_name=MovementTypeConstants.OPERATIONS)
+    comisiones = MovementType.objects.get(name=_("Comisiones"))
+    ingresos_inversiones = MovementType.objects.get(name=_("Inversiones"))
+
     (acciones,) = MovementType.objects.bulk_create(
         [
             MovementType(
@@ -27,10 +30,15 @@ def populate_movementtypes(apps, schema_editor):
             ),
             MovementType(
                 tn_parent=acciones,
+                name=_("Spin-off"),
+                description=_("An existing company is divided into two"),
+            ),
+            MovementType(
+                tn_parent=comisiones,
                 name=_("ADR pass-through fees"),
             ),
             MovementType(
-                tn_parent=acciones,
+                tn_parent=ingresos_inversiones,
                 name=_("Emisión derechos"),
             ),
         ]
