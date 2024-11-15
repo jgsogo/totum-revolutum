@@ -1,4 +1,4 @@
-from .account import Account
+from .account import Account, AccountHolderRole
 from .account_holder import AccountHolder
 from .account_type import AccountType
 from .custodian import Custodian
@@ -19,4 +19,5 @@ __all__ = [
     "TransactionGroup",
     "Fx",
     "Movement",
+    "AccountHolderRole",
 ]
