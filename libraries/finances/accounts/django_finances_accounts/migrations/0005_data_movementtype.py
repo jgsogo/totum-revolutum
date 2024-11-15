@@ -8,11 +8,12 @@ def populate_movementtypes(apps, schema_editor):
     MovementType = apps.get_model("finances_accounts", "MovementType")
 
     gastos = MovementType.objects.get(unique_name=MovementTypeConstants.EXPENSE)
+    ingresos = MovementType.objects.get(unique_name=MovementTypeConstants.INCOME)
     vivienda = MovementType.objects.get(tn_parent=gastos, name=_("Vivienda"))
     hijos = MovementType.objects.get(tn_parent=gastos, name=_("Hijos"))
     colegio = MovementType.objects.get(tn_parent=hijos, name=_("Colegio"))
     suministros = MovementType.objects.get(tn_parent=vivienda, name=_("Suministros"))
-    salud_higiene = MovementType.objects.get(tn_parent=vivienda, name=_("Salud e higiene"))
+    salud_higiene = MovementType.objects.get(tn_parent=gastos, name=_("Salud e higiene"))
     impuestos_indirectos = MovementType.objects.get(
         unique_name=MovementTypeConstants.INDIRECT_TAXES
     )
@@ -31,8 +32,31 @@ def populate_movementtypes(apps, schema_editor):
         ]
     )
 
+    (subvenciones, _1) = MovementType.objects.bulk_create(
+        [
+            MovementType(
+                tn_parent=ingresos,
+                name=_("Subvenciones (y ayudas públicas)"),
+                description=_(
+                    "La subvención es la entrega de dinero, bienes o servicios que realiza una administración pública a un particular, bien sea una persona física o jurídica. Esta entrega está exenta de la obligación de reembolso o devolución. Aunque la subvención no sea reembolsable, entre el beneficiario y la Administración se crea un vínculo jurídico por el cual, el primero adquiere el derecho a recibir el monto de dinero o bienes incluidos en la prestación, siempre que se cumplan las condiciones legales inherentes a la subvención. Esto obliga al beneficiario a llevar a cabo todas las actividades para las cuales se le entrega la subvención."
+                ),
+            ),
+            MovementType(
+                tn_parent=ingresos,
+                name=_("Vales descuento/Tarjetas de fidelización"),
+            ),
+        ]
+    )
+
     MovementType.objects.bulk_create(
         [
+            MovementType(
+                tn_parent=subvenciones,
+                name=_("RDL 6/2022 (gasolina) [Bonificación]"),
+                description=_(
+                    "La bonificación es una reducción en una obligación fiscal. El impuesto NO se paga"
+                ),
+            ),
             MovementType(
                 tn_parent=colegio,
                 name=_("Cuotas/Aportaciones"),
@@ -76,11 +100,6 @@ def populate_movementtypes(apps, schema_editor):
             MovementType(
                 tn_parent=hijos,
                 name=_("Niñera/Au-pair/Canguro"),
-            ),
-            MovementType(
-                tn_parent=gastos,
-                name=_("Coleccionables"),
-                description=_("In theory they could be considered as investements"),
             ),
             MovementType(
                 tn_parent=colecciones,

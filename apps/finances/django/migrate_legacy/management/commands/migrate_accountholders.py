@@ -2,7 +2,6 @@ import logging
 from typing import Dict
 
 from django.core.management.base import BaseCommand  # , CommandError
-from django.utils.translation import gettext_lazy as _
 from django_finances_accounts.constants import MovementTypeConstants
 from django_finances_accounts.models import (
     Account,
@@ -61,7 +60,7 @@ class Command(BaseCommand):
         statement = text("SELECT * FROM data_accounttype")
         results = conn.execute(statement)
 
-        to_be_removed, _ = AccountType.objects.get_or_create(name="to-be-removed")
+        to_be_removed, _1 = AccountType.objects.get_or_create(name="to-be-removed")
         logacy_name_to_account_type = {
             "Cuenta corriente": AccountType.objects.get(name="Cuenta bancaria"),
             "Plan de pensiones": AccountType.objects.get(name="Individual"),
@@ -92,7 +91,8 @@ class Command(BaseCommand):
         total = conn.execute(text("SELECT COUNT(*) FROM data_account")).scalar()
 
         statement = text(
-            "SELECT id, type_id, holder_id, identifier, name, is_numerable, ccy, open, close FROM data_account"
+            "SELECT id, type_id, holder_id, identifier, name, is_numerable, ccy, open, close "
+            "FROM data_account"
         )
         results = conn.execute(statement)
 
@@ -139,7 +139,7 @@ class Command(BaseCommand):
         mapping = {}
         for fx in tqdm(results, total=total, desc="data/data_fx"):
             pk, foreign, local, rate, date_value = fx
-            # Note.- This is deduplicating Fx -- # TODO: Write a custom command in the finances/accounts to actually do this
+            # Note.- This is deduplicating Fx
             fx, _ = Fx.objects.get_or_create(
                 foreign=foreign,
                 local=local,
@@ -166,12 +166,14 @@ class Command(BaseCommand):
         gasto_alquiler = MovementType.objects.get(
             name="Alquiler", tn_parent=MovementType.objects.get(name="Vivienda")
         )
+        salario = MovementType.objects.get(
+            name="Salario",
+            tn_parent=MovementType.objects.get(unique_name=MovementTypeConstants.INCOME),
+        )
         logacy_name_to_movement_type = {
-            # 'Cuenta corriente': AccountType.objects.get(name = "Cuenta bancaria"),
-            # 'Online': to_be_removed,
             "Transferencia": MovementType.objects.get(name="Transferencia"),
             "Rendimientos de bienes inmuebles": inversiones_alquiler,
-            "Rendimientos del trabajo": MovementType.objects.get(name="Salario"),
+            "Rendimientos del trabajo": salario,
             "Lope de Haro": MovementType.objects.get(
                 name="Alquiler", tn_parent=MovementType.objects.get(name="Vivienda")
             ),
@@ -181,24 +183,6 @@ class Command(BaseCommand):
             "IBI": MovementType.objects.get(name="IBI"),
             "Comunidad": MovementType.objects.get(name="Comunidad"),
             "Rendimientos del capital": MovementType.objects.get(name="Inversiones"),
-            # "(995) Cotización contingencias comunes": to_be_removed,  # MovementType.objects.get(name = "(995) Cotización contingencias comunes"),
-            # "(996) Cotización formación": to_be_removed,  # MovementType.objects.get(name = "(996) Cotización formación"),
-            # "(997) Cotización desempleo": to_be_removed,  # MovementType.objects.get(name = "(997) Cotización desempleo"),
-            # "(999) Tributación IRPF": to_be_removed,  # MovementType.objects.get(name = "(999) Tributación IRPF"),
-            # "(1) Salario base": to_be_removed,  # MovementType.objects.get(name = "(1) Salario base"),
-            # "(62) Plus exclusividad": to_be_removed,  # MovementType.objects.get(name = "(62) Plus exclusividad"),
-            # "(78) Parte proporcional pagas extraordinarias": to_be_removed,  # MovementType.objects.get(name = "(78) Parte proporcional pagas extraordinarias"),
-            # "(147) Regularización salarial": to_be_removed,  # MovementType.objects.get(name = "(147) Regularización salarial"),
-            # "(606) Dietas sin pernocta": to_be_removed,  # MovementType.objects.get(name = "(606) Dietas sin pernocta"),
-            # "(607) Gastos locomoción": to_be_removed,  # MovementType.objects.get(name = "(607) Gastos locomoción"),
-            # "(615) Dietas pernocta extranjero": to_be_removed,  # MovementType.objects.get(name = "(615) Dietas pernocta extranjero"),
-            # "(612) Dietas pernocta España": to_be_removed,  # MovementType.objects.get(name = "(612) Dietas pernocta España"),
-            # "(620) Gastos estancia": to_be_removed,  # MovementType.objects.get(name = "(620) Gastos estancia"),
-            # "(642) Gastos exentos": to_be_removed,  # MovementType.objects.get(name = "(642) Gastos exentos"),
-            # "(320) Ayuda gimnasio": to_be_removed,  # MovementType.objects.get(name = "(320) Ayuda gimnasio"),
-            # "Premio nupcialidad": to_be_removed,  # MovementType.objects.get(name = "Premio nupcialidad"),
-            # "Bonus": to_be_removed,  # MovementType.objects.get(name = "Bonus"),
-            # "Prima": to_be_removed,  # MovementType.objects.get(name = "Prima"),
             "Dividendo": MovementType.objects.get(name="Dividendos"),
             "Intereses": MovementType.objects.get(name="Intereses"),
             "Tributación rendimiento capital mobiliario": MovementType.objects.get(
@@ -223,26 +207,21 @@ class Command(BaseCommand):
             "Acciones": MovementType.objects.get(name="Operaciones"),
             "Stock split": MovementType.objects.get(name="Stock split"),
             "Compra/Venta acciones": MovementType.objects.get(
-                name="Operaciones"
-            ),  # TODO: Compra o venta
+                name="Acciones", tn_parent=MovementType.objects.get(name="Operaciones")
+            ),
             "Retención USA": MovementType.objects.get(name="Dividend tax (15%)"),
             "Compra cosas": MovementType.objects.get(unique_name=MovementTypeConstants.EXPENSE),
             "Emisión derechos": MovementType.objects.get(name="Emisión derechos"),
             "Rdtos capital (19%)": MovementType.objects.get(
                 name="Rendimientos del capital"
             ),  # Most of the time it is 19%, that is then adjusted in the Tax Declaration
-            # "(708) Descuento valor especies": to_be_removed,  # MovementType.objects.get(name = "(708) Descuento valor especies"),
-            # "Stock options": to_be_removed,  # MovementType.objects.get(name = "Stock options"),
-            # "Complemento dedicación sede": to_be_removed,  # MovementType.objects.get(name = "Complemento dedicación sede"),
-            # "Finiquito": to_be_removed,  # MovementType.objects.get(name = "Finiquito"),
-            # "Indemnización": to_be_removed,  # MovementType.objects.get(name = "Indemnización"),
-            # "Liquidación vacaciones": to_be_removed,  # MovementType.objects.get(name = "Liquidación vacaciones"),
-            # "ESPP": to_be_removed,  # MovementType.objects.get(name = "ESPP"),
-            # "Aportaciones empleado": to_be_removed,  # MovementType.objects.get(name = "Aportaciones empleado"),
-            # "Complemento empresa": to_be_removed,  # MovementType.objects.get(name = "Complemento empresa"),
             "Adrián": MovementType.objects.get(name="Hijos"),
-            # "Ayudas, subvenciones": to_be_removed,  # MovementType.objects.get(name = "Ayudas, subvenciones"),
-            # "RDL 6/2022 (gasolina)": to_be_removed,  # MovementType.objects.get(name = "RDL 6/2022 (gasolina)"),
+            "Ayudas, subvenciones": MovementType.objects.get(
+                name="Subvenciones (y ayudas públicas)"
+            ),
+            "RDL 6/2022 (gasolina)": MovementType.objects.get(
+                name="RDL 6/2022 (gasolina) [Bonificación]"
+            ),
             "Muebles": MovementType.objects.get(name="Muebles"),
             "Guardería": MovementType.objects.get(name="Guardería"),
             "Au-pair": MovementType.objects.get(name="Niñera/Au-pair/Canguro"),
@@ -256,34 +235,16 @@ class Command(BaseCommand):
             "Alquiler - Atyka": gasto_alquiler,
             "Comunidad - Atyka": MovementType.objects.get(name="Cuota de comunidad"),
             "Suministros - Atyka": MovementType.objects.get(name="Suministros"),
-            # "(3) Mejora voluntaria - Complemento personal": to_be_removed,  # MovementType.objects.get(name = "(3) Mejora voluntaria - Complemento personal"),
-            # "(2) Plus convenio - Complemento de puesto": to_be_removed,  # MovementType.objects.get(name = "(2) Plus convenio - Complemento de puesto"),
             "Seguro médico": MovementType.objects.get(name="Seguro médico"),
-            # "Deducción ESPP": to_be_removed,  # MovementType.objects.get(name = "Deducción ESPP"),
-            # "Cotización Régimen General (4,70%)": to_be_removed,  # MovementType.objects.get(name = "Cotización Régimen General (4,70%)"),
-            # "Cotización D+F+P+S (1,65%)": to_be_removed,  # MovementType.objects.get(name = "Cotización D+F+P+S (1,65%)"),
-            # "Retribución flexible": to_be_removed,  # MovementType.objects.get(name = "Retribución flexible"),
-            # "Guardería (R. Flex)": to_be_removed,  # MovementType.objects.get(name = "Guardería (R. Flex)"),
-            # "Seguro médico (R. Flex)": to_be_removed,  # MovementType.objects.get(name = "Seguro médico (R. Flex)"),
-            # "Plan Dental (Cotización)": to_be_removed,  # MovementType.objects.get(name = "Plan Dental (Cotización)"),
-            # "Cotización MEI (Mecanismo Equidad Intergeneracional)": to_be_removed,  # MovementType.objects.get(name = "Cotización MEI (Mecanismo Equidad Intergeneracional)"),
-            # "Blue Points": to_be_removed,  # MovementType.objects.get(name = "Blue Points"),
-            # "Total especies": to_be_removed,  # MovementType.objects.get(name = "Total especies"),
-            # "Pagos especie (no repercutidos)": to_be_removed,  # MovementType.objects.get(name = "Pagos especie (no repercutidos)"),
             "ADR pass-through fees": MovementType.objects.get(name="ADR pass-through fees"),
             "Alquiler - Lope de Haro": inversiones_alquiler,
-            # "GDP": to_be_removed,  # MovementType.objects.get(name = "GDP"),
-            # "Deducción ESPP Variable": to_be_removed,  # MovementType.objects.get(name = "Deducción ESPP Variable"),
             "Farmacia": MovementType.objects.get(name="Farmacia"),
             "Gasolina": MovementType.objects.get(name="Gasolina"),
             "IVA 5% (aceites, pasta - enero 23)": MovementType.objects.get(
                 name="5% (RDL 20/2022 y RDL 4/2024)"
             ),
             "Fianza - Lope de Haro": MovementType.objects.get(name="Transferencia"),
-            # "Premio": to_be_removed,  # MovementType.objects.get(name = "Premio"),
             "Cupones y ofertas": MovementType.objects.get(name="Transferencia"),
-            # "Paga Extra": to_be_removed,  # MovementType.objects.get(name = "Paga Extra"),
-            # "Paga Extra Prorrateada": to_be_removed,  # MovementType.objects.get(name = "Paga Extra Prorrateada"),
             "Seguro de hogar": MovementType.objects.get(name="Seguros"),
             "Derramas": MovementType.objects.get(name="Derrama"),
             "Propinas": MovementType.objects.get(name="Regalos/Propinas"),
@@ -299,7 +260,81 @@ class Command(BaseCommand):
                 name="Ropa y calzado", tn_parent=MovementType.objects.get(name="Hijos")
             ),
             "Deporte": MovementType.objects.get(name="Gimnasio/Deporte"),
-            # "Regalo": MovementType.objects.get(name = "Regalos/Propinas"),  # TODO: Mark this movements. Maybe these are Regalos TO Hijos (not to friends)
+            "Regalo": MovementType.objects.get(name="Regalos/Propinas"),
+            # Salario
+            "(995) Cotización contingencias comunes": MovementType.objects.get(
+                name="Contingencias comunes (4,70%)"
+            ),
+            "(996) Cotización formación": MovementType.objects.get(
+                name="Formación profesional (0,10%)"
+            ),
+            "(997) Cotización desempleo": MovementType.objects.get(name="Desempleo"),
+            "(999) Tributación IRPF": MovementType.objects.get(name="Rendimientos del trabajo"),
+            "Cotización Régimen General (4,70%)": MovementType.objects.get(
+                name="Contingencias comunes (4,70%)"
+            ),
+            "Cotización D+F+P+S (1,65%)": MovementType.objects.get(
+                name="Desempleo + Formación profesional"
+            ),
+            "(1) Salario base": MovementType.objects.get(name="Salario base"),
+            "(62) Plus exclusividad": MovementType.objects.get(name="Plus exclusividad"),
+            "(78) Parte proporcional pagas extraordinarias": MovementType.objects.get(
+                name="Parte proporcional pagas extraordinarias"
+            ),
+            "(147) Regularización salarial": MovementType.objects.get(
+                name="Regularización salarial"
+            ),
+            "(606) Dietas sin pernocta": MovementType.objects.get(name="Dietas sin pernocta"),
+            "(607) Gastos locomoción": MovementType.objects.get(name="Gastos locomoción"),
+            "(615) Dietas pernocta extranjero": MovementType.objects.get(
+                name="Dietas pernocta extranjero"
+            ),
+            "(612) Dietas pernocta España": MovementType.objects.get(name="Dietas pernocta España"),
+            "(620) Gastos estancia": MovementType.objects.get(name="Gastos estancia"),
+            "(642) Gastos exentos": MovementType.objects.get(name="Gastos exentos"),
+            "(320) Ayuda gimnasio": MovementType.objects.get(name="Ayuda gimnasio"),
+            "Premio nupcialidad": MovementType.objects.get(name="Premio nupcialidad"),
+            "Bonus": MovementType.objects.get(name="Bonus"),
+            "Prima": MovementType.objects.get(name="Prima"),
+            "Blue Points": MovementType.objects.get(name="Blue Points"),
+            "GDP": MovementType.objects.get(name="GDP"),
+            "Premio": MovementType.objects.get(name="Premio"),
+            "Paga Extra": MovementType.objects.get(name="Paga extra"),
+            "Paga Extra Prorrateada": MovementType.objects.get(
+                name="Parte proporcional pagas extraordinarias"
+            ),
+            "Finiquito": MovementType.objects.get(name="Finiquito"),
+            "Indemnización": MovementType.objects.get(name="Indemnización"),
+            "Liquidación vacaciones": MovementType.objects.get(name="Liquidación vacaciones"),
+            "Complemento dedicación sede": MovementType.objects.get(
+                name="Complemento dedicación sede"
+            ),
+            "(3) Mejora voluntaria - Complemento personal": MovementType.objects.get(
+                name="Mejora voluntaria - Complemento personal"
+            ),
+            "(2) Plus convenio - Complemento de puesto": MovementType.objects.get(
+                name="Plus convenio - Complemento de puesto"
+            ),
+            "ESPP": MovementType.objects.get(name="ESPP"),
+            "Aportaciones empleado": MovementType.objects.get(name="Aportaciones empleado"),
+            "Complemento empresa": MovementType.objects.get(name="Complemento empresa"),
+            "Deducción ESPP": MovementType.objects.get(name="ESPP"),
+            "Guardería (R. Flex)": MovementType.objects.get(name="Guardería (R. Flex)"),
+            "Seguro médico (R. Flex)": MovementType.objects.get(name="Seguro médico (R. Flex)"),
+            "Deducción ESPP Variable": MovementType.objects.get(name="ESPP"),
+            "Plan Dental (Cotización)": MovementType.objects.get(name="Plan Dental (Cotización)"),
+            "Cotización MEI (Mecanismo Equidad Intergeneracional)": MovementType.objects.get(
+                name="Cotización MEI (Mecanismo Equidad Intergeneracional)"
+            ),
+            "(708) Descuento valor especies": MovementType.objects.get(name="Total Especies"),
+            "Stock options": MovementType.objects.get(name="Stock options"),
+            "Retribución flexible": MovementType.objects.get(
+                name="Deducciones Salario"
+            ),  # Not really, probably remove
+            "Total especies": MovementType.objects.get(name="Total Especies"),
+            "Pagos especie (no repercutidos)": MovementType.objects.get(
+                name="Retención IRPF Pagos Esp. No Reperc."
+            ),
         }
 
         mapping = {}
@@ -309,7 +344,6 @@ class Command(BaseCommand):
                 mapping[pk] = movement_type
             except KeyError:
                 self.stderr.write(f"Legacy MovmentType '{name}' not mapped yet")
-                # self.stderr.write(f"\"{name}\": to_be_removed,  # MovementType.objects.get(name = \"{name}\"),")
 
         return mapping
 
