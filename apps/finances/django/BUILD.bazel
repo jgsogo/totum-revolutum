@@ -1,16 +1,16 @@
 load("@rules_oci//oci:defs.bzl", "oci_push")
-load("//bazel/python/django/project:django_project.bzl", "django_project")
+load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
+load("//bazel/python/django/project:django_project.bzl", "django_project", "django_project_container")
 load("//bazel/tools/gh:release.bzl", "gh_release")
 
 image_name = package_name().replace("/", "_")
 
 repository = "ghcr.io/jgsogo/{}".format(image_name)  # FIXME: Make it global for all the repo
 
+name = "app"
+
 django_project(
-    name = "app",
-    app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
-    repository = repository,
-    version = "//apps/finances:version",
+    name = name,
     deps = [
         "//apps/finances/django/migrate_legacy",
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
@@ -18,10 +18,16 @@ django_project(
     ],
 )
 
+django_project_container(
+    name = name,
+    repository = repository,
+    version = "//apps/finances:version",
+)
+
 # Release the docker container with the django project
 oci_push(
     name = "release-app",
-    image = ":app-container",
+    image = ":{}-container".format(name),
     remote_tags = "//apps/finances:version",
     repository = repository,
     tags = [
@@ -51,6 +57,13 @@ genrule(
         echo "finances-$$(cat $(location //apps/finances:version))" > $@
     """,
     tags = ["manual"],
+)
+
+docker_compose(
+    name = "{}-docker_compose".format(name),
+    app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
+    app_repository = repository,
+    visibility = [":__subpackages__"],
 )
 
 gh_release(

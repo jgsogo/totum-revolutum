@@ -8,19 +8,15 @@ load("@rules_oci//oci:defs.bzl", "oci_load")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
-load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
 
-def django_project(name, deps, version, app_image_tag_stamped, repository, **kwargs):
+def django_project(name, deps, **kwargs):
     """
     An opinionated macro to create a Django project.
 
     Args:
         name(str): A name for the project
         deps(List[str]): List of dependencies.
-        version(Target): The target that contains the application version
-        app_image_tag_stamped(str): The key inside the stable-status file to use to label the application image (when stamped)
-        repository(str): Docker repository for the app image. Example: 'gcr.io/jgsogo/finances_app'
         **kwargs(dict): Other arguments for the rules
     """
     settings_module = "{}.settings".format(native.package_name().replace("/", "."))
@@ -84,9 +80,23 @@ def django_project(name, deps, version, app_image_tag_stamped, repository, **kwa
         **kwargs
     )
 
-    #####
-    # Create OCI image with this application ready to run
-    #####
+def django_project_container(name, version, repository, env = None):
+    """Create OCI image with this application ready to run
+
+    Args:
+        name(str): Name of the created target
+        version(Target): The target that contains the application version
+        repository(str): Docker repository for the app image. Example: 'gcr.io/jgsogo/finances_app'
+        env(Dict[str, str]): Environment variables
+    """
+
+    settings_module = "{}.settings".format(native.package_name().replace("/", "."))
+
+    env = env or {}
+    env["DJANGO_SETTINGS_MODULE"] = settings_module
+    env["DJANGO_ALLOWED_HOSTS"] = "localhost 127.0.0.1 0.0.0.0 [::1]"
+    env["DEBUG"] = "1"
+    env["SECRET_KEY"] = "4niv*0w++!1y%x59x(ma165cni2-0%m-jmx-7rpav1zmgp#no9-{}".format(settings_module)
 
     expand_template(
         name = "{}-entrypoint-file".format(name),
@@ -181,9 +191,3 @@ def django_project(name, deps, version, app_image_tag_stamped, repository, **kwa
         visibility = [":__subpackages__"],
         tags = ["manual"],
     )
-
-    #######
-    ## Docker compose
-    #######
-
-    docker_compose(name = "{}-docker_compose".format(name), app_repository = repository, app_image_tag_stamped = app_image_tag_stamped, visibility = [":__subpackages__"])
