@@ -1,0 +1,8 @@
+load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
+
+value_from_stable_status(
+    name = "version",
+    default = module_name(),
+    key = "STABLE_FINANCES_VERSION",
+    visibility = [":__subpackages__"],
+)

@@ -4,21 +4,23 @@ load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
-load("@rules_oci//oci:defs.bzl", "oci_load", "oci_push")
+load("@rules_oci//oci:defs.bzl", "oci_load")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
 load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
-load("//bazel/tools/gh:release.bzl", "gh_release")
 
-def django_project(name, deps, **kwargs):
+def django_project(name, deps, version, app_image_tag_stamped, repository, **kwargs):
     """
     An opinionated macro to create a Django project.
 
     Args:
         name(str): A name for the project
         deps(List[str]): List of dependencies.
+        version(Target): The target that contains the application version
+        app_image_tag_stamped(str): The key inside the stable-status file to use to label the application image (when stamped)
+        repository(str): Docker repository for the app image. Example: 'gcr.io/jgsogo/finances_app'
         **kwargs(dict): Other arguments for the rules
     """
     settings_module = "{}.settings".format(native.package_name().replace("/", "."))
@@ -150,28 +152,14 @@ def django_project(name, deps, **kwargs):
     #     ],
     # )
 
-    image_name = native.package_name().replace("/", "_")
-    repository = "ghcr.io/jgsogo/{}".format(image_name)  # FIXME: Make it global for all the repo
-
-    oci_push(
-        name = "{}-release".format(name),
-        image = ":{}-container".format(name),
-        remote_tags = "//:stable_build_scm_revision",
-        repository = repository,
-        tags = [
-            "manual",
-            "no-remote-cache",
-            "release",
-        ],
-    )
-
     native.genrule(
         name = "{}-repo_tags".format(name),
         outs = ["repo_tags.txt"],
         cmd_bash = """
-            echo "{}:$$(cat $(location //:stable_build_scm_revision))" > $@
-        """.format(repository),
-        srcs = ["//:stable_build_scm_revision"],
+            echo "{}:$$(cat $(location {}))" > $@
+        """.format(repository, version),
+        srcs = [version],
+        tags = ["manual"],
     )
 
     oci_load(
@@ -191,32 +179,11 @@ def django_project(name, deps, **kwargs):
         srcs = [":{}-load".format(name)],
         output_group = "tarball",
         visibility = [":__subpackages__"],
+        tags = ["manual"],
     )
 
     #######
     ## Docker compose
     #######
 
-    docker_compose(name = "{}-docker_compose".format(name), app_image = image_name, visibility = [":__subpackages__"])
-
-    native.alias(
-        name = "{}-nginx".format(name),
-        actual = "//bazel/python/django/containers/nginx:nginx-load",
-        tags = [
-            "manual",
-            "release",
-        ],
-    )
-
-    gh_release(
-        name = "{}-release-docker-compose".format(name),
-        tag = "??",
-        display_label = "{}-docker-compose".format(image_name),
-        data = [
-            ":{}-docker_compose".format(name),
-        ],
-        tags = [
-            "manual",
-            "release",
-        ],
-    )
+    docker_compose(name = "{}-docker_compose".format(name), app_repository = repository, app_image_tag_stamped = app_image_tag_stamped, visibility = [":__subpackages__"])

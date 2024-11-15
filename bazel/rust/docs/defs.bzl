@@ -195,7 +195,7 @@ rust_docs = rule(
         ),
         "_capture_args_and_env": attr.label(
             doc = "A tool for dumping arguments and env vars to a file",
-            default = Label("@totum//bazel/rust/docs:capture_args_and_env"),
+            default = Label("//bazel/rust/docs:capture_args_and_env"),
             cfg = "exec",
             executable = True,
         ),
@@ -208,7 +208,7 @@ rust_docs = rule(
         ),
         "_run_scripts": attr.label(
             doc = "A tool for running multiple scripts in the same action",
-            default = Label("@totum//bazel/rust/docs:run_scripts"),
+            default = Label("//bazel/rust/docs:run_scripts"),
             cfg = "exec",
             executable = True,
         ),

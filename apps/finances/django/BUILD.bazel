@@ -1,10 +1,67 @@
+load("@rules_oci//oci:defs.bzl", "oci_push")
 load("//bazel/python/django/project:django_project.bzl", "django_project")
+load("//bazel/tools/gh:release.bzl", "gh_release")
+
+image_name = package_name().replace("/", "_")
+
+repository = "ghcr.io/jgsogo/{}".format(image_name)  # FIXME: Make it global for all the repo
 
 django_project(
     name = "app",
+    app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
+    repository = repository,
+    version = "//apps/finances:version",
     deps = [
         "//apps/finances/django/migrate_legacy",
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
         "//libraries/finances/investments/django_finances_investments:finances_investments",
+    ],
+)
+
+# Release the docker container with the django project
+oci_push(
+    name = "release-app",
+    image = ":app-container",
+    remote_tags = "//apps/finances:version",
+    repository = repository,
+    tags = [
+        "manual",
+        "no-remote-cache",
+        "release",
+    ],
+)
+
+# An alias to find the nging-release target inside this //apps/finances directory. Useful so we ensure we capture
+# everything that needs to be released when querying //apps/finances dir.
+alias(
+    name = "release-nginx",
+    actual = "//bazel/python/django/containers/nginx:release",
+    tags = [
+        "manual",
+        "release",
+    ],
+)
+
+# Release the docker-compose file matching the released docker contianers (see rules above)
+genrule(
+    name = "gh_tagname",
+    srcs = ["//apps/finances:version"],
+    outs = ["gh_tagname.txt"],
+    cmd_bash = """
+        echo "finances-$$(cat $(location //apps/finances:version))" > $@
+    """,
+    tags = ["manual"],
+)
+
+gh_release(
+    name = "release-docker-compose",
+    data = [
+        ":app-docker_compose",
+    ],
+    display_label = "django-docker-compose.tar",
+    tag = ":gh_tagname",
+    tags = [
+        "manual",
+        "release",
     ],
 )

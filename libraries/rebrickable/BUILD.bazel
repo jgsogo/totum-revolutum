@@ -1,6 +1,6 @@
 load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
-load("@totum//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
 rust_library_tests_and_docs(
     name = "rebrickable",
@@ -20,7 +20,7 @@ rust_library_tests_and_docs(
     deps = all_crate_deps(
         normal = True,
     ) + [
-        "@totum//libraries/utils",
+        "//libraries/utils",
     ],
 )
 
@@ -35,6 +35,6 @@ rust_binary(
         normal = True,
     ) + [
         ":rebrickable",
-        "@totum//libraries/utils",
+        "//libraries/utils",
     ],
 )

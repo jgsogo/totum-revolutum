@@ -56,7 +56,7 @@ jobs:
           echo "Get latest release for application ${{ inputs.app }}"
           bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --json tagName,name | jq '.[].tagName' | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
           PREV_RELEASE=$(bazel run //bazel/tools/semver:bin -- max --filter-prefix=${{ inputs.app }} $(<${{ runner.temp }}/${{ inputs.app }}-releases.json))
-          echo "PREV_RELEASE=$PREV_RELEASE"
+          echo ">>>> PREV_RELEASE=$PREV_RELEASE"
 
           echo "Compute new release"
           if [ "${{ inputs.prerelease }}" == "true" ]; then
@@ -64,18 +64,11 @@ jobs:
           else
             NEW_RELEASE=$(bazel run //bazel/tools/semver:bin -- bump --component ${{ inputs.bump_component }} $PREV_RELEASE)
           fi
-          echo "NEW_RELEASE=$NEW_RELEASE"
+          echo ">>>> NEW_RELEASE=$NEW_RELEASE"
 
           echo "NEW_RELEASE=$NEW_RELEASE" >> $GITHUB_OUTPUT
           echo "PREV_RELEASE=$PREV_RELEASE" >> $GITHUB_OUTPUT
 
-
-      - name: Build the artifacts
-        env:
-          NEW_RELEASE: ${{ steps.release-new.outputs.NEW_RELEASE }}
-        run: |
-          echo "NEW_RELEASE=$NEW_RELEASE"
-          bazel query "attr('tags', 'release', '//apps/${{ inputs.app }}/...')" | tee  ${{ runner.temp }}/${{ inputs.app }}-release-targets.txt
 
       - name: Create the release
         env:
@@ -83,8 +76,6 @@ jobs:
           NEW_RELEASE: ${{ steps.release-new.outputs.NEW_RELEASE }}
           PREV_RELEASE: ${{ steps.release-new.outputs.PREV_RELEASE }}
         run: |
-          echo "NEW_RELEASE = $NEW_RELEASE"
-          echo "PREV_RELEASE = $PREV_RELEASE"
           echo "Create new release ($NEW_RELEASE) and generate notes starting on the prev one ($PREV_RELEASE)"
           if [ "${{ inputs.bump_component }}" == "prerelease" ]; then
               bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --draft --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
@@ -93,6 +84,18 @@ jobs:
           else
               bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --draft --generate-notes --notes-start-tag $PREV_RELEASE
           fi
+
+      - name: Build and upload the artifacts
+        env:
+          NEW_RELEASE: ${{ steps.release-new.outputs.NEW_RELEASE }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bazel query "attr('tags', 'release', '//apps/${{ inputs.app }}/...')" | tee  ${{ runner.temp }}/${{ inputs.app }}-release-targets.txt
+          while IFS="" read -r p || [ -n "$p" ]
+          do
+            printf '%s\n' "$p"
+          done < ${{ runner.temp }}/${{ inputs.app }}-release-targets.txt
 
 
       # - name: Upload artifacts
