@@ -10,7 +10,9 @@ from django_finances_accounts.models import (
     Custodian,
     Fx,
     MovementType,
+    Snapshot,
 )
+from django_finances_investments.models import SnapshotNumerable
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 from tqdm import tqdm
@@ -19,7 +21,7 @@ log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Migrates AccountHolder instances"
+    help = "Migrates legacy DB"
 
     def add_arguments(self, parser):
         parser.add_argument("--DATABASE_URL", type=str)
@@ -36,6 +38,7 @@ class Command(BaseCommand):
             )
             _fxs: Dict[int, Fx] = self.migrate_fx(c)
             _movement_types: Dict[int, MovementType] = self.migrate_movementtype(c)
+            self.migrate_snapshots(c, accounts=_accounts)
 
     def migrate_accountholders(self, conn):
         total = conn.execute(text("SELECT COUNT(*) FROM data_accountholder")).scalar()
@@ -123,6 +126,7 @@ class Command(BaseCommand):
                     "ccy": ccy,
                     "open": acc_open,
                     "close": acc_close,
+                    "is_numerable": is_numerable,
                 },
             )
             account.holders.set([acc_holder])
@@ -252,7 +256,7 @@ class Command(BaseCommand):
             "Colegio": MovementType.objects.get(name="Colegio"),
             "Material escolar": MovementType.objects.get(name="Libros y material escolar"),
             "Cuotas/Aportaciones": MovementType.objects.get(name="Cuotas/Aportaciones"),
-            "Uniforme": MovementType.objects.get(name="Ropa y calzado"),
+            "Uniforme": MovementType.objects.get(name="Uniforme"),
             "AMPA": MovementType.objects.get(name="AMPA"),
             "Comedor": MovementType.objects.get(name="Comedor"),
             "Extraescolares": MovementType.objects.get(name="Extraescolares"),
@@ -347,7 +351,36 @@ class Command(BaseCommand):
 
         return mapping
 
+    def migrate_snapshots(self, conn, accounts: Dict[int, Account]):
+        total = conn.execute(text("SELECT COUNT(*) FROM data_snapshot")).scalar()
+
+        statement = text(
+            "SELECT id, account_id, date_value, amount, quantity, unit_value " "FROM data_snapshot"
+        )
+        results = conn.execute(statement)
+
+        for snapshot in tqdm(results, total=total, desc="data/snapshots"):
+            pk, account, date_value, amount, quantity, unit_value = snapshot
+            account = accounts[account]
+
+            if account.is_numerable:
+                SnapshotNumerable.objects.get_or_create(
+                    account=account,
+                    date_value=date_value,
+                    defaults={
+                        "quantity": quantity,
+                        "unit_value": unit_value,
+                    },
+                )
+            else:
+                Snapshot.objects.get_or_create(
+                    account=account,
+                    date_value=date_value,
+                    defaults={
+                        "amount": amount,
+                    },
+                )
+
 
 #  public | data_movement                 | table | finances
-#  public | data_snapshot                 | table | finances
 #  public | data_transfer                 | table | finances

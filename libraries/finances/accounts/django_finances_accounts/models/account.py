@@ -63,5 +63,15 @@ class Account(models.Model):
         ),
     )
 
+    is_numerable = models.BooleanField(
+        default=False,
+        help_text=_(
+            "We can only know at an account level if it is numerable or not. Of course there are"
+            " some AccountType that will always be numerable (Real State, Stocks,...) but"
+            " sometimes even some investments that could be numerable are not (i.e: an investment"
+            " fund or pension plan that invest in many different assets)"
+        ),
+    )
+
     def __str__(self) -> str:
         return f"{self.custodian} - {self.name}"

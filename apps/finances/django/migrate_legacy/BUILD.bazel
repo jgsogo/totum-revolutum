@@ -8,8 +8,5 @@ django_app(
         requirement("psycopg"),
         requirement("SQLAlchemy"),
         requirement("tqdm"),
-        #     requirement("django-money"),
-        #     requirement("django-countries"),
-        #     requirement("django-appconf"),
     ],
 )
