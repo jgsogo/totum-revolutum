@@ -368,7 +368,7 @@ class Command(BaseCommand):
                         unit_value,
                         account,
                         date_value,
-                        transfer_id,
+                        _2,
                         transfer_description,
                         mov_type_name,
                         fx,
@@ -379,7 +379,7 @@ class Command(BaseCommand):
                     mov_type = movtypes[mov_type_name]
                     if fx:
                         fx = fxs[fx]
-                    mov = self._get_movement_or_none(
+                    mov = self._movement_exists(
                         conn=conn,
                         amount=amount,
                         quantity=quantity,
@@ -392,12 +392,14 @@ class Command(BaseCommand):
                         direction=direction,
                         date=date,
                     )
-                    movs_created_or_not.append(mov is not None)
+                    movs_created_or_not.append(mov)
 
                 if len(set(movs_created_or_not)) != 1:
+                    for exists, mov in zip(movs_created_or_not, movements):
+                        self.stderr.write(f"{exists} - movement {mov[1]}")
                     raise CommandError(
-                        f"Error with transfer_id {transfer_id}, some movements exists"
-                        " and others doesn't!"
+                        f"Error with transfer_id {transfer_id} ('{transfer_description.strip()}'),"
+                        f" some movements ({movs_created_or_not}) exists and others doesn't!"
                     )
 
                 # If all movements exist, then skip this transfer
@@ -447,7 +449,7 @@ class Command(BaseCommand):
 
                     pbar_movs.update(1)
 
-    def _get_movement_or_none(
+    def _movement_exists(
         self,
         conn,
         amount,
@@ -472,24 +474,17 @@ class Command(BaseCommand):
         }
 
         dividendos_mov_type = MovementType.objects.get(name="Dividendos")
-        try:
-            if mov_type == dividendos_mov_type:
-                # FIXME: We don't have information about 'ex_dividend_date' and 'unit_value', so
-                # we are creating this as regular movements and, afterwards, I can go through all
-                # them and add this information
-                return Movement.objects.get(**uniqueness, amount=amount)
-            elif account.is_numerable:
-                return MovementNumerable.objects.get(
-                    **uniqueness, unit_value=unit_value, quantity=quantity
-                )
-            else:
-                return Movement.objects.get_or_create(**uniqueness, amount=amount)
-        except (
-            Movement.DoesNotExist,
-            MovementNumerable.DoesNotExist,
-            MovementDividend.DoesNotExist,
-        ):
-            return None
+        if mov_type == dividendos_mov_type:
+            # FIXME: We don't have information about 'ex_dividend_date' and 'unit_value', so
+            # we are creating this as regular movements and, afterwards, I can go through all
+            # them and add this information
+            return Movement.objects.filter(**uniqueness, amount=amount).exists()
+        elif account.is_numerable:
+            return MovementNumerable.objects.filter(
+                **uniqueness, unit_value=unit_value, quantity=quantity
+            ).exists()
+        else:
+            return Movement.objects.filter(**uniqueness, amount=amount).exists()
 
     def _get_or_create_movement(
         self,
@@ -533,109 +528,3 @@ class Command(BaseCommand):
             )
 
         return movement, created
-
-    def migrate_transfers(self, conn, obliterated: bool = False):
-        total = conn.execute(text("SELECT COUNT(*) FROM data_transfer")).scalar()
-
-        statement = text("SELECT id, description FROM data_transfer")
-        results = conn.execute(statement)
-
-        mapping = {}
-        for transfer in tqdm(results, total=total, desc="data/transfers"):
-            pk, description = transfer
-            name = description.splitlines()[0][:80]
-            transaction, created = Transaction.objects.get_or_create(
-                name=name,
-                defaults={
-                    "description": description,
-                },
-            )
-
-            if obliterated and not created:
-                self.stderr.write(f"Transaction '{transaction}' was not created!")
-            if created and not obliterated:
-                self.stderr.write(f"Transaction '{transaction}' was created!")
-
-            mapping[pk] = transaction
-        return mapping
-
-    def migrate_movements_deprecated(
-        self, conn, accounts, transfers, fxs, obliterated: bool = False
-    ):
-        total = conn.execute(text("SELECT COUNT(*) FROM data_movement")).scalar()
-
-        statement = text(
-            """
-            SELECT
-                data_movement.id,
-                data_movement.amount,
-                data_movement.quantity,
-                data_movement.unit_value,
-                data_movement.account_id,
-                data_movement.date_value,
-                data_movement.transfer_id,
-                data_movementtype.name,
-                data_movement.fx_id,
-                data_movement.direction,
-                data_movement.date
-            FROM
-                data_movement
-            LEFT OUTER JOIN
-                data_movementtype
-            ON
-                data_movement.type_id=data_movementtype.id
-        """
-        )
-        results = conn.execute(statement)
-
-        movtypes = get_movement_types_mapping()
-        for movement in tqdm(results, total=total, desc="data/movements"):
-            (
-                pk,
-                amount,
-                quantity,
-                unit_value,
-                account,
-                date_value,
-                transfer,
-                mov_type_name,
-                fx,
-                direction,
-                date,
-            ) = movement
-            account = accounts[account]
-            transfer = transfers[transfer]
-            mov_type = movtypes[mov_type_name]
-            if fx:
-                fx = fxs[fx]
-
-            uniqueness = {
-                "account": account,
-                "transaction": transfer,
-                "type": mov_type,
-                "direction": direction,
-                "date_value": date_value,
-                # "amount": amount,
-            }
-
-            dividendos_mov_type = MovementType.objects.get(name="Dividendos")
-            if mov_type == dividendos_mov_type:
-                # FIXME: We don't have information about 'ex_dividend_date' and 'unit_value', so
-                # we are creating this as regular movements and, afterwards, I can go through all
-                # them and add this information
-                movement, created = Movement.objects.get_or_create(
-                    **uniqueness, amount=amount, defaults={"fx": fx}
-                )
-            elif account.is_numerable:
-                movement, created = MovementNumerable.objects.get_or_create(
-                    **uniqueness, unit_value=unit_value, quantity=quantity, defaults={"fx": fx}
-                )
-            else:
-                movement, created = Movement.objects.get_or_create(
-                    **uniqueness, amount=amount, defaults={"fx": fx}
-                )
-
-            if obliterated and not created:
-                self.stderr.write(f"Movement '{movement}' was not created!")
-            if created and not obliterated:
-                self.stderr.write(f"Movement '{movement}' was created!")

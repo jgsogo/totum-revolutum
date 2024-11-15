@@ -8,7 +8,7 @@ class AmountMixin(models.Model):
 
     amount = models.DecimalField(
         max_digits=14,
-        decimal_places=2,
+        decimal_places=4,
         validators=[MinValueValidator(0, "Amount should be equal or greater than 0")],
         help_text=_("Amount in object's currency"),
         blank=True,
