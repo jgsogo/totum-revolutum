@@ -10,6 +10,7 @@ from .test_model__amount import AmountTestMixin
 
 
 class SnapshotTestCase(AmountTestMixin, TestCase):
+
     def setUp(self):
         self.acctype = AccountType.objects.create(name="acctype")
         self.custodian = Custodian.objects.create(name="custodian", country="ES")
@@ -85,5 +86,5 @@ class SnapshotTestCase(AmountTestMixin, TestCase):
             str(cm.exception),
             "(\"Cannot delete some instances of model 'Account' because they are referenced"
             " through protected foreign keys: 'Snapshot.account'.\","
-            " {<Snapshot: Snapshot object (1)>})",
+            " {<Snapshot: custodian - acc1 @ 2010-01-01>})",
         )

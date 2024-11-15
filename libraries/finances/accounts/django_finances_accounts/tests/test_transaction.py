@@ -59,7 +59,7 @@ class TransactionTestCase(TestCase):
 
         self.assertListEqual(
             cm.exception.messages,
-            ["INs (500.00) has to be equal to OUTs (1000.00) with tolerance '0'"],
+            ["INs (500.0000) has to be equal to OUTs (1000.0000) with tolerance '0'"],
         )
 
     def test_movements_xccy(self):
@@ -96,7 +96,7 @@ class TransactionTestCase(TestCase):
 
         self.assertListEqual(
             cm.exception.messages,
-            ["INs (250.000) has to be equal to OUTs (1000.00) with tolerance '0'"],
+            ["INs (250.00000) has to be equal to OUTs (1000.0000) with tolerance '0'"],
         )
 
     def test_validate_movements_tolerance(self):
