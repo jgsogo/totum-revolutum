@@ -80,7 +80,7 @@ def django_project(name, deps, **kwargs):
         **kwargs
     )
 
-def django_project_container(name, version, repository, env = None):
+def django_project_container(name, version, repository, env = None, entrypoint = None):
     """Create OCI image with this application ready to run
 
     Args:
@@ -88,6 +88,7 @@ def django_project_container(name, version, repository, env = None):
         version(Target): The target that contains the application version
         repository(str): Docker repository for the app image. Example: 'gcr.io/jgsogo/finances_app'
         env(Dict[str, str]): Environment variables
+        entrypoint(Target): A pkg_tar target with (at least) the `entrypoint.sh` script to execute
     """
 
     settings_module = "{}.settings".format(native.package_name().replace("/", "."))
@@ -98,20 +99,24 @@ def django_project_container(name, version, repository, env = None):
     env["DEBUG"] = "1"
     env["SECRET_KEY"] = "4niv*0w++!1y%x59x(ma165cni2-0%m-jmx-7rpav1zmgp#no9-{}".format(settings_module)
 
-    expand_template(
-        name = "{}-entrypoint-file".format(name),
-        out = "entrypoint.sh",
-        substitutions = {
-            "%DJANGO_PORT%": DJANGO_PORT,
-        },
-        template = "//bazel/python/django/project:entrypoint.sh.tpl",
-        is_executable = True,
-    )
+    # If there is no default entrypoint, we provide one by default
+    if not entrypoint:
+        expand_template(
+            name = "{}-entrypoint-file".format(name),
+            out = "entrypoint.sh",
+            substitutions = {
+                "%DJANGO_PORT%": DJANGO_PORT,
+            },
+            template = "//bazel/python/django/project:entrypoint.sh.tpl",
+            is_executable = True,
+        )
 
-    pkg_tar(
-        name = "{}-entrypoint".format(name),
-        srcs = [":{}-entrypoint-file".format(name)],
-    )
+        pkg_tar(
+            name = "{}-entrypoint".format(name),
+            srcs = [":{}-entrypoint-file".format(name)],
+        )
+
+        entrypoint = ":{}-entrypoint".format(name)
 
     py_oci_image(
         name = "{}-_container".format(name),
@@ -126,7 +131,7 @@ def django_project_container(name, version, repository, env = None):
             "manual",
         ],
         tars = [
-            ":{}-entrypoint".format(name),
+            entrypoint,
         ],
         env = env | {
             # We need to override the database here so both 'admin' and 'gunicorn' use the same database

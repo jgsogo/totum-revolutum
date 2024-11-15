@@ -31,10 +31,10 @@ class Command(BaseCommand):
     help = "Migrates legacy DB data"
 
     def add_arguments(self, parser):
-        parser.add_argument("--DATABASE_URL", type=str)
+        parser.add_argument("--LEGACY_DATABASE_URL", type=str)
 
     def handle(self, *args, **options):
-        database_url = options["DATABASE_URL"]
+        database_url = options["LEGACY_DATABASE_URL"]
         engine = create_engine(f"postgresql+psycopg:{database_url}")
 
         with engine.connect() as c:
