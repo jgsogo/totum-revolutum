@@ -9,5 +9,46 @@ class SnapshotNumerableModelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(SnapshotNumerable, SnapshotNumerableModelAdmin)
-admin.site.register(MovementNumerable)
-admin.site.register(MovementDividend)
+
+
+class MovementNumerableAdmin(admin.ModelAdmin):
+    list_display = (
+        "account",
+        "date_value",
+        "direction",
+        "transaction__group",
+        "type",
+        "quantity",
+        "unit_value",
+    )
+    list_filter = (
+        "date_value",
+        "direction",
+        "type",
+    )
+    search_fields = ("transaction__group",)
+
+
+admin.site.register(MovementNumerable, MovementNumerableAdmin)
+
+
+class MovementDividendAdmin(admin.ModelAdmin):
+    list_display = (
+        "account",
+        "date_value",
+        "direction",
+        "transaction__group",
+        "type",
+        "ex_dividend_date",
+        "unit_value",
+    )
+    list_filter = (
+        "ex_dividend_date",
+        "date_value",
+        "direction",
+        "type",
+    )
+    search_fields = ("transaction__group",)
+
+
+admin.site.register(MovementDividend, MovementDividendAdmin)

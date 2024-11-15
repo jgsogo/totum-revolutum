@@ -9,10 +9,16 @@ from django_finances_accounts.models import (
     AccountType,
     Custodian,
     Fx,
+    Movement,
     MovementType,
     Snapshot,
+    Transaction,
 )
-from django_finances_investments.models import SnapshotNumerable
+from django_finances_investments.models import (
+    MovementDividend,
+    MovementNumerable,
+    SnapshotNumerable,
+)
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 from tqdm import tqdm
@@ -39,6 +45,10 @@ class Command(BaseCommand):
             _fxs: Dict[int, Fx] = self.migrate_fx(c)
             _movement_types: Dict[int, MovementType] = self.migrate_movementtype(c)
             self.migrate_snapshots(c, accounts=_accounts)
+            _transfers = self.migrate_transfers(c)
+            self.migrate_movements(
+                c, accounts=_accounts, transfers=_transfers, movtypes=_movement_types, fxs=_fxs
+            )
 
     def migrate_accountholders(self, conn):
         total = conn.execute(text("SELECT COUNT(*) FROM data_accountholder")).scalar()
@@ -355,7 +365,7 @@ class Command(BaseCommand):
         total = conn.execute(text("SELECT COUNT(*) FROM data_snapshot")).scalar()
 
         statement = text(
-            "SELECT id, account_id, date_value, amount, quantity, unit_value " "FROM data_snapshot"
+            "SELECT id, account_id, date_value, amount, quantity, unit_value FROM data_snapshot"
         )
         results = conn.execute(statement)
 
@@ -381,6 +391,95 @@ class Command(BaseCommand):
                     },
                 )
 
+    def migrate_transfers(self, conn):
+        total = conn.execute(text("SELECT COUNT(*) FROM data_transfer")).scalar()
 
-#  public | data_movement                 | table | finances
-#  public | data_transfer                 | table | finances
+        statement = text("SELECT id, description FROM data_transfer")
+        results = conn.execute(statement)
+
+        mapping = {}
+        for transfer in tqdm(results, total=total, desc="data/transfers"):
+            pk, description = transfer
+            name = description.splitlines()[0][:80]
+            transaction, _1 = Transaction.objects.get_or_create(
+                name=name,
+                defaults={
+                    "description": description,
+                },
+            )
+            mapping[pk] = transaction
+        return mapping
+
+    def migrate_movements(self, conn, accounts, transfers, movtypes, fxs):
+        Movement.objects.all().delete()  # FIXME: Make this an option
+
+        total = conn.execute(text("SELECT COUNT(*) FROM data_movement")).scalar()
+
+        statement = text(
+            "SELECT id, amount, quantity, unit_value, account_id, date_value,"
+            " transfer_id, type_id, fx_id, direction, date  FROM data_movement"
+        )
+        results = conn.execute(statement)
+
+        for movement in tqdm(results, total=total, desc="data/movements"):
+            (
+                pk,
+                amount,
+                quantity,
+                unit_value,
+                account,
+                date_value,
+                transfer,
+                mov_type,
+                fx,
+                direction,
+                date,
+            ) = movement
+            account = accounts[account]
+            transfer = transfers[transfer]
+            mov_type = movtypes[mov_type]
+            if fx:
+                fx = fxs[fx]
+
+            uniqueness = {
+                "account": account,
+                "transaction": transfer,
+                "type": mov_type,
+                "direction": direction,
+                "date_value": date_value,
+                # "amount": amount,
+            }
+
+            dividendos_mov_type = MovementType.objects.get(name="Dividendos")
+            if mov_type == dividendos_mov_type:
+                # FIXME: We don't have information about 'ex_dividend_date' and 'unit_value', so
+                # we are creating this as regular movements and, afterwards, I can go through all
+                # them and add this information
+                MovementDividend
+                _1, created = Movement.objects.get_or_create(
+                    **uniqueness,
+                    amount=amount,
+                )
+                # assert not created, f"Movement[Divident] created: {uniqueness}"
+                assert created, f"Movement[Divident] not created: {uniqueness}"
+            elif account.is_numerable:
+                _1, created = MovementNumerable.objects.get_or_create(
+                    **uniqueness,
+                    defaults={
+                        "unit_value": unit_value,
+                        "quantity": quantity,
+                    },
+                )
+                # assert not created, (f"MovementNumerable created: {uniqueness},"
+                # f"unit_value: {unit_value}, quantity = {quantity}")
+                assert created, (
+                    f"MovementNumerable not created: {uniqueness},"
+                    f" unit_value: {unit_value}, quantity = {quantity}"
+                )
+            else:
+                _1, created = Movement.objects.get_or_create(
+                    **uniqueness,
+                    amount=amount,
+                )
+                # assert not created, f"Movement created: {uniqueness}"
+                assert created, f"Movement not created: {uniqueness}"

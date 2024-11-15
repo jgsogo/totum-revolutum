@@ -143,7 +143,11 @@ class MovementAdmin(admin.ModelAdmin):
         "type",
         "amount",
     )
-    list_filter = ("account", "type", "date_value", "direction")
+    list_filter = (
+        "date_value",
+        "direction",
+        "type",
+    )
     search_fields = ("transaction__group",)
 
 
