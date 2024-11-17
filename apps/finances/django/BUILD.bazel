@@ -15,6 +15,7 @@ name = "app"
 django_project(
     name = name,
     deps = [
+        "//apps/finances/django/front_bootstrap5",
         "//apps/finances/django/migrate_legacy",
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
         "//libraries/finances/investments/django_finances_investments:finances_investments",
