@@ -78,11 +78,11 @@ jobs:
         run: |
           echo "Create new release ($NEW_RELEASE) and generate notes starting on the prev one ($PREV_RELEASE)"
           if [ "${{ inputs.bump_component }}" == "prerelease" ]; then
-              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --draft --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
+              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
           elif [ "${{ inputs.prerelease }}" == "true" ]; then
-              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --draft --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
+              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
           else
-              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --draft --generate-notes --notes-start-tag $PREV_RELEASE
+              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE
           fi
           git fetch --tags
           git tag
