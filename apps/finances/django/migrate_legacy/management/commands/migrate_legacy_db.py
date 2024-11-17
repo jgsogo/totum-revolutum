@@ -126,7 +126,7 @@ class Command(BaseCommand):
 
         fake_custodian, _ = Custodian.objects.get_or_create(name="fake", defaults={"country": "es"})
         mapping = {}
-        for account in tqdm(results, total=total, desc="data/accounttype"):
+        for account in tqdm(results, total=total, desc="data/account"):
             (
                 pk,
                 acc_type_name,
@@ -300,7 +300,7 @@ class Command(BaseCommand):
                     mov_type = movtypes[mov_type_name]
                     if fx:
                         fx = fxs[fx]
-                    movement, created = self._get_or_create_movement(
+                    self.create_movement(
                         conn=conn,
                         amount=amount,
                         quantity=quantity,
@@ -313,9 +313,6 @@ class Command(BaseCommand):
                         direction=direction,
                         date=date,
                     )
-
-                    if not created:
-                        self.stderr.write(f"Movement '{movement}' was not created!")
 
                     pbar_movs.update(1)
         else:
@@ -528,3 +525,42 @@ class Command(BaseCommand):
             )
 
         return movement, created
+
+    def create_movement(
+        self,
+        conn,
+        amount,
+        quantity,
+        unit_value,
+        account,
+        date_value,
+        transaction,
+        mov_type,
+        fx,
+        direction,
+        date,
+    ):
+
+        uniqueness = {
+            "account": account,
+            "transaction": transaction,
+            "type": mov_type,
+            "direction": direction,
+            "date_value": date_value,
+            # "amount": amount,
+        }
+
+        dividendos_mov_type = MovementType.objects.get(name="Dividendos")
+        if mov_type == dividendos_mov_type:
+            # FIXME: We don't have information about 'ex_dividend_date' and 'unit_value', so
+            # we are creating this as regular movements and, afterwards, I can go through all
+            # them and add this information
+            movement = Movement.objects.create(**uniqueness, amount=amount, fx=fx)
+        elif account.is_numerable:
+            movement = MovementNumerable.objects.create(
+                **uniqueness, unit_value=unit_value, quantity=quantity, fx=fx
+            )
+        else:
+            movement = Movement.objects.create(**uniqueness, amount=amount, fx=fx)
+
+        return movement
