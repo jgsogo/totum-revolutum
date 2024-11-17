@@ -94,7 +94,7 @@ jobs:
           bazel query "attr('tags', 'release', '//apps/${{ inputs.app }}/...')" | tee  ${{ runner.temp }}/${{ inputs.app }}-release-targets.txt
           while IFS="" read -r p || [ -n "$p" ]
           do
-            printf '%s\n' "$p"
+            bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE "$p"
           done < ${{ runner.temp }}/${{ inputs.app }}-release-targets.txt
 
 
