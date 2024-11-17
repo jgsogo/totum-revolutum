@@ -1,26 +1,75 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_oci//oci:defs.bzl", "oci_push")
-load("//bazel/python/django/project:django_project.bzl", "django_project")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT")
+load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
+load("//bazel/python/django/project:django_project.bzl", "django_project", "django_project_container")
 load("//bazel/tools/gh:release.bzl", "gh_release")
 
 image_name = package_name().replace("/", "_")
 
 repository = "ghcr.io/jgsogo/{}".format(image_name)  # FIXME: Make it global for all the repo
 
+name = "app"
+
 django_project(
-    name = "app",
-    app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
-    repository = repository,
-    version = "//apps/finances:version",
+    name = name,
     deps = [
+        "//apps/finances/django/migrate_legacy",
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
         "//libraries/finances/investments/django_finances_investments:finances_investments",
     ],
 )
 
+####
+# Django project container
+#
+# We are providing a custom 'entrypoint.sh' file so it executes some
+# custom commands on startup (if 'LEGACY_DATABASE_URL' envvar is provided):
+#  * check_movement_types
+#  * check_account_types
+####
+expand_template(
+    name = "{}-entrypoint-file".format(name),
+    out = "entrypoint.sh",
+    is_executable = True,
+    substitutions = {
+        "%DJANGO_PORT%": DJANGO_PORT,
+    },
+    template = ":entrypoint.sh.tpl",
+)
+
+pkg_tar(
+    name = "{}-entrypoint".format(name),
+    srcs = [":{}-entrypoint-file".format(name)],
+)
+
+django_project_container(
+    name = name,
+    entrypoint = ":{}-entrypoint".format(name),
+    repository = repository,
+    version = "//apps/finances:version",
+)
+
+####
+# Docker compose
+####
+
+docker_compose(
+    name = "{}-docker_compose".format(name),
+    app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
+    app_repository = repository,
+    visibility = [":__subpackages__"],
+)
+
+####
+# Releases
+####
+
 # Release the docker container with the django project
 oci_push(
     name = "release-app",
-    image = ":app-container",
+    image = ":{}-container".format(name),
     remote_tags = "//apps/finances:version",
     repository = repository,
     tags = [

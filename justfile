@@ -5,7 +5,10 @@ _just-check:
     {{ just_executable() }} --unstable --fmt --check
 
 # Updates all the dependencies (MODULE.bazel and 3rd parties not included)
-update: update-deps
+update: update-deps update-precommit
+    pre-commit autoupdate
+
+update-precommit:
     pre-commit autoupdate
 
 # Updates only the dependencies

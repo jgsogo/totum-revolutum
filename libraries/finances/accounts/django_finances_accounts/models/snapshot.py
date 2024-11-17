@@ -22,6 +22,9 @@ class BaseSnapshot(models.Model):
         unique_together = [["account", "date_value"]]
         ordering = ["-date_value"]
 
+    def __str__(self):
+        return f"{self.account} @ {self.date_value}"
+
     def clean(self):
         super().clean()
         if self.date_value < self.account.open:

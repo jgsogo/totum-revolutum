@@ -16,7 +16,13 @@ from ._hierarchy_tree_model_admin import HierarchyTreeModelAdmin
 from ._render_change_form_mixin import RenderChangeFormMixin
 from .inlines import AccountHolderRoleInline, MovementInline, SnapshotInline
 
-admin.site.register(Snapshot)
+
+class SnapshotModelAdmin(admin.ModelAdmin):
+    list_display = ("account", "date_value", "amount")
+    list_filter = ("account", "date_value")
+
+
+admin.site.register(Snapshot, SnapshotModelAdmin)
 
 
 class AccountTypeModelAdmin(RenderChangeFormMixin, HierarchyTreeModelAdmin):
@@ -81,8 +87,8 @@ class AccountModelAdmin(admin.ModelAdmin):
         AccountHolderRoleInline,
         SnapshotInline,
     )
-    list_display = ("name", "custodian", "type", "open", "close")
-    list_filter = ("custodian", "type__name", "close")
+    list_display = ("name", "custodian", "type", "open", "close", "is_numerable")
+    list_filter = ("custodian", "type__name", "close", "is_numerable")
 
     def get_inline_instances(self, request, obj=None):
         # Return no inlines when obj is being created
@@ -137,7 +143,11 @@ class MovementAdmin(admin.ModelAdmin):
         "type",
         "amount",
     )
-    list_filter = ("account", "type", "date_value", "direction")
+    list_filter = (
+        "date_value",
+        "direction",
+        "type",
+    )
     search_fields = ("transaction__group",)
 
 
