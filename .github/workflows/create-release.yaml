@@ -84,6 +84,7 @@ jobs:
           else
               bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --draft --generate-notes --notes-start-tag $PREV_RELEASE
           fi
+          git fetch --tags
           git tag
           git describe --tags --abbrev=0
 
