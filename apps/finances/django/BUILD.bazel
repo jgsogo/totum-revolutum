@@ -96,7 +96,7 @@ genrule(
     srcs = ["//apps/finances:version"],
     outs = ["gh_tagname.txt"],
     cmd_bash = """
-        echo "finances-$$(cat $(location //apps/finances:version))" > $@
+        echo "finances-v$$(cat $(location //apps/finances:version))" > $@
     """,
     tags = ["manual"],
 )
