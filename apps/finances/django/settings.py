@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     "django_finances_accounts.apps.FinancesAccountsConfig",
     "django_finances_investments.apps.FinancesInvestmentsConfig",
     "migrate_legacy",
+    # Front
+    "front_bootstrap5",
+    "django_bootstrap5",
 ]
 
 MIDDLEWARE = [

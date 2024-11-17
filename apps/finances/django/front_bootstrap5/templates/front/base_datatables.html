@@ -1,0 +1,32 @@
+{% extends 'front/base.html' %}
+
+{% block css_extra %}
+<link href="https://cdn.datatables.net/v/bs5/dt-2.1.8/sp-2.3.3/datatables.min.css" rel="stylesheet">
+{% endblock %}
+
+
+
+{% block js_extra %}
+<script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/sp-2.3.3/datatables.min.js"></script>
+
+<script>
+// function init_datatable(identifier, options={"pageLength": 100}) {
+//     $(`#${identifier} tfoot th`).each( function () {
+//         var title = $(this).text();
+//         $(this).html( '<input type="text" class="form-control filter-input" placeholder="Filter '+title+'" style="width:100%"/>' );
+//     });
+//     var table = $(`#${identifier}`).DataTable(options);
+
+//     table.columns().every( function () {
+//         var that = this;
+//         $( 'input', this.footer() ).on( 'keyup change clear', function () {
+//             if ( that.search() !== this.value ) {
+//                 that
+//                     .search( this.value )
+//                     .draw();
+//             }
+//         } );
+//     } );
+// }
+</script>
+{% endblock %}
