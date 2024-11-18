@@ -1,17 +1,12 @@
-# load("//bazel/rust/diesel:defs.bzl", "diesel_print_schema")
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("//bazel/containers/with_docker:with_docker_binary.bzl", "with_docker_compose")
-
-# diesel_print_schema(
-#     name = "schema",
-#     config_file = ":diesel_config",
-#     database_url = "postgres://postgres:postgress@localhost/finances",
-#     schema = "src/schema.rs",
-# )
 
 expand_template(
     name = "expose_postgresql",
     out = "expose_postgresql.yaml",
+    tags = [
+        "manual",
+    ],
     template = [
         "services:",
         "  db:",
@@ -21,36 +16,17 @@ expand_template(
     ],
 )
 
-# genrule(
-#     name = "schema",
-#     outs = ["schema.sh"],
-#     cmd_bash = """
-#         echo "./$(location @diesel_cli//:diesel_cli) --help" > $@
-#     """,
-#     # cmd_bash = "./$(location @diesel_cli//:diesel_cli) --help > \"$@\"",
-#     tools = ["@diesel_cli//:diesel_cli"],
-#     executable = True,
-# )
-
-# genrule(
-#     name = "schema_print",
-#     outs = ["src/schema.rs"],
-#     cmd = "./$(location @diesel_cli//:diesel_cli) --help > \"$@\"",
-#     tools = ["@diesel_cli//:diesel_cli"],
-#     executable = True,
-# )
-
 filegroup(
     name = "diesel_config",
     srcs = ["diesel.toml"],
+    tags = [
+        "manual",
+    ],
 )
 
 with_docker_compose(
     name = "schema_gen",
-    # outs = ["schema.rs"],
-    # binary = ":schema_print",
-    cmd = "./$(rootpath @diesel_cli//:diesel_cli) print-schema --database-url postgres://diesel-schema:diesel-schema@127.0.0.1:5431/diesel-schema --config-file $(location :diesel_config) > $BUILD_WORKSPACE_DIRECTORY/apps/finances/desktop/src/schema.postgres.rs",
-    # print-schema --database-url $2 --config-file $3 --patch-file $4
+    cmd = "./$(rootpath @diesel_cli//:diesel_cli) print-schema --database-url postgres://diesel-schema:diesel-schema@127.0.0.1:5431/diesel-schema > $BUILD_WORKSPACE_DIRECTORY/apps/finances/desktop/src/schema.postgres.rs",
     docker_compose = [
         "//apps/finances/django:app-docker_compose",
         ":expose_postgresql",
@@ -64,9 +40,9 @@ with_docker_compose(
         "SQL_USER": "diesel-schema",
         "SQL_DATABASE": "diesel-schema",
         "SQL_PASSWORD": "diesel-schema",
-        # "COMPOSE_PROFILES": "development",
-        # "EXTERNAL_POSTGRES_PORT": "5431", # With the 'development' profile we expose Postgres to the world
     },
+    tags = [
+        "update",
+    ],
     tools = ["@diesel_cli"],
-    deps = [":diesel_config"],
 )
