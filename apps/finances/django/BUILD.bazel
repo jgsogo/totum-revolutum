@@ -59,7 +59,7 @@ docker_compose(
     name = "{}-docker_compose".format(name),
     app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
     app_repository = repository,
-    visibility = [":__subpackages__"],
+    visibility = ["//apps/finances:__subpackages__"],
 )
 
 ####
@@ -104,7 +104,7 @@ genrule(
 gh_release(
     name = "release-docker-compose",
     data = [
-        ":app-docker_compose",
+        ":{}-docker_compose".format(name),
     ],
     display_label = "django-docker-compose.tar",
     tag = ":gh_tagname",
