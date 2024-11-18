@@ -70,7 +70,7 @@ lazy_static = "1.4.0"
 log = "0.4.21"
 main_error = "0.1.2"
 mime = "0.3.17"
-mockall = { version = "0.13.0" }
+mockall = { version = "0.13.1" }
 num-traits = "0.2.19"
 oxipng = { version = "9.0", features = ["parallel", "zopfli", "filetime"], default-features = false }
 regex = "1.10.5"
