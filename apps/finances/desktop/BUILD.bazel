@@ -1,5 +1,6 @@
-load("//bazel/containers/with_docker:with_docker_binary.bzl", "with_docker_compose")
 # load("//bazel/rust/diesel:defs.bzl", "diesel_print_schema")
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("//bazel/containers/with_docker:with_docker_binary.bzl", "with_docker_compose")
 
 # diesel_print_schema(
 #     name = "schema",
@@ -8,8 +9,57 @@ load("//bazel/containers/with_docker:with_docker_binary.bzl", "with_docker_compo
 #     schema = "src/schema.rs",
 # )
 
+expand_template(
+    name = "expose_postgresql",
+    out = "expose_postgresql.yaml",
+    template = [
+        "services:",
+        "  db:",
+        "    ports:",
+        "      - 5431:5432",
+        "",
+    ],
+)
+
+# genrule(
+#     name = "schema",
+#     outs = ["schema.sh"],
+#     cmd_bash = """
+#         echo "./$(location @diesel_cli//:diesel_cli) --help" > $@
+#     """,
+#     # cmd_bash = "./$(location @diesel_cli//:diesel_cli) --help > \"$@\"",
+#     tools = ["@diesel_cli//:diesel_cli"],
+#     executable = True,
+# )
+
+# genrule(
+#     name = "schema_print",
+#     outs = ["src/schema.rs"],
+#     cmd = "./$(location @diesel_cli//:diesel_cli) --help > \"$@\"",
+#     tools = ["@diesel_cli//:diesel_cli"],
+#     executable = True,
+# )
+
 with_docker_compose(
     name = "schema_gen",
-    binary = "@diesel_cli//:diesel_cli",
-    docker_compose = "//apps/finances/django:app-docker_compose",
+    outs = ["schema.rs"],
+    # binary = ":schema_print",
+    cmd = "./$(location @diesel_cli//:diesel_cli) --help > schema.rs",
+    docker_compose = [
+        "//apps/finances/django:app-docker_compose",
+        ":expose_postgresql",
+    ],
+    docker_services = [
+        "web",
+        "db",
+    ],
+    env = {
+        "SECRET_KEY": "not-for-production",
+        "SQL_USER": "diesel-schema",
+        "SQL_DATABASE": "diesel-schema",
+        # "COMPOSE_PROFILES": "development",
+        # "EXTERNAL_POSTGRES_PORT": "5431", # With the 'development' profile we expose Postgres to the world
+    },
+    tools = ["@diesel_cli"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
 )
