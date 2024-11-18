@@ -1,5 +1,5 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
-load("//bazel/containers/with_docker:with_docker_binary.bzl", "with_docker_compose")
+load("//bazel/containers/with_docker:with_docker_compose_run.bzl", "with_docker_compose_run")
 
 expand_template(
     name = "expose_postgresql",
@@ -24,7 +24,7 @@ filegroup(
     ],
 )
 
-with_docker_compose(
+with_docker_compose_run(
     name = "schema_gen",
     cmd = "./$(rootpath @diesel_cli//:diesel_cli) print-schema --database-url postgres://diesel-schema:diesel-schema@127.0.0.1:5431/diesel-schema > $BUILD_WORKSPACE_DIRECTORY/apps/finances/desktop/src/schema.postgres.rs",
     docker_compose = [

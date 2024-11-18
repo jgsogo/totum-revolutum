@@ -1,1 +1,1 @@
-exports_files(["with_docker_binary.tpl.sh"])
+exports_files(["with_docker_compose_run.tpl.sh"])

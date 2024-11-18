@@ -4,7 +4,7 @@ load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_rlocatio
 
 #FIXME: HAve a look to https://github.com/bazel-contrib/rules_oci/blob/main/oci/private/load.bzl
 
-def _with_docker_compose_impl(ctx):
+def _with_docker_compose_run_impl(ctx):
     executable = ctx.actions.declare_file(ctx.label.name)
 
     # Compose environment
@@ -48,8 +48,8 @@ def _with_docker_compose_impl(ctx):
         ),
     ]
 
-with_docker_compose = rule(
-    implementation = _with_docker_compose_impl,
+with_docker_compose_run = rule(
+    implementation = _with_docker_compose_run_impl,
     attrs = {
         "docker_compose": attr.label_list(
             doc = "Docker compose file/s to run",
@@ -67,7 +67,7 @@ with_docker_compose = rule(
             allow_files = True,
         ),
         "_run_template": attr.label(
-            default = Label("//bazel/containers/with_docker:with_docker_binary.tpl.sh"),
+            default = Label("//bazel/containers/with_docker:with_docker_compose_run.tpl.sh"),
             allow_single_file = True,
         ),
         "env": attr.string_dict(
