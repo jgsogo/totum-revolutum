@@ -129,4 +129,5 @@ def django_app(name, deps = None, visibility = None, app_label = None):
         name = "migrate",
         django_admin_tool = ":django-admin",
         tags = ["manual"],
+        visibility = ["//:__subpackages__"],
     )

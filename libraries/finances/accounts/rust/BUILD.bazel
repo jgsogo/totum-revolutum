@@ -1,0 +1,75 @@
+load("@crates_libraries//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("//bazel/rust/diesel:print_schema.bzl", "diesel_print_schema")
+
+rust_library(
+    name = "finances_accounts",
+    srcs = glob(["src/**/*.rs"]),
+    crate_features = ["postgres"],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    visibility = ["//apps/finances:__subpackages__"],
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)
+
+# rust_library_tests_and_docs(
+#     name = "finances_accounts",
+#     srcs = glob(["src/**/*.rs"]),
+#     aliases = aliases(),
+#     all_features = {
+#         "sqlite": ["sqlite"],
+#         "postgres": ["postgres"],
+#         "test_utils": ["test_utils"],
+#     },
+#     proc_macro_deps = all_crate_deps(
+#         proc_macro = True,
+#     ),
+#     test_deps = [
+#         "@crates_libraries//:anyhow",
+#     ],
+#     test_suite_deps = [
+#         "@crates_libraries//:anyhow",
+#     ],
+#     deps = all_crate_deps(
+#         normal = True,
+#     ) + [
+#         "//libraries/diesel_utils",
+#         "@crates_libraries//:diesel",
+#         "@crates_libraries//:diesel_migrations",
+#     ],
+# )
+
+diesel_print_schema(
+    name = "diesel_print_schema",
+    only_tables = "finances_accounts",
+    schema = "$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema/schema_postgres.rs",
+    tags = ["manual"],
+)
+
+with_postgres_run(
+    name = "diesel_schema_postgres",
+    # First migrate,then print the schema
+    binaries = [
+        "//libraries/finances/accounts/django_finances_accounts:migrate",
+        ":diesel_print_schema",
+    ],
+    env = {
+        "SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        "SQL_DATABASE": "POSTGRES_DB",
+        "SQL_USER": "POSTGRES_USER",
+        "SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "SQL_HOST": "POSTGRES_HOST",
+        "SQL_PORT": "POSTGRES_PORT",
+    },
+    postgres_image_tag = "17",
+    tags = [
+        "manual",
+        "update",
+    ],
+)

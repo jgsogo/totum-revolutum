@@ -10,6 +10,7 @@ members = [
     "libraries/constants",
     "libraries/diesel_utils",
     "libraries/filesystem",
+    "libraries/finances/accounts/rust",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
     "libraries/utils",

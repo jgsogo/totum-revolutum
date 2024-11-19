@@ -1,7 +1,5 @@
 load("@py_deps//:requirements.bzl", "requirement")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/python/django/app:django_app.bzl", "django_app")
-load("//bazel/rust/diesel:print_schema.bzl", "diesel_print_schema")
 
 django_app(
     name = "finances_accounts",
@@ -11,36 +9,5 @@ django_app(
         requirement("django-money"),
         requirement("django-countries"),
         requirement("django-appconf"),
-    ],
-)
-
-diesel_print_schema(
-    name = "diesel_print_schema",
-    only_tables = "finances_accounts",
-    schema = "$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema.postgres.rs",
-    tags = ["manual"],
-)
-
-with_postgres_run(
-    name = "diesel_schema_postgres",
-    # First migrate,then print the schema
-    binaries = [
-        ":migrate",
-        ":diesel_print_schema",
-    ],
-    env = {
-        "SQL_ENGINE": "django.db.backends.postgresql",
-    },
-    env_transpose = {
-        "SQL_DATABASE": "POSTGRES_DB",
-        "SQL_USER": "POSTGRES_USER",
-        "SQL_PASSWORD": "POSTGRES_PASSWORD",
-        "SQL_HOST": "POSTGRES_HOST",
-        "SQL_PORT": "POSTGRES_PORT",
-    },
-    postgres_image_tag = "17",
-    tags = [
-        "manual",
-        "update",
     ],
 )
