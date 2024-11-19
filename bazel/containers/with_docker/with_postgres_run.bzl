@@ -1,12 +1,11 @@
-"""A rule that ensures a docker container is running while executing another binary"""
+"""A rule that ensures that Postgres (in a docker container) is running while executing another binary"""
 
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_rlocation_path")
-
-#FIXME: HAve a look to https://github.com/bazel-contrib/rules_oci/blob/main/oci/private/load.bzl
 
 def _with_docker_run_impl(ctx):
     executable = ctx.actions.declare_file(ctx.label.name)
 
+    # Environment: we will use both a file (for docker) and environment variables
     env = {
         "POSTGRES_USER": "with_postgres",
         "POSTGRES_DB": "with_postgres",
@@ -22,12 +21,10 @@ def _with_docker_run_impl(ctx):
         content = "\n".join(env_file_content),
     )
 
-    # Expand the 'cmd' we are going to run
     binaries = []
     for dep in ctx.attr.binaries:
         binaries.append(to_rlocation_path(ctx, dep.files_to_run.executable))
 
-    # cmd = ctx.expand_location(ctx.attr.cmd, targets = ctx.attr.tools)
     env_transposition = []
     for key, value in ctx.attr.env_transpose.items():
         env_transposition.append("export {}=${}".format(key, value))
@@ -42,7 +39,6 @@ def _with_docker_run_impl(ctx):
             "%CONTAINER_NAME%": ctx.label.package.replace("/", "_") + "_" + ctx.label.name,
             "%POSTGRES_IMAGE_TAG%": ctx.attr.postgres_image_tag,
             "%LIVENESS_PROBE%": "liveness-probe",
-            # "%CMD%": cmd,
             "%ENV_FILE%": env_file.short_path,
             "%BINARIES%": " ".join(binaries),
             "%ENV_TRANSPOSE%": "\n".join(env_transposition),  # TODO: Create another file and source it here
@@ -54,14 +50,9 @@ def _with_docker_run_impl(ctx):
     if ctx.file.docker_cli:
         runtime_deps.append(ctx.file.docker_cli)
 
-    binaries_files = []
-    # for dep in ctx.files.binaries:
-    #     binaries_files.append(dep)
-
-    runfiles = ctx.runfiles(runtime_deps, transitive_files = depset(binaries_files))
+    runfiles = ctx.runfiles(runtime_deps)
     runfiles = runfiles.merge(ctx.attr._runfiles.default_runfiles)
 
-    # for tool in ctx.attr.tools:
     for dep in ctx.attr.binaries:
         runfiles = runfiles.merge(dep.default_runfiles)
 
@@ -86,12 +77,6 @@ with_postgres_run = rule(
         "postgres_image_tag": attr.string(
             doc = "Docker image to run",
         ),
-        # "cmd": attr.string(
-        #     mandatory = True,
-        # ),
-        # "tools": attr.label_list(
-        #     allow_files = True,
-        # ),
         "binaries": attr.label_list(
             doc = "Binaries to execute while the container is running",
             mandatory = True,
