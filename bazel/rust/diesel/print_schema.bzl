@@ -6,11 +6,6 @@ load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_rlocatio
 def _diesel_print_schema_impl(ctx):
     executable = ctx.actions.declare_file(ctx.label.name)
 
-    # env = {
-    #     # "POSTGRES_USER": "with_postgres",
-    #     # "POSTGRES_DB": "with_postgres",
-    #     # "POSTGRES_PASSWORD": "with_postgres",
-    # } | ctx.attr.env
     diesel_cli_args = []
     if ctx.attr.only_tables:
         diesel_cli_args.append("--only-tables \"{}\"".format(ctx.attr.only_tables))
@@ -36,9 +31,6 @@ def _diesel_print_schema_impl(ctx):
             executable = executable,
             runfiles = runfiles,
         ),
-        # RunEnvironmentInfo(
-        #     environment = env,
-        # ),
     ]
 
 diesel_print_schema = rule(
@@ -69,9 +61,6 @@ diesel_print_schema = rule(
         "_run_template": attr.label(
             default = Label("//bazel/rust/diesel:print_schema.tpl.sh"),
             allow_single_file = True,
-        ),
-        "env": attr.string_dict(
-            doc = "Environment variables",
         ),
         "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
     },

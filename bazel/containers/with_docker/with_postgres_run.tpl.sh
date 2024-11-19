@@ -26,15 +26,13 @@ function finish {
 }
 trap finish EXIT
 
-echo "POSTGRES_USER: $POSTGRES_USER"
-
 # Start docker compose UP
 "$CONTAINER_CLI" run --rm -p 5432 --name=%CONTAINER_NAME% --env-file=%ENV_FILE% -d postgres:%POSTGRES_IMAGE_TAG%
 CONTAINER_HOST_AND_PORT=$("$CONTAINER_CLI" port %CONTAINER_NAME% 5432 | head -n 1)
 CONTAINER_HOST=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 1)
 CONTAINER_PORT=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 2)
 
-echo "external host: $CONTAINER_HOST, port: $CONTAINER_PORT"
+# Wait until Postgres is ready
 RETRY_COUNT=0
 RETRY_MAX=10
 RETRY_INTERVAL=3
@@ -53,10 +51,8 @@ done
 export POSTGRES_HOST=$CONTAINER_HOST
 export POSTGRES_PORT=$CONTAINER_PORT
 export POSTGRES_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$CONTAINER_HOST:$CONTAINER_PORT/$POSTGRES_DB"
-echo '>>>>> Run binaries'
 %ENV_TRANSPOSE%
 for binary in %BINARIES%; do
     BINARY_CLI="$(rlocation "$binary")"
-    echo "Running binary '$binary' (rlocation: '$BINARY_CLI')"
     $BINARY_CLI
 done
