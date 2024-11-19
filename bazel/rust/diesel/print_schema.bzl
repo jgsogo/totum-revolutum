@@ -19,6 +19,7 @@ def _diesel_print_schema_impl(ctx):
         substitutions = {
             "%BASH_RLOCATION_FUNCTION%": BASH_RLOCATION_FUNCTION,
             "%DIESEL_CLI%": to_rlocation_path(ctx, ctx.file._diesel_cli),
+            "%SCHEMA_FILE%": ctx.attr.schema,
         },
         is_executable = True,
     )

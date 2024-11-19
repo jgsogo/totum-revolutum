@@ -34,6 +34,7 @@ django_app(
 
 diesel_print_schema(
     name = "diesel_print_schema",
+    schema = "src/schema.postgres.rs",
 )
 
 with_postgres_run(
@@ -43,12 +44,16 @@ with_postgres_run(
         ":migrate",
         ":diesel_print_schema",
     ],
-    # env_transpose = {
-    #     "POSTGRES_USER": ""
-    # }
-    # env = {
-    #     "POSTGRES_USER": "user",
-    # },
+    env = {
+        "SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        "SQL_DATABASE": "POSTGRES_DB",
+        "SQL_USER": "POSTGRES_USER",
+        "SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "SQL_HOST": "POSTGRES_HOST",
+        "SQL_PORT": "POSTGRES_PORT",
+    },
     postgres_image_tag = "17",
 )
 

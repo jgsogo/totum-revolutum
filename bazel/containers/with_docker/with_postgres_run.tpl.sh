@@ -54,6 +54,7 @@ export POSTGRES_HOST=$CONTAINER_HOST
 export POSTGRES_PORT=$CONTAINER_PORT
 export POSTGRES_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$CONTAINER_HOST:$CONTAINER_PORT/$POSTGRES_DB"
 echo '>>>>> Run binaries'
+%ENV_TRANSPOSE%
 for binary in %BINARIES%; do
     BINARY_CLI="$(rlocation "$binary")"
     echo "Running binary '$binary' (rlocation: '$BINARY_CLI')"

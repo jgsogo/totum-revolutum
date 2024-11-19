@@ -28,6 +28,9 @@ def _with_docker_run_impl(ctx):
         binaries.append(to_rlocation_path(ctx, dep.files_to_run.executable))
 
     # cmd = ctx.expand_location(ctx.attr.cmd, targets = ctx.attr.tools)
+    env_transposition = []
+    for key, value in ctx.attr.env_transpose.items():
+        env_transposition.append("export {}=${}".format(key, value))
 
     # Render the script we are executing
     ctx.actions.expand_template(
@@ -42,6 +45,7 @@ def _with_docker_run_impl(ctx):
             # "%CMD%": cmd,
             "%ENV_FILE%": env_file.short_path,
             "%BINARIES%": " ".join(binaries),
+            "%ENV_TRANSPOSE%": "\n".join(env_transposition),  # TODO: Create another file and source it here
         },
         is_executable = True,
     )
@@ -99,6 +103,9 @@ with_postgres_run = rule(
         ),
         "env": attr.string_dict(
             doc = "Environment variables",
+        ),
+        "env_transpose": attr.string_dict(
+            doc = "Environment variables that will be populated with the value of others",
         ),
         "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
         "docker_cli": attr.label(
