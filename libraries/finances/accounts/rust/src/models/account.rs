@@ -19,3 +19,13 @@ pub struct Account {
     pub custodian_id: i64,
     pub is_numerable: bool,
 }
+
+impl Account {
+    /// Returns (a query to) all the [`Account`]s together with their [`Custodian`] and [`AccountType`]
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all_with_custodian_and_type() -> _ {
+        crate::schema::finances_accounts_account::table
+            .inner_join(crate::schema::finances_accounts_custodian::table)
+            .inner_join(crate::schema::finances_accounts_accounttype::table)
+    }
+}

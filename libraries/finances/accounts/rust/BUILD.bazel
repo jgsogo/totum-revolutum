@@ -1,6 +1,6 @@
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
-load("@rules_rust//rust:defs.bzl", "rust_library")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run", "with_postgres_test")
 load("//bazel/rust/diesel:print_schema.bzl", "diesel_print_schema")
 
 rust_library(
@@ -16,33 +16,43 @@ rust_library(
     ),
 )
 
-# rust_library_tests_and_docs(
-#     name = "finances_accounts",
-#     srcs = glob(["src/**/*.rs"]),
-#     aliases = aliases(),
-#     all_features = {
-#         "sqlite": ["sqlite"],
-#         "postgres": ["postgres"],
-#         "test_utils": ["test_utils"],
-#     },
-#     proc_macro_deps = all_crate_deps(
-#         proc_macro = True,
-#     ),
-#     test_deps = [
-#         "@crates_libraries//:anyhow",
-#     ],
-#     test_suite_deps = [
-#         "@crates_libraries//:anyhow",
-#     ],
-#     deps = all_crate_deps(
-#         normal = True,
-#     ) + [
-#         "//libraries/diesel_utils",
-#         "@crates_libraries//:diesel",
-#         "@crates_libraries//:diesel_migrations",
-#     ],
-# )
+# Unittests... but they require Postgres
+rust_test(
+    name = "_tests",
+    crate = ":finances_accounts",
+    crate_features = [
+        "postgres",
+        "test_utils",
+    ],
+    tags = ["manual"],
+    deps = [
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:diesel_migrations",
+        "@crates_libraries//:tempfile",
+    ],
+)
 
+with_postgres_test(
+    name = "tests/postgres",
+    # First migrate,then run the tests
+    binaries = [
+        "//libraries/finances/accounts/django_finances_accounts:migrate",
+        ":_tests",
+    ],
+    env = {
+        "SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        "SQL_DATABASE": "POSTGRES_DB",
+        "SQL_USER": "POSTGRES_USER",
+        "SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "SQL_HOST": "POSTGRES_HOST",
+        "SQL_PORT": "POSTGRES_PORT",
+    },
+    postgres_image_tag = "17",
+)
+
+# Generate schema files
 diesel_print_schema(
     name = "diesel_print_schema",
     only_tables = "finances_accounts",
