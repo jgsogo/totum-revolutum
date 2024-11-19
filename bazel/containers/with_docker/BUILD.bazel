@@ -1,1 +1,5 @@
-exports_files(["with_docker_compose_run.tpl.sh"])
+exports_files([
+    "with_docker_compose_run.tpl.sh",
+    "with_docker_run.tpl.sh",
+    "with_postgres_run.tpl.sh",
+])

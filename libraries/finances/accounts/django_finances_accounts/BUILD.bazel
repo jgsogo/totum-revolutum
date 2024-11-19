@@ -1,4 +1,6 @@
 load("@py_deps//:requirements.bzl", "requirement")
+load("//bazel/containers/with_docker:with_docker_run.bzl", "with_docker_run")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/python/django/app:django_app.bzl", "django_app")
 
 django_app(
@@ -11,3 +13,73 @@ django_app(
         requirement("django-appconf"),
     ],
 )
+
+with_docker_run(
+    name = "diesel_schema",
+    cmd = "ls -la",
+    env = {
+        "POSTGRES_PASSWORD": "password",
+    },
+    image = "postgres:17",
+)
+
+genrule(
+    name = "migrate_postgres",
+    outs = ["migrate.sh"],
+    cmd_bash = """
+        echo 'export \"SQL_ENGINE=django.db.backends.postgresql\"' > $@
+        echo 'export \"SQL_DATABASE=$$POSTGRES_DB\"' >> $@
+        echo 'export \"SQL_USER=$$POSTGRES_USER\"' >> $@
+        echo 'export \"SQL_PASSWORD=$$POSTGRES_PASSWORD\"' >> $@
+        echo 'export \"SQL_HOST=$$POSTGRES_HOST\"' >> $@
+        echo 'export \"SQL_PORT=$$POSTGRES_PORT\"' >> $@
+        echo '$(rootpath :django-admin) migrate' >> $@
+    """,
+    executable = True,
+    tools = [
+        ":django-admin",
+    ],
+)
+
+# run_binary(
+#     name = "migrate_postgres",
+#     tool = ":django-admin",
+#     args = ["migrate"],
+#     env = {
+#         ""
+#     }
+# )
+
+with_postgres_run(
+    name = "diesel_schema_postgres",
+    # cmd = "ls -la",
+    # cmd = "./$(rootpath @diesel_cli//:diesel_cli) print-schema --database-url postgres://diesel-schema:diesel-schema@127.0.0.1:5431/diesel-schema > $BUILD_WORKSPACE_DIRECTORY/apps/finances/desktop/src/schema.postgres.rs",
+    # cmd = "./$(rootpath :migrate_and_diesel_cli)",
+    # tools = [
+    #     # "@diesel_cli",
+    #     ":migrate_and_diesel_cli",
+    #     # ":django-admin"
+    # ],
+    binaries = [
+        # ":django-admin",
+        ":migrate_postgres",
+    ],
+    env = {
+        "POSTGRES_USER": "user",
+    },
+    postgres_image_tag = "17",
+)
+
+#   - SQL_ENGINE=django.db.backends.postgresql
+#   - SQL_DATABASE=${SQL_DATABASE:-hello_django_dev}
+#   - SQL_USER=${SQL_USER:-hello_django}
+#   - SQL_PASSWORD=${SQL_PASSWORD:-hello_django}
+#   - SQL_HOST=db
+#   - SQL_PORT=5432
+
+# "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+# "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+# "USER": os.environ.get("SQL_USER", "user"),
+# "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+# "HOST": os.environ.get("SQL_HOST", "localhost"),
+# "PORT": os.environ.get("SQL_PORT", "5432"),
