@@ -1,3 +1,5 @@
+import os
+
 import django
 from django.conf import settings
 from django.core.management import execute_from_command_line
@@ -17,8 +19,12 @@ def setup_application():
         DEBUG=True,
         DATABASES={
             "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": "db.sqlite3",
+                "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+                "NAME": os.environ.get("SQL_DATABASE", "db.sqlite3"),
+                "USER": os.environ.get("SQL_USER", "user"),
+                "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+                "HOST": os.environ.get("SQL_HOST", "localhost"),
+                "PORT": os.environ.get("SQL_PORT", "5432"),
             }
         },
         TIME_ZONE="UTC",
