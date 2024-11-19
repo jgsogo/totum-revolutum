@@ -1,7 +1,7 @@
 load("@py_deps//:requirements.bzl", "requirement")
-load("//bazel/containers/with_docker:with_docker_run.bzl", "with_docker_run")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/python/django/app:django_app.bzl", "django_app")
+load("//bazel/rust/diesel:print_schema.bzl", "diesel_print_schema")
 
 django_app(
     name = "finances_accounts",
@@ -14,59 +14,41 @@ django_app(
     ],
 )
 
-with_docker_run(
-    name = "diesel_schema",
-    cmd = "ls -la",
-    env = {
-        "POSTGRES_PASSWORD": "password",
-    },
-    image = "postgres:17",
-)
-
-genrule(
-    name = "migrate_postgres",
-    outs = ["migrate.sh"],
-    cmd_bash = """
-        echo 'export \"SQL_ENGINE=django.db.backends.postgresql\"' > $@
-        echo 'export \"SQL_DATABASE=$$POSTGRES_DB\"' >> $@
-        echo 'export \"SQL_USER=$$POSTGRES_USER\"' >> $@
-        echo 'export \"SQL_PASSWORD=$$POSTGRES_PASSWORD\"' >> $@
-        echo 'export \"SQL_HOST=$$POSTGRES_HOST\"' >> $@
-        echo 'export \"SQL_PORT=$$POSTGRES_PORT\"' >> $@
-        echo '$(rootpath :django-admin) migrate' >> $@
-    """,
-    executable = True,
-    tools = [
-        ":django-admin",
-    ],
-)
-
-# run_binary(
+# genrule(
 #     name = "migrate_postgres",
-#     tool = ":django-admin",
-#     args = ["migrate"],
-#     env = {
-#         ""
-#     }
+#     outs = ["migrate.sh"],
+#     cmd_bash = """
+#         echo 'export \"SQL_ENGINE=django.db.backends.postgresql\"' > $@
+#         echo 'export \"SQL_DATABASE=$$POSTGRES_DB\"' >> $@
+#         echo 'export \"SQL_USER=$$POSTGRES_USER\"' >> $@
+#         echo 'export \"SQL_PASSWORD=$$POSTGRES_PASSWORD\"' >> $@
+#         echo 'export \"SQL_HOST=$$POSTGRES_HOST\"' >> $@
+#         echo 'export \"SQL_PORT=$$POSTGRES_PORT\"' >> $@
+#         echo '$(rootpath :django-admin) migrate' >> $@
+#     """,
+#     executable = True,
+#     tools = [
+#         ":django-admin",
+#     ],
 # )
+
+diesel_print_schema(
+    name = "diesel_print_schema",
+)
 
 with_postgres_run(
     name = "diesel_schema_postgres",
-    # cmd = "ls -la",
-    # cmd = "./$(rootpath @diesel_cli//:diesel_cli) print-schema --database-url postgres://diesel-schema:diesel-schema@127.0.0.1:5431/diesel-schema > $BUILD_WORKSPACE_DIRECTORY/apps/finances/desktop/src/schema.postgres.rs",
-    # cmd = "./$(rootpath :migrate_and_diesel_cli)",
-    # tools = [
-    #     # "@diesel_cli",
-    #     ":migrate_and_diesel_cli",
-    #     # ":django-admin"
-    # ],
+    # First migrate,then print the schema
     binaries = [
-        # ":django-admin",
-        ":migrate_postgres",
+        ":migrate",
+        ":diesel_print_schema",
     ],
-    env = {
-        "POSTGRES_USER": "user",
-    },
+    # env_transpose = {
+    #     "POSTGRES_USER": ""
+    # }
+    # env = {
+    #     "POSTGRES_USER": "user",
+    # },
     postgres_image_tag = "17",
 )
 
@@ -83,3 +65,58 @@ with_postgres_run(
 # "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
 # "HOST": os.environ.get("SQL_HOST", "localhost"),
 # "PORT": os.environ.get("SQL_PORT", "5432"),
+
+# genrule(
+#     name = "diesel_print_schema",
+#     outs = ["diesel_print_schema.sh"],
+#     cmd_bash = """
+#         echo 'export \"SQL_ENGINE=django.db.backends.postgresql\"' > $@
+#         echo 'export \"SQL_DATABASE=$$POSTGRES_DB\"' >> $@
+#         echo 'export \"SQL_USER=$$POSTGRES_USER\"' >> $@
+#         echo 'export \"SQL_PASSWORD=$$POSTGRES_PASSWORD\"' >> $@
+#         echo 'export \"SQL_HOST=$$POSTGRES_HOST\"' >> $@
+#         echo 'export \"SQL_PORT=$$POSTGRES_PORT\"' >> $@
+#         echo '$(location @diesel_cli) print-schema --help' >> $@
+#     """,
+#     executable = True,
+#     tools = [
+#         "@diesel_cli",
+#     ],
+# )
+
+# sh_binary(
+#     name = "diesel_print_schema",
+#     outs = ["schema.rs"],
+#     cmd = "ls -la"
+# )
+
+# filegroup(
+#     name = "diesel_config",
+#     srcs = ["diesel.toml"],
+#     tags = [
+#         "manual",
+#     ],
+# )
+
+# with_docker_compose_run(
+#     name = "schema_gen",
+#     cmd = "./$(rootpath @diesel_cli//:diesel_cli) print-schema --database-url postgres://diesel-schema:diesel-schema@127.0.0.1:5431/diesel-schema > $BUILD_WORKSPACE_DIRECTORY/apps/finances/desktop/src/schema.postgres.rs",
+#     docker_compose = [
+#         "//apps/finances/django:app-docker_compose",
+#         ":expose_postgresql",
+#     ],
+#     docker_services = [
+#         "web",
+#         "db",
+#     ],
+#     env = {
+#         "SECRET_KEY": "not-for-production",
+#         "SQL_USER": "diesel-schema",
+#         "SQL_DATABASE": "diesel-schema",
+#         "SQL_PASSWORD": "diesel-schema",
+#     },
+#     tags = [
+#         "update",
+#     ],
+#     tools = ["@diesel_cli"],
+# )

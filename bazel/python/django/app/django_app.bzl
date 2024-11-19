@@ -3,6 +3,7 @@
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
 load("//bazel/python/django/app:makemigrations.bzl", "django_makemigrations_check", "django_makemigrations_update")
+load("//bazel/python/django/app:migrate.bzl", "django_migrate")
 load("//bazel/python/django/app:test.bzl", "django_test")
 
 def django_app(name, deps = None, visibility = None, app_label = None):
@@ -120,5 +121,11 @@ def django_app(name, deps = None, visibility = None, app_label = None):
         app_label = app_label,
         django_admin_tool = ":django-admin",
         deps = ["@bazel_tools//tools/bash/runfiles"],
+        tags = ["manual"],
+    )
+
+    django_migrate(
+        name = "migrate",
+        django_admin_tool = ":django-admin",
         tags = ["manual"],
     )

@@ -57,7 +57,6 @@ echo '>>>>> Run binaries'
 for binary in %BINARIES%; do
     BINARY_CLI="$(rlocation "$binary")"
     echo "Running binary '$binary' (rlocation: '$BINARY_CLI')"
-    # $binary
     $BINARY_CLI
 done
 

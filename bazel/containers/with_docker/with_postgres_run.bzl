@@ -51,8 +51,8 @@ def _with_docker_run_impl(ctx):
         runtime_deps.append(ctx.file.docker_cli)
 
     binaries_files = []
-    for dep in ctx.files.binaries:
-        binaries_files.append(dep)
+    # for dep in ctx.files.binaries:
+    #     binaries_files.append(dep)
 
     runfiles = ctx.runfiles(runtime_deps, transitive_files = depset(binaries_files))
     runfiles = runfiles.merge(ctx.attr._runfiles.default_runfiles)
@@ -60,6 +60,11 @@ def _with_docker_run_impl(ctx):
     # for tool in ctx.attr.tools:
     for dep in ctx.attr.binaries:
         runfiles = runfiles.merge(dep.default_runfiles)
+
+    runfiles = runfiles.merge_all([
+        dep[DefaultInfo].default_runfiles
+        for dep in ctx.attr.binaries
+    ])
 
     return [
         DefaultInfo(

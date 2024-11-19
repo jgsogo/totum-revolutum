@@ -36,6 +36,10 @@ def setup_application():
         COUNTRIES_ONLY=["ES", "US", "NL"],
     )
 
+    print(">" * 50)
+    print(settings.DATABASES)
+    print(">" * 50)
+
 
 if __name__ == "__main__":
     setup_application()

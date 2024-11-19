@@ -1,1 +1,4 @@
-exports_files(["skip_rustfmt.patch"])
+exports_files([
+    "skip_rustfmt.patch",
+    "print_schema.tpl.sh",
+])
