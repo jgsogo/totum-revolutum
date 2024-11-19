@@ -34,7 +34,9 @@ django_app(
 
 diesel_print_schema(
     name = "diesel_print_schema",
-    schema = "src/schema.postgres.rs",
+    only_tables = "finances_accounts",
+    schema = "$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema.postgres.rs",
+    tags = ["manual"],
 )
 
 with_postgres_run(
@@ -55,7 +57,19 @@ with_postgres_run(
         "SQL_PORT": "POSTGRES_PORT",
     },
     postgres_image_tag = "17",
+    tags = [
+        "manual",
+        "update",
+    ],
 )
+
+# # We need to run this rule so we can build using Cargo
+# run_copy_to_workspace(
+#     name = "schema.update",
+#     origin = ":schema",
+#     tags = ["update"],
+#     target = "src/schema.rs",
+# )
 
 #   - SQL_ENGINE=django.db.backends.postgresql
 #   - SQL_DATABASE=${SQL_DATABASE:-hello_django_dev}

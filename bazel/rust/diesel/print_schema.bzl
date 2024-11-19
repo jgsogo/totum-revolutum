@@ -11,6 +11,9 @@ def _diesel_print_schema_impl(ctx):
     #     # "POSTGRES_DB": "with_postgres",
     #     # "POSTGRES_PASSWORD": "with_postgres",
     # } | ctx.attr.env
+    diesel_cli_args = []
+    if ctx.attr.only_tables:
+        diesel_cli_args.append("--only-tables \"{}\"".format(ctx.attr.only_tables))
 
     # Render the script we are executing
     ctx.actions.expand_template(
@@ -20,6 +23,7 @@ def _diesel_print_schema_impl(ctx):
             "%BASH_RLOCATION_FUNCTION%": BASH_RLOCATION_FUNCTION,
             "%DIESEL_CLI%": to_rlocation_path(ctx, ctx.file._diesel_cli),
             "%SCHEMA_FILE%": ctx.attr.schema,
+            "%DIESEL_CLI_ARGS%": " ".join(diesel_cli_args),
         },
         is_executable = True,
     )
@@ -47,6 +51,9 @@ diesel_print_schema = rule(
         "schema": attr.string(
             doc = "Path to the generated schema file",
             mandatory = False,
+        ),
+        "only_tables": attr.string(
+            doc = "Only include tables from table-name that matches regexp.",
         ),
         "patch_schema": attr.label(
             allow_single_file = True,
