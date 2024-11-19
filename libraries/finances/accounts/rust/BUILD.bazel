@@ -33,7 +33,7 @@ rust_test(
 )
 
 with_postgres_test(
-    name = "tests/postgres",
+    name = "tests-postgres",
     # First migrate,then run the tests
     binaries = [
         "//libraries/finances/accounts/django_finances_accounts:migrate",
