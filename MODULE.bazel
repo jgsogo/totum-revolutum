@@ -111,6 +111,13 @@ crate.from_cargo(
         # Sandbox apps
         "//sandbox/tauri-hello-world/src-tauri:Cargo.toml",
     ],
+    # Limiting the number of supported platforms can help with performance: https://github.com/bazelbuild/rules_rust/discussions/2259
+    supported_platform_triples = [
+        # "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-apple-darwin",
+        # "x86_64-unknown-linux-gnu",
+    ],
 )
 use_repo(crate, "crates_libraries")
 
