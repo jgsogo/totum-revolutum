@@ -1,5 +1,6 @@
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
-load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run", "with_postgres_test")
 load("//bazel/rust/diesel:print_schema.bzl", "diesel_print_schema")
 
@@ -14,6 +15,28 @@ rust_library(
     deps = all_crate_deps(
         normal = True,
     ),
+)
+
+rust_binary(
+    name = "gen_constants",
+    srcs = glob(["src/gen_constants/bin/**/*.rs"]),
+    # proc_macro_deps = all_crate_deps(
+    #     proc_macro = True,
+    # ),
+    # visibility = [
+    #     "//apps/finances:__subpackages__",
+    # ],
+    deps = [
+        ":finances_accounts",
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:camino",
+        "@crates_libraries//:clap",
+        "@crates_libraries//:clap-verbosity-flag",
+        "@crates_libraries//:diesel",
+        "@crates_libraries//:log",
+        "@crates_libraries//:tracing",
+        "@crates_libraries//:tracing-subscriber",
+    ],
 )
 
 # Unittests... but they require Postgres
@@ -52,6 +75,10 @@ with_postgres_test(
     postgres_image_tag = "17",
 )
 
+###
+# Scripts executed at build time. These generate source files
+###
+
 # Generate schema files
 diesel_print_schema(
     name = "diesel_print_schema",
@@ -60,12 +87,25 @@ diesel_print_schema(
     tags = ["manual"],
 )
 
+# Generate constants.rs file
+sh_with_runfiles_binary(
+    name = "gen_constants_bin",
+    args = [
+        "--output-file",
+        "$$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/constants.rs",
+        "--database-url",
+        "$$POSTGRES_URL",
+    ],
+    tool = ":gen_constants",
+)
+
 with_postgres_run(
     name = "diesel_schema_postgres",
     # First migrate,then print the schema
     binaries = [
         "//libraries/finances/accounts/django_finances_accounts:migrate",
         ":diesel_print_schema",
+        ":gen_constants_bin",
     ],
     env = {
         "SQL_ENGINE": "django.db.backends.postgresql",

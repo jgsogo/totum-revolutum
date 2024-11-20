@@ -9,9 +9,25 @@ pub struct MovementType {
     pub name: String,
     pub description: Option<String>,
     pub is_abstract: bool,
+    pub unique_name: Option<String>,
 
     // FIXME: These are treenode fields, implement them somwhere else if needed
     pub tn_parent_id: Option<i64>,
+}
+
+impl MovementType {
+    /// Returns (a query to) all the [`AccountType`]s
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all() -> _ {
+        crate::schema::finances_accounts_movementtype::table
+    }
+
+    /// Returns (a query to) all the [`AccountType`]s with 'unique_name
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all_with_unique_name() -> _ {
+        crate::schema::finances_accounts_movementtype::table
+            .filter(crate::schema::finances_accounts_movementtype::unique_name.is_not_null())
+    }
 }
 
 // diesel::table! {
