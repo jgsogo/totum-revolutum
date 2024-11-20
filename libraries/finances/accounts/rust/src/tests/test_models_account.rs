@@ -20,19 +20,28 @@ fn test_queries() {
             let (acc, custodian, acc_type) = all.get(0).unwrap();
             assert_eq!(acc.name, "Netflix");
             assert_eq!(custodian.name, "custodian2");
-            assert_eq!(acc_type.name, "Activos");
+            assert_eq!(
+                acc_type.unique_name.as_ref().unwrap(),
+                crate::constants::accounttype::ASSETS
+            );
         }
         {
             let (acc, custodian, acc_type) = all.get(1).unwrap();
             assert_eq!(acc.name, "IBM");
             assert_eq!(custodian.name, "custodian1");
-            assert_eq!(acc_type.name, "Activos");
+            assert_eq!(
+                acc_type.unique_name.as_ref().unwrap(),
+                crate::constants::accounttype::ASSETS
+            );
         }
         {
             let (acc, custodian, acc_type) = all.get(2).unwrap();
             assert_eq!(acc.name, "Gastos compartidos");
             assert_eq!(custodian.name, "custodian0");
-            assert_eq!(acc_type.name, "Efectivo/Metálico/Cash");
+            assert_eq!(
+                acc_type.unique_name.as_ref().unwrap(),
+                crate::constants::accounttype::ASSETS_CURRENT
+            );
         }
     }
 

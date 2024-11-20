@@ -1,5 +1,6 @@
 use tracing::error;
 
+use crate::models::AccountType;
 use anyhow::Result;
 use diesel::prelude::*;
 
@@ -68,6 +69,14 @@ impl TestDatabase {
 
     pub fn populate_accounts(&mut self) -> Result<()> {
         use crate::schema::finances_accounts_account::dsl::*;
+
+        let assets = AccountType::get_by_unique_name(crate::constants::accounttype::ASSETS)
+            .select(AccountType::as_select())
+            .first(&mut self.conn)?;
+        let assets_current = AccountType::get_by_unique_name(crate::constants::accounttype::ASSETS_CURRENT)
+            .select(AccountType::as_select())
+            .first(&mut self.conn)?;
+
         diesel::insert_into(finances_accounts_account)
             .values(&vec![
                 (
@@ -78,7 +87,7 @@ impl TestDatabase {
                     ccy.eq("EUR"),
                     open.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
                     close.eq(None),
-                    type_id.eq(5),
+                    type_id.eq(assets_current.id),
                     custodian_id.eq(0),
                     is_numerable.eq(false),
                 ),
@@ -90,7 +99,7 @@ impl TestDatabase {
                     ccy.eq("USD"),
                     open.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
                     close.eq(None),
-                    type_id.eq(1),
+                    type_id.eq(assets.id),
                     custodian_id.eq(1),
                     is_numerable.eq(true),
                 ),
@@ -102,7 +111,7 @@ impl TestDatabase {
                     ccy.eq("USD"),
                     open.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 8).unwrap()),
                     close.eq(Some(chrono::NaiveDate::from_ymd_opt(2024, 10, 8).unwrap())),
-                    type_id.eq(1),
+                    type_id.eq(assets.id),
                     custodian_id.eq(2),
                     is_numerable.eq(true),
                 ),
