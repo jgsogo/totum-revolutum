@@ -45,21 +45,20 @@ fn test_queries() {
         }
     }
 
-    // // Get account by pk
-    // {
-    //     let accounts = Account::get_with_holder_and_type(0)
-    //         .select((
-    //             Account::as_select(),
-    //             AccountHolder::as_select(),
-    //             AccountType::as_select(),
-    //         ))
-    //         .load::<(Account, AccountHolder, AccountType)>(&mut database_with_accounts.conn)
-    //         .expect("Error loading accounts");
-    //     assert_eq!(accounts.len(), 1);
+    // Get account by pk
+    {
+        let accounts = Account::get_with_custodian_and_type(0)
+            .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
+            .load::<(Account, Custodian, AccountType)>(&mut database_with_accounts.conn)
+            .expect("Error loading accounts");
+        assert_eq!(accounts.len(), 1);
 
-    //     let (acc, holder, acc_type) = accounts.get(0).unwrap();
-    //     assert_eq!(acc.name, "Gastos compartidos");
-    //     assert_eq!(holder.name, "holder0");
-    //     assert_eq!(acc_type.name, CUENTA_CORRIENTE);
-    // }
+        let (acc, holder, acc_type) = accounts.get(0).unwrap();
+        assert_eq!(acc.name, "Gastos compartidos");
+        assert_eq!(holder.name, "custodian0");
+        assert_eq!(
+            acc_type.unique_name.as_ref().unwrap(),
+            crate::constants::accounttype::ASSETS_CURRENT
+        );
+    }
 }

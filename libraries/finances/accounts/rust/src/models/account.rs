@@ -20,12 +20,26 @@ pub struct Account {
     pub is_numerable: bool,
 }
 
+pub type AllWithCustodiaAndType = diesel::dsl::InnerJoin<
+    diesel::dsl::InnerJoin<
+        crate::schema::finances_accounts_account::table,
+        crate::schema::finances_accounts_custodian::table,
+    >,
+    crate::schema::finances_accounts_accounttype::table,
+>;
+
 impl Account {
     /// Returns (a query to) all the [`Account`]s together with their [`Custodian`] and [`AccountType`]
-    #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn all_with_custodian_and_type() -> _ {
+    pub fn all_with_custodian_and_type() -> AllWithCustodiaAndType {
         crate::schema::finances_accounts_account::table
             .inner_join(crate::schema::finances_accounts_custodian::table)
             .inner_join(crate::schema::finances_accounts_accounttype::table)
+    }
+
+    /// Returns (a query to) all the ([`Account`], [`Custodian`], [`AccountType`]) for a given account primary-key
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn get_with_custodian_and_type(pk: i64) -> _ {
+        let all: AllWithCustodiaAndType = Account::all_with_custodian_and_type();
+        all.filter(crate::schema::finances_accounts_custodian::id.eq(pk))
     }
 }

@@ -34,8 +34,5 @@ impl AccountType {
     pub fn get_by_unique_name(unique_name: &str) -> _ {
         crate::schema::finances_accounts_accounttype::table
             .filter(crate::schema::finances_accounts_accounttype::unique_name.eq(unique_name))
-
-        // let all_with_unique_name = AccountType::all_with_unique_name();
-        // all_with_unique_name.filter(crate::schema::finances_accounts_accounttype::unique_name.eq(Some(unique_name)))
     }
 }
