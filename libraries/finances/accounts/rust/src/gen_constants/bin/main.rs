@@ -1,12 +1,11 @@
-
 use anyhow::{anyhow, bail, Result};
 use camino::Utf8PathBuf;
 use clap::{Args, Parser, Subcommand};
-use tracing::{debug, error, info};
-use finances_accounts::models::{AccountType, MovementType};
 use diesel::prelude::*;
+use finances_accounts::models::{AccountType, MovementType};
 use std::fs::File;
 use std::io::Write;
+use tracing::{debug, error, info};
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
     match log_level {
@@ -64,7 +63,7 @@ fn main() -> Result<()> {
 
     // AccountType
     {
-        let account_types =  AccountType::all_with_unique_name()
+        let account_types = AccountType::all_with_unique_name()
             .select(AccountType::as_select())
             .load(&mut conn)
             .expect("Error loading account types");
@@ -72,24 +71,40 @@ fn main() -> Result<()> {
         write!(output, "pub mod accounttype {{\n");
         for account_type in account_types {
             let unique_name = account_type.unique_name.unwrap();
-            let unique_name_var = unique_name.trim_start_matches('/').replace("/", "_").replace("-", "_").to_uppercase();
-            write!(output, "    pub const {}: &str = \"{}\";\n", unique_name_var, unique_name);
+            let unique_name_var = unique_name
+                .trim_start_matches('/')
+                .replace("/", "_")
+                .replace("-", "_")
+                .to_uppercase();
+            write!(
+                output,
+                "    pub const {}: &str = \"{}\";\n",
+                unique_name_var, unique_name
+            );
         }
         write!(output, "}}\n")?;
     }
 
     // MovementType
     {
-        let mov_types =  MovementType::all_with_unique_name()
+        let mov_types = MovementType::all_with_unique_name()
             .select(MovementType::as_select())
             .load(&mut conn)
             .expect("Error loading account types");
 
-        write!(output, "pub mod movementtype {{\n");
+        write!(output, "\npub mod movementtype {{\n");
         for mov_type in mov_types {
             let unique_name = mov_type.unique_name.unwrap();
-            let unique_name_var = unique_name.trim_start_matches('/').replace("/", "_").replace("-", "_").to_uppercase();
-            write!(output, "    pub const {}: &str = \"{}\";\n", unique_name_var, unique_name);
+            let unique_name_var = unique_name
+                .trim_start_matches('/')
+                .replace("/", "_")
+                .replace("-", "_")
+                .to_uppercase();
+            write!(
+                output,
+                "    pub const {}: &str = \"{}\";\n",
+                unique_name_var, unique_name
+            );
         }
         write!(output, "}}\n")?;
     }
