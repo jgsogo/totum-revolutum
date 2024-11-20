@@ -1,11 +1,11 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::Result;
 use camino::Utf8PathBuf;
-use clap::{Args, Parser, Subcommand};
+use clap::Parser;
 use diesel::prelude::*;
 use finances_accounts::models::{AccountType, MovementType};
 use std::fs::File;
 use std::io::Write;
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 
 fn tracing_level(log_level: log::LevelFilter) -> tracing::Level {
     match log_level {
@@ -58,8 +58,8 @@ fn main() -> Result<()> {
 
     let mut conn = establish_connection(&cli.database_url)?;
     let mut output = File::create(cli.output_file).expect("Unable to create file");
-    write!(output, "// This file is auto-generated. Do not modify\n\n");
-    write!(output, "// We use 'unique_name' fields to identify these elements because the PK might be different depending on the status of the DB when the data is migrated\n\n");
+    write!(output, "// This file is auto-generated. Do not modify\n\n")?;
+    write!(output, "// We use 'unique_name' fields to identify these elements because the PK might be different depending on the status of the DB when the data is migrated\n\n")?;
 
     // AccountType
     {
@@ -68,7 +68,7 @@ fn main() -> Result<()> {
             .load(&mut conn)
             .expect("Error loading account types");
 
-        write!(output, "pub mod accounttype {{\n");
+        write!(output, "pub mod accounttype {{\n")?;
         for account_type in account_types {
             let unique_name = account_type.unique_name.unwrap();
             let unique_name_var = unique_name
@@ -80,7 +80,7 @@ fn main() -> Result<()> {
                 output,
                 "    pub const {}: &str = \"{}\";\n",
                 unique_name_var, unique_name
-            );
+            )?;
         }
         write!(output, "}}\n")?;
     }
@@ -92,7 +92,7 @@ fn main() -> Result<()> {
             .load(&mut conn)
             .expect("Error loading account types");
 
-        write!(output, "\npub mod movementtype {{\n");
+        write!(output, "\npub mod movementtype {{\n")?;
         for mov_type in mov_types {
             let unique_name = mov_type.unique_name.unwrap();
             let unique_name_var = unique_name
@@ -104,7 +104,7 @@ fn main() -> Result<()> {
                 output,
                 "    pub const {}: &str = \"{}\";\n",
                 unique_name_var, unique_name
-            );
+            )?;
         }
         write!(output, "}}\n")?;
     }

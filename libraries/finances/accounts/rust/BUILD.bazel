@@ -100,7 +100,7 @@ sh_with_runfiles_binary(
 )
 
 with_postgres_run(
-    name = "diesel_schema_postgres",
+    name = "codegen",
     # First migrate,then print the schema
     binaries = [
         "//libraries/finances/accounts/django_finances_accounts:migrate",
