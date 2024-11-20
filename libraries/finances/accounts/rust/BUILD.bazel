@@ -2,7 +2,6 @@ load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run", "with_postgres_test")
-load("//bazel/rust/diesel:print_schema.bzl", "diesel_print_schema")
 
 rust_library(
     name = "finances_accounts",
@@ -80,11 +79,15 @@ with_postgres_test(
 ###
 
 # Generate schema files
-diesel_print_schema(
+sh_with_runfiles_binary(
     name = "diesel_print_schema",
-    only_tables = "finances_accounts",
-    schema = "$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema/schema_postgres.rs",
-    tags = ["manual"],
+    args = [
+        "print-schema",
+        "--database-url",
+        "$$POSTGRES_URL",
+        "> $$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema/schema_postgres.rs",
+    ],
+    tool = "@diesel_cli",
 )
 
 # Generate constants.rs file
