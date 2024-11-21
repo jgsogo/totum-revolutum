@@ -16,15 +16,11 @@ rust_library(
     ),
 )
 
+# FIXME: This binary is a bit convoluted: it depends on the 'finances_accounts' library
+# to generate the 'constants.rs' file which is included in the library itself.
 rust_binary(
     name = "gen_constants",
     srcs = glob(["src/gen_constants/bin/**/*.rs"]),
-    # proc_macro_deps = all_crate_deps(
-    #     proc_macro = True,
-    # ),
-    # visibility = [
-    #     "//apps/finances:__subpackages__",
-    # ],
     deps = [
         ":finances_accounts",
         "@crates_libraries//:anyhow",
@@ -38,7 +34,7 @@ rust_binary(
     ],
 )
 
-# Unittests... but they require Postgres
+# Unittests... marked as 'manual' because they require Postgres
 rust_test(
     name = "_tests",
     crate = ":finances_accounts",
@@ -49,7 +45,6 @@ rust_test(
     tags = ["manual"],
     deps = [
         "@crates_libraries//:anyhow",
-        "@crates_libraries//:diesel_migrations",
         "@crates_libraries//:tempfile",
     ],
 )
