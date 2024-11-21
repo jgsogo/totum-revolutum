@@ -28,6 +28,13 @@ impl MovementType {
         crate::schema::finances_accounts_movementtype::table
             .filter(crate::schema::finances_accounts_movementtype::unique_name.is_not_null())
     }
+
+    /// Returns (a query to) all the [`MovementType`]s for a given unique_name
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn get_by_unique_name(unique_name: &str) -> _ {
+        crate::schema::finances_accounts_movementtype::table
+            .filter(crate::schema::finances_accounts_movementtype::unique_name.eq(unique_name))
+    }
 }
 
 // diesel::table! {

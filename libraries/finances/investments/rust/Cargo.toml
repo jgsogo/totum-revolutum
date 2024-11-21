@@ -1,0 +1,33 @@
+[package]
+name = "finances_investments"
+version = "0.0.1"
+edition = "2021"
+
+[features]
+default = ["postgres"]
+postgres = ["dep:bigdecimal", "diesel/numeric", "diesel/postgres"]
+test_utils = ["dep:anyhow", "finances_accounts/test_utils"]
+cli = ["dep:clap", "dep:clap-verbosity-flag", "dep:tracing-subscriber"]
+
+[dependencies]
+finances_accounts = { path = "../../accounts/rust"}
+chrono = { workspace = true }
+diesel = { workspace = true, features = ["r2d2", "chrono"] }
+log = { workspace = true }
+tracing = { workspace = true }
+
+# Optional deps
+bigdecimal = { workspace = true, optional = true }
+anyhow = { workspace = true, optional = true }
+clap = { workspace = true, optional = true, features = ["derive"] }
+clap-verbosity-flag = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true }
+
+[dev-dependencies]
+finances_investments = { path = ".", default-features = false, features = ["test_utils"] }
+
+
+# [[bin]]
+# name = "gen_constants"
+# path = "src/gen_constants/bin/main.rs"
+# required-features = ["cli"]

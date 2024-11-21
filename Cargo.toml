@@ -11,6 +11,7 @@ members = [
     "libraries/diesel_utils",
     "libraries/filesystem",
     "libraries/finances/accounts/rust",
+    "libraries/finances/investments/rust",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
     "libraries/utils",

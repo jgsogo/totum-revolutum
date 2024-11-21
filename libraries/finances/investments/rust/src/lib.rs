@@ -1,11 +1,10 @@
 pub mod models;
-pub mod schema;
-pub mod types;
+mod schema;
 
 #[cfg(test)]
 mod tests;
 
+pub mod constants;
+
 #[cfg(feature = "test_utils")]
 pub mod test_utils;
-
-pub mod constants;

@@ -1,67 +1,46 @@
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run", "with_postgres_test")
 
 rust_library(
-    name = "finances_accounts",
+    name = "finances_investments",
     srcs = glob(["src/**/*.rs"]),
     crate_features = ["postgres"],
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    visibility = [
-        "//apps/finances:__subpackages__",
-        "//libraries/finances:__subpackages__",
-    ],
+    visibility = ["//apps/finances:__subpackages__"],
     deps = all_crate_deps(
         normal = True,
-    ),
+    ) + [
+        "//libraries/finances/accounts/rust:finances_accounts",
+    ],
 )
 
 rust_library(
-    name = "finances_accounts/test_utils",
+    name = "finances_investments/test_utils",
     srcs = glob(["src/**/*.rs"]),
     crate_features = [
         "postgres",
         "test_utils",
     ],
-    crate_name = "finances_accounts",
+    crate_name = "finances_investments",
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    visibility = [
-        "//apps/finances:__subpackages__",
-        "//libraries/finances:__subpackages__",
-    ],
+    visibility = ["//apps/finances:__subpackages__"],
     deps = all_crate_deps(
         normal = True,
-    ),
-)
-
-# FIXME: This binary is a bit convoluted: it depends on the 'finances_accounts' library
-# to generate the 'constants.rs' file which is included in the library itself.
-rust_binary(
-    name = "gen_constants",
-    srcs = glob(["src/gen_constants/bin/**/*.rs"]),
-    visibility = ["//libraries/finances/investments/rust:__subpackages__"],
-    deps = [
-        ":finances_accounts",
-        "@crates_libraries//:anyhow",
-        "@crates_libraries//:camino",
-        "@crates_libraries//:clap",
-        "@crates_libraries//:clap-verbosity-flag",
-        "@crates_libraries//:diesel",
-        "@crates_libraries//:log",
-        "@crates_libraries//:tracing",
-        "@crates_libraries//:tracing-subscriber",
+    ) + [
+        "//libraries/finances/accounts/rust:finances_accounts/test_utils",
     ],
 )
 
 # Unittests... marked as 'manual' because they require Postgres
 rust_test(
     name = "_tests",
-    crate = ":finances_accounts",
+    crate = ":finances_investments/test_utils",
     crate_features = [
         "postgres",
         "test_utils",
@@ -77,7 +56,7 @@ with_postgres_test(
     name = "tests-postgres",
     # First migrate,then run the tests
     binaries = [
-        "//libraries/finances/accounts/django_finances_accounts:migrate",
+        "//libraries/finances/investments/django_finances_investments:migrate",
         ":_tests",
     ],
     env = {
@@ -102,6 +81,9 @@ sh_with_runfiles_binary(
     name = "diesel_print_schema",
     args = [
         "print-schema",
+        # Do not filter the tables, some of them have foreign keys referring to "external" tables
+        # "--only-tables",
+        # "finances_investments",
         "--database-url",
         "$$POSTGRES_URL",
         "> $$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema/schema_postgres.rs",
@@ -118,14 +100,14 @@ sh_with_runfiles_binary(
         "--database-url",
         "$$POSTGRES_URL",
     ],
-    tool = ":gen_constants",
+    tool = "//libraries/finances/accounts/rust:gen_constants",
 )
 
 with_postgres_run(
     name = "codegen",
     # First migrate,then print the schema
     binaries = [
-        "//libraries/finances/accounts/django_finances_accounts:migrate",
+        "//libraries/finances/investments/django_finances_investments:migrate",
         ":diesel_print_schema",
         ":gen_constants_bin",
     ],
