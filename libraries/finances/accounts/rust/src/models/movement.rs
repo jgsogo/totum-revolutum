@@ -4,7 +4,7 @@ use crate::types::NumericType;
 
 use super::{Account, Fx, MovementType, Transaction};
 
-#[derive(Queryable, Selectable, Identifiable, Associations, Debug)]
+#[derive(Queryable, Selectable, Identifiable, Associations, Debug, QueryableByName)]
 #[diesel(table_name = crate::schema::finances_accounts_movement)]
 #[diesel(check_for_backend(crate::types::BackendType))]
 #[diesel(belongs_to(Account, foreign_key = account_id))]

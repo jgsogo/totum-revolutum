@@ -81,9 +81,8 @@ sh_with_runfiles_binary(
     name = "diesel_print_schema",
     args = [
         "print-schema",
-        # Do not filter the tables, some of them have foreign keys referring to "external" tables
-        # "--only-tables",
-        # "finances_investments",
+        "--only-tables",
+        "finances_investments",
         "--database-url",
         "$$POSTGRES_URL",
         "> $$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema/schema_postgres.rs",

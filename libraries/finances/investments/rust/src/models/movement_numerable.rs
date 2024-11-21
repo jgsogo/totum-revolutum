@@ -2,9 +2,14 @@ use diesel::prelude::*;
 
 use finances_accounts::types::NumericType;
 
+use diesel::query_builder::SqlQuery;
+use diesel::sql_query;
 use finances_accounts::models::Movement;
 
-#[derive(Queryable, Selectable, Identifiable, Associations, Debug)]
+use diesel::deserialize::Result;
+use diesel::row::NamedRow;
+
+#[derive(Queryable, Selectable, Identifiable, Associations, Debug, QueryableByName)]
 #[diesel(table_name = crate::schema::finances_investments_movementnumerable)]
 #[diesel(primary_key(movement_ptr_id))]
 #[diesel(check_for_backend(finances_accounts::types::BackendType))]
@@ -15,16 +20,42 @@ pub struct MovementNumerable {
     pub unit_value: NumericType,
 }
 
-// impl MovementNumerable {
-//     /// Returns (a query to) all the `MovementNumerable`s for a given account primary-key
-//     #[diesel::dsl::auto_type(no_type_alias)]
-//     pub fn all_with_related_data(account_pk: i64) -> _ {
-//         crate::schema::finances_investments_movementnumerable::table
-//             .inner_join(finances_accounts::schema::finances_accounts_movement::table)
-//             // .inner_join(crate::schema::finances_accounts_fx::table) // FIXME: I cannot 'inner_join' a nullable FK
-//             // .inner_join(finances_accounts::schema::finances_accounts_transaction::table)
-//             // .inner_join(finances_accounts::schema::finances_accounts_movementtype::table)
-//             // .filter(finances_accounts::schema::finances_accounts_movement::account_id.eq(account_pk))
-//             // .order((finances_accounts::schema::finances_accounts_movement::date_value.desc(),))
-//     }
-// }
+pub struct MovementNumerableType {
+    pub movement: Movement,
+    pub movement_numerable: MovementNumerable,
+}
+
+impl QueryableByName<finances_accounts::types::BackendType> for MovementNumerableType
+where
+    Self: Sized,
+{
+    fn build<'a>(row: &impl NamedRow<'a, finances_accounts::types::BackendType>) -> Result<Self> {
+        let movement = <Movement as diesel::QueryableByName<finances_accounts::types::BackendType>>::build(row)?;
+        let movement_numerable =
+            <MovementNumerable as diesel::QueryableByName<finances_accounts::types::BackendType>>::build(row)?;
+        Ok(MovementNumerableType {
+            movement,
+            movement_numerable,
+        })
+    }
+}
+
+impl MovementNumerable {
+    /// Returns (a query to) all the `MovementNumerable`s for a given account primary-key
+    pub fn all_with_related_data_raw(_account_pk: i64) -> SqlQuery {
+        sql_query(
+            r#"
+            SELECT *
+            FROM finances_accounts_movement
+            INNER JOIN
+                finances_investments_movementnumerable
+            ON
+                finances_accounts_movement.id = finances_investments_movementnumerable.movement_ptr_id
+            WHERE
+                finances_accounts_movement.account_id = $1
+        "#,
+        )
+        // FIXME: Figure out how to bind the account_id here
+        // .bind::<diesel::sql_types::Int8, _>(_account_pk)
+    }
+}

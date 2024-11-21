@@ -102,6 +102,8 @@ sh_with_runfiles_binary(
     name = "diesel_print_schema",
     args = [
         "print-schema",
+        "--only-tables",
+        "finances_accounts",
         "--database-url",
         "$$POSTGRES_URL",
         "> $$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema/schema_postgres.rs",
