@@ -1,4 +1,3 @@
 exports_files([
     "skip_rustfmt.patch",
-    "print_schema.tpl.sh",
 ])

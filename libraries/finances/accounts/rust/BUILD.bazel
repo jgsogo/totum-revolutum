@@ -1,0 +1,123 @@
+load("@crates_libraries//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run", "with_postgres_test")
+
+rust_library(
+    name = "finances_accounts",
+    srcs = glob(["src/**/*.rs"]),
+    crate_features = ["postgres"],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    visibility = ["//apps/finances:__subpackages__"],
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)
+
+# FIXME: This binary is a bit convoluted: it depends on the 'finances_accounts' library
+# to generate the 'constants.rs' file which is included in the library itself.
+rust_binary(
+    name = "gen_constants",
+    srcs = glob(["src/gen_constants/bin/**/*.rs"]),
+    deps = [
+        ":finances_accounts",
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:camino",
+        "@crates_libraries//:clap",
+        "@crates_libraries//:clap-verbosity-flag",
+        "@crates_libraries//:diesel",
+        "@crates_libraries//:log",
+        "@crates_libraries//:tracing",
+        "@crates_libraries//:tracing-subscriber",
+    ],
+)
+
+# Unittests... marked as 'manual' because they require Postgres
+rust_test(
+    name = "_tests",
+    crate = ":finances_accounts",
+    crate_features = [
+        "postgres",
+        "test_utils",
+    ],
+    tags = ["manual"],
+    deps = [
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:tempfile",
+    ],
+)
+
+with_postgres_test(
+    name = "tests-postgres",
+    # First migrate,then run the tests
+    binaries = [
+        "//libraries/finances/accounts/django_finances_accounts:migrate",
+        ":_tests",
+    ],
+    env = {
+        "SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        "SQL_DATABASE": "POSTGRES_DB",
+        "SQL_USER": "POSTGRES_USER",
+        "SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "SQL_HOST": "POSTGRES_HOST",
+        "SQL_PORT": "POSTGRES_PORT",
+    },
+    postgres_image_tag = "17",
+)
+
+###
+# Scripts executed at build time. These generate source files
+###
+
+# Generate schema files
+sh_with_runfiles_binary(
+    name = "diesel_print_schema",
+    args = [
+        "print-schema",
+        "--database-url",
+        "$$POSTGRES_URL",
+        "> $$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/schema/schema_postgres.rs",
+    ],
+    tool = "@diesel_cli",
+)
+
+# Generate constants.rs file
+sh_with_runfiles_binary(
+    name = "gen_constants_bin",
+    args = [
+        "--output-file",
+        "$$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/src/constants.rs",
+        "--database-url",
+        "$$POSTGRES_URL",
+    ],
+    tool = ":gen_constants",
+)
+
+with_postgres_run(
+    name = "codegen",
+    # First migrate,then print the schema
+    binaries = [
+        "//libraries/finances/accounts/django_finances_accounts:migrate",
+        ":diesel_print_schema",
+        ":gen_constants_bin",
+    ],
+    env = {
+        "SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        "SQL_DATABASE": "POSTGRES_DB",
+        "SQL_USER": "POSTGRES_USER",
+        "SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "SQL_HOST": "POSTGRES_HOST",
+        "SQL_PORT": "POSTGRES_PORT",
+    },
+    postgres_image_tag = "17",
+    tags = [
+        "manual",
+        "update",
+    ],
+)

@@ -10,6 +10,7 @@ members = [
     "libraries/constants",
     "libraries/diesel_utils",
     "libraries/filesystem",
+    "libraries/finances/accounts/rust",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
     "libraries/utils",
@@ -59,7 +60,7 @@ http = "1.1.0"
 http-body = "1.0.1"
 http-body-util = "0.1.1"
 httpmock = { version = "0.7" }
-hyper = { version = "1.5.0" }
+hyper = { version = "1.5.1" }
 hyper-util = { version = "0.1.6" }
 ignore = { version = "0.4.22" }
 ignore-files = "3.0.1"
@@ -85,9 +86,9 @@ sha256 = { version = "1.5" }
 strum = "0.26.3"
 strum_macros = "0.26.2"
 syn = { version = "2.0.87", features = ["visit"] }
-tauri-build = { version = "2.0.1", features = [] }
-tauri = { version = "2.0.3", features = [] }
-tauri-plugin-shell = "2.0.1"
+tauri-build = { version = "2.0.3", features = [] }
+tauri = { version = "2.1.1", features = [] }
+tauri-plugin-shell = "2.0.2"
 tempfile = { version = "3.10.1" }
 testing_logger = "0.1.1"
 thiserror = "1.0.68"
