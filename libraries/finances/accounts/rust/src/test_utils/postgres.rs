@@ -1,6 +1,7 @@
 use tracing::error;
 
-use crate::models::AccountType;
+use crate::models::{AccountType, MovementType};
+use crate::types::NumericType;
 use anyhow::Result;
 use diesel::prelude::*;
 
@@ -37,19 +38,6 @@ impl TestDatabase {
     //             (id.eq(2), name.eq("holder2"), owner.eq(0)),
     //             (id.eq(3), name.eq("holder3"), owner.eq(1)),
     //             (id.eq(4), name.eq("holder4"), owner.eq(1)),
-    //         ])
-    //         .execute(&mut self.conn)?;
-    //     Ok(())
-    // }
-
-    // pub fn populate_account_types(&mut self) -> Result<()> {
-    //     use crate::schema::data_accounttype::dsl::*;
-    //     diesel::insert_into(data_accounttype)
-    //         .values(&vec![
-    //             (id.eq(0), name.eq(CUENTA_CORRIENTE)),
-    //             (id.eq(1), name.eq(DEPOSITO)),
-    //             (id.eq(2), name.eq(ACCIONES)),
-    //             (id.eq(3), name.eq(PLAN_PENSIONES)),
     //         ])
     //         .execute(&mut self.conn)?;
     //     Ok(())
@@ -144,152 +132,88 @@ impl TestDatabase {
     //     Ok(())
     // }
 
-    // pub fn populate_movement_types(&mut self) -> Result<()> {
-    //     use crate::schema::data_movementtype::dsl::*;
-    //     diesel::insert_into(data_movementtype)
-    //         .values(&vec![
-    //             (
-    //                 id.eq(0),
-    //                 name.eq(RENDIMIENTOS_BIENES_INMUEBLES),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(1),
-    //                 name.eq(RENDIMIENTOS_TRABAJO),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(2),
-    //                 name.eq(LOPE_DE_HARO),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(3),
-    //                 name.eq(RENDIMIENTOS_CAPITAL),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(4),
-    //                 name.eq(MOVIMIENTO_EFECTIVO),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(5),
-    //                 name.eq(IMPUESTOS),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(6),
-    //                 name.eq(ACCIONES_MOVTYPE),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(7),
-    //                 name.eq(AYUDAS_SUBVENCIONES),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(8),
-    //                 name.eq(CHALET_ATYKA),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //         ])
-    //         .execute(&mut self.conn)?;
-    //     Ok(())
-    // }
+    pub fn populate_transactions(&mut self) -> Result<()> {
+        use crate::schema::finances_accounts_transaction::dsl::*;
+        diesel::insert_into(finances_accounts_transaction)
+            .values(&vec![
+                (id.eq(0), name.eq("transaction0")),
+                (id.eq(1), name.eq("transaction1")),
+                (id.eq(2), name.eq("transaction2")),
+            ])
+            .execute(&mut self.conn)?;
+        Ok(())
+    }
 
-    // pub fn populate_transfers(&mut self) -> Result<()> {
-    //     use crate::schema::data_transfer::dsl::*;
-    //     diesel::insert_into(data_transfer)
-    //         .values(&vec![
-    //             (id.eq(0), description.eq("transfer0")),
-    //             (id.eq(1), description.eq("transfer1")),
-    //             (id.eq(2), description.eq("transfer2")),
-    //         ])
-    //         .execute(&mut self.conn)?;
-    //     Ok(())
-    // }
+    /// Populates some movements for the given account
+    pub fn populate_movements(&mut self, account_pk: i64) -> Result<Vec<i64>> {
+        self.populate_fx(account_pk * 10)?;
 
-    // /// Populates some movements for the given account
-    // pub fn populate_movements(&mut self, account_pk: i32) -> Result<()> {
-    //     self.populate_fx(account_pk * 10)?;
+        let expense = MovementType::get_by_unique_name(crate::constants::movementtype::EXPENSE)
+            .select(MovementType::as_select())
+            .first(&mut self.conn)?;
 
-    //     use crate::schema::data_movement::dsl::*;
-    //     diesel::insert_into(data_movement)
-    //         .values(&vec![
-    //             (
-    //                 amount.eq::<NumericType>(0.into()),
-    //                 quantity.eq::<Option<i32>>(None),
-    //                 unit_value.eq::<Option<NumericType>>(None),
-    //                 direction.eq(0),
-    //                 date.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
-    //                 date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
-    //                 account_id.eq(account_pk),
-    //                 fx_id.eq::<Option<i32>>(Some(account_pk * 10)),
-    //                 transfer_id.eq::<i32>(0),
-    //                 type_id.eq::<i32>(0),
-    //             ),
-    //             (
-    //                 amount.eq::<NumericType>(0.into()),
-    //                 quantity.eq::<Option<i32>>(None),
-    //                 unit_value.eq::<Option<NumericType>>(None),
-    //                 direction.eq(0),
-    //                 date.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
-    //                 date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
-    //                 account_id.eq(account_pk),
-    //                 fx_id.eq::<Option<i32>>(Some(account_pk * 10 + 1)),
-    //                 transfer_id.eq::<i32>(0),
-    //                 type_id.eq::<i32>(0),
-    //             ),
-    //         ])
-    //         .execute(&mut self.conn)?;
-    //     Ok(())
-    // }
+        use crate::schema::finances_accounts_movement::dsl::*;
+        let results: Vec<i64> = diesel::insert_into(finances_accounts_movement)
+            .values(&vec![
+                (
+                    amount.eq::<NumericType>(0.into()),
+                    direction.eq(0),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
+                    account_id.eq(account_pk),
+                    fx_id.eq::<Option<i64>>(Some(account_pk * 10)),
+                    transaction_id.eq::<i64>(0),
+                    type_id.eq::<i64>(expense.id),
+                ),
+                (
+                    amount.eq::<NumericType>(0.into()),
+                    direction.eq(0),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
+                    account_id.eq(account_pk),
+                    fx_id.eq::<Option<i64>>(Some(account_pk * 10 + 1)),
+                    transaction_id.eq::<i64>(0),
+                    type_id.eq::<i64>(expense.id),
+                ),
+            ])
+            .returning(id)
+            .get_results(&mut self.conn)?;
+        Ok(results)
+    }
 
-    // /// Populates some FX values
-    // pub fn populate_fx(&mut self, start_id: i32) -> Result<()> {
-    //     use crate::schema::data_fx::dsl::*;
-    //     diesel::insert_into(data_fx)
-    //         .values(&vec![
-    //             (
-    //                 id.eq(start_id),
-    //                 foreign.eq("USD"),
-    //                 local.eq("EUR"),
-    //                 rate.eq::<NumericType>(1.into()),
-    //                 date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
-    //             ),
-    //             (
-    //                 id.eq(start_id + 1),
-    //                 foreign.eq("USD"),
-    //                 local.eq("EUR"),
-    //                 rate.eq::<NumericType>(2.into()),
-    //                 date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
-    //             ),
-    //             (
-    //                 id.eq(start_id + 2),
-    //                 foreign.eq("USD"),
-    //                 local.eq("EUR"),
-    //                 rate.eq::<NumericType>(3.into()),
-    //                 date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 8).unwrap()),
-    //             ),
-    //             (
-    //                 id.eq(start_id + 3),
-    //                 foreign.eq("USD"),
-    //                 local.eq("EUR"),
-    //                 rate.eq::<NumericType>(4.into()),
-    //                 date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 9).unwrap()),
-    //             ),
-    //         ])
-    //         .execute(&mut self.conn)?;
-    //     Ok(())
-    // }
+    /// Populates some FX values
+    pub fn populate_fx(&mut self, start_id: i64) -> Result<()> {
+        use crate::schema::finances_accounts_fx::dsl::*;
+        diesel::insert_into(finances_accounts_fx)
+            .values(&vec![
+                (
+                    id.eq(start_id),
+                    foreign.eq("USD"),
+                    local.eq("EUR"),
+                    rate.eq::<NumericType>(1.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
+                ),
+                (
+                    id.eq(start_id + 1),
+                    foreign.eq("USD"),
+                    local.eq("EUR"),
+                    rate.eq::<NumericType>(2.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
+                ),
+                (
+                    id.eq(start_id + 2),
+                    foreign.eq("USD"),
+                    local.eq("EUR"),
+                    rate.eq::<NumericType>(3.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 8).unwrap()),
+                ),
+                (
+                    id.eq(start_id + 3),
+                    foreign.eq("USD"),
+                    local.eq("EUR"),
+                    rate.eq::<NumericType>(4.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 9).unwrap()),
+                ),
+            ])
+            .execute(&mut self.conn)?;
+        Ok(())
+    }
 }

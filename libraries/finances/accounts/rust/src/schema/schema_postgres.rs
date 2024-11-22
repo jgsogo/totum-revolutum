@@ -1,17 +1,6 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    django_migrations (id) {
-        id -> Int4,
-        #[max_length = 255]
-        app -> Varchar,
-        #[max_length = 255]
-        name -> Varchar,
-        applied -> Timestamptz,
-    }
-}
-
-diesel::table! {
     finances_accounts_account (id) {
         id -> Int8,
         #[max_length = 255]
@@ -178,7 +167,6 @@ diesel::joinable!(finances_accounts_snapshot -> finances_accounts_account (accou
 diesel::joinable!(finances_accounts_transaction -> finances_accounts_transactiongroup (group_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    django_migrations,
     finances_accounts_account,
     finances_accounts_accountholder,
     finances_accounts_accountholderrole,

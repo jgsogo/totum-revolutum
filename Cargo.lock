@@ -1816,6 +1816,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "finances_investments"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "bigdecimal",
+ "chrono",
+ "clap",
+ "clap-verbosity-flag",
+ "diesel",
+ "finances_accounts",
+ "finances_investments",
+ "log",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "fixedbitset"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
