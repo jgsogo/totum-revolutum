@@ -2,10 +2,10 @@ mod account_holder;
 
 pub use account_holder::AccountHolder;
 
-pub mod account;
+mod account;
 pub use account::Account;
 
-pub mod custodian;
+mod custodian;
 pub use custodian::Custodian;
 
 mod account_type;

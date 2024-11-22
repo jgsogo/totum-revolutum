@@ -14,7 +14,7 @@ pub struct Transaction {
 }
 
 impl Transaction {
-    /// Returns (a query to) all the [`Movement`]s
+    /// Returns (a query to) all the [`Transaction`]s
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn all() -> _ {
         crate::schema::finances_accounts_transaction::table
