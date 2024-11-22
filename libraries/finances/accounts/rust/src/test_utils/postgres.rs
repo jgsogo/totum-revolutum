@@ -43,19 +43,6 @@ impl TestDatabase {
     //     Ok(())
     // }
 
-    // pub fn populate_account_types(&mut self) -> Result<()> {
-    //     use crate::schema::data_accounttype::dsl::*;
-    //     diesel::insert_into(data_accounttype)
-    //         .values(&vec![
-    //             (id.eq(0), name.eq(CUENTA_CORRIENTE)),
-    //             (id.eq(1), name.eq(DEPOSITO)),
-    //             (id.eq(2), name.eq(ACCIONES)),
-    //             (id.eq(3), name.eq(PLAN_PENSIONES)),
-    //         ])
-    //         .execute(&mut self.conn)?;
-    //     Ok(())
-    // }
-
     pub fn populate_custodians(&mut self) -> Result<()> {
         use crate::schema::finances_accounts_custodian::dsl::*;
         diesel::insert_into(finances_accounts_custodian)
@@ -145,69 +132,6 @@ impl TestDatabase {
     //     Ok(())
     // }
 
-    // pub fn populate_movement_types(&mut self) -> Result<()> {
-    //     use crate::schema::data_movementtype::dsl::*;
-    //     diesel::insert_into(data_movementtype)
-    //         .values(&vec![
-    //             (
-    //                 id.eq(0),
-    //                 name.eq(RENDIMIENTOS_BIENES_INMUEBLES),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(1),
-    //                 name.eq(RENDIMIENTOS_TRABAJO),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(2),
-    //                 name.eq(LOPE_DE_HARO),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(3),
-    //                 name.eq(RENDIMIENTOS_CAPITAL),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(4),
-    //                 name.eq(MOVIMIENTO_EFECTIVO),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(5),
-    //                 name.eq(IMPUESTOS),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(6),
-    //                 name.eq(ACCIONES_MOVTYPE),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(7),
-    //                 name.eq(AYUDAS_SUBVENCIONES),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //             (
-    //                 id.eq(8),
-    //                 name.eq(CHALET_ATYKA),
-    //                 level.eq(1),
-    //                 parent_id.eq::<Option<i32>>(None),
-    //             ),
-    //         ])
-    //         .execute(&mut self.conn)?;
-    //     Ok(())
-    // }
-
     pub fn populate_transactions(&mut self) -> Result<()> {
         use crate::schema::finances_accounts_transaction::dsl::*;
         diesel::insert_into(finances_accounts_transaction)
@@ -233,10 +157,7 @@ impl TestDatabase {
             .values(&vec![
                 (
                     amount.eq::<NumericType>(0.into()),
-                    // quantity.eq::<Option<i32>>(None),
-                    // unit_value.eq::<Option<NumericType>>(None),
                     direction.eq(0),
-                    // date.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
                     date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
                     account_id.eq(account_pk),
                     fx_id.eq::<Option<i64>>(Some(account_pk * 10)),
@@ -245,10 +166,7 @@ impl TestDatabase {
                 ),
                 (
                     amount.eq::<NumericType>(0.into()),
-                    // quantity.eq::<Option<i32>>(None),
-                    // unit_value.eq::<Option<NumericType>>(None),
                     direction.eq(0),
-                    // date.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
                     date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 7).unwrap()),
                     account_id.eq(account_pk),
                     fx_id.eq::<Option<i64>>(Some(account_pk * 10 + 1)),

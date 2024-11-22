@@ -23,7 +23,8 @@ pub struct Movement {
 }
 
 impl Movement {
-    /// Returns (a query to) all the `Movement`s for a given account primary-key
+    /// Returns (a query to) all the ([`Movement`], [`Transaction`], [`MovementType`]) for a given account primary-key
+    /// ordered (desc) by date_value
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn all_with_related_data(account_pk: i64) -> _ {
         crate::schema::finances_accounts_movement::table
