@@ -42,4 +42,18 @@ impl Account {
         let all: AllWithCustodiaAndType = Account::all_with_custodian_and_type();
         all.filter(crate::schema::finances_accounts_custodian::id.eq(pk))
     }
+
+    /// Returns a query fragment to filter all the [`Account`]s that are opened as of today
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn opened() -> _ {
+        crate::schema::finances_accounts_account::close
+            .is_null()
+            .or(crate::schema::finances_accounts_account::close.ge(diesel::dsl::today))
+    }
+
+    // /// Returns a query fragment to filter all the [`Account`]s that are owned by ME
+    // #[diesel::dsl::auto_type(no_type_alias)]
+    // pub fn mine() -> _ {
+    //     crate::schema::data_accountholder::owner.eq(0i32)
+    // }
 }

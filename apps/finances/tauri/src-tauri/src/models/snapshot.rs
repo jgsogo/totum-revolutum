@@ -10,8 +10,8 @@ pub struct Snapshot {
     pub date_value: String,
 }
 
-impl From<finances_db::models::Snapshot> for Snapshot {
-    fn from(value: finances_db::models::Snapshot) -> Self {
+impl From<finances_accounts::models::Snapshot> for Snapshot {
+    fn from(value: finances_accounts::models::Snapshot) -> Self {
         Self {
             account_id: value.account_id,
             amount: value.amount.to_f32().unwrap(),

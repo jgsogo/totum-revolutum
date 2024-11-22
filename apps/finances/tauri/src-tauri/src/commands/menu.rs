@@ -1,77 +1,61 @@
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_db::models::{Account, AccountHolder, AccountType};
+use finances_accounts::models::{Account, AccountType, Custodian};
 use tauri::State;
 
 fn all_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
+) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all_with_holder_and_type()
+    Account::all_with_custodian_and_type()
         .filter(Account::opened())
-        .select((
-            Account::as_select(),
-            AccountHolder::as_select(),
-            AccountType::as_select(),
-        ))
+        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
         .filter(Account::mine())
-        .load::<(Account, AccountHolder, AccountType)>(&mut conn)
+        .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn checking_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
+) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all_with_holder_and_type()
+    Account::all_with_custodian_and_type()
         .filter(Account::opened())
-        .select((
-            Account::as_select(),
-            AccountHolder::as_select(),
-            AccountType::as_select(),
-        ))
+        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
         .filter(Account::mine())
         .filter(Account::checking_account())
-        .load::<(Account, AccountHolder, AccountType)>(&mut conn)
+        .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn investment_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
+) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all_with_holder_and_type()
+    Account::all_with_custodian_and_type()
         .filter(Account::opened())
-        .select((
-            Account::as_select(),
-            AccountHolder::as_select(),
-            AccountType::as_select(),
-        ))
+        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
         .filter(Account::mine())
         .filter(Account::investment())
-        .load::<(Account, AccountHolder, AccountType)>(&mut conn)
+        .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn retirement_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<(Account, AccountHolder, AccountType)>, String> {
+) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all_with_holder_and_type()
+    Account::all_with_custodian_and_type()
         .filter(Account::opened())
-        .select((
-            Account::as_select(),
-            AccountHolder::as_select(),
-            AccountType::as_select(),
-        ))
+        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
         .filter(Account::mine())
         .filter(Account::retirement())
-        .load::<(Account, AccountHolder, AccountType)>(&mut conn)
+        .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 

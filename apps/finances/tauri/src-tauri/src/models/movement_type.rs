@@ -13,8 +13,8 @@ pub struct MovementType {
     pub parent: Option<ParentMovementType>,
 }
 
-impl From<finances_db::models::MovementType> for MovementType {
-    fn from(value: finances_db::models::MovementType) -> Self {
+impl From<finances_accounts::models::MovementType> for MovementType {
+    fn from(value: finances_accounts::models::MovementType) -> Self {
         Self {
             name: value.name,
             level: value.level,

@@ -10,8 +10,8 @@ pub struct Fx {
     pub date_value: String,
 }
 
-impl From<finances_db::models::Fx> for Fx {
-    fn from(value: finances_db::models::Fx) -> Self {
+impl From<finances_accounts::models::Fx> for Fx {
+    fn from(value: finances_accounts::models::Fx) -> Self {
         Self {
             foreign: value.foreign,
             local: value.local,
