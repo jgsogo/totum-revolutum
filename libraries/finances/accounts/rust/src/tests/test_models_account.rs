@@ -1,5 +1,5 @@
 use crate::models::{Account, AccountType, Custodian};
-use crate::query_fragments::{account_closed, account_opened, account_ordered};
+use crate::query_fragments::{account_closed, account_opened, account_ordered, custodian_by_pk};
 use crate::test_utils::fixtures::database_with_accounts;
 use diesel::prelude::*;
 
@@ -90,7 +90,7 @@ fn test_queries() {
     // Get all accounts for a given Custodian
     {
         let accounts = Account::all()
-            .filter(crate::models::custodian::filter_pk(0))
+            .filter(custodian_by_pk(0))
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))

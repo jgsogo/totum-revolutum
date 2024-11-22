@@ -10,12 +10,6 @@ pub struct Custodian {
     pub country: String,
 }
 
-/// Returns a query fragment to filter [`Custodian`]s by pk
-#[diesel::dsl::auto_type(no_type_alias)]
-pub fn filter_pk(pk: i64) -> _ {
-    crate::schema::finances_accounts_custodian::id.eq(pk)
-}
-
 impl Custodian {
     /// Returns (a query to) all the [`Custodian`]s
     #[diesel::dsl::auto_type(no_type_alias)]
