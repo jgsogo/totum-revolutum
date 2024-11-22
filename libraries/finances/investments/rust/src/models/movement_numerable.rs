@@ -14,31 +14,32 @@ use diesel::row::NamedRow;
 #[diesel(primary_key(movement_ptr_id))]
 #[diesel(check_for_backend(finances_accounts::types::BackendType))]
 #[diesel(belongs_to(Movement, foreign_key = movement_ptr_id))]
+struct _MovementNumerable {
+    movement_ptr_id: i64,
+    quantity: NumericType,
+    unit_value: NumericType,
+}
+
 pub struct MovementNumerable {
-    pub movement_ptr_id: i64,
-    pub quantity: NumericType,
-    pub unit_value: NumericType,
+    movement: Movement,
+    movement_numerable: _MovementNumerable,
 }
 
-pub struct MovementNumerableType {
-    pub movement: Movement,
-    pub movement_numerable: MovementNumerable,
-}
-
-impl QueryableByName<finances_accounts::types::BackendType> for MovementNumerableType
+impl QueryableByName<finances_accounts::types::BackendType> for MovementNumerable
 where
     Self: Sized,
 {
     fn build<'a>(row: &impl NamedRow<'a, finances_accounts::types::BackendType>) -> Result<Self> {
         let movement = <Movement as diesel::QueryableByName<finances_accounts::types::BackendType>>::build(row)?;
         let movement_numerable =
-            <MovementNumerable as diesel::QueryableByName<finances_accounts::types::BackendType>>::build(row)?;
-        Ok(MovementNumerableType {
+            <_MovementNumerable as diesel::QueryableByName<finances_accounts::types::BackendType>>::build(row)?;
+        Ok(MovementNumerable {
             movement,
             movement_numerable,
         })
     }
 }
+use diesel::query_builder::AsQuery;
 
 impl MovementNumerable {
     /// Returns (a query to) all the `MovementNumerable`s for a given account primary-key
