@@ -12,3 +12,11 @@ pub struct Transaction {
     pub description: Option<String>,
     pub group_id: Option<i64>,
 }
+
+impl Transaction {
+    /// Returns (a query to) all the [`Movement`]s
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all() -> _ {
+        crate::schema::finances_accounts_transaction::table
+    }
+}

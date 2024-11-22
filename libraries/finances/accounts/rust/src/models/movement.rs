@@ -23,15 +23,9 @@ pub struct Movement {
 }
 
 impl Movement {
-    /// Returns (a query to) all the ([`Movement`], [`Transaction`], [`MovementType`]) for a given account primary-key
-    /// ordered (desc) by date_value
+    /// Returns (a query to) all the [`Movement`]s
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn all_with_related_data(account_pk: i64) -> _ {
+    pub fn all() -> _ {
         crate::schema::finances_accounts_movement::table
-            // .inner_join(crate::schema::finances_accounts_fx::table) // FIXME: I cannot 'inner_join' a nullable FK
-            .inner_join(crate::schema::finances_accounts_transaction::table)
-            .inner_join(crate::schema::finances_accounts_movementtype::table)
-            .filter(crate::schema::finances_accounts_movement::account_id.eq(account_pk))
-            .order((crate::schema::finances_accounts_movement::date_value.desc(),))
     }
 }

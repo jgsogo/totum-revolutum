@@ -51,3 +51,9 @@ pub fn movementtype_with_unique_name() -> _ {
 pub fn movementtype_by_unique_name(unique_name: &str) -> _ {
     crate::schema::finances_accounts_movementtype::unique_name.eq(unique_name)
 }
+
+/// Returns a query fragment to order accounts [`Account`]s. This can be considered the _default_ ordering
+#[diesel::dsl::auto_type]
+pub fn movement_filter_account_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_movement::account_id.eq(pk)
+}
