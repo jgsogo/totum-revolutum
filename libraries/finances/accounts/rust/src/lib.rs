@@ -9,4 +9,4 @@ mod tests;
 pub mod test_utils;
 
 pub mod constants;
-pub mod query_fragments;
+pub mod sql;

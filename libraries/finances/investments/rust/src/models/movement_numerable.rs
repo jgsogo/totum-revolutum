@@ -2,8 +2,6 @@ use diesel::prelude::*;
 
 use finances_accounts::types::NumericType;
 
-use diesel::query_builder::SqlQuery;
-use diesel::sql_query;
 use finances_accounts::models::Movement;
 
 use diesel::deserialize::Result;
@@ -37,26 +35,5 @@ where
             movement,
             movement_numerable,
         })
-    }
-}
-use diesel::query_builder::AsQuery;
-
-impl MovementNumerable {
-    /// Returns (a query to) all the `MovementNumerable`s for a given account primary-key
-    pub fn all_with_related_data_raw(_account_pk: i64) -> SqlQuery {
-        sql_query(
-            r#"
-            SELECT *
-            FROM finances_accounts_movement
-            INNER JOIN
-                finances_investments_movementnumerable
-            ON
-                finances_accounts_movement.id = finances_investments_movementnumerable.movement_ptr_id
-            WHERE
-                finances_accounts_movement.account_id = $1
-        "#,
-        )
-        // FIXME: Figure out how to bind the account_id here
-        // .bind::<diesel::sql_types::Int8, _>(_account_pk)
     }
 }

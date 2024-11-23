@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 
-pub use super::{AccountType, Custodian};
-use crate::query_fragments::{account_closed, account_opened};
+use super::{AccountType, Custodian};
+use crate::sql::filters::{account_closed, account_opened};
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::finances_accounts_account)]

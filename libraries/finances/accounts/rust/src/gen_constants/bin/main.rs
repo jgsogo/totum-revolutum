@@ -3,7 +3,7 @@ use camino::Utf8PathBuf;
 use clap::Parser;
 use diesel::prelude::*;
 use finances_accounts::models::{AccountType, MovementType};
-use finances_accounts::query_fragments::{acounttype_with_unique_name, movementtype_with_unique_name};
+use finances_accounts::sql::filters::{acounttype_with_unique_name, movementtype_with_unique_name};
 use std::fs::File;
 use std::io::Write;
 use tracing::{debug, error};

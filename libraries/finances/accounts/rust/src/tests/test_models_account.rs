@@ -1,5 +1,5 @@
 use crate::models::{Account, AccountType, Custodian};
-use crate::query_fragments::{account_closed, account_opened, account_ordered, custodian_by_pk};
+use crate::sql::filters::{account_closed, account_opened, account_ordered, custodian_by_pk};
 use crate::test_utils::fixtures::database_with_accounts;
 use diesel::prelude::*;
 

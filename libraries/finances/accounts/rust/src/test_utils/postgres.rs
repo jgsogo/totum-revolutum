@@ -1,7 +1,7 @@
 use tracing::error;
 
 use crate::models::{AccountType, MovementType};
-use crate::query_fragments::{acounttype_by_unique_name, movementtype_by_unique_name};
+use crate::sql::filters::{acounttype_by_unique_name, movementtype_by_unique_name};
 use crate::types::NumericType;
 use anyhow::Result;
 use diesel::prelude::*;
