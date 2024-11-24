@@ -93,7 +93,6 @@ crate.from_cargo(
     cargo_lockfile = "//:Cargo.lock",
     manifests = [
         "//:Cargo.toml",
-        "//apps/finances/finances_db:Cargo.toml",
         "//apps/finances/tauri/src-tauri:Cargo.toml",
         "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",

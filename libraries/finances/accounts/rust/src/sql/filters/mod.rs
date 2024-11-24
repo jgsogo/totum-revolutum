@@ -22,6 +22,19 @@ pub fn account_ordered() -> _ {
     crate::schema::finances_accounts_account::open.desc()
 }
 
+/// Returns a query fragment to filter [`Account`]s by pk
+#[diesel::dsl::auto_type]
+pub fn account_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_account::id.eq(pk)
+}
+
+/// Returns a query fragment to filter [`Account`]s by [`AccountType`], selecting only those that are checking account (type equals 'XXXXX' or children)
+#[diesel::dsl::auto_type]
+pub fn account_is_checking_account() -> _ {
+    todo!("impl pending");
+    crate::schema::finances_accounts_account::id.eq(0i64)
+}
+
 /// Returns a query fragment to filter [`Custodian`]s by pk
 #[diesel::dsl::auto_type(no_type_alias)]
 pub fn custodian_by_pk(pk: i64) -> _ {
@@ -52,8 +65,14 @@ pub fn movementtype_by_unique_name(unique_name: &str) -> _ {
     crate::schema::finances_accounts_movementtype::unique_name.eq(unique_name)
 }
 
-/// Returns a query fragment to order accounts [`Account`]s. This can be considered the _default_ ordering
+/// Returns a query fragment to filter [`Movement`]s by account_id
 #[diesel::dsl::auto_type]
 pub fn movement_filter_account_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_movement::account_id.eq(pk)
+}
+
+/// Returns a query fragment to filter [`Snapshot`]s by account_id
+#[diesel::dsl::auto_type]
+pub fn snapshot_filter_account_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_snapshot::account_id.eq(pk)
 }

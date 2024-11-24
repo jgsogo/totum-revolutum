@@ -2,6 +2,7 @@ use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::{Account, AccountType, Custodian};
+use finances_accounts::sql::filters::account_is_checking_account;
 use tauri::State;
 
 fn all_accounts(
@@ -9,10 +10,11 @@ fn all_accounts(
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all_with_custodian_and_type()
-        .filter(Account::opened())
+    Account::all()
+        .inner_join(Custodian::all())
+        .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-        .filter(Account::mine())
+        // .filter(Account::mine())
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
@@ -22,11 +24,12 @@ fn checking_accounts(
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all_with_custodian_and_type()
-        .filter(Account::opened())
+    Account::all()
+        .inner_join(Custodian::all())
+        .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-        .filter(Account::mine())
-        .filter(Account::checking_account())
+        // .filter(Account::mine())
+        .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(CHECKING_ACCOUNT))
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
@@ -36,11 +39,12 @@ fn investment_accounts(
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all_with_custodian_and_type()
-        .filter(Account::opened())
+    Account::all()
+        .inner_join(Custodian::all())
+        .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-        .filter(Account::mine())
-        .filter(Account::investment())
+        // .filter(Account::mine())
+        .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(INVESTMENT))
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
@@ -50,11 +54,12 @@ fn retirement_accounts(
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all_with_custodian_and_type()
-        .filter(Account::opened())
+    Account::all()
+        .inner_join(Custodian::all())
+        .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-        .filter(Account::mine())
-        .filter(Account::retirement())
+        // .filter(Account::mine())
+        .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(RETIREMENT))
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
@@ -92,7 +97,7 @@ pub async fn sidebar_menu(
                 .into_iter()
                 .map(|v| v.into())
                 .collect::<Vec<crate::models::Account>>();
-            Ok(crate::models::MenuGroup::new_grouped_by_holder(accounts))
+            Ok(crate::models::MenuGroup::new_grouped_by_custodian(accounts))
         }
         Err(e) => Err(e),
     }

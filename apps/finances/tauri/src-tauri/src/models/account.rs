@@ -10,7 +10,7 @@ type AccountAndRelatedData = (
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Account {
-    pub pk: i32,
+    pub pk: i64,
     pub name: String,
     pub custodian: Custodian,
     pub r#type: AccountType,

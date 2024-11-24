@@ -16,14 +16,10 @@ pub struct Snapshot {
 }
 
 impl Snapshot {
-    /// Creates a query to return all the [`Snapshot`] for a given [`Account`]. The snapshots are
-    /// in descending order according to their [`Snapshot::date_value`].
-    ///
-    /// To get the latest snapshot, just take the first from the returned vector.
+    /// Returns (a query to) all the [`Snapshot`]s (ordered-desc by date_value)
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn all_snapshots(account_pk: i64) -> _ {
+    pub fn all() -> _ {
         crate::schema::finances_accounts_snapshot::table
-            .filter(crate::schema::finances_accounts_snapshot::account_id.eq(account_pk))
-            .order((crate::schema::finances_accounts_snapshot::date_value.desc(),))
+            .order(crate::schema::finances_accounts_snapshot::date_value.desc())
     }
 }
