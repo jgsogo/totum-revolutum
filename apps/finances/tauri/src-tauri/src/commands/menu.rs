@@ -1,7 +1,6 @@
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::constants;
 use finances_accounts::models::{Account, AccountType, Custodian, TreeNodeList};
 use finances_accounts::sql::filters::accounttype_by_unique_names;
 use tauri::State;
@@ -47,11 +46,7 @@ fn checking_accounts(
 
     let checking_accounttypes_pks: Vec<i64> = get_all_accounttypes(
         &mut conn,
-        &[
-            constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
-            constants::accounttype::ASSETS_CURRENT_CASH,
-            constants::accounttype::ASSETS_CURRENT_CASH_FLOW,
-        ],
+        &[finances_accounts::constants::accounttype::ASSETS_CURRENT_SAVINGS],
     )?;
 
     Account::all()
@@ -72,13 +67,8 @@ fn investment_accounts(
     let investment_accounttypes_pks: Vec<i64> = get_all_accounttypes(
         &mut conn,
         &[
-            // constants::accounttype::ASSETS_CURRENT_STOCKS,
-            // constants::accounttype::ASSETS_CURRENT_ETF,
-            // constants::accounttype::ASSETS_CURRENT_FUNDS,
-            // constants::accounttype::ASSETS_NON_CURRENT_REAL_STATE,
-            constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
-            constants::accounttype::ASSETS_CURRENT_CASH,
-            constants::accounttype::ASSETS_CURRENT_CASH_FLOW,
+            finances_investments::constants::accounttype::ASSETS_CURRENT_INVESTMENT,
+            finances_investments::constants::accounttype::ASSETS_NON_CURRENT_REAL_STATE,
         ],
     )?;
 
@@ -99,12 +89,7 @@ fn retirement_accounts(
 
     let retirement_accounttypes_pks: Vec<i64> = get_all_accounttypes(
         &mut conn,
-        &[
-            // constants::accounttype::RETIREMENT_PLANS,
-            constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
-            constants::accounttype::ASSETS_CURRENT_CASH,
-            constants::accounttype::ASSETS_CURRENT_CASH_FLOW,
-        ],
+        &[finances_investments::constants::accounttype::ASSETS_NON_CURRENT_RETIREMENT],
     )?;
 
     Account::all()
@@ -132,6 +117,9 @@ pub async fn sidebar_menu(
         investment_accounts(pool)
     } else if category == "/retirement" {
         retirement_accounts(pool)
+    } else if category == "/other" {
+        // TODO: Other accounts not included in the categories above
+        Ok(vec![])
     } else if category == "/rentals" {
         // TODO: Return links to views about rented properties
         Ok(vec![])

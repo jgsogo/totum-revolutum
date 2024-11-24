@@ -14,13 +14,24 @@ def populate_accounttype(apps, schema_editor):
     )
 
     # / Activos / Corrientes
-    AccountType.objects.bulk_create(
+    (actions_corrientes_inversion,) = AccountType.objects.bulk_create(
         [
-            AccountType(tn_parent=activos_corrientes, name=_("Acciones")),
-            AccountType(tn_parent=activos_corrientes, name=_("ETF")),
-            AccountType(tn_parent=activos_corrientes, name=_("Fondo de inversión")),
+            AccountType(
+                tn_parent=activos_corrientes,
+                name=_("Inversión"),
+                unique_name=AccountTypeConstants.ASSETS_CURRENT_INVESTMENT,
+            ),
         ]
     )
+    # / Activos / Corrientes / Inversión
+    AccountType.objects.bulk_create(
+        [
+            AccountType(tn_parent=actions_corrientes_inversion, name=_("Acciones")),
+            AccountType(tn_parent=actions_corrientes_inversion, name=_("ETF")),
+            AccountType(tn_parent=actions_corrientes_inversion, name=_("Fondo de inversión")),
+        ]
+    )
+
     # / Activos / No corrientes
     plan_pensiones, bienes_inmuebles, _1, _2 = AccountType.objects.bulk_create(
         [
@@ -28,16 +39,19 @@ def populate_accounttype(apps, schema_editor):
                 tn_parent=activos_no_corrientes,
                 name=_("Plan de pensiones"),
                 is_abstract=True,
+                unique_name=AccountTypeConstants.ASSETS_NON_CURRENT_RETIREMENTPLAN,
             ),
             AccountType(
                 tn_parent=activos_no_corrientes,
                 name=_("Bienes inmuebles"),
                 is_abstract=True,
+                unique_name=AccountTypeConstants.ASSETS_NON_CURRENT_REALSTATE,
             ),
             AccountType(tn_parent=activos_no_corrientes, name=_("Colecciones/Arte")),
             AccountType(tn_parent=activos_no_corrientes, name=_("Vehículo")),
         ]
     )
+
     # / Activos / No corrientes / Plan de pensiones
     AccountType.objects.bulk_create(
         [

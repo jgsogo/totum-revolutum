@@ -15,7 +15,7 @@ fn test_queries() {
             .load::<AccountType>(&mut database.conn)
             .expect("Error loading account types");
 
-        assert_eq!(all.len(), 14);
+        assert_eq!(all.len(), 15);
     }
 }
 
@@ -33,7 +33,7 @@ fn test_ancestors() {
             .load::<(TreeNodeList, i32)>(&mut database.conn)
             .expect("Error loading account types (ancestors)");
 
-        assert_eq!(ancestors.len(), 14);
+        assert_eq!(ancestors.len(), 15);
 
         for (treenode_list, count) in ancestors {
             assert_eq!(treenode_list.nodes.len(), count.try_into().unwrap());
@@ -51,15 +51,15 @@ fn test_ancestors() {
         .get_result::<i64>(&mut database.conn)
         .unwrap();
 
-    // Check know ones: bank_account
+    // Check know ones: savings
     {
         let bank_account = AccountType::all()
             .filter(acounttype_by_unique_name(
-                constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
+                constants::accounttype::ASSETS_CURRENT_SAVINGS,
             ))
             .select(AccountType::as_select())
             .get_result::<AccountType>(&mut database.conn)
-            .expect("Error fetching ASSETS_CURRENT_BANK_ACCOUNT");
+            .expect("Error fetching ASSETS_CURRENT_SAVINGS");
 
         assert_eq!(bank_account.tn_ancestors_count, 2);
         assert_eq!(bank_account.tn_ancestors_pks.nodes, &[assets_pk, assets_current_pk]);
@@ -80,7 +80,7 @@ fn test_children() {
             .load::<(TreeNodeList, i32)>(&mut database.conn)
             .expect("Error loading account types (children)");
 
-        assert_eq!(children.len(), 14);
+        assert_eq!(children.len(), 15);
 
         for (treenode_list, count) in children {
             assert_eq!(treenode_list.nodes.len(), count.try_into().unwrap());
@@ -128,7 +128,7 @@ fn test_descendants() {
             .load::<(TreeNodeList, i32)>(&mut database.conn)
             .expect("Error loading account types (descendants)");
 
-        assert_eq!(descendants.len(), 14);
+        assert_eq!(descendants.len(), 15);
 
         for (treenode_list, count) in descendants {
             assert_eq!(treenode_list.nodes.len(), count.try_into().unwrap());
@@ -136,7 +136,9 @@ fn test_descendants() {
     }
 
     let cash_pk = AccountType::all()
-        .filter(acounttype_by_unique_name(constants::accounttype::ASSETS_CURRENT_CASH))
+        .filter(acounttype_by_unique_name(
+            constants::accounttype::ASSETS_CURRENT_SAVINGS,
+        ))
         .select(crate::schema::finances_accounts_accounttype::id)
         .get_result::<i64>(&mut database.conn)
         .unwrap();
@@ -149,7 +151,7 @@ fn test_descendants() {
             .get_result::<AccountType>(&mut database.conn)
             .expect("Error fetching ASSETS");
 
-        assert_eq!(assets.tn_descendants_count, 7);
+        assert_eq!(assets.tn_descendants_count, 8);
         assert!(assets.tn_descendants_pks.nodes.contains(&cash_pk));
     }
 }

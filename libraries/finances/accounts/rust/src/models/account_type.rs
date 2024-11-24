@@ -1,4 +1,3 @@
-use diesel::backend;
 use diesel::backend::Backend;
 use diesel::deserialize;
 use diesel::deserialize::FromSql;
@@ -39,7 +38,7 @@ where
     DB: Backend,
     String: FromSql<Text, DB>,
 {
-    fn from_sql(bytes: backend::RawValue<DB>) -> deserialize::Result<Self> {
+    fn from_sql(bytes: DB::RawValue<'_>) -> deserialize::Result<Self> {
         let binding = String::from_sql(bytes)?;
         let nodes_str = binding.trim();
         if nodes_str.is_empty() {

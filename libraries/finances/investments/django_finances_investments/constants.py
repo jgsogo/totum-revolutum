@@ -7,7 +7,9 @@ from django_finances_accounts.constants import (
 
 
 class AccountTypeConstants(AccountsAccountTypeConstants):
-    pass
+    ASSETS_CURRENT_INVESTMENT: str = "/assets/current/investment"
+    ASSETS_NON_CURRENT_REALSTATE: str = "/assets/non-current/real-state"
+    ASSETS_NON_CURRENT_RETIREMENTPLAN: str = "/assets/non-current/retirement"
 
 
 class MovementTypeConstants(AccountsMovementTypeConstants):

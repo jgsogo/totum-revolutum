@@ -6,9 +6,7 @@ class AccountTypeConstants:
     LIABILITIES: str = "/liabilities"
     ASSETS_CURRENT: str = "/assets/current"
     ASSETS_NONCURRENT: str = "/assets/non-current"
-    ASSETS_CURRENT_BANK_ACCOUNT: str = "/assets/current/bank-account"
-    ASSETS_CURRENT_CASH: str = "/assets/current/cash"
-    ASSETS_CURRENT_CASH_FLOW: str = "/assets/current/cash-flow"
+    ASSETS_CURRENT_SAVINGS: str = "/assets/current/savings"
 
 
 class MovementTypeConstants:
