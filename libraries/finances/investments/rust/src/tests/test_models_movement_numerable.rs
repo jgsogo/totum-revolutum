@@ -1,7 +1,9 @@
-use crate::models::{MovementNumerable, MovementNumerableType};
+use crate::models::MovementNumerable;
+use crate::sql::queries::all_movementnumerable_for_account_id;
 use crate::test_utils::PopulateDatabase;
 use diesel::prelude::*;
 use finances_accounts::models::{Movement, MovementType, Transaction};
+use finances_accounts::sql::filters::movement_filter_account_by_pk;
 use finances_accounts::test_utils::fixtures::database_with_accounts;
 
 #[test]
@@ -25,7 +27,11 @@ fn test_queries() {
 
     // All movements (as Movement) for a given account
     {
-        let all = Movement::all_with_related_data(account_id)
+        // TODO: Move these tests to finances_accounts
+        let all = Movement::all()
+            .filter(movement_filter_account_by_pk(account_id))
+            .inner_join(Transaction::all())
+            .inner_join(MovementType::all())
             .select((
                 Movement::as_select(),
                 Transaction::as_select(),
@@ -39,7 +45,7 @@ fn test_queries() {
 
     // All movements (as MovementNumerable) for a given account
     {
-        let all: Vec<MovementNumerableType> = MovementNumerable::all_with_related_data_raw(account_id)
+        let all: Vec<MovementNumerable> = all_movementnumerable_for_account_id()
             .bind::<diesel::sql_types::Int8, _>(account_id)
             .load(&mut database_with_accounts.conn)
             .expect("Error loading numerable movements");

@@ -1,6 +1,7 @@
 use tracing::error;
 
 use crate::models::{AccountType, MovementType};
+use crate::sql::filters::{acounttype_by_unique_name, movementtype_by_unique_name};
 use crate::types::NumericType;
 use anyhow::Result;
 use diesel::prelude::*;
@@ -58,10 +59,12 @@ impl TestDatabase {
     pub fn populate_accounts(&mut self) -> Result<()> {
         use crate::schema::finances_accounts_account::dsl::*;
 
-        let assets = AccountType::get_by_unique_name(crate::constants::accounttype::ASSETS)
+        let assets = AccountType::all()
+            .filter(acounttype_by_unique_name(crate::constants::accounttype::ASSETS))
             .select(AccountType::as_select())
             .first(&mut self.conn)?;
-        let assets_current = AccountType::get_by_unique_name(crate::constants::accounttype::ASSETS_CURRENT)
+        let assets_current = AccountType::all()
+            .filter(acounttype_by_unique_name(crate::constants::accounttype::ASSETS_CURRENT))
             .select(AccountType::as_select())
             .first(&mut self.conn)?;
 
@@ -148,7 +151,8 @@ impl TestDatabase {
     pub fn populate_movements(&mut self, account_pk: i64) -> Result<Vec<i64>> {
         self.populate_fx(account_pk * 10)?;
 
-        let expense = MovementType::get_by_unique_name(crate::constants::movementtype::EXPENSE)
+        let expense = MovementType::all()
+            .filter(movementtype_by_unique_name(crate::constants::movementtype::EXPENSE))
             .select(MovementType::as_select())
             .first(&mut self.conn)?;
 

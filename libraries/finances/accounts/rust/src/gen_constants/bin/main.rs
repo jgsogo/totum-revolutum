@@ -3,6 +3,7 @@ use camino::Utf8PathBuf;
 use clap::Parser;
 use diesel::prelude::*;
 use finances_accounts::models::{AccountType, MovementType};
+use finances_accounts::sql::filters::{acounttype_with_unique_name, movementtype_with_unique_name};
 use std::fs::File;
 use std::io::Write;
 use tracing::{debug, error};
@@ -63,7 +64,8 @@ fn main() -> Result<()> {
 
     // AccountType
     {
-        let account_types = AccountType::all_with_unique_name()
+        let account_types = AccountType::all()
+            .filter(acounttype_with_unique_name())
             .select(AccountType::as_select())
             .load(&mut conn)
             .expect("Error loading account types");
@@ -87,7 +89,8 @@ fn main() -> Result<()> {
 
     // MovementType
     {
-        let mov_types = MovementType::all_with_unique_name()
+        let mov_types = MovementType::all()
+            .filter(movementtype_with_unique_name())
             .select(MovementType::as_select())
             .load(&mut conn)
             .expect("Error loading account types");
