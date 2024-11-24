@@ -38,7 +38,7 @@ fn test_queries() {
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-            .order(crate::schema::finances_accounts_account::open.desc())
+            .order(account_ordered())
             .load::<(Account, Custodian, AccountType)>(&mut database_with_accounts.conn)
             .expect("Error loading accounts");
 
