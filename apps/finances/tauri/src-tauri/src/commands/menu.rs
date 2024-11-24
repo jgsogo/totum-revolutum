@@ -2,7 +2,7 @@ use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::constants;
-use finances_accounts::models::{Account, AccountType, Custodian};
+use finances_accounts::models::{Account, AccountType, Custodian, TreeNodeList};
 use finances_accounts::sql::filters::accounttype_by_unique_names;
 use tauri::State;
 
@@ -20,22 +20,39 @@ fn all_accounts(
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
+/// Given some 'unique_name's, get the PKs for all of them and their descendants
+fn get_all_accounttypes<'a>(conn: &mut PgConnection, unique_names: &'a [&'a str]) -> Result<Vec<i64>, String> {
+    let account_types = AccountType::all()
+        .select((
+            finances_accounts::schema::finances_accounts_accounttype::id,
+            finances_accounts::schema::finances_accounts_accounttype::tn_descendants_pks,
+        ))
+        .filter(accounttype_by_unique_names(unique_names))
+        .load::<(i64, TreeNodeList)>(conn)
+        .map_err(|e| format!("Error loading accounts: {}", e))?;
+    let mut account_types_pks = Vec::default();
+    for (acc_type_pk, mut tn_descendants_pks) in account_types {
+        account_types_pks.push(acc_type_pk);
+        account_types_pks.append(&mut tn_descendants_pks.nodes);
+    }
+    account_types_pks.sort();
+    account_types_pks.dedup();
+    Ok(account_types_pks)
+}
+
 fn checking_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    let checking_accounttypes_pks: Vec<i64> = {
-        AccountType::all()
-            .select(finances_accounts::schema::finances_accounts_accounttype::id)
-            .filter(accounttype_by_unique_names(&[
-                constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
-                constants::accounttype::ASSETS_CURRENT_CASH,
-                constants::accounttype::ASSETS_CURRENT_CASH_FLOW,
-            ]))
-            .load::<i64>(&mut conn)
-            .map_err(|e| format!("Error loading accounts: {}", e))?
-    };
+    let checking_accounttypes_pks: Vec<i64> = get_all_accounttypes(
+        &mut conn,
+        &[
+            constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
+            constants::accounttype::ASSETS_CURRENT_CASH,
+            constants::accounttype::ASSETS_CURRENT_CASH_FLOW,
+        ],
+    )?;
 
     Account::all()
         .inner_join(Custodian::all())
@@ -52,12 +69,25 @@ fn investment_accounts(
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
+    let investment_accounttypes_pks: Vec<i64> = get_all_accounttypes(
+        &mut conn,
+        &[
+            // constants::accounttype::ASSETS_CURRENT_STOCKS,
+            // constants::accounttype::ASSETS_CURRENT_ETF,
+            // constants::accounttype::ASSETS_CURRENT_FUNDS,
+            // constants::accounttype::ASSETS_NON_CURRENT_REAL_STATE,
+            constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
+            constants::accounttype::ASSETS_CURRENT_CASH,
+            constants::accounttype::ASSETS_CURRENT_CASH_FLOW,
+        ],
+    )?;
+
     Account::all()
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
         // .filter(Account::mine())
-        // .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(INVESTMENT))
+        .filter(finances_accounts::schema::finances_accounts_account::type_id.eq_any(investment_accounttypes_pks))
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
@@ -67,12 +97,22 @@ fn retirement_accounts(
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
+    let retirement_accounttypes_pks: Vec<i64> = get_all_accounttypes(
+        &mut conn,
+        &[
+            // constants::accounttype::RETIREMENT_PLANS,
+            constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
+            constants::accounttype::ASSETS_CURRENT_CASH,
+            constants::accounttype::ASSETS_CURRENT_CASH_FLOW,
+        ],
+    )?;
+
     Account::all()
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
         // .filter(Account::mine())
-        // .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(RETIREMENT))
+        .filter(finances_accounts::schema::finances_accounts_account::type_id.eq_any(retirement_accounttypes_pks))
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
