@@ -9,7 +9,7 @@ mod custodian;
 pub use custodian::Custodian;
 
 mod account_type;
-pub use account_type::AccountType;
+pub use account_type::{AccountType, TreeNodeList};
 
 mod fx;
 pub use fx::Fx;

@@ -28,12 +28,12 @@ pub fn account_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_account::id.eq(pk)
 }
 
-/// Returns a query fragment to filter [`Account`]s by [`AccountType`], selecting only those that are checking account (type equals 'XXXXX' or children)
-#[diesel::dsl::auto_type]
-pub fn account_is_checking_account() -> _ {
-    todo!("impl pending");
-    crate::schema::finances_accounts_account::id.eq(0i64)
-}
+// /// Returns a query fragment to filter [`Account`]s by [`AccountType`], selecting only those that are checking account (type equals 'XXXXX' or children)
+// #[diesel::dsl::auto_type]
+// pub fn accounttype_in_tree_hierarchy(pks: &[i64]) -> _ {
+//     todo!("impl pending");
+//     //crate::schema::finances_accounts_accounttype::tn_ancestors_pks.eq(0i64)
+// }
 
 /// Returns a query fragment to filter [`Custodian`]s by pk
 #[diesel::dsl::auto_type(no_type_alias)]

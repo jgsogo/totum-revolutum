@@ -69,10 +69,22 @@ def populate_optional_accounttypes(apps, schema_editor):
     # / Activos / Corrientes
     AccountType.objects.bulk_create(
         [
-            AccountType(tn_parent=activos_corrientes, name=_("Efectivo/Metálico/Cash")),
-            AccountType(tn_parent=activos_corrientes, name=_("Cuenta bancaria")),
+            AccountType(
+                tn_parent=activos_corrientes,
+                name=_("Efectivo/Metálico/Cash"),
+                unique_name=AccountTypeConstants.ASSETS_CURRENT_CASH,
+            ),
+            AccountType(
+                tn_parent=activos_corrientes,
+                name=_("Cuenta bancaria"),
+                unique_name=AccountTypeConstants.ASSETS_CURRENT_BANK_ACCOUNT,
+            ),
             AccountType(tn_parent=activos_corrientes, name=_("Depósito")),
-            AccountType(tn_parent=activos_corrientes, name=_("Flujo de caja")),
+            AccountType(
+                tn_parent=activos_corrientes,
+                name=_("Flujo de caja"),
+                unique_name=AccountTypeConstants.ASSETS_CURRENT_CASH_FLOW,
+            ),
         ]
     )
     # / Activos / No corrientes
