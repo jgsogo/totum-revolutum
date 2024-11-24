@@ -6,7 +6,6 @@ _just-check:
 
 # Updates all the dependencies (MODULE.bazel and 3rd parties not included)
 update: update-deps update-precommit
-    pre-commit autoupdate
 
 update-precommit:
     pre-commit autoupdate
