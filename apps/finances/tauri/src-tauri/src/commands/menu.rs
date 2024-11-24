@@ -1,8 +1,9 @@
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
+use finances_accounts::constants;
 use finances_accounts::models::{Account, AccountType, Custodian};
-use finances_accounts::sql::filters::account_is_checking_account;
+use finances_accounts::sql::filters::accounttype_by_unique_names;
 use tauri::State;
 
 fn all_accounts(
@@ -24,12 +25,24 @@ fn checking_accounts(
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
+    let checking_accounttypes_pks: Vec<i64> = {
+        AccountType::all()
+            .select(finances_accounts::schema::finances_accounts_accounttype::id)
+            .filter(accounttype_by_unique_names(&[
+                constants::accounttype::ASSETS_CURRENT_BANK_ACCOUNT,
+                constants::accounttype::ASSETS_CURRENT_CASH,
+                constants::accounttype::ASSETS_CURRENT_CASH_FLOW,
+            ]))
+            .load::<i64>(&mut conn)
+            .map_err(|e| format!("Error loading accounts: {}", e))?
+    };
+
     Account::all()
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
+        .filter(finances_accounts::schema::finances_accounts_account::type_id.eq_any(checking_accounttypes_pks))
         // .filter(Account::mine())
-        .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(CHECKING_ACCOUNT))
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
@@ -44,7 +57,7 @@ fn investment_accounts(
         .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
         // .filter(Account::mine())
-        .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(INVESTMENT))
+        // .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(INVESTMENT))
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
@@ -59,7 +72,7 @@ fn retirement_accounts(
         .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
         // .filter(Account::mine())
-        .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(RETIREMENT))
+        // .filter(account_is_checking_account()) // TODO: .filter(account_is_accounttype_or_children(RETIREMENT))
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }

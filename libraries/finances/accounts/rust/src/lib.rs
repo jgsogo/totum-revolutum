@@ -1,5 +1,5 @@
 pub mod models;
-mod schema;
+pub mod schema; // FIXME: Make this private
 pub mod types;
 
 #[cfg(test)]
