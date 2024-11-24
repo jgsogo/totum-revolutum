@@ -21,18 +21,4 @@ impl AccountType {
     pub fn all() -> _ {
         crate::schema::finances_accounts_accounttype::table
     }
-
-    /// Returns (a query to) all the [`AccountType`]s with 'unique_name
-    #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn all_with_unique_name() -> _ {
-        crate::schema::finances_accounts_accounttype::table
-            .filter(crate::schema::finances_accounts_accounttype::unique_name.is_not_null())
-    }
-
-    /// Returns (a query to) all the [`AccountType`]s for a given unique_name
-    #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn get_by_unique_name(unique_name: &str) -> _ {
-        crate::schema::finances_accounts_accounttype::table
-            .filter(crate::schema::finances_accounts_accounttype::unique_name.eq(unique_name))
-    }
 }

@@ -9,3 +9,11 @@ pub struct Custodian {
     pub description: Option<String>,
     pub country: String,
 }
+
+impl Custodian {
+    /// Returns (a query to) all the [`Custodian`]s
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all() -> _ {
+        crate::schema::finances_accounts_custodian::table
+    }
+}

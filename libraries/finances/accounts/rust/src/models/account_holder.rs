@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 
-pub use super::Account;
+use super::Account;
 
 #[derive(Queryable, Selectable, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::finances_accounts_accountholder)]
