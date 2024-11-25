@@ -5,29 +5,30 @@ use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let mut database_with_accounts = database_with_accounts();
+    let database_with_accounts = database_with_accounts();
+    let mut conn = database_with_accounts.pool.get().unwrap();
 
     {
         let all: i64 = Account::all()
             .count()
-            .get_result(&mut database_with_accounts.conn)
+            .get_result(&mut conn)
             .expect("Error counting 'all' accounts");
         assert_eq!(all, 2); // Only the opened accounts are returned
         let opened: i64 = Account::all()
             .filter(account_opened())
             .count()
-            .get_result(&mut database_with_accounts.conn)
+            .get_result(&mut conn)
             .expect("Error counting 'opened' accounts");
         assert_eq!(opened, 2);
         let closed: i64 = Account::all()
             .filter(account_closed())
             .count()
-            .get_result(&mut database_with_accounts.conn)
+            .get_result(&mut conn)
             .expect("Error counting 'closed' accounts");
         assert_eq!(closed, 0); // 'all' returns only the opened ones, then we filter for the closed ones :D
         let all_closed: i64 = Account::all_closed()
             .count()
-            .get_result(&mut database_with_accounts.conn)
+            .get_result(&mut conn)
             .expect("Error counting 'all_closed' accounts");
         assert_eq!(all_closed, 1); // 'all_closed' returns only the closed ones
     }
@@ -39,7 +40,7 @@ fn test_queries() {
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
             .order(account_ordered())
-            .load::<(Account, Custodian, AccountType)>(&mut database_with_accounts.conn)
+            .load::<(Account, Custodian, AccountType)>(&mut conn)
             .expect("Error loading accounts");
 
         assert_eq!(all.len(), 2);
@@ -71,7 +72,7 @@ fn test_queries() {
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
             .order(account_ordered())
-            .load::<(Account, Custodian, AccountType)>(&mut database_with_accounts.conn)
+            .load::<(Account, Custodian, AccountType)>(&mut conn)
             .expect("Error loading accounts");
 
         assert_eq!(all.len(), 1);
@@ -94,7 +95,7 @@ fn test_queries() {
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-            .load::<(Account, Custodian, AccountType)>(&mut database_with_accounts.conn)
+            .load::<(Account, Custodian, AccountType)>(&mut conn)
             .expect("Error loading accounts");
         assert_eq!(accounts.len(), 1);
 

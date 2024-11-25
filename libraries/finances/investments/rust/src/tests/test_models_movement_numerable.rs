@@ -19,6 +19,7 @@ fn test_queries() {
         .populate_movements_numerable(1)
         .expect("Error populating database with MovementNumerable instances");
 
+    let mut conn = database_with_accounts.pool.get().unwrap();
     {
         // TODO: Check that all movements for all acounts are equal to 4
         // let all = Movement::all()
@@ -37,7 +38,7 @@ fn test_queries() {
                 Transaction::as_select(),
                 MovementType::as_select(),
             ))
-            .load::<(Movement, Transaction, MovementType)>(&mut database_with_accounts.conn)
+            .load::<(Movement, Transaction, MovementType)>(&mut conn)
             .expect("Error loading movements");
 
         assert_eq!(all.len(), 2);
@@ -47,7 +48,7 @@ fn test_queries() {
     {
         let all: Vec<MovementNumerable> = all_movementnumerable_for_account_id()
             .bind::<diesel::sql_types::Int8, _>(account_id)
-            .load(&mut database_with_accounts.conn)
+            .load(&mut conn)
             .expect("Error loading numerable movements");
         assert_eq!(all.len(), 2);
     }

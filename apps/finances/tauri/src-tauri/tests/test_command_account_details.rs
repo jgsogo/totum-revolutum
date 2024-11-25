@@ -1,5 +1,6 @@
+use finances_accounts::test_utils::fixtures::database_with_accounts;
+use finances_app_lib::db::establish_connection;
 use finances_app_lib::models::Account;
-use finances_db::test_utils::fixtures::database_with_accounts;
 use serde_json::{json, Value};
 use tauri::{test::MockRuntime, Manager, WebviewWindow};
 
@@ -20,9 +21,8 @@ fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Account,
 }
 
 #[test]
-fn test_account_detail() {
-    let database = database_with_accounts();
-    let pool = finances_app_lib::db::establish_connection(database.filepath().to_str().unwrap());
+fn test_account_detail() -> Result<(), Value> {
+    let pool = database_with_accounts().pool;
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone());
     app.manage(pool); // FIXME: The `.manage` inside `create_app` is not working for the mock.
@@ -32,10 +32,7 @@ fn test_account_detail() {
 
     {
         let body = json!({ "pk": 0i32 });
-        let r = call_it(&webview, body);
-
-        assert!(r.is_ok());
-        let r = r.unwrap();
+        let r = call_it(&webview, body)?;
         assert_eq!(r.name, "Gastos compartidos");
     }
 
@@ -47,4 +44,5 @@ fn test_account_detail() {
         let r = r.unwrap_err();
         assert_eq!(r.as_str().unwrap(), "Error loading account: Record not found");
     }
+    Ok(())
 }

@@ -25,10 +25,11 @@ impl PopulateDatabase for TestDatabase {
             })
             .collect::<Vec<_>>();
 
+        let mut conn = self.pool.get()?;
         let results: Vec<i64> = diesel::insert_into(finances_investments_movementnumerable)
             .values(&movement_numerables)
             .returning(movement_ptr_id)
-            .get_results(&mut self.conn)?;
+            .get_results(&mut conn)?;
 
         Ok(results)
     }

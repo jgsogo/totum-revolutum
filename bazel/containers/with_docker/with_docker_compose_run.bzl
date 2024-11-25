@@ -1,15 +1,17 @@
-"""A rule that ensures that Postgres (in a docker container) is running while executing another binary"""
+"""A rule that ensures a docker container is running while executing another binary"""
 
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_rlocation_path")
 
-def _with_docker_run_impl(ctx):
+#FIXME: HAve a look to https://github.com/bazel-contrib/rules_oci/blob/main/oci/private/load.bzl
+
+def _with_docker_compose_run_impl(ctx):
     executable = ctx.actions.declare_file(ctx.label.name)
 
     # Environment: we will use both a file (for docker) and environment variables
     env = {
-        "POSTGRES_USER": "with_postgres",
-        "POSTGRES_DB": "with_postgres",
-        "POSTGRES_PASSWORD": "with_postgres",
+        "SQL_USER": "with_docker_compose",
+        # "POSTGRES_DB": "with_postgres",
+        "SQL_PASSWORD": "with_docker_compose",
     } | ctx.attr.env
 
     env_file = ctx.actions.declare_file(ctx.label.name + ".env")
@@ -29,6 +31,10 @@ def _with_docker_run_impl(ctx):
     for key, value in ctx.attr.env_transpose.items():
         env_transposition.append("export {}=${}".format(key, value))
 
+    docker_compose_files = []
+    for dc_file in ctx.files.docker_compose:
+        docker_compose_files.append("--file=$(pwd)/{}".format(dc_file.short_path))
+
     # Render the script we are executing
     ctx.actions.expand_template(
         template = ctx.file._run_template,
@@ -36,16 +42,17 @@ def _with_docker_run_impl(ctx):
         substitutions = {
             "%BASH_RLOCATION_FUNCTION%": BASH_RLOCATION_FUNCTION,
             "%DOCKER_CLI%": to_rlocation_path(ctx, ctx.file.docker_cli) if ctx.file.docker_cli else "",
-            "%CONTAINER_NAME%": ctx.label.package.replace("/", "_") + "_" + ctx.label.name,
-            "%POSTGRES_IMAGE_TAG%": ctx.attr.postgres_image_tag,
+            "%PROJECT_NAME%": ctx.label.package.replace("/", "_") + "_" + ctx.label.name,
+            "%SERVICES%": " ".join(ctx.attr.docker_services),
             "%ENV_FILE%": env_file.short_path,
             "%BINARIES%": " ".join(binaries),
             "%ENV_TRANSPOSE%": "\n".join(env_transposition),  # TODO: Create another file and source it here
+            "%DOCKER_COMPOSE_FILES%": " ".join(docker_compose_files),
         },
         is_executable = True,
     )
 
-    runtime_deps = [env_file]
+    runtime_deps = ctx.files.docker_compose + [env_file]
     if ctx.file.docker_cli:
         runtime_deps.append(ctx.file.docker_cli)
 
@@ -70,11 +77,17 @@ def _with_docker_run_impl(ctx):
         ),
     ]
 
-with_postgres_run = rule(
-    implementation = _with_docker_run_impl,
+with_docker_compose_run = rule(
+    implementation = _with_docker_compose_run_impl,
     attrs = {
-        "postgres_image_tag": attr.string(
-            doc = "Docker image to run",
+        "docker_compose": attr.label_list(
+            doc = "Docker compose file/s to run",
+            allow_files = True,
+            mandatory = True,
+        ),
+        "docker_services": attr.string_list(
+            doc = "Service/s to start",
+            default = [],
         ),
         "binaries": attr.label_list(
             doc = "Binaries to execute while the container is running",
@@ -82,7 +95,7 @@ with_postgres_run = rule(
             cfg = "target",
         ),
         "_run_template": attr.label(
-            default = Label("//bazel/containers/with_docker:with_postgres_run.tpl.sh"),
+            default = Label("//bazel/containers/with_docker:with_docker_compose_run.tpl.sh"),
             allow_single_file = True,
         ),
         "env": attr.string_dict(
@@ -106,14 +119,20 @@ with_postgres_run = rule(
         ),
     },
     executable = True,
-    doc = """Ensure postgres is running while executing the 'binary'. The binary will receive the postgres URL as argument""",
+    doc = """Ensure docker compose services are running while executing the 'binary'""",
 )
 
-with_postgres_test = rule(
-    implementation = _with_docker_run_impl,
+with_docker_compose_test = rule(
+    implementation = _with_docker_compose_run_impl,
     attrs = {
-        "postgres_image_tag": attr.string(
-            doc = "Docker image to run",
+        "docker_compose": attr.label_list(
+            doc = "Docker compose file/s to run",
+            allow_files = True,
+            mandatory = True,
+        ),
+        "docker_services": attr.string_list(
+            doc = "Service/s to start",
+            default = [],
         ),
         "binaries": attr.label_list(
             doc = "Binaries to execute while the container is running",
@@ -121,7 +140,7 @@ with_postgres_test = rule(
             cfg = "target",
         ),
         "_run_template": attr.label(
-            default = Label("//bazel/containers/with_docker:with_postgres_run.tpl.sh"),
+            default = Label("//bazel/containers/with_docker:with_docker_compose_run.tpl.sh"),
             allow_single_file = True,
         ),
         "env": attr.string_dict(
@@ -145,5 +164,5 @@ with_postgres_test = rule(
         ),
     },
     test = True,
-    doc = """Ensure postgres is running while executing the 'binary'. The binary will receive the postgres URL as argument""",
+    doc = """Ensure docker compose services are running while executing the 'binary'""",
 )

@@ -80,7 +80,7 @@ def django_project(name, deps, **kwargs):
         **kwargs
     )
 
-def django_project_container(name, version, repository, env = None, entrypoint = None):
+def django_project_container(name, version, repository, env = None, entrypoint = None, visibility = None):
     """Create OCI image with this application ready to run
 
     Args:
@@ -89,6 +89,7 @@ def django_project_container(name, version, repository, env = None, entrypoint =
         repository(str): Docker repository for the app image. Example: 'gcr.io/jgsogo/finances_app'
         env(Dict[str, str]): Environment variables
         entrypoint(Target): A pkg_tar target with (at least) the `entrypoint.sh` script to execute
+        visibility: Visibility argument for Bazel targets
     """
 
     settings_module = "{}.settings".format(native.package_name().replace("/", "."))
@@ -193,6 +194,6 @@ def django_project_container(name, version, repository, env = None, entrypoint =
         name = "{}-tarball".format(name),
         srcs = [":{}-load".format(name)],
         output_group = "tarball",
-        visibility = [":__subpackages__"],
+        visibility = visibility,
         tags = ["manual"],
     )

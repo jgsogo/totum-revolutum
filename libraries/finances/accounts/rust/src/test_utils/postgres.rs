@@ -1,33 +1,28 @@
-use tracing::error;
-
 use crate::models::{AccountType, MovementType};
 use crate::sql::filters::{acounttype_by_unique_name, movementtype_by_unique_name};
 use crate::types::NumericType;
 use anyhow::Result;
 use diesel::prelude::*;
+use diesel::r2d2::{ConnectionManager, Pool};
 
 pub struct TestDatabase {
-    pub conn: PgConnection,
+    pub pool: Pool<ConnectionManager<diesel::pg::PgConnection>>,
 }
 
-pub fn establish_connection(database_url: &str) -> Result<PgConnection, ConnectionError> {
-    match PgConnection::establish(&database_url) {
-        Ok(value) => Ok(value),
-        Err(e) => {
-            error!("Could not connect to PostgreSQL.");
-            error!("Error connecting to {}", database_url);
-            Err(e)
-        }
-    }
+pub fn establish_connection(database_url: &str) -> Pool<ConnectionManager<diesel::pg::PgConnection>> {
+    let manager = ConnectionManager::<diesel::pg::PgConnection>::new(database_url);
+    Pool::builder()
+        .test_on_check_out(true)
+        .build(manager)
+        .expect("Error creating DB connection pool")
 }
 
 impl TestDatabase {
     /// Creates a new [`TestDatabase`]
     pub fn new() -> Self {
         let database_url = std::env::var("POSTGRES_URL").expect("POSTGRES_URL environment variable is not set.");
-        let conn = establish_connection(&database_url).unwrap();
-
-        Self { conn }
+        let pool = establish_connection(&database_url);
+        Self { pool }
     }
 
     // pub fn populate_account_holders(&mut self) -> Result<()> {
@@ -52,21 +47,22 @@ impl TestDatabase {
                 (id.eq(1), name.eq("custodian1"), country.eq("us")),
                 (id.eq(2), name.eq("custodian2"), country.eq("nl")),
             ])
-            .execute(&mut self.conn)?;
+            .execute(&mut self.pool.get()?)?;
         Ok(())
     }
 
     pub fn populate_accounts(&mut self) -> Result<()> {
         use crate::schema::finances_accounts_account::dsl::*;
 
+        let mut conn = self.pool.get()?;
         let assets = AccountType::all()
             .filter(acounttype_by_unique_name(crate::constants::accounttype::ASSETS))
             .select(AccountType::as_select())
-            .first(&mut self.conn)?;
+            .first(&mut conn)?;
         let assets_current = AccountType::all()
             .filter(acounttype_by_unique_name(crate::constants::accounttype::ASSETS_CURRENT))
             .select(AccountType::as_select())
-            .first(&mut self.conn)?;
+            .first(&mut conn)?;
 
         diesel::insert_into(finances_accounts_account)
             .values(&vec![
@@ -107,7 +103,7 @@ impl TestDatabase {
                     is_numerable.eq(true),
                 ),
             ])
-            .execute(&mut self.conn)?;
+            .execute(&mut conn)?;
         Ok(())
     }
 
@@ -143,7 +139,7 @@ impl TestDatabase {
                 (id.eq(1), name.eq("transaction1")),
                 (id.eq(2), name.eq("transaction2")),
             ])
-            .execute(&mut self.conn)?;
+            .execute(&mut self.pool.get()?)?;
         Ok(())
     }
 
@@ -151,10 +147,11 @@ impl TestDatabase {
     pub fn populate_movements(&mut self, account_pk: i64) -> Result<Vec<i64>> {
         self.populate_fx(account_pk * 10)?;
 
+        let mut conn = self.pool.get()?;
         let expense = MovementType::all()
             .filter(movementtype_by_unique_name(crate::constants::movementtype::EXPENSE))
             .select(MovementType::as_select())
-            .first(&mut self.conn)?;
+            .first(&mut conn)?;
 
         use crate::schema::finances_accounts_movement::dsl::*;
         let results: Vec<i64> = diesel::insert_into(finances_accounts_movement)
@@ -179,7 +176,7 @@ impl TestDatabase {
                 ),
             ])
             .returning(id)
-            .get_results(&mut self.conn)?;
+            .get_results(&mut conn)?;
         Ok(results)
     }
 
@@ -217,7 +214,7 @@ impl TestDatabase {
                     date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 9).unwrap()),
                 ),
             ])
-            .execute(&mut self.conn)?;
+            .execute(&mut self.pool.get()?)?;
         Ok(())
     }
 }

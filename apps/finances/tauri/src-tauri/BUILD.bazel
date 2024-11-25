@@ -1,6 +1,8 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
+load("//bazel/containers/with_docker:with_docker_compose_run.bzl", "with_docker_compose_test")
 
 cargo_build_script(
     name = "build",
@@ -74,18 +76,75 @@ rust_test(
     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
 )
 
-# # Integration tests
-# rust_test_suite(
-#     name = "integration_tests",
-#     srcs = glob(["tests/**/test_*.rs"]),
-#     crate_features = ["sqlite"],
-#     deps = all_crate_deps(
-#         normal = True,
-#     ) + [
-#         ":applib/sqlite",
-#         "//apps/finances/finances_db:finances_db/sqlite",
-#     ],
-# )
+# Integration tests
+rust_test_suite(
+    name = "_integration_tests",
+    # srcs = glob(["tests/**/test_*.rs"]),
+    srcs = [
+        # "tests/test_wip.rs",
+        "tests/test_command_account_details.rs",
+    ],
+    crate_features = ["postgres"],
+    # data = glob(["tests/common/**/*.rs"]) + [
+    #     # "//apps/finances/django:app-docker_compose",
+    #     # "//apps/finances/django:app-tarball",
+    #     # "//bazel/python/django/containers/nginx:nginx-tarball",
+    # ],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":applib",
+        "//libraries/finances/accounts/rust:finances_accounts/test_utils",
+        "@crates_libraries//:serde_json",
+        "@crates_libraries//:tauri",
+    ],
+)
+
+expand_template(
+    name = "expose_postgresql",
+    out = "expose_postgresql.yaml",
+    tags = [
+        "manual",
+    ],
+    template = [
+        "services:",
+        "  db:",
+        "    ports:",
+        "      - 5432",
+        "",
+    ],
+)
+
+with_docker_compose_test(
+    name = "integration_tests",
+    binaries = [
+        "_integration_tests_tests/test_command_account_details",  # NOTE: The rust_test_suite is just a group of tests!
+    ],
+    docker_compose = [
+        "//apps/finances/django:app-docker_compose",  # FIXME: Are docker images a transitive dep? Do I need to load them first?
+        ":expose_postgresql",
+    ],
+    docker_services = [
+        "db",
+        "web",
+    ],
+    env = {
+        "SQL_ENGINE": "django.db.backends.postgresql",
+        "SECRET_KEY": "testing-app",
+        "SQL_DATABASE": "finances_tauri_tests",
+    },
+    # env_transpose = {
+    #     "SQL_DATABASE": "POSTGRES_DB",
+    #     "SQL_USER": "POSTGRES_USER",
+    #     "SQL_PASSWORD": "POSTGRES_PASSWORD",
+    #     "SQL_HOST": "POSTGRES_HOST",
+    #     "SQL_PORT": "POSTGRES_PORT",
+    # },
+)
 
 # TODO: Add targets to generate docs and to doc-testing
 
