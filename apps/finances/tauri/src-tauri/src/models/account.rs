@@ -1,18 +1,18 @@
 use serde::{Deserialize, Serialize};
 
-use crate::models::{AccountType, Holder};
+use crate::models::{AccountType, Custodian};
 
 type AccountAndRelatedData = (
-    finances_db::models::Account,
-    finances_db::models::AccountHolder,
-    finances_db::models::AccountType,
+    finances_accounts::models::Account,
+    finances_accounts::models::Custodian,
+    finances_accounts::models::AccountType,
 );
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Account {
-    pub pk: i32,
+    pub pk: i64,
     pub name: String,
-    pub holder: Holder,
+    pub custodian: Custodian,
     pub r#type: AccountType,
     pub ccy: String,
     pub identifier: Option<String>,
@@ -20,11 +20,11 @@ pub struct Account {
 
 impl From<AccountAndRelatedData> for Account {
     fn from(value: AccountAndRelatedData) -> Self {
-        let (account, holder, account_type) = value;
+        let (account, custodian, account_type) = value;
         Self {
             pk: account.id,
             name: account.name,
-            holder: holder.into(),
+            custodian: custodian.into(),
             r#type: account_type.into(),
             ccy: account.ccy,
             identifier: account.identifier,

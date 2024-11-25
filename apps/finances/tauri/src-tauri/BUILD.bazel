@@ -1,6 +1,6 @@
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
 
 cargo_build_script(
     name = "build",
@@ -35,57 +35,58 @@ rust_library(
         normal = True,
     ) + [
         ":build",
-        "//apps/finances/finances_db",
+        "//libraries/finances/accounts/rust:finances_accounts",
+        "//libraries/finances/investments/rust:finances_investments",
     ],
 )
 
-rust_library(
-    name = "applib/sqlite",
-    srcs = glob(
-        ["src/**/*.rs"],
-        exclude = ["src/main.rs"],
-    ),
-    crate_features = ["sqlite"],
-    crate_name = "finances_app_lib",
-    data = [
-        "tauri.conf.json",
-    ] + glob(["icons/**"]) + glob(["capabilities/**"]),
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
-        ":build",
-        "//apps/finances/finances_db:finances_db/sqlite",
-    ],
-)
+# rust_library(
+#     name = "applib/sqlite",
+#     srcs = glob(
+#         ["src/**/*.rs"],
+#         exclude = ["src/main.rs"],
+#     ),
+#     crate_features = ["sqlite"],
+#     crate_name = "finances_app_lib",
+#     data = [
+#         "tauri.conf.json",
+#     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+#     proc_macro_deps = all_crate_deps(
+#         proc_macro = True,
+#     ),
+#     deps = all_crate_deps(
+#         normal = True,
+#     ) + [
+#         ":build",
+#         "//apps/finances/finances_db:finances_db/sqlite",
+#     ],
+# )
 
-# Unittests
-rust_test(
-    name = "tests",
-    # compile_data = [":migrations"],
-    crate = ":applib/sqlite",
-    crate_features = [
-        "sqlite",
-    ],
-    data = [
-        "tauri.conf.json",
-    ] + glob(["icons/**"]) + glob(["capabilities/**"]),
-)
+# # Unittests
+# rust_test(
+#     name = "tests",
+#     # compile_data = [":migrations"],
+#     crate = ":applib/sqlite",
+#     crate_features = [
+#         "sqlite",
+#     ],
+#     data = [
+#         "tauri.conf.json",
+#     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+# )
 
-# Integration tests
-rust_test_suite(
-    name = "integration_tests",
-    srcs = glob(["tests/**/test_*.rs"]),
-    crate_features = ["sqlite"],
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
-        ":applib/sqlite",
-        "//apps/finances/finances_db:finances_db/sqlite",
-    ],
-)
+# # Integration tests
+# rust_test_suite(
+#     name = "integration_tests",
+#     srcs = glob(["tests/**/test_*.rs"]),
+#     crate_features = ["sqlite"],
+#     deps = all_crate_deps(
+#         normal = True,
+#     ) + [
+#         ":applib/sqlite",
+#         "//apps/finances/finances_db:finances_db/sqlite",
+#     ],
+# )
 
 # TODO: Add targets to generate docs and to doc-testing
 

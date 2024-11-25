@@ -22,6 +22,12 @@ pub fn account_ordered() -> _ {
     crate::schema::finances_accounts_account::open.desc()
 }
 
+/// Returns a query fragment to filter [`Account`]s by pk
+#[diesel::dsl::auto_type]
+pub fn account_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_account::id.eq(pk)
+}
+
 /// Returns a query fragment to filter [`Custodian`]s by pk
 #[diesel::dsl::auto_type(no_type_alias)]
 pub fn custodian_by_pk(pk: i64) -> _ {
@@ -40,6 +46,12 @@ pub fn acounttype_by_unique_name(unique_name: &str) -> _ {
     crate::schema::finances_accounts_accounttype::unique_name.eq(unique_name)
 }
 
+/// Returns query fragment to filter [`MovementType`]s by 'unique_name'
+#[diesel::dsl::auto_type(no_type_alias)]
+pub fn accounttype_by_unique_names<'a>(unique_names: &'a [&'a str]) -> _ {
+    crate::schema::finances_accounts_accounttype::unique_name.eq_any(unique_names)
+}
+
 /// Returns query fragment to filter [`MovementType`]s with 'unique_name
 #[diesel::dsl::auto_type(no_type_alias)]
 pub fn movementtype_with_unique_name() -> _ {
@@ -52,8 +64,14 @@ pub fn movementtype_by_unique_name(unique_name: &str) -> _ {
     crate::schema::finances_accounts_movementtype::unique_name.eq(unique_name)
 }
 
-/// Returns a query fragment to order accounts [`Account`]s. This can be considered the _default_ ordering
+/// Returns a query fragment to filter [`Movement`]s by account_id
 #[diesel::dsl::auto_type]
 pub fn movement_filter_account_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_movement::account_id.eq(pk)
+}
+
+/// Returns a query fragment to filter [`Snapshot`]s by account_id
+#[diesel::dsl::auto_type]
+pub fn snapshot_filter_account_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_snapshot::account_id.eq(pk)
 }

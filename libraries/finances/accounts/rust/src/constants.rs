@@ -7,6 +7,7 @@ pub mod accounttype {
     pub const LIABILITIES: &str = "/liabilities";
     pub const ASSETS_CURRENT: &str = "/assets/current";
     pub const ASSETS_NON_CURRENT: &str = "/assets/non-current";
+    pub const ASSETS_CURRENT_SAVINGS: &str = "/assets/current/savings";
 }
 
 pub mod movementtype {

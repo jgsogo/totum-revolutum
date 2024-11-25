@@ -13,15 +13,19 @@ pub struct MenuGroup {
 }
 
 impl MenuGroup {
-    pub fn new_grouped_by_holder(accounts: Vec<Account>) -> Vec<Self> {
+    pub fn new_grouped_by_custodian(accounts: Vec<Account>) -> Vec<Self> {
         accounts
             .into_iter()
             // order first, so all the groups are together
             .sorted_by(|acc_lhs, acc_rhs| {
-                Ord::cmp(&acc_lhs.holder.name.to_lowercase(), &acc_rhs.holder.name.to_lowercase())
+                // TODO: Reimplement this sort
+                Ord::cmp(
+                    &acc_lhs.custodian.name.to_lowercase(),
+                    &acc_rhs.custodian.name.to_lowercase(),
+                )
             })
             // split the vector into the groups
-            .chunk_by(|acc| acc.holder.name.clone())
+            .chunk_by(|acc| acc.custodian.name.clone())
             .into_iter()
             // create the MenuGroup entries from each chunk
             .map(|(key, chunk)| MenuGroup {

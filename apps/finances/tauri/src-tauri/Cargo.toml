@@ -7,8 +7,8 @@ edition = "2021"
 
 [features]
 default = ["postgres"]
-sqlite = ["finances_db/sqlite", "diesel/sqlite", "diesel/returning_clauses_for_sqlite_3_35"]
-postgres = ["finances_db/postgres", "diesel/postgres", "diesel/numeric"]
+# sqlite = ["finances_db/sqlite", "diesel/sqlite", "diesel/returning_clauses_for_sqlite_3_35"]
+postgres = ["finances_accounts/postgres", "finances_investments/postgres", "diesel/postgres", "diesel/numeric"]
 
 [lib]
 name = "finances_app_lib"
@@ -18,7 +18,8 @@ crate-type = ["lib", "cdylib", "staticlib"]
 tauri-build = { version = "2.0.3", features = [] }
 
 [dependencies]
-finances_db = { path = "../../finances_db" }
+finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
+finances_investments = { path = "../../../../libraries/finances/investments/rust" }
 
 bigdecimal = "0.4.5"
 diesel = { version = "2.2.4", features = ["r2d2", "chrono"] }
@@ -32,6 +33,7 @@ tauri-plugin-log = "2.0.2"
 itertools = "0.13.0"
 
 [dev-dependencies]
-finances_db = { path = "../../finances_db", default-features = false, features = ["sqlite", "test_utils"] }
-finances-app = { path = ".", default-features = false, features = ["sqlite"] }
+finances_accounts = { path = "../../../../libraries/finances/accounts/rust", features = ["postgres", "test_utils"] }
+finances_investments = { path = "../../../../libraries/finances/investments/rust", features = ["postgres", "test_utils"] }
+finances-app = { path = ".", default-features = false, features = ["postgres"] }
 tauri = { version = "2.1.1", features = ["test"] }

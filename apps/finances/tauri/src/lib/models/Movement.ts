@@ -1,14 +1,3 @@
-// pub amount: f32,
-// pub quantity: Option<i32>,
-// pub unit_value: Option<f32>,
-// pub direction: i32,
-// pub date: String,
-// pub date_value: String,
-// pub account: MovementAccount,
-// pub fx: Fx,
-// pub transfer: Transfer,
-// pub r#type: MovementType,
-
 import type {Account} from "$lib/models/Account";
 
 export class Movement {

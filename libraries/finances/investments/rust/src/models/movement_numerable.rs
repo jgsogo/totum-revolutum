@@ -14,12 +14,16 @@ use diesel::row::NamedRow;
 #[diesel(belongs_to(Movement, foreign_key = movement_ptr_id))]
 struct _MovementNumerable {
     movement_ptr_id: i64,
+    #[allow(dead_code)]
     quantity: NumericType,
+    #[allow(dead_code)]
     unit_value: NumericType,
 }
 
 pub struct MovementNumerable {
+    #[allow(dead_code)]
     movement: Movement,
+    #[allow(dead_code)]
     movement_numerable: _MovementNumerable,
 }
 

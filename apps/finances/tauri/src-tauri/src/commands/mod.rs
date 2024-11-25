@@ -9,24 +9,24 @@ pub mod menu;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_db::models::{Account, AccountHolder, AccountType, Movement, MovementType, Snapshot, Transfer};
+use finances_accounts::models::{Account, AccountType, Custodian, Movement, MovementType, Snapshot, Transaction};
+use finances_accounts::sql::filters::{account_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk};
 use tauri::State;
 
 #[tauri::command]
 pub async fn account_detail(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-    pk: i32,
+    pk: i64,
 ) -> Result<crate::models::Account, String> {
     log::info!("Get Accounts pk {pk}");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::get_with_holder_and_type(pk)
-        .select((
-            Account::as_select(),
-            AccountHolder::as_select(),
-            AccountType::as_select(),
-        ))
-        .first::<(Account, AccountHolder, AccountType)>(&mut conn)
+    Account::all()
+        .inner_join(Custodian::all())
+        .inner_join(AccountType::all())
+        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
+        .filter(account_by_pk(pk))
+        .first::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading account: {e}"))
         .map(|v| v.into())
 }
@@ -34,12 +34,13 @@ pub async fn account_detail(
 #[tauri::command]
 pub async fn account_snapshot_latest(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-    pk: i32,
+    pk: i64,
 ) -> Result<Option<crate::models::Snapshot>, String> {
     log::info!("Get (latest) Snapshot for account pk {pk}");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    let snapshot: Result<Option<Snapshot>, String> = Snapshot::all_snapshots(pk)
+    let snapshot: Result<Option<Snapshot>, String> = Snapshot::all()
+        .filter(snapshot_filter_account_by_pk(pk))
         .first(&mut conn)
         .optional()
         .map_err(|e| format!("Error loading last snapshot: {e}"));
@@ -53,12 +54,13 @@ pub async fn account_snapshot_latest(
 #[tauri::command]
 pub async fn account_snapshots(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-    pk: i32,
+    pk: i64,
 ) -> Result<Vec<crate::models::Snapshot>, String> {
     log::info!("Get all Snapshots for account pk {pk}");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    let snapshots: Vec<Snapshot> = Snapshot::all_snapshots(pk)
+    let snapshots: Vec<Snapshot> = Snapshot::all()
+        .filter(snapshot_filter_account_by_pk(pk))
         .load(&mut conn)
         .expect("Error returning all the snapshots");
 
@@ -69,19 +71,21 @@ pub async fn account_snapshots(
 #[tauri::command]
 pub async fn account_movements(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-    pk: i32,
+    pk: i64,
 ) -> Result<Vec<crate::models::Movement>, String> {
     log::info!("Get all Movements for account pk {pk}");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    let movements = Movement::all_with_related_data(pk)
+    let movements = Movement::all()
+        .filter(movement_filter_account_by_pk(pk))
+        .inner_join(Transaction::all())
+        .inner_join(MovementType::all())
         .select((
             Movement::as_select(),
-            // Fx::as_select(),
-            Transfer::as_select(),
+            Transaction::as_select(),
             MovementType::as_select(),
         ))
-        .load::<(Movement, Transfer, MovementType)>(&mut conn)
+        .load::<(Movement, Transaction, MovementType)>(&mut conn)
         .expect("Error returning all the movements");
 
     log::info!("Found {} movements for account pk {pk}", movements.len());

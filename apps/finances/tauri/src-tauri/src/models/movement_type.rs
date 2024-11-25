@@ -9,16 +9,14 @@ pub enum ParentMovementType {
 pub struct MovementType {
     // pub pk: i32,
     pub name: String,
-    pub level: i16,
-    pub parent: Option<ParentMovementType>,
+    // pub parent: Option<ParentMovementType>,
 }
 
-impl From<finances_db::models::MovementType> for MovementType {
-    fn from(value: finances_db::models::MovementType) -> Self {
+impl From<finances_accounts::models::MovementType> for MovementType {
+    fn from(value: finances_accounts::models::MovementType) -> Self {
         Self {
             name: value.name,
-            level: value.level,
-            parent: value.parent_id.map(ParentMovementType::Id),
+            // parent: value.parent_id.map(ParentMovementType::Id),
         }
     }
 }
