@@ -78,7 +78,9 @@ with_postgres_test(
     name = "integration_tests",
     # First migrate,then run the tests
     binaries = [
-        "//libraries/finances/accounts/django_finances_accounts:migrate",
+        "//libraries/finances/investments/django_finances_investments:migrate",
+        "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
+        "//libraries/finances/investments/django_finances_investments:populate_test_database",
     ] + ["_integration_tests_{}".format(it.replace(".rs", "")) for it in integration_tests_files],  # NOTE: The rust_test_suite is just a group of tests!
     env = {
         "SQL_ENGINE": "django.db.backends.postgresql",

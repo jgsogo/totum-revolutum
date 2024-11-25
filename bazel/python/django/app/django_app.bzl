@@ -70,7 +70,7 @@ def django_app(name, deps = None, visibility = None, app_label = None):
 
     py_library(
         name = name,
-        # Includes only the actual application files. Tests and management commands are not part of the library
+        # Includes only the actual application files. Tests and run_local are not part of the library
         srcs = native.glob(
             ["**/*.py"],
             exclude = [

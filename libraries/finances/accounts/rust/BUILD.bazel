@@ -75,9 +75,10 @@ rust_test(
 
 with_postgres_test(
     name = "tests-postgres",
-    # First migrate,then run the tests
+    # First migrate, then populate the database, then run the tests
     binaries = [
         "//libraries/finances/accounts/django_finances_accounts:migrate",
+        "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
         ":_tests",
     ],
     env = {
