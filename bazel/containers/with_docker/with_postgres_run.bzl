@@ -2,6 +2,8 @@
 
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_rlocation_path")
 
+POSTGRES_IMAGE_TAG = "17"
+
 def _with_docker_run_impl(ctx):
     executable = ctx.actions.declare_file(ctx.label.name)
 
@@ -75,6 +77,7 @@ with_postgres_run = rule(
     attrs = {
         "postgres_image_tag": attr.string(
             doc = "Docker image to run",
+            default = POSTGRES_IMAGE_TAG,
         ),
         "binaries": attr.label_list(
             doc = "Binaries to execute while the container is running",
@@ -114,6 +117,7 @@ with_postgres_test = rule(
     attrs = {
         "postgres_image_tag": attr.string(
             doc = "Docker image to run",
+            default = POSTGRES_IMAGE_TAG,
         ),
         "binaries": attr.label_list(
             doc = "Binaries to execute while the container is running",

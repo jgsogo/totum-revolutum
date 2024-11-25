@@ -90,7 +90,6 @@ with_postgres_test(
         "SQL_HOST": "POSTGRES_HOST",
         "SQL_PORT": "POSTGRES_PORT",
     },
-    postgres_image_tag = "17",
 )
 
 ###

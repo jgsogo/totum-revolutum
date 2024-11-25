@@ -1,5 +1,4 @@
 use finances_accounts::test_utils::fixtures::database_with_accounts;
-use finances_app_lib::db::establish_connection;
 use finances_app_lib::models::Account;
 use serde_json::{json, Value};
 use tauri::{test::MockRuntime, Manager, WebviewWindow};

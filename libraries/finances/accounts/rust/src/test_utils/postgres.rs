@@ -107,29 +107,26 @@ impl TestDatabase {
         Ok(())
     }
 
-    // /// Populates some snapshots for the given account
-    // pub fn populate_snapshots(&mut self, account_pk: i32) -> Result<()> {
-    //     use crate::schema::data_snapshot::dsl::*;
-    //     diesel::insert_into(data_snapshot)
-    //         .values(&vec![
-    //             (
-    //                 amount.eq::<NumericType>(0.into()),
-    //                 quantity.eq::<Option<i32>>(None),
-    //                 unit_value.eq::<Option<NumericType>>(None),
-    //                 date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
-    //                 account_id.eq(account_pk),
-    //             ),
-    //             (
-    //                 amount.eq::<NumericType>(1.into()),
-    //                 quantity.eq::<Option<i32>>(None),
-    //                 unit_value.eq::<Option<NumericType>>(None),
-    //                 date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 30).unwrap()),
-    //                 account_id.eq(account_pk),
-    //             ),
-    //         ])
-    //         .execute(&mut self.conn)?;
-    //     Ok(())
-    // }
+    /// Populates some snapshots for the given account
+    pub fn populate_snapshots(&mut self, account_pk: i64) -> Result<()> {
+        use crate::schema::finances_accounts_snapshot::dsl::*;
+        let mut conn = self.pool.get()?;
+        diesel::insert_into(finances_accounts_snapshot)
+            .values(&vec![
+                (
+                    amount.eq::<NumericType>(0.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 6).unwrap()),
+                    account_id.eq(account_pk),
+                ),
+                (
+                    amount.eq::<NumericType>(1.into()),
+                    date_value.eq(chrono::NaiveDate::from_ymd_opt(2024, 9, 30).unwrap()),
+                    account_id.eq(account_pk),
+                ),
+            ])
+            .execute(&mut conn)?;
+        Ok(())
+    }
 
     pub fn populate_transactions(&mut self) -> Result<()> {
         use crate::schema::finances_accounts_transaction::dsl::*;

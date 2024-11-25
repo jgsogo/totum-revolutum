@@ -1,5 +1,5 @@
+use finances_accounts::test_utils::fixtures::database_with_accounts;
 use finances_app_lib::models::MenuGroup;
-use finances_db::test_utils::fixtures::database_with_accounts;
 use serde_json::{json, Value};
 use tauri::{test::MockRuntime, Manager, WebviewWindow};
 
@@ -22,7 +22,7 @@ fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Vec<Menu
 #[test]
 fn test_category_all() {
     let database = database_with_accounts();
-    let pool = finances_app_lib::db::establish_connection(database.filepath().to_str().unwrap());
+    let pool = database.pool;
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone());
     app.manage(pool); // FIXME: The `.manage` inside `create_app` is not working for the mock.
