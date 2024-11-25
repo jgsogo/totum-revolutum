@@ -1,6 +1,6 @@
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 
 cargo_build_script(
     name = "build",
@@ -62,18 +62,17 @@ rust_library(
 #     ],
 # )
 
-# # Unittests
-# rust_test(
-#     name = "tests",
-#     # compile_data = [":migrations"],
-#     crate = ":applib/sqlite",
-#     crate_features = [
-#         "sqlite",
-#     ],
-#     data = [
-#         "tauri.conf.json",
-#     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
-# )
+# Unittests
+rust_test(
+    name = "tests",
+    crate = ":applib",
+    crate_features = [
+        "postgres",
+    ],
+    data = [
+        "tauri.conf.json",
+    ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+)
 
 # # Integration tests
 # rust_test_suite(
