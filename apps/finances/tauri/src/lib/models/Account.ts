@@ -16,9 +16,11 @@ export class AccountType {
 
 export class Holder {
     private readonly name: string;
+    private readonly is_company: boolean;
 
-    constructor(name: string) {
+    constructor(name: string, is_company: boolean) {
         this.name = name;
+        this.is_company = is_company;
     }
 
     toString() {

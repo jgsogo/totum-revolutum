@@ -126,3 +126,18 @@ export const account_movements = async (account: Account): Promise<Movement[]> =
         return new Movement(it.amount, it.direction, it.date, it.date_value, it.quantity, it.unit_value)
     });
 };
+
+
+/**
+ * Returns (a promise to) all the Holders in the database
+ * @returns {Holder[]} All the holders
+ */
+export const holders = async (): Promise<Holder[]> => {
+    const data: {
+        name: string,
+        is_company: boolean
+    }[] = await invoke("holders", {});
+    return data.map((it) => {
+        return new Holder(it.name, it.is_company);
+    });
+};

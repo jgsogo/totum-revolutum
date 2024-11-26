@@ -1,5 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
 load("//bazel/tauri:defs.bzl", "tauri_run")
 
 npm_link_all_packages(name = "node_modules")
@@ -40,4 +41,21 @@ tauri_run(
     name = "dev",
     backend = "//apps/finances/tauri/src-tauri:app",
     frontend = ":devserver",
+)
+
+# FIXME: This is mostly a workaround because the ":dev" target is not working (see ../README.md),
+# it executes "tauri dev" outside Bazel using the files in the workspace
+sh_with_runfiles_binary(
+    name = "dev_sh",
+    args = [
+        "--dir /Users/jgsogo/personal/totum-revolutum/apps/finances/tauri",
+        "tauri",
+        "dev",
+    ],
+    tags = [
+        "manual",
+        "workaround",
+    ],
+    tool = "@pnpm",
+    visibility = ["//visibility:public"],
 )

@@ -36,6 +36,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         database_url = options["LEGACY_DATABASE_URL"]
+        database_url = database_url.lstrip("postgres:")
         engine = create_engine(f"postgresql+psycopg:{database_url}")
 
         with engine.connect() as conn:

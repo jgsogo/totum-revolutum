@@ -4,10 +4,14 @@ use serde::{Deserialize, Serialize};
 pub struct Holder {
     // pub pk: i32,
     pub name: String,
+    pub is_company: bool,
 }
 
-impl From<finances_db::models::AccountHolder> for Holder {
-    fn from(value: finances_db::models::AccountHolder) -> Self {
-        Self { name: value.name }
+impl From<finances_accounts::models::AccountHolder> for Holder {
+    fn from(value: finances_accounts::models::AccountHolder) -> Self {
+        Self {
+            name: value.name,
+            is_company: value.is_company,
+        }
     }
 }

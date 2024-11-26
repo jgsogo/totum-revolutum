@@ -13,6 +13,16 @@ At this moment there are two applications here:
 
 ### Tauri - Dev environment
 
+Use workaround provided by the following command, it setups everything required
+
+```
+bazel run //apps/finances:dev
+```
+
+The Tauri frontend will start, and Django app is running as well in http://localhost:1337/admin/
+
+---
+
 The following command starts the application from the workspace:
 
 ```sh

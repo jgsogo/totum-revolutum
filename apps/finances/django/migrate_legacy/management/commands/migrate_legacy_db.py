@@ -64,6 +64,7 @@ class Command(BaseCommand):
             Custodian.objects.all().delete()
 
         database_url = options["LEGACY_DATABASE_URL"]
+        database_url = database_url.lstrip("postgres:")
         engine = create_engine(f"postgresql+psycopg:{database_url}")
 
         with engine.connect() as c:
@@ -405,7 +406,7 @@ class Command(BaseCommand):
                     continue
 
                 # If all NOT exist, create the transaction and the movements
-                transaction = self._create_one_transaction(transfer_description)
+                transaction = self._create_one_transaction(conn, transfer_description)
 
                 for movement in movements:
                     (

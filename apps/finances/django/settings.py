@@ -138,6 +138,12 @@ STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:1337"
+    # FIXME: Match with the actual port used in the docker-compose NGINX_PORT?
+    # FIXME: Match with the actual domain used for NGINX
+]
+
 # finances-data
 MONEY_TOLERANCE = 0
 

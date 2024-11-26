@@ -33,6 +33,7 @@ pub fn create_app<R: tauri::Runtime>(
             commands::account_snapshot_latest,
             commands::account_snapshots,
             commands::account_movements,
+            commands::holders,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

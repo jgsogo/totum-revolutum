@@ -1,9 +1,19 @@
 <script>
 	import '../app.postcss';
-	import { DarkMode } from 'flowbite-svelte';
-	let darkmodebtn =
-		'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-lg p-2.5 fixed right-4 top-2 z-50';
+	import Navbar from './Navbar.svelte';
+	import Sidebar from './Sidebar.svelte';
+	let drawerHidden = false;
 </script>
 
-<DarkMode btnClass={darkmodebtn} />
-<slot />
+<header
+	class="fixed top-0 z-40 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
+>
+	<Navbar bind:drawerHidden />
+</header>
+<div class="overflow-hidden lg:flex">
+	<Sidebar bind:drawerHidden />
+	<div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
+		<slot />
+
+	</div>
+</div>

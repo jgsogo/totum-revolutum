@@ -62,6 +62,7 @@ docker_compose(
     app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
     app_repository = repository,
     visibility = ["//apps/finances:__subpackages__"],
+    # FIXME: To ensure we are using the right deps, we need to load DjangoApp and Nginx container first
 )
 
 ####
