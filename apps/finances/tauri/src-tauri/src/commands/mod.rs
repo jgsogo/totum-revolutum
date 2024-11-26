@@ -12,7 +12,9 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::{
     Account, AccountHolder, AccountType, Custodian, Movement, MovementType, Snapshot, Transaction,
 };
-use finances_accounts::sql::filters::{account_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk};
+use finances_accounts::sql::filters::{
+    account_by_pk, accountholder_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk,
+};
 use tauri::State;
 
 #[tauri::command]
@@ -108,4 +110,20 @@ pub async fn holders(
 
     log::info!("Found {} holders", holders.len());
     Ok(holders.into_iter().map(|v| v.into()).collect())
+}
+
+#[tauri::command]
+pub async fn holder_details(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+    pk: i64,
+) -> Result<crate::models::Holder, String> {
+    log::info!("Get Holder pk {pk}");
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    AccountHolder::all()
+        .filter(accountholder_by_pk(pk))
+        .select(AccountHolder::as_select())
+        .first::<AccountHolder>(&mut conn)
+        .map_err(|e| format!("Error loading account: {e}"))
+        .map(|v| v.into())
 }

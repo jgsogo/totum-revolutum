@@ -106,8 +106,9 @@ fn retirement_accounts(
 pub async fn sidebar_menu(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     category: &str,
+    holder_pk: i64,
 ) -> Result<Vec<crate::models::MenuGroup>, String> {
-    log::info!("Get Accounts for category {category}");
+    log::info!("Get Accounts for category {category} and holder {holder_pk}");
 
     let accounts = if category == "/all" {
         all_accounts(pool)

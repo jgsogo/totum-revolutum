@@ -30,7 +30,7 @@ fn test_category_all() {
         .unwrap();
 
     {
-        let body = json!({ "category": "/all" });
+        let body = json!({ "category": "/all", "holderPk": 0i64 });
         let r = call_it(&webview, body);
 
         assert!(r.is_ok());
@@ -61,7 +61,7 @@ fn test_category_all() {
     }
 
     {
-        let body = json!({ "category": "/savings" });
+        let body = json!({ "category": "/savings", "holderPk": 0i64 });
         let r = call_it(&webview, body);
 
         assert!(r.is_ok());
@@ -83,7 +83,7 @@ fn test_category_all() {
     }
 
     {
-        let body = json!({ "category": "/investments" });
+        let body = json!({ "category": "/investments", "holderPk": 0i64 });
         let r = call_it(&webview, body);
 
         assert!(r.is_ok());
@@ -105,7 +105,7 @@ fn test_category_all() {
     }
 
     {
-        let body = json!({ "category": "/retirement" });
+        let body = json!({ "category": "/retirement", "holderPk": 0i64 });
         let r = call_it(&webview, body);
 
         assert!(r.is_ok());
@@ -121,7 +121,7 @@ fn test_category_all() {
     }
 
     {
-        let body = json!({ "category": "/rentals" });
+        let body = json!({ "category": "/rentals", "holderPk": 0i64 });
         let r = call_it(&webview, body);
 
         assert!(r.is_ok());
@@ -130,7 +130,7 @@ fn test_category_all() {
     }
 
     {
-        let body = json!({ "category": "/taxes" });
+        let body = json!({ "category": "/taxes", "holderPk": 0i64 });
         let r = call_it(&webview, body);
 
         assert!(r.is_ok());
@@ -140,7 +140,7 @@ fn test_category_all() {
 
     // An invalid category
     {
-        let body = json!({ "category": "<not-valid>" });
+        let body = json!({ "category": "<not-valid>", "holderPk": 0i64 });
         let r = call_it(&webview, body);
 
         assert!(r.is_err());

@@ -75,3 +75,9 @@ pub fn movement_filter_account_by_pk(pk: i64) -> _ {
 pub fn snapshot_filter_account_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_snapshot::account_id.eq(pk)
 }
+
+/// Returns a query fragment to filter [`Account`]s by pk
+#[diesel::dsl::auto_type]
+pub fn accountholder_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_accountholder::id.eq(pk)
+}

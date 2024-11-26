@@ -2,13 +2,7 @@
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/stores";
 
-  import {
-    Sidebar,
-    SidebarDropdownWrapper,
-    SidebarGroup,
-    SidebarItem,
-    SidebarWrapper,
-  } from "flowbite-svelte";
+  import { Sidebar, SidebarDropdownWrapper, SidebarGroup, SidebarItem, SidebarWrapper } from "flowbite-svelte";
   import {
     AngleDownOutline,
     AngleUpOutline,
@@ -25,9 +19,10 @@
     TableColumnSolid,
   } from "flowbite-svelte-icons";
 
-  import { sidebar_menu } from "$lib/commands";
+  let { menu, drawerHidden } = $props();
 
-  export let drawerHidden: boolean = false;
+  // export let drawerHidden: boolean = false;
+  // export let holder: Holder;
   const closeDrawer = () => {
     drawerHidden = true;
   };
@@ -37,7 +32,7 @@
   let itemClass =
     "flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700";
   let groupClass = "pt-2 space-y-2";
-  $: mainSidebarUrl = $page.url.pathname;
+  // $: mainSidebarUrl = $page.url.pathname;
 
   let links = [
     {
@@ -65,7 +60,6 @@
 
 <Sidebar
   class={drawerHidden ? "hidden" : ""}
-  activeUrl={mainSidebarUrl}
   activeClass="bg-gray-100 dark:bg-gray-700"
   asideClass="fixed inset-0 z-30 flex-none h-full w-64 lg:h-auto border-e border-gray-200 dark:border-gray-600 lg:overflow-y-visible lg:pt-16 lg:block"
 >
@@ -75,43 +69,20 @@
   >
     <nav class="divide-y divide-gray-200 dark:divide-gray-700">
       <SidebarGroup ulClass={groupClass} class="mb-3">
-        <!-- All the accounts here -->
-        {#await sidebar_menu("/all")}
-          <SidebarItem
-            label="Loading account"
-            spanClass="ml-3"
-            class={itemClass}
-            target="_blank"
-          >
-          </SidebarItem>
-        {:then account_group}
-          {#each account_group as { name, accounts } (name)}
-            <SidebarDropdownWrapper label={name} class="pr-3">
-              <AngleDownOutline slot="arrowdown" strokeWidth="3.3" size="sm" />
-              <AngleUpOutline slot="arrowup" strokeWidth="3.3" size="sm" />
-              {#each accounts as account}
-                <SidebarItem
-                  label={account.name}
-                  spanClass="ml-9"
-                  class={itemClass}
-                />
-              {/each}
-            </SidebarDropdownWrapper>
-          {/each}
-        {:catch error}
-          <p style="color: red">{error.message}</p>
-        {/await}
+        {#each menu as { name, accounts } (name)}
+          <SidebarDropdownWrapper label={name} class="pr-3">
+            <AngleDownOutline slot="arrowdown" strokeWidth="3.3" size="sm" />
+            <AngleUpOutline slot="arrowup" strokeWidth="3.3" size="sm" />
+            {#each accounts as account}
+              <SidebarItem label={account.name} spanClass="ml-9" class={itemClass} />
+            {/each}
+          </SidebarDropdownWrapper>
+        {/each}
       </SidebarGroup>
 
       <SidebarGroup ulClass={groupClass}>
         {#each links as { label, href, icon } (label)}
-          <SidebarItem
-            {label}
-            {href}
-            spanClass="ml-3"
-            class={itemClass}
-            target="_blank"
-          >
+          <SidebarItem {label} {href} spanClass="ml-3" class={itemClass} target="_blank">
             <svelte:component this={icon} slot="icon" class={iconClass} />
           </SidebarItem>
         {/each}
