@@ -1,45 +1,9 @@
-<script lang="ts">
+<script>
 	import '../app.postcss';
-	import { AppShell, initializeStores, Toast, Drawer, getDrawerStore, AppBar } from '@skeletonlabs/skeleton';
-
-    // Finances Components
-    import FinancesAppBar from '$lib/components/FinancesAppBar/FinancesAppBar.svelte';
-    import FinancesSidebar from '$lib/components/FinancesSidebar/FinancesSidebar.svelte';
-    import FinancesDrawer from '$lib/components/FinancesDrawer/FinancesDrawer.svelte';
-
-    // Dependency: Floating UI
-	import { storePopup } from '@skeletonlabs/skeleton';
-	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
-	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
-
-    // Global Stylesheets
-	import '../app.postcss';
-	// Font Awesome
-	import '@fortawesome/fontawesome-free/css/fontawesome.css';
-	import '@fortawesome/fontawesome-free/css/brands.css';
-	import '@fortawesome/fontawesome-free/css/solid.css';
-
-    initializeStores();
-
-    const drawerStore = getDrawerStore();
+	import { DarkMode } from 'flowbite-svelte';
+	let darkmodebtn =
+		'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-lg p-2.5 fixed right-4 top-2 z-50';
 </script>
 
-<Toast />
-<FinancesDrawer />
-
-
-<!-- App Shell -->
-<AppShell slotSidebarLeft="bg-surface-50-900-token lg:w-auto">
-    <!-- Header -->
-	<svelte:fragment slot="header">
-        <FinancesAppBar />
-	</svelte:fragment>
-
-	<!-- Sidebar (Left) -->
-	<svelte:fragment slot="sidebarLeft">
-		<FinancesSidebar div_class="hidden lg:grid w-[360px] overflow-hidden" />
-	</svelte:fragment>
-
-	<!-- Page Content -->
-	<slot />
-</AppShell>
+<DarkMode btnClass={darkmodebtn} />
+<slot />
