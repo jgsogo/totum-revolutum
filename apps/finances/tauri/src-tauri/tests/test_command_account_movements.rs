@@ -1,4 +1,4 @@
-use finances_accounts::test_utils::fixtures::database_with_accounts;
+use finances_accounts::test_utils::establish_connection;
 use finances_app_lib::models::Movement;
 use serde_json::{json, Value};
 use tauri::{test::MockRuntime, Manager, WebviewWindow};
@@ -21,10 +21,7 @@ fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Vec<Move
 
 #[test]
 fn test_account_movements() {
-    let mut database = database_with_accounts();
-    database.populate_transactions().unwrap();
-    database.populate_movements(0).unwrap();
-    let pool = database.pool;
+    let pool = establish_connection();
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone());
     app.manage(pool); // FIXME: The `.manage` inside `create_app` is not working for the mock.

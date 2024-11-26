@@ -1,12 +1,12 @@
 use crate::models::{Account, AccountType, Custodian};
 use crate::sql::filters::{account_closed, account_opened, account_ordered, custodian_by_pk};
-use crate::test_utils::fixtures::database_with_accounts;
+use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let database_with_accounts = database_with_accounts();
-    let mut conn = database_with_accounts.pool.get().unwrap();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     {
         let all: i64 = Account::all()

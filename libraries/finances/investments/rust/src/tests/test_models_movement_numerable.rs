@@ -1,25 +1,16 @@
 use crate::models::MovementNumerable;
 use crate::sql::queries::all_movementnumerable_for_account_id;
-use crate::test_utils::PopulateDatabase;
+use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 use finances_accounts::models::{Movement, MovementType, Transaction};
 use finances_accounts::sql::filters::movement_filter_account_by_pk;
-use finances_accounts::test_utils::fixtures::database_with_accounts;
 
 #[test]
 fn test_queries() {
-    let mut database_with_accounts = database_with_accounts();
-    database_with_accounts.populate_transactions().unwrap();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     let account_id = 0;
-    database_with_accounts
-        .populate_movements_numerable(account_id)
-        .expect("Error populating database with MovementNumerable instances");
-    database_with_accounts
-        .populate_movements_numerable(1)
-        .expect("Error populating database with MovementNumerable instances");
-
-    let mut conn = database_with_accounts.pool.get().unwrap();
     {
         // TODO: Check that all movements for all acounts are equal to 4
         // let all = Movement::all()

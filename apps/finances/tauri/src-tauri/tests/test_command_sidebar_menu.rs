@@ -1,4 +1,4 @@
-use finances_accounts::test_utils::fixtures::database_with_accounts;
+use finances_accounts::test_utils::establish_connection;
 use finances_app_lib::models::MenuGroup;
 use serde_json::{json, Value};
 use tauri::{test::MockRuntime, Manager, WebviewWindow};
@@ -21,8 +21,7 @@ fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Vec<Menu
 
 #[test]
 fn test_category_all() {
-    let database = database_with_accounts();
-    let pool = database.pool;
+    let pool = establish_connection();
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone());
     app.manage(pool); // FIXME: The `.manage` inside `create_app` is not working for the mock.
@@ -40,13 +39,13 @@ fn test_category_all() {
 
         {
             let group = r.get(0).unwrap();
-            assert_eq!(group.name, "holder0");
+            assert_eq!(group.name, "custodian0");
             assert_eq!(group.accounts.len(), 1);
             assert_eq!(group.accounts.get(0).unwrap().name, "Gastos compartidos");
         }
         {
             let group = r.get(1).unwrap();
-            assert_eq!(group.name, "holder1");
+            assert_eq!(group.name, "custodian1");
             assert_eq!(group.accounts.len(), 1);
             assert_eq!(group.accounts.get(0).unwrap().name, "IBM");
         }
@@ -62,7 +61,7 @@ fn test_category_all() {
 
         {
             let group = r.get(0).unwrap();
-            assert_eq!(group.name, "holder0");
+            assert_eq!(group.name, "custodian0");
             assert_eq!(group.accounts.len(), 1);
             assert_eq!(group.accounts.get(0).unwrap().name, "Gastos compartidos");
         }
@@ -78,7 +77,7 @@ fn test_category_all() {
 
         {
             let group = r.get(0).unwrap();
-            assert_eq!(group.name, "holder1");
+            assert_eq!(group.name, "custodian1");
             assert_eq!(group.accounts.len(), 1);
             assert_eq!(group.accounts.get(0).unwrap().name, "IBM");
         }

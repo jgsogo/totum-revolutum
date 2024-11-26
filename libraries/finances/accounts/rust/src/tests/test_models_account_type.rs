@@ -1,13 +1,13 @@
 use crate::constants;
 use crate::models::{AccountType, TreeNodeList};
 use crate::sql::filters::acounttype_by_unique_name;
-use crate::test_utils::TestDatabase;
+use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let database = TestDatabase::new();
-    let mut conn = database.pool.get().unwrap();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     // All account types
     {
@@ -22,8 +22,8 @@ fn test_queries() {
 
 #[test]
 fn test_ancestors() {
-    let database = TestDatabase::new();
-    let mut conn = database.pool.get().unwrap();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     // Check all
     {
@@ -70,8 +70,8 @@ fn test_ancestors() {
 
 #[test]
 fn test_children() {
-    let database = TestDatabase::new();
-    let mut conn = database.pool.get().unwrap();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     // Check all
     {
@@ -119,8 +119,8 @@ fn test_children() {
 
 #[test]
 fn test_descendants() {
-    let database = TestDatabase::new();
-    let mut conn = database.pool.get().unwrap();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     // Check all
     {
