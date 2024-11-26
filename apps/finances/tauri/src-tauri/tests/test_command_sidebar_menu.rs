@@ -52,7 +52,7 @@ fn test_category_all() {
     }
 
     {
-        let body = json!({ "category": "/accounts" });
+        let body = json!({ "category": "/savings" });
         let r = call_it(&webview, body);
 
         assert!(r.is_ok());
