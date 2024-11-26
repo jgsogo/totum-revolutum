@@ -1,9 +1,11 @@
-# Use 'pre-commit autoupdate' in the CLI to update this repositories
+# Use 'pre-commit autoupdate' in the CLI to update these repositories
 
 # Use a slightly older version of node by default
 # as the default uses a very new version of GLIBC
 default_language_version:
   node: 16.18.0
+
+fail_fast: true
 
 repos:
   # Some common pre-commit hooks
