@@ -39,12 +39,12 @@ fn get_all_accounttypes<'a>(conn: &mut PgConnection, unique_names: &'a [&'a str]
     Ok(account_types_pks)
 }
 
-fn checking_accounts(
+fn savings_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
 ) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    let checking_accounttypes_pks: Vec<i64> = get_all_accounttypes(
+    let savings_accounttypes_pks: Vec<i64> = get_all_accounttypes(
         &mut conn,
         &[finances_accounts::constants::accounttype::ASSETS_CURRENT_SAVINGS],
     )?;
@@ -53,7 +53,7 @@ fn checking_accounts(
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
         .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-        .filter(finances_accounts::schema::finances_accounts_account::type_id.eq_any(checking_accounttypes_pks))
+        .filter(finances_accounts::schema::finances_accounts_account::type_id.eq_any(savings_accounttypes_pks))
         // .filter(Account::mine())
         .load::<(Account, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
@@ -111,8 +111,8 @@ pub async fn sidebar_menu(
 
     let accounts = if category == "/all" {
         all_accounts(pool)
-    } else if category == "/accounts" {
-        checking_accounts(pool)
+    } else if category == "/savings" {
+        savings_accounts(pool)
     } else if category == "/investments" {
         investment_accounts(pool)
     } else if category == "/retirement" {

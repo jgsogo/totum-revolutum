@@ -14,7 +14,7 @@ def populate_accounttype(apps, schema_editor):
     )
 
     # / Activos / Corrientes
-    (actions_corrientes_inversion,) = AccountType.objects.bulk_create(
+    (activos_corrientes_inversion,) = AccountType.objects.bulk_create(
         [
             AccountType(
                 tn_parent=activos_corrientes,
@@ -26,9 +26,9 @@ def populate_accounttype(apps, schema_editor):
     # / Activos / Corrientes / Inversión
     AccountType.objects.bulk_create(
         [
-            AccountType(tn_parent=actions_corrientes_inversion, name=_("Acciones")),
-            AccountType(tn_parent=actions_corrientes_inversion, name=_("ETF")),
-            AccountType(tn_parent=actions_corrientes_inversion, name=_("Fondo de inversión")),
+            AccountType(tn_parent=activos_corrientes_inversion, name=_("Acciones")),
+            AccountType(tn_parent=activos_corrientes_inversion, name=_("ETF")),
+            AccountType(tn_parent=activos_corrientes_inversion, name=_("Fondo de inversión")),
         ]
     )
 

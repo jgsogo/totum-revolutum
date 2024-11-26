@@ -24,7 +24,7 @@
 		let basePath: string = page.url.pathname.split('/')[1];
 		if (!basePath) return;
 		// Translate base path to link section
-		if (['accounts'].includes(basePath)) currentRailCategory = '/accounts';
+		if (['savings'].includes(basePath)) currentRailCategory = '/savings';
 		if (['investments'].includes(basePath)) currentRailCategory = '/investments';
 		if (['rentals'].includes(basePath)) currentRailCategory = '/rentals';
 		if (['taxes'].includes(basePath)) currentRailCategory = '/taxes';
@@ -63,9 +63,9 @@
 			<span>All</span>
 		</AppRailTile>
         <hr class="opacity-30" />
-        <AppRailTile bind:group={currentRailCategory} name="accounts" value={'/accounts'}>
+        <AppRailTile bind:group={currentRailCategory} name="savings" value={'/savings'}>
 			<svelte:fragment slot="lead"><i class="fa-solid fa-sack-dollar text-2xl"></i></svelte:fragment>
-			<span>Accounts</span>
+			<span>Savings</span>
 		</AppRailTile>
 		<AppRailTile bind:group={currentRailCategory} name="investments" value={'/investments'}>
 			<svelte:fragment slot="lead"><i class="fa-solid fa-money-bill-trend-up text-2xl"></i></svelte:fragment>

@@ -1,3 +1,4 @@
 exports_files([
     "with_postgres_run.tpl.sh",
+    "with_docker_compose_run.tpl.sh",
 ])

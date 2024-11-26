@@ -1,2 +1,1 @@
-mod database;
-pub use database::PopulateDatabase;
+pub use finances_accounts::test_utils::establish_connection;

@@ -1,5 +1,5 @@
+use finances_accounts::test_utils::establish_connection;
 use finances_app_lib::models::Snapshot;
-use finances_db::test_utils::fixtures::database_with_accounts;
 use serde_json::{json, Value};
 use tauri::{test::MockRuntime, Manager, WebviewWindow};
 
@@ -21,10 +21,7 @@ fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Option<S
 
 #[test]
 fn test_account_snapshot_latest() {
-    let mut database = database_with_accounts();
-    database.populate_snapshots(0).unwrap();
-
-    let pool = finances_app_lib::db::establish_connection(database.filepath().to_str().unwrap());
+    let pool = establish_connection();
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone());
     app.manage(pool); // FIXME: The `.manage` inside `create_app` is not working for the mock.
@@ -33,18 +30,18 @@ fn test_account_snapshot_latest() {
         .unwrap();
 
     {
-        let body = json!({ "pk": 0i32 });
+        let body = json!({ "pk": 0i64 });
         let r = call_it(&webview, body);
 
         assert!(r.is_ok());
         let snapshot = r.unwrap();
         assert!(snapshot.is_some());
         let snapshot = snapshot.unwrap();
-        assert_eq!(snapshot.account_id, 0i32);
+        assert_eq!(snapshot.account_id, 0i64);
     }
 
     {
-        let body = json!({ "pk": -2i32 });
+        let body = json!({ "pk": -2i64 });
         let r = call_it(&webview, body);
 
         // We filter using the account-pk, it doesn't check if the account exists. This is the reason

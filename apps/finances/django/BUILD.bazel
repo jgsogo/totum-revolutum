@@ -14,6 +14,7 @@ name = "app"
 
 django_project(
     name = name,
+    visibility = ["//apps/finances:__subpackages__"],
     deps = [
         "//apps/finances/django/migrate_legacy",
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
@@ -49,6 +50,7 @@ django_project_container(
     entrypoint = ":{}-entrypoint".format(name),
     repository = repository,
     version = "//apps/finances:version",
+    visibility = ["//apps/finances:__subpackages__"],
 )
 
 ####
@@ -59,7 +61,7 @@ docker_compose(
     name = "{}-docker_compose".format(name),
     app_image_tag_stamped = "{{STABLE_FINANCES_VERSION}}",
     app_repository = repository,
-    visibility = [":__subpackages__"],
+    visibility = ["//apps/finances:__subpackages__"],
 )
 
 ####

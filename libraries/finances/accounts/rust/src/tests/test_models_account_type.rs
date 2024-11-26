@@ -1,18 +1,19 @@
 use crate::constants;
 use crate::models::{AccountType, TreeNodeList};
 use crate::sql::filters::acounttype_by_unique_name;
-use crate::test_utils::TestDatabase;
+use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let mut database = TestDatabase::new();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     // All account types
     {
         let all = AccountType::all()
             .select(AccountType::as_select())
-            .load::<AccountType>(&mut database.conn)
+            .load::<AccountType>(&mut conn)
             .expect("Error loading account types");
 
         assert_eq!(all.len(), 15);
@@ -21,7 +22,8 @@ fn test_queries() {
 
 #[test]
 fn test_ancestors() {
-    let mut database = TestDatabase::new();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     // Check all
     {
@@ -30,7 +32,7 @@ fn test_ancestors() {
                 crate::schema::finances_accounts_accounttype::tn_ancestors_pks,
                 crate::schema::finances_accounts_accounttype::tn_ancestors_count,
             ))
-            .load::<(TreeNodeList, i32)>(&mut database.conn)
+            .load::<(TreeNodeList, i32)>(&mut conn)
             .expect("Error loading account types (ancestors)");
 
         assert_eq!(ancestors.len(), 15);
@@ -43,12 +45,12 @@ fn test_ancestors() {
     let assets_pk = AccountType::all()
         .filter(acounttype_by_unique_name(constants::accounttype::ASSETS))
         .select(crate::schema::finances_accounts_accounttype::id)
-        .get_result::<i64>(&mut database.conn)
+        .get_result::<i64>(&mut conn)
         .unwrap();
     let assets_current_pk = AccountType::all()
         .filter(acounttype_by_unique_name(constants::accounttype::ASSETS_CURRENT))
         .select(crate::schema::finances_accounts_accounttype::id)
-        .get_result::<i64>(&mut database.conn)
+        .get_result::<i64>(&mut conn)
         .unwrap();
 
     // Check know ones: savings
@@ -58,7 +60,7 @@ fn test_ancestors() {
                 constants::accounttype::ASSETS_CURRENT_SAVINGS,
             ))
             .select(AccountType::as_select())
-            .get_result::<AccountType>(&mut database.conn)
+            .get_result::<AccountType>(&mut conn)
             .expect("Error fetching ASSETS_CURRENT_SAVINGS");
 
         assert_eq!(bank_account.tn_ancestors_count, 2);
@@ -68,7 +70,8 @@ fn test_ancestors() {
 
 #[test]
 fn test_children() {
-    let mut database = TestDatabase::new();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     // Check all
     {
@@ -77,7 +80,7 @@ fn test_children() {
                 crate::schema::finances_accounts_accounttype::tn_children_pks,
                 crate::schema::finances_accounts_accounttype::tn_children_count,
             ))
-            .load::<(TreeNodeList, i32)>(&mut database.conn)
+            .load::<(TreeNodeList, i32)>(&mut conn)
             .expect("Error loading account types (children)");
 
         assert_eq!(children.len(), 15);
@@ -90,12 +93,12 @@ fn test_children() {
     let assets_current_pk = AccountType::all()
         .filter(acounttype_by_unique_name(constants::accounttype::ASSETS_CURRENT))
         .select(crate::schema::finances_accounts_accounttype::id)
-        .get_result::<i64>(&mut database.conn)
+        .get_result::<i64>(&mut conn)
         .unwrap();
     let assets_non_current_pk = AccountType::all()
         .filter(acounttype_by_unique_name(constants::accounttype::ASSETS_NON_CURRENT))
         .select(crate::schema::finances_accounts_accounttype::id)
-        .get_result::<i64>(&mut database.conn)
+        .get_result::<i64>(&mut conn)
         .unwrap();
 
     // Check know ones: assets
@@ -103,7 +106,7 @@ fn test_children() {
         let assets = AccountType::all()
             .filter(acounttype_by_unique_name(constants::accounttype::ASSETS))
             .select(AccountType::as_select())
-            .get_result::<AccountType>(&mut database.conn)
+            .get_result::<AccountType>(&mut conn)
             .expect("Error fetching ASSETS");
 
         assert_eq!(assets.tn_children_count, 2);
@@ -116,7 +119,8 @@ fn test_children() {
 
 #[test]
 fn test_descendants() {
-    let mut database = TestDatabase::new();
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
 
     // Check all
     {
@@ -125,7 +129,7 @@ fn test_descendants() {
                 crate::schema::finances_accounts_accounttype::tn_descendants_pks,
                 crate::schema::finances_accounts_accounttype::tn_descendants_count,
             ))
-            .load::<(TreeNodeList, i32)>(&mut database.conn)
+            .load::<(TreeNodeList, i32)>(&mut conn)
             .expect("Error loading account types (descendants)");
 
         assert_eq!(descendants.len(), 15);
@@ -140,7 +144,7 @@ fn test_descendants() {
             constants::accounttype::ASSETS_CURRENT_SAVINGS,
         ))
         .select(crate::schema::finances_accounts_accounttype::id)
-        .get_result::<i64>(&mut database.conn)
+        .get_result::<i64>(&mut conn)
         .unwrap();
 
     // Check know ones: bank_account
@@ -148,7 +152,7 @@ fn test_descendants() {
         let assets = AccountType::all()
             .filter(acounttype_by_unique_name(constants::accounttype::ASSETS))
             .select(AccountType::as_select())
-            .get_result::<AccountType>(&mut database.conn)
+            .get_result::<AccountType>(&mut conn)
             .expect("Error fetching ASSETS");
 
         assert_eq!(assets.tn_descendants_count, 8);

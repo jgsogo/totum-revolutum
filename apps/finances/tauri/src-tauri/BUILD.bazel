@@ -1,6 +1,7 @@
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
 
 cargo_build_script(
     name = "build",
@@ -40,53 +41,58 @@ rust_library(
     ],
 )
 
-# rust_library(
-#     name = "applib/sqlite",
-#     srcs = glob(
-#         ["src/**/*.rs"],
-#         exclude = ["src/main.rs"],
-#     ),
-#     crate_features = ["sqlite"],
-#     crate_name = "finances_app_lib",
-#     data = [
-#         "tauri.conf.json",
-#     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
-#     proc_macro_deps = all_crate_deps(
-#         proc_macro = True,
-#     ),
-#     deps = all_crate_deps(
-#         normal = True,
-#     ) + [
-#         ":build",
-#         "//apps/finances/finances_db:finances_db/sqlite",
-#     ],
-# )
+# Unittests
+rust_test(
+    name = "tests",
+    crate = ":applib",
+    crate_features = [
+        "postgres",
+    ],
+    data = [
+        "tauri.conf.json",
+    ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+)
 
-# # Unittests
-# rust_test(
-#     name = "tests",
-#     # compile_data = [":migrations"],
-#     crate = ":applib/sqlite",
-#     crate_features = [
-#         "sqlite",
-#     ],
-#     data = [
-#         "tauri.conf.json",
-#     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
-# )
+# Integration tests
+integration_tests_files = glob(["tests/**/test_*.rs"])
 
-# # Integration tests
-# rust_test_suite(
-#     name = "integration_tests",
-#     srcs = glob(["tests/**/test_*.rs"]),
-#     crate_features = ["sqlite"],
-#     deps = all_crate_deps(
-#         normal = True,
-#     ) + [
-#         ":applib/sqlite",
-#         "//apps/finances/finances_db:finances_db/sqlite",
-#     ],
-# )
+rust_test_suite(
+    name = "_integration_tests",
+    srcs = integration_tests_files,
+    crate_features = ["postgres"],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    tags = [
+        "manual",
+    ],
+    deps = [
+        ":applib",
+        "//libraries/finances/accounts/rust:finances_accounts/test_utils",
+        "@crates_libraries//:serde_json",
+        "@crates_libraries//:tauri",
+    ],
+)
+
+with_postgres_test(
+    name = "integration_tests",
+    # First migrate,then run the tests
+    binaries = [
+        "//libraries/finances/investments/django_finances_investments:migrate",
+        "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
+        "//libraries/finances/investments/django_finances_investments:populate_test_database",
+    ] + ["_integration_tests_{}".format(it.replace(".rs", "")) for it in integration_tests_files],  # NOTE: The rust_test_suite is just a group of tests!
+    env = {
+        "SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        "SQL_DATABASE": "POSTGRES_DB",
+        "SQL_USER": "POSTGRES_USER",
+        "SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "SQL_HOST": "POSTGRES_HOST",
+        "SQL_PORT": "POSTGRES_PORT",
+    },
+)
 
 # TODO: Add targets to generate docs and to doc-testing
 

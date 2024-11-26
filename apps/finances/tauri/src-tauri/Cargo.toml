@@ -34,6 +34,6 @@ itertools = "0.13.0"
 
 [dev-dependencies]
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust", features = ["postgres", "test_utils"] }
-finances_investments = { path = "../../../../libraries/finances/investments/rust", features = ["postgres", "test_utils"] }
+finances_investments = { path = "../../../../libraries/finances/investments/rust", features = ["postgres"] }
 finances-app = { path = ".", default-features = false, features = ["postgres"] }
 tauri = { version = "2.1.1", features = ["test"] }
