@@ -10,7 +10,7 @@ fn test_queries() {
     let pool = establish_connection();
     let mut conn = pool.get().unwrap();
 
-    let account_id = 0;
+    let account_id = 4;
     {
         // TODO: Check that all movements for all acounts are equal to 4
         // let all = Movement::all()
@@ -32,7 +32,7 @@ fn test_queries() {
             .load::<(Movement, Transaction, MovementType)>(&mut conn)
             .expect("Error loading movements");
 
-        assert_eq!(all.len(), 2);
+        assert_eq!(all.len(), 3);
     }
 
     // All movements (as MovementNumerable) for a given account
@@ -41,6 +41,6 @@ fn test_queries() {
             .bind::<diesel::sql_types::Int8, _>(account_id)
             .load(&mut conn)
             .expect("Error loading numerable movements");
-        assert_eq!(all.len(), 2);
+        assert_eq!(all.len(), 3);
     }
 }
