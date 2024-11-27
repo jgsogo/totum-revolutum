@@ -1,14 +1,16 @@
 import {invoke} from "@tauri-apps/api/core";
-import {Account, AccountType, Holder} from "$lib/models/Account";
+import {Account, AccountType} from "$lib/models/Account";
 import {Snapshot} from "$lib/models/Snapshot"
 import {MenuGroup} from "$lib/models/MenuGroup";
 import {Movement} from "$lib/models/Movement"
+import { Custodian } from "./models/Custodian";
+import { Holder } from "./models/Holder";
 
 /** The data returned by the backend representing an Account */
 type AccountData = {
     pk: number,
     name: string,
-    holder: { name: string },
+    custodian: { pk: number, name: string },
     type: { name: string },
     ccy: string,
     identifier?: string
@@ -20,9 +22,9 @@ type AccountData = {
  * @returns {Account} The parsed instance
  */
 const create_account = function (data: AccountData): Account {
-    let holder = new Holder(data.holder.name);
+    let custodian = new Custodian(data.custodian.pk, data.custodian.name);
     let account_type = new AccountType(data.type.name);
-    return new Account(data.pk, data.name, holder, account_type, data.ccy, data.identifier);
+    return new Account(data.pk, data.name, custodian, account_type, data.ccy, data.identifier);
 }
 
 /** The data returned by the backend representing a Snapshot */
@@ -69,11 +71,11 @@ export const account_detail = async (pk: number): Promise<Account> => {
  * Returns (a promise to) the MenuGroup items
  * @returns {MenuGroup[]} The list of menu entries
  */
-export const sidebar_menu = async (category: string): Promise<MenuGroup[]> => {
+export const sidebar_menu = async (category: string, holder: Holder): Promise<MenuGroup[]> => {
     const data: {
         name: string,
         accounts: AccountData[],
-    }[] = await invoke("sidebar_menu", {category});
+    }[] = await invoke("sidebar_menu", {category, holderPk: holder.pk});
     return data.map((it) => {
         let accounts = it.accounts.map((acc) => create_account(acc))
         return new MenuGroup(it.name, accounts)
@@ -125,4 +127,42 @@ export const account_movements = async (account: Account): Promise<Movement[]> =
     return data.map((it) => {
         return new Movement(it.amount, it.direction, it.date, it.date_value, it.quantity, it.unit_value)
     });
+};
+
+
+/** The data returned by the backend representing a Holder */
+type HolderData = {
+    pk: number,
+    name: string,
+    is_company: boolean
+};
+
+/**
+ * Converts an {@link HolderData} dictionary into an {@link Holder}
+ * @param {HolderData} data - The data returned by the backend
+ * @returns {Holder} The parsed instance
+ */
+const create_holder = function (data: HolderData): Holder {
+    return new Holder(data.pk, data.name, data.is_company);
+}
+
+/**
+ * Returns (a promise to) all the Holders in the database
+ * @returns {Holder[]} All the holders
+ */
+export const holders = async (): Promise<Holder[]> => {
+    const data: HolderData[] = await invoke("holders", {});
+    return data.map((it) => {
+        return create_holder(it);
+    });
+};
+
+/**
+ * Returns (a promise to) the Holder with the given primary key value
+ * @param {number} pk - The primary key value of the holder we are looking for
+ * @returns {Holder} The Holder instance
+ */
+export const holder_details = async (pk: number): Promise<Holder> => {
+    const data: HolderData = await invoke("holder_details", {pk});
+    return create_holder(data);
 };

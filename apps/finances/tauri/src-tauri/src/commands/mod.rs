@@ -9,8 +9,12 @@ pub mod menu;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::models::{Account, AccountType, Custodian, Movement, MovementType, Snapshot, Transaction};
-use finances_accounts::sql::filters::{account_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk};
+use finances_accounts::models::{
+    Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Movement, MovementType, Snapshot, Transaction,
+};
+use finances_accounts::sql::filters::{
+    account_by_pk, accountholder_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk,
+};
 use tauri::State;
 
 #[tauri::command]
@@ -22,11 +26,20 @@ pub async fn account_detail(
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all()
+        .inner_join(
+            finances_accounts::schema::finances_accounts_accountholderrole::table
+                .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
+        )
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
-        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
+        .select((
+            Account::as_select(),
+            AccountHolderRole::as_select(),
+            Custodian::as_select(),
+            AccountType::as_select(),
+        ))
         .filter(account_by_pk(pk))
-        .first::<(Account, Custodian, AccountType)>(&mut conn)
+        .first::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading account: {e}"))
         .map(|v| v.into())
 }
@@ -90,4 +103,36 @@ pub async fn account_movements(
 
     log::info!("Found {} movements for account pk {pk}", movements.len());
     Ok(movements.into_iter().map(|v| v.into()).collect())
+}
+
+#[tauri::command]
+pub async fn holders(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+) -> Result<Vec<crate::models::Holder>, String> {
+    log::info!("Get all Holders in the database");
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    let holders = AccountHolder::all()
+        .select(AccountHolder::as_select())
+        .load::<AccountHolder>(&mut conn)
+        .expect("Error returning all the holders");
+
+    log::info!("Found {} holders", holders.len());
+    Ok(holders.into_iter().map(|v| v.into()).collect())
+}
+
+#[tauri::command]
+pub async fn holder_details(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+    pk: i64,
+) -> Result<crate::models::Holder, String> {
+    log::info!("Get Holder pk {pk}");
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    AccountHolder::all()
+        .filter(accountholder_by_pk(pk))
+        .select(AccountHolder::as_select())
+        .first::<AccountHolder>(&mut conn)
+        .map_err(|e| format!("Error loading account: {e}"))
+        .map(|v| v.into())
 }

@@ -20,6 +20,12 @@ services:
       # Django static and media files
       - STATIC_ROOT=/home/%USER%/web/staticfiles/
       - MEDIA_ROOT=/home/%USER%/web/mediafiles/
+      # Django create superuser
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      # Django if we execute the migration legacy DB first (FIXME: Remove, this doesn't belong to all apps)
+      - LEGACY_DATABASE_URL=${LEGACY_DATABASE_URL}
     depends_on:
       - db
     volumes:

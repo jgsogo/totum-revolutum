@@ -22,3 +22,11 @@ pub struct AccountHolderRole {
     pub account_id: i64,
     pub holder_id: i64,
 }
+
+impl AccountHolder {
+    /// Returns (a query to) all the [`AccountHolder`]s
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all() -> _ {
+        crate::schema::finances_accounts_accountholder::table
+    }
+}

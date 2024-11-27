@@ -2,6 +2,8 @@ from django.core.management.base import BaseCommand  # , CommandError
 from django.utils.translation import gettext_lazy as _
 from django_finances_accounts.models import (
     Account,
+    AccountHolder,
+    AccountHolderRole,
     AccountType,
     Custodian,
     MovementType,
@@ -22,6 +24,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         accounts = self.populate_accounts()
+        holder0 = AccountHolder.objects.get(pk=0)
+        self.add_accounts_to_holder(accounts=accounts, holder=holder0)
         transactions = Transaction.objects.all()
         self.populate_movements_numerable(account=accounts[0], transaction=transactions[0])
         self.populate_movements_numerable(account=accounts[2], transaction=transactions[0])
@@ -85,6 +89,11 @@ class Command(BaseCommand):
                     is_numerable=False,
                 ),
             ]
+        )
+
+    def add_accounts_to_holder(self, accounts: list[Account], holder: AccountHolder):
+        AccountHolderRole.objects.bulk_create(
+            [AccountHolderRole(account=it, holder=holder, owns_money=True) for it in accounts]
         )
 
     def populate_movements_numerable(self, account: Account, transaction: Transaction):

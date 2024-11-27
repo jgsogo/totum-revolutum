@@ -1,21 +1,31 @@
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::models::{Account, AccountType, Custodian, TreeNodeList};
-use finances_accounts::sql::filters::accounttype_by_unique_names;
+use finances_accounts::models::{Account, AccountHolderRole, AccountType, Custodian, TreeNodeList};
+use finances_accounts::sql::filters::{accountholder_by_pk, accounttype_by_unique_names};
 use tauri::State;
 
 fn all_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
+    holder_pk: i64,
+) -> Result<Vec<(Account, AccountHolderRole, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all()
+        .inner_join(
+            finances_accounts::schema::finances_accounts_accountholderrole::table
+                .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
+        )
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
-        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-        // .filter(Account::mine())
-        .load::<(Account, Custodian, AccountType)>(&mut conn)
+        .filter(accountholder_by_pk(holder_pk))
+        .select((
+            Account::as_select(),
+            AccountHolderRole::as_select(),
+            Custodian::as_select(),
+            AccountType::as_select(),
+        ))
+        .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
@@ -41,7 +51,8 @@ fn get_all_accounttypes<'a>(conn: &mut PgConnection, unique_names: &'a [&'a str]
 
 fn savings_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
+    holder_pk: i64,
+) -> Result<Vec<(Account, AccountHolderRole, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let savings_accounttypes_pks: Vec<i64> = get_all_accounttypes(
@@ -50,18 +61,28 @@ fn savings_accounts(
     )?;
 
     Account::all()
+        .inner_join(
+            finances_accounts::schema::finances_accounts_accountholderrole::table
+                .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
+        )
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
-        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
+        .filter(accountholder_by_pk(holder_pk))
         .filter(finances_accounts::schema::finances_accounts_account::type_id.eq_any(savings_accounttypes_pks))
-        // .filter(Account::mine())
-        .load::<(Account, Custodian, AccountType)>(&mut conn)
+        .select((
+            Account::as_select(),
+            AccountHolderRole::as_select(),
+            Custodian::as_select(),
+            AccountType::as_select(),
+        ))
+        .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn investment_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
+    holder_pk: i64,
+) -> Result<Vec<(Account, AccountHolderRole, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let investment_accounttypes_pks: Vec<i64> = get_all_accounttypes(
@@ -73,18 +94,28 @@ fn investment_accounts(
     )?;
 
     Account::all()
+        .inner_join(
+            finances_accounts::schema::finances_accounts_accountholderrole::table
+                .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
+        )
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
-        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-        // .filter(Account::mine())
+        .filter(accountholder_by_pk(holder_pk))
         .filter(finances_accounts::schema::finances_accounts_account::type_id.eq_any(investment_accounttypes_pks))
-        .load::<(Account, Custodian, AccountType)>(&mut conn)
+        .select((
+            Account::as_select(),
+            AccountHolderRole::as_select(),
+            Custodian::as_select(),
+            AccountType::as_select(),
+        ))
+        .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
 fn retirement_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<(Account, Custodian, AccountType)>, String> {
+    holder_pk: i64,
+) -> Result<Vec<(Account, AccountHolderRole, Custodian, AccountType)>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let retirement_accounttypes_pks: Vec<i64> = get_all_accounttypes(
@@ -93,12 +124,21 @@ fn retirement_accounts(
     )?;
 
     Account::all()
+        .inner_join(
+            finances_accounts::schema::finances_accounts_accountholderrole::table
+                .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
+        )
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
-        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
-        // .filter(Account::mine())
+        .filter(accountholder_by_pk(holder_pk))
         .filter(finances_accounts::schema::finances_accounts_account::type_id.eq_any(retirement_accounttypes_pks))
-        .load::<(Account, Custodian, AccountType)>(&mut conn)
+        .select((
+            Account::as_select(),
+            AccountHolderRole::as_select(),
+            Custodian::as_select(),
+            AccountType::as_select(),
+        ))
+        .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))
 }
 
@@ -106,17 +146,18 @@ fn retirement_accounts(
 pub async fn sidebar_menu(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     category: &str,
+    holder_pk: i64,
 ) -> Result<Vec<crate::models::MenuGroup>, String> {
-    log::info!("Get Accounts for category {category}");
+    log::info!("Get Accounts for category {category} and holder {holder_pk}");
 
     let accounts = if category == "/all" {
-        all_accounts(pool)
+        all_accounts(pool, holder_pk)
     } else if category == "/savings" {
-        savings_accounts(pool)
+        savings_accounts(pool, holder_pk)
     } else if category == "/investments" {
-        investment_accounts(pool)
+        investment_accounts(pool, holder_pk)
     } else if category == "/retirement" {
-        retirement_accounts(pool)
+        retirement_accounts(pool, holder_pk)
     } else if category == "/other" {
         // TODO: Other accounts not included in the categories above
         Ok(vec![])

@@ -1,6 +1,6 @@
 mod account_holder;
 
-pub use account_holder::AccountHolder;
+pub use account_holder::{AccountHolder, AccountHolderRole};
 
 mod account;
 pub use account::Account;

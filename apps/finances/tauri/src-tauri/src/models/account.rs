@@ -4,6 +4,7 @@ use crate::models::{AccountType, Custodian};
 
 type AccountAndRelatedData = (
     finances_accounts::models::Account,
+    finances_accounts::models::AccountHolderRole,
     finances_accounts::models::Custodian,
     finances_accounts::models::AccountType,
 );
@@ -16,11 +17,12 @@ pub struct Account {
     pub r#type: AccountType,
     pub ccy: String,
     pub identifier: Option<String>,
+    pub holder_owns_money: bool,
 }
 
 impl From<AccountAndRelatedData> for Account {
     fn from(value: AccountAndRelatedData) -> Self {
-        let (account, custodian, account_type) = value;
+        let (account, account_holder_role, custodian, account_type) = value;
         Self {
             pk: account.id,
             name: account.name,
@@ -28,6 +30,7 @@ impl From<AccountAndRelatedData> for Account {
             r#type: account_type.into(),
             ccy: account.ccy,
             identifier: account.identifier,
+            holder_owns_money: account_holder_role.owns_money,
         }
     }
 }

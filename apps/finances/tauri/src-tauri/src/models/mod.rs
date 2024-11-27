@@ -3,9 +3,9 @@
 
 mod account;
 mod account_type;
-mod fx;
-// mod holder;
 mod custodian;
+mod fx;
+mod holder;
 mod menu;
 mod movement;
 mod movement_type;
@@ -14,9 +14,9 @@ mod transaction;
 
 pub use account::Account;
 pub use account_type::AccountType;
-pub use fx::Fx;
-// pub use holder::Holder;
 pub use custodian::Custodian;
+pub use fx::Fx;
+pub use holder::Holder;
 pub use menu::MenuGroup;
 pub use movement::Movement;
 pub use movement_type::MovementType;

@@ -6,6 +6,8 @@ from django_finances_accounts.constants import (
 )
 from django_finances_accounts.models import (
     Account,
+    AccountHolder,
+    AccountHolderRole,
     AccountType,
     Custodian,
     Fx,
@@ -28,6 +30,8 @@ class Command(BaseCommand):
         self.populate_snapshots(account=accounts[0])
         transactions = self.populate_transactions()
         self.populate_movements(account=accounts[0], transactions=transactions)
+        holders = self.populate_holders()
+        self.populate_accountholder_roles(holders=holders, accounts=accounts)
 
     def populate_custodians(self):
         return Custodian.objects.bulk_create(
@@ -142,6 +146,72 @@ class Command(BaseCommand):
                     fx=fxs[1],
                     transaction=transactions[0],
                     type=expense,
+                ),
+            ]
+        )
+
+    def populate_holders(self):
+        return AccountHolder.objects.bulk_create(
+            [
+                AccountHolder(pk=0, name="holder0", is_company=False),
+                AccountHolder(pk=1, name="holder1", is_company=False),
+                AccountHolder(pk=2, name="holder2", is_company=True),
+            ]
+        )
+
+    def populate_accountholder_roles(self, holders: list[AccountHolder], accounts: list[Account]):
+        gastos_compartidos, depo, hipoteca, old_account = accounts
+        holder0, holder1, holder2 = holders
+
+        AccountHolderRole.objects.bulk_create(
+            [
+                # Holder0 owns money in all accounts
+                AccountHolderRole(
+                    holder=holder0,
+                    account=gastos_compartidos,
+                    owns_money=True,
+                ),
+                AccountHolderRole(
+                    holder=holder0,
+                    account=depo,
+                    owns_money=True,
+                ),
+                AccountHolderRole(
+                    holder=holder0,
+                    account=hipoteca,
+                    owns_money=True,
+                ),
+                AccountHolderRole(
+                    holder=holder0,
+                    account=old_account,
+                    owns_money=True,
+                ),
+                # Holder1 owns money in some accounts
+                AccountHolderRole(
+                    holder=holder1,
+                    account=gastos_compartidos,
+                    owns_money=True,
+                ),
+                AccountHolderRole(
+                    holder=holder1,
+                    account=depo,
+                    owns_money=True,
+                ),
+                AccountHolderRole(
+                    holder=holder1,
+                    account=old_account,
+                    owns_money=True,
+                ),
+                # Holder2 plays a role (can view), but doesn't own the money
+                AccountHolderRole(
+                    holder=holder2,
+                    account=gastos_compartidos,
+                    owns_money=False,
+                ),
+                AccountHolderRole(
+                    holder=holder2,
+                    account=depo,
+                    owns_money=False,
                 ),
             ]
         )
