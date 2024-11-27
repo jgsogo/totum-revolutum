@@ -10,7 +10,7 @@ use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::{
-    Account, AccountHolder, AccountType, Custodian, Movement, MovementType, Snapshot, Transaction,
+    Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Movement, MovementType, Snapshot, Transaction,
 };
 use finances_accounts::sql::filters::{
     account_by_pk, accountholder_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk,
@@ -26,11 +26,20 @@ pub async fn account_detail(
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     Account::all()
+        .inner_join(
+            finances_accounts::schema::finances_accounts_accountholderrole::table
+                .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
+        )
         .inner_join(Custodian::all())
         .inner_join(AccountType::all())
-        .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
+        .select((
+            Account::as_select(),
+            AccountHolderRole::as_select(),
+            Custodian::as_select(),
+            AccountType::as_select(),
+        ))
         .filter(account_by_pk(pk))
-        .first::<(Account, Custodian, AccountType)>(&mut conn)
+        .first::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
         .map_err(|e| format!("Error loading account: {e}"))
         .map(|v| v.into())
 }

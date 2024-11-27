@@ -41,22 +41,22 @@ fn test_category_all() {
             let group = r.get(0).unwrap();
             assert_eq!(group.name, "custodian0");
             assert_eq!(group.accounts.len(), 2);
-            assert_eq!(group.accounts.get(0).unwrap().name, "Plan de pensiones");
-            assert_eq!(group.accounts.get(1).unwrap().name, "Gastos compartidos");
+            assert_eq!(group.accounts.get(0).unwrap().name, "Gastos compartidos");
+            assert_eq!(group.accounts.get(1).unwrap().name, "Plan de pensiones");
         }
         {
             let group = r.get(1).unwrap();
             assert_eq!(group.name, "custodian1");
             assert_eq!(group.accounts.len(), 2);
-            assert_eq!(group.accounts.get(0).unwrap().name, "IBM");
-            assert_eq!(group.accounts.get(1).unwrap().name, "Depósito 3M");
+            assert_eq!(group.accounts.get(0).unwrap().name, "Depósito 3M");
+            assert_eq!(group.accounts.get(1).unwrap().name, "IBM");
         }
         {
             let group = r.get(2).unwrap();
             assert_eq!(group.name, "custodian2");
             assert_eq!(group.accounts.len(), 2);
-            assert_eq!(group.accounts.get(0).unwrap().name, "Indexa Capital");
-            assert_eq!(group.accounts.get(1).unwrap().name, "Hipoteca casa NY");
+            assert_eq!(group.accounts.get(0).unwrap().name, "Hipoteca casa NY");
+            assert_eq!(group.accounts.get(1).unwrap().name, "Indexa Capital");
         }
     }
 
