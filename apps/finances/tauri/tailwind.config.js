@@ -1,8 +1,8 @@
-import type { Config } from 'tailwindcss';
 import forms from '@tailwindcss/forms';
 import flowbitePlugin from 'flowbite/plugin'
 
-export default {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
 	darkMode: 'selector',
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',
@@ -30,4 +30,4 @@ export default {
 	plugins: [
 		forms, flowbitePlugin
 	]
-} as Config;
+}
