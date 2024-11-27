@@ -1,7 +1,6 @@
 import {invoke} from "@tauri-apps/api/core";
 import {Account, AccountType} from "$lib/models/Account";
 import {Snapshot} from "$lib/models/Snapshot"
-import {MenuGroup} from "$lib/models/MenuGroup";
 import {Movement} from "$lib/models/Movement"
 import { Custodian } from "./models/Custodian";
 import { Holder } from "./models/Holder";
@@ -68,20 +67,52 @@ export const account_detail = async (pk: number): Promise<Account> => {
 };
 
 /**
- * Returns (a promise to) the MenuGroup items
- * @returns {MenuGroup[]} The list of menu entries
+ * Returns (a promise to) all the Accounts for a given Holder
+ * @param {Holder} holder - The holder
+ * @returns {Account[]} The Account instances
  */
-export const sidebar_menu = async (category: string, holder: Holder): Promise<MenuGroup[]> => {
-    const data: {
-        name: string,
-        accounts: AccountData[],
-    }[] = await invoke("sidebar_menu", {category, holderPk: holder.pk});
+export const all_accounts = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("all_accounts", {holderPk: holder.pk});
     return data.map((it) => {
-        let accounts = it.accounts.map((acc) => create_account(acc))
-        return new MenuGroup(it.name, accounts)
+        return create_account(it)
     });
 };
 
+/**
+ * Returns (a promise to) all the savings Accounts for a given Holder
+ * @param {Holder} holder - The holder
+ * @returns {Account[]} The Account instances
+ */
+export const savings_accounts = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("savings_accounts", {holderPk: holder.pk});
+    return data.map((it) => {
+        return create_account(it)
+    });
+};
+
+/**
+ * Returns (a promise to) all the investment Accounts for a given Holder
+ * @param {Holder} holder - The holder
+ * @returns {Account[]} The Account instances
+ */
+export const investment_accounts = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("investment_accounts", {holderPk: holder.pk});
+    return data.map((it) => {
+        return create_account(it)
+    });
+};
+
+/**
+ * Returns (a promise to) all the retirement Accounts for a given Holder
+ * @param {Holder} holder - The holder
+ * @returns {Account[]} The Account instances
+ */
+export const retirement_accounts = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("retirement_accounts", {holderPk: holder.pk});
+    return data.map((it) => {
+        return create_account(it)
+    });
+};
 
 /**
  * Returns (a promise to) all the Snapshots for a given Account

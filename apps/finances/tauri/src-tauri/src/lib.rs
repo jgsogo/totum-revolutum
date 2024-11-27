@@ -2,7 +2,6 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use tauri::Manager;
 pub mod commands;
 pub mod db;
-mod menu;
 pub mod models;
 mod types;
 mod views;
@@ -28,7 +27,10 @@ pub fn create_app<R: tauri::Runtime>(
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            commands::menu::sidebar_menu,
+            commands::account_list::all_accounts,
+            commands::account_list::savings_accounts,
+            commands::account_list::investment_accounts,
+            commands::account_list::retirement_accounts,
             commands::account_detail,
             commands::account_snapshot_latest,
             commands::account_snapshots,

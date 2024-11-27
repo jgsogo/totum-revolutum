@@ -5,13 +5,14 @@ use finances_accounts::models::{Account, AccountHolderRole, AccountType, Custodi
 use finances_accounts::sql::filters::{accountholder_by_pk, accounttype_by_unique_names};
 use tauri::State;
 
-fn all_accounts(
+#[tauri::command]
+pub fn all_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
-) -> Result<Vec<(Account, AccountHolderRole, Custodian, AccountType)>, String> {
+) -> Result<Vec<crate::models::Account>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    Account::all()
+    let accounts = Account::all()
         .inner_join(
             finances_accounts::schema::finances_accounts_accountholderrole::table
                 .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
@@ -26,7 +27,12 @@ fn all_accounts(
             AccountType::as_select(),
         ))
         .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
-        .map_err(|e| format!("Error loading accounts: {}", e))
+        .map_err(|e| format!("Error loading accounts: {}", e))?;
+
+    Ok(accounts
+        .into_iter()
+        .map(|v| v.into())
+        .collect::<Vec<crate::models::Account>>())
 }
 
 /// Given some 'unique_name's, get the PKs for all of them and their descendants
@@ -49,10 +55,11 @@ fn get_all_accounttypes<'a>(conn: &mut PgConnection, unique_names: &'a [&'a str]
     Ok(account_types_pks)
 }
 
-fn savings_accounts(
+#[tauri::command]
+pub fn savings_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
-) -> Result<Vec<(Account, AccountHolderRole, Custodian, AccountType)>, String> {
+) -> Result<Vec<crate::models::Account>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let savings_accounttypes_pks: Vec<i64> = get_all_accounttypes(
@@ -60,7 +67,7 @@ fn savings_accounts(
         &[finances_accounts::constants::accounttype::ASSETS_CURRENT_SAVINGS],
     )?;
 
-    Account::all()
+    let accounts = Account::all()
         .inner_join(
             finances_accounts::schema::finances_accounts_accountholderrole::table
                 .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
@@ -76,13 +83,19 @@ fn savings_accounts(
             AccountType::as_select(),
         ))
         .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
-        .map_err(|e| format!("Error loading accounts: {}", e))
+        .map_err(|e| format!("Error loading accounts: {}", e))?;
+
+    Ok(accounts
+        .into_iter()
+        .map(|v| v.into())
+        .collect::<Vec<crate::models::Account>>())
 }
 
-fn investment_accounts(
+#[tauri::command]
+pub fn investment_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
-) -> Result<Vec<(Account, AccountHolderRole, Custodian, AccountType)>, String> {
+) -> Result<Vec<crate::models::Account>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let investment_accounttypes_pks: Vec<i64> = get_all_accounttypes(
@@ -93,7 +106,7 @@ fn investment_accounts(
         ],
     )?;
 
-    Account::all()
+    let accounts = Account::all()
         .inner_join(
             finances_accounts::schema::finances_accounts_accountholderrole::table
                 .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
@@ -109,13 +122,19 @@ fn investment_accounts(
             AccountType::as_select(),
         ))
         .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
-        .map_err(|e| format!("Error loading accounts: {}", e))
+        .map_err(|e| format!("Error loading accounts: {}", e))?;
+
+    Ok(accounts
+        .into_iter()
+        .map(|v| v.into())
+        .collect::<Vec<crate::models::Account>>())
 }
 
-fn retirement_accounts(
+#[tauri::command]
+pub fn retirement_accounts(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
-) -> Result<Vec<(Account, AccountHolderRole, Custodian, AccountType)>, String> {
+) -> Result<Vec<crate::models::Account>, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let retirement_accounttypes_pks: Vec<i64> = get_all_accounttypes(
@@ -123,7 +142,7 @@ fn retirement_accounts(
         &[finances_investments::constants::accounttype::ASSETS_NON_CURRENT_RETIREMENT],
     )?;
 
-    Account::all()
+    let accounts = Account::all()
         .inner_join(
             finances_accounts::schema::finances_accounts_accountholderrole::table
                 .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
@@ -139,48 +158,10 @@ fn retirement_accounts(
             AccountType::as_select(),
         ))
         .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
-        .map_err(|e| format!("Error loading accounts: {}", e))
-}
+        .map_err(|e| format!("Error loading accounts: {}", e))?;
 
-#[tauri::command]
-pub async fn sidebar_menu(
-    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-    category: &str,
-    holder_pk: i64,
-) -> Result<Vec<crate::models::MenuGroup>, String> {
-    log::info!("Get Accounts for category {category} and holder {holder_pk}");
-
-    let accounts = if category == "/all" {
-        all_accounts(pool, holder_pk)
-    } else if category == "/savings" {
-        savings_accounts(pool, holder_pk)
-    } else if category == "/investments" {
-        investment_accounts(pool, holder_pk)
-    } else if category == "/retirement" {
-        retirement_accounts(pool, holder_pk)
-    } else if category == "/other" {
-        // TODO: Other accounts not included in the categories above
-        Ok(vec![])
-    } else if category == "/rentals" {
-        // TODO: Return links to views about rented properties
-        Ok(vec![])
-    } else if category == "/taxes" {
-        // TODO: Return links to views about taxes: IRPF, 720,...
-        Ok(vec![])
-    } else {
-        log::error!("Unexpected sidebar_menu category '{category}'");
-        // FIXME: Return error?
-        Err(format!("Unexpected sidebar_menu category '{category}'"))
-    };
-
-    match accounts {
-        Ok(accounts) => {
-            let accounts = accounts
-                .into_iter()
-                .map(|v| v.into())
-                .collect::<Vec<crate::models::Account>>();
-            Ok(crate::models::MenuGroup::new_grouped_by_custodian(accounts))
-        }
-        Err(e) => Err(e),
-    }
+    Ok(accounts
+        .into_iter()
+        .map(|v| v.into())
+        .collect::<Vec<crate::models::Account>>())
 }

@@ -4,6 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 GH_VERSION = "2.61.0"
 
+# FIXME: We may use https://github.com/theoremlp/rules_multitool for this (and other tools-like applications)
 def _fetch_gh_impl(_ctx):
     http_archive(
         name = "gh_linux_amd64",
