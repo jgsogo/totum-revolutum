@@ -1,7 +1,6 @@
 <script lang="ts">
   import "../../../app.postcss";
   import Navbar from "$lib/components/Navbar.svelte";
-  import Sidebar from "$lib/components/Sidebar.svelte";
   import SidebarMenu from "$lib/components/SidebarMenu/SidebarMenu.svelte";
   let { data, children } = $props();
 
