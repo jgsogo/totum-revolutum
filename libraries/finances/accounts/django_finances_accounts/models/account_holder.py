@@ -13,7 +13,7 @@ class AccountHolder(models.Model):
     is_company = models.BooleanField(
         default=True, help_text=_("Whether the holder is a company or a physical person")
     )
-    photo = models.ImageField(upload_to="holders", blank=True, null=True)
+    photo = models.FileField(upload_to="holders", blank=True, null=True)
 
     class Meta:
         ordering = ["name"]

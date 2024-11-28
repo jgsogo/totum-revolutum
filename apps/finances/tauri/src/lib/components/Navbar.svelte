@@ -16,7 +16,7 @@
   import { invalidate } from '$app/navigation';
   import { ChevronDownOutline, RefreshOutline } from "flowbite-svelte-icons";
 
-  let { fluid = true, drawerHidden = $bindable(), list = false, holders, active_holder = $bindable(), home_href = "/" } = $props();
+  let { fluid = true, drawerHidden = $bindable(), list = false, holders, active_holder = $bindable(), home_href = "/", base_media_url } = $props();
 
   const refresh_all = async () => {
     await invalidate('invalidate:refresh');
@@ -63,6 +63,6 @@
     </button>
 
     <DarkMode />
-    <HolderSelector bind:active_holder {holders} />
+    <HolderSelector bind:active_holder {holders} {base_media_url} />
   </div>
 </Navbar>

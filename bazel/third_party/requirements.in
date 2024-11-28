@@ -10,4 +10,3 @@ semver~=3.0.2
 SQLAlchemy~=2.0.36
 testcontainers~=4.8.2
 tqdm~=4.67.0
-pillow~=11.0.0

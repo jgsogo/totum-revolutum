@@ -3,6 +3,7 @@ use tauri::Manager;
 pub mod commands;
 pub mod db;
 pub mod models;
+pub mod state;
 mod types;
 mod views;
 
@@ -12,6 +13,7 @@ use crate::types::ConnectionType;
 pub fn create_app<R: tauri::Runtime>(
     builder: tauri::Builder<R>,
     db_pool: Pool<ConnectionManager<ConnectionType>>,
+    state: state::AppState,
 ) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
 
@@ -23,6 +25,7 @@ pub fn create_app<R: tauri::Runtime>(
         )
         .setup(|app| {
             app.manage(db_pool);
+            app.manage(state);
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
@@ -37,6 +40,7 @@ pub fn create_app<R: tauri::Runtime>(
             commands::account_movements,
             commands::holders,
             commands::holder_details,
+            commands::base_media_url,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

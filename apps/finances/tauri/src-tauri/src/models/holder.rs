@@ -5,6 +5,7 @@ pub struct Holder {
     pub pk: i64,
     pub name: String,
     pub is_company: bool,
+    pub photo: Option<String>,
 }
 
 impl From<finances_accounts::models::AccountHolder> for Holder {
@@ -13,6 +14,7 @@ impl From<finances_accounts::models::AccountHolder> for Holder {
             pk: value.id,
             name: value.name,
             is_company: value.is_company,
+            photo: value.photo,
         }
     }
 }

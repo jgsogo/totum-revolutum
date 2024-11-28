@@ -6,6 +6,7 @@
 
 pub mod account_list;
 
+use crate::state::AppState;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
@@ -135,4 +136,9 @@ pub async fn holder_details(
         .first::<AccountHolder>(&mut conn)
         .map_err(|e| format!("Error loading account: {e}"))
         .map(|v| v.into())
+}
+
+#[tauri::command]
+pub async fn base_media_url(state: State<'_, AppState>) -> Result<String, String> {
+    Ok(state.base_media_url())
 }

@@ -9,7 +9,7 @@ import { Holder } from "./models/Holder";
 type AccountData = {
     pk: number,
     name: string,
-    custodian: { pk: number, name: string },
+    custodian: { pk: number, name: string, photo?: string },
     type: { name: string },
     ccy: string,
     identifier?: string
@@ -21,7 +21,7 @@ type AccountData = {
  * @returns {Account} The parsed instance
  */
 const create_account = function (data: AccountData): Account {
-    let custodian = new Custodian(data.custodian.pk, data.custodian.name);
+    let custodian = new Custodian(data.custodian.pk, data.custodian.name, data.custodian.photo);
     let account_type = new AccountType(data.type.name);
     return new Account(data.pk, data.name, custodian, account_type, data.ccy, data.identifier);
 }
@@ -166,6 +166,7 @@ type HolderData = {
     pk: number,
     name: string,
     is_company: boolean
+    photo?: string,
 };
 
 /**
@@ -174,7 +175,7 @@ type HolderData = {
  * @returns {Holder} The parsed instance
  */
 const create_holder = function (data: HolderData): Holder {
-    return new Holder(data.pk, data.name, data.is_company);
+    return new Holder(data.pk, data.name, data.is_company, data.photo);
 }
 
 /**
@@ -196,4 +197,14 @@ export const holders = async (): Promise<Holder[]> => {
 export const holder_details = async (pk: number): Promise<Holder> => {
     const data: HolderData = await invoke("holder_details", {pk});
     return create_holder(data);
+};
+
+
+
+/**
+ * Returns (a promise to) the base_media_url URL
+ * @returns {string} The full URL to the base media URL
+ */
+export const get_base_media_url = async (): Promise<string> => {
+    return await invoke("base_media_url", {});
 };
