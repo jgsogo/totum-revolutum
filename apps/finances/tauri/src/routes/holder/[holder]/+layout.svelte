@@ -14,7 +14,7 @@
   <Navbar
     bind:drawerHidden
     holders={data.holders}
-    bind:active_holder={data.holder.name}
+    bind:active_holder={data.holder}
     home_href="/holder/{data.holder.pk}"
   />
 </header>

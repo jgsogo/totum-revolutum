@@ -9,7 +9,9 @@ import { holders } from '$lib/commands';
 import { Holder } from '$lib/models/Holder';
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load() {
+export async function load({ depends }) {
+    depends('invalidate:all_holders');
+
 	try {
 		let all_holders: Holder[] = await holders();
 		return {
