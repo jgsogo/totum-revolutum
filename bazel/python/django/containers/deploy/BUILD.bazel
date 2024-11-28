@@ -22,6 +22,7 @@ image_from_dockerfile(
     srcs = [
         ":dockerfile",
     ],
+    loadable = False,
     repository = repository,
     tags = [
         "manual",

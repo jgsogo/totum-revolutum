@@ -13,6 +13,10 @@ class Custodian(models.Model):
     description = models.TextField(null=True, blank=True)
 
     country = CountryField(help_text=_("Country where this custodian runs its business"))
+    photo = models.ImageField(upload_to="custodians", blank=True, null=True)
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self) -> str:
         return self.name
