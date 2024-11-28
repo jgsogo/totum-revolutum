@@ -40,7 +40,9 @@ pub fn create_app<R: tauri::Runtime>(
             commands::account_movements,
             commands::holders,
             commands::holder_details,
+            commands::custodian_details,
             commands::base_media_url,
+            commands::base_static_url,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

@@ -5,11 +5,27 @@ import {Movement} from "$lib/models/Movement"
 import { Custodian } from "./models/Custodian";
 import { Holder } from "./models/Holder";
 
+/** The data returned by the backend representing an Custodian */
+type CustodianData = {
+    pk: number, name: string, photo?: string
+};
+
+
+/**
+ * Converts an {@link CustodianData} dictionary into an {@link Custodian}
+ * @param {CustodianData} data - The data returned by the backend
+ * @returns {Custodian} The parsed instance
+ */
+const create_custodian = function (data: CustodianData): Custodian {
+    return new Custodian(data.pk, data.name, data.photo);
+}
+
+
 /** The data returned by the backend representing an Account */
 type AccountData = {
     pk: number,
     name: string,
-    custodian: { pk: number, name: string, photo?: string },
+    custodian: CustodianData,
     type: { name: string },
     ccy: string,
     identifier?: string
@@ -21,7 +37,7 @@ type AccountData = {
  * @returns {Account} The parsed instance
  */
 const create_account = function (data: AccountData): Account {
-    let custodian = new Custodian(data.custodian.pk, data.custodian.name, data.custodian.photo);
+    let custodian = create_custodian(data.custodian);
     let account_type = new AccountType(data.type.name);
     return new Account(data.pk, data.name, custodian, account_type, data.ccy, data.identifier);
 }
@@ -199,6 +215,15 @@ export const holder_details = async (pk: number): Promise<Holder> => {
     return create_holder(data);
 };
 
+/**
+ * Returns (a promise to) the Holder with the given primary key value
+ * @param {number} pk - The primary key value of the holder we are looking for
+ * @returns {Holder} The Holder instance
+ */
+export const custodian_details = async (pk: number): Promise<Custodian> => {
+    const data: CustodianData = await invoke("custodian_details", {pk});
+    return create_custodian(data);
+};
 
 
 /**
@@ -207,4 +232,12 @@ export const holder_details = async (pk: number): Promise<Holder> => {
  */
 export const get_base_media_url = async (): Promise<string> => {
     return await invoke("base_media_url", {});
+};
+
+/**
+ * Returns (a promise to) the base_static_url URL
+ * @returns {string} The full URL to the base static URL
+ */
+export const get_base_static_url = async (): Promise<string> => {
+    return await invoke("base_static_url", {});
 };

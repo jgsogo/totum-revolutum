@@ -14,7 +14,7 @@ use finances_accounts::models::{
     Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Movement, MovementType, Snapshot, Transaction,
 };
 use finances_accounts::sql::filters::{
-    account_by_pk, accountholder_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk,
+    account_by_pk, accountholder_by_pk, custodian_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk,
 };
 use tauri::State;
 
@@ -134,11 +134,32 @@ pub async fn holder_details(
         .filter(accountholder_by_pk(pk))
         .select(AccountHolder::as_select())
         .first::<AccountHolder>(&mut conn)
-        .map_err(|e| format!("Error loading account: {e}"))
+        .map_err(|e| format!("Error loading holder: {e}"))
+        .map(|v| v.into())
+}
+
+#[tauri::command]
+pub async fn custodian_details(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+    pk: i64,
+) -> Result<crate::models::Custodian, String> {
+    log::info!("Get Custodian pk {pk}");
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    Custodian::all()
+        .filter(custodian_by_pk(pk))
+        .select(Custodian::as_select())
+        .first::<Custodian>(&mut conn)
+        .map_err(|e| format!("Error loading custodian: {e}"))
         .map(|v| v.into())
 }
 
 #[tauri::command]
 pub async fn base_media_url(state: State<'_, AppState>) -> Result<String, String> {
     Ok(state.base_media_url())
+}
+
+#[tauri::command]
+pub async fn base_static_url(state: State<'_, AppState>) -> Result<String, String> {
+    Ok(state.base_static_url())
 }
