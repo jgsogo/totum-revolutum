@@ -4,22 +4,9 @@ import {SidebarEntry} from "$lib/components/SidebarMenu/SidebarEntry.js"
 import {Account} from '$lib/models/Account.js'
 
 import {
-	AngleDownOutline,
-	AngleUpOutline,
-	ClipboardListSolid,
-	CogOutline,
-	FileChartBarSolid,
-	GithubSolid,
-	LayersSolid,
-	LifeSaverSolid,
 	LockSolid,
-	WandMagicSparklesOutline,
-	ChartPieOutline,
-	RectangleListSolid,
-	TableColumnSolid,
 	ChartMixedDollarSolid,
 	CashSolid,
-	BuildingSolid,
 	LandmarkSolid,
 
 } from 'flowbite-svelte-icons';

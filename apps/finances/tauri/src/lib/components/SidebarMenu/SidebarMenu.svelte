@@ -1,29 +1,15 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
-  import { page } from "$app/stores";
-
   import { Sidebar, SidebarDropdownWrapper, SidebarGroup, SidebarItem, SidebarWrapper } from "flowbite-svelte";
   import {
     AngleDownOutline,
     AngleUpOutline,
-    ClipboardListSolid,
-    CogOutline,
-    FileChartBarSolid,
     GithubSolid,
-    LayersSolid,
-    LifeSaverSolid,
-    LockSolid,
-    WandMagicSparklesOutline,
-    ChartPieOutline,
-    RectangleListSolid,
-    TableColumnSolid,
+    ColumnSolid,
   } from "flowbite-svelte-icons";
   import type { SidebarEntry } from "./SidebarEntry";
 
   let { menu, drawerHidden = $bindable() }: { menu: SidebarEntry[]; drawerHidden: boolean } = $props();
 
-  // export let drawerHidden: boolean = false;
-  // export let holder: Holder;
   const closeDrawer = () => {
     drawerHidden = true;
   };
@@ -33,28 +19,17 @@
   let itemClass =
     "flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700";
   let groupClass = "pt-2 space-y-2";
-  // $: mainSidebarUrl = $page.url.pathname;
 
   let links = [
     {
-      label: "GitHub Repository",
-      href: "https://github.com/themesberg/flowbite-svelte-admin-dashboard",
+      label: "totum-revolutum",
+      href: "https://github.com/jgsogo/totum-revolutum",
       icon: GithubSolid,
     },
     {
-      label: "Flowbite Svelte",
-      href: "https://flowbite-svelte.com/docs/pages/quickstart",
-      icon: ClipboardListSolid,
-    },
-    {
-      label: "Components",
-      href: "https://flowbite-svelte.com/docs/components/accordion",
-      icon: LayersSolid,
-    },
-    {
-      label: "Support",
-      href: "https://github.com/themesberg/flowbite-svelte-admin-dashboard/issues",
-      icon: LifeSaverSolid,
+      label: "Admin interface",
+      href: "http://localhost:1337/admin/",
+      icon: ColumnSolid,
     },
   ];
 </script>
