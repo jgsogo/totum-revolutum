@@ -19,7 +19,7 @@
   let { fluid = false, drawerHidden = $bindable(), list = true, holders, active_holder = $bindable(), home_href = "/" } = $props();
 
   const refresh_all = async () => {
-    await invalidate('invalidate:all_holders');
+    await invalidate('invalidate:refresh');
   };
 </script>
 

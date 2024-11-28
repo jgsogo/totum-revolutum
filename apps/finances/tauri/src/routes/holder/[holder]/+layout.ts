@@ -12,7 +12,9 @@ import {
 } from 'flowbite-svelte-icons';
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({ params }) {
+export async function load({ params, depends }) {
+	depends('invalidate:refresh');
+
 	// TODO: Choose better default, see https://github.com/jgsogo/totum-revolutum/issues/637
 	let holder_pk = params.holder === '<unknown>' ? 1 : parseInt(params.holder, 10);
 
@@ -23,10 +25,13 @@ export async function load({ params }) {
 
 		// Menu - custodians
 		let all_accounts_list: Account[] = await all_accounts(holder);
-		let custodians = all_accounts_list.map((it) => it.custodian);
-		let custodians_entry = new SidebarEntry(`Custodians (${custodians.length})`, LandmarkSolid);
-		for (let it of custodians) {
-			custodians_entry.addChildren(it.name, `/holder/${holder.pk}/custodian/${it.pk}`);
+		let accounts_by_custodian = Object.groupBy(all_accounts_list, ({custodian}) => custodian.name);
+		let custodians_entry = new SidebarEntry(`Custodians (${Object.entries(accounts_by_custodian).length})`, LandmarkSolid);
+		for (const [key, value] of Object.entries(accounts_by_custodian)) {
+			if (value) {
+				const custodian_pk = value[0].custodian.pk;
+				custodians_entry.addChildren(`${key} (${value?.length})`, `/holder/${holder.pk}/custodian/${custodian_pk}`);
+			}
 		}
 		menu.push(custodians_entry);
 
