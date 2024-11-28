@@ -47,17 +47,20 @@
       <SidebarGroup ulClass={groupClass} class="mb-3">
         {#each menu as menuItem}
           {#if menuItem.children.length != 0}
-            <SidebarDropdownWrapper label={menuItem.label} class="pr-3">
+            <SidebarDropdownWrapper isOpen={true} label={menuItem.label} class="pr-3">
               <svelte:component this={menuItem.icon} slot="icon" class={iconClass} />
               <AngleDownOutline slot="arrowdown" strokeWidth="3.3" size="sm" />
               <AngleUpOutline slot="arrowup" strokeWidth="3.3" size="sm" />
               {#each menuItem.children as child}
-                <SidebarItem label={child.label} spanClass="ml-9" class={itemClass} />
+                <SidebarItem label={child.label} href={child.href} spanClass="ml-9" class={itemClass} />
               {/each}
             </SidebarDropdownWrapper>
           {:else}
             <SidebarItem label={menuItem.label} href={menuItem.href} spanClass="ml-3" class={itemClass}>
               <svelte:component this={menuItem.icon} slot="icon" class={iconClass} />
+              <!-- <svelte:fragment slot="subtext">
+                <span class="inline-flex justify-center items-center p-3 ms-3 w-3 h-3 text-sm font-medium text-primary-600 bg-primary-200 rounded-full dark:bg-primary-900 dark:text-primary-200"> 3 </span>
+              </svelte:fragment> -->
             </SidebarItem>
           {/if}
         {/each}

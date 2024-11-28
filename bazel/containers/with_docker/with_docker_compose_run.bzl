@@ -35,6 +35,10 @@ def _with_docker_compose_run_impl(ctx):
     for dc_file in ctx.files.docker_compose:
         docker_compose_files.append("--file=$(pwd)/{}".format(dc_file.short_path))
 
+    docker_compose_down_args = ["--timeout=60"]
+    if ctx.attr.remove_volumes:
+        docker_compose_down_args.append("--volumes")
+
     # Render the script we are executing
     ctx.actions.expand_template(
         template = ctx.file._run_template,
@@ -48,6 +52,7 @@ def _with_docker_compose_run_impl(ctx):
             "%BINARIES%": " ".join(binaries),
             "%ENV_TRANSPOSE%": "\n".join(env_transposition),  # TODO: Create another file and source it here
             "%DOCKER_COMPOSE_FILES%": " ".join(docker_compose_files),
+            "%DOCKER_COMPOSE_DOWN_ARGS%": " ".join(docker_compose_down_args),
         },
         is_executable = True,
     )
@@ -88,6 +93,10 @@ with_docker_compose_run = rule(
         "docker_services": attr.string_list(
             doc = "Service/s to start",
             default = [],
+        ),
+        "remove_volumes": attr.bool(
+            doc = "If the volumes should be removed when stopped or not",
+            default = True,
         ),
         "binaries": attr.label_list(
             doc = "Binaries to execute while the container is running",
@@ -133,6 +142,10 @@ with_docker_compose_test = rule(
         "docker_services": attr.string_list(
             doc = "Service/s to start",
             default = [],
+        ),
+        "remove_volumes": attr.bool(
+            doc = "If the volumes should be removed when stopped or not",
+            default = True,
         ),
         "binaries": attr.label_list(
             doc = "Binaries to execute while the container is running",

@@ -13,9 +13,14 @@
     Navbar,
     Search,
   } from "flowbite-svelte";
-  import { ChevronDownOutline } from "flowbite-svelte-icons";
+  import { invalidate } from '$app/navigation';
+  import { ChevronDownOutline, RefreshOutline } from "flowbite-svelte-icons";
 
-  let { fluid = false, drawerHidden = $bindable(), list = true, holders, active_holder = $bindable(), home_href = "/" } = $props();
+  let { fluid = true, drawerHidden = $bindable(), list = false, holders, active_holder = $bindable(), home_href = "/" } = $props();
+
+  const refresh_all = async () => {
+    await invalidate('invalidate:refresh');
+  };
 </script>
 
 <Navbar {fluid} class="text-black" color="default" let:NavContainer>
@@ -53,6 +58,10 @@
   </div>
 
   <div class="ms-auto flex items-center text-gray-500 dark:text-gray-400 sm:order-2">
+    <button on:click={refresh_all} class="ms-3 dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5">
+      <RefreshOutline />
+    </button>
+
     <DarkMode />
     <HolderSelector bind:active_holder {holders} />
   </div>

@@ -25,7 +25,7 @@ DOCKER_COMPOSE_COMMAND="$CONTAINER_CLI compose --project-name=%PROJECT_NAME% %DO
 # Ensure we execute the docker compose DOWN
 function finish {
     echo "docker compose down"
-    $DOCKER_COMPOSE_COMMAND down --volumes --timeout=30
+    $DOCKER_COMPOSE_COMMAND down %DOCKER_COMPOSE_DOWN_ARGS%
 }
 trap finish EXIT
 trap finish INT  # Capture Ctrl_C (SIGINT)

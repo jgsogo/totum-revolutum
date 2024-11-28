@@ -45,4 +45,5 @@ with_docker_compose_run(
         # Migrate data from legacy DB ('host.docker.internal' is the host for the _external localhost_)
         "LEGACY_DATABASE_URL": "postgres://finances_ro:finances_ro@host.docker.internal:5432/finances",
     },
+    remove_volumes = False,
 )
