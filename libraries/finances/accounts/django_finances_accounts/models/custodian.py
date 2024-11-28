@@ -13,6 +13,12 @@ class Custodian(models.Model):
     description = models.TextField(null=True, blank=True)
 
     country = CountryField(help_text=_("Country where this custodian runs its business"))
+    # FIXME: We use FileField instead of ImageField because of this:
+    # https://github.com/jgsogo/totum-revolutum/issues/641
+    photo = models.FileField(upload_to="custodians", blank=True, null=True)
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self) -> str:
         return self.name

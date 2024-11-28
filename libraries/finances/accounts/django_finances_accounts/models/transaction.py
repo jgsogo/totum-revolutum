@@ -68,6 +68,9 @@ class TransactionGroup(models.Model):
         )
     )
 
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self) -> str:
         return f"{self.name} ({self.cadence})"
 

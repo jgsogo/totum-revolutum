@@ -16,7 +16,7 @@
   import { invalidate } from '$app/navigation';
   import { ChevronDownOutline, RefreshOutline } from "flowbite-svelte-icons";
 
-  let { fluid = true, drawerHidden = $bindable(), list = false, holders, active_holder = $bindable(), home_href = "/" } = $props();
+  let { fluid = true, drawerHidden = $bindable(), list = false, holders, active_holder = $bindable(), home_href = "/", base_media_url } = $props();
 
   const refresh_all = async () => {
     await invalidate('invalidate:refresh');
@@ -27,9 +27,9 @@
   <NavHamburger onClick={() => (drawerHidden = !drawerHidden)} class="m-0 me-3 md:block lg:hidden" />
 
   <NavBrand href={home_href} class={list ? "w-40" : "lg:w-60"}>
-    <img src="/images/flowbite-svelte-icon-logo.svg" class="me-2.5 h-6 sm:h-8" alt="Flowbite Logo" />
+    <img src="/favicon.png" class="me-2.5 h-6 sm:h-8" alt="Flowbite Logo" />
     <span class="ml-px self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:text-2xl">
-      Flowbite
+      Finances
     </span>
   </NavBrand>
 
@@ -63,6 +63,6 @@
     </button>
 
     <DarkMode />
-    <HolderSelector bind:active_holder {holders} />
+    <HolderSelector bind:active_holder {holders} {base_media_url} />
   </div>
 </Navbar>

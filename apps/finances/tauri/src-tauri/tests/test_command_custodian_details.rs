@@ -1,14 +1,14 @@
 use finances_accounts::test_utils::establish_connection;
-use finances_app_lib::models::Account;
+use finances_app_lib::models::Custodian;
 use finances_app_lib::state::AppState;
 use serde_json::{json, Value};
 use tauri::{test::MockRuntime, Manager, WebviewWindow};
 
-fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Account, Value> {
+fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Custodian, Value> {
     tauri::test::get_ipc_response(
         &webview,
         tauri::webview::InvokeRequest {
-            cmd: "account_detail".into(),
+            cmd: "custodian_details".into(),
             callback: tauri::ipc::CallbackFn(0),
             error: tauri::ipc::CallbackFn(1),
             url: "http://tauri.localhost".parse().unwrap(),
@@ -17,11 +17,11 @@ fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Account,
             invoke_key: tauri::test::INVOKE_KEY.to_string(),
         },
     )
-    .map(|b| b.deserialize::<Account>().unwrap())
+    .map(|b| b.deserialize::<Custodian>().unwrap())
 }
 
 #[test]
-fn test_account_detail() -> Result<(), Value> {
+fn test_custodians() -> Result<(), Value> {
     let pool = establish_connection();
     let app_state = AppState::new(
         "postgres_url".to_string(),
@@ -37,18 +37,10 @@ fn test_account_detail() -> Result<(), Value> {
         .unwrap();
 
     {
-        let body = json!({ "pk": 0i32 });
+        let body = json!({"pk": 0i64});
         let r = call_it(&webview, body)?;
-        assert_eq!(r.name, "Gastos compartidos");
+        assert_eq!(r.name, "custodian0");
     }
 
-    {
-        let body = json!({ "pk": -2i32 });
-        let r = call_it(&webview, body);
-
-        assert!(r.is_err());
-        let r = r.unwrap_err();
-        assert_eq!(r.as_str().unwrap(), "Error loading account: Record not found");
-    }
     Ok(())
 }

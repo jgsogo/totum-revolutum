@@ -8,6 +8,7 @@ pub struct Custodian {
     pub name: String,
     pub description: Option<String>,
     pub country: String,
+    pub photo: Option<String>,
 }
 
 impl Custodian {

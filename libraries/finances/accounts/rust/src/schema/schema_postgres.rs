@@ -24,6 +24,8 @@ diesel::table! {
         #[max_length = 255]
         name -> Varchar,
         is_company -> Bool,
+        #[max_length = 100]
+        photo -> Nullable<Varchar>,
     }
 }
 
@@ -70,6 +72,8 @@ diesel::table! {
         description -> Nullable<Text>,
         #[max_length = 2]
         country -> Varchar,
+        #[max_length = 100]
+        photo -> Nullable<Varchar>,
     }
 }
 

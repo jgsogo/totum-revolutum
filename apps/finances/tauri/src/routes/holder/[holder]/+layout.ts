@@ -12,7 +12,7 @@ import {
 } from 'flowbite-svelte-icons';
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({ params, depends }) {
+export async function load({ params, depends, parent }) {
 	depends('invalidate:refresh');
 
 	// TODO: Choose better default, see https://github.com/jgsogo/totum-revolutum/issues/637

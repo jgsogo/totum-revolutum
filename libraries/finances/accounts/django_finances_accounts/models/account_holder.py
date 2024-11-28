@@ -13,6 +13,12 @@ class AccountHolder(models.Model):
     is_company = models.BooleanField(
         default=True, help_text=_("Whether the holder is a company or a physical person")
     )
+    # FIXME: We use FileField instead of ImageField because of this:
+    # https://github.com/jgsogo/totum-revolutum/issues/641
+    photo = models.FileField(upload_to="holders", blank=True, null=True)
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self) -> str:
         return self.name

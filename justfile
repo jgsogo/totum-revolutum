@@ -44,6 +44,10 @@ bazel-update:
 bazel-check:
     scripts/bazel_run_targets.sh check
 
+# Run all the `oci_load` rules: These rules will generate OCI containers and load them into the local registry
+bazel-load-oci:
+    scripts/bazel_run_oci_load_targets.sh
+
 # Execute tokei: prints statistics about the repository
 tokei:
     tokei --sort lines --compact

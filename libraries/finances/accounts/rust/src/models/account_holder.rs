@@ -9,6 +9,7 @@ pub struct AccountHolder {
     pub id: i64,
     pub name: String,
     pub is_company: bool,
+    pub photo: Option<String>,
 }
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]

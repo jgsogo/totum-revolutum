@@ -1,5 +1,6 @@
 use finances_accounts::test_utils::establish_connection;
 use finances_app_lib::models::Holder;
+use finances_app_lib::state::AppState;
 use serde_json::{json, Value};
 use tauri::{test::MockRuntime, Manager, WebviewWindow};
 
@@ -22,8 +23,14 @@ fn call_it(webview: &WebviewWindow<MockRuntime>, body: Value) -> Result<Holder, 
 #[test]
 fn test_holders() -> Result<(), Value> {
     let pool = establish_connection();
+    let app_state = AppState::new(
+        "postgres_url".to_string(),
+        "base_url".to_string(),
+        "media_url".to_string(),
+        "static_url".to_string(),
+    );
 
-    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone());
+    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state);
     app.manage(pool); // FIXME: The `.manage` inside `create_app` is not working for the mock.
     let webview = tauri::WebviewWindowBuilder::new(&app, "main", Default::default())
         .build()

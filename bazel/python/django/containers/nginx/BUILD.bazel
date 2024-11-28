@@ -23,6 +23,7 @@ image_from_dockerfile(
         "Dockerfile",
         ":nginx_conf",
     ],
+    loadable = True,
     repository = repository,
     tags = [
         "manual",

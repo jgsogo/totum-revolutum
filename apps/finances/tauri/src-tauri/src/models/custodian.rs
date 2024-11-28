@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct Custodian {
     pub pk: i64,
     pub name: String,
+    pub photo: Option<String>,
 }
 
 impl From<finances_accounts::models::Custodian> for Custodian {
@@ -11,6 +12,7 @@ impl From<finances_accounts::models::Custodian> for Custodian {
         Self {
             pk: value.id,
             name: value.name,
+            photo: value.photo,
         }
     }
 }
