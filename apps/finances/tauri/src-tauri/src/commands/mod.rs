@@ -4,7 +4,7 @@
 //! to be unique for each Tauri application. We enforce this guarantee if all the commands are
 //! defined in the same module.
 
-pub mod menu;
+pub mod account_list;
 
 use crate::types::ConnectionType;
 use diesel::prelude::*;

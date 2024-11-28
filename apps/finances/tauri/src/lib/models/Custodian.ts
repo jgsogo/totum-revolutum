@@ -1,7 +1,7 @@
 
 export class Custodian {
-    private readonly name: string;
-    private readonly pk: number;
+    readonly name: string;
+    readonly pk: number;
 
     constructor(pk: number, name: string) {
         this.pk = pk;

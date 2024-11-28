@@ -444,7 +444,8 @@ class Command(BaseCommand):
 
                     if not created:
                         self.stderr.write(
-                            f"Movement '{movement}' (transfer_id: {transfer_id}) was not created!"
+                            f"Movement '{movement}' (transfer_id: {transfer_id},"
+                            f" amount: {amount}) was not created!"
                         )
 
                     pbar_movs.update(1)

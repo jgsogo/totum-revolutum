@@ -35,7 +35,7 @@ services:
         test: ["CMD", "curl", "-f", "http://localhost:%DJANGO_PORT%/admin"]
         interval: 10s
         retries: 5
-        start_period: 30s
+        start_period: 60s
         timeout: 10s
 
   db:
