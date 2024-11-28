@@ -23,6 +23,15 @@ impl Default for AppState {
 }
 
 impl AppState {
+    pub fn new(postgres_url: String, base_url: String, media_url: String, static_url: String) -> Self {
+        Self {
+            postgres_url,
+            base_url,
+            media_url,
+            static_url,
+        }
+    }
+
     pub fn postgres_url(&self) -> &str {
         &self.postgres_url
     }
