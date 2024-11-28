@@ -5,8 +5,6 @@
   let { data } = $props();
 </script>
 
-<main class="p-4">
-  <div class="mt-px space-y-4">
-    <AccountsTable bind:accounts={data.all_accounts_list} />
-  </div>
-</main>
+<div class="mt-px space-y-4">
+  <AccountsTable bind:accounts={data.all_accounts_list} />
+</div>

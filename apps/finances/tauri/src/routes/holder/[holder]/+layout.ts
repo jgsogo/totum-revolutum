@@ -25,25 +25,25 @@ export async function load({ params, depends }) {
 
 		// Menu - custodians
 		let all_accounts_list: Account[] = await all_accounts(holder);
-		let accounts_by_custodian = Object.groupBy(all_accounts_list, ({custodian}) => custodian.name);
+		let accounts_by_custodian = Object.groupBy(all_accounts_list, ({custodian}) => custodian.pk);
 		let custodians_entry = new SidebarEntry(`Custodians (${Object.entries(accounts_by_custodian).length})`, LandmarkSolid);
-		for (const [key, value] of Object.entries(accounts_by_custodian)) {
+		for (const [_, value] of Object.entries(accounts_by_custodian)) {
 			if (value) {
-				const custodian_pk = value[0].custodian.pk;
-				custodians_entry.addChildren(`${key} (${value?.length})`, `/holder/${holder.pk}/custodian/${custodian_pk}`);
+				const custodian = value[0].custodian;
+				custodians_entry.addChildren(`${custodian.name} (${value?.length})`, `/holder/${holder.pk}/accounts/custodian/${custodian.pk}`);
 			}
 		}
 		menu.push(custodians_entry);
 
 		// Menu - other entries
 		let savings_accounts_list = await savings_accounts(holder);
-		menu.push(new SidebarEntry(`Savings (${savings_accounts_list.length})`, CashSolid));
+		menu.push(new SidebarEntry(`Savings (${savings_accounts_list.length})`, CashSolid, `/holder/${holder.pk}/accounts/savings`));
 
 		let investment_accounts_list = await investment_accounts(holder);
-		menu.push(new SidebarEntry(`Investment (${investment_accounts_list.length})`, ChartMixedDollarSolid));
+		menu.push(new SidebarEntry(`Investment (${investment_accounts_list.length})`, ChartMixedDollarSolid, `/holder/${holder.pk}/accounts/investment`));
 
 		let retirement_accounts_list = await retirement_accounts(holder);
-		menu.push(new SidebarEntry(`Retirement (${retirement_accounts_list.length})`, LockSolid));
+		menu.push(new SidebarEntry(`Retirement (${retirement_accounts_list.length})`, LockSolid, `/holder/${holder.pk}/accounts/retirement`));
 
 
 		return {
@@ -51,6 +51,8 @@ export async function load({ params, depends }) {
 			all_accounts_list,
 			retirement_accounts_list,
 			investment_accounts_list,
+			savings_accounts_list,
+			accounts_by_custodian,
 			menu,
 		};
 	}

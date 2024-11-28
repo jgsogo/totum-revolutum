@@ -22,6 +22,8 @@
   <SidebarMenu bind:drawerHidden menu={data.menu} />
 
   <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
-    {@render children()}
+    <main class="p-4">
+      {@render children()}
+    </main>
   </div>
 </div>

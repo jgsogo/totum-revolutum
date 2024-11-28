@@ -52,7 +52,7 @@
               <AngleDownOutline slot="arrowdown" strokeWidth="3.3" size="sm" />
               <AngleUpOutline slot="arrowup" strokeWidth="3.3" size="sm" />
               {#each menuItem.children as child}
-                <SidebarItem label={child.label} spanClass="ml-9" class={itemClass} />
+                <SidebarItem label={child.label} href={child.href} spanClass="ml-9" class={itemClass} />
               {/each}
             </SidebarDropdownWrapper>
           {:else}
