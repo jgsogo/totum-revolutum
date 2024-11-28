@@ -1,12 +1,12 @@
 import type {Account} from "$lib/models/Account";
 
 export class Movement {
-    private readonly amount: number;
+    readonly amount: number;
     private readonly quantity?: number;
     private readonly unit_value?: number;
-    private readonly direction: number;
+    readonly direction: number;
     private readonly date: string;
-    private readonly date_value: string;
+    readonly date_value: string;
     // private readonly account: Account;
     // private readonly fx?: Fx;
     // private readonly transfer: Transfer;

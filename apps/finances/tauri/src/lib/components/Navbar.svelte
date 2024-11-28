@@ -58,7 +58,7 @@
   </div>
 
   <div class="ms-auto flex items-center text-gray-500 dark:text-gray-400 sm:order-2">
-    <button on:click={refresh_all} class="ms-3 dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5">
+    <button onclick={refresh_all} class="ms-3 dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5">
       <RefreshOutline />
     </button>
 

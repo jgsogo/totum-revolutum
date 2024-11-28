@@ -6,13 +6,22 @@
     TableBodyRow,
     TableHead,
     TableHeadCell,
-    Checkbox,
-    TableSearch,
     Card,
     Heading,
   } from "flowbite-svelte";
+  import { goto } from "$app/navigation";
+  import type { Account } from "$lib/models/Account";
+  import type { Holder } from "$lib/models/Holder";
 
-  let { accounts = $bindable(), show_custodian = true } = $props();
+  let {
+    holder,
+    accounts = $bindable(),
+    show_custodian = true,
+  }: { holder: Holder; accounts: Account[]; show_custodian?: boolean } = $props();
+
+  async function goTo(account: Account) {
+    await goto(`/holder/${holder.pk}/account/${account.pk}/detail`);
+  }
 </script>
 
 <Card size="xl" class="shadow-sm max-w-none">
@@ -33,7 +42,7 @@
     </TableHead>
     <TableBody tableBodyClass="divide-y">
       {#each accounts as account}
-        <TableBodyRow>
+        <TableBodyRow onclick={() => goTo(account)}>
           {#if show_custodian}
             <TableBodyCell>{account.custodian}</TableBodyCell>
           {/if}
