@@ -16,7 +16,7 @@
   import { invalidate } from '$app/navigation';
   import { ChevronDownOutline, RefreshOutline } from "flowbite-svelte-icons";
 
-  let { fluid = false, drawerHidden = $bindable(), list = true, holders, active_holder = $bindable(), home_href = "/" } = $props();
+  let { fluid = true, drawerHidden = $bindable(), list = false, holders, active_holder = $bindable(), home_href = "/" } = $props();
 
   const refresh_all = async () => {
     await invalidate('invalidate:refresh');

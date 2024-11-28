@@ -19,9 +19,9 @@
   />
 </header>
 <div class="overflow-hidden lg:flex">
-  <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
-    <SidebarMenu bind:drawerHidden menu={data.menu} />
+  <SidebarMenu bind:drawerHidden menu={data.menu} />
 
+  <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
     {@render children()}
   </div>
 </div>
