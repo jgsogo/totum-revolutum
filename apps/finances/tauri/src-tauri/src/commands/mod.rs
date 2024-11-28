@@ -115,6 +115,7 @@ pub async fn holders(
 
     let holders = AccountHolder::all()
         .select(AccountHolder::as_select())
+        .order(finances_accounts::schema::finances_accounts_accountholder::name.asc())
         .load::<AccountHolder>(&mut conn)
         .expect("Error returning all the holders");
 
