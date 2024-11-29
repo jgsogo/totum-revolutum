@@ -18,6 +18,7 @@ pub struct Account {
     pub ccy: String,
     pub identifier: Option<String>,
     pub holder_owns_money: bool,
+    pub is_numerable: bool,
 }
 
 impl From<AccountAndRelatedData> for Account {
@@ -31,6 +32,7 @@ impl From<AccountAndRelatedData> for Account {
             ccy: account.ccy,
             identifier: account.identifier,
             holder_owns_money: account_holder_role.owns_money,
+            is_numerable: account.is_numerable,
         }
     }
 }
