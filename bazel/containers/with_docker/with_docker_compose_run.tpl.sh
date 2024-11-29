@@ -33,6 +33,7 @@ trap finish INT  # Capture Ctrl_C (SIGINT)
 # Start docker compose UP
 # $DOCKER_COMPOSE_COMMAND config %SERVICES%
 $DOCKER_COMPOSE_COMMAND up %SERVICES% --wait --wait-timeout 120
+# $DOCKER_COMPOSE_COMMAND up %SERVICES%
 
 # Get the external port for internal 5432
 SERVICE_NAME="db"

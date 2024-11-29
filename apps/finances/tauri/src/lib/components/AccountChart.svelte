@@ -15,7 +15,7 @@
   let options = {
     series: [
       {
-        name: "XYZ MOTORS",
+        name: account.name,
         data: dates,
       },
     ],
@@ -38,10 +38,14 @@
     markers: {
       size: 1,
     },
-    title: {
-      text: `${account.custodian} / ${account.name}`,
-      align: "left",
-    },
+    // title: {
+    //   text: `${account.custodian} / ${account.name}`,
+    //   align: "left",
+    //   style: {
+    //     //   cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+    //     //   color: "gray-500 dark:gray-100"
+    //     },
+    // },
     fill: {
       type: "gradient",
       gradient: {
@@ -57,13 +61,24 @@
         formatter: function (val) {
           return val;
         },
+        style: {
+          cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+        },
       },
       title: {
         text: `Snapshot (${account.ccy})`,
+        style: {
+          cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+        },
       },
     },
     xaxis: {
       type: "datetime",
+      labels: {
+        style: {
+          cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+        },
+      },
     },
     stroke: {
       curve: "smooth",
@@ -72,7 +87,7 @@
       shared: false,
       y: {
         formatter: function (val) {
-          return val;
+          return `${val} ${account.ccy}`;
         },
       },
     },
@@ -81,8 +96,4 @@
 
 <Card size="xl" class="w-full max-w-none 2xl:col-span-2">
   <Chart {options}></Chart>
-  <div class="mt-4 flex items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-700 sm:pt-6">
-    <!-- <LastRange />
-		<More title="Sales Report" href="#top" /> -->
-  </div>
 </Card>

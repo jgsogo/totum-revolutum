@@ -10,7 +10,7 @@ export class Movement {
     // private readonly account: Account;
     // private readonly fx?: Fx;
     // private readonly transfer: Transfer;
-    // private readonly type: MovementType;
+    // readonly type: MovementType;
 
     constructor(amount: number, direction: number, date: string, date_value: string, quantity?: number, unit_value?: number) {
         this.amount = amount;
@@ -20,5 +20,4 @@ export class Movement {
         this.date = date
         this.date_value = date_value
     }
-
 }

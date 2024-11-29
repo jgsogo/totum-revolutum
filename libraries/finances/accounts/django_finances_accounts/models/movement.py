@@ -77,3 +77,7 @@ class Movement(AmountMixin):
             return amount * self.fx.inverse()
         else:
             return amount
+
+    # TODO: Amount in given currency, using official FX rates
+    # def amount_in_ccy(self, ccy: str) -> float:
+    #     pass

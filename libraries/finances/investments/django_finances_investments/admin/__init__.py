@@ -6,6 +6,7 @@ from ..models import MovementDividend, MovementNumerable, SnapshotNumerable
 class SnapshotNumerableModelAdmin(admin.ModelAdmin):
     list_display = ("account", "date_value", "quantity", "unit_value")
     list_filter = ("account", "date_value")
+    search_fields = ("account",)
 
 
 admin.site.register(SnapshotNumerable, SnapshotNumerableModelAdmin)
@@ -26,7 +27,7 @@ class MovementNumerableAdmin(admin.ModelAdmin):
         "direction",
         "type",
     )
-    search_fields = ("transaction__group",)
+    search_fields = ("transaction__group", "account", "transaction")
 
 
 admin.site.register(MovementNumerable, MovementNumerableAdmin)
@@ -48,7 +49,7 @@ class MovementDividendAdmin(admin.ModelAdmin):
         "direction",
         "type",
     )
-    search_fields = ("transaction__group",)
+    search_fields = ("transaction__group", "account", "transaction")
 
 
 admin.site.register(MovementDividend, MovementDividendAdmin)

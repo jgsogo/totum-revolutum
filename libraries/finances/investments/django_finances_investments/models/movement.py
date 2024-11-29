@@ -5,10 +5,14 @@ from django.utils.translation import gettext_lazy as _
 from django_finances_accounts.models import Movement
 
 from ._amount_numerable import AmountNumerableMixin
+from .snapshot import SnapshotNumerable
 
 
 class MovementNumerable(AmountNumerableMixin, Movement):
     """A movement that modifies the number of units in a numerable account (buy/sell units)"""
+
+    class Meta:
+        ordering = ["-date_value"]
 
     def save(self, *args, **kwargs):
         self.amount = self.get_amount()
@@ -32,6 +36,9 @@ class MovementDividend(Movement):
         help_text=_("Dividen per stock"),
     )
 
+    class Meta:
+        ordering = ["-date_value"]
+
     def save(self, *args, **kwargs):
         self.amount = self.get_amount()
         super().save(*args, **kwargs)
@@ -48,8 +55,8 @@ class MovementDividend(Movement):
             raise ValidationError("MovementDividend ex_dividend_date should be before date_value")
 
     def _snapshot(self):
-        snapshot = self.account.snapshotnumerable_set.filter(
-            date_value__lte=self.ex_dividend_date
+        snapshot = SnapshotNumerable.objects.filter(
+            snapshot_ptr__account=self.account, snapshot_ptr__date_value__lte=self.ex_dividend_date
         ).first()
         if not snapshot:
             raise ObjectDoesNotExist(

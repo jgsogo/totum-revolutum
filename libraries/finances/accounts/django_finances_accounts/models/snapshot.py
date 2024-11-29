@@ -6,7 +6,7 @@ from ._amount import AmountMixin
 from .account import Account
 
 
-class BaseSnapshot(models.Model):
+class Snapshot(AmountMixin):
     account = models.ForeignKey(
         Account, on_delete=models.PROTECT, help_text=_("Account this snapshot refers to")
     )
@@ -18,7 +18,6 @@ class BaseSnapshot(models.Model):
     )
 
     class Meta:
-        abstract = True
         unique_together = [["account", "date_value"]]
         ordering = ["-date_value"]
 
@@ -32,8 +31,9 @@ class BaseSnapshot(models.Model):
         if self.account.close and self.date_value > self.account.close:
             raise ValidationError("Snapshot date_vale cannot be after account is closed")
 
+    def get_amount(self):
+        return self.amount
 
-class Snapshot(BaseSnapshot, AmountMixin):
-    """Snapshot for an account"""
-
-    pass
+    # TODO: Amount in given currency, using official FX rates
+    # def amount_in_ccy(self, ccy: str) -> float:
+    #     pass
