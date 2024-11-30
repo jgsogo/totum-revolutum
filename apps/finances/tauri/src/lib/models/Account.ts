@@ -24,8 +24,9 @@ export class Account {
     readonly ccy: string;
     readonly identifier?: string;
     readonly is_numerable: boolean;
+    readonly open: Date;
 
-    constructor(pk: number, name: string, custodian: Custodian, type: AccountType, ccy: string, is_numerable: boolean, identifier?: string) {
+    constructor(pk: number, name: string, custodian: Custodian, type: AccountType, ccy: string, is_numerable: boolean, open: Date, identifier?: string) {
         this.pk = pk;
         this.name = name;
         this.custodian = custodian;
@@ -33,6 +34,7 @@ export class Account {
         this.ccy = ccy;
         this.identifier = identifier;
         this.is_numerable = is_numerable;
+        this.open = open;
     }
 
     async last_snapshot(): Promise<Snapshot> {
