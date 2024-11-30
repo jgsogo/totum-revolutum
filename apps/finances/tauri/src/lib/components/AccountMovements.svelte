@@ -37,7 +37,8 @@
             <TableBodyCell></TableBodyCell>
           </TableBodyRow>
         {:else}
-          <TableBodyRow class={class_row_movement}>
+        <!-- TODO: On click, we can show the information about the Transaction this moement belongs to. There is an example in the official Flowbite documentation about Table component (https://flowbite-svelte.com/docs/components/table#Click_and_double-click_on_row) -->
+        <TableBodyRow class={class_row_movement}>
             <TableBodyCell>{entry.date_value}</TableBodyCell>
             <TableBodyCell>{entry.direction}</TableBodyCell>
             <TableBodyCell>TODO: type</TableBodyCell>
