@@ -11,7 +11,7 @@
   } from "flowbite-svelte";
   import type { Account } from "$lib/models/Account";
   import type { Holder } from "$lib/models/Holder";
-  import {goTo} from "$lib/utils"
+  import {goToAccountDetail} from "$lib/utils"
 
   let {
     holder,
@@ -39,7 +39,7 @@
     </TableHead>
     <TableBody tableBodyClass="divide-y">
       {#each accounts as account}
-        <TableBodyRow onclick={() => goTo(holder, account)}>
+        <TableBodyRow onclick={() => goToAccountDetail(holder, account)}>
           {#if show_custodian}
             <TableBodyCell>{account.custodian}</TableBodyCell>
           {/if}
