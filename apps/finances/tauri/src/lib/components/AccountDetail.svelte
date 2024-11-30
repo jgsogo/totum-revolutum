@@ -5,12 +5,15 @@
   import type { Snapshot } from "$lib/models/Snapshot";
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
   import SnapshotForm from "$lib/forms/SnapshotForm.svelte";
+    import { goToTransactionCreate } from "$lib/utils";
+  import type { Holder } from "$lib/models/Holder";
 
   let {
+    holder = $bindable(),
     account = $bindable(),
     base_media_url,
     last_snapshot = $bindable(),
-  }: { account: Account; base_media_url: string; last_snapshot?: Snapshot } = $props();
+  }: { holder: Holder,  account: Account; base_media_url: string; last_snapshot?: Snapshot } = $props();
 
   const initials = (custodian: Custodian): string => {
     let words = custodian.name.split(/\s/);
@@ -25,7 +28,9 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  const on_snapshot = (amount: number, date_value: Date) => {
+  const on_snapshot = (amount: number, date_value: Date): void | string => {
+    // TODO: Invoke a command to send the data
+    // TODO: Get result: if valid then close the modal, if not return the error message
     snapshotModal = false;
   };
 </script>
@@ -55,11 +60,11 @@
                   <CameraPhotoOutline class="w-4 h-4 mr-1" />
                   Snapshot
                 </button>
-                <button class="flex hover:underline mr-2">
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(holder, undefined, account)}>
                   <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
                   Income
                 </button>
-                <button class="flex hover:underline mr-2">
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(holder, account, undefined)}>
                   <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
                   Expense
                 </button>

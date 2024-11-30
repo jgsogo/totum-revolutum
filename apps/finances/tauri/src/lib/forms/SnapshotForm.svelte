@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button, Input, Label, ButtonGroup, InputAddon, Datepicker } from "flowbite-svelte";
 
-  let { ccy, on_snapshot }: { ccy: string, on_snapshot: (amount: number, date_value: Date) => void } = $props();
+  let { ccy, on_snapshot }: { ccy: string, on_snapshot: (amount: number, date_value: Date) => void | string } = $props();
 
   let snapshotDate: Date = $state(new Date());
   let snapshotAmount: number | null = $state(null);
@@ -11,7 +11,8 @@
     //  * Date lower or equal than today
     //  * Amount makes sense
     if (snapshotAmount ) {
-        on_snapshot(snapshotAmount, snapshotDate);
+        let err = on_snapshot(snapshotAmount, snapshotDate);
+        // TODO: Manage error
     }
   };
 </script>

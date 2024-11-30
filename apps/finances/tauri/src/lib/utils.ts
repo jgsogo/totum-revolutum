@@ -18,3 +18,7 @@ export async function goToAccountDetail(holder: Holder, account: Account) {
         await goto(`/holder/${holder.pk}/account/${account.pk}/detail`);
     }
   }
+
+export async function goToTransactionCreate(holder: Holder, from?: Account, to?: Account) {
+    await goto(`/holder/${holder.pk}/transaction/create?from=${from?.pk}&to=${to?.pk}`);
+}
