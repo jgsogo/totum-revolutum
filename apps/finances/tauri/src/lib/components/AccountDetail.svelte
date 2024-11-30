@@ -7,6 +7,7 @@
   import SnapshotForm from "$lib/forms/SnapshotForm.svelte";
     import { goToTransactionCreate } from "$lib/utils";
   import type { Holder } from "$lib/models/Holder";
+  import { create_snapshot } from "$lib/commands";
 
   let {
     holder = $bindable(),
@@ -28,10 +29,12 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  const on_snapshot = (date_value: Date, amount?: number, quantity?: number, unit_value?: number): void | string => {
+  const on_snapshot = async (date_value: Date, amount?: number, quantity?: number, unit_value?: number): Promise<string | null> => {
     // TODO: Invoke a command to send the data
+    let err = await create_snapshot(account, date_value, amount, quantity, unit_value);
     // TODO: Get result: if valid then close the modal, if not return the error message
     snapshotModal = false;
+    return null;
   };
 </script>
 

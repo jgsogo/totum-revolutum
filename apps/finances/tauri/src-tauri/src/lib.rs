@@ -34,6 +34,7 @@ pub fn create_app<R: tauri::Runtime>(
             commands::account_list::savings_accounts,
             commands::account_list::investment_accounts,
             commands::account_list::retirement_accounts,
+            commands::snapshot::create_snapshot,
             commands::account_detail,
             commands::account_snapshot_latest,
             commands::account_snapshots,

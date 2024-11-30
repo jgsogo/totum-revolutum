@@ -59,7 +59,7 @@ type SnapshotData = {
  * @param {SnapshotData} data - The data returned by the backend
  * @returns {Snapshot} The parsed instance
  */
-const create_snapshot = function (account: Account, data: SnapshotData): Snapshot {
+const _create_snapshot = function (account: Account, data: SnapshotData): Snapshot {
     if (account.pk !== data.account_id) throw new Error("Snapshot mismatch Account");
     return new Snapshot(account.ccy, data.amount, data.date_value, data.quantity, data.unit_value);
 }
@@ -71,7 +71,7 @@ const create_snapshot = function (account: Account, data: SnapshotData): Snapsho
  */
 export const account_snapshot_latest = async (account: Account): Promise<Snapshot> => {
     const data: SnapshotData = await invoke("account_snapshot_latest", {pk: account.pk});
-    return create_snapshot(account, data);
+    return _create_snapshot(account, data);
 };
 
 /**
@@ -140,7 +140,7 @@ export const retirement_accounts = async (holder: Holder): Promise<Account[]> =>
 export const account_snapshots = async (account: Account): Promise<Snapshot[]> => {
     const data: SnapshotData[] = await invoke("account_snapshots", {pk: account.pk});
     return data.map((it) => {
-        return create_snapshot(account, it);
+        return _create_snapshot(account, it);
     });
 };
 
@@ -243,3 +243,9 @@ export const get_base_media_url = async (): Promise<string> => {
 export const get_base_static_url = async (): Promise<string> => {
     return await invoke("base_static_url", {});
 };
+
+
+export const create_snapshot = async (account: Account, date_value: Date, amount?: number, quantity?: number, unit_value?: number): Promise<void | string> => {
+    let date = date_value.toISOString().slice(0, 10);
+    return await invoke("create_snapshot", {accountPk: account.pk, dateValue: date, amount: amount, quantity: quantity, unitValue: unit_value});
+}

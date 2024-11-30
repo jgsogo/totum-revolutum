@@ -5,6 +5,7 @@
 //! defined in the same module.
 
 pub mod account_list;
+pub mod snapshot;
 
 use crate::state::AppState;
 use crate::types::ConnectionType;

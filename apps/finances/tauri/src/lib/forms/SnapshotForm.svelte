@@ -11,7 +11,7 @@
   }: {
     account: Account;
     last_snapshot?: Snapshot;
-    on_snapshot: (date_value: Date, amount?: number, quantity?: number, unit_value?: number) => string | null;
+    on_snapshot: (date_value: Date, amount?: number, quantity?: number, unit_value?: number) => Promise<string | null>;
   } = $props();
 
   let date_value: Date = $state(new Date());
@@ -26,7 +26,7 @@
 
   let today = new Date();
 
-  const submitSnapshot = () => {
+  const submitSnapshot = async () => {
     // Validation
     backend_error = null;
     date_error = amount_error = quantity_error = unit_value_error = undefined;
@@ -40,6 +40,7 @@
     }
 
     if (account.is_numerable) {
+        amount = undefined;
       // Quantity needs to be a positive integer
       if (!quantity || !Number.isInteger(quantity) || quantity < 0) {
         quantity_error = "Positive integer required.";
@@ -50,6 +51,7 @@
         unit_value_error = "Positive value required.";
       }
     } else {
+        quantity = unit_value = undefined;
       // Amount needs to be a positive float
       if (!amount || amount < 0) {
         amount_error = "Positive value required.";
@@ -60,7 +62,7 @@
       return;
     }
 
-    backend_error = on_snapshot(date_value, amount, quantity, unit_value);
+    backend_error = await on_snapshot(date_value, amount, quantity, unit_value);
   };
 </script>
 
@@ -100,7 +102,7 @@
           <InputAddon>{account.ccy}</InputAddon>
           <Input type="number" required placeholder="1234,56" bind:value={unit_value} />
         </ButtonGroup>
-        {#if unit_value}
+        {#if unit_value_error}
           <Helper class="mt-2" color="red"><span class="font-medium">Error!</span> {unit_value_error}</Helper>
         {/if}
       </Label>
