@@ -1,8 +1,8 @@
 export class Snapshot {
     readonly amount: number;
     private readonly ccy: string;
-    private readonly quantity?: number;
-    private readonly unit_value?: number;
+    readonly quantity?: number;
+    readonly unit_value?: number;
     readonly date_value: string;
 
     constructor(ccy: string, amount: number, date_value: string, quantity?: number, unit_value?: number) {

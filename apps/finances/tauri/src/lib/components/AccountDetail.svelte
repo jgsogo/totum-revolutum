@@ -28,7 +28,7 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  const on_snapshot = (amount: number, date_value: Date): void | string => {
+  const on_snapshot = (date_value: Date, amount?: number, quantity?: number, unit_value?: number): void | string => {
     // TODO: Invoke a command to send the data
     // TODO: Get result: if valid then close the modal, if not return the error message
     snapshotModal = false;
@@ -83,5 +83,5 @@
 </Card>
 
 <Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose={false}>
-  <SnapshotForm ccy={account.ccy} {on_snapshot} />
+  <SnapshotForm {account} {last_snapshot} {on_snapshot} />
 </Modal>
