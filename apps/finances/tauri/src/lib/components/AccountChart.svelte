@@ -2,7 +2,6 @@
   import { Card, Chart } from "flowbite-svelte";
   import type { Account } from "$lib/models/Account";
   import type { Snapshot } from "$lib/models/Snapshot";
-  import type { Movement } from "$lib/models/Movement";
 
   let { account = $bindable(), snapshots = $bindable() }: { account: Account; snapshots: Snapshot[] } = $props();
 

@@ -3,7 +3,8 @@
   import type { Account } from "$lib/models/Account";
   import type { Custodian } from "$lib/models/Custodian";
   import type { Snapshot } from "$lib/models/Snapshot";
-  import type { Movement } from "$lib/models/Movement";
+  import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
+  import More from "$lib/widgets/More.svelte";
 
   let {
     account = $bindable(),
@@ -43,6 +44,17 @@
               {account.name}
             </p>
             <span class="text-gray-500 text-sm">{account.identifier}</span>
+            <p>
+              <span class="flex text-xs mr-2">
+                <button class="flex hover:underline mr-2"><CameraPhotoOutline class="w-4 h-4 mr-1" />Snapshot</button>
+                <button class="flex hover:underline mr-2"
+                  ><ArrowDownToBracketOutline class="w-4 h-4 mr-1" />Income</button
+                >
+                <button class="flex hover:underline mr-2"
+                  ><ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />Expense</button
+                >
+              </span>
+            </p>
           </div>
         </div>
         {#if last_snapshot}
