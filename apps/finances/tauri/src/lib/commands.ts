@@ -1,7 +1,7 @@
-import {invoke} from "@tauri-apps/api/core";
-import {Account, AccountType} from "$lib/models/Account";
-import {Snapshot} from "$lib/models/Snapshot"
-import {Movement} from "$lib/models/Movement"
+import { invoke } from "@tauri-apps/api/core";
+import { Account, AccountType } from "$lib/models/Account";
+import { Snapshot } from "$lib/models/Snapshot"
+import { Movement } from "$lib/models/Movement"
 import { Custodian } from "./models/Custodian";
 import { Holder } from "./models/Holder";
 
@@ -70,7 +70,7 @@ const _create_snapshot = function (account: Account, data: SnapshotData): Snapsh
  * @returns {Snapshot} Latest snapshot for the given account
  */
 export const account_snapshot_latest = async (account: Account): Promise<Snapshot> => {
-    const data: SnapshotData = await invoke("account_snapshot_latest", {pk: account.pk});
+    const data: SnapshotData = await invoke("account_snapshot_latest", { pk: account.pk });
     return _create_snapshot(account, data);
 };
 
@@ -80,7 +80,7 @@ export const account_snapshot_latest = async (account: Account): Promise<Snapsho
  * @returns {Account} The Account instance
  */
 export const account_detail = async (pk: number): Promise<Account> => {
-    const data: AccountData = await invoke("account_detail", {pk});
+    const data: AccountData = await invoke("account_detail", { pk });
     return create_account(data);
 };
 
@@ -90,7 +90,7 @@ export const account_detail = async (pk: number): Promise<Account> => {
  * @returns {Account[]} The Account instances
  */
 export const all_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("all_accounts", {holderPk: holder.pk});
+    const data: AccountData[] = await invoke("all_accounts", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -102,7 +102,7 @@ export const all_accounts = async (holder: Holder): Promise<Account[]> => {
  * @returns {Account[]} The Account instances
  */
 export const savings_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("savings_accounts", {holderPk: holder.pk});
+    const data: AccountData[] = await invoke("savings_accounts", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -114,7 +114,7 @@ export const savings_accounts = async (holder: Holder): Promise<Account[]> => {
  * @returns {Account[]} The Account instances
  */
 export const investment_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("investment_accounts", {holderPk: holder.pk});
+    const data: AccountData[] = await invoke("investment_accounts", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -126,7 +126,7 @@ export const investment_accounts = async (holder: Holder): Promise<Account[]> =>
  * @returns {Account[]} The Account instances
  */
 export const retirement_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("retirement_accounts", {holderPk: holder.pk});
+    const data: AccountData[] = await invoke("retirement_accounts", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -138,7 +138,7 @@ export const retirement_accounts = async (holder: Holder): Promise<Account[]> =>
  * @returns {Snapshot[]} All the snapshots for the given account
  */
 export const account_snapshots = async (account: Account): Promise<Snapshot[]> => {
-    const data: SnapshotData[] = await invoke("account_snapshots", {pk: account.pk});
+    const data: SnapshotData[] = await invoke("account_snapshots", { pk: account.pk });
     return data.map((it) => {
         return _create_snapshot(account, it);
     });
@@ -172,7 +172,7 @@ export const account_movements = async (account: Account): Promise<Movement[]> =
             level: number,
             // parent: MovementType
         }
-    }[] = await invoke("account_movements", {pk: account.pk});
+    }[] = await invoke("account_movements", { pk: account.pk });
     return data.map((it) => {
         return new Movement(it.amount, it.direction, it.date, it.date_value, it.quantity, it.unit_value)
     });
@@ -213,7 +213,7 @@ export const holders = async (): Promise<Holder[]> => {
  * @returns {Holder} The Holder instance
  */
 export const holder_details = async (pk: number): Promise<Holder> => {
-    const data: HolderData = await invoke("holder_details", {pk});
+    const data: HolderData = await invoke("holder_details", { pk });
     return create_holder(data);
 };
 
@@ -223,7 +223,7 @@ export const holder_details = async (pk: number): Promise<Holder> => {
  * @returns {Holder} The Holder instance
  */
 export const custodian_details = async (pk: number): Promise<Custodian> => {
-    const data: CustodianData = await invoke("custodian_details", {pk});
+    const data: CustodianData = await invoke("custodian_details", { pk });
     return create_custodian(data);
 };
 
@@ -244,8 +244,16 @@ export const get_base_static_url = async (): Promise<string> => {
     return await invoke("base_static_url", {});
 };
 
-
-export const create_snapshot = async (account: Account, date_value: Date, amount?: number, quantity?: number, unit_value?: number): Promise<void | string> => {
+/**
+ * Creates a snapshot for the give account
+ * @param {Account} account - The account for the new snapshot
+ * @param {Date} date_value - Date for the new snapshot
+ * @param {number} amount - Amount for the new snapshot (only if account is not numerable)
+ * @param {number} quantity - Number of units in a numerable account
+ * @param {number} unit_value - Unit value (if numerable account)
+ * @returns - A promise that resolves when the snapshot is created, or the error if it was not possible
+ */
+export const create_snapshot = (account: Account, date_value: Date, amount?: number, quantity?: number, unit_value?: number): Promise<void> => {
     let date = date_value.toISOString().slice(0, 10);
-    return await invoke("create_snapshot", {accountPk: account.pk, dateValue: date, amount: amount, quantity: quantity, unitValue: unit_value});
+    return invoke("create_snapshot", { accountPk: account.pk, dateValue: date, amount: amount, quantity: quantity, unitValue: unit_value });
 }

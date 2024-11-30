@@ -5,7 +5,7 @@
   import type { Snapshot } from "$lib/models/Snapshot";
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
   import SnapshotForm from "$lib/forms/SnapshotForm.svelte";
-    import { goToTransactionCreate } from "$lib/utils";
+  import { goToTransactionCreate } from "$lib/utils";
   import type { Holder } from "$lib/models/Holder";
   import { create_snapshot } from "$lib/commands";
 
@@ -14,7 +14,7 @@
     account = $bindable(),
     base_media_url,
     last_snapshot = $bindable(),
-  }: { holder: Holder,  account: Account; base_media_url: string; last_snapshot?: Snapshot } = $props();
+  }: { holder: Holder; account: Account; base_media_url: string; last_snapshot?: Snapshot } = $props();
 
   const initials = (custodian: Custodian): string => {
     let words = custodian.name.split(/\s/);
@@ -29,12 +29,15 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  const on_snapshot = async (date_value: Date, amount?: number, quantity?: number, unit_value?: number): Promise<string | null> => {
-    // TODO: Invoke a command to send the data
-    let err = await create_snapshot(account, date_value, amount, quantity, unit_value);
-    // TODO: Get result: if valid then close the modal, if not return the error message
-    snapshotModal = false;
-    return null;
+  const on_snapshot = async (
+    date_value: Date,
+    amount?: number,
+    quantity?: number,
+    unit_value?: number
+  ): Promise<void> => {
+    return create_snapshot(account, date_value, amount, quantity, unit_value).then((_) => {
+      snapshotModal = false;
+    });
   };
 </script>
 
@@ -63,11 +66,17 @@
                   <CameraPhotoOutline class="w-4 h-4 mr-1" />
                   Snapshot
                 </button>
-                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(holder, undefined, account)}>
+                <button
+                  class="flex hover:underline mr-2"
+                  onclick={() => goToTransactionCreate(holder, undefined, account)}
+                >
                   <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
                   Income
                 </button>
-                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(holder, account, undefined)}>
+                <button
+                  class="flex hover:underline mr-2"
+                  onclick={() => goToTransactionCreate(holder, account, undefined)}
+                >
                   <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
                   Expense
                 </button>

@@ -13,5 +13,5 @@ pub fn create_snapshot(
     unit_value: Option<f32>,
 ) -> Result<(), String> {
     info!("Create snapshot for account {account_pk}: date_value: {date_value}, amount: {amount:?}, quantity: {quantity:?}, unit_value: {unit_value:?}");
-    Ok(())
+    Err("Backend side not implemented".to_string())
 }
