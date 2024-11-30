@@ -37,8 +37,8 @@ class SnapshotNumerableTestCase(AmountNumerableTestsMixin, TestCase):
 
         self.assertEqual(
             str(cm.exception),
-            "UNIQUE constraint failed: finances_investments_snapshotnumerable.account_id,"
-            " finances_investments_snapshotnumerable.date_value",
+            "UNIQUE constraint failed: finances_accounts_snapshot.account_id,"
+            " finances_accounts_snapshot.date_value",
         )
 
     def test_validate_default_order(self):
@@ -95,6 +95,6 @@ class SnapshotNumerableTestCase(AmountNumerableTestsMixin, TestCase):
         self.assertEqual(
             str(cm.exception),
             "(\"Cannot delete some instances of model 'Account' because they are referenced"
-            " through protected foreign keys: 'SnapshotNumerable.account'.\","
-            " {<SnapshotNumerable: custodian - acc1 @ 2010-01-01>})",
+            " through protected foreign keys: 'Snapshot.account'.\","
+            " {<Snapshot: custodian - acc1 @ 2010-01-01>})",
         )

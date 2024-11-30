@@ -1,9 +1,14 @@
-from django_finances_accounts.models.snapshot import BaseSnapshot
+from django_finances_accounts.models.snapshot import Snapshot
 
 from ._amount_numerable import AmountNumerableMixin
 
 
-class SnapshotNumerable(BaseSnapshot, AmountNumerableMixin):
+class SnapshotNumerable(AmountNumerableMixin, Snapshot):
     """Snapshot for a numerable account"""
 
-    pass
+    class Meta:
+        ordering = ["-date_value"]
+
+    def save(self, *args, **kwargs):
+        self.amount = self.get_amount()
+        super().save(*args, **kwargs)

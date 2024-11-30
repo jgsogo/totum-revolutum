@@ -26,6 +26,9 @@ bazel_dep(name = "rules_uv", version = "0.41.0", dev_dependency = True)
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
 # Bazel-diff: https://github.com/Tinder/bazel-diff
+# TODO: Is this superseded: https://github.com/bazel-contrib/target-determinator? It uses
+# TODO: bazel-differ (https://github.com/ewhauser/bazel-differ) under the hood, which is
+# TODO: _"mostly a pure Go port of the excellent Tinder/bazel-diff"_
 http_jar(
     name = "bazel_diff",
     sha256 = "ed5410288bd7ec5b49b556103f561fb15e4c82f13f12cb41be128d447ecc2d46",

@@ -17,12 +17,10 @@ diesel::table! {
 }
 
 diesel::table! {
-    finances_investments_snapshotnumerable (id) {
-        id -> Int8,
-        date_value -> Date,
+    finances_investments_snapshotnumerable (snapshot_ptr_id) {
+        snapshot_ptr_id -> Int8,
         quantity -> Numeric,
         unit_value -> Numeric,
-        account_id -> Int8,
     }
 }
 

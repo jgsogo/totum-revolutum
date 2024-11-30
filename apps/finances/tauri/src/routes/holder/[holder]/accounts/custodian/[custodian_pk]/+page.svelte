@@ -10,5 +10,5 @@
     {data.custodian}
     <img src="{data.base_media_url}{data.custodian.photo}" />
 
-    <AccountsTable show_custodian={false} bind:accounts={data.accounts_for_custodian} />
+    <AccountsTable holder={data.holder} show_custodian={false} bind:accounts={data.accounts_for_custodian} />
   </div>

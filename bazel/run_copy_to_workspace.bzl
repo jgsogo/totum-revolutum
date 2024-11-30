@@ -2,6 +2,8 @@
 """
 
 def _run_copy_to_workspace_impl(ctx):
+    # FIXME: Do not do the copy if the content is the same. This is important for applications that are monitoring the
+    # workspace and will trigger an update if the file is touched.
     ctx.actions.write(
         output = ctx.outputs.executable,
         content = "cd $BUILD_WORKSPACE_DIRECTORY && cp -fv {} {}".format(ctx.file.origin.path, ctx.file.target.path),

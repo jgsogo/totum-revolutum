@@ -4,6 +4,9 @@
 # https://github.com/aspect-build/bazel-examples/blob/a25b6c0ba307545aff6c4b5feb4ae875d7d507f1/oci_python_image/py_layer.bzl
 # and adapted to allow multiple binaries and the user
 
+# TODO: Has this been superseeded by https://github.com/aspect-build/rules_py/blob/f22eff92f9d3f1df572e47c142b6d1d9d07d8283/docs/py_image_layer.md?
+# TODO: and it also talks about transitions...
+
 load("@aspect_bazel_lib//lib:tar.bzl", "mtree_mutate", "mtree_spec", "tar")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 

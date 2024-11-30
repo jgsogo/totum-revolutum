@@ -1,16 +1,16 @@
 import type {Account} from "$lib/models/Account";
 
 export class Movement {
-    private readonly amount: number;
+    readonly amount: number;
     private readonly quantity?: number;
     private readonly unit_value?: number;
-    private readonly direction: number;
+    readonly direction: number;
     private readonly date: string;
-    private readonly date_value: string;
+    readonly date_value: string;
     // private readonly account: Account;
     // private readonly fx?: Fx;
     // private readonly transfer: Transfer;
-    // private readonly type: MovementType;
+    // readonly type: MovementType;
 
     constructor(amount: number, direction: number, date: string, date_value: string, quantity?: number, unit_value?: number) {
         this.amount = amount;
@@ -20,5 +20,4 @@ export class Movement {
         this.date = date
         this.date_value = date_value
     }
-
 }

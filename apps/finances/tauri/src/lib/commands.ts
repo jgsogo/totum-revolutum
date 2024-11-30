@@ -28,7 +28,8 @@ type AccountData = {
     custodian: CustodianData,
     type: { name: string },
     ccy: string,
-    identifier?: string
+    identifier?: string,
+    is_numerable: boolean,
 };
 
 /**
@@ -39,7 +40,7 @@ type AccountData = {
 const create_account = function (data: AccountData): Account {
     let custodian = create_custodian(data.custodian);
     let account_type = new AccountType(data.type.name);
-    return new Account(data.pk, data.name, custodian, account_type, data.ccy, data.identifier);
+    return new Account(data.pk, data.name, custodian, account_type, data.ccy, data.is_numerable, data.identifier);
 }
 
 /** The data returned by the backend representing a Snapshot */
