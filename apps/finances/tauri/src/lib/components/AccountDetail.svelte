@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Avatar, Card, Img } from "flowbite-svelte";
+  import { Avatar, Card, Img, Modal } from "flowbite-svelte";
   import type { Account } from "$lib/models/Account";
   import type { Custodian } from "$lib/models/Custodian";
   import type { Snapshot } from "$lib/models/Snapshot";
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
-  import More from "$lib/widgets/More.svelte";
+  import SnapshotForm from "$lib/forms/SnapshotForm.svelte";
 
   let {
     account = $bindable(),
@@ -22,6 +22,11 @@
         .reduce((response, word) => (response += word.slice(0, 1)), "");
       return acronym.substring(0, 3);
     }
+  };
+
+  let snapshotModal: boolean = $state(false);
+  const on_snapshot = (amount: number, date_value: Date) => {
+    snapshotModal = false;
   };
 </script>
 
@@ -46,13 +51,18 @@
             <span class="text-gray-500 text-sm">{account.identifier}</span>
             <p>
               <span class="flex text-xs mr-2">
-                <button class="flex hover:underline mr-2"><CameraPhotoOutline class="w-4 h-4 mr-1" />Snapshot</button>
-                <button class="flex hover:underline mr-2"
-                  ><ArrowDownToBracketOutline class="w-4 h-4 mr-1" />Income</button
-                >
-                <button class="flex hover:underline mr-2"
-                  ><ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />Expense</button
-                >
+                <button class="flex hover:underline mr-2" onclick={() => (snapshotModal = true)}>
+                  <CameraPhotoOutline class="w-4 h-4 mr-1" />
+                  Snapshot
+                </button>
+                <button class="flex hover:underline mr-2">
+                  <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
+                  Income
+                </button>
+                <button class="flex hover:underline mr-2">
+                  <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
+                  Expense
+                </button>
               </span>
             </p>
           </div>
@@ -66,3 +76,7 @@
     </li>
   </ul>
 </Card>
+
+<Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose={false}>
+  <SnapshotForm ccy={account.ccy} {on_snapshot} />
+</Modal>
