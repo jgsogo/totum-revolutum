@@ -39,3 +39,11 @@ where
         })
     }
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::finances_investments_snapshotnumerable)]
+pub struct NewSnapshotNumerable<'a> {
+    pub snapshot_ptr_id: &'a i64,
+    pub quantity: &'a NumericType,
+    pub unit_value: &'a NumericType,
+}

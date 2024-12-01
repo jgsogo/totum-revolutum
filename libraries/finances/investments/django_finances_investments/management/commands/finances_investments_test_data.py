@@ -13,7 +13,7 @@ from django_finances_investments.constants import (
     AccountTypeConstants,
     MovementTypeConstants,
 )
-from django_finances_investments.models import MovementNumerable
+from django_finances_investments.models import MovementNumerable, SnapshotNumerable
 
 
 class Command(BaseCommand):
@@ -29,6 +29,7 @@ class Command(BaseCommand):
         transactions = Transaction.objects.all()
         self.populate_movements_numerable(account=accounts[0], transaction=transactions[0])
         self.populate_movements_numerable(account=accounts[2], transaction=transactions[0])
+        self.populate_snapshot_numerable(account=accounts[0])
 
     def populate_accounts(self):
         activos_corrientes_inversion = AccountType.objects.get(
@@ -111,3 +112,14 @@ class Command(BaseCommand):
                 unit_value=100,
             )
             mov.save()
+
+    def populate_snapshot_numerable(self, account: Account):
+        for i in range(2):
+            snapshot = SnapshotNumerable(
+                account=account,
+                amount=(i * 100),
+                date_value="2024-09-0{}".format(i + 1),
+                unit_value=100,
+                quantity=i,
+            )
+            snapshot.save()
