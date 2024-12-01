@@ -10,8 +10,7 @@
     movements = $bindable(),
   }: { account: Account; snapshots: Snapshot[]; movements: Movement[] } = $props();
 
-  const entries = [...snapshots, ...movements];
-  entries.sort((lhs, rhs) => new Date(rhs.date_value).getTime() - new Date(lhs.date_value).getTime());
+  const entries = $derived([...snapshots, ...movements].sort((lhs, rhs) => new Date(rhs.date_value).getTime() - new Date(lhs.date_value).getTime()));
 
   let class_row_snapshot = "bg-gray-300 dark:bg-gray-700";
   let class_row_movement = "";

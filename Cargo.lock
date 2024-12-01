@@ -1768,6 +1768,8 @@ name = "finances-app"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "chrono",
+ "chrono-tz",
  "diesel",
  "finances-app",
  "finances_accounts",

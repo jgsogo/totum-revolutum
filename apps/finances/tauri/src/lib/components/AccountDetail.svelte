@@ -8,6 +8,7 @@
   import { goToTransactionCreate } from "$lib/utils";
   import type { Holder } from "$lib/models/Holder";
   import { create_snapshot } from "$lib/commands";
+  import { invalidate } from "$app/navigation";
 
   let {
     holder = $bindable(),
@@ -29,15 +30,10 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  const on_snapshot = async (
-    date_value: Date,
-    amount?: number,
-    quantity?: number,
-    unit_value?: number
-  ): Promise<void> => {
-    return create_snapshot(account, date_value, amount, quantity, unit_value).then((_) => {
+  const on_snapshot = async (date_value: Date, amount?: number, quantity?: number, unit_value?: number) =>  {
+      await create_snapshot(account, date_value, amount, quantity, unit_value);
+      await invalidate("invalidate:account");
       snapshotModal = false;
-    });
   };
 </script>
 

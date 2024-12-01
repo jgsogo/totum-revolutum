@@ -62,7 +62,13 @@
       return;
     }
 
-    on_snapshot(date_value, amount, quantity, unit_value).catch((error) => (backend_error = error));
+    try {
+        await on_snapshot(date_value, amount, quantity, unit_value);
+    }
+    catch (error) {
+        backend_error = String(error);
+    }
+
   };
 </script>
 

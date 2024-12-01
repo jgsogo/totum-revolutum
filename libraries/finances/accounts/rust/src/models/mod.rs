@@ -20,7 +20,7 @@ pub use movement::Movement;
 pub use movement_type::MovementType;
 
 mod snapshot;
-pub use snapshot::Snapshot;
+pub use snapshot::{NewSnapshot, Snapshot};
 
 mod transaction;
 pub use transaction::Transaction;
