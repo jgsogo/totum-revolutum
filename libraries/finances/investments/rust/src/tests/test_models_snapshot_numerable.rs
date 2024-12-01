@@ -1,10 +1,8 @@
-use crate::models::MovementNumerable;
 use crate::models::{NewSnapshotNumerable, SnapshotNumerable};
 use crate::sql::queries::all_snapshotnumerable_for_account_id;
 use crate::test_utils::establish_connection;
 use diesel::prelude::*;
-use finances_accounts::models::{Movement, MovementType, NewSnapshot, Transaction};
-use finances_accounts::sql::filters::movement_filter_account_by_pk;
+use finances_accounts::models::NewSnapshot;
 
 #[test]
 fn test_queries() {
@@ -43,7 +41,7 @@ fn test_queries() {
             quantity: &quantity,
             unit_value: &unit_value,
         };
-        let inserted = diesel::insert_into(crate::schema::finances_investments_snapshotnumerable::table)
+        diesel::insert_into(crate::schema::finances_investments_snapshotnumerable::table)
             .values(&new_snapshot_numerable)
             .execute(conn)?;
 
