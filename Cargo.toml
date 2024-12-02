@@ -73,7 +73,7 @@ main_error = "0.1.2"
 mime = "0.3.17"
 mockall = { version = "0.13.0" }
 num-traits = "0.2.19"
-oxipng = { version = "9.0", features = ["parallel", "zopfli", "filetime"], default-features = false }
+oxipng = { version = "9.1", features = ["parallel", "zopfli", "filetime"], default-features = false }
 regex = "1.10.5"
 reqwest = { version = "0.12.4" }
 ring = "0.17.8"
