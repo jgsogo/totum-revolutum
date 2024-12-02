@@ -18,10 +18,10 @@ bazel_dep(name = "rules_pkg", version = "1.0.1")
 bazel_dep(name = "rules_java", version = "8.5.1", dev_dependency = True)
 bazel_dep(name = "aspect_bazel_lib", version = "2.9.4", dev_dependency = True)
 
-bazel_dep(name = "aspect_rules_js", version = "2.1.0")
+bazel_dep(name = "aspect_rules_js", version = "2.1.1")
 bazel_dep(name = "aspect_rules_ts", version = "3.3.1")
 
-bazel_dep(name = "rules_uv", version = "0.41.0", dev_dependency = True)
+bazel_dep(name = "rules_uv", version = "0.44.0", dev_dependency = True)
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
