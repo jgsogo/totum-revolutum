@@ -50,7 +50,7 @@ dyn-clone = "1.0.17"
 env_logger = "0.11.3"
 kamadak-exif = "0.6.1"
 flume = "0.11.0"
-fs4 = { version = "0.11.0" }
+fs4 = { version = "0.12.0" }
 futures = { version = "0.3.30" }
 futures-util = { version = "0.3.30", default-features = false }
 headers = { version = "0.4.0" }
