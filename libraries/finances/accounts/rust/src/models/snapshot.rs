@@ -23,3 +23,11 @@ impl Snapshot {
             .order(crate::schema::finances_accounts_snapshot::date_value.desc())
     }
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::finances_accounts_snapshot)]
+pub struct NewSnapshot<'a> {
+    pub amount: &'a NumericType,
+    pub date_value: &'a chrono::NaiveDate,
+    pub account_id: &'a i64,
+}

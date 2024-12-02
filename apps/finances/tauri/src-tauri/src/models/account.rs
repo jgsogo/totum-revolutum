@@ -19,6 +19,7 @@ pub struct Account {
     pub identifier: Option<String>,
     pub holder_owns_money: bool,
     pub is_numerable: bool,
+    pub open: String,
 }
 
 impl From<AccountAndRelatedData> for Account {
@@ -33,6 +34,7 @@ impl From<AccountAndRelatedData> for Account {
             identifier: account.identifier,
             holder_owns_money: account_holder_role.owns_money,
             is_numerable: account.is_numerable,
+            open: account.open.format("%Y-%m-%d").to_string(),
         }
     }
 }

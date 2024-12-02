@@ -1,1 +1,2 @@
 mod test_models_movement_numerable;
+mod test_models_snapshot_numerable;

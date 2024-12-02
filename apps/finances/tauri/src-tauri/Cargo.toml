@@ -22,6 +22,8 @@ finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
 finances_investments = { path = "../../../../libraries/finances/investments/rust" }
 
 bigdecimal = "0.4.5"
+chrono = { version = "0.4.38" }
+chrono-tz = { version = "0.10.0" }
 diesel = { version = "2.2.4", features = ["r2d2", "chrono"] }
 
 tauri = { version = "2.0.3", features = [] }

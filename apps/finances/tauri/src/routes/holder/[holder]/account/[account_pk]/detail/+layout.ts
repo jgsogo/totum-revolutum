@@ -5,7 +5,9 @@ import type { Custodian } from '$lib/models/Custodian.js';
 import type { Account } from '$lib/models/Account.js';
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({ params, parent }) {
+export async function load({ params, parent, depends }) {
+    depends('invalidate:account');
+
     const { all_accounts_list } = await parent();
 
     // Find the account for the input params
