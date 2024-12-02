@@ -8,11 +8,12 @@ import {
 	ChartMixedDollarSolid,
 	CashSolid,
 	LandmarkSolid,
+	ClipboardSolid,
 
 } from 'flowbite-svelte-icons';
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({ params, depends, parent }) {
+export async function load({ params, depends }) {
 	depends('invalidate:refresh');
 
 	// TODO: Choose better default, see https://github.com/jgsogo/totum-revolutum/issues/637
@@ -22,11 +23,14 @@ export async function load({ params, depends, parent }) {
 		let holder = await holder_details(holder_pk);
 
 		let menu = []
+		let all_accounts_list: Account[] = await all_accounts(holder);
+
+		// Menu - All accounts
+		menu.push(new SidebarEntry(`All (${all_accounts_list.length})`, ClipboardSolid, `/holder/${holder.pk}/accounts/all`));
 
 		// Menu - custodians
-		let all_accounts_list: Account[] = await all_accounts(holder);
 		let accounts_by_custodian = Object.groupBy(all_accounts_list, ({custodian}) => custodian.pk);
-		let custodians_entry = new SidebarEntry(`Custodians (${Object.entries(accounts_by_custodian).length})`, LandmarkSolid);
+		let custodians_entry = new SidebarEntry(`By custodian (${Object.entries(accounts_by_custodian).length})`, LandmarkSolid);
 		for (const [_, value] of Object.entries(accounts_by_custodian)) {
 			if (value) {
 				const custodian = value[0].custodian;

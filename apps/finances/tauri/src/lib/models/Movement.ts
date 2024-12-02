@@ -1,5 +1,13 @@
 import type {Account} from "$lib/models/Account";
 
+export class NewMovement {
+    amount?: number;
+    quantity?: number;
+    unit_value?: number;
+    account?: Account;
+};
+
+
 export class Movement {
     readonly amount: number;
     private readonly quantity?: number;
