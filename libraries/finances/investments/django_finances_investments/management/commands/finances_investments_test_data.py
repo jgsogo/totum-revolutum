@@ -89,6 +89,16 @@ class Command(BaseCommand):
                     custodian=custodians[0],
                     is_numerable=False,
                 ),
+                Account(
+                    pk=8,
+                    name="IBM2",
+                    identifier="2345",
+                    ccy="USD",
+                    open="2024-09-12",
+                    type=stocks,
+                    custodian=custodians[2],
+                    is_numerable=True,
+                ),
             ]
         )
 

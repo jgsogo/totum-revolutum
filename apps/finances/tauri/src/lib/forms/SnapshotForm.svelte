@@ -11,7 +11,7 @@
   }: {
     account: Account;
     last_snapshot?: Snapshot;
-    on_snapshot: (date_value: Date, amount?: number, quantity?: number, unit_value?: number) => Promise<void>;
+    on_snapshot: (date_value: Date, amount: number, quantity?: number, unit_value?: number) => Promise<void>;
   } = $props();
 
   let date_value: Date = $state(new Date());
@@ -40,7 +40,7 @@
     }
 
     if (account.is_numerable) {
-      amount = undefined;
+      amount = undefined; // It is computed later
       // Quantity needs to be a positive integer
       if (!quantity || !Number.isInteger(quantity) || quantity < 0) {
         quantity_error = "Positive integer required.";
@@ -63,6 +63,7 @@
     }
 
     try {
+        amount = amount ?? quantity! * unit_value!;
         await on_snapshot(date_value, amount, quantity, unit_value);
     }
     catch (error) {

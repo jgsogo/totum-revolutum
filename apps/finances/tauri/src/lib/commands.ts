@@ -257,7 +257,7 @@ export const get_base_static_url = async (): Promise<string> => {
  * @param {number} unit_value - Unit value (if numerable account)
  * @returns - A promise that resolves when the snapshot is created, or the error if it was not possible
  */
-export const create_snapshot = async (account: Account, date_value: Date, amount?: number, quantity?: number, unit_value?: number) => {
+export const create_snapshot = async (account: Account, date_value: Date, amount: number, quantity?: number, unit_value?: number) => {
     let date = date_value.toISOString().slice(0, 10);
     await invoke("create_snapshot", { accountPk: account.pk, dateValue: date, amount: amount, quantity: quantity, unitValue: unit_value });
 }

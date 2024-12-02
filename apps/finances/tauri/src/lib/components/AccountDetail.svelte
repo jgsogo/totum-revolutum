@@ -30,7 +30,7 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  const on_snapshot = async (date_value: Date, amount?: number, quantity?: number, unit_value?: number) =>  {
+  const on_snapshot = async (date_value: Date, amount: number, quantity?: number, unit_value?: number) =>  {
       await create_snapshot(account, date_value, amount, quantity, unit_value);
       await invalidate("invalidate:account");
       snapshotModal = false;

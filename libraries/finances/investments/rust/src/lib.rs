@@ -5,6 +5,7 @@ mod schema;
 mod tests;
 
 pub mod constants;
+pub mod managers;
 
 pub mod sql;
 #[cfg(feature = "test_utils")]

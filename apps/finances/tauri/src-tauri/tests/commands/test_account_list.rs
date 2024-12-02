@@ -43,7 +43,7 @@ fn test_acount_lists() {
 
         assert!(r.is_ok());
         let r = r.unwrap();
-        assert_eq!(r.len(), 6);
+        assert_eq!(r.len(), 7);
 
         let account_names = r.into_iter().map(|acc| acc.name).collect::<Vec<String>>();
         assert_eq!(
@@ -54,7 +54,8 @@ fn test_acount_lists() {
                 "Hipoteca casa NY",
                 "IBM",
                 "Indexa Capital",
-                "Plan de pensiones"
+                "Plan de pensiones",
+                "IBM2",
             ]
         );
     }
@@ -79,10 +80,10 @@ fn test_acount_lists() {
 
         assert!(r.is_ok());
         let r = r.unwrap();
-        assert_eq!(r.len(), 2);
+        assert_eq!(r.len(), 3);
 
         let account_names = r.into_iter().map(|acc| acc.name).collect::<Vec<String>>();
-        assert_eq!(account_names, vec!["IBM", "Indexa Capital"]);
+        assert_eq!(account_names, vec!["IBM", "Indexa Capital", "IBM2"]);
     }
 
     // Retirement accounts

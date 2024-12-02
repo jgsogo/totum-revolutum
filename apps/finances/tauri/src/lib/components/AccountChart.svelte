@@ -15,7 +15,7 @@
     series: [
       {
         name: account.name,
-        data: dates,
+        data: dates, // FIXME: Make this variable reactive
       },
     ],
     chart: {
