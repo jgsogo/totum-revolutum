@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Account, AccountType } from "$lib/models/Account";
+import { Account, AccountCategories, AccountType } from "$lib/models/Account";
 import { Snapshot } from "$lib/models/Snapshot"
 import { Movement } from "$lib/models/Movement"
 import { Custodian } from "./models/Custodian";
@@ -41,7 +41,11 @@ type AccountData = {
 const create_account = function (data: AccountData): Account {
     let custodian = create_custodian(data.custodian);
     let account_type = new AccountType(data.type.name);
-    return new Account(data.pk, data.name, custodian, account_type, data.ccy, data.is_numerable, new Date(data.open), data.identifier);
+    let account_category = AccountCategories.default;
+    if (data.is_numerable) {
+        account_category = AccountCategories.numerable_stock;
+    }
+    return new Account(account_category, data.pk, data.name, custodian, account_type, data.ccy, data.is_numerable, new Date(data.open), data.identifier);
 }
 
 /** The data returned by the backend representing a Snapshot */

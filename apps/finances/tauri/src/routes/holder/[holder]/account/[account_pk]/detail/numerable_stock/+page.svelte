@@ -11,7 +11,7 @@
 
 <div class="mt-px space-y-4">
   <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-    I'm numerable account!!!
+    I'm numerable-stock account!!!
     <AccountDetail
       bind:holder={data.holder}
       base_media_url={data.base_media_url}
