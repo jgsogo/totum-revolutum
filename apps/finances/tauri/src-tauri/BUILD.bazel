@@ -60,6 +60,7 @@ rust_test_suite(
     name = "_integration_tests",
     srcs = integration_tests_files,
     crate_features = ["postgres"],
+    data = glob(["tests/common/**/*.rs"]),
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
