@@ -15,7 +15,7 @@
     "@tauri-apps/cli": "2.1.0",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
-    "apexcharts": "^3.54.1",
+    "apexcharts": "^4.0.0",
     "autoprefixer": "^10.4.20",
     "dayjs": "^1.11.13",
     "eslint": "^9.15.0",
