@@ -2,6 +2,7 @@ import type {Account} from "$lib/models/Account";
 
 export class NewMovement {
     amount?: number;
+    date_value?: Date;
     quantity?: number;
     unit_value?: number;
     account?: Account;
