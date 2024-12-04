@@ -11,7 +11,7 @@ fn test_acount_lists() {
     // All accounts
     {
         let body = json!({ "holderPk": 0i64 });
-        let r = call_it::<Vec<Account>>(&webview, "all_accounts".to_string(), body);
+        let r = call_it::<Vec<Account>>(&webview, "get_all_accounts_for_holder".to_string(), body);
 
         assert!(r.is_ok());
         let r = r.unwrap();
@@ -35,7 +35,7 @@ fn test_acount_lists() {
     // Savings accounts
     {
         let body = json!({ "holderPk": 0i64 });
-        let r = call_it::<Vec<Account>>(&webview, "savings_accounts".to_string(), body);
+        let r = call_it::<Vec<Account>>(&webview, "get_all_savings_accounts_for_holder".to_string(), body);
 
         assert!(r.is_ok());
         let r = r.unwrap();
@@ -48,7 +48,7 @@ fn test_acount_lists() {
     // Investments accounts
     {
         let body = json!({ "holderPk": 0i64 });
-        let r = call_it::<Vec<Account>>(&webview, "investment_accounts".to_string(), body);
+        let r = call_it::<Vec<Account>>(&webview, "get_all_investment_accounts_for_holder".to_string(), body);
 
         assert!(r.is_ok());
         let r = r.unwrap();
@@ -61,7 +61,7 @@ fn test_acount_lists() {
     // Retirement accounts
     {
         let body = json!({ "holderPk": 0i64 });
-        let r = call_it::<Vec<Account>>(&webview, "retirement_accounts".to_string(), body);
+        let r = call_it::<Vec<Account>>(&webview, "get_all_retirement_accounts_for_holder".to_string(), body);
 
         assert!(r.is_ok());
         let r = r.unwrap();

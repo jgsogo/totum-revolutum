@@ -10,7 +10,7 @@ fn test_account_snapshots() {
 
     {
         let body = json!({ "pk": 0i32 });
-        let r = call_it::<Vec<Snapshot>>(&webview, "account_snapshots".to_string(), body);
+        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
 
         assert!(r.is_ok());
         let snapshots = r.unwrap();
@@ -22,7 +22,7 @@ fn test_account_snapshots() {
 
     {
         let body = json!({ "pk": -2i32 });
-        let r = call_it::<Vec<Snapshot>>(&webview, "account_snapshots".to_string(), body);
+        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
 
         // We filter using the account-pk, it doesn't check if the account exists. This is the reason
         // why it returns an empty vector instead of an error

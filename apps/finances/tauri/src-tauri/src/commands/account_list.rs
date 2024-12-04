@@ -6,7 +6,7 @@ use finances_accounts::sql::filters::{accountholder_by_pk, accounttype_by_unique
 use tauri::State;
 
 #[tauri::command]
-pub fn all_accounts(
+pub fn get_all_accounts_for_holder(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
 ) -> Result<Vec<crate::models::Account>, String> {
@@ -56,7 +56,7 @@ fn get_all_accounttypes<'a>(conn: &mut PgConnection, unique_names: &'a [&'a str]
 }
 
 #[tauri::command]
-pub fn savings_accounts(
+pub fn get_all_savings_accounts_for_holder(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
 ) -> Result<Vec<crate::models::Account>, String> {
@@ -92,7 +92,7 @@ pub fn savings_accounts(
 }
 
 #[tauri::command]
-pub fn investment_accounts(
+pub fn get_all_investment_accounts_for_holder(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
 ) -> Result<Vec<crate::models::Account>, String> {
@@ -131,7 +131,7 @@ pub fn investment_accounts(
 }
 
 #[tauri::command]
-pub fn retirement_accounts(
+pub fn get_all_retirement_accounts_for_holder(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
 ) -> Result<Vec<crate::models::Account>, String> {

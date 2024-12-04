@@ -14,7 +14,7 @@ fn test_snapshot() {
     let account_id = 1i32;
     {
         let body = json!({ "pk": account_id });
-        let r = call_it::<Vec<Snapshot>>(&webview, "account_snapshots".to_string(), body);
+        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         assert_eq!(r.unwrap().len(), 0);
     }
@@ -32,7 +32,7 @@ fn test_snapshot() {
 
         // Now we have one more snapshot
         let body = json!({ "pk": account_id });
-        let r = call_it::<Vec<Snapshot>>(&webview, "account_snapshots".to_string(), body);
+        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         assert_eq!(r.unwrap().len(), 1);
     }
@@ -43,7 +43,7 @@ fn test_snapshot() {
     let account_id = 8i32;
     {
         let body = json!({ "pk": account_id });
-        let r = call_it::<Vec<Snapshot>>(&webview, "account_snapshots".to_string(), body);
+        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         assert_eq!(r.unwrap().len(), 0);
     }
@@ -64,7 +64,7 @@ fn test_snapshot() {
 
         // Now we have one more snapshot
         let body = json!({ "pk": account_id });
-        let r = call_it::<Vec<Snapshot>>(&webview, "account_snapshots".to_string(), body);
+        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         assert_eq!(r.unwrap().len(), 1);
     }

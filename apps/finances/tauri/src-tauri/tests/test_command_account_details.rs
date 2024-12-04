@@ -10,13 +10,13 @@ fn test_account_detail() -> Result<(), Value> {
 
     {
         let body = json!({ "pk": 0i32 });
-        let r = call_it::<Account>(&webview, "account_detail".to_string(), body)?;
+        let r = call_it::<Account>(&webview, "get_account_details".to_string(), body)?;
         assert_eq!(r.name, "Gastos compartidos");
     }
 
     {
         let body = json!({ "pk": -2i32 });
-        let r = call_it::<Account>(&webview, "account_detail".to_string(), body);
+        let r = call_it::<Account>(&webview, "get_account_details".to_string(), body);
 
         assert!(r.is_err());
         let r = r.unwrap_err();

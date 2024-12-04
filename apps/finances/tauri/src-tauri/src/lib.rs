@@ -30,20 +30,21 @@ pub fn create_app<R: tauri::Runtime>(
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            commands::account_list::all_accounts,
-            commands::account_list::savings_accounts,
-            commands::account_list::investment_accounts,
-            commands::account_list::retirement_accounts,
+            commands::account_list::get_all_accounts_for_holder,
+            commands::account_list::get_all_savings_accounts_for_holder,
+            commands::account_list::get_all_investment_accounts_for_holder,
+            commands::account_list::get_all_retirement_accounts_for_holder,
             commands::snapshot::create_snapshot,
-            commands::account_detail,
-            commands::account_snapshot_latest,
-            commands::account_snapshots,
-            commands::account_movements,
-            commands::holders,
-            commands::holder_details,
-            commands::custodian_details,
-            commands::base_media_url,
-            commands::base_static_url,
+            commands::account::get_account_details,
+            commands::account::get_account_snapshot_latest,
+            commands::account::get_account_snapshots,
+            commands::account::get_account_movements,
+            commands::holder::get_all_holders,
+            commands::holder::get_holder_details,
+            commands::custodian::get_custodian_details,
+            commands::get_base_url,
+            commands::get_base_media_url,
+            commands::get_base_static_url,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

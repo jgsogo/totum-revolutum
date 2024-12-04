@@ -3,10 +3,10 @@
   import type { Holder } from "$lib/models/Holder";
 
   let {
-    holders,
+    all_holders,
     active_holder = $bindable(),
     base_media_url,
-  }: { holders: Holder[]; active_holder: Holder; base_media_url: string } = $props();
+  }: { all_holders: Holder[]; active_holder: Holder; base_media_url: string } = $props();
 
   const initials = (holder: Holder): string => {
     let words = holder.name.split(/\s/);
@@ -22,7 +22,7 @@
 
   let dropdownOpen = $state(false);
   let searchTerm = $state("");
-  const people = holders.map((h) => {
+  const people = all_holders.map((h) => {
     return { name: h.name, holder: h };
   });
   let filteredItems = $derived(

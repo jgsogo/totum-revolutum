@@ -10,7 +10,7 @@ fn test_holders() -> Result<(), Value> {
 
     {
         let body = json!({});
-        let r = call_it::<Vec<Holder>>(&webview, "holders".to_string(), body)?;
+        let r = call_it::<Vec<Holder>>(&webview, "get_all_holders".to_string(), body)?;
         assert_eq!(r.len(), 3);
         {
             let holder = r.get(0).unwrap();

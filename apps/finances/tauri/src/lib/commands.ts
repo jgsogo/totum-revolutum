@@ -73,8 +73,8 @@ const _create_snapshot = function (account: Account, data: SnapshotData): Snapsh
  * @param {Account} account - Account instance
  * @returns {Snapshot} Latest snapshot for the given account
  */
-export const account_snapshot_latest = async (account: Account): Promise<Snapshot> => {
-    const data: SnapshotData = await invoke("account_snapshot_latest", { pk: account.pk });
+export const get_account_snapshot_latest = async (account: Account): Promise<Snapshot> => {
+    const data: SnapshotData = await invoke("get_account_snapshot_latest", { pk: account.pk });
     return _create_snapshot(account, data);
 };
 
@@ -83,8 +83,8 @@ export const account_snapshot_latest = async (account: Account): Promise<Snapsho
  * @param {number} pk - The primary key value of the account we are looking for
  * @returns {Account} The Account instance
  */
-export const account_detail = async (pk: number): Promise<Account> => {
-    const data: AccountData = await invoke("account_detail", { pk });
+export const get_account_details = async (pk: number): Promise<Account> => {
+    const data: AccountData = await invoke("get_account_details", { pk });
     return create_account(data);
 };
 
@@ -93,8 +93,8 @@ export const account_detail = async (pk: number): Promise<Account> => {
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances
  */
-export const all_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("all_accounts", { holderPk: holder.pk });
+export const get_all_accounts_for_holder = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_accounts_for_holder", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -105,8 +105,8 @@ export const all_accounts = async (holder: Holder): Promise<Account[]> => {
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances
  */
-export const savings_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("savings_accounts", { holderPk: holder.pk });
+export const get_all_savings_accounts_for_holder = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_savings_accounts_for_holder", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -117,8 +117,8 @@ export const savings_accounts = async (holder: Holder): Promise<Account[]> => {
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances
  */
-export const investment_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("investment_accounts", { holderPk: holder.pk });
+export const get_all_investment_accounts_for_holder = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_investment_accounts_for_holder", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -129,8 +129,8 @@ export const investment_accounts = async (holder: Holder): Promise<Account[]> =>
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances
  */
-export const retirement_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("retirement_accounts", { holderPk: holder.pk });
+export const get_all_retirement_accounts_for_holder = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_retirement_accounts_for_holder", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -141,8 +141,8 @@ export const retirement_accounts = async (holder: Holder): Promise<Account[]> =>
  * @param {Account} account - Account instance
  * @returns {Snapshot[]} All the snapshots for the given account
  */
-export const account_snapshots = async (account: Account): Promise<Snapshot[]> => {
-    const data: SnapshotData[] = await invoke("account_snapshots", { pk: account.pk });
+export const get_account_snapshots = async (account: Account): Promise<Snapshot[]> => {
+    const data: SnapshotData[] = await invoke("get_account_snapshots", { pk: account.pk });
     return data.map((it) => {
         return _create_snapshot(account, it);
     });
@@ -153,7 +153,7 @@ export const account_snapshots = async (account: Account): Promise<Snapshot[]> =
  * @param {Account} account - Account instance
  * @returns {Movement[]} All the movements for the given account
  */
-export const account_movements = async (account: Account): Promise<Movement[]> => {
+export const get_account_movements = async (account: Account): Promise<Movement[]> => {
     const data: {
         amount: number,
         quantity?: number,
@@ -176,7 +176,7 @@ export const account_movements = async (account: Account): Promise<Movement[]> =
             level: number,
             // parent: MovementType
         }
-    }[] = await invoke("account_movements", { pk: account.pk });
+    }[] = await invoke("get_account_movements", { pk: account.pk });
     return data.map((it) => {
         return new Movement(it.amount, it.direction, it.date, it.date_value, it.quantity, it.unit_value)
     });
@@ -204,8 +204,8 @@ const create_holder = function (data: HolderData): Holder {
  * Returns (a promise to) all the Holders in the database
  * @returns {Holder[]} All the holders
  */
-export const holders = async (): Promise<Holder[]> => {
-    const data: HolderData[] = await invoke("holders", {});
+export const get_all_holders = async (): Promise<Holder[]> => {
+    const data: HolderData[] = await invoke("get_all_holders", {});
     return data.map((it) => {
         return create_holder(it);
     });
@@ -216,8 +216,8 @@ export const holders = async (): Promise<Holder[]> => {
  * @param {number} pk - The primary key value of the holder we are looking for
  * @returns {Holder} The Holder instance
  */
-export const holder_details = async (pk: number): Promise<Holder> => {
-    const data: HolderData = await invoke("holder_details", { pk });
+export const get_holder_details = async (pk: number): Promise<Holder> => {
+    const data: HolderData = await invoke("get_holder_details", { pk });
     return create_holder(data);
 };
 
@@ -226,8 +226,8 @@ export const holder_details = async (pk: number): Promise<Holder> => {
  * @param {number} pk - The primary key value of the holder we are looking for
  * @returns {Holder} The Holder instance
  */
-export const custodian_details = async (pk: number): Promise<Custodian> => {
-    const data: CustodianData = await invoke("custodian_details", { pk });
+export const get_custodian_details = async (pk: number): Promise<Custodian> => {
+    const data: CustodianData = await invoke("get_custodian_details", { pk });
     return create_custodian(data);
 };
 
@@ -237,7 +237,7 @@ export const custodian_details = async (pk: number): Promise<Custodian> => {
  * @returns {string} The full URL to the base media URL
  */
 export const get_base_media_url = async (): Promise<string> => {
-    return await invoke("base_media_url", {});
+    return await invoke("get_base_media_url", {});
 };
 
 /**
@@ -245,7 +245,15 @@ export const get_base_media_url = async (): Promise<string> => {
  * @returns {string} The full URL to the base static URL
  */
 export const get_base_static_url = async (): Promise<string> => {
-    return await invoke("base_static_url", {});
+    return await invoke("get_base_static_url", {});
+};
+
+/**
+ * Returns (a promise to) the base_url URL
+ * @returns {string} The full URL to the base URL
+ */
+export const get_base_url = async (): Promise<string> => {
+    return await invoke("get_base_url", {});
 };
 
 /**
