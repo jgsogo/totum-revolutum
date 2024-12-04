@@ -6,7 +6,7 @@ use finances_accounts::sql::filters::custodian_by_pk;
 use tauri::State;
 
 #[tauri::command]
-pub async fn custodian_details(
+pub async fn get_custodian_details(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i64,
 ) -> Result<crate::models::Custodian, String> {

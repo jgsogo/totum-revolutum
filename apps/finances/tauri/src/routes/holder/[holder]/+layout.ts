@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { holder_details, get_all_accounts_for_holder, get_all_savings_accounts_for_holder, get_all_retirement_accounts_for_holder, get_all_investment_accounts_for_holder } from '$lib/commands';
+import { get_holder_details, get_all_accounts_for_holder, get_all_savings_accounts_for_holder, get_all_retirement_accounts_for_holder, get_all_investment_accounts_for_holder } from '$lib/commands';
 import {SidebarEntry} from "$lib/components/SidebarMenu/SidebarEntry.js"
 import {Account} from '$lib/models/Account.js'
 
@@ -20,7 +20,7 @@ export async function load({ params, depends }) {
 	let holder_pk = params.holder === '<unknown>' ? 1 : parseInt(params.holder, 10);
 
 	try {
-		let holder = await holder_details(holder_pk);
+		let holder = await get_holder_details(holder_pk);
 
 		let menu = []
 		let all_accounts_for_holder: Account[] = await get_all_accounts_for_holder(holder);

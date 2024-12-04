@@ -12,14 +12,14 @@
 >
   <Navbar
     bind:drawerHidden
-    holders={data.holders}
+    all_holders={data.all_holders}
     bind:active_holder={data.holder}
     home_href="/holder/{data.holder.pk}"
     base_media_url={data.base_media_url}
   />
 </header>
 <div class="overflow-hidden lg:flex">
-  <SidebarMenu bind:drawerHidden menu={data.menu}/>
+  <SidebarMenu bind:drawerHidden menu={data.menu} base_url={data.base_url}/>
 
   <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
     <main class="p-4">

@@ -10,7 +10,7 @@ fn test_account_snapshot_latest() {
 
     {
         let body = json!({ "pk": 0i64 });
-        let r = call_it::<Option<Snapshot>>(&webview, "account_snapshot_latest".to_string(), body);
+        let r = call_it::<Option<Snapshot>>(&webview, "get_account_snapshot_latest".to_string(), body);
 
         assert!(r.is_ok());
         let snapshot = r.unwrap();
@@ -21,7 +21,7 @@ fn test_account_snapshot_latest() {
 
     {
         let body = json!({ "pk": -2i64 });
-        let r = call_it::<Option<Snapshot>>(&webview, "account_snapshot_latest".to_string(), body);
+        let r = call_it::<Option<Snapshot>>(&webview, "get_account_snapshot_latest".to_string(), body);
 
         // We filter using the account-pk, it doesn't check if the account exists. This is the reason
         // why it returns an empty value instead of an error

@@ -8,7 +8,7 @@
   } from "flowbite-svelte-icons";
   import type { SidebarEntry } from "./SidebarEntry";
 
-  let { menu, drawerHidden = $bindable() }: { menu: SidebarEntry[]; drawerHidden: boolean } = $props();
+  let { menu, drawerHidden = $bindable(), base_url }: { menu: SidebarEntry[]; drawerHidden: boolean, base_url: string } = $props();
 
   const closeDrawer = () => {
     drawerHidden = true;
@@ -28,7 +28,7 @@
     },
     {
       label: "Admin interface",
-      href: "http://localhost:1337/admin/",
+      href: `${base_url}/admin`,
       icon: ColumnSolid,
     },
   ];

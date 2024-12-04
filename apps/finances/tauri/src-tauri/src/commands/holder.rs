@@ -6,7 +6,7 @@ use finances_accounts::sql::filters::accountholder_by_pk;
 use tauri::State;
 
 #[tauri::command]
-pub async fn holders(
+pub async fn get_all_holders(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
 ) -> Result<Vec<crate::models::Holder>, String> {
     log::info!("Get all Holders in the database");
@@ -23,7 +23,7 @@ pub async fn holders(
 }
 
 #[tauri::command]
-pub async fn holder_details(
+pub async fn get_holder_details(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i64,
 ) -> Result<crate::models::Holder, String> {

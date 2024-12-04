@@ -8,7 +8,7 @@ use finances_accounts::sql::filters::{account_by_pk, movement_filter_account_by_
 use tauri::State;
 
 #[tauri::command]
-pub async fn account_detail(
+pub async fn get_account_details(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i64,
 ) -> Result<crate::models::Account, String> {
@@ -35,7 +35,7 @@ pub async fn account_detail(
 }
 
 #[tauri::command]
-pub async fn account_snapshot_latest(
+pub async fn get_account_snapshot_latest(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i64,
 ) -> Result<Option<crate::models::Snapshot>, String> {
@@ -55,7 +55,7 @@ pub async fn account_snapshot_latest(
 }
 
 #[tauri::command]
-pub async fn account_snapshots(
+pub async fn get_account_snapshots(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i64,
 ) -> Result<Vec<crate::models::Snapshot>, String> {
@@ -72,7 +72,7 @@ pub async fn account_snapshots(
 }
 
 #[tauri::command]
-pub async fn account_movements(
+pub async fn get_account_movements(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i64,
 ) -> Result<Vec<crate::models::Movement>, String> {

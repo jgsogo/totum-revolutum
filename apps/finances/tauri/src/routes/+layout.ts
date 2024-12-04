@@ -5,7 +5,7 @@ export const prerender = true;
 export const ssr = false;
 
 import { error } from '@sveltejs/kit';
-import { holders, get_base_media_url, get_base_static_url } from '$lib/commands';
+import { get_all_holders, get_base_media_url, get_base_static_url, get_base_url } from '$lib/commands';
 import { Holder } from '$lib/models/Holder';
 
 /** @type {import('./$types').LayoutLoad} */
@@ -13,11 +13,13 @@ export async function load({ depends }) {
     depends('invalidate:refresh');
 
 	try {
-		let all_holders: Holder[] = await holders();
+		let all_holders: Holder[] = await get_all_holders();
 		let base_media_url = await get_base_media_url();
 		let base_static_url = await get_base_static_url();
+		let base_url = await get_base_url();
 		return {
-			holders: all_holders,
+			all_holders,
+			base_url,
 			base_media_url,
 			base_static_url,
 		};

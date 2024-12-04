@@ -10,7 +10,7 @@ fn test_custodians() -> Result<(), Value> {
 
     {
         let body = json!({"pk": 0i64});
-        let r = call_it::<Custodian>(&webview, "custodian_details".to_string(), body)?;
+        let r = call_it::<Custodian>(&webview, "get_custodian_details".to_string(), body)?;
         assert_eq!(r.name, "custodian0");
     }
 

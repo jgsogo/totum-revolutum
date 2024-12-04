@@ -14,11 +14,16 @@ use crate::state::AppState;
 use tauri::State;
 
 #[tauri::command]
-pub async fn base_media_url(state: State<'_, AppState>) -> Result<String, String> {
+pub async fn get_base_url(state: State<'_, AppState>) -> Result<String, String> {
+    Ok(state.base_url().to_string())
+}
+
+#[tauri::command]
+pub async fn get_base_media_url(state: State<'_, AppState>) -> Result<String, String> {
     Ok(state.base_media_url())
 }
 
 #[tauri::command]
-pub async fn base_static_url(state: State<'_, AppState>) -> Result<String, String> {
+pub async fn get_base_static_url(state: State<'_, AppState>) -> Result<String, String> {
     Ok(state.base_static_url())
 }
