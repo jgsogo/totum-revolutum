@@ -114,7 +114,7 @@
             bind:quantity={mov.quantity}
             bind:unit_value={mov.unit_value}
             show_date={show_individual_dates}
-            all_accounts_list={data.all_accounts_list}
+            all_accounts_for_holder={data.all_accounts_for_holder}
             {all_movement_types}
           />
           <button
@@ -150,7 +150,7 @@
             bind:quantity={mov.quantity}
             bind:unit_value={mov.unit_value}
             show_date={show_individual_dates}
-            all_accounts_list={data.all_accounts_list}
+            all_accounts_for_holder={data.all_accounts_for_holder}
             {all_movement_types}
           />
           <button

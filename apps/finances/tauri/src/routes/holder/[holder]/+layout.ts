@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { holder_details, all_accounts, savings_accounts, retirement_accounts, investment_accounts } from '$lib/commands';
+import { holder_details, get_all_accounts_for_holder, get_all_savings_accounts_for_holder, get_all_retirement_accounts_for_holder, get_all_investment_accounts_for_holder } from '$lib/commands';
 import {SidebarEntry} from "$lib/components/SidebarMenu/SidebarEntry.js"
 import {Account} from '$lib/models/Account.js'
 
@@ -23,13 +23,13 @@ export async function load({ params, depends }) {
 		let holder = await holder_details(holder_pk);
 
 		let menu = []
-		let all_accounts_list: Account[] = await all_accounts(holder);
+		let all_accounts_for_holder: Account[] = await get_all_accounts_for_holder(holder);
 
 		// Menu - All accounts
-		menu.push(new SidebarEntry(`All (${all_accounts_list.length})`, ClipboardSolid, `/holder/${holder.pk}/accounts/all`));
+		menu.push(new SidebarEntry(`All (${all_accounts_for_holder.length})`, ClipboardSolid, `/holder/${holder.pk}/accounts/all`));
 
 		// Menu - custodians
-		let accounts_by_custodian = Object.groupBy(all_accounts_list, ({custodian}) => custodian.pk);
+		let accounts_by_custodian = Object.groupBy(all_accounts_for_holder, ({custodian}) => custodian.pk);
 		let custodians_entry = new SidebarEntry(`By custodian (${Object.entries(accounts_by_custodian).length})`, LandmarkSolid);
 		for (const [_, value] of Object.entries(accounts_by_custodian)) {
 			if (value) {
@@ -40,22 +40,22 @@ export async function load({ params, depends }) {
 		menu.push(custodians_entry);
 
 		// Menu - other entries
-		let savings_accounts_list = await savings_accounts(holder);
-		menu.push(new SidebarEntry(`Savings (${savings_accounts_list.length})`, CashSolid, `/holder/${holder.pk}/accounts/savings`));
+		let all_savings_accounts_for_holder = await get_all_savings_accounts_for_holder(holder);
+		menu.push(new SidebarEntry(`Savings (${all_savings_accounts_for_holder.length})`, CashSolid, `/holder/${holder.pk}/accounts/savings`));
 
-		let investment_accounts_list = await investment_accounts(holder);
-		menu.push(new SidebarEntry(`Investment (${investment_accounts_list.length})`, ChartMixedDollarSolid, `/holder/${holder.pk}/accounts/investment`));
+		let all_investment_accounts_for_holder = await get_all_investment_accounts_for_holder(holder);
+		menu.push(new SidebarEntry(`Investment (${all_investment_accounts_for_holder.length})`, ChartMixedDollarSolid, `/holder/${holder.pk}/accounts/investment`));
 
-		let retirement_accounts_list = await retirement_accounts(holder);
-		menu.push(new SidebarEntry(`Retirement (${retirement_accounts_list.length})`, LockSolid, `/holder/${holder.pk}/accounts/retirement`));
+		let all_retirement_accounts_for_holder = await get_all_retirement_accounts_for_holder(holder);
+		menu.push(new SidebarEntry(`Retirement (${all_retirement_accounts_for_holder.length})`, LockSolid, `/holder/${holder.pk}/accounts/retirement`));
 
 
 		return {
 			holder,
-			all_accounts_list,
-			retirement_accounts_list,
-			investment_accounts_list,
-			savings_accounts_list,
+			all_accounts_for_holder,
+			all_retirement_accounts_for_holder,
+			all_investment_accounts_for_holder,
+			all_savings_accounts_for_holder,
 			accounts_by_custodian,
 			menu,
 		};

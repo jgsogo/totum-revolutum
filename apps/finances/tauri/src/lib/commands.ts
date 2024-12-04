@@ -93,8 +93,8 @@ export const account_detail = async (pk: number): Promise<Account> => {
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances
  */
-export const all_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("all_accounts", { holderPk: holder.pk });
+export const get_all_accounts_for_holder = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_accounts_for_holder", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -105,8 +105,8 @@ export const all_accounts = async (holder: Holder): Promise<Account[]> => {
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances
  */
-export const savings_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("savings_accounts", { holderPk: holder.pk });
+export const get_all_savings_accounts_for_holder = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_savings_accounts_for_holder", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -117,8 +117,8 @@ export const savings_accounts = async (holder: Holder): Promise<Account[]> => {
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances
  */
-export const investment_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("investment_accounts", { holderPk: holder.pk });
+export const get_all_investment_accounts_for_holder = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_investment_accounts_for_holder", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });
@@ -129,8 +129,8 @@ export const investment_accounts = async (holder: Holder): Promise<Account[]> =>
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances
  */
-export const retirement_accounts = async (holder: Holder): Promise<Account[]> => {
-    const data: AccountData[] = await invoke("retirement_accounts", { holderPk: holder.pk });
+export const get_all_retirement_accounts_for_holder = async (holder: Holder): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_retirement_accounts_for_holder", { holderPk: holder.pk });
     return data.map((it) => {
         return create_account(it)
     });

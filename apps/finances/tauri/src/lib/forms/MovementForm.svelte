@@ -14,7 +14,7 @@
     quantity = $bindable(),
     unit_value = $bindable(),
     show_date,
-    all_accounts_list,
+    all_accounts_for_holder,
     all_movement_types,
   }: {
     account: Account | undefined;
@@ -24,13 +24,13 @@
     quantity: number | undefined;
     unit_value: number | undefined;
     show_date: boolean;
-    all_accounts_list: Account[];
+    all_accounts_for_holder: Account[];
     all_movement_types: MovementType[];
   } = $props();
 
   let total_amount = $derived((quantity ? quantity : 0) * (unit_value ? unit_value : 0));
 
-  let accounts = all_accounts_list.map((value) => {
+  let accounts = all_accounts_for_holder.map((value) => {
     return { value: value, name: value.name };
   });
 
