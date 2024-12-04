@@ -30,6 +30,7 @@ pub fn create_app<R: tauri::Runtime>(
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
+            commands::account_list::get_all_accounts,
             commands::account_list::get_all_accounts_for_holder,
             commands::account_list::get_all_savings_accounts_for_holder,
             commands::account_list::get_all_investment_accounts_for_holder,

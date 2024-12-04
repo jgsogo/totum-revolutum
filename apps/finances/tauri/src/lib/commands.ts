@@ -101,6 +101,18 @@ export const get_all_accounts_for_holder = async (holder: Holder): Promise<Accou
 };
 
 /**
+ * Returns (a promise to) all the Accounts in the database
+ * @returns {Account[]} The Account instances
+ */
+export const get_all_accounts = async (): Promise<Account[]> => {
+    const data: AccountData[] = await invoke("get_all_accounts", {});
+    return data.map((it) => {
+        return create_account(it)
+    });
+};
+
+
+/**
  * Returns (a promise to) all the savings Accounts for a given Holder
  * @param {Holder} holder - The holder
  * @returns {Account[]} The Account instances

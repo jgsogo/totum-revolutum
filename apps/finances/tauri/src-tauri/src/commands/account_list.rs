@@ -6,6 +6,34 @@ use finances_accounts::sql::filters::{accountholder_by_pk, accounttype_by_unique
 use tauri::State;
 
 #[tauri::command]
+pub fn get_all_accounts(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+) -> Result<Vec<crate::models::Account>, String> {
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    let accounts = Account::all()
+        .inner_join(
+            finances_accounts::schema::finances_accounts_accountholderrole::table
+                .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
+        )
+        .inner_join(Custodian::all())
+        .inner_join(AccountType::all())
+        .select((
+            Account::as_select(),
+            AccountHolderRole::as_select(),
+            Custodian::as_select(),
+            AccountType::as_select(),
+        ))
+        .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
+        .map_err(|e| format!("Error loading accounts: {}", e))?;
+
+    Ok(accounts
+        .into_iter()
+        .map(|v| v.into())
+        .collect::<Vec<crate::models::Account>>())
+}
+
+#[tauri::command]
 pub fn get_all_accounts_for_holder(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     holder_pk: i64,
