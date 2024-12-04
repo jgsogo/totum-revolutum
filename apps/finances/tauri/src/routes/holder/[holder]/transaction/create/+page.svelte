@@ -78,7 +78,15 @@
   }
 
   let all_transaction_groups: TransactionGroup[] = [];
-  let all_movement_types: MovementType[] = [];
+
+  let all_movementtypes = data.all_movementtypes.map((value) => {
+    return { value: value, name: value.getBreadcrumbs()!.join(" / ") };
+  }).sort((lhs, rhs) => lhs.name < rhs.name ? - 1 : lhs.name > rhs.name ? 1 : 0);
+
+  let all_accounts = data.all_accounts.map((value) => {
+    return { value: value, name: `${value.custodian} | ${value.name}` };
+  }).sort((lhs, rhs) => lhs.name < rhs.name ? - 1 : lhs.name > rhs.name ? 1 : 0);
+
 </script>
 
 <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
@@ -98,6 +106,7 @@
 
 <div class="mt-4 space-y-4">
   <div class="grid gap-4 grid-cols-2">
+
     <!-- from movements -->
     <div>
       <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl"
@@ -114,8 +123,8 @@
             bind:quantity={mov.quantity}
             bind:unit_value={mov.unit_value}
             show_date={show_individual_dates}
-            all_accounts={data.all_accounts}
-            {all_movement_types}
+            {all_accounts}
+            {all_movementtypes}
           />
           <button
             onclick={() => remove_movement_from(i)}
@@ -150,8 +159,8 @@
             bind:quantity={mov.quantity}
             bind:unit_value={mov.unit_value}
             show_date={show_individual_dates}
-            all_accounts={data.all_accounts}
-            {all_movement_types}
+            {all_accounts}
+            {all_movementtypes}
           />
           <button
             onclick={() => remove_movement_to(i)}
@@ -170,5 +179,6 @@
         </button>
       </Card>
     </div>
+
   </div>
 </div>

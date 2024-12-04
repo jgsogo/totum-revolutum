@@ -46,6 +46,8 @@ pub fn create_app<R: tauri::Runtime>(
             commands::get_base_url,
             commands::get_base_media_url,
             commands::get_base_static_url,
+            commands::movement_type::get_all_movementtypes,
+            commands::movement_type::get_breadcrumbs_for_movementtype,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

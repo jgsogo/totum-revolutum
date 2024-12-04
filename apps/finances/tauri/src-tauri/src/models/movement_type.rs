@@ -5,9 +5,10 @@ pub enum ParentMovementType {
     Id(i32),
     MovementType(Box<MovementType>),
 }
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MovementType {
-    // pub pk: i32,
+    pub pk: i64,
     pub name: String,
     // pub parent: Option<ParentMovementType>,
 }
@@ -15,6 +16,7 @@ pub struct MovementType {
 impl From<finances_accounts::models::MovementType> for MovementType {
     fn from(value: finances_accounts::models::MovementType) -> Self {
         Self {
+            pk: value.id,
             name: value.name,
             // parent: value.parent_id.map(ParentMovementType::Id),
         }

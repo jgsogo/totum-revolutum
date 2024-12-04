@@ -1,5 +1,7 @@
 use crate::constants;
-use crate::models::{AccountType, TreeNodeList};
+use crate::fields::TreeNodeList;
+use crate::managers::get_breadcrumbs_for_accounttype;
+use crate::models::AccountType;
 use crate::sql::filters::acounttype_by_unique_name;
 use crate::test_utils::establish_connection;
 use diesel::prelude::*;
@@ -158,4 +160,20 @@ fn test_descendants() {
         assert_eq!(assets.tn_descendants_count, 8);
         assert!(assets.tn_descendants_pks.nodes.contains(&cash_pk));
     }
+}
+
+#[test]
+fn test_breadcrumbs() {
+    let pool = establish_connection();
+    let mut conn = pool.get().unwrap();
+
+    let assets_current = AccountType::all()
+        .filter(acounttype_by_unique_name(constants::accounttype::ASSETS_CURRENT))
+        .select(AccountType::as_select())
+        .get_result::<AccountType>(&mut conn)
+        .unwrap();
+
+    let breadcrumbs = get_breadcrumbs_for_accounttype(&mut conn, &assets_current).unwrap();
+    assert_eq!(breadcrumbs.len(), 2);
+    assert_eq!(breadcrumbs, ["Activos".to_string(), "Corrientes".to_string()]);
 }

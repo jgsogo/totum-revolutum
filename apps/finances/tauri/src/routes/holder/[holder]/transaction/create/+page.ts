@@ -2,7 +2,7 @@
 // so we will use adapter-static to prerender the app (SSG)
 // See: https://v2.tauri.app/start/frontend/sveltekit/ for more info
 import { error } from '@sveltejs/kit';
-import { get_all_holders, get_base_media_url, get_base_static_url, get_all_accounts } from '$lib/commands';
+import { get_all_holders, get_base_media_url, get_base_static_url, get_all_accounts, get_all_movementtypes } from '$lib/commands';
 import { Holder } from '$lib/models/Holder';
 import type { Account } from '$lib/models/Account';
 
@@ -25,6 +25,11 @@ export async function load({ url, parent }) {
     }
 
     let all_accounts = await get_all_accounts();
+    let all_movementtypes_without_breadcrumbs = await get_all_movementtypes();
+    let all_movementtypes = await Promise.all(all_movementtypes_without_breadcrumbs.map(async (movtype) => {
+        await movtype.breadcrumbs();
+        return movtype;
+    }))
 
-    return { from_account, to_account, all_accounts };
+    return { from_account, to_account, all_accounts, all_movementtypes };
 }

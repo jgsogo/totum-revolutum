@@ -15,7 +15,7 @@
     unit_value = $bindable(),
     show_date,
     all_accounts,
-    all_movement_types,
+    all_movementtypes,
   }: {
     account: Account | undefined;
     movement_type: MovementType | undefined;
@@ -24,19 +24,11 @@
     quantity: number | undefined;
     unit_value: number | undefined;
     show_date: boolean;
-    all_accounts: Account[];
-    all_movement_types: MovementType[];
+    all_accounts: { value: Account, name: string }[];
+    all_movementtypes: { value: MovementType, name: string }[];
   } = $props();
 
   let total_amount = $derived((quantity ? quantity : 0) * (unit_value ? unit_value : 0));
-
-  let accounts = all_accounts.map((value) => {
-    return { value: value, name: `${value.custodian} | ${value.name}` };
-  }).sort((lhs, rhs) => lhs.name < rhs.name ? - 1 : lhs.name > rhs.name ? 1 : 0);
-
-  let movement_types = all_movement_types.map((value) => {
-    return { value: value, name: value.breadcrumb || value.name };
-  });
 
   let dateFormat: Intl.DateTimeFormatOptions = {
     day: "2-digit",
@@ -48,11 +40,11 @@
 <form class="flex flex-col space-y-6" action="#">
   <Label class="space-y-2">
     <span>Account</span>
-    <Select class="mt-2" items={accounts} bind:value={account} />
+    <Select class="mt-2" items={all_accounts} bind:value={account} />
   </Label>
   <Label class="space-y-2">
     <span>Type</span>
-    <Select class="mt-2" items={movement_types} bind:value={movement_type} />
+    <Select class="mt-2" items={all_movementtypes} bind:value={movement_type} />
   </Label>
   {#if show_date}
     <Label class="space-y-2">

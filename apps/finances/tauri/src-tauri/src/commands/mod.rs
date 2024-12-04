@@ -8,6 +8,7 @@ pub mod account;
 pub mod account_list;
 pub mod custodian;
 pub mod holder;
+pub mod movement_type;
 pub mod snapshot;
 
 use crate::state::AppState;

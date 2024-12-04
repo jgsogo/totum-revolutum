@@ -4,6 +4,7 @@ import { Snapshot } from "$lib/models/Snapshot"
 import { Movement } from "$lib/models/Movement"
 import { Custodian } from "./models/Custodian";
 import { Holder } from "./models/Holder";
+import { MovementType } from "./models/MovementType";
 
 /** The data returned by the backend representing an Custodian */
 type CustodianData = {
@@ -281,3 +282,38 @@ export const create_snapshot = async (account: Account, date_value: Date, amount
     let date = date_value.toISOString().slice(0, 10);
     await invoke("create_snapshot", { accountPk: account.pk, dateValue: date, amount: amount, quantity: quantity, unitValue: unit_value });
 }
+
+/** The data returned by the backend representing a MovementType */
+type MovementTypeData = {
+    pk: number,
+    name: string,
+};
+
+/**
+ * Converts an {@link MovementTypeData} dictionary into an {@link MovementType}
+ * @param {MovementTypeData} data - The data returned by the backend
+ * @returns {MovementType} The parsed instance
+ */
+const _create_movementtype = function (data: MovementTypeData): MovementType {
+    return new MovementType(data.pk, data.name);
+}
+
+/**
+ * Returns (a promise to) all the MovementTypes in the database
+ * @returns {MovementType[]} All the movement types
+ */
+export const get_all_movementtypes = async (): Promise<MovementType[]> => {
+    const data: MovementTypeData[] = await invoke("get_all_movementtypes", {});
+    return data.map((it) => {
+        return _create_movementtype(it);
+    });
+};
+
+/**
+ * Returns (a promise to) with the breadcrumbs for a MovementType
+ * @param {MovementType} movementtype - The movementtype we want to get breadcrumbs for
+ * @returns {string[]} An ordered vector with the breadcrumbs
+ */
+export const get_breadcrumbs_for_movementtype = async (movementtype: MovementType): Promise<string[]> => {
+    return await invoke("get_breadcrumbs_for_movementtype", {pk: movementtype.pk});
+};

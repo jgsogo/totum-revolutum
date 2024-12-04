@@ -1,7 +1,8 @@
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::models::{Account, AccountHolderRole, AccountType, Custodian, TreeNodeList};
+use finances_accounts::fields::TreeNodeList;
+use finances_accounts::models::{Account, AccountHolderRole, AccountType, Custodian};
 use finances_accounts::sql::filters::{accountholder_by_pk, accounttype_by_unique_names};
 use tauri::State;
 
