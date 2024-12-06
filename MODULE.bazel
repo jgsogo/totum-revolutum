@@ -106,6 +106,7 @@ crate.from_cargo(
         "//libraries/filesystem:Cargo.toml",
         "//libraries/finances/accounts/rust:Cargo.toml",
         "//libraries/finances/investments/rust:Cargo.toml",
+        "//libraries/openexchangerates:Cargo.toml",
         "//libraries/pcloud_sdk:Cargo.toml",
         "//libraries/rebrickable:Cargo.toml",
         "//libraries/utils:Cargo.toml",

@@ -1,0 +1,43 @@
+load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+
+rust_library_tests_and_docs(
+    name = "openexchangerates",
+    srcs = glob(["src/**/*.rs"]),
+    aliases = aliases(),
+    all_features = {
+        "bin": [
+            "bin",
+        ],
+    },
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)
+
+rust_binary(
+    name = "cli",
+    srcs = glob(["src/bin/**/*.rs"]),
+    aliases = aliases(),
+    crate_features = [
+        "bin",
+    ],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    deps = all_crate_deps(
+        normal = True,
+    ) + [
+        ":openexchangerates/bin",
+        "@crates_libraries//:anyhow",
+        "@crates_libraries//:clap",
+        "@crates_libraries//:clap-verbosity-flag",
+        "@crates_libraries//:log",
+        "@crates_libraries//:reqwest",
+        "@crates_libraries//:tracing-subscriber",
+    ],
+)
