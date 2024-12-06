@@ -93,19 +93,16 @@ async fn main() -> Result<()> {
     // Go ahead!
     match &cli.command {
         Commands::Latest(input) => {
-            info!("Commands::Latest");
             let latest = client.latest(input.base.as_ref(), input.symbols.as_ref()).await?;
             println!("{:?}", latest);
             Ok(())
         }
         Commands::Usage => {
-            info!("Commands::Usage");
             let data = client.usage().await?;
             println!("{:?}", data);
             Ok(())
         }
         Commands::Historical(input) => {
-            info!("Commands::Historical({:?})", input);
             let data = client
                 .historical(
                     &input.date,
@@ -117,7 +114,6 @@ async fn main() -> Result<()> {
             Ok(())
         }
         Commands::Currencies => {
-            info!("Commands::Currencies");
             let data = client.currencies().await?;
             println!("{:?}", data);
             Ok(())
