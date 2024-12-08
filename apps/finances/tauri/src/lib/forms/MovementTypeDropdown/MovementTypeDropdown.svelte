@@ -14,15 +14,23 @@
     all_movementtypes: MovementType[]; // TODO: Document that all movement types should have breadcrumbs already resolved!
   } = $props();
 
+  const breadcrumbs_group_size = 2;
+
+  function group_movementtype_by_breadcrumb(movtype: MovementType) {
+    let breadcrumbs = movtype.getBreadcrumbs()!;
+    if (breadcrumbs.length > breadcrumbs_group_size) {
+      return breadcrumbs.slice(0, breadcrumbs_group_size).join(" / ");
+    } else {
+      return "/";
+    }
+  }
+
   // Index all movement types by their first two levels
   // svelte-ignore non_reactive_update
-  let all_select_categories: string[] = all_movementtypes.map((value: MovementType): string => {
-    let breadcrumbs = value.getBreadcrumbs()!.slice(0, 2);
-    return breadcrumbs.join(" / ");
-  });
+  let all_select_categories: string[] = all_movementtypes.map(group_movementtype_by_breadcrumb);
   all_select_categories = all_select_categories
     .filter((value: string, index: number) => all_select_categories.indexOf(value) === index)
-    .sort((one, two) => (one > two ? -1 : 1));
+    .sort((one, two) => (one < two ? -1 : 1));
 
   // Select movement type category
   let selectCategory = $state("All");
@@ -45,9 +53,14 @@
     } else {
       // Collect without custodian
       return all_movementtypes
-        .filter((value: MovementType) => value.getBreadcrumbs()!.slice(0, 2).join(" / ") === selectCategory)
+        .filter((value: MovementType) => group_movementtype_by_breadcrumb(value) === selectCategory)
         .map((value) => {
-          return { value: value, name: `${value.getBreadcrumbs()!.slice(2).join(" / ")}` };
+          let breadcrumbs = value.getBreadcrumbs()!;
+          if (breadcrumbs.length > breadcrumbs_group_size) {
+            return { value: value, name: `${breadcrumbs.slice(breadcrumbs_group_size).join(" / ")}` };
+          } else {
+            return { value: value, name: `${breadcrumbs.join(" / ")}` };
+          }
         })
         .sort((lhs, rhs) => (lhs.name < rhs.name ? -1 : lhs.name > rhs.name ? 1 : 0));
     }
@@ -55,11 +68,11 @@
 </script>
 
 <div class="flex relative">
-  <Button class="rounded-e-none whitespace-nowrap border border-e-0 border-primary-700">
+  <Button size="sm" class="rounded-e-none whitespace-nowrap border border-e-0 border-primary-700">
     {selectCategory}
     <ChevronDownOutline class="w-2.5 h-2.5 ms-2.5" />
   </Button>
-  <Dropdown bind:open={dropdownOpen} classContainer="w-40">
+  <Dropdown bind:open={dropdownOpen} classContainer="w-120">
     {#each all_select_categories as label}
       <DropdownItem onclick={handleClickCustodian}>
         {label}
@@ -72,5 +85,5 @@
     >
   </Dropdown>
 
-  <Select size="md" class="rounded-none py-2.5" items={all_movementtypes_items} bind:value={movementtype} />
+  <Select size="sm" class="rounded-none py-2.5" items={all_movementtypes_items} bind:value={movementtype} placeholder="Choose movement type ..."/>
 </div>

@@ -74,7 +74,7 @@
 </script>
 
 <form class="flex flex-col space-y-6" action="#">
-  <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Add snapshot</h3>
+  <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Add snapshot for {account.name}</h3>
 
   <Label class="space-y-2">
     <span>Date value: {date_value.toLocaleDateString()}</span>

@@ -51,7 +51,7 @@
 </script>
 
 <div class="flex relative">
-  <Button class="rounded-e-none whitespace-nowrap border border-e-0 border-primary-700">
+  <Button size="sm" class="rounded-e-none whitespace-nowrap border border-e-0 border-primary-700">
     {selectCategory}
     <ChevronDownOutline class="w-2.5 h-2.5 ms-2.5" />
   </Button>
@@ -68,5 +68,5 @@
     >
   </Dropdown>
 
-  <Select size="md" class="rounded-none py-2.5" items={all_accounts_items} bind:value={account} />
+  <Select size="sm" class="rounded-none py-2.5" items={all_accounts_items} bind:value={account} placeholder="Choose account ..."/>
 </div>

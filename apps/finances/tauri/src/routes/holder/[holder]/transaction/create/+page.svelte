@@ -1,20 +1,11 @@
 <script lang="ts">
   import MovementForm from "$lib/forms/MovementForm.svelte";
   import type { Account } from "$lib/models/Account.js";
-  import { NewMovement } from "$lib/models/Movement";
   import TransactionForm from "$lib/forms/TransactionForm.svelte";
-  import { Card, Indicator, Heading } from "flowbite-svelte";
-  import {
-    CirclePlusSolid,
-    CircleMinusSolid,
-    PlusOutline,
-    CircleMinusOutline,
-    MinusOutline,
-  } from "flowbite-svelte-icons";
+  import { Card, Heading } from "flowbite-svelte";
+  import { PlusOutline, MinusOutline } from "flowbite-svelte-icons";
   import type { TransactionGroup } from "$lib/models/TransactionGroup.js";
   import type { MovementType } from "$lib/models/MovementType.js";
-  import AccountDropdown from "$lib/forms/AccountDropdown/AccountDropdown.svelte";
-  import MovementTypeDropdown from "$lib/forms/MovementTypeDropdown/MovementTypeDropdown.svelte";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -101,25 +92,7 @@
   }
 
   let all_transaction_groups: TransactionGroup[] = [];
-
-  let all_movementtypes = data.all_movementtypes
-    .map((value) => {
-      return { value: value, name: value.getBreadcrumbs()!.join(" / ") };
-    })
-    .sort((lhs, rhs) => (lhs.name < rhs.name ? -1 : lhs.name > rhs.name ? 1 : 0));
-
-  let all_accounts = data.all_accounts
-    .map((value) => {
-      return { value: value, name: `${value.custodian} | ${value.name}` };
-    })
-    .sort((lhs, rhs) => (lhs.name < rhs.name ? -1 : lhs.name > rhs.name ? 1 : 0));
-
-    let account_dropdown = $state(undefined); // TODO: Remove. Not here
-    let movementtype_dropdown = $state(undefined); // TODO: Remove. Not here
 </script>
-
-<AccountDropdown bind:account={account_dropdown} all_accounts={data.all_accounts} />
-<MovementTypeDropdown bind:movementtype={movementtype_dropdown} all_movementtypes={data.all_movementtypes} />
 
 <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
 
@@ -148,7 +121,7 @@
         <Card size="xl" class="mt-6">
           <MovementForm
             bind:account={mov.account}
-            bind:movement_type={mov.movement_type}
+            bind:movementtype={mov.movement_type}
             bind:date_value={mov.date_value}
             bind:amount={mov.amount}
             bind:quantity={mov.quantity}
@@ -156,8 +129,8 @@
             bind:fx={mov.fx}
             base_ccy={data.base_ccy}
             show_date={show_individual_dates}
-            {all_accounts}
-            {all_movementtypes}
+            all_accounts={data.all_accounts}
+            all_movementtypes={data.all_movementtypes}
           />
           <button
             onclick={() => remove_movement_from(i)}
@@ -186,7 +159,7 @@
         <Card size="xl" class="mt-6">
           <MovementForm
             bind:account={mov.account}
-            bind:movement_type={mov.movement_type}
+            bind:movementtype={mov.movement_type}
             bind:date_value={mov.date_value}
             bind:amount={mov.amount}
             bind:quantity={mov.quantity}
@@ -194,8 +167,8 @@
             bind:fx={mov.fx}
             base_ccy={data.base_ccy}
             show_date={show_individual_dates}
-            {all_accounts}
-            {all_movementtypes}
+            all_accounts={data.all_accounts}
+            all_movementtypes={data.all_movementtypes}
           />
           <button
             onclick={() => remove_movement_to(i)}

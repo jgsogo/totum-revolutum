@@ -13,6 +13,7 @@ pub fn get_all_movementtypes(
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let movementtypes = MovementType::all()
+        .filter(finances_accounts::schema::finances_accounts_movementtype::is_abstract.eq(false))
         .select(MovementType::as_select())
         .load::<MovementType>(&mut conn)
         .map_err(|e| format!("Error loading accounts: {}", e))?;

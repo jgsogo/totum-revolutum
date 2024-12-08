@@ -5,10 +5,12 @@
   import { Button, Input, Label, ButtonGroup, InputAddon, Datepicker, Helper, Alert, Select } from "flowbite-svelte";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
   import { MovementType } from "$lib/models/MovementType";
+  import AccountDropdown from "./AccountDropdown/AccountDropdown.svelte";
+  import MovementTypeDropdown from "./MovementTypeDropdown/MovementTypeDropdown.svelte";
 
   let {
     account = $bindable(),
-    movement_type = $bindable(),
+    movementtype = $bindable(),
     date_value = $bindable(),
     amount = $bindable(),
     quantity = $bindable(),
@@ -20,7 +22,7 @@
     all_movementtypes,
   }: {
     account: Account | undefined;
-    movement_type: MovementType | undefined;
+    movementtype: MovementType | undefined;
     date_value: Date | undefined;
     amount: number | undefined;
     quantity: number | undefined;
@@ -28,8 +30,8 @@
     fx: number | undefined;
     base_ccy: string;
     show_date: boolean;
-    all_accounts: { value: Account; name: string }[];
-    all_movementtypes: { value: MovementType; name: string }[];
+    all_accounts: Account[];
+    all_movementtypes: MovementType[];
   } = $props();
 
   let total_amount = $derived.by(() => {
@@ -57,15 +59,9 @@
 </script>
 
 <form class="flex flex-col space-y-6" action="#">
-  <Label class="space-y-2">
-    <span>Account</span>
-    <!-- FIXME: Why initial 'account' is not working here? -->
-    <Select class="mt-2" items={all_accounts} bind:value={account} />
-  </Label>
-  <Label class="space-y-2">
-    <span>Type</span>
-    <Select class="mt-2" items={all_movementtypes} bind:value={movement_type} />
-  </Label>
+  <AccountDropdown bind:account {all_accounts} />
+  <MovementTypeDropdown bind:movementtype {all_movementtypes} />
+
   {#if show_date}
     <Label class="space-y-2">
       <span>Date value</span>
