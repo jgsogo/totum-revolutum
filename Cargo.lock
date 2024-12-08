@@ -1113,7 +1113,7 @@ dependencies = [
  "chrono-tz",
  "cron-parser",
  "serde",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
 ]
 
 [[package]]
@@ -1338,7 +1338,7 @@ dependencies = [
  "diesel_migrations",
  "log",
  "testing_logger",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
 ]
 
 [[package]]
@@ -1734,7 +1734,7 @@ dependencies = [
  "ignore-files",
  "pcloud_sdk",
  "sha256",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "tokio",
  "tracing",
  "utils",
@@ -4312,7 +4312,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "time",
  "tokio",
  "tracing",
@@ -4513,7 +4513,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "time",
  "tokio",
  "tracing",
@@ -5227,7 +5227,7 @@ dependencies = [
  "serde_json",
  "serde_repr",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "time",
  "tokio",
  "tracing",
@@ -6125,7 +6125,7 @@ dependencies = [
  "sha256",
  "syncronia",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "time",
  "tokio",
  "tracing",
@@ -7129,7 +7129,7 @@ dependencies = [
  "serde",
  "serde_json",
  "testing_logger",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "tokio",
  "tracing",
 ]
