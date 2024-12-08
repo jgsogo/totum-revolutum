@@ -56,6 +56,16 @@
     month: "2-digit",
     year: "numeric",
   };
+
+  function ccy_symbol(ccy: string): string {
+    if (ccy === "EUR") {
+      return "€";
+    } else if (ccy === "USD") {
+      return "$";
+    } else {
+      return ccy;
+    }
+  }
 </script>
 
 <form class="flex flex-col space-y-6" action="#">
@@ -78,7 +88,7 @@
         <Label class="ml-4">
           <span>Unit value</span>
           <ButtonGroup>
-            <InputAddon>{account.ccy}</InputAddon>
+            <InputAddon>{ccy_symbol(account.ccy)}</InputAddon>
             <Input type="number" required placeholder="unit_value" bind:value={unit_value} />
           </ButtonGroup>
         </Label>
@@ -86,7 +96,7 @@
         <Label>
           <span>Amount</span>
           <ButtonGroup class="w-full">
-            <InputAddon>{account.ccy}</InputAddon>
+            <InputAddon>{ccy_symbol(account.ccy)}</InputAddon>
             <Input type="number" required placeholder="1234,56" bind:value={amount} />
           </ButtonGroup>
         </Label>
@@ -95,7 +105,7 @@
         <Label class="ml-4">
           <span>FX</span>
           <ButtonGroup>
-            <InputAddon>{base_ccy}/{account.ccy}</InputAddon>
+            <InputAddon>{ccy_symbol(base_ccy)}/{ccy_symbol(account.ccy)}</InputAddon>
             <Input type="number" required placeholder="fx" bind:value={fx} />
           </ButtonGroup>
         </Label>
@@ -103,7 +113,7 @@
       <Label class="ml-4">
         <span>Total</span>
         <ButtonGroup>
-          <InputAddon>{base_ccy}</InputAddon>
+          <InputAddon>{ccy_symbol(base_ccy)}</InputAddon>
           <Input disabled type="number" required value={total_amount} />
         </ButtonGroup>
       </Label>
