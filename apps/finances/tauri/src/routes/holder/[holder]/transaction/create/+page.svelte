@@ -13,6 +13,7 @@
   } from "flowbite-svelte-icons";
   import type { TransactionGroup } from "$lib/models/TransactionGroup.js";
   import type { MovementType } from "$lib/models/MovementType.js";
+  import AccountDropdown from "$lib/forms/AccountDropdown/AccountDropdown.svelte";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -111,7 +112,14 @@
       return { value: value, name: `${value.custodian} | ${value.name}` };
     })
     .sort((lhs, rhs) => (lhs.name < rhs.name ? -1 : lhs.name > rhs.name ? 1 : 0));
+
+    let account_dropdown = $state(undefined); // TODO: Remove. Not here
 </script>
+
+<AccountDropdown
+  bind:account={account_dropdown}
+  all_accounts={data.all_accounts}
+/>
 
 <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
 
