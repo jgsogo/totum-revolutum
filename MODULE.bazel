@@ -85,10 +85,10 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 http_archive(
     name = "diesel_cli",
     build_file = "//bazel/external:BUILD.diesel_cli.bazel",
-    sha256 = "929ff6fa154d64b930d84d6c2b65ec03968622f20db947c50bf92a9910edd01c",
-    strip_prefix = "diesel_cli-2.2.4",
+    sha256 = "4a5a3f3bf0906ab9d40b6df4dfcafb4c20ab15ad96ad0e3ae919268151a50dd6",
+    strip_prefix = "diesel_cli-2.2.6",
     type = "tar.gz",
-    urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.4/download"],
+    urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.6/download"],
 )
 
 crate.from_cargo(
