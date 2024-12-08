@@ -8,7 +8,7 @@ import type { Account } from '$lib/models/Account';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ url, parent }) {
-    const { all_accounts_for_holder } = await parent();
+    const { all_accounts_for_holder, base_ccy } = await parent();
 
     let from_account: Account | null = null;
     let from = url.searchParams.get('from');
@@ -31,5 +31,5 @@ export async function load({ url, parent }) {
         return movtype;
     }))
 
-    return { from_account, to_account, all_accounts, all_movementtypes };
+    return { from_account, to_account, all_accounts, all_movementtypes, base_ccy };
 }

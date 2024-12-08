@@ -13,6 +13,8 @@
     amount = $bindable(),
     quantity = $bindable(),
     unit_value = $bindable(),
+    fx = $bindable(),
+    base_ccy,
     show_date,
     all_accounts,
     all_movementtypes,
@@ -23,12 +25,29 @@
     amount: number | undefined;
     quantity: number | undefined;
     unit_value: number | undefined;
+    fx: number | undefined;
+    base_ccy: string;
     show_date: boolean;
-    all_accounts: { value: Account, name: string }[];
-    all_movementtypes: { value: MovementType, name: string }[];
+    all_accounts: { value: Account; name: string }[];
+    all_movementtypes: { value: MovementType; name: string }[];
   } = $props();
 
-  let total_amount = $derived((quantity ? quantity : 0) * (unit_value ? unit_value : 0));
+  let total_amount = $derived.by(() => {
+    let total = 0;
+
+    if (account?.is_numerable) {
+      total = (quantity ? quantity : 0) * (unit_value ? unit_value : 0);
+    } else {
+      total = amount ? amount : 0;
+    }
+
+    // apply FX
+    if (fx) {
+      total = total / fx;
+    }
+
+    return total;
+  });
 
   let dateFormat: Intl.DateTimeFormatOptions = {
     day: "2-digit",
@@ -40,6 +59,7 @@
 <form class="flex flex-col space-y-6" action="#">
   <Label class="space-y-2">
     <span>Account</span>
+    <!-- FIXME: Why initial 'account' is not working here? -->
     <Select class="mt-2" items={all_accounts} bind:value={account} />
   </Label>
   <Label class="space-y-2">
@@ -52,31 +72,21 @@
       <Datepicker required bind:value={date_value} {dateFormat} />
     </Label>
   {/if}
-
   {#if account}
-    {#if account.is_numerable}
-      <div class="flex items-center w-full">
+    <div class="flex items-center w-full">
+      {#if account.is_numerable}
         <Label>
           <span>Quantity</span>
-          <Input type="number" required placeholder="12" bind:value={quantity} />
+          <Input type="number" required placeholder="quantity" bind:value={quantity} />
         </Label>
         <Label class="ml-4">
           <span>Unit value</span>
           <ButtonGroup>
             <InputAddon>{account.ccy}</InputAddon>
-            <Input type="number" required placeholder="1234,56" bind:value={unit_value} />
+            <Input type="number" required placeholder="unit_value" bind:value={unit_value} />
           </ButtonGroup>
         </Label>
-        <Label class="ml-4">
-          <span>Total amount</span>
-          <ButtonGroup>
-            <InputAddon>{account.ccy}</InputAddon>
-            <Input disabled type="number" required value={total_amount} />
-          </ButtonGroup>
-        </Label>
-      </div>
-    {:else}
-      <div class="flex items-center w-full">
+      {:else}
         <Label>
           <span>Amount</span>
           <ButtonGroup class="w-full">
@@ -84,7 +94,23 @@
             <Input type="number" required placeholder="1234,56" bind:value={amount} />
           </ButtonGroup>
         </Label>
-      </div>
-    {/if}
+      {/if}
+      {#if account.ccy != base_ccy}
+        <Label class="ml-4">
+          <span>FX</span>
+          <ButtonGroup>
+            <InputAddon>{base_ccy}/{account.ccy}</InputAddon>
+            <Input type="number" required placeholder="fx" bind:value={fx} />
+          </ButtonGroup>
+        </Label>
+      {/if}
+      <Label class="ml-4">
+        <span>Total</span>
+        <ButtonGroup>
+          <InputAddon>{base_ccy}</InputAddon>
+          <Input disabled type="number" required value={total_amount} />
+        </ButtonGroup>
+      </Label>
+    </div>
   {/if}
 </form>

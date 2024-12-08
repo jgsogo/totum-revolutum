@@ -270,6 +270,15 @@ export const get_base_url = async (): Promise<string> => {
 };
 
 /**
+ * Returns (a promise to) the base currency
+ * @returns {string} Base CCY
+ */
+export const get_base_ccy = async (): Promise<string> => {
+    return await invoke("get_base_ccy", {});
+};
+
+
+/**
  * Creates a snapshot for the give account
  * @param {Account} account - The account for the new snapshot
  * @param {Date} date_value - Date for the new snapshot
