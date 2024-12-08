@@ -1,0 +1,40 @@
+[package]
+name = "openexchangerates"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+bin = ["dep:clap-verbosity-flag", "dep:log", "dep:clap", "dep:anyhow", "dep:tracing-subscriber"]
+
+
+[dependencies]
+chrono = {workspace = true}
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+reqwest = {workspace = true}
+tracing = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+thiserror = {workspace = true}
+time = { workspace = true, features = [
+    "serde",
+    "parsing",
+    "formatting",
+    "macros",
+] }
+
+# Deps for CLI
+clap = { workspace = true, features = ["derive"], optional = true }
+clap-verbosity-flag = { workspace = true, optional = true }
+log = { workspace = true, optional = true }
+anyhow = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true }
+
+[dev-dependencies]
+env_logger = { workspace = true }
+
+
+[[bin]]
+name = "openexchangerates"
+path = "src/bin/cli/main.rs"
+# Waiting for https://github.com/rust-lang/cargo/issues/4663 (and related: https://github.com/rust-lang/rfcs/pull/3374)
+required-features = ["bin"]
