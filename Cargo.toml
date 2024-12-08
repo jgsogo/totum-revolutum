@@ -11,6 +11,7 @@ members = [
     "libraries/filesystem",
     "libraries/finances/accounts/rust",
     "libraries/finances/investments/rust",
+    "libraries/openexchangerates",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
     "libraries/utils",
