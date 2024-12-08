@@ -21,7 +21,7 @@ rust_library_tests_and_docs(
 
 rust_binary(
     name = "cli",
-    srcs = glob(["src/bin/**/*.rs"]),
+    srcs = glob(["src/bin/cli/**/*.rs"]),
     aliases = aliases(),
     crate_features = [
         "bin",

@@ -1,7 +1,9 @@
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use openexchangerates::OXRClient;
-use tracing::{debug, info};
+use tracing::debug;
+mod output;
+use output::{Output, OutputArg, OutputImpl};
 
 /// Arguments that apply to all subcommands
 #[derive(Parser)]
@@ -23,6 +25,9 @@ struct Cli {
 
     #[command(subcommand)]
     command: Commands,
+
+    #[clap(value_enum, long, default_value_t=OutputArg::Porcelain)]
+    output: OutputArg,
 }
 
 #[derive(Subcommand, Debug)]
@@ -88,18 +93,21 @@ async fn main() -> Result<()> {
         .init();
     debug!("Tracing level configured to {}", tracing_level);
 
+    // Get the output
+    let output = OutputImpl::new(cli.output);
+
     let client = OXRClient::new(cli.app_id)?;
 
     // Go ahead!
     match &cli.command {
         Commands::Latest(input) => {
             let latest = client.latest(input.base.as_ref(), input.symbols.as_ref()).await?;
-            println!("{:?}", latest);
+            output.print_exchange_rates(latest);
             Ok(())
         }
         Commands::Usage => {
             let data = client.usage().await?;
-            println!("{:?}", data);
+            output.print_usage(data);
             Ok(())
         }
         Commands::Historical(input) => {
@@ -110,12 +118,12 @@ async fn main() -> Result<()> {
                     input.base_and_symbols.symbols.as_ref(),
                 )
                 .await?;
-            println!("{:?}", data);
+            output.print_exchange_rates(data);
             Ok(())
         }
         Commands::Currencies => {
             let data = client.currencies().await?;
-            println!("{:?}", data);
+            output.print_currencies(data);
             Ok(())
         }
     }

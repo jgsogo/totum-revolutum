@@ -35,6 +35,6 @@ env_logger = { workspace = true }
 
 [[bin]]
 name = "openexchangerates"
-path = "src/bin/main.rs"
+path = "src/bin/cli/main.rs"
 # Waiting for https://github.com/rust-lang/cargo/issues/4663 (and related: https://github.com/rust-lang/rfcs/pull/3374)
 required-features = ["bin"]
