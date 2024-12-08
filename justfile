@@ -62,6 +62,5 @@ clean:
     bazel clean
     docker system prune --force
 
-
 # Reset: removes all temporary files and recreates the workspace (Cargo and Bazel). This can take a while
 reset: clean build test
