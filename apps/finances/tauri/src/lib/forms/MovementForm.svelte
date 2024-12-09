@@ -16,6 +16,7 @@
     quantity = $bindable(),
     unit_value = $bindable(),
     fx = $bindable(),
+    is_valid = $bindable(),
     base_ccy,
     show_date,
     all_accounts,
@@ -28,6 +29,7 @@
     quantity: number | undefined;
     unit_value: number | undefined;
     fx: number | undefined;
+    is_valid: boolean;
     base_ccy: string;
     show_date: boolean;
     all_accounts: Account[];
@@ -66,9 +68,19 @@
       return ccy;
     }
   }
+
+  $effect(() => {
+    is_valid =
+      account != undefined &&
+      movementtype instanceof MovementType &&
+      (!show_date || (show_date && date_value != undefined)) &&
+      ((account.is_numerable && quantity != undefined && unit_value != undefined) ||
+        (!account.is_numerable && amount != undefined)) &&
+      (account.ccy == base_ccy || fx != undefined);
+  });
 </script>
 
-<form class="flex flex-col space-y-6" action="#">
+<div class="flex flex-col space-y-6" action="#">
   <AccountDropdown bind:account {all_accounts} />
   <MovementTypeDropdown bind:movementtype {all_movementtypes} />
 
@@ -119,4 +131,4 @@
       </Label>
     </div>
   {/if}
-</form>
+  </div>

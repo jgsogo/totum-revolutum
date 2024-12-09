@@ -24,6 +24,7 @@
     transaction_description = $bindable(),
     transaction_date = $bindable(),
     show_date = $bindable(),
+    is_valid = $bindable(),
     all_transaction_groups,
   }: {
     transaction_group: TransactionGroup | undefined;
@@ -31,6 +32,7 @@
     transaction_description: string | undefined;
     transaction_date: Date | undefined;
     show_date: boolean;
+    is_valid: boolean;
     all_transaction_groups: TransactionGroup[];
   } = $props();
 
@@ -43,6 +45,13 @@
     month: "2-digit",
     year: "numeric",
   };
+
+  $effect(() => {
+    is_valid =
+      transaction_name != undefined &&
+      transaction_name.length > 0 &&
+      (!show_date || (show_date && transaction_date != undefined));
+  });
 </script>
 
 <div class="px-2">
@@ -64,7 +73,6 @@
           <Datepicker required bind:value={transaction_date} {dateFormat} />
         </Label>
       {/if}
-
     </div>
 
     <div class="w-1/2 px-2">

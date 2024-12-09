@@ -4,8 +4,9 @@
   import TransactionForm from "$lib/forms/TransactionForm.svelte";
   import { Alert, Button, Card, Heading } from "flowbite-svelte";
   import { PlusOutline, MinusOutline, InfoCircleSolid } from "flowbite-svelte-icons";
-  import type { TransactionGroup } from "$lib/models/TransactionGroup.js";
+  import { NewTransaction, type TransactionGroup } from "$lib/models/TransactionGroup.js";
   import type { MovementType } from "$lib/models/MovementType.js";
+  import { NewMovement } from "$lib/models/Movement.js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -18,12 +19,20 @@
     quantity?: number;
     unit_value?: number;
     fx?: number;
+    is_valid: boolean;
   };
 
   let movements_from: MovementData[] = $state([]);
   let movements_to: MovementData[] = $state([]);
-  let transation_data: { group?: TransactionGroup; name?: string; description?: string; date_value?: Date } = $state({
+  let transation_data: {
+    group?: TransactionGroup;
+    name?: string;
+    description?: string;
+    date_value?: Date;
+    is_valid: boolean;
+  } = $state({
     date_value: new Date(),
+    is_valid: false,
   });
   let show_transaction_date = $state(true);
   let show_individual_dates = $derived(!show_transaction_date);
@@ -56,21 +65,17 @@
   function add_movement_from(account?: Account) {
     movements_from = movements_from.concat({
       account: account,
-      //   movement_type: undefined,
       date_value: new Date(),
-      //   amount: undefined,
-      //   quantity: undefined,
-      //   unit_value: undefined,
+      is_valid: false,
+      movement_type: undefined,
     });
   }
   function add_movement_to(account?: Account) {
     movements_to = movements_to.concat({
       account: account,
-      //   movement_type: undefined,
       date_value: new Date(),
-      //   amount: undefined,
-      //   quantity: undefined,
-      //   unit_value: undefined,
+      is_valid: false,
+      movement_type: undefined,
     });
   }
 
@@ -92,20 +97,55 @@
   }
 
   let all_transaction_groups: TransactionGroup[] = [];
-  let submit_disabled = $derived(total_source != total_target);
+
+  // Form validation and submit
+  let is_valid = $derived(
+    transation_data.is_valid && movements_from.every((v) => v.is_valid) && movements_to.every((v) => v.is_valid)
+  );
+  let submit_disabled = $derived(!is_valid || total_source != total_target);
+
+  function submit() {
+    // Collect movements_from -> NewMovements
+    let movs_from: NewMovement[] = movements_from.map((v: MovementData) => {
+      // TODO: Errors if some fields are null
+      return new NewMovement(v.account!, v.movement_type!, v.amount, v.date_value, v.quantity, v.unit_value, v.fx);
+    });
+
+    // Collect movements_to -> NewMovements
+    let movs_to: NewMovement[] = movements_to.map((v: MovementData) => {
+      // TODO: Errors if some fields are null
+      return new NewMovement(v.account!, v.movement_type!, v.amount, v.date_value, v.quantity, v.unit_value, v.fx);
+    });
+
+    // Create NewTransaction
+    // TODO: Errors if some fields are null
+    let new_transacion = new NewTransaction(
+      transation_data.name!,
+      movs_from,
+      movs_to,
+      transation_data.description,
+      transation_data.date_value,
+      transation_data.group
+    );
+    // Send to the backend
+    console.log(JSON.stringify(new_transacion));
+  }
+
+  let card_error_style = "border-red-600 dark:border-red-600";
 </script>
 
 <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
 
 <form>
   <div class="mt-px space-y-4">
-    <Card size="xl" class="mt-6">
+    <Card size="xl" class="mt-6 {transation_data.is_valid ? '' : card_error_style}">
       <TransactionForm
         bind:transaction_name={transation_data.name}
         bind:transaction_description={transation_data.description}
         bind:transaction_date={transation_data.date_value}
         bind:transaction_group={transation_data.group}
         bind:show_date={show_transaction_date}
+        bind:is_valid={transation_data.is_valid}
         {all_transaction_groups}
       />
     </Card>
@@ -120,7 +160,7 @@
         </Heading>
 
         {#each movements_from as mov, i}
-          <Card size="xl" class="mt-6">
+          <Card size="xl" class="mt-6 {mov.is_valid ? '' : card_error_style}">
             <MovementForm
               bind:account={mov.account}
               bind:movementtype={mov.movement_type}
@@ -129,6 +169,7 @@
               bind:quantity={mov.quantity}
               bind:unit_value={mov.unit_value}
               bind:fx={mov.fx}
+              bind:is_valid={mov.is_valid}
               base_ccy={data.base_ccy}
               show_date={show_individual_dates}
               all_accounts={data.all_accounts}
@@ -158,7 +199,7 @@
           Target accounts
         </Heading>
         {#each movements_to as mov, i}
-          <Card size="xl" class="mt-6">
+          <Card size="xl" class="mt-6 {mov.is_valid ? '' : card_error_style}">
             <MovementForm
               bind:account={mov.account}
               bind:movementtype={mov.movement_type}
@@ -167,6 +208,7 @@
               bind:quantity={mov.quantity}
               bind:unit_value={mov.unit_value}
               bind:fx={mov.fx}
+              bind:is_valid={mov.is_valid}
               base_ccy={data.base_ccy}
               show_date={show_individual_dates}
               all_accounts={data.all_accounts}
@@ -208,7 +250,7 @@
           Source total is EUR {total_source} while target total is EUR {total_target}.
         </Alert>
       {/if}
-      <Button disabled={submit_disabled}>Submit</Button>
+      <Button onclick={submit} disabled={submit_disabled}>Submit</Button>
     </Card>
   </div>
 </form>
