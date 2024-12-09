@@ -68,5 +68,5 @@
     >
   </Dropdown>
 
-  <Select size="sm" class="rounded-none py-2.5" items={all_accounts_items} bind:value={account} placeholder="Choose account ..."/>
+  <Select required size="sm" class="rounded-none py-2.5" items={all_accounts_items} bind:value={account} placeholder="Choose account ..."/>
 </div>

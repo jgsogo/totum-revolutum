@@ -97,7 +97,7 @@
           <span>Amount</span>
           <ButtonGroup class="w-full">
             <InputAddon>{ccy_symbol(account.ccy)}</InputAddon>
-            <Input type="number" required placeholder="1234,56" bind:value={amount} />
+            <Input type="number" required placeholder="amount" bind:value={amount} />
           </ButtonGroup>
         </Label>
       {/if}

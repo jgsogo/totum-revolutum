@@ -2,8 +2,8 @@
   import MovementForm from "$lib/forms/MovementForm.svelte";
   import type { Account } from "$lib/models/Account.js";
   import TransactionForm from "$lib/forms/TransactionForm.svelte";
-  import { Card, Heading } from "flowbite-svelte";
-  import { PlusOutline, MinusOutline } from "flowbite-svelte-icons";
+  import { Alert, Button, Card, Heading } from "flowbite-svelte";
+  import { PlusOutline, MinusOutline, InfoCircleSolid } from "flowbite-svelte-icons";
   import type { TransactionGroup } from "$lib/models/TransactionGroup.js";
   import type { MovementType } from "$lib/models/MovementType.js";
 
@@ -92,100 +92,123 @@
   }
 
   let all_transaction_groups: TransactionGroup[] = [];
+  let submit_disabled = $derived(total_source != total_target);
 </script>
 
 <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
 
-<div class="mt-px space-y-4">
-  <Card size="xl" class="mt-6">
-    <TransactionForm
-      bind:transaction_name={transation_data.name}
-      bind:transaction_description={transation_data.description}
-      bind:transaction_date={transation_data.date_value}
-      bind:transaction_group={transation_data.group}
-      bind:show_date={show_transaction_date}
-      {all_transaction_groups}
-    />
-  </Card>
-</div>
+<form>
+  <div class="mt-px space-y-4">
+    <Card size="xl" class="mt-6">
+      <TransactionForm
+        bind:transaction_name={transation_data.name}
+        bind:transaction_description={transation_data.description}
+        bind:transaction_date={transation_data.date_value}
+        bind:transaction_group={transation_data.group}
+        bind:show_date={show_transaction_date}
+        {all_transaction_groups}
+      />
+    </Card>
+  </div>
 
-<div class="mt-4 space-y-4">
-  <div class="grid gap-4 grid-cols-2">
-    <!-- from movements -->
-    <div>
-      <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl"
-        >Source accounts ({data.base_ccy} {total_source})</Heading
-      >
+  <div class="mt-4 space-y-4">
+    <div class="grid gap-4 grid-cols-2">
+      <!-- from movements -->
+      <div>
+        <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl">
+          Source accounts
+        </Heading>
 
-      {#each movements_from as mov, i}
+        {#each movements_from as mov, i}
+          <Card size="xl" class="mt-6">
+            <MovementForm
+              bind:account={mov.account}
+              bind:movementtype={mov.movement_type}
+              bind:date_value={mov.date_value}
+              bind:amount={mov.amount}
+              bind:quantity={mov.quantity}
+              bind:unit_value={mov.unit_value}
+              bind:fx={mov.fx}
+              base_ccy={data.base_ccy}
+              show_date={show_individual_dates}
+              all_accounts={data.all_accounts}
+              all_movementtypes={data.all_movementtypes}
+            />
+            <button
+              onclick={() => remove_movement_from(i)}
+              class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
+            >
+              <MinusOutline />
+            </button>
+          </Card>
+        {/each}
         <Card size="xl" class="mt-6">
-          <MovementForm
-            bind:account={mov.account}
-            bind:movementtype={mov.movement_type}
-            bind:date_value={mov.date_value}
-            bind:amount={mov.amount}
-            bind:quantity={mov.quantity}
-            bind:unit_value={mov.unit_value}
-            bind:fx={mov.fx}
-            base_ccy={data.base_ccy}
-            show_date={show_individual_dates}
-            all_accounts={data.all_accounts}
-            all_movementtypes={data.all_movementtypes}
-          />
           <button
-            onclick={() => remove_movement_from(i)}
+            onclick={() => add_movement_from()}
             class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
           >
-            <MinusOutline />
+            <PlusOutline />
           </button>
         </Card>
-      {/each}
-      <Card size="xl" class="mt-6">
-        <button
-          onclick={() => add_movement_from()}
-          class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
-        >
-          <PlusOutline />
-        </button>
-      </Card>
-    </div>
+      </div>
 
-    <!-- to movements -->
-    <div>
-      <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl"
-        >Target accounts ({data.base_ccy} {total_target})</Heading
-      >
-      {#each movements_to as mov, i}
+      <!-- to movements -->
+      <div>
+        <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl">
+          Target accounts
+        </Heading>
+        {#each movements_to as mov, i}
+          <Card size="xl" class="mt-6">
+            <MovementForm
+              bind:account={mov.account}
+              bind:movementtype={mov.movement_type}
+              bind:date_value={mov.date_value}
+              bind:amount={mov.amount}
+              bind:quantity={mov.quantity}
+              bind:unit_value={mov.unit_value}
+              bind:fx={mov.fx}
+              base_ccy={data.base_ccy}
+              show_date={show_individual_dates}
+              all_accounts={data.all_accounts}
+              all_movementtypes={data.all_movementtypes}
+            />
+            <button
+              onclick={() => remove_movement_to(i)}
+              class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
+            >
+              <MinusOutline />
+            </button>
+          </Card>
+        {/each}
         <Card size="xl" class="mt-6">
-          <MovementForm
-            bind:account={mov.account}
-            bind:movementtype={mov.movement_type}
-            bind:date_value={mov.date_value}
-            bind:amount={mov.amount}
-            bind:quantity={mov.quantity}
-            bind:unit_value={mov.unit_value}
-            bind:fx={mov.fx}
-            base_ccy={data.base_ccy}
-            show_date={show_individual_dates}
-            all_accounts={data.all_accounts}
-            all_movementtypes={data.all_movementtypes}
-          />
           <button
-            onclick={() => remove_movement_to(i)}
+            onclick={() => add_movement_to()}
             class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
           >
-            <MinusOutline />
+            <PlusOutline />
           </button>
         </Card>
-      {/each}
-      <Card size="xl" class="mt-6">
-        <button
-          onclick={() => add_movement_to()}
-          class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
-        >
-          <PlusOutline />
-        </button>
-      </Card>
+      </div>
     </div>
   </div>
-</div>
+
+  <div class="mt-px space-y-4">
+    <Card size="xl" class="mt-6">
+      {#if movements_from.length == 0 || movements_to.length == 0}
+        <Alert class="mb-6">
+          <InfoCircleSolid slot="icon" class="w-5 h-5" />
+          <span class="font-medium">Empty movements list!</span>
+          Cannot create empty transactions.
+        </Alert>
+      {/if}
+      {#if total_source != total_target}
+        <Alert class="mb-6">
+          <InfoCircleSolid slot="icon" class="w-5 h-5" />
+          <span class="font-medium">Source and target mismatch!</span>
+          Source total is EUR {total_source} while target total is EUR {total_target}.
+        </Alert>
+      {/if}
+      <Button disabled={submit_disabled}>Submit</Button>
+    </Card>
+  </div>
+</form>

@@ -85,5 +85,5 @@
     >
   </Dropdown>
 
-  <Select size="sm" class="rounded-none py-2.5" items={all_movementtypes_items} bind:value={movementtype} placeholder="Choose movement type ..."/>
+  <Select required size="sm" class="rounded-none py-2.5" items={all_movementtypes_items} bind:value={movementtype} placeholder="Choose movement type ..."/>
 </div>
