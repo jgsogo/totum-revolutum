@@ -46,6 +46,9 @@ labels:
     description: Short session, 1-2 hours
 
   # Type
+  - name: dependencies
+    color: D4C5F9
+    description: Related to dependencies (required by dependabot and similar tools)
   - name: type:EPIC
     color: BBA6DD
     description: Group of issues
