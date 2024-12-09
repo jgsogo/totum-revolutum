@@ -46,10 +46,16 @@ pub fn acounttype_by_unique_name(unique_name: &str) -> _ {
     crate::schema::finances_accounts_accounttype::unique_name.eq(unique_name)
 }
 
-/// Returns query fragment to filter [`MovementType`]s by 'unique_name'
+/// Returns query fragment to filter [`AccountType`]s by 'unique_name'
 #[diesel::dsl::auto_type(no_type_alias)]
 pub fn accounttype_by_unique_names<'a>(unique_names: &'a [&'a str]) -> _ {
     crate::schema::finances_accounts_accounttype::unique_name.eq_any(unique_names)
+}
+
+/// Returns query fragment to filter [`AccountType`]s by 'pk'
+#[diesel::dsl::auto_type(no_type_alias)]
+pub fn accounttype_by_pks<'a>(pks: &'a [i64]) -> _ {
+    crate::schema::finances_accounts_accounttype::id.eq_any(pks)
 }
 
 /// Returns query fragment to filter [`MovementType`]s with 'unique_name
@@ -62,6 +68,18 @@ pub fn movementtype_with_unique_name() -> _ {
 #[diesel::dsl::auto_type(no_type_alias)]
 pub fn movementtype_by_unique_name(unique_name: &str) -> _ {
     crate::schema::finances_accounts_movementtype::unique_name.eq(unique_name)
+}
+
+/// Returns query fragment to filter [`MovementType`]s by 'pk'
+#[diesel::dsl::auto_type(no_type_alias)]
+pub fn movementtype_by_pks<'a>(pks: &'a [i64]) -> _ {
+    crate::schema::finances_accounts_movementtype::id.eq_any(pks)
+}
+
+/// Returns query fragment to get [`MovementType`]s by 'pk'
+#[diesel::dsl::auto_type(no_type_alias)]
+pub fn movementtype_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_movementtype::id.eq(pk)
 }
 
 /// Returns a query fragment to filter [`Movement`]s by account_id

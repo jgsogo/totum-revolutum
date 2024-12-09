@@ -1,5 +1,7 @@
 use diesel::prelude::*;
 
+use crate::fields::TreeNodeList;
+
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::finances_accounts_movementtype)]
 #[diesel(check_for_backend(crate::types::BackendType))]
@@ -13,6 +15,7 @@ pub struct MovementType {
 
     // FIXME: These are treenode fields, implement them somwhere else if needed
     pub tn_parent_id: Option<i64>,
+    pub tn_ancestors_pks: TreeNodeList,
 }
 
 impl MovementType {

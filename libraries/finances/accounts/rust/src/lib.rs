@@ -1,5 +1,6 @@
+pub mod fields;
 pub mod models;
-pub mod schema; // FIXME: Make this private
+pub mod schema;
 pub mod types;
 
 #[cfg(test)]
@@ -9,4 +10,5 @@ mod tests;
 pub mod test_utils;
 
 pub mod constants;
+pub mod managers;
 pub mod sql;

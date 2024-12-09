@@ -45,25 +45,34 @@
   };
 </script>
 
-<form class="flex flex-col space-y-6" action="#">
-  <Label class="space-y-2">
-    <span>Name</span>
-    <Input type="text" required placeholder="Transaction name" bind:value={transaction_name} />
-  </Label>
+<div class="px-2">
+  <div class="flex -mx-2">
+    <div class="w-1/2 px-2">
+      <Label class="space-y-2 py-2">
+        <span>Name</span>
+        <Input type="text" required placeholder="Transaction name" bind:value={transaction_name} />
+      </Label>
 
-  <Label class="space-y-2">
-    <span>Description</span>
-    <Textarea placeholder="Long description" bind:value={transaction_description} />
-  </Label>
+      <Label class="space-y-2 py-2">
+        <span>Group</span>
+        <Select items={transaction_groups} bind:value={transaction_group} />
+      </Label>
 
-  {#if show_date}
-    <Label class="space-y-2">
-      <span>Date value</span>
-      <Datepicker required bind:value={transaction_date} {dateFormat} />
-    </Label>
-  {/if}
+      {#if show_date}
+        <Label class="space-y-2 pt-2">
+          <span>Date value</span>
+          <Datepicker required bind:value={transaction_date} {dateFormat} />
+        </Label>
+      {/if}
 
-  <Label class="space-y-2">
-    <Checkbox bind:checked={show_date}>All movements the same date</Checkbox>
-  </Label>
-</form>
+    </div>
+
+    <div class="w-1/2 px-2">
+      <Label class="space-y-2 py-2">
+        <span>Description</span>
+        <Textarea placeholder="Long description" rows="8" bind:value={transaction_description} />
+      </Label>
+      <Checkbox bind:checked={show_date}>All movements the same date</Checkbox>
+    </div>
+  </div>
+</div>

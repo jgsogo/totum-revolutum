@@ -10,6 +10,34 @@ fn test_acount_lists() {
 
     // All accounts
     {
+        let body = json!({});
+        let r = call_it::<Vec<Account>>(&webview, "get_all_accounts".to_string(), body);
+
+        assert!(r.is_ok());
+        let r = r.unwrap();
+        assert_eq!(r.len(), 11);
+
+        let account_names = r.into_iter().map(|acc| acc.name).collect::<Vec<String>>();
+        assert_eq!(
+            account_names,
+            vec![
+                "Gastos compartidos",
+                "Depósito 3M",
+                "Hipoteca casa NY",
+                "Gastos compartidos",
+                "Depósito 3M",
+                "Gastos compartidos",
+                "Depósito 3M",
+                "IBM",
+                "Indexa Capital",
+                "Plan de pensiones",
+                "IBM2",
+            ]
+        );
+    }
+
+    // All accounts for a given holder
+    {
         let body = json!({ "holderPk": 0i64 });
         let r = call_it::<Vec<Account>>(&webview, "get_all_accounts_for_holder".to_string(), body);
 

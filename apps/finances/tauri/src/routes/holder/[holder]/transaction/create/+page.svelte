@@ -1,62 +1,76 @@
 <script lang="ts">
   import MovementForm from "$lib/forms/MovementForm.svelte";
   import type { Account } from "$lib/models/Account.js";
-  import { NewMovement } from "$lib/models/Movement";
   import TransactionForm from "$lib/forms/TransactionForm.svelte";
-  import { Card, Indicator, Heading } from "flowbite-svelte";
-  import {
-    CirclePlusSolid,
-    CircleMinusSolid,
-    PlusOutline,
-    CircleMinusOutline,
-    MinusOutline,
-  } from "flowbite-svelte-icons";
+  import { Card, Heading } from "flowbite-svelte";
+  import { PlusOutline, MinusOutline } from "flowbite-svelte-icons";
   import type { TransactionGroup } from "$lib/models/TransactionGroup.js";
   import type { MovementType } from "$lib/models/MovementType.js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
 
-  let movements_from: {
+  type MovementData = {
     account?: Account;
     movement_type?: MovementType;
     date_value?: Date;
     amount?: number;
     quantity?: number;
     unit_value?: number;
-  }[] = $state([]);
-  let movements_to: {
-    account?: Account;
-    movement_type?: MovementType;
-    date_value?: Date;
-    amount?: number;
-    quantity?: number;
-    unit_value?: number;
-  }[] = $state([]);
-  let transation_data: { group?: TransactionGroup; name?: string; description?: string; date_value?: Date } = $state(
-    {date_value: new Date()}
-  );
+    fx?: number;
+  };
+
+  let movements_from: MovementData[] = $state([]);
+  let movements_to: MovementData[] = $state([]);
+  let transation_data: { group?: TransactionGroup; name?: string; description?: string; date_value?: Date } = $state({
+    date_value: new Date(),
+  });
   let show_transaction_date = $state(true);
   let show_individual_dates = $derived(!show_transaction_date);
+  function movement_total(mov: MovementData): number {
+    if (!mov.account) return 0;
+    let total = 0;
+    if (mov.account.is_numerable) {
+      if (!mov.quantity || !mov.unit_value) return 0;
+      total = mov.quantity * mov.unit_value;
+    } else {
+      if (!mov.amount) return 0;
+      total = mov.amount;
+    }
+    // Apply FX
+    if (mov.fx) {
+      total = total / mov.fx;
+    }
+    return total;
+  }
+
+  let total_source = $derived.by(() => {
+    const total_sum_initial = 0;
+    return movements_from.reduce((acc, mov: MovementData) => acc + movement_total(mov), total_sum_initial);
+  });
+  let total_target = $derived.by(() => {
+    const total_sum_initial = 0;
+    return movements_to.reduce((acc, mov: MovementData) => acc + movement_total(mov), total_sum_initial);
+  });
 
   function add_movement_from(account?: Account) {
     movements_from = movements_from.concat({
       account: account,
-    //   movement_type: undefined,
+      //   movement_type: undefined,
       date_value: new Date(),
-    //   amount: undefined,
-    //   quantity: undefined,
-    //   unit_value: undefined,
+      //   amount: undefined,
+      //   quantity: undefined,
+      //   unit_value: undefined,
     });
   }
   function add_movement_to(account?: Account) {
     movements_to = movements_to.concat({
       account: account,
-    //   movement_type: undefined,
+      //   movement_type: undefined,
       date_value: new Date(),
-    //   amount: undefined,
-    //   quantity: undefined,
-    //   unit_value: undefined,
+      //   amount: undefined,
+      //   quantity: undefined,
+      //   unit_value: undefined,
     });
   }
 
@@ -78,7 +92,6 @@
   }
 
   let all_transaction_groups: TransactionGroup[] = [];
-  let all_movement_types: MovementType[] = [];
 </script>
 
 <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
@@ -91,7 +104,7 @@
       bind:transaction_date={transation_data.date_value}
       bind:transaction_group={transation_data.group}
       bind:show_date={show_transaction_date}
-      all_transaction_groups={all_transaction_groups}
+      {all_transaction_groups}
     />
   </Card>
 </div>
@@ -101,21 +114,23 @@
     <!-- from movements -->
     <div>
       <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl"
-        >Source accounts</Heading
+        >Source accounts ({data.base_ccy} {total_source})</Heading
       >
 
       {#each movements_from as mov, i}
         <Card size="xl" class="mt-6">
           <MovementForm
             bind:account={mov.account}
-            bind:movement_type={mov.movement_type}
+            bind:movementtype={mov.movement_type}
             bind:date_value={mov.date_value}
             bind:amount={mov.amount}
             bind:quantity={mov.quantity}
             bind:unit_value={mov.unit_value}
+            bind:fx={mov.fx}
+            base_ccy={data.base_ccy}
             show_date={show_individual_dates}
-            all_accounts_for_holder={data.all_accounts_for_holder}
-            {all_movement_types}
+            all_accounts={data.all_accounts}
+            all_movementtypes={data.all_movementtypes}
           />
           <button
             onclick={() => remove_movement_from(i)}
@@ -138,20 +153,22 @@
     <!-- to movements -->
     <div>
       <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl"
-        >Target accounts</Heading
+        >Target accounts ({data.base_ccy} {total_target})</Heading
       >
       {#each movements_to as mov, i}
         <Card size="xl" class="mt-6">
           <MovementForm
             bind:account={mov.account}
-            bind:movement_type={mov.movement_type}
+            bind:movementtype={mov.movement_type}
             bind:date_value={mov.date_value}
             bind:amount={mov.amount}
             bind:quantity={mov.quantity}
             bind:unit_value={mov.unit_value}
+            bind:fx={mov.fx}
+            base_ccy={data.base_ccy}
             show_date={show_individual_dates}
-            all_accounts_for_holder={data.all_accounts_for_holder}
-            {all_movement_types}
+            all_accounts={data.all_accounts}
+            all_movementtypes={data.all_movementtypes}
           />
           <button
             onclick={() => remove_movement_to(i)}

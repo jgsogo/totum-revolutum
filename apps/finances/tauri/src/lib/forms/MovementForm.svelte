@@ -5,37 +5,50 @@
   import { Button, Input, Label, ButtonGroup, InputAddon, Datepicker, Helper, Alert, Select } from "flowbite-svelte";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
   import { MovementType } from "$lib/models/MovementType";
+  import AccountDropdown from "./AccountDropdown/AccountDropdown.svelte";
+  import MovementTypeDropdown from "./MovementTypeDropdown/MovementTypeDropdown.svelte";
 
   let {
     account = $bindable(),
-    movement_type = $bindable(),
+    movementtype = $bindable(),
     date_value = $bindable(),
     amount = $bindable(),
     quantity = $bindable(),
     unit_value = $bindable(),
+    fx = $bindable(),
+    base_ccy,
     show_date,
-    all_accounts_for_holder,
-    all_movement_types,
+    all_accounts,
+    all_movementtypes,
   }: {
     account: Account | undefined;
-    movement_type: MovementType | undefined;
+    movementtype: MovementType | undefined;
     date_value: Date | undefined;
     amount: number | undefined;
     quantity: number | undefined;
     unit_value: number | undefined;
+    fx: number | undefined;
+    base_ccy: string;
     show_date: boolean;
-    all_accounts_for_holder: Account[];
-    all_movement_types: MovementType[];
+    all_accounts: Account[];
+    all_movementtypes: MovementType[];
   } = $props();
 
-  let total_amount = $derived((quantity ? quantity : 0) * (unit_value ? unit_value : 0));
+  let total_amount = $derived.by(() => {
+    let total = 0;
 
-  let accounts = all_accounts_for_holder.map((value) => {
-    return { value: value, name: value.name };
-  });
+    if (account?.is_numerable) {
+      total = (quantity ? quantity : 0) * (unit_value ? unit_value : 0);
+    } else {
+      total = amount ? amount : 0;
+    }
 
-  let movement_types = all_movement_types.map((value) => {
-    return { value: value, name: value.breadcrumb || value.name };
+    // apply FX
+    if (fx) {
+      total = total / fx;
+    }
+
+    return total;
   });
 
   let dateFormat: Intl.DateTimeFormatOptions = {
@@ -43,56 +56,67 @@
     month: "2-digit",
     year: "numeric",
   };
+
+  function ccy_symbol(ccy: string): string {
+    if (ccy === "EUR") {
+      return "€";
+    } else if (ccy === "USD") {
+      return "$";
+    } else {
+      return ccy;
+    }
+  }
 </script>
 
 <form class="flex flex-col space-y-6" action="#">
-  <Label class="space-y-2">
-    <span>Account</span>
-    <Select class="mt-2" items={accounts} bind:value={account} />
-  </Label>
-  <Label class="space-y-2">
-    <span>Type</span>
-    <Select class="mt-2" items={movement_types} bind:value={movement_type} />
-  </Label>
+  <AccountDropdown bind:account {all_accounts} />
+  <MovementTypeDropdown bind:movementtype {all_movementtypes} />
+
   {#if show_date}
     <Label class="space-y-2">
       <span>Date value</span>
       <Datepicker required bind:value={date_value} {dateFormat} />
     </Label>
   {/if}
-
   {#if account}
-    {#if account.is_numerable}
-      <div class="flex items-center w-full">
+    <div class="flex items-center w-full">
+      {#if account.is_numerable}
         <Label>
           <span>Quantity</span>
-          <Input type="number" required placeholder="12" bind:value={quantity} />
+          <Input type="number" required placeholder="quantity" bind:value={quantity} />
         </Label>
         <Label class="ml-4">
           <span>Unit value</span>
           <ButtonGroup>
-            <InputAddon>{account.ccy}</InputAddon>
-            <Input type="number" required placeholder="1234,56" bind:value={unit_value} />
+            <InputAddon>{ccy_symbol(account.ccy)}</InputAddon>
+            <Input type="number" required placeholder="unit_value" bind:value={unit_value} />
           </ButtonGroup>
         </Label>
-        <Label class="ml-4">
-          <span>Total amount</span>
-          <ButtonGroup>
-            <InputAddon>{account.ccy}</InputAddon>
-            <Input disabled type="number" required value={total_amount} />
-          </ButtonGroup>
-        </Label>
-      </div>
-    {:else}
-      <div class="flex items-center w-full">
+      {:else}
         <Label>
           <span>Amount</span>
           <ButtonGroup class="w-full">
-            <InputAddon>{account.ccy}</InputAddon>
+            <InputAddon>{ccy_symbol(account.ccy)}</InputAddon>
             <Input type="number" required placeholder="1234,56" bind:value={amount} />
           </ButtonGroup>
         </Label>
-      </div>
-    {/if}
+      {/if}
+      {#if account.ccy != base_ccy}
+        <Label class="ml-4">
+          <span>FX</span>
+          <ButtonGroup>
+            <InputAddon>{ccy_symbol(base_ccy)}/{ccy_symbol(account.ccy)}</InputAddon>
+            <Input type="number" required placeholder="fx" bind:value={fx} />
+          </ButtonGroup>
+        </Label>
+      {/if}
+      <Label class="ml-4">
+        <span>Total</span>
+        <ButtonGroup>
+          <InputAddon>{ccy_symbol(base_ccy)}</InputAddon>
+          <Input disabled type="number" required value={total_amount} />
+        </ButtonGroup>
+      </Label>
+    </div>
   {/if}
 </form>

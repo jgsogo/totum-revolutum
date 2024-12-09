@@ -30,6 +30,7 @@ pub fn create_app<R: tauri::Runtime>(
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
+            commands::account_list::get_all_accounts,
             commands::account_list::get_all_accounts_for_holder,
             commands::account_list::get_all_savings_accounts_for_holder,
             commands::account_list::get_all_investment_accounts_for_holder,
@@ -45,6 +46,9 @@ pub fn create_app<R: tauri::Runtime>(
             commands::get_base_url,
             commands::get_base_media_url,
             commands::get_base_static_url,
+            commands::get_base_ccy,
+            commands::movement_type::get_all_movementtypes,
+            commands::movement_type::get_breadcrumbs_for_movementtype,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
