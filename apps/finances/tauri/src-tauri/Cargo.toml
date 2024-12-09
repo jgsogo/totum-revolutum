@@ -21,7 +21,7 @@ tauri-build = { version = "2.0.3", features = [] }
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
 finances_investments = { path = "../../../../libraries/finances/investments/rust" }
 
-bigdecimal = "0.4.6"
+bigdecimal = "0.4.7"
 chrono = { version = "0.4.38" }
 chrono-tz = { version = "0.10.0" }
 diesel = { version = "2.2.6", features = ["r2d2", "chrono"] }
