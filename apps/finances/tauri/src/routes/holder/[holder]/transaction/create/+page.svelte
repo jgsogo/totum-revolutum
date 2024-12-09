@@ -2,7 +2,18 @@
   import MovementForm from "$lib/forms/MovementForm.svelte";
   import type { Account } from "$lib/models/Account.js";
   import TransactionForm from "$lib/forms/TransactionForm.svelte";
-  import { Alert, Button, Card, Heading } from "flowbite-svelte";
+  import {
+    Alert,
+    Badge,
+    Button,
+    Card,
+    CardPlaceholder,
+    Heading,
+    ListPlaceholder,
+    Secondary,
+    Skeleton,
+    TextPlaceholder,
+  } from "flowbite-svelte";
   import { PlusOutline, MinusOutline, InfoCircleSolid } from "flowbite-svelte-icons";
   import { NewTransaction, type TransactionGroup } from "$lib/models/TransactionGroup.js";
   import type { MovementType } from "$lib/models/MovementType.js";
@@ -155,8 +166,13 @@
     <div class="grid gap-4 grid-cols-2">
       <!-- from movements -->
       <div>
-        <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl">
-          Source accounts
+        <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold md:text-3xl lg:text-4xl">
+          <div class="flex">
+            <span> Source accounts </span>
+            <button onclick={() => add_movement_from()} class="ml-4">
+              <Secondary class="text-xs">Add movement</Secondary>
+            </button>
+          </div>
         </Heading>
 
         {#each movements_from as mov, i}
@@ -175,28 +191,26 @@
               all_accounts={data.all_accounts}
               all_movementtypes={data.all_movementtypes}
             />
-            <button
-              onclick={() => remove_movement_from(i)}
-              class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
-            >
-              <MinusOutline />
-            </button>
+            <div class="flex flex-col text-right text-xs mt-2">
+              <span class="font-semibold text-primary-500"><button onclick={() => remove_movement_from(i)}>Remove</button></span>
+            </div>
+          </Card>
+        {:else}
+          <Card size="xl" class="mt-6">
+            <TextPlaceholder size="xxxl" class="mt-4" />
           </Card>
         {/each}
-        <Card size="xl" class="mt-6">
-          <button
-            onclick={() => add_movement_from()}
-            class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
-          >
-            <PlusOutline />
-          </button>
-        </Card>
       </div>
 
       <!-- to movements -->
       <div>
         <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl">
-          Target accounts
+          <div class="flex">
+            <span> Target accounts </span>
+            <button onclick={() => add_movement_to()} class="ml-4">
+              <Secondary class="text-xs">Add movement</Secondary>
+            </button>
+          </div>
         </Heading>
         {#each movements_to as mov, i}
           <Card size="xl" class="mt-6 {mov.is_valid ? '' : card_error_style}">
@@ -214,22 +228,15 @@
               all_accounts={data.all_accounts}
               all_movementtypes={data.all_movementtypes}
             />
-            <button
-              onclick={() => remove_movement_to(i)}
-              class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
-            >
-              <MinusOutline />
-            </button>
+            <div class="flex flex-col text-right text-xs mt-2">
+              <span class="font-semibold text-primary-500"><button onclick={() => remove_movement_to(i)}>Remove</button></span>
+            </div>
+          </Card>
+        {:else}
+          <Card size="xl" class="mt-6">
+            <TextPlaceholder size="xxxl" class="mt-8" />
           </Card>
         {/each}
-        <Card size="xl" class="mt-6">
-          <button
-            onclick={() => add_movement_to()}
-            class="dark:ring-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg p-2.5"
-          >
-            <PlusOutline />
-          </button>
-        </Card>
       </div>
     </div>
   </div>
@@ -250,7 +257,7 @@
           Source total is EUR {total_source} while target total is EUR {total_target}.
         </Alert>
       {/if}
-      <Button onclick={submit} disabled={submit_disabled}>Submit</Button>
+      <Button onclick={submit} disabled={submit_disabled}>Submit (Total: {total_source} EUR)</Button>
     </Card>
   </div>
 </form>
