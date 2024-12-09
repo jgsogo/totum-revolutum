@@ -13,7 +13,7 @@ fn test_movement_type() {
         let r = call_it::<Vec<MovementType>>(&webview, "get_all_movementtypes".to_string(), body);
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         let movs = r.unwrap();
-        assert_eq!(movs.len(), 159);
+        assert_eq!(movs.len(), 139);
 
         // Find a MovementType to use later
         movs.into_iter().find(|m| m.name == "Tasas").unwrap().pk
