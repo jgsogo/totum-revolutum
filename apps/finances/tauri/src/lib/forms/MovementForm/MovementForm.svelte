@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { Account } from "$lib/models/Account";
-  import { Input, Label, ButtonGroup, InputAddon, Datepicker } from "flowbite-svelte";
+  import { Input, Label, ButtonGroup, InputAddon } from "flowbite-svelte";
   import { MovementType } from "$lib/models/MovementType";
   import AccountDropdown from "../AccountDropdown/AccountDropdown.svelte";
   import MovementTypeDropdown from "../MovementTypeDropdown/MovementTypeDropdown.svelte";
   import type { NewMovement } from "./NewMovement.svelte";
+  import Datepicker from "../Datepicker.svelte";
 
   let {
     new_movement = $bindable(),
@@ -19,12 +20,6 @@
     all_accounts: Account[];
     all_movementtypes: MovementType[];
   } = $props();
-
-  let dateFormat: Intl.DateTimeFormatOptions = {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  };
 
   function ccy_symbol(ccy: string): string {
     if (ccy === "EUR") {
@@ -44,7 +39,7 @@
   {#if show_date}
     <Label class="space-y-2">
       <span>Date value</span>
-      <Datepicker required bind:value={new_movement.date_value} {dateFormat} />
+      <Datepicker required bind:value={new_movement.date_value} />
     </Label>
   {/if}
   {#if new_movement.account}

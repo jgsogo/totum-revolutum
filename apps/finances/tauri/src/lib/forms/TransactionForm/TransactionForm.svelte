@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { TransactionGroup } from "$lib/models/TransactionGroup";
-  import { Input, Checkbox, Label, Datepicker, Select, Textarea } from "flowbite-svelte";
+  import { Input, Checkbox, Label, Select, Textarea } from "flowbite-svelte";
   import type { NewTransaction } from "./NewTransaction.svelte";
+  import Datepicker from "../Datepicker.svelte";
 
   let {
     transaction = $bindable(),
@@ -16,12 +17,6 @@
   let transaction_groups = all_transaction_groups.map((value) => {
     return { value: value, name: value.name };
   });
-
-  let dateFormat: Intl.DateTimeFormatOptions = {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  };
 </script>
 
 <div class="px-2">
@@ -40,7 +35,7 @@
       {#if show_date}
         <Label class="space-y-2 pt-2">
           <span>Date value</span>
-          <Datepicker required bind:value={transaction.date_value} {dateFormat} />
+          <Datepicker required bind:value={transaction.date_value} />
         </Label>
       {/if}
     </div>

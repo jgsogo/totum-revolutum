@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Account } from "$lib/models/Account";
   import type { Snapshot } from "$lib/models/Snapshot";
-  import { Button, Input, Label, ButtonGroup, InputAddon, Datepicker, Helper, Alert } from "flowbite-svelte";
+  import { Button, Input, Label, ButtonGroup, InputAddon, Helper, Alert } from "flowbite-svelte";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
+  import Datepicker from "./Datepicker.svelte";
 
   let {
     account,
