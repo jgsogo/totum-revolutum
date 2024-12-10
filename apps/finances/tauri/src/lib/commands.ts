@@ -5,6 +5,7 @@ import { Movement } from "$lib/models/Movement"
 import { Custodian } from "./models/Custodian";
 import { Holder } from "./models/Holder";
 import { MovementType } from "./models/MovementType";
+import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
 
 /** The data returned by the backend representing an Custodian */
 type CustodianData = {
@@ -280,16 +281,12 @@ export const get_base_ccy = async (): Promise<string> => {
 
 /**
  * Creates a snapshot for the give account
- * @param {Account} account - The account for the new snapshot
- * @param {Date} date_value - Date for the new snapshot
- * @param {number} amount - Amount for the new snapshot (only if account is not numerable)
- * @param {number} quantity - Number of units in a numerable account
- * @param {number} unit_value - Unit value (if numerable account)
+ * @param {NewSnapshot} snapshot - The new Snapshot to create
  * @returns - A promise that resolves when the snapshot is created, or the error if it was not possible
  */
-export const create_snapshot = async (account: Account, date_value: Date, amount: number, quantity?: number, unit_value?: number) => {
-    let date = date_value.toISOString().slice(0, 10);
-    await invoke("create_snapshot", { accountPk: account.pk, dateValue: date, amount: amount, quantity: quantity, unitValue: unit_value });
+export const create_snapshot = async (snapshot: NewSnapshot) => {
+    let date = snapshot.date_value.toISOString().slice(0, 10);
+    await invoke("create_snapshot", { accountPk: snapshot.account.pk, dateValue: date, amount: snapshot.amount, quantity: snapshot.quantity, unitValue: snapshot.unit_value });
 }
 
 /** The data returned by the backend representing a MovementType */

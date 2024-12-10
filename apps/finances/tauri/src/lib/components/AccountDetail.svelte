@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Avatar, Card, Img, Modal } from "flowbite-svelte";
+  import { Avatar, Button, Card, Img, Modal } from "flowbite-svelte";
   import type { Account } from "$lib/models/Account";
   import type { Custodian } from "$lib/models/Custodian";
   import type { Snapshot } from "$lib/models/Snapshot";
@@ -9,6 +9,7 @@
   import type { Holder } from "$lib/models/Holder";
   import { create_snapshot } from "$lib/commands";
   import { invalidate } from "$app/navigation";
+  import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
 
   let {
     holder = $bindable(),
@@ -30,10 +31,13 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  const on_snapshot = async (date_value: Date, amount: number, quantity?: number, unit_value?: number) =>  {
-      await create_snapshot(account, date_value, amount, quantity, unit_value);
-      await invalidate("invalidate:account");
-      snapshotModal = false;
+  let newSnapshot = $state(new NewSnapshot(account));
+  const on_snapshot = async (e: MouseEvent) => {
+    e.preventDefault();
+    // TODO: Do something with newSnapshot
+    await create_snapshot(newSnapshot);
+    await invalidate("invalidate:account");
+    snapshotModal = false;
   };
 </script>
 
@@ -91,5 +95,10 @@
 </Card>
 
 <Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose={false}>
-  <SnapshotForm {account} {last_snapshot} {on_snapshot} />
+  <form>
+    <SnapshotForm bind:snapshot={newSnapshot} />
+    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">
+      Submit
+    </Button>
+  </form>
 </Modal>

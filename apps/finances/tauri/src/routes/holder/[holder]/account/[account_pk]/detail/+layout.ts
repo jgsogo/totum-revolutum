@@ -17,6 +17,9 @@ export async function load({ params, parent, depends }) {
         error(400, "Account not accessible for this Holder");
     }
 
+    // Prefetch latest snapshot
+    await account.getLastSnapshot();
+
     // Get snapshots and movements
     let snapshots = await get_account_snapshots(account);
     let movements = await get_account_movements(account);
