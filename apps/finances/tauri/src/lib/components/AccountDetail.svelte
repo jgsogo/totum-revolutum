@@ -4,7 +4,7 @@
   import type { Custodian } from "$lib/models/Custodian";
   import type { Snapshot } from "$lib/models/Snapshot";
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
-  import SnapshotForm from "$lib/forms/SnapshotForm.svelte";
+  import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
   import { goToTransactionCreate } from "$lib/utils";
   import type { Holder } from "$lib/models/Holder";
   import { create_snapshot } from "$lib/commands";

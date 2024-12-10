@@ -3,7 +3,7 @@
   import type { Snapshot } from "$lib/models/Snapshot";
   import { Button, Input, Label, ButtonGroup, InputAddon, Helper, Alert } from "flowbite-svelte";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
-  import Datepicker from "./Datepicker.svelte";
+  import Datepicker from "../Datepicker.svelte";
 
   let {
     account,
