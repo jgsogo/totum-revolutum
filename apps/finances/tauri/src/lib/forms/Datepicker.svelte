@@ -3,12 +3,12 @@
 
   let {
     value = $bindable(),
-    inline,
     required,
+    inline = false,
   }: {
     value: Date | undefined;
     required: boolean;
-    inline: boolean;
+    inline?: boolean;
   } = $props();
 
   let dateFormat: Intl.DateTimeFormatOptions = {

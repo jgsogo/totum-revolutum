@@ -24,6 +24,7 @@
   let { data } = $props();
 
   let transaction: NewTransaction = $state(new NewTransaction());
+  transaction.date_value = new Date();
   let show_transaction_date = $state(true);
   let show_individual_dates = $derived(!show_transaction_date);
 
