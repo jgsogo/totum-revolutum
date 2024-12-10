@@ -137,13 +137,7 @@
         {#each movements_from as mov, i}
           <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, data.base_ccy) ? '' : card_error_style}">
             <MovementForm
-              bind:account={mov.account}
-              bind:movementtype={mov.mov_type}
-              bind:date_value={mov.date_value}
-              bind:amount={mov.amount}
-              bind:quantity={mov.quantity}
-              bind:unit_value={mov.unit_value}
-              bind:fx={mov.fx}
+              bind:new_movement={movements_from[i]}
               base_ccy={data.base_ccy}
               show_date={show_individual_dates}
               all_accounts={data.all_accounts}
@@ -175,13 +169,7 @@
         {#each movements_to as mov, i}
           <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, data.base_ccy) ? '' : card_error_style}">
             <MovementForm
-              bind:account={mov.account}
-              bind:movementtype={mov.mov_type}
-              bind:date_value={mov.date_value}
-              bind:amount={mov.amount}
-              bind:quantity={mov.quantity}
-              bind:unit_value={mov.unit_value}
-              bind:fx={mov.fx}
+              bind:new_movement={movements_to[i]}
               base_ccy={data.base_ccy}
               show_date={show_individual_dates}
               all_accounts={data.all_accounts}

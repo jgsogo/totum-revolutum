@@ -20,11 +20,19 @@ export class NewMovement {
     }
 
     total(base_ccy: string): number | undefined {
-        if (!this.is_valid(false, base_ccy)) return undefined;
+        if (!this.account) return undefined;
+        let total = 0;
+        if (this.account.is_numerable) {
+            if (!this.quantity || !this.unit_value) return undefined;
+            total = this.quantity * this.unit_value;
+        } else {
+            if (!this.amount) return undefined;
+            total = this.amount;
+        }
 
-        let total = this.account!.is_numerable ? (this.quantity! * this.unit_value!) : this.amount!;
-        if (this.account!.ccy !== base_ccy) {
-            total = total / this.fx!;
+        if (this.account.ccy !== base_ccy) {
+            if (!this.fx) return undefined;
+            total = total / this.fx;
         }
         return total;
     }

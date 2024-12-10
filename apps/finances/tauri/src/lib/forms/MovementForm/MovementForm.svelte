@@ -1,54 +1,24 @@
 <script lang="ts">
   import type { Account } from "$lib/models/Account";
-  import type { Snapshot } from "$lib/models/Snapshot";
-  import { Button, Input, Label, ButtonGroup, InputAddon, Datepicker, Helper, Alert, Select } from "flowbite-svelte";
-  import { InfoCircleSolid } from "flowbite-svelte-icons";
+  import { Input, Label, ButtonGroup, InputAddon, Datepicker } from "flowbite-svelte";
   import { MovementType } from "$lib/models/MovementType";
   import AccountDropdown from "../AccountDropdown/AccountDropdown.svelte";
   import MovementTypeDropdown from "../MovementTypeDropdown/MovementTypeDropdown.svelte";
+  import type { NewMovement } from "./NewMovement.svelte";
 
   let {
-    account = $bindable(),
-    movementtype = $bindable(),
-    date_value = $bindable(),
-    amount = $bindable(),
-    quantity = $bindable(),
-    unit_value = $bindable(),
-    fx = $bindable(),
+    new_movement = $bindable(),
     base_ccy,
     show_date,
     all_accounts,
     all_movementtypes,
   }: {
-    account: Account | undefined;
-    movementtype: MovementType | undefined;
-    date_value: Date | undefined;
-    amount: number | undefined;
-    quantity: number | undefined;
-    unit_value: number | undefined;
-    fx: number | undefined;
+    new_movement: NewMovement;
     base_ccy: string;
     show_date: boolean;
     all_accounts: Account[];
     all_movementtypes: MovementType[];
   } = $props();
-
-  let total_amount = $derived.by(() => {
-    let total = 0;
-
-    if (account?.is_numerable) {
-      total = (quantity ? quantity : 0) * (unit_value ? unit_value : 0);
-    } else {
-      total = amount ? amount : 0;
-    }
-
-    // apply FX
-    if (fx) {
-      total = total / fx;
-    }
-
-    return total;
-  });
 
   let dateFormat: Intl.DateTimeFormatOptions = {
     day: "2-digit",
@@ -68,44 +38,44 @@
 </script>
 
 <div class="flex flex-col space-y-6" action="#">
-  <AccountDropdown bind:account {all_accounts} />
-  <MovementTypeDropdown bind:movementtype {all_movementtypes} />
+  <AccountDropdown bind:account={new_movement.account} {all_accounts} />
+  <MovementTypeDropdown bind:movementtype={new_movement.mov_type} {all_movementtypes} />
 
   {#if show_date}
     <Label class="space-y-2">
       <span>Date value</span>
-      <Datepicker required bind:value={date_value} {dateFormat} />
+      <Datepicker required bind:value={new_movement.date_value} {dateFormat} />
     </Label>
   {/if}
-  {#if account}
+  {#if new_movement.account}
     <div class="flex items-center w-full">
-      {#if account.is_numerable}
+      {#if new_movement.account.is_numerable}
         <Label>
           <span>Quantity</span>
-          <Input type="number" required placeholder="quantity" bind:value={quantity} />
+          <Input type="number" required placeholder="quantity" bind:value={new_movement.quantity} />
         </Label>
         <Label class="ml-4">
           <span>Unit value</span>
           <ButtonGroup>
-            <InputAddon>{ccy_symbol(account.ccy)}</InputAddon>
-            <Input type="number" required placeholder="unit_value" bind:value={unit_value} />
+            <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <Input type="number" required placeholder="unit_value" bind:value={new_movement.unit_value} />
           </ButtonGroup>
         </Label>
       {:else}
         <Label>
           <span>Amount</span>
           <ButtonGroup class="w-full">
-            <InputAddon>{ccy_symbol(account.ccy)}</InputAddon>
-            <Input type="number" required placeholder="amount" bind:value={amount} />
+            <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <Input type="number" required placeholder="amount" bind:value={new_movement.amount} />
           </ButtonGroup>
         </Label>
       {/if}
-      {#if account.ccy != base_ccy}
+      {#if new_movement.account.ccy != base_ccy}
         <Label class="ml-4">
           <span>FX</span>
           <ButtonGroup>
-            <InputAddon>{ccy_symbol(base_ccy)}/{ccy_symbol(account.ccy)}</InputAddon>
-            <Input type="number" required placeholder="fx" bind:value={fx} />
+            <InputAddon>{ccy_symbol(base_ccy)}/{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <Input type="number" required placeholder="fx" bind:value={new_movement.fx} />
           </ButtonGroup>
         </Label>
       {/if}
@@ -113,9 +83,9 @@
         <span>Total</span>
         <ButtonGroup>
           <InputAddon>{ccy_symbol(base_ccy)}</InputAddon>
-          <Input disabled type="number" required value={total_amount} />
+          <Input disabled type="number" required value={new_movement.total(base_ccy)} />
         </ButtonGroup>
       </Label>
     </div>
   {/if}
-  </div>
+</div>
