@@ -1,12 +1,11 @@
 <script lang="ts">
   import type { Account } from "$lib/models/Account";
-  import { NewMovement } from "$lib/models/Movement";
   import type { Snapshot } from "$lib/models/Snapshot";
   import { Button, Input, Label, ButtonGroup, InputAddon, Datepicker, Helper, Alert, Select } from "flowbite-svelte";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
   import { MovementType } from "$lib/models/MovementType";
-  import AccountDropdown from "./AccountDropdown/AccountDropdown.svelte";
-  import MovementTypeDropdown from "./MovementTypeDropdown/MovementTypeDropdown.svelte";
+  import AccountDropdown from "../AccountDropdown/AccountDropdown.svelte";
+  import MovementTypeDropdown from "../MovementTypeDropdown/MovementTypeDropdown.svelte";
 
   let {
     account = $bindable(),
@@ -16,7 +15,6 @@
     quantity = $bindable(),
     unit_value = $bindable(),
     fx = $bindable(),
-    is_valid = $bindable(),
     base_ccy,
     show_date,
     all_accounts,
@@ -29,7 +27,6 @@
     quantity: number | undefined;
     unit_value: number | undefined;
     fx: number | undefined;
-    is_valid: boolean;
     base_ccy: string;
     show_date: boolean;
     all_accounts: Account[];
@@ -68,16 +65,6 @@
       return ccy;
     }
   }
-
-  $effect(() => {
-    is_valid =
-      account != undefined &&
-      movementtype instanceof MovementType &&
-      (!show_date || (show_date && date_value != undefined)) &&
-      ((account.is_numerable && quantity != undefined && unit_value != undefined) ||
-        (!account.is_numerable && amount != undefined)) &&
-      (account.ccy == base_ccy || fx != undefined);
-  });
 </script>
 
 <div class="flex flex-col space-y-6" action="#">

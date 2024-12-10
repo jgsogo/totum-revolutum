@@ -1,4 +1,4 @@
-import type { NewMovement } from "./Movement";
+import type { NewMovement } from "$lib/forms/MovementForm/NewMovement.svelte";
 
 export class NewTransaction {
     name: string;

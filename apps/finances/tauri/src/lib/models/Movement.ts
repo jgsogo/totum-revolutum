@@ -1,27 +1,3 @@
-import type {Account} from "$lib/models/Account";
-import type { MovementType } from "./MovementType";
-
-export class NewMovement {
-    account_pk: number;
-    mov_type_pk: number;
-    amount?: number;
-    date_value?: Date;
-    quantity?: number;
-    unit_value?: number;
-    fx?: number;
-
-    constructor(account: Account, mov_type: MovementType, amount?: number, date_value?: Date, quantity?: number, unit_value?: number, fx?: number) {
-        this.account_pk = account.pk;
-        this.mov_type_pk = mov_type.pk;
-        this.amount = amount;
-        this.date_value = date_value;
-        this.quantity = quantity;
-        this.unit_value = unit_value;
-        this.fx = fx;
-    }
-};
-
-
 export class Movement {
     readonly amount: number;
     private readonly quantity?: number;

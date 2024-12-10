@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Account } from "$lib/models/Account";
-  import { NewMovement } from "$lib/models/Movement";
   import type { Snapshot } from "$lib/models/Snapshot";
   import type { TransactionGroup } from "$lib/models/TransactionGroup";
   import {

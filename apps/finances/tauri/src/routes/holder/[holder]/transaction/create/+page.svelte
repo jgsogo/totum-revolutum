@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MovementForm from "$lib/forms/MovementForm.svelte";
+  import MovementForm from "$lib/forms/MovementForm/MovementForm.svelte";
   import type { Account } from "$lib/models/Account.js";
   import TransactionForm from "$lib/forms/TransactionForm.svelte";
   import {
@@ -17,24 +17,13 @@
   import { PlusOutline, MinusOutline, InfoCircleSolid } from "flowbite-svelte-icons";
   import { NewTransaction, type TransactionGroup } from "$lib/models/TransactionGroup.js";
   import type { MovementType } from "$lib/models/MovementType.js";
-  import { NewMovement } from "$lib/models/Movement.js";
+  import { NewMovement } from "$lib/forms/MovementForm/NewMovement.svelte.js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
 
-  type MovementData = {
-    account?: Account;
-    movement_type?: MovementType;
-    date_value?: Date;
-    amount?: number;
-    quantity?: number;
-    unit_value?: number;
-    fx?: number;
-    is_valid: boolean;
-  };
-
-  let movements_from: MovementData[] = $state([]);
-  let movements_to: MovementData[] = $state([]);
+  let movements_from: NewMovement[] = $state([]);
+  let movements_to: NewMovement[] = $state([]);
   let transation_data: {
     group?: TransactionGroup;
     name?: string;
@@ -47,47 +36,29 @@
   });
   let show_transaction_date = $state(true);
   let show_individual_dates = $derived(!show_transaction_date);
-  function movement_total(mov: MovementData): number {
-    if (!mov.account) return 0;
-    let total = 0;
-    if (mov.account.is_numerable) {
-      if (!mov.quantity || !mov.unit_value) return 0;
-      total = mov.quantity * mov.unit_value;
-    } else {
-      if (!mov.amount) return 0;
-      total = mov.amount;
-    }
-    // Apply FX
-    if (mov.fx) {
-      total = total / mov.fx;
-    }
-    return total;
+
+  function accumulate_movements_total(movements: NewMovement[]): number {
+    const total_sum_initial = 0;
+    return movements.reduce((acc, mov: NewMovement) => {
+      let total = mov.total(data.base_ccy);
+      return total === undefined ? Number.NEGATIVE_INFINITY : acc + total;
+    }, total_sum_initial);
   }
 
-  let total_source = $derived.by(() => {
-    const total_sum_initial = 0;
-    return movements_from.reduce((acc, mov: MovementData) => acc + movement_total(mov), total_sum_initial);
-  });
-  let total_target = $derived.by(() => {
-    const total_sum_initial = 0;
-    return movements_to.reduce((acc, mov: MovementData) => acc + movement_total(mov), total_sum_initial);
-  });
+  let total_source = $derived(accumulate_movements_total(movements_from));
+  let total_target = $derived(accumulate_movements_total(movements_to));
 
   function add_movement_from(account?: Account) {
-    movements_from = movements_from.concat({
-      account: account,
-      date_value: new Date(),
-      is_valid: false,
-      movement_type: undefined,
-    });
+    let new_mov = new NewMovement();
+    new_mov.account = account;
+    new_mov.date_value = new Date();
+    movements_from = movements_from.concat(new_mov);
   }
   function add_movement_to(account?: Account) {
-    movements_to = movements_to.concat({
-      account: account,
-      date_value: new Date(),
-      is_valid: false,
-      movement_type: undefined,
-    });
+    let new_mov = new NewMovement();
+    new_mov.account = account;
+    new_mov.date_value = new Date();
+    movements_to = movements_to.concat(new_mov);
   }
 
   if (data.from_account) {
@@ -116,24 +87,12 @@
   let submit_disabled = $derived(!is_valid || total_source != total_target);
 
   function submit() {
-    // Collect movements_from -> NewMovements
-    let movs_from: NewMovement[] = movements_from.map((v: MovementData) => {
-      // TODO: Errors if some fields are null
-      return new NewMovement(v.account!, v.movement_type!, v.amount, v.date_value, v.quantity, v.unit_value, v.fx);
-    });
-
-    // Collect movements_to -> NewMovements
-    let movs_to: NewMovement[] = movements_to.map((v: MovementData) => {
-      // TODO: Errors if some fields are null
-      return new NewMovement(v.account!, v.movement_type!, v.amount, v.date_value, v.quantity, v.unit_value, v.fx);
-    });
-
     // Create NewTransaction
     // TODO: Errors if some fields are null
     let new_transacion = new NewTransaction(
       transation_data.name!,
-      movs_from,
-      movs_to,
+      movements_from,
+      movements_to,
       transation_data.description,
       transation_data.date_value,
       transation_data.group
@@ -176,23 +135,24 @@
         </Heading>
 
         {#each movements_from as mov, i}
-          <Card size="xl" class="mt-6 {mov.is_valid ? '' : card_error_style}">
+          <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, data.base_ccy) ? '' : card_error_style}">
             <MovementForm
               bind:account={mov.account}
-              bind:movementtype={mov.movement_type}
+              bind:movementtype={mov.mov_type}
               bind:date_value={mov.date_value}
               bind:amount={mov.amount}
               bind:quantity={mov.quantity}
               bind:unit_value={mov.unit_value}
               bind:fx={mov.fx}
-              bind:is_valid={mov.is_valid}
               base_ccy={data.base_ccy}
               show_date={show_individual_dates}
               all_accounts={data.all_accounts}
               all_movementtypes={data.all_movementtypes}
             />
             <div class="flex flex-col text-right text-xs mt-2">
-              <span class="font-semibold text-primary-500"><button onclick={() => remove_movement_from(i)}>Remove</button></span>
+              <span class="font-semibold text-primary-500"
+                ><button onclick={() => remove_movement_from(i)}>Remove</button></span
+              >
             </div>
           </Card>
         {:else}
@@ -213,23 +173,24 @@
           </div>
         </Heading>
         {#each movements_to as mov, i}
-          <Card size="xl" class="mt-6 {mov.is_valid ? '' : card_error_style}">
+          <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, data.base_ccy) ? '' : card_error_style}">
             <MovementForm
               bind:account={mov.account}
-              bind:movementtype={mov.movement_type}
+              bind:movementtype={mov.mov_type}
               bind:date_value={mov.date_value}
               bind:amount={mov.amount}
               bind:quantity={mov.quantity}
               bind:unit_value={mov.unit_value}
               bind:fx={mov.fx}
-              bind:is_valid={mov.is_valid}
               base_ccy={data.base_ccy}
               show_date={show_individual_dates}
               all_accounts={data.all_accounts}
               all_movementtypes={data.all_movementtypes}
             />
             <div class="flex flex-col text-right text-xs mt-2">
-              <span class="font-semibold text-primary-500"><button onclick={() => remove_movement_to(i)}>Remove</button></span>
+              <span class="font-semibold text-primary-500"
+                ><button onclick={() => remove_movement_to(i)}>Remove</button></span
+              >
             </div>
           </Card>
         {:else}
