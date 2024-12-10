@@ -27,7 +27,7 @@ export async function load({ url, parent }) {
     let all_accounts = await get_all_accounts();
     let all_movementtypes_without_breadcrumbs = await get_all_movementtypes();
     let all_movementtypes = await Promise.all(all_movementtypes_without_breadcrumbs.map(async (movtype) => {
-        await movtype.breadcrumbs();
+        await movtype.getBreadcrumbs(); // Populate all breadcrumbs
         return movtype;
     }))
 
