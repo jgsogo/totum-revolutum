@@ -34,10 +34,12 @@
   let newSnapshot = $state(new NewSnapshot(account));
   const on_snapshot = async (e: MouseEvent) => {
     e.preventDefault();
-    await create_snapshot(newSnapshot);
-    // TODO: Handle error if it fails to create the snapshot
-    await invalidate("invalidate:account");
-    snapshotModal = false;
+    if (newSnapshot.isValid()) {
+      await create_snapshot(newSnapshot);
+      // TODO: Handle error if it fails to create the snapshot
+      await invalidate("invalidate:account");
+      snapshotModal = false;
+    }
   };
 </script>
 

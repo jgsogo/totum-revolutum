@@ -30,3 +30,15 @@ impl Movement {
             .order(crate::schema::finances_accounts_movement::date_value.desc())
     }
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::finances_accounts_movement)]
+pub struct NewMovement<'a> {
+    pub amount: &'a NumericType,
+    pub direction: i32,
+    pub date_value: &'a chrono::NaiveDate,
+    pub account_id: &'a i64,
+    pub fx_id: Option<&'a i64>,
+    pub type_id: &'a i64,
+    pub transaction_id: &'a i64,
+}

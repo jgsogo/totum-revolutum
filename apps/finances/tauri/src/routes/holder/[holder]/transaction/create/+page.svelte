@@ -26,10 +26,12 @@
 
   const submit = async (e: MouseEvent) => {
     e.preventDefault();
-    await create_transaction(transaction);
-    // TODO: Show error when it fails
-    // TODO: transaction/create is a child of some account/detail (we need the account here)
-    await goToAccountDetail(data.holder, 0);
+    if (transaction.is_valid(show_transaction_date, data.base_ccy)) {
+      await create_transaction(transaction);
+      // TODO: Show error when it fails
+      // TODO: transaction/create is a child of some account/detail (we need the account here)
+      await goToAccountDetail(data.holder, 0);
+    }
   };
 
   let card_error_style = "border-red-600 dark:border-red-600";

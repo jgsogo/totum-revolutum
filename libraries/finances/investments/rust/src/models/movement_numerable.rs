@@ -41,3 +41,11 @@ where
         })
     }
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::finances_investments_movementnumerable)]
+pub struct NewMovementNumerable<'a> {
+    pub movement_ptr_id: &'a i64,
+    pub quantity: &'a NumericType,
+    pub unit_value: &'a NumericType,
+}
