@@ -48,8 +48,10 @@ pub fn create_app<R: tauri::Runtime>(
             commands::get_base_ccy,
             commands::movement_type::get_all_movementtypes,
             commands::movement_type::get_breadcrumbs_for_movementtype,
+            commands::transaction_group::get_all_transaction_groups,
             // Sending data
             commands::snapshot::create_snapshot,
+            commands::transaction::create_transaction,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

@@ -6,6 +6,8 @@
   import { type TransactionGroup } from "$lib/models/TransactionGroup.js";
   import { NewTransaction } from "$lib/forms/TransactionForm/NewTransaction.svelte.js";
   import { NewMovement } from "$lib/forms/MovementForm/NewMovement.svelte.js";
+  import { create_transaction } from "$lib/commands.js";
+  import { goToAccountDetail } from "$lib/utils.js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -19,15 +21,16 @@
   let show_transaction_date = $state(true);
   let show_individual_dates = $derived(!show_transaction_date);
 
-  let all_transaction_groups: TransactionGroup[] = [];
-
   // Form validation and submit
   let submit_disabled = $derived(!transaction.is_valid(show_transaction_date, data.base_ccy));
 
-  function submit() {
-    // TODO: Send to the backend
-    console.log(JSON.stringify(transaction));
-  }
+  const submit = async (e: MouseEvent) => {
+    e.preventDefault();
+    await create_transaction(transaction);
+    // TODO: Show error when it fails
+    // TODO: transaction/create is a child of some account/detail (we need the account here)
+    await goToAccountDetail(data.holder, 0);
+  };
 
   let card_error_style = "border-red-600 dark:border-red-600";
 </script>
@@ -37,7 +40,11 @@
 <form>
   <div class="mt-px space-y-4">
     <Card size="xl" class="mt-6 {transaction.is_valid(show_transaction_date, data.base_ccy) ? '' : card_error_style}">
-      <TransactionForm bind:transaction bind:show_date={show_transaction_date} {all_transaction_groups} />
+      <TransactionForm
+        bind:transaction
+        bind:show_date={show_transaction_date}
+        all_transaction_groups={data.all_transaction_groups}
+      />
     </Card>
   </div>
 

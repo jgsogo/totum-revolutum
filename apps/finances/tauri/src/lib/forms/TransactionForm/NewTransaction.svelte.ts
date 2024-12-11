@@ -81,13 +81,15 @@ export class NewTransaction {
     }
 
     toJSON() {
+        // This serialization is used when sending this structure via a command to the Tauri backend
+        let date = this.date_value?.toISOString().slice(0, 10);
         return {
             name: this.name,
             description: this.description,
-            date_value: this.date_value,
-            transaction_group: this.transaction_group,
-            movements_from: this.movements_from,
-            movements_to: this.movements_to,
+            date_value: date,
+            transaction_group_pk: this.transaction_group?.pk,
+            movements_from: this.movements_from.map((mov) => mov.toJSON()),
+            movements_to: this.movements_to.map((mov) => mov.toJSON()),
         };
     }
 };

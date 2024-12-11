@@ -10,6 +10,8 @@ pub mod custodian;
 pub mod holder;
 pub mod movement_type;
 pub mod snapshot;
+pub mod transaction;
+pub mod transaction_group;
 
 use crate::state::AppState;
 use tauri::State;

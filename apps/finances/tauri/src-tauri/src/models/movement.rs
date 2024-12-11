@@ -42,3 +42,15 @@ impl From<MovementAndRelatedData> for Movement {
         }
     }
 }
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct NewMovement {
+    pub account_pk: i64,
+    pub movement_type_pk: i64,
+
+    pub date_value: Option<String>,
+    pub amount: Option<f32>,
+    pub quantity: Option<f32>,
+    pub unit_value: Option<f32>,
+    pub fx: Option<f32>,
+}

@@ -34,8 +34,8 @@
   let newSnapshot = $state(new NewSnapshot(account));
   const on_snapshot = async (e: MouseEvent) => {
     e.preventDefault();
-    // TODO: Do something with newSnapshot
     await create_snapshot(newSnapshot);
+    // TODO: Handle error if it fails to create the snapshot
     await invalidate("invalidate:account");
     snapshotModal = false;
   };

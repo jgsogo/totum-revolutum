@@ -10,6 +10,7 @@ mod movement;
 mod movement_type;
 mod snapshot;
 mod transaction;
+mod transaction_group;
 
 pub use account::Account;
 pub use account_type::AccountType;
@@ -19,4 +20,5 @@ pub use holder::Holder;
 pub use movement::Movement;
 pub use movement_type::MovementType;
 pub use snapshot::{NewSnapshot, Snapshot};
-pub use transaction::Transaction;
+pub use transaction::{NewTransaction, Transaction};
+pub use transaction_group::TransactionGroup;

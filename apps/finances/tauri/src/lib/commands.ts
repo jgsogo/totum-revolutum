@@ -6,6 +6,8 @@ import { Custodian } from "./models/Custodian";
 import { Holder } from "./models/Holder";
 import { MovementType } from "./models/MovementType";
 import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
+import { TransactionGroup } from "./models/TransactionGroup";
+import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
 
 /** The data returned by the backend representing an Custodian */
 type CustodianData = {
@@ -285,7 +287,7 @@ export const get_base_ccy = async (): Promise<string> => {
  * @returns - A promise that resolves when the snapshot is created, or the error if it was not possible
  */
 export const create_snapshot = async (snapshot: NewSnapshot) => {
-    await invoke("create_snapshot", snapshot.toJSON());
+    await invoke("create_snapshot", { snapshot: snapshot.toJSON() });
 }
 
 /** The data returned by the backend representing a MovementType */
@@ -322,3 +324,26 @@ export const get_all_movementtypes = async (): Promise<MovementType[]> => {
 export const get_breadcrumbs_for_movementtype = async (movementtype: MovementType): Promise<string[]> => {
     return await invoke("get_breadcrumbs_for_movementtype", { pk: movementtype.pk });
 };
+
+
+/**
+ * Returns (a promise to) all the TransactionGroups in the database
+ * @returns {TransactionGroup[]} The TransactionGroup instances
+ */
+export const get_all_transaction_groups = async (): Promise<TransactionGroup[]> => {
+    const data: TransactionGroup[] = await invoke("get_all_transaction_groups", {});
+    return data.map((it) => {
+        return new TransactionGroup(it.pk, it.name, it.description);
+    });
+};
+
+
+/**
+ * Creates a transaction
+ * @param {NewTransaction} transaction - The new transaction to create
+ * @returns - A promise that resolves when the transaction is created, or the error if it was not possible
+ */
+export const create_transaction = async (transaction: NewTransaction) => {
+    console.log(JSON.stringify(transaction));
+    await invoke("create_transaction", { transaction: transaction.toJSON() });
+}
