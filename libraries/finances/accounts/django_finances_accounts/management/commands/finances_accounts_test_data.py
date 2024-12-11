@@ -15,6 +15,7 @@ from django_finances_accounts.models import (
     MovementType,
     Snapshot,
     Transaction,
+    TransactionGroup,
 )
 
 
@@ -28,6 +29,7 @@ class Command(BaseCommand):
         custodians = self.populate_custodians()
         accounts = self.populate_accounts(custodians=custodians)
         self.populate_snapshots(account=accounts[0])
+        self.populate_transaction_groups()
         transactions = self.populate_transactions()
         self.populate_movements(account=accounts[0], transactions=transactions)
         holders = self.populate_holders()
@@ -100,6 +102,19 @@ class Command(BaseCommand):
             [
                 Snapshot(amount=0, date_value="2024-09-06", account=account),
                 Snapshot(amount=1, date_value="2024-09-30", account=account),
+            ]
+        )
+
+    def populate_transaction_groups(self):
+        return TransactionGroup.objects.bulk_create(
+            [
+                TransactionGroup(pk=0, name="transaction_group0", start="2024-09-06"),
+                TransactionGroup(
+                    pk=1, name="transaction_group1", cadence="year", start="2024-09-06"
+                ),
+                TransactionGroup(
+                    pk=2, name="transaction_group2", start="2024-09-06", end="2024-10-10"
+                ),
             ]
         )
 
