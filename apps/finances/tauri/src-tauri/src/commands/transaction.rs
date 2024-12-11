@@ -70,15 +70,15 @@ fn create_transaction_movements(
     transaction_date_value: Option<&String>,
     transaction_pk: &i64,
 ) -> Result<usize, CommandError> {
-    for movement_from in movements {
+    for mov in movements {
         // FIXME: Collect all the accounts instead of doing N queries
         let account_numerable = Account::all()
             .select(finances_accounts::schema::finances_accounts_account::is_numerable)
-            .filter(account_by_pk(movement_from.account_pk))
+            .filter(account_by_pk(mov.account_pk))
             .first::<bool>(conn)?;
 
         let date_value = {
-            let date_str = movement_from
+            let date_str = mov
                 .date_value
                 .as_ref()
                 .or(transaction_date_value)
@@ -87,63 +87,63 @@ fn create_transaction_movements(
             chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d")
                 .map_err(|e| CommandError::Other(format!("Error parsing date from string ({}): {e}", date_str)))?
         };
-        let fx_id = None; // movement_from.fx.map(|_fx| 0i64); // FIXME: Create the fx and return pk
+        let fx_id = None; // mov.fx.map(|_fx| 0i64); // FIXME: Create the fx and return pk
 
         if account_numerable {
-            let quantity: bigdecimal::BigDecimal = movement_from
+            let quantity: bigdecimal::BigDecimal = mov
                 .quantity
                 .ok_or(CommandError::Other("No qunatity for movement".to_string()))?
                 .try_into()
                 .map_err(|e| {
                     CommandError::Other(format!(
                         "Cannot convert quantity f32 ({}) to BigDecimal: {e}",
-                        movement_from.quantity.unwrap()
+                        mov.quantity.unwrap()
                     ))
                 })?;
 
-            let unit_value: bigdecimal::BigDecimal = movement_from
+            let unit_value: bigdecimal::BigDecimal = mov
                 .unit_value
                 .ok_or(CommandError::Other("No unit_value for movement".to_string()))?
                 .try_into()
                 .map_err(|e| {
                     CommandError::Other(format!(
                         "Cannot convert unit_value f32 ({}) to BigDecimal: {e}",
-                        movement_from.unit_value.unwrap()
+                        mov.unit_value.unwrap()
                     ))
                 })?;
 
             let amount: bigdecimal::BigDecimal = &quantity * &unit_value;
 
             let new_movement = NewMovement {
-                account_id: &movement_from.account_pk,
+                account_id: &mov.account_pk,
                 amount: &amount,
                 date_value: &date_value,
                 direction,
                 fx_id: fx_id.as_ref(),
-                type_id: &movement_from.movement_type_pk,
+                type_id: &mov.movement_type_pk,
                 transaction_id: transaction_pk,
             };
 
             create_movement_numerable(conn, &new_movement, &quantity, &unit_value)?;
         } else {
-            let amount: bigdecimal::BigDecimal = movement_from
+            let amount: bigdecimal::BigDecimal = mov
                 .amount
                 .ok_or(CommandError::Other("No amount for movement".to_string()))?
                 .try_into()
                 .map_err(|e| {
                     CommandError::Other(format!(
                         "Cannot convert amount f32 ({}) to BigDecimal: {e}",
-                        movement_from.amount.unwrap()
+                        mov.amount.unwrap()
                     ))
                 })?;
 
             let new_movement = NewMovement {
-                account_id: &movement_from.account_pk,
+                account_id: &mov.account_pk,
                 amount: &amount,
                 date_value: &date_value,
                 direction,
                 fx_id: fx_id.as_ref(),
-                type_id: &movement_from.movement_type_pk,
+                type_id: &mov.movement_type_pk,
                 transaction_id: transaction_pk,
             };
 
