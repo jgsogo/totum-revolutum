@@ -37,34 +37,17 @@ pub fn create_snapshot_numerable(
     })
 }
 
-#[allow(clippy::too_many_arguments)]
 pub fn create_movement_numerable(
     conn: &mut PgConnection,
-    amount: &NumericType,
-    direction: i32,
-    date_value: &chrono::NaiveDate,
-    account_id: &i64,
-    fx_id: Option<&i64>,
-    type_id: &i64,
-    transaction_id: &i64,
+    new_movement: &NewMovement,
     // for the numerable part
     quantity: &NumericType,
     unit_value: &NumericType,
 ) -> Result<usize, diesel::result::Error> {
     // Insert one more movement numerable
     conn.transaction(|conn| {
-        let new_movement = NewMovement {
-            amount,
-            direction,
-            date_value,
-            account_id,
-            fx_id,
-            type_id,
-            transaction_id,
-        };
-
         let inserted = diesel::insert_into(finances_accounts::schema::finances_accounts_movement::table)
-            .values(&new_movement)
+            .values(new_movement)
             .returning(finances_accounts::schema::finances_accounts_movement::id)
             .get_result(conn)?;
 

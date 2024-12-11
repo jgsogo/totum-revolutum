@@ -114,18 +114,17 @@ fn create_transaction_movements(
 
             let amount: bigdecimal::BigDecimal = &quantity * &unit_value;
 
-            create_movement_numerable(
-                conn,
-                &amount,
+            let new_movement = NewMovement {
+                account_id: &movement_from.account_pk,
+                amount: &amount,
+                date_value: &date_value,
                 direction,
-                &date_value,
-                &movement_from.account_pk,
-                fx_id.as_ref(),
-                &movement_from.movement_type_pk,
-                transaction_pk,
-                &quantity,
-                &unit_value,
-            )?;
+                fx_id: fx_id.as_ref(),
+                type_id: &movement_from.movement_type_pk,
+                transaction_id: transaction_pk,
+            };
+
+            create_movement_numerable(conn, &new_movement, &quantity, &unit_value)?;
         } else {
             let amount: bigdecimal::BigDecimal = movement_from
                 .amount
