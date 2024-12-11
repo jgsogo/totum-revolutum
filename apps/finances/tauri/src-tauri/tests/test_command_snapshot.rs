@@ -1,4 +1,4 @@
-use finances_app_lib::models::Snapshot;
+use finances_app_lib::models::{NewSnapshot, Snapshot};
 use serde_json::json;
 
 mod common;
@@ -11,7 +11,7 @@ fn test_snapshot() {
     /****
     Non-numerable account
     ***/
-    let account_id = 1i32;
+    let account_id = 1i64;
     {
         let body = json!({ "pk": account_id });
         let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
@@ -21,11 +21,18 @@ fn test_snapshot() {
 
     // Snapshot (non-numerable)
     {
-        let body = json!({
-            "accountPk": account_id,
-            "dateValue": "2024-11-30",
-            "amount": Some(100f32),
-        });
+        let body = {
+            let new_snapshot = NewSnapshot {
+                account_pk: account_id,
+                date_value: "2024-11-30".to_string(),
+                amount: Some(100f32),
+                quantity: None,
+                unit_value: None,
+            };
+            json!({
+                "snapshot": serde_json::to_value(new_snapshot).unwrap(),
+            })
+        };
 
         let r = call_it::<usize>(&webview, "create_snapshot".to_string(), body);
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
@@ -40,7 +47,7 @@ fn test_snapshot() {
     /****
     Numerable account
     ***/
-    let account_id = 8i32;
+    let account_id = 8i64;
     {
         let body = json!({ "pk": account_id });
         let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
@@ -48,16 +55,20 @@ fn test_snapshot() {
         assert_eq!(r.unwrap().len(), 0);
     }
 
-    // Snapshot (non-numerable)
+    // Snapshot (numerable)
     {
-        let body = json!({
-            "accountPk": account_id,
-            "dateValue": "2024-11-30",
-            "amount": Some(300f32),
-            "quantity": Some(3f32),
-            "unitValue": Some(100f32),
-
-        });
+        let body = {
+            let new_snapshot = NewSnapshot {
+                account_pk: account_id,
+                date_value: "2024-11-30".to_string(),
+                amount: Some(300f32),
+                quantity: Some(3f32),
+                unit_value: Some(100f32),
+            };
+            json!({
+                "snapshot": serde_json::to_value(new_snapshot).unwrap(),
+            })
+        };
 
         let r = call_it::<usize>(&webview, "create_snapshot".to_string(), body);
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());

@@ -1,7 +1,7 @@
 use bigdecimal::ToPrimitive;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Snapshot {
     pub account_id: i64,
     pub amount: f32,
@@ -18,7 +18,7 @@ impl From<finances_accounts::models::Snapshot> for Snapshot {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct NewSnapshot {
     pub account_pk: i64,
     pub date_value: String,
