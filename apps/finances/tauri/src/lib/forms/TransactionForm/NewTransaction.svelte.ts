@@ -1,17 +1,52 @@
+import type { Account } from "$lib/models/Account";
 import type { TransactionGroup } from "$lib/models/TransactionGroup";
 
 
-import type { NewMovement } from "../MovementForm/NewMovement.svelte";
+import { NewMovement } from "../MovementForm/NewMovement.svelte";
 
 
 export class NewTransaction {
     name?: string = $state();
     description?: string = $state();
     date_value?: Date = $state();
-    transaction_group?: number = $state();
+    transaction_group?: TransactionGroup = $state();
 
     movements_from: NewMovement[] = $state([]);
     movements_to: NewMovement[] = $state([]);
+
+    constructor(date_value?: Date, initial_movements_from?: NewMovement[], initial_movements_to?: NewMovement[]) {
+        this.date_value = date_value;
+        this.movements_from = initial_movements_from ?? [];
+        this.movements_to = initial_movements_to ?? [];
+    }
+
+    add_movement_from(account?: Account) {
+        let new_mov = new NewMovement();
+        new_mov.account = account;
+        new_mov.date_value = new Date();
+        this.movements_from = this.movements_from.concat(new_mov);
+    }
+
+    add_movement_to(account?: Account) {
+        let new_mov = new NewMovement();
+        new_mov.account = account;
+        new_mov.date_value = new Date();
+        this.movements_to = this.movements_to.concat(new_mov);
+    }
+
+    remove_movement_from(index: number) {
+        let pre_list = this.movements_from.slice(0, index);
+        this.movements_from = pre_list.concat(
+            this.movements_from.slice(index + 1, this.movements_from.length)
+        );
+    }
+
+    remove_movement_to(index: number) {
+        let pre_list = this.movements_to.slice(0, index);
+        this.movements_to = pre_list.concat(
+            this.movements_to.slice(index + 1, this.movements_to.length)
+        );
+    }
 
     is_valid(date_required: boolean, base_ccy: string): boolean {
         return (this.name !== undefined &&

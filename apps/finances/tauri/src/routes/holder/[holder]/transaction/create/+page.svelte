@@ -1,66 +1,23 @@
 <script lang="ts">
   import MovementForm from "$lib/forms/MovementForm/MovementForm.svelte";
-  import type { Account } from "$lib/models/Account.js";
   import TransactionForm from "$lib/forms/TransactionForm/TransactionForm.svelte";
-  import {
-    Alert,
-    Badge,
-    Button,
-    Card,
-    CardPlaceholder,
-    Heading,
-    ListPlaceholder,
-    Secondary,
-    Skeleton,
-    TextPlaceholder,
-  } from "flowbite-svelte";
-  import { PlusOutline, MinusOutline, InfoCircleSolid } from "flowbite-svelte-icons";
+  import { Alert, Button, Card, Heading, Secondary, TextPlaceholder } from "flowbite-svelte";
+  import { InfoCircleSolid } from "flowbite-svelte-icons";
   import { type TransactionGroup } from "$lib/models/TransactionGroup.js";
-  import type { MovementType } from "$lib/models/MovementType.js";
-  import { NewMovement } from "$lib/forms/MovementForm/NewMovement.svelte.js";
   import { NewTransaction } from "$lib/forms/TransactionForm/NewTransaction.svelte.js";
+  import { NewMovement } from "$lib/forms/MovementForm/NewMovement.svelte.js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
 
-  let transaction: NewTransaction = $state(new NewTransaction());
-  transaction.date_value = new Date();
+  let initial_movements_from = data.from_account ? [new NewMovement(data.from_account, new Date())] : [];
+  let initial_movements_to = data.to_account ? [new NewMovement(data.to_account, new Date())] : [];
+
+  let transaction: NewTransaction = $state(
+    new NewTransaction(new Date(), initial_movements_from, initial_movements_to)
+  );
   let show_transaction_date = $state(true);
   let show_individual_dates = $derived(!show_transaction_date);
-
-  function add_movement_from(account?: Account) {
-    let new_mov = new NewMovement();
-    new_mov.account = account;
-    new_mov.date_value = new Date();
-    transaction.movements_from = transaction.movements_from.concat(new_mov);
-  }
-  function add_movement_to(account?: Account) {
-    let new_mov = new NewMovement();
-    new_mov.account = account;
-    new_mov.date_value = new Date();
-    transaction.movements_to = transaction.movements_to.concat(new_mov);
-  }
-
-  if (data.from_account) {
-    add_movement_from(data.from_account);
-  }
-
-  if (data.to_account) {
-    add_movement_to(data.to_account);
-  }
-
-  function remove_movement_from(index: number) {
-    let pre_list = transaction.movements_from.slice(0, index);
-    transaction.movements_from = pre_list.concat(
-      transaction.movements_from.slice(index + 1, transaction.movements_from.length)
-    );
-  }
-  function remove_movement_to(index: number) {
-    let pre_list = transaction.movements_to.slice(0, index);
-    transaction.movements_to = pre_list.concat(
-      transaction.movements_to.slice(index + 1, transaction.movements_to.length)
-    );
-  }
 
   let all_transaction_groups: TransactionGroup[] = [];
 
@@ -68,7 +25,7 @@
   let submit_disabled = $derived(!transaction.is_valid(show_transaction_date, data.base_ccy));
 
   function submit() {
-    // Send to the backend
+    // TODO: Send to the backend
     console.log(JSON.stringify(transaction));
   }
 
@@ -91,7 +48,7 @@
         <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold md:text-3xl lg:text-4xl">
           <div class="flex">
             <span> Source accounts </span>
-            <button onclick={() => add_movement_from()} class="ml-4">
+            <button onclick={() => transaction.add_movement_from()} class="ml-4">
               <Secondary class="text-xs">Add movement</Secondary>
             </button>
           </div>
@@ -108,7 +65,7 @@
             />
             <div class="flex flex-col text-right text-xs mt-2">
               <span class="font-semibold text-primary-500"
-                ><button onclick={() => remove_movement_from(i)}>Remove</button></span
+                ><button onclick={() => transaction.remove_movement_from(i)}>Remove</button></span
               >
             </div>
           </Card>
@@ -124,7 +81,7 @@
         <Heading tag="h2" class="mb-4" customSize="text-2xl font-extrabold  md:text-3xl lg:text-4xl">
           <div class="flex">
             <span> Target accounts </span>
-            <button onclick={() => add_movement_to()} class="ml-4">
+            <button onclick={() => transaction.add_movement_to()} class="ml-4">
               <Secondary class="text-xs">Add movement</Secondary>
             </button>
           </div>
@@ -140,7 +97,7 @@
             />
             <div class="flex flex-col text-right text-xs mt-2">
               <span class="font-semibold text-primary-500"
-                ><button onclick={() => remove_movement_to(i)}>Remove</button></span
+                ><button onclick={() => transaction.remove_movement_to(i)}>Remove</button></span
               >
             </div>
           </Card>

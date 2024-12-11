@@ -10,6 +10,11 @@ export class NewMovement {
     unit_value?: number = $state();
     fx?: number = $state();
 
+    constructor(account?: Account, date_value?: Date) {
+        this.account = account;
+        this.date_value = date_value;
+    }
+
     is_valid(date_required: boolean, base_ccy: string): boolean {
         return (this.account instanceof Account &&
             this.mov_type instanceof MovementType &&
