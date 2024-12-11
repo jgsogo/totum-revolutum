@@ -64,9 +64,18 @@
     <DropdownDivider />
     <DropdownItem
       class="flex items-center p-3 -mb-1 text-sm font-medium text-red-600 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-red-500 hover:underline"
-      onclick={handleClickCustodian}><CloseCircleOutline class="w-5 h-5 me-1" />All</DropdownItem
+      onclick={handleClickCustodian}
     >
+      <CloseCircleOutline class="w-5 h-5 me-1" />All
+    </DropdownItem>
   </Dropdown>
 
-  <Select required size="sm" class="rounded-none py-2.5" items={all_accounts_items} bind:value={account} placeholder="Choose account ..."/>
+  <Select
+    required
+    size="sm"
+    class="rounded-none py-2.5"
+    items={all_accounts_items}
+    bind:value={account}
+    placeholder="Choose account ..."
+  />
 </div>
