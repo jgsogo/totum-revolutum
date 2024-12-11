@@ -8,16 +8,20 @@ import type { Account } from '$lib/models/Account.js';
 export async function load({ params, parent, depends }) {
     depends('invalidate:account');
 
-    const { account } = await parent();
+    const { all_accounts_for_holder } = await parent();
 
-    // Get snapshots and movements
-    let snapshots = await get_account_snapshots(account);
-    let movements = await get_account_movements(account);
+    // Find the account for the input params
+    let account_pk = parseInt(params.account_pk, 10)
+    let account: Account | undefined = all_accounts_for_holder.find((acc: Account) => { return acc.pk == account_pk; });
+    if (!account) {
+        error(400, "Account not accessible for this Holder");
+    }
+
+    // Prefetch latest snapshot
+    await account.getLastSnapshot();
 
     return {
         account,
-        snapshots,
-        movements,
     };
 
 }

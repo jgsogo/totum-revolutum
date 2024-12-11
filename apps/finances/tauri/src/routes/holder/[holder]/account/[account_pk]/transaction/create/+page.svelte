@@ -29,8 +29,7 @@
     if (transaction.is_valid(show_transaction_date, data.base_ccy)) {
       await create_transaction(transaction);
       // TODO: Show error when it fails
-      // TODO: transaction/create is a child of some account/detail (we need the account here)
-      await goToAccountDetail(data.holder, 0);
+      await goToAccountDetail(data.holder, data.account);
     }
   };
 

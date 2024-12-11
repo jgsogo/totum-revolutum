@@ -87,7 +87,7 @@ fn create_transaction_movements(
             chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d")
                 .map_err(|e| CommandError::Other(format!("Error parsing date from string ({}): {e}", date_str)))?
         };
-        let fx_id = movement_from.fx.map(|_fx| 0i64); // FIXME: Create the fx and return pk
+        let fx_id = None; // movement_from.fx.map(|_fx| 0i64); // FIXME: Create the fx and return pk
 
         if account_numerable {
             let quantity: bigdecimal::BigDecimal = movement_from

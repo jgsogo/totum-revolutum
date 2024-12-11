@@ -70,14 +70,14 @@
                 </button>
                 <button
                   class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(holder, undefined, account)}
+                  onclick={() => goToTransactionCreate(holder, account, undefined, account)}
                 >
                   <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
                   Income
                 </button>
                 <button
                   class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(holder, account, undefined)}
+                  onclick={() => goToTransactionCreate(holder, account, account, undefined)}
                 >
                   <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
                   Expense
