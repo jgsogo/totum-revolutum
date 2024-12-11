@@ -18,5 +18,5 @@ pub use fx::Fx;
 pub use holder::Holder;
 pub use movement::Movement;
 pub use movement_type::MovementType;
-pub use snapshot::Snapshot;
+pub use snapshot::{NewSnapshot, Snapshot};
 pub use transaction::Transaction;

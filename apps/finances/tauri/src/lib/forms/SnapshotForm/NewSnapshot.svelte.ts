@@ -62,12 +62,16 @@ export class NewSnapshot {
     }
 
     toJSON() {
+        // This serialization is used when sending this structure via a command to the Tauri backend
+        let date = this.date_value?.toISOString().slice(0, 10);
         return {
-            account: this.account,
-            date_value: this.date_value,
-            amount: this.amount,
-            quantity: this.quantity,
-            unit_value: this.unit_value,
+            snapshot: {
+                account_pk: this.account.pk,
+                date_value: date,
+                amount: this.amount,
+                quantity: this.quantity,
+                unit_value: this.unit_value,
+            }
         };
     }
 };

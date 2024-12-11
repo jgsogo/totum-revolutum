@@ -285,8 +285,7 @@ export const get_base_ccy = async (): Promise<string> => {
  * @returns - A promise that resolves when the snapshot is created, or the error if it was not possible
  */
 export const create_snapshot = async (snapshot: NewSnapshot) => {
-    let date = snapshot.date_value.toISOString().slice(0, 10);
-    await invoke("create_snapshot", { accountPk: snapshot.account.pk, dateValue: date, amount: snapshot.amount, quantity: snapshot.quantity, unitValue: snapshot.unit_value });
+    await invoke("create_snapshot", snapshot.toJSON());
 }
 
 /** The data returned by the backend representing a MovementType */
@@ -321,5 +320,5 @@ export const get_all_movementtypes = async (): Promise<MovementType[]> => {
  * @returns {string[]} An ordered vector with the breadcrumbs
  */
 export const get_breadcrumbs_for_movementtype = async (movementtype: MovementType): Promise<string[]> => {
-    return await invoke("get_breadcrumbs_for_movementtype", {pk: movementtype.pk});
+    return await invoke("get_breadcrumbs_for_movementtype", { pk: movementtype.pk });
 };
