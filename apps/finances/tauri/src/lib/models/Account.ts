@@ -46,8 +46,8 @@ export class Account {
         this.category = category;
     }
 
-    async getLastSnapshot(): Promise<Snapshot> {
-        if (this._last_snapshot) {
+    async getLastSnapshot(force: boolean = false): Promise<Snapshot> {
+        if (!force && this._last_snapshot) {
             return this._last_snapshot;
         }
         this._last_snapshot = await get_account_snapshot_latest(this);
