@@ -12,7 +12,7 @@ mod account_type;
 pub use account_type::AccountType;
 
 mod fx;
-pub use fx::Fx;
+pub use fx::{Fx, NewFx};
 
 mod movement;
 mod movement_type;

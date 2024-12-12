@@ -1,4 +1,5 @@
 /// Application state
+#[derive(Clone)]
 pub struct AppState {
     pub postgres_url: String,
     pub base_url: String,

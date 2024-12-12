@@ -1,7 +1,8 @@
+use crate::state::AppState;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::models::{Account, NewMovement, NewTransaction};
+use finances_accounts::models::{Account, NewFx, NewMovement, NewTransaction};
 use finances_accounts::sql::filters::account_by_pk;
 use finances_investments::managers::create_movement_numerable;
 use finances_investments::models::NewMovementNumerable;
@@ -21,6 +22,7 @@ enum CommandError {
 #[tauri::command]
 pub fn create_transaction(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+    state: State<'_, AppState>,
     transaction: crate::models::NewTransaction,
 ) -> Result<usize, String> {
     info!("Create new transaction: {transaction:?}");
@@ -45,6 +47,7 @@ pub fn create_transaction(
         };
 
         let n_from = create_transaction_movements(
+            &state.base_ccy,
             conn,
             &transaction.movements_from,
             0, // FIXME: We want an enum here
@@ -52,6 +55,7 @@ pub fn create_transaction(
         )?;
 
         let n_to = create_transaction_movements(
+            &state.base_ccy,
             conn,
             &transaction.movements_to,
             1, // FIXME: We want an enum here
@@ -64,6 +68,7 @@ pub fn create_transaction(
 }
 
 fn create_transaction_movements(
+    base_ccy: &str,
     conn: &mut PgConnection,
     movements: &[crate::models::NewMovement],
     direction: i32,
@@ -71,15 +76,33 @@ fn create_transaction_movements(
 ) -> Result<usize, CommandError> {
     for mov in movements {
         // FIXME: Collect all the accounts instead of doing N queries
-        let account_numerable = Account::all()
-            .select(finances_accounts::schema::finances_accounts_account::is_numerable)
+        let (account_numerable, account_ccy) = Account::all()
+            .select((
+                finances_accounts::schema::finances_accounts_account::is_numerable,
+                finances_accounts::schema::finances_accounts_account::ccy,
+            ))
             .filter(account_by_pk(mov.account_pk))
-            .first::<bool>(conn)?;
+            .first::<(bool, String)>(conn)?;
 
         let date_value = chrono::NaiveDate::parse_from_str(&mov.date_value, "%Y-%m-%d")
             .map_err(|e| CommandError::Other(format!("Error parsing date from string ({}): {e}", mov.date_value)))?;
 
-        let fx_id = None; // mov.fx.map(|_fx| 0i64); // FIXME: Create the fx and return pk
+        let fx_id = mov.fx.map_or(Ok::<Option<i64>, CommandError>(None), |fx| {
+            let rate: bigdecimal::BigDecimal = fx.try_into().map_err(|e| {
+                CommandError::Other(format!("Cannot convert FX rate from f32 ({fx}) to BigDecimal: {e}",))
+            })?;
+            let new_fx = NewFx {
+                foreign: &account_ccy,
+                local: base_ccy,
+                rate: &rate,
+                date_value: &date_value,
+            };
+            let pk = diesel::insert_into(finances_accounts::schema::finances_accounts_fx::table)
+                .values(&new_fx)
+                .returning(finances_accounts::schema::finances_accounts_fx::id)
+                .get_result::<i64>(conn)?;
+            Ok(Some(pk))
+        })?;
 
         let (amount, quantity, unit_value) = mov
             .amount
