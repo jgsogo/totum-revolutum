@@ -4,6 +4,7 @@ use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
+use finances_accounts::fields::MovementDirection;
 use finances_accounts::models::{Account, NewFx, NewMovement, NewTransaction};
 use finances_accounts::sql::filters::account_by_pk;
 use finances_investments::managers::create_movement_numerable;
@@ -50,7 +51,7 @@ pub fn create_transaction(
             &state.base_ccy,
             conn,
             &transaction.movements_from,
-            0, // FIXME: We want an enum here
+            MovementDirection::Out,
             &transaction_pk,
         )?;
 
@@ -58,7 +59,7 @@ pub fn create_transaction(
             &state.base_ccy,
             conn,
             &transaction.movements_to,
-            1, // FIXME: We want an enum here
+            MovementDirection::In,
             &transaction_pk,
         )?;
 
@@ -79,7 +80,7 @@ fn create_transaction_movements(
     base_ccy: &str,
     conn: &mut PgConnection,
     movements: &[crate::models::NewMovement],
-    direction: i32,
+    direction: MovementDirection,
     transaction_pk: &i64,
 ) -> Result<bigdecimal::BigDecimal, CommandError> {
     let mut amount_totals = bigdecimal::BigDecimal::zero();

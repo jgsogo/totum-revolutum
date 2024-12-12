@@ -36,7 +36,7 @@ impl Movement {
 #[diesel(table_name = crate::schema::finances_accounts_movement)]
 pub struct NewMovement<'a> {
     pub amount: &'a NumericType,
-    pub direction: i32,
+    pub direction: MovementDirection,
     pub date_value: &'a chrono::NaiveDate,
     pub account_id: &'a i64,
     pub fx_id: Option<&'a i64>,
