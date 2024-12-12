@@ -33,7 +33,7 @@ impl From<MovementAndRelatedData> for Movement {
         let (movement, transaction, movement_type) = value;
         Self {
             amount: movement.amount.to_f32().unwrap(),
-            direction: movement.direction,
+            direction: movement.direction as i32,
             date_value: movement.date_value.format("%Y-%m-%d").to_string(),
             account: MovementAccount::Id(movement.account_id),
             fx: None,

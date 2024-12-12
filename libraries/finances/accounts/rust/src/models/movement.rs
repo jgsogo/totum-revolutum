@@ -3,6 +3,7 @@ use diesel::prelude::*;
 use crate::types::NumericType;
 
 use super::{Account, Fx, MovementType, Transaction};
+use crate::fields::MovementDirection;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, QueryableByName)]
 #[diesel(table_name = crate::schema::finances_accounts_movement)]
@@ -14,7 +15,7 @@ use super::{Account, Fx, MovementType, Transaction};
 pub struct Movement {
     pub id: i64,
     pub amount: NumericType,
-    pub direction: i32,
+    pub direction: MovementDirection,
     pub date_value: chrono::NaiveDate,
     pub account_id: i64,
     pub fx_id: Option<i64>,

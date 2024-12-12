@@ -3,6 +3,7 @@ from .account_holder import AccountHolder
 from .account_type import AccountType
 from .custodian import Custodian
 from .fx import Fx
+from .movement import Direction as MovementDirection
 from .movement import Movement
 from .movement_type import MovementType
 from .snapshot import Snapshot
@@ -19,5 +20,6 @@ __all__ = [
     "TransactionGroup",
     "Fx",
     "Movement",
+    "MovementDirection",
     "AccountHolderRole",
 ]

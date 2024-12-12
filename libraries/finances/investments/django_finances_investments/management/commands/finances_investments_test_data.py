@@ -6,6 +6,7 @@ from django_finances_accounts.models import (
     AccountHolderRole,
     AccountType,
     Custodian,
+    MovementDirection,
     MovementType,
     Transaction,
 )
@@ -113,7 +114,7 @@ class Command(BaseCommand):
         for i in range(3):
             mov = MovementNumerable(
                 amount=(i * 100),
-                direction=0,
+                direction=MovementDirection.IN,
                 date_value="2024-09-06",
                 account=account,
                 transaction=transaction,
