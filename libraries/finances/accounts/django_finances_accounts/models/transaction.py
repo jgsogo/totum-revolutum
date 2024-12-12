@@ -67,6 +67,14 @@ class TransactionGroup(models.Model):
             " For non recurring events, this is just the date of the single occurrence"
         )
     )
+    end = models.DateField(
+        blank=True,
+        null=True,
+        help_text=_(
+            "Recurring and non recurring groups can have a finish data. After it they won't"
+            " be listed when creating other transactions"
+        ),
+    )
 
     class Meta:
         ordering = ["name"]

@@ -2,7 +2,7 @@ use diesel::prelude::*;
 
 use finances_accounts::types::NumericType;
 
-use finances_accounts::models::Movement;
+use finances_accounts::models::{Movement, NewMovement};
 
 use diesel::deserialize::Result;
 use diesel::row::NamedRow;
@@ -40,4 +40,18 @@ where
             movement_numerable,
         })
     }
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::finances_investments_movementnumerable)]
+pub(crate) struct _NewMovementNumerable<'a> {
+    pub(crate) movement_ptr_id: &'a i64,
+    pub(crate) quantity: &'a NumericType,
+    pub(crate) unit_value: &'a NumericType,
+}
+
+pub struct NewMovementNumerable<'a> {
+    pub new_movement: &'a NewMovement<'a>,
+    pub quantity: &'a NumericType,
+    pub unit_value: &'a NumericType,
 }

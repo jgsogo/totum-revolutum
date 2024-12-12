@@ -64,8 +64,8 @@ class TransactionGroupModelAdmin(RenderChangeFormMixin, admin.ModelAdmin):
         " not overuse them. Ideally these groups will be used to create"
         " reports."
     )
-    list_display = ("name", "cadence", "start")
-    list_filter = ("cadence", "start")
+    list_display = ("name", "cadence", "start", "end")
+    list_filter = ("cadence", "start", "end")
 
 
 admin.site.register(TransactionGroup, TransactionGroupModelAdmin)

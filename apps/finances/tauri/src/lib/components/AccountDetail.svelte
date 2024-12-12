@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { Avatar, Card, Img, Modal } from "flowbite-svelte";
+  import { Avatar, Button, Card, Img, Modal } from "flowbite-svelte";
   import type { Account } from "$lib/models/Account";
   import type { Custodian } from "$lib/models/Custodian";
   import type { Snapshot } from "$lib/models/Snapshot";
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
-  import SnapshotForm from "$lib/forms/SnapshotForm.svelte";
+  import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
   import { goToTransactionCreate } from "$lib/utils";
   import type { Holder } from "$lib/models/Holder";
   import { create_snapshot } from "$lib/commands";
   import { invalidate } from "$app/navigation";
+  import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
 
   let {
     holder = $bindable(),
@@ -30,10 +31,15 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  const on_snapshot = async (date_value: Date, amount: number, quantity?: number, unit_value?: number) =>  {
-      await create_snapshot(account, date_value, amount, quantity, unit_value);
+  let newSnapshot = $state(new NewSnapshot(account));
+  const on_snapshot = async (e: MouseEvent) => {
+    e.preventDefault();
+    if (newSnapshot.isValid()) {
+      await create_snapshot(newSnapshot);
+      // TODO: Handle error if it fails to create the snapshot
       await invalidate("invalidate:account");
       snapshotModal = false;
+    }
   };
 </script>
 
@@ -64,14 +70,14 @@
                 </button>
                 <button
                   class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(holder, undefined, account)}
+                  onclick={() => goToTransactionCreate(holder, account, undefined, account)}
                 >
                   <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
                   Income
                 </button>
                 <button
                   class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(holder, account, undefined)}
+                  onclick={() => goToTransactionCreate(holder, account, account, undefined)}
                 >
                   <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
                   Expense
@@ -91,5 +97,10 @@
 </Card>
 
 <Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose={false}>
-  <SnapshotForm {account} {last_snapshot} {on_snapshot} />
+  <form>
+    <SnapshotForm bind:snapshot={newSnapshot} />
+    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">
+      Submit
+    </Button>
+  </form>
 </Modal>

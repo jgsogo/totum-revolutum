@@ -1,3 +1,4 @@
+use super::NewAmount;
 use bigdecimal::ToPrimitive;
 use serde::{Deserialize, Serialize};
 
@@ -16,4 +17,12 @@ impl From<finances_accounts::models::Snapshot> for Snapshot {
             date_value: value.date_value.format("%Y-%m-%d").to_string(),
         }
     }
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct NewSnapshot {
+    pub account_pk: i64,
+    pub date_value: String,
+    #[serde(flatten)]
+    pub amount: NewAmount,
 }

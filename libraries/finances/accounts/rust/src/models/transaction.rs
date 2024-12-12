@@ -20,3 +20,11 @@ impl Transaction {
         crate::schema::finances_accounts_transaction::table
     }
 }
+
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::finances_accounts_transaction)]
+pub struct NewTransaction<'a> {
+    pub name: &'a str,
+    pub description: Option<&'a str>,
+    pub group_id: Option<&'a i64>,
+}

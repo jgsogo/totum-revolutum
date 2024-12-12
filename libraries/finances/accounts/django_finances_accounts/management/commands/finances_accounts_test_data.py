@@ -15,6 +15,7 @@ from django_finances_accounts.models import (
     MovementType,
     Snapshot,
     Transaction,
+    TransactionGroup,
 )
 
 
@@ -28,6 +29,7 @@ class Command(BaseCommand):
         custodians = self.populate_custodians()
         accounts = self.populate_accounts(custodians=custodians)
         self.populate_snapshots(account=accounts[0])
+        self.populate_transaction_groups()
         transactions = self.populate_transactions()
         self.populate_movements(account=accounts[0], transactions=transactions)
         holders = self.populate_holders()
@@ -103,27 +105,40 @@ class Command(BaseCommand):
             ]
         )
 
-    def populate_transactions(self):
-        return Transaction.objects.bulk_create(
+    def populate_transaction_groups(self):
+        return TransactionGroup.objects.bulk_create(
             [
-                Transaction(pk=0, name="transaction0"),
-                Transaction(pk=1, name="transaction1"),
-                Transaction(pk=2, name="transaction2"),
+                TransactionGroup(pk=0, name="transaction_group0", start="2024-09-06"),
+                TransactionGroup(
+                    pk=1, name="transaction_group1", cadence="year", start="2024-09-06"
+                ),
+                TransactionGroup(
+                    pk=2, name="transaction_group2", start="2024-09-06", end="2024-10-10"
+                ),
             ]
         )
 
-    def populate_fxs(self, start_id: int):
+    def populate_transactions(self):
+        return Transaction.objects.bulk_create(
+            [
+                Transaction(name="transaction0"),
+                Transaction(name="transaction1"),
+                Transaction(name="transaction2"),
+            ]
+        )
+
+    def populate_fxs(self):
         return Fx.objects.bulk_create(
             [
-                Fx(pk=start_id, foreign="USD", local="EUR", rate=1, date_value="2024-09-06"),
-                Fx(pk=start_id + 1, foreign="USD", local="EUR", rate=2, date_value="2024-09-07"),
-                Fx(pk=start_id + 2, foreign="USD", local="EUR", rate=3, date_value="2024-09-08"),
-                Fx(pk=start_id + 3, foreign="USD", local="EUR", rate=4, date_value="2024-09-09"),
+                Fx(foreign="USD", local="EUR", rate=1, date_value="2024-09-06"),
+                Fx(foreign="USD", local="EUR", rate=2, date_value="2024-09-07"),
+                Fx(foreign="USD", local="EUR", rate=3, date_value="2024-09-08"),
+                Fx(foreign="USD", local="EUR", rate=4, date_value="2024-09-09"),
             ]
         )
 
     def populate_movements(self, account: Account, transactions: list):
-        fxs = self.populate_fxs(start_id=account.pk * 10)
+        fxs = self.populate_fxs()
 
         expense = MovementType.objects.get(unique_name=MovementTypeConstants.EXPENSE)
 
