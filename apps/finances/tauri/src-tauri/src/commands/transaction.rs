@@ -27,6 +27,8 @@ pub fn create_transaction(
 
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
+    // TODO: Validate amounts, is there a better place?
+
     conn.transaction(|conn| {
         // Create the transaction
         let transaction_pk = {

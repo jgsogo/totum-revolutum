@@ -121,9 +121,9 @@ class Command(BaseCommand):
     def populate_transactions(self):
         return Transaction.objects.bulk_create(
             [
-                Transaction(pk=0, name="transaction0"),
-                Transaction(pk=1, name="transaction1"),
-                Transaction(pk=2, name="transaction2"),
+                Transaction(name="transaction0"),
+                Transaction(name="transaction1"),
+                Transaction(name="transaction2"),
             ]
         )
 

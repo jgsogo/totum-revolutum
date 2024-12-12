@@ -46,6 +46,10 @@ fn test_queries() {
     }
 
     // Insert one more movement numerable
+    let transaction_id = Transaction::all()
+        .select(finances_accounts::schema::finances_accounts_transaction::id)
+        .first::<i64>(&mut conn)
+        .unwrap();
     let amount: bigdecimal::BigDecimal = 3f32.try_into().unwrap();
     let date_value = chrono::NaiveDate::parse_from_str("2024-09-10", "%Y-%m-%d").unwrap();
     let quantity: bigdecimal::BigDecimal = 5f32.try_into().unwrap();
@@ -66,7 +70,7 @@ fn test_queries() {
             account_id: &account_id,
             fx_id: None,
             type_id: &movement_type,
-            transaction_id: &0,
+            transaction_id: &transaction_id,
         },
         quantity: &quantity,
         unit_value: &unit_value,
