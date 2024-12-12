@@ -12,18 +12,18 @@ mod account_type;
 pub use account_type::AccountType;
 
 mod fx;
-pub use fx::Fx;
+pub use fx::{Fx, NewFx};
 
 mod movement;
 mod movement_type;
-pub use movement::Movement;
+pub use movement::{Movement, NewMovement};
 pub use movement_type::MovementType;
 
 mod snapshot;
 pub use snapshot::{NewSnapshot, Snapshot};
 
 mod transaction;
-pub use transaction::Transaction;
+pub use transaction::{NewTransaction, Transaction};
 
 mod transaction_group;
 pub use transaction_group::TransactionGroup;

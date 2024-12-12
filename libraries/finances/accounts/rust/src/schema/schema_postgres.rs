@@ -156,6 +156,7 @@ diesel::table! {
         #[max_length = 10]
         cadence -> Varchar,
         start -> Date,
+        end -> Nullable<Date>,
     }
 }
 

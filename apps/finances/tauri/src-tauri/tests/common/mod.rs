@@ -13,8 +13,10 @@ pub fn webview() -> WebviewWindow<MockRuntime> {
         "MKD".to_string(),
     );
 
-    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state);
-    app.manage(pool); // FIXME: The `.manage` inside `create_app` is not working for the mock.
+    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone());
+    // FIXME: The `.manage` inside `create_app` is not working for the mock.
+    app.manage(app_state);
+    app.manage(pool);
     tauri::WebviewWindowBuilder::new(&app, "main", Default::default())
         .build()
         .unwrap()

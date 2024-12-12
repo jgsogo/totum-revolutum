@@ -1,6 +1,7 @@
 use bigdecimal::ToPrimitive;
 use serde::{Deserialize, Serialize};
 
+use super::NewAmount;
 use crate::models::{Account, Fx, MovementType, Transaction};
 
 type MovementAndRelatedData = (
@@ -41,4 +42,15 @@ impl From<MovementAndRelatedData> for Movement {
             r#type: movement_type.into(),
         }
     }
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct NewMovement {
+    pub account_pk: i64,
+    pub movement_type_pk: i64,
+
+    pub date_value: String,
+    #[serde(flatten)]
+    pub amount: NewAmount,
+    pub fx: Option<f32>,
 }

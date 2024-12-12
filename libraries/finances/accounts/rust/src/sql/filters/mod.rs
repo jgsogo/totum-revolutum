@@ -99,3 +99,11 @@ pub fn snapshot_filter_account_by_pk(pk: i64) -> _ {
 pub fn accountholder_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_accountholder::id.eq(pk)
 }
+
+/// Returns a query fragment to filter all the [`TransactionGroup`]s that are active as of today (they don't have end date or it is later than today or equal)
+#[diesel::dsl::auto_type]
+pub fn transaction_group_active() -> _ {
+    crate::schema::finances_accounts_transactiongroup::end
+        .is_null()
+        .or(crate::schema::finances_accounts_transactiongroup::end.ge(diesel::dsl::today))
+}

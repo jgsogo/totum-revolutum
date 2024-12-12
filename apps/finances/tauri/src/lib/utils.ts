@@ -19,9 +19,9 @@ export async function goToAccountDetail(holder: Holder, account: Account) {
    *
    * @param holder Returns a promise that resolves when the Svelte navigates to the
    * Transaction create view. It uses {@link goto} under the hood.
-   * @param {Account} from - If provided, it prepolates transaction origin with this account
-   * @param {Account} to - If provided, it prepolates transaction target with this account
+   * @param {Account} from - If provided, it prepopulates transaction origin with this account
+   * @param {Account} to - If provided, it prepopulates transaction target with this account
    */
-export async function goToTransactionCreate(holder: Holder, from?: Account, to?: Account) {
-    await goto(`/holder/${holder.pk}/transaction/create?from=${from?.pk}&to=${to?.pk}`);
+export async function goToTransactionCreate(holder: Holder, account: Account, from?: Account, to?: Account) {
+    await goto(`/holder/${holder.pk}/account/${account.pk}/transaction/create?from=${from?.pk}&to=${to?.pk}`);
 }
