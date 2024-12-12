@@ -1,5 +1,7 @@
 use crate::state::AppState;
 use crate::types::ConnectionType;
+use bigdecimal::ToPrimitive;
+use bigdecimal::Zero;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::{Account, NewFx, NewMovement, NewTransaction};
@@ -24,12 +26,10 @@ pub fn create_transaction(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     state: State<'_, AppState>,
     transaction: crate::models::NewTransaction,
-) -> Result<usize, String> {
+) -> Result<f32, String> {
     info!("Create new transaction: {transaction:?}");
 
     let mut conn = pool.get().expect("Get a connection from the Pool");
-
-    // TODO: Validate amounts, is there a better place?
 
     conn.transaction(|conn| {
         // Create the transaction
@@ -46,7 +46,7 @@ pub fn create_transaction(
                 .get_result::<i64>(conn)?
         };
 
-        let n_from = create_transaction_movements(
+        let total_from = create_transaction_movements(
             &state.base_ccy,
             conn,
             &transaction.movements_from,
@@ -54,7 +54,7 @@ pub fn create_transaction(
             &transaction_pk,
         )?;
 
-        let n_to = create_transaction_movements(
+        let total_to = create_transaction_movements(
             &state.base_ccy,
             conn,
             &transaction.movements_to,
@@ -62,7 +62,15 @@ pub fn create_transaction(
             &transaction_pk,
         )?;
 
-        Ok(n_from + n_to)
+        if total_from != total_to {
+            Err(CommandError::Other(format!(
+                "Mismatched amounts, from {total_from} != to {total_to}"
+            )))
+        } else {
+            Ok(total_from
+                .to_f32()
+                .ok_or(CommandError::Other(format!("Cannot convert {total_from} back to f32")))?)
+        }
     })
     .map_err(|e: CommandError| e.to_string())
 }
@@ -73,7 +81,9 @@ fn create_transaction_movements(
     movements: &[crate::models::NewMovement],
     direction: i32,
     transaction_pk: &i64,
-) -> Result<usize, CommandError> {
+) -> Result<bigdecimal::BigDecimal, CommandError> {
+    let mut amount_totals = bigdecimal::BigDecimal::zero();
+
     for mov in movements {
         // FIXME: Collect all the accounts instead of doing N queries
         let (account_numerable, account_ccy) = Account::all()
@@ -87,27 +97,32 @@ fn create_transaction_movements(
         let date_value = chrono::NaiveDate::parse_from_str(&mov.date_value, "%Y-%m-%d")
             .map_err(|e| CommandError::Other(format!("Error parsing date from string ({}): {e}", mov.date_value)))?;
 
-        let fx_id = mov.fx.map_or(Ok::<Option<i64>, CommandError>(None), |fx| {
-            let rate: bigdecimal::BigDecimal = fx.try_into().map_err(|e| {
-                CommandError::Other(format!("Cannot convert FX rate from f32 ({fx}) to BigDecimal: {e}",))
-            })?;
-            let new_fx = NewFx {
-                foreign: &account_ccy,
-                local: base_ccy,
-                rate: &rate,
-                date_value: &date_value,
-            };
-            let pk = diesel::insert_into(finances_accounts::schema::finances_accounts_fx::table)
-                .values(&new_fx)
-                .returning(finances_accounts::schema::finances_accounts_fx::id)
-                .get_result::<i64>(conn)?;
-            Ok(Some(pk))
-        })?;
-
         let (amount, quantity, unit_value) = mov
             .amount
             .into_bigdecimals(account_numerable)
             .map_err(CommandError::Other)?;
+
+        let (fx_id, amount_base_ccy) = mov.fx.map_or(
+            Ok::<(Option<i64>, bigdecimal::BigDecimal), CommandError>((None, amount.clone())),
+            |fx| {
+                let rate: bigdecimal::BigDecimal = fx.try_into().map_err(|e| {
+                    CommandError::Other(format!("Cannot convert FX rate from f32 ({fx}) to BigDecimal: {e}",))
+                })?;
+                let new_fx = NewFx {
+                    foreign: &account_ccy,
+                    local: base_ccy,
+                    rate: &rate,
+                    date_value: &date_value,
+                };
+                let pk = diesel::insert_into(finances_accounts::schema::finances_accounts_fx::table)
+                    .values(&new_fx)
+                    .returning(finances_accounts::schema::finances_accounts_fx::id)
+                    .get_result::<i64>(conn)?;
+                Ok((Some(pk), amount.clone() / rate))
+            },
+        )?;
+
+        amount_totals += amount_base_ccy;
 
         let new_movement = NewMovement {
             account_id: &mov.account_pk,
@@ -132,5 +147,5 @@ fn create_transaction_movements(
                 .execute(conn)?;
         }
     }
-    Ok(movements.len())
+    Ok(amount_totals)
 }

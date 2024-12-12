@@ -127,18 +127,18 @@ class Command(BaseCommand):
             ]
         )
 
-    def populate_fxs(self, start_id: int):
+    def populate_fxs(self):
         return Fx.objects.bulk_create(
             [
-                Fx(pk=start_id, foreign="USD", local="EUR", rate=1, date_value="2024-09-06"),
-                Fx(pk=start_id + 1, foreign="USD", local="EUR", rate=2, date_value="2024-09-07"),
-                Fx(pk=start_id + 2, foreign="USD", local="EUR", rate=3, date_value="2024-09-08"),
-                Fx(pk=start_id + 3, foreign="USD", local="EUR", rate=4, date_value="2024-09-09"),
+                Fx(foreign="USD", local="EUR", rate=1, date_value="2024-09-06"),
+                Fx(foreign="USD", local="EUR", rate=2, date_value="2024-09-07"),
+                Fx(foreign="USD", local="EUR", rate=3, date_value="2024-09-08"),
+                Fx(foreign="USD", local="EUR", rate=4, date_value="2024-09-09"),
             ]
         )
 
     def populate_movements(self, account: Account, transactions: list):
-        fxs = self.populate_fxs(start_id=account.pk * 10)
+        fxs = self.populate_fxs()
 
         expense = MovementType.objects.get(unique_name=MovementTypeConstants.EXPENSE)
 

@@ -28,11 +28,11 @@ fn test_create_transaction() {
             movement_type_pk: movement_type_pk,
             date_value: "2024-12-10".to_string(),
             amount: NewAmount {
-                amount: Some(100f32),
+                amount: Some(200f32),
                 quantity: None,
                 unit_value: None,
             },
-            fx: None, // TODO: Add FX
+            fx: Some(2f32),
         }],
         movements_to: vec![NewMovement {
             account_pk: account_numerable,
@@ -48,12 +48,12 @@ fn test_create_transaction() {
     };
 
     let body = serde_json::to_value(transaction).unwrap();
-    let r = call_it::<usize>(
+    let r = call_it::<f32>(
         &webview,
         "create_transaction".to_string(),
         json!({ "transaction": body }),
     );
     assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-
+    assert_eq!(r.unwrap(), 100f32);
     // TODO: Test mismatch amounts
 }
