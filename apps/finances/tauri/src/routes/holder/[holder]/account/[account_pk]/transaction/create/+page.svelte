@@ -15,6 +15,7 @@
   let initial_movements_from = data.from_account ? [new NewMovement(data.from_account, new Date())] : [];
   let initial_movements_to = data.to_account ? [new NewMovement(data.to_account, new Date())] : [];
 
+  let common_date = $state(new Date());
   let transaction: NewTransaction = $state(
     new NewTransaction(new Date(), initial_movements_from, initial_movements_to)
   );
@@ -23,6 +24,10 @@
 
   // Form validation and submit
   let submit_disabled = $derived(!transaction.is_valid(show_transaction_date, data.base_ccy));
+
+  $effect(() => {
+    transaction.set_date(common_date);
+  });
 
   const submit = async (e: MouseEvent) => {
     e.preventDefault();
@@ -44,6 +49,7 @@
       <TransactionForm
         bind:transaction
         bind:show_date={show_transaction_date}
+        bind:date={common_date}
         all_transaction_groups={data.all_transaction_groups}
       />
     </Card>

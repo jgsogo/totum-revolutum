@@ -22,7 +22,6 @@ impl From<finances_accounts::models::Transaction> for Transaction {
 pub struct NewTransaction {
     pub name: String,
     pub description: Option<String>,
-    pub date_value: Option<String>,
     pub transaction_group_pk: Option<i64>,
     pub movements_from: Vec<NewMovement>,
     pub movements_to: Vec<NewMovement>,

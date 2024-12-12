@@ -7,10 +7,12 @@
   let {
     transaction = $bindable(),
     show_date = $bindable(),
+    date = $bindable(),
     all_transaction_groups,
   }: {
     transaction: NewTransaction;
     show_date: boolean;
+    date: Date;
     all_transaction_groups: TransactionGroup[];
   } = $props();
 
@@ -35,7 +37,7 @@
       {#if show_date}
         <Label class="space-y-2 pt-2">
           <span>Date value</span>
-          <Datepicker required bind:value={transaction.date_value} />
+          <Datepicker required bind:value={date} />
         </Label>
       {/if}
     </div>

@@ -49,7 +49,7 @@ pub struct NewMovement {
     pub account_pk: i64,
     pub movement_type_pk: i64,
 
-    pub date_value: Option<String>,
+    pub date_value: String,
     #[serde(flatten)]
     pub amount: NewAmount,
     pub fx: Option<f32>,

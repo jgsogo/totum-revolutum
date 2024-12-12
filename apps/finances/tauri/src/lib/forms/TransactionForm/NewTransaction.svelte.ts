@@ -8,14 +8,12 @@ import { NewMovement } from "../MovementForm/NewMovement.svelte";
 export class NewTransaction {
     name?: string = $state();
     description?: string = $state();
-    date_value?: Date = $state();
     transaction_group?: TransactionGroup = $state();
 
     movements_from: NewMovement[] = $state([]);
     movements_to: NewMovement[] = $state([]);
 
     constructor(date_value?: Date, initial_movements_from?: NewMovement[], initial_movements_to?: NewMovement[]) {
-        this.date_value = date_value;
         this.movements_from = initial_movements_from ?? [];
         this.movements_to = initial_movements_to ?? [];
     }
@@ -50,7 +48,6 @@ export class NewTransaction {
 
     is_valid(date_required: boolean, base_ccy: string): boolean {
         return (this.name !== undefined &&
-            (!date_required || (date_required && this.date_value instanceof Date)) &&
             this.movements_from.length > 0 &&
             this.movements_from.every((v) => v.is_valid(!date_required, base_ccy)) &&
             this.movements_to.length > 0 &&
@@ -80,13 +77,17 @@ export class NewTransaction {
         return total;
     }
 
+    // Assigns this date to all the movements
+    set_date(date: Date) {
+        this.movements_from.forEach((value) => value.date_value = date);
+        this.movements_to.forEach((value) => value.date_value = date);
+    }
+
     toJSON() {
         // This serialization is used when sending this structure via a command to the Tauri backend
-        let date = this.date_value?.toISOString().slice(0, 10);
         return {
             name: this.name,
             description: this.description,
-            date_value: date,
             transaction_group_pk: this.transaction_group?.pk,
             movements_from: this.movements_from.map((mov) => mov.toJSON()),
             movements_to: this.movements_to.map((mov) => mov.toJSON()),

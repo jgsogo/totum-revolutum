@@ -47,18 +47,14 @@ pub fn create_transaction(
             conn,
             &transaction.movements_from,
             0, // FIXME: We want an enum here
-            transaction.date_value.as_ref(),
             &transaction_pk,
-            insert_into_database,
         )?;
 
         let n_to = create_transaction_movements(
             conn,
             &transaction.movements_to,
             1, // FIXME: We want an enum here
-            transaction.date_value.as_ref(),
             &transaction_pk,
-            insert_into_database,
         )?;
 
         Ok(n_from + n_to)
@@ -66,31 +62,11 @@ pub fn create_transaction(
     .map_err(|e: CommandError| e.to_string())
 }
 
-enum InsertableMovement<'a> {
-    Numerable(NewMovementNumerable<'a>),
-    NonNumerable(NewMovement<'a>),
-}
-
-fn insert_into_database(conn: &mut PgConnection, insertable: &InsertableMovement) -> Result<usize, CommandError> {
-    match insertable {
-        InsertableMovement::Numerable(new_movement_numerable) => {
-            Ok(create_movement_numerable(conn, new_movement_numerable)?)
-        }
-        InsertableMovement::NonNumerable(new_movement) => Ok(diesel::insert_into(
-            finances_accounts::schema::finances_accounts_movement::table,
-        )
-        .values(new_movement)
-        .execute(conn)?),
-    }
-}
-
 fn create_transaction_movements(
     conn: &mut PgConnection,
     movements: &[crate::models::NewMovement],
     direction: i32,
-    transaction_date_value: Option<&String>,
     transaction_pk: &i64,
-    func: impl Fn(&mut PgConnection, &InsertableMovement) -> Result<usize, CommandError>,
 ) -> Result<usize, CommandError> {
     for mov in movements {
         // FIXME: Collect all the accounts instead of doing N queries
@@ -99,16 +75,9 @@ fn create_transaction_movements(
             .filter(account_by_pk(mov.account_pk))
             .first::<bool>(conn)?;
 
-        let date_value = {
-            let date_str = mov
-                .date_value
-                .as_ref()
-                .or(transaction_date_value)
-                .ok_or(CommandError::Other("Movement without date".to_string()))?;
+        let date_value = chrono::NaiveDate::parse_from_str(&mov.date_value, "%Y-%m-%d")
+            .map_err(|e| CommandError::Other(format!("Error parsing date from string ({}): {e}", mov.date_value)))?;
 
-            chrono::NaiveDate::parse_from_str(date_str, "%Y-%m-%d")
-                .map_err(|e| CommandError::Other(format!("Error parsing date from string ({}): {e}", date_str)))?
-        };
         let fx_id = None; // mov.fx.map(|_fx| 0i64); // FIXME: Create the fx and return pk
 
         let (amount, quantity, unit_value) = mov
@@ -126,17 +95,18 @@ fn create_transaction_movements(
             transaction_id: transaction_pk,
         };
 
-        let insertable = if account_numerable {
+        if account_numerable {
             let new_movement_numerable = NewMovementNumerable {
                 new_movement: &new_movement,
                 quantity: quantity.as_ref().expect("It has already been tested"),
                 unit_value: unit_value.as_ref().expect("It has already been tested"),
             };
-            InsertableMovement::Numerable(new_movement_numerable)
+            create_movement_numerable(conn, &new_movement_numerable)?;
         } else {
-            InsertableMovement::NonNumerable(new_movement)
-        };
-        func(conn, &insertable)?;
+            diesel::insert_into(finances_accounts::schema::finances_accounts_movement::table)
+                .values(&new_movement)
+                .execute(conn)?;
+        }
     }
-    Ok(0) // FIXME: Return the number of created movements
+    Ok(movements.len())
 }
