@@ -53,3 +53,104 @@ impl NewAmount {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_non_numerable_amount() {
+        {
+            let amount = NewAmount {
+                amount: Some(300f32),
+                quantity: None,
+                unit_value: None,
+            };
+
+            let (amount, quantity, unit_value) = amount.into_bigdecimals(false).unwrap();
+            assert!(quantity.is_none());
+            assert!(unit_value.is_none());
+            assert_eq!(amount, 300f32.try_into().unwrap());
+        }
+
+        // quantity and unit_value are ignored
+        {
+            let amount = NewAmount {
+                amount: Some(300f32),
+                quantity: Some(300f32),
+                unit_value: Some(300f32),
+            };
+
+            let (amount, quantity, unit_value) = amount.into_bigdecimals(false).unwrap();
+            assert!(quantity.is_none());
+            assert!(unit_value.is_none());
+            assert_eq!(amount, 300f32.try_into().unwrap());
+        }
+
+        // if amount is not given, it fails
+        {
+            let amount = NewAmount {
+                amount: None,
+                quantity: Some(300f32),
+                unit_value: Some(300f32),
+            };
+
+            let r = amount.into_bigdecimals(false);
+            assert!(r.is_err());
+        }
+    }
+
+    #[test]
+    fn test_numerable_amount() {
+        {
+            let amount = NewAmount {
+                amount: None,
+                quantity: Some(3f32),
+                unit_value: Some(100f32),
+            };
+
+            let (amount, quantity, unit_value) = amount.into_bigdecimals(true).unwrap();
+            assert!(quantity.is_some());
+            assert!(unit_value.is_some());
+            assert_eq!(amount, 300f32.try_into().unwrap());
+        }
+
+        // If 'amount' is given, it's ignored
+        {
+            let amount = NewAmount {
+                amount: Some(5000f32),
+                quantity: Some(3f32),
+                unit_value: Some(100f32),
+            };
+
+            let (amount, quantity, unit_value) = amount.into_bigdecimals(true).unwrap();
+            assert!(quantity.is_some());
+            assert!(unit_value.is_some());
+            assert_eq!(amount, 300f32.try_into().unwrap());
+        }
+
+        // If 'quantity' is missing, it fails
+        {
+            let amount = NewAmount {
+                amount: Some(5000f32),
+                quantity: None,
+                unit_value: Some(100f32),
+            };
+
+            let r = amount.into_bigdecimals(true);
+            assert!(r.is_err());
+        }
+
+        // If 'unit_value' is missing, it fails
+        {
+            let amount = NewAmount {
+                amount: Some(5000f32),
+                quantity: Some(100f32),
+                unit_value: None,
+            };
+
+            let r = amount.into_bigdecimals(true);
+            assert!(r.is_err());
+        }
+    }
+}
