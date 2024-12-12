@@ -19,41 +19,72 @@ fn test_create_transaction() {
         movs.into_iter().find(|m| m.name == "Tasas").unwrap().pk
     };
 
-    let transaction = NewTransaction {
-        name: "New transaction".to_string(),
-        description: Some("Some description".to_string()),
-        transaction_group_pk: None,
-        movements_from: vec![NewMovement {
-            account_pk: account_non_numerable,
-            movement_type_pk: movement_type_pk,
-            date_value: "2024-12-10".to_string(),
-            amount: NewAmount {
-                amount: Some(200f32),
-                quantity: None,
-                unit_value: None,
-            },
-            fx: Some(2f32),
-        }],
-        movements_to: vec![NewMovement {
-            account_pk: account_numerable,
-            movement_type_pk: movement_type_pk,
-            date_value: "2024-12-10".to_string(),
-            amount: NewAmount {
-                amount: None,
-                quantity: Some(10f32),
-                unit_value: Some(10f32),
-            },
-            fx: None,
-        }],
-    };
+    {
+        let transaction = NewTransaction {
+            name: "New transaction".to_string(),
+            description: Some("Some description".to_string()),
+            transaction_group_pk: None,
+            movements_from: vec![NewMovement {
+                account_pk: account_non_numerable,
+                movement_type_pk: movement_type_pk,
+                date_value: "2024-12-10".to_string(),
+                amount: NewAmount {
+                    amount: Some(200f32),
+                    quantity: None,
+                    unit_value: None,
+                },
+                fx: Some(2f32),
+            }],
+            movements_to: vec![NewMovement {
+                account_pk: account_numerable,
+                movement_type_pk: movement_type_pk,
+                date_value: "2024-12-10".to_string(),
+                amount: NewAmount {
+                    amount: None,
+                    quantity: Some(10f32),
+                    unit_value: Some(10f32),
+                },
+                fx: None,
+            }],
+        };
 
-    let body = serde_json::to_value(transaction).unwrap();
-    let r = call_it::<f32>(
-        &webview,
-        "create_transaction".to_string(),
-        json!({ "transaction": body }),
-    );
-    assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-    assert_eq!(r.unwrap(), 100f32);
-    // TODO: Test mismatch amounts
+        let body = serde_json::to_value(transaction).unwrap();
+        let r = call_it::<f32>(
+            &webview,
+            "create_transaction".to_string(),
+            json!({ "transaction": body }),
+        );
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
+        assert_eq!(r.unwrap(), 100f32);
+    }
+
+    // Test mismatch amounts
+    {
+        let transaction = NewTransaction {
+            name: "New transaction".to_string(),
+            description: Some("Some description".to_string()),
+            transaction_group_pk: None,
+            movements_from: vec![],
+            movements_to: vec![NewMovement {
+                account_pk: account_numerable,
+                movement_type_pk: movement_type_pk,
+                date_value: "2024-12-10".to_string(),
+                amount: NewAmount {
+                    amount: None,
+                    quantity: Some(10f32),
+                    unit_value: Some(10f32),
+                },
+                fx: None,
+            }],
+        };
+
+        let body = serde_json::to_value(transaction).unwrap();
+        let r = call_it::<f32>(
+            &webview,
+            "create_transaction".to_string(),
+            json!({ "transaction": body }),
+        );
+        assert!(r.is_err());
+        assert_eq!(r.unwrap_err(), "Mismatched amounts, from 0 != to 100");
+    }
 }
