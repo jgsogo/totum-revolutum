@@ -1,3 +1,4 @@
+use super::NewAmount;
 use bigdecimal::ToPrimitive;
 use serde::{Deserialize, Serialize};
 
@@ -22,7 +23,6 @@ impl From<finances_accounts::models::Snapshot> for Snapshot {
 pub struct NewSnapshot {
     pub account_pk: i64,
     pub date_value: String,
-    pub amount: Option<f32>,
-    pub quantity: Option<f32>,
-    pub unit_value: Option<f32>,
+    #[serde(flatten)]
+    pub amount: NewAmount,
 }

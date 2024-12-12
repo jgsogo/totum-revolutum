@@ -111,43 +111,10 @@ fn create_transaction_movements(
         };
         let fx_id = None; // mov.fx.map(|_fx| 0i64); // FIXME: Create the fx and return pk
 
-        let (amount, quantity, unit_value) = if !account_numerable {
-            let amount: bigdecimal::BigDecimal = mov
-                .amount
-                .ok_or(CommandError::Other("No amount for movement".to_string()))?
-                .try_into()
-                .map_err(|e| {
-                    CommandError::Other(format!(
-                        "Cannot convert amount f32 ({}) to BigDecimal: {e}",
-                        mov.amount.unwrap()
-                    ))
-                })?;
-            (amount, None, None)
-        } else {
-            let quantity: bigdecimal::BigDecimal = mov
-                .quantity
-                .ok_or(CommandError::Other("No quantity for movement".to_string()))?
-                .try_into()
-                .map_err(|e| {
-                    CommandError::Other(format!(
-                        "Cannot convert quantity f32 ({}) to BigDecimal: {e}",
-                        mov.quantity.unwrap()
-                    ))
-                })?;
-
-            let unit_value: bigdecimal::BigDecimal = mov
-                .unit_value
-                .ok_or(CommandError::Other("No unit_value for movement".to_string()))?
-                .try_into()
-                .map_err(|e| {
-                    CommandError::Other(format!(
-                        "Cannot convert unit_value f32 ({}) to BigDecimal: {e}",
-                        mov.unit_value.unwrap()
-                    ))
-                })?;
-
-            (&quantity * &unit_value, Some(quantity), Some(unit_value))
-        };
+        let (amount, quantity, unit_value) = mov
+            .amount
+            .into_bigdecimals(account_numerable)
+            .map_err(CommandError::Other)?;
 
         let new_movement = NewMovement {
             account_id: &mov.account_pk,

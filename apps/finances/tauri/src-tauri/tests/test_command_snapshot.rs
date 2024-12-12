@@ -1,4 +1,4 @@
-use finances_app_lib::models::{NewSnapshot, Snapshot};
+use finances_app_lib::models::{NewAmount, NewSnapshot, Snapshot};
 use serde_json::json;
 
 mod common;
@@ -25,9 +25,11 @@ fn test_snapshot() {
             let new_snapshot = NewSnapshot {
                 account_pk: account_id,
                 date_value: "2024-11-30".to_string(),
-                amount: Some(100f32),
-                quantity: None,
-                unit_value: None,
+                amount: NewAmount {
+                    amount: Some(100f32),
+                    quantity: None,
+                    unit_value: None,
+                },
             };
             json!({
                 "snapshot": serde_json::to_value(new_snapshot).unwrap(),
@@ -61,9 +63,11 @@ fn test_snapshot() {
             let new_snapshot = NewSnapshot {
                 account_pk: account_id,
                 date_value: "2024-11-30".to_string(),
-                amount: Some(300f32),
-                quantity: Some(3f32),
-                unit_value: Some(100f32),
+                amount: NewAmount {
+                    amount: Some(300f32), // This will be ignored
+                    quantity: Some(3f32),
+                    unit_value: Some(100f32),
+                },
             };
             json!({
                 "snapshot": serde_json::to_value(new_snapshot).unwrap(),

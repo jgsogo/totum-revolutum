@@ -22,44 +22,20 @@ pub fn create_snapshot(
         .first::<bool>(&mut conn)
         .map_err(|e| format!("Error loading account: {e}"))?;
 
-    let amount: bigdecimal::BigDecimal = snapshot.amount.ok_or("Amount expected")?.try_into().map_err(|e| {
-        format!(
-            "Cannot convert amount f32 ({}) to BigDecimal: {e}",
-            snapshot.amount.unwrap()
-        )
-    })?;
     let date_value = chrono::NaiveDate::parse_from_str(&snapshot.date_value, "%Y-%m-%d")
         .map_err(|e| format!("Error parsing date from string ({}): {e}", snapshot.date_value))?;
 
+    let (amount, quantity, unit_value) = snapshot.amount.into_bigdecimals(account_numerable)?;
+
     let r = if account_numerable {
         // Insert one more snapshot numerable
-        let quantity: bigdecimal::BigDecimal =
-            snapshot.quantity.ok_or("Quantity expected")?.try_into().map_err(|e| {
-                format!(
-                    "Cannot convert quantity f32 ({}) to BigDecimal: {e}",
-                    snapshot.quantity.unwrap()
-                )
-            })?;
-
-        let unit_value: bigdecimal::BigDecimal =
-            snapshot
-                .unit_value
-                .ok_or("UnitValue expected")?
-                .try_into()
-                .map_err(|e| {
-                    format!(
-                        "Cannot convert unit_value f32 ({}) to BigDecimal: {e}",
-                        snapshot.unit_value.unwrap()
-                    )
-                })?;
-
         create_snapshot_numerable(
             &mut conn,
             &snapshot.account_pk,
             &amount,
             &date_value,
-            &quantity,
-            &unit_value,
+            quantity.as_ref().expect("Already validated"),
+            unit_value.as_ref().expect("Already validated"),
         )
     } else {
         let new_snapshot = NewSnapshot {
