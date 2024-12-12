@@ -49,6 +49,7 @@ pub fn create_transaction(
             0, // FIXME: We want an enum here
             transaction.date_value.as_ref(),
             &transaction_pk,
+            insert_into_database,
         )?;
 
         let n_to = create_transaction_movements(
@@ -57,11 +58,30 @@ pub fn create_transaction(
             1, // FIXME: We want an enum here
             transaction.date_value.as_ref(),
             &transaction_pk,
+            insert_into_database,
         )?;
 
         Ok(n_from + n_to)
     })
     .map_err(|e: CommandError| e.to_string())
+}
+
+enum InsertableMovement<'a> {
+    Numerable(NewMovementNumerable<'a>),
+    NonNumerable(NewMovement<'a>),
+}
+
+fn insert_into_database(conn: &mut PgConnection, insertable: &InsertableMovement) -> Result<usize, CommandError> {
+    match insertable {
+        InsertableMovement::Numerable(new_movement_numerable) => {
+            Ok(create_movement_numerable(conn, new_movement_numerable)?)
+        }
+        InsertableMovement::NonNumerable(new_movement) => Ok(diesel::insert_into(
+            finances_accounts::schema::finances_accounts_movement::table,
+        )
+        .values(new_movement)
+        .execute(conn)?),
+    }
 }
 
 fn create_transaction_movements(
@@ -70,6 +90,7 @@ fn create_transaction_movements(
     direction: i32,
     transaction_date_value: Option<&String>,
     transaction_pk: &i64,
+    func: impl Fn(&mut PgConnection, &InsertableMovement) -> Result<usize, CommandError>,
 ) -> Result<usize, CommandError> {
     for mov in movements {
         // FIXME: Collect all the accounts instead of doing N queries
@@ -101,7 +122,7 @@ fn create_transaction_movements(
                         mov.amount.unwrap()
                     ))
                 })?;
-            (amount, (-1).into(), (-1).into())
+            (amount, None, None)
         } else {
             let quantity: bigdecimal::BigDecimal = mov
                 .quantity
@@ -125,7 +146,7 @@ fn create_transaction_movements(
                     ))
                 })?;
 
-            (&quantity * &unit_value, quantity, unit_value)
+            (&quantity * &unit_value, Some(quantity), Some(unit_value))
         };
 
         let new_movement = NewMovement {
@@ -138,19 +159,17 @@ fn create_transaction_movements(
             transaction_id: transaction_pk,
         };
 
-        if account_numerable {
+        let insertable = if account_numerable {
             let new_movement_numerable = NewMovementNumerable {
                 new_movement: &new_movement,
-                quantity: &quantity,
-                unit_value: &unit_value,
+                quantity: quantity.as_ref().expect("It has already been tested"),
+                unit_value: unit_value.as_ref().expect("It has already been tested"),
             };
-
-            create_movement_numerable(conn, &new_movement_numerable)?;
+            InsertableMovement::Numerable(new_movement_numerable)
         } else {
-            diesel::insert_into(finances_accounts::schema::finances_accounts_movement::table)
-                .values(&new_movement)
-                .execute(conn)?;
-        }
+            InsertableMovement::NonNumerable(new_movement)
+        };
+        func(conn, &insertable)?;
     }
     Ok(0) // FIXME: Return the number of created movements
 }
