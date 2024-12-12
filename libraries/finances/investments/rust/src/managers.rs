@@ -1,9 +1,10 @@
 //! Provides some helper queries that operate on actual instance (diesel is hidden):
 //! these functions takes data and return model instances.
 
+use crate::models::movement_numerable::_NewMovementNumerable;
 use crate::models::{NewMovementNumerable, NewSnapshotNumerable};
 use diesel::prelude::*;
-use finances_accounts::models::{NewMovement, NewSnapshot};
+use finances_accounts::models::NewSnapshot;
 use finances_accounts::types::NumericType;
 
 pub fn create_snapshot_numerable(
@@ -39,22 +40,19 @@ pub fn create_snapshot_numerable(
 
 pub fn create_movement_numerable(
     conn: &mut PgConnection,
-    new_movement: &NewMovement,
-    // for the numerable part
-    quantity: &NumericType,
-    unit_value: &NumericType,
+    new_movement_numerable: &NewMovementNumerable,
 ) -> Result<usize, diesel::result::Error> {
     // Insert one more movement numerable
     conn.transaction(|conn| {
         let inserted = diesel::insert_into(finances_accounts::schema::finances_accounts_movement::table)
-            .values(new_movement)
+            .values(new_movement_numerable.new_movement)
             .returning(finances_accounts::schema::finances_accounts_movement::id)
             .get_result(conn)?;
 
-        let new_movement_numerable = NewMovementNumerable {
+        let new_movement_numerable = _NewMovementNumerable {
             movement_ptr_id: &inserted,
-            quantity,
-            unit_value,
+            quantity: new_movement_numerable.quantity,
+            unit_value: new_movement_numerable.unit_value,
         };
         diesel::insert_into(crate::schema::finances_investments_movementnumerable::table)
             .values(&new_movement_numerable)

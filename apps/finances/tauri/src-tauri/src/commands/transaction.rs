@@ -4,6 +4,7 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::{Account, NewMovement, NewTransaction};
 use finances_accounts::sql::filters::account_by_pk;
 use finances_investments::managers::create_movement_numerable;
+use finances_investments::models::NewMovementNumerable;
 use log::info;
 use tauri::State;
 use thiserror::Error;
@@ -89,10 +90,22 @@ fn create_transaction_movements(
         };
         let fx_id = None; // mov.fx.map(|_fx| 0i64); // FIXME: Create the fx and return pk
 
-        if account_numerable {
+        let (amount, quantity, unit_value) = if !account_numerable {
+            let amount: bigdecimal::BigDecimal = mov
+                .amount
+                .ok_or(CommandError::Other("No amount for movement".to_string()))?
+                .try_into()
+                .map_err(|e| {
+                    CommandError::Other(format!(
+                        "Cannot convert amount f32 ({}) to BigDecimal: {e}",
+                        mov.amount.unwrap()
+                    ))
+                })?;
+            (amount, (-1).into(), (-1).into())
+        } else {
             let quantity: bigdecimal::BigDecimal = mov
                 .quantity
-                .ok_or(CommandError::Other("No qunatity for movement".to_string()))?
+                .ok_or(CommandError::Other("No quantity for movement".to_string()))?
                 .try_into()
                 .map_err(|e| {
                     CommandError::Other(format!(
@@ -112,41 +125,28 @@ fn create_transaction_movements(
                     ))
                 })?;
 
-            let amount: bigdecimal::BigDecimal = &quantity * &unit_value;
+            (&quantity * &unit_value, quantity, unit_value)
+        };
 
-            let new_movement = NewMovement {
-                account_id: &mov.account_pk,
-                amount: &amount,
-                date_value: &date_value,
-                direction,
-                fx_id: fx_id.as_ref(),
-                type_id: &mov.movement_type_pk,
-                transaction_id: transaction_pk,
+        let new_movement = NewMovement {
+            account_id: &mov.account_pk,
+            amount: &amount,
+            date_value: &date_value,
+            direction,
+            fx_id: fx_id.as_ref(),
+            type_id: &mov.movement_type_pk,
+            transaction_id: transaction_pk,
+        };
+
+        if account_numerable {
+            let new_movement_numerable = NewMovementNumerable {
+                new_movement: &new_movement,
+                quantity: &quantity,
+                unit_value: &unit_value,
             };
 
-            create_movement_numerable(conn, &new_movement, &quantity, &unit_value)?;
+            create_movement_numerable(conn, &new_movement_numerable)?;
         } else {
-            let amount: bigdecimal::BigDecimal = mov
-                .amount
-                .ok_or(CommandError::Other("No amount for movement".to_string()))?
-                .try_into()
-                .map_err(|e| {
-                    CommandError::Other(format!(
-                        "Cannot convert amount f32 ({}) to BigDecimal: {e}",
-                        mov.amount.unwrap()
-                    ))
-                })?;
-
-            let new_movement = NewMovement {
-                account_id: &mov.account_pk,
-                amount: &amount,
-                date_value: &date_value,
-                direction,
-                fx_id: fx_id.as_ref(),
-                type_id: &mov.movement_type_pk,
-                transaction_id: transaction_pk,
-            };
-
             diesel::insert_into(finances_accounts::schema::finances_accounts_movement::table)
                 .values(&new_movement)
                 .execute(conn)?;

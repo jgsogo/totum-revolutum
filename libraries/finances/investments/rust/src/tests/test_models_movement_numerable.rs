@@ -1,5 +1,5 @@
 use crate::managers::create_movement_numerable;
-use crate::models::MovementNumerable;
+use crate::models::{MovementNumerable, NewMovementNumerable};
 use crate::sql::queries::all_movementnumerable_for_account_id;
 use crate::test_utils::establish_connection;
 use diesel::prelude::*;
@@ -58,17 +58,21 @@ fn test_queries() {
         .get_result::<i64>(&mut conn)
         .unwrap();
 
-    let new_movement = NewMovement {
-        amount: &amount,
-        direction: 0,
-        date_value: &date_value,
-        account_id: &account_id,
-        fx_id: None,
-        type_id: &movement_type,
-        transaction_id: &0,
+    let new_movement_numerable = NewMovementNumerable {
+        new_movement: &NewMovement {
+            amount: &amount,
+            direction: 0,
+            date_value: &date_value,
+            account_id: &account_id,
+            fx_id: None,
+            type_id: &movement_type,
+            transaction_id: &0,
+        },
+        quantity: &quantity,
+        unit_value: &unit_value,
     };
 
-    create_movement_numerable(&mut conn, &new_movement, &quantity, &unit_value).unwrap();
+    create_movement_numerable(&mut conn, &new_movement_numerable).unwrap();
 
     let all: Vec<MovementNumerable> = all_movementnumerable_for_account_id()
         .bind::<diesel::sql_types::Int8, _>(account_id)
@@ -80,7 +84,7 @@ fn test_queries() {
     {
         let r: Result<(), diesel::result::Error> = conn.transaction(|conn| {
             // Here we create a movement inside this transaction
-            let r = create_movement_numerable(conn, &new_movement, &quantity, &unit_value);
+            let r = create_movement_numerable(conn, &new_movement_numerable);
             assert!(r.is_ok());
             // Here we raise an error inside the transaction
             Err(diesel::result::Error::NotFound)
