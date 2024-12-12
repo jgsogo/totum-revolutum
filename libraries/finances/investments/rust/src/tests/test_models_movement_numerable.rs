@@ -3,6 +3,7 @@ use crate::models::{MovementNumerable, NewMovementNumerable};
 use crate::sql::queries::all_movementnumerable_for_account_id;
 use crate::test_utils::establish_connection;
 use diesel::prelude::*;
+use finances_accounts::fields::MovementDirection;
 use finances_accounts::models::{Movement, MovementType, NewMovement, Transaction};
 use finances_accounts::sql::filters::{movement_filter_account_by_pk, movementtype_by_unique_name};
 
@@ -65,7 +66,7 @@ fn test_queries() {
     let new_movement_numerable = NewMovementNumerable {
         new_movement: &NewMovement {
             amount: &amount,
-            direction: 0,
+            direction: MovementDirection::In,
             date_value: &date_value,
             account_id: &account_id,
             fx_id: None,

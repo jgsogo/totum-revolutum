@@ -4,7 +4,6 @@ use diesel::deserialize::FromSql;
 use diesel::sql_types::Text;
 use diesel::FromSqlRow;
 
-// #[repr(i32)]
 #[derive(Debug, Clone, PartialEq, FromSqlRow)]
 pub struct TreeNodeList {
     pub nodes: Vec<i64>,

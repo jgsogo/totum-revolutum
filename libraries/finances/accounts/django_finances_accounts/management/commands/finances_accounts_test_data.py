@@ -12,6 +12,7 @@ from django_finances_accounts.models import (
     Custodian,
     Fx,
     Movement,
+    MovementDirection,
     MovementType,
     Snapshot,
     Transaction,
@@ -146,7 +147,7 @@ class Command(BaseCommand):
             [
                 Movement(
                     amount=0,
-                    direction=0,
+                    direction=MovementDirection.IN,
                     date_value="2024-09-06",
                     account=account,
                     fx=fxs[0],
@@ -155,7 +156,7 @@ class Command(BaseCommand):
                 ),
                 Movement(
                     amount=0,
-                    direction=0,
+                    direction=MovementDirection.IN,
                     date_value="2024-09-07",
                     account=account,
                     fx=fxs[1],
