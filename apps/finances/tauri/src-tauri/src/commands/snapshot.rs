@@ -5,6 +5,7 @@ use finances_accounts::models::Account;
 use finances_accounts::models::NewSnapshot;
 use finances_accounts::sql::filters::account_by_pk;
 use finances_investments::managers::create_snapshot_numerable;
+use finances_investments::models::NewSnapshotNumerable;
 use log::info;
 use tauri::State;
 
@@ -27,23 +28,20 @@ pub fn create_snapshot(
 
     let (amount, quantity, unit_value) = snapshot.amount.into_bigdecimals(account_numerable)?;
 
-    let r = if account_numerable {
-        // Insert one more snapshot numerable
-        create_snapshot_numerable(
-            &mut conn,
-            &snapshot.account_pk,
-            &amount,
-            &date_value,
-            quantity.as_ref().expect("Already validated"),
-            unit_value.as_ref().expect("Already validated"),
-        )
-    } else {
-        let new_snapshot = NewSnapshot {
-            account_id: &snapshot.account_pk,
-            amount: &amount,
-            date_value: &date_value,
-        };
+    let new_snapshot = NewSnapshot {
+        account_id: &snapshot.account_pk,
+        amount: &amount,
+        date_value: &date_value,
+    };
 
+    let r = if account_numerable {
+        let new_snapshot_numerable = NewSnapshotNumerable {
+            new_snapshot: &new_snapshot,
+            quantity: quantity.as_ref().expect("Already validated"),
+            unit_value: unit_value.as_ref().expect("Already validated"),
+        };
+        create_snapshot_numerable(&mut conn, &new_snapshot_numerable)
+    } else {
         diesel::insert_into(finances_accounts::schema::finances_accounts_snapshot::table)
             .values(&new_snapshot)
             .execute(&mut conn)

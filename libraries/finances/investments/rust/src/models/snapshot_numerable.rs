@@ -2,7 +2,7 @@ use diesel::prelude::*;
 
 use finances_accounts::types::NumericType;
 
-use finances_accounts::models::Snapshot;
+use finances_accounts::models::{NewSnapshot, Snapshot};
 
 use diesel::deserialize::Result;
 use diesel::row::NamedRow;
@@ -42,8 +42,14 @@ where
 
 #[derive(Insertable)]
 #[diesel(table_name = crate::schema::finances_investments_snapshotnumerable)]
-pub struct NewSnapshotNumerable<'a> {
+pub struct _NewSnapshotNumerable<'a> {
     pub snapshot_ptr_id: &'a i64,
+    pub quantity: &'a NumericType,
+    pub unit_value: &'a NumericType,
+}
+
+pub struct NewSnapshotNumerable<'a> {
+    pub new_snapshot: &'a NewSnapshot<'a>,
     pub quantity: &'a NumericType,
     pub unit_value: &'a NumericType,
 }

@@ -42,7 +42,6 @@ pub fn create_transaction(
                 .get_result::<i64>(conn)?
         };
 
-        // Create the movements from
         let n_from = create_transaction_movements(
             conn,
             &transaction.movements_from,

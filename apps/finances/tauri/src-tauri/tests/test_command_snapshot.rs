@@ -64,7 +64,7 @@ fn test_snapshot() {
                 account_pk: account_id,
                 date_value: "2024-11-30".to_string(),
                 amount: NewAmount {
-                    amount: Some(300f32), // This will be ignored
+                    amount: None,
                     quantity: Some(3f32),
                     unit_value: Some(100f32),
                 },
