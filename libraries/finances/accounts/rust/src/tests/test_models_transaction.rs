@@ -1,11 +1,10 @@
+use super::DB_POOL;
 use crate::models::{NewTransaction, Transaction};
-use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     // All transactions
     {
@@ -23,9 +22,6 @@ fn test_queries() {
         group_id: None,
     };
 
-    let r = diesel::insert_into(crate::schema::finances_accounts_transaction::table)
-        .values(&new_transaction)
-        .returning(crate::schema::finances_accounts_transaction::id)
-        .get_result::<i64>(&mut conn);
+    let r = new_transaction.insert_into_db(&mut conn);
     assert!(r.is_ok());
 }

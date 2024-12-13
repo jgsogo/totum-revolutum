@@ -25,7 +25,7 @@ tracing-subscriber = { workspace = true, optional = true }
 
 [dev-dependencies]
 finances_investments = { path = ".", default-features = false, features = ["test_utils"] }
-
+lazy_static = {workspace = true}
 
 # [[bin]]
 # name = "gen_constants"

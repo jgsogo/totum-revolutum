@@ -1,11 +1,10 @@
+use super::DB_POOL;
 use crate::models::{NewSnapshot, Snapshot};
-use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     let account_id = 0i64;
     // All snapshots
@@ -27,11 +26,7 @@ fn test_queries() {
             date_value: &date_value,
             account_id: &account_id,
         };
-        let inserted = diesel::insert_into(crate::schema::finances_accounts_snapshot::table)
-            .values(&new_snapshot)
-            .execute(&mut conn)
-            .unwrap();
-        assert_eq!(inserted, 1);
+        new_snapshot.insert_into_db(&mut conn).unwrap();
 
         // ... and now we have one more snapshot
         let all_snapshots = Snapshot::all()

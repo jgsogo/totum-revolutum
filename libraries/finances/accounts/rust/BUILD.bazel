@@ -69,6 +69,7 @@ rust_test(
     tags = ["manual"],
     deps = [
         "@crates_libraries//:anyhow",
+        "@crates_libraries//:lazy_static",
         "@crates_libraries//:tempfile",
     ],
 )

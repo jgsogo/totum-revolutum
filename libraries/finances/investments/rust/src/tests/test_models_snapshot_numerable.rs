@@ -1,14 +1,12 @@
-use crate::managers::create_snapshot_numerable;
+use super::DB_POOL;
 use crate::models::{NewSnapshotNumerable, SnapshotNumerable};
 use crate::sql::queries::all_snapshotnumerable_for_account_id;
-use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 use finances_accounts::models::NewSnapshot;
 
 #[test]
 fn test_queries() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     let account_id = 4;
 
@@ -35,7 +33,7 @@ fn test_queries() {
         quantity: &quantity,
         unit_value: &unit_value,
     };
-    create_snapshot_numerable(&mut conn, &new_snapshot_numerable).unwrap();
+    new_snapshot_numerable.insert_into_db(&mut conn).unwrap();
 
     let all: Vec<SnapshotNumerable> = all_snapshotnumerable_for_account_id()
         .bind::<diesel::sql_types::Int8, _>(account_id)

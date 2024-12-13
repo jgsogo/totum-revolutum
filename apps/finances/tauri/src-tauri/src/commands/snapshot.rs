@@ -4,7 +4,6 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::Account;
 use finances_accounts::models::NewSnapshot;
 use finances_accounts::sql::filters::account_by_pk;
-use finances_investments::managers::create_snapshot_numerable;
 use finances_investments::models::NewSnapshotNumerable;
 use log::info;
 use tauri::State;
@@ -13,7 +12,7 @@ use tauri::State;
 pub fn create_snapshot(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     snapshot: crate::models::NewSnapshot,
-) -> Result<usize, String> {
+) -> Result<i64, String> {
     info!("Create snapshot: {snapshot:?}");
 
     let mut conn = pool.get().expect("Get a connection from the Pool");
@@ -40,11 +39,9 @@ pub fn create_snapshot(
             quantity: quantity.as_ref().expect("Already validated"),
             unit_value: unit_value.as_ref().expect("Already validated"),
         };
-        create_snapshot_numerable(&mut conn, &new_snapshot_numerable)
+        new_snapshot_numerable.insert_into_db(&mut conn)
     } else {
-        diesel::insert_into(finances_accounts::schema::finances_accounts_snapshot::table)
-            .values(&new_snapshot)
-            .execute(&mut conn)
+        new_snapshot.insert_into_db(&mut conn)
     };
 
     r.map_err(|e| format!("Error inserting snapshot to database: {e}"))

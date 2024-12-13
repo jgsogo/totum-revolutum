@@ -1,12 +1,11 @@
+use super::DB_POOL;
 use crate::fields::MovementDirection;
 use crate::models::Movement;
-use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_movements() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     let movs = Movement::all()
         .select(Movement::as_select())

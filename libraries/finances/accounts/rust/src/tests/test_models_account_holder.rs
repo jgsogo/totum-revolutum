@@ -1,12 +1,11 @@
+use super::DB_POOL;
 use crate::models::{Account, AccountHolder};
 use crate::sql::filters::{account_by_pk, accountholder_by_pk};
-use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     {
         let all: i64 = AccountHolder::all()

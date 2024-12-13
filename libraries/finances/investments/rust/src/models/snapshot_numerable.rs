@@ -53,3 +53,21 @@ pub struct NewSnapshotNumerable<'a> {
     pub quantity: &'a NumericType,
     pub unit_value: &'a NumericType,
 }
+
+impl<'a> NewSnapshotNumerable<'a> {
+    pub fn insert_into_db(&self, conn: &mut PgConnection) -> std::result::Result<i64, diesel::result::Error> {
+        conn.transaction(|conn| {
+            let inner_snapshot_pk = self.new_snapshot.insert_into_db(conn)?;
+
+            let new_movement_numerable = _NewSnapshotNumerable {
+                snapshot_ptr_id: &inner_snapshot_pk,
+                quantity: self.quantity,
+                unit_value: self.unit_value,
+            };
+            diesel::insert_into(crate::schema::finances_investments_snapshotnumerable::table)
+                .values(&new_movement_numerable)
+                .returning(crate::schema::finances_investments_snapshotnumerable::snapshot_ptr_id)
+                .get_result::<i64>(conn)
+        })
+    }
+}

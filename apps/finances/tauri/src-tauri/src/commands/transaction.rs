@@ -7,7 +7,6 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::fields::MovementDirection;
 use finances_accounts::models::{Account, NewFx, NewMovement, NewTransaction};
 use finances_accounts::sql::filters::account_by_pk;
-use finances_investments::managers::create_movement_numerable;
 use finances_investments::models::NewMovementNumerable;
 use log::info;
 use tauri::State;
@@ -40,11 +39,7 @@ pub fn create_transaction(
                 description: transaction.description.as_deref(),
                 group_id: transaction.transaction_group_pk.as_ref(),
             };
-
-            diesel::insert_into(finances_accounts::schema::finances_accounts_transaction::table)
-                .values(&new_transaction)
-                .returning(finances_accounts::schema::finances_accounts_transaction::id)
-                .get_result::<i64>(conn)?
+            new_transaction.insert_into_db(conn)?
         };
 
         let total_from = create_transaction_movements(
@@ -115,10 +110,7 @@ fn create_transaction_movements(
                     rate: &rate,
                     date_value: &date_value,
                 };
-                let pk = diesel::insert_into(finances_accounts::schema::finances_accounts_fx::table)
-                    .values(&new_fx)
-                    .returning(finances_accounts::schema::finances_accounts_fx::id)
-                    .get_result::<i64>(conn)?;
+                let pk = new_fx.insert_into_db(conn)?;
                 Ok((Some(pk), amount.clone() / rate))
             },
         )?;
@@ -141,11 +133,9 @@ fn create_transaction_movements(
                 quantity: quantity.as_ref().expect("It has already been tested"),
                 unit_value: unit_value.as_ref().expect("It has already been tested"),
             };
-            create_movement_numerable(conn, &new_movement_numerable)?;
+            new_movement_numerable.insert_into_db(conn)?;
         } else {
-            diesel::insert_into(finances_accounts::schema::finances_accounts_movement::table)
-                .values(&new_movement)
-                .execute(conn)?;
+            new_movement.insert_into_db(conn)?;
         }
     }
     Ok(amount_totals)

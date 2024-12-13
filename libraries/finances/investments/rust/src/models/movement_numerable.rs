@@ -55,3 +55,21 @@ pub struct NewMovementNumerable<'a> {
     pub quantity: &'a NumericType,
     pub unit_value: &'a NumericType,
 }
+
+impl<'a> NewMovementNumerable<'a> {
+    pub fn insert_into_db(&self, conn: &mut PgConnection) -> std::result::Result<i64, diesel::result::Error> {
+        conn.transaction(|conn| {
+            let inner_movement_pk = self.new_movement.insert_into_db(conn)?;
+
+            let new_movement_numerable = _NewMovementNumerable {
+                movement_ptr_id: &inner_movement_pk,
+                quantity: self.quantity,
+                unit_value: self.unit_value,
+            };
+            diesel::insert_into(crate::schema::finances_investments_movementnumerable::table)
+                .values(&new_movement_numerable)
+                .returning(crate::schema::finances_investments_movementnumerable::movement_ptr_id)
+                .get_result::<i64>(conn)
+        })
+    }
+}

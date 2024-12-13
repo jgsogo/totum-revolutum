@@ -28,3 +28,12 @@ pub struct NewTransaction<'a> {
     pub description: Option<&'a str>,
     pub group_id: Option<&'a i64>,
 }
+
+impl<'a> NewTransaction<'a> {
+    pub fn insert_into_db(&self, conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {
+        diesel::insert_into(crate::schema::finances_accounts_transaction::table)
+            .values(self)
+            .returning(crate::schema::finances_accounts_transaction::id)
+            .get_result::<i64>(conn)
+    }
+}
