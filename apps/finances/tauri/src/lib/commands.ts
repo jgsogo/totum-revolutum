@@ -69,7 +69,7 @@ type SnapshotData = {
  */
 const _create_snapshot = function (account: Account, data: SnapshotData): Snapshot {
     if (account.pk !== data.account_id) throw new Error("Snapshot mismatch Account");
-    return new Snapshot(account.ccy, data.amount, data.date_value, data.quantity, data.unit_value);
+    return new Snapshot(account.ccy, data.amount, new Date(data.date_value), data.quantity, data.unit_value);
 }
 
 /**

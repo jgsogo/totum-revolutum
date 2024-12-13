@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { Account } from "$lib/models/Account";
-  import { Input, Label, ButtonGroup, InputAddon } from "flowbite-svelte";
+  import { Input, Label, ButtonGroup, InputAddon, Radio, Helper } from "flowbite-svelte";
   import { MovementType } from "$lib/models/MovementType";
   import AccountDropdown from "../AccountDropdown/AccountDropdown.svelte";
   import MovementTypeDropdown from "../MovementTypeDropdown/MovementTypeDropdown.svelte";
-  import type { NewMovement } from "./NewMovement.svelte";
+  import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
   import Datepicker from "../Datepicker.svelte";
+  import type { Snapshot } from "$lib/models/Snapshot";
 
   let {
     new_movement = $bindable(),
@@ -30,26 +31,93 @@
       return ccy;
     }
   }
+
+  const movement_types = Object.keys(NewMovementType)
+    .filter((v) => isNaN(Number(v)))
+    .map((key) => {
+      return { label: key, value: NewMovementType[key] };
+    });
+
+  async function handleDividendDateSelect(event) {
+    const choosen_date = event.detail;
+    // Get the closest (equal or before) snapshot to the given date
+    let snapshots = await new_movement.account?.snapshots();
+    let snapshot = snapshots?.find((s: Snapshot) => {
+      return s.date_value <= choosen_date;
+    });
+    new_movement.ex_dividend_snapshot = snapshot;
+  }
+
+  let total_str = $derived.by(() => {
+    let total = new_movement.total(base_ccy);
+    let symbol = ccy_symbol(base_ccy);
+    if (total === undefined) {
+      return `- ${symbol}`;
+    }
+
+    switch (new_movement.type) {
+      case NewMovementType.NonNumerable:
+        return `${total} ${symbol}`;
+      case NewMovementType.Numerable: {
+        return `${total} ${symbol} (${new_movement.quantity} x ${new_movement.unit_value} ${symbol})`;
+      }
+      case NewMovementType.Dividend: {
+        return `${total} ${symbol} (${new_movement.ex_dividend_snapshot?.quantity} x ${new_movement.unit_value} ${symbol})`;
+      }
+    }
+  });
 </script>
 
 <div class="flex flex-col space-y-6" action="#">
+  <!-- Radio button to choose the movement type -->
+  <ul
+    class="items-center w-full rounded-lg border border-gray-200 sm:flex dark:bg-gray-800 dark:border-gray-600 divide-x rtl:divide-x-reverse divide-gray-200 dark:divide-gray-600"
+  >
+    {#each movement_types as { label, value }, i}
+      <li class="w-full"><Radio bind:group={new_movement.type} {value} name="hor-list" class="p-3">{label}</Radio></li>
+    {/each}
+  </ul>
+
+  <!-- Common fields -->
   <AccountDropdown bind:account={new_movement.account} {all_accounts} />
   <MovementTypeDropdown bind:movementtype={new_movement.mov_type} {all_movementtypes} />
-
   {#if show_date}
     <Label class="space-y-2">
       <span>Date value</span>
       <Datepicker required bind:value={new_movement.date_value} />
     </Label>
   {/if}
+
   {#if new_movement.account}
     <div class="flex items-center w-full">
-      {#if new_movement.account.is_numerable}
-        <Label>
+      <!-- Different form fields depending on the type of movement we are creating -->
+      {#if new_movement.type === NewMovementType.NonNumerable}
+        <Label class="flex flex-col">
+          <span>Amount</span>
+          <ButtonGroup class="w-full">
+            <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <Input type="number" required placeholder="amount" bind:value={new_movement.amount} />
+          </ButtonGroup>
+        </Label>
+      {:else if new_movement.type === NewMovementType.Numerable}
+        <Label class="flex flex-col">
           <span>Quantity</span>
           <Input type="number" required placeholder="quantity" bind:value={new_movement.quantity} />
         </Label>
-        <Label class="ml-4">
+        <Label class="ml-4 flex flex-col">
+          <span>Unit value</span>
+          <ButtonGroup>
+            <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <Input type="number" required placeholder="unit_value" bind:value={new_movement.unit_value} />
+          </ButtonGroup>
+        </Label>
+      {:else if new_movement.type === NewMovementType.Dividend}
+        <Label class="flex flex-col">
+          <span>Ex dividend date</span>
+          <Datepicker required bind:value={new_movement.ex_dividend_date} on:select={handleDividendDateSelect} />
+          <Helper>snapshot @ {new_movement.ex_dividend_snapshot?.date_value}</Helper>
+        </Label>
+        <Label class="ml-4 flex flex-col">
           <span>Unit value</span>
           <ButtonGroup>
             <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
@@ -57,16 +125,11 @@
           </ButtonGroup>
         </Label>
       {:else}
-        <Label>
-          <span>Amount</span>
-          <ButtonGroup class="w-full">
-            <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
-            <Input type="number" required placeholder="amount" bind:value={new_movement.amount} />
-          </ButtonGroup>
-        </Label>
+        Invalid movement type {new_movement.account}
       {/if}
+
       {#if new_movement.account.ccy != base_ccy}
-        <Label class="ml-4">
+        <Label class="ml-4 flex flex-col">
           <span>FX</span>
           <ButtonGroup>
             <InputAddon>{ccy_symbol(base_ccy)}/{ccy_symbol(new_movement.account.ccy)}</InputAddon>
@@ -74,13 +137,10 @@
           </ButtonGroup>
         </Label>
       {/if}
-      <Label class="ml-4">
-        <span>Total</span>
-        <ButtonGroup>
-          <InputAddon>{ccy_symbol(base_ccy)}</InputAddon>
-          <Input disabled type="number" required value={new_movement.total(base_ccy)} />
-        </ButtonGroup>
-      </Label>
+    </div>
+
+    <div class="flex flex-col text-left text-xs mt-2">
+      <span class="font-semibold">Total: {total_str}</span>
     </div>
   {/if}
 </div>
