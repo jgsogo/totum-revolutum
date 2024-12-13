@@ -1,3 +1,4 @@
+use crate::sql::filters::custodian_by_pk;
 use diesel::prelude::*;
 
 #[derive(Queryable, Selectable, Identifiable, Debug, PartialEq)]
@@ -16,5 +17,14 @@ impl Custodian {
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn all() -> _ {
         crate::schema::finances_accounts_custodian::table
+    }
+}
+
+impl Custodian {
+    pub fn from_pk(pk: i64, conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
+        Self::all()
+            .filter(custodian_by_pk(pk))
+            .select(Custodian::as_select())
+            .first::<Custodian>(conn)
     }
 }

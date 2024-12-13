@@ -1,14 +1,12 @@
+use super::DB_POOL;
 use crate::constants;
-use crate::managers::get_breadcrumbs_for_movementtype;
 use crate::models::MovementType;
 use crate::sql::filters::movementtype_by_unique_name;
-use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_breadcrumbs() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     let assets_current = MovementType::all()
         .filter(movementtype_by_unique_name(
@@ -18,7 +16,7 @@ fn test_breadcrumbs() {
         .get_result::<MovementType>(&mut conn)
         .unwrap();
 
-    let breadcrumbs = get_breadcrumbs_for_movementtype(&mut conn, &assets_current).unwrap();
+    let breadcrumbs = assets_current.get_breadcrumbs(&mut conn).unwrap();
     assert_eq!(breadcrumbs.len(), 3);
     assert_eq!(
         breadcrumbs,

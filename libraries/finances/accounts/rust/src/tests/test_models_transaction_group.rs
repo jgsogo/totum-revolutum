@@ -1,11 +1,10 @@
+use super::DB_POOL;
 use crate::models::TransactionGroup;
-use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     let all_transaction_groups = TransactionGroup::all()
         .select(TransactionGroup::as_select())

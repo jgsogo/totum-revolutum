@@ -1,15 +1,13 @@
+use super::DB_POOL;
 use crate::constants;
 use crate::fields::TreeNodeList;
-use crate::managers::get_breadcrumbs_for_accounttype;
 use crate::models::AccountType;
 use crate::sql::filters::acounttype_by_unique_name;
-use crate::test_utils::establish_connection;
 use diesel::prelude::*;
 
 #[test]
 fn test_queries() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     // All account types
     {
@@ -24,8 +22,7 @@ fn test_queries() {
 
 #[test]
 fn test_ancestors() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     // Check all
     {
@@ -72,8 +69,7 @@ fn test_ancestors() {
 
 #[test]
 fn test_children() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     // Check all
     {
@@ -121,8 +117,7 @@ fn test_children() {
 
 #[test]
 fn test_descendants() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     // Check all
     {
@@ -164,8 +159,7 @@ fn test_descendants() {
 
 #[test]
 fn test_breadcrumbs() {
-    let pool = establish_connection();
-    let mut conn = pool.get().unwrap();
+    let mut conn = DB_POOL.get().unwrap();
 
     let assets_current = AccountType::all()
         .filter(acounttype_by_unique_name(constants::accounttype::ASSETS_CURRENT))
@@ -173,7 +167,7 @@ fn test_breadcrumbs() {
         .get_result::<AccountType>(&mut conn)
         .unwrap();
 
-    let breadcrumbs = get_breadcrumbs_for_accounttype(&mut conn, &assets_current).unwrap();
+    let breadcrumbs = assets_current.get_breadcrumbs(&mut conn).unwrap();
     assert_eq!(breadcrumbs.len(), 2);
     assert_eq!(breadcrumbs, ["Activos".to_string(), "Corrientes".to_string()]);
 }

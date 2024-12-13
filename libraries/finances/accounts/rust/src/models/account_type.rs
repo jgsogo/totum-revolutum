@@ -1,4 +1,6 @@
 use crate::fields::TreeNodeList;
+use crate::sql::filters::accounttype_by_pks;
+use crate::utils::reorder_breadcrumbs;
 use diesel::prelude::*;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
@@ -28,5 +30,21 @@ impl AccountType {
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn all() -> _ {
         crate::schema::finances_accounts_accounttype::table
+    }
+}
+
+impl AccountType {
+    pub fn get_breadcrumbs(&self, conn: &mut PgConnection) -> Result<Vec<String>, diesel::result::Error> {
+        let me_pk = vec![self.id];
+        let all_pks = [self.tn_ancestors_pks.nodes.clone(), me_pk].concat();
+        let breadcrumbs = Self::all()
+            .filter(accounttype_by_pks(&all_pks))
+            .select((
+                crate::schema::finances_accounts_accounttype::id,
+                crate::schema::finances_accounts_accounttype::name,
+            ))
+            .load::<(i64, String)>(conn)?;
+
+        Ok(reorder_breadcrumbs(breadcrumbs, &all_pks))
     }
 }
