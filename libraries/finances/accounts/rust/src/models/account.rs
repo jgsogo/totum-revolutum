@@ -1,7 +1,12 @@
 use diesel::prelude::*;
 
 use super::{AccountType, Custodian};
+use crate::fields::MovementDirection;
+use crate::models::{AccountHolderRole, Movement, MovementType, Snapshot, Transaction};
+use crate::sql::filters::{account_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk};
 use crate::sql::filters::{account_closed, account_opened};
+use crate::types::NumericType;
+use bigdecimal::Zero;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::finances_accounts_account)]
@@ -40,5 +45,151 @@ impl Account {
         crate::schema::finances_accounts_account::close
             .is_null()
             .or(crate::schema::finances_accounts_account::close.ge(diesel::dsl::today))
+    }
+}
+
+impl Account {
+    pub fn from_pk(pk: i64, conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
+        Self::all()
+            .filter(account_by_pk(pk))
+            .select(Account::as_select())
+            .first::<Account>(conn)
+    }
+
+    pub fn details_for_pk(
+        pk: i64,
+        conn: &mut PgConnection,
+    ) -> Result<(Account, AccountHolderRole, Custodian, AccountType), diesel::result::Error> {
+        Self::all()
+            .inner_join(
+                crate::schema::finances_accounts_accountholderrole::table
+                    .inner_join(crate::schema::finances_accounts_accountholder::table),
+            )
+            .inner_join(Custodian::all())
+            .inner_join(AccountType::all())
+            .select((
+                Account::as_select(),
+                AccountHolderRole::as_select(),
+                Custodian::as_select(),
+                AccountType::as_select(),
+            ))
+            .filter(account_by_pk(pk))
+            .first::<(Account, AccountHolderRole, Custodian, AccountType)>(conn)
+    }
+
+    pub fn details(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<(AccountHolderRole, Custodian, AccountType), diesel::result::Error> {
+        Self::all()
+            .inner_join(
+                crate::schema::finances_accounts_accountholderrole::table
+                    .inner_join(crate::schema::finances_accounts_accountholder::table),
+            )
+            .inner_join(Custodian::all())
+            .inner_join(AccountType::all())
+            .select((
+                // Account::as_select(),
+                AccountHolderRole::as_select(),
+                Custodian::as_select(),
+                AccountType::as_select(),
+            ))
+            .filter(account_by_pk(self.id))
+            .first::<(AccountHolderRole, Custodian, AccountType)>(conn)
+    }
+
+    pub fn latest_snapshot_for_pk(pk: i64, conn: &mut PgConnection) -> Result<Option<Snapshot>, diesel::result::Error> {
+        Snapshot::all()
+            .filter(snapshot_filter_account_by_pk(pk))
+            .first(conn)
+            .optional()
+    }
+    pub fn latest_snapshot(&self, conn: &mut PgConnection) -> Result<Option<Snapshot>, diesel::result::Error> {
+        Self::latest_snapshot_for_pk(self.id, conn)
+    }
+
+    pub fn snapshots_for_pk(pk: i64, conn: &mut PgConnection) -> Result<Vec<Snapshot>, diesel::result::Error> {
+        Snapshot::all().filter(snapshot_filter_account_by_pk(pk)).load(conn)
+    }
+
+    pub fn snapshots(&self, conn: &mut PgConnection) -> Result<Vec<Snapshot>, diesel::result::Error> {
+        Self::snapshots_for_pk(self.id, conn)
+    }
+
+    pub fn movements_for_pk(
+        pk: i64,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(Movement, Transaction, MovementType)>, diesel::result::Error> {
+        Movement::all()
+            .filter(movement_filter_account_by_pk(pk))
+            .inner_join(Transaction::all())
+            .inner_join(MovementType::all())
+            .select((
+                Movement::as_select(),
+                Transaction::as_select(),
+                MovementType::as_select(),
+            ))
+            .load::<(Movement, Transaction, MovementType)>(conn)
+    }
+
+    pub fn movements(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(Movement, Transaction, MovementType)>, diesel::result::Error> {
+        Self::movements_for_pk(self.id, conn)
+    }
+
+    pub fn position_for_pk(
+        pk: i64,
+        conn: &mut PgConnection,
+        date: &chrono::NaiveDate,
+    ) -> Result<NumericType, diesel::result::Error> {
+        // Get latest snapshot for the given date
+        let snapshot: Option<Snapshot> = Snapshot::all()
+            .filter(snapshot_filter_account_by_pk(pk))
+            .filter(crate::schema::finances_accounts_snapshot::date_value.le(date))
+            .first(conn)
+            .optional()?;
+
+        // Get all movements between the closest snapshot and the requested date
+        let movs: Vec<(NumericType, MovementDirection)> = match snapshot {
+            Some(ref snapshot) => {
+                Movement::all()
+                    .filter(movement_filter_account_by_pk(pk))
+                    .filter(crate::schema::finances_accounts_movement::date_value.gt(snapshot.date_value)) // We consider that the snapshot is taken EOD
+                    .filter(crate::schema::finances_accounts_movement::date_value.le(date))
+                    .select((
+                        crate::schema::finances_accounts_movement::amount,
+                        crate::schema::finances_accounts_movement::direction,
+                    ))
+                    .load::<(NumericType, MovementDirection)>(conn)?
+            }
+            None => Movement::all()
+                .filter(movement_filter_account_by_pk(pk))
+                .filter(crate::schema::finances_accounts_movement::date_value.le(date))
+                .select((
+                    crate::schema::finances_accounts_movement::amount,
+                    crate::schema::finances_accounts_movement::direction,
+                ))
+                .load::<(NumericType, MovementDirection)>(conn)?,
+        };
+
+        let initial_position: NumericType = snapshot.map_or(NumericType::zero(), |v| v.amount);
+        let position = movs.into_iter().fold(initial_position, |total, v| {
+            let (amount, direction) = v;
+            match direction {
+                MovementDirection::In => total + amount,
+                MovementDirection::Out => total - amount,
+            }
+        });
+        Ok(position)
+    }
+
+    pub fn position(
+        &self,
+        conn: &mut PgConnection,
+        date: &chrono::NaiveDate,
+    ) -> Result<NumericType, diesel::result::Error> {
+        Self::position_for_pk(self.id, conn, date)
     }
 }

@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 
 use super::Account;
+use crate::sql::filters::accountholder_by_pk;
 
 #[derive(Queryable, Selectable, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::finances_accounts_accountholder)]
@@ -29,5 +30,14 @@ impl AccountHolder {
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn all() -> _ {
         crate::schema::finances_accounts_accountholder::table
+    }
+}
+
+impl AccountHolder {
+    pub fn from_pk(pk: i64, conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
+        Self::all()
+            .filter(accountholder_by_pk(pk))
+            .select(AccountHolder::as_select())
+            .first::<AccountHolder>(conn)
     }
 }
