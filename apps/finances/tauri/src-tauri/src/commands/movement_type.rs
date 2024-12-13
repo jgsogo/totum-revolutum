@@ -1,7 +1,6 @@
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::managers;
 use finances_accounts::models::MovementType;
 use finances_accounts::sql::filters::movementtype_by_pk;
 use tauri::State;
@@ -37,6 +36,7 @@ pub fn get_breadcrumbs_for_movementtype(
         .first::<MovementType>(&mut conn)
         .map_err(|e| format!("Error loading movement type: {}", e))?;
 
-    managers::get_breadcrumbs_for_movementtype(&mut conn, &movementtype)
+    movementtype
+        .get_breadcrumbs(&mut conn)
         .map_err(|e| format!("Error getting the breadcrumbs: {}", e))
 }

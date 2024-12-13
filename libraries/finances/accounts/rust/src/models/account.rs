@@ -41,10 +41,4 @@ impl Account {
             .is_null()
             .or(crate::schema::finances_accounts_account::close.ge(diesel::dsl::today))
     }
-
-    // /// Returns a query fragment to filter all the [`Account`]s that are owned by ME
-    // #[diesel::dsl::auto_type(no_type_alias)]
-    // pub fn mine() -> _ {
-    //     crate::schema::data_accountholder::owner.eq(0i32)
-    // }
 }

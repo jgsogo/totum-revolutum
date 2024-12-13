@@ -1,6 +1,5 @@
 use crate::constants;
 use crate::fields::TreeNodeList;
-use crate::managers::get_breadcrumbs_for_accounttype;
 use crate::models::AccountType;
 use crate::sql::filters::acounttype_by_unique_name;
 use crate::test_utils::establish_connection;
@@ -173,7 +172,7 @@ fn test_breadcrumbs() {
         .get_result::<AccountType>(&mut conn)
         .unwrap();
 
-    let breadcrumbs = get_breadcrumbs_for_accounttype(&mut conn, &assets_current).unwrap();
+    let breadcrumbs = assets_current.get_breadcrumbs(&mut conn).unwrap();
     assert_eq!(breadcrumbs.len(), 2);
     assert_eq!(breadcrumbs, ["Activos".to_string(), "Corrientes".to_string()]);
 }

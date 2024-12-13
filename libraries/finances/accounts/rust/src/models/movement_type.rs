@@ -1,6 +1,8 @@
 use diesel::prelude::*;
 
 use crate::fields::TreeNodeList;
+use crate::sql::filters::movementtype_by_pks;
+use crate::utils::reorder_breadcrumbs;
 
 #[derive(Queryable, Selectable, Identifiable, Associations, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::finances_accounts_movementtype)]
@@ -23,5 +25,21 @@ impl MovementType {
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn all() -> _ {
         crate::schema::finances_accounts_movementtype::table
+    }
+}
+
+impl MovementType {
+    pub fn get_breadcrumbs(&self, conn: &mut PgConnection) -> Result<Vec<String>, diesel::result::Error> {
+        let me_pk = vec![self.id];
+        let all_pks = [self.tn_ancestors_pks.nodes.clone(), me_pk].concat();
+        let breadcrumbs = Self::all()
+            .filter(movementtype_by_pks(&all_pks))
+            .select((
+                crate::schema::finances_accounts_movementtype::id,
+                crate::schema::finances_accounts_movementtype::name,
+            ))
+            .load::<(i64, String)>(conn)?;
+
+        Ok(reorder_breadcrumbs(breadcrumbs, &all_pks))
     }
 }

@@ -10,5 +10,5 @@ mod tests;
 pub mod test_utils;
 
 pub mod constants;
-pub mod managers;
 pub mod sql;
+pub mod utils;
