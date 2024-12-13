@@ -20,9 +20,9 @@ pub struct _SnapshotNumerable {
 
 pub struct SnapshotNumerable {
     #[allow(dead_code)]
-    snapshot: Snapshot,
+    pub snapshot: Snapshot,
     #[allow(dead_code)]
-    snapshot_numerable: _SnapshotNumerable,
+    pub snapshot_numerable: _SnapshotNumerable,
 }
 
 impl QueryableByName<finances_accounts::types::BackendType> for SnapshotNumerable

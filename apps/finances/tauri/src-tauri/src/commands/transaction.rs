@@ -93,6 +93,8 @@ fn create_transaction_movements(
         let date_value = chrono::NaiveDate::parse_from_str(&mov.date_value, "%Y-%m-%d")
             .map_err(|e| CommandError::Other(format!("Error parsing date from string ({}): {e}", mov.date_value)))?;
 
+        // TODO: Now I need to match the movement type
+        // todo!("Match movement type");
         let (amount, quantity, unit_value) = mov
             .amount
             .into_bigdecimals(account_numerable)

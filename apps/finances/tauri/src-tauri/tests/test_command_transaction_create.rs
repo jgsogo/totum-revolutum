@@ -34,6 +34,9 @@ fn test_create_transaction() {
                     unit_value: None,
                 },
                 fx: Some(2f32),
+                r#type: "it should be an enum".to_string(),
+                ex_dividend_date: None,
+                ex_dividend_snapshot_pk: None,
             }],
             movements_to: vec![NewMovement {
                 account_pk: account_numerable,
@@ -45,6 +48,9 @@ fn test_create_transaction() {
                     unit_value: Some(10f32),
                 },
                 fx: None,
+                r#type: "it should be an enum".to_string(),
+                ex_dividend_date: None,
+                ex_dividend_snapshot_pk: None,
             }],
         };
 
@@ -75,6 +81,9 @@ fn test_create_transaction() {
                     unit_value: Some(10f32),
                 },
                 fx: None,
+                r#type: "it should be an enum".to_string(),
+                ex_dividend_date: None,
+                ex_dividend_snapshot_pk: None,
             }],
         };
 

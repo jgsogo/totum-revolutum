@@ -34,6 +34,8 @@ pub fn all_snapshotnumerable_for_account_id() -> SqlQuery {
             finances_accounts_snapshot.id = finances_investments_snapshotnumerable.snapshot_ptr_id
         WHERE
             finances_accounts_snapshot.account_id = $1
+        ORDER BY
+            finances_accounts_snapshot.date_value DESC
     "#,
     )
 }

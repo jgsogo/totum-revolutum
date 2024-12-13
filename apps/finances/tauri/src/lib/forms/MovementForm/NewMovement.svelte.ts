@@ -62,9 +62,6 @@ export class NewMovement {
                 total = this.quantity * this.unit_value;
                 break;
             case NewMovementType.Dividend:
-                console.log("ex_dividend_snapshot: ", this.ex_dividend_snapshot);
-                console.log("ex_dividend_snapshot.quantity: ", this.ex_dividend_snapshot?.quantity);
-                console.log("unit_value: ", this.unit_value);
                 if (!this.ex_dividend_snapshot || !this.ex_dividend_snapshot.quantity || !this.unit_value) return undefined;
                 total = this.ex_dividend_snapshot.quantity * this.unit_value;
                 break;
@@ -93,7 +90,7 @@ export class NewMovement {
             unit_value: this.unit_value,
             // dividend
             ex_dividend_date: this.ex_dividend_date,
-            ex_dividend_quantity: this.ex_dividend_snapshot?.quantity,
+            ex_dividend_snapshot_pk: this.ex_dividend_snapshot?.pk,
         };
     }
 };

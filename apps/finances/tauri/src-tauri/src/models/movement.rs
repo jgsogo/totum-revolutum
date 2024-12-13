@@ -48,9 +48,14 @@ impl From<MovementAndRelatedData> for Movement {
 pub struct NewMovement {
     pub account_pk: i64,
     pub movement_type_pk: i64,
-
     pub date_value: String,
+    pub fx: Option<f32>,
+    pub r#type: String, // TODO: Make this an enum
+
     #[serde(flatten)]
     pub amount: NewAmount,
-    pub fx: Option<f32>,
+
+    // dividend data
+    pub ex_dividend_date: Option<String>,
+    pub ex_dividend_snapshot_pk: Option<i64>,
 }

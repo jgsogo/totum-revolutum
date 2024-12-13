@@ -38,33 +38,29 @@
       return { label: key, value: NewMovementType[key] };
     });
 
-  async function handleDividendDateSelect(event) {
-    const choosen_date = event.detail;
-    // Get the closest (equal or before) snapshot to the given date
-    let snapshots = await new_movement.account?.snapshots();
-    let snapshot = snapshots?.find((s: Snapshot) => {
-      return s.date_value <= choosen_date;
-    });
-    new_movement.ex_dividend_snapshot = snapshot;
+  async function handleDividendDateSnapshot() {
+    if (!new_movement.ex_dividend_date) {
+      new_movement.ex_dividend_snapshot = undefined;
+    } else {
+      // Get the closest (equal or before) snapshot to the given date
+      let snapshots = await new_movement.account?.snapshots();
+      let snapshot = snapshots?.find((s: Snapshot) => {
+        return s.date_value.getDate() <= new_movement.ex_dividend_date!.getDate();
+      });
+      console.log("Found snapshot: ", snapshot);
+      new_movement.ex_dividend_snapshot = snapshot;
+    }
   }
 
   let total_str = $derived.by(() => {
+    let _ = new_movement.ex_dividend_snapshot;
+
     let total = new_movement.total(base_ccy);
     let symbol = ccy_symbol(base_ccy);
     if (total === undefined) {
       return `- ${symbol}`;
     }
-
-    switch (new_movement.type) {
-      case NewMovementType.NonNumerable:
-        return `${total} ${symbol}`;
-      case NewMovementType.Numerable: {
-        return `${total} ${symbol} (${new_movement.quantity} x ${new_movement.unit_value} ${symbol})`;
-      }
-      case NewMovementType.Dividend: {
-        return `${total} ${symbol} (${new_movement.ex_dividend_snapshot?.quantity} x ${new_movement.unit_value} ${symbol})`;
-      }
-    }
+    return `${total} ${symbol}`;
   });
 </script>
 
@@ -79,7 +75,7 @@
   </ul>
 
   <!-- Common fields -->
-  <AccountDropdown bind:account={new_movement.account} {all_accounts} />
+  <AccountDropdown bind:account={new_movement.account} {all_accounts} on:change={handleDividendDateSnapshot} />
   <MovementTypeDropdown bind:movementtype={new_movement.mov_type} {all_movementtypes} />
   {#if show_date}
     <Label class="space-y-2">
@@ -114,8 +110,11 @@
       {:else if new_movement.type === NewMovementType.Dividend}
         <Label class="flex flex-col">
           <span>Ex dividend date</span>
-          <Datepicker required bind:value={new_movement.ex_dividend_date} on:select={handleDividendDateSelect} />
-          <Helper>snapshot @ {new_movement.ex_dividend_snapshot?.date_value}</Helper>
+          <Datepicker required bind:value={new_movement.ex_dividend_date} on:select={handleDividendDateSnapshot} />
+          <Helper
+            >snapshot @ {new_movement.ex_dividend_snapshot?.date_value.toISOString().slice(0, 10)} ({new_movement
+              .ex_dividend_snapshot?.quantity} ud.)</Helper
+          >
         </Label>
         <Label class="ml-4 flex flex-col">
           <span>Unit value</span>
