@@ -1,6 +1,7 @@
 import { Account } from "$lib/models/Account";
 import { MovementType } from "$lib/models/MovementType";
 import { Snapshot } from "$lib/models/Snapshot";
+import { toFixedNumber } from "$lib/utils";
 
 export enum NewMovementType {
     NonNumerable,
@@ -71,16 +72,15 @@ export class NewMovement {
             if (!this.fx) return undefined;
             total = total / this.fx;
         }
-        return total;
+        return toFixedNumber(total, 4);
     }
 
     toJSON() {
         // This serialization is used when sending this structure via a command to the Tauri backend
-        let date = this.date_value?.toISOString().slice(0, 10);
         return {
             account_pk: this.account?.pk,
             movement_type_pk: this.mov_type?.pk,
-            date_value: date,
+            date_value:  this.date_value?.toISOString().slice(0, 10),
             fx: this.fx,
             type: NewMovementType[this.type],
             // non-numerable
@@ -89,7 +89,7 @@ export class NewMovement {
             quantity: this.quantity,
             unit_value: this.unit_value,
             // dividend
-            ex_dividend_date: this.ex_dividend_date,
+            ex_dividend_date: this.ex_dividend_date?.toISOString().slice(0, 10),
             ex_dividend_snapshot_pk: this.ex_dividend_snapshot?.pk,
         };
     }

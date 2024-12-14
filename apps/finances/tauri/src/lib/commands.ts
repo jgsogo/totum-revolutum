@@ -54,6 +54,7 @@ const create_account = function (data: AccountData): Account {
 
 /** The data returned by the backend representing a Snapshot */
 type SnapshotData = {
+    pk: number,
     account_id: number,
     amount: number,
     date_value: string,
@@ -69,7 +70,7 @@ type SnapshotData = {
  */
 const _create_snapshot = function (account: Account, data: SnapshotData): Snapshot {
     if (account.pk !== data.account_id) throw new Error("Snapshot mismatch Account");
-    return new Snapshot(account.ccy, data.amount, new Date(data.date_value), data.quantity, data.unit_value);
+    return new Snapshot(data.pk, account.ccy, data.amount, new Date(data.date_value), data.quantity, data.unit_value);
 }
 
 /**
