@@ -19,9 +19,7 @@ pub struct _SnapshotNumerable {
 }
 
 pub struct SnapshotNumerable {
-    #[allow(dead_code)]
     pub snapshot: Snapshot,
-    #[allow(dead_code)]
     pub snapshot_numerable: _SnapshotNumerable,
 }
 

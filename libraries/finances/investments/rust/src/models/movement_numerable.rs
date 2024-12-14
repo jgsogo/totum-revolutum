@@ -12,19 +12,15 @@ use diesel::row::NamedRow;
 #[diesel(primary_key(movement_ptr_id))]
 #[diesel(check_for_backend(finances_accounts::types::BackendType))]
 #[diesel(belongs_to(Movement, foreign_key = movement_ptr_id))]
-struct _MovementNumerable {
-    movement_ptr_id: i64,
-    #[allow(dead_code)]
-    quantity: NumericType,
-    #[allow(dead_code)]
-    unit_value: NumericType,
+pub struct _MovementNumerable {
+    pub movement_ptr_id: i64,
+    pub quantity: NumericType,
+    pub unit_value: NumericType,
 }
 
 pub struct MovementNumerable {
-    #[allow(dead_code)]
-    movement: Movement,
-    #[allow(dead_code)]
-    movement_numerable: _MovementNumerable,
+    pub movement: Movement,
+    pub movement_numerable: _MovementNumerable,
 }
 
 impl QueryableByName<finances_accounts::types::BackendType> for MovementNumerable
