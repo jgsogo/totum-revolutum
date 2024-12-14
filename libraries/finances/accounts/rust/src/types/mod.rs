@@ -5,4 +5,4 @@ mod backend;
 mod numeric;
 
 pub use backend::BackendType;
-pub use numeric::{Double, NumericType};
+pub use numeric::{compare_eq, Double, NumericType};
