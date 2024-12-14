@@ -1,5 +1,6 @@
 use crate::state::AppState;
 use crate::types::ConnectionType;
+use bigdecimal::One;
 use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 use diesel::prelude::*;
@@ -7,6 +8,7 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::fields::MovementDirection;
 use finances_accounts::models::{Account, NewFx, NewMovement, NewTransaction};
 use finances_accounts::sql::filters::account_by_pk;
+use finances_investments::models::NewMovementDividend;
 use finances_investments::models::NewMovementNumerable;
 use log::info;
 use tauri::State;
@@ -81,8 +83,12 @@ fn create_transaction_movements(
     let mut amount_totals = bigdecimal::BigDecimal::zero();
 
     for mov in movements {
+        // TODO: Add more checks:
+        //  * if 'base_ccy != account_ccy', the fx is required
+        //  * ex_dividend_date <= date_value
+
         // FIXME: Collect all the accounts instead of doing N queries
-        let (account_numerable, account_ccy) = Account::all()
+        let (_, account_ccy) = Account::all()
             .select((
                 finances_accounts::schema::finances_accounts_account::is_numerable,
                 finances_accounts::schema::finances_accounts_account::ccy,
@@ -93,31 +99,75 @@ fn create_transaction_movements(
         let date_value = chrono::NaiveDate::parse_from_str(&mov.date_value, "%Y-%m-%d")
             .map_err(|e| CommandError::Other(format!("Error parsing date from string ({}): {e}", mov.date_value)))?;
 
-        // TODO: Now I need to match the movement type
-        // todo!("Match movement type");
-        let (amount, quantity, unit_value) = mov
-            .amount
-            .into_bigdecimals(account_numerable)
-            .map_err(CommandError::Other)?;
+        let fx_rate: Option<bigdecimal::BigDecimal> = mov
+            .fx
+            .map(|v| {
+                v.try_into().map_err(|e| {
+                    CommandError::Other(format!("Cannot convert FX rate from f32 ({v}) to BigDecimal: {e}",))
+                })
+            })
+            .transpose()?;
 
-        let (fx_id, amount_base_ccy) = mov.fx.map_or(
-            Ok::<(Option<i64>, bigdecimal::BigDecimal), CommandError>((None, amount.clone())),
-            |fx| {
-                let rate: bigdecimal::BigDecimal = fx.try_into().map_err(|e| {
-                    CommandError::Other(format!("Cannot convert FX rate from f32 ({fx}) to BigDecimal: {e}",))
-                })?;
+        let ex_dividend_date: Option<chrono::NaiveDate> = mov
+            .ex_dividend_date
+            .as_ref()
+            .map(|v| {
+                chrono::NaiveDate::parse_from_str(v, "%Y-%m-%d")
+                    .map_err(|e| CommandError::Other(format!("Error parsing date from string ({v}): {e}")))
+            })
+            .transpose()?;
+
+        let (amount, quantity, unit_value) = match mov.r#type {
+            crate::models::NewMovementType::NonNumerable => {
+                mov.amount.into_bigdecimals(false).map_err(CommandError::Other)?
+            }
+            crate::models::NewMovementType::Numerable => {
+                mov.amount.into_bigdecimals(true).map_err(CommandError::Other)?
+            }
+            crate::models::NewMovementType::Dividend => {
+                let unit_value = mov
+                    .amount
+                    .unit_value
+                    .ok_or(CommandError::Other("No unit_value for movement".to_string()))?
+                    .try_into()
+                    .map_err(|e| {
+                        CommandError::Other(format!(
+                            "Cannot convert unit_value f32 ({}) to BigDecimal: {e}",
+                            mov.amount.unit_value.unwrap()
+                        ))
+                    })?;
+                let snapshot_quantity = {
+                    let snapshot_pk = mov
+                        .ex_dividend_snapshot_pk
+                        .ok_or(CommandError::Other("No snapshot_pk for dividend movmeent".to_string()))?;
+                    finances_investments::schema::finances_investments_snapshotnumerable::table
+                        .filter(
+                            finances_investments::schema::finances_investments_snapshotnumerable::snapshot_ptr_id
+                                .eq(snapshot_pk),
+                        )
+                        .select(finances_investments::schema::finances_investments_snapshotnumerable::quantity)
+                        .get_result::<bigdecimal::BigDecimal>(conn)?
+                };
+
+                let amount = &unit_value * &snapshot_quantity;
+                (amount, Some(snapshot_quantity), Some(unit_value))
+            }
+        };
+
+        amount_totals += amount.clone() / fx_rate.as_ref().unwrap_or(&bigdecimal::BigDecimal::one());
+
+        // Create the FX
+        let fx_id: Option<i64> = fx_rate
+            .map(|rate| {
                 let new_fx = NewFx {
                     foreign: &account_ccy,
                     local: base_ccy,
                     rate: &rate,
                     date_value: &date_value,
                 };
-                let pk = new_fx.insert_into_db(conn)?;
-                Ok((Some(pk), amount.clone() / rate))
-            },
-        )?;
-
-        amount_totals += amount_base_ccy;
+                new_fx.insert_into_db(conn)
+            })
+            .transpose()?;
 
         let new_movement = NewMovement {
             account_id: &mov.account_pk,
@@ -129,16 +179,25 @@ fn create_transaction_movements(
             transaction_id: transaction_pk,
         };
 
-        if account_numerable {
-            let new_movement_numerable = NewMovementNumerable {
-                new_movement: &new_movement,
-                quantity: quantity.as_ref().expect("It has already been tested"),
-                unit_value: unit_value.as_ref().expect("It has already been tested"),
-            };
-            new_movement_numerable.insert_into_db(conn)?;
-        } else {
-            new_movement.insert_into_db(conn)?;
-        }
+        match mov.r#type {
+            crate::models::NewMovementType::NonNumerable => new_movement.insert_into_db(conn)?,
+            crate::models::NewMovementType::Numerable => {
+                let new_movement_numerable = NewMovementNumerable {
+                    new_movement: &new_movement,
+                    quantity: quantity.as_ref().expect("It has already been tested"),
+                    unit_value: unit_value.as_ref().expect("It has already been tested"),
+                };
+                new_movement_numerable.insert_into_db(conn)?
+            }
+            crate::models::NewMovementType::Dividend => {
+                let new_movement_dividend = NewMovementDividend {
+                    new_movement: &new_movement,
+                    ex_dividend_date: ex_dividend_date.as_ref().expect("It has already been tested"),
+                    unit_value: unit_value.as_ref().expect("It has already been tested"),
+                };
+                new_movement_dividend.insert_into_db(conn)?
+            }
+        };
     }
     Ok(amount_totals)
 }

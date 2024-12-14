@@ -45,12 +45,19 @@ impl From<MovementAndRelatedData> for Movement {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
+pub enum NewMovementType {
+    NonNumerable,
+    Numerable,
+    Dividend,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
 pub struct NewMovement {
     pub account_pk: i64,
     pub movement_type_pk: i64,
     pub date_value: String,
     pub fx: Option<f32>,
-    pub r#type: String, // TODO: Make this an enum
+    pub r#type: NewMovementType,
 
     #[serde(flatten)]
     pub amount: NewAmount,

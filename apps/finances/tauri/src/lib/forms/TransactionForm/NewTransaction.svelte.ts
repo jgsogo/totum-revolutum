@@ -2,7 +2,7 @@ import type { Account } from "$lib/models/Account";
 import type { TransactionGroup } from "$lib/models/TransactionGroup";
 
 
-import { NewMovement } from "../MovementForm/NewMovement.svelte";
+import { NewMovement, NewMovementType } from "../MovementForm/NewMovement.svelte";
 
 
 export class NewTransaction {
@@ -19,14 +19,14 @@ export class NewTransaction {
     }
 
     add_movement_from(account?: Account) {
-        let new_mov = new NewMovement();
+        let new_mov = new NewMovement(account?.is_numerable ? NewMovementType.Numerable : NewMovementType.NonNumerable);
         new_mov.account = account;
         new_mov.date_value = new Date();
         this.movements_from = this.movements_from.concat(new_mov);
     }
 
     add_movement_to(account?: Account) {
-        let new_mov = new NewMovement();
+        let new_mov = new NewMovement(account?.is_numerable ? NewMovementType.Numerable : NewMovementType.NonNumerable);
         new_mov.account = account;
         new_mov.date_value = new Date();
         this.movements_to = this.movements_to.concat(new_mov);

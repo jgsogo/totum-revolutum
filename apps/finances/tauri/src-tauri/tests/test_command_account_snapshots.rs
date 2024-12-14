@@ -8,6 +8,7 @@ use common::call_it;
 fn test_account_snapshots() {
     let webview = common::webview();
 
+    // Account with snapshots
     {
         let body = json!({ "pk": 0i32 });
         let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
@@ -20,13 +21,12 @@ fn test_account_snapshots() {
         assert!(latest.date_value > next.date_value);
     }
 
+    // Account that doesn't exist
     {
         let body = json!({ "pk": -2i32 });
         let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
 
-        // We filter using the account-pk, it doesn't check if the account exists. This is the reason
-        // why it returns an empty vector instead of an error
-        assert!(r.is_ok());
-        assert_eq!(r.unwrap().len(), 0);
+        assert!(r.is_err());
+        assert_eq!(r.unwrap_err(), "Error loading account: Record not found");
     }
 }

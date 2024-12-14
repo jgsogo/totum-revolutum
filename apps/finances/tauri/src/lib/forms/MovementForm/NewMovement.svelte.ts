@@ -82,7 +82,7 @@ export class NewMovement {
             movement_type_pk: this.mov_type?.pk,
             date_value: date,
             fx: this.fx,
-            type: this.type,
+            type: NewMovementType[this.type],
             // non-numerable
             amount: this.amount,
             // numerable

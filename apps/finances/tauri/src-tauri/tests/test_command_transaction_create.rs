@@ -1,4 +1,4 @@
-use finances_app_lib::models::{MovementType, NewAmount, NewMovement, NewTransaction};
+use finances_app_lib::models::{MovementType, NewAmount, NewMovement, NewMovementType, NewTransaction};
 use serde_json::json;
 
 mod common;
@@ -34,7 +34,7 @@ fn test_create_transaction() {
                     unit_value: None,
                 },
                 fx: Some(2f32),
-                r#type: "it should be an enum".to_string(),
+                r#type: NewMovementType::NonNumerable,
                 ex_dividend_date: None,
                 ex_dividend_snapshot_pk: None,
             }],
@@ -48,7 +48,7 @@ fn test_create_transaction() {
                     unit_value: Some(10f32),
                 },
                 fx: None,
-                r#type: "it should be an enum".to_string(),
+                r#type: NewMovementType::Numerable,
                 ex_dividend_date: None,
                 ex_dividend_snapshot_pk: None,
             }],
@@ -81,7 +81,7 @@ fn test_create_transaction() {
                     unit_value: Some(10f32),
                 },
                 fx: None,
-                r#type: "it should be an enum".to_string(),
+                r#type: NewMovementType::Numerable,
                 ex_dividend_date: None,
                 ex_dividend_snapshot_pk: None,
             }],
