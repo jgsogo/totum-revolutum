@@ -120,7 +120,7 @@ fn test_create_transaction() {
             json!({ "transaction": body }),
         );
         assert!(r.is_err());
-        assert_eq!(r.unwrap_err(), "Mismatched amounts, from 0.0000 != to 100.0000");
+        assert_eq!(r.unwrap_err(), "Mismatched amounts, from 0 != to 100");
     }
 
     // TODO: Wrong movements // invalid checks

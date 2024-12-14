@@ -14,7 +14,12 @@ from django_finances_accounts.models import (
 
 from ._hierarchy_tree_model_admin import HierarchyTreeModelAdmin
 from ._render_change_form_mixin import RenderChangeFormMixin
-from .inlines import AccountHolderRoleInline, MovementInline, SnapshotInline
+from .inlines import (
+    AccountHolderRoleInline,
+    MovementInInline,
+    MovementOutInline,
+    SnapshotInline,
+)
 
 
 class SnapshotModelAdmin(admin.ModelAdmin):
@@ -75,7 +80,8 @@ class TransactionModelAdmin(admin.ModelAdmin):
     list_display = ("name", "group")
     list_filter = ("group",)
     inlines = [
-        MovementInline,
+        MovementOutInline,
+        MovementInInline,
     ]
 
 
