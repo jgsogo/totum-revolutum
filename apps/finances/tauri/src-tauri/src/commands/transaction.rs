@@ -60,14 +60,18 @@ pub fn create_transaction(
             &transaction_pk,
         )?;
 
-        if total_from != total_to {
+        // Compare using 4 decimal digits
+        // TODO: Make this 4 a global variable, or even better implement the compare method somewhere else (finances/accounts)
+        let total_from_p4 = total_from.with_scale_round(4, bigdecimal::rounding::RoundingMode::HalfUp);
+        let total_to_p4 = total_to.with_scale_round(4, bigdecimal::rounding::RoundingMode::HalfUp);
+        if total_from_p4 != total_to_p4 {
             Err(CommandError::Other(format!(
-                "Mismatched amounts, from {total_from} != to {total_to}"
+                "Mismatched amounts, from {total_from_p4} != to {total_to_p4}"
             )))
         } else {
-            Ok(total_from
-                .to_f32()
-                .ok_or(CommandError::Other(format!("Cannot convert {total_from} back to f32")))?)
+            Ok(total_from_p4.to_f32().ok_or(CommandError::Other(format!(
+                "Cannot convert {total_from_p4} back to f32"
+            )))?)
         }
     })
     .map_err(|e: CommandError| e.to_string())

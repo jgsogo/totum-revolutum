@@ -49,7 +49,7 @@ fn test_snapshot() {
     /****
     Numerable account
     ***/
-    let account_id = 8i64;
+    let account_id = 7i64;
     {
         let body = json!({ "pk": account_id });
         let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);

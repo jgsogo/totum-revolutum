@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Snapshot {
+    pub pk: i64,
     pub account_id: i64,
     pub amount: f32,
     pub date_value: String,
@@ -15,6 +16,7 @@ pub struct Snapshot {
 impl From<finances_accounts::models::Snapshot> for Snapshot {
     fn from(value: finances_accounts::models::Snapshot) -> Self {
         Self {
+            pk: value.id,
             account_id: value.account_id,
             amount: value.amount.to_f32().unwrap(),
             date_value: value.date_value.format("%Y-%m-%d").to_string(),
@@ -27,6 +29,7 @@ impl From<finances_accounts::models::Snapshot> for Snapshot {
 impl From<finances_investments::models::SnapshotNumerable> for Snapshot {
     fn from(value: finances_investments::models::SnapshotNumerable) -> Self {
         Self {
+            pk: value.snapshot.id,
             account_id: value.snapshot.account_id,
             amount: value.snapshot.amount.to_f32().unwrap(),
             date_value: value.snapshot.date_value.format("%Y-%m-%d").to_string(),
