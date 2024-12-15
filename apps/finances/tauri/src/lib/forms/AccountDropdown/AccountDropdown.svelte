@@ -77,5 +77,6 @@
     items={all_accounts_items}
     bind:value={account}
     placeholder="Choose account ..."
+    on:change
   />
 </div>

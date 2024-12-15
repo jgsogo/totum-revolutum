@@ -1,5 +1,5 @@
 pub mod models;
-mod schema;
+pub mod schema;
 
 #[cfg(test)]
 mod tests;

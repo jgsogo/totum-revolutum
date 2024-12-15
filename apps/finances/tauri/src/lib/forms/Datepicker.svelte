@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Datepicker } from "flowbite-svelte";
 
+
   let {
     value = $bindable(),
     required,
@@ -23,4 +24,4 @@
 Just a regular DatePicker with opinionated DateTime formating
 -->
 
-<Datepicker {required} {inline} bind:value {dateFormat} />
+<Datepicker {required} {inline} bind:value {dateFormat} on:apply on:clear on:select/>

@@ -31,6 +31,7 @@ class Command(BaseCommand):
         self.populate_movements_numerable(account=accounts[0], transaction=transactions[0])
         self.populate_movements_numerable(account=accounts[2], transaction=transactions[0])
         self.populate_snapshot_numerable(account=accounts[0])
+        self.populate_snapshot_numerable(account=accounts[4])
 
     def populate_accounts(self):
         activos_corrientes_inversion = AccountType.objects.get(
@@ -88,7 +89,7 @@ class Command(BaseCommand):
                     open="2024-09-11",
                     type=retirement_plan,
                     custodian=custodians[0],
-                    is_numerable=False,
+                    is_numerable=True,
                 ),
                 Account(
                     pk=8,
@@ -125,7 +126,7 @@ class Command(BaseCommand):
             mov.save()
 
     def populate_snapshot_numerable(self, account: Account):
-        for i in range(2):
+        for i in range(1, 3):
             snapshot = SnapshotNumerable(
                 account=account,
                 amount=(i * 100),

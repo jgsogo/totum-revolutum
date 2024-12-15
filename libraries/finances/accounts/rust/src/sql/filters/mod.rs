@@ -94,6 +94,12 @@ pub fn snapshot_filter_account_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_snapshot::account_id.eq(pk)
 }
 
+/// Returns a query fragment to get [`Snapshot`]s by 'pk'
+#[diesel::dsl::auto_type]
+pub fn snapshot_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_snapshot::id.eq(pk)
+}
+
 /// Returns a query fragment to filter [`Account`]s by pk
 #[diesel::dsl::auto_type]
 pub fn accountholder_by_pk(pk: i64) -> _ {

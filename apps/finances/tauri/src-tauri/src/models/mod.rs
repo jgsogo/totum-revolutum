@@ -18,7 +18,7 @@ pub use account_type::AccountType;
 pub use custodian::Custodian;
 pub use fx::Fx;
 pub use holder::Holder;
-pub use movement::{Movement, NewMovement};
+pub use movement::{Movement, NewMovement, NewMovementType};
 pub use movement_type::MovementType;
 pub use new_amount::NewAmount;
 pub use snapshot::{NewSnapshot, Snapshot};

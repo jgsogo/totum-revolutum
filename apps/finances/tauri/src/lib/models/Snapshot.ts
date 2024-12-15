@@ -1,11 +1,13 @@
 export class Snapshot {
+    readonly pk: number;
     readonly amount: number;
     private readonly ccy: string;
     readonly quantity?: number;
     readonly unit_value?: number;
-    readonly date_value: string;
+    readonly date_value: Date;
 
-    constructor(ccy: string, amount: number, date_value: string, quantity?: number, unit_value?: number) {
+    constructor(pk: number, ccy: string, amount: number, date_value: Date, quantity?: number, unit_value?: number) {
+        this.pk = pk;
         this.amount = amount;
         this.ccy = ccy;
         this.date_value = date_value;

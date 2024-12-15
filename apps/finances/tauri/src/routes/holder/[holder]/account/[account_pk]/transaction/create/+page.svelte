@@ -5,15 +5,16 @@
   import { InfoCircleSolid } from "flowbite-svelte-icons";
   import { type TransactionGroup } from "$lib/models/TransactionGroup.js";
   import { NewTransaction } from "$lib/forms/TransactionForm/NewTransaction.svelte.js";
-  import { NewMovement } from "$lib/forms/MovementForm/NewMovement.svelte.js";
+  import { NewMovement, NewMovementType } from "$lib/forms/MovementForm/NewMovement.svelte.js";
   import { create_transaction } from "$lib/commands.js";
   import { goToAccountDetail } from "$lib/utils.js";
+  import { MovementType } from "$lib/models/MovementType.js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
 
-  let initial_movements_from = data.from_account ? [new NewMovement(data.from_account, new Date())] : [];
-  let initial_movements_to = data.to_account ? [new NewMovement(data.to_account, new Date())] : [];
+  let initial_movements_from = data.from_account ? [new NewMovement(data.from_account.is_numerable ? NewMovementType.Numerable : NewMovementType.NonNumerable, data.from_account, new Date())] : [];
+  let initial_movements_to = data.to_account ? [new NewMovement(data.to_account.is_numerable ? NewMovementType.Numerable : NewMovementType.NonNumerable, data.to_account, new Date())] : [];
 
   let common_date = $state(new Date());
   let transaction: NewTransaction = $state(

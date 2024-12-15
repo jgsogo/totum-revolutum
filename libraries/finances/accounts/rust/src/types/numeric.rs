@@ -20,3 +20,26 @@ pub use diesel::sql_types::Numeric as Double;
 
 #[cfg(feature = "postgres")]
 pub use bigdecimal::BigDecimal as NumericType;
+
+/// Compares that two [`bigdecimal::BigDecimal`] scaling them first to 4 decimal digits (rounding [`bigdecimal::rounding::RoundingMode::HalfUp`])
+pub fn compare_eq(lhs: &bigdecimal::BigDecimal, rhs: &bigdecimal::BigDecimal) -> bool {
+    let lhs = lhs.with_scale_round(4, bigdecimal::rounding::RoundingMode::HalfUp);
+    let rhs = rhs.with_scale_round(4, bigdecimal::rounding::RoundingMode::HalfUp);
+    lhs == rhs
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_compare_eq() {
+        let lhs: bigdecimal::BigDecimal = 119.99999f32.try_into().unwrap();
+        let rhs: bigdecimal::BigDecimal = 120f32.try_into().unwrap();
+        assert!(compare_eq(&lhs, &rhs));
+
+        let lhs: bigdecimal::BigDecimal = 119.9999f32.try_into().unwrap();
+        let rhs: bigdecimal::BigDecimal = 120f32.try_into().unwrap();
+        assert!(!compare_eq(&lhs, &rhs));
+    }
+}
