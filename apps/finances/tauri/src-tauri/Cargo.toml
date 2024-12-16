@@ -23,7 +23,7 @@ finances_investments = { path = "../../../../libraries/finances/investments/rust
 openexchangerates = { path = "../../../../libraries/openexchangerates" }
 
 bigdecimal = "0.4.7"
-chrono = { version = "0.4.38" }
+chrono = { version = "0.4.39" }
 chrono-tz = { version = "0.10.0" }
 diesel = { version = "2.2.6", features = ["r2d2", "chrono"] }
 
