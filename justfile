@@ -29,12 +29,12 @@ update-python:
 test: build bazel-check
     cargo check
     cargo clippy
-    bazel test //...
+    bazel test --test_keep_going //...
 
 # Build everything
 build: bazel-update
     cargo build
-    bazel build //...
+    bazel build --keep_going //...
 
 # Run all the Bazel targets labelled with 'update' tag
 bazel-update:
@@ -60,7 +60,7 @@ doc:
 clean:
     cargo clean
     bazel clean
-    docker system prune --force
+    docker system prune --volumes --force
 
 # Reset: removes all temporary files and recreates the workspace (Cargo and Bazel). This can take a while
 reset: clean build test

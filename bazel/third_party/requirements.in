@@ -1,12 +1,12 @@
-django~=5.1.0
+django~=5.1.4
 django-appconf~=1.0.6
 django-countries~=7.6.1
 django-money~=3.5.3
 django-treenode~=0.22.1
 gunicorn~=23.0.0
-psycopg~=3.2.0
-pytest~=8.3.0
+psycopg~=3.2.3
+pytest~=8.3.4
 semver~=3.0.2
 SQLAlchemy~=2.0.36
-testcontainers~=4.8.2
-tqdm~=4.67.0
+testcontainers~=4.9.0
+tqdm~=4.67.1
