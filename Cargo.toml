@@ -39,9 +39,9 @@ clap = { version = "4.5.4", features = ["cargo", "string"] }
 clap_complete = "4.5.18"
 clap-verbosity-flag = { version = "3.0.0" }
 confy = { version = "0.6.1", default-features = false, features = ["yaml_conf"] }
-cron-parser = "0.9.0"
+cron-parser = "0.10.0"
 data-encoding = "2.6.0"
-diesel = { version = "2.2.4", default-features = false, features = ["sqlite", "r2d2"] }
+diesel = { version = "2.2.6", default-features = false, features = ["sqlite", "r2d2"] }
 diesel_migrations = { version = "2.2.0", default-features = false, features = ["sqlite"] }
 diesel_table_macro_syntax = "0.2.0"
 diffy = "0.4.0"
@@ -61,7 +61,7 @@ http = "1.2.0"
 http-body = "1.0.1"
 http-body-util = "0.1.1"
 httpmock = { version = "0.7" }
-hyper = { version = "1.5.1" }
+hyper = { version = "1.5.2" }
 hyper-util = { version = "0.1.6" }
 ignore = { version = "0.4.22" }
 ignore-files = "3.0.1"
@@ -92,7 +92,7 @@ tauri = { version = "2.1.1", features = [] }
 tauri-plugin-shell = "2.0.2"
 tempfile = { version = "3.10.1" }
 testing_logger = "0.1.1"
-thiserror = "1.0.69"  # FIXME: v2 requires https://github.com/diesel-rs/diesel/pull/4337
+thiserror = "1.0.69"  # FIXME: v2 requires https://github.com/diesel-rs/diesel/pull/4337 (diesel 2.2.7?)
 time = { version = "0.3.36" }
 tokio = { version = "1.40" }
 tokio-stream = "0.1.15"
