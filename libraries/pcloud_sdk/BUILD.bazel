@@ -4,7 +4,7 @@ load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 
 filegroup(
     name = "test_data",
-    srcs = glob(["resources/**/*.*"]),
+    srcs = glob(["resources/**/*.json"]),
     visibility = ["//libraries:__subpackages__"],
 )
 

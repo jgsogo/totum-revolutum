@@ -91,9 +91,21 @@ http_archive(
     urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.6/download"],
 )
 
+# crate.annotation(
+#     crate = "protoc-gen-prost",
+#     gen_binaries = ["protoc-gen-prost"],
+#     repositories = ["crates_libraries"],
+# )
+# crate.annotation(
+#     crate = "protoc-gen-tonic",
+#     gen_binaries = ["protoc-gen-tonic"],
+#     repositories = ["crates_libraries"],
+# )
+
 crate.from_cargo(
     name = "crates_libraries",
     cargo_lockfile = "//:Cargo.lock",
+    # generate_binaries = True,
     manifests = [
         "//:Cargo.toml",
         "//apps/finances/tauri/src-tauri:Cargo.toml",

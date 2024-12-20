@@ -16,6 +16,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
 tauri-build = { version = "2.0.3", features = [] }
+tonic-build = "0.12.3"
 
 [dependencies]
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
@@ -35,6 +36,9 @@ thiserror = "1.0.69"
 log = "0.4.22"
 tauri-plugin-log = "2.0.3"
 itertools = "0.13.0"
+
+tonic = {version = "0.12.3", features = ["transport"]}
+prost = "0.13.4"
 
 [dev-dependencies]
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust", features = ["postgres", "test_utils"] }

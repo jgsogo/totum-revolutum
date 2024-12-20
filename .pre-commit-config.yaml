@@ -99,6 +99,21 @@ repos:
       #        language: script
       #        always_run: true
 
+      # - id: cargo-check
+      #   name: Run cargo check (using the rules_rust managed version)
+      #   entry: bazel run @rules_rust//tools/upstream_wrapper:cargo -- check
+      #   language: script
+      #   always_run: true
+      #   require_serial: true
+
+      - id: rustfmt
+        name: Run rustfmt (using the rules_rust managed version)
+        entry: bazel run @rules_rust//tools/upstream_wrapper:rustfmt --
+        language: script
+        files: \.rs$
+        # exclude: ^(qcm/.*/build\.rs)
+        require_serial: true
+
       - id: bazel-check
         name: Run all Bazel targets with 'check' tag
         entry: scripts/bazel_run_targets.sh check

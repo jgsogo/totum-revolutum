@@ -20,10 +20,10 @@ cargo_build_script(
 rust_library(
     name = "applib",
     srcs = ["src/lib.rs"],
-    crate_name = "tauri_hello_world_lib",
-    data = [
+    compile_data = [
         "tauri.conf.json",
     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+    crate_name = "tauri_hello_world_lib",
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),

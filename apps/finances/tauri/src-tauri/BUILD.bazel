@@ -24,11 +24,14 @@ rust_library(
         ["src/**/*.rs"],
         exclude = ["src/main.rs"],
     ),
-    crate_features = ["postgres"],
-    crate_name = "finances_app_lib",
-    data = [
+    # data = [
+    #     "tauri.conf.json",
+    # ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+    compile_data = [
         "tauri.conf.json",
     ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+    crate_features = ["postgres"],
+    crate_name = "finances_app_lib",
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
@@ -60,10 +63,10 @@ rust_test_suite(
     name = "_integration_tests",
     srcs = integration_tests_files,
     crate_features = ["postgres"],
-    data = glob(["tests/common/**/*.rs"]),
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    shared_srcs = glob(["tests/common/**/*.rs"]),
     tags = [
         "manual",
     ],
