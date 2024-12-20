@@ -112,7 +112,7 @@ repos:
         language: script
         files: \.rs$
         # exclude: ^(qcm/.*/build\.rs)
-        require_serial: true
+        # require_serial: true
 
       - id: bazel-check
         name: Run all Bazel targets with 'check' tag
