@@ -19,8 +19,9 @@ update-cargo:
 update-npm:
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines
     bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world update
-    bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
+    bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri update
+    bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/protos update
 
 update-python:
     bazel run @@//bazel/third_party:python_requirements

@@ -159,6 +159,7 @@ npm.npm_translate_lock(
     },
     data = [
         "//apps/finances/tauri:package.json",
+        "//apps/finances/tauri/protos:package.json",
         "//sandbox/svelte-hello-world:package.json",
         "//sandbox/tauri-hello-world:package.json",
     ],

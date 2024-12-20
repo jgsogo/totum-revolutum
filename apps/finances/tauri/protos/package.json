@@ -1,0 +1,10 @@
+{
+  "description": "Can log \"hello world\" and \"goodbye world\" to the console!",
+  "files": [
+    "/dist"
+  ],
+  "main": "dist/index.js",
+  "name": "finances_app_protos",
+  "types": "dist/index.d.ts",
+  "version": "1.0.0"
+}

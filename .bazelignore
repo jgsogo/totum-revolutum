@@ -1,4 +1,5 @@
 apps/finances/tauri/node_modules/
+apps/finances/tauri/protos/node_modules/
 node_modules/
 sandbox/svelte-hello-world/node_modules/
 sandbox/tauri-hello-world/node_modules/
