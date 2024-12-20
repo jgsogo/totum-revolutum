@@ -2,7 +2,7 @@
 // @generated from file apps/finances/tauri/protocol/protos/account.proto (package finances_app, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import type { Message } from "@bufbuild/protobuf";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 
@@ -12,99 +12,27 @@ import type { Timestamp } from "@bufbuild/protobuf/wkt";
 export declare const file_apps_finances_tauri_protocol_protos_account: GenFile;
 
 /**
- * @generated from message finances_app.Person
+ * @generated from message finances_app.Account
  */
-export declare type Person = Message<"finances_app.Person"> & {
+export declare type Account = Message<"finances_app.Account"> & {
   /**
    * @generated from field: string name = 1;
    */
   name: string;
 
   /**
-   * @generated from field: int32 id = 2;
+   * @generated from field: optional string description = 2;
    */
-  id: number;
+  description?: string;
 
   /**
-   * @generated from field: string email = 3;
+   * @generated from field: optional google.protobuf.Timestamp open = 3;
    */
-  email: string;
-
-  /**
-   * @generated from field: repeated finances_app.Person.PhoneNumber phones = 4;
-   */
-  phones: Person_PhoneNumber[];
-
-  /**
-   * @generated from field: google.protobuf.Timestamp last_updated = 5;
-   */
-  lastUpdated?: Timestamp;
+  open?: Timestamp;
 };
 
 /**
- * Describes the message finances_app.Person.
- * Use `create(PersonSchema)` to create a new message.
+ * Describes the message finances_app.Account.
+ * Use `create(AccountSchema)` to create a new message.
  */
-export declare const PersonSchema: GenMessage<Person>;
-
-/**
- * @generated from message finances_app.Person.PhoneNumber
- */
-export declare type Person_PhoneNumber = Message<"finances_app.Person.PhoneNumber"> & {
-  /**
-   * @generated from field: string number = 1;
-   */
-  number: string;
-
-  /**
-   * @generated from field: finances_app.Person.PhoneType type = 2;
-   */
-  type: Person_PhoneType;
-};
-
-/**
- * Describes the message finances_app.Person.PhoneNumber.
- * Use `create(Person_PhoneNumberSchema)` to create a new message.
- */
-export declare const Person_PhoneNumberSchema: GenMessage<Person_PhoneNumber>;
-
-/**
- * @generated from enum finances_app.Person.PhoneType
- */
-export enum Person_PhoneType {
-  /**
-   * @generated from enum value: MOBILE = 0;
-   */
-  MOBILE = 0,
-
-  /**
-   * @generated from enum value: HOME = 1;
-   */
-  HOME = 1,
-
-  /**
-   * @generated from enum value: WORK = 2;
-   */
-  WORK = 2,
-}
-
-/**
- * Describes the enum finances_app.Person.PhoneType.
- */
-export declare const Person_PhoneTypeSchema: GenEnum<Person_PhoneType>;
-
-/**
- * @generated from message finances_app.AddressBook
- */
-export declare type AddressBook = Message<"finances_app.AddressBook"> & {
-  /**
-   * @generated from field: repeated finances_app.Person people = 1;
-   */
-  people: Person[];
-};
-
-/**
- * Describes the message finances_app.AddressBook.
- * Use `create(AddressBookSchema)` to create a new message.
- */
-export declare const AddressBookSchema: GenMessage<AddressBook>;
+export declare const AccountSchema: GenMessage<Account>;

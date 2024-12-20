@@ -64,24 +64,6 @@ register_toolchains("@//bazel/rust/prost:prost_toolchain")
 
 crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
 crate.spec(
-    package = "prost",
-    version = "0.13.4",
-)
-crate.spec(
-    default_features = False,
-    package = "prost-types",
-    version = "0.13.1",
-)
-crate.spec(
-    features = ["transport"],
-    package = "tonic",
-    version = "0.12.3",
-)
-crate.spec(
-    package = "tonic-build",
-    version = "0.12.3",
-)
-crate.spec(
     package = "protoc-gen-prost",
     version = "0.4.0",
 )

@@ -1,0 +1,46 @@
+load("@aspect_rules_jest//jest:defs.bzl", "jest_test")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+
+ts_project(
+    name = "lib",
+    srcs = [
+        "hello-world.ts",
+        "index.ts",
+    ],
+    declaration = True,
+    source_map = True,
+    # out_dir = "dist",
+    tsconfig = "//apps/finances/tauri/protocol:tsconfig",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//apps/finances/tauri/protocol:node_modules/@types/node",
+        "//apps/finances/tauri/protocol/protos:protos_ts",
+    ],
+)
+
+ts_project(
+    name = "test_lib",
+    srcs = ["index.spec.ts"],
+    declaration = True,
+    source_map = True,
+    # out_dir = "dist",
+    tsconfig = "//apps/finances/tauri/protocol:tsconfig",
+    deps = [
+        ":lib",
+        "//apps/finances/tauri/protocol:node_modules/@testing-library/jest-dom",
+        "//apps/finances/tauri/protocol:node_modules/@types/jest",
+    ],
+)
+
+jest_test(
+    name = "test",
+    config = "//apps/finances/tauri/protocol:jest_config",
+    data = [
+        ":test_lib",
+        "//apps/finances/tauri/protocol:node_modules/jest-environment-jsdom",
+        # ":lib",
+    ],
+    node_modules = "//apps/finances/tauri/protocol:node_modules",
+)
+
+# Maybe: https://stackoverflow.com/questions/59433880/jest-testing-with-bazel-throws-module-ts-jest-in-the-transform-option-was-not-f

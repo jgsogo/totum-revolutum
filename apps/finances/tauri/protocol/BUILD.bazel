@@ -1,22 +1,46 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 load("@rules_rust_prost//:defs.bzl", "rust_prost_library")
 
-npm_link_all_packages(name = "node_modules")
+# Testing with jest, example: https://github.com/aspect-build/bazel-examples/tree/main/jest
+# Maybe: https://stackoverflow.com/questions/59433880/jest-testing-with-bazel-throws-module-ts-jest-in-the-transform-option-was-not-f
 
-# proto_library(
-#     name = "account_proto",
-#     srcs = ["protos/account.proto"],
-#     deps = ["@protobuf//:timestamp_proto"],
-# )
+npm_link_all_packages(name = "node_modules")
 
 # Generate Rust bindings from the generated proto files
 # https://bazelbuild.github.io/rules_rust/rust_proto.html#rust_prost_library
 rust_prost_library(
-    name = "protocol",
+    name = "protos",
     proto = "//apps/finances/tauri/protocol/protos:account_proto",
+    # TODO: Wait for https://github.com/bazelbuild/rules_rust/issues/2831, so we can add type_attributes, if not we can go the build.rs way
+)
+
+rust_library(
+    name = "protocol",
+    srcs = glob(
+        ["src/**/*.rs"],
+    ),
+    crate_features = ["bazel"],
+    crate_name = "finances_app_protocol",
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
     visibility = ["//visibility:public"],
+    deps = all_crate_deps(
+        normal = True,
+    ) + [
+        ":protos",
+    ],
+)
+
+# Unittests
+rust_test(
+    name = "tests",
+    crate = ":protocol",
+    crate_features = ["bazel"],
 )
 
 # ts_proto_library(
@@ -26,31 +50,68 @@ rust_prost_library(
 #     proto_srcs = ["protos/account.proto"],
 # )
 
-ts_project(
-    name = "lib",
-    srcs = [
-        "src-js/hello-world.ts",
-        "src-js/index.ts",
-    ],
-    declaration = True,
-    out_dir = "dist",
-    tsconfig = "tsconfig.json",
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
     visibility = ["//visibility:public"],
-    deps = [
-        "//apps/finances/tauri/protocol/protos:protos_ts",
-        # ":node_modules/@aspect-test/e",
-        # ":node_modules/@aspect-test/f",
-        # ":node_modules/@types/node",
-        # ":node_modules/alias-e",
-    ],
 )
+
+js_library(
+    name = "jest_config",
+    srcs = ["jest.config.js"],
+    visibility = ["//visibility:public"],
+)
+
+# ts_project(
+#     name = "lib",
+#     srcs = [
+#         "src-js/hello-world.ts",
+#         "src-js/index.ts",
+#     ],
+#     declaration = True,
+#     source_map = True,
+#     out_dir = "dist",
+#     tsconfig = ":tsconfig",
+#     visibility = ["//visibility:public"],
+#     deps = [
+#         "//apps/finances/tauri/protocol/protos:protos_ts",
+#         # ":node_modules/@aspect-test/e",
+#         # ":node_modules/@aspect-test/f",
+#         # ":node_modules/@types/node",
+#         # ":node_modules/alias-e",
+#     ],
+# )
 
 # Exposed via js_library()
 js_library(
     name = "pkg",
     srcs = [
         "package.json",
-        ":lib",
+        "//apps/finances/tauri/protocol/src-js:lib",
     ],
     visibility = ["//visibility:public"],
 )
+
+# ts_project(
+#     name = "test_lib",
+#     srcs = ["src-js/index.spec.ts"],
+#     declaration = True,
+#     source_map = True,
+#     tsconfig = ":tsconfig",
+#     deps = [
+#         ":lib",
+#         ":node_modules/@types/jest"
+#     ]
+# )
+
+# jest_test(
+#     name = "test",
+#     config = ":jest_config",
+#     data = [
+#         ":test_lib",
+#         # ":lib",
+#     ],
+#     node_modules = ":node_modules",
+# )
+
+# # Maybe: https://stackoverflow.com/questions/59433880/jest-testing-with-bazel-throws-module-ts-jest-in-the-transform-option-was-not-f

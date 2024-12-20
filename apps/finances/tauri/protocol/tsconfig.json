@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
     "declaration": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": true,
     "module": "commonjs",
-    "outDir": "./dist",
+    "sourceMap": true,
     "target": "es2019"
   },
   "include": [
-    "src-js/**/*"
+    "src-js/**/*.ts",
+    "@types/**/*.d.ts"
   ]
 }

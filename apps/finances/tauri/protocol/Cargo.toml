@@ -9,6 +9,9 @@ include = ["**/*.rs", "Cargo.toml", "protos"]
 [lib]
 name = "finances_app_protocol"
 
+[features]
+bazel = []
+
 [build-dependencies]
 prost-build = {workspace = true}
 

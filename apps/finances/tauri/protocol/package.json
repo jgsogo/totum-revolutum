@@ -1,7 +1,12 @@
 {
   "description": "Can log \"hello world\" and \"goodbye world\" to the console!",
   "devDependencies": {
-    "@types/node": "^22"
+    "@testing-library/jest-dom": "6.6.3",
+    "@types/jest": "29.5.14",
+    "@types/node": "22.10.2",
+    "jest-cli": "29.7.0",
+    "jest-environment-jsdom": "29.7.0",
+    "jest-junit": "16.0.0"
   },
   "files": [
     "/dist"
