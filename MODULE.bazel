@@ -108,6 +108,7 @@ crate.from_cargo(
     # generate_binaries = True,
     manifests = [
         "//:Cargo.toml",
+        "//apps/finances/tauri/protos:Cargo.toml",
         "//apps/finances/tauri/src-tauri:Cargo.toml",
         "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",

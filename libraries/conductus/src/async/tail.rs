@@ -152,7 +152,7 @@ impl<Output: PipelineData> Stream for PipelineTailImplStream<'_, Output> {
     }
 }
 
-impl<'a, Output: PipelineData> FusedStream for PipelineTailImplStream<'a, Output> {
+impl<Output: PipelineData> FusedStream for PipelineTailImplStream<'_, Output> {
     fn is_terminated(&self) -> bool {
         self.0.is_terminated()
     }

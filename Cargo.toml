@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "apps/finances/tauri/protos",
     "apps/finances/tauri/src-tauri",
     "apps/photodb",
     "apps/syncronia",
@@ -77,6 +78,7 @@ num-traits = "0.2.19"
 oxipng = { version = "9.0", features = ["parallel", "zopfli", "filetime"], default-features = false }
 prost = "0.13.4"
 prost-types = "0.13.4"
+prost-build = "0.13.4"
 protoc-gen-prost = "0.4.0"
 protoc-gen-tonic = "0.4.1"
 regex = "1.10.5"

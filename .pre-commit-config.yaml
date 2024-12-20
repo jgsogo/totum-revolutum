@@ -107,8 +107,8 @@ repos:
       #   require_serial: true
 
       - id: rustfmt
-        name: Run rustfmt (using the rules_rust managed version)
-        entry: bazel run @rules_rust//tools/upstream_wrapper:rustfmt --
+        name: Run rustfmt (rules_rust managed version)
+        entry: bazel/tools/rustfmt.sh
         language: script
         files: \.rs$
         # exclude: ^(qcm/.*/build\.rs)

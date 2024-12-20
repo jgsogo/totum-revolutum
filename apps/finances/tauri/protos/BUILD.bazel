@@ -2,8 +2,8 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_rust_prost//:defs.bzl", "rust_prost_library")
 
 proto_library(
-    name = "addressbook_proto",
-    srcs = ["account.proto"],
+    name = "account_proto",
+    srcs = ["src/account.proto"],
     deps = ["@protobuf//:timestamp_proto"],
 )
 
@@ -11,6 +11,6 @@ proto_library(
 # https://bazelbuild.github.io/rules_rust/rust_proto.html#rust_prost_library
 rust_prost_library(
     name = "protos",
-    proto = ":addressbook_proto",
+    proto = ":account_proto",
     visibility = ["//visibility:public"],
 )

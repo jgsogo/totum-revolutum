@@ -22,7 +22,7 @@ pub struct NewFx<'a> {
     pub date_value: &'a chrono::NaiveDate,
 }
 
-impl<'a> NewFx<'a> {
+impl NewFx<'_> {
     pub fn insert_into_db(&self, conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {
         diesel::insert_into(crate::schema::finances_accounts_fx::table)
             .values(self)

@@ -6,7 +6,7 @@ use crate::{FilePath, Filesystem, Result};
 /// Moves the content of the `origin` file in `lhs_fs` filesystem to the `target` file
 /// in the `rhs_fs` filesystem. This action returns a [`Receiver`] that the caller can
 /// use to wait for any async operation to finish.
-pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: FilesystemOps + ?Sized>(
+pub async fn move_file<'action, FsLhs: Filesystem, FsRhs: FilesystemOps>(
     lhs_fs: &'action mut FsLhs,
     rhs_fs: &'action mut FsRhs,
     origin: &FilePath,

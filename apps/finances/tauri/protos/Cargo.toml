@@ -1,0 +1,15 @@
+[package]
+name = "finances-app-protos"
+version = "0.1.0"
+authors = ["you"]
+edition = "2021"
+
+[lib]
+name = "finances_app_protos"
+
+[build-dependencies]
+prost-build = {workspace = true}
+
+[dependencies]
+prost ={workspace = true}
+prost-types = {workspace = true}

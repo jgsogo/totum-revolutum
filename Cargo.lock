@@ -1849,6 +1849,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "finances-app-protos"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "prost-build",
+ "prost-types",
+]
+
+[[package]]
 name = "finances_accounts"
 version = "0.0.1"
 dependencies = [

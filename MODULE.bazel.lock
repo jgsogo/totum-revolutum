@@ -6947,7 +6947,7 @@
         "recordedFileInputs": {
           "@@rules_rust~~rust_host_tools~rust_host_tools//bin/rustc": "d649a93ce0ab337bff366334b2a416c81ebe7523f0381f99bf063761f4e7e991",
           "@@rules_rust~~cu~cargo_bazel_bootstrap//cargo-bazel": "a88d81f6c7220a2e28a95158c91f1f53ec158130452d960d9213281a4ad9aae3",
-          "@@//MODULE.bazel": "ca951d70058dfa6788d0502ef40c9cea5a4ef468094df47e28d037cb7264596e",
+          "@@//MODULE.bazel": "2417cec965c1210bf6f8d9b27b8c8508e94b0211b0b9a46851cd50833c37271a",
           "@@rules_rust~~rust_host_tools~rust_host_tools//bin/cargo": "82fa972ab5fc1c0c76f50775074fe1ed7a1d8f232258b8c7c2d5e16adb2c8b97"
         },
         "recordedDirentsInputs": {},
