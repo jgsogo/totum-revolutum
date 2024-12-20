@@ -22,6 +22,7 @@ tonic-build = "0.12.3"
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
 finances_investments = { path = "../../../../libraries/finances/investments/rust" }
 openexchangerates = { path = "../../../../libraries/openexchangerates" }
+finances-app-protocol = { path = "../protocol" }
 
 bigdecimal = "0.4.7"
 chrono = { version = "0.4.38" }

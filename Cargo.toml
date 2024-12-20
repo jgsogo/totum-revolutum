@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "apps/finances/tauri/protos",
+    "apps/finances/tauri/protocol",
     "apps/finances/tauri/src-tauri",
     "apps/photodb",
     "apps/syncronia",

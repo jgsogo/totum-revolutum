@@ -903,6 +903,41 @@
         ]
       }
     },
+    "@@aspect_rules_ts~//ts:extensions.bzl%ext": {
+      "general": {
+        "bzlTransitiveDigest": "RqHZocRc7jsds9NAPS8k3oUCS3SqqA3cFqpd0Lt7mkU=",
+        "usagesDigest": "5PAm6REcE3NgS5xQb6pVoCFgp2fnZusQkVeFwmZI+Gs=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "npm_typescript": {
+            "bzlFile": "@@aspect_rules_ts~//ts/private:npm_repositories.bzl",
+            "ruleClassName": "http_archive_version",
+            "attributes": {
+              "bzlmod": true,
+              "version": "5.6.3",
+              "integrity": "",
+              "build_file": "@@aspect_rules_ts~//ts:BUILD.typescript",
+              "build_file_substitutions": {
+                "bazel_worker_version": "5.4.2",
+                "google_protobuf_version": "3.20.1"
+              },
+              "urls": [
+                "https://registry.npmjs.org/typescript/-/typescript-{}.tgz"
+              ]
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "aspect_rules_ts~",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
     "@@buildifier_prebuilt~//:defs.bzl%buildifier_prebuilt_deps_extension": {
       "general": {
         "bzlTransitiveDigest": "lqH5eQXGrxGyrPzoegk5Mn6zC3A1P0h+QsA1O/QlXHc=",
@@ -6947,7 +6982,7 @@
         "recordedFileInputs": {
           "@@rules_rust~~rust_host_tools~rust_host_tools//bin/rustc": "d649a93ce0ab337bff366334b2a416c81ebe7523f0381f99bf063761f4e7e991",
           "@@rules_rust~~cu~cargo_bazel_bootstrap//cargo-bazel": "a88d81f6c7220a2e28a95158c91f1f53ec158130452d960d9213281a4ad9aae3",
-          "@@//MODULE.bazel": "2417cec965c1210bf6f8d9b27b8c8508e94b0211b0b9a46851cd50833c37271a",
+          "@@//MODULE.bazel": "8ccf0f47f5f1bdad7dd70dd29c5dc3238eea2d5c6be0deea64e3fefa453e9567",
           "@@rules_rust~~rust_host_tools~rust_host_tools//bin/cargo": "82fa972ab5fc1c0c76f50775074fe1ed7a1d8f232258b8c7c2d5e16adb2c8b97"
         },
         "recordedDirentsInputs": {},

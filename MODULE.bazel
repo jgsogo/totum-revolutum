@@ -108,7 +108,7 @@ crate.from_cargo(
     # generate_binaries = True,
     manifests = [
         "//:Cargo.toml",
-        "//apps/finances/tauri/protos:Cargo.toml",
+        "//apps/finances/tauri/protocol:Cargo.toml",
         "//apps/finances/tauri/src-tauri:Cargo.toml",
         "//apps/photodb:Cargo.toml",
         "//apps/syncronia:Cargo.toml",
@@ -159,7 +159,8 @@ npm.npm_translate_lock(
     },
     data = [
         "//apps/finances/tauri:package.json",
-        "//apps/finances/tauri/protos:package.json",
+        "//apps/finances/tauri/protocol:package.json",
+        "//apps/finances/tauri/protocol/protos:package.json",
         "//sandbox/svelte-hello-world:package.json",
         "//sandbox/tauri-hello-world:package.json",
     ],
@@ -176,6 +177,14 @@ pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 # Allows developers to use the matching pnpm version, for example:
 # bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
 use_repo(pnpm, "pnpm")
+
+################################################################################
+# rules_ts
+################################################################################
+
+rules_ts_ext = use_extension("@aspect_rules_ts//ts:extensions.bzl", "ext", dev_dependency = True)
+rules_ts_ext.deps()
+use_repo(rules_ts_ext, "npm_typescript")
 
 #####
 # Extensions

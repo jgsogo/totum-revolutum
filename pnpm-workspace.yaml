@@ -3,4 +3,5 @@ packages:
   - 'sandbox/svelte-hello-world'
   - 'sandbox/tauri-hello-world'
   - 'apps/finances/tauri'
-  - 'apps/finances/tauri/protos'
+  - 'apps/finances/tauri/protocol'
+  - 'apps/finances/tauri/protocol/protos'

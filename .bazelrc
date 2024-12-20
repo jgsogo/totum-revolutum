@@ -16,6 +16,16 @@ build:stamp --stamp
 
 test:ci --verbose_failures --test_output=all --keep_going
 
+###################
+# Typescript
+###################
+# honor the setting of `skipLibCheck` in the tsconfig.json file
+# Bazel 6.4 or greater: 'common' means 'any command that supports this flag'
+common --@aspect_rules_ts//ts:skipLibCheck=honor_tsconfig
+# Define a transpiler for all ts_project rules. TSC is slower, but no extra deps are required (https://github.com/aspect-build/rules_ts/blob/main/docs/transpiler.md)
+common --@aspect_rules_ts//ts:default_to_tsc_transpiler
+
+
 ##############
 # user.bazelrc
 ##############

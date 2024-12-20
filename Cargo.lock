@@ -1831,6 +1831,7 @@ dependencies = [
  "chrono-tz",
  "diesel",
  "finances-app",
+ "finances-app-protocol",
  "finances_accounts",
  "finances_investments",
  "itertools 0.13.0",
@@ -1849,12 +1850,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "finances-app-protos"
+name = "finances-app-protocol"
 version = "0.1.0"
 dependencies = [
  "prost",
  "prost-build",
  "prost-types",
+ "serde",
 ]
 
 [[package]]
