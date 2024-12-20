@@ -1,10 +1,17 @@
 {
   "description": "Can log \"hello world\" and \"goodbye world\" to the console!",
+  "devDependencies": {
+    "protoc-gen-js": "^3.21.4",
+    "ts-protoc-gen": "^0.15.0"
+  },
   "files": [
     "/dist"
   ],
   "main": "dist/index.js",
   "name": "finances_app_protos",
+  "scripts": {
+    "build:proto": "scripts/protoc-generate.sh"
+  },
   "types": "dist/index.d.ts",
   "version": "1.0.0"
 }

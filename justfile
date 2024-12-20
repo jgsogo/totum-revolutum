@@ -35,6 +35,7 @@ test: build bazel-check
 # Build everything
 build: bazel-update
     cargo build
+    bazel run -- @pnpm install
     bazel build --keep_going //...
 
 # Run all the Bazel targets labelled with 'update' tag
