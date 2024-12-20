@@ -36,3 +36,4 @@ export declare type Account = Message<"finances_app.Account"> & {
  * Use `create(AccountSchema)` to create a new message.
  */
 export declare const AccountSchema: GenMessage<Account>;
+

@@ -2,3 +2,4 @@
 // @generated from file apps/finances/tauri/protocol/protos/account.proto (package finances_app, syntax proto3)
 /* eslint-disable */
 // @ts-nocheck
+

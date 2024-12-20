@@ -3,20 +3,11 @@ load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
-load("@rules_rust_prost//:defs.bzl", "rust_prost_library")
 
 # Testing with jest, example: https://github.com/aspect-build/bazel-examples/tree/main/jest
 # Maybe: https://stackoverflow.com/questions/59433880/jest-testing-with-bazel-throws-module-ts-jest-in-the-transform-option-was-not-f
 
 npm_link_all_packages(name = "node_modules")
-
-# Generate Rust bindings from the generated proto files
-# https://bazelbuild.github.io/rules_rust/rust_proto.html#rust_prost_library
-rust_prost_library(
-    name = "protos",
-    proto = "//apps/finances/tauri/protocol/protos:account_proto",
-    # TODO: Wait for https://github.com/bazelbuild/rules_rust/issues/2831, so we can add type_attributes, if not we can go the build.rs way
-)
 
 rust_library(
     name = "protocol",
@@ -32,7 +23,7 @@ rust_library(
     deps = all_crate_deps(
         normal = True,
     ) + [
-        ":protos",
+        "//apps/finances/tauri/protocol/protos:protos_rs",
     ],
 )
 

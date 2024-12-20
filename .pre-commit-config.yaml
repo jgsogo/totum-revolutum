@@ -17,6 +17,7 @@ repos:
       - id: check-merge-conflict
       - id: check-symlinks
       - id: end-of-file-fixer
+        exclude: ".d.ts$"
       - id: mixed-line-ending
       - id: trailing-whitespace
       # - id: check-illegal-windows-names # Introduced in next version

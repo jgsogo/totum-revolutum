@@ -22,7 +22,6 @@ update-npm:
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri update
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/protocol update
-    bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/protocol/protos update
 
 update-python:
     bazel run @@//bazel/third_party:python_requirements
@@ -41,7 +40,6 @@ build: bazel-update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/protocol install
-    bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/protocol/protos install
     bazel build --keep_going //...
 
 # Run all the Bazel targets labelled with 'update' tag

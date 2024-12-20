@@ -1,6 +1,11 @@
 {
+  "dependencies": {
+    "@bufbuild/protobuf": "2.2.3"
+  },
   "description": "Can log \"hello world\" and \"goodbye world\" to the console!",
   "devDependencies": {
+    "@bufbuild/protoc-gen-es": "2.2.3",
+    "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@testing-library/jest-dom": "6.6.3",
     "@types/jest": "29.5.14",
     "@types/node": "22.10.2",
