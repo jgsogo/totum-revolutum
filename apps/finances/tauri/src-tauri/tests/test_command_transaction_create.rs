@@ -33,7 +33,7 @@ fn test_create_transaction() {
                 // non-numerable movement
                 NewMovement {
                     account_pk: account_non_numerable,
-                    movement_type_pk: movement_type_pk,
+                    movement_type_pk,
                     date_value: "2024-12-10".to_string(),
                     amount: NewAmount {
                         amount: Some(200f32),
@@ -48,7 +48,7 @@ fn test_create_transaction() {
                 // dividend movement
                 NewMovement {
                     account_pk: account_numerable,
-                    movement_type_pk: movement_type_pk,
+                    movement_type_pk,
                     date_value: "2024-12-10".to_string(),
                     amount: NewAmount {
                         amount: None,
@@ -65,7 +65,7 @@ fn test_create_transaction() {
                 // numerable movement
                 NewMovement {
                     account_pk: account_numerable,
-                    movement_type_pk: movement_type_pk,
+                    movement_type_pk,
                     date_value: "2024-12-10".to_string(),
                     amount: NewAmount {
                         amount: None,
@@ -99,7 +99,7 @@ fn test_create_transaction() {
             movements_from: vec![],
             movements_to: vec![NewMovement {
                 account_pk: account_numerable,
-                movement_type_pk: movement_type_pk,
+                movement_type_pk,
                 date_value: "2024-12-10".to_string(),
                 amount: NewAmount {
                     amount: None,

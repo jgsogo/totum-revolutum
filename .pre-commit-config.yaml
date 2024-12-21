@@ -46,14 +46,6 @@ repos:
       - id: commitizen
         stages: [ commit-msg ]
 
-  # Run Rust pre-commit hooks
-  - repo: https://github.com/doublify/pre-commit-rust
-    rev: v1.0
-    hooks:
-      - id: fmt
-      - id: cargo-check
-      - id: clippy
-
   # Lint and format SQL files
   - repo: https://github.com/sqlfluff/sqlfluff
     rev: 3.3.0
@@ -86,18 +78,31 @@ repos:
   # Some local scripts
   - repo: local
     hooks:
-      # - id: cargo-check
-      #   name: cargo +nightly check
-      #   entry: cargo +nightly check
-      #   language: system
-      #   always_run: true
-      #   pass_filenames: false
-
       #      - id: branch-updated
       #        name: Branch up-to-date with master
       #        entry: scripts/branch_updated.sh
       #        language: script
       #        always_run: true
+
+      - id: rustfmt
+        name: Run rustfmt (rules_rust managed version)
+        entry: bazel/tools/rustfmt.sh
+        language: script
+        files: \.rs$
+
+      - id: cargo-check
+        name: Run cargo check (rules_rust managed version)
+        entry: bazel/tools/cargocheck.sh
+        language: script
+        pass_filenames: false
+        files: \.rs$
+
+      - id: cargo-clippy
+        name: Run cargo clipp (rules_rust managed version)
+        entry: bazel/tools/cargoclippy.sh
+        language: script
+        pass_filenames: false
+        files: \.rs$
 
       - id: bazel-check
         name: Run all Bazel targets with 'check' tag
