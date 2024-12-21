@@ -3,7 +3,7 @@
 
 load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rust_test_suite")
 
-def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_deps = None, test_suite_deps = None, test_docs_deps = None, **kwargs):
+def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_compile_data = None, test_deps = None, test_suite_deps = None, test_docs_deps = None, test_shared_srcs = [], **kwargs):
     """Creates a predefined set of targets for the given arguments.
 
     This macro generates the following targets:
@@ -24,9 +24,11 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
             target named `<name>/<key>` enabling the list of features in the `<value>` will be created,
             for each of the entries in the dictionary.
         test_data (List): data files (and targets) to add to the `data` argument in `rust_test`
+        test_compile_data (List): data files (and targets) to add to the `compile_data` argument in `rust_test`
         test_deps (List): dependencies only for the `rust_test` rule
         test_suite_deps (List): dependencies only for the `rust_test_suite` rule
         test_docs_deps (List): dependencies only for the `rust_doc_test` rule
+        test_shared_srcs (List): Optional argument for sources shared among tests, typically helper functions (for the `rust_test_suite` rule).
         **kwargs: other arguments to use for `rust_library`
     """
 
@@ -67,6 +69,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
         name = "tests",
         crate = ":{}".format(name),
         crate_features = collect_all_features,
+        compile_data = test_compile_data,
         data = test_data,
         deps = test_deps,
     )
@@ -78,7 +81,9 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
         name = "integration_tests",
         crate_features = collect_all_features,
         srcs = native.glob(["tests/**/test_*.rs"]),
+        compile_data = test_compile_data,
         data = test_data,
+        shared_srcs = test_shared_srcs,
         deps = deps + test_suite_deps + [":{}".format(name)],
     )
 

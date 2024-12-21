@@ -52,7 +52,7 @@ pub struct NewMovementDividend<'a> {
     pub unit_value: &'a NumericType,
 }
 
-impl<'a> NewMovementDividend<'a> {
+impl NewMovementDividend<'_> {
     pub fn insert_into_db(&self, conn: &mut PgConnection) -> std::result::Result<i64, diesel::result::Error> {
         conn.transaction(|conn| {
             let inner_movement_pk = self.new_movement.insert_into_db(conn)?;

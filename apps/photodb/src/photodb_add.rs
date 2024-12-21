@@ -52,8 +52,8 @@ pub trait PhotoDBAdd<FS: Filesystem + Clone + 'static> {
 }
 
 #[async_trait]
-impl<'a, T: Database + Send, TPCloudClient: PCloudClient + Clone + Send + 'static> PhotoDBAdd<FilesystemLocalSync>
-    for PhotoDB<'a, T, TPCloudClient>
+impl<T: Database + Send, TPCloudClient: PCloudClient + Clone + Send + 'static> PhotoDBAdd<FilesystemLocalSync>
+    for PhotoDB<'_, T, TPCloudClient>
 {
     async fn add_from_file(
         &mut self,
