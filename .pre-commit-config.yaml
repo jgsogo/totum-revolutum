@@ -99,7 +99,7 @@ repos:
 
       - id: cargo-clippy
         name: Run cargo clipp (rules_rust managed version)
-        entry: bazel run @rules_rust//tools/upstream_wrapper:cargo_clippy
+        entry: bazel/tools/cargoclippy.sh
         language: script
         pass_filenames: false
         files: \.rs$
