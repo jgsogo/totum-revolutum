@@ -1,6 +1,9 @@
 # https://rust-lang.github.io/rustfmt/?version=v1.5.1
 
+edition = "2021"
 max_width = 120
+use_field_init_shorthand = true
+reorder_imports = true
 
 # TODO: Only supported in nightly. Meanwhile, we are patching the generated schema.rs files to skip rustfmt
 #ignore = [
