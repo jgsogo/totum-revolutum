@@ -34,6 +34,10 @@ test: build bazel-check
 # Build everything
 build: bazel-update
     cargo build
+    bazel run -- @pnpm install --recursive  # FIXME: Are the next ones needed?
+    bazel run -- @pnpm --dir $(pwd)/sandbox/tauri-hello-world install
+    bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
+    bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri install
     bazel build --keep_going //...
 
 # Run all the Bazel targets labelled with 'update' tag
