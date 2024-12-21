@@ -6,12 +6,12 @@ filegroup(
 genrule(
     name = "sh",
     srcs = [":all-files"],
-    outs = ["gh.sh",],
-    cmd = "echo 'gh $$@' >$@"
+    outs = ["gh.sh"],
+    cmd = "echo 'gh $$@' >$@",
 )
 
 sh_binary(
-  name = "gh",
-  srcs = [":sh"],
-  visibility = ["//visibility:public"],
+    name = "gh",
+    srcs = [":sh"],
+    visibility = ["//visibility:public"],
 )
