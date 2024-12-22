@@ -44,7 +44,7 @@ pub struct NewMovement<'a> {
     pub transaction_id: &'a i64,
 }
 
-impl<'a> NewMovement<'a> {
+impl NewMovement<'_> {
     pub fn insert_into_db(&self, conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {
         diesel::insert_into(crate::schema::finances_accounts_movement::table)
             .values(self)

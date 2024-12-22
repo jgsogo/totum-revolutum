@@ -17,8 +17,10 @@ repos:
       - id: check-merge-conflict
       - id: check-symlinks
       - id: end-of-file-fixer
+        exclude: ".patch$"
       - id: mixed-line-ending
       - id: trailing-whitespace
+        exclude: ".patch$"
       # - id: check-illegal-windows-names # Introduced in next version
       - id: check-yaml
       - id: check-json

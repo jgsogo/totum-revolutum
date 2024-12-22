@@ -31,7 +31,6 @@ pub fn sha256_string<R: Read>(reader: R) -> Result<String> {
 }
 
 /// Computes sha256 and returns it as lowercase string
-
 pub fn sha256_string_from_file(file: impl AsRef<Utf8Path>) -> Result<String> {
     let input = File::open(file.as_ref())?;
     let reader = BufReader::new(input);

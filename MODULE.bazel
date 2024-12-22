@@ -8,7 +8,7 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "platforms", version = "0.0.10")
 
 bazel_dep(name = "rules_python", version = "1.0.0", dev_dependency = True)
-bazel_dep(name = "rules_rust", version = "0.54.1", dev_dependency = True)
+bazel_dep(name = "rules_rust", version = "0.56.0", dev_dependency = True)
 
 bazel_dep(name = "rules_nodejs", version = "6.3.2")
 bazel_dep(name = "aspect_rules_py", version = "1.0.0")
@@ -22,6 +22,18 @@ bazel_dep(name = "aspect_rules_js", version = "2.1.2")
 bazel_dep(name = "aspect_rules_ts", version = "3.3.2")
 
 bazel_dep(name = "rules_uv", version = "0.44.0", dev_dependency = True)
+
+# FIXME: Override rules_rust to add this patch: https://github.com/bazelbuild/rules_rust/pull/3102, required for the protobuf-stuff
+archive_override(
+    module_name = "rules_rust",
+    integrity = "sha256-GtOMBT3FH1/Wmdfsp/mi5gYltPeulIwTxHDnSU04fu4=",
+    patch_strip = 1,
+    patches = [
+        "@//bazel/external:rules_rust_0001-Workspace_members.patch",
+    ],
+    strip_prefix = "rules_rust-89aec557796a3a404f3458b8643a85d49a789b83",
+    urls = ["https://github.com/bazelbuild/rules_rust/archive/89aec557796a3a404f3458b8643a85d49a789b83.tar.gz"],
+)
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
@@ -113,7 +125,6 @@ crate.from_cargo(
         # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
         "//bazel/external:Cargo.toml",
         # Sandbox apps
-        "//sandbox/tauri-hello-world/src-tauri:Cargo.toml",
     ],
     # Limiting the number of supported platforms can help with performance: https://github.com/bazelbuild/rules_rust/discussions/2259
     supported_platform_triples = [
@@ -147,7 +158,6 @@ npm.npm_translate_lock(
     data = [
         "//apps/finances/tauri:package.json",
         "//sandbox/svelte-hello-world:package.json",
-        "//sandbox/tauri-hello-world:package.json",
     ],
     # generate_bzl_library_targets = True,
     npmrc = "//:.npmrc",

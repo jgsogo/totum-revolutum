@@ -52,7 +52,7 @@ pub struct NewSnapshotNumerable<'a> {
     pub unit_value: &'a NumericType,
 }
 
-impl<'a> NewSnapshotNumerable<'a> {
+impl NewSnapshotNumerable<'_> {
     pub fn insert_into_db(&self, conn: &mut PgConnection) -> std::result::Result<i64, diesel::result::Error> {
         conn.transaction(|conn| {
             let inner_snapshot_pk = self.new_snapshot.insert_into_db(conn)?;

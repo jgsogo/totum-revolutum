@@ -32,7 +32,7 @@ pub struct NewSnapshot<'a> {
     pub account_id: &'a i64,
 }
 
-impl<'a> NewSnapshot<'a> {
+impl NewSnapshot<'_> {
     pub fn insert_into_db(&self, conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {
         diesel::insert_into(crate::schema::finances_accounts_snapshot::table)
             .values(self)

@@ -186,8 +186,6 @@ labels:
     color: "000000"
   - name: cmp:sandbox/svelte-hello-world
     color: "000000"
-  - name: cmp:sandbox/tauri-hello-world
-    color: "000000"
   - name: cmp:scripts
     color: "000000"
   - name: cmp:tooling/python
