@@ -17,7 +17,7 @@ repos:
       - id: check-merge-conflict
       - id: check-symlinks
       - id: end-of-file-fixer
-        exclude: ".patch$"
+        exclude: ".patch$|.d.ts$"
       - id: mixed-line-ending
       - id: trailing-whitespace
         exclude: ".patch$"
@@ -100,7 +100,7 @@ repos:
         files: \.rs$
 
       - id: cargo-clippy
-        name: Run cargo clipp (rules_rust managed version)
+        name: Run cargo clippy (rules_rust managed version)
         entry: bazel/tools/cargoclippy.sh
         language: script
         pass_filenames: false

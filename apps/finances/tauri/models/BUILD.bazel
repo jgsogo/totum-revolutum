@@ -1,0 +1,35 @@
+# load("@aspect_rules_js//js:defs.bzl", "js_library")
+# load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+load("@crates_libraries//:defs.bzl", "all_crate_deps")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+# Testing with jest, example: https://github.com/aspect-build/bazel-examples/tree/main/jest
+# Maybe: https://stackoverflow.com/questions/59433880/jest-testing-with-bazel-throws-module-ts-jest-in-the-transform-option-was-not-f
+
+npm_link_all_packages(name = "node_modules")
+
+rust_library(
+    name = "models",
+    srcs = glob(
+        ["src-rust/**/*.rs"],
+    ),
+    crate_features = ["bazel"],
+    crate_name = "finances_app_models",
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    visibility = ["//visibility:public"],
+    deps = all_crate_deps(
+        normal = True,
+    ) + [
+        "//apps/finances/tauri/models/protos:protos_rs",
+    ],
+)
+
+# Unittests
+rust_test(
+    name = "tests",
+    crate = ":models",
+    crate_features = ["bazel"],
+)

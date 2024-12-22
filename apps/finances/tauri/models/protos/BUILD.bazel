@@ -1,0 +1,27 @@
+load("@aspect_rules_ts//ts:proto.bzl", "ts_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_rust_prost//:defs.bzl", "rust_prost_library")
+
+proto_library(
+    name = "account_proto",
+    srcs = ["account.proto"],
+    deps = ["@protobuf//:timestamp_proto"],
+)
+
+# This rule generates (and copies to the workspace) the proto files for Typescript
+ts_proto_library(
+    name = "protos_ts",
+    node_modules = "//apps/finances/tauri/models:node_modules",
+    proto = ":account_proto",
+    proto_srcs = ["account.proto"],
+    visibility = ["//apps/finances/tauri/models:__subpackages__"],
+)
+
+# Generate Rust bindings from the generated proto files
+# https://bazelbuild.github.io/rules_rust/rust_proto.html#rust_prost_library
+rust_prost_library(
+    name = "protos_rs",
+    proto = ":account_proto",
+    # TODO: Wait for https://github.com/bazelbuild/rules_rust/issues/2831, so we can add type_attributes, if not we can go the build.rs way
+    visibility = ["//apps/finances/tauri/models:__subpackages__"],
+)
