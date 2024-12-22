@@ -31,7 +31,7 @@ tauri-build = { version = "2.0.3", features = [] } # FIXME: If I don't list it h
 tauri = { version = "2.1.1", features = [] }
 tauri-plugin-shell = "2.0.2"
 serde = { version = "1.0.215", features = ["derive"] }
-serde_json = "1.0.133"
+serde_json = "1.0.134"
 thiserror = "1.0.69"
 log = "0.4.22"
 tauri-plugin-log = "2.0.3"
