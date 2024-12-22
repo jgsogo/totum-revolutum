@@ -1,0 +1,11 @@
+syntax = "proto3";
+package finances_app_models;
+
+import "google/protobuf/timestamp.proto";
+
+message Account {
+  string name = 1;
+  optional string description = 2;
+
+  optional google.protobuf.Timestamp open = 3;
+}

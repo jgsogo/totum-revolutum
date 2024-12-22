@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "@bufbuild/protobuf": "2.2.3"
+  },
+  "description": "Can log \"hello world\" and \"goodbye world\" to the console!",
+  "devDependencies": {
+    "@bufbuild/protoc-gen-es": "2.2.3",
+    "@connectrpc/protoc-gen-connect-es": "1.4.0",
+    "@testing-library/jest-dom": "6.6.3",
+    "@types/jest": "29.5.14",
+    "@types/node": "22.10.2",
+    "jest-cli": "29.7.0",
+    "jest-environment-jsdom": "29.7.0",
+    "jest-junit": "16.0.0"
+  },
+  "files": [
+    "/dist"
+  ],
+  "main": "dist/index.js",
+  "name": "finances_app_models",
+  "types": "dist/index.d.ts",
+  "version": "1.0.0"
+}

@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "apps/finances/tauri/src-tauri",
+    "apps/finances/tauri/models",
     "apps/photodb",
     "apps/syncronia",
     "libraries/cron",
@@ -74,6 +75,11 @@ mime = "0.3.17"
 mockall = { version = "0.13.0" }
 num-traits = "0.2.19"
 oxipng = { version = "9.0", features = ["parallel", "zopfli", "filetime"], default-features = false }
+prost = "0.13.4"
+prost-types = "0.13.4"
+prost-build = "0.13.4"
+# protoc-gen-prost = "0.4.0"
+# protoc-gen-tonic = "0.4.1"
 regex = "1.10.5"
 reqwest = { version = "0.12.4" }
 ring = "0.17.8"
@@ -85,7 +91,7 @@ serde_yaml = "0.9.34"
 sha256 = { version = "1.5" }
 strum = "0.26.3"
 strum_macros = "0.26.2"
-syn = { version = "2.0.90", features = ["visit"] }
+syn = { version = "2.0.91", features = ["visit"] }
 tauri-build = { version = "2.0.3", features = [] }
 tauri = { version = "2.1.1", features = [] }
 tauri-plugin-shell = "2.0.2"
@@ -96,6 +102,8 @@ time = { version = "0.3.36" }
 tokio = { version = "1.40" }
 tokio-stream = "0.1.15"
 toml = "0.8.19"
+# tonic = {version = "0.12.3", features = ["transport"]}
+# tonic-build = "0.12.3"
 tracing = { version = "0.1.40" }
 tracing-subscriber = { version = "0.3.18" }
 tryhard = { version = "0.5.1" }

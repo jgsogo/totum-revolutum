@@ -1,0 +1,35 @@
+load("@rules_rust//rust:defs.bzl", "rust_library_group")
+load("@rules_rust_prost//:defs.bzl", "rust_prost_toolchain")
+
+rust_library_group(
+    name = "prost_runtime",
+    deps = [
+        "@crates_libraries//:prost",
+    ],
+)
+
+# rust_library_group(
+#     name = "tonic_runtime",
+#     deps = [
+#         ":prost_runtime",
+#         "@crates_libraries//:tonic",
+#     ],
+# )
+
+rust_prost_toolchain(
+    name = "prost_toolchain_impl",
+    # Prost is to compile protobuf
+    prost_plugin = "@crates_protoc//:protoc-gen-prost__protoc-gen-prost",
+    prost_runtime = ":prost_runtime",
+    prost_types = "@crates_libraries//:prost-types",
+    # Tonic is about gRPC
+    # tonic_plugin = "@crates_protoc//:protoc-gen-tonic__protoc-gen-tonic",
+    # tonic_runtime = ":tonic_runtime",
+    tonic_plugin_flag = "",  # FIXME: Just to bypass this check https://github.com/bazelbuild/rules_rust/blob/7a1f0373f3c763e7d0b8a5c306641bc6a01603f0/extensions/prost/private/prost.bzl#L416, remove if using tonic/gRPC
+)
+
+toolchain(
+    name = "prost_toolchain",
+    toolchain = "prost_toolchain_impl",
+    toolchain_type = "@rules_rust_prost//:toolchain_type",
+)

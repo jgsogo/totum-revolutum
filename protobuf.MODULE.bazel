@@ -1,0 +1,62 @@
+# All the Bazel stuff required to have protobuf available
+#
+# Copied from: https://github.com/bazelbuild/rules_rust/blob/main/examples/bzlmod/proto/MODULE.bazel
+
+bazel_dep(name = "rules_proto", version = "7.1.0")
+bazel_dep(name = "toolchains_protoc", version = "0.3.6")
+bazel_dep(name = "protobuf", version = "29.2")
+bazel_dep(name = "toolchains_llvm", version = "1.2.0")
+bazel_dep(name = "rules_rust_prost", version = "0.56.0")
+
+###############################################################################
+# L L V M
+#
+# TODO: This LLVM stuff is related to C++, move it outside this protobuf related module
+# https://github.com/bazel-contrib/toolchains_llvm/blob/master/tests/MODULE.bazel
+###############################################################################
+llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+
+# LLVM Versions and platforms
+# https://github.com/bazel-contrib/toolchains_llvm/blob/master/toolchain/internal/llvm_distributions.bzl
+LLVM_VERSIONS = {
+    "": "19.1.0",
+    # "darwin-aarch64": "16.0.3",
+    # "darwin-x86_64": "15.0.7",
+}
+
+# LLVM toolchain.
+llvm.toolchain(
+    name = "llvm_toolchain",
+    llvm_versions = LLVM_VERSIONS,
+)
+use_repo(llvm, "llvm_toolchain", "llvm_toolchain_llvm")
+
+register_toolchains("@llvm_toolchain//:all")
+
+# 2 Register Proto toolchain
+###############################################################################
+# Proto toolchain
+# register_toolchains("@rules_rust_prost//:default_prost_toolchain")
+
+# Custom Prost toolchain
+register_toolchains("@//bazel/rust/prost:prost_toolchain")
+
+crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+crate.spec(
+    package = "protoc-gen-prost",
+    version = "0.4.0",
+)
+crate.annotation(
+    crate = "protoc-gen-prost",
+    gen_binaries = ["protoc-gen-prost"],
+)
+crate.spec(
+    package = "protoc-gen-tonic",
+    version = "0.4.1",
+)
+crate.annotation(
+    crate = "protoc-gen-tonic",
+    gen_binaries = ["protoc-gen-tonic"],
+)
+crate.from_specs(name = "crates_protoc")
+use_repo(crate, "crates_protoc")
