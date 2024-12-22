@@ -1,3 +1,6 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+
 # load("@aspect_rules_js//js:defs.bzl", "js_library")
 # load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
@@ -32,4 +35,26 @@ rust_test(
     name = "tests",
     crate = ":models",
     crate_features = ["bazel"],
+)
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+    visibility = ["//visibility:public"],
+)
+
+js_library(
+    name = "jest_config",
+    srcs = ["jest.config.js"],
+    visibility = ["//visibility:public"],
+)
+
+# Exposed via js_library()
+js_library(
+    name = "pkg",
+    srcs = [
+        "package.json",
+        "//apps/finances/tauri/models/src-js:lib",
+    ],
+    visibility = ["//visibility:public"],
 )
