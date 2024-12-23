@@ -9,6 +9,7 @@
   },
   "include": [
     "src-js/**/*.ts",
+    "protos/**/*.ts",
     "@types/**/*.d.ts"
   ]
 }

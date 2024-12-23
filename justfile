@@ -32,13 +32,16 @@ test: build bazel-check
     bazel test --test_keep_going //...
 
 # Build everything
-build: bazel-update
+build: bazel-update npm-install
     cargo build
+    bazel build --keep_going //...
+
+npm-install:
     bazel run -- @pnpm install --recursive  # FIXME: Are the next ones needed?
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/models install
-    bazel build --keep_going //...
+
 
 # Run all the Bazel targets labelled with 'update' tag
 bazel-update:

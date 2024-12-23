@@ -1,1 +1,1 @@
-export {sayHello, sayGoodbye} from './hello-world'
+export {  AccountSchema} from '../protos/account_pb.js';

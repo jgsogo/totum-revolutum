@@ -5,10 +5,11 @@
 
 /** @type {import('ts-jest').JestConfigWithTsJest} **/
 module.exports = {
-    testEnvironment: "jsdom",
+    globals: { TextDecoder, TextEncoder },
     // testMatch: ["**/*.test.js", "**/*.test.ts"],
     // preset: 'ts-jest',
     // transform: {
     //   "^.+.tsx?$": "ts-jest",
     // },
+    testEnvironment: "jsdom"
 };

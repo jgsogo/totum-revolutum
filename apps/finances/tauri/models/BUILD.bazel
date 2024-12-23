@@ -1,5 +1,6 @@
+load("@aspect_rules_jest//jest:defs.bzl", "jest_test")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
 
 # load("@aspect_rules_js//js:defs.bzl", "js_library")
 # load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
@@ -12,8 +13,12 @@ load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 
 npm_link_all_packages(name = "node_modules")
 
+###########
+# Rust library
+###########
+
 rust_library(
-    name = "models",
+    name = "models/rust",
     srcs = glob(
         ["src-rust/**/*.rs"],
     ),
@@ -33,20 +38,65 @@ rust_library(
 # Unittests
 rust_test(
     name = "tests",
-    crate = ":models",
+    crate = ":models/rust",
     crate_features = ["bazel"],
 )
+
+###########
+# Javascript library
+###########
 
 ts_config(
     name = "tsconfig",
     src = "tsconfig.json",
-    visibility = ["//visibility:public"],
 )
 
 js_library(
     name = "jest_config",
     srcs = ["jest.config.js"],
-    visibility = ["//visibility:public"],
+)
+
+ts_project(
+    name = "lib",
+    srcs = glob(
+        ["src-js/**/*.ts"],
+        exclude = ["**/*.spec.ts"],
+    ),
+    # out_dir = "dist",
+    data = ["package.json"],
+    declaration = True,
+    source_map = True,
+    tsconfig = ":tsconfig",
+    # visibility = ["//visibility:public"],
+    deps = [
+        ":node_modules/@types/node",
+        "//apps/finances/tauri/models/protos:protos_ts",
+    ],
+)
+
+ts_project(
+    name = "test_lib",
+    srcs = ["src-js/index.spec.ts"],
+    declaration = True,
+    source_map = True,
+    # out_dir = "dist",
+    tsconfig = ":tsconfig",
+    deps = [
+        ":lib",
+        ":node_modules/@testing-library/jest-dom",
+        ":node_modules/@types/jest",
+    ],
+)
+
+jest_test(
+    name = "test",
+    config = ":jest_config",
+    data = [
+        ":test_lib",
+        ":node_modules/jest-environment-jsdom",
+        # ":lib",
+    ],
+    node_modules = ":node_modules",
 )
 
 # Exposed via js_library()
@@ -54,7 +104,7 @@ js_library(
     name = "pkg",
     srcs = [
         "package.json",
-        "//apps/finances/tauri/models/src-js:lib",
+        ":lib",
     ],
     visibility = ["//visibility:public"],
 )
