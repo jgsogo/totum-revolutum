@@ -57,34 +57,30 @@ js_library(
 )
 
 ts_project(
-    name = "lib",
-    srcs = glob(
-        ["src-js/**/*.ts"],
-        exclude = ["**/*.spec.ts"],
-    ),
-    # out_dir = "dist",
-    data = ["package.json"],
+    name = "src_ts",
+    srcs = [
+        "src-js/a.ts",
+    ],
     declaration = True,
     source_map = True,
     tsconfig = ":tsconfig",
-    # visibility = ["//visibility:public"],
     deps = [
         ":node_modules/@types/node",
-        "//apps/finances/tauri/models/protos:protos_ts",
     ],
 )
 
 ts_project(
-    name = "test_lib",
-    srcs = ["src-js/index.spec.ts"],
+    name = "src_test_ts",
+    srcs = [
+        "src-js/a.spec.ts",
+    ],
     declaration = True,
     source_map = True,
-    # out_dir = "dist",
     tsconfig = ":tsconfig",
     deps = [
-        ":lib",
         ":node_modules/@testing-library/jest-dom",
         ":node_modules/@types/jest",
+        ":src_ts",
     ],
 )
 
@@ -92,19 +88,62 @@ jest_test(
     name = "test",
     config = ":jest_config",
     data = [
-        ":test_lib",
         ":node_modules/jest-environment-jsdom",
-        # ":lib",
+        ":src_test_ts",
     ],
     node_modules = ":node_modules",
 )
 
-# Exposed via js_library()
-js_library(
-    name = "pkg",
-    srcs = [
-        "package.json",
-        ":lib",
-    ],
-    visibility = ["//visibility:public"],
-)
+# ts_project(
+#     name = "lib",
+#     srcs = glob(
+#         ["src-js/**/*.ts"],
+#         exclude = ["**/*.spec.ts"],
+#     ),
+#     # out_dir = "dist",
+#     data = ["package.json"],
+#     declaration = True,
+#     source_map = True,
+#     tsconfig = ":tsconfig",
+#     # visibility = ["//visibility:public"],
+#     deps = [
+#         ":node_modules/@types/node",
+#         "//apps/finances/tauri/models/protos:protos_ts",
+#     ],
+# )
+
+# ts_project(
+#     name = "test_lib",
+#     srcs = ["src-js/index.spec.ts"],
+#     declaration = True,
+#     source_map = True,
+#     # out_dir = "dist",
+#     tsconfig = ":tsconfig",
+#     deps = [
+#         ":lib",
+#         ":node_modules/@testing-library/jest-dom",
+#         ":node_modules/@types/jest",
+#     ],
+# )
+
+# jest_test(
+#     name = "test",
+#     config = ":jest_config",
+#     data = [
+#         ":test_lib",
+#         ":node_modules/jest-environment-jsdom",
+#         ":node_modules/ts-jest",
+#         # ":lib",
+#     ],
+#     node_modules = ":node_modules",
+# )
+
+# # Exposed via js_library()
+# js_library(
+#     name = "pkg",
+#     srcs = [
+#         "package.json",
+#         ":lib",
+#     ],
+#     visibility = ["//visibility:public"],
+# )

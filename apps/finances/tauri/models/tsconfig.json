@@ -1,15 +1,8 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "forceConsistentCasingInFileNames": true,
     "inlineSources": true,
     "module": "commonjs",
-    "sourceMap": true,
-    "target": "es2019"
-  },
-  "include": [
-    "src-js/**/*.ts",
-    "protos/**/*.ts",
-    "@types/**/*.d.ts"
-  ]
+    "sourceMap": true
+  }
 }
