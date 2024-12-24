@@ -39,7 +39,7 @@
     "vite-plugin-tailwind-purgecss": "^0.3.5"
   },
   "license": "MIT",
-  "name": "finances",
+  "name": "@totum-revolutum/finances",
   "scripts": {
     "build": "vite build",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",

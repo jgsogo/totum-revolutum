@@ -156,6 +156,10 @@ npm.npm_translate_lock(
         "vite": [
             "vite=./bin/vite",
         ],
+        "@tauri-apps/cli": [
+            # ./tauri.js
+            "tauri=./tauri.js",
+        ],
     },
     data = [
         "//apps/finances/tauri:package.json",

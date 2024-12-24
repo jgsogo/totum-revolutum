@@ -29,7 +29,8 @@ expand_template(
 with_docker_compose_run(
     name = "dev",
     binaries = [
-        "//apps/finances/tauri:dev_sh",
+        "//apps/finances/tauri:dev",
+        # "//apps/finances/tauri:dev_sh",
     ],
     docker_compose = [
         "//apps/finances/django:app-docker_compose",

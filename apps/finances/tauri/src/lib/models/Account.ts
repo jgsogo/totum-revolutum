@@ -3,6 +3,11 @@ import { Movement } from "$lib/models/Movement";
 import { get_account_snapshot_latest, get_account_snapshots, get_account_movements } from "$lib/commands"
 import { Custodian } from "./Custodian";
 
+
+// import { AccountSchema} from 'models/protos/account_pb';
+import { AccountSchema} from '../../../models/protos/account_pb';
+// import { AccountSchema} from '../../../models/src-js/index';
+
 export enum AccountCategories {
     default = 'default',
     numerable_stock = 'numerable_stock',

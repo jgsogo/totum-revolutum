@@ -24,7 +24,7 @@ def _sh_with_runfiles_binary_impl(ctx):
         is_executable = True,
     )
 
-    runfiles = ctx.runfiles([], transitive_files = depset([]))
+    runfiles = ctx.runfiles([], transitive_files = depset([]), collect_data = True)
     runfiles = runfiles.merge(ctx.attr.tool.default_runfiles)
     runfiles = runfiles.merge(ctx.attr._runfiles.default_runfiles)
 
@@ -44,6 +44,9 @@ sh_with_runfiles_binary = rule(
             executable = True,
             cfg = "exec",
             mandatory = True,
+        ),
+        "data": attr.label_list(
+            allow_files = True,
         ),
         "_run_template": attr.label(
             default = Label("//bazel:sh_with_runfiles_binary.tpl.sh"),
