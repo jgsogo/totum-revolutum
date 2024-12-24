@@ -1,9 +1,5 @@
 import { create, toBinary, toJson } from "@bufbuild/protobuf";
 import { AccountSchema} from './index';
-import { configureTextEncoding } from "@bufbuild/protobuf/wire";
-// import { TextEncoder, TextDecoder } from "web-encoding"
-
-// configureTextEncoding();
 
 
 describe('concatenate module', () => {

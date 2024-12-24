@@ -1,0 +1,5 @@
+{
+    "testEnvironment": "module",
+    "testMatch": ["**/*.test.js"]
+  }
+  

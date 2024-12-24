@@ -14,11 +14,14 @@ ts_proto_library(
     node_modules = "//apps/finances/tauri/models:node_modules",
     proto = ":account_proto",
     proto_srcs = ["account.proto"],
+    protoc_gen_options = {
+        # FIXME: Use legacy imports, otherwise the `jest_test` is not able to use those js files
+        "js_import_style":"legacy_commonjs"
+    },
     visibility = ["//apps/finances/tauri/models:__subpackages__"],
 )
 
 # Generate Rust bindings from the generated proto files
-# https://bazelbuild.github.io/rules_rust/rust_proto.html#rust_prost_library
 rust_prost_library(
     name = "protos_rs",
     proto = ":account_proto",
