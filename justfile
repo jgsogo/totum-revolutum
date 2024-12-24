@@ -39,6 +39,7 @@ build: bazel-update npm-install
 npm-install:
     bazel run -- @pnpm install --recursive  # FIXME: Are the next ones needed?
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
+    bazel run -- @pnpm --dir $(pwd)/sandbox/ts-library-with-tests install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/models install
 

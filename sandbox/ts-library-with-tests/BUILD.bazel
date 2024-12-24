@@ -1,0 +1,56 @@
+load("@aspect_rules_jest//jest:defs.bzl", "jest_test")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+)
+
+js_library(
+    name = "jest_config",
+    srcs = ["jest.config.js"],
+)
+
+ts_project(
+    name = "src_ts",
+    srcs = [
+        "a.ts",
+    ],
+    declaration = True,
+    # source_map = True,
+    tsconfig = ":tsconfig",
+    deps = [
+        ":node_modules/@types/node",
+        # "//apps/finances/tauri/models/protos:protos_ts",
+    ],
+)
+
+ts_project(
+    name = "src_test_ts",
+    srcs = [
+        "a.test.ts",
+        # "src-js/index.spec.ts",
+    ],
+    declaration = True,
+    # source_map = True,
+    tsconfig = ":tsconfig",
+    deps = [
+        ":node_modules/@testing-library/jest-dom",
+        ":node_modules/@types/jest",
+        ":src_ts",
+    ],
+)
+
+jest_test(
+    name = "test",
+    config = ":jest_config",
+    data = [
+        ":node_modules/jest-environment-jsdom",
+        ":src_test_ts",
+    ],
+    node_modules = ":node_modules",
+)

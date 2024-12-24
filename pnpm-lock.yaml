@@ -195,6 +195,30 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8
 
+  sandbox/ts-library-with-tests:
+    devDependencies:
+      '@testing-library/jest-dom':
+        specifier: 6.6.3
+        version: 6.6.3
+      '@types/jest':
+        specifier: 29.5.14
+        version: 29.5.14
+      '@types/node':
+        specifier: 22.10.2
+        version: 22.10.2
+      jest-cli:
+        specifier: 29.7.0
+        version: 29.7.0(@types/node@22.10.2)
+      jest-environment-jsdom:
+        specifier: 29.7.0
+        version: 29.7.0
+      jest-junit:
+        specifier: 16.0.0
+        version: 16.0.0
+      typescript:
+        specifier: 5.7.2
+        version: 5.7.2
+
 packages:
 
   /@adobe/css-tools@4.4.1:

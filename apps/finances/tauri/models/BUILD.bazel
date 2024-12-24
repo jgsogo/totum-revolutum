@@ -49,6 +49,7 @@ rust_test(
 ts_config(
     name = "tsconfig",
     src = "tsconfig.json",
+    visibility = ["//apps/finances/tauri/models:__subpackages__"],
 )
 
 js_library(
@@ -60,12 +61,14 @@ ts_project(
     name = "src_ts",
     srcs = [
         "src-js/a.ts",
+        "src-js/index.ts",
     ],
     declaration = True,
     source_map = True,
     tsconfig = ":tsconfig",
     deps = [
         ":node_modules/@types/node",
+        "//apps/finances/tauri/models/protos:protos_ts",
     ],
 )
 
@@ -73,6 +76,7 @@ ts_project(
     name = "src_test_ts",
     srcs = [
         "src-js/a.spec.ts",
+        "src-js/index.spec.ts",
     ],
     declaration = True,
     source_map = True,
