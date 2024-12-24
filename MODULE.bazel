@@ -161,7 +161,6 @@ npm.npm_translate_lock(
         "//apps/finances/tauri:package.json",
         "//apps/finances/tauri/models:package.json",
         "//sandbox/svelte-hello-world:package.json",
-        "//sandbox/ts-library-with-tests:package.json",
     ],
     # generate_bzl_library_targets = True,
     npmrc = "//:.npmrc",

@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "declaration": true,
-    "module": "commonjs",
-    // "moduleResolution": "nodenext",
-    // "lib": ["ES2022", "dom"],
-    "forceConsistentCasingInFileNames": true
-  }
-}

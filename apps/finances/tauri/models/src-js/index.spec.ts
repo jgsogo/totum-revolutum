@@ -1,13 +1,17 @@
-import { create, toBinary, toJson } from "@bufbuild/protobuf";
+import { create, toBinary, toJson, fromBinary, fromJson } from "@bufbuild/protobuf";
 import { AccountSchema} from './index';
 
 
-describe('concatenate module', () => {
-    test('test_concatenate', ()=> {
-        let msg = create(AccountSchema, { name: 'account name' });
-        expect('account name').toBe('account name')
-        // let msg = Account.fromJson({ name: 'account name' });
-        // let account = Account.fromBinary(msg.toBinary());
-        // expect(account.name).toBe('account name')
+describe('Account roundtrip', () => {
+    let account = create(AccountSchema, { name: 'account name' });
+    test('test_binary', ()=> {
+        const bytes = toBinary(AccountSchema, account);
+        expect(fromBinary(AccountSchema, bytes).name).toBe(account.name)
+    });
+
+    test('test_json', ()=> {
+        const json = toJson(AccountSchema, account);
+        expect(json['name']).toBe(account.name);
+        expect(fromJson(AccountSchema, json).name).toBe(account.name)
     });
 });

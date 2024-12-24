@@ -2,7 +2,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "2.2.3"
   },
-  "description": "Can log \"hello world\" and \"goodbye world\" to the console!",
+  "description": "Models used to exchange information between Tauri backend and frontend (se protobuf)",
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "2.2.3",
     "@connectrpc/protoc-gen-connect-es": "1.6.1",
@@ -14,6 +14,6 @@
     "jest-junit": "16.0.0",
     "typescript": "5.7.2"
   },
-  "name": "jest",
+  "name": "finances-app-models",
   "private": true
 }
