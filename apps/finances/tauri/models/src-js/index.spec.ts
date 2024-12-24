@@ -1,5 +1,5 @@
-import { create, toBinary, toJson, fromBinary, fromJson } from "@bufbuild/protobuf";
-import { AccountSchema} from './index';
+import { create, toBinary, toJson, fromBinary, fromJson, JsonObject } from "@bufbuild/protobuf";
+import { AccountSchema } from './index';
 
 
 describe('Account roundtrip', () => {
@@ -10,7 +10,7 @@ describe('Account roundtrip', () => {
     });
 
     test('test_json', ()=> {
-        const json = toJson(AccountSchema, account);
+        const json: JsonObject = toJson(AccountSchema, account)! as JsonObject;
         expect(json['name']).toBe(account.name);
         expect(fromJson(AccountSchema, json).name).toBe(account.name)
     });

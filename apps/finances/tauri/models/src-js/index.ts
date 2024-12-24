@@ -1,1 +1,1 @@
-export {  AccountSchema} from '../protos/account_pb';
+export {  AccountSchema } from '../protos/account_pb';

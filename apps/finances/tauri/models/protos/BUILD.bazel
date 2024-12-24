@@ -18,7 +18,7 @@ ts_proto_library(
         # FIXME: Use legacy imports, otherwise the `jest_test` is not able to use those js files
         "js_import_style":"legacy_commonjs"
     },
-    visibility = ["//apps/finances/tauri/models:__subpackages__"],
+    visibility = ["//visibility:public"],
 )
 
 # Generate Rust bindings from the generated proto files

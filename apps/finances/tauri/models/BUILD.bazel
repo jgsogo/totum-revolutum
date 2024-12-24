@@ -65,6 +65,7 @@ ts_project(
         ":node_modules/@types/node",
         "//apps/finances/tauri/models/protos:protos_ts",
     ],
+    visibility = ["//visibility:public"]
 )
 
 ts_project(
@@ -98,7 +99,7 @@ jest_test(
 #     name = "pkg",
 #     srcs = [
 #         "package.json",
-#         ":lib",
+#         ":src_ts",
 #     ],
 #     visibility = ["//visibility:public"],
 # )
