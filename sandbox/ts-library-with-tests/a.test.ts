@@ -1,4 +1,4 @@
-import {A} from './a'
+import {A, BarSchema} from './a'
 
 describe('concatenate module', () => {
     test('test_concatenate', ()=> {

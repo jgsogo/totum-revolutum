@@ -1,4 +1,4 @@
 module.exports = {
-    testEnvironment: 'jsdom',
-    globals: { TextDecoder, TextEncoder }
-  };
+  // testEnvironment: 'jsdom',
+  globals: { TextDecoder, TextEncoder }
+};
