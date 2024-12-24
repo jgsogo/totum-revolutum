@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
-    "declaration": true
+    "declaration": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "lib": ["ES2022", "dom"]
   }
 }

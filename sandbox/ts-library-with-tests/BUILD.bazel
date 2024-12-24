@@ -30,12 +30,19 @@ ts_config(
 #     srcs = ["jest.config.js"],
 # )
 
-js_library(
+ts_project(
     name = "jest_config",
-    srcs = ["jest.config.js"],
+    srcs = ["jest.config.ts"],
     data = [
         "package.json",  # for type=module
     ],
+    declaration = True,
+    tsconfig = ":tsconfig",
+    deps = [
+        ":node_modules/jest",
+        ":node_modules/@types/jest",
+        ":node_modules/@types/node",
+    ]
 )
 
 ts_project(
