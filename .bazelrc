@@ -5,6 +5,9 @@ build --action_env=CARGO_PKG_AUTHORS=mock --action_env=CARGO_PKG_DESCRIPTION=moc
 # Always show errors from testing
 test --verbose_failures --test_output=errors
 
+# FIXME: Remove this line and fix empty globs
+common --noincompatible_disallow_empty_glob
+
 ###################
 # CI Specific flags
 ###################

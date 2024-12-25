@@ -1,0 +1,20 @@
+{
+  "name": "totum-revolutum",
+  "pnpm": {
+    "packageExtensions": {
+      "flowbite": {
+        "dependencies": {
+          "tailwindcss": "*"
+        }
+      }
+    }
+  },
+  "private": true,
+  "scripts": {},
+  "version": "0.0.0",
+  "workspaces": [
+    "sandbox/*",
+    "apps/finances/tauri",
+    "apps/finances/tauri/models"
+  ]
+}

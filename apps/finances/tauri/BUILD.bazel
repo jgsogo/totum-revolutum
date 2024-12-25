@@ -21,13 +21,17 @@ js_run_devserver(
     command = "./node_modules/.bin/vite",
     data = [
         # Configs
-        "vite.config.js",
         "package.json",
-        "tsconfig.json",
+        "postcss.config.cjs",
         "svelte.config.js",
+        "tailwind.config.js",
+        "tsconfig.json",
+        "vite.config.js",
 
         # Build deps
         ":node_modules",  # TODO: Use //:node_modules instead
+        # ":node_modules/tailwindcss",
+        # ":node_modules/flowbite",
         "//apps/finances/tauri/models:src_ts",
         "//apps/finances/tauri/models/protos:protos_ts",
 

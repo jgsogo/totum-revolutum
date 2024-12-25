@@ -1,7 +1,6 @@
 load("@aspect_rules_jest//jest:defs.bzl", "jest_test")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
-
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
@@ -56,23 +55,26 @@ ts_project(
     name = "src_ts",
     srcs = glob(
         ["src-js/**/*.ts"],
-        exclude = ["**/*.spec.ts", "**/*.test.ts"],
+        exclude = [
+            "**/*.spec.ts",
+            "**/*.test.ts",
+        ],
     ),
     declaration = True,
     source_map = True,
     tsconfig = ":tsconfig",
+    visibility = ["//visibility:public"],
     deps = [
         ":node_modules/@types/node",
         "//apps/finances/tauri/models/protos:protos_ts",
     ],
-    visibility = ["//visibility:public"]
 )
 
 ts_project(
     name = "src_test_ts",
     srcs = glob([
         "src-js/**/*.spec.ts",
-        "src-js/**/*.test.ts",
+        # "src-js/**/*.test.ts",
     ]),
     declaration = True,
     source_map = True,

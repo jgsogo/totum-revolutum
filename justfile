@@ -37,7 +37,8 @@ build: bazel-update npm-install
     bazel build --keep_going //...
 
 npm-install:
-    bazel run -- @pnpm install --recursive  # FIXME: Are the next ones needed?
+    bazel run -- @pnpm//:pnpm --dir $(pwd) install --lockfile-only # Only this one is needed to update pnpm-lock.yaml
+    bazel run -- @pnpm --dir $(pwd) install --recursive  # FIXME: Are the next ones needed?
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/models install
