@@ -438,7 +438,7 @@
     "@@aspect_rules_ts+//ts:extensions.bzl%ext": {
       "general": {
         "bzlTransitiveDigest": "KGhgk1bHleBGI80aMWunBVSiWFlrkXg/D7auEDQXJoM=",
-        "usagesDigest": "KfWj/VWWYWgBwxqAoc8ip7FXQgJXBYif6V049npon20=",
+        "usagesDigest": "cnLIMNCl7ns5WnPKhrSbRsDqAqFb7119waE13S7zYIA=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -447,8 +447,9 @@
             "repoRuleId": "@@aspect_rules_ts+//ts/private:npm_repositories.bzl%http_archive_version",
             "attributes": {
               "bzlmod": true,
-              "version": "5.6.3",
-              "integrity": "",
+              "version": "",
+              "version_from": "@@//:package.json",
+              "integrity": "sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==",
               "build_file": "@@aspect_rules_ts+//ts:BUILD.typescript",
               "build_file_substitutions": {
                 "bazel_worker_version": "5.4.2",
