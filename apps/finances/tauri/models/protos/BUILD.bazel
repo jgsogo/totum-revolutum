@@ -15,9 +15,6 @@ ts_proto_library(
     proto = ":account_proto",
     proto_srcs = ["account.proto"],
     protoc_gen_options = {
-        # FIXME: Use legacy imports, otherwise the `jest_test` is not able to use those js files
-        # "js_import_style":"legacy_commonjs"
-        # "target": "js+dts"
         "import_extension": "js",
     },
     visibility = ["//visibility:public"],

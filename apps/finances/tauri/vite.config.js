@@ -31,7 +31,6 @@ export default defineConfig(async () => ({
     fs: {
       allow: [
         searchForWorkspaceRoot(process.cwd()),
-        // "/Users/jgsogo/personal/totum-revolutum/bazel-bin/apps/finances/tauri/devserver_/devserver.runfiles/_main/apps/finances/tauri",
         "/private/var/tmp/_bazel_jgsogo/", // TODO: Bazel deploys the node_modules inside this tmp folders
       ]
     },

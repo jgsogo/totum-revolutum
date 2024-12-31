@@ -42,11 +42,10 @@ rust_test(
 ts_config(
     name = "tsconfig",
     src = "tsconfig.json",
-    visibility = ["//apps/finances/tauri/models:__subpackages__"],
 )
 
 ts_project(
-    name = "src_ts",
+    name = "models/ts",
     srcs = glob(
         ["src-js/**/*.ts"],
         exclude = [
@@ -74,8 +73,8 @@ ts_project(
     source_map = True,
     tsconfig = ":tsconfig",
     deps = [
+        ":models/ts",
         ":node_modules/vitest",
-        ":src_ts",
     ],
 )
 

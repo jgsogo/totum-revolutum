@@ -37,6 +37,7 @@ build: bazel-update npm-install
     bazel build --keep_going //...
 
 npm-install:
+    # FIXME: Remove. These 'install' rules are just creating the node_modules in the workspace, but Bazel uses the ones in the build directory (created by the 'npm_link_all_packages' rule)
     bazel run -- @pnpm//:pnpm --dir $(pwd) install --lockfile-only # Only this one is needed to update pnpm-lock.yaml
     bazel run -- @pnpm --dir $(pwd) install --recursive  # FIXME: Are the next ones needed?
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install

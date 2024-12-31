@@ -4,9 +4,7 @@ import { get_account_snapshot_latest, get_account_snapshots, get_account_movemen
 import { Custodian } from "./Custodian";
 
 
-// import { AccountSchema} from 'models/protos/account_pb';
 import { AccountSchema} from '../../../models/protos/account_pb';
-// import { AccountSchema} from '../../../models/src-js/index';
 
 export enum AccountCategories {
     default = 'default',

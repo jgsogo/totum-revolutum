@@ -4,33 +4,13 @@ load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
 
 filegroup(
-    name = "tauri_conf_json",
-    srcs = ["tauri.conf.json"],
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
-    name = "cargo_toml",
-    srcs = ["Cargo.toml"],
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
-    name = "build_rs",
-    srcs = ["build.rs"],
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
     name = "capabilities",
     srcs = glob(["capabilities/**/*"]),
-    visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "icons",
     srcs = glob(["icons/**/*"]),
-    visibility = ["//visibility:public"],
 )
 
 filegroup(
@@ -42,36 +22,16 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-filegroup(
-    name = "srcs_bin",
-    srcs = ["src/main.rs"],
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
-    name = "all",
-    srcs = [
-        ":build_rs",
-        ":capabilities",
-        ":cargo_toml",
-        ":icons",
-        ":srcs_bin",
-        ":srcs_lib",
-        ":tauri_conf_json",
-    ],
-    visibility = ["//visibility:public"],
-)
-
 cargo_build_script(
     name = "build",
-    srcs = [":build_rs"],
+    srcs = ["build.rs"],
     build_script_env = {
         "DEP_TAURI_DEV": "false",
     },
     data = [
-        ":cargo_toml",
+        "Cargo.toml",
+        "tauri.conf.json",
         ":srcs_lib",
-        ":tauri_conf_json",
     ],
     deps = [
         "@crates_libraries//:tauri-build",
@@ -82,7 +42,7 @@ rust_library(
     name = "applib",
     srcs = [":srcs_lib"],
     compile_data = [
-        ":tauri_conf_json",
+        "tauri.conf.json",
         ":icons",
         ":capabilities",
     ],
@@ -108,9 +68,9 @@ rust_test(
         "postgres",
     ],
     data = [
+        "tauri.conf.json",
         ":capabilities",
         ":icons",
-        ":tauri_conf_json",
     ],
 )
 
@@ -161,7 +121,7 @@ with_postgres_test(
 
 rust_binary(
     name = "app",
-    srcs = [":srcs_bin"],
+    srcs = ["src/main.rs"],
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),

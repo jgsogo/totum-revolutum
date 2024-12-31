@@ -184,7 +184,7 @@ pnpm.pnpm(
 
 # Allows developers to use the matching pnpm version, for example:
 # bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world install
-use_repo(pnpm, "pnpm", "pnpm__links")
+use_repo(pnpm, "pnpm")
 
 ################################################################################
 # rules_ts

@@ -30,12 +30,8 @@ js_run_devserver(
 
         # Build deps
         ":node_modules",  # TODO: Use //:node_modules instead
-        # ":node_modules/tailwindcss",
-        # ":node_modules/flowbite",
-        "//apps/finances/tauri/models:src_ts",
+        "//apps/finances/tauri/models:models/ts",
         "//apps/finances/tauri/models/protos:protos_ts",
-
-        # "//apps/finances/tauri/src-tauri:tauri_conf_json",
 
         # Sources
         ":src",
@@ -50,45 +46,3 @@ tauri_run(
     frontend = ":devserver",
     visibility = ["//visibility:public"],
 )
-
-# # FIXME: This is mostly a workaround because the ":dev" target is not working (see ../README.md),
-# # it executes "tauri dev" outside Bazel using the files in the workspace
-# sh_with_runfiles_binary(
-#     name = "dev_sh",
-#     data = [
-#         # Configs
-#         "vite.config.js",
-#         "package.json",
-#         "tsconfig.json",
-#         "svelte.config.js",
-
-#         # Build deps
-#         ":node_modules",  # TODO: Use //:node_modules instead
-#         "//apps/finances/tauri/models:src_ts",
-#         "//apps/finances/tauri/models/protos:protos_ts",
-
-#         # "//apps/finances/tauri/src-tauri:tauri_conf_json",
-#         # "//apps/finances/tauri/src-tauri:app",
-#         "//apps/finances/tauri/src-tauri:all",
-
-#         # Sources
-#         ":src",
-#         ":static",
-#     ],
-#     args = [
-#         "--dir apps/finances/tauri",
-#         # "--dir /Users/jgsogo/personal/totum-revolutum/apps/finances/tauri",
-#         "tauri",
-#         "dev",
-#         # "--config=apps/finances/tauri/src-tauri/tauri.conf.json",
-#         "--no-watch",
-#         "--runner=andwhat", # This is the app to use to run the binary (cargo)
-#         # "--help",
-#     ],
-#     tags = [
-#         "manual",
-#         "workaround",
-#     ],
-#     tool = "@pnpm",
-#     visibility = ["//visibility:public"],
-# )
