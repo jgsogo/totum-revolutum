@@ -1,6 +1,10 @@
 {
+  "dependencies": {
+    "typescript": "5.7.2"
+  },
   "name": "totum-revolutum",
   "pnpm": {
+    "onlyBuiltDependencies": [],
     "packageExtensions": {
       "flowbite": {
         "dependencies": {
@@ -16,8 +20,5 @@
     "sandbox/*",
     "apps/finances/tauri",
     "apps/finances/tauri/models"
-  ],
-  "dependencies": {
-    "typescript": "5.7.2"
-  }
+  ]
 }

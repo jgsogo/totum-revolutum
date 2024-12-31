@@ -45,11 +45,6 @@ ts_config(
     visibility = ["//apps/finances/tauri/models:__subpackages__"],
 )
 
-# js_library(
-#     name = "jest_config",
-#     srcs = ["jest.config.js"],
-# )
-
 ts_project(
     name = "src_ts",
     srcs = glob(
@@ -79,8 +74,6 @@ ts_project(
     source_map = True,
     tsconfig = ":tsconfig",
     deps = [
-        # ":node_modules/@testing-library/jest-dom",
-        # ":node_modules/@types/jest",
         ":node_modules/vitest",
         ":src_ts",
     ],
@@ -96,28 +89,3 @@ vitest_bin.vitest_test(
         ":src_test_ts",
     ],
 )
-
-# js_test(
-#     name = "test.js_test",
-#     entry_point = "test.js",
-# )
-
-# jest_test(
-#     name = "test.jest",
-#     config = ":jest_config",
-#     data = [
-#         ":node_modules/jest-environment-jsdom",
-#         ":src_test_ts",
-#     ],
-#     node_modules = ":node_modules",
-# )
-
-# # Exposed via js_library()
-# js_library(
-#     name = "pkg",
-#     srcs = [
-#         "package.json",
-#         ":src_ts",
-#     ],
-#     visibility = ["//visibility:public"],
-# )

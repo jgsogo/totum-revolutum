@@ -20,9 +20,8 @@ bazel_dep(name = "aspect_bazel_lib", version = "2.10.0", dev_dependency = True)
 
 bazel_dep(name = "aspect_rules_js", version = "2.1.2")
 bazel_dep(name = "aspect_rules_ts", version = "3.3.2")
-bazel_dep(name = "aspect_rules_jest", version = "0.22.0")
 
-bazel_dep(name = "rules_uv", version = "0.46.0", dev_dependency = True)
+bazel_dep(name = "rules_uv", version = "0.48.0", dev_dependency = True)
 
 # FIXME: Override rules_rust to add this patch: https://github.com/bazelbuild/rules_rust/pull/3102, required for the protobuf-stuff
 archive_override(
@@ -60,14 +59,14 @@ http_jar(
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     configure_coverage_tool = True,
-    python_version = "3.12",
+    python_version = "3.13",
 )
 # use_repo(python, python_3 = "python_3_12") # Adds target @python_3//:python3, which is the Python interpreter
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "py_deps",
-    python_version = "3.12",
+    python_version = "3.13",
     requirements_lock = "//bazel/third_party:requirements.lock",
 )
 use_repo(pip, "py_deps")
@@ -179,8 +178,8 @@ use_repo(npm, "npm")
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
     name = "pnpm",
-    pnpm_version = "8.6.7",
-    pnpm_version_integrity = "sha512-vRIWpD/L4phf9Bk2o/O2TDR8fFoJnpYrp2TKqTIZF/qZ2/rgL3qKXzHofHgbXsinwMoSEigz28sqk3pQ+yMEQQ==",
+    pnpm_version = "9.15.2",
+    pnpm_version_integrity = "sha512-k+V7ASbw33TOa/8paAOUwLpU7Ecka5zzIfASHY2bsD91CnBfJO3DwRgIU6/XwsO5QZbQo9U9PgadnieT7xHzIQ==",
 )
 
 # Allows developers to use the matching pnpm version, for example:
@@ -193,10 +192,10 @@ use_repo(pnpm, "pnpm", "pnpm__links")
 
 rules_ts_ext = use_extension("@aspect_rules_ts//ts:extensions.bzl", "ext", dev_dependency = True)
 rules_ts_ext.deps(
-    ts_version_from = "//:package.json",
     # Use "curl --silent https://registry.npmjs.org/typescript/5.7.2 | jq -r '.dist.integrity'"
     # see docs: https://github.com/aspect-build/rules_ts/blob/bbce47640f888e56f48399cdc1e5af1dbf7e0c75/ts/repositories.bzl#L52
-    ts_integrity="sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg=="
+    ts_integrity = "sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==",
+    ts_version_from = "//:package.json",
 )
 use_repo(rules_ts_ext, "npm_typescript")
 
