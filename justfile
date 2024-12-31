@@ -44,7 +44,6 @@ npm-install:
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri install
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/models install
 
-
 # Run all the Bazel targets labelled with 'update' tag
 bazel-update:
     scripts/bazel_run_targets.sh update
