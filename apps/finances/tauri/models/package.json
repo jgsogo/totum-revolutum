@@ -12,14 +12,16 @@
     "jest-cli": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
     "jest-junit": "16.0.0",
-    "typescript": "5.7.2"
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
   },
-  "name": "@totum-revolutum/finances-app-models",
-  "private": true,
+  "exports": [
+    "./src-js/index.js"
+  ],
   "files": [
     "/src-js"
   ],
-  "exports": [
-    "./src-js/index.js"
-  ]
+  "name": "@totum-revolutum/finances-app-models",
+  "private": true,
+  "type": "module"
 }

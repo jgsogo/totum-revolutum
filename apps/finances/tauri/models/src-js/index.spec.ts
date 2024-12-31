@@ -1,6 +1,6 @@
 import { create, toBinary, toJson, fromBinary, fromJson, JsonObject } from "@bufbuild/protobuf";
-import { AccountSchema } from './index';
-
+import { AccountSchema } from './index.js';
+import { describe, test, expect } from 'vitest';
 
 describe('Account roundtrip', () => {
     let account = create(AccountSchema, { name: 'account name' });

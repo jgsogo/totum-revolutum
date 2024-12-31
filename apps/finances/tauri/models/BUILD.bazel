@@ -1,8 +1,7 @@
-load("@aspect_rules_jest//jest:defs.bzl", "jest_test")
-load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 
 npm_link_all_packages(name = "node_modules")
@@ -46,10 +45,10 @@ ts_config(
     visibility = ["//apps/finances/tauri/models:__subpackages__"],
 )
 
-js_library(
-    name = "jest_config",
-    srcs = ["jest.config.js"],
-)
+# js_library(
+#     name = "jest_config",
+#     srcs = ["jest.config.js"],
+# )
 
 ts_project(
     name = "src_ts",
@@ -59,7 +58,7 @@ ts_project(
             "**/*.spec.ts",
             "**/*.test.ts",
         ],
-    ),
+    ) + ["package.json"],
     declaration = True,
     source_map = True,
     tsconfig = ":tsconfig",
@@ -75,26 +74,43 @@ ts_project(
     srcs = glob([
         "src-js/**/*.spec.ts",
         # "src-js/**/*.test.ts",
-    ]),
+    ]) + ["package.json"],
     declaration = True,
     source_map = True,
     tsconfig = ":tsconfig",
     deps = [
-        ":node_modules/@testing-library/jest-dom",
-        ":node_modules/@types/jest",
+        # ":node_modules/@testing-library/jest-dom",
+        # ":node_modules/@types/jest",
+        ":node_modules/vitest",
         ":src_ts",
     ],
 )
 
-jest_test(
-    name = "test",
-    config = ":jest_config",
+vitest_bin.vitest_test(
+    name = "test.vitest",
+    args = ["run"],
+    chdir = package_name(),
     data = [
-        ":node_modules/jest-environment-jsdom",
+        "package.json",
+        ":node_modules",
         ":src_test_ts",
     ],
-    node_modules = ":node_modules",
 )
+
+# js_test(
+#     name = "test.js_test",
+#     entry_point = "test.js",
+# )
+
+# jest_test(
+#     name = "test.jest",
+#     config = ":jest_config",
+#     data = [
+#         ":node_modules/jest-environment-jsdom",
+#         ":src_test_ts",
+#     ],
+#     node_modules = ":node_modules",
+# )
 
 # # Exposed via js_library()
 # js_library(
