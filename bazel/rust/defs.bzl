@@ -80,7 +80,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
     rust_test_suite(
         name = "integration_tests",
         crate_features = collect_all_features,
-        srcs = native.glob(["tests/**/test_*.rs"]),
+        srcs = native.glob(["tests/**/test_*.rs"], allow_empty = True),
         compile_data = test_compile_data,
         data = test_data,
         shared_srcs = test_shared_srcs,

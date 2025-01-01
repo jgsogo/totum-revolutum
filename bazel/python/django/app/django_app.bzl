@@ -53,17 +53,17 @@ def django_app(name, deps = None, visibility = None, app_label = None):
     all_extensions = fixture_extensions + ["{}.{}".format(it1, it2) for it1 in fixture_extensions for it2 in fixture_compression_formats]
     native.filegroup(
         name = "{}/fixtures".format(name),
-        srcs = native.glob(["fixtures/**/*.{}".format(ext) for ext in all_extensions]),
+        srcs = native.glob(["fixtures/**/*.{}".format(ext) for ext in all_extensions], allow_empty = True),
     )
 
     native.filegroup(
         name = "{}/static".format(name),
-        srcs = native.glob(["static/**/*.*"]),
+        srcs = native.glob(["static/**/*.*"], allow_empty = True),
     )
 
     native.filegroup(
         name = "{}/templates".format(name),
-        srcs = native.glob(["templates/**/*.html"]),
+        srcs = native.glob(["templates/**/*.html"], allow_empty = True),
     )
 
     deps = depset([requirement("django")] + (deps or [])).to_list()
