@@ -30,7 +30,7 @@ diesel = { version = "2.2.6", features = ["r2d2", "chrono"] }
 tauri-build = { version = "2.0.3", features = [] } # FIXME: If I don't list it here, Bazel doesn't include it in crate_libraries
 tauri = { version = "2.1.1", features = [] }
 tauri-plugin-shell = "2.0.2"
-serde = { version = "1.0.215", features = ["derive"] }
+serde = { version = "1.0.217", features = ["derive"] }
 serde_json = "1.0.133"
 thiserror = "1.0.69"
 log = "0.4.22"
