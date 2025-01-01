@@ -68,7 +68,7 @@ jobs:
           cat ${{ runner.temp }}/base-hashes.json
 
       - name: Generate hashes from current
-        run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
+        run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
 
       - name: Compute impacted targets
         run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
