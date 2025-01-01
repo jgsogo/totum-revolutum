@@ -3,6 +3,25 @@ load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
 
+filegroup(
+    name = "capabilities",
+    srcs = glob(["capabilities/**/*"]),
+)
+
+filegroup(
+    name = "icons",
+    srcs = glob(["icons/**/*"]),
+)
+
+filegroup(
+    name = "srcs_lib",
+    srcs = glob(
+        ["src/**/*.rs"],
+        exclude = ["src/main.rs"],
+    ),
+    visibility = ["//visibility:public"],
+)
+
 cargo_build_script(
     name = "build",
     srcs = ["build.rs"],
@@ -12,7 +31,8 @@ cargo_build_script(
     data = [
         "Cargo.toml",
         "tauri.conf.json",
-    ] + glob(["src/**/*.rs"]),
+        ":srcs_lib",
+    ],
     deps = [
         "@crates_libraries//:tauri-build",
     ],
@@ -20,13 +40,12 @@ cargo_build_script(
 
 rust_library(
     name = "applib",
-    srcs = glob(
-        ["src/**/*.rs"],
-        exclude = ["src/main.rs"],
-    ),
+    srcs = [":srcs_lib"],
     compile_data = [
         "tauri.conf.json",
-    ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+        ":icons",
+        ":capabilities",
+    ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",
     proc_macro_deps = all_crate_deps(
@@ -50,7 +69,9 @@ rust_test(
     ],
     data = [
         "tauri.conf.json",
-    ] + glob(["icons/**"]) + glob(["capabilities/**"]),
+        ":capabilities",
+        ":icons",
+    ],
 )
 
 # Integration tests

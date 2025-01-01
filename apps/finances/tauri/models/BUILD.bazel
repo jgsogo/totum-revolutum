@@ -1,16 +1,17 @@
-# load("@aspect_rules_js//js:defs.bzl", "js_library")
-# load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
-
-# Testing with jest, example: https://github.com/aspect-build/bazel-examples/tree/main/jest
-# Maybe: https://stackoverflow.com/questions/59433880/jest-testing-with-bazel-throws-module-ts-jest-in-the-transform-option-was-not-f
 
 npm_link_all_packages(name = "node_modules")
 
+###########
+# Rust library
+###########
+
 rust_library(
-    name = "models",
+    name = "models/rust",
     srcs = glob(
         ["src-rust/**/*.rs"],
     ),
@@ -30,6 +31,60 @@ rust_library(
 # Unittests
 rust_test(
     name = "tests",
-    crate = ":models",
+    crate = ":models/rust",
     crate_features = ["bazel"],
+)
+
+###########
+# Javascript library
+###########
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+)
+
+ts_project(
+    name = "models/ts",
+    srcs = glob(
+        ["src-js/**/*.ts"],
+        exclude = [
+            "**/*.spec.ts",
+            "**/*.test.ts",
+        ],
+    ) + ["package.json"],
+    declaration = True,
+    source_map = True,
+    tsconfig = ":tsconfig",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":node_modules/@types/node",
+        "//apps/finances/tauri/models/protos:protos_ts",
+    ],
+)
+
+ts_project(
+    name = "src_test_ts",
+    srcs = glob([
+        "src-js/**/*.spec.ts",
+        # "src-js/**/*.test.ts",
+    ]) + ["package.json"],
+    declaration = True,
+    source_map = True,
+    tsconfig = ":tsconfig",
+    deps = [
+        ":models/ts",
+        ":node_modules/vitest",
+    ],
+)
+
+vitest_bin.vitest_test(
+    name = "test.vitest",
+    args = ["run"],
+    chdir = package_name(),
+    data = [
+        "package.json",
+        ":node_modules",
+        ":src_test_ts",
+    ],
 )

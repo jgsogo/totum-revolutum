@@ -1,11 +1,10 @@
-import forms from '@tailwindcss/forms';
-import flowbitePlugin from 'flowbite/plugin'
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	darkMode: 'selector',
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',
+		'./node_modules/flowbite/**/*.js',
 		'./node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}',
 		'./node_modules/flowbite-svelte-icons/**/*.{html,js,svelte,ts}',
 	],
@@ -29,6 +28,7 @@ module.exports = {
 		}
 	},
 	plugins: [
-		forms, flowbitePlugin
+		require('flowbite/plugin'),
+		require('@tailwindcss/forms')
 	]
 }
