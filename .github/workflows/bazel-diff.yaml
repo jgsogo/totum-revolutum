@@ -64,7 +64,7 @@ jobs:
 
       - name: Generate hashes from base
         run: |
-          bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
+          bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
           cat ${{ runner.temp }}/base-hashes.json
 
       - name: Generate hashes from current
