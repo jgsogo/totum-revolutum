@@ -21,7 +21,7 @@ bazel_dep(name = "aspect_bazel_lib", version = "2.10.0", dev_dependency = True)
 bazel_dep(name = "aspect_rules_js", version = "2.1.2")
 bazel_dep(name = "aspect_rules_ts", version = "3.3.2")
 
-bazel_dep(name = "rules_uv", version = "0.48.0", dev_dependency = True)
+bazel_dep(name = "rules_uv", version = "0.49.0", dev_dependency = True)
 
 # FIXME: Override rules_rust to add this patch: https://github.com/bazelbuild/rules_rust/pull/3102, required for the protobuf-stuff
 archive_override(
