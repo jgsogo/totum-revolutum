@@ -20,26 +20,6 @@ use tauri::ipc::Response;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_base_url(state: State<'_, AppState>) -> Result<String, String> {
-    Ok(state.base_url().to_string())
-}
-
-#[tauri::command]
-pub async fn get_base_media_url(state: State<'_, AppState>) -> Result<String, String> {
-    Ok(state.base_media_url())
-}
-
-#[tauri::command]
-pub async fn get_base_static_url(state: State<'_, AppState>) -> Result<String, String> {
-    Ok(state.base_static_url())
-}
-
-#[tauri::command]
-pub async fn get_base_ccy(state: State<'_, AppState>) -> Result<String, String> {
-    Ok(state.base_ccy.clone())
-}
-
-#[tauri::command]
 pub async fn get_app_config(state: State<'_, AppState>) -> Result<Response, String> {
     let app_config = protos::AppConfig {
         base_ccy: protos::Ccy::from_str_name(&state.base_ccy)

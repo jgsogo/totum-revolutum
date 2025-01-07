@@ -252,40 +252,6 @@ export const get_custodian_details = async (pk: number): Promise<Custodian> => {
     return create_custodian(data);
 };
 
-
-/**
- * Returns (a promise to) the base_media_url URL
- * @returns {string} The full URL to the base media URL
- */
-export const get_base_media_url = async (): Promise<string> => {
-    return await invoke("get_base_media_url", {});
-};
-
-/**
- * Returns (a promise to) the base_static_url URL
- * @returns {string} The full URL to the base static URL
- */
-export const get_base_static_url = async (): Promise<string> => {
-    return await invoke("get_base_static_url", {});
-};
-
-/**
- * Returns (a promise to) the base_url URL
- * @returns {string} The full URL to the base URL
- */
-export const get_base_url = async (): Promise<string> => {
-    return await invoke("get_base_url", {});
-};
-
-/**
- * Returns (a promise to) the base currency
- * @returns {string} Base CCY
- */
-export const get_base_ccy = async (): Promise<string> => {
-    return await invoke("get_base_ccy", {});
-};
-
-
 /**
  * Returns (a promise to) the app configuration
  * @returns {AppConfig} Application configuration
@@ -296,9 +262,6 @@ export const get_app_config = async (): Promise<AppConfig> => {
     const app_config = fromBinary(AppConfigSchema, Buffer.from(message));
     return app_config;
 };
-
-
-
 
 /**
  * Creates a snapshot for the give account
