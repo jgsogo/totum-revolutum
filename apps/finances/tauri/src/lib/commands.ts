@@ -8,6 +8,10 @@ import { MovementType } from "./models/MovementType";
 import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
 import { TransactionGroup } from "./models/TransactionGroup";
 import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
+import { AppConfigSchema } from "../../models/protos/app_config_pb";
+import type { AppConfig } from "../../models/protos/app_config_pb";
+import { fromBinary } from "@bufbuild/protobuf";
+import {Buffer} from 'buffer';
 
 /** The data returned by the backend representing an Custodian */
 type CustodianData = {
@@ -280,6 +284,20 @@ export const get_base_url = async (): Promise<string> => {
 export const get_base_ccy = async (): Promise<string> => {
     return await invoke("get_base_ccy", {});
 };
+
+
+/**
+ * Returns (a promise to) the app configuration
+ * @returns {AppConfig} Application configuration
+ */
+export const get_app_config = async (): Promise<AppConfig> => {
+    const data: Uint8Array = await invoke("get_app_config", {});
+    const message: string = new TextDecoder().decode(data)
+    const app_config = fromBinary(AppConfigSchema, Buffer.from(message));
+    return app_config;
+};
+
+
 
 
 /**

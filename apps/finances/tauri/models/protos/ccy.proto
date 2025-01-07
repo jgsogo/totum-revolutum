@@ -1,0 +1,7 @@
+syntax = "proto3";
+package finances_app_models;
+
+enum Ccy {
+    USD = 0;
+    EUR = 1;
+}

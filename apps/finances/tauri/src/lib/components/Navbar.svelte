@@ -1,6 +1,4 @@
 <script lang="ts">
-  // import Notifications from '../utils/dashboard/NotificationList.svelte';
-  // import AppsMenu from '../utils/widgets/AppsMenu.svelte';
   import HolderSelector from "./HolderSelector.svelte";
   import {
     DarkMode,
@@ -15,8 +13,12 @@
   } from "flowbite-svelte";
   import { invalidate } from '$app/navigation';
   import { ChevronDownOutline, RefreshOutline } from "flowbite-svelte-icons";
+  import type { Holder } from "$lib/models/Holder";
+  import type { AppConfig } from "../../../models/protos/app_config_pb";
 
-  let { fluid = true, drawerHidden = $bindable(), list = false, all_holders, active_holder = $bindable(), home_href = "/", base_media_url } = $props();
+  let { fluid = true, drawerHidden = $bindable(), list = false, all_holders, active_holder, home_href = "/", app_config }: {
+    fluid: boolean; drawerHidden : boolean; list: boolean, all_holders: Holder[], active_holder: Holder, home_href: string, app_config: AppConfig
+    } = $props();
 
   const refresh_all = async () => {
     await invalidate('invalidate:refresh');
@@ -63,6 +65,6 @@
     </button>
 
     <DarkMode />
-    <HolderSelector bind:active_holder {all_holders} {base_media_url} />
+    <HolderSelector {active_holder} {all_holders} {app_config} />
   </div>
 </Navbar>

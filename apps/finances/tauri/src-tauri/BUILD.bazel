@@ -55,6 +55,7 @@ rust_library(
         normal = True,
     ) + [
         ":build",
+        "//apps/finances/tauri/models:models/rust",
         "//libraries/finances/accounts/rust:finances_accounts",
         "//libraries/finances/investments/rust:finances_investments",
     ],

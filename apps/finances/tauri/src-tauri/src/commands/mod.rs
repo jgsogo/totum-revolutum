@@ -14,6 +14,9 @@ pub mod transaction;
 pub mod transaction_group;
 
 use crate::state::AppState;
+use finances_app_models::protos;
+use prost::Message;
+use tauri::ipc::Response;
 use tauri::State;
 
 #[tauri::command]
@@ -34,4 +37,20 @@ pub async fn get_base_static_url(state: State<'_, AppState>) -> Result<String, S
 #[tauri::command]
 pub async fn get_base_ccy(state: State<'_, AppState>) -> Result<String, String> {
     Ok(state.base_ccy.clone())
+}
+
+#[tauri::command]
+pub async fn get_app_config(state: State<'_, AppState>) -> Result<Response, String> {
+    let app_config = protos::AppConfig {
+        base_ccy: protos::Ccy::from_str_name(&state.base_ccy)
+            .ok_or(format!("Provided CCY '{}' not in enum", state.base_ccy))?
+            .into(),
+        base_media_url: state.base_media_url(),
+        base_static_url: state.base_static_url(),
+        base_url: state.base_url().to_string(),
+        db: None,
+    };
+
+    let encoded = app_config.encode_to_vec();
+    Ok(Response::new(encoded))
 }

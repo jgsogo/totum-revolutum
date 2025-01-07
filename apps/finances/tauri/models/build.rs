@@ -6,8 +6,14 @@ fn main() -> Result<()> {
         // cannot be converted to JSON (https://github.com/tokio-rs/prost/issues/75). Official JSON support
         // is expected in v1.0 (https://github.com/tokio-rs/prost/issues/624).
         // .type_attribute(".", "#[derive(serde::Serialize,serde::Deserialize)]")
-        .compile_protos(&["protos/account.proto"], &["protos/"])?;
-
-    // prost_build::compile_protos(&["protos/account.proto"], &["protos/"])?;
+        .compile_protos(
+            &[
+                "apps/finances/tauri/models/protos/account.proto",
+                "apps/finances/tauri/models/protos/app_config.proto",
+                "apps/finances/tauri/models/protos/ccy.proto",
+                "apps/finances/tauri/models/protos/holder.proto",
+            ],
+            &["../../../../"],
+        )?;
     Ok(())
 }
