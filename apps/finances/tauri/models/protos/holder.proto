@@ -1,0 +1,13 @@
+syntax = "proto3";
+package finances_app_models;
+
+message Holder {
+  int64 pk = 1;
+  string name = 2;
+  bool is_company = 3;
+  optional string photo = 4;
+}
+
+message HolderList {
+    repeated Holder holders = 1;
+}

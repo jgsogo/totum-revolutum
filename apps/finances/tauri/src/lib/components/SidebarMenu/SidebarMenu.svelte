@@ -7,8 +7,9 @@
     ColumnSolid,
   } from "flowbite-svelte-icons";
   import type { SidebarEntry } from "./SidebarEntry";
+  import type { AppConfig } from "../../../../models/protos/app_config_pb";
 
-  let { menu, drawerHidden = $bindable(), base_url }: { menu: SidebarEntry[]; drawerHidden: boolean, base_url: string } = $props();
+  let { menu, drawerHidden = $bindable(), app_config }: { menu: SidebarEntry[]; drawerHidden: boolean, app_config: AppConfig } = $props();
 
   const closeDrawer = () => {
     drawerHidden = true;
@@ -28,7 +29,7 @@
     },
     {
       label: "Admin interface",
-      href: `${base_url}/admin`,
+      href: `${app_config.baseUrl}/admin`,
       icon: ColumnSolid,
     },
   ];
@@ -80,7 +81,7 @@
 <div
   hidden={drawerHidden}
   class="fixed inset-0 z-20 bg-gray-900/50 dark:bg-gray-900/60"
-  on:click={closeDrawer}
-  on:keydown={closeDrawer}
+  onclick={closeDrawer}
+  onkeydown={closeDrawer}
   role="presentation"
 ></div>

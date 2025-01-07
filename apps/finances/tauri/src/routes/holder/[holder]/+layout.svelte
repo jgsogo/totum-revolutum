@@ -2,6 +2,7 @@
   import "../../../app.postcss";
   import Navbar from "$lib/components/Navbar.svelte";
   import SidebarMenu from "$lib/components/SidebarMenu/SidebarMenu.svelte";
+  import type { AppConfig } from "../../../../models/protos/app_config_pb";
   let { data, children } = $props();
 
   let drawerHidden = $state(false);
@@ -13,13 +14,13 @@
   <Navbar
     bind:drawerHidden
     all_holders={data.all_holders}
-    bind:active_holder={data.holder}
+    active_holder={data.holder}
     home_href="/holder/{data.holder.pk}"
-    base_media_url={data.base_media_url}
+    app_config={data.app_config}
   />
 </header>
 <div class="overflow-hidden lg:flex">
-  <SidebarMenu bind:drawerHidden menu={data.menu} base_url={data.base_url}/>
+  <SidebarMenu bind:drawerHidden menu={data.menu} app_config={data.app_config}/>
 
   <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
     <main class="p-4">

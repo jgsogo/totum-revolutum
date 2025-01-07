@@ -5,25 +5,20 @@ export const prerender = true;
 export const ssr = false;
 
 import { error } from '@sveltejs/kit';
-import { get_all_holders, get_base_media_url, get_base_static_url, get_base_url, get_base_ccy } from '$lib/commands';
+import { get_all_holders, get_app_config } from '$lib/commands';
 import { Holder } from '$lib/models/Holder';
+import type { AppConfig } from '../../models/protos/app_config_pb.js';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ depends }) {
     depends('invalidate:refresh');
 
 	try {
+		let app_config: AppConfig = await get_app_config();
 		let all_holders: Holder[] = await get_all_holders();
-		let base_media_url = await get_base_media_url();
-		let base_static_url = await get_base_static_url();
-		let base_url = await get_base_url();
-		let base_ccy = await get_base_ccy();
 		return {
+			app_config,
 			all_holders,
-			base_url,
-			base_media_url,
-			base_static_url,
-			base_ccy,
 		};
 	}
 	catch(e) {

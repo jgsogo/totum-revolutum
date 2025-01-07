@@ -46,6 +46,7 @@ pub fn create_app<R: tauri::Runtime>(
             commands::get_base_media_url,
             commands::get_base_static_url,
             commands::get_base_ccy,
+            commands::get_app_config,
             commands::movement_type::get_all_movementtypes,
             commands::movement_type::get_breadcrumbs_for_movementtype,
             commands::transaction_group::get_all_transaction_groups,

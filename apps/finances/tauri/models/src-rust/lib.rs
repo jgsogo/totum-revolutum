@@ -1,11 +1,11 @@
-// Include the `items` module, which is generated from items.proto.
-// It is important to maintain the same structure as in the proto.
+#[cfg(not(feature = "bazel"))]
 pub mod protos {
-    #[cfg(not(feature = "bazel"))]
     include!(concat!(env!("OUT_DIR"), "/finances_app_models.rs"));
+}
 
-    #[cfg(feature = "bazel")]
-    pub use account_proto::finances_app_models::Account;
+#[cfg(feature = "bazel")]
+pub mod protos {
+    pub use protos::finances_app_models::{Account, AppConfig, Ccy, DatabaseConnection, Holder, HolderList};
 }
 
 #[cfg(test)]
@@ -15,7 +15,7 @@ mod tests {
     use prost::Message;
 
     #[test]
-    fn test_account() {
+    fn test_account_roundtrip() {
         let account = protos::Account {
             name: "name".to_string(),
             description: None,
