@@ -5,7 +5,7 @@ export const prerender = true;
 export const ssr = false;
 
 import { error } from '@sveltejs/kit';
-import { get_all_holders, get_app_state, get_main_context } from '$lib/commands';
+import { get_app_state, get_main_context } from '$lib/commands';
 import { Holder } from '$lib/models/Holder';
 import type { AppState, MainContext } from '../../models/src-js/index.js';
 
@@ -16,10 +16,8 @@ export async function load({ depends }) {
 	try {
 		let main_context: MainContext = await get_main_context();
 		let app_config: AppState = await get_app_state();
-		let all_holders: Holder[] = await get_all_holders();
 		return {
 			app_config,
-			all_holders,
 			main_context,
 		};
 	}

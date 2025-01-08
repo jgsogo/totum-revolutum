@@ -221,17 +221,6 @@ const create_holder = function (data: HolderData): Holder {
 }
 
 /**
- * Returns (a promise to) all the Holders in the database
- * @returns {Holder[]} All the holders
- */
-export const get_all_holders = async (): Promise<Holder[]> => {
-    const data: HolderData[] = await invoke("get_all_holders", {});
-    return data.map((it) => {
-        return create_holder(it);
-    });
-};
-
-/**
  * Returns (a promise to) the Holder with the given primary key value
  * @param {number} pk - The primary key value of the holder we are looking for
  * @returns {Holder} The Holder instance
@@ -258,7 +247,7 @@ export const get_custodian_details = async (pk: number): Promise<Custodian> => {
 export const get_app_state = async (): Promise<AppState> => {
     const data: Uint8Array = await invoke("get_app_state", {});
     const message: string = new TextDecoder().decode(data)
-    const app_state = fromBinary(AppConfigSchema, Buffer.from(message));
+    const app_state = fromBinary(AppStateSchema, Buffer.from(message));
     return app_state;
 };
 

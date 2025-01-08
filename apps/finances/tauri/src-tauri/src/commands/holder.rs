@@ -6,23 +6,6 @@ use finances_accounts::models::AccountHolder;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_all_holders(
-    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-) -> Result<Vec<crate::models::Holder>, String> {
-    log::info!("Get all Holders in the database");
-    let mut conn = pool.get().expect("Get a connection from the Pool");
-
-    let holders = AccountHolder::all()
-        .select(AccountHolder::as_select())
-        .order(finances_accounts::schema::finances_accounts_accountholder::name.asc())
-        .load::<AccountHolder>(&mut conn)
-        .expect("Error returning all the holders");
-
-    log::info!("Found {} holders", holders.len());
-    Ok(holders.into_iter().map(|v| v.into()).collect())
-}
-
-#[tauri::command]
 pub async fn get_holder_details(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i64,

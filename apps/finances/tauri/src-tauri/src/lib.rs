@@ -39,7 +39,6 @@ pub fn create_app<R: tauri::Runtime>(
             commands::account::get_account_snapshot_latest,
             commands::account::get_account_snapshots,
             commands::account::get_account_movements,
-            commands::holder::get_all_holders,
             commands::holder::get_holder_details,
             commands::custodian::get_custodian_details,
             commands::get_app_state,

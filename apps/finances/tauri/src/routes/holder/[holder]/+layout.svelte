@@ -12,7 +12,7 @@
 >
   <Navbar
     bind:drawerHidden
-    all_holders={data.all_holders}
+    all_holders={data.main_context.holders}
     active_holder={data.holder}
     home_href="/holder/{data.holder.pk}"
     app_config={data.app_config}
