@@ -16,8 +16,8 @@
   import type { Holder } from "$lib/models/Holder";
   import type { AppState } from "../../../models/src-js/index";
 
-  let { fluid = true, drawerHidden = $bindable(), list = false, all_holders, active_holder, home_href = "/", app_config }: {
-    fluid: boolean; drawerHidden : boolean; list: boolean, all_holders: Holder[], active_holder: Holder, home_href: string, app_config: AppState
+  let { fluid = true, drawerHidden = $bindable(), list = false, all_holders, active_holder, home_href = "/", app_state }: {
+    fluid: boolean; drawerHidden : boolean; list: boolean, all_holders: Holder[], active_holder: Holder, home_href: string, app_state: AppState
     } = $props();
 
   const refresh_all = async () => {
@@ -65,6 +65,6 @@
     </button>
 
     <DarkMode />
-    <HolderSelector {active_holder} {all_holders} {app_config} />
+    <HolderSelector {active_holder} {all_holders} {app_state} />
   </div>
 </Navbar>

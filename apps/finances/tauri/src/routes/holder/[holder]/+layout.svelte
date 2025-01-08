@@ -15,11 +15,11 @@
     all_holders={data.main_context.holders}
     active_holder={data.holder}
     home_href="/holder/{data.holder.pk}"
-    app_config={data.app_config}
+    app_state={data.app_state}
   />
 </header>
 <div class="overflow-hidden lg:flex">
-  <SidebarMenu bind:drawerHidden menu={data.menu} app_config={data.app_config}/>
+  <SidebarMenu bind:drawerHidden menu={data.menu} app_state={data.app_state}/>
 
   <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
     <main class="p-4">

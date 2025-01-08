@@ -6,8 +6,8 @@
   let {
     all_holders,
     active_holder,
-    app_config,
-  }: { all_holders: Holder[]; active_holder: Holder; app_config: AppState } = $props();
+    app_state,
+  }: { all_holders: Holder[]; active_holder: Holder; app_state: AppState } = $props();
 
   const initials = (holder: Holder): string => {
     let words = holder.name.split(/\s/);
@@ -33,7 +33,7 @@
 
 <button class="ms-3 rounded-full ring-gray-400 focus:ring-4 dark:ring-gray-600">
   {#if active_holder.photo}
-    <Avatar title={active_holder.name} src="{app_config.baseMediaUrl}{active_holder.photo}">{active_holder.name}</Avatar>
+    <Avatar title={active_holder.name} src="{app_state.baseMediaUrl}{active_holder.photo}">{active_holder.name}</Avatar>
   {:else}
     <Avatar title={active_holder.name}>{initials(active_holder).toUpperCase()}</Avatar>
   {/if}

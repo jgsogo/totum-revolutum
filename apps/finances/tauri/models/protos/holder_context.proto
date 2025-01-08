@@ -9,5 +9,5 @@ message HolderContext {
     Holder holder = 1;
 
     // All accounts for the selected holder
-    repeated Account accounts = 3;
+    repeated Account accounts = 2;
 }

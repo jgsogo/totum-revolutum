@@ -15,9 +15,9 @@ export async function load({ depends }) {
 
 	try {
 		let main_context: MainContext = await get_main_context();
-		let app_config: AppState = await get_app_state();
+		let app_state: AppState = await get_app_state();
 		return {
-			app_config,
+			app_state,
 			main_context,
 		};
 	}
