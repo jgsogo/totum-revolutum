@@ -4,9 +4,12 @@ load("@rules_rust_prost//:defs.bzl", "rust_prost_library")
 
 protos = [
     "account.proto",
-    "holder.proto",
+    "app_state.proto",
     "ccy.proto",
-    "app_config.proto",
+    "custodian.proto",
+    "holder_context.proto",
+    "holder.proto",
+    "main_context.proto",
 ]
 
 proto_library(

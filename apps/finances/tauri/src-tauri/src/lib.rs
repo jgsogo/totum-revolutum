@@ -3,9 +3,9 @@ use tauri::Manager;
 pub mod commands;
 pub mod db;
 pub mod models;
-pub mod state;
 mod types;
 mod views;
+use finances_app_models::AppState;
 
 use crate::types::ConnectionType;
 
@@ -13,7 +13,7 @@ use crate::types::ConnectionType;
 pub fn create_app<R: tauri::Runtime>(
     builder: tauri::Builder<R>,
     db_pool: Pool<ConnectionManager<ConnectionType>>,
-    state: state::AppState,
+    state: AppState,
 ) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
 
@@ -42,7 +42,7 @@ pub fn create_app<R: tauri::Runtime>(
             commands::holder::get_all_holders,
             commands::holder::get_holder_details,
             commands::custodian::get_custodian_details,
-            commands::get_app_config,
+            commands::get_app_state,
             commands::movement_type::get_all_movementtypes,
             commands::movement_type::get_breadcrumbs_for_movementtype,
             commands::transaction_group::get_all_transaction_groups,

@@ -2,8 +2,10 @@
 // @generated from file apps/finances/tauri/models/protos/account.proto (package finances_app_models, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import type { Message } from "@bufbuild/protobuf";
+import type { Custodian } from "./custodian_pb.js";
+import type { Ccy } from "./ccy_pb.js";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 
 /**
@@ -12,23 +14,79 @@ import type { Timestamp } from "@bufbuild/protobuf/wkt";
 export declare const file_apps_finances_tauri_models_protos_account: GenFile;
 
 /**
- * @generated from message finances_app_models.Account
+ * @generated from message finances_app_models.AccountType
  */
-export declare type Account = Message<"finances_app_models.Account"> & {
+export declare type AccountType = Message<"finances_app_models.AccountType"> & {
   /**
    * @generated from field: string name = 1;
    */
   name: string;
+};
+
+/**
+ * Describes the message finances_app_models.AccountType.
+ * Use `create(AccountTypeSchema)` to create a new message.
+ */
+export declare const AccountTypeSchema: GenMessage<AccountType>;
+
+/**
+ * @generated from message finances_app_models.Account
+ */
+export declare type Account = Message<"finances_app_models.Account"> & {
+  /**
+   * @generated from field: int64 pk = 1;
+   */
+  pk: bigint;
 
   /**
-   * @generated from field: optional string description = 2;
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: finances_app_models.Custodian custodian = 3;
+   */
+  custodian?: Custodian;
+
+  /**
+   * @generated from field: finances_app_models.AccountCategory category = 4;
+   */
+  category: AccountCategory;
+
+  /**
+   * @generated from field: finances_app_models.AccountType type = 5;
+   */
+  type?: AccountType;
+
+  /**
+   * @generated from field: finances_app_models.Ccy ccy = 6;
+   */
+  ccy: Ccy;
+
+  /**
+   * @generated from field: optional string identifier = 7;
+   */
+  identifier?: string;
+
+  /**
+   * @generated from field: optional string description = 8;
    */
   description?: string;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp open = 3;
+   * @generated from field: optional google.protobuf.Timestamp open = 9;
    */
   open?: Timestamp;
+
+  /**
+   * @generated from field: bool holder_owns_money = 10;
+   */
+  holderOwnsMoney: boolean;
+
+  /**
+   * @generated from field: bool is_numerable = 11;
+   */
+  isNumerable: boolean;
 };
 
 /**
@@ -36,4 +94,34 @@ export declare type Account = Message<"finances_app_models.Account"> & {
  * Use `create(AccountSchema)` to create a new message.
  */
 export declare const AccountSchema: GenMessage<Account>;
+
+/**
+ * @generated from enum finances_app_models.AccountCategory
+ */
+export enum AccountCategory {
+  /**
+   * @generated from enum value: Other = 0;
+   */
+  Other = 0,
+
+  /**
+   * @generated from enum value: Savings = 1;
+   */
+  Savings = 1,
+
+  /**
+   * @generated from enum value: Investment = 2;
+   */
+  Investment = 2,
+
+  /**
+   * @generated from enum value: Retirement = 3;
+   */
+  Retirement = 3,
+}
+
+/**
+ * Describes the enum finances_app_models.AccountCategory.
+ */
+export declare const AccountCategorySchema: GenEnum<AccountCategory>;
 

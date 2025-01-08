@@ -12,25 +12,34 @@ pub mod movement_type;
 pub mod snapshot;
 pub mod transaction;
 pub mod transaction_group;
-
-use crate::state::AppState;
-use finances_app_models::protos;
+use crate::types::ConnectionType;
+use diesel::prelude::*;
+use diesel::r2d2::{ConnectionManager, Pool};
+use finances_accounts::models::AccountHolder;
+use finances_app_models::{AppModel, AppState, Holder, MainContext};
 use prost::Message;
 use tauri::ipc::Response;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_app_config(state: State<'_, AppState>) -> Result<Response, String> {
-    let app_config = protos::AppConfig {
-        base_ccy: protos::Ccy::from_str_name(&state.base_ccy)
-            .ok_or(format!("Provided CCY '{}' not in enum", state.base_ccy))?
-            .into(),
-        base_media_url: state.base_media_url(),
-        base_static_url: state.base_static_url(),
-        base_url: state.base_url().to_string(),
-        db: None,
-    };
+pub async fn get_app_state(state: State<'_, AppState>) -> Result<Response, String> {
+    let encoded = state.encode_to_vec();
+    Ok(Response::new(encoded))
+}
 
-    let encoded = app_config.encode_to_vec();
+#[tauri::command]
+pub async fn get_main_context(pool: State<'_, Pool<ConnectionManager<ConnectionType>>>) -> Result<Response, String> {
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    let holders = AccountHolder::all()
+        .select(AccountHolder::as_select())
+        .order(finances_accounts::schema::finances_accounts_accountholder::name.asc())
+        .load::<AccountHolder>(&mut conn)
+        .map_err(|e| format!("Error loading holders: {}", e))?;
+
+    log::debug!("Found {} holders", holders.len());
+
+    let main_context = MainContext::new(holders);
+    let encoded = main_context.encode_to_vec();
     Ok(Response::new(encoded))
 }

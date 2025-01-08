@@ -91,6 +91,7 @@ rust_test_suite(
     ],
     deps = [
         ":applib",
+        "//apps/finances/tauri/models:models/rust",
         "//libraries/finances/accounts/rust:finances_accounts/test_utils",
         "@crates_libraries//:serde",
         "@crates_libraries//:serde_json",
@@ -133,5 +134,6 @@ rust_binary(
         normal = True,
     ) + [
         ":applib",
+        "//apps/finances/tauri/models:models/rust",
     ],
 )

@@ -4,16 +4,16 @@ package finances_app_models;
 import "apps/finances/tauri/models/protos/ccy.proto";
 
 message DatabaseConnection {
-    string user = 1;
-    string password = 2;
-    string host = 3;
-    uint32 port = 4;
-    string dbname = 5;
+    string postgres_url = 1;
+    // string user = 1;
+    // string password = 2;
+    // string host = 3;
+    // uint32 port = 4;
+    // string dbname = 5;
 }
 
-message AppConfig {
-    // The currency to use in the user interface
-    Ccy base_ccy = 1;
+message AppState {
+    Ccy base_ccy  = 1;
 
     // Base URL to all media resources
     string base_media_url = 2;
@@ -24,5 +24,6 @@ message AppConfig {
     // Base URL to the site root
     string base_url = 4;
 
+    // Current DB connection
     DatabaseConnection db = 5;
 }

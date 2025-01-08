@@ -9,9 +9,12 @@ fn main() -> Result<()> {
         .compile_protos(
             &[
                 "apps/finances/tauri/models/protos/account.proto",
-                "apps/finances/tauri/models/protos/app_config.proto",
+                "apps/finances/tauri/models/protos/app_state.proto",
                 "apps/finances/tauri/models/protos/ccy.proto",
+                "apps/finances/tauri/models/protos/custodian.proto",
+                "apps/finances/tauri/models/protos/holder_context.proto",
                 "apps/finances/tauri/models/protos/holder.proto",
+                "apps/finances/tauri/models/protos/main_context.proto",
             ],
             &["../../../../"],
         )?;

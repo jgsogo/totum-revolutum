@@ -2,10 +2,37 @@ syntax = "proto3";
 package finances_app_models;
 
 import "google/protobuf/timestamp.proto";
+import "apps/finances/tauri/models/protos/custodian.proto";
+import "apps/finances/tauri/models/protos/ccy.proto";
+
+// Main account categories
+enum AccountCategory {
+  Other = 0;
+  Savings = 1;
+  Investment = 2;
+  Retirement = 3;
+}
+
+// Fine-grained account type
+message AccountType {
+  string name = 1;
+}
+
 
 message Account {
-  string name = 1;
-  optional string description = 2;
+  int64 pk = 1;
+  string name = 2;
+  Custodian custodian = 3;
 
-  optional google.protobuf.Timestamp open = 3;
+  AccountCategory category = 4;
+  AccountType type = 5;
+  Ccy ccy = 6;
+
+  optional string identifier = 7;
+  optional string description = 8;
+
+  optional google.protobuf.Timestamp open = 9;
+
+  bool holder_owns_money = 10;
+  bool is_numerable = 11;
 }

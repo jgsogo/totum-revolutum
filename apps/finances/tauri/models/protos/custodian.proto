@@ -1,9 +1,8 @@
 syntax = "proto3";
 package finances_app_models;
 
-message Holder {
+message Custodian {
   int64 pk = 1;
   string name = 2;
-  bool is_company = 3;
-  optional string photo = 4;
+  optional string photo = 3;
 }

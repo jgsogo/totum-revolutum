@@ -25,6 +25,7 @@ rust_library(
         normal = True,
     ) + [
         "//apps/finances/tauri/models/protos:protos_rs",
+        "//libraries/finances/accounts/rust:finances_accounts",
     ],
 )
 
