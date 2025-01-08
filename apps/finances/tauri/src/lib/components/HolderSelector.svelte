@@ -1,13 +1,13 @@
 <script lang="ts">
   import { Avatar, Dropdown, DropdownItem, Search } from "flowbite-svelte";
   import type { Holder } from "$lib/models/Holder";
-  import type { AppConfig } from "../../../models/protos/app_config_pb";
+  import type { AppState } from "../../../models/src-js/index";
 
   let {
     all_holders,
     active_holder,
     app_config,
-  }: { all_holders: Holder[]; active_holder: Holder; app_config: AppConfig } = $props();
+  }: { all_holders: Holder[]; active_holder: Holder; app_config: AppState } = $props();
 
   const initials = (holder: Holder): string => {
     let words = holder.name.split(/\s/);

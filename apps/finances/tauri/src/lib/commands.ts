@@ -8,8 +8,7 @@ import { MovementType } from "./models/MovementType";
 import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
 import { TransactionGroup } from "./models/TransactionGroup";
 import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
-import { AppConfigSchema } from "../../models/protos/app_config_pb";
-import type { AppConfig } from "../../models/protos/app_config_pb";
+import { AppStateSchema, type AppState, type MainContext, MainContextSchema } from "../../models/src-js/index";
 import { fromBinary } from "@bufbuild/protobuf";
 import {Buffer} from 'buffer';
 
@@ -254,14 +253,26 @@ export const get_custodian_details = async (pk: number): Promise<Custodian> => {
 
 /**
  * Returns (a promise to) the app configuration
- * @returns {AppConfig} Application configuration
+ * @returns {AppState} Application configuration
  */
-export const get_app_config = async (): Promise<AppConfig> => {
-    const data: Uint8Array = await invoke("get_app_config", {});
+export const get_app_state = async (): Promise<AppState> => {
+    const data: Uint8Array = await invoke("get_app_state", {});
     const message: string = new TextDecoder().decode(data)
-    const app_config = fromBinary(AppConfigSchema, Buffer.from(message));
-    return app_config;
+    const app_state = fromBinary(AppConfigSchema, Buffer.from(message));
+    return app_state;
 };
+
+/**
+ * Returns (a promise to) the main context
+ * @returns {MainContext} Main context, the same for all the application
+ */
+export const get_main_context = async (): Promise<MainContext> => {
+    const data: Uint8Array = await invoke("get_main_context", {});
+    const message: string = new TextDecoder().decode(data)
+    const main_context = fromBinary(MainContextSchema, Buffer.from(message));
+    return main_context;
+};
+
 
 /**
  * Creates a snapshot for the give account

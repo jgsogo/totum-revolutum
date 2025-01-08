@@ -10,7 +10,7 @@ pub fn webview() -> WebviewWindow<MockRuntime> {
         "base_url".to_string(),
         "media_url".to_string(),
         "static_url".to_string(),
-        "MKD".to_string(),
+        "USD".to_string(),
     );
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone());

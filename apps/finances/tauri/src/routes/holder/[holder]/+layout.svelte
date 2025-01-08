@@ -2,7 +2,6 @@
   import "../../../app.postcss";
   import Navbar from "$lib/components/Navbar.svelte";
   import SidebarMenu from "$lib/components/SidebarMenu/SidebarMenu.svelte";
-  import type { AppConfig } from "../../../../models/protos/app_config_pb";
   let { data, children } = $props();
 
   let drawerHidden = $state(false);
