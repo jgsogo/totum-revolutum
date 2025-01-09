@@ -25,10 +25,20 @@ use finances_app_models::{
 use tauri::ipc::Response;
 use tauri::State;
 
+trait IntoTauriResponse<R: prost::Message> {
+    fn to_response(&self) -> Response;
+}
+
+impl<T: AppModel<U>, U: prost::Message> IntoTauriResponse<U> for T {
+    fn to_response(&self) -> Response {
+        let encoded = self.inner_type_ref().encode_to_vec();
+        Response::new(encoded)
+    }
+}
+
 #[tauri::command]
 pub async fn get_app_state(state: State<'_, AppState>) -> Result<Response, String> {
-    let encoded = state.encode_to_vec();
-    Ok(Response::new(encoded))
+    Ok(state.to_response())
 }
 
 #[tauri::command]
@@ -84,8 +94,7 @@ pub async fn get_main_context(pool: State<'_, Pool<ConnectionManager<ConnectionT
     };
 
     let context = MainContext::new(holders, account_types);
-    let encoded = context.encode_to_vec();
-    Ok(Response::new(encoded))
+    Ok(context.to_response())
 }
 
 /// Given some 'unique_name's, get the PKs for all of them and their descendants
@@ -149,6 +158,5 @@ pub async fn get_holder_context(
     };
 
     let context = HolderContext::new(acc_holder, accounts);
-    let encoded = context.encode_to_vec();
-    Ok(Response::new(encoded))
+    Ok(context.to_response())
 }

@@ -43,7 +43,7 @@ with_docker_compose_run(
         "DJANGO_SUPERUSER_USERNAME": "django",
         "DJANGO_SUPERUSER_EMAIL": "django@django.com",
         # Migrate data from legacy DB ('host.docker.internal' is the host for the _external localhost_)
-        "LEGACY_DATABASE_URL": "postgres://finances_ro:finances_ro@host.docker.internal:5432/finances",
+        # "LEGACY_DATABASE_URL": "postgres://finances_ro:finances_ro@host.docker.internal:5432/finances",
         # Need to keep this data synced with the docker_compose (port) and the django settings
         "BASE_URL": "http://localhost:1337",
         "MEDIA_URL": "/media/",

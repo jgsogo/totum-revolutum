@@ -16,10 +16,6 @@ pub use holder_context::HolderContext;
 pub use main_context::MainContext;
 
 pub trait AppModel<T: prost::Message> {
-    fn encode_to_vec(&self) -> Vec<u8> {
-        self.inner_type_ref().encode_to_vec()
-    }
-
     fn inner_type(self) -> T;
 
     fn inner_type_ref(&self) -> &T;

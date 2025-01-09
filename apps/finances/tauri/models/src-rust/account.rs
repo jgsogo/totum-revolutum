@@ -11,7 +11,7 @@ impl Account {
         account_type_pk: i64,
     ) -> Self {
         let timestamp = crate::protos::Timestamp {
-            seconds: (account.open.num_days_from_ce() * 24 * 3600) as i64,
+            seconds: (account.open.num_days_from_ce() as i64) * 24 * 3600,
             nanos: 0,
         };
         let ccy = crate::protos::Ccy::from_str_name(&account.ccy)

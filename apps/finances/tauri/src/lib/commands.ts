@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import { invoke, type InvokeArgs, type InvokeOptions } from "@tauri-apps/api/core";
 import { Account, AccountCategories, AccountType } from "$lib/models/Account";
 import { Snapshot } from "$lib/models/Snapshot"
 import { Movement } from "$lib/models/Movement"
@@ -8,9 +8,21 @@ import { MovementType } from "./models/MovementType";
 import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
 import { TransactionGroup } from "./models/TransactionGroup";
 import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
-import { AppStateSchema, type AppState, type MainContext, MainContextSchema } from "../../models/src-js/index";
-import { fromBinary } from "@bufbuild/protobuf";
-import {Buffer} from 'buffer';
+import { AppStateSchema, type AppState, type MainContext, MainContextSchema, type HolderContext, HolderContextSchema } from "../../models/src-js/index";
+import { fromBinary, type DescMessage } from "@bufbuild/protobuf";
+import { Buffer } from 'buffer';
+
+
+/**
+ * Calls the given command and returns the protobuf message already parsed
+ *
+ * @returns {Type} The parsed message
+ */
+async function invoke_protobuf_command<Desc extends DescMessage, Type>(schema_type: Desc, cmd: string, args?: InvokeArgs, options?: InvokeOptions): Promise<Type> {
+    const data: ArrayBuffer = await invoke(cmd, args, options);
+    const context = fromBinary(schema_type, Buffer.from(data, 0, data.byteLength));
+    return context;
+}
 
 /** The data returned by the backend representing an Custodian */
 type CustodianData = {
@@ -258,10 +270,17 @@ export const get_app_state = async (): Promise<AppState> => {
 export const get_main_context = async (): Promise<MainContext> => {
     const data: Uint8Array = await invoke("get_main_context", {});
     const message: string = new TextDecoder().decode(data)
-    const main_context = fromBinary(MainContextSchema, Buffer.from(message));
-    return main_context;
+    const context = fromBinary(MainContextSchema, Buffer.from(message));
+    return context;
 };
 
+/**
+ * Returns (a promise to) the holder context
+ * @returns {HolderContext} Holder context, common things for a given holder
+ */
+export const get_holder_context = async (holder_pk: number): Promise<HolderContext> => {
+    return await invoke_protobuf_command(HolderContextSchema, "get_holder_context", { holderPk: holder_pk });
+};
 
 /**
  * Creates a snapshot for the give account
