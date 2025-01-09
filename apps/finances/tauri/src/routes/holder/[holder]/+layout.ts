@@ -1,7 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { get_holder_details, get_all_accounts_for_holder, get_all_savings_accounts_for_holder, get_all_retirement_accounts_for_holder, get_all_investment_accounts_for_holder, get_holder_context } from '$lib/commands';
 import {SidebarEntry} from "$lib/components/SidebarMenu/SidebarEntry.js"
-import { AccountCategory, type MainContext } from "../../../../models/src-js/index";
 import { Account } from '$lib/models/Account';
 import {
 	LockSolid,
@@ -13,9 +12,7 @@ import {
 } from 'flowbite-svelte-icons';
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({ params, depends, parent }) {
-	const { main_context }: {main_context: MainContext} = await parent();
-
+export async function load({ params, depends }) {
 	depends('invalidate:refresh');
 
 	// TODO: Choose better default, see https://github.com/jgsogo/totum-revolutum/issues/637

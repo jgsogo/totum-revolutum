@@ -8,7 +8,7 @@ import { MovementType } from "./models/MovementType";
 import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
 import { TransactionGroup } from "./models/TransactionGroup";
 import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
-import { AppStateSchema, type AppState, type MainContext, MainContextSchema, type HolderContext, HolderContextSchema, type AccountType as AccountTypeProto } from "../../models/src-js/index";
+import { AppStateSchema, type AppState, type MainContext, MainContextSchema, type HolderContextProto, HolderContext, HolderContextSchema } from "../../models/src-js/index";
 import { fromBinary, type DescMessage } from "@bufbuild/protobuf";
 import { Buffer } from 'buffer';
 
@@ -23,6 +23,31 @@ async function invoke_protobuf_command<Desc extends DescMessage, Type>(schema_ty
     const context = fromBinary(schema_type, Buffer.from(data, 0, data.byteLength));
     return context;
 }
+
+/**
+ * Returns (a promise to) the app configuration
+ * @returns {AppState} Application configuration
+ */
+export const get_app_state = async (): Promise<AppState> => {
+    return await invoke_protobuf_command(AppStateSchema, "get_app_state");
+};
+
+/**
+ * Returns (a promise to) the main context
+ * @returns {MainContext} Main context, the same for all the application
+ */
+export const get_main_context = async (): Promise<MainContext> => {
+    return await invoke_protobuf_command(MainContextSchema, "get_main_context");
+};
+
+/**
+ * Returns (a promise to) the holder context
+ * @returns {HolderContext} Holder context, common things for a given holder
+ */
+export const get_holder_context = async (holder_pk: number): Promise<HolderContext> => {
+    let context: HolderContextProto = await invoke_protobuf_command(HolderContextSchema, "get_holder_context", { holderPk: holder_pk });
+    return new HolderContext(context);
+};
 
 /** The data returned by the backend representing an Custodian */
 type CustodianData = {
@@ -252,35 +277,7 @@ export const get_custodian_details = async (pk: number): Promise<Custodian> => {
     return create_custodian(data);
 };
 
-/**
- * Returns (a promise to) the app configuration
- * @returns {AppState} Application configuration
- */
-export const get_app_state = async (): Promise<AppState> => {
-    const data: Uint8Array = await invoke("get_app_state", {});
-    const message: string = new TextDecoder().decode(data)
-    const app_state = fromBinary(AppStateSchema, Buffer.from(message));
-    return app_state;
-};
 
-/**
- * Returns (a promise to) the main context
- * @returns {MainContext} Main context, the same for all the application
- */
-export const get_main_context = async (): Promise<MainContext> => {
-    const data: Uint8Array = await invoke("get_main_context", {});
-    const message: string = new TextDecoder().decode(data)
-    const context = fromBinary(MainContextSchema, Buffer.from(message));
-    return context;
-};
-
-/**
- * Returns (a promise to) the holder context
- * @returns {HolderContext} Holder context, common things for a given holder
- */
-export const get_holder_context = async (holder_pk: number): Promise<HolderContext> => {
-    return await invoke_protobuf_command(HolderContextSchema, "get_holder_context", { holderPk: holder_pk });
-};
 
 /**
  * Creates a snapshot for the give account
