@@ -6,13 +6,13 @@
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
   import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
   import { goToTransactionCreate } from "$lib/utils";
-  import type { Holder } from "$lib/models/Holder";
   import { create_snapshot } from "$lib/commands";
   import { invalidate } from "$app/navigation";
   import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
+  import { type Holder } from "../../../models/src-js";
 
   let {
-    holder = $bindable(),
+    holder,
     account = $bindable(),
     base_media_url,
     last_snapshot = $bindable(),

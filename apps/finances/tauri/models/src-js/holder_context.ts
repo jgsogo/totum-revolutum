@@ -2,6 +2,7 @@ import { HolderContext as HolderContextProto } from "../protos/holder_context_pb
 import { Account as AccountProto, AccountCategory } from "../protos/account_pb.js";
 import { Custodian } from "../protos/custodian_pb.js";
 import { Account } from "./account.js";
+import { Holder } from "../protos/holder_pb.js";
 
 export class HolderContext {
     private readonly holder_context: HolderContextProto;
@@ -10,6 +11,10 @@ export class HolderContext {
     constructor(holder_context: HolderContextProto) {
         this.holder_context = holder_context;
         this.accounts = this.holder_context.accounts.map((value: AccountProto) => new Account(value))
+    }
+
+    holder(): Holder {
+        return this.holder_context.holder!;
     }
 
     filter_accounts(category: AccountCategory): Account[] {

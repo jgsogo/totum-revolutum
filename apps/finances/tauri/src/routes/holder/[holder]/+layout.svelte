@@ -13,8 +13,8 @@
   <Navbar
     bind:drawerHidden
     all_holders={data.main_context.holders}
-    active_holder={data.holder}
-    home_href="/holder/{data.holder.pk}"
+    active_holder={data.holder_context.holder()}
+    home_href="/holder/{data.holder_context.holder().pk}"
     app_state={data.app_state}
   />
 </header>

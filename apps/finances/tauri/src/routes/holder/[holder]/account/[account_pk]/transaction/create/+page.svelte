@@ -35,7 +35,7 @@
     if (transaction.is_valid(show_transaction_date, data.base_ccy)) {
       await create_transaction(transaction);
       // TODO: Show error when it fails
-      await goToAccountDetail(data.holder, data.account);
+      await goToAccountDetail(data.holder_context.holder(), data.account);
     }
   };
 

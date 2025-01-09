@@ -6,5 +6,5 @@
   </script>
 
   <div class="mt-px space-y-4">
-    <AccountsTable holder={data.holder} bind:accounts={data.all_investment_accounts_for_holder} />
+    <AccountsTable holder={data.holder_context.holder()} bind:accounts={data.all_investment_accounts_for_holder} />
   </div>

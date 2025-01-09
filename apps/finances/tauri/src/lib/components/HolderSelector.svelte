@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Avatar, Dropdown, DropdownItem, Search } from "flowbite-svelte";
-  import type { Holder } from "$lib/models/Holder";
-  import type { AppState } from "../../../models/src-js/index";
+  import type { AppState, Holder } from "../../../models/src-js/index";
 
   let {
     all_holders,

@@ -13,8 +13,7 @@
   } from "flowbite-svelte";
   import { invalidate } from '$app/navigation';
   import { ChevronDownOutline, RefreshOutline } from "flowbite-svelte-icons";
-  import type { Holder } from "$lib/models/Holder";
-  import type { AppState } from "../../../models/src-js/index";
+  import type { AppState, Holder } from "../../../models/src-js/index";
 
   let { fluid = true, drawerHidden = $bindable(), list = false, all_holders, active_holder, home_href = "/", app_state }: {
     fluid: boolean; drawerHidden : boolean; list: boolean, all_holders: Holder[], active_holder: Holder, home_href: string, app_state: AppState

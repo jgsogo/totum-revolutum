@@ -57,7 +57,7 @@ export async function load({ params, depends }) {
 
 
 		return {
-			holder,
+			holder_context,
 			all_accounts_for_holder,
 			all_retirement_accounts_for_holder,
 			all_investment_accounts_for_holder,
