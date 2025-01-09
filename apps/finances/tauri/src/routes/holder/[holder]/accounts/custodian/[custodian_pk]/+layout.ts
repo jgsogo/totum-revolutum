@@ -1,18 +1,12 @@
-// Tauri doesn't have a Node.js server to do proper SSR
-// so we will use adapter-static to prerender the app (SSG)
-// See: https://v2.tauri.app/start/frontend/sveltekit/ for more info
-import { error } from '@sveltejs/kit';
-import { get_custodian_details } from '$lib/commands';
-import { Holder } from '$lib/models/Holder';
-import type { Custodian } from '$lib/models/Custodian.js';
+import type { Custodian, HolderContext } from '../../../../../../../models/src-js';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ params, parent }) {
-    const { accounts_by_custodian } = await parent();
-    let custodian_pk = parseInt(params.custodian_pk, 10)
-    let custodian = await get_custodian_details(custodian_pk);
+    const { holder_context }: { holder_context: HolderContext } = await parent();
 
-    let accounts_for_custodian = accounts_by_custodian[custodian_pk];
+    let custodian_pk: number = parseInt(params.custodian_pk, 10);
+    const accounts_for_custodian = holder_context.grouped_by_custodian().get(custodian_pk)!;
+    const custodian: Custodian = accounts_for_custodian[0].custodian();
     return {
         accounts_for_custodian,
         custodian,

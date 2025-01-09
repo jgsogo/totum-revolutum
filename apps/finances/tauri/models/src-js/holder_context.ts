@@ -1,24 +1,27 @@
 import { HolderContext as HolderContextProto } from "../protos/holder_context_pb.js";
 import { Account as AccountProto, AccountCategory } from "../protos/account_pb.js";
-import { Custodian } from "../protos/custodian_pb.js";
 import { Account } from "./account.js";
 import { Holder } from "../protos/holder_pb.js";
 
 export class HolderContext {
     private readonly holder_context: HolderContextProto;
-    private readonly accounts: Account[];
+    private readonly _accounts: Account[];
 
     constructor(holder_context: HolderContextProto) {
         this.holder_context = holder_context;
-        this.accounts = this.holder_context.accounts.map((value: AccountProto) => new Account(value))
+        this._accounts = this.holder_context.accounts.map((value: AccountProto) => new Account(value))
     }
 
     holder(): Holder {
         return this.holder_context.holder!;
     }
 
-    filter_accounts(category: AccountCategory): Account[] {
-        return this.accounts.filter((account) => account.type().category === category);
+    accounts(): Account[] {
+        return this._accounts;
+    }
+
+    private filter_accounts(category: AccountCategory): Account[] {
+        return this._accounts.filter((account) => account.type().category === category);
     }
 
     savings_accounts(): Account[] {
@@ -37,15 +40,15 @@ export class HolderContext {
         return this.filter_accounts(AccountCategory.Other)
     }
 
-    grouped_by_custodian(): Map<Custodian, Account[]> {
-        return this.accounts.reduce((store, account: Account) => {
-            let key = account.custodian();
+    grouped_by_custodian(): Map<number, Account[]> {
+        return this._accounts.reduce((store, account: Account) => {
+            let key = Number(account.custodian().pk);
             if (!store.has(key)) {
                 store.set(key, [account])
             } else {
                 store.get(key)!.push(account)
             }
             return store;
-        }, new Map<Custodian, Account[]>())
+        }, new Map<number, Account[]>())
     }
 }

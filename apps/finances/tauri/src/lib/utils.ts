@@ -1,7 +1,6 @@
 import { goto } from "$app/navigation";
-import type { Account } from "./models/Account";
-import type { Holder as HolderModel } from "./models/Holder";
-import type { Holder } from "../../models/src-js";
+import type { Account as AccountModel } from "./models/Account";
+import type { Holder, Account } from "../../models/src-js";
 
 /**
  * Returns a promise that resolves when Svelte nagivates to the Account detail view.
@@ -11,8 +10,9 @@ import type { Holder } from "../../models/src-js";
  * @param {Holder} holder - The holder we are working with
  * @param {Account} account - Account to redirect to
  */
-export async function goToAccountDetail(holder: HolderModel, account: Account) {
-    await goto(`/holder/${holder.pk}/account/${account.pk}/detail/${account.category}`);
+export async function goToAccountDetail(holder: Holder, account: Account) {
+    let account_view = account.is_numerable() ? "numerable_stock" : "default";
+    await goto(`/holder/${holder.pk}/account/${account.pk}/detail/${account_view}`);
   }
 
 /**
@@ -22,7 +22,7 @@ export async function goToAccountDetail(holder: HolderModel, account: Account) {
  * @param {Account} from - If provided, it prepopulates transaction origin with this account
  * @param {Account} to - If provided, it prepopulates transaction target with this account
  */
-export async function goToTransactionCreate(holder: Holder, account: Account, from?: Account, to?: Account) {
+export async function goToTransactionCreate(holder: Holder, account: AccountModel, from?: AccountModel, to?: AccountModel) {
     await goto(`/holder/${holder.pk}/account/${account.pk}/transaction/create?from=${from?.pk}&to=${to?.pk}`);
 }
 
