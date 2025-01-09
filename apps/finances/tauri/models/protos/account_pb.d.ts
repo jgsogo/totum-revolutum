@@ -21,6 +21,16 @@ export declare type AccountType = Message<"finances_app_models.AccountType"> & {
    * @generated from field: string name = 1;
    */
   name: string;
+
+  /**
+   * @generated from field: repeated string breadcrumb = 2;
+   */
+  breadcrumb: string[];
+
+  /**
+   * @generated from field: finances_app_models.AccountCategory category = 3;
+   */
+  category: AccountCategory;
 };
 
 /**
@@ -49,42 +59,37 @@ export declare type Account = Message<"finances_app_models.Account"> & {
   custodian?: Custodian;
 
   /**
-   * @generated from field: finances_app_models.AccountCategory category = 4;
-   */
-  category: AccountCategory;
-
-  /**
-   * @generated from field: finances_app_models.AccountType type = 5;
+   * @generated from field: finances_app_models.AccountType type = 4;
    */
   type?: AccountType;
 
   /**
-   * @generated from field: finances_app_models.Ccy ccy = 6;
+   * @generated from field: finances_app_models.Ccy ccy = 5;
    */
   ccy: Ccy;
 
   /**
-   * @generated from field: optional string identifier = 7;
+   * @generated from field: optional string identifier = 6;
    */
   identifier?: string;
 
   /**
-   * @generated from field: optional string description = 8;
+   * @generated from field: optional string description = 7;
    */
   description?: string;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp open = 9;
+   * @generated from field: optional google.protobuf.Timestamp open = 8;
    */
   open?: Timestamp;
 
   /**
-   * @generated from field: bool holder_owns_money = 10;
+   * @generated from field: bool holder_owns_money = 9;
    */
   holderOwnsMoney: boolean;
 
   /**
-   * @generated from field: bool is_numerable = 11;
+   * @generated from field: bool is_numerable = 10;
    */
   isNumerable: boolean;
 };

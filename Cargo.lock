@@ -1782,7 +1782,9 @@ dependencies = [
 name = "finances-app-models"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "finances_accounts",
+ "finances_investments",
  "prost",
  "prost-build",
  "prost-types",

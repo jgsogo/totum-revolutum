@@ -22,7 +22,7 @@ export declare type HolderContext = Message<"finances_app_models.HolderContext">
   holder?: Holder;
 
   /**
-   * @generated from field: repeated finances_app_models.Account accounts = 3;
+   * @generated from field: repeated finances_app_models.Account accounts = 2;
    */
   accounts: Account[];
 };

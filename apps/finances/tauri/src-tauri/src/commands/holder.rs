@@ -1,5 +1,4 @@
 use crate::types::ConnectionType;
-use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::AccountHolder;
 

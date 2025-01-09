@@ -15,7 +15,11 @@ enum AccountCategory {
 
 // Fine-grained account type
 message AccountType {
-  string name = 1;
+  int64 pk = 1;
+  string name = 2;
+  // Last element in the breadcrumb is the account-type itself. This way, if the breadcrumb is empty, it has not been populated.
+  repeated string breadcrumb = 3;
+  AccountCategory category = 4;
 }
 
 
@@ -24,15 +28,14 @@ message Account {
   string name = 2;
   Custodian custodian = 3;
 
-  AccountCategory category = 4;
-  AccountType type = 5;
-  Ccy ccy = 6;
+  int64 account_type_pk = 4;
+  Ccy ccy = 5;
 
-  optional string identifier = 7;
-  optional string description = 8;
+  optional string identifier = 6;
+  optional string description = 7;
 
-  optional google.protobuf.Timestamp open = 9;
+  optional google.protobuf.Timestamp open = 8;
 
-  bool holder_owns_money = 10;
-  bool is_numerable = 11;
+  bool holder_owns_money = 9;
+  bool is_numerable = 10;
 }

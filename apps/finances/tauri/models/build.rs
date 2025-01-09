@@ -6,6 +6,7 @@ fn main() -> Result<()> {
         // cannot be converted to JSON (https://github.com/tokio-rs/prost/issues/75). Official JSON support
         // is expected in v1.0 (https://github.com/tokio-rs/prost/issues/624).
         // .type_attribute(".", "#[derive(serde::Serialize,serde::Deserialize)]")
+        .compile_well_known_types()
         .compile_protos(
             &[
                 "apps/finances/tauri/models/protos/account.proto",
