@@ -18,17 +18,22 @@ export declare const file_apps_finances_tauri_models_protos_account: GenFile;
  */
 export declare type AccountType = Message<"finances_app_models.AccountType"> & {
   /**
-   * @generated from field: string name = 1;
+   * @generated from field: int64 pk = 1;
+   */
+  pk: bigint;
+
+  /**
+   * @generated from field: string name = 2;
    */
   name: string;
 
   /**
-   * @generated from field: repeated string breadcrumb = 2;
+   * @generated from field: repeated string breadcrumb = 3;
    */
   breadcrumb: string[];
 
   /**
-   * @generated from field: finances_app_models.AccountCategory category = 3;
+   * @generated from field: finances_app_models.AccountCategory category = 4;
    */
   category: AccountCategory;
 };

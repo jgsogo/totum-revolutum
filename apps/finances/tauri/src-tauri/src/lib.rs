@@ -5,9 +5,12 @@ pub mod db;
 pub mod models;
 mod types;
 mod views;
-use finances_app_models::AppState;
-
 use crate::types::ConnectionType;
+use diesel::prelude::*;
+use finances_accounts::fields::TreeNodeList;
+use finances_accounts::models::{AccountHolder, AccountType};
+use finances_accounts::sql::filters::accounttype_by_unique_names;
+use finances_app_models::{AccountCategory, AccountType as AppModelAccountType, AppState, MainContext};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn create_app<R: tauri::Runtime>(
@@ -16,6 +19,9 @@ pub fn create_app<R: tauri::Runtime>(
     state: AppState,
 ) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
+
+    let mut conn = db_pool.get().expect("Get a connection from the Pool");
+    let main_context = get_main_context(&mut conn).expect("Error creating main context");
 
     builder
         .plugin(
@@ -26,6 +32,7 @@ pub fn create_app<R: tauri::Runtime>(
         .setup(|app| {
             app.manage(db_pool);
             app.manage(state);
+            app.manage(main_context);
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
@@ -53,4 +60,80 @@ pub fn create_app<R: tauri::Runtime>(
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
+}
+
+fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> {
+    let holders = AccountHolder::all()
+        .select(AccountHolder::as_select())
+        .order(finances_accounts::schema::finances_accounts_accountholder::name.asc())
+        .load::<AccountHolder>(conn)
+        .map_err(|e| format!("Error loading holders: {}", e))?;
+
+    log::debug!("Found {} holders", holders.len());
+
+    // All the account types
+    let account_types: Vec<AppModelAccountType> = {
+        let savings_accounttypes_pks: Vec<i64> =
+            get_accounttypes_for_unique_names(conn, AccountCategory::savings_accounttypes())?;
+
+        let investment_accounttypes_pks: Vec<i64> =
+            get_accounttypes_for_unique_names(conn, AccountCategory::investment_accounttypes())?;
+
+        let retirement_accounttypes_pks: Vec<i64> =
+            get_accounttypes_for_unique_names(conn, AccountCategory::retirement_accounttypes())?;
+
+        AccountType::all()
+            .select(AccountType::as_select())
+            // .filter(accounttype_by_unique_names(unique_names))
+            .load::<AccountType>(conn)
+            .map_err(|e| format!("Error loading account types: {}", e))?
+            .into_iter()
+            .map(|v| {
+                let account_category = if savings_accounttypes_pks.contains(&v.id) {
+                    AccountCategory::Savings
+                } else if investment_accounttypes_pks.contains(&v.id) {
+                    AccountCategory::Investment
+                } else if retirement_accounttypes_pks.contains(&v.id) {
+                    AccountCategory::Retirement
+                } else {
+                    AccountCategory::Other
+                };
+                let breadcrumbs = v
+                    .get_breadcrumbs(conn)
+                    .map_err(|e| format!("Error getting breadcrumbs for account type {}: {}", v.id, e))?;
+                Ok::<_, String>(AppModelAccountType::new(
+                    v.id,
+                    v.name,
+                    Some(breadcrumbs),
+                    account_category,
+                ))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    };
+
+    let context = MainContext::new(holders, account_types);
+    Ok(context)
+}
+
+/// Given some 'unique_name's, get the PKs for all of them and their descendants
+fn get_accounttypes_for_unique_names<'a>(
+    conn: &mut PgConnection,
+    unique_names: &'a [&'a str],
+) -> Result<Vec<i64>, String> {
+    let account_types = AccountType::all()
+        .select((
+            finances_accounts::schema::finances_accounts_accounttype::id,
+            finances_accounts::schema::finances_accounts_accounttype::tn_descendants_pks,
+        ))
+        .filter(accounttype_by_unique_names(unique_names))
+        .load::<(i64, TreeNodeList)>(conn)
+        .map_err(|e| format!("Error loading accounts: {}", e))?;
+    let mut account_types_pks = Vec::default();
+    for (acc_type_pk, mut tn_descendants_pks) in account_types {
+        account_types_pks.push(acc_type_pk);
+        account_types_pks.append(&mut tn_descendants_pks.nodes);
+    }
+    account_types_pks.sort();
+    account_types_pks.dedup();
+    Ok(account_types_pks)
 }

@@ -15,6 +15,10 @@ impl MainContext {
             account_types: account_types.into_iter().map(|v| v.inner_type()).collect(),
         })
     }
+
+    pub fn find_account_type(&self, pk: i64) -> Option<&crate::protos::AccountType> {
+        self.0.account_types.iter().find(|acc_type| acc_type.pk == pk)
+    }
 }
 
 impl AppModel<crate::protos::MainContext> for MainContext {

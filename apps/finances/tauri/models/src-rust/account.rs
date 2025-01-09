@@ -8,7 +8,7 @@ impl Account {
         account: finances_accounts::models::Account,
         account_holder_role: finances_accounts::models::AccountHolderRole,
         custodian: Custodian,
-        account_type_pk: i64,
+        account_type: crate::protos::AccountType,
     ) -> Self {
         let timestamp = crate::protos::Timestamp {
             seconds: (account.open.num_days_from_ce() as i64) * 24 * 3600,
@@ -22,7 +22,7 @@ impl Account {
             pk: account.id,
             name: account.name,
             custodian: Some(custodian.inner_type()),
-            account_type_pk,
+            r#type: Some(account_type),
             ccy,
             identifier: account.identifier,
             description: account.description,

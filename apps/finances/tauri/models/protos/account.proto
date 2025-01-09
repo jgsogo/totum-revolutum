@@ -28,7 +28,7 @@ message Account {
   string name = 2;
   Custodian custodian = 3;
 
-  int64 account_type_pk = 4;
+  AccountType type = 4;
   Ccy ccy = 5;
 
   optional string identifier = 6;

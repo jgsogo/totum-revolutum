@@ -8,7 +8,7 @@ import { MovementType } from "./models/MovementType";
 import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
 import { TransactionGroup } from "./models/TransactionGroup";
 import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
-import { AppStateSchema, type AppState, type MainContext, MainContextSchema, type HolderContext, HolderContextSchema } from "../../models/src-js/index";
+import { AppStateSchema, type AppState, type MainContext, MainContextSchema, type HolderContext, HolderContextSchema, type AccountType as AccountTypeProto } from "../../models/src-js/index";
 import { fromBinary, type DescMessage } from "@bufbuild/protobuf";
 import { Buffer } from 'buffer';
 
