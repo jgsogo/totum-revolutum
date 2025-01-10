@@ -8,13 +8,16 @@ pub(crate) mod google {
     pub(crate) mod protobuf {
         include!(concat!(env!("OUT_DIR"), "/google.protobuf.rs"));
     }
+    pub(crate) mod r#type {
+        include!(concat!(env!("OUT_DIR"), "/google.r#type.rs"));
+    }
 }
 
 #[cfg(feature = "bazel")]
 pub(crate) mod finances_app_models {
     pub(crate) use protos::finances_app_models::{
-        Account, AccountCategory, AccountType, AppState, Ccy, Custodian, DatabaseConnection, Holder, HolderContext,
-        MainContext,
+        Account, AccountCategory, AccountContext, AccountType, AppState, Ccy, Custodian, DatabaseConnection, Holder,
+        HolderContext, MainContext,
     };
 }
 

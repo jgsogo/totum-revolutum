@@ -1785,6 +1785,7 @@ dependencies = [
  "chrono",
  "finances_accounts",
  "finances_investments",
+ "googleapis",
  "prost",
  "prost-build",
  "prost-types",
@@ -2545,6 +2546,14 @@ dependencies = [
  "glib-sys",
  "libc",
  "system-deps",
+]
+
+[[package]]
+name = "googleapis"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "prost-build",
 ]
 
 [[package]]

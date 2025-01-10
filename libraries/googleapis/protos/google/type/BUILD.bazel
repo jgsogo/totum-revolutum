@@ -3,35 +3,38 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_rust_prost//:defs.bzl", "rust_prost_library")
 
 protos = [
-    "account.proto",
-    "account_context.proto",
-    "app_state.proto",
-    "ccy.proto",
-    "custodian.proto",
-    "fx.proto",
-    "holder_context.proto",
-    "holder.proto",
-    "main_context.proto",
-    "money_amount.proto",
-    "movement.proto",
-    "snapshot.proto",
+    "date.proto",
+    "decimal.proto",
+    "money.proto",
 ]
 
 proto_library(
     name = "protos",
     srcs = protos,
-    deps = [
-        "//libraries/googleapis/protos/google/type:date_proto",
-        "//libraries/googleapis/protos/google/type:decimal_proto",
-        "//libraries/googleapis/protos/google/type:money_proto",
-        "@protobuf//:timestamp_proto",
-    ],
+)
+
+proto_library(
+    name = "date_proto",
+    srcs = ["date.proto"],
+    visibility = ["//visibility:public"],
+)
+
+proto_library(
+    name = "decimal_proto",
+    srcs = ["decimal.proto"],
+    visibility = ["//visibility:public"],
+)
+
+proto_library(
+    name = "money_proto",
+    srcs = ["money.proto"],
+    visibility = ["//visibility:public"],
 )
 
 # This rule generates (and copies to the workspace) the proto files for Typescript
 ts_proto_library(
     name = "protos_ts",
-    node_modules = "//apps/finances/tauri/models:node_modules",
+    node_modules = "//libraries/googleapis:node_modules",
     proto = ":protos",
     proto_srcs = protos,
     protoc_gen_options = {
@@ -45,5 +48,5 @@ rust_prost_library(
     name = "protos_rs",
     proto = ":protos",
     # TODO: Wait for https://github.com/bazelbuild/rules_rust/issues/2831, so we can add type_attributes, if not we can go the build.rs way
-    visibility = ["//apps/finances/tauri/models:__subpackages__"],
+    visibility = ["//visibility:public"],
 )

@@ -1,4 +1,5 @@
 mod account;
+mod account_context;
 mod account_type;
 mod app_state;
 mod custodian;
@@ -8,6 +9,7 @@ mod main_context;
 mod protos;
 
 pub use account::Account;
+pub use account_context::AccountContext;
 pub use account_type::{AccountCategory, AccountType};
 pub use app_state::AppState;
 pub use custodian::Custodian;

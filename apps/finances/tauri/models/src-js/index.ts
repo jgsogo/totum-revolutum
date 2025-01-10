@@ -1,4 +1,3 @@
-// export { AccountSchema, Account } from '../protos/account_pb.js';
 export { AccountCategory, AccountCategorySchema } from '../protos/account_pb.js';
 export { AccountTypeSchema, AccountType } from '../protos/account_pb.js';
 export { AppStateSchema, AppState } from '../protos/app_state_pb.js';
@@ -9,3 +8,4 @@ export { Holder, HolderSchema } from '../protos/holder_pb.js';
 export { MainContext, MainContextSchema } from '../protos/main_context_pb.js';
 export { HolderContext } from './holder_context.js';
 export { Account } from './account.js';
+export { AccountContext, AccountContextSchema } from '../protos/account_context_pb.js';

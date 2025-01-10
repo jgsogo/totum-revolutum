@@ -12,6 +12,7 @@ members = [
     "libraries/filesystem",
     "libraries/finances/accounts/rust",
     "libraries/finances/investments/rust",
+    "libraries/googleapis",
     "libraries/openexchangerates",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",

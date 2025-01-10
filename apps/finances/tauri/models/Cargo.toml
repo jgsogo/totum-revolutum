@@ -22,5 +22,6 @@ prost-types = { workspace = true }
 serde = { workspace = true }
 chrono = { workspace =  true }
 
+googleapis = { path = "../../../../libraries/googleapis" }
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust" }
 finances_investments = { path = "../../../../libraries/finances/investments/rust" }

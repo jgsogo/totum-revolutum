@@ -27,6 +27,7 @@ rust_library(
         "//apps/finances/tauri/models/protos:protos_rs",
         "//libraries/finances/accounts/rust:finances_accounts",
         "//libraries/finances/investments/rust:finances_investments",
+        "//libraries/googleapis:googleapis/rust",
     ],
 )
 
@@ -62,6 +63,7 @@ ts_project(
     deps = [
         ":node_modules/@types/node",
         "//apps/finances/tauri/models/protos:protos_ts",
+        "//libraries/googleapis:googleapis/ts",
     ],
 )
 

@@ -1,5 +1,6 @@
 apps/finances/tauri/models/node_modules/
 apps/finances/tauri/node_modules/
+libraries/googleapis/node_modules/
 node_modules/
 sandbox/svelte-hello-world/node_modules/
 target/

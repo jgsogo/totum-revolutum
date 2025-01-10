@@ -1,24 +1,18 @@
 import { error } from '@sveltejs/kit';
-import { get_custodian_details, get_account_snapshots, get_account_movements } from '$lib/commands';
-import { Holder } from '$lib/models/Holder';
-import type { Custodian } from '$lib/models/Custodian.js';
-import type { Account } from '$lib/models/Account.js';
+import { Account } from '../../../../../../models/src-js';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ params, parent, depends }) {
-    depends('invalidate:account');
+    const { holder_context } = await parent();
 
-    const { all_accounts_for_holder } = await parent();
+    depends('invalidate:account');
 
     // Find the account for the input params
     let account_pk = parseInt(params.account_pk, 10)
-    let account: Account | undefined = all_accounts_for_holder.find((acc: Account) => { return acc.pk == account_pk; });
+    let account: Account | undefined = holder_context.accounts().find((acc: Account) => { return acc.pk() == account_pk; });
     if (!account) {
         error(400, "Account not accessible for this Holder");
     }
-
-    // Prefetch latest snapshot
-    await account.getLastSnapshot();
 
     return {
         account,

@@ -5,9 +5,7 @@ import type { Custodian } from '$lib/models/Custodian.js';
 import type { Account } from '$lib/models/Account.js';
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({ params, parent, depends }) {
-    depends('invalidate:account');
-
+export async function load({ params, parent }) {
     const { account } = await parent();
 
     // Get snapshots and movements

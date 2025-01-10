@@ -1,0 +1,30 @@
+syntax = "proto3";
+package finances_app_models;
+
+import "libraries/googleapis/protos/google/type/date.proto";
+import "apps/finances/tauri/models/protos/money_amount.proto";
+import "apps/finances/tauri/models/protos/fx.proto";
+
+
+message MovementType {
+    int64 pk = 1;
+    string name = 2;
+    // Last element in the breadcrumb is the movement-type itself. This way, if the breadcrumb is empty, it has not been populated.
+    repeated string breadcrumb = 3;
+}
+
+enum MovementDirection {
+    In = 0;
+    Out = 1;
+}
+message Movement {
+    int64 pk = 1;
+    google.type.Date date_value = 2;
+
+    int64 transaction_pk = 3;
+    MovementType type = 4;
+    MovementDirection direction = 5;
+
+    MoneyAmount amount = 6;
+    Fx fx = 7;
+}

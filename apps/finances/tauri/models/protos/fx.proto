@@ -1,0 +1,19 @@
+syntax = "proto3";
+package finances_app_models;
+
+import "libraries/googleapis/protos/google/type/date.proto";
+import "libraries/googleapis/protos/google/type/decimal.proto";
+
+
+
+message Fx {
+    // The three-letter currency code defined in ISO 4217.
+    string foreign_code = 1;
+
+    // The three-letter currency code defined in ISO 4217.
+    string local_code = 2;
+
+    google.type.Decimal fx = 3;
+
+    google.type.Date date_value = 4;
+}
