@@ -13,6 +13,14 @@ pub struct Fx {
     pub date_value: chrono::NaiveDate,
 }
 
+impl Fx {
+    /// Returns (a query to) all the [`Fx`]s
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all() -> _ {
+        crate::schema::finances_accounts_fx::table
+    }
+}
+
 #[derive(Insertable)]
 #[diesel(table_name = crate::schema::finances_accounts_fx)]
 pub struct NewFx<'a> {

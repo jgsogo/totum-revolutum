@@ -8,9 +8,11 @@ mod views;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use finances_accounts::fields::TreeNodeList;
-use finances_accounts::models::{AccountHolder, AccountType};
+use finances_accounts::models::{AccountHolder, AccountType, MovementType};
 use finances_accounts::sql::filters::accounttype_by_unique_names;
-use finances_app_models::{AccountCategory, AccountType as AppModelAccountType, AppState, MainContext};
+use finances_app_models::{
+    AccountCategory, AccountType as AppModelAccountType, AppState, MainContext, MovementType as AppModelMovementType,
+};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn create_app<R: tauri::Runtime>(
@@ -112,7 +114,24 @@ fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> {
             .collect::<Result<Vec<_>, _>>()?
     };
 
-    let context = MainContext::new(holders, account_types);
+    // All the movement types
+    let movement_types: Vec<AppModelMovementType> = {
+        MovementType::all()
+            .select(MovementType::as_select())
+            // .filter(accounttype_by_unique_names(unique_names))
+            .load::<MovementType>(conn)
+            .map_err(|e| format!("Error loading account types: {}", e))?
+            .into_iter()
+            .map(|v| {
+                let breadcrumbs = v
+                    .get_breadcrumbs(conn)
+                    .map_err(|e| format!("Error getting breadcrumbs for movement type {}: {}", v.id, e))?;
+                Ok::<_, String>(AppModelMovementType::new(v.id, v.name, Some(breadcrumbs)))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    };
+
+    let context = MainContext::new(holders, account_types, movement_types);
     Ok(context)
 }
 

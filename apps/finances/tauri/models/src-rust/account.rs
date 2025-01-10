@@ -31,6 +31,13 @@ impl Account {
             is_numerable: account.is_numerable,
         })
     }
+    pub fn is_numerable(&self) -> bool {
+        self.0.is_numerable
+    }
+    pub fn ccy(&self) -> &str {
+        let ccy: crate::protos::Ccy = self.0.ccy.try_into().expect("Invalid i32 for CCY");
+        ccy.as_str_name()
+    }
 }
 
 impl AppModel<crate::protos::Account> for Account {

@@ -15,9 +15,16 @@ pub mod transaction_group;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian};
-use finances_accounts::sql::filters::accountholder_by_pk;
-use finances_app_models::{Account as AppModelAccount, AccountContext, AppModel, AppState, HolderContext, MainContext};
+use finances_accounts::fields::MovementDirection;
+use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Fx, Movement};
+use finances_accounts::sql::filters::{accountholder_by_pk, fx_by_pk, movement_filter_account_by_pk};
+use finances_app_models::{
+    google_type, Account as AppModelAccount, AccountContext, AppModel, AppState, Fx as AppModelFx, HolderContext,
+    MainContext, MoneyAmount, Movement as AppModelMovement, MovementDirection as ModelMovementDirection,
+    Snapshot as AppModelSnapshot,
+};
+use finances_investments::models::SnapshotNumerable;
+use finances_investments::sql::queries::all_snapshotnumerable_for_account_id;
 use tauri::ipc::Response;
 use tauri::State;
 
@@ -111,6 +118,83 @@ pub async fn get_account_context(
         AppModelAccount::new(account, account_holder_role, custodian.into(), account_type)
     };
 
-    let context = AccountContext::new(account, Vec::default(), Vec::default());
+    let account_ccy = account.ccy().to_string();
+
+    // Snapshots
+    let snapshots: Vec<AppModelSnapshot> = if !account.is_numerable() {
+        Account::snapshots_for_pk(account_pk, &mut conn)
+            .map_err(|e| format!("Error retrieving snapshots: {e}"))?
+            .into_iter()
+            .map(|v| {
+                let money: google_type::Money = (v.amount, account_ccy.clone()).into();
+                let money_amount = MoneyAmount::new_non_numerable(money);
+                AppModelSnapshot::new(v.id, v.date_value.into(), money_amount)
+            })
+            .collect()
+    } else {
+        all_snapshotnumerable_for_account_id()
+            .bind::<diesel::sql_types::Int8, _>(account_pk)
+            .load(&mut conn)
+            .map_err(|e| format!("Error loading snapshots numerable: {e}"))?
+            .into_iter()
+            .map(|v: SnapshotNumerable| {
+                let unit_value: google_type::Money = (v.snapshot_numerable.unit_value, account_ccy.clone()).into();
+                let quantity: google_type::Decimal = v.snapshot_numerable.quantity.into();
+                let money_amount = MoneyAmount::new_numerable(unit_value, quantity);
+                AppModelSnapshot::new(v.snapshot.id, v.snapshot.date_value.into(), money_amount)
+            })
+            .collect()
+    };
+
+    // Movements
+    let movements: Vec<AppModelMovement> = {
+        Movement::all()
+            .filter(movement_filter_account_by_pk(account_pk))
+            .select(Movement::as_select())
+            .load::<Movement>(&mut conn)
+            .map_err(|e| format!("Error retrieving movements: {e}"))?
+            .into_iter()
+            .map(|v| {
+                let money: google_type::Money = (v.amount, account_ccy.clone()).into();
+                let money_amount = MoneyAmount::new_non_numerable(money);
+                let movement_type = main_context
+                    .find_movement_type(v.type_id)
+                    .cloned()
+                    .ok_or(format!("Movement type 'pk={}' not found in main context", v.type_id))?;
+                let direction = match v.direction {
+                    MovementDirection::In => ModelMovementDirection::In,
+                    MovementDirection::Out => ModelMovementDirection::Out,
+                };
+                let fx = v
+                    .fx_id
+                    .map(|v| {
+                        let fx = Fx::all()
+                            .filter(fx_by_pk(v))
+                            .select(Fx::as_select())
+                            .first::<Fx>(&mut conn)
+                            .map_err(|e| format!("Error retrieving movements: {e}"))?;
+                        Ok::<_, String>(AppModelFx::new(
+                            fx.foreign,
+                            fx.local,
+                            fx.date_value.into(),
+                            fx.rate.into(),
+                        ))
+                    })
+                    .transpose()?;
+
+                Ok::<_, String>(AppModelMovement::new(
+                    v.id,
+                    v.date_value.into(),
+                    v.transaction_id,
+                    movement_type,
+                    direction,
+                    money_amount,
+                    fx,
+                ))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    };
+
+    let context = AccountContext::new(account, movements, snapshots);
     Ok(context.to_response())
 }

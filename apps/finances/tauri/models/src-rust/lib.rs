@@ -24,7 +24,7 @@ pub use holder::Holder;
 pub use holder_context::HolderContext;
 pub use main_context::MainContext;
 pub use money_amount::MoneyAmount;
-pub use movement::Movement;
+pub use movement::{Movement, MovementDirection};
 pub use movement_type::MovementType;
 pub use snapshot::Snapshot;
 

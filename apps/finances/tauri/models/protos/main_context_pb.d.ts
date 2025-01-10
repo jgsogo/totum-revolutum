@@ -6,6 +6,7 @@ import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import type { Message } from "@bufbuild/protobuf";
 import type { Holder } from "./holder_pb.js";
 import type { AccountType } from "./account_pb.js";
+import type { MovementType } from "./movement_pb.js";
 
 /**
  * Describes the file apps/finances/tauri/models/protos/main_context.proto.
@@ -25,6 +26,11 @@ export declare type MainContext = Message<"finances_app_models.MainContext"> & {
    * @generated from field: repeated finances_app_models.AccountType account_types = 2;
    */
   accountTypes: AccountType[];
+
+  /**
+   * @generated from field: repeated finances_app_models.MovementType movement_types = 3;
+   */
+  movementTypes: MovementType[];
 };
 
 /**

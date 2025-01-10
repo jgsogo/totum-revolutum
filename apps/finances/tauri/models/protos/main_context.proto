@@ -3,9 +3,11 @@ package finances_app_models;
 
 import "apps/finances/tauri/models/protos/holder.proto";
 import "apps/finances/tauri/models/protos/account.proto";
+import "apps/finances/tauri/models/protos/movement.proto";
 
 // Data that is shared across all the application
 message MainContext {
     repeated Holder holders = 1;
     repeated AccountType account_types = 2;
+    repeated MovementType movement_types = 3;
 }
