@@ -21,6 +21,8 @@ prost = { workspace = true }
 prost-types = { workspace = true }
 serde = { workspace = true }
 chrono = { workspace =  true }
+bigdecimal = {workspace = true}
+num-bigint = {workspace = true}
 
 googleapis = { path = "../../../../libraries/googleapis" }
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust" }

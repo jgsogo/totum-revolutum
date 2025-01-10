@@ -1782,10 +1782,12 @@ dependencies = [
 name = "finances-app-models"
 version = "0.1.0"
 dependencies = [
+ "bigdecimal",
  "chrono",
  "finances_accounts",
  "finances_investments",
  "googleapis",
+ "num-bigint",
  "prost",
  "prost-build",
  "prost-types",
@@ -2552,6 +2554,7 @@ dependencies = [
 name = "googleapis"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "prost",
  "prost-build",
 ]

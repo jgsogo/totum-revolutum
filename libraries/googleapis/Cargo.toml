@@ -20,4 +20,4 @@ prost-build = { workspace = true }
 prost = { workspace = true }
 # prost-types = { workspace = true }
 # serde = { workspace = true }
-# chrono = { workspace =  true }
+chrono = { workspace =  true }

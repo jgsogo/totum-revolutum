@@ -51,6 +51,7 @@ pub fn create_app<R: tauri::Runtime>(
             commands::get_app_state,
             commands::get_main_context,
             commands::get_holder_context,
+            commands::get_account_context,
             commands::movement_type::get_all_movementtypes,
             commands::movement_type::get_breadcrumbs_for_movementtype,
             commands::transaction_group::get_all_transaction_groups,

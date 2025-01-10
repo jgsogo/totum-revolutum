@@ -17,7 +17,7 @@ use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian};
 use finances_accounts::sql::filters::accountholder_by_pk;
-use finances_app_models::{Account as AppModelAccount, AppModel, AppState, HolderContext, MainContext};
+use finances_app_models::{Account as AppModelAccount, AccountContext, AppModel, AppState, HolderContext, MainContext};
 use tauri::ipc::Response;
 use tauri::State;
 
@@ -90,5 +90,27 @@ pub async fn get_holder_context(
     };
 
     let context = HolderContext::new(acc_holder, accounts);
+    Ok(context.to_response())
+}
+
+#[tauri::command]
+pub async fn get_account_context(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+    main_context: State<'_, MainContext>,
+    account_pk: i64,
+) -> Result<Response, String> {
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    let account = {
+        let (account, account_holder_role, custodian, account_type) =
+            Account::details_for_pk(account_pk, &mut conn).map_err(|e| format!("Error loading account: {e}"))?;
+        let account_type = main_context.find_account_type(account_type.id).cloned().ok_or(format!(
+            "Account type 'pk={}' not found in main context",
+            account_type.id
+        ))?;
+        AppModelAccount::new(account, account_holder_role, custodian.into(), account_type)
+    };
+
+    let context = AccountContext::new(account, Vec::default(), Vec::default());
     Ok(context.to_response())
 }
