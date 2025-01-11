@@ -1,21 +1,20 @@
 <script lang="ts">
   import { Avatar, Button, Card, Img, Modal } from "flowbite-svelte";
-  import type { Account } from "$lib/models/Account";
-  import type { Custodian } from "$lib/models/Custodian";
-  import type { Snapshot } from "$lib/models/Snapshot";
+
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
   import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
   import { goToTransactionCreate } from "$lib/utils";
   import { create_snapshot } from "$lib/commands";
   import { invalidate } from "$app/navigation";
   import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
-  import { type Holder } from "../../../models/src-js";
+  import { type Holder, Account, type Snapshot, type Custodian } from "../../../models/src-js";
+
 
   let {
     holder,
-    account = $bindable(),
+    account,
     base_media_url,
-    last_snapshot = $bindable(),
+    last_snapshot,
   }: { holder: Holder; account: Account; base_media_url: string; last_snapshot?: Snapshot } = $props();
 
   const initials = (custodian: Custodian): string => {

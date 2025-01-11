@@ -1,13 +1,11 @@
 <script lang="ts">
   import { Card, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
-  import type { Account } from "$lib/models/Account";
-  import { Snapshot } from "$lib/models/Snapshot";
-  import type { Movement } from "$lib/models/Movement";
+  import { Account, Snapshot, Movement } from "../../../models/src-js";
 
   let {
-    account = $bindable(),
-    snapshots = $bindable(),
-    movements = $bindable(),
+    account,
+    snapshots,
+    movements,
   }: { account: Account; snapshots: Snapshot[]; movements: Movement[] } = $props();
 
   const entries = $derived([...snapshots, ...movements].sort((lhs, rhs) => new Date(rhs.date_value).getTime() - new Date(lhs.date_value).getTime()));

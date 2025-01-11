@@ -17,6 +17,7 @@ enum MovementDirection {
     In = 0;
     Out = 1;
 }
+
 message Movement {
     int64 pk = 1;
     google.type.Date date_value = 2;

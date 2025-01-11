@@ -9,3 +9,5 @@ export { MainContext, MainContextSchema } from '../protos/main_context_pb.js';
 export { HolderContext } from './holder_context.js';
 export { Account } from './account.js';
 export { AccountContext, AccountContextSchema } from '../protos/account_context_pb.js';
+export { Snapshot, SnapshotSchema} from '../protos/snapshot_pb.js';
+export { Movement, MovementSchema} from '../protos/movement_pb.js';

@@ -1,4 +1,4 @@
-import type { Account } from "$lib/models/Account";
+import { Account } from "../../../../models/src-js";
 
 
 

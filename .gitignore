@@ -5,6 +5,7 @@
 .idea/
 .svelte-kit/
 __pycache__/
+apps/finances/tauri/models/protos/*.d.ts
 bazel-bin
 bazel-out
 bazel-testlogs

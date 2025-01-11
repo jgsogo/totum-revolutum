@@ -12,7 +12,7 @@ import type { Holder, Account } from "../../models/src-js";
  */
 export async function goToAccountDetail(holder: Holder, account: Account) {
     let account_view = account.is_numerable() ? "numerable_stock" : "default";
-    await goto(`/holder/${holder.pk}/account/${account.pk}/detail/${account_view}`);
+    await goto(`/holder/${holder.pk}/account/${account.pk()}/detail/${account_view}`);
   }
 
 /**
