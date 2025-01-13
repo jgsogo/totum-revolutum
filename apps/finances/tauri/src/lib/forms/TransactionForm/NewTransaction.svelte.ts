@@ -1,9 +1,7 @@
-import type { Account } from "$lib/models/Account";
-import type { TransactionGroup } from "$lib/models/TransactionGroup";
-
+import type { TransactionGroup } from "../../../../models/src-js";
 
 import { NewMovement, NewMovementType } from "../MovementForm/NewMovement.svelte";
-
+import { Account } from "../../../../models/src-js";
 
 export class NewTransaction {
     name?: string = $state();

@@ -14,4 +14,4 @@ export { AccountContext } from './account_context.js';
 export { MoneyAmount } from './money_amount.js';
 export { MainContext} from './main_context.js';
 export { TransactionGroup} from "../protos/transaction_pb.js";
-export { MovementType } from '../protos/movement_pb.js';
+export { MovementType } from './movement_type.js';

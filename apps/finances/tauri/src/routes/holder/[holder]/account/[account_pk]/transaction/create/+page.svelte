@@ -7,8 +7,13 @@
   import { NewMovement, NewMovementType } from "$lib/forms/MovementForm/NewMovement.svelte.js";
   import { create_transaction } from "$lib/commands.js";
   import { goToAccountDetail } from "$lib/utils.js";
-  import type { AccountContext, HolderContext } from "../../../../../../../../models/src-js/index.js";
-  import type { MainContext, Account, TransactionGroup, MovementType, AppState } from '../../../../../../../../models/src-js';
+  import type {
+    MainContext,
+    Account,
+    AppState,
+    AccountContext,
+    HolderContext,
+  } from "../../../../../../../../models/src-js/index.js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -21,8 +26,24 @@
   let from_account: Account | null = data.from_account;
   let to_account: Account | null = data.to_account;
 
-  let initial_movements_from = from_account ? [new NewMovement(from_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable, from_account, new Date())] : [];
-  let initial_movements_to = to_account ? [new NewMovement(to_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable, to_account, new Date())] : [];
+  let initial_movements_from = from_account
+    ? [
+        new NewMovement(
+          from_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable,
+          from_account,
+          new Date()
+        ),
+      ]
+    : [];
+  let initial_movements_to = to_account
+    ? [
+        new NewMovement(
+          to_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable,
+          to_account,
+          new Date()
+        ),
+      ]
+    : [];
 
   let common_date = $state(new Date());
   let transaction: NewTransaction = $state(
@@ -54,7 +75,10 @@
 
 <form>
   <div class="mt-px space-y-4">
-    <Card size="xl" class="mt-6 {transaction.is_valid(show_transaction_date, app_state.baseCcy) ? '' : card_error_style}">
+    <Card
+      size="xl"
+      class="mt-6 {transaction.is_valid(show_transaction_date, app_state.baseCcy) ? '' : card_error_style}"
+    >
       <TransactionForm
         bind:transaction
         bind:show_date={show_transaction_date}

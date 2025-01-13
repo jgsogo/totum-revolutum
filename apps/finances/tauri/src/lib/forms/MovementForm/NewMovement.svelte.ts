@@ -1,5 +1,5 @@
 import { toFixedNumber } from "$lib/utils";
-import { Account, type MovementType, Snapshot } from "../../../../models/src-js";
+import { Account, MovementType, Snapshot } from "../../../../models/src-js";
 
 export enum NewMovementType {
     NonNumerable,
@@ -9,6 +9,7 @@ export enum NewMovementType {
 
 export class NewMovement {
     account?: Account = $state();
+    snapshots?: Snapshot[] = $state();
     mov_type?: MovementType = $state();
     date_value?: Date = $state();
     fx?: number = $state();
@@ -26,9 +27,10 @@ export class NewMovement {
     ex_dividend_date?: Date = $state();
     ex_dividend_snapshot?: Snapshot = $state();
 
-    constructor(type: NewMovementType, account?: Account, date_value?: Date) {
+    constructor(type: NewMovementType, account?: Account, date_value?: Date, snapshots?: Snapshot[]) {
         this.type = type;
         this.account = account;
+        this.snapshots = snapshots;
         this.date_value = date_value;
     }
 
@@ -61,8 +63,8 @@ export class NewMovement {
                 total = this.quantity * this.unit_value;
                 break;
             case NewMovementType.Dividend:
-                if (!this.ex_dividend_snapshot || !this.ex_dividend_snapshot.quantity || !this.unit_value) return undefined;
-                total = this.ex_dividend_snapshot.quantity * this.unit_value;
+                if (!this.ex_dividend_snapshot || !this.ex_dividend_snapshot.amount().quantity() || !this.unit_value) return undefined;
+                total = this.ex_dividend_snapshot.amount().quantity()!.as_number() * this.unit_value;
                 break;
         }
 
@@ -77,7 +79,7 @@ export class NewMovement {
         // This serialization is used when sending this structure via a command to the Tauri backend
         return {
             account_pk: this.account?.pk(),
-            movement_type_pk: this.mov_type?.pk,
+            movement_type_pk: this.mov_type?.pk(),
             date_value:  this.date_value?.toISOString().slice(0, 10),
             fx: this.fx,
             type: NewMovementType[this.type],

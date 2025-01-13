@@ -1,9 +1,10 @@
 import { MainContext as MainContextProto } from "../protos/main_context_pb.js";
 import { Account as AccountProto } from "../protos/account_pb.js";
+import { MovementType as MovementTypeProto } from "../protos/movement_pb.js";
 import { Account } from "./account.js";
 import { Holder } from "../protos/holder_pb.js";
 import { TransactionGroup } from "../protos/transaction_pb.js";
-import { MovementType } from "../protos/movement_pb.js";
+import { MovementType } from './movement_type.js';
 
 export class MainContext {
     private readonly main_context: MainContextProto;
@@ -29,6 +30,6 @@ export class MainContext {
     }
 
     movement_types(): MovementType[] {
-        return this.main_context.movementTypes;
+        return this.main_context.movementTypes.map((value: MovementTypeProto) => new MovementType(value));
     }
 }

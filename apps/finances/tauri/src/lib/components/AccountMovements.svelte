@@ -3,10 +3,9 @@
   import { Account, Snapshot, Movement } from "../../../models/src-js";
 
   let {
-    account,
     snapshots,
     movements,
-  }: { account: Account; snapshots: Snapshot[]; movements: Movement[] } = $props();
+  }: { snapshots: Snapshot[]; movements: Movement[] } = $props();
 
   const entries = $derived([...snapshots, ...movements].sort((lhs, rhs) => rhs.dateValue().as_date().getTime() - lhs.dateValue().as_date().getTime()));
 
@@ -27,7 +26,7 @@
       {#each entries as entry}
         {#if entry instanceof Snapshot}
           <TableBodyRow class={class_row_snapshot}>
-            <TableBodyCell>{entry.dateValue()}</TableBodyCell>
+            <TableBodyCell>{entry.dateValue().as_date()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell>{entry.amount()}</TableBodyCell>
@@ -36,7 +35,7 @@
         {:else}
         <!-- TODO: On click, we can show the information about the Transaction this moement belongs to. There is an example in the official Flowbite documentation about Table component (https://flowbite-svelte.com/docs/components/table#Click_and_double-click_on_row) -->
         <TableBodyRow class={class_row_movement}>
-            <TableBodyCell>{entry.dateValue()}</TableBodyCell>
+            <TableBodyCell>{entry.dateValue().as_date()}</TableBodyCell>
             <TableBodyCell>{entry.direction()}</TableBodyCell>
             <TableBodyCell>TODO: type</TableBodyCell>
             <TableBodyCell>{entry.amount()}</TableBodyCell>
