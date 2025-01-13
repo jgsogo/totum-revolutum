@@ -8,7 +8,7 @@ import { MovementType } from "./models/MovementType";
 import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
 import { TransactionGroup } from "./models/TransactionGroup";
 import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
-import { AppStateSchema, type AppState, type MainContext, MainContextSchema, type HolderContextProto, HolderContext, HolderContextSchema, type AccountContextProto, AccountContextSchema, AccountContext } from "../../models/src-js/index";
+import { AppStateSchema, type AppState, MainContext, type MainContextProto, MainContextSchema, type HolderContextProto, HolderContext, HolderContextSchema, type AccountContextProto, AccountContextSchema, AccountContext } from "../../models/src-js/index";
 import { fromBinary, type DescMessage } from "@bufbuild/protobuf";
 import { Buffer } from 'buffer';
 
@@ -37,7 +37,8 @@ export const get_app_state = async (): Promise<AppState> => {
  * @returns {MainContext} Main context, the same for all the application
  */
 export const get_main_context = async (): Promise<MainContext> => {
-    return await invoke_protobuf_command(MainContextSchema, "get_main_context");
+    let context: MainContextProto = await invoke_protobuf_command(MainContextSchema, "get_main_context");
+    return new MainContext(context);
 };
 
 /**

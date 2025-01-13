@@ -18,6 +18,7 @@ pub(crate) mod finances_app_models {
     pub(crate) use protos::finances_app_models::{
         money_amount, Account, AccountCategory, AccountContext, AccountType, AppState, Custodian, DatabaseConnection,
         Fx, Holder, HolderContext, MainContext, MoneyAmount, Movement, MovementDirection, MovementType, Snapshot,
+        TransactionGroup,
     };
 }
 

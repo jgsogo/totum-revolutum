@@ -13,6 +13,7 @@ mod movement;
 mod movement_type;
 mod protos;
 mod snapshot;
+mod transaction_group;
 
 pub use account::Account;
 pub use account_context::AccountContext;
@@ -27,6 +28,7 @@ pub use money_amount::MoneyAmount;
 pub use movement::{Movement, MovementDirection};
 pub use movement_type::MovementType;
 pub use snapshot::Snapshot;
+pub use transaction_group::TransactionGroup;
 
 pub trait AppModel<T: prost::Message> {
     fn inner_type(self) -> T;

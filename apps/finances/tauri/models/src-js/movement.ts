@@ -2,7 +2,6 @@ import { Movement as MovementProto, MovementDirection } from "../protos/movement
 import { MoneyAmount } from "./money_amount.js";
 import { DateWrapper } from "../../../../../libraries/googleapis/src-js/date.js";
 
-
 export class Movement {
     private readonly movement: MovementProto;
 
@@ -11,7 +10,7 @@ export class Movement {
     }
 
     pk(): number {
-        return this.movement.pk as unknown as number;
+        return Number(this.movement.pk);
     }
 
     dateValue(): DateWrapper {

@@ -10,7 +10,7 @@ export class Account {
     }
 
     pk(): number {
-        return this.account.pk as unknown as number;
+        return Number(this.account.pk);
     }
 
     custodian(): Custodian {

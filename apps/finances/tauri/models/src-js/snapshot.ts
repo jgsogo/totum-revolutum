@@ -2,9 +2,6 @@ import { Snapshot as SnapshotProto } from "../protos/snapshot_pb.js";
 import { MoneyAmount } from "./money_amount.js";
 import { DateWrapper } from "../../../../../libraries/googleapis/src-js/date.js";
 
-
-
-
 export class Snapshot {
     private readonly snapshot: SnapshotProto;
 
@@ -13,7 +10,7 @@ export class Snapshot {
     }
 
     pk(): number {
-        return this.snapshot.pk as unknown as number;
+        return Number(this.snapshot.pk);
     }
 
     dateValue(): DateWrapper {

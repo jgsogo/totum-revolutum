@@ -24,6 +24,10 @@ impl Account {
             is_numerable: account.is_numerable,
         })
     }
+    pub fn pk(&self) -> i64 {
+        self.0.pk
+    }
+
     pub fn is_numerable(&self) -> bool {
         self.0.is_numerable
     }

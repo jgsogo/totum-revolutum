@@ -2,12 +2,15 @@
   import "../../../app.postcss";
   import Navbar from "$lib/components/Navbar.svelte";
   import SidebarMenu from "$lib/components/SidebarMenu/SidebarMenu.svelte";
-  import type { AppState, Holder } from "../../../../models/src-js";
+  import type { AppState, Holder, HolderContext, MainContext } from "../../../../models/src-js";
 
   let { data, children } = $props();
   let app_state: AppState = data.app_state;
-  let all_holders: Holder[] = data.main_context.holders;
-  let active_holder: Holder = data.holder_context.holder();
+  let main_context: MainContext = data.main_context;
+  let holder_context: HolderContext = data.holder_context;
+
+  let all_holders: Holder[] = main_context.holders();
+  let active_holder: Holder = holder_context.holder();
   let menu = data.menu;
 
   let drawerHidden = $state(false);

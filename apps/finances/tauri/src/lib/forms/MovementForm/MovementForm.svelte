@@ -1,12 +1,10 @@
 <script lang="ts">
-  import type { Account } from "$lib/models/Account";
   import { Input, Label, ButtonGroup, InputAddon, Radio, Helper } from "flowbite-svelte";
-  import { MovementType } from "$lib/models/MovementType";
   import AccountDropdown from "../AccountDropdown/AccountDropdown.svelte";
   import MovementTypeDropdown from "../MovementTypeDropdown/MovementTypeDropdown.svelte";
   import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
   import Datepicker from "../Datepicker.svelte";
-  import type { Snapshot } from "$lib/models/Snapshot";
+  import { Account, Snapshot, type MovementType } from "../../../../models/src-js";
 
   let {
     new_movement = $bindable(),

@@ -1,7 +1,5 @@
-import { Account } from "$lib/models/Account";
-import { MovementType } from "$lib/models/MovementType";
-import { Snapshot } from "$lib/models/Snapshot";
 import { toFixedNumber } from "$lib/utils";
+import { Account, type MovementType, Snapshot } from "../../../../models/src-js";
 
 export enum NewMovementType {
     NonNumerable,
@@ -38,7 +36,7 @@ export class NewMovement {
         let valid = this.account instanceof Account &&
             this.mov_type instanceof MovementType &&
             (!date_required || (date_required && this.date_value instanceof Date)) &&
-            (this.account.ccy === base_ccy || this.fx != undefined);
+            (this.account.ccy() === base_ccy || this.fx != undefined);
         switch (this.type) {
             case NewMovementType.NonNumerable:
                 return valid && this.amount != undefined;
@@ -68,7 +66,7 @@ export class NewMovement {
                 break;
         }
 
-        if (this.account.ccy !== base_ccy) {
+        if (this.account.ccy() !== base_ccy) {
             if (!this.fx) return undefined;
             total = total / this.fx;
         }
@@ -78,7 +76,7 @@ export class NewMovement {
     toJSON() {
         // This serialization is used when sending this structure via a command to the Tauri backend
         return {
-            account_pk: this.account?.pk,
+            account_pk: this.account?.pk(),
             movement_type_pk: this.mov_type?.pk,
             date_value:  this.date_value?.toISOString().slice(0, 10),
             fx: this.fx,
@@ -90,7 +88,7 @@ export class NewMovement {
             unit_value: this.unit_value,
             // dividend
             ex_dividend_date: this.ex_dividend_date?.toISOString().slice(0, 10),
-            ex_dividend_snapshot_pk: this.ex_dividend_snapshot?.pk,
+            ex_dividend_snapshot_pk: this.ex_dividend_snapshot?.pk(),
         };
     }
 };

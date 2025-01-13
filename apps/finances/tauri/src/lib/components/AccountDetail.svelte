@@ -36,7 +36,7 @@
     if (newSnapshot.isValid()) {
       await create_snapshot(newSnapshot);
       // TODO: Handle error if it fails to create the snapshot
-      await invalidate("invalidate:account");
+      await invalidate("invalidate:account"); // FIXME: Only binded properties?
       snapshotModal = false;
     }
   };

@@ -6,7 +6,6 @@ export const ssr = false;
 
 import { error } from '@sveltejs/kit';
 import { get_app_state, get_main_context } from '$lib/commands';
-import { Holder } from '$lib/models/Holder';
 import type { AppState, MainContext } from '../../models/src-js/index.js';
 
 /** @type {import('./$types').LayoutLoad} */

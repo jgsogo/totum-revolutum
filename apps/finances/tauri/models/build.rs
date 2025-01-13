@@ -20,6 +20,7 @@ fn main() -> Result<()> {
                 "apps/finances/tauri/models/protos/money_amount.proto",
                 "apps/finances/tauri/models/protos/movement.proto",
                 "apps/finances/tauri/models/protos/snapshot.proto",
+                "apps/finances/tauri/models/protos/transaction.proto",
             ],
             &["../../../../"],
         )?;

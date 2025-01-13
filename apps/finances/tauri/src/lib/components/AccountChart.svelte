@@ -13,7 +13,7 @@
   let options = {
     series: [
       {
-        name: account.name,
+        name: account.name(),
         data: dates, // FIXME: Make this variable reactive
       },
     ],
@@ -64,7 +64,7 @@
         },
       },
       title: {
-        text: `Snapshot (${account.ccy})`,
+        text: `Snapshot (${account.ccy()})`,
         style: {
           cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
         },

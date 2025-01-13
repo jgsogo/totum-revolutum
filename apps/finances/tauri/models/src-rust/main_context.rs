@@ -1,4 +1,4 @@
-use super::{AccountType, AppModel, Holder, MovementType};
+use super::{Account, AccountType, AppModel, Holder, MovementType, TransactionGroup};
 
 pub struct MainContext(crate::protos::MainContext);
 
@@ -7,6 +7,8 @@ impl MainContext {
         holders: Vec<finances_accounts::models::AccountHolder>,
         account_types: Vec<AccountType>,
         movement_types: Vec<MovementType>,
+        accounts: Vec<Account>,
+        transaction_groups: Vec<TransactionGroup>,
     ) -> Self {
         Self(crate::protos::MainContext {
             holders: holders
@@ -18,6 +20,8 @@ impl MainContext {
                 .collect(),
             account_types: account_types.into_iter().map(|v| v.inner_type()).collect(),
             movement_types: movement_types.into_iter().map(|v| v.inner_type()).collect(),
+            accounts: accounts.into_iter().map(|v| v.inner_type()).collect(),
+            transaction_groups: transaction_groups.into_iter().map(|v| v.inner_type()).collect(),
         })
     }
 
@@ -27,6 +31,10 @@ impl MainContext {
 
     pub fn find_movement_type(&self, pk: i64) -> Option<&crate::protos::MovementType> {
         self.0.movement_types.iter().find(|mov_type| mov_type.pk == pk)
+    }
+
+    pub fn find_account(&self, pk: i64) -> Option<&crate::protos::Account> {
+        self.0.accounts.iter().find(|acc| acc.pk == pk)
     }
 }
 

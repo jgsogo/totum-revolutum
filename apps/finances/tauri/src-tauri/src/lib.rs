@@ -8,10 +8,14 @@ mod views;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use finances_accounts::fields::TreeNodeList;
-use finances_accounts::models::{AccountHolder, AccountType, MovementType};
+use finances_accounts::models::{
+    Account, AccountHolder, AccountHolderRole, AccountType, Custodian, MovementType, TransactionGroup,
+};
 use finances_accounts::sql::filters::accounttype_by_unique_names;
+use finances_app_models::AppModel;
 use finances_app_models::{
-    AccountCategory, AccountType as AppModelAccountType, AppState, MainContext, MovementType as AppModelMovementType,
+    Account as AppModelAccount, AccountCategory, AccountType as AppModelAccountType, AppState, MainContext,
+    MovementType as AppModelMovementType, TransactionGroup as AppModelTransactionGroup,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -131,7 +135,59 @@ fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> {
             .collect::<Result<Vec<_>, _>>()?
     };
 
-    let context = MainContext::new(holders, account_types, movement_types);
+    // All the accounts
+    let accounts: Vec<AppModelAccount> = {
+        // Get all accounts for a given holder
+        let accounts = Account::all()
+            .inner_join(
+                finances_accounts::schema::finances_accounts_accountholderrole::table
+                    .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
+            )
+            .inner_join(Custodian::all())
+            .inner_join(AccountType::all())
+            .select((
+                Account::as_select(),
+                AccountHolderRole::as_select(),
+                Custodian::as_select(),
+                AccountType::as_select(),
+            ))
+            .load::<(Account, AccountHolderRole, Custodian, AccountType)>(conn)
+            .map_err(|e| format!("Error loading accounts: {}", e))?;
+
+        accounts
+            .into_iter()
+            .map(|(account, account_holder_role, custodian, account_type)| {
+                let account_type = account_types
+                    .iter()
+                    .find(|&acc_type| acc_type.pk() == account_type.id)
+                    .ok_or(format!(
+                        "Account type 'pk={}' not found in main context",
+                        account_type.id
+                    ))?
+                    .inner_type_ref()
+                    .clone();
+                Ok::<_, String>(AppModelAccount::new(
+                    account,
+                    account_holder_role,
+                    custodian.into(),
+                    account_type,
+                ))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    };
+
+    // All the transaction groups
+    let transaction_groups: Vec<AppModelTransactionGroup> = //Vec::default();
+    {
+        TransactionGroup::all()
+            .select(TransactionGroup::as_select())
+            .load::<TransactionGroup>(conn)
+            .map_err(|e| format!("Error loading transactions groups: {e}"))?
+            .into_iter()
+            .map(|v| AppModelTransactionGroup::new(v.id, v.name, v.description)).collect()
+    };
+
+    let context = MainContext::new(holders, account_types, movement_types, accounts, transaction_groups);
     Ok(context)
 }
 

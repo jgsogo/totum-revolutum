@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Account } from "$lib/models/Account";
   import { Button, Select, DropdownDivider } from "flowbite-svelte";
   import { CloseCircleOutline } from "flowbite-svelte-icons";
   import { Dropdown, DropdownItem } from "flowbite-svelte";
   import { ChevronDownOutline } from "flowbite-svelte-icons";
-  import type { MovementType } from "$lib/models/MovementType";
+
+  import type { MovementType } from "../../../../models/src-js";
 
   let {
     movementtype = $bindable(),
@@ -17,7 +17,7 @@
   const breadcrumbs_group_size = 2;
 
   function group_movementtype_by_breadcrumb(movtype: MovementType) {
-    let breadcrumbs = movtype.breadcrumbs()!;
+    let breadcrumbs = movtype.breadcrumb!;
     if (breadcrumbs.length > breadcrumbs_group_size) {
       return breadcrumbs.slice(0, breadcrumbs_group_size).join(" / ");
     } else {
@@ -47,7 +47,7 @@
       // Collect all accounts with their custodian
       return all_movementtypes
         .map((value: MovementType) => {
-          return { value: value, name: `${value.breadcrumbs()!.join(" / ")}` };
+          return { value: value, name: `${value.breadcrumb!.join(" / ")}` };
         })
         .sort((lhs, rhs) => (lhs.name < rhs.name ? -1 : lhs.name > rhs.name ? 1 : 0));
     } else {
@@ -55,7 +55,7 @@
       return all_movementtypes
         .filter((value: MovementType) => group_movementtype_by_breadcrumb(value) === selectCategory)
         .map((value) => {
-          let breadcrumbs = value.breadcrumbs()!;
+          let breadcrumbs = value.breadcrumb!;
           if (breadcrumbs.length > breadcrumbs_group_size) {
             return { value: value, name: `${breadcrumbs.slice(breadcrumbs_group_size).join(" / ")}` };
           } else {

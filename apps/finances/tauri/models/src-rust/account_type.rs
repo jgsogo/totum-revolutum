@@ -53,6 +53,10 @@ impl AccountType {
             category: category.into(),
         })
     }
+
+    pub fn pk(&self) -> i64 {
+        self.0.pk
+    }
 }
 
 impl AppModel<crate::protos::AccountType> for AccountType {

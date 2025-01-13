@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Account } from "$lib/models/Account";
   import { Button, Select, DropdownDivider } from "flowbite-svelte";
   import { CloseCircleOutline } from "flowbite-svelte-icons";
   import { Dropdown, DropdownItem } from "flowbite-svelte";
   import { ChevronDownOutline } from "flowbite-svelte-icons";
+  import { Account } from "../../../../models/src-js";
 
   let {
     account = $bindable(),
@@ -15,7 +15,7 @@
 
   // All custodian names
   // svelte-ignore non_reactive_update
-  let all_custodians_names = all_accounts.map((value: Account) => value.custodian.name);
+  let all_custodians_names = all_accounts.map((value: Account) => value.custodian().name);
   all_custodians_names = all_custodians_names
     .filter((value: string, index: number) => all_custodians_names.indexOf(value) === index)
     .sort((one, two) => (one > two ? -1 : 1));
@@ -35,15 +35,15 @@
       // Collect all accounts with their custodian
       return all_accounts
         .map((value) => {
-          return { value: value, name: `${value.custodian} | ${value.name}` };
+          return { value: value, name: `${value.custodian()} | ${value.name()}` };
         })
         .sort((lhs, rhs) => (lhs.name < rhs.name ? -1 : lhs.name > rhs.name ? 1 : 0));
     } else {
       // Collect without custodian
       return all_accounts
-        .filter((acc: Account) => acc.custodian.name === selectCategory)
+        .filter((acc: Account) => acc.custodian().name === selectCategory)
         .map((value) => {
-          return { value: value, name: value.name };
+          return { value: value, name: value.name() };
         })
         .sort((lhs, rhs) => (lhs.name < rhs.name ? -1 : lhs.name > rhs.name ? 1 : 0));
     }
