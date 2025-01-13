@@ -1,7 +1,6 @@
 export { AccountCategory, AccountCategorySchema } from '../protos/account_pb.js';
 export { AccountTypeSchema, AccountType } from '../protos/account_pb.js';
 export { AppStateSchema, AppState } from '../protos/app_state_pb.js';
-export { Ccy, CcySchema } from '../protos/ccy_pb.js';
 export { Custodian, CustodianSchema } from '../protos/custodian_pb.js';
 export { HolderContext as HolderContextProto, HolderContextSchema } from '../protos/holder_context_pb.js';
 export { Holder, HolderSchema } from '../protos/holder_pb.js';

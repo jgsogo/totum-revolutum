@@ -16,18 +16,13 @@ pub(crate) mod google {
 #[cfg(feature = "bazel")]
 pub(crate) mod finances_app_models {
     pub(crate) use protos::finances_app_models::{
-        money_amount, Account, AccountCategory, AccountContext, AccountType, AppState, Ccy, Custodian,
-        DatabaseConnection, Fx, Holder, HolderContext, MainContext, MoneyAmount, Movement, MovementDirection,
-        MovementType, Snapshot,
+        money_amount, Account, AccountCategory, AccountContext, AccountType, AppState, Custodian, DatabaseConnection,
+        Fx, Holder, HolderContext, MainContext, MoneyAmount, Movement, MovementDirection, MovementType, Snapshot,
     };
 }
 
 #[cfg(feature = "bazel")]
 pub(crate) mod google {
-    pub(crate) mod protobuf {
-        pub(crate) use protos::timestamp_proto::google::protobuf::Timestamp;
-    }
-
     pub(crate) mod r#type {
         pub(crate) use protos::date_proto::google::r#type::Date;
         pub(crate) use protos::decimal_proto::google::r#type::Decimal;
@@ -37,4 +32,3 @@ pub(crate) mod google {
 
 // Reexport at root level
 pub(crate) use finances_app_models::*;
-pub(crate) use google::protobuf::Timestamp;

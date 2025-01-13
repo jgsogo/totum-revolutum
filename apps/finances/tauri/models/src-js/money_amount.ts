@@ -39,4 +39,15 @@ export class MoneyAmount {
         return formatter.format(value);
     }
 
+    unit_value(): Money | undefined {
+        if (this.money_amount.amount.case == "numerable") return new Money(this.money_amount.amount.value!.unitValue!);
+        else return undefined;
+    }
+
+    quantity(): Decimal | undefined {
+        if (this.money_amount.amount.case == "numerable") return new Decimal(this.money_amount.amount.value!.quantity!);
+        else return undefined;
+    }
+
+
 }

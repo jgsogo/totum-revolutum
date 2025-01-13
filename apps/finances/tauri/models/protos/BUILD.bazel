@@ -6,7 +6,6 @@ protos = [
     "account_context.proto",
     "account.proto",
     "app_state.proto",
-    "ccy.proto",
     "custodian.proto",
     "fx.proto",
     "holder_context.proto",

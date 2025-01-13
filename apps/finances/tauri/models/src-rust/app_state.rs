@@ -12,9 +12,7 @@ impl AppState {
         base_ccy: String,
     ) -> Self {
         Self(crate::protos::AppState {
-            base_ccy: crate::protos::Ccy::from_str_name(&base_ccy)
-                .expect(&format!("{} is not a valid CCY", base_ccy))
-                .into(),
+            base_ccy,
             base_media_url: format!("{}{}", base_url, media_url),
             base_static_url: format!("{}{}", base_url, static_url),
             base_url,
@@ -35,8 +33,7 @@ impl AppState {
     }
 
     pub fn base_ccy(&self) -> &str {
-        let ccy: crate::protos::Ccy = self.0.base_ccy.try_into().expect("Invalid i32 for CCY");
-        ccy.as_str_name()
+        &self.0.base_ccy
     }
 }
 

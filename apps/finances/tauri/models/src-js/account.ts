@@ -1,5 +1,5 @@
+import { DateWrapper } from "../../../../../libraries/googleapis/src-js/date.js";
 import { Account as AccountProto, AccountType } from "../protos/account_pb.js";
-import { Ccy } from "../protos/ccy_pb.js";
 import { Custodian } from "../protos/custodian_pb.js";
 
 export class Account {
@@ -29,11 +29,15 @@ export class Account {
         return this.account.type!;
     }
 
-    ccy(): Ccy {
-        return this.account.ccy;
+    ccy(): string {
+        return this.account.currencyCode;
     }
 
     is_numerable(): boolean {
         return this.account.isNumerable;
+    }
+
+    open(): DateWrapper {
+        return new DateWrapper(this.account.open!);
     }
 }

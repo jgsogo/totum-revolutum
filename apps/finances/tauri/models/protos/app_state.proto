@@ -1,8 +1,6 @@
 syntax = "proto3";
 package finances_app_models;
 
-import "apps/finances/tauri/models/protos/ccy.proto";
-
 message DatabaseConnection {
     string postgres_url = 1;
     // string user = 1;
@@ -13,7 +11,8 @@ message DatabaseConnection {
 }
 
 message AppState {
-    Ccy base_ccy  = 1;
+    // The three-letter currency code defined in ISO 4217.
+    string base_ccy = 1;
 
     // Base URL to all media resources
     string base_media_url = 2;

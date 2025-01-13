@@ -1,5 +1,4 @@
-use super::{AppModel, Custodian};
-use chrono::Datelike;
+use super::{google_type, AppModel, Custodian};
 
 pub struct Account(crate::protos::Account);
 
@@ -10,23 +9,17 @@ impl Account {
         custodian: Custodian,
         account_type: crate::protos::AccountType,
     ) -> Self {
-        let timestamp = crate::protos::Timestamp {
-            seconds: (account.open.num_days_from_ce() as i64) * 24 * 3600,
-            nanos: 0,
-        };
-        let ccy = crate::protos::Ccy::from_str_name(&account.ccy)
-            .expect(&format!("{} is not a valid CCY", account.ccy))
-            .into();
+        let open_date: google_type::Date = account.open.into();
 
         Self(crate::protos::Account {
             pk: account.id,
             name: account.name,
             custodian: Some(custodian.inner_type()),
             r#type: Some(account_type),
-            ccy,
+            currency_code: account.ccy,
             identifier: account.identifier,
             description: account.description,
-            open: Some(timestamp),
+            open: Some(open_date.into()),
             holder_owns_money: account_holder_role.owns_money,
             is_numerable: account.is_numerable,
         })
@@ -35,8 +28,7 @@ impl Account {
         self.0.is_numerable
     }
     pub fn ccy(&self) -> &str {
-        let ccy: crate::protos::Ccy = self.0.ccy.try_into().expect("Invalid i32 for CCY");
-        ccy.as_str_name()
+        &self.0.currency_code
     }
 }
 

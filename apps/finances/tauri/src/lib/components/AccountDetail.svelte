@@ -6,7 +6,7 @@
   import { goToTransactionCreate } from "$lib/utils";
   import { create_snapshot } from "$lib/commands";
   import { invalidate } from "$app/navigation";
-  // import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
+  import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
   import { type Holder, Account, Snapshot, type Custodian } from "../../../models/src-js";
 
 
@@ -30,16 +30,16 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  // let newSnapshot = $state(new NewSnapshot(account));
-  // const on_snapshot = async (e: MouseEvent) => {
-  //   e.preventDefault();
-  //   if (newSnapshot.isValid()) {
-  //     await create_snapshot(newSnapshot);
-  //     // TODO: Handle error if it fails to create the snapshot
-  //     await invalidate("invalidate:account");
-  //     snapshotModal = false;
-  //   }
-  // };
+  let newSnapshot = $state(new NewSnapshot(account, last_snapshot));
+  const on_snapshot = async (e: MouseEvent) => {
+    e.preventDefault();
+    if (newSnapshot.isValid()) {
+      await create_snapshot(newSnapshot);
+      // TODO: Handle error if it fails to create the snapshot
+      await invalidate("invalidate:account");
+      snapshotModal = false;
+    }
+  };
 </script>
 
 <Card size="xl">
@@ -87,14 +87,14 @@
         </div>
         {#if last_snapshot}
           <div class="truncate inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-            {last_snapshot.amount}
+            {last_snapshot.amount()}
           </div>
         {/if}
       </div>
     </li>
   </ul>
 </Card>
-<!--
+
 <Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose={false}>
   <form>
     <SnapshotForm bind:snapshot={newSnapshot} />
@@ -102,4 +102,4 @@
       Submit
     </Button>
   </form>
-</Modal> -->
+</Modal>
