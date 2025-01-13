@@ -21,6 +21,10 @@ export class Account {
         return this.account.name;
     }
 
+    identifier(): string | undefined {
+        return this.account.identifier
+    }
+
     type(): AccountType {
         return this.account.type!;
     }

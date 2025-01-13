@@ -1,6 +1,7 @@
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
 load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 npm_link_all_packages(name = "node_modules")
@@ -47,6 +48,10 @@ ts_project(
     name = "googleapis/ts",
     srcs = glob(
         ["src-js/**/*.ts"],
+        exclude = [
+            "**/*.spec.ts",
+            "**/*.test.ts",
+        ],
     ) + ["package.json"],
     declaration = True,
     source_map = True,
@@ -54,6 +59,33 @@ ts_project(
     visibility = ["//visibility:public"],
     deps = [
         ":node_modules/@types/node",
+        ":node_modules/decimal.js",
         "//libraries/googleapis/protos/google/type:protos_ts",
+    ],
+)
+
+ts_project(
+    name = "src_test_ts",
+    srcs = glob([
+        "src-js/**/*.spec.ts",
+        # "src-js/**/*.test.ts",
+    ]) + ["package.json"],
+    declaration = True,
+    source_map = True,
+    tsconfig = ":tsconfig",
+    deps = [
+        ":googleapis/ts",
+        ":node_modules/vitest",
+    ],
+)
+
+vitest_bin.vitest_test(
+    name = "test.vitest",
+    args = ["run"],
+    chdir = package_name(),
+    data = [
+        "package.json",
+        ":node_modules",
+        ":src_test_ts",
     ],
 )

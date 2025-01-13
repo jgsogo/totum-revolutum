@@ -1,12 +1,12 @@
 <script lang="ts">
   import { Card, Chart } from "flowbite-svelte";
-  import { Account, type Snapshot } from "../../../models/src-js";
+  import { Account, Snapshot } from "../../../models/src-js";
 
   let { account, snapshots }: { account: Account; snapshots: Snapshot[] } = $props();
 
   let dates = snapshots.map((snapshot) => {
-    let x = new Date(snapshot.date_value).getTime();
-    let y = snapshot.amount;
+    let x = snapshot.dateValue().as_date().getTime();
+    let y = snapshot.amount().as_number();
     return { x, y };
   });
 

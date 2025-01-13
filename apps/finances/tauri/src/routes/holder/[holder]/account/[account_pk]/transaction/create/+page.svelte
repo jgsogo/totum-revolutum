@@ -3,12 +3,11 @@
   import TransactionForm from "$lib/forms/TransactionForm/TransactionForm.svelte";
   import { Alert, Button, Card, Heading, Secondary, TextPlaceholder } from "flowbite-svelte";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
-  import { type TransactionGroup } from "$lib/models/TransactionGroup.js";
   import { NewTransaction } from "$lib/forms/TransactionForm/NewTransaction.svelte.js";
   import { NewMovement, NewMovementType } from "$lib/forms/MovementForm/NewMovement.svelte.js";
   import { create_transaction } from "$lib/commands.js";
   import { goToAccountDetail } from "$lib/utils.js";
-  import { MovementType } from "$lib/models/MovementType.js";
+
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();

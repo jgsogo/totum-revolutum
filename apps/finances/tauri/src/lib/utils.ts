@@ -1,5 +1,4 @@
 import { goto } from "$app/navigation";
-import type { Account as AccountModel } from "./models/Account";
 import type { Holder, Account } from "../../models/src-js";
 
 /**
@@ -22,8 +21,8 @@ export async function goToAccountDetail(holder: Holder, account: Account) {
  * @param {Account} from - If provided, it prepopulates transaction origin with this account
  * @param {Account} to - If provided, it prepopulates transaction target with this account
  */
-export async function goToTransactionCreate(holder: Holder, account: AccountModel, from?: AccountModel, to?: AccountModel) {
-    await goto(`/holder/${holder.pk}/account/${account.pk}/transaction/create?from=${from?.pk}&to=${to?.pk}`);
+export async function goToTransactionCreate(holder: Holder, account: Account, from?: Account, to?: Account) {
+    await goto(`/holder/${holder.pk}/account/${account.pk()}/transaction/create?from=${from?.pk()}&to=${to?.pk()}`);
 }
 
 /**

@@ -6,8 +6,8 @@
   import { goToTransactionCreate } from "$lib/utils";
   import { create_snapshot } from "$lib/commands";
   import { invalidate } from "$app/navigation";
-  import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
-  import { type Holder, Account, type Snapshot, type Custodian } from "../../../models/src-js";
+  // import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
+  import { type Holder, Account, Snapshot, type Custodian } from "../../../models/src-js";
 
 
   let {
@@ -30,16 +30,16 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  let newSnapshot = $state(new NewSnapshot(account));
-  const on_snapshot = async (e: MouseEvent) => {
-    e.preventDefault();
-    if (newSnapshot.isValid()) {
-      await create_snapshot(newSnapshot);
-      // TODO: Handle error if it fails to create the snapshot
-      await invalidate("invalidate:account");
-      snapshotModal = false;
-    }
-  };
+  // let newSnapshot = $state(new NewSnapshot(account));
+  // const on_snapshot = async (e: MouseEvent) => {
+  //   e.preventDefault();
+  //   if (newSnapshot.isValid()) {
+  //     await create_snapshot(newSnapshot);
+  //     // TODO: Handle error if it fails to create the snapshot
+  //     await invalidate("invalidate:account");
+  //     snapshotModal = false;
+  //   }
+  // };
 </script>
 
 <Card size="xl">
@@ -47,20 +47,20 @@
     <li class="py-3 sm:py-3.5">
       <div class="flex items-center justify-between">
         <div class="flex min-w-0 items-center">
-          {#if account.custodian.photo}
-            <Img size="w-20" src="{base_media_url}{account.custodian.photo}" />
+          {#if account.custodian().photo}
+            <Img size="w-20" src="{base_media_url}{account.custodian().photo}" />
             <!-- <Avatar title={account.custodian.name} src="{base_media_url}{account.custodian.photo}"
                 >{account.custodian.name}</Avatar
               > -->
           {:else}
-            <Avatar size="lg" title={account.custodian.name}>{initials(account.custodian)}</Avatar>
+            <Avatar size="lg" title={account.custodian().name}>{initials(account.custodian())}</Avatar>
           {/if}
 
           <div class="ml-3">
             <p class="truncate font-medium text-gray-900 dark:text-white">
-              {account.name}
+              {account.name()}
             </p>
-            <span class="text-gray-500 text-sm">{account.identifier}</span>
+            <span class="text-gray-500 text-sm">{account.identifier()}</span>
             <p>
               <span class="flex text-xs mr-2">
                 <button class="flex hover:underline mr-2" onclick={() => (snapshotModal = true)}>
@@ -87,14 +87,14 @@
         </div>
         {#if last_snapshot}
           <div class="truncate inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-            {last_snapshot}
+            {last_snapshot.amount}
           </div>
         {/if}
       </div>
     </li>
   </ul>
 </Card>
-
+<!--
 <Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose={false}>
   <form>
     <SnapshotForm bind:snapshot={newSnapshot} />
@@ -102,4 +102,4 @@
       Submit
     </Button>
   </form>
-</Modal>
+</Modal> -->

@@ -8,10 +8,10 @@ import { MovementType } from "./models/MovementType";
 import type { NewSnapshot } from "./forms/SnapshotForm/NewSnapshot.svelte";
 import { TransactionGroup } from "./models/TransactionGroup";
 import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
-import { AppStateSchema, type AppState, type MainContext, MainContextSchema, type HolderContextProto, HolderContext, HolderContextSchema, type AccountContext, AccountContextSchema } from "../../models/src-js/index";
+import { AppStateSchema, type AppState, type MainContext, MainContextSchema, type HolderContextProto, HolderContext, HolderContextSchema, type AccountContextProto, AccountContextSchema, AccountContext } from "../../models/src-js/index";
 import { fromBinary, type DescMessage } from "@bufbuild/protobuf";
 import { Buffer } from 'buffer';
-import { debug } from '@tauri-apps/plugin-log';
+
 
 /**
  * Calls the given command and returns the protobuf message already parsed
@@ -29,7 +29,6 @@ async function invoke_protobuf_command<Desc extends DescMessage, Type>(schema_ty
  * @returns {AppState} Application configuration
  */
 export const get_app_state = async (): Promise<AppState> => {
-    debug("get_app_state");
     return await invoke_protobuf_command(AppStateSchema, "get_app_state");
 };
 
@@ -38,7 +37,6 @@ export const get_app_state = async (): Promise<AppState> => {
  * @returns {MainContext} Main context, the same for all the application
  */
 export const get_main_context = async (): Promise<MainContext> => {
-    debug("get_main_context");
     return await invoke_protobuf_command(MainContextSchema, "get_main_context");
 };
 
@@ -47,7 +45,6 @@ export const get_main_context = async (): Promise<MainContext> => {
  * @returns {HolderContext} Holder context, common things for a given holder
  */
 export const get_holder_context = async (holder_pk: number): Promise<HolderContext> => {
-    debug(`get_holder_context(holder_pk {holder_pk})`);
     let context: HolderContextProto = await invoke_protobuf_command(HolderContextSchema, "get_holder_context", { holderPk: holder_pk });
     return new HolderContext(context);
 };
@@ -57,8 +54,8 @@ export const get_holder_context = async (holder_pk: number): Promise<HolderConte
  * @returns {AccountContext} Account context, common things for a given account
  */
 export const get_account_context = async (account_pk: number): Promise<AccountContext> => {
-    debug(`get_account_context(account_pk {account_pk})`);
-    return await invoke_protobuf_command(AccountContextSchema, "get_account_context", { accountPk: account_pk });
+    const context: AccountContextProto = await invoke_protobuf_command(AccountContextSchema, "get_account_context", { accountPk: account_pk });
+    return new AccountContext(context);
 };
 
 /** The data returned by the backend representing an Custodian */
