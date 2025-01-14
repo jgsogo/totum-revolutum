@@ -1,6 +1,14 @@
 use super::{Account, AppModel, Holder};
-
+use prost::Message;
 pub struct HolderContext(crate::protos::HolderContext);
+
+impl TryFrom<Vec<u8>> for HolderContext {
+    type Error = prost::DecodeError;
+
+    fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
+        Ok(Self(crate::protos::HolderContext::decode(&*v)?))
+    }
+}
 
 impl HolderContext {
     pub fn new(holder: finances_accounts::models::AccountHolder, accounts: Vec<Account>) -> Self {

@@ -1,10 +1,7 @@
 import { Snapshot } from "$lib/models/Snapshot";
 import { Movement } from "$lib/models/Movement";
-import { get_account_snapshot_latest, get_account_snapshots, get_account_movements } from "$lib/commands"
+import { get_account_snapshots, get_account_movements } from "$lib/commands"
 import { Custodian } from "./Custodian";
-
-
-import { AccountSchema} from '../../../models/protos/account_pb';
 
 export enum AccountCategories {
     default = 'default',
@@ -47,14 +44,6 @@ export class Account {
         this.is_numerable = is_numerable;
         this.open = open;
         this.category = category;
-    }
-
-    async getLastSnapshot(force: boolean = false): Promise<Snapshot> {
-        if (!force && this._last_snapshot) {
-            return this._last_snapshot;
-        }
-        this._last_snapshot = await get_account_snapshot_latest(this);
-        return this._last_snapshot;
     }
 
     last_snapshot(): Snapshot | undefined {

@@ -1,8 +1,9 @@
-use finances_app_lib::models::{MovementType, NewAmount, NewMovement, NewMovementType, NewTransaction, Snapshot};
+use finances_app_lib::models::{MovementType, NewAmount, NewMovement, NewMovementType, NewTransaction};
 use serde_json::json;
 
 mod common;
-use common::call_it;
+use common::{call_it, call_it_proto};
+use finances_app_models::AccountContext;
 
 #[test]
 fn test_create_transaction() {
@@ -19,9 +20,11 @@ fn test_create_transaction() {
         movs.into_iter().find(|m| m.name == "Tasas").unwrap().pk
     };
     let snapshot_latest_pk = {
-        let body = json!({ "pk": account_numerable });
-        let r = call_it::<Option<Snapshot>>(&webview, "get_account_snapshot_latest".to_string(), body);
-        r.unwrap().unwrap().pk
+        let body = json!({"accountPk": account_numerable});
+        let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
+        assert!(r.is_ok());
+        let account_context = r.unwrap();
+        account_context.snapshots().into_iter().nth(0).unwrap().pk()
     };
 
     {

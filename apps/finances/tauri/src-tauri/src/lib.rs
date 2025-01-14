@@ -43,13 +43,6 @@ pub fn create_app<R: tauri::Runtime>(
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            commands::account_list::get_all_accounts,
-            commands::account_list::get_all_accounts_for_holder,
-            commands::account_list::get_all_savings_accounts_for_holder,
-            commands::account_list::get_all_investment_accounts_for_holder,
-            commands::account_list::get_all_retirement_accounts_for_holder,
-            commands::account::get_account_details,
-            commands::account::get_account_snapshot_latest,
             commands::account::get_account_snapshots,
             commands::account::get_account_movements,
             commands::holder::get_holder_details,
@@ -69,7 +62,7 @@ pub fn create_app<R: tauri::Runtime>(
         .expect("error while running tauri application")
 }
 
-fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> {
+pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> {
     let holders = AccountHolder::all()
         .select(AccountHolder::as_select())
         .order(finances_accounts::schema::finances_accounts_accountholder::name.asc())

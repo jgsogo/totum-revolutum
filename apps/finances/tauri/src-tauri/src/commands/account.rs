@@ -8,53 +8,6 @@ use finances_investments::sql::queries::all_snapshotnumerable_for_account_id;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_account_details(
-    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-    pk: i64,
-) -> Result<crate::models::Account, String> {
-    log::info!("Get Accounts pk {pk}");
-    let mut conn = pool.get().expect("Get a connection from the Pool");
-
-    Account::details_for_pk(pk, &mut conn)
-        .map_err(|e| format!("Error loading account: {e}"))
-        .map(|v| v.into())
-}
-
-#[tauri::command]
-pub async fn get_account_snapshot_latest(
-    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
-    pk: i64,
-) -> Result<Option<crate::models::Snapshot>, String> {
-    log::info!("Get (latest) Snapshot for account pk {pk}");
-    let mut conn = pool.get().expect("Get a connection from the Pool");
-
-    let account_numerable = Account::all()
-        .select(finances_accounts::schema::finances_accounts_account::is_numerable)
-        .filter(account_by_pk(pk))
-        .first::<bool>(&mut conn)
-        .map_err(|e| format!("Error loading account: {e}"))?;
-
-    if !account_numerable {
-        match Account::latest_snapshot_for_pk(pk, &mut conn) {
-            Ok(snapshot) => Ok(snapshot.map(|v| v.into())),
-            Err(e) => Err(format!("Error loading last snapshot: {e}")),
-        }
-    } else {
-        let snapshot_numerable: Option<SnapshotNumerable> = all_snapshotnumerable_for_account_id()
-            .bind::<diesel::sql_types::Int8, _>(pk)
-            .load(&mut conn)
-            .map_err(|e| format!("Error loading snapshots numerable: {e}"))?
-            .into_iter()
-            .next();
-
-        match snapshot_numerable {
-            Some(snapshot) => Ok(Some(snapshot.into())),
-            None => Ok(None),
-        }
-    }
-}
-
-#[tauri::command]
 pub async fn get_account_snapshots(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     pk: i64,

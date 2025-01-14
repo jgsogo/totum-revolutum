@@ -1,6 +1,14 @@
 use super::{Account, AccountType, AppModel, Holder, MovementType, TransactionGroup};
-
+use prost::Message;
 pub struct MainContext(crate::protos::MainContext);
+
+impl TryFrom<Vec<u8>> for MainContext {
+    type Error = prost::DecodeError;
+
+    fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
+        Ok(Self(crate::protos::MainContext::decode(&*v)?))
+    }
+}
 
 impl MainContext {
     pub fn new(

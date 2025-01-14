@@ -1,7 +1,17 @@
+use prost::Message;
+
 use crate::AppModel;
 
 #[derive(Clone)]
 pub struct AppState(crate::protos::AppState);
+
+impl TryFrom<Vec<u8>> for AppState {
+    type Error = prost::DecodeError;
+
+    fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
+        Ok(Self(crate::protos::AppState::decode(&*v)?))
+    }
+}
 
 impl AppState {
     pub fn new(

@@ -5,7 +5,6 @@
 //! defined in the same module.
 
 pub mod account;
-pub mod account_list;
 pub mod custodian;
 pub mod holder;
 pub mod movement_type;
