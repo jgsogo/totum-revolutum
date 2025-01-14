@@ -26,7 +26,7 @@
       {#each entries as entry}
         {#if entry instanceof Snapshot}
           <TableBodyRow class={class_row_snapshot}>
-            <TableBodyCell>{entry.dateValue().as_date().toISOString()}</TableBodyCell>
+            <TableBodyCell>{entry.dateValue().as_date().toISOString().split('T')[0]}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell>{entry.amount()}</TableBodyCell>
@@ -35,7 +35,7 @@
         {:else}
         <!-- TODO: On click, we can show the information about the Transaction this moement belongs to. There is an example in the official Flowbite documentation about Table component (https://flowbite-svelte.com/docs/components/table#Click_and_double-click_on_row) -->
         <TableBodyRow class={class_row_movement}>
-            <TableBodyCell>{entry.dateValue().as_date()}</TableBodyCell>
+            <TableBodyCell>{entry.dateValue().as_date().toISOString().split('T')[0]}</TableBodyCell>
             <TableBodyCell>{entry.direction()}</TableBodyCell>
             <TableBodyCell>TODO: type</TableBodyCell>
             <TableBodyCell>{entry.amount()}</TableBodyCell>

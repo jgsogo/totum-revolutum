@@ -43,17 +43,10 @@ pub fn create_app<R: tauri::Runtime>(
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            commands::account::get_account_snapshots,
-            commands::account::get_account_movements,
-            commands::holder::get_holder_details,
-            commands::custodian::get_custodian_details,
             commands::get_app_state,
             commands::get_main_context,
             commands::get_holder_context,
             commands::get_account_context,
-            commands::movement_type::get_all_movementtypes,
-            commands::movement_type::get_breadcrumbs_for_movementtype,
-            commands::transaction_group::get_all_transaction_groups,
             // Sending data
             commands::snapshot::create_snapshot,
             commands::transaction::create_transaction,

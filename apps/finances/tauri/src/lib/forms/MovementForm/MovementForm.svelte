@@ -5,7 +5,6 @@
   import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
   import Datepicker from "../Datepicker.svelte";
   import { Account, Snapshot, MovementType } from "../../../../models/src-js";
-  import { get_account_snapshots } from "$lib/commands";
 
   let {
     new_movement = $bindable(),

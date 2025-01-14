@@ -4,13 +4,8 @@
 //! to be unique for each Tauri application. We enforce this guarantee if all the commands are
 //! defined in the same module.
 
-pub mod account;
-pub mod custodian;
-pub mod holder;
-pub mod movement_type;
 pub mod snapshot;
 pub mod transaction;
-pub mod transaction_group;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};

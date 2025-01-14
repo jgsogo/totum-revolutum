@@ -1,6 +1,6 @@
 use super::AppModel;
 
-pub struct MovementType(crate::protos::MovementType);
+pub struct MovementType(pub(crate) crate::protos::MovementType);
 
 impl MovementType {
     pub fn new(pk: i64, name: String, breadcrumb: Option<Vec<String>>) -> Self {
@@ -9,6 +9,10 @@ impl MovementType {
             name,
             breadcrumb: breadcrumb.unwrap_or(Vec::default()),
         })
+    }
+
+    pub fn pk(&self) -> i64 {
+        self.0.pk
     }
 }
 

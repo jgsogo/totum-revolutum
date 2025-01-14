@@ -44,6 +44,14 @@ impl MainContext {
     pub fn find_account(&self, pk: i64) -> Option<&crate::protos::Account> {
         self.0.accounts.iter().find(|acc| acc.pk == pk)
     }
+
+    pub fn find_movement_type_by_name(&self, name: &str) -> Option<MovementType> {
+        self.0
+            .movement_types
+            .iter()
+            .find(|mov_type| mov_type.name == name)
+            .map(|v| MovementType(v.clone()))
+    }
 }
 
 impl AppModel<crate::protos::MainContext> for MainContext {

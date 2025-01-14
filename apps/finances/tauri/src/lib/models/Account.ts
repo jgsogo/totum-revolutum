@@ -1,6 +1,4 @@
 import { Snapshot } from "$lib/models/Snapshot";
-import { Movement } from "$lib/models/Movement";
-import { get_account_snapshots, get_account_movements } from "$lib/commands"
 import { Custodian } from "./Custodian";
 
 export enum AccountCategories {
@@ -48,13 +46,5 @@ export class Account {
 
     last_snapshot(): Snapshot | undefined {
         return this._last_snapshot;
-    }
-
-    async snapshots(): Promise<Snapshot[]> {
-        return get_account_snapshots(this);
-    }
-
-    async movements(): Promise<Movement[]> {
-        return get_account_movements(this);
     }
 }
