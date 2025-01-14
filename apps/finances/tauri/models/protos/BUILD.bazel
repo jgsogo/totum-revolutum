@@ -31,10 +31,7 @@ proto_library(
 # This rule generates (and copies to the workspace) the proto files for Typescript
 ts_proto_library(
     name = "protos_ts",
-    copy_files = select({
-        "//bazel:machine_user": True,
-        "//conditions:default": False,
-    }),
+    copy_files = True,
     node_modules = "//apps/finances/tauri/models:node_modules",
     proto = ":protos",
     proto_srcs = protos,

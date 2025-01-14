@@ -5,14 +5,12 @@
 .idea/
 .svelte-kit/
 __pycache__/
-apps/finances/tauri/models/protos/**/*.d.ts
 bazel-bin
 bazel-out
 bazel-testlogs
 bazel-totum-revolutum
 build/
 examples/files/
-libraries/googleapis/protos/**/*.d.ts
 node_modules/
 secret.json
 secrets/
