@@ -1,0 +1,70 @@
+use super::AppModel;
+
+pub enum AccountCategory {
+    Other,
+    Savings,
+    Investment,
+    Retirement,
+}
+
+impl Into<crate::protos::AccountCategory> for AccountCategory {
+    fn into(self) -> crate::protos::AccountCategory {
+        match self {
+            AccountCategory::Other => crate::protos::AccountCategory::Other,
+            AccountCategory::Savings => crate::protos::AccountCategory::Savings,
+            AccountCategory::Investment => crate::protos::AccountCategory::Investment,
+            AccountCategory::Retirement => crate::protos::AccountCategory::Retirement,
+        }
+    }
+}
+
+const SAVINGS_UNIQUE_NAMES: &'static [&'static str] =
+    &[finances_accounts::constants::accounttype::ASSETS_CURRENT_SAVINGS];
+const INVESTMENT_UNIQUE_NAMES: &'static [&'static str] = &[
+    finances_investments::constants::accounttype::ASSETS_CURRENT_INVESTMENT,
+    finances_investments::constants::accounttype::ASSETS_NON_CURRENT_REAL_STATE,
+];
+const RETIREMENT_UNIQUE_NAMES: &'static [&'static str] =
+    &[finances_investments::constants::accounttype::ASSETS_NON_CURRENT_RETIREMENT];
+
+impl AccountCategory {
+    pub fn savings_accounttypes() -> &'static [&'static str] {
+        SAVINGS_UNIQUE_NAMES
+    }
+
+    pub fn investment_accounttypes() -> &'static [&'static str] {
+        INVESTMENT_UNIQUE_NAMES
+    }
+
+    pub fn retirement_accounttypes() -> &'static [&'static str] {
+        RETIREMENT_UNIQUE_NAMES
+    }
+}
+
+pub struct AccountType(crate::protos::AccountType);
+
+impl AccountType {
+    pub fn new(pk: i64, name: String, breadcrumb: Option<Vec<String>>, category: AccountCategory) -> Self {
+        let category: crate::protos::AccountCategory = category.into();
+        Self(crate::protos::AccountType {
+            pk,
+            name,
+            breadcrumb: breadcrumb.unwrap_or(Vec::default()),
+            category: category.into(),
+        })
+    }
+
+    pub fn pk(&self) -> i64 {
+        self.0.pk
+    }
+}
+
+impl AppModel<crate::protos::AccountType> for AccountType {
+    fn inner_type(self) -> crate::protos::AccountType {
+        self.0
+    }
+
+    fn inner_type_ref(&self) -> &crate::protos::AccountType {
+        &self.0
+    }
+}

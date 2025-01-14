@@ -1,0 +1,56 @@
+load("@aspect_rules_ts//ts:proto.bzl", "ts_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_rust_prost//:defs.bzl", "rust_prost_library")
+
+protos = [
+    "date.proto",
+    "decimal.proto",
+    "money.proto",
+]
+
+proto_library(
+    name = "protos",
+    srcs = protos,
+)
+
+proto_library(
+    name = "date_proto",
+    srcs = ["date.proto"],
+    visibility = ["//visibility:public"],
+)
+
+proto_library(
+    name = "decimal_proto",
+    srcs = ["decimal.proto"],
+    visibility = ["//visibility:public"],
+)
+
+proto_library(
+    name = "money_proto",
+    srcs = ["money.proto"],
+    visibility = ["//visibility:public"],
+)
+
+# This rule generates (and copies to the workspace) the proto files for Typescript
+ts_proto_library(
+    name = "protos_ts",
+    copy_files = select({
+        "//bazel:machine_user": True,
+        "//conditions:default": False,
+    }),
+    node_modules = "//libraries/googleapis:node_modules",
+    proto = ":protos",
+    proto_srcs = protos,
+    protoc_gen_options = {
+        "import_extension": "js",
+    },
+    visibility = ["//visibility:public"],
+)
+
+# Generate Rust bindings from the generated proto files
+rust_prost_library(
+    name = "protos_rs",
+    proto = ":protos",
+    # TODO: Wait for https://github.com/bazelbuild/rules_rust/issues/2831, so we can add type_attributes, if not we can go the build.rs way
+    visibility = ["//visibility:public"],
+)

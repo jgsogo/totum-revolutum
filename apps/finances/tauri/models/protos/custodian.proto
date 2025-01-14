@@ -1,0 +1,8 @@
+syntax = "proto3";
+package finances_app_models;
+
+message Custodian {
+  int64 pk = 1;
+  string name = 2;
+  optional string photo = 3;
+}

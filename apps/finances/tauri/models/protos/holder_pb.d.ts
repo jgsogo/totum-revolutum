@@ -41,19 +41,3 @@ export declare type Holder = Message<"finances_app_models.Holder"> & {
  */
 export declare const HolderSchema: GenMessage<Holder>;
 
-/**
- * @generated from message finances_app_models.HolderList
- */
-export declare type HolderList = Message<"finances_app_models.HolderList"> & {
-  /**
-   * @generated from field: repeated finances_app_models.Holder holders = 1;
-   */
-  holders: Holder[];
-};
-
-/**
- * Describes the message finances_app_models.HolderList.
- * Use `create(HolderListSchema)` to create a new message.
- */
-export declare const HolderListSchema: GenMessage<HolderList>;
-

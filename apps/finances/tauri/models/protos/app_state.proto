@@ -1,0 +1,28 @@
+syntax = "proto3";
+package finances_app_models;
+
+message DatabaseConnection {
+    string postgres_url = 1;
+    // string user = 1;
+    // string password = 2;
+    // string host = 3;
+    // uint32 port = 4;
+    // string dbname = 5;
+}
+
+message AppState {
+    // The three-letter currency code defined in ISO 4217.
+    string base_ccy = 1;
+
+    // Base URL to all media resources
+    string base_media_url = 2;
+
+    // Base URL to static content
+    string base_static_url = 3;
+
+    // Base URL to the site root
+    string base_url = 4;
+
+    // Current DB connection
+    DatabaseConnection db = 5;
+}

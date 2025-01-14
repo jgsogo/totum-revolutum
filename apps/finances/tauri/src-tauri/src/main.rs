@@ -1,10 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-pub use finances_app_lib::state::AppState;
+use finances_app_models::AppState;
 
 fn main() {
-    let state = AppState::default();
+    let state = AppState::new_from_env();
     let pool = finances_app_lib::db::establish_connection(state.postgres_url());
 
     let builder = tauri::Builder::default();

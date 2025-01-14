@@ -3,21 +3,35 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_rust_prost//:defs.bzl", "rust_prost_library")
 
 protos = [
+    "account_context.proto",
     "account.proto",
+    "app_state.proto",
+    "custodian.proto",
+    "fx.proto",
+    "holder_context.proto",
     "holder.proto",
-    "ccy.proto",
-    "app_config.proto",
+    "main_context.proto",
+    "money_amount.proto",
+    "movement.proto",
+    "snapshot.proto",
+    "transaction.proto",
 ]
 
 proto_library(
     name = "protos",
     srcs = protos,
-    deps = ["@protobuf//:timestamp_proto"],
+    deps = [
+        "//libraries/googleapis/protos/google/type:date_proto",
+        "//libraries/googleapis/protos/google/type:decimal_proto",
+        "//libraries/googleapis/protos/google/type:money_proto",
+        "@protobuf//:timestamp_proto",
+    ],
 )
 
 # This rule generates (and copies to the workspace) the proto files for Typescript
 ts_proto_library(
     name = "protos_ts",
+    copy_files = True,
     node_modules = "//apps/finances/tauri/models:node_modules",
     proto = ":protos",
     proto_srcs = protos,

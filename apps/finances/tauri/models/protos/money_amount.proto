@@ -1,0 +1,20 @@
+syntax = "proto3";
+package finances_app_models;
+
+import "libraries/googleapis/protos/google/type/money.proto";
+import "libraries/googleapis/protos/google/type/decimal.proto";
+
+message MoneyAmount {
+    message NonNumerable {
+        google.type.Money amount = 1;
+    }
+    message Numerable {
+        google.type.Money unit_value = 1;
+        google.type.Decimal quantity = 2;
+    }
+
+    oneof amount {
+        NonNumerable non_numerable = 1;
+        Numerable numerable = 2;
+    }
+}

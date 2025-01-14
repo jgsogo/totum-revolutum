@@ -1,11 +1,41 @@
 syntax = "proto3";
 package finances_app_models;
 
-import "google/protobuf/timestamp.proto";
+import "apps/finances/tauri/models/protos/custodian.proto";
+import "libraries/googleapis/protos/google/type/date.proto";
+
+// Main account categories
+enum AccountCategory {
+  Other = 0;
+  Savings = 1;
+  Investment = 2;
+  Retirement = 3;
+}
+
+// Fine-grained account type
+message AccountType {
+  int64 pk = 1;
+  string name = 2;
+  // Last element in the breadcrumb is the account-type itself. This way, if the breadcrumb is empty, it has not been populated.
+  repeated string breadcrumb = 3;
+  AccountCategory category = 4;
+}
+
 
 message Account {
-  string name = 1;
-  optional string description = 2;
+  int64 pk = 1;
+  string name = 2;
+  Custodian custodian = 3;
 
-  optional google.protobuf.Timestamp open = 3;
+  AccountType type = 4;
+  // The three-letter currency code defined in ISO 4217.
+  string currency_code = 5;
+
+  optional string identifier = 6;
+  optional string description = 7;
+
+  optional google.type.Date open = 8;
+
+  bool holder_owns_money = 9;
+  bool is_numerable = 10;
 }

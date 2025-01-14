@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TransactionGroup } from "$lib/models/TransactionGroup";
+  import type { TransactionGroup } from "../../../../models/src-js";
   import { Input, Checkbox, Label, Select, Textarea } from "flowbite-svelte";
   import type { NewTransaction } from "./NewTransaction.svelte";
   import Datepicker from "../Datepicker.svelte";

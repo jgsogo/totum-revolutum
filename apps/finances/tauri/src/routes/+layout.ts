@@ -5,20 +5,19 @@ export const prerender = true;
 export const ssr = false;
 
 import { error } from '@sveltejs/kit';
-import { get_all_holders, get_app_config } from '$lib/commands';
-import { Holder } from '$lib/models/Holder';
-import type { AppConfig } from '../../models/protos/app_config_pb.js';
+import { get_app_state, get_main_context } from '$lib/commands';
+import type { AppState, MainContext } from '../../models/src-js/index.js';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ depends }) {
     depends('invalidate:refresh');
 
 	try {
-		let app_config: AppConfig = await get_app_config();
-		let all_holders: Holder[] = await get_all_holders();
+		let main_context: MainContext = await get_main_context();
+		let app_state: AppState = await get_app_state();
 		return {
-			app_config,
-			all_holders,
+			app_state,
+			main_context,
 		};
 	}
 	catch(e) {

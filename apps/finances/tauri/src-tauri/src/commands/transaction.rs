@@ -1,4 +1,3 @@
-use crate::state::AppState;
 use crate::types::ConnectionType;
 use bigdecimal::One;
 use bigdecimal::ToPrimitive;
@@ -8,6 +7,7 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::fields::MovementDirection;
 use finances_accounts::models::{Account, NewFx, NewMovement, NewTransaction};
 use finances_accounts::sql::filters::account_by_pk;
+use finances_app_models::AppState;
 use finances_investments::models::NewMovementDividend;
 use finances_investments::models::NewMovementNumerable;
 use log::info;
@@ -45,7 +45,7 @@ pub fn create_transaction(
         };
 
         let total_from = create_transaction_movements(
-            &state.base_ccy,
+            &state.base_ccy(),
             conn,
             &transaction.movements_from,
             MovementDirection::Out,
@@ -53,7 +53,7 @@ pub fn create_transaction(
         )?;
 
         let total_to = create_transaction_movements(
-            &state.base_ccy,
+            &state.base_ccy(),
             conn,
             &transaction.movements_to,
             MovementDirection::In,

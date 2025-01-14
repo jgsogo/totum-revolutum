@@ -1,14 +1,18 @@
 <script lang="ts">
-    import AccountsTable from "$lib/components/AccountsTable.svelte";
+  import AccountsTable from "$lib/components/AccountsTable.svelte";
+  import type { Custodian, Account, Holder, AppState } from "../../../../../../../models/src-js";
 
-    /** @type {{ data: import('./$types').PageData }} */
-    let { data } = $props();
-  </script>
+  /** @type {{ data: import('./$types').PageData }} */
+  let { data } = $props();
+  let app_state: AppState = data.app_state;
+  let custodian: Custodian = data.custodian;
+  let holder: Holder = data.holder_context.holder();
+  let accounts: Account[] = data.accounts_for_custodian;
+</script>
 
-  <div class="mt-px space-y-4">
+<div class="mt-px space-y-4">
+  {custodian}
+  <img alt="Custodian {custodian.name}" src="{app_state.baseMediaUrl}{custodian.photo}" />
 
-    {data.custodian}
-    <img src="{data.base_media_url}{data.custodian.photo}" />
-
-    <AccountsTable holder={data.holder} show_custodian={false} bind:accounts={data.accounts_for_custodian} />
-  </div>
+  <AccountsTable {holder} show_custodian={false} {accounts} />
+</div>

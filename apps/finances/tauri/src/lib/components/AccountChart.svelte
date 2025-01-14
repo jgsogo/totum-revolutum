@@ -1,20 +1,19 @@
 <script lang="ts">
   import { Card, Chart } from "flowbite-svelte";
-  import type { Account } from "$lib/models/Account";
-  import type { Snapshot } from "$lib/models/Snapshot";
+  import { Account, Snapshot } from "../../../models/src-js";
 
-  let { account = $bindable(), snapshots = $bindable() }: { account: Account; snapshots: Snapshot[] } = $props();
+  let { account, snapshots }: { account: Account; snapshots: Snapshot[] } = $props();
 
   let dates = snapshots.map((snapshot) => {
-    let x = new Date(snapshot.date_value).getTime();
-    let y = snapshot.amount;
+    let x = snapshot.dateValue().as_date().getTime();
+    let y = snapshot.amount().as_number();
     return { x, y };
   });
 
   let options = {
     series: [
       {
-        name: account.name,
+        name: account.name(),
         data: dates, // FIXME: Make this variable reactive
       },
     ],
@@ -65,7 +64,7 @@
         },
       },
       title: {
-        text: `Snapshot (${account.ccy})`,
+        text: `Snapshot (${account.ccy()})`,
         style: {
           cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
         },

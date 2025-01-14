@@ -1,31 +1,37 @@
-#[cfg(not(feature = "bazel"))]
-pub mod protos {
-    include!(concat!(env!("OUT_DIR"), "/finances_app_models.rs"));
-}
+mod account;
+mod account_context;
+mod account_type;
+mod app_state;
+mod custodian;
+mod fx;
+pub mod google_type;
+mod holder;
+mod holder_context;
+mod main_context;
+mod money_amount;
+mod movement;
+mod movement_type;
+mod protos;
+mod snapshot;
+mod transaction_group;
 
-#[cfg(feature = "bazel")]
-pub mod protos {
-    pub use protos::finances_app_models::{Account, AppConfig, Ccy, DatabaseConnection, Holder, HolderList};
-}
+pub use account::Account;
+pub use account_context::AccountContext;
+pub use account_type::{AccountCategory, AccountType};
+pub use app_state::AppState;
+pub use custodian::Custodian;
+pub use fx::Fx;
+pub use holder::Holder;
+pub use holder_context::HolderContext;
+pub use main_context::MainContext;
+pub use money_amount::MoneyAmount;
+pub use movement::{Movement, MovementDirection};
+pub use movement_type::MovementType;
+pub use snapshot::Snapshot;
+pub use transaction_group::TransactionGroup;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub trait AppModel<T: prost::Message> {
+    fn inner_type(self) -> T;
 
-    use prost::Message;
-
-    #[test]
-    fn test_account_roundtrip() {
-        let account = protos::Account {
-            name: "name".to_string(),
-            description: None,
-            open: None,
-        };
-
-        let encoded = account.encode_to_vec();
-
-        let mut buf = encoded.as_slice();
-        let roundtrip = protos::Account::decode(&mut buf).unwrap();
-        assert_eq!(account.name, roundtrip.name);
-    }
+    fn inner_type_ref(&self) -> &T;
 }

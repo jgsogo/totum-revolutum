@@ -1,0 +1,13 @@
+syntax = "proto3";
+package finances_app_models;
+
+import "apps/finances/tauri/models/protos/holder.proto";
+import "apps/finances/tauri/models/protos/account.proto";
+
+// Data available for the selected holder
+message HolderContext {
+    Holder holder = 1;
+
+    // All accounts for the selected holder
+    repeated Account accounts = 2;
+}

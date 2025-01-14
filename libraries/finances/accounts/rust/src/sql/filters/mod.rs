@@ -34,6 +34,12 @@ pub fn custodian_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_custodian::id.eq(pk)
 }
 
+/// Returns a query fragment to filter [`Fx`]s by pk
+#[diesel::dsl::auto_type(no_type_alias)]
+pub fn fx_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_fx::id.eq(pk)
+}
+
 /// Returns a query fragment to filter [`AccountType`]s that have 'unique_name'
 #[diesel::dsl::auto_type(no_type_alias)]
 pub fn acounttype_with_unique_name() -> _ {

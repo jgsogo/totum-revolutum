@@ -2,18 +2,26 @@
   import AccountChart from "$lib/components/AccountChart.svelte";
   import AccountDetail from "$lib/components/AccountDetail.svelte";
   import AccountMovements from "$lib/components/AccountMovements.svelte";
+  import { Account, AccountContext, type AppState, type Holder, type HolderContext } from "../../../../../../../../models/src-js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
 
-  let last_snapshot = $state(data.snapshots.at(0));
+  let app_state: AppState = data.app_state;
+
+  let holder_context: HolderContext = data.holder_context;
+  let holder: Holder = holder_context.holder();
+
+  let account_context: AccountContext = data.account_context;
+  let account: Account = account_context.account();
+  let last_snapshot = account_context.snapshots().at(0);
 </script>
 
 <div class="mt-px space-y-4">
   <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-    <AccountDetail bind:holder={data.holder} base_media_url={data.base_media_url} bind:account={data.account} bind:last_snapshot></AccountDetail>
-    <AccountChart bind:account={data.account} bind:snapshots={data.snapshots}></AccountChart>
+    <AccountDetail {holder} base_media_url={app_state.baseMediaUrl} {account} {last_snapshot}></AccountDetail>
+    <AccountChart {account} snapshots={account_context.snapshots()}></AccountChart>
   </div>
-  <AccountMovements bind:account={data.account} bind:snapshots={data.snapshots} bind:movements={data.movements}
+  <AccountMovements {account} snapshots={account_context.snapshots()} movements={account_context.movements()}
   ></AccountMovements>
 </div>

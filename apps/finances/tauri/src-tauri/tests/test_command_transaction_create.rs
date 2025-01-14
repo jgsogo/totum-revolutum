@@ -1,8 +1,9 @@
-use finances_app_lib::models::{MovementType, NewAmount, NewMovement, NewMovementType, NewTransaction, Snapshot};
+use finances_app_lib::models::{NewAmount, NewMovement, NewMovementType, NewTransaction};
 use serde_json::json;
 
 mod common;
-use common::call_it;
+use common::{call_it, call_it_proto};
+use finances_app_models::{AccountContext, MainContext};
 
 #[test]
 fn test_create_transaction() {
@@ -13,15 +14,17 @@ fn test_create_transaction() {
     let movement_type_pk = {
         // Find a MovementType to use later
         let body = json!({});
-        let r = call_it::<Vec<MovementType>>(&webview, "get_all_movementtypes".to_string(), body);
-        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-        let movs = r.unwrap();
-        movs.into_iter().find(|m| m.name == "Tasas").unwrap().pk
+        let r = call_it_proto::<MainContext>(&webview, "get_main_context".to_string(), body);
+        assert!(r.is_ok());
+        let main_context = r.unwrap();
+        main_context.find_movement_type_by_name("Tasas").unwrap().pk()
     };
     let snapshot_latest_pk = {
-        let body = json!({ "pk": account_numerable });
-        let r = call_it::<Option<Snapshot>>(&webview, "get_account_snapshot_latest".to_string(), body);
-        r.unwrap().unwrap().pk
+        let body = json!({"accountPk": account_numerable});
+        let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
+        assert!(r.is_ok());
+        let account_context = r.unwrap();
+        account_context.snapshots().into_iter().nth(0).unwrap().pk()
     };
 
     {

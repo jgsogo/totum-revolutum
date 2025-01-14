@@ -1,8 +1,8 @@
-use finances_app_lib::models::{NewAmount, NewSnapshot, Snapshot};
+use finances_app_lib::models::{NewAmount, NewSnapshot};
+use finances_app_models::AccountContext;
 use serde_json::json;
-
 mod common;
-use common::call_it;
+use common::{call_it, call_it_proto};
 
 #[test]
 fn test_snapshot() {
@@ -13,10 +13,11 @@ fn test_snapshot() {
     ***/
     let account_id = 1i64;
     {
-        let body = json!({ "pk": account_id });
-        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
-        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-        assert_eq!(r.unwrap().len(), 0);
+        let body = json!({"accountPk": account_id});
+        let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
+        assert!(r.is_ok());
+        let account_context = r.unwrap();
+        assert_eq!(account_context.snapshots().len(), 0);
     }
 
     // Snapshot (non-numerable)
@@ -40,10 +41,11 @@ fn test_snapshot() {
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
 
         // Now we have one more snapshot
-        let body = json!({ "pk": account_id });
-        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
-        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-        assert_eq!(r.unwrap().len(), 1);
+        let body = json!({"accountPk": account_id});
+        let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
+        assert!(r.is_ok());
+        let account_context = r.unwrap();
+        assert_eq!(account_context.snapshots().len(), 1);
     }
 
     /****
@@ -51,10 +53,11 @@ fn test_snapshot() {
     ***/
     let account_id = 7i64;
     {
-        let body = json!({ "pk": account_id });
-        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
-        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-        assert_eq!(r.unwrap().len(), 0);
+        let body = json!({"accountPk": account_id});
+        let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
+        assert!(r.is_ok());
+        let account_context = r.unwrap();
+        assert_eq!(account_context.snapshots().len(), 0);
     }
 
     // Snapshot (numerable)
@@ -78,9 +81,10 @@ fn test_snapshot() {
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
 
         // Now we have one more snapshot
-        let body = json!({ "pk": account_id });
-        let r = call_it::<Vec<Snapshot>>(&webview, "get_account_snapshots".to_string(), body);
-        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-        assert_eq!(r.unwrap().len(), 1);
+        let body = json!({"accountPk": account_id});
+        let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
+        assert!(r.is_ok());
+        let account_context = r.unwrap();
+        assert_eq!(account_context.snapshots().len(), 1);
     }
 }

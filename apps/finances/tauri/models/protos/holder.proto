@@ -7,7 +7,3 @@ message Holder {
   bool is_company = 3;
   optional string photo = 4;
 }
-
-message HolderList {
-    repeated Holder holders = 1;
-}

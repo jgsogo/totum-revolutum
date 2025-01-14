@@ -1,12 +1,10 @@
 <script lang="ts">
-  import type { Account } from "$lib/models/Account";
   import { Input, Label, ButtonGroup, InputAddon, Radio, Helper } from "flowbite-svelte";
-  import { MovementType } from "$lib/models/MovementType";
   import AccountDropdown from "../AccountDropdown/AccountDropdown.svelte";
   import MovementTypeDropdown from "../MovementTypeDropdown/MovementTypeDropdown.svelte";
   import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
   import Datepicker from "../Datepicker.svelte";
-  import type { Snapshot } from "$lib/models/Snapshot";
+  import { Account, Snapshot, MovementType } from "../../../../models/src-js";
 
   let {
     new_movement = $bindable(),
@@ -43,9 +41,9 @@
       new_movement.ex_dividend_snapshot = undefined;
     } else {
       // Get the closest (equal or before) snapshot to the given date
-      let snapshots = await new_movement.account?.snapshots();
+      let snapshots: Snapshot[] = []; // FIXME: Retrieve the snapshosts for this account
       let snapshot = snapshots?.find((s: Snapshot) => {
-        return s.date_value.getDate() <= new_movement.ex_dividend_date!.getDate();
+        return s.dateValue().as_date() <= new_movement.ex_dividend_date!;
       });
       console.log("Found snapshot: ", snapshot);
       new_movement.ex_dividend_snapshot = snapshot;
@@ -91,7 +89,7 @@
         <Label class="flex flex-col">
           <span>Amount</span>
           <ButtonGroup class="w-full">
-            <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <InputAddon>{ccy_symbol(new_movement.account.ccy())}</InputAddon>
             <Input type="number" required placeholder="amount" bind:value={new_movement.amount} />
           </ButtonGroup>
         </Label>
@@ -103,7 +101,7 @@
         <Label class="ml-4 flex flex-col">
           <span>Unit value</span>
           <ButtonGroup>
-            <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <InputAddon>{ccy_symbol(new_movement.account.ccy())}</InputAddon>
             <Input type="number" required placeholder="unit_value" bind:value={new_movement.unit_value} />
           </ButtonGroup>
         </Label>
@@ -112,14 +110,14 @@
           <span>Ex dividend date</span>
           <Datepicker required bind:value={new_movement.ex_dividend_date} on:select={handleDividendDateSnapshot} />
           <Helper
-            >snapshot @ {new_movement.ex_dividend_snapshot?.date_value.toISOString().slice(0, 10)} ({new_movement
-              .ex_dividend_snapshot?.quantity} ud.)</Helper
+            >snapshot @ {new_movement.ex_dividend_snapshot?.dateValue().as_date().toISOString().slice(0, 10)} ({new_movement
+              .ex_dividend_snapshot?.amount().quantity()!} ud.)</Helper
           >
         </Label>
         <Label class="ml-4 flex flex-col">
           <span>Unit value</span>
           <ButtonGroup>
-            <InputAddon>{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <InputAddon>{ccy_symbol(new_movement.account.ccy())}</InputAddon>
             <Input type="number" required placeholder="unit_value" bind:value={new_movement.unit_value} />
           </ButtonGroup>
         </Label>
@@ -127,11 +125,11 @@
         Invalid movement type {new_movement.account}
       {/if}
 
-      {#if new_movement.account.ccy != base_ccy}
+      {#if new_movement.account.ccy() != base_ccy}
         <Label class="ml-4 flex flex-col">
           <span>FX</span>
           <ButtonGroup>
-            <InputAddon>{ccy_symbol(base_ccy)}/{ccy_symbol(new_movement.account.ccy)}</InputAddon>
+            <InputAddon>{ccy_symbol(base_ccy)}/{ccy_symbol(new_movement.account.ccy())}</InputAddon>
             <Input type="number" required placeholder="fx" bind:value={new_movement.fx} />
           </ButtonGroup>
         </Label>

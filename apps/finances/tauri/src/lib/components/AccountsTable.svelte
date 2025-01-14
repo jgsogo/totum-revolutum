@@ -9,13 +9,12 @@
     Card,
     Heading,
   } from "flowbite-svelte";
-  import type { Account } from "$lib/models/Account";
-  import type { Holder } from "$lib/models/Holder";
+  import type { Holder, Account } from "../../../models/src-js";
   import { goToAccountDetail } from "$lib/utils";
 
   let {
     holder,
-    accounts = $bindable(),
+    accounts,
     show_custodian = true,
   }: { holder: Holder; accounts: Account[]; show_custodian?: boolean } = $props();
 </script>
@@ -43,11 +42,11 @@
         {#each accounts as account}
           <TableBodyRow onclick={() => goToAccountDetail(holder, account)}>
             {#if show_custodian}
-              <TableBodyCell>{account.custodian}</TableBodyCell>
+              <TableBodyCell>{account.custodian().name}</TableBodyCell>
             {/if}
-            <TableBodyCell>{account.name}</TableBodyCell>
-            <TableBodyCell>{account.type}</TableBodyCell>
-            <TableBodyCell>{account.ccy}</TableBodyCell>
+            <TableBodyCell>{account.name()}</TableBodyCell>
+            <TableBodyCell>{account.type().name}</TableBodyCell>
+            <TableBodyCell>{account.ccy()}</TableBodyCell>
           </TableBodyRow>
         {/each}
       </TableBody>

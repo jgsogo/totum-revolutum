@@ -1,21 +1,20 @@
 <script lang="ts">
   import { Avatar, Button, Card, Img, Modal } from "flowbite-svelte";
-  import type { Account } from "$lib/models/Account";
-  import type { Custodian } from "$lib/models/Custodian";
-  import type { Snapshot } from "$lib/models/Snapshot";
+
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
   import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
   import { goToTransactionCreate } from "$lib/utils";
-  import type { Holder } from "$lib/models/Holder";
   import { create_snapshot } from "$lib/commands";
   import { invalidate } from "$app/navigation";
   import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
+  import { type Holder, Account, Snapshot, type Custodian } from "../../../models/src-js";
+
 
   let {
-    holder = $bindable(),
-    account = $bindable(),
+    holder,
+    account,
     base_media_url,
-    last_snapshot = $bindable(),
+    last_snapshot,
   }: { holder: Holder; account: Account; base_media_url: string; last_snapshot?: Snapshot } = $props();
 
   const initials = (custodian: Custodian): string => {
@@ -31,13 +30,13 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  let newSnapshot = $state(new NewSnapshot(account));
+  let newSnapshot = $state(new NewSnapshot(account, last_snapshot));
   const on_snapshot = async (e: MouseEvent) => {
     e.preventDefault();
     if (newSnapshot.isValid()) {
       await create_snapshot(newSnapshot);
       // TODO: Handle error if it fails to create the snapshot
-      await invalidate("invalidate:account");
+      await invalidate("invalidate:account"); // FIXME: Only binded properties?
       snapshotModal = false;
     }
   };
@@ -48,20 +47,20 @@
     <li class="py-3 sm:py-3.5">
       <div class="flex items-center justify-between">
         <div class="flex min-w-0 items-center">
-          {#if account.custodian.photo}
-            <Img size="w-20" src="{base_media_url}{account.custodian.photo}" />
+          {#if account.custodian().photo}
+            <Img size="w-20" src="{base_media_url}{account.custodian().photo}" />
             <!-- <Avatar title={account.custodian.name} src="{base_media_url}{account.custodian.photo}"
                 >{account.custodian.name}</Avatar
               > -->
           {:else}
-            <Avatar size="lg" title={account.custodian.name}>{initials(account.custodian)}</Avatar>
+            <Avatar size="lg" title={account.custodian().name}>{initials(account.custodian())}</Avatar>
           {/if}
 
           <div class="ml-3">
             <p class="truncate font-medium text-gray-900 dark:text-white">
-              {account.name}
+              {account.name()}
             </p>
-            <span class="text-gray-500 text-sm">{account.identifier}</span>
+            <span class="text-gray-500 text-sm">{account.identifier()}</span>
             <p>
               <span class="flex text-xs mr-2">
                 <button class="flex hover:underline mr-2" onclick={() => (snapshotModal = true)}>
@@ -88,7 +87,7 @@
         </div>
         {#if last_snapshot}
           <div class="truncate inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-            {last_snapshot}
+            {last_snapshot.amount()}
           </div>
         {/if}
       </div>

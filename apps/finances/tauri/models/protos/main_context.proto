@@ -1,0 +1,20 @@
+syntax = "proto3";
+package finances_app_models;
+
+import "apps/finances/tauri/models/protos/holder.proto";
+import "apps/finances/tauri/models/protos/account.proto";
+import "apps/finances/tauri/models/protos/movement.proto";
+import "apps/finances/tauri/models/protos/transaction.proto";
+
+// Data that is shared across all the application
+message MainContext {
+    repeated Holder holders = 1;
+    repeated AccountType account_types = 2;
+    repeated MovementType movement_types = 3;
+
+    // FIXME: I'm not sure I want to retrieve all the accounts here (maybe some holders cannot see some accounts)
+    // FIXME: If I have all the accounts here, then others can just return the pks (see 'holder_context' and 'account_context')
+    repeated Account accounts = 4;
+
+    repeated TransactionGroup transaction_groups = 5;
+}

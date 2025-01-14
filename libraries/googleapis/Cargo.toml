@@ -1,0 +1,23 @@
+[package]
+name = "googleapis"
+version = "0.1.0"
+authors = ["you"]
+edition = "2021"
+
+include = ["**/*.rs", "Cargo.toml", "protos"]
+
+[lib]
+name = "googleapis"
+path = "src-rust/lib.rs"
+
+[features]
+bazel = []
+
+[build-dependencies]
+prost-build = { workspace = true }
+
+[dependencies]
+prost = { workspace = true }
+# prost-types = { workspace = true }
+# serde = { workspace = true }
+chrono = { workspace =  true }
