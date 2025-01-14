@@ -35,7 +35,7 @@
       // Collect all accounts with their custodian
       return all_accounts
         .map((value) => {
-          return { value: value, name: `${value.custodian()} | ${value.name()}` };
+          return { value: value, name: `${value.custodian().name} | ${value.name()}` };
         })
         .sort((lhs, rhs) => (lhs.name < rhs.name ? -1 : lhs.name > rhs.name ? 1 : 0));
     } else {

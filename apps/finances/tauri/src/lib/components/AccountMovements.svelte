@@ -26,7 +26,7 @@
       {#each entries as entry}
         {#if entry instanceof Snapshot}
           <TableBodyRow class={class_row_snapshot}>
-            <TableBodyCell>{entry.dateValue().as_date()}</TableBodyCell>
+            <TableBodyCell>{entry.dateValue().as_date().toISOString()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell>{entry.amount()}</TableBodyCell>
