@@ -36,7 +36,7 @@ ts_proto_library(
     name = "protos_ts",
     copy_files = select({
         "//bazel:machine_user": True,
-        "//conditions:default": [],
+        "//conditions:default": False,
     }),
     node_modules = "//libraries/googleapis:node_modules",
     proto = ":protos",

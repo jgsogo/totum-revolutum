@@ -33,7 +33,7 @@ ts_proto_library(
     name = "protos_ts",
     copy_files = select({
         "//bazel:machine_user": True,
-        "//conditions:default": [],
+        "//conditions:default": False,
     }),
     node_modules = "//apps/finances/tauri/models:node_modules",
     proto = ":protos",
