@@ -1,7 +1,15 @@
-import { Money as MoneyProto } from "../protos/google/type/money_pb.js";
+import { Money as MoneyProto, MoneySchema } from "../protos/google/type/money_pb.js";
+import { create, toBinary } from "@bufbuild/protobuf";
 
 export class Money {
     private readonly money: MoneyProto;
+
+    static create_from_number(currencyCode: string, amount: number): Money {
+        let units = Math.trunc(amount);
+        let decimal_part = (amount - units) * Math.pow(10, 9);
+        let proto = create(MoneySchema, { currencyCode, units: BigInt(units), nanos: decimal_part }) as MoneyProto;
+        return new Money(proto);
+    }
 
     constructor(money: MoneyProto) {
         this.money = money;
@@ -29,6 +37,14 @@ export class Money {
         });
 
         return formatter.format(this.as_number());
+    }
+
+    innerType(): MoneyProto {
+        return this.money;
+    }
+
+    toBinary(): Uint8Array {
+        return toBinary(MoneySchema, this.money);
     }
 
 }

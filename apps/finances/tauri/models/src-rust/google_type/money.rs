@@ -7,7 +7,7 @@ use bigdecimal::Zero;
 const NANO_EXP: usize = 9;
 const NANO_VALUE: u32 = 1_000_000_000;
 
-pub struct Money(crate::protos::google::r#type::Money);
+pub struct Money(pub(crate) crate::protos::google::r#type::Money);
 
 impl Into<crate::protos::google::r#type::Money> for Money {
     fn into(self) -> crate::protos::google::r#type::Money {

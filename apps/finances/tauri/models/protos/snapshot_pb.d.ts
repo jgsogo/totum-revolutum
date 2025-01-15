@@ -38,3 +38,29 @@ export declare type Snapshot = Message<"finances_app_models.Snapshot"> & {
  */
 export declare const SnapshotSchema: GenMessage<Snapshot>;
 
+/**
+ * @generated from message finances_app_models.NewSnapshot
+ */
+export declare type NewSnapshot = Message<"finances_app_models.NewSnapshot"> & {
+  /**
+   * @generated from field: int64 account_pk = 1;
+   */
+  accountPk: bigint;
+
+  /**
+   * @generated from field: google.type.Date date_value = 2;
+   */
+  dateValue?: Date;
+
+  /**
+   * @generated from field: finances_app_models.MoneyAmount amount = 3;
+   */
+  amount?: MoneyAmount;
+};
+
+/**
+ * Describes the message finances_app_models.NewSnapshot.
+ * Use `create(NewSnapshotSchema)` to create a new message.
+ */
+export declare const NewSnapshotSchema: GenMessage<NewSnapshot>;
+

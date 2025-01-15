@@ -23,6 +23,8 @@ serde = { workspace = true }
 chrono = { workspace =  true }
 bigdecimal = {workspace = true}
 num-bigint = {workspace = true}
+diesel = {workspace =  true} # FIXME: Remove this dep
+
 
 googleapis = { path = "../../../../libraries/googleapis" }
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust" }

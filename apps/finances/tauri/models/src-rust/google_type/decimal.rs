@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 // FIXME: Move this to //libraries/googleapis and reuse it.
 
-pub struct Decimal(crate::protos::google::r#type::Decimal);
+pub struct Decimal(pub(crate) crate::protos::google::r#type::Decimal);
 
 impl Into<crate::protos::google::r#type::Decimal> for Decimal {
     fn into(self) -> crate::protos::google::r#type::Decimal {

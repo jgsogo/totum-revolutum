@@ -2,7 +2,7 @@ use chrono::{Datelike, NaiveDate};
 
 // FIXME: Move this to //libraries/googleapis and reuse it.
 
-pub struct Date(crate::protos::google::r#type::Date);
+pub struct Date(pub(crate) crate::protos::google::r#type::Date);
 
 impl Into<crate::protos::google::r#type::Date> for Date {
     fn into(self) -> crate::protos::google::r#type::Date {
@@ -22,7 +22,10 @@ impl From<NaiveDate> for Date {
 
 impl Into<NaiveDate> for Date {
     fn into(self) -> NaiveDate {
-        NaiveDate::from_ymd_opt(self.0.year, self.0.month as u32, self.0.day as u32).unwrap()
+        NaiveDate::from_ymd_opt(self.0.year, self.0.month as u32, self.0.day as u32).expect(&format!(
+            "Failed to convert to NaiveDate: {}/{}/{}",
+            self.0.year, self.0.month, self.0.day
+        ))
     }
 }
 

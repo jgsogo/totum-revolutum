@@ -5,9 +5,6 @@ pub(crate) mod finances_app_models {
 
 #[cfg(not(feature = "bazel"))]
 pub(crate) mod google {
-    pub(crate) mod protobuf {
-        include!(concat!(env!("OUT_DIR"), "/google.protobuf.rs"));
-    }
     pub(crate) mod r#type {
         include!(concat!(env!("OUT_DIR"), "/google.r#type.rs"));
     }
@@ -17,8 +14,8 @@ pub(crate) mod google {
 pub(crate) mod finances_app_models {
     pub(crate) use protos::finances_app_models::{
         money_amount, Account, AccountCategory, AccountContext, AccountType, AppState, Custodian, DatabaseConnection,
-        Fx, Holder, HolderContext, MainContext, MoneyAmount, Movement, MovementDirection, MovementType, Snapshot,
-        TransactionGroup,
+        Fx, Holder, HolderContext, MainContext, MoneyAmount, Movement, MovementDirection, MovementType, NewSnapshot,
+        Snapshot, TransactionGroup,
     };
 }
 

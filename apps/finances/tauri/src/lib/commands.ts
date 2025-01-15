@@ -61,7 +61,8 @@ export const get_account_context = async (account_pk: number): Promise<AccountCo
  * @returns - A promise that resolves when the snapshot is created, or the error if it was not possible
  */
 export const create_snapshot = async (snapshot: NewSnapshot) => {
-    await invoke("create_snapshot", { snapshot: snapshot.toJSON() });
+    let data = snapshot.toMessage().toBinary();
+    await invoke("create_snapshot", data);
 }
 
 

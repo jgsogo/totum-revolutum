@@ -1,5 +1,5 @@
 import { Account, Snapshot } from "../../../../models/src-js";
-
+import { NewSnapshot as NewSnapshotModel } from "../../../../models/src-js/snapshot";
 
 export class NewSnapshot {
     readonly account: Account;
@@ -61,15 +61,18 @@ export class NewSnapshot {
         return !(this.error_date_value || this.error_quantity || this.error_unit_value || this.error_amount)
     }
 
-    toJSON() {
-        // This serialization is used when sending this structure via a command to the Tauri backend
-        let date = this.date_value?.toISOString().slice(0, 10);
-        return {
-            account_pk: this.account.pk(),
-            date_value: date,
-            amount: this.amount,
-            quantity: this.quantity,
-            unit_value: this.unit_value,
-        };
+    toMessage(): NewSnapshotModel {
+        let data: NewSnapshotModel = new NewSnapshotModel();
+        console.log("NewSnapshot::toMessage");
+        console.log(`this.date_value: ${this.date_value}`);
+
+        data.setAccountPk(this.account.pk());
+        data.setDate(this.date_value);
+        if (this.account.is_numerable()) {
+            data.setNumerableAmount(this.account.ccy(), this.quantity!, this.unit_value!);
+        } else {
+            data.setNonNumerableAmount(this.account.ccy(), this.amount!);
+        }
+        return data;
     }
 };
