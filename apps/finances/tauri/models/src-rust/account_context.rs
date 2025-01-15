@@ -4,6 +4,7 @@ use prost::Message;
 #[derive(Debug)]
 pub struct AccountContext(crate::protos::AccountContext);
 
+// We only need this for testing (for `call_it_proto`)
 impl TryFrom<Vec<u8>> for AccountContext {
     type Error = prost::DecodeError;
 

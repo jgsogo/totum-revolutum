@@ -20,7 +20,7 @@ rust_library(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
-    visibility = ["//visibility:public"],
+    visibility = ["//apps/finances/tauri/src-tauri:__subpackages__"],
     deps = all_crate_deps(
         normal = True,
     ) + [

@@ -23,7 +23,7 @@ serde = { workspace = true }
 chrono = { workspace =  true }
 bigdecimal = {workspace = true}
 num-bigint = {workspace = true}
-diesel = {workspace =  true} # FIXME: Remove this dep
+diesel = {workspace =  true} # FIXME: Do we want diesel responsibilities in this crate?
 
 
 googleapis = { path = "../../../../libraries/googleapis" }
