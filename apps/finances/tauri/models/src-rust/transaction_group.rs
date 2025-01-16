@@ -12,8 +12,4 @@ impl AppModel<crate::protos::TransactionGroup> for TransactionGroup {
     fn inner_type(self) -> crate::protos::TransactionGroup {
         self.0
     }
-
-    fn inner_type_ref(&self) -> &crate::protos::TransactionGroup {
-        &self.0
-    }
 }

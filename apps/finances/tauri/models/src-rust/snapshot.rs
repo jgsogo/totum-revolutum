@@ -20,8 +20,4 @@ impl AppModel<crate::protos::Snapshot> for Snapshot {
     fn inner_type(self) -> crate::protos::Snapshot {
         self.0
     }
-
-    fn inner_type_ref(&self) -> &crate::protos::Snapshot {
-        &self.0
-    }
 }

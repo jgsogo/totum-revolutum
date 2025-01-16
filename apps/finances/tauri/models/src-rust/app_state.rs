@@ -1,6 +1,6 @@
 use prost::Message;
 
-use crate::AppModel;
+use super::{AppModel, OutgoingModel};
 
 #[derive(Clone)]
 pub struct AppState(crate::protos::AppState);
@@ -51,8 +51,10 @@ impl AppModel<crate::protos::AppState> for AppState {
     fn inner_type(self) -> crate::protos::AppState {
         self.0
     }
+}
 
-    fn inner_type_ref(&self) -> &crate::protos::AppState {
+impl OutgoingModel for AppState {
+    fn as_message(&self) -> &impl Message {
         &self.0
     }
 }

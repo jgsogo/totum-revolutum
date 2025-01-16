@@ -16,8 +16,4 @@ impl AppModel<crate::protos::Custodian> for Custodian {
     fn inner_type(self) -> crate::protos::Custodian {
         self.0
     }
-
-    fn inner_type_ref(&self) -> &crate::protos::Custodian {
-        &self.0
-    }
 }

@@ -41,7 +41,8 @@ impl AccountCategory {
     }
 }
 
-pub struct AccountType(crate::protos::AccountType);
+#[derive(Clone)]
+pub struct AccountType(pub(crate) crate::protos::AccountType);
 
 impl AccountType {
     pub fn new(pk: i64, name: String, breadcrumb: Option<Vec<String>>, category: AccountCategory) -> Self {
@@ -62,9 +63,5 @@ impl AccountType {
 impl AppModel<crate::protos::AccountType> for AccountType {
     fn inner_type(self) -> crate::protos::AccountType {
         self.0
-    }
-
-    fn inner_type_ref(&self) -> &crate::protos::AccountType {
-        &self.0
     }
 }

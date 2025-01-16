@@ -17,8 +17,4 @@ impl AppModel<crate::protos::Holder> for Holder {
     fn inner_type(self) -> crate::protos::Holder {
         self.0
     }
-
-    fn inner_type_ref(&self) -> &crate::protos::Holder {
-        &self.0
-    }
 }

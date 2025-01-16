@@ -14,6 +14,7 @@ mod movement_type;
 mod new_snapshot;
 mod protos;
 mod snapshot;
+mod traits;
 mod transaction_group;
 
 pub use account::Account;
@@ -30,10 +31,9 @@ pub use movement::{Movement, MovementDirection};
 pub use movement_type::MovementType;
 pub use new_snapshot::NewSnapshot;
 pub use snapshot::Snapshot;
+pub use traits::{IncomingModel, OutgoingModel};
 pub use transaction_group::TransactionGroup;
 
-pub trait AppModel<T: prost::Message> {
+trait AppModel<T: prost::Message> {
     fn inner_type(self) -> T;
-
-    fn inner_type_ref(&self) -> &T;
 }

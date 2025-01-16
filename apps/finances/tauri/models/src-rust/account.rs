@@ -1,4 +1,4 @@
-use super::{google_type, AppModel, Custodian};
+use super::{google_type, AccountType, AppModel, Custodian};
 
 pub struct Account(crate::protos::Account);
 
@@ -7,7 +7,7 @@ impl Account {
         account: finances_accounts::models::Account,
         account_holder_role: finances_accounts::models::AccountHolderRole,
         custodian: Custodian,
-        account_type: crate::protos::AccountType,
+        account_type: AccountType,
     ) -> Self {
         let open_date: google_type::Date = account.open.into();
 
@@ -15,7 +15,7 @@ impl Account {
             pk: account.id,
             name: account.name,
             custodian: Some(custodian.inner_type()),
-            r#type: Some(account_type),
+            r#type: Some(account_type.inner_type()),
             currency_code: account.ccy,
             identifier: account.identifier,
             description: account.description,
@@ -39,9 +39,5 @@ impl Account {
 impl AppModel<crate::protos::Account> for Account {
     fn inner_type(self) -> crate::protos::Account {
         self.0
-    }
-
-    fn inner_type_ref(&self) -> &crate::protos::Account {
-        &self.0
     }
 }

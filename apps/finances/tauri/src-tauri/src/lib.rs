@@ -12,7 +12,6 @@ use finances_accounts::models::{
     Account, AccountHolder, AccountHolderRole, AccountType, Custodian, MovementType, TransactionGroup,
 };
 use finances_accounts::sql::filters::accounttype_by_unique_names;
-use finances_app_models::AppModel;
 use finances_app_models::{
     Account as AppModelAccount, AccountCategory, AccountType as AppModelAccountType, AppState, MainContext,
     MovementType as AppModelMovementType, TransactionGroup as AppModelTransactionGroup,
@@ -149,14 +148,12 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> 
                     .ok_or(format!(
                         "Account type 'pk={}' not found in main context",
                         account_type.id
-                    ))?
-                    .inner_type_ref()
-                    .clone();
+                    ))?;
                 Ok::<_, String>(AppModelAccount::new(
                     account,
                     account_holder_role,
                     custodian.into(),
-                    account_type,
+                    account_type.clone(),
                 ))
             })
             .collect::<Result<Vec<_>, _>>()?

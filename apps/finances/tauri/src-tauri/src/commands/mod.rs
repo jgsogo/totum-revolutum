@@ -13,34 +13,24 @@ use finances_accounts::fields::MovementDirection;
 use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Fx, Movement};
 use finances_accounts::sql::filters::{accountholder_by_pk, fx_by_pk, movement_filter_account_by_pk};
 use finances_app_models::{
-    google_type, Account as AppModelAccount, AccountContext, AppModel, AppState, Fx as AppModelFx, HolderContext,
-    MainContext, MoneyAmount, Movement as AppModelMovement, MovementDirection as ModelMovementDirection,
+    google_type, Account as AppModelAccount, AccountContext, AppState, Fx as AppModelFx, HolderContext, MainContext,
+    MoneyAmount, Movement as AppModelMovement, MovementDirection as ModelMovementDirection, OutgoingModel,
     Snapshot as AppModelSnapshot,
 };
 use finances_investments::models::SnapshotNumerable;
 use finances_investments::sql::queries::all_snapshotnumerable_for_account_id;
+use prost::Message;
 use tauri::ipc::Response;
 use tauri::State;
 
-trait IntoTauriResponse<R: prost::Message> {
-    fn to_response(&self) -> Response;
-}
-
-impl<T: AppModel<U>, U: prost::Message> IntoTauriResponse<U> for T {
-    fn to_response(&self) -> Response {
-        let encoded = self.inner_type_ref().encode_to_vec();
-        Response::new(encoded)
-    }
-}
-
 #[tauri::command]
 pub async fn get_app_state(state: State<'_, AppState>) -> Result<Response, String> {
-    Ok(state.to_response())
+    Ok(Response::new(state.as_message().encode_to_vec()))
 }
 
 #[tauri::command]
 pub async fn get_main_context(main_context: State<'_, MainContext>) -> Result<Response, String> {
-    Ok(main_context.to_response())
+    Ok(Response::new(main_context.as_message().encode_to_vec()))
 }
 
 #[tauri::command]
@@ -76,7 +66,7 @@ pub async fn get_holder_context(
         accounts
             .into_iter()
             .map(|(account, account_holder_role, custodian, account_type)| {
-                let account_type = main_context.find_account_type(account_type.id).cloned().ok_or(format!(
+                let account_type = main_context.find_account_type(account_type.id).ok_or(format!(
                     "Account type 'pk={}' not found in main context",
                     account_type.id
                 ))?;
@@ -91,7 +81,7 @@ pub async fn get_holder_context(
     };
 
     let context = HolderContext::new(acc_holder, accounts);
-    Ok(context.to_response())
+    Ok(Response::new(context.as_message().encode_to_vec()))
 }
 
 #[tauri::command]
@@ -105,7 +95,7 @@ pub async fn get_account_context(
     let account = {
         let (account, account_holder_role, custodian, account_type) =
             Account::details_for_pk(account_pk, &mut conn).map_err(|e| format!("Error loading account: {e}"))?;
-        let account_type = main_context.find_account_type(account_type.id).cloned().ok_or(format!(
+        let account_type = main_context.find_account_type(account_type.id).ok_or(format!(
             "Account type 'pk={}' not found in main context",
             account_type.id
         ))?;
@@ -190,5 +180,5 @@ pub async fn get_account_context(
     };
 
     let context = AccountContext::new(account, movements, snapshots);
-    Ok(context.to_response())
+    Ok(Response::new(context.as_message().encode_to_vec()))
 }

@@ -1,4 +1,4 @@
-use super::{Account, AppModel, Holder};
+use super::{Account, AppModel, Holder, OutgoingModel};
 use prost::Message;
 pub struct HolderContext(crate::protos::HolderContext);
 
@@ -24,8 +24,10 @@ impl AppModel<crate::protos::HolderContext> for HolderContext {
     fn inner_type(self) -> crate::protos::HolderContext {
         self.0
     }
+}
 
-    fn inner_type_ref(&self) -> &crate::protos::HolderContext {
+impl OutgoingModel for HolderContext {
+    fn as_message(&self) -> &impl Message {
         &self.0
     }
 }

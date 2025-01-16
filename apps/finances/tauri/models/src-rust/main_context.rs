@@ -1,4 +1,4 @@
-use super::{Account, AccountType, AppModel, Holder, MovementType, TransactionGroup};
+use super::{Account, AccountType, AppModel, Holder, MovementType, OutgoingModel, TransactionGroup};
 use prost::Message;
 pub struct MainContext(crate::protos::MainContext);
 
@@ -33,8 +33,9 @@ impl MainContext {
         })
     }
 
-    pub fn find_account_type(&self, pk: i64) -> Option<&crate::protos::AccountType> {
-        self.0.account_types.iter().find(|acc_type| acc_type.pk == pk)
+    pub fn find_account_type(&self, pk: i64) -> Option<AccountType> {
+        let acc_type = self.0.account_types.iter().find(|acc_type| acc_type.pk == pk);
+        acc_type.map(|v| AccountType(v.clone()))
     }
 
     pub fn find_movement_type(&self, pk: i64) -> Option<&crate::protos::MovementType> {
@@ -58,8 +59,10 @@ impl AppModel<crate::protos::MainContext> for MainContext {
     fn inner_type(self) -> crate::protos::MainContext {
         self.0
     }
+}
 
-    fn inner_type_ref(&self) -> &crate::protos::MainContext {
+impl OutgoingModel for MainContext {
+    fn as_message(&self) -> &impl Message {
         &self.0
     }
 }

@@ -37,8 +37,4 @@ impl AppModel<crate::protos::Movement> for Movement {
     fn inner_type(self) -> crate::protos::Movement {
         self.0
     }
-
-    fn inner_type_ref(&self) -> &crate::protos::Movement {
-        &self.0
-    }
 }

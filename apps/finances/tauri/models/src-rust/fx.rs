@@ -22,8 +22,4 @@ impl AppModel<crate::protos::Fx> for Fx {
     fn inner_type(self) -> crate::protos::Fx {
         self.0
     }
-
-    fn inner_type_ref(&self) -> &crate::protos::Fx {
-        &self.0
-    }
 }

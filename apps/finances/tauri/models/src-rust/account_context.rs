@@ -1,4 +1,4 @@
-use super::{Account, AppModel, Movement, Snapshot};
+use super::{Account, AppModel, Movement, OutgoingModel, Snapshot};
 use prost::Message;
 
 #[derive(Debug)]
@@ -27,12 +27,8 @@ impl AccountContext {
     }
 }
 
-impl AppModel<crate::protos::AccountContext> for AccountContext {
-    fn inner_type(self) -> crate::protos::AccountContext {
-        self.0
-    }
-
-    fn inner_type_ref(&self) -> &crate::protos::AccountContext {
+impl OutgoingModel for AccountContext {
+    fn as_message(&self) -> &impl Message {
         &self.0
     }
 }
