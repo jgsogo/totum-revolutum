@@ -1,4 +1,4 @@
-use super::{google_type, AppModel, MoneyAmount};
+use super::{google_type, MoneyAmount};
 
 pub struct Snapshot(pub(crate) crate::protos::Snapshot);
 
@@ -13,11 +13,5 @@ impl Snapshot {
 
     pub fn pk(&self) -> i64 {
         self.0.pk
-    }
-}
-
-impl AppModel<crate::protos::Snapshot> for Snapshot {
-    fn inner_type(self) -> crate::protos::Snapshot {
-        self.0
     }
 }

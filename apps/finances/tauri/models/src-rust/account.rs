@@ -1,6 +1,6 @@
-use super::{google_type, AccountType, AppModel, Custodian};
+use super::{google_type, AccountType, Custodian};
 
-pub struct Account(crate::protos::Account);
+pub struct Account(pub(crate) crate::protos::Account);
 
 impl Account {
     pub fn new(
@@ -14,8 +14,8 @@ impl Account {
         Self(crate::protos::Account {
             pk: account.id,
             name: account.name,
-            custodian: Some(custodian.inner_type()),
-            r#type: Some(account_type.inner_type()),
+            custodian: Some(custodian.0),
+            r#type: Some(account_type.0),
             currency_code: account.ccy,
             identifier: account.identifier,
             description: account.description,
@@ -33,11 +33,5 @@ impl Account {
     }
     pub fn ccy(&self) -> &str {
         &self.0.currency_code
-    }
-}
-
-impl AppModel<crate::protos::Account> for Account {
-    fn inner_type(self) -> crate::protos::Account {
-        self.0
     }
 }

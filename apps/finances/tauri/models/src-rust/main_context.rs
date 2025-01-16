@@ -1,4 +1,4 @@
-use super::{Account, AccountType, AppModel, Holder, MovementType, OutgoingModel, TransactionGroup};
+use super::{Account, AccountType, Holder, MovementType, OutgoingModel, TransactionGroup};
 use prost::Message;
 pub struct MainContext(crate::protos::MainContext);
 
@@ -23,13 +23,13 @@ impl MainContext {
                 .into_iter()
                 .map(|v| {
                     let holder: Holder = v.into();
-                    holder.inner_type()
+                    holder.0
                 })
                 .collect(),
-            account_types: account_types.into_iter().map(|v| v.inner_type()).collect(),
-            movement_types: movement_types.into_iter().map(|v| v.inner_type()).collect(),
-            accounts: accounts.into_iter().map(|v| v.inner_type()).collect(),
-            transaction_groups: transaction_groups.into_iter().map(|v| v.inner_type()).collect(),
+            account_types: account_types.into_iter().map(|v| v.0).collect(),
+            movement_types: movement_types.into_iter().map(|v| v.0).collect(),
+            accounts: accounts.into_iter().map(|v| v.0).collect(),
+            transaction_groups: transaction_groups.into_iter().map(|v| v.0).collect(),
         })
     }
 
@@ -52,12 +52,6 @@ impl MainContext {
             .iter()
             .find(|mov_type| mov_type.name == name)
             .map(|v| MovementType(v.clone()))
-    }
-}
-
-impl AppModel<crate::protos::MainContext> for MainContext {
-    fn inner_type(self) -> crate::protos::MainContext {
-        self.0
     }
 }
 

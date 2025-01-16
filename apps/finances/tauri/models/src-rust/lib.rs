@@ -33,7 +33,3 @@ pub use new_snapshot::NewSnapshot;
 pub use snapshot::Snapshot;
 pub use traits::{IncomingModel, OutgoingModel};
 pub use transaction_group::TransactionGroup;
-
-trait AppModel<T: prost::Message> {
-    fn inner_type(self) -> T;
-}

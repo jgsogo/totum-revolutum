@@ -1,6 +1,6 @@
-use super::{google_type, AppModel, Fx, MoneyAmount};
+use super::{google_type, Fx, MoneyAmount};
 
-pub struct Movement(crate::protos::Movement);
+pub struct Movement(pub(crate) crate::protos::Movement);
 
 pub enum MovementDirection {
     In,
@@ -28,13 +28,7 @@ impl Movement {
             r#type: Some(r#type),
             direction: direction.into(),
             amount: Some(amount.into()),
-            fx: fx.map(|v| v.inner_type()),
+            fx: fx.map(|v| v.0),
         })
-    }
-}
-
-impl AppModel<crate::protos::Movement> for Movement {
-    fn inner_type(self) -> crate::protos::Movement {
-        self.0
     }
 }

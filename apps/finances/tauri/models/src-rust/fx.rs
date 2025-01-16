@@ -1,6 +1,6 @@
-use super::{google_type, AppModel};
+use super::google_type;
 
-pub struct Fx(crate::protos::Fx);
+pub struct Fx(pub(crate) crate::protos::Fx);
 
 impl Fx {
     pub fn new(
@@ -15,11 +15,5 @@ impl Fx {
             local_code,
             fx: Some(fx.into()),
         })
-    }
-}
-
-impl AppModel<crate::protos::Fx> for Fx {
-    fn inner_type(self) -> crate::protos::Fx {
-        self.0
     }
 }

@@ -1,4 +1,4 @@
-use super::{Account, AppModel, Holder, OutgoingModel};
+use super::{Account, Holder, OutgoingModel};
 use prost::Message;
 pub struct HolderContext(crate::protos::HolderContext);
 
@@ -14,15 +14,9 @@ impl HolderContext {
     pub fn new(holder: finances_accounts::models::AccountHolder, accounts: Vec<Account>) -> Self {
         let holder: Holder = holder.into();
         Self(crate::protos::HolderContext {
-            holder: Some(holder.inner_type()),
-            accounts: accounts.into_iter().map(|v| v.inner_type()).collect(),
+            holder: Some(holder.0),
+            accounts: accounts.into_iter().map(|v| v.0).collect(),
         })
-    }
-}
-
-impl AppModel<crate::protos::HolderContext> for HolderContext {
-    fn inner_type(self) -> crate::protos::HolderContext {
-        self.0
     }
 }
 

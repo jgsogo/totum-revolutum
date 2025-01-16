@@ -1,4 +1,4 @@
-use super::{Account, AppModel, Movement, OutgoingModel, Snapshot};
+use super::{Account, Movement, OutgoingModel, Snapshot};
 use prost::Message;
 
 #[derive(Debug)]
@@ -16,9 +16,9 @@ impl TryFrom<Vec<u8>> for AccountContext {
 impl AccountContext {
     pub fn new(account: Account, movements: Vec<Movement>, snapshots: Vec<Snapshot>) -> Self {
         Self(crate::protos::AccountContext {
-            account: Some(account.inner_type()),
-            movements: movements.into_iter().map(|v| v.inner_type()).collect(),
-            snapshots: snapshots.into_iter().map(|v| v.inner_type()).collect(),
+            account: Some(account.0),
+            movements: movements.into_iter().map(|v| v.0).collect(),
+            snapshots: snapshots.into_iter().map(|v| v.0).collect(),
         })
     }
 

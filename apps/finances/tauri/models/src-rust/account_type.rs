@@ -1,5 +1,3 @@
-use super::AppModel;
-
 pub enum AccountCategory {
     Other,
     Savings,
@@ -57,11 +55,5 @@ impl AccountType {
 
     pub fn pk(&self) -> i64 {
         self.0.pk
-    }
-}
-
-impl AppModel<crate::protos::AccountType> for AccountType {
-    fn inner_type(self) -> crate::protos::AccountType {
-        self.0
     }
 }
