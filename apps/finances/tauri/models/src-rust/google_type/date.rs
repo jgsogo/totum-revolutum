@@ -20,12 +20,12 @@ impl From<NaiveDate> for Date {
     }
 }
 
-impl Into<NaiveDate> for Date {
-    fn into(self) -> NaiveDate {
-        NaiveDate::from_ymd_opt(self.0.year, self.0.month as u32, self.0.day as u32).unwrap_or_else(|| {
+impl From<Date> for NaiveDate {
+    fn from(val: Date) -> Self {
+        NaiveDate::from_ymd_opt(val.0.year, val.0.month as u32, val.0.day as u32).unwrap_or_else(|| {
             panic!(
                 "Failed to convert to NaiveDate: {}/{}/{}",
-                self.0.year, self.0.month, self.0.day
+                val.0.year, val.0.month, val.0.day
             )
         })
     }

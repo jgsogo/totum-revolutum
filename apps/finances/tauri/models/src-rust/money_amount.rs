@@ -20,8 +20,8 @@ impl MoneyAmount {
     }
 }
 
-impl Into<crate::protos::MoneyAmount> for MoneyAmount {
-    fn into(self) -> crate::protos::MoneyAmount {
-        self.0
+impl From<MoneyAmount> for crate::protos::MoneyAmount {
+    fn from(val: MoneyAmount) -> Self {
+        val.0
     }
 }

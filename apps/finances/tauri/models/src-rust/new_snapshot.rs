@@ -30,8 +30,8 @@ impl NewSnapshot {
             NewSnapshotAmount::Numerable(NewNumerableAmount { quantity, unit_value }) => {
                 let new_snapshot_numerable = NewSnapshotNumerableDb {
                     new_snapshot: &new_snapshot,
-                    quantity: &quantity,
-                    unit_value: &unit_value,
+                    quantity,
+                    unit_value,
                 };
                 new_snapshot_numerable.insert_into_db(conn)
             }

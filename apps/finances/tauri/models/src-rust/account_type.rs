@@ -5,9 +5,9 @@ pub enum AccountCategory {
     Retirement,
 }
 
-impl Into<crate::protos::AccountCategory> for AccountCategory {
-    fn into(self) -> crate::protos::AccountCategory {
-        match self {
+impl From<AccountCategory> for crate::protos::AccountCategory {
+    fn from(val: AccountCategory) -> Self {
+        match val {
             AccountCategory::Other => crate::protos::AccountCategory::Other,
             AccountCategory::Savings => crate::protos::AccountCategory::Savings,
             AccountCategory::Investment => crate::protos::AccountCategory::Investment,
@@ -16,14 +16,12 @@ impl Into<crate::protos::AccountCategory> for AccountCategory {
     }
 }
 
-const SAVINGS_UNIQUE_NAMES: &'static [&'static str] =
-    &[finances_accounts::constants::accounttype::ASSETS_CURRENT_SAVINGS];
-const INVESTMENT_UNIQUE_NAMES: &'static [&'static str] = &[
+const SAVINGS_UNIQUE_NAMES: &[&str] = &[finances_accounts::constants::accounttype::ASSETS_CURRENT_SAVINGS];
+const INVESTMENT_UNIQUE_NAMES: &[&str] = &[
     finances_investments::constants::accounttype::ASSETS_CURRENT_INVESTMENT,
     finances_investments::constants::accounttype::ASSETS_NON_CURRENT_REAL_STATE,
 ];
-const RETIREMENT_UNIQUE_NAMES: &'static [&'static str] =
-    &[finances_investments::constants::accounttype::ASSETS_NON_CURRENT_RETIREMENT];
+const RETIREMENT_UNIQUE_NAMES: &[&str] = &[finances_investments::constants::accounttype::ASSETS_NON_CURRENT_RETIREMENT];
 
 impl AccountCategory {
     pub fn savings_accounttypes() -> &'static [&'static str] {
@@ -48,7 +46,7 @@ impl AccountType {
         Self(crate::protos::AccountType {
             pk,
             name,
-            breadcrumb: breadcrumb.unwrap_or(Vec::default()),
+            breadcrumb: breadcrumb.unwrap_or_default(),
             category: category.into(),
         })
     }

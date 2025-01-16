@@ -5,7 +5,7 @@ impl MovementType {
         Self(crate::protos::MovementType {
             pk,
             name,
-            breadcrumb: breadcrumb.unwrap_or(Vec::default()),
+            breadcrumb: breadcrumb.unwrap_or_default(),
         })
     }
 
