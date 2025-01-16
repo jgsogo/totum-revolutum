@@ -62,6 +62,7 @@ ts_project(
     visibility = ["//visibility:public"],
     deps = [
         ":node_modules/@types/node",
+        ":node_modules/buffer",
         ":node_modules/decimal.js",
         "//apps/finances/tauri/models/protos:protos_ts",
         "//libraries/googleapis:googleapis/ts",

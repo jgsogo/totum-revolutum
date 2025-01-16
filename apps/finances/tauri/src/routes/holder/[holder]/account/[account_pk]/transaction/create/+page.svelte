@@ -53,7 +53,7 @@
   let show_individual_dates = $derived(!show_transaction_date);
 
   // Form validation and submit
-  let submit_disabled = $derived(!transaction.is_valid(show_transaction_date, app_state.baseCcy));
+  let submit_disabled = $derived(!transaction.is_valid(show_transaction_date, app_state.base_ccy()));
 
   $effect(() => {
     transaction.set_date(common_date);
@@ -61,7 +61,7 @@
 
   const submit = async (e: MouseEvent) => {
     e.preventDefault();
-    if (transaction.is_valid(show_transaction_date, app_state.baseCcy)) {
+    if (transaction.is_valid(show_transaction_date, app_state.base_ccy())) {
       await create_transaction(transaction);
       // TODO: Show error when it fails
       await goToAccountDetail(holder_context.holder(), account_context.account());
@@ -77,7 +77,7 @@
   <div class="mt-px space-y-4">
     <Card
       size="xl"
-      class="mt-6 {transaction.is_valid(show_transaction_date, app_state.baseCcy) ? '' : card_error_style}"
+      class="mt-6 {transaction.is_valid(show_transaction_date, app_state.base_ccy()) ? '' : card_error_style}"
     >
       <TransactionForm
         bind:transaction
@@ -102,10 +102,10 @@
         </Heading>
 
         {#each transaction.movements_from as mov, i}
-          <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.baseCcy) ? '' : card_error_style}">
+          <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}">
             <MovementForm
               bind:new_movement={transaction.movements_from[i]}
-              base_ccy={app_state.baseCcy}
+              base_ccy={app_state.base_ccy()}
               show_date={show_individual_dates}
               all_accounts={main_context.accounts()}
               all_movementtypes={main_context.movement_types()}
@@ -134,10 +134,10 @@
           </div>
         </Heading>
         {#each transaction.movements_to as mov, i}
-          <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.baseCcy) ? '' : card_error_style}">
+          <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}">
             <MovementForm
               bind:new_movement={transaction.movements_to[i]}
-              base_ccy={app_state.baseCcy}
+              base_ccy={app_state.base_ccy()}
               show_date={show_individual_dates}
               all_accounts={main_context.accounts()}
               all_movementtypes={main_context.movement_types()}
@@ -166,17 +166,17 @@
           Cannot create empty transactions.
         </Alert>
       {/if}
-      {#if transaction.total_from(app_state.baseCcy) != transaction.total_to(app_state.baseCcy)}
+      {#if transaction.total_from(app_state.base_ccy()) != transaction.total_to(app_state.base_ccy())}
         <Alert class="mb-6">
           <InfoCircleSolid slot="icon" class="w-5 h-5" />
           <span class="font-medium">Source and target mismatch!</span>
-          Source total is EUR {transaction.total_from(app_state.baseCcy)} while target total is EUR {transaction.total_to(
-            app_state.baseCcy
+          Source total is EUR {transaction.total_from(app_state.base_ccy())} while target total is EUR {transaction.total_to(
+            app_state.base_ccy()
           )}.
         </Alert>
       {/if}
       <Button onclick={submit} disabled={submit_disabled}>
-        Submit (Total: {transaction.total_from(app_state.baseCcy)} EUR)
+        Submit (Total: {transaction.total_from(app_state.base_ccy())} EUR)
       </Button>
     </Card>
   </div>

@@ -19,18 +19,17 @@ use finances_app_models::{
 };
 use finances_investments::models::SnapshotNumerable;
 use finances_investments::sql::queries::all_snapshotnumerable_for_account_id;
-use prost::Message;
 use tauri::ipc::Response;
 use tauri::State;
 
 #[tauri::command]
 pub async fn get_app_state(state: State<'_, AppState>) -> Result<Response, String> {
-    Ok(Response::new(state.as_message().encode_to_vec()))
+    Ok(Response::new(state.encode_to_vec()))
 }
 
 #[tauri::command]
 pub async fn get_main_context(main_context: State<'_, MainContext>) -> Result<Response, String> {
-    Ok(Response::new(main_context.as_message().encode_to_vec()))
+    Ok(Response::new(main_context.encode_to_vec()))
 }
 
 #[tauri::command]
@@ -81,7 +80,7 @@ pub async fn get_holder_context(
     };
 
     let context = HolderContext::new(acc_holder, accounts);
-    Ok(Response::new(context.as_message().encode_to_vec()))
+    Ok(Response::new(context.encode_to_vec()))
 }
 
 #[tauri::command]
@@ -180,5 +179,5 @@ pub async fn get_account_context(
     };
 
     let context = AccountContext::new(account, movements, snapshots);
-    Ok(Response::new(context.as_message().encode_to_vec()))
+    Ok(Response::new(context.encode_to_vec()))
 }

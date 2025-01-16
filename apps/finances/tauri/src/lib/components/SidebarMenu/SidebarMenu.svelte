@@ -29,7 +29,7 @@
     },
     {
       label: "Admin interface",
-      href: `${app_state.baseUrl}/admin`,
+      href: `${app_state.base_url()}/admin`,
       icon: ColumnSolid,
     },
   ];

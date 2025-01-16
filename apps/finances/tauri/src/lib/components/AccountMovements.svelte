@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Card, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
-  import { Account, Snapshot, Movement } from "../../../models/src-js";
+  import { Snapshot, Movement } from "../../../models/src-js";
 
   let {
     snapshots,

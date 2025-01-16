@@ -48,7 +48,7 @@ impl AppState {
 }
 
 impl OutgoingModel for AppState {
-    fn as_message(&self) -> &impl Message {
-        &self.0
+    fn encode_to_vec(&self) -> Vec<u8> {
+        self.0.encode_to_vec()
     }
 }

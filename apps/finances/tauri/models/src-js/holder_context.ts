@@ -1,8 +1,10 @@
-import { HolderContext as HolderContextProto } from "../protos/holder_context_pb.js";
+import { HolderContext as HolderContextProto, HolderContextSchema } from "../protos/holder_context_pb.js";
 import { Account as AccountProto, AccountCategory } from "../protos/account_pb.js";
 import { Account } from "./account.js";
 import { Holder } from "../protos/holder_pb.js";
-
+import { Buffer } from 'buffer';
+import { fromBinary } from "@bufbuild/protobuf";
+import { IncomingMessageConstructor, staticImplements } from "./message.js";
 export class HolderContext {
     private readonly holder_context: HolderContextProto;
     private readonly _accounts: Account[];
@@ -10,6 +12,11 @@ export class HolderContext {
     constructor(holder_context: HolderContextProto) {
         this.holder_context = holder_context;
         this._accounts = this.holder_context.accounts.map((value: AccountProto) => new Account(value))
+    }
+
+    static create_from(data: ArrayBuffer): HolderContext {
+        const context: HolderContextProto = fromBinary(HolderContextSchema, Buffer.from(data, 0, data.byteLength));
+        return new HolderContext(context);
     }
 
     holder(): Holder {
@@ -52,3 +59,4 @@ export class HolderContext {
         }, new Map<number, Account[]>())
     }
 }
+staticImplements<IncomingMessageConstructor<HolderContext>>(HolderContext);

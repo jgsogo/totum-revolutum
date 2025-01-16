@@ -31,7 +31,6 @@ js_run_devserver(
         # Build deps
         ":node_modules",  # TODO: Use //:node_modules instead
         "//apps/finances/tauri/models:models/ts",
-        "//apps/finances/tauri/models/protos:protos_ts",
 
         # Sources
         ":src",

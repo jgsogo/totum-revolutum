@@ -8,6 +8,7 @@ import { Money } from "../../../../../libraries/googleapis/src-js/money.js";
 import { Decimal } from "decimal.js";
 import { DecimalSchema, Decimal as DecimalProto } from "../../../../../libraries/googleapis/protos/google/type/decimal_pb.js";
 import { Date as DateProto, DateSchema } from "../../../../../libraries/googleapis/protos/google/type/date_pb.js";
+import { OutgoingMessage } from "./message.js";
 
 export class Snapshot {
     private readonly snapshot: SnapshotProto;
@@ -30,10 +31,11 @@ export class Snapshot {
 }
 
 
-export class NewSnapshot {
+export class NewSnapshot extends OutgoingMessage {
     private data: NewSnapshotProto;
 
     constructor() {
+        super();
         this.data = create(NewSnapshotSchema, {});
     }
 
