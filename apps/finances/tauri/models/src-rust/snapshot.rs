@@ -6,8 +6,8 @@ impl Snapshot {
     pub fn new(pk: i64, date_value: google_type::Date, amount: MoneyAmount) -> Self {
         Self(crate::protos::Snapshot {
             pk,
-            date_value: Some(date_value.into()),
-            amount: Some(amount.into()),
+            date_value: Some(date_value.0),
+            amount: Some(amount.0),
         })
     }
 

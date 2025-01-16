@@ -19,7 +19,7 @@ impl Account {
             currency_code: account.ccy,
             identifier: account.identifier,
             description: account.description,
-            open: Some(open_date.into()),
+            open: Some(open_date.0),
             holder_owns_money: account_holder_role.owns_money,
             is_numerable: account.is_numerable,
         })

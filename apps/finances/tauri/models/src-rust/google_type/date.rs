@@ -4,16 +4,16 @@ use chrono::{Datelike, NaiveDate};
 
 pub struct Date(pub(crate) crate::protos::google::r#type::Date);
 
-impl Into<crate::protos::google::r#type::Date> for Date {
-    fn into(self) -> crate::protos::google::r#type::Date {
-        self.0
+impl From<crate::protos::google::r#type::Date> for Date {
+    fn from(v: crate::protos::google::r#type::Date) -> Self {
+        Self(v)
     }
 }
 
 impl From<NaiveDate> for Date {
     fn from(value: NaiveDate) -> Self {
         Self(crate::protos::google::r#type::Date {
-            year: value.year() as i32,
+            year: value.year(),
             month: value.month() as i32,
             day: value.day() as i32,
         })
@@ -22,10 +22,12 @@ impl From<NaiveDate> for Date {
 
 impl Into<NaiveDate> for Date {
     fn into(self) -> NaiveDate {
-        NaiveDate::from_ymd_opt(self.0.year, self.0.month as u32, self.0.day as u32).expect(&format!(
-            "Failed to convert to NaiveDate: {}/{}/{}",
-            self.0.year, self.0.month, self.0.day
-        ))
+        NaiveDate::from_ymd_opt(self.0.year, self.0.month as u32, self.0.day as u32).unwrap_or_else(|| {
+            panic!(
+                "Failed to convert to NaiveDate: {}/{}/{}",
+                self.0.year, self.0.month, self.0.day
+            )
+        })
     }
 }
 

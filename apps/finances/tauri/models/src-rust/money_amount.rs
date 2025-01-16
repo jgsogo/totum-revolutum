@@ -1,6 +1,6 @@
 use super::google_type;
 
-pub struct MoneyAmount(crate::protos::MoneyAmount);
+pub struct MoneyAmount(pub(crate) crate::protos::MoneyAmount);
 
 impl MoneyAmount {
     pub fn new_non_numerable(amount: google_type::Money) -> Self {

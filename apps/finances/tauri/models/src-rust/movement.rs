@@ -23,11 +23,11 @@ impl Movement {
         };
         Self(crate::protos::Movement {
             pk,
-            date_value: Some(date_value.into()),
+            date_value: Some(date_value.0),
             transaction_pk,
             r#type: Some(r#type),
             direction: direction.into(),
-            amount: Some(amount.into()),
+            amount: Some(amount.0),
             fx: fx.map(|v| v.0),
         })
     }

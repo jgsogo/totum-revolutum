@@ -10,10 +10,10 @@ impl Fx {
         fx: google_type::Decimal,
     ) -> Self {
         Self(crate::protos::Fx {
-            date_value: Some(date_value.into()),
+            date_value: Some(date_value.0),
             foreign_code,
             local_code,
-            fx: Some(fx.into()),
+            fx: Some(fx.0),
         })
     }
 }
