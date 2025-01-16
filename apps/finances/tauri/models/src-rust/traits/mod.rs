@@ -4,6 +4,3 @@ use prost::Message;
 pub trait OutgoingModel {
     fn as_message(&self) -> &impl Message;
 }
-
-// Represents a model that arrives as protobuf
-pub trait IncomingModel: TryFrom<Vec<u8>> {}

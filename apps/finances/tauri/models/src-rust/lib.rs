@@ -31,5 +31,5 @@ pub use movement::{Movement, MovementDirection};
 pub use movement_type::MovementType;
 pub use new_snapshot::NewSnapshot;
 pub use snapshot::Snapshot;
-pub use traits::{IncomingModel, OutgoingModel};
+pub use traits::OutgoingModel;
 pub use transaction_group::TransactionGroup;
