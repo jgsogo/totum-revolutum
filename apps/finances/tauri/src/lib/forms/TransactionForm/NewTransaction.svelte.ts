@@ -1,7 +1,7 @@
 import type { TransactionGroup } from "../../../../models/src-js";
 
 import { NewMovement, NewMovementType } from "../MovementForm/NewMovement.svelte";
-import { Account } from "../../../../models/src-js";
+import { Account, NewTransaction as NewTransactionModel } from "../../../../models/src-js";
 
 export class NewTransaction {
     name?: string = $state();
@@ -81,14 +81,10 @@ export class NewTransaction {
         this.movements_to.forEach((value) => value.date_value = date);
     }
 
-    toJSON() {
-        // This serialization is used when sending this structure via a command to the Tauri backend
-        return {
-            name: this.name,
-            description: this.description,
-            transaction_group_pk: this.transaction_group?.pk,
-            movements_from: this.movements_from.map((mov) => mov.toJSON()),
-            movements_to: this.movements_to.map((mov) => mov.toJSON()),
-        };
+    toMessage(): NewTransactionModel {
+        let data: NewTransactionModel = new NewTransactionModel(this.name!, this.description, this.transaction_group);
+        this.movements_from.forEach((v) => data.pushFromMovement(v.toMessage()));
+        this.movements_to.forEach((v) => data.pushToMovement(v.toMessage()));
+        return data;
     }
 };

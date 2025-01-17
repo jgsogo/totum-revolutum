@@ -9,11 +9,12 @@ export { HolderContext } from './holder_context.js';
 export { Account } from './account.js';
 export { AccountContext as AccountContextProto, AccountContextSchema } from '../protos/account_context_pb.js';
 export { Snapshot } from './snapshot.js';
-export { Movement } from './movement.js';
+export { Movement, NewMovement } from './movement.js';
 export { AccountContext } from './account_context.js';
 export { MoneyAmount } from './money_amount.js';
 export { MainContext } from './main_context.js';
 export { TransactionGroup } from "../protos/transaction_pb.js";
 export { MovementType } from './movement_type.js';
+export { NewTransaction } from './transaction.js';
 
 export { OutgoingMessage } from './message.js';

@@ -4,6 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import type { Message } from "@bufbuild/protobuf";
+import type { NewMovement } from "./movement_pb.js";
 
 /**
  * Describes the file apps/finances/tauri/models/protos/transaction.proto.
@@ -35,4 +36,40 @@ export declare type TransactionGroup = Message<"finances_app_models.TransactionG
  * Use `create(TransactionGroupSchema)` to create a new message.
  */
 export declare const TransactionGroupSchema: GenMessage<TransactionGroup>;
+
+/**
+ * @generated from message finances_app_models.NewTransaction
+ */
+export declare type NewTransaction = Message<"finances_app_models.NewTransaction"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: optional string description = 2;
+   */
+  description?: string;
+
+  /**
+   * @generated from field: optional int64 transaction_group_pk = 3;
+   */
+  transactionGroupPk?: bigint;
+
+  /**
+   * @generated from field: repeated finances_app_models.NewMovement movements_from = 4;
+   */
+  movementsFrom: NewMovement[];
+
+  /**
+   * @generated from field: repeated finances_app_models.NewMovement movements_to = 5;
+   */
+  movementsTo: NewMovement[];
+};
+
+/**
+ * Describes the message finances_app_models.NewTransaction.
+ * Use `create(NewTransactionSchema)` to create a new message.
+ */
+export declare const NewTransactionSchema: GenMessage<NewTransaction>;
 

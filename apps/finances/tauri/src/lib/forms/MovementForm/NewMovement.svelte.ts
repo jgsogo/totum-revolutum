@@ -1,5 +1,6 @@
 import { toFixedNumber } from "$lib/utils";
-import { Account, MovementType, Snapshot } from "../../../../models/src-js";
+import { Account, MovementType, Snapshot, NewMovement as NewMovementModel } from "../../../../models/src-js";
+
 
 export enum NewMovementType {
     NonNumerable,
@@ -75,22 +76,20 @@ export class NewMovement {
         return toFixedNumber(total, 4);
     }
 
-    toJSON() {
-        // This serialization is used when sending this structure via a command to the Tauri backend
-        return {
-            account_pk: this.account?.pk(),
-            movement_type_pk: this.mov_type?.pk(),
-            date_value:  this.date_value?.toISOString().slice(0, 10),
-            fx: this.fx,
-            type: NewMovementType[this.type],
-            // non-numerable
-            amount: this.amount,
-            // numerable
-            quantity: this.quantity,
-            unit_value: this.unit_value,
-            // dividend
-            ex_dividend_date: this.ex_dividend_date?.toISOString().slice(0, 10),
-            ex_dividend_snapshot_pk: this.ex_dividend_snapshot?.pk(),
-        };
+
+    toMessage(): NewMovementModel {
+        let data: NewMovementModel = new NewMovementModel(this.account!, this.mov_type!, this.date_value!);
+        switch (this.type) {
+            case NewMovementType.NonNumerable:
+                data.setNonNumerableAmount(this.amount!);
+                break;
+            case NewMovementType.Numerable:
+                data.setNumerableAmount(this.quantity!, this.unit_value!);
+                break;
+            case NewMovementType.Dividend:
+                data.setDividendAmount(this.unit_value!, this.ex_dividend_date!, this.ex_dividend_snapshot!)
+                break;
+        }
+        return data;
     }
 };

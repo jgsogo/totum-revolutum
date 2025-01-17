@@ -2,7 +2,7 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use tauri::Manager;
 pub mod commands;
 pub mod db;
-pub mod models;
+
 mod types;
 mod views;
 use crate::types::ConnectionType;

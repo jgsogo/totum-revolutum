@@ -4,7 +4,7 @@ package finances_app_models;
 import "libraries/googleapis/protos/google/type/date.proto";
 import "apps/finances/tauri/models/protos/money_amount.proto";
 import "apps/finances/tauri/models/protos/fx.proto";
-
+import "libraries/googleapis/protos/google/type/money.proto";
 
 message MovementType {
     int64 pk = 1;
@@ -28,4 +28,26 @@ message Movement {
 
     MoneyAmount amount = 6;
     Fx fx = 7;
+}
+
+
+message NewMovement {
+    int64 account_pk = 1;
+    int64 movement_type_pk = 2;
+    google.type.Date date_value = 3;
+    Fx fx = 4;
+
+    message DividendAmount {
+        google.type.Date ex_dividend_date = 1;
+        int64 ex_dividend_snapshot_pk = 2;
+
+        // Payout per share (and quantity from the snapshot)
+        MoneyAmount.Numerable payout = 3;
+    }
+
+    oneof amount {
+        MoneyAmount.NonNumerable non_numerable = 5;
+        MoneyAmount.Numerable numerable = 6;
+        DividendAmount dividend =7;
+    }
 }
