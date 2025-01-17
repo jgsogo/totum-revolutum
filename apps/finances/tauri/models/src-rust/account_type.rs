@@ -5,13 +5,13 @@ pub enum AccountCategory {
     Retirement,
 }
 
-impl From<AccountCategory> for crate::protos::AccountCategory {
+impl From<AccountCategory> for crate::protos::finances_app_models::AccountCategory {
     fn from(val: AccountCategory) -> Self {
         match val {
-            AccountCategory::Other => crate::protos::AccountCategory::Other,
-            AccountCategory::Savings => crate::protos::AccountCategory::Savings,
-            AccountCategory::Investment => crate::protos::AccountCategory::Investment,
-            AccountCategory::Retirement => crate::protos::AccountCategory::Retirement,
+            AccountCategory::Other => crate::protos::finances_app_models::AccountCategory::Other,
+            AccountCategory::Savings => crate::protos::finances_app_models::AccountCategory::Savings,
+            AccountCategory::Investment => crate::protos::finances_app_models::AccountCategory::Investment,
+            AccountCategory::Retirement => crate::protos::finances_app_models::AccountCategory::Retirement,
         }
     }
 }
@@ -38,12 +38,12 @@ impl AccountCategory {
 }
 
 #[derive(Clone)]
-pub struct AccountType(pub(crate) crate::protos::AccountType);
+pub struct AccountType(pub(crate) crate::protos::finances_app_models::AccountType);
 
 impl AccountType {
     pub fn new(pk: i64, name: String, breadcrumb: Option<Vec<String>>, category: AccountCategory) -> Self {
-        let category: crate::protos::AccountCategory = category.into();
-        Self(crate::protos::AccountType {
+        let category: crate::protos::finances_app_models::AccountCategory = category.into();
+        Self(crate::protos::finances_app_models::AccountType {
             pk,
             name,
             breadcrumb: breadcrumb.unwrap_or_default(),

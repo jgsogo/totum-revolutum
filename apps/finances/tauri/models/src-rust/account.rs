@@ -1,6 +1,6 @@
 use super::{google_type, AccountType, Custodian};
 
-pub struct Account(pub(crate) crate::protos::Account);
+pub struct Account(pub(crate) crate::protos::finances_app_models::Account);
 
 impl Account {
     pub fn new(
@@ -11,7 +11,7 @@ impl Account {
     ) -> Self {
         let open_date: google_type::Date = account.open.into();
 
-        Self(crate::protos::Account {
+        Self(crate::protos::finances_app_models::Account {
             pk: account.id,
             name: account.name,
             custodian: Some(custodian.0),

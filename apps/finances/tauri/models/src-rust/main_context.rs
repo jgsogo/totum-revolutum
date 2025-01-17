@@ -1,12 +1,12 @@
 use super::{Account, AccountType, Holder, MovementType, OutgoingModel, TransactionGroup};
 use prost::Message;
-pub struct MainContext(crate::protos::MainContext);
+pub struct MainContext(crate::protos::finances_app_models::MainContext);
 
 impl TryFrom<Vec<u8>> for MainContext {
     type Error = prost::DecodeError;
 
     fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
-        Ok(Self(crate::protos::MainContext::decode(&*v)?))
+        Ok(Self(crate::protos::finances_app_models::MainContext::decode(&*v)?))
     }
 }
 
@@ -18,7 +18,7 @@ impl MainContext {
         accounts: Vec<Account>,
         transaction_groups: Vec<TransactionGroup>,
     ) -> Self {
-        Self(crate::protos::MainContext {
+        Self(crate::protos::finances_app_models::MainContext {
             holders: holders
                 .into_iter()
                 .map(|v| {
@@ -38,11 +38,11 @@ impl MainContext {
         acc_type.map(|v| AccountType(v.clone()))
     }
 
-    pub fn find_movement_type(&self, pk: i64) -> Option<&crate::protos::MovementType> {
+    pub fn find_movement_type(&self, pk: i64) -> Option<&crate::protos::finances_app_models::MovementType> {
         self.0.movement_types.iter().find(|mov_type| mov_type.pk == pk)
     }
 
-    pub fn find_account(&self, pk: i64) -> Option<&crate::protos::Account> {
+    pub fn find_account(&self, pk: i64) -> Option<&crate::protos::finances_app_models::Account> {
         self.0.accounts.iter().find(|acc| acc.pk == pk)
     }
 

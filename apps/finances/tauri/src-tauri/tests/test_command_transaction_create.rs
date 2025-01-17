@@ -2,7 +2,7 @@ use finances_app_lib::models::{NewAmount, NewMovement, NewMovementType, NewTrans
 use serde_json::json;
 
 mod common;
-use common::{call_it, call_it_proto};
+use common::call_command;
 use finances_app_models::{AccountContext, MainContext};
 
 #[test]
@@ -14,16 +14,16 @@ fn test_create_transaction() {
     let movement_type_pk = {
         // Find a MovementType to use later
         let body = json!({});
-        let r = call_it_proto::<MainContext>(&webview, "get_main_context".to_string(), body);
+        let r = call_command(&webview, "get_main_context", body.into());
         assert!(r.is_ok());
-        let main_context = r.unwrap();
+        let main_context: MainContext = r.unwrap().try_into_proto().unwrap();
         main_context.find_movement_type_by_name("Tasas").unwrap().pk()
     };
     let snapshot_latest_pk = {
         let body = json!({"accountPk": account_numerable});
-        let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
+        let r = call_command(&webview, "get_account_context", body.into());
         assert!(r.is_ok());
-        let account_context = r.unwrap();
+        let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
         account_context.snapshots().into_iter().nth(0).unwrap().pk()
     };
 
@@ -84,13 +84,9 @@ fn test_create_transaction() {
         };
 
         let body = serde_json::to_value(transaction).unwrap();
-        let r = call_it::<f32>(
-            &webview,
-            "create_transaction".to_string(),
-            json!({ "transaction": body }),
-        );
+        let r = call_command(&webview, "create_transaction", json!({ "transaction": body }).into());
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-        assert_eq!(r.unwrap(), 120f32);
+        assert_eq!(r.unwrap().try_into_json::<f32>().unwrap(), 120f32);
     }
 
     // Test mismatch amounts
@@ -117,11 +113,7 @@ fn test_create_transaction() {
         };
 
         let body = serde_json::to_value(transaction).unwrap();
-        let r = call_it::<f32>(
-            &webview,
-            "create_transaction".to_string(),
-            json!({ "transaction": body }),
-        );
+        let r = call_command(&webview, "create_transaction", json!({ "transaction": body }).into());
         assert!(r.is_err());
         assert_eq!(r.unwrap_err(), "Mismatched amounts, from 0 != to 100");
     }

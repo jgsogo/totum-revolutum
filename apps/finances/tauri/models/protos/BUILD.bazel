@@ -46,5 +46,8 @@ rust_prost_library(
     name = "protos_rs",
     proto = ":protos",
     # TODO: Wait for https://github.com/bazelbuild/rules_rust/issues/2831, so we can add type_attributes, if not we can go the build.rs way
-    visibility = ["//apps/finances/tauri/models:__subpackages__"],
+    visibility = [
+        "//apps/finances/tauri/models:__subpackages__",
+        "//apps/finances/tauri/src-tauri:__subpackages__",  # Used for testing
+    ],
 )

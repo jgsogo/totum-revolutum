@@ -1,6 +1,6 @@
 use super::{google_type, Fx, MoneyAmount};
 
-pub struct Movement(pub(crate) crate::protos::Movement);
+pub struct Movement(pub(crate) crate::protos::finances_app_models::Movement);
 
 pub enum MovementDirection {
     In,
@@ -12,16 +12,16 @@ impl Movement {
         pk: i64,
         date_value: google_type::Date,
         transaction_pk: i64,
-        r#type: crate::protos::MovementType,
+        r#type: crate::protos::finances_app_models::MovementType,
         direction: MovementDirection,
         amount: MoneyAmount,
         fx: Option<Fx>,
     ) -> Self {
         let direction = match direction {
-            MovementDirection::In => crate::protos::MovementDirection::In,
-            MovementDirection::Out => crate::protos::MovementDirection::Out,
+            MovementDirection::In => crate::protos::finances_app_models::MovementDirection::In,
+            MovementDirection::Out => crate::protos::finances_app_models::MovementDirection::Out,
         };
-        Self(crate::protos::Movement {
+        Self(crate::protos::finances_app_models::Movement {
             pk,
             date_value: Some(date_value.0),
             transaction_pk,

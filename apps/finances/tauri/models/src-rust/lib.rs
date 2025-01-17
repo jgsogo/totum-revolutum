@@ -12,7 +12,7 @@ mod money_amount;
 mod movement;
 mod movement_type;
 mod new_snapshot;
-mod protos;
+pub mod protos;
 mod snapshot;
 mod traits;
 mod transaction_group;
