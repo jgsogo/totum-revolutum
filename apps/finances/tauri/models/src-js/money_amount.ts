@@ -49,5 +49,10 @@ export class MoneyAmount {
         else return undefined;
     }
 
+    amount(): Money | undefined {
+        if (this.money_amount.amount.case == "nonNumerable") return new Money(this.money_amount.amount.value!.amount!);
+        else return undefined;
+    }
+
 
 }

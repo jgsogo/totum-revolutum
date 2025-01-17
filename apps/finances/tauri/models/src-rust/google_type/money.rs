@@ -7,11 +7,11 @@ use bigdecimal::Zero;
 const NANO_EXP: usize = 9;
 const NANO_VALUE: u32 = 1_000_000_000;
 
-pub struct Money(crate::protos::google::r#type::Money);
+pub struct Money(pub(crate) crate::protos::google::r#type::Money);
 
-impl Into<crate::protos::google::r#type::Money> for Money {
-    fn into(self) -> crate::protos::google::r#type::Money {
-        self.0
+impl From<Money> for crate::protos::google::r#type::Money {
+    fn from(val: Money) -> Self {
+        val.0
     }
 }
 
@@ -42,7 +42,7 @@ impl From<(BigDecimal, String)> for Money {
             let idx = digits.len() - scale;
             let integer_part =
                 num_bigint::BigInt::from_radix_be(sign, &digits[0..idx], 10).expect("Radix_be no reversible");
-            let mut fractional_digits = (&digits[idx..]).to_vec();
+            let mut fractional_digits = digits[idx..].to_vec();
             fractional_digits.resize(NANO_EXP, u8::zero());
             let fractional_part =
                 num_bigint::BigInt::from_radix_be(sign, &fractional_digits, 10).expect("Radix_be no reversible");
@@ -61,11 +61,11 @@ impl From<(BigDecimal, String)> for Money {
     }
 }
 
-impl Into<(BigDecimal, String)> for Money {
-    fn into(self) -> (BigDecimal, String) {
-        let ccy = self.0.currency_code;
-        let amount = BigDecimal::from(self.0.units);
-        let fractional = BigDecimal::from(self.0.nanos) / NANO_VALUE;
+impl From<Money> for (BigDecimal, String) {
+    fn from(val: Money) -> Self {
+        let ccy = val.0.currency_code;
+        let amount = BigDecimal::from(val.0.units);
+        let fractional = BigDecimal::from(val.0.nanos) / NANO_VALUE;
         (amount + fractional, ccy)
     }
 }

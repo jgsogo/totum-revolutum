@@ -10,3 +10,10 @@ message Snapshot {
 
     MoneyAmount amount = 3;
 }
+
+message NewSnapshot {
+    int64 account_pk = 1;
+    google.type.Date date_value = 2;
+
+    MoneyAmount amount = 3;
+}

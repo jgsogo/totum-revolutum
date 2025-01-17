@@ -1,6 +1,6 @@
-use super::{google_type, AppModel};
+use super::google_type;
 
-pub struct Fx(crate::protos::Fx);
+pub struct Fx(pub(crate) crate::protos::Fx);
 
 impl Fx {
     pub fn new(
@@ -10,20 +10,10 @@ impl Fx {
         fx: google_type::Decimal,
     ) -> Self {
         Self(crate::protos::Fx {
-            date_value: Some(date_value.into()),
+            date_value: Some(date_value.0),
             foreign_code,
             local_code,
-            fx: Some(fx.into()),
+            fx: Some(fx.0),
         })
-    }
-}
-
-impl AppModel<crate::protos::Fx> for Fx {
-    fn inner_type(self) -> crate::protos::Fx {
-        self.0
-    }
-
-    fn inner_type_ref(&self) -> &crate::protos::Fx {
-        &self.0
     }
 }

@@ -2,27 +2,32 @@ use chrono::{Datelike, NaiveDate};
 
 // FIXME: Move this to //libraries/googleapis and reuse it.
 
-pub struct Date(crate::protos::google::r#type::Date);
+pub struct Date(pub(crate) crate::protos::google::r#type::Date);
 
-impl Into<crate::protos::google::r#type::Date> for Date {
-    fn into(self) -> crate::protos::google::r#type::Date {
-        self.0
+impl From<crate::protos::google::r#type::Date> for Date {
+    fn from(v: crate::protos::google::r#type::Date) -> Self {
+        Self(v)
     }
 }
 
 impl From<NaiveDate> for Date {
     fn from(value: NaiveDate) -> Self {
         Self(crate::protos::google::r#type::Date {
-            year: value.year() as i32,
+            year: value.year(),
             month: value.month() as i32,
             day: value.day() as i32,
         })
     }
 }
 
-impl Into<NaiveDate> for Date {
-    fn into(self) -> NaiveDate {
-        NaiveDate::from_ymd_opt(self.0.year, self.0.month as u32, self.0.day as u32).unwrap()
+impl From<Date> for NaiveDate {
+    fn from(val: Date) -> Self {
+        NaiveDate::from_ymd_opt(val.0.year, val.0.month as u32, val.0.day as u32).unwrap_or_else(|| {
+            panic!(
+                "Failed to convert to NaiveDate: {}/{}/{}",
+                val.0.year, val.0.month, val.0.day
+            )
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-use super::{Account, AccountType, AppModel, Holder, MovementType, TransactionGroup};
+use super::{Account, AccountType, Holder, MovementType, OutgoingModel, TransactionGroup};
 use prost::Message;
 pub struct MainContext(crate::protos::MainContext);
 
@@ -23,18 +23,19 @@ impl MainContext {
                 .into_iter()
                 .map(|v| {
                     let holder: Holder = v.into();
-                    holder.inner_type()
+                    holder.0
                 })
                 .collect(),
-            account_types: account_types.into_iter().map(|v| v.inner_type()).collect(),
-            movement_types: movement_types.into_iter().map(|v| v.inner_type()).collect(),
-            accounts: accounts.into_iter().map(|v| v.inner_type()).collect(),
-            transaction_groups: transaction_groups.into_iter().map(|v| v.inner_type()).collect(),
+            account_types: account_types.into_iter().map(|v| v.0).collect(),
+            movement_types: movement_types.into_iter().map(|v| v.0).collect(),
+            accounts: accounts.into_iter().map(|v| v.0).collect(),
+            transaction_groups: transaction_groups.into_iter().map(|v| v.0).collect(),
         })
     }
 
-    pub fn find_account_type(&self, pk: i64) -> Option<&crate::protos::AccountType> {
-        self.0.account_types.iter().find(|acc_type| acc_type.pk == pk)
+    pub fn find_account_type(&self, pk: i64) -> Option<AccountType> {
+        let acc_type = self.0.account_types.iter().find(|acc_type| acc_type.pk == pk);
+        acc_type.map(|v| AccountType(v.clone()))
     }
 
     pub fn find_movement_type(&self, pk: i64) -> Option<&crate::protos::MovementType> {
@@ -54,12 +55,8 @@ impl MainContext {
     }
 }
 
-impl AppModel<crate::protos::MainContext> for MainContext {
-    fn inner_type(self) -> crate::protos::MainContext {
-        self.0
-    }
-
-    fn inner_type_ref(&self) -> &crate::protos::MainContext {
-        &self.0
+impl OutgoingModel for MainContext {
+    fn encode_to_vec(&self) -> Vec<u8> {
+        self.0.encode_to_vec()
     }
 }

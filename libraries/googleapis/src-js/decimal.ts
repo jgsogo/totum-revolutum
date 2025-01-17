@@ -9,7 +9,10 @@ export class Decimal {
     }
 
     as_number(): number {
-        let value = new DecimalJS(this.decimal.value);
-        return value.toNumber();
+        return this.as_decimal().toNumber();
+    }
+
+    as_decimal(): DecimalJS {
+        return new DecimalJS(this.decimal.value);
     }
 }

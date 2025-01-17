@@ -1,9 +1,10 @@
-use super::{Account, AppModel, Movement, Snapshot};
+use super::{Account, Movement, OutgoingModel, Snapshot};
 use prost::Message;
 
 #[derive(Debug)]
 pub struct AccountContext(crate::protos::AccountContext);
 
+// We only need this for testing (for `call_it_proto`)
 impl TryFrom<Vec<u8>> for AccountContext {
     type Error = prost::DecodeError;
 
@@ -15,9 +16,9 @@ impl TryFrom<Vec<u8>> for AccountContext {
 impl AccountContext {
     pub fn new(account: Account, movements: Vec<Movement>, snapshots: Vec<Snapshot>) -> Self {
         Self(crate::protos::AccountContext {
-            account: Some(account.inner_type()),
-            movements: movements.into_iter().map(|v| v.inner_type()).collect(),
-            snapshots: snapshots.into_iter().map(|v| v.inner_type()).collect(),
+            account: Some(account.0),
+            movements: movements.into_iter().map(|v| v.0).collect(),
+            snapshots: snapshots.into_iter().map(|v| v.0).collect(),
         })
     }
 
@@ -26,12 +27,8 @@ impl AccountContext {
     }
 }
 
-impl AppModel<crate::protos::AccountContext> for AccountContext {
-    fn inner_type(self) -> crate::protos::AccountContext {
-        self.0
-    }
-
-    fn inner_type_ref(&self) -> &crate::protos::AccountContext {
-        &self.0
+impl OutgoingModel for AccountContext {
+    fn encode_to_vec(&self) -> Vec<u8> {
+        self.0.encode_to_vec()
     }
 }

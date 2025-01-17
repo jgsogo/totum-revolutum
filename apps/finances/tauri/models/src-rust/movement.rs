@@ -1,6 +1,6 @@
-use super::{google_type, AppModel, Fx, MoneyAmount};
+use super::{google_type, Fx, MoneyAmount};
 
-pub struct Movement(crate::protos::Movement);
+pub struct Movement(pub(crate) crate::protos::Movement);
 
 pub enum MovementDirection {
     In,
@@ -23,22 +23,12 @@ impl Movement {
         };
         Self(crate::protos::Movement {
             pk,
-            date_value: Some(date_value.into()),
+            date_value: Some(date_value.0),
             transaction_pk,
             r#type: Some(r#type),
             direction: direction.into(),
-            amount: Some(amount.into()),
-            fx: fx.map(|v| v.inner_type()),
+            amount: Some(amount.0),
+            fx: fx.map(|v| v.0),
         })
-    }
-}
-
-impl AppModel<crate::protos::Movement> for Movement {
-    fn inner_type(self) -> crate::protos::Movement {
-        self.0
-    }
-
-    fn inner_type_ref(&self) -> &crate::protos::Movement {
-        &self.0
     }
 }

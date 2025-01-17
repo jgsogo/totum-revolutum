@@ -1,6 +1,6 @@
 use prost::Message;
 
-use crate::AppModel;
+use super::OutgoingModel;
 
 #[derive(Clone)]
 pub struct AppState(crate::protos::AppState);
@@ -47,12 +47,8 @@ impl AppState {
     }
 }
 
-impl AppModel<crate::protos::AppState> for AppState {
-    fn inner_type(self) -> crate::protos::AppState {
-        self.0
-    }
-
-    fn inner_type_ref(&self) -> &crate::protos::AppState {
-        &self.0
+impl OutgoingModel for AppState {
+    fn encode_to_vec(&self) -> Vec<u8> {
+        self.0.encode_to_vec()
     }
 }

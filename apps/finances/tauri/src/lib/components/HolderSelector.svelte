@@ -32,7 +32,7 @@
 
 <button class="ms-3 rounded-full ring-gray-400 focus:ring-4 dark:ring-gray-600">
   {#if active_holder.photo}
-    <Avatar title={active_holder.name} src="{app_state.baseMediaUrl}{active_holder.photo}">{active_holder.name}</Avatar>
+    <Avatar title={active_holder.name} src="{app_state.base_media_url()}{active_holder.photo}">{active_holder.name}</Avatar>
   {:else}
     <Avatar title={active_holder.name}>{initials(active_holder).toUpperCase()}</Avatar>
   {/if}

@@ -27,7 +27,6 @@ bigdecimal = "0.4.7"
 chrono = { version = "0.4.38" }
 chrono-tz = { version = "0.10.0" }
 diesel = { version = "2.2.6", features = ["r2d2", "chrono"] }
-prost = {version = "0.13.4"}
 
 tauri-build = { version = "2.0.3", features = [] } # FIXME: If I don't list it here, Bazel doesn't include it in crate_libraries
 tauri = { version = "2.1.1", features = [] }

@@ -21,7 +21,7 @@ export async function load({ url, parent }) {
     // let all_transaction_groups: TransactionGroup[] = main_context.transaction_groups();
     // let all_accounts: Account[] = main_context.accounts();
     // let all_movementtypes: MovementType[] = main_context.movement_types();
-    // let base_ccy: string = app_state.baseCyy;
+    // let base_ccy: string = app_state.base_ccy();
 
     return { from_account, to_account };
 }

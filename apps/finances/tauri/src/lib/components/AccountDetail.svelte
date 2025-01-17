@@ -34,7 +34,7 @@
   const on_snapshot = async (e: MouseEvent) => {
     e.preventDefault();
     if (newSnapshot.isValid()) {
-      await create_snapshot(newSnapshot);
+      await create_snapshot(newSnapshot.toMessage());
       // TODO: Handle error if it fails to create the snapshot
       await invalidate("invalidate:account"); // FIXME: Only binded properties?
       snapshotModal = false;
