@@ -1,7 +1,7 @@
 use serde_json::json;
 
 mod common;
-use common::call_it_proto;
+use common::call_command;
 use finances_app_models::HolderContext;
 
 #[test]
@@ -10,9 +10,9 @@ fn test_holder_context() {
 
     {
         let body = json!({"holderPk": 0i64});
-        let r = call_it_proto::<HolderContext>(&webview, "get_holder_context".to_string(), body);
+        let r = call_command(&webview, "get_holder_context", body.into());
 
         assert!(r.is_ok());
-        let _holder_context = r.unwrap();
+        let _holder_context: HolderContext = r.unwrap().try_into_proto().unwrap();
     }
 }

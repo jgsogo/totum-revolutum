@@ -3,13 +3,13 @@ use prost::Message;
 use super::OutgoingModel;
 
 #[derive(Clone)]
-pub struct AppState(crate::protos::AppState);
+pub struct AppState(crate::protos::finances_app_models::AppState);
 
 impl TryFrom<Vec<u8>> for AppState {
     type Error = prost::DecodeError;
 
     fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
-        Ok(Self(crate::protos::AppState::decode(&*v)?))
+        Ok(Self(crate::protos::finances_app_models::AppState::decode(&*v)?))
     }
 }
 
@@ -21,12 +21,12 @@ impl AppState {
         static_url: String,
         base_ccy: String,
     ) -> Self {
-        Self(crate::protos::AppState {
+        Self(crate::protos::finances_app_models::AppState {
             base_ccy,
             base_media_url: format!("{}{}", base_url, media_url),
             base_static_url: format!("{}{}", base_url, static_url),
             base_url,
-            db: Some(crate::protos::DatabaseConnection { postgres_url }),
+            db: Some(crate::protos::finances_app_models::DatabaseConnection { postgres_url }),
         })
     }
 

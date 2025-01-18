@@ -62,7 +62,7 @@
   const submit = async (e: MouseEvent) => {
     e.preventDefault();
     if (transaction.is_valid(show_transaction_date, app_state.base_ccy())) {
-      await create_transaction(transaction);
+      await create_transaction(transaction.toMessage());
       // TODO: Show error when it fails
       await goToAccountDetail(holder_context.holder(), account_context.account());
     }

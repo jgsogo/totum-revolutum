@@ -7,7 +7,6 @@ import { MoneyAmount as MoneyAmountProto } from "../protos/money_amount_pb.js"
 import { Money } from "../../../../../libraries/googleapis/src-js/money.js";
 import { Decimal } from "decimal.js";
 import { DecimalSchema, Decimal as DecimalProto } from "../../../../../libraries/googleapis/protos/google/type/decimal_pb.js";
-import { Date as DateProto, DateSchema } from "../../../../../libraries/googleapis/protos/google/type/date_pb.js";
 import { OutgoingMessage } from "./message.js";
 
 export class Snapshot {
@@ -48,9 +47,8 @@ export class NewSnapshot extends OutgoingMessage {
     }
 
     setDate(date: Date) {
-        let month = date.getMonth() + 1; // It's zero based!
-        let day = date.getDate(); // Yes, name is confusing
-        this.data.dateValue = create(DateSchema, {year: date.getFullYear(), month, day}) as DateProto;
+        let dateValue = DateWrapper.create_from_date(date);
+        this.data.dateValue = dateValue.as_proto();
     }
 
     setNonNumerableAmount(ccy: string, amount: number) {

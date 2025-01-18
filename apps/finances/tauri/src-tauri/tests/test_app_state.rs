@@ -1,7 +1,7 @@
 use serde_json::json;
 
 mod common;
-use common::call_it_proto;
+use common::call_command;
 use finances_app_models::AppState;
 
 #[test]
@@ -10,10 +10,10 @@ fn test_app_state() {
 
     {
         let body = json!({});
-        let r = call_it_proto::<AppState>(&webview, "get_app_state".to_string(), body);
+        let r = call_command(&webview, "get_app_state", body.into());
 
         assert!(r.is_ok());
-        let app_state = r.unwrap();
+        let app_state: AppState = r.unwrap().try_into_proto().unwrap();
         assert_eq!(app_state.base_ccy(), "USD");
         assert_eq!(app_state.postgres_url(), "postgres_url");
     }

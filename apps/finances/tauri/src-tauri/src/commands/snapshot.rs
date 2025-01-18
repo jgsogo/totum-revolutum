@@ -19,9 +19,7 @@ pub fn create_snapshot(
         .map_err(|e| format!("Failed to decode data to NewSnapshot: {e}"))?;
 
     let mut conn = pool.get().expect("Get a connection from the Pool");
-    let new_snapshot_pk = new_snapshot
+    new_snapshot
         .insert_into_db(&mut conn)
-        .map_err(|e| format!("Error saving snapshot to db: {e}"))?;
-
-    Ok(new_snapshot_pk)
+        .map_err(|e| format!("Error saving snapshot to db: {e}"))
 }

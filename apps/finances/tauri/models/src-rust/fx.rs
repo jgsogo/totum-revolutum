@@ -1,6 +1,6 @@
 use super::google_type;
 
-pub struct Fx(pub(crate) crate::protos::Fx);
+pub struct Fx(pub(crate) crate::protos::finances_app_models::Fx);
 
 impl Fx {
     pub fn new(
@@ -9,7 +9,7 @@ impl Fx {
         date_value: google_type::Date,
         fx: google_type::Decimal,
     ) -> Self {
-        Self(crate::protos::Fx {
+        Self(crate::protos::finances_app_models::Fx {
             date_value: Some(date_value.0),
             foreign_code,
             local_code,

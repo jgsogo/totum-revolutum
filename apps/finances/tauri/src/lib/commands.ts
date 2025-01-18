@@ -55,9 +55,10 @@ export const create_snapshot = async (snapshot: OutgoingMessage) => {
 
 /**
  * Creates a transaction
- * @param {NewTransaction} transaction - The new transaction to create
+ * @param {NewTransaction} transaction - The new Transaction to create
  * @returns - A promise that resolves when the transaction is created, or the error if it was not possible
  */
-export const create_transaction = async (transaction: NewTransaction) => {
-    await invoke("create_transaction", { transaction: transaction.toJSON() });
+export const create_transaction = async (transaction: OutgoingMessage) => {
+    let data = transaction.toBinary();
+    await invoke("create_transaction", data);
 }

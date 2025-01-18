@@ -1,8 +1,8 @@
-pub struct MovementType(pub(crate) crate::protos::MovementType);
+pub struct MovementType(pub(crate) crate::protos::finances_app_models::MovementType);
 
 impl MovementType {
     pub fn new(pk: i64, name: String, breadcrumb: Option<Vec<String>>) -> Self {
-        Self(crate::protos::MovementType {
+        Self(crate::protos::finances_app_models::MovementType {
             pk,
             name,
             breadcrumb: breadcrumb.unwrap_or_default(),

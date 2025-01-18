@@ -1,7 +1,7 @@
 use serde_json::json;
 
 mod common;
-use common::call_it_proto;
+use common::call_command;
 use finances_app_models::AccountContext;
 
 #[test]
@@ -10,10 +10,10 @@ fn test_holder_context() {
 
     {
         let body = json!({"accountPk": 0i64});
-        let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
+        let r = call_command(&webview, "get_account_context", body.into());
 
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
-        let account_context = r.unwrap();
+        let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
 
         let snapshots = account_context.snapshots();
         assert_eq!(snapshots.len(), 2);

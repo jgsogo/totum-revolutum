@@ -1,90 +1,110 @@
-// use finances_app_lib::models::{NewAmount, NewSnapshot};
-// use finances_app_models::AccountContext;
-// use serde_json::json;
-// mod common;
-// use common::{call_it, call_it_proto};
+use finances_app_models::AccountContext;
+use serde_json::json;
+mod common;
+use common::call_command;
+use finances_app_models::protos::finances_app_models::money_amount::{
+    Amount as AmountProto, NonNumerable as NonNumerableProto, Numerable as NumerableProto,
+};
+use finances_app_models::protos::finances_app_models::{
+    MoneyAmount as MoneyAmountProto, NewSnapshot as NewSnapshotProto,
+};
+use finances_app_models::protos::google::r#type::{Date as DateProto, Decimal as DecimalProto, Money as MoneyProto};
+use prost::Message;
 
-// #[test]
-// fn test_snapshot() {
-//     let webview = common::webview();
+#[test]
+fn test_snapshot() {
+    let webview = common::webview();
 
-//     /****
-//     Non-numerable account
-//     ***/
-//     let account_id = 1i64;
-//     {
-//         let body = json!({"accountPk": account_id});
-//         let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
-//         assert!(r.is_ok());
-//         let account_context = r.unwrap();
-//         assert_eq!(account_context.snapshots().len(), 0);
-//     }
+    /****
+    Non-numerable account
+    ***/
+    let account_id = 1i64;
+    {
+        let body = json!({"accountPk": account_id});
+        let r = call_command(&webview, "get_account_context", body.into());
+        assert!(r.is_ok());
+        let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
+        assert_eq!(account_context.snapshots().len(), 0);
+    }
 
-//     // Snapshot (non-numerable)
-//     {
-//         let body = {
-//             let new_snapshot = NewSnapshot {
-//                 account_pk: account_id,
-//                 date_value: "2024-11-30".to_string(),
-//                 amount: NewAmount {
-//                     amount: Some(100f32),
-//                     quantity: None,
-//                     unit_value: None,
-//                 },
-//             };
-//             json!({
-//                 "snapshot": serde_json::to_value(new_snapshot).unwrap(),
-//             })
-//         };
+    // Snapshot (non-numerable)
+    {
+        let date_proto = DateProto {
+            day: 30,
+            month: 11,
+            year: 2024,
+        };
 
-//         let r = call_it::<usize>(&webview, "create_snapshot".to_string(), body);
-//         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
+        let amount = MoneyAmountProto {
+            amount: Some(AmountProto::NonNumerable(NonNumerableProto {
+                amount: Some(MoneyProto {
+                    currency_code: "USD".to_string(),
+                    units: 100i64,
+                    nanos: 0i32,
+                }),
+            })),
+        };
 
-//         // Now we have one more snapshot
-//         let body = json!({"accountPk": account_id});
-//         let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
-//         assert!(r.is_ok());
-//         let account_context = r.unwrap();
-//         assert_eq!(account_context.snapshots().len(), 1);
-//     }
+        let new_snapshot_proto = NewSnapshotProto {
+            account_pk: account_id,
+            amount: Some(amount),
+            date_value: Some(date_proto),
+        };
+        let r = call_command(&webview, "create_snapshot", new_snapshot_proto.encode_to_vec().into());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
 
-//     /****
-//     Numerable account
-//     ***/
-//     let account_id = 7i64;
-//     {
-//         let body = json!({"accountPk": account_id});
-//         let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
-//         assert!(r.is_ok());
-//         let account_context = r.unwrap();
-//         assert_eq!(account_context.snapshots().len(), 0);
-//     }
+        // Now we have one more snapshot
+        let body = json!({"accountPk": account_id});
+        let r = call_command(&webview, "get_account_context", body.into());
+        assert!(r.is_ok());
+        let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
+        assert_eq!(account_context.snapshots().len(), 1);
+    }
 
-//     // Snapshot (numerable)
-//     {
-//         let body = {
-//             let new_snapshot = NewSnapshot {
-//                 account_pk: account_id,
-//                 date_value: "2024-11-30".to_string(),
-//                 amount: NewAmount {
-//                     amount: None,
-//                     quantity: Some(3f32),
-//                     unit_value: Some(100f32),
-//                 },
-//             };
-//             json!({
-//                 "snapshot": serde_json::to_value(new_snapshot).unwrap(),
-//             })
-//         };
+    /****
+    Numerable account
+    ***/
+    let account_id = 7i64;
+    {
+        let body = json!({"accountPk": account_id});
+        let r = call_command(&webview, "get_account_context", body.into());
+        assert!(r.is_ok());
+        let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
+        assert_eq!(account_context.snapshots().len(), 0);
+    }
 
-//         let r = call_it::<usize>(&webview, "create_snapshot".to_string(), body);
-//         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
+    // Snapshot (numerable)
+    {
+        let date_proto = DateProto {
+            day: 30,
+            month: 11,
+            year: 2024,
+        };
 
-//         // Now we have one more snapshot
-//         let body = json!({"accountPk": account_id});
-//         let r = call_it_proto::<AccountContext>(&webview, "get_account_context".to_string(), body);
-//         assert!(r.is_ok());
-//         let account_context = r.unwrap();
-//         assert_eq!(account_context.snapshots().len(), 1);
-//     }
-// }
+        let amount = MoneyAmountProto {
+            amount: Some(AmountProto::Numerable(NumerableProto {
+                unit_value: Some(MoneyProto {
+                    currency_code: "USD".to_string(),
+                    units: 100i64,
+                    nanos: 0i32,
+                }),
+                quantity: Some(DecimalProto { value: "3".to_string() }),
+            })),
+        };
+
+        let new_snapshot_proto = NewSnapshotProto {
+            account_pk: account_id,
+            amount: Some(amount),
+            date_value: Some(date_proto),
+        };
+        let r = call_command(&webview, "create_snapshot", new_snapshot_proto.encode_to_vec().into());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
+
+        // Now we have one more snapshot
+        let body = json!({"accountPk": account_id});
+        let r = call_command(&webview, "get_account_context", body.into());
+        assert!(r.is_ok());
+        let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
+        assert_eq!(account_context.snapshots().len(), 1);
+    }
+}

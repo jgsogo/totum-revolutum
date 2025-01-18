@@ -49,7 +49,7 @@ enum NewSnapshotAmount {
     NonNumerable(bigdecimal::BigDecimal),
 }
 
-impl TryFrom<crate::protos::money_amount::NonNumerable> for NewSnapshotAmount {
+impl TryFrom<crate::protos::finances_app_models::money_amount::NonNumerable> for NewSnapshotAmount {
     type Error = String;
 
     fn try_from(v: crate::protos::finances_app_models::money_amount::NonNumerable) -> Result<Self, Self::Error> {
@@ -59,7 +59,7 @@ impl TryFrom<crate::protos::money_amount::NonNumerable> for NewSnapshotAmount {
     }
 }
 
-impl TryFrom<crate::protos::money_amount::Numerable> for NewSnapshotAmount {
+impl TryFrom<crate::protos::finances_app_models::money_amount::Numerable> for NewSnapshotAmount {
     type Error = String;
 
     fn try_from(v: crate::protos::finances_app_models::money_amount::Numerable) -> Result<Self, Self::Error> {
@@ -77,7 +77,7 @@ impl TryFrom<Vec<u8>> for NewSnapshot {
     type Error = prost::DecodeError;
 
     fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
-        let proto = crate::protos::NewSnapshot::decode(&*v)?;
+        let proto = crate::protos::finances_app_models::NewSnapshot::decode(&*v)?;
 
         let account_id = proto.account_pk;
         let date_value: chrono::NaiveDate = {
@@ -92,10 +92,10 @@ impl TryFrom<Vec<u8>> for NewSnapshot {
                 .amount
                 .expect("amount is required");
             match amount {
-                crate::protos::money_amount::Amount::NonNumerable(amount) => {
+                crate::protos::finances_app_models::money_amount::Amount::NonNumerable(amount) => {
                     amount.try_into().expect("Every required field should be set")
                 }
-                crate::protos::money_amount::Amount::Numerable(amount) => {
+                crate::protos::finances_app_models::money_amount::Amount::Numerable(amount) => {
                     amount.try_into().expect("Every required field should be set")
                 }
             }

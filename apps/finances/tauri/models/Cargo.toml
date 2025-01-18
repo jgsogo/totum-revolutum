@@ -3,6 +3,7 @@ name = "finances-app-models"
 version = "0.1.0"
 authors = ["you"]
 edition = "2021"
+description = "Provide the adapter between the diesel models coming from the DB and the types that can be sent to the frontend using protobuf as communication protocol"
 
 include = ["**/*.rs", "Cargo.toml", "protos"]
 
@@ -20,10 +21,10 @@ prost-build = { workspace = true }
 prost = { workspace = true }
 prost-types = { workspace = true }
 serde = { workspace = true }
-chrono = { workspace =  true }
-bigdecimal = {workspace = true}
-num-bigint = {workspace = true}
-diesel = {workspace =  true} # FIXME: Do we want diesel responsibilities in this crate?
+chrono = { workspace = true }
+bigdecimal = { workspace = true }
+num-bigint = { workspace = true }
+diesel = { workspace = true }
 
 
 googleapis = { path = "../../../../libraries/googleapis" }
