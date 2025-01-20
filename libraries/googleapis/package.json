@@ -9,7 +9,7 @@
     "@connectrpc/protoc-gen-connect-es": "1.6.1",
     "@types/node": "22.10.5",
     "typescript": "5.7.2",
-    "vitest": "2.1.8"
+    "vitest": "3.0.2"
   },
   "name": "@totum-revolutum/googleapis",
   "private": true,

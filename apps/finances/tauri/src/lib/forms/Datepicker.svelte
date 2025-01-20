@@ -1,15 +1,16 @@
 <script lang="ts">
   import { Datepicker } from "flowbite-svelte";
 
-
   let {
     value = $bindable(),
     required,
     inline = false,
+    locale = "default",
   }: {
-    value: Date | undefined;
+    value: Date | null;
     required: boolean;
     inline?: boolean;
+    locale?: string;
   } = $props();
 
   let dateFormat: Intl.DateTimeFormatOptions = {
@@ -24,4 +25,4 @@
 Just a regular DatePicker with opinionated DateTime formating
 -->
 
-<Datepicker {required} {inline} bind:value {dateFormat} on:apply on:clear on:select/>
+<Datepicker {required} {inline} bind:value {dateFormat} {locale} on:apply on:clear on:select />

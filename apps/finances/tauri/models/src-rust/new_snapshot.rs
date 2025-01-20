@@ -6,6 +6,7 @@ use prost::Message;
 
 use diesel::prelude::*;
 
+#[derive(Debug)]
 pub struct NewSnapshot {
     account_id: i64,
     date_value: chrono::NaiveDate,
@@ -39,11 +40,13 @@ impl NewSnapshot {
     }
 }
 
+#[derive(Debug)]
 struct NewNumerableAmount {
     quantity: bigdecimal::BigDecimal,
     unit_value: bigdecimal::BigDecimal,
 }
 
+#[derive(Debug)]
 enum NewSnapshotAmount {
     Numerable(NewNumerableAmount),
     NonNumerable(bigdecimal::BigDecimal),

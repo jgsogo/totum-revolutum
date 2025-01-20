@@ -5,9 +5,9 @@
   let { account, snapshots }: { account: Account; snapshots: Snapshot[] } = $props();
 
   let dates = snapshots.map((snapshot) => {
-    let x = snapshot.dateValue().as_date().getTime();
+    const date_value = new Date(snapshot.dateValue().year(), snapshot.dateValue().month() - 1, snapshot.dateValue().day());
     let y = snapshot.amount().as_number();
-    return { x, y };
+    return { x: date_value.getTime(), y };
   });
 
   let options = {

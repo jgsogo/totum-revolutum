@@ -14,7 +14,6 @@
   <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Add snapshot for {snapshot.account.name()}</h3>
 
   <Label class="space-y-2">
-    <!-- <span>Date value: {snapshot.date_value.toLocaleDateString()}</span> -->
     <Datepicker required inline bind:value={snapshot.date_value} />
     {#if snapshot.error_date_value}
       <Helper class="mt-2" color="red"><span class="font-medium">Error!</span> {snapshot.error_date_value}</Helper>

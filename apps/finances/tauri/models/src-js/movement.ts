@@ -48,9 +48,8 @@ export class NewMovement {
     private data: NewMovementProto;
     private readonly ccy: string;
 
-    constructor(account: Account, movement_type: MovementType, date_value: Date) {
+    constructor(account: Account, movement_type: MovementType, dateValue: DateWrapper) {
         // TODO: Add FX
-        let dateValue = DateWrapper.create_from_date(date_value);
         this.data = create(NewMovementSchema, { accountPk: BigInt(account.pk()), movementTypePk: BigInt(movement_type.pk()), dateValue: dateValue.as_proto() });
         this.ccy = account.ccy();
     }
@@ -79,16 +78,15 @@ export class NewMovement {
         };
     }
 
-    setDividendAmount(payout: number, ex_dividend_date: Date, ex_dividend_snapshot: Snapshot) {
+    setDividendAmount(payout: number, ex_dividend_date: DateWrapper, ex_dividend_snapshot: Snapshot) {
         let _payout = Money.create_from_number(this.ccy, payout);
         // FIXME: Get the quantity from the `ex_dividend_snapshot`
         let _quantity = create(DecimalSchema, { value: new Decimal(0).toString() }) as DecimalProto;
-        let exDividendDate = DateWrapper.create_from_date(ex_dividend_date);
 
         let numerable_amount: MoneyAmount_Numerable = create(MoneyAmount_NumerableSchema, { unitValue: _payout.innerType(), quantity: _quantity }) as MoneyAmount_Numerable;
 
         let dividend_amount: NewMovement_DividendAmount = create(NewMovement_DividendAmountSchema, {
-            exDividendDate: exDividendDate.as_proto(),
+            exDividendDate: ex_dividend_date.as_proto(),
             exDividendSnapshotPk: BigInt(ex_dividend_snapshot.pk()),
             payout: numerable_amount
         }) as NewMovement_DividendAmount;
