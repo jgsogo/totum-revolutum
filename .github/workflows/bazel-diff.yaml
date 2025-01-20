@@ -82,8 +82,8 @@ jobs:
       - name: Save current-hashes as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: impacted-targets.txt
-          path: ${{ runner.temp }}/impacted-targets.txt
+          name: current-hashes.json
+          path: ${{ runner.temp }}/current-hashes.json
 
       - name: Test impacted targets
         run: |
