@@ -5,6 +5,7 @@
   import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
   import Datepicker from "../Datepicker.svelte";
   import { Account, Snapshot, MovementType } from "../../../../models/src-js";
+  import { DateWrapper, sort_date_wrapper } from "../../../../../../../libraries/googleapis/src-js/date";
 
   let {
     new_movement = $bindable(),
@@ -42,8 +43,13 @@
     } else {
       // Get the closest (equal or before) snapshot to the given date
       let snapshots: Snapshot[] = []; // FIXME: Retrieve the snapshosts for this account
+      let ex_dividend_date = DateWrapper.create_from_yyyy_mm_dd(
+        new_movement.ex_dividend_date.getFullYear(),
+        new_movement.ex_dividend_date.getMonth() + 1,
+        new_movement.ex_dividend_date.getDate()
+      );
       let snapshot = snapshots?.find((s: Snapshot) => {
-        return s.dateValue().as_date() <= new_movement.ex_dividend_date!;
+        return sort_date_wrapper(s.dateValue(), ex_dividend_date) <= 0;
       });
       console.log("Found snapshot: ", snapshot);
       new_movement.ex_dividend_snapshot = snapshot;
@@ -110,8 +116,9 @@
           <span>Ex dividend date</span>
           <Datepicker required bind:value={new_movement.ex_dividend_date} on:select={handleDividendDateSnapshot} />
           <Helper
-            >snapshot @ {new_movement.ex_dividend_snapshot?.dateValue().as_date().toISOString().slice(0, 10)} ({new_movement
-              .ex_dividend_snapshot?.amount().quantity()!} ud.)</Helper
+            >snapshot @ {new_movement.ex_dividend_snapshot?.dateValue().toString()} ({new_movement.ex_dividend_snapshot
+              ?.amount()
+              .quantity()!} ud.)</Helper
           >
         </Label>
         <Label class="ml-4 flex flex-col">

@@ -1,5 +1,6 @@
 import { Account, Snapshot } from "../../../../models/src-js";
 import { NewSnapshot as NewSnapshotModel } from "../../../../models/src-js/snapshot";
+import { DateWrapper, sort_date_wrapper } from "../../../../../../../libraries/googleapis/src-js/date";
 
 export class NewSnapshot {
     readonly account: Account;
@@ -36,10 +37,13 @@ export class NewSnapshot {
         this.cleanErrors();
 
         // Validate date_value
-        if (this.date_value < this.account.open().as_date()) {
+        let date_value = DateWrapper.create_from_yyyy_mm_dd(this.date_value.getFullYear(), this.date_value.getMonth() + 1, this.date_value.getDate());
+        if (sort_date_wrapper(date_value, this.account.open()) < 0) {
             this.error_date_value = "Cannot take an snapshot before the account was opened.";
         }
-        if (this.date_value > new Date()) {
+        let today = new Date();
+        let today_date = DateWrapper.create_from_yyyy_mm_dd(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        if (sort_date_wrapper(today_date, date_value) < 0) {
             this.error_date_value = "Cannot take an snapshot of the future.";
         }
 
@@ -63,11 +67,11 @@ export class NewSnapshot {
 
     toMessage(): NewSnapshotModel {
         let data: NewSnapshotModel = new NewSnapshotModel();
-        console.log("NewSnapshot::toMessage");
-        console.log(`this.date_value: ${this.date_value}`);
-
         data.setAccountPk(this.account.pk());
-        data.setDate(this.date_value);
+
+        let date_wrapper = DateWrapper.create_from_yyyy_mm_dd(this.date_value.getFullYear(), this.date_value.getMonth() + 1, this.date_value.getDate());
+        data.setDate(date_wrapper);
+
         if (this.account.is_numerable()) {
             data.setNumerableAmount(this.account.ccy(), this.quantity!, this.unit_value!);
         } else {

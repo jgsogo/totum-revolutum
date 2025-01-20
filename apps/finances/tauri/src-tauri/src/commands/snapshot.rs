@@ -18,6 +18,8 @@ pub fn create_snapshot(
         .try_into()
         .map_err(|e| format!("Failed to decode data to NewSnapshot: {e}"))?;
 
+    log::info!("NewSnapshot: {:?}", new_snapshot);
+
     let mut conn = pool.get().expect("Get a connection from the Pool");
     new_snapshot
         .insert_into_db(&mut conn)

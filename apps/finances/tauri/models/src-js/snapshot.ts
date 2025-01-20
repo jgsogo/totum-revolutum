@@ -46,9 +46,8 @@ export class NewSnapshot extends OutgoingMessage {
         this.data.accountPk = BigInt(account_pk)
     }
 
-    setDate(date: Date) {
-        let dateValue = DateWrapper.create_from_date(date);
-        this.data.dateValue = dateValue.as_proto();
+    setDate(date: DateWrapper) {
+        this.data.dateValue = date.as_proto();
     }
 
     setNonNumerableAmount(ccy: string, amount: number) {
