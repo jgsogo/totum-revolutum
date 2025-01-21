@@ -4,7 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import type { Message } from "@bufbuild/protobuf";
-import type { NewMovement } from "./movement_pb.js";
+import type { Movement, MovementDirection, NewMovement } from "./movement_pb.js";
 
 /**
  * Describes the file apps/finances/tauri/models/protos/transaction.proto.
@@ -36,6 +36,47 @@ export declare type TransactionGroup = Message<"finances_app_models.TransactionG
  * Use `create(TransactionGroupSchema)` to create a new message.
  */
 export declare const TransactionGroupSchema: GenMessage<TransactionGroup>;
+
+/**
+ * @generated from message finances_app_models.Transaction
+ */
+export declare type Transaction = Message<"finances_app_models.Transaction"> & {
+  /**
+   * @generated from field: int64 pk = 1;
+   */
+  pk: bigint;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: optional string description = 3;
+   */
+  description?: string;
+
+  /**
+   * @generated from field: finances_app_models.TransactionGroup group = 4;
+   */
+  group?: TransactionGroup;
+
+  /**
+   * @generated from field: repeated finances_app_models.Movement movements_from = 5;
+   */
+  movementsFrom: Movement[];
+
+  /**
+   * @generated from field: repeated finances_app_models.Movement movements_to = 6;
+   */
+  movementsTo: Movement[];
+};
+
+/**
+ * Describes the message finances_app_models.Transaction.
+ * Use `create(TransactionSchema)` to create a new message.
+ */
+export declare const TransactionSchema: GenMessage<Transaction>;
 
 /**
  * @generated from message finances_app_models.NewTransaction
@@ -72,4 +113,46 @@ export declare type NewTransaction = Message<"finances_app_models.NewTransaction
  * Use `create(NewTransactionSchema)` to create a new message.
  */
 export declare const NewTransactionSchema: GenMessage<NewTransaction>;
+
+/**
+ * @generated from message finances_app_models.LastTransactionsRequest
+ */
+export declare type LastTransactionsRequest = Message<"finances_app_models.LastTransactionsRequest"> & {
+  /**
+   * @generated from field: int64 account_pk = 1;
+   */
+  accountPk: bigint;
+
+  /**
+   * @generated from field: finances_app_models.MovementDirection account_movement_direction = 2;
+   */
+  accountMovementDirection: MovementDirection;
+
+  /**
+   * @generated from field: optional int32 n_transactions = 3;
+   */
+  nTransactions?: number;
+};
+
+/**
+ * Describes the message finances_app_models.LastTransactionsRequest.
+ * Use `create(LastTransactionsRequestSchema)` to create a new message.
+ */
+export declare const LastTransactionsRequestSchema: GenMessage<LastTransactionsRequest>;
+
+/**
+ * @generated from message finances_app_models.LastTransactionsResponse
+ */
+export declare type LastTransactionsResponse = Message<"finances_app_models.LastTransactionsResponse"> & {
+  /**
+   * @generated from field: repeated finances_app_models.Transaction transactions = 1;
+   */
+  transactions: Transaction[];
+};
+
+/**
+ * Describes the message finances_app_models.LastTransactionsResponse.
+ * Use `create(LastTransactionsResponseSchema)` to create a new message.
+ */
+export declare const LastTransactionsResponseSchema: GenMessage<LastTransactionsResponse>;
 

@@ -95,6 +95,12 @@ pub fn movement_filter_account_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_movement::account_id.eq(pk)
 }
 
+/// Returns a query fragment to filter [`Movement`]s by account_id
+#[diesel::dsl::auto_type]
+pub fn movement_filter_transaction_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_movement::transaction_id.eq(pk)
+}
+
 /// Returns a query fragment to filter [`Movement`]s by direction
 #[diesel::dsl::auto_type]
 pub fn movement_filter_by_direction(direction: MovementDirection) -> _ {

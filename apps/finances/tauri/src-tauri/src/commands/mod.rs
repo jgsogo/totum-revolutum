@@ -4,12 +4,12 @@
 //! to be unique for each Tauri application. We enforce this guarantee if all the commands are
 //! defined in the same module.
 
+pub mod last_transactions;
 pub mod snapshot;
 pub mod transaction;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::fields::MovementDirection;
 use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Fx, Movement};
 use finances_accounts::sql::filters::{accountholder_by_pk, fx_by_pk, movement_filter_account_by_pk};
 use finances_app_models::{
@@ -115,9 +115,7 @@ pub async fn get_account_context(
             })
             .collect()
     } else {
-        all_snapshotnumerable_for_account_id()
-            .bind::<diesel::sql_types::Int8, _>(account_pk)
-            .load(&mut conn)
+        all_snapshotnumerable_for_account_id(account_pk, &mut conn)
             .map_err(|e| format!("Error loading snapshots numerable: {e}"))?
             .into_iter()
             .map(|v: SnapshotNumerable| {
@@ -144,10 +142,7 @@ pub async fn get_account_context(
                     .find_movement_type(v.type_id)
                     .cloned()
                     .ok_or(format!("Movement type 'pk={}' not found in main context", v.type_id))?;
-                let direction = match v.direction {
-                    MovementDirection::In => ModelMovementDirection::In,
-                    MovementDirection::Out => ModelMovementDirection::Out,
-                };
+                let direction: ModelMovementDirection = v.direction.into();
                 let fx = v
                     .fx_id
                     .map(|v| {

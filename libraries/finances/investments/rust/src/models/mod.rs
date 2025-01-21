@@ -21,4 +21,12 @@ impl Movement {
             Movement::Dividend(movement_dividend) => &movement_dividend.movement.date_value,
         }
     }
+
+    pub fn direction(&self) -> finances_accounts::fields::MovementDirection {
+        match self {
+            Movement::NonNumerable(movement) => movement.direction,
+            Movement::Numerable(movement_numerable) => movement_numerable.movement.direction,
+            Movement::Dividend(movement_dividend) => movement_dividend.movement.direction,
+        }
+    }
 }
