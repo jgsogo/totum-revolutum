@@ -35,12 +35,10 @@ fn test_queries() {
         assert_eq!(all.len(), 3);
     }
 
-    // All movements (as MovementNumerable) for a given account
+    // All movements (as MovementDividend) for a given account
     {
-        let all: Vec<MovementDividend> = all_movementdividend_for_account_id()
-            .bind::<diesel::sql_types::Int8, _>(account_id)
-            .load(&mut conn)
-            .expect("Error loading dividend movements");
+        let all: Vec<MovementDividend> =
+            all_movementdividend_for_account_id(account_id, &mut conn).expect("Error loading dividend movements");
         assert_eq!(all.len(), 0);
     }
 
@@ -76,9 +74,7 @@ fn test_queries() {
     };
     new_movement_dividend.insert_into_db(&mut conn).unwrap();
 
-    let all: Vec<MovementDividend> = all_movementdividend_for_account_id()
-        .bind::<diesel::sql_types::Int8, _>(account_id)
-        .load(&mut conn)
-        .expect("Error loading dividend movements");
+    let all: Vec<MovementDividend> =
+        all_movementdividend_for_account_id(account_id, &mut conn).expect("Error loading dividend movements");
     assert_eq!(all.len(), 1);
 }
