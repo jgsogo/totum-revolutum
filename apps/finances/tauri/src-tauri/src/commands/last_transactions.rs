@@ -34,7 +34,7 @@ pub async fn past_transactions(
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     // Get the last transactions involving the given account and direction
-    let transactions = TransactionDb::all()
+    let mut transactions = TransactionDb::all()
         .inner_join(finances_accounts::schema::finances_accounts_movement::table)
         .select(TransactionDb::as_select())
         .filter(
@@ -43,11 +43,13 @@ pub async fn past_transactions(
             )),
         )
         .order(finances_accounts::schema::finances_accounts_movement::date_value.desc())
-        .limit(10)
+        .limit(20)
         .load::<TransactionDb>(&mut conn)
         .map_err(|e| format!("Error retrieving transactions from db: {e}"))?;
 
-    // TODO: Deduplicate transactions (just in case)
+    // Deduplicate transactions
+    transactions.sort_by_key(|v| v.name.clone());
+    transactions.dedup_by_key(|v| v.name.clone());
 
     // Get details for all the transactions
     let transactions: Vec<Transaction> = transactions
