@@ -15,6 +15,7 @@
   let account_context: AccountContext = data.account_context;
   let account: Account = account_context.account();
   let last_snapshot = account_context.snapshots().at(0);
+
 </script>
 
 <div class="mt-px space-y-4">

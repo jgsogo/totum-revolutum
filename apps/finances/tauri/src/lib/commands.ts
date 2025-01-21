@@ -1,5 +1,4 @@
 import { invoke, } from "@tauri-apps/api/core";
-import type { NewTransaction } from "./forms/TransactionForm/NewTransaction.svelte";
 import { AppState, MainContext, HolderContext, AccountContext, OutgoingMessage } from "../../models/src-js/index";
 
 
@@ -39,9 +38,6 @@ export const get_account_context = async (account_pk: number): Promise<AccountCo
     return AccountContext.create_from(data);
 };
 
-
-
-
 /**
  * Creates a snapshot for the give account
  * @param {NewSnapshot} snapshot - The new Snapshot to create
@@ -51,7 +47,6 @@ export const create_snapshot = async (snapshot: OutgoingMessage) => {
     let data = snapshot.toBinary();
     await invoke("create_snapshot", data);
 }
-
 
 /**
  * Creates a transaction
