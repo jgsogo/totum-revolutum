@@ -2,6 +2,7 @@ use super::{google_type, Fx, MoneyAmount};
 
 pub struct Movement(pub(crate) crate::protos::finances_app_models::Movement);
 
+#[derive(PartialEq)]
 pub enum MovementDirection {
     In,
     Out,

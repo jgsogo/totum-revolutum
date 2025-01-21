@@ -10,13 +10,16 @@ pub mod transaction;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Fx, Movement};
+use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Fx};
 use finances_accounts::sql::filters::{accountholder_by_pk, fx_by_pk, movement_filter_account_by_pk};
 use finances_app_models::{
     google_type, Account as AppModelAccount, AccountContext, AppState, Fx as AppModelFx, HolderContext, MainContext,
     MoneyAmount, Movement as AppModelMovement, MovementDirection as ModelMovementDirection, OutgoingModel,
     Snapshot as AppModelSnapshot,
 };
+use finances_investments::models::Movement;
+use finances_investments::sql::queries::all_movements_for_account_id;
+
 use finances_investments::models::SnapshotNumerable;
 use finances_investments::sql::queries::all_snapshotnumerable_for_account_id;
 use tauri::ipc::Response;
@@ -129,50 +132,69 @@ pub async fn get_account_context(
 
     // Movements
     let movements: Vec<AppModelMovement> = {
-        Movement::all()
-            .filter(movement_filter_account_by_pk(account_pk))
-            .select(Movement::as_select())
-            .load::<Movement>(&mut conn)
+        all_movements_for_account_id(account_pk, &mut conn)
             .map_err(|e| format!("Error retrieving movements: {e}"))?
             .into_iter()
-            .map(|v| {
-                let money: google_type::Money = (v.amount, account_ccy.clone()).into();
-                let money_amount = MoneyAmount::new_non_numerable(money);
-                let movement_type = main_context
-                    .find_movement_type(v.type_id)
-                    .cloned()
-                    .ok_or(format!("Movement type 'pk={}' not found in main context", v.type_id))?;
-                let direction: ModelMovementDirection = v.direction.into();
-                let fx = v
-                    .fx_id
-                    .map(|v| {
-                        let fx = Fx::all()
-                            .filter(fx_by_pk(v))
-                            .select(Fx::as_select())
-                            .first::<Fx>(&mut conn)
-                            .map_err(|e| format!("Error retrieving movements: {e}"))?;
-                        Ok::<_, String>(AppModelFx::new(
-                            fx.foreign,
-                            fx.local,
-                            fx.date_value.into(),
-                            fx.rate.into(),
-                        ))
-                    })
-                    .transpose()?;
-
-                Ok::<_, String>(AppModelMovement::new(
-                    v.id,
-                    v.date_value.into(),
-                    v.transaction_id,
-                    movement_type,
-                    direction,
-                    money_amount,
-                    fx,
-                ))
-            })
+            .map(|v| movement_into_model_movement(v, &account_ccy, &main_context, &mut conn))
             .collect::<Result<Vec<_>, _>>()?
     };
 
     let context = AccountContext::new(account, movements, snapshots);
     Ok(Response::new(context.encode_to_vec()))
+}
+
+pub fn movement_into_model_movement(
+    v: Movement,
+    account_ccy: &str,
+    main_context: &MainContext,
+    conn: &mut PgConnection,
+) -> Result<AppModelMovement, String> {
+    let money_amount = match &v {
+        Movement::NonNumerable(movement) => {
+            let money: google_type::Money = (movement.amount.clone(), account_ccy.to_string()).into();
+            MoneyAmount::new_non_numerable(money)
+        }
+        Movement::Numerable(movement_numerable) => {
+            let unit_value = (
+                movement_numerable.movement_numerable.unit_value.clone(),
+                account_ccy.to_string(),
+            )
+                .into();
+            let quantity = movement_numerable.movement_numerable.quantity.clone().into();
+            MoneyAmount::new_numerable(unit_value, quantity)
+        }
+        Movement::Dividend(movement_dividend) => todo!(),
+    };
+
+    let movement_type = main_context
+        .find_movement_type(v.type_id())
+        .cloned()
+        .ok_or(format!("Movement type 'pk={}' not found in main context", v.type_id()))?;
+    let direction: ModelMovementDirection = v.direction().into();
+    let fx = v
+        .fx_id()
+        .map(|v| {
+            let fx = Fx::all()
+                .filter(fx_by_pk(v))
+                .select(Fx::as_select())
+                .first::<Fx>(conn)
+                .map_err(|e| format!("Error retrieving movements: {e}"))?;
+            Ok::<_, String>(AppModelFx::new(
+                fx.foreign,
+                fx.local,
+                fx.date_value.into(),
+                fx.rate.into(),
+            ))
+        })
+        .transpose()?;
+
+    Ok::<_, String>(AppModelMovement::new(
+        v.id(),
+        (*v.date_value()).into(),
+        v.transaction_id(),
+        movement_type,
+        direction,
+        money_amount,
+        fx,
+    ))
 }

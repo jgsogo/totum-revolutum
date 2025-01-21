@@ -8,7 +8,8 @@ pub use movement_dividend::{all_movementdividend_for_account_id, all_movementdiv
 pub use movement_numerable::{all_movementnumerable_for_account_id, all_movementnumerable_for_transaction_id};
 pub use snapshot_numerable::all_snapshotnumerable_for_account_id;
 
-/// Returns all the [`MovementDividend`]s for a given account primary-key
+/// Returns all the movements for a given account primary-key. The objects are instances of [`Movement`], an enum type
+/// that holds all possible movement variantes: dividend, numerable,...
 pub fn all_movements_for_account_id<Conn>(
     account_id: i64,
     conn: &mut Conn,

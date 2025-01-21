@@ -5,15 +5,18 @@ use finances_accounts::models::{Transaction as TransactionDb, TransactionGroup a
 use finances_accounts::sql::filters::{
     movement_filter_account_by_pk, movement_filter_by_direction, transactiongroup_by_pk,
 };
-use finances_app_models::OutgoingModel;
 use finances_app_models::{LastTransactionsRequest, LastTransactionsResponse, Transaction};
+use finances_app_models::{MainContext, OutgoingModel};
 use tauri::State;
+
+use super::movement_into_model_movement;
 
 /// Given an account and a direction (as source of target), it returns the last N transactions
 /// (removing duplicates) involving that account.
 #[tauri::command]
 pub async fn past_transactions(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+    main_context: State<'_, MainContext>,
     request: tauri::ipc::Request<'_>,
 ) -> Result<tauri::ipc::Response, String> {
     let tauri::ipc::InvokeBody::Raw(data) = request.body() else {
@@ -67,7 +70,17 @@ pub async fn past_transactions(
                 .transpose()?;
 
             let all_movements = finances_investments::sql::queries::all_movements_for_transaction_id(t.id, &mut conn)
-                .map_err(|e| format!("Error retrieving movements from db: {e}"))?;
+                .map_err(|e| format!("Error retrieving movements from db: {e}"))?
+                .into_iter()
+                .map(|mov| {
+                    let account_ccy = main_context
+                        .find_account(mov.account_id())
+                        .map(|acc| acc.currency_code.clone())
+                        .ok_or(format!("Cannot find account pk '{}' for movement", mov.account_id()))?;
+
+                    movement_into_model_movement(mov, &account_ccy, &main_context, &mut conn)
+                })
+                .collect::<Result<Vec<_>, _>>()?;
 
             Ok::<_, String>(Transaction::new(t, group, all_movements))
         })
