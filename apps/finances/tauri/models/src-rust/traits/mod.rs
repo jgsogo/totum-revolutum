@@ -14,7 +14,7 @@ pub trait OutgoingModel {
 /// * [`From<TProto>`]: To convert a proto instance into this object
 /// * [`AsRef<TProto>`]: To get a reference to the inner proto
 ///
-pub trait ProtoWrapper<TProto: Message>: TryFrom<Vec<u8>, Error = crate::errors::Error> {}
+pub trait ProtoWrapper<TProto: Message>: TryFrom<Vec<u8>, Error = crate::errors::Error> + AsRef<Self> + Into<TProto>  {}
 
 /// On top of [`ProtoWrapper<TProto>`], this object implements `as_ref` function to return an
 /// object that contains a reference to the proto.

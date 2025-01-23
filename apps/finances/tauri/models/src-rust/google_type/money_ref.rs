@@ -3,7 +3,7 @@ use bigdecimal::BigDecimal;
 use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 
-use crate::traits::ProtoWrapperRef;
+use crate::traits::{ProtoWrapperRef, ProtoWrapper};
 
 const NANO_EXP: usize = 9;
 pub(crate) const NANO_VALUE: u32 = 1_000_000_000;
@@ -72,10 +72,11 @@ impl MoneyRef {
     }
 }
 
-impl ProtoWrapperRef<crate::protos::google::r#type::Money> for MoneyRef {
-    fn new(proto: &crate::protos::google::r#type::Money) -> &Self {
-        MoneyRef::new_ref(proto)
-    }
+impl ProtoWrapper<crate::protos::google::r#type::Money> for MoneyRef {
+    // fn new(proto: &crate::protos::google::r#type::Money) -> &Self {
+    //     MoneyRef::new_ref(proto)
+    // }
+
     // fn new(proto: &'a crate::protos::google::r#type::Money) -> Self {
     //     Self(proto)
     // }
