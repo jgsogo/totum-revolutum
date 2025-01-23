@@ -8,7 +8,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("Cannot convert from one type to the other: {0}")]
-    ConversionError(ConversionError),
+    ConversionError(#[from] ConversionError),
 
     #[error("Required field '{0}' is missing")]
     MissingRequiredField(String),

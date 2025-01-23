@@ -6,7 +6,7 @@
 mod errors;
 // mod fx;
 pub mod google_type;
-// mod money_amount;
+mod money_amount;
 // mod movement;
 // mod holder;
 // mod holder_context;
@@ -33,7 +33,7 @@ pub mod protos;
 // pub use app_state::AppState;
 // pub use custodian::Custodian;
 pub use errors::{Error, Result};
-// pub use money_amount::MoneyAmount;
+pub use money_amount::MoneyAmount;
 // pub use movement::{MovementDirection, MovementType};
 // pub use fx::Fx;
 // pub use holder::Holder;

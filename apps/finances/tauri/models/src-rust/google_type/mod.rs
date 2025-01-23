@@ -8,6 +8,6 @@ mod decimal;
 mod money;
 
 pub use currency_code::CurrencyCode;
-// pub use date::Date;
-// pub use decimal::Decimal;
+pub use date::Date;
+pub use decimal::Decimal;
 pub use money::Money;

@@ -1,26 +1,43 @@
-
+mod non_numerable;
 mod numerable;
+use crate::errors::{Error, Result};
+use crate::google_type;
 
-use crate::traits::ProtoWrapper;
+use proto_wrapper::ProtoWrapper;
 
+use non_numerable::MoneyAmountNonNumerable;
+use numerable::MoneyAmountNumerable;
+
+#[repr(transparent)]
+#[derive(ProtoWrapper)]
 pub struct MoneyAmount(crate::protos::finances_app_models::MoneyAmount);
 
-impl MoneyAmount {}
-
-impl ProtoWrapper<crate::protos::finances_app_models::MoneyAmount> for MoneyAmount {
-    fn as_proto(&self) -> &crate::protos::finances_app_models::MoneyAmount {
-        &self.0
+impl MoneyAmount {
+    pub fn new_non_numerable(amount: google_type::Money) -> Self {
+        let non_numerable = MoneyAmountNonNumerable::new(amount);
+        let amount = crate::protos::finances_app_models::money_amount::Amount::NonNumerable(non_numerable.into());
+        Self(crate::protos::finances_app_models::MoneyAmount { amount: Some(amount) })
     }
-}
 
-impl From<crate::protos::finances_app_models::MoneyAmount> for MoneyAmount {
-    fn from(value: crate::protos::finances_app_models::MoneyAmount) -> Self {
-        Self(value)
+    pub fn new_numerable(unit_value: google_type::Money, quantity: google_type::Decimal) -> Self {
+        let numerable = MoneyAmountNumerable::new(unit_value, quantity);
+        let amount = crate::protos::finances_app_models::money_amount::Amount::Numerable(numerable.into());
+        Self(crate::protos::finances_app_models::MoneyAmount { amount: Some(amount) })
     }
-}
 
-impl From<MoneyAmount> for crate::protos::finances_app_models::MoneyAmount {
-    fn from(val: MoneyAmount) -> Self {
-        val.0
+    pub fn amount(&self) -> Result<google_type::Money> {
+        match self
+            .0
+            .amount
+            .as_ref()
+            .ok_or(Error::MissingRequiredField("amount".to_string()))?
+        {
+            crate::protos::finances_app_models::money_amount::Amount::NonNumerable(non_numerable) => {
+                MoneyAmountNonNumerable::new_ref(non_numerable).amount().cloned()
+            }
+            crate::protos::finances_app_models::money_amount::Amount::Numerable(numerable) => {
+                MoneyAmountNumerable::new_ref(numerable).amount()
+            }
+        }
     }
 }

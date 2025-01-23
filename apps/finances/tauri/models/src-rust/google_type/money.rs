@@ -19,7 +19,7 @@ pub(crate) const NANO_VALUE: u32 = 1_000_000_000;
 /// with the inner amounts. If that's the case, use some other struct and convert
 /// to this in a final step before serializing to the wire.
 #[repr(transparent)]
-#[derive(ProtoWrapper)]
+#[derive(ProtoWrapper, Clone)]
 pub struct Money(MoneyProto);
 
 impl Money {

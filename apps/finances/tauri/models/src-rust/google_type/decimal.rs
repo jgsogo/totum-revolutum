@@ -26,6 +26,14 @@ impl TryFrom<Decimal> for BigDecimal {
     }
 }
 
+impl TryFrom<&Decimal> for BigDecimal {
+    type Error = crate::errors::ConversionError;
+
+    fn try_from(value: &Decimal) -> Result<Self, Self::Error> {
+        Ok(BigDecimal::from_str(&value.0.value)?)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
