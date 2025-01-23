@@ -4,7 +4,6 @@ use std::str::FromStr;
 use crate::protos::google::r#type::Decimal as DecimalProto;
 
 use proto_wrapper::ProtoWrapper;
-// use proto_wrapper_derive::ProtoWrapper;
 
 /// A wrapper over the `google::type::Decimal` protobuf provided by the `googleapis` ([link](https://github.com/googleapis/googleapis/blob/master/google/type/decimal.proto))
 #[repr(transparent)]
