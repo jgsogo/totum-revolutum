@@ -5,12 +5,14 @@ use bigdecimal::BigDecimal;
 use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 
+use crate::traits::private_parts::ProtoWrapperPrivate;
 use crate::traits::ProtoWrapper;
+
+use super::CurrencyCode;
+use prost::Message;
 
 const NANO_EXP: usize = 9;
 pub(crate) const NANO_VALUE: u32 = 1_000_000_000;
-use super::CurrencyCode;
-use prost::Message;
 
 /// A wrapper over the `google::type::money` protobuf provided by the `googleapis` ([link](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto))
 ///
@@ -61,7 +63,7 @@ impl Money {
         }))
     }
 
-    pub fn new_ref(proto: &crate::protos::google::r#type::Money) -> &Self {
+    pub(crate) fn new_ref(proto: &crate::protos::google::r#type::Money) -> &Self {
         (unsafe { &*(proto as *const crate::protos::google::r#type::Money as *const Self) }) as _
     }
 
@@ -77,11 +79,13 @@ impl Money {
     }
 }
 
-impl ProtoWrapper<crate::protos::google::r#type::Money> for Money {
-    fn encode_to_vec(&self) -> Vec<u8> {
-        self.0.encode_to_vec()
+impl ProtoWrapperPrivate<crate::protos::google::r#type::Money> for Money {
+    fn inner_proto(&self) -> &crate::protos::google::r#type::Money {
+        &self.0
     }
 }
+
+impl ProtoWrapper<crate::protos::google::r#type::Money> for Money {}
 
 impl From<Money> for crate::protos::google::r#type::Money {
     fn from(val: Money) -> Self {
@@ -217,5 +221,8 @@ mod tests {
         let money_ref: &Money = (&proto).into();
         assert_eq!(money_ref.amount().to_string(), "2");
         assert_eq!(money_ref.currency_code().unwrap(), CurrencyCode::USD);
+
+        // And, if needed, we can get a clone of the inner proto so we can store it in an inner message
+        let _proto_cloned: crate::protos::google::r#type::Money = money_ref.into();
     }
 }
