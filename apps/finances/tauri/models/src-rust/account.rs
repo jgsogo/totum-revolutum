@@ -2,6 +2,12 @@ use super::{google_type, AccountType, Custodian};
 
 pub struct Account(pub(crate) crate::protos::finances_app_models::Account);
 
+impl From<Account> for crate::protos::finances_app_models::Account {
+    fn from(val: Account) -> Self {
+        val.0
+    }
+}
+
 impl Account {
     pub fn new(
         account: finances_accounts::models::Account,

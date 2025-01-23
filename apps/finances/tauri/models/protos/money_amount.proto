@@ -4,6 +4,8 @@ package finances_app_models;
 import "libraries/googleapis/protos/google/type/money.proto";
 import "libraries/googleapis/protos/google/type/decimal.proto";
 
+// Encodes an amount of money. It can be a non-numerable amount or
+// a numerable amount that encodes the quantity and the unit value.
 message MoneyAmount {
     message NonNumerable {
         google.type.Money amount = 1;

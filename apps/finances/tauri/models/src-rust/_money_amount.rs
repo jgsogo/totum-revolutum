@@ -2,6 +2,12 @@ use super::google_type;
 
 pub struct MoneyAmount(pub(crate) crate::protos::finances_app_models::MoneyAmount);
 
+impl From<MoneyAmount> for crate::protos::finances_app_models::MoneyAmount {
+    fn from(val: MoneyAmount) -> Self {
+        val.0
+    }
+}
+
 impl MoneyAmount {
     pub fn new_non_numerable(amount: google_type::Money) -> Self {
         let amount = crate::protos::finances_app_models::money_amount::Amount::NonNumerable(
@@ -21,11 +27,5 @@ impl MoneyAmount {
             },
         );
         Self(crate::protos::finances_app_models::MoneyAmount { amount: Some(amount) })
-    }
-}
-
-impl From<MoneyAmount> for crate::protos::finances_app_models::MoneyAmount {
-    fn from(val: MoneyAmount) -> Self {
-        val.0
     }
 }

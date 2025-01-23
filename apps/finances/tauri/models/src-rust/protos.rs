@@ -15,7 +15,7 @@ pub mod google {
 #[cfg(feature = "bazel")]
 pub mod finances_app_models {
     pub use protos::finances_app_models::{
-        money_amount, new_movement, Account, AccountCategory, AccountContext, AccountType, AppState, Custodian,
+        money_amount, MovementAmount, movement_amount, Account, AccountCategory, AccountContext, AccountType, AppState, Custodian,
         DatabaseConnection, Fx, Holder, HolderContext, LastTransactionsRequest, LastTransactionsResponse, MainContext,
         MoneyAmount, Movement, MovementDirection, MovementType, NewMovement, NewSnapshot, NewTransaction, Snapshot,
         Transaction, TransactionGroup,

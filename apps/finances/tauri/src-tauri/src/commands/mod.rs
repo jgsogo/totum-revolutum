@@ -14,10 +14,11 @@ use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, Accou
 use finances_accounts::sql::filters::{accountholder_by_pk, fx_by_pk, movement_filter_account_by_pk};
 use finances_app_models::{
     google_type, Account as AppModelAccount, AccountContext, AppState, Fx as AppModelFx, HolderContext, MainContext,
-    MoneyAmount, Movement as AppModelMovement, MovementDirection as ModelMovementDirection, OutgoingModel,
-    Snapshot as AppModelSnapshot,
+    MoneyAmount, Movement as AppModelMovement, MovementAmount as AppModelAmount,
+    MovementDirection as ModelMovementDirection, OutgoingModel, Snapshot as AppModelSnapshot,
 };
 use finances_investments::models::Movement;
+
 use finances_investments::sql::queries::all_movements_for_account_id;
 
 use finances_investments::models::SnapshotNumerable;
@@ -94,6 +95,7 @@ pub async fn get_account_context(
 ) -> Result<Response, String> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
+    // TODO: Can we just retrieve it from the MainContext and save one DB call.
     let account = {
         let (account, account_holder_role, custodian, account_type) =
             Account::details_for_pk(account_pk, &mut conn).map_err(|e| format!("Error loading account: {e}"))?;
@@ -135,7 +137,7 @@ pub async fn get_account_context(
         all_movements_for_account_id(account_pk, &mut conn)
             .map_err(|e| format!("Error retrieving movements: {e}"))?
             .into_iter()
-            .map(|v| movement_into_model_movement(v, &account_ccy, &main_context, &mut conn))
+            .map(|v| movement_into_model_movement(v, &account.0, &main_context, &mut conn))
             .collect::<Result<Vec<_>, _>>()?
     };
 
@@ -145,25 +147,44 @@ pub async fn get_account_context(
 
 pub fn movement_into_model_movement(
     v: Movement,
-    account_ccy: &str,
+    account: &finances_app_models::Account,
     main_context: &MainContext,
     conn: &mut PgConnection,
 ) -> Result<AppModelMovement, String> {
     let money_amount = match &v {
         Movement::NonNumerable(movement) => {
-            let money: google_type::Money = (movement.amount.clone(), account_ccy.to_string()).into();
-            MoneyAmount::new_non_numerable(money)
+            let money: google_type::Money = (movement.amount.clone(), account.ccy().to_string()).into();
+            AppModelAmount::new_non_numerable(money)
         }
         Movement::Numerable(movement_numerable) => {
             let unit_value = (
                 movement_numerable.movement_numerable.unit_value.clone(),
-                account_ccy.to_string(),
+                account.ccy().to_string(),
             )
                 .into();
             let quantity = movement_numerable.movement_numerable.quantity.clone().into();
-            MoneyAmount::new_numerable(unit_value, quantity)
+            AppModelAmount::new_numerable(unit_value, quantity)
         }
-        Movement::Dividend(movement_dividend) => todo!(),
+        Movement::Dividend(movement_dividend) => {
+            let ex_dividend_date: google_type::Date = movement_dividend.movement_dividend.ex_dividend_date.into();
+            // From the date, get the closest snapshot, so I can get the quantity
+            let quantity: google_type::Decimal = {
+                let snapshot =
+                    finances_investments::sql::queries::all_snapshotnumerable_for_account_id(account.pk(), conn)
+                        .map_err(|e| format!("Error fetching snpashots from the DB: {e}"))?
+                        .into_iter()
+                        .find(|s| s.snapshot.date_value < movement_dividend.movement_dividend.ex_dividend_date)
+                        .ok_or("Cannot find snapshot for the given dividend".to_string())?;
+                snapshot.snapshot_numerable.quantity.into()
+            };
+
+            let unit_value = (
+                movement_dividend.movement_dividend.unit_value.clone(),
+                account.ccy().to_string(),
+            )
+                .into();
+            AppModelAmount::new_dividend(ex_dividend_date, unit_value, quantity)
+        }
     };
 
     let movement_type = main_context

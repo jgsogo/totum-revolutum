@@ -25,6 +25,7 @@ chrono = { workspace = true }
 bigdecimal = { workspace = true }
 num-bigint = { workspace = true }
 diesel = { workspace = true }
+thiserror = { workspace = true }
 
 
 googleapis = { path = "../../../../libraries/googleapis" }

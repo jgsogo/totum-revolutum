@@ -1,13 +1,24 @@
+use crate::traits::ProtoWrapper;
 use bigdecimal::BigDecimal;
 use std::str::FromStr;
 
-// FIXME: Move this to //libraries/googleapis and reuse it.
+pub struct Decimal(crate::protos::google::r#type::Decimal);
 
-pub struct Decimal(pub(crate) crate::protos::google::r#type::Decimal);
+impl ProtoWrapper<crate::protos::google::r#type::Decimal> for Decimal {
+    fn as_proto(&self) -> &crate::protos::google::r#type::Decimal {
+        &self.0
+    }
+}
 
 impl From<Decimal> for crate::protos::google::r#type::Decimal {
     fn from(val: Decimal) -> Self {
         val.0
+    }
+}
+
+impl From<crate::protos::google::r#type::Decimal> for Decimal {
+    fn from(v: crate::protos::google::r#type::Decimal) -> Self {
+        Self(v)
     }
 }
 
@@ -19,10 +30,11 @@ impl From<BigDecimal> for Decimal {
     }
 }
 
-impl TryInto<BigDecimal> for Decimal {
-    type Error = bigdecimal::ParseBigDecimalError;
-    fn try_into(self) -> Result<BigDecimal, Self::Error> {
-        BigDecimal::from_str(&self.0.value)
+impl TryFrom<Decimal> for BigDecimal {
+    type Error = crate::errors::ConversionError;
+
+    fn try_from(value: Decimal) -> Result<Self, Self::Error> {
+        Ok(BigDecimal::from_str(&value.0.value)?)
     }
 }
 

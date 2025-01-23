@@ -1,4 +1,4 @@
-use super::{Account, Movement, OutgoingModel, Snapshot, Transaction};
+use super::{OutgoingModel, Transaction};
 use prost::Message;
 
 #[derive(Debug)]

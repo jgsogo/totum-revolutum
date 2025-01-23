@@ -18,6 +18,21 @@ enum MovementDirection {
     Out = 1;
 }
 
+message MovementAmount {
+    message Dividend {
+        google.type.Date ex_dividend_date = 1;
+        // Payout per share (and quantity from the snapshot)
+        MoneyAmount.Numerable payout = 3;
+    }
+
+    // This is also used to classify the Movement into Numerable/NonNumerable/Dividend
+    oneof amount {
+        MoneyAmount.NonNumerable non_numerable = 5;
+        MoneyAmount.Numerable numerable = 6;
+        Dividend dividend =7;
+    }
+}
+
 message Movement {
     int64 pk = 1;
     google.type.Date date_value = 2;
@@ -26,9 +41,10 @@ message Movement {
     MovementType type = 4;
     MovementDirection direction = 5;
 
-    MoneyAmount amount = 6;
+    MovementAmount amount = 6;
     Fx fx = 7;
 }
+
 
 
 message NewMovement {
@@ -37,17 +53,5 @@ message NewMovement {
     google.type.Date date_value = 3;
     Fx fx = 4;
 
-    message DividendAmount {
-        google.type.Date ex_dividend_date = 1;
-        int64 ex_dividend_snapshot_pk = 2;
-
-        // Payout per share (and quantity from the snapshot)
-        MoneyAmount.Numerable payout = 3;
-    }
-
-    oneof amount {
-        MoneyAmount.NonNumerable non_numerable = 5;
-        MoneyAmount.Numerable numerable = 6;
-        DividendAmount dividend =7;
-    }
+    MovementAmount amount =5;
 }

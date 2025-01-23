@@ -85,7 +85,7 @@ impl TryFrom<Vec<u8>> for NewSnapshot {
         let account_id = proto.account_pk;
         let date_value: chrono::NaiveDate = {
             let date = google_type::Date(proto.date_value.expect("date_value is requried"));
-            date.into()
+            date.try_into().expect("TODO: forward the error")
         };
 
         let amount: NewSnapshotAmount = {

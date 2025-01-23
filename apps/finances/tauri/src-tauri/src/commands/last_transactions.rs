@@ -73,12 +73,11 @@ pub async fn past_transactions(
                 .map_err(|e| format!("Error retrieving movements from db: {e}"))?
                 .into_iter()
                 .map(|mov| {
-                    let account_ccy = main_context
+                    let account = main_context
                         .find_account(mov.account_id())
-                        .map(|acc| acc.currency_code.clone())
                         .ok_or(format!("Cannot find account pk '{}' for movement", mov.account_id()))?;
 
-                    movement_into_model_movement(mov, &account_ccy, &main_context, &mut conn)
+                    movement_into_model_movement(mov, account, &main_context, &mut conn)
                 })
                 .collect::<Result<Vec<_>, _>>()?;
 
