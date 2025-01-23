@@ -6,7 +6,7 @@ use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 
 use proto_wrapper::ProtoWrapper;
-use proto_wrapper_derive::ProtoWrapper;
+// use proto_wrapper_derive::ProtoWrapper;
 
 use super::CurrencyCode;
 use crate::protos::google::r#type::Money as MoneyProto;

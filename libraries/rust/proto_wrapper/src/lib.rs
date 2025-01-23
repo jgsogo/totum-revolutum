@@ -1,3 +1,8 @@
+#[cfg(feature = "derive_macro")]
+extern crate proto_wrapper_derive;
+#[cfg(feature = "derive_macro")]
+pub use proto_wrapper_derive::ProtoWrapper;
+
 use prost::Message;
 
 /// An object that wraps a proto message.

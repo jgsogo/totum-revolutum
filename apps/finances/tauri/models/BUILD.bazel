@@ -19,9 +19,7 @@ rust_library(
     crate_name = "finances_app_models",
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
-    ) + [
-        "//libraries/rust/proto_wrapper_derive",
-    ],
+    ),
     visibility = ["//apps/finances/tauri/src-tauri:__subpackages__"],
     deps = all_crate_deps(
         normal = True,

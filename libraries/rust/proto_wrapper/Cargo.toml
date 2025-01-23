@@ -3,5 +3,10 @@ name = "proto_wrapper"
 version = "0.0.1"
 edition = "2021"
 
+[features]
+derive_macro = []
+default = ["derive_macro"]
+
 [dependencies]
 prost = { workspace = true }
+proto_wrapper_derive = { path = "../proto_wrapper_derive" }
