@@ -1,30 +1,23 @@
-use std::ops::Deref;
 use std::ops::Mul;
 
 use bigdecimal::BigDecimal;
+
 use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 
-use super::CurrencyCode;
-use super::MoneyRef;
-use crate::traits::{ProtoWrapper, ProtoWrapperWithRef, ProtoWrapperRef};
-use prost::Message;
+use crate::traits::ProtoWrapper;
 
 const NANO_EXP: usize = 9;
 pub(crate) const NANO_VALUE: u32 = 1_000_000_000;
-
-// pub trait MoneyTrait {
-//     #[must_use]
-//     fn amount(&self) -> BigDecimal;
-
-//     fn currency_code(&self) -> Result<CurrencyCode, crate::errors::ConversionError>;
-// }
+use super::CurrencyCode;
+use prost::Message;
 
 /// A wrapper over the `google::type::money` protobuf provided by the `googleapis` ([link](https://github.com/googleapis/googleapis/blob/master/google/type/money.proto))
 ///
 /// Note.- This is not a performant datatype if your application requires operating
 /// with the inner amounts. If that's the case, use some other struct and convert
 /// to this in a final step before serializing to the wire.
+#[repr(transparent)]
 pub struct Money(crate::protos::google::r#type::Money);
 
 impl Money {
@@ -67,27 +60,27 @@ impl Money {
                 .ok_or(crate::errors::ConversionError::I32Overflow(fractional_part))?,
         }))
     }
+
+    pub fn new_ref(proto: &crate::protos::google::r#type::Money) -> &Self {
+        (unsafe { &*(proto as *const crate::protos::google::r#type::Money as *const Self) }) as _
+    }
+
+    #[must_use = "This is not just a getter, it actually does some computation"]
+    pub fn amount(&self) -> BigDecimal {
+        let amount = BigDecimal::from(self.0.units);
+        let fractional = BigDecimal::from(self.0.nanos) / NANO_VALUE;
+        amount + fractional
+    }
+
+    pub fn currency_code(&self) -> Result<CurrencyCode, crate::errors::ConversionError> {
+        CurrencyCode::new(&self.0.currency_code)
+    }
 }
 
-// impl MoneyTrait for Money {
-//     #[must_use]
-//     fn amount(&self) -> BigDecimal {
-//         self.as_ref().amount()
-//     }
-
-//     fn currency_code(&self) -> Result<CurrencyCode, crate::errors::ConversionError> {
-//         self.as_ref().currency_code()
-//     }
-// }
-
 impl ProtoWrapper<crate::protos::google::r#type::Money> for Money {
-    // fn as_proto(&self) -> &crate::protos::google::r#type::Money {
-    //     &self.0
-    // }
-
-    // fn as_ref<'a>(&'a self) -> Self::Reference<'a> {
-    //     MoneyRef::from(&self.0)
-    // }
+    fn encode_to_vec(&self) -> Vec<u8> {
+        self.0.encode_to_vec()
+    }
 }
 
 impl From<Money> for crate::protos::google::r#type::Money {
@@ -96,17 +89,17 @@ impl From<Money> for crate::protos::google::r#type::Money {
     }
 }
 
-impl From<crate::protos::google::r#type::Money> for Money {
-    fn from(v: crate::protos::google::r#type::Money) -> Self {
-        Self(v)
+impl From<&Money> for crate::protos::google::r#type::Money {
+    fn from(val: &Money) -> Self {
+        val.0.clone()
     }
 }
 
-// impl AsRef<crate::protos::google::r#type::Money> for Money {
-//     fn as_ref(&self) -> &crate::protos::google::r#type::Money {
-//         &self.0
-//     }
-// }
+impl<'a> From<&'a crate::protos::google::r#type::Money> for &'a Money {
+    fn from(value: &'a crate::protos::google::r#type::Money) -> Self {
+        Money::new_ref(value)
+    }
+}
 
 impl TryFrom<Vec<u8>> for Money {
     type Error = crate::errors::Error;
@@ -115,36 +108,6 @@ impl TryFrom<Vec<u8>> for Money {
         Ok(Self(crate::protos::google::r#type::Money::decode(&*value)?))
     }
 }
-
-impl<'a> ProtoWrapperWithRef<'a, crate::protos::google::r#type::Money> for Money {
-    type Reference = MoneyRef;
-
-    fn as_ref(&'a self) -> &'a Self::Reference {
-        <MoneyRef as ProtoWrapperRef<crate::protos::google::r#type::Money>>::new(&self.0)
-    }
-}
-
-impl Deref for Money {
-    type Target = MoneyRef;
-
-    fn deref(&self) -> &Self::Target {
-        Self::Target::new_ref(&self.0)
-    }
-}
-
-// impl<'a> Deref for Money {
-//     type Target = MoneyRef<'a>;
-
-//     fn deref(&'a self) -> &'a Self::Target {
-//         todo!()
-//     }
-// }
-
-// impl<'a> AsRef<MoneyRef<'a>> for Money {
-//     fn as_ref(&'a self) -> &MoneyRef<'a> {
-//         &MoneyRef::from(&self.0)
-//     }
-// }
 
 impl Mul<&BigDecimal> for &Money {
     type Output = Result<Money, crate::errors::ConversionError>;
@@ -160,6 +123,22 @@ mod tests {
     use super::*;
 
     use std::str::FromStr;
+
+    #[test]
+    fn roundtrip() {
+        let money = {
+            let amount = BigDecimal::from_str("12.345600").unwrap();
+            Money::new(amount, CurrencyCode::EUR).unwrap()
+        };
+
+        let money2: Money = {
+            let msg = money.encode_to_vec();
+            msg.try_into().unwrap()
+        };
+
+        assert_eq!(money.amount(), money2.amount());
+        assert_eq!(money.currency_code().unwrap(), money2.currency_code().unwrap());
+    }
 
     #[test]
     fn positive_amount() {
@@ -227,12 +206,16 @@ mod tests {
     }
 
     #[test]
-    fn as_ref() {
-        let amount = BigDecimal::from_str("2.00").unwrap();
-        let money = Money::new(amount, CurrencyCode::USD).unwrap();
+    fn from_reference() {
+        let proto: crate::protos::google::r#type::Money = {
+            let amount = BigDecimal::from_str("2.00").unwrap();
+            let money = Money::new(amount, CurrencyCode::USD).unwrap();
+            money.into()
+        };
 
-        let reference = money.as_ref();
-        assert_eq!(reference.amount().to_string(), "2");
-        assert_eq!(reference.currency_code().unwrap(), CurrencyCode::USD);
+        // From a reference to a proto I can construct (and use) the wrapper
+        let money_ref: &Money = (&proto).into();
+        assert_eq!(money_ref.amount().to_string(), "2");
+        assert_eq!(money_ref.currency_code().unwrap(), CurrencyCode::USD);
     }
 }
