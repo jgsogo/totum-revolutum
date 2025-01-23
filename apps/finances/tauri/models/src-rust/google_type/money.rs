@@ -9,7 +9,7 @@ use crate::traits::private_parts::ProtoWrapperPrivate;
 use crate::traits::ProtoWrapper;
 
 use super::CurrencyCode;
-use prost::Message;
+use crate::protos::google::r#type::Money as MoneyProto;
 
 const NANO_EXP: usize = 9;
 pub(crate) const NANO_VALUE: u32 = 1_000_000_000;
@@ -20,12 +20,12 @@ pub(crate) const NANO_VALUE: u32 = 1_000_000_000;
 /// with the inner amounts. If that's the case, use some other struct and convert
 /// to this in a final step before serializing to the wire.
 #[repr(transparent)]
-pub struct Money(crate::protos::google::r#type::Money);
+pub struct Money(MoneyProto);
 
 impl Money {
     pub fn new(amount: BigDecimal, ccy: CurrencyCode) -> Result<Self, crate::errors::ConversionError> {
         if amount.is_zero() {
-            return Ok(Self(crate::protos::google::r#type::Money {
+            return Ok(Self(MoneyProto {
                 currency_code: ccy.to_string(),
                 units: i64::zero(),
                 nanos: i32::zero(),
@@ -52,7 +52,7 @@ impl Money {
             (integer_part, fractional_part)
         };
 
-        Ok(Self(crate::protos::google::r#type::Money {
+        Ok(Self(MoneyProto {
             currency_code: ccy.to_string(),
             units: integer_part
                 .to_i64()
@@ -61,10 +61,6 @@ impl Money {
                 .to_i32()
                 .ok_or(crate::errors::ConversionError::I32Overflow(fractional_part))?,
         }))
-    }
-
-    pub(crate) fn new_ref(proto: &crate::protos::google::r#type::Money) -> &Self {
-        (unsafe { &*(proto as *const crate::protos::google::r#type::Money as *const Self) }) as _
     }
 
     #[must_use = "This is not just a getter, it actually does some computation"]
@@ -79,37 +75,31 @@ impl Money {
     }
 }
 
-impl ProtoWrapperPrivate<crate::protos::google::r#type::Money> for Money {
-    fn inner_proto(&self) -> &crate::protos::google::r#type::Money {
+impl ProtoWrapperPrivate<MoneyProto> for Money {
+    fn inner_proto(&self) -> &MoneyProto {
         &self.0
+    }
+
+    fn from_proto(proto: MoneyProto) -> Self {
+        Self(proto)
     }
 }
 
-impl ProtoWrapper<crate::protos::google::r#type::Money> for Money {}
+impl ProtoWrapper<MoneyProto> for Money {
+    fn new_ref(proto: &MoneyProto) -> &Self {
+        (unsafe { &*(proto as *const MoneyProto as *const Self) }) as _
+    }
+}
 
-impl From<Money> for crate::protos::google::r#type::Money {
+impl From<Money> for MoneyProto {
     fn from(val: Money) -> Self {
         val.0
     }
 }
 
-impl From<&Money> for crate::protos::google::r#type::Money {
+impl From<&Money> for MoneyProto {
     fn from(val: &Money) -> Self {
         val.0.clone()
-    }
-}
-
-impl<'a> From<&'a crate::protos::google::r#type::Money> for &'a Money {
-    fn from(value: &'a crate::protos::google::r#type::Money) -> Self {
-        Money::new_ref(value)
-    }
-}
-
-impl TryFrom<Vec<u8>> for Money {
-    type Error = crate::errors::Error;
-
-    fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
-        Ok(Self(crate::protos::google::r#type::Money::decode(&*value)?))
     }
 }
 
@@ -135,9 +125,9 @@ mod tests {
             Money::new(amount, CurrencyCode::EUR).unwrap()
         };
 
-        let money2: Money = {
+        let money2 = {
             let msg = money.encode_to_vec();
-            msg.try_into().unwrap()
+            Money::decode(msg).unwrap()
         };
 
         assert_eq!(money.amount(), money2.amount());
@@ -211,18 +201,18 @@ mod tests {
 
     #[test]
     fn from_reference() {
-        let proto: crate::protos::google::r#type::Money = {
+        let proto: MoneyProto = {
             let amount = BigDecimal::from_str("2.00").unwrap();
             let money = Money::new(amount, CurrencyCode::USD).unwrap();
             money.into()
         };
 
         // From a reference to a proto I can construct (and use) the wrapper
-        let money_ref: &Money = (&proto).into();
+        let money_ref = Money::new_ref(&proto);
         assert_eq!(money_ref.amount().to_string(), "2");
         assert_eq!(money_ref.currency_code().unwrap(), CurrencyCode::USD);
 
         // And, if needed, we can get a clone of the inner proto so we can store it in an inner message
-        let _proto_cloned: crate::protos::google::r#type::Money = money_ref.into();
+        let _proto_cloned: MoneyProto = money_ref.into();
     }
 }
