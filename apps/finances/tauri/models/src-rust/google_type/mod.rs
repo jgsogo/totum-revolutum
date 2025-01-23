@@ -4,7 +4,7 @@
 
 mod currency_code;
 // mod date;
-// mod decimal;
+mod decimal;
 mod money;
 
 pub use currency_code::CurrencyCode;

@@ -4,7 +4,10 @@ use prost::Message;
 ///
 /// * [`Into<TProto>`]: To extract the underlying proto from the type so it can be actually added to protobuf messages.
 ///   of the reference can benefit from the wrapper functionality.
-pub trait ProtoWrapper<TProto: Message + Default>: Into<TProto> + private_parts::ProtoWrapperPrivate<TProto> {
+pub trait ProtoWrapper<TProto: Message + Default>: Into<TProto> + private_parts::ProtoWrapperPrivate<TProto>
+where
+    TProto: for<'a> From<&'a Self>,
+{
     /// Creates a reference to a **non owning** reference of the wrapper
     fn new_ref(proto: &TProto) -> &Self;
 

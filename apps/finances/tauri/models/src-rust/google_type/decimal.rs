@@ -18,44 +18,40 @@ impl Decimal {
 }
 
 impl ProtoWrapperPrivate<DecimalProto> for Decimal {
-    fn new_ref(proto: &DecimalProto) -> &Self {
-        (unsafe { &*(proto as *const DecimalProto as *const Self) }) as _
-    }
-
     fn inner_proto(&self) -> &DecimalProto {
         &self.0
     }
+
+    fn from_proto(proto: DecimalProto) -> Self {
+        Self(proto)
+    }
 }
 
-// impl ProtoWrapper<crate::protos::google::r#type::Money> for Money {}
+impl ProtoWrapper<DecimalProto> for Decimal {
+    fn new_ref(proto: &DecimalProto) -> &Self {
+        (unsafe { &*(proto as *const DecimalProto as *const Self) }) as _
+    }
+}
 
-// impl From<Decimal> for crate::protos::google::r#type::Decimal {
-//     fn from(val: Decimal) -> Self {
-//         val.0
-//     }
-// }
+impl From<Decimal> for DecimalProto {
+    fn from(val: Decimal) -> Self {
+        val.0
+    }
+}
 
-// impl From<crate::protos::google::r#type::Decimal> for Decimal {
-//     fn from(v: crate::protos::google::r#type::Decimal) -> Self {
-//         Self(v)
-//     }
-// }
+impl From<&Decimal> for DecimalProto {
+    fn from(val: &Decimal) -> Self {
+        val.0.clone()
+    }
+}
 
-// impl From<BigDecimal> for Decimal {
-//     fn from(value: BigDecimal) -> Self {
-//         Self(crate::protos::google::r#type::Decimal {
-//             value: value.to_scientific_notation(),
-//         })
-//     }
-// }
+impl TryFrom<Decimal> for BigDecimal {
+    type Error = crate::errors::ConversionError;
 
-// impl TryFrom<Decimal> for BigDecimal {
-//     type Error = crate::errors::ConversionError;
-
-//     fn try_from(value: Decimal) -> Result<Self, Self::Error> {
-//         Ok(BigDecimal::from_str(&value.0.value)?)
-//     }
-// }
+    fn try_from(value: Decimal) -> Result<Self, Self::Error> {
+        Ok(BigDecimal::from_str(&value.0.value)?)
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -66,7 +62,7 @@ mod tests {
     fn roundtrip() {
         let amount = BigDecimal::from_str("-00.01234").unwrap();
 
-        let dec: Decimal = amount.into();
+        let dec = Decimal::new(amount);
         assert_eq!(dec.0.value, "-1.234e-2");
 
         let big_decimal: BigDecimal = dec.try_into().unwrap();
@@ -77,7 +73,7 @@ mod tests {
     fn roundtrip_zero() {
         let amount = BigDecimal::zero();
 
-        let dec: Decimal = amount.into();
+        let dec = Decimal::new(amount);
         assert_eq!(dec.0.value, "0e0");
 
         let big_decimal: BigDecimal = dec.try_into().unwrap();
