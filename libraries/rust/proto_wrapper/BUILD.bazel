@@ -1,0 +1,20 @@
+load("@crates_libraries//:defs.bzl", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+###########
+# Rust library
+###########
+
+rust_library(
+    name = "proto_wrapper",
+    srcs = glob(
+        ["src/**/*.rs"],
+    ),
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    visibility = ["//visibility:public"],
+    deps = all_crate_deps(
+        normal = True,
+    ),
+)

@@ -123,6 +123,8 @@ crate.from_cargo(
         "//libraries/openexchangerates:Cargo.toml",
         "//libraries/pcloud_sdk:Cargo.toml",
         "//libraries/rebrickable:Cargo.toml",
+        "//libraries/rust/proto_wrapper:Cargo.toml",
+        "//libraries/rust/proto_wrapper_derive:Cargo.toml",
         "//libraries/utils:Cargo.toml",
         # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
         "//bazel/external:Cargo.toml",

@@ -3,7 +3,7 @@
 //! FIXME: Move this to //libraries/googleapis and reuse it.
 
 mod currency_code;
-// mod date;
+mod date;
 mod decimal;
 mod money;
 

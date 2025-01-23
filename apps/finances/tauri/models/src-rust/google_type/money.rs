@@ -5,8 +5,8 @@ use bigdecimal::BigDecimal;
 use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 
-use crate::traits::private_parts::ProtoWrapperPrivate;
-use crate::traits::ProtoWrapper;
+use proto_wrapper::private_parts::ProtoWrapperPrivate;
+use proto_wrapper::ProtoWrapper;
 
 use super::CurrencyCode;
 use crate::protos::google::r#type::Money as MoneyProto;

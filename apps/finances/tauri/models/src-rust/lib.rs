@@ -23,7 +23,7 @@ pub mod google_type;
 // mod new_transaction;
 pub mod protos;
 // mod snapshot;
-pub mod traits;
+// pub mod traits;
 // mod transaction;
 // mod transaction_group;
 

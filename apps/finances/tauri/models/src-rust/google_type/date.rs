@@ -1,7 +1,13 @@
-use crate::traits::ProtoWrapper;
 use chrono::{Datelike, NaiveDate};
 
-pub struct Date(crate::protos::google::r#type::Date);
+use crate::protos::google::r#type::Date as DateProto;
+
+use proto_wrapper::private_parts::ProtoWrapperPrivate;
+use proto_wrapper::ProtoWrapper;
+use proto_wrapper_derive::ProtoWrapper;
+
+#[derive(ProtoWrapper)]
+pub struct Date(DateProto);
 
 impl Date {
     /// Creates a new [`Date`] following the same rules as the [`NaiveDate::from_ymd_opt`] implementation
@@ -13,24 +19,6 @@ impl Date {
                 day: day.try_into()?,
             })?;
         Ok(date.into())
-    }
-}
-
-impl ProtoWrapper<crate::protos::google::r#type::Date> for Date {
-    fn as_proto(&self) -> &crate::protos::google::r#type::Date {
-        &self.0
-    }
-}
-
-impl From<Date> for crate::protos::google::r#type::Date {
-    fn from(val: Date) -> Self {
-        val.0
-    }
-}
-
-impl From<crate::protos::google::r#type::Date> for Date {
-    fn from(v: crate::protos::google::r#type::Date) -> Self {
-        Self(v)
     }
 }
 
