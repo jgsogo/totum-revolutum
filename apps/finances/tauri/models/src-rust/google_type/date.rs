@@ -1,12 +1,10 @@
 use chrono::{Datelike, NaiveDate};
 
-use crate::protos::google::r#type::Date as DateProto;
-
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
 #[derive(ProtoWrapper)]
-pub struct Date(DateProto);
+pub struct Date(crate::protos::google::r#type::Date);
 
 impl Date {
     /// Creates a new [`Date`] following the same rules as the [`NaiveDate::from_ymd_opt`] implementation

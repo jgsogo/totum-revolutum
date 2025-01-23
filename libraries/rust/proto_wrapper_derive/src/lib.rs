@@ -17,7 +17,11 @@ fn impl_proto_wrapper_macro(ast: &syn::DeriveInput) -> TokenStream {
     let proto_type = match &ast.data {
         syn::Data::Struct(data_struct) => match &data_struct.fields {
             syn::Fields::Unnamed(unnamed_field) => match &unnamed_field.unnamed.first().unwrap().ty {
-                syn::Type::Path(p) => p.path.get_ident().unwrap(),
+                syn::Type::Path(p) => p,
+                //  match p.path.get_ident() {
+                //     Some(ident) => ident,
+                //   None => panic!("Not implemented"),
+                //  },
                 _ => panic!("Expects Type::Path"),
             },
             _ => panic!("Expecting just one Field::Unnamed"),
