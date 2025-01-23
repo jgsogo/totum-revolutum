@@ -7,7 +7,7 @@ use bigdecimal::Zero;
 
 use super::CurrencyCode;
 use super::MoneyRef;
-use crate::traits::{ProtoWrapper, ProtoWrapperWithRef};
+use crate::traits::{ProtoWrapper, ProtoWrapperWithRef, ProtoWrapperRef};
 use prost::Message;
 
 const NANO_EXP: usize = 9;
@@ -120,7 +120,7 @@ impl<'a> ProtoWrapperWithRef<'a, crate::protos::google::r#type::Money> for Money
     type Reference = MoneyRef;
 
     fn as_ref(&'a self) -> &'a Self::Reference {
-        MoneyRef::new(&self.0)
+        <MoneyRef as ProtoWrapperRef<crate::protos::google::r#type::Money>>::new(&self.0)
     }
 }
 
@@ -128,7 +128,7 @@ impl Deref for Money {
     type Target = MoneyRef;
 
     fn deref(&self) -> &Self::Target {
-        Self::Target::new(&self.0)
+        Self::Target::new_ref(&self.0)
     }
 }
 

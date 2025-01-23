@@ -41,7 +41,7 @@ where
 /// A wrapper over a reference to a proto
 ///
 /// * [`Into<TProto>`]: So we can get the proto (a clone)
-pub trait ProtoWrapperRef<TProto: Message>: Into<TProto> {
+pub trait ProtoWrapperRef<TProto: Message>: Into<TProto> + AsRef<Self> {
     fn new(proto: &TProto) -> &Self;
 
     // fn as_proto(&self) -> &TProto;
