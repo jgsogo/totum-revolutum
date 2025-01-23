@@ -67,17 +67,6 @@ impl Money {
                 .ok_or(crate::errors::ConversionError::I32Overflow(fractional_part))?,
         }))
     }
-
-    #[must_use]
-    fn amount(&self) -> BigDecimal {
-        let amount = BigDecimal::from(self.0.units);
-        let fractional = BigDecimal::from(self.0.nanos) / NANO_VALUE;
-        amount + fractional
-    }
-
-    fn currency_code(&self) -> Result<CurrencyCode, crate::errors::ConversionError> {
-        CurrencyCode::new(&self.0.currency_code)
-    }
 }
 
 // impl MoneyTrait for Money {
@@ -128,20 +117,20 @@ impl TryFrom<Vec<u8>> for Money {
 }
 
 impl<'a> ProtoWrapperWithRef<'a, crate::protos::google::r#type::Money> for Money {
-    type Reference = MoneyRef<'a>;
+    type Reference = MoneyRef;
 
-    fn as_ref(&'a self) -> Self::Reference {
-        MoneyRef::from(&self.0)
+    fn as_ref(&'a self) -> &'a Self::Reference {
+        MoneyRef::new(&self.0)
     }
 }
 
-// impl Deref for Money {
-//     type Target = MoneyRef<'static>;
+impl Deref for Money {
+    type Target = MoneyRef;
 
-//     fn deref(&'a self) -> &'a Self::Target {
-//         todo!()
-//     }
-// }
+    fn deref(&self) -> &Self::Target {
+        Self::Target::new(&self.0)
+    }
+}
 
 // impl<'a> Deref for Money {
 //     type Target = MoneyRef<'a>;

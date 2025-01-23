@@ -29,20 +29,20 @@ pub trait ProtoWrapper<TProto: Message>: TryFrom<Vec<u8>, Error = crate::errors:
 pub trait ProtoWrapperWithRef<'a, TProto: 'a + Message>:
     ProtoWrapper<TProto> 
     // + AsRef
-    // + Deref<Target = Self::Reference>
+    + Deref<Target = Self::Reference>
 where
     Self: 'a,
 {
-    type Reference: ProtoWrapperRef<'a, TProto>;
+    type Reference: ProtoWrapperRef<TProto>;
 
-    fn as_ref(&'a self) -> Self::Reference;
+    fn as_ref(&'a self) -> &'a Self::Reference;
 }
 
 /// A wrapper over a reference to a proto
 ///
 /// * [`Into<TProto>`]: So we can get the proto (a clone)
-pub trait ProtoWrapperRef<'a, TProto: 'a + Message>: Into<TProto> {
-    fn new(proto: &'a TProto) -> Self;
+pub trait ProtoWrapperRef<TProto: Message>: Into<TProto> {
+    fn new(proto: &TProto) -> &Self;
 
     // fn as_proto(&self) -> &TProto;
 }
