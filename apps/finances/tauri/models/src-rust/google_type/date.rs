@@ -2,10 +2,10 @@ use chrono::{Datelike, NaiveDate};
 
 use crate::protos::google::r#type::Date as DateProto;
 
-use proto_wrapper::private_parts::ProtoWrapperPrivate;
 use proto_wrapper::ProtoWrapper;
 use proto_wrapper_derive::ProtoWrapper;
 
+#[repr(transparent)]
 #[derive(ProtoWrapper)]
 pub struct Date(DateProto);
 

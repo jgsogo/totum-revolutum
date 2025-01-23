@@ -3,12 +3,12 @@ use std::str::FromStr;
 
 use crate::protos::google::r#type::Decimal as DecimalProto;
 
-use proto_wrapper::private_parts::ProtoWrapperPrivate;
 use proto_wrapper::ProtoWrapper;
-// use proto_wrapper_derive::ProtoWrapper;
+use proto_wrapper_derive::ProtoWrapper;
 
 /// A wrapper over the `google::type::Decimal` protobuf provided by the `googleapis` ([link](https://github.com/googleapis/googleapis/blob/master/google/type/decimal.proto))
 #[repr(transparent)]
+#[derive(ProtoWrapper)]
 pub struct Decimal(DecimalProto);
 
 impl Decimal {
@@ -16,34 +16,6 @@ impl Decimal {
         Self(DecimalProto {
             value: value.to_scientific_notation(),
         })
-    }
-}
-
-impl ProtoWrapperPrivate<DecimalProto> for Decimal {
-    fn inner_proto(&self) -> &DecimalProto {
-        &self.0
-    }
-
-    fn from_proto(proto: DecimalProto) -> Self {
-        Self(proto)
-    }
-}
-
-impl ProtoWrapper<DecimalProto> for Decimal {
-    fn new_ref(proto: &DecimalProto) -> &Self {
-        (unsafe { &*(proto as *const DecimalProto as *const Self) }) as _
-    }
-}
-
-impl From<Decimal> for DecimalProto {
-    fn from(val: Decimal) -> Self {
-        val.0
-    }
-}
-
-impl From<&Decimal> for DecimalProto {
-    fn from(val: &Decimal) -> Self {
-        val.0.clone()
     }
 }
 

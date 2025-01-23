@@ -5,8 +5,8 @@ use bigdecimal::BigDecimal;
 use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 
-use proto_wrapper::private_parts::ProtoWrapperPrivate;
 use proto_wrapper::ProtoWrapper;
+use proto_wrapper_derive::ProtoWrapper;
 
 use super::CurrencyCode;
 use crate::protos::google::r#type::Money as MoneyProto;
@@ -20,6 +20,7 @@ pub(crate) const NANO_VALUE: u32 = 1_000_000_000;
 /// with the inner amounts. If that's the case, use some other struct and convert
 /// to this in a final step before serializing to the wire.
 #[repr(transparent)]
+#[derive(ProtoWrapper)]
 pub struct Money(MoneyProto);
 
 impl Money {
@@ -72,34 +73,6 @@ impl Money {
 
     pub fn currency_code(&self) -> Result<CurrencyCode, crate::errors::ConversionError> {
         CurrencyCode::new(&self.0.currency_code)
-    }
-}
-
-impl ProtoWrapperPrivate<MoneyProto> for Money {
-    fn inner_proto(&self) -> &MoneyProto {
-        &self.0
-    }
-
-    fn from_proto(proto: MoneyProto) -> Self {
-        Self(proto)
-    }
-}
-
-impl ProtoWrapper<MoneyProto> for Money {
-    fn new_ref(proto: &MoneyProto) -> &Self {
-        (unsafe { &*(proto as *const MoneyProto as *const Self) }) as _
-    }
-}
-
-impl From<Money> for MoneyProto {
-    fn from(val: Money) -> Self {
-        val.0
-    }
-}
-
-impl From<&Money> for MoneyProto {
-    fn from(val: &Money) -> Self {
-        val.0.clone()
     }
 }
 

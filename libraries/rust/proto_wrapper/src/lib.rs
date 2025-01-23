@@ -4,7 +4,7 @@ use prost::Message;
 ///
 /// * [`Into<TProto>`]: To extract the underlying proto from the type so it can be actually added to protobuf messages.
 ///   of the reference can benefit from the wrapper functionality.
-pub trait ProtoWrapper<TProto: Message + Default>: Into<TProto> + private_parts::ProtoWrapperPrivate<TProto>
+pub trait ProtoWrapper<TProto: Message + Default>: Into<TProto>
 where
     TProto: for<'a> From<&'a Self>,
 {
@@ -23,14 +23,10 @@ where
         let proto = TProto::decode(&*buf)?;
         Ok(Self::from_proto(proto))
     }
-}
 
-pub mod private_parts {
-    use super::Message;
+    /// Returns a reference to the inner proto
+    fn inner_proto(&self) -> &TProto;
 
-    pub trait ProtoWrapperPrivate<TProto: Message> {
-        fn inner_proto(&self) -> &TProto;
-
-        fn from_proto(proto: TProto) -> Self;
-    }
+    /// Creates a new instance from a proto
+    fn from_proto(proto: TProto) -> Self;
 }

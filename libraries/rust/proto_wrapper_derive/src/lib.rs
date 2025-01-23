@@ -26,7 +26,11 @@ fn impl_proto_wrapper_macro(ast: &syn::DeriveInput) -> TokenStream {
     };
 
     let gen = quote! {
-        impl ProtoWrapperPrivate<#proto_type> for #name {
+        impl ProtoWrapper<#proto_type> for #name {
+            fn new_ref(proto: &#proto_type) -> &Self {
+                (unsafe { &*(proto as *const #proto_type as *const Self) }) as _
+            }
+
             fn inner_proto(&self) -> &#proto_type {
                 &self.0
             }
@@ -35,13 +39,6 @@ fn impl_proto_wrapper_macro(ast: &syn::DeriveInput) -> TokenStream {
                 Self(proto)
             }
         }
-
-        impl ProtoWrapper<#proto_type> for #name {
-            fn new_ref(proto: &#proto_type) -> &Self {
-                (unsafe { &*(proto as *const #proto_type as *const Self) }) as _
-            }
-        }
-
 
         impl From<#name> for #proto_type {
             fn from(val: #name) -> Self {
