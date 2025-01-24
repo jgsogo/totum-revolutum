@@ -35,6 +35,7 @@ pub(crate) mod protos;
 pub use errors::{Error, Result};
 pub(crate) use fx_quote::FxQuote;
 pub(crate) use money_amount::MoneyAmount;
+pub(crate) use movement::Movement;
 // pub use movement::{MovementDirection, MovementType};
 // pub use fx::Fx;
 // pub use holder::Holder;
