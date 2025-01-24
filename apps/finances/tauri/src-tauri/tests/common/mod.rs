@@ -1,17 +1,18 @@
 use finances_accounts::test_utils::establish_connection;
-use finances_app_models::AppState;
+use finances_app_models::{google_type, AppState, DatabaseConnection, ProtoWrapper};
 
 use serde_json::Value;
 use tauri::{test::MockRuntime, Manager, WebviewWindow};
 
 pub fn webview() -> WebviewWindow<MockRuntime> {
     let pool = establish_connection();
+    let db = DatabaseConnection::new("postgres_url".to_string());
     let app_state = AppState::new(
-        "postgres_url".to_string(),
-        "base_url".to_string(),
+        google_type::CurrencyCode::USD,
         "media_url".to_string(),
         "static_url".to_string(),
-        "USD".to_string(),
+        "base_url".to_string(),
+        db,
     );
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone());

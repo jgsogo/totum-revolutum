@@ -5,8 +5,8 @@ use finances_accounts::models::{Transaction as TransactionDb, TransactionGroup a
 use finances_accounts::sql::filters::{
     movement_filter_account_by_pk, movement_filter_by_direction, transactiongroup_by_pk,
 };
+use finances_app_models::MainContext;
 use finances_app_models::{LastTransactionsRequest, LastTransactionsResponse, Transaction};
-use finances_app_models::{MainContext, OutgoingModel};
 use tauri::State;
 
 use super::movement_into_model_movement;

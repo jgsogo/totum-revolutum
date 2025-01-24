@@ -55,6 +55,16 @@ fn impl_proto_wrapper_macro(ast: &syn::DeriveInput) -> TokenStream {
                 val.0.clone()
             }
         }
+
+        /// This implementation is important, so we can convert from Vec<u8> to
+        /// the actual type without knowing which one is the proto message type.
+        impl TryFrom<Vec<u8>> for #name {
+            type Error = prost::DecodeError;
+
+            fn try_from(v: Vec<u8>) -> std::result::Result<Self, Self::Error> {
+                Self::decode(v)
+            }
+        }
     };
     gen.into()
 }

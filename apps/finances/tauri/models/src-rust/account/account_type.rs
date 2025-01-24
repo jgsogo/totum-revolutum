@@ -4,7 +4,7 @@ use super::AccountCategory;
 use crate::Result;
 
 #[repr(transparent)]
-#[derive(ProtoWrapper)]
+#[derive(ProtoWrapper, Clone)]
 pub struct AccountType(crate::protos::finances_app_models::AccountType);
 
 impl AccountType {

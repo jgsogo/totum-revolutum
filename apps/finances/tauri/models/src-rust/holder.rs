@@ -5,12 +5,12 @@ use proto_wrapper::ProtoWrapper;
 pub struct Holder(crate::protos::finances_app_models::Holder);
 
 impl Holder {
-    pub fn new(pk: i64, name: String, is_company: bool, photo: String) -> Self {
+    pub fn new(pk: i64, name: String, is_company: bool, photo: Option<String>) -> Self {
         Self(crate::protos::finances_app_models::Holder {
             pk,
             name,
             is_company,
-            photo: Some(photo),
+            photo,
         })
     }
 
@@ -27,6 +27,6 @@ impl Holder {
     }
 
     pub fn photo(&self) -> Option<&str> {
-        self.0.photo.as_ref().map(|x| x.as_str())
+        self.0.photo.as_deref()
     }
 }

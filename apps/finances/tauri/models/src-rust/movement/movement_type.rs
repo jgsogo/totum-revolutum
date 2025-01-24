@@ -1,7 +1,7 @@
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
-#[derive(ProtoWrapper)]
+#[derive(ProtoWrapper, Clone)]
 pub struct MovementType(crate::protos::finances_app_models::MovementType);
 
 impl MovementType {

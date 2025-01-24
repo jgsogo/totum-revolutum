@@ -13,15 +13,23 @@ use finances_accounts::models::{
 };
 use finances_accounts::sql::filters::accounttype_by_unique_names;
 use finances_app_models::{
-    Account as AppModelAccount, AccountCategory, AccountType as AppModelAccountType, AppState, MainContext,
-    MovementType as AppModelMovementType, TransactionGroup as AppModelTransactionGroup,
+    google_type, Account as AccountProto, AccountCategory as AccountCategoryProto, AccountType as AccountTypeProto,
+    AppState as AppStateProto, Holder as HolderProto, MainContext as MainContextProto,
+    MovementType as MovementTypeProto, TransactionGroup as TransactionGroupProto,
 };
+
+const SAVINGS_UNIQUE_NAMES: &[&str] = &[finances_accounts::constants::accounttype::ASSETS_CURRENT_SAVINGS];
+const INVESTMENT_UNIQUE_NAMES: &[&str] = &[
+    finances_investments::constants::accounttype::ASSETS_CURRENT_INVESTMENT,
+    finances_investments::constants::accounttype::ASSETS_NON_CURRENT_REAL_STATE,
+];
+const RETIREMENT_UNIQUE_NAMES: &[&str] = &[finances_investments::constants::accounttype::ASSETS_NON_CURRENT_RETIREMENT];
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn create_app<R: tauri::Runtime>(
     builder: tauri::Builder<R>,
     db_pool: Pool<ConnectionManager<ConnectionType>>,
-    state: AppState,
+    state: AppStateProto,
 ) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
 
@@ -42,37 +50,38 @@ pub fn create_app<R: tauri::Runtime>(
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            commands::get_app_state,
-            commands::get_main_context,
-            commands::get_holder_context,
-            commands::get_account_context,
+            // commands::get_app_state,
+            // commands::get_main_context,
+            // commands::get_holder_context,
+            // commands::get_account_context,
             // Sending data
-            commands::snapshot::create_snapshot,
-            commands::transaction::create_transaction,
+            // commands::snapshot::create_snapshot,
+            // commands::transaction::create_transaction,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
 }
 
-pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> {
-    let holders = AccountHolder::all()
+pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, String> {
+    // All the holders
+    let holders: Vec<HolderProto> = AccountHolder::all()
         .select(AccountHolder::as_select())
         .order(finances_accounts::schema::finances_accounts_accountholder::name.asc())
         .load::<AccountHolder>(conn)
-        .map_err(|e| format!("Error loading holders: {}", e))?;
+        .map_err(|e| format!("Error loading holders: {}", e))?
+        .into_iter()
+        .map(|v| HolderProto::new(v.id, v.name, v.is_company, v.photo))
+        .collect();
 
     log::debug!("Found {} holders", holders.len());
 
     // All the account types
-    let account_types: Vec<AppModelAccountType> = {
-        let savings_accounttypes_pks: Vec<i64> =
-            get_accounttypes_for_unique_names(conn, AccountCategory::savings_accounttypes())?;
+    let account_types: Vec<AccountTypeProto> = {
+        let savings_accounttypes_pks: Vec<i64> = get_accounttypes_for_unique_names(conn, SAVINGS_UNIQUE_NAMES)?;
 
-        let investment_accounttypes_pks: Vec<i64> =
-            get_accounttypes_for_unique_names(conn, AccountCategory::investment_accounttypes())?;
+        let investment_accounttypes_pks: Vec<i64> = get_accounttypes_for_unique_names(conn, INVESTMENT_UNIQUE_NAMES)?;
 
-        let retirement_accounttypes_pks: Vec<i64> =
-            get_accounttypes_for_unique_names(conn, AccountCategory::retirement_accounttypes())?;
+        let retirement_accounttypes_pks: Vec<i64> = get_accounttypes_for_unique_names(conn, RETIREMENT_UNIQUE_NAMES)?;
 
         AccountType::all()
             .select(AccountType::as_select())
@@ -82,29 +91,24 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> 
             .into_iter()
             .map(|v| {
                 let account_category = if savings_accounttypes_pks.contains(&v.id) {
-                    AccountCategory::Savings
+                    AccountCategoryProto::savings()
                 } else if investment_accounttypes_pks.contains(&v.id) {
-                    AccountCategory::Investment
+                    AccountCategoryProto::investment()
                 } else if retirement_accounttypes_pks.contains(&v.id) {
-                    AccountCategory::Retirement
+                    AccountCategoryProto::retirement()
                 } else {
-                    AccountCategory::Other
+                    AccountCategoryProto::other()
                 };
                 let breadcrumbs = v
                     .get_breadcrumbs(conn)
                     .map_err(|e| format!("Error getting breadcrumbs for account type {}: {}", v.id, e))?;
-                Ok::<_, String>(AppModelAccountType::new(
-                    v.id,
-                    v.name,
-                    Some(breadcrumbs),
-                    account_category,
-                ))
+                Ok::<_, String>(AccountTypeProto::new(v.id, v.name, Some(breadcrumbs), account_category))
             })
             .collect::<Result<Vec<_>, _>>()?
     };
 
     // All the movement types
-    let movement_types: Vec<AppModelMovementType> = {
+    let movement_types: Vec<MovementTypeProto> = {
         MovementType::all()
             .select(MovementType::as_select())
             // .filter(accounttype_by_unique_names(unique_names))
@@ -115,13 +119,13 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> 
                 let breadcrumbs = v
                     .get_breadcrumbs(conn)
                     .map_err(|e| format!("Error getting breadcrumbs for movement type {}: {}", v.id, e))?;
-                Ok::<_, String>(AppModelMovementType::new(v.id, v.name, Some(breadcrumbs)))
+                Ok::<_, String>(MovementTypeProto::new(v.id, v.name, Some(breadcrumbs)))
             })
             .collect::<Result<Vec<_>, _>>()?
     };
 
     // All the accounts
-    let accounts: Vec<AppModelAccount> = {
+    let accounts: Vec<AccountProto> = {
         // Get all accounts for a given holder
         let accounts = Account::all()
             .inner_join(
@@ -149,28 +153,34 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContext, String> 
                         "Account type 'pk={}' not found in main context",
                         account_type.id
                     ))?;
-                Ok::<_, String>(AppModelAccount::new(
-                    account,
-                    account_holder_role,
+                Ok::<_, String>(AccountProto::new(
+                    account.id,
+                    account.name,
                     custodian.into(),
                     account_type.clone(),
+                    google_type::CurrencyCode::new(&account.ccy).map_err(|e| e.to_string())?,
+                    account.identifier,
+                    account.description,
+                    account.open.into(),
+                    account_holder_role.owns_money,
+                    account.is_numerable,
                 ))
             })
             .collect::<Result<Vec<_>, _>>()?
     };
 
     // All the transaction groups
-    let transaction_groups: Vec<AppModelTransactionGroup> = //Vec::default();
+    let transaction_groups: Vec<TransactionGroupProto> = //Vec::default();
     {
         TransactionGroup::all()
             .select(TransactionGroup::as_select())
             .load::<TransactionGroup>(conn)
             .map_err(|e| format!("Error loading transactions groups: {e}"))?
             .into_iter()
-            .map(|v| AppModelTransactionGroup::new(v.id, v.name, v.description)).collect()
+            .map(|v| TransactionGroupProto::new(v.id, v.name, v.description)).collect()
     };
 
-    let context = MainContext::new(holders, account_types, movement_types, accounts, transaction_groups);
+    let context = MainContextProto::new(holders, account_types, movement_types, accounts, transaction_groups);
     Ok(context)
 }
 

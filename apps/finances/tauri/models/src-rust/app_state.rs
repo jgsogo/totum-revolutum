@@ -1,8 +1,8 @@
-use crate::{google_type::CurrencyCode, Result};
+use crate::{google_type::CurrencyCode, Error, Result};
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
-#[derive(ProtoWrapper, Debug)]
+#[derive(ProtoWrapper, Debug, Clone)]
 pub struct DatabaseConnection(crate::protos::finances_app_models::DatabaseConnection);
 
 impl DatabaseConnection {
@@ -16,7 +16,7 @@ impl DatabaseConnection {
 }
 
 #[repr(transparent)]
-#[derive(ProtoWrapper, Debug)]
+#[derive(ProtoWrapper, Debug, Clone)]
 pub struct AppState(crate::protos::finances_app_models::AppState);
 
 impl AppState {
@@ -40,11 +40,13 @@ impl AppState {
         Ok(CurrencyCode::new(&self.0.base_ccy)?)
     }
 
-    // pub fn new_from_env() -> Self {
-    //     let postgres_url = std::env::var("POSTGRES_URL").expect("POSTGRES_URL envvar is required");
-    //     let base_url = std::env::var("BASE_URL").expect("BASE_URL envvar is required");
-    //     let media_url = std::env::var("MEDIA_URL").expect("MEDIA_URL envvar is required");
-    //     let static_url = std::env::var("STATIC_URL").expect("STATIC_URL envvar is required");
-    //     Self::new(postgres_url, base_url, media_url, static_url, "EUR".to_string())
-    // }
+    pub fn postgres_url(&self) -> Result<&str> {
+        Ok(self
+            .0
+            .db
+            .as_ref()
+            .map(DatabaseConnection::new_ref)
+            .ok_or(Error::MissingRequiredField("db".to_string()))?
+            .postgres_url())
+    }
 }
