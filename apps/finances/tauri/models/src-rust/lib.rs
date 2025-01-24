@@ -1,8 +1,8 @@
 // mod account;
 mod account_context;
 // mod account_type;
-// mod app_state;
 mod account;
+mod app_state;
 mod custodian;
 mod errors;
 mod fx_quote;
@@ -31,7 +31,7 @@ mod snapshot;
 pub(crate) use account::Account;
 pub use account_context::AccountContext;
 // pub use account_type::{AccountCategory, AccountType};
-// pub use app_state::AppState;
+pub use app_state::AppState;
 // pub use custodian::Custodian;
 pub(crate) use custodian::Custodian;
 pub use errors::{Error, Result};
