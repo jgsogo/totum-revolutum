@@ -3,6 +3,7 @@ use crate::types::ConnectionType;
 use bigdecimal::BigDecimal;
 use diesel::r2d2::{ConnectionManager, Pool};
 
+use diesel::prelude::*;
 use finances_app_models::Snapshot as SnapshotProto;
 use tauri::State;
 
@@ -24,7 +25,10 @@ pub fn create_snapshot(
 
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    // Insert into the database
+    insert_into_db(snapshot, &mut conn)
+}
+
+fn insert_into_db(snapshot: SnapshotProto, conn: &mut PgConnection) -> Result<i64, String> {
     let amount = snapshot.amount().map_err(|e| e.to_string())?;
 
     let amount_value = amount.amount().map_err(|e| e.to_string())?.amount();
@@ -52,11 +56,11 @@ pub fn create_snapshot(
             unit_value: &unit_value,
         };
         new_snapshot_numerable
-            .insert_into_db(&mut conn)
+            .insert_into_db(conn)
             .map_err(|e| format!("Error saving snapshot numerable to db: {e}"))
     } else if let Some(_non_numerable) = amount.as_non_numerable().map_err(|e| e.to_string())? {
         new_snapshot
-            .insert_into_db(&mut conn)
+            .insert_into_db(conn)
             .map_err(|e| format!("Error saving snapshot to db: {e}"))
     } else {
         Err("Nor numerable, neither non-numerable, can't do anything".to_string())
