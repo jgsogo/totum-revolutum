@@ -15,6 +15,12 @@ pub enum Error {
 
     #[error(transparent)]
     ProtoDecodeError(#[from] prost::DecodeError),
+
+    #[error("Error performing operation: {0}")]
+    OperationError(#[from] OperationError),
+
+    #[error("Invalid FX quote pair (ccy must be diferent)")]
+    InvalidFxQuotePair,
 }
 
 #[derive(Debug, Error)]
@@ -42,4 +48,13 @@ pub enum ConversionError {
 
     #[error("Failed to create BigInt from radix 10 buffer")]
     BigIntFromRadix10Error,
+}
+
+#[derive(Debug, Error)]
+pub enum OperationError {
+    #[error("FxQuote cannot be applied to given Money: no matching ccys")]
+    FxQuoteMismatch,
+
+    #[error("Operations on Money objects require that both are expressed in the same currency")]
+    MoneyCcyMismatch,
 }

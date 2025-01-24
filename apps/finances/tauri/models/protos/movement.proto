@@ -3,7 +3,7 @@ package finances_app_models;
 
 import "libraries/googleapis/protos/google/type/date.proto";
 import "apps/finances/tauri/models/protos/money_amount.proto";
-import "apps/finances/tauri/models/protos/fx.proto";
+import "apps/finances/tauri/models/protos/fx_quote.proto";
 import "libraries/googleapis/protos/google/type/money.proto";
 
 message MovementType {
@@ -42,7 +42,7 @@ message Movement {
     MovementDirection direction = 5;
 
     MovementAmount amount = 6;
-    Fx fx = 7;
+    FxQuote fx = 7;
 }
 
 
@@ -51,7 +51,7 @@ message NewMovement {
     int64 account_pk = 1;
     int64 movement_type_pk = 2;
     google.type.Date date_value = 3;
-    Fx fx = 4;
+    FxQuote fx = 4;
 
     MovementAmount amount =5;
 }

@@ -1,4 +1,6 @@
+use std::ops::Add;
 use std::ops::Mul;
+use std::ops::Sub;
 
 use bigdecimal::BigDecimal;
 
@@ -8,6 +10,7 @@ use bigdecimal::Zero;
 use proto_wrapper::ProtoWrapper;
 
 use super::CurrencyCode;
+use crate::errors::OperationError;
 use crate::protos::google::r#type::Money as MoneyProto;
 
 const NANO_EXP: usize = 9;
@@ -81,6 +84,34 @@ impl Mul<&BigDecimal> for &Money {
     fn mul(self, rhs: &BigDecimal) -> Self::Output {
         let new_amount = self.amount() * rhs;
         Money::new(new_amount, self.currency_code()?)
+    }
+}
+
+impl Add<&Money> for &Money {
+    type Output = Result<Money, crate::errors::Error>;
+
+    fn add(self, rhs: &Money) -> Self::Output {
+        if self.currency_code()? != rhs.currency_code()? {
+            Err(OperationError::MoneyCcyMismatch.into())
+        } else {
+            let lhs_amount = self.amount();
+            let rhs_amount = rhs.amount();
+            Ok(Money::new(lhs_amount + rhs_amount, self.currency_code()?)?)
+        }
+    }
+}
+
+impl Sub<&Money> for &Money {
+    type Output = Result<Money, crate::errors::Error>;
+
+    fn sub(self, rhs: &Money) -> Self::Output {
+        if self.currency_code()? != rhs.currency_code()? {
+            Err(OperationError::MoneyCcyMismatch.into())
+        } else {
+            let lhs_amount = self.amount();
+            let rhs_amount = rhs.amount();
+            Ok(Money::new(lhs_amount - rhs_amount, self.currency_code()?)?)
+        }
     }
 }
 
@@ -159,7 +190,7 @@ mod tests {
     }
 
     #[test]
-    fn multiply() {
+    fn money_multiply() {
         let amount = BigDecimal::from_str("2.00").unwrap();
         let money = Money::new(amount, CurrencyCode::USD).unwrap();
 
@@ -186,5 +217,27 @@ mod tests {
 
         // And, if needed, we can get a clone of the inner proto so we can store it in an inner message
         let _proto_cloned: MoneyProto = money_ref.into();
+    }
+
+    #[test]
+    fn money_add() {
+        let money1 = Money::new(BigDecimal::from_str("1.00").unwrap(), CurrencyCode::USD).unwrap();
+        let money2 = Money::new(BigDecimal::from_str("2.00").unwrap(), CurrencyCode::USD).unwrap();
+
+        let result: Money = (&money1 + &money2).unwrap();
+        assert_eq!(result.0.currency_code, "USD");
+        assert_eq!(result.0.units, 3i64);
+        assert_eq!(result.0.nanos, 0i32);
+    }
+
+    #[test]
+    fn money_sub() {
+        let money1 = Money::new(BigDecimal::from_str("1.00").unwrap(), CurrencyCode::USD).unwrap();
+        let money2 = Money::new(BigDecimal::from_str("2.00").unwrap(), CurrencyCode::USD).unwrap();
+
+        let result: Money = (&money1 - &money2).unwrap();
+        assert_eq!(result.0.currency_code, "USD");
+        assert_eq!(result.0.units, -1i64);
+        assert_eq!(result.0.nanos, 0i32);
     }
 }

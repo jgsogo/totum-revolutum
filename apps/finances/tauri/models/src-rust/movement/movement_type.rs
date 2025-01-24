@@ -1,5 +1,7 @@
-use crate::traits::ProtoWrapper;
+use proto_wrapper::ProtoWrapper;
 
+#[repr(transparent)]
+#[derive(ProtoWrapper)]
 pub struct MovementType(crate::protos::finances_app_models::MovementType);
 
 impl MovementType {
@@ -25,23 +27,5 @@ impl MovementType {
         } else {
             Some(&self.0.breadcrumb)
         }
-    }
-}
-
-impl ProtoWrapper<crate::protos::finances_app_models::MovementType> for MovementType {
-    fn as_proto(&self) -> &crate::protos::finances_app_models::MovementType {
-        &self.0
-    }
-}
-
-impl From<crate::protos::finances_app_models::MovementType> for MovementType {
-    fn from(value: crate::protos::finances_app_models::MovementType) -> Self {
-        Self(value)
-    }
-}
-
-impl From<MovementType> for crate::protos::finances_app_models::MovementType {
-    fn from(val: MovementType) -> Self {
-        val.0
     }
 }

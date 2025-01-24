@@ -7,7 +7,7 @@ protos = [
     "account.proto",
     "app_state.proto",
     "custodian.proto",
-    "fx.proto",
+    "fx_quote.proto",
     "holder_context.proto",
     "holder.proto",
     "main_context.proto",

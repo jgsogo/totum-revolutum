@@ -1,5 +1,8 @@
-use crate::traits::ProtoWrapper;
+// TODO: A different ProtoWrapper[Enum] to wrap enums instead of messages
 
+// use proto_wrapper::ProtoWrapper;
+#[repr(transparent)]
+// #[derive(ProtoWrapper)]
 pub struct MovementDirection(crate::protos::finances_app_models::MovementDirection);
 
 impl MovementDirection {
@@ -14,23 +17,23 @@ impl MovementDirection {
     }
 }
 
-impl ProtoWrapper<crate::protos::finances_app_models::MovementDirection> for MovementDirection {
-    fn as_proto(&self) -> &crate::protos::finances_app_models::MovementDirection {
-        &self.0
-    }
-}
+// impl ProtoWrapper<crate::protos::finances_app_models::MovementDirection> for MovementDirection {
+//     fn as_proto(&self) -> &crate::protos::finances_app_models::MovementDirection {
+//         &self.0
+//     }
+// }
 
-impl From<crate::protos::finances_app_models::MovementDirection> for MovementDirection {
-    fn from(value: crate::protos::finances_app_models::MovementDirection) -> Self {
-        Self(value)
-    }
-}
+// impl From<crate::protos::finances_app_models::MovementDirection> for MovementDirection {
+//     fn from(value: crate::protos::finances_app_models::MovementDirection) -> Self {
+//         Self(value)
+//     }
+// }
 
-impl From<MovementDirection> for crate::protos::finances_app_models::MovementDirection {
-    fn from(val: MovementDirection) -> Self {
-        val.0
-    }
-}
+// impl From<MovementDirection> for crate::protos::finances_app_models::MovementDirection {
+//     fn from(val: MovementDirection) -> Self {
+//         val.0
+//     }
+// }
 
 impl From<finances_accounts::fields::MovementDirection> for MovementDirection {
     fn from(value: finances_accounts::fields::MovementDirection) -> Self {

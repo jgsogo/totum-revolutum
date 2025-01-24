@@ -5,8 +5,8 @@ use crate::google_type;
 
 use proto_wrapper::ProtoWrapper;
 
-use non_numerable::MoneyAmountNonNumerable;
-use numerable::MoneyAmountNumerable;
+pub use non_numerable::MoneyAmountNonNumerable;
+pub use numerable::MoneyAmountNumerable;
 
 #[repr(transparent)]
 #[derive(ProtoWrapper)]
