@@ -64,7 +64,7 @@ impl Movement {
         Ok(self.0.direction.try_into()?)
     }
 
-    pub fn amount(&self) -> Result<&MovementAmount> {
+    pub fn movement_amount(&self) -> Result<&MovementAmount> {
         self.0
             .amount
             .as_ref()
@@ -74,5 +74,21 @@ impl Movement {
 
     pub fn fx(&self) -> Option<&FxQuote> {
         self.0.fx.as_ref().map(FxQuote::new_ref)
+    }
+
+    /// Returns the Money amount in the base currency (use [`Self::movement_amount`] to get the raw information)
+    pub fn amount(&self) -> Result<google_type::Money> {
+        let amount_raw = self
+            .0
+            .amount
+            .as_ref()
+            .map(MovementAmount::new_ref)
+            .ok_or(Error::MissingRequiredField("amount".to_string()))?
+            .amount()?;
+
+        match self.fx() {
+            Some(fx) => &amount_raw * fx,
+            None => Ok(amount_raw),
+        }
     }
 }
