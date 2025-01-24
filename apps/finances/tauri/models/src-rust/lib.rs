@@ -2,7 +2,8 @@
 // mod account_context;
 // mod account_type;
 // mod app_state;
-// mod custodian;
+mod account;
+mod custodian;
 mod errors;
 mod fx_quote;
 pub mod google_type;
@@ -32,6 +33,7 @@ pub(crate) mod protos;
 // pub use account_type::{AccountCategory, AccountType};
 // pub use app_state::AppState;
 // pub use custodian::Custodian;
+pub(crate) use custodian::Custodian;
 pub use errors::{Error, Result};
 pub(crate) use fx_quote::FxQuote;
 pub(crate) use money_amount::MoneyAmount;

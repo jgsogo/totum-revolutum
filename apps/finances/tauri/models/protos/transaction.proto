@@ -22,7 +22,7 @@ message Transaction {
 }
 
 
-
+// FIXME: Are we using this one?
 message NewTransaction {
     string name = 1;
     optional string description = 2;

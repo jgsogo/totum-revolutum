@@ -37,6 +37,9 @@ pub enum ConversionError {
     #[error("Invalid movement direction '{0}'")]
     InvalidMovementDirection(i32),
 
+    #[error("Invalid account category '{0}'")]
+    InvalidAccountCategory(i32),
+
     #[error("Cannot convert BigInt({0}) to i64")]
     I64Overflow(num_bigint::BigInt),
 

@@ -46,7 +46,7 @@ message Movement {
 }
 
 
-
+// FIXME: Are we using this one?
 message NewMovement {
     int64 account_pk = 1;
     int64 movement_type_pk = 2;
