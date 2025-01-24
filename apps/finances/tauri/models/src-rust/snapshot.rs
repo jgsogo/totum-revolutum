@@ -6,7 +6,7 @@ use crate::google_type;
 use crate::MoneyAmount;
 
 #[repr(transparent)]
-#[derive(ProtoWrapper)]
+#[derive(ProtoWrapper, Debug)]
 pub struct Snapshot(crate::protos::finances_app_models::Snapshot);
 
 impl Snapshot {

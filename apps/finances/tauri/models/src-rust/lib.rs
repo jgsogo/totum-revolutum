@@ -4,7 +4,7 @@ mod account_context;
 mod account;
 mod app_state;
 mod custodian;
-mod errors;
+pub mod errors;
 mod fx_quote;
 pub mod google_type;
 mod holder;

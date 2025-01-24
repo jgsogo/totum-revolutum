@@ -40,4 +40,32 @@ impl MoneyAmount {
             }
         }
     }
+
+    pub fn as_numerable(&self) -> Result<Option<&MoneyAmountNumerable>> {
+        match self
+            .0
+            .amount
+            .as_ref()
+            .ok_or(Error::MissingRequiredField("amount".to_string()))?
+        {
+            crate::protos::finances_app_models::money_amount::Amount::Numerable(money_amount) => {
+                Ok(Some(MoneyAmountNumerable::new_ref(money_amount)))
+            }
+            _ => Ok(None),
+        }
+    }
+
+    pub fn as_non_numerable(&self) -> Result<Option<&MoneyAmountNonNumerable>> {
+        match self
+            .0
+            .amount
+            .as_ref()
+            .ok_or(Error::MissingRequiredField("amount".to_string()))?
+        {
+            crate::protos::finances_app_models::money_amount::Amount::NonNumerable(money_amount) => {
+                Ok(Some(MoneyAmountNonNumerable::new_ref(money_amount)))
+            }
+            _ => Ok(None),
+        }
+    }
 }

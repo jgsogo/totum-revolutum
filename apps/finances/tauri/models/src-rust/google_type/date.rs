@@ -43,6 +43,20 @@ impl TryFrom<Date> for NaiveDate {
     }
 }
 
+impl TryFrom<&Date> for NaiveDate {
+    type Error = crate::errors::ConversionError;
+
+    fn try_from(val: &Date) -> Result<Self, Self::Error> {
+        NaiveDate::from_ymd_opt(val.0.year, val.0.month as u32, val.0.day as u32).ok_or(
+            crate::errors::ConversionError::FromDateComponents {
+                year: val.0.year,
+                month: val.0.month,
+                day: val.0.day,
+            },
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

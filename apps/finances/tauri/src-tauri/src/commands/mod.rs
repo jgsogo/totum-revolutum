@@ -5,31 +5,20 @@
 //! defined in the same module.
 
 // pub mod last_transactions;
-// pub mod snapshot;
+pub mod snapshot;
 // pub mod transaction;
 use crate::types::ConnectionType;
+
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Fx};
-use finances_accounts::sql::filters::{accountholder_by_pk, fx_by_pk, movement_filter_account_by_pk};
+use finances_accounts::sql::filters::{accountholder_by_pk, fx_by_pk};
 use finances_app_models::{
-    google_type,
-    Account as AccountProto, // google_type, Account as AppModelAccount, AccountContext, AppState, Fx as AppModelFx, HolderContext, MainContext,
-    AccountContext as AccountContextProto,
-    // MoneyAmount, Movement as AppModelMovement, MovementAmount as AppModelAmount,
-    // MovementDirection as ModelMovementDirection, OutgoingModel, Snapshot as AppModelSnapshot,
-    AppState as AppStateProto,
-    FxQuote as FxQuoteProto,
-    FxQuotePair as FxQuotePairProto,
-    Holder as HolderProto,
-    HolderContext as HolderContextProto,
-    MainContext as MainContextProto,
-    MoneyAmount as MoneyAmountProto,
-    Movement as MovementProto,
-    MovementAmount as MovementAmountProto,
-    MovementDirection as MovementDirectionProto,
-    ProtoWrapper,
-    Snapshot as SnapshotProto,
+    google_type, Account as AccountProto, AccountContext as AccountContextProto, AppState as AppStateProto,
+    FxQuote as FxQuoteProto, FxQuotePair as FxQuotePairProto, Holder as HolderProto,
+    HolderContext as HolderContextProto, MainContext as MainContextProto, MoneyAmount as MoneyAmountProto,
+    Movement as MovementProto, MovementAmount as MovementAmountProto, MovementDirection as MovementDirectionProto,
+    ProtoWrapper, Snapshot as SnapshotProto,
 };
 use finances_investments::models::Movement;
 
