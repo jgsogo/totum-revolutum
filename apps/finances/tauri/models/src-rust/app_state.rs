@@ -1,4 +1,4 @@
-use crate::{google_type::CurrencyCode, Error, Result};
+use crate::{google_type::CurrencyCode, Result};
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]

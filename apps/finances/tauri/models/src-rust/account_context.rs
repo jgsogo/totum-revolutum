@@ -32,15 +32,3 @@ impl AccountContext {
         self.0.movements.iter().map(Movement::new_ref).collect()
     }
 }
-
-/*
-
-message AccountContext {
-    Account account = 1;
-
-    repeated Movement movements = 2;
-    repeated Snapshot snapshots = 3;
-}
-
-
-*/
