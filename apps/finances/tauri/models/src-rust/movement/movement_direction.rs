@@ -1,7 +1,5 @@
 // TODO: A different ProtoWrapper[Enum] to wrap enums instead of messages
 
-use crate::errors::ConversionError;
-
 // use proto_wrapper::ProtoWrapper;
 #[repr(transparent)]
 #[derive(Debug, PartialEq)]

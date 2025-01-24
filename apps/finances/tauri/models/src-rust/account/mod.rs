@@ -8,7 +8,7 @@ use crate::{google_type::CurrencyCode, Custodian, Error, Result};
 
 use proto_wrapper::ProtoWrapper;
 
-use crate::{google_type, FxQuote};
+use crate::google_type;
 
 #[repr(transparent)]
 #[derive(ProtoWrapper)]

@@ -1,34 +1,46 @@
-use super::{Account, Movement, OutgoingModel, Snapshot};
-use prost::Message;
+use super::{Account, Movement, Snapshot};
 
-#[derive(Debug)]
+use crate::{Error, Result};
+use proto_wrapper::ProtoWrapper;
+
+#[repr(transparent)]
+#[derive(ProtoWrapper, Debug)]
 pub struct AccountContext(crate::protos::finances_app_models::AccountContext);
-
-// We only need this for testing (for `call_it_proto`)
-impl TryFrom<Vec<u8>> for AccountContext {
-    type Error = prost::DecodeError;
-
-    fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
-        Ok(Self(crate::protos::finances_app_models::AccountContext::decode(&*v)?))
-    }
-}
 
 impl AccountContext {
     pub fn new(account: Account, movements: Vec<Movement>, snapshots: Vec<Snapshot>) -> Self {
         Self(crate::protos::finances_app_models::AccountContext {
-            account: Some(account.0),
-            movements: movements.into_iter().map(|v| v.0).collect(),
-            snapshots: snapshots.into_iter().map(|v| v.0).collect(),
+            account: Some(account.into()),
+            movements: movements.into_iter().map(|v| v.into()).collect(),
+            snapshots: snapshots.into_iter().map(|v| v.into()).collect(),
         })
     }
 
-    pub fn snapshots(&self) -> Vec<Snapshot> {
-        self.0.snapshots.iter().map(|v| Snapshot(v.clone())).collect()
+    pub fn account(&self) -> Result<&Account> {
+        self.0
+            .account
+            .as_ref()
+            .map(Account::new_ref)
+            .ok_or(Error::MissingRequiredField("account".to_string()))
+    }
+
+    pub fn snapshots(&self) -> Vec<&Snapshot> {
+        self.0.snapshots.iter().map(Snapshot::new_ref).collect()
+    }
+
+    pub fn movements(&self) -> Vec<&Movement> {
+        self.0.movements.iter().map(Movement::new_ref).collect()
     }
 }
 
-impl OutgoingModel for AccountContext {
-    fn encode_to_vec(&self) -> Vec<u8> {
-        self.0.encode_to_vec()
-    }
+/*
+
+message AccountContext {
+    Account account = 1;
+
+    repeated Movement movements = 2;
+    repeated Snapshot snapshots = 3;
 }
+
+
+*/

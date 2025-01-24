@@ -130,7 +130,6 @@ impl Mul<&FxQuote> for &google_type::Money {
 mod tests {
     use std::str::FromStr;
 
-    use chrono::NaiveDate;
     use google_type::Money;
 
     use super::*;
