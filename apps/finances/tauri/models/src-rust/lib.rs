@@ -57,7 +57,6 @@ pub use main_context::MainContext;
 pub use snapshot::Snapshot;
 // pub use traits::OutgoingModel;
 pub use last_transactions::{LastTransactionsRequest, LastTransactionsResponse};
-pub(crate) use transaction::Transaction;
-pub use transaction::TransactionGroup;
+pub use transaction::{TransactionGroup, Transaction};
 
 pub use proto_wrapper::ProtoWrapper;

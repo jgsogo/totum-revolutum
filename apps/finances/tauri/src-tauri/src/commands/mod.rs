@@ -6,7 +6,7 @@
 
 // pub mod last_transactions;
 pub mod snapshot;
-// pub mod transaction;
+pub mod transaction;
 use crate::types::ConnectionType;
 
 use diesel::prelude::*;
