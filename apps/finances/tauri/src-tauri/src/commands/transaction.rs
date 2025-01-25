@@ -15,20 +15,18 @@ use tauri::State;
 pub fn create_transaction(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     request: tauri::ipc::Request,
-) -> std::result::Result<f32, String> {
+) -> Result<f32> {
     let tauri::ipc::InvokeBody::Raw(data) = request.body() else {
-        return Err("Error::RequestBodyMustBeRaw".to_string());
+        return Err(Error::Other("Error::RequestBodyMustBeRaw".to_string()));
     };
 
     let transaction: TransactionProto = data
         .to_owned()
         .try_into()
-        .map_err(|e| format!("Failed to decode data to NewTransaction: {e}"))?;
+        .map_err(|e| Error::Other(format!("Failed to decode data to NewTransaction: {e}")))?;
 
     let mut conn = pool.get().expect("Get a connection from the Pool");
-    insert_into_db(transaction, &mut conn)
-        .map(|v| v.to_f32().unwrap())
-        .map_err(|e| e.to_string())
+    insert_into_db(transaction, &mut conn).map(|v| v.to_f32().unwrap())
 }
 
 fn insert_into_db(transaction: TransactionProto, conn: &mut PgConnection) -> Result<BigDecimal> {

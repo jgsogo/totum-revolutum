@@ -3,6 +3,7 @@ use crate::types::ConnectionType;
 use bigdecimal::BigDecimal;
 use diesel::r2d2::{ConnectionManager, Pool};
 
+use crate::{Error, Result};
 use diesel::prelude::*;
 use finances_app_models::Snapshot as SnapshotProto;
 use tauri::State;
@@ -11,15 +12,15 @@ use tauri::State;
 pub fn create_snapshot(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     request: tauri::ipc::Request,
-) -> Result<i64, String> {
+) -> Result<i64> {
     let tauri::ipc::InvokeBody::Raw(data) = request.body() else {
-        return Err("Error::RequestBodyMustBeRaw".to_string());
+        return Err(Error::Other("Error::RequestBodyMustBeRaw".to_string()));
     };
 
     let snapshot: SnapshotProto = data
         .to_owned()
         .try_into()
-        .map_err(|e| format!("Failed to decode data to SnapshotProto: {e}"))?;
+        .map_err(|e| Error::Other(format!("Failed to decode data to SnapshotProto: {e}")))?;
 
     log::info!("SnapshotProto: {:?}", snapshot);
 
@@ -28,41 +29,31 @@ pub fn create_snapshot(
     insert_into_db(snapshot, &mut conn)
 }
 
-fn insert_into_db(snapshot: SnapshotProto, conn: &mut PgConnection) -> Result<i64, String> {
-    let amount = snapshot.amount().map_err(|e| e.to_string())?;
+fn insert_into_db(snapshot: SnapshotProto, conn: &mut PgConnection) -> Result<i64> {
+    let amount = snapshot.amount()?;
 
-    let amount_value = amount.amount().map_err(|e| e.to_string())?.amount();
-    let date_value: chrono::NaiveDate = snapshot
-        .date_value()
-        .map_err(|e| e.to_string())?
-        .try_into()
-        .map_err(|e: finances_app_models::errors::ConversionError| e.to_string())?;
+    let amount_value = amount.amount()?.amount();
+    let date_value: chrono::NaiveDate = snapshot.date_value()?.try_into()?;
     let new_snapshot = finances_accounts::models::NewSnapshot {
         account_id: snapshot.pk(),
         amount: &amount_value,
         date_value: &date_value,
     };
 
-    if let Some(numerable) = amount.as_numerable().map_err(|e| e.to_string())? {
-        let quantity: BigDecimal = numerable
-            .quantity()
-            .map_err(|e| e.to_string())?
-            .try_into()
-            .map_err(|e: finances_app_models::errors::ConversionError| e.to_string())?;
-        let unit_value = numerable.unit_value().map_err(|e| e.to_string())?.amount();
+    if let Some(numerable) = amount.as_numerable()? {
+        let quantity: BigDecimal = numerable.quantity()?.try_into()?;
+        let unit_value = numerable.unit_value()?.amount();
         let new_snapshot_numerable = finances_investments::models::NewSnapshotNumerable {
             new_snapshot: &new_snapshot,
             quantity: &quantity,
             unit_value: &unit_value,
         };
-        new_snapshot_numerable
-            .insert_into_db(conn)
-            .map_err(|e| format!("Error saving snapshot numerable to db: {e}"))
-    } else if let Some(_non_numerable) = amount.as_non_numerable().map_err(|e| e.to_string())? {
-        new_snapshot
-            .insert_into_db(conn)
-            .map_err(|e| format!("Error saving snapshot to db: {e}"))
+        Ok(new_snapshot_numerable.insert_into_db(conn)?)
+    } else if let Some(_non_numerable) = amount.as_non_numerable()? {
+        Ok(new_snapshot.insert_into_db(conn)?)
     } else {
-        Err("Nor numerable, neither non-numerable, can't do anything".to_string())
+        Err(Error::Other(
+            "Nor numerable, neither non-numerable, can't do anything".to_string(),
+        ))
     }
 }
