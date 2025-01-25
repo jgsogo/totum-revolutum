@@ -2,6 +2,8 @@ use diesel::r2d2::{ConnectionManager, Pool};
 use tauri::Manager;
 pub mod commands;
 pub mod db;
+pub mod errors;
+pub use errors::{Error, Result};
 
 mod types;
 mod views;
@@ -62,13 +64,12 @@ pub fn create_app<R: tauri::Runtime>(
         .expect("error while running tauri application")
 }
 
-pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, String> {
+pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
     // All the holders
     let holders: Vec<HolderProto> = AccountHolder::all()
         .select(AccountHolder::as_select())
         .order(finances_accounts::schema::finances_accounts_accountholder::name.asc())
-        .load::<AccountHolder>(conn)
-        .map_err(|e| format!("Error loading holders: {}", e))?
+        .load::<AccountHolder>(conn)?
         .into_iter()
         .map(|v| HolderProto::new(v.id, v.name, v.is_company, v.photo))
         .collect();
@@ -86,8 +87,7 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, Str
         AccountType::all()
             .select(AccountType::as_select())
             // .filter(accounttype_by_unique_names(unique_names))
-            .load::<AccountType>(conn)
-            .map_err(|e| format!("Error loading account types: {}", e))?
+            .load::<AccountType>(conn)?
             .into_iter()
             .map(|v| {
                 let account_category = if savings_accounttypes_pks.contains(&v.id) {
@@ -99,12 +99,10 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, Str
                 } else {
                     AccountCategoryProto::other()
                 };
-                let breadcrumbs = v
-                    .get_breadcrumbs(conn)
-                    .map_err(|e| format!("Error getting breadcrumbs for account type {}: {}", v.id, e))?;
-                Ok::<_, String>(AccountTypeProto::new(v.id, v.name, Some(breadcrumbs), account_category))
+                let breadcrumbs = v.get_breadcrumbs(conn)?;
+                Ok::<_, Error>(AccountTypeProto::new(v.id, v.name, Some(breadcrumbs), account_category))
             })
-            .collect::<Result<Vec<_>, _>>()?
+            .collect::<Result<Vec<_>>>()?
     };
 
     // All the movement types
@@ -112,16 +110,13 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, Str
         MovementType::all()
             .select(MovementType::as_select())
             // .filter(accounttype_by_unique_names(unique_names))
-            .load::<MovementType>(conn)
-            .map_err(|e| format!("Error loading account types: {}", e))?
+            .load::<MovementType>(conn)?
             .into_iter()
             .map(|v| {
-                let breadcrumbs = v
-                    .get_breadcrumbs(conn)
-                    .map_err(|e| format!("Error getting breadcrumbs for movement type {}: {}", v.id, e))?;
-                Ok::<_, String>(MovementTypeProto::new(v.id, v.name, Some(breadcrumbs)))
+                let breadcrumbs = v.get_breadcrumbs(conn)?;
+                Ok::<_, Error>(MovementTypeProto::new(v.id, v.name, Some(breadcrumbs)))
             })
-            .collect::<Result<Vec<_>, _>>()?
+            .collect::<Result<Vec<_>>>()?
     };
 
     // All the accounts
@@ -140,8 +135,7 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, Str
                 Custodian::as_select(),
                 AccountType::as_select(),
             ))
-            .load::<(Account, AccountHolderRole, Custodian, AccountType)>(conn)
-            .map_err(|e| format!("Error loading accounts: {}", e))?;
+            .load::<(Account, AccountHolderRole, Custodian, AccountType)>(conn)?;
 
         accounts
             .into_iter()
@@ -149,16 +143,16 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, Str
                 let account_type = account_types
                     .iter()
                     .find(|&acc_type| acc_type.pk() == account_type.id)
-                    .ok_or(format!(
+                    .ok_or(Error::Other(format!(
                         "Account type 'pk={}' not found in main context",
                         account_type.id
-                    ))?;
-                Ok::<_, String>(AccountProto::new(
+                    )))?;
+                Ok::<_, Error>(AccountProto::new(
                     account.id,
                     account.name,
                     custodian.into(),
                     account_type.clone(),
-                    google_type::CurrencyCode::new(&account.ccy).map_err(|e| e.to_string())?,
+                    google_type::CurrencyCode::new(&account.ccy)?,
                     account.identifier,
                     account.description,
                     account.open.into(),
@@ -166,7 +160,7 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, Str
                     account.is_numerable,
                 ))
             })
-            .collect::<Result<Vec<_>, _>>()?
+            .collect::<Result<Vec<_>>>()?
     };
 
     // All the transaction groups
@@ -174,8 +168,7 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, Str
     {
         TransactionGroup::all()
             .select(TransactionGroup::as_select())
-            .load::<TransactionGroup>(conn)
-            .map_err(|e| format!("Error loading transactions groups: {e}"))?
+            .load::<TransactionGroup>(conn)?
             .into_iter()
             .map(|v| TransactionGroupProto::new(v.id, v.name, v.description)).collect()
     };
@@ -185,18 +178,14 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto, Str
 }
 
 /// Given some 'unique_name's, get the PKs for all of them and their descendants
-fn get_accounttypes_for_unique_names<'a>(
-    conn: &mut PgConnection,
-    unique_names: &'a [&'a str],
-) -> Result<Vec<i64>, String> {
+fn get_accounttypes_for_unique_names<'a>(conn: &mut PgConnection, unique_names: &'a [&'a str]) -> Result<Vec<i64>> {
     let account_types = AccountType::all()
         .select((
             finances_accounts::schema::finances_accounts_accounttype::id,
             finances_accounts::schema::finances_accounts_accounttype::tn_descendants_pks,
         ))
         .filter(accounttype_by_unique_names(unique_names))
-        .load::<(i64, TreeNodeList)>(conn)
-        .map_err(|e| format!("Error loading accounts: {}", e))?;
+        .load::<(i64, TreeNodeList)>(conn)?;
     let mut account_types_pks = Vec::default();
     for (acc_type_pk, mut tn_descendants_pks) in account_types {
         account_types_pks.push(acc_type_pk);

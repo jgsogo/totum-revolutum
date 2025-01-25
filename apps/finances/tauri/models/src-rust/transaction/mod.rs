@@ -2,7 +2,7 @@ mod transaction_group;
 
 pub use transaction_group::TransactionGroup;
 
-use crate::Movement;
+use crate::{Error, Movement, Result};
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
@@ -32,10 +32,22 @@ impl Transaction {
     }
 
     pub fn name(&self) -> &str {
-        &self.0.name.as_ref()
+        self.0.name.as_ref()
     }
 
     pub fn description(&self) -> Option<&str> {
         self.0.description.as_deref()
+    }
+
+    pub fn group(&self) -> Option<&TransactionGroup> {
+        self.0.group.as_ref().map(TransactionGroup::new_ref)
+    }
+
+    pub fn movements_from(&self) -> impl Iterator<Item = &Movement> {
+        self.0.movements_from.iter().map(Movement::new_ref)
+    }
+
+    pub fn movements_to(&self) -> impl Iterator<Item = &Movement> {
+        self.0.movements_to.iter().map(Movement::new_ref)
     }
 }
