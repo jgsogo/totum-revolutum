@@ -14,7 +14,7 @@ impl Transaction {
         pk: i64,
         name: String,
         description: Option<String>,
-        group: TransactionGroup,
+        group: Option<TransactionGroup>,
         movements_from: Vec<Movement>,
         movements_to: Vec<Movement>,
     ) -> Self {
@@ -22,7 +22,7 @@ impl Transaction {
             pk,
             name,
             description,
-            group: Some(group.into()),
+            group: group.map(|g| g.into()),
             movements_from: movements_from.into_iter().map(|v| v.into()).collect(),
             movements_to: movements_to.into_iter().map(|v| v.into()).collect(),
         })

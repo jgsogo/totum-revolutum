@@ -16,3 +16,17 @@ pub enum Error {
     #[error("{0}")]
     Other(String),
 }
+
+impl serde::Serialize for Error {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+
+        let mut state = serializer.serialize_struct("Error", 2)?;
+        // state.serialize_field("severity", &self.severity())?;
+        state.serialize_field("message", &self.to_string())?;
+        state.end()
+    }
+}

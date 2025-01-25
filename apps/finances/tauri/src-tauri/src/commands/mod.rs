@@ -4,7 +4,7 @@
 //! to be unique for each Tauri application. We enforce this guarantee if all the commands are
 //! defined in the same module.
 
-// pub mod last_transactions;
+pub mod last_transactions;
 pub mod snapshot;
 pub mod transaction;
 use crate::types::ConnectionType;
@@ -24,18 +24,19 @@ use finances_investments::models::Movement;
 
 use finances_investments::sql::queries::all_movements_for_account_id;
 
+use crate::{Error, Result};
 use finances_investments::models::SnapshotNumerable;
 use finances_investments::sql::queries::all_snapshotnumerable_for_account_id;
 use tauri::ipc::Response;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_app_state(state: State<'_, AppStateProto>) -> Result<Response, String> {
+pub async fn get_app_state(state: State<'_, AppStateProto>) -> Result<Response> {
     Ok(Response::new(state.encode_to_vec()))
 }
 
 #[tauri::command]
-pub async fn get_main_context(main_context: State<'_, MainContextProto>) -> Result<Response, String> {
+pub async fn get_main_context(main_context: State<'_, MainContextProto>) -> Result<Response> {
     Ok(Response::new(main_context.encode_to_vec()))
 }
 
@@ -44,12 +45,12 @@ pub async fn get_holder_context(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     main_context: State<'_, MainContextProto>,
     holder_pk: i64,
-) -> Result<Response, String> {
+) -> Result<Response> {
     log::info!("Get Holder {holder_pk} context");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     let acc_holder = {
-        let v = AccountHolder::from_pk(holder_pk, &mut conn).map_err(|e| format!("Error loading holder: {e}"))?;
+        let v = AccountHolder::from_pk(holder_pk, &mut conn)?;
         HolderProto::new(v.id, v.name, v.is_company, v.photo)
     };
 
@@ -69,22 +70,23 @@ pub async fn get_holder_context(
                 Custodian::as_select(),
                 AccountType::as_select(),
             ))
-            .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)
-            .map_err(|e| format!("Error loading accounts: {}", e))?;
+            .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)?;
 
         accounts
             .into_iter()
             .map(|(account, account_holder_role, custodian, account_type)| {
-                let account_type = main_context.find_account_type(account_type.id).ok_or(format!(
-                    "Account type 'pk={}' not found in main context",
-                    account_type.id
-                ))?;
-                Ok::<_, String>(AccountProto::new(
+                let account_type = main_context
+                    .find_account_type(account_type.id)
+                    .ok_or(Error::Other(format!(
+                        "Account type 'pk={}' not found in main context",
+                        account_type.id
+                    )))?;
+                Ok::<_, Error>(AccountProto::new(
                     account.id,
                     account.name,
                     custodian.into(),
                     account_type.clone(),
-                    google_type::CurrencyCode::new(&account.ccy).map_err(|e| e.to_string())?,
+                    google_type::CurrencyCode::new(&account.ccy)?,
                     account.identifier,
                     account.description,
                     account.open.into(),
@@ -92,7 +94,7 @@ pub async fn get_holder_context(
                     account.is_numerable,
                 ))
             })
-            .collect::<Result<Vec<_>, _>>()?
+            .collect::<Result<Vec<_>>>()?
     };
 
     let context = HolderContextProto::new(acc_holder, accounts);
@@ -104,23 +106,24 @@ pub async fn get_account_context(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     main_context: State<'_, MainContextProto>,
     account_pk: i64,
-) -> Result<Response, String> {
+) -> Result<Response> {
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     // TODO: Can we just retrieve it from the MainContext and save one DB call.
     let account = {
-        let (account, account_holder_role, custodian, account_type) =
-            Account::details_for_pk(account_pk, &mut conn).map_err(|e| format!("Error loading account: {e}"))?;
-        let account_type = main_context.find_account_type(account_type.id).ok_or(format!(
-            "Account type 'pk={}' not found in main context",
-            account_type.id
-        ))?;
+        let (account, account_holder_role, custodian, account_type) = Account::details_for_pk(account_pk, &mut conn)?;
+        let account_type = main_context
+            .find_account_type(account_type.id)
+            .ok_or(Error::Other(format!(
+                "Account type 'pk={}' not found in main context",
+                account_type.id
+            )))?;
         AccountProto::new(
             account.id,
             account.name,
             custodian.into(),
             account_type.clone(),
-            google_type::CurrencyCode::new(&account.ccy).map_err(|e| e.to_string())?,
+            google_type::CurrencyCode::new(&account.ccy)?,
             account.identifier,
             account.description,
             account.open.into(),
@@ -129,44 +132,40 @@ pub async fn get_account_context(
         )
     };
 
-    let account_ccy = account.currency_code().map_err(|e| e.to_string())?;
+    let account_ccy = account.currency_code()?;
 
     // Snapshots
     let snapshots: Vec<SnapshotProto> = if !account.is_numerable() {
-        Account::snapshots_for_pk(account_pk, &mut conn)
-            .map_err(|e| format!("Error retrieving snapshots: {e}"))?
+        Account::snapshots_for_pk(account_pk, &mut conn)?
             .into_iter()
             .map(|v| {
-                let amount = google_type::Money::new(v.amount, account_ccy).map_err(|e| e.to_string())?;
+                let amount = google_type::Money::new(v.amount, account_ccy)?;
                 let money_amount = MoneyAmountProto::new_non_numerable(amount);
-                Ok::<_, String>(SnapshotProto::new(v.id, v.date_value.into(), money_amount))
+                Ok::<_, Error>(SnapshotProto::new(v.id, v.date_value.into(), money_amount))
             })
-            .collect::<Result<Vec<_>, _>>()?
+            .collect::<Result<Vec<_>>>()?
     } else {
-        all_snapshotnumerable_for_account_id(account_pk, &mut conn)
-            .map_err(|e| format!("Error loading snapshots numerable: {e}"))?
+        all_snapshotnumerable_for_account_id(account_pk, &mut conn)?
             .into_iter()
             .map(|v: SnapshotNumerable| {
-                let unit_value =
-                    google_type::Money::new(v.snapshot_numerable.unit_value, account_ccy).map_err(|e| e.to_string())?;
+                let unit_value = google_type::Money::new(v.snapshot_numerable.unit_value, account_ccy)?;
                 let quantity = google_type::Decimal::new(v.snapshot_numerable.quantity);
                 let money_amount = MoneyAmountProto::new_numerable(unit_value, quantity);
-                Ok::<_, String>(SnapshotProto::new(
+                Ok::<_, Error>(SnapshotProto::new(
                     v.snapshot.id,
                     v.snapshot.date_value.into(),
                     money_amount,
                 ))
             })
-            .collect::<Result<Vec<_>, _>>()?
+            .collect::<Result<Vec<_>>>()?
     };
 
     // Movements
     let movements: Vec<MovementProto> = {
-        all_movements_for_account_id(account_pk, &mut conn)
-            .map_err(|e| format!("Error retrieving movements: {e}"))?
+        all_movements_for_account_id(account_pk, &mut conn)?
             .into_iter()
             .map(|v| movement_into_model_movement(v, &account, &main_context, &mut conn))
-            .collect::<Result<Vec<_>, _>>()?
+            .collect::<Result<Vec<_>>>()?
     };
 
     let context = AccountContextProto::new(account, movements, snapshots);
@@ -178,35 +177,32 @@ pub fn movement_into_model_movement(
     account: &AccountProto,
     main_context: &MainContextProto,
     conn: &mut PgConnection,
-) -> Result<MovementProto, String> {
-    let account_ccy = account.currency_code().map_err(|e| e.to_string())?;
+) -> Result<MovementProto> {
+    let account_ccy = account.currency_code()?;
 
     let movement_amount: MovementAmountProto = match &v {
         Movement::NonNumerable(movement) => {
-            let amount = google_type::Money::new(movement.amount.clone(), account_ccy).map_err(|e| e.to_string())?;
+            let amount = google_type::Money::new(movement.amount.clone(), account_ccy)?;
             MovementAmountProto::new_non_numerable(amount)
         }
         Movement::Numerable(movement_numerable) => {
             let unit_value =
-                google_type::Money::new(movement_numerable.movement_numerable.unit_value.clone(), account_ccy)
-                    .map_err(|e| e.to_string())?;
+                google_type::Money::new(movement_numerable.movement_numerable.unit_value.clone(), account_ccy)?;
             let quantity = google_type::Decimal::new(movement_numerable.movement_numerable.quantity.clone());
             MovementAmountProto::new_numerable(unit_value, quantity)
         }
         Movement::Dividend(movement_dividend) => {
             let ex_dividend_date: google_type::Date = movement_dividend.movement_dividend.ex_dividend_date.into();
             let unit_value =
-                google_type::Money::new(movement_dividend.movement_dividend.unit_value.clone(), account_ccy)
-                    .map_err(|e| e.to_string())?;
+                google_type::Money::new(movement_dividend.movement_dividend.unit_value.clone(), account_ccy)?;
 
             // From the date, get the closest snapshot, so I can get the quantity
             let quantity: google_type::Decimal = {
                 let snapshot =
-                    finances_investments::sql::queries::all_snapshotnumerable_for_account_id(*account.pk(), conn)
-                        .map_err(|e| format!("Error fetching snpashots from the DB: {e}"))?
+                    finances_investments::sql::queries::all_snapshotnumerable_for_account_id(*account.pk(), conn)?
                         .into_iter()
                         .find(|s| s.snapshot.date_value < movement_dividend.movement_dividend.ex_dividend_date)
-                        .ok_or("Cannot find snapshot for the given dividend".to_string())?;
+                        .ok_or(Error::Other("Cannot find snapshot for the given dividend".to_string()))?;
                 google_type::Decimal::new(snapshot.snapshot_numerable.quantity)
             };
             MovementAmountProto::new_dividend(ex_dividend_date, unit_value, quantity)
@@ -216,7 +212,10 @@ pub fn movement_into_model_movement(
     let movement_type = main_context
         .find_movement_type(v.type_id())
         .cloned()
-        .ok_or(format!("Movement type 'pk={}' not found in main context", v.type_id()))?;
+        .ok_or(Error::Other(format!(
+            "Movement type 'pk={}' not found in main context",
+            v.type_id()
+        )))?;
     let direction: MovementDirectionProto = v.direction().into();
     let fx = v
         .fx_id()
@@ -224,15 +223,13 @@ pub fn movement_into_model_movement(
             let fx = Fx::all()
                 .filter(fx_by_pk(v))
                 .select(Fx::as_select())
-                .first::<Fx>(conn)
-                .map_err(|e| format!("Error retrieving fx: {e}"))?;
+                .first::<Fx>(conn)?;
 
             let pair = FxQuotePairProto::new(
-                google_type::CurrencyCode::new(&fx.local).map_err(|e| e.to_string())?,
-                google_type::CurrencyCode::new(&fx.foreign).map_err(|e| e.to_string())?,
-            )
-            .map_err(|e| e.to_string())?;
-            Ok::<_, String>(FxQuoteProto::new(
+                google_type::CurrencyCode::new(&fx.local)?,
+                google_type::CurrencyCode::new(&fx.foreign)?,
+            )?;
+            Ok::<_, Error>(FxQuoteProto::new(
                 pair,
                 fx.date_value.into(),
                 google_type::Decimal::new(fx.rate),
@@ -240,7 +237,7 @@ pub fn movement_into_model_movement(
         })
         .transpose()?;
 
-    Ok::<_, String>(MovementProto::new(
+    Ok::<_, Error>(MovementProto::new(
         v.id(),
         (*v.date_value()).into(),
         v.transaction_id(),
@@ -248,6 +245,6 @@ pub fn movement_into_model_movement(
         direction,
         movement_amount,
         fx,
-        account.pk().clone(),
+        *account.pk(),
     ))
 }

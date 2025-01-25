@@ -52,13 +52,13 @@ pub fn create_app<R: tauri::Runtime>(
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            // commands::get_app_state,
-            // commands::get_main_context,
-            // commands::get_holder_context,
-            // commands::get_account_context,
+            commands::get_app_state,
+            commands::get_main_context,
+            commands::get_holder_context,
+            commands::get_account_context,
             // Sending data
-            // commands::snapshot::create_snapshot,
-            // commands::transaction::create_transaction,
+            commands::snapshot::create_snapshot,
+            commands::transaction::create_transaction,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
