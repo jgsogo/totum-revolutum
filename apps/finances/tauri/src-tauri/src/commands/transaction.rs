@@ -6,8 +6,8 @@ use bigdecimal::Zero;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_app_models::{
-    AppState as AppStateProto, FxQuote as FxQuoteProto, Movement as MovementProto,
-    MovementDirection as MovementDirectionProto, Transaction as TransactionProto,
+    FxQuote as FxQuoteProto, Movement as MovementProto, MovementDirection as MovementDirectionProto,
+    Transaction as TransactionProto,
 };
 use tauri::State;
 
@@ -94,9 +94,8 @@ fn insert_movement_into_db(
     let fx_id: Option<i64> = movement.fx().map(|quote| insert_fx_into_db(quote, conn)).transpose()?;
 
     // Create the regular movement
-    let account_pk: i64 = 0i64; // FIXME!!!!
     let new_movement = finances_accounts::models::NewMovement {
-        account_id: &account_pk,
+        account_id: movement.account_pk(),
         amount: &amount_foreign_ccy.amount(),
         date_value: &date_value,
         direction: direction.into(),

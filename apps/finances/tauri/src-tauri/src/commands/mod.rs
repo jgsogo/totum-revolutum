@@ -248,5 +248,6 @@ pub fn movement_into_model_movement(
         direction,
         movement_amount,
         fx,
+        account.pk().clone(),
     ))
 }

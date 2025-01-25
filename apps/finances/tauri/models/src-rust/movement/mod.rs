@@ -24,6 +24,7 @@ impl Movement {
         direction: MovementDirection,
         amount: MovementAmount,
         fx: Option<FxQuote>,
+        account_pk: i64,
     ) -> Self {
         Self(crate::protos::finances_app_models::Movement {
             pk,
@@ -33,6 +34,7 @@ impl Movement {
             direction: direction.to_i32(),
             amount: Some(amount.into()),
             fx: fx.map(|v| v.into()),
+            account_pk,
         })
     }
 
@@ -90,5 +92,9 @@ impl Movement {
             Some(fx) => &amount_raw * fx,
             None => Ok(amount_raw),
         }
+    }
+
+    pub fn account_pk(&self) -> &i64 {
+        &self.0.account_pk
     }
 }

@@ -43,6 +43,8 @@ message Movement {
 
     MovementAmount amount = 6;
     FxQuote fx = 7;
+
+    int64 account_pk = 8;
 }
 
 
