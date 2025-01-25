@@ -42,6 +42,14 @@ impl FxQuotePair {
             Ok(Self { base, quote })
         }
     }
+
+    pub fn base(&self) -> CurrencyCode {
+        self.base
+    }
+
+    pub fn quote(&self) -> CurrencyCode {
+        self.quote
+    }
 }
 
 impl std::fmt::Display for FxQuotePair {

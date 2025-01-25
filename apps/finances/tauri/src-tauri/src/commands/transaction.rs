@@ -6,7 +6,8 @@ use bigdecimal::Zero;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_app_models::{
-    google_type, AppState as AppStateProto, Movement as MovementProto, Transaction as TransactionProto,
+    AppState as AppStateProto, FxQuote as FxQuoteProto, Movement as MovementProto,
+    MovementDirection as MovementDirectionProto, Transaction as TransactionProto,
 };
 use tauri::State;
 
@@ -14,7 +15,6 @@ use tauri::State;
 pub fn create_transaction(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     request: tauri::ipc::Request,
-    state: State<'_, AppStateProto>,
 ) -> std::result::Result<f32, String> {
     let tauri::ipc::InvokeBody::Raw(data) = request.body() else {
         return Err("Error::RequestBodyMustBeRaw".to_string());
@@ -26,16 +26,12 @@ pub fn create_transaction(
         .map_err(|e| format!("Failed to decode data to NewTransaction: {e}"))?;
 
     let mut conn = pool.get().expect("Get a connection from the Pool");
-    insert_into_db(transaction, &mut conn, state.base_ccy().map_err(|e| e.to_string())?)
+    insert_into_db(transaction, &mut conn)
         .map(|v| v.to_f32().unwrap())
         .map_err(|e| e.to_string())
 }
 
-fn insert_into_db(
-    transaction: TransactionProto,
-    conn: &mut PgConnection,
-    base_ccy: google_type::CurrencyCode,
-) -> Result<BigDecimal> {
+fn insert_into_db(transaction: TransactionProto, conn: &mut PgConnection) -> Result<BigDecimal> {
     let (total_from, total_to) = conn.transaction(|conn| {
         // Create the transaction
         let transaction_pk = {
@@ -49,14 +45,14 @@ fn insert_into_db(
 
         let total_from: BigDecimal = transaction
             .movements_from()
-            .map(|mov| insert_movement_into_db(transaction_pk, mov, conn, base_ccy))
+            .map(|mov| insert_movement_into_db(transaction_pk, mov, MovementDirectionProto::out(), conn))
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .fold(BigDecimal::zero(), |sum, mov_amount| sum + mov_amount);
 
         let total_to: BigDecimal = transaction
             .movements_to()
-            .map(|mov| insert_movement_into_db(transaction_pk, mov, conn, base_ccy))
+            .map(|mov| insert_movement_into_db(transaction_pk, mov, MovementDirectionProto::r#in(), conn))
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .fold(BigDecimal::zero(), |sum, mov_amount| sum + mov_amount);
@@ -73,11 +69,69 @@ fn insert_into_db(
     }
 }
 
+fn insert_fx_into_db(fx_quote: &FxQuoteProto, conn: &mut PgConnection) -> Result<i64> {
+    let rate: BigDecimal = fx_quote.quote()?.try_into()?;
+    let new_fx = finances_accounts::models::NewFx {
+        foreign: &fx_quote.fx_pair()?.quote().to_string(),
+        local: &fx_quote.fx_pair()?.base().to_string(),
+        rate: &rate,
+        date_value: &fx_quote.date_value()?.try_into()?,
+    };
+    Ok(new_fx.insert_into_db(conn)?)
+}
+
 fn insert_movement_into_db(
     transaction_pk: i64,
     movement: &MovementProto,
+    direction: MovementDirectionProto,
     conn: &mut PgConnection,
-    base_ccy: google_type::CurrencyCode,
 ) -> Result<BigDecimal> {
-    todo!()
+    // Collect some data
+    let movement_amount = movement.movement_amount()?;
+    let amount_foreign_ccy = movement_amount.amount()?;
+
+    let date_value: chrono::NaiveDate = movement.date_value()?.try_into()?;
+    let fx_id: Option<i64> = movement.fx().map(|quote| insert_fx_into_db(quote, conn)).transpose()?;
+
+    // Create the regular movement
+    let account_pk: i64 = 0i64; // FIXME!!!!
+    let new_movement = finances_accounts::models::NewMovement {
+        account_id: &account_pk,
+        amount: &amount_foreign_ccy.amount(),
+        date_value: &date_value,
+        direction: direction.into(),
+        fx_id: fx_id.as_ref(),
+        type_id: &movement.r#type()?.pk(),
+        transaction_id: &transaction_pk,
+    };
+
+    if let Some(_non_numerable) = movement_amount.as_non_numerable()? {
+        new_movement.insert_into_db(conn)?;
+    } else if let Some(numerable) = movement_amount.as_numerable()? {
+        let quantity: BigDecimal = numerable.quantity()?.try_into()?;
+        let unit_value = numerable.unit_value()?.amount();
+
+        let new_numerable = finances_investments::models::NewMovementNumerable {
+            new_movement: &new_movement,
+            quantity: &quantity,
+            unit_value: &unit_value,
+        };
+        new_numerable.insert_into_db(conn)?;
+    } else if let Some(dividend) = movement_amount.as_dividend()? {
+        let unit_value = dividend.payout()?.unit_value()?.amount();
+        let ex_dividend_date: chrono::NaiveDate = dividend.ex_dividend_date()?.try_into()?;
+
+        let new_dividend = finances_investments::models::NewMovementDividend {
+            new_movement: &new_movement,
+            ex_dividend_date: &ex_dividend_date,
+            unit_value: &unit_value,
+        };
+        new_dividend.insert_into_db(conn)?;
+    } else {
+        return Err(Error::Other("MovementAmount type not recognized!".to_string()));
+    }
+
+    // Amount in the base currency
+    let amount = movement.amount()?;
+    Ok(amount.amount())
 }
