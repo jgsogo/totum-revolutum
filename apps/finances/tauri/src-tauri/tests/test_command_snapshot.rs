@@ -1,15 +1,11 @@
+use bigdecimal::BigDecimal;
 use finances_app_models::AccountContext;
 use serde_json::json;
 mod common;
 use common::call_command;
-use finances_app_models::protos::finances_app_models::money_amount::{
-    Amount as AmountProto, NonNumerable as NonNumerableProto, Numerable as NumerableProto,
-};
-use finances_app_models::protos::finances_app_models::{
-    MoneyAmount as MoneyAmountProto, NewSnapshot as NewSnapshotProto,
-};
-use finances_app_models::protos::google::r#type::{Date as DateProto, Decimal as DecimalProto, Money as MoneyProto};
-use prost::Message;
+use finances_app_models::ProtoWrapper;
+use finances_app_models::{google_type, MoneyAmount as MoneyAmountProto, Snapshot as SnapshotProto};
+use std::str::FromStr;
 
 #[test]
 fn test_snapshot() {
@@ -29,27 +25,13 @@ fn test_snapshot() {
 
     // Snapshot (non-numerable)
     {
-        let date_proto = DateProto {
-            day: 30,
-            month: 11,
-            year: 2024,
-        };
+        let date_proto = google_type::Date::new(2024, 11, 30).unwrap();
 
-        let amount = MoneyAmountProto {
-            amount: Some(AmountProto::NonNumerable(NonNumerableProto {
-                amount: Some(MoneyProto {
-                    currency_code: "USD".to_string(),
-                    units: 100i64,
-                    nanos: 0i32,
-                }),
-            })),
-        };
+        let amount = MoneyAmountProto::new_non_numerable(
+            google_type::Money::new(BigDecimal::from_str("100.00").unwrap(), google_type::CurrencyCode::USD).unwrap(),
+        );
 
-        let new_snapshot_proto = NewSnapshotProto {
-            account_pk: account_id,
-            amount: Some(amount),
-            date_value: Some(date_proto),
-        };
+        let new_snapshot_proto = SnapshotProto::new(None, date_proto, amount, account_id);
         let r = call_command(&webview, "create_snapshot", new_snapshot_proto.encode_to_vec().into());
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
 
@@ -75,28 +57,14 @@ fn test_snapshot() {
 
     // Snapshot (numerable)
     {
-        let date_proto = DateProto {
-            day: 30,
-            month: 11,
-            year: 2024,
-        };
+        let date_proto = google_type::Date::new(2024, 11, 30).unwrap();
 
-        let amount = MoneyAmountProto {
-            amount: Some(AmountProto::Numerable(NumerableProto {
-                unit_value: Some(MoneyProto {
-                    currency_code: "USD".to_string(),
-                    units: 100i64,
-                    nanos: 0i32,
-                }),
-                quantity: Some(DecimalProto { value: "3".to_string() }),
-            })),
-        };
+        let amount = MoneyAmountProto::new_numerable(
+            google_type::Money::new(BigDecimal::from_str("100.00").unwrap(), google_type::CurrencyCode::USD).unwrap(),
+            google_type::Decimal::new(BigDecimal::from_str("3").unwrap()),
+        );
 
-        let new_snapshot_proto = NewSnapshotProto {
-            account_pk: account_id,
-            amount: Some(amount),
-            date_value: Some(date_proto),
-        };
+        let new_snapshot_proto = SnapshotProto::new(None, date_proto, amount, account_id);
         let r = call_command(&webview, "create_snapshot", new_snapshot_proto.encode_to_vec().into());
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
 

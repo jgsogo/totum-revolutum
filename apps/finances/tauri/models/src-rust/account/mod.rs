@@ -15,6 +15,7 @@ use crate::google_type;
 pub struct Account(crate::protos::finances_app_models::Account);
 
 impl Account {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         pk: i64,
         name: String,

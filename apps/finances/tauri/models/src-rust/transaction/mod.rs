@@ -2,7 +2,7 @@ mod transaction_group;
 
 pub use transaction_group::TransactionGroup;
 
-use crate::{Error, Movement, Result};
+use crate::Movement;
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
@@ -11,7 +11,7 @@ pub struct Transaction(crate::protos::finances_app_models::Transaction);
 
 impl Transaction {
     pub fn new(
-        pk: i64,
+        pk: Option<i64>,
         name: String,
         description: Option<String>,
         group: Option<TransactionGroup>,
@@ -27,8 +27,8 @@ impl Transaction {
             movements_to: movements_to.into_iter().map(|v| v.into()).collect(),
         })
     }
-    pub fn pk(&self) -> &i64 {
-        &self.0.pk
+    pub fn pk(&self) -> Option<&i64> {
+        self.0.pk.as_ref()
     }
 
     pub fn name(&self) -> &str {

@@ -13,7 +13,7 @@ impl TransactionGroup {
     }
 
     pub fn name(&self) -> &str {
-        &self.0.name.as_ref()
+        self.0.name.as_ref()
     }
 
     pub fn description(&self) -> Option<&str> {

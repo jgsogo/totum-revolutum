@@ -16,10 +16,11 @@ use crate::{google_type, FxQuote};
 pub struct Movement(crate::protos::finances_app_models::Movement);
 
 impl Movement {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
-        pk: i64,
+        pk: Option<i64>,
         date_value: google_type::Date,
-        transaction_pk: i64,
+        transaction_pk: Option<i64>,
         r#type: MovementType,
         direction: MovementDirection,
         amount: MovementAmount,
@@ -38,8 +39,8 @@ impl Movement {
         })
     }
 
-    pub fn pk(&self) -> &i64 {
-        &self.0.pk
+    pub fn pk(&self) -> Option<&i64> {
+        self.0.pk.as_ref()
     }
 
     pub fn date_value(&self) -> Result<&google_type::Date> {
@@ -50,8 +51,8 @@ impl Movement {
             .ok_or(Error::MissingRequiredField("date_value".to_string()))
     }
 
-    pub fn transaction_pk(&self) -> &i64 {
-        &self.0.transaction_pk
+    pub fn transaction_pk(&self) -> Option<&i64> {
+        self.0.transaction_pk.as_ref()
     }
 
     pub fn r#type(&self) -> Result<&MovementType> {

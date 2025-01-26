@@ -3,7 +3,7 @@ use chrono::{Datelike, NaiveDate};
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
-#[derive(ProtoWrapper)]
+#[derive(ProtoWrapper, Clone)]
 pub struct Date(crate::protos::google::r#type::Date);
 
 impl Date {

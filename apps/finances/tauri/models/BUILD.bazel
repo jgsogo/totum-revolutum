@@ -27,7 +27,6 @@ rust_library(
         "//libraries/rust/proto_wrapper",
         "//apps/finances/tauri/models/protos:protos_rs",
         "//libraries/finances/accounts/rust:finances_accounts",
-        "//libraries/finances/investments/rust:finances_investments",
         # "//libraries/googleapis:googleapis/rust", # FIXME: Rust regenerates the googleapis/protos so we can't reuse here
     ],
 )

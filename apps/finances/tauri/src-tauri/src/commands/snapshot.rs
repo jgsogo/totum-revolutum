@@ -35,7 +35,7 @@ fn insert_into_db(snapshot: SnapshotProto, conn: &mut PgConnection) -> Result<i6
     let amount_value = amount.amount()?.amount();
     let date_value: chrono::NaiveDate = snapshot.date_value()?.try_into()?;
     let new_snapshot = finances_accounts::models::NewSnapshot {
-        account_id: snapshot.pk(),
+        account_id: snapshot.account_pk(),
         amount: &amount_value,
         date_value: &date_value,
     };

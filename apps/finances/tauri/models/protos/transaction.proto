@@ -11,7 +11,8 @@ message TransactionGroup {
 
 // Details for a given transaction
 message Transaction {
-    int64 pk = 1;
+    // optional - New transaction don't have pk yet
+    optional int64 pk = 1;
     string name = 2;
     optional string description = 3;
 
@@ -20,19 +21,6 @@ message Transaction {
     repeated Movement movements_from = 5;
     repeated Movement movements_to = 6;
 }
-
-
-// FIXME: Are we using this one?
-message NewTransaction {
-    string name = 1;
-    optional string description = 2;
-    optional int64 transaction_group_pk = 3;
-
-    repeated NewMovement movements_from = 4;
-    repeated NewMovement movements_to = 5;
-
-}
-
 
 message LastTransactionsRequest {
     int64 account_pk = 1;

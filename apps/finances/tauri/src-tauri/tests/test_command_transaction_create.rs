@@ -1,17 +1,15 @@
+use bigdecimal::BigDecimal;
 use serde_json::json;
 
 mod common;
 use common::call_command;
-use finances_app_models::protos::finances_app_models::money_amount::{
-    NonNumerable as NonNumerableProto, Numerable as NumerableProto,
+use finances_app_models::ProtoWrapper;
+use finances_app_models::{
+    google_type, FxQuote as FxQuoteProto, FxQuotePair as FxQuotePairProto, MainContext as MainContextProto,
+    Movement as MovementProto, MovementAmount as MovementAmountProto, MovementDirection as MovementDirectionProto,
+    Transaction as TransactionProto,
 };
-use finances_app_models::protos::finances_app_models::{
-    new_movement as new_movement_proto, Fx as FxProto, NewMovement as NewMovementProto,
-    NewTransaction as NewTransactionProto,
-};
-use finances_app_models::protos::google::r#type::{Date as DateProto, Decimal as DecimalProto, Money as MoneyProto};
-use finances_app_models::{AccountContext, MainContext};
-use prost::Message;
+use std::str::FromStr;
 
 #[test]
 fn test_create_transaction() {
@@ -19,107 +17,84 @@ fn test_create_transaction() {
 
     let account_non_numerable = 1i64;
     let account_numerable = 8i64;
-    let movement_type_pk = {
+    let movement_type = {
         // Find a MovementType to use later
         let body = json!({});
         let r = call_command(&webview, "get_main_context", body.into());
         assert!(r.is_ok());
-        let main_context: MainContext = r.unwrap().try_into_proto().unwrap();
-        main_context.find_movement_type_by_name("Tasas").unwrap().pk()
-    };
-    let snapshot_latest_pk = {
-        let body = json!({"accountPk": account_numerable});
-        let r = call_command(&webview, "get_account_context", body.into());
-        assert!(r.is_ok());
-        let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
-        account_context.snapshots().into_iter().nth(0).unwrap().pk()
+        let main_context: MainContextProto = r.unwrap().try_into_proto().unwrap();
+        main_context.find_movement_type_by_name("Tasas").unwrap().clone()
     };
 
-    let date_value = DateProto {
-        day: 10,
-        month: 12,
-        year: 2024,
-    };
+    let date_proto = google_type::Date::new(2024, 12, 10).unwrap();
 
     {
-        let ccy_eur = "EUR";
-        let ccy_usd = "USD";
-
-        let transaction = NewTransactionProto {
-            name: "New transaction".to_string(),
-            description: Some("Some description".to_string()),
-            transaction_group_pk: None,
-            movements_from: vec![
+        let transaction = TransactionProto::new(
+            None,
+            "New transaction".to_string(),
+            Some("Some description".to_string()),
+            None,
+            vec![
                 // non-numerable movement
-                NewMovementProto {
-                    account_pk: account_non_numerable,
-                    movement_type_pk,
-                    date_value: Some(date_value),
-                    fx: Some(FxProto {
-                        foreign_code: ccy_usd.to_string(),
-                        local_code: ccy_eur.to_string(),
-                        fx: Some(DecimalProto {
-                            value: "2.0".to_string(),
-                        }),
-                        date_value: Some(date_value),
-                    }),
-                    amount: Some(new_movement_proto::Amount::NonNumerable(NonNumerableProto {
-                        amount: Some(MoneyProto {
-                            currency_code: ccy_usd.to_string(),
-                            units: 200i64,
-                            nanos: 0i32,
-                        }),
-                    })),
-                },
-                // dividend movement
-                NewMovementProto {
-                    account_pk: account_non_numerable,
-                    movement_type_pk,
-                    date_value: Some(date_value),
-                    fx: Some(FxProto {
-                        foreign_code: ccy_usd.to_string(),
-                        local_code: ccy_eur.to_string(),
-                        fx: Some(DecimalProto {
-                            value: "0.1".to_string(),
-                        }),
-                        date_value: Some(date_value),
-                    }),
-                    amount: Some(new_movement_proto::Amount::Dividend(
-                        new_movement_proto::DividendAmount {
-                            ex_dividend_date: Some(date_value),
-                            ex_dividend_snapshot_pk: snapshot_latest_pk,
-                            payout: Some(NumerableProto {
-                                unit_value: Some(MoneyProto {
-                                    currency_code: ccy_usd.to_string(),
-                                    units: 1i64,
-                                    nanos: 0i32,
-                                }),
-                                quantity: Some(DecimalProto { value: "2".to_string() }),
-                            }),
-                        },
+                MovementProto::new(
+                    None,
+                    date_proto.clone(),
+                    None,
+                    movement_type.clone(),
+                    MovementDirectionProto::out(),
+                    MovementAmountProto::new_non_numerable(
+                        google_type::Money::new(
+                            BigDecimal::from_str("200.00").unwrap(),
+                            google_type::CurrencyCode::USD,
+                        )
+                        .unwrap(),
+                    ),
+                    Some(FxQuoteProto::new(
+                        FxQuotePairProto::new(google_type::CurrencyCode::EUR, google_type::CurrencyCode::USD).unwrap(),
+                        date_proto.clone(),
+                        google_type::Decimal::new(BigDecimal::from_str("2").unwrap()),
                     )),
-                },
+                    account_non_numerable,
+                ),
+                // dividend movement
+                MovementProto::new(
+                    None,
+                    date_proto.clone(),
+                    None,
+                    movement_type.clone(),
+                    MovementDirectionProto::out(),
+                    MovementAmountProto::new_dividend(
+                        date_proto.clone(),
+                        google_type::Money::new(BigDecimal::from_str("1.00").unwrap(), google_type::CurrencyCode::USD)
+                            .unwrap(),
+                        google_type::Decimal::new(BigDecimal::from_str("2").unwrap()),
+                    ),
+                    Some(FxQuoteProto::new(
+                        FxQuotePairProto::new(google_type::CurrencyCode::EUR, google_type::CurrencyCode::USD).unwrap(),
+                        date_proto.clone(),
+                        google_type::Decimal::new(BigDecimal::from_str("0.1").unwrap()),
+                    )),
+                    account_non_numerable,
+                ),
             ],
-            movements_to: vec![
+            vec![
                 // numerable movement
-                NewMovementProto {
-                    account_pk: account_numerable,
-                    movement_type_pk,
-                    date_value: Some(date_value),
-                    fx: None,
-                    amount: Some(new_movement_proto::Amount::Numerable(NumerableProto {
-                        unit_value: Some(MoneyProto {
-                            currency_code: ccy_eur.to_string(),
-                            units: 10i64,
-                            nanos: 0i32,
-                        }),
-                        quantity: Some(DecimalProto {
-                            value: "12".to_string(),
-                        }),
-                    })),
-                },
+                MovementProto::new(
+                    None,
+                    date_proto.clone(),
+                    None,
+                    movement_type.clone(),
+                    MovementDirectionProto::r#in(),
+                    MovementAmountProto::new_numerable(
+                        google_type::Money::new(BigDecimal::from_str("10.00").unwrap(), google_type::CurrencyCode::EUR)
+                            .unwrap(),
+                        google_type::Decimal::new(BigDecimal::from_str("12").unwrap()),
+                    ),
+                    None,
+                    account_numerable,
+                ),
             ],
-        };
+        );
 
         let r = call_command(&webview, "create_transaction", transaction.encode_to_vec().into());
         assert!(r.is_ok(), "Error: {}", r.unwrap_err());
@@ -128,34 +103,36 @@ fn test_create_transaction() {
 
     // Test mismatch amounts
     {
-        let transaction = NewTransactionProto {
-            name: "New transaction".to_string(),
-            description: Some("Some description".to_string()),
-            transaction_group_pk: None,
-            movements_from: Vec::default(),
-            movements_to: vec![NewMovementProto {
-                account_pk: account_numerable,
-                movement_type_pk,
-                date_value: Some(date_value),
-                fx: None,
-                amount: Some(new_movement_proto::Amount::Numerable(NumerableProto {
-                    unit_value: Some(MoneyProto {
-                        currency_code: "EUR".to_string(),
-                        units: 10i64,
-                        nanos: 0i32,
-                    }),
-                    quantity: Some(DecimalProto {
-                        value: "12".to_string(),
-                    }),
-                })),
-            }],
-        };
+        let transaction = TransactionProto::new(
+            None,
+            "New transaction".to_string(),
+            Some("Some description".to_string()),
+            None,
+            Vec::new(),
+            vec![
+                // numerable movement
+                MovementProto::new(
+                    None,
+                    date_proto.clone(),
+                    None,
+                    movement_type.clone(),
+                    MovementDirectionProto::out(),
+                    MovementAmountProto::new_numerable(
+                        google_type::Money::new(BigDecimal::from_str("10.00").unwrap(), google_type::CurrencyCode::EUR)
+                            .unwrap(),
+                        google_type::Decimal::new(BigDecimal::from_str("12").unwrap()),
+                    ),
+                    None,
+                    account_numerable,
+                ),
+            ],
+        );
 
         let r = call_command(&webview, "create_transaction", transaction.encode_to_vec().into());
         assert!(r.is_err());
         assert_eq!(
-            r.unwrap_err(),
-            "Error saving transaction to db: Mismatched amounts, from 0 != to 120"
+            r.unwrap_err().to_string(),
+            "{\"message\":\"Mismatched amounts, from 0 != to 120\"}"
         );
     }
 

@@ -141,7 +141,12 @@ pub async fn get_account_context(
             .map(|v| {
                 let amount = google_type::Money::new(v.amount, account_ccy)?;
                 let money_amount = MoneyAmountProto::new_non_numerable(amount);
-                Ok::<_, Error>(SnapshotProto::new(v.id, v.date_value.into(), money_amount))
+                Ok::<_, Error>(SnapshotProto::new(
+                    Some(v.id),
+                    v.date_value.into(),
+                    money_amount,
+                    *account.pk(),
+                ))
             })
             .collect::<Result<Vec<_>>>()?
     } else {
@@ -152,9 +157,10 @@ pub async fn get_account_context(
                 let quantity = google_type::Decimal::new(v.snapshot_numerable.quantity);
                 let money_amount = MoneyAmountProto::new_numerable(unit_value, quantity);
                 Ok::<_, Error>(SnapshotProto::new(
-                    v.snapshot.id,
+                    Some(v.snapshot.id),
                     v.snapshot.date_value.into(),
                     money_amount,
+                    *account.pk(),
                 ))
             })
             .collect::<Result<Vec<_>>>()?
@@ -238,9 +244,9 @@ pub fn movement_into_model_movement(
         .transpose()?;
 
     Ok::<_, Error>(MovementProto::new(
-        v.id(),
+        Some(v.id()),
         (*v.date_value()).into(),
-        v.transaction_id(),
+        Some(v.transaction_id()),
         movement_type,
         direction,
         movement_amount,

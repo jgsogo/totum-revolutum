@@ -34,10 +34,11 @@ message MovementAmount {
 }
 
 message Movement {
-    int64 pk = 1;
+    optional int64 pk = 1;
     google.type.Date date_value = 2;
 
-    int64 transaction_pk = 3;
+    // optional - New movements doesn't belong to a transaction yet
+    optional int64 transaction_pk = 3;
     MovementType type = 4;
     MovementDirection direction = 5;
 
@@ -45,15 +46,4 @@ message Movement {
     FxQuote fx = 7;
 
     int64 account_pk = 8;
-}
-
-
-// FIXME: Are we using this one?
-message NewMovement {
-    int64 account_pk = 1;
-    int64 movement_type_pk = 2;
-    google.type.Date date_value = 3;
-    FxQuote fx = 4;
-
-    MovementAmount amount =5;
 }

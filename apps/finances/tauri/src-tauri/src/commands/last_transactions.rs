@@ -87,7 +87,7 @@ pub async fn past_transactions(
                 .partition(|(_, direction)| direction == &MovementDirection::out());
 
             Ok::<_, Error>(TransactionProto::new(
-                t.id,
+                Some(t.id),
                 t.name,
                 t.description,
                 group,

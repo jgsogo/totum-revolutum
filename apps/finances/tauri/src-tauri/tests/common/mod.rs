@@ -1,5 +1,5 @@
 use finances_accounts::test_utils::establish_connection;
-use finances_app_models::{google_type, AppState, DatabaseConnection, ProtoWrapper};
+use finances_app_models::{google_type, AppState, DatabaseConnection};
 
 use serde_json::Value;
 use tauri::{test::MockRuntime, Manager, WebviewWindow};

@@ -1786,7 +1786,6 @@ dependencies = [
  "chrono",
  "diesel",
  "finances_accounts",
- "finances_investments",
  "googleapis",
  "num-bigint",
  "prost",

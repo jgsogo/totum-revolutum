@@ -17,8 +17,8 @@ pub mod finances_app_models {
     pub use protos::finances_app_models::{
         money_amount, movement_amount, Account, AccountCategory, AccountContext, AccountType, AppState, Custodian,
         DatabaseConnection, FxQuote, Holder, HolderContext, LastTransactionsRequest, LastTransactionsResponse,
-        MainContext, MoneyAmount, Movement, MovementAmount, MovementDirection, MovementType, NewMovement, NewSnapshot,
-        NewTransaction, Snapshot, Transaction, TransactionGroup,
+        MainContext, MoneyAmount, Movement, MovementAmount, MovementDirection, MovementType, Snapshot, Transaction,
+        TransactionGroup,
     };
 }
 
