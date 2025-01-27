@@ -18,4 +18,8 @@ export class MovementType {
     breadcrumb(): string[] {
         return this.movement_type.breadcrumb;
     }
+
+    as_proto(): MovementTypeProto {
+        return this.movement_type;
+    }
 }

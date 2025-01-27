@@ -99,9 +99,9 @@ export declare const MovementAmount_DividendSchema: GenMessage<MovementAmount_Di
  */
 export declare type Movement = Message<"finances_app_models.Movement"> & {
   /**
-   * @generated from field: int64 pk = 1;
+   * @generated from field: optional int64 pk = 1;
    */
-  pk: bigint;
+  pk?: bigint;
 
   /**
    * @generated from field: google.type.Date date_value = 2;
@@ -109,9 +109,9 @@ export declare type Movement = Message<"finances_app_models.Movement"> & {
   dateValue?: Date;
 
   /**
-   * @generated from field: int64 transaction_pk = 3;
+   * @generated from field: optional int64 transaction_pk = 3;
    */
-  transactionPk: bigint;
+  transactionPk?: bigint;
 
   /**
    * @generated from field: finances_app_models.MovementType type = 4;
@@ -132,6 +132,11 @@ export declare type Movement = Message<"finances_app_models.Movement"> & {
    * @generated from field: finances_app_models.FxQuote fx = 7;
    */
   fx?: FxQuote;
+
+  /**
+   * @generated from field: int64 account_pk = 8;
+   */
+  accountPk: bigint;
 };
 
 /**
@@ -139,42 +144,6 @@ export declare type Movement = Message<"finances_app_models.Movement"> & {
  * Use `create(MovementSchema)` to create a new message.
  */
 export declare const MovementSchema: GenMessage<Movement>;
-
-/**
- * @generated from message finances_app_models.NewMovement
- */
-export declare type NewMovement = Message<"finances_app_models.NewMovement"> & {
-  /**
-   * @generated from field: int64 account_pk = 1;
-   */
-  accountPk: bigint;
-
-  /**
-   * @generated from field: int64 movement_type_pk = 2;
-   */
-  movementTypePk: bigint;
-
-  /**
-   * @generated from field: google.type.Date date_value = 3;
-   */
-  dateValue?: Date;
-
-  /**
-   * @generated from field: finances_app_models.FxQuote fx = 4;
-   */
-  fx?: FxQuote;
-
-  /**
-   * @generated from field: finances_app_models.MovementAmount amount = 5;
-   */
-  amount?: MovementAmount;
-};
-
-/**
- * Describes the message finances_app_models.NewMovement.
- * Use `create(NewMovementSchema)` to create a new message.
- */
-export declare const NewMovementSchema: GenMessage<NewMovement>;
 
 /**
  * @generated from enum finances_app_models.MovementDirection

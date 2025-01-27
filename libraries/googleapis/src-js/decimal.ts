@@ -1,6 +1,7 @@
 import { Decimal as DecimalProto, DecimalSchema } from "../protos/google/type/decimal_pb.js";
 import { Decimal as DecimalJS } from "decimal.js";
 import { create } from "@bufbuild/protobuf";
+
 export class Decimal {
     private readonly decimal: DecimalProto;
 

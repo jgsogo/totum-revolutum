@@ -1,13 +1,29 @@
 import { Money as MoneyProto, MoneySchema } from "../protos/google/type/money_pb.js";
-import { create, toBinary } from "@bufbuild/protobuf";
+import { create } from "@bufbuild/protobuf";
+
+export enum CurrencyCode {
+    EUR = "EUR",
+    USD = "USD",
+}
+
+function enumFromStringValue<T>(enm: { [s: string]: T }, value: string): T | undefined {
+    return (Object.values(enm) as unknown as string[]).includes(value)
+        ? value as unknown as T
+        : undefined;
+}
+
+export function currency_code_from_str(ccy: string): CurrencyCode | undefined {
+    return enumFromStringValue(CurrencyCode, ccy.toUpperCase());
+}
+
 
 export class Money {
     private readonly money: MoneyProto;
 
-    static create_from_number(currencyCode: string, amount: number): Money {
+    static create_from_number(currencyCode: CurrencyCode, amount: number): Money {
         let units = Math.trunc(amount);
         let decimal_part = (amount - units) * Math.pow(10, 9);
-        let proto = create(MoneySchema, { currencyCode, units: BigInt(units), nanos: decimal_part }) as MoneyProto;
+        let proto = create(MoneySchema, { currencyCode: currencyCode.toString(), units: BigInt(units), nanos: decimal_part }) as MoneyProto;
         return new Money(proto);
     }
 
@@ -15,7 +31,7 @@ export class Money {
         this.money = money;
     }
 
-    as_number(): number {
+    amount(): number {
         if (this.money.units > Number.MAX_SAFE_INTEGER) {
             throw new Error(`Money amount ${this.money.units} cannot be represented as a (safe) 'Number'`);
         }
@@ -27,6 +43,10 @@ export class Money {
         return amount + amount_decimal;
     }
 
+    currency_code(): CurrencyCode {
+        return currency_code_from_str(this.money.currencyCode)!;
+    }
+
     toString(locale?: string): string {
         locale = locale ?? 'es-ES';
 
@@ -36,15 +56,15 @@ export class Money {
             notation: 'standard'
         });
 
-        return formatter.format(this.as_number());
+        return formatter.format(this.amount());
     }
 
-    innerType(): MoneyProto {
+    as_proto(): MoneyProto {
         return this.money;
     }
 
-    toBinary(): Uint8Array {
-        return toBinary(MoneySchema, this.money);
-    }
+    // toBinary(): Uint8Array {
+    //     return toBinary(MoneySchema, this.money);
+    // }
 
 }

@@ -1,20 +1,15 @@
-export { AccountCategory, AccountCategorySchema } from '../protos/account_pb.js';
-export { AccountTypeSchema, AccountType } from '../protos/account_pb.js';
-export { AppState } from './app_state.js';
-export { Custodian, CustodianSchema } from '../protos/custodian_pb.js';
-export { HolderContext as HolderContextProto, HolderContextSchema } from '../protos/holder_context_pb.js';
-export { Holder, HolderSchema } from '../protos/holder_pb.js';
-export { MainContext as MainContextProto, MainContextSchema } from '../protos/main_context_pb.js';
+export { AppState, DatabaseConnection } from './app_state.js';
+export { Custodian } from './custodian.js';
+export { Holder } from './holder.js';
 export { HolderContext } from './holder_context.js';
-export { Account } from './account.js';
-export { AccountContext as AccountContextProto, AccountContextSchema } from '../protos/account_context_pb.js';
+export { Account, AccountCategory, AccountType } from './account.js';
 export { Snapshot } from './snapshot.js';
-export { Movement, NewMovement } from './movement.js';
+export { Movement, MovementAmount, MovementAmountDividend } from './movement.js';
 export { AccountContext } from './account_context.js';
-export { MoneyAmount } from './money_amount.js';
+export { MoneyAmount, MoneyAmountNumerable, MoneyAmountNonNumerable } from './money_amount.js';
 export { MainContext } from './main_context.js';
-export { TransactionGroup } from "../protos/transaction_pb.js";
 export { MovementType } from './movement_type.js';
-export { NewTransaction } from './transaction.js';
+export { TransactionGroup, Transaction } from './transaction.js';
+export { LastTransactionsRequest, LastTransactionsResponse } from './transaction_request.js'
 
 export { OutgoingMessage } from './message.js';
