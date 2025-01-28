@@ -5,8 +5,8 @@
   let { account, snapshots }: { account: Account; snapshots: Snapshot[] } = $props();
 
   let dates = snapshots.map((snapshot) => {
-    const date_value = new Date(snapshot.dateValue().year(), snapshot.dateValue().month() - 1, snapshot.dateValue().day());
-    let y = snapshot.amount().as_number();
+    const date_value = new Date(snapshot.date_value().year(), snapshot.date_value().month() - 1, snapshot.date_value().day());
+    let y = snapshot.amount().amount();
     return { x: date_value.getTime(), y };
   });
 
@@ -85,7 +85,7 @@
       shared: false,
       y: {
         formatter: function (val) {
-          return `${val} ${account.ccy}`;
+          return `${val} ${account.ccy()}`;
         },
       },
     },

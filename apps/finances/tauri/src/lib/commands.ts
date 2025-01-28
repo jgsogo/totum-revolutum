@@ -1,6 +1,6 @@
 import { invoke, } from "@tauri-apps/api/core";
 import { AppState, MainContext, HolderContext, AccountContext, OutgoingMessage } from "../../models/src-js/index";
-
+import { NewSnapshot, NewTransaction } from "../../models/src-js";
 
 /**
  * Returns (a promise to) the app configuration
@@ -43,7 +43,7 @@ export const get_account_context = async (account_pk: number): Promise<AccountCo
  * @param {NewSnapshot} snapshot - The new Snapshot to create
  * @returns - A promise that resolves when the snapshot is created, or the error if it was not possible
  */
-export const create_snapshot = async (snapshot: OutgoingMessage) => {
+export const create_snapshot = async (snapshot: NewSnapshot) => {
     let data = snapshot.toBinary();
     await invoke("create_snapshot", data);
 }
@@ -53,7 +53,7 @@ export const create_snapshot = async (snapshot: OutgoingMessage) => {
  * @param {NewTransaction} transaction - The new Transaction to create
  * @returns - A promise that resolves when the transaction is created, or the error if it was not possible
  */
-export const create_transaction = async (transaction: OutgoingMessage) => {
+export const create_transaction = async (transaction: NewTransaction) => {
     let data = transaction.toBinary();
     await invoke("create_transaction", data);
 }

@@ -195,20 +195,6 @@ export class NewMovement {
             amount: movement_amount.as_proto(),
             fx: fx_quote ? fx_quote.as_proto() : undefined,
             accountPk: BigInt(account.pk())
-            /*
-                optional int64 pk = 1;
-                google.type.Date date_value = 2;
-
-                // optional - New movements doesn't belong to a transaction yet
-                optional int64 transaction_pk = 3;
-                MovementType type = 4;
-                MovementDirection direction = 5;
-
-                MovementAmount amount = 6;
-                FxQuote fx = 7;
-
-                int64 account_pk = 8;
-            */
         });
     }
 

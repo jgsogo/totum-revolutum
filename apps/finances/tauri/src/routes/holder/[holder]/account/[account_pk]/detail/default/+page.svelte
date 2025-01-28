@@ -14,6 +14,7 @@
 
   let account_context: AccountContext = data.account_context;
   let account: Account = account_context.account();
+  console.log(`account_context: ${JSON.stringify(account_context, (_, v) => typeof v === 'bigint' ? v.toString() : v, "\t")}`);
   let last_snapshot = account_context.snapshots().at(0);
 
 </script>

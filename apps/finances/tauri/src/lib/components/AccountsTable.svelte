@@ -42,10 +42,10 @@
         {#each accounts as account}
           <TableBodyRow onclick={() => goToAccountDetail(holder, account)}>
             {#if show_custodian}
-              <TableBodyCell>{account.custodian().name}</TableBodyCell>
+              <TableBodyCell>{account.custodian().name()}</TableBodyCell>
             {/if}
             <TableBodyCell>{account.name()}</TableBodyCell>
-            <TableBodyCell>{account.type().name}</TableBodyCell>
+            <TableBodyCell>{account.type().name()}</TableBodyCell>
             <TableBodyCell>{account.ccy()}</TableBodyCell>
           </TableBodyRow>
         {/each}

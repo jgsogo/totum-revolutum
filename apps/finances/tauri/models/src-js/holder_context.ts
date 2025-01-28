@@ -50,7 +50,7 @@ export class HolderContext {
 
     grouped_by_custodian(): Map<number, Account[]> {
         return this._accounts.reduce((store, account: Account) => {
-            let key = Number(account.custodian().pk);
+            let key = Number(account.custodian().pk());
             if (!store.has(key)) {
                 store.set(key, [account])
             } else {

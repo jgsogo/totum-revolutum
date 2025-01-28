@@ -6,7 +6,7 @@
   let { snapshots, movements }: { snapshots: Snapshot[]; movements: Movement[] } = $props();
 
   const entries = $derived(
-    [...snapshots, ...movements].sort((lhs, rhs) => sort_date_wrapper(rhs.dateValue(), lhs.dateValue()))
+    [...snapshots, ...movements].sort((lhs, rhs) => sort_date_wrapper(rhs.date_value(), lhs.date_value()))
   );
 
   let class_row_snapshot = "bg-gray-300 dark:bg-gray-700";
@@ -27,20 +27,20 @@
         {#if entry instanceof Snapshot}
           <TableBodyRow class={class_row_snapshot}>
             <!-- FIXME: Dates from the backend arrive in "User-local", but without timezone info -->
-            <TableBodyCell>{entry.dateValue()}</TableBodyCell>
+            <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell></TableBodyCell>
-            <TableBodyCell>{entry.amount()}</TableBodyCell>
+            <TableBodyCell>{entry.amount().amount().amount()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
           </TableBodyRow>
         {:else}
-          <!-- TODO: On click, we can show the information about the Transaction this moement belongs to. There is an example in the official Flowbite documentation about Table component (https://flowbite-svelte.com/docs/components/table#Click_and_double-click_on_row) -->
+          <!-- TODO: On click, we can show the information about the Transaction this movement belongs to. There is an example in the official Flowbite documentation about Table component (https://flowbite-svelte.com/docs/components/table#Click_and_double-click_on_row) -->
           <TableBodyRow class={class_row_movement}>
             <!-- FIXME: Dates from the backend arrive in "User-local", but without timezone info -->
-            <TableBodyCell>{entry.dateValue()}</TableBodyCell>
+            <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell>{entry.direction()}</TableBodyCell>
             <TableBodyCell>TODO: type</TableBodyCell>
-            <TableBodyCell>{entry.amount()}</TableBodyCell>
+            <TableBodyCell>{entry.amount().amount()}</TableBodyCell>
             <TableBodyCell>TODO: transaction</TableBodyCell>
           </TableBodyRow>
         {/if}
