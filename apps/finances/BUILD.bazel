@@ -31,7 +31,6 @@ expand_template(
 with_docker_compose_run(
     name = "backend",
     binaries = [
-        # "//apps/finances/tauri:dev",
         "//apps/finances/tauri/src-tauri:app",
     ],
     docker_compose = [
