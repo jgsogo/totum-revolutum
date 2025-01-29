@@ -25,12 +25,21 @@ The Tauri frontend will start, and Django app is running as well in http://local
 
 Backend and frontend can also be started using their corresponding targets:
 
-> **Note.-** You need to execute the frontend first, and then the backend
+> **Note.-** You need to execute the frontend first, and then the backend, so the initial connection
+  is stablished. Afterwards you can kill and run the frontend and it will work (see watch mode with ibazel).
 
  * For the **fronted** execute:
 
    ```sh
    bazel run //apps/finances:frontend
+   ```
+
+   You can also execute [this target in watch mode](https://github.com/aspect-build/rules_js/blob/main/docs/js_run_devserver.md)
+   using ibazel (this tool monitors the files in the `data` attribute and re-run the target
+   if they are modified):
+
+   ```sh
+   ibazel run //apps/finances:frontend
    ```
 
  * For the **backend** execute
