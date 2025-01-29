@@ -1,12 +1,32 @@
-pub struct Holder(pub(crate) crate::protos::finances_app_models::Holder);
+use proto_wrapper::ProtoWrapper;
 
-impl From<finances_accounts::models::AccountHolder> for Holder {
-    fn from(value: finances_accounts::models::AccountHolder) -> Self {
+#[repr(transparent)]
+#[derive(ProtoWrapper)]
+pub struct Holder(crate::protos::finances_app_models::Holder);
+
+impl Holder {
+    pub fn new(pk: i64, name: String, is_company: bool, photo: Option<String>) -> Self {
         Self(crate::protos::finances_app_models::Holder {
-            pk: value.id,
-            name: value.name,
-            is_company: value.is_company,
-            photo: value.photo,
+            pk,
+            name,
+            is_company,
+            photo,
         })
+    }
+
+    pub fn pk(&self) -> &i64 {
+        &self.0.pk
+    }
+
+    pub fn name(&self) -> &str {
+        &self.0.name
+    }
+
+    pub fn is_company(&self) -> bool {
+        self.0.is_company
+    }
+
+    pub fn photo(&self) -> Option<&str> {
+        self.0.photo.as_deref()
     }
 }

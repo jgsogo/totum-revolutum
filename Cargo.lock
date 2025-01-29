@@ -1807,13 +1807,14 @@ dependencies = [
  "chrono",
  "diesel",
  "finances_accounts",
- "finances_investments",
  "googleapis",
  "num-bigint",
  "prost",
  "prost-build",
  "prost-types",
+ "proto_wrapper",
  "serde",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -5098,6 +5099,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc2f1e56baa61e93533aebc21af4d2134b70f66275e0fcdf3cbe43d77ff7e8fc"
 dependencies = [
  "prost",
+]
+
+[[package]]
+name = "proto_wrapper"
+version = "0.0.1"
+dependencies = [
+ "prost",
+ "proto_wrapper_derive",
+]
+
+[[package]]
+name = "proto_wrapper_derive"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.96",
 ]
 
 [[package]]

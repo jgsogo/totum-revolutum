@@ -1,45 +1,44 @@
-import { Snapshot as SnapshotProto, NewSnapshot as NewSnapshotProto, NewSnapshotSchema } from "../protos/snapshot_pb.js";
-import { MoneyAmount } from "./money_amount.js";
+import { Snapshot as SnapshotProto, SnapshotSchema } from "../protos/snapshot_pb.js";
+import { MoneyAmount, NewMoneyAmount } from "./money_amount.js";
 import { DateWrapper } from "../../../../../libraries/googleapis/src-js/date.js";
 import { create, toBinary } from "@bufbuild/protobuf";
-import { MoneyAmount_NonNumerable, MoneyAmount_Numerable, MoneyAmount_NonNumerableSchema, MoneyAmount_NumerableSchema, MoneyAmountSchema } from "../protos/money_amount_pb.js";
-import { MoneyAmount as MoneyAmountProto } from "../protos/money_amount_pb.js"
-import { Money } from "../../../../../libraries/googleapis/src-js/money.js";
-import { Decimal } from "decimal.js";
-import { DecimalSchema, Decimal as DecimalProto } from "../../../../../libraries/googleapis/protos/google/type/decimal_pb.js";
 import { OutgoingMessage } from "./message.js";
 
-export class Snapshot {
-    private readonly snapshot: SnapshotProto;
 
-    constructor(snapshot: SnapshotProto) {
-        this.snapshot = snapshot;
+export class Snapshot {
+    private readonly proto: SnapshotProto;
+
+    constructor(proto: SnapshotProto) {
+        this.proto = proto;
     }
 
     pk(): number {
-        return Number(this.snapshot.pk);
+        return Number(this.proto.pk);
     }
 
-    dateValue(): DateWrapper {
-        return new DateWrapper(this.snapshot.dateValue!);
+    date_value(): DateWrapper {
+        return new DateWrapper(this.proto.dateValue!);
     }
 
     amount(): MoneyAmount {
-        return new MoneyAmount(this.snapshot.amount!);
+        return new MoneyAmount(this.proto.amount!);
+    }
+
+    account_pk(): number {
+        return Number(this.proto.accountPk);
     }
 }
 
-
 export class NewSnapshot extends OutgoingMessage {
-    private data: NewSnapshotProto;
+    private data: SnapshotProto;
 
     constructor() {
         super();
-        this.data = create(NewSnapshotSchema, {});
+        this.data = create(SnapshotSchema, {});
     }
 
     toBinary(): Uint8Array {
-        return toBinary(NewSnapshotSchema, this.data);
+        return toBinary(SnapshotSchema, this.data);
     }
 
     setAccountPk(account_pk: number) {
@@ -50,30 +49,7 @@ export class NewSnapshot extends OutgoingMessage {
         this.data.dateValue = date.as_proto();
     }
 
-    setNonNumerableAmount(ccy: string, amount: number) {
-        let _amount = Money.create_from_number(ccy, amount);
-        let non_numerable_amount: MoneyAmount_NonNumerable = create(MoneyAmount_NonNumerableSchema, { amount: _amount.innerType() }) as MoneyAmount_NonNumerable;
-        let money_amount = create(MoneyAmountSchema, {
-            amount: {
-                case: "nonNumerable",
-                value: non_numerable_amount,
-            }
-        }) as MoneyAmountProto;
-        this.data.amount = money_amount;
+    set_money_amount(money_amount: NewMoneyAmount) {
+        this.data.amount = money_amount.as_proto();
     }
-
-    setNumerableAmount(ccy: string, quantity: number, unit_value: number) {
-        let _quantity = create(DecimalSchema, { value: new Decimal(quantity).toString() }) as DecimalProto;
-        let _unit_value = Money.create_from_number(ccy, unit_value);
-
-        let numerable_amount: MoneyAmount_Numerable = create(MoneyAmount_NumerableSchema, { unitValue: _unit_value.innerType(), quantity: _quantity }) as MoneyAmount_Numerable;
-        let money_amount = create(MoneyAmountSchema, {
-            amount: {
-                case: "numerable",
-                value: numerable_amount,
-            }
-        }) as MoneyAmountProto;
-        this.data.amount = money_amount;
-    }
-
 }

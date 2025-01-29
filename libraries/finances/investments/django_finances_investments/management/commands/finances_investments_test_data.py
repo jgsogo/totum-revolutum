@@ -6,6 +6,7 @@ from django_finances_accounts.models import (
     AccountHolderRole,
     AccountType,
     Custodian,
+    Movement,
     MovementDirection,
     MovementType,
     Transaction,
@@ -14,7 +15,11 @@ from django_finances_investments.constants import (
     AccountTypeConstants,
     MovementTypeConstants,
 )
-from django_finances_investments.models import MovementNumerable, SnapshotNumerable
+from django_finances_investments.models import (
+    MovementDividend,
+    MovementNumerable,
+    SnapshotNumerable,
+)
 
 
 class Command(BaseCommand):
@@ -32,6 +37,10 @@ class Command(BaseCommand):
         self.populate_movements_numerable(account=accounts[2], transaction=transactions[0])
         self.populate_snapshot_numerable(account=accounts[0])
         self.populate_snapshot_numerable(account=accounts[4])
+        # Account pk9 will have numerable and divididend movements
+        self.populate_movements(account=accounts[5], transactions=transactions[0])
+        self.populate_movements_numerable(account=accounts[5], transaction=transactions[0])
+        self.populate_movements_dividend(account=accounts[5], transaction=transactions[0])
 
     def populate_accounts(self):
         activos_corrientes_inversion = AccountType.objects.get(
@@ -101,6 +110,16 @@ class Command(BaseCommand):
                     custodian=custodians[2],
                     is_numerable=True,
                 ),
+                Account(
+                    pk=9,
+                    name="FROG",
+                    identifier="FROG",
+                    ccy="USD",
+                    open="2020-01-01",
+                    type=stocks,
+                    custodian=custodians[2],
+                    is_numerable=True,
+                ),
             ]
         )
 
@@ -116,7 +135,7 @@ class Command(BaseCommand):
             mov = MovementNumerable(
                 amount=(i * 100),
                 direction=MovementDirection.IN,
-                date_value="2024-09-06",
+                date_value="2024-09-0{}".format(i + 1),
                 account=account,
                 transaction=transaction,
                 type=expense,
@@ -135,3 +154,53 @@ class Command(BaseCommand):
                 quantity=i,
             )
             snapshot.save()
+
+    def populate_movements_dividend(self, account: Account, transaction: Transaction):
+        incoming = MovementType.objects.get(unique_name=MovementTypeConstants.INVESTMENTS)
+
+        snapshot = SnapshotNumerable(
+            account=account,
+            amount=100,
+            date_value="2024-01-01",
+            unit_value=100,
+            quantity=1,
+        )
+        snapshot.save()
+
+        for i in range(3):
+            mov = MovementDividend(
+                amount=(i * 100),
+                direction=MovementDirection.IN,
+                date_value="2024-09-0{}".format(i + 3),
+                account=account,
+                transaction=transaction,
+                type=incoming,
+                # specific to the MovementDividend
+                ex_dividend_date="2024-09-06",
+                unit_value=100,
+            )
+            mov.save()
+
+    def populate_movements(self, account: Account, transactions: Transaction):
+        expense = MovementType.objects.get(unique_name=MovementTypeConstants.EXPENSE)
+
+        Movement.objects.bulk_create(
+            [
+                Movement(
+                    amount=0,
+                    direction=MovementDirection.IN,
+                    date_value="2024-08-30",
+                    account=account,
+                    transaction=transactions,
+                    type=expense,
+                ),
+                Movement(
+                    amount=0,
+                    direction=MovementDirection.IN,
+                    date_value="2024-09-07",
+                    account=account,
+                    transaction=transactions,
+                    type=expense,
+                ),
+            ]
+        )

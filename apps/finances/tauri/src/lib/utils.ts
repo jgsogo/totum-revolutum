@@ -11,7 +11,7 @@ import type { Holder, Account } from "../../models/src-js";
  */
 export async function goToAccountDetail(holder: Holder, account: Account) {
     let account_view = account.is_numerable() ? "numerable_stock" : "default";
-    await goto(`/holder/${holder.pk}/account/${account.pk()}/detail/${account_view}`);
+    await goto(`/holder/${holder.pk()}/account/${account.pk()}/detail/${account_view}`);
   }
 
 /**
@@ -22,7 +22,7 @@ export async function goToAccountDetail(holder: Holder, account: Account) {
  * @param {Account} to - If provided, it prepopulates transaction target with this account
  */
 export async function goToTransactionCreate(holder: Holder, account: Account, from?: Account, to?: Account) {
-    await goto(`/holder/${holder.pk}/account/${account.pk()}/transaction/create?from=${from?.pk()}&to=${to?.pk()}`);
+    await goto(`/holder/${holder.pk()}/account/${account.pk()}/transaction/create?from=${from?.pk()}&to=${to?.pk()}`);
 }
 
 /**

@@ -1,3 +1,4 @@
+mod test_models_all_movements;
 mod test_models_movement_dividend;
 mod test_models_movement_numerable;
 mod test_models_snapshot_numerable;

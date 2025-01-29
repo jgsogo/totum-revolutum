@@ -18,10 +18,11 @@ export class NewSnapshot {
     constructor(account: Account, last_snapshot?: Snapshot) {
         this.account = account;
         if (last_snapshot) {
-            this.amount = last_snapshot.amount().as_number();
+            this.amount = last_snapshot.amount().amount().amount();
             if (account.is_numerable()) {
-                this.quantity = last_snapshot.amount().quantity()?.as_number();
-                this.unit_value = last_snapshot.amount().unit_value()?.as_number();
+                let numerable = last_snapshot.amount().as_numerable()!;
+                this.quantity = numerable.quantity().as_number();
+                this.unit_value = numerable.unit_value().amount();
             }
         }
     }

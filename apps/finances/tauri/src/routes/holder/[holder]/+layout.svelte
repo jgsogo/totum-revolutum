@@ -19,7 +19,7 @@
 <header
   class="fixed top-0 z-40 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
 >
-  <Navbar bind:drawerHidden {all_holders} {active_holder} home_href="/holder/{active_holder.pk}" {app_state} />
+  <Navbar bind:drawerHidden {all_holders} {active_holder} home_href="/holder/{active_holder.pk()}" {app_state} />
 </header>
 <div class="overflow-hidden lg:flex">
   <SidebarMenu bind:drawerHidden {menu} {app_state} />

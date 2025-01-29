@@ -5,7 +5,7 @@ import "apps/finances/tauri/models/protos/account.proto";
 import "apps/finances/tauri/models/protos/movement.proto";
 import "apps/finances/tauri/models/protos/snapshot.proto";
 
-// Data available for the selected holder
+// Data available for the selected account
 message AccountContext {
     Account account = 1;
 

@@ -32,7 +32,7 @@ describe('Money USD units', () => {
     let money = new Money(proto);
 
     test('test_as_number', ()=> {
-        expect(money.as_number()).toBe(1234.789);
+        expect(money.amount()).toBe(1234.789);
     });
 
     test('test toString default', ()=> {
@@ -53,7 +53,7 @@ describe('Money EUR units', () => {
     let money = new Money(proto);
 
     test('test_as_number', ()=> {
-        expect(money.as_number()).toBe(1234.789);
+        expect(money.amount()).toBe(1234.789);
     });
 
     test('test toString default', ()=> {
@@ -74,7 +74,7 @@ describe('Money rounded: five rounded up', () => {
     let money = new Money(proto);
 
     test('test_as_number', ()=> {
-        expect(money.as_number()).toBe(1234.785);
+        expect(money.amount()).toBe(1234.785);
     });
 
     test('test toString default', ()=> {
