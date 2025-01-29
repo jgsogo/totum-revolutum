@@ -28,6 +28,10 @@ jobs:
     env:
       BAZEL_CONFIG: "--config=ci"
     steps:
+      - name: Logging
+        run: |
+          echo "${{ toJSON(github.event) }}"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
