@@ -45,6 +45,6 @@ export async function load({ params, depends }) {
 		};
 	}
 	catch (e) {
-		error(404, `Cannot get URL: ${e}`);
+		error(404, `Cannot get URL: ${JSON.stringify(e)}`);
 	}
 }

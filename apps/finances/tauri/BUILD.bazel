@@ -1,6 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//bazel/tauri:defs.bzl", "tauri_run")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -37,11 +36,5 @@ js_run_devserver(
         ":static",
     ],
     grant_sandbox_write_permissions = True,
-)
-
-tauri_run(
-    name = "dev",
-    backend = "//apps/finances/tauri/src-tauri:app",
-    frontend = ":devserver",
-    visibility = ["//visibility:public"],
+    visibility = ["//apps/finances:__pkg__"],
 )
