@@ -1,6 +1,7 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
 load("//bazel/containers/with_docker:with_docker_compose_run.bzl", "with_docker_compose_run")
+load("//bazel/run:defs.bzl", "run_together")
 
 value_from_stable_status(
     name = "version",
@@ -26,10 +27,12 @@ expand_template(
     ],
 )
 
+# The backend requires a database (and the Django application to access the admin interface)
 with_docker_compose_run(
-    name = "dev",
+    name = "backend",
     binaries = [
-        "//apps/finances/tauri:dev",
+        # "//apps/finances/tauri:dev",
+        "//apps/finances/tauri/src-tauri:app",
     ],
     docker_compose = [
         "//apps/finances/django:app-docker_compose",
@@ -48,6 +51,23 @@ with_docker_compose_run(
         "BASE_URL": "http://localhost:1337",
         "MEDIA_URL": "/media/",
         "STATIC_URL": "/static/",
+        # Rust debugging
+        "RUST_BACKTRACE": "1",
+        "RUST_LOG": "debug",
     },
     remove_volumes = False,
+)
+
+# The frontend is just a regular Svelte application with SSR enabled
+alias(
+    name = "frontend",
+    actual = "//apps/finances/tauri:devserver",
+)
+
+# To develop, we need to run the backend and the frontend
+run_together(
+    name = "dev",
+    after = ":backend",
+    before = ":frontend",
+    delay_seconds = 1,
 )
