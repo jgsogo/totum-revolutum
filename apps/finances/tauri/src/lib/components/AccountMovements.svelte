@@ -41,7 +41,7 @@
             <TableBodyCell>{entry.direction()}</TableBodyCell>
             <TableBodyCell>{entry.type()}</TableBodyCell>
             <TableBodyCell>{entry.amount()}</TableBodyCell>
-            <TableBodyCell>TODO: get_transaction({entry.transaction_pk()})</TableBodyCell>
+            <TableBodyCell>{entry.transaction_name()}</TableBodyCell>
           </TableBodyRow>
         {/if}
       {/each}

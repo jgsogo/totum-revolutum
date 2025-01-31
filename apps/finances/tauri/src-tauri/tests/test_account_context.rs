@@ -5,7 +5,7 @@ use common::call_command;
 use finances_app_models::AccountContext;
 
 #[test]
-fn test_holder_context() {
+fn test_account_context() {
     let webview = common::webview();
 
     {

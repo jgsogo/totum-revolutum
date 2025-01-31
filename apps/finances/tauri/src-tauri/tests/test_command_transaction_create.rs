@@ -40,6 +40,7 @@ fn test_create_transaction() {
                     None,
                     date_proto.clone(),
                     None,
+                    None,
                     movement_type.clone(),
                     MovementDirectionProto::out(),
                     MovementAmountProto::new_non_numerable(
@@ -60,6 +61,7 @@ fn test_create_transaction() {
                 MovementProto::new(
                     None,
                     date_proto.clone(),
+                    None,
                     None,
                     movement_type.clone(),
                     MovementDirectionProto::out(),
@@ -82,6 +84,7 @@ fn test_create_transaction() {
                 MovementProto::new(
                     None,
                     date_proto.clone(),
+                    None,
                     None,
                     movement_type.clone(),
                     MovementDirectionProto::r#in(),
@@ -114,6 +117,7 @@ fn test_create_transaction() {
                 MovementProto::new(
                     None,
                     date_proto.clone(),
+                    None,
                     None,
                     movement_type.clone(),
                     MovementDirectionProto::out(),

@@ -4,7 +4,7 @@ use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 use finances_accounts::models::{Transaction as TransactionDb, TransactionGroup as TransactionGroupDb};
 use finances_accounts::sql::filters::{
-    movement_filter_account_by_pk, movement_filter_by_direction, transactiongroup_by_pk,
+    movement_filter_account_by_pk, movement_filter_by_direction, transaction_by_pk, transactiongroup_by_pk,
 };
 use finances_app_models::{
     LastTransactionsRequest as LastTransactionsRequestProto, LastTransactionsResponse as LastTransactionsResponseProto,
@@ -77,7 +77,7 @@ pub async fn past_transactions(
                         mov.account_id()
                     )))?;
 
-                    let mov = movement_into_model_movement(mov, account, &main_context, &mut conn)?;
+                    let mov = movement_into_model_movement(mov, account, &main_context, None, &mut conn)?;
                     let direction = mov.direction()?;
                     Ok((mov, direction))
                 })
@@ -99,4 +99,33 @@ pub async fn past_transactions(
 
     let response = LastTransactionsResponseProto::new(transactions);
     Ok(tauri::ipc::Response::new(response.encode_to_vec()))
+}
+
+pub(crate) fn get_transaction_details(transaction_pk: i64, conn: &mut PgConnection) -> Result<TransactionProto> {
+    log::info!("Get Transaction {transaction_pk} details");
+
+    let t = TransactionDb::all()
+        .filter(transaction_by_pk(transaction_pk))
+        .select(TransactionDb::as_select())
+        .first::<TransactionDb>(conn)?;
+
+    let group = t
+        .group_id
+        .map(|group_id| {
+            finances_accounts::schema::finances_accounts_transactiongroup::table
+                .filter(transactiongroup_by_pk(group_id))
+                .select(TransactionGroupDb::as_select())
+                .first::<TransactionGroupDb>(conn)
+        })
+        .transpose()?
+        .map(|g| TransactionGroupProto::new(g.id, g.name, g.description));
+
+    Ok(TransactionProto::new(
+        Some(t.id),
+        t.name,
+        t.description,
+        group,
+        Vec::new(),
+        Vec::new(),
+    ))
 }

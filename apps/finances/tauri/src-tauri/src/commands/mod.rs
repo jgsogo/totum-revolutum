@@ -18,11 +18,12 @@ use finances_app_models::{
     FxQuote as FxQuoteProto, FxQuotePair as FxQuotePairProto, Holder as HolderProto,
     HolderContext as HolderContextProto, MainContext as MainContextProto, MoneyAmount as MoneyAmountProto,
     Movement as MovementProto, MovementAmount as MovementAmountProto, MovementDirection as MovementDirectionProto,
-    ProtoWrapper, Snapshot as SnapshotProto,
+    ProtoWrapper, Snapshot as SnapshotProto, Transaction as TransactionProto,
 };
 use finances_investments::models::Movement;
 
 use finances_investments::sql::queries::all_movements_for_account_id;
+use last_transactions::get_transaction_details;
 
 use crate::{Error, Result};
 use finances_investments::models::SnapshotNumerable;
@@ -113,6 +114,7 @@ pub async fn get_account_context(
     main_context: State<'_, MainContextProto>,
     account_pk: i64,
 ) -> Result<Response> {
+    log::info!("Get Account {account_pk} context");
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     // TODO: Can we just retrieve it from the MainContext and save one DB call.
@@ -149,7 +151,10 @@ pub async fn get_account_context(
     let movements: Vec<MovementProto> = {
         all_movements_for_account_id(account_pk, &mut conn)?
             .into_iter()
-            .map(|v| movement_into_model_movement(v, &account, &main_context, &mut conn))
+            .map(|v| {
+                let transaction = get_transaction_details(v.transaction_id(), &mut conn)?;
+                movement_into_model_movement(v, &account, &main_context, Some(transaction), &mut conn)
+            })
             .collect::<Result<Vec<_>>>()?
     };
 
@@ -161,6 +166,7 @@ pub fn movement_into_model_movement(
     v: Movement,
     account: &AccountProto,
     main_context: &MainContextProto,
+    transaction: Option<TransactionProto>,
     conn: &mut PgConnection,
 ) -> Result<MovementProto> {
     let account_ccy = account.currency_code()?;
@@ -225,7 +231,8 @@ pub fn movement_into_model_movement(
     Ok::<_, Error>(MovementProto::new(
         Some(v.id()),
         (*v.date_value()).into(),
-        Some(v.transaction_id()),
+        transaction.as_ref().and_then(|t| t.pk().cloned()),
+        transaction.as_ref().map(|t| t.name().to_string()),
         movement_type,
         direction,
         movement_amount,

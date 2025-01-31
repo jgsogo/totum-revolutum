@@ -138,6 +138,10 @@ export class Movement {
         return Number(this.movement.transactionPk);
     }
 
+    transaction_name(): string | undefined {
+        return this.movement.transactionName;
+    }
+
     type(): MovementType {
         return new MovementType(this.movement.type!);
     }

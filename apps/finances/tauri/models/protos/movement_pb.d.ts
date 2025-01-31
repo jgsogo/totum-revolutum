@@ -114,6 +114,11 @@ export declare type Movement = Message<"finances_app_models.Movement"> & {
   transactionPk?: bigint;
 
   /**
+   * @generated from field: optional string transaction_name = 9;
+   */
+  transactionName?: string;
+
+  /**
    * @generated from field: finances_app_models.MovementType type = 4;
    */
   type?: MovementType;

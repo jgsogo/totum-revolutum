@@ -21,6 +21,7 @@ impl Movement {
         pk: Option<i64>,
         date_value: google_type::Date,
         transaction_pk: Option<i64>,
+        transaction_name: Option<String>,
         r#type: MovementType,
         direction: MovementDirection,
         amount: MovementAmount,
@@ -31,6 +32,7 @@ impl Movement {
             pk,
             date_value: Some(date_value.into()),
             transaction_pk,
+            transaction_name,
             r#type: Some(r#type.into()),
             direction: direction.to_i32(),
             amount: Some(amount.into()),
@@ -53,6 +55,10 @@ impl Movement {
 
     pub fn transaction_pk(&self) -> Option<&i64> {
         self.0.transaction_pk.as_ref()
+    }
+
+    pub fn transaction_name(&self) -> Option<&str> {
+        self.0.transaction_name.as_deref()
     }
 
     pub fn r#type(&self) -> Result<&MovementType> {
