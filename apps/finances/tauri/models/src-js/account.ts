@@ -2,6 +2,7 @@ import { DateWrapper, CurrencyCode, currency_code_from_str } from "../../../../.
 import { AccountCategory as AccountCategoryProto, Account as AccountProto, AccountType as AccountTypeProto } from "../protos/account_pb.js";
 
 import { Custodian } from "./custodian.js";
+import { Snapshot } from "./snapshot.js";
 
 export enum AccountCategory {
     Other = 0,
@@ -84,5 +85,9 @@ export class Account {
 
     open(): DateWrapper {
         return new DateWrapper(this.account.open!);
+    }
+
+    last_snapshot(): Snapshot | undefined {
+        return this.account.lastSnapshot ? new Snapshot(this.account.lastSnapshot) : undefined;
     }
 }

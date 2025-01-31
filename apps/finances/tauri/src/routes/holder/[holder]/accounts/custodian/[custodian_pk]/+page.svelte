@@ -11,7 +11,7 @@
 </script>
 
 <div class="mt-px space-y-4">
-  {custodian}
+  {custodian.name()}
   <img alt="Custodian {custodian.name()}" src="{app_state.base_media_url()}{custodian.photo()}" />
 
   <AccountsTable {holder} show_custodian={false} {accounts} />

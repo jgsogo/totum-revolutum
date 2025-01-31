@@ -30,7 +30,7 @@
             <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell></TableBodyCell>
-            <TableBodyCell>{entry.amount().amount().amount()}</TableBodyCell>
+            <TableBodyCell>{entry.amount().amount()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
           </TableBodyRow>
         {:else}
@@ -39,9 +39,9 @@
             <!-- FIXME: Dates from the backend arrive in "User-local", but without timezone info -->
             <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell>{entry.direction()}</TableBodyCell>
-            <TableBodyCell>TODO: type</TableBodyCell>
-            <TableBodyCell>{entry.amount().amount()}</TableBodyCell>
-            <TableBodyCell>TODO: transaction</TableBodyCell>
+            <TableBodyCell>{entry.type()}</TableBodyCell>
+            <TableBodyCell>{entry.amount()}</TableBodyCell>
+            <TableBodyCell>TODO: get_transaction({entry.transaction_pk()})</TableBodyCell>
           </TableBodyRow>
         {/if}
       {/each}

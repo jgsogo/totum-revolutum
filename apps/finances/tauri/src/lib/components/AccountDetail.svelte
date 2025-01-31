@@ -14,8 +14,7 @@
     holder,
     account,
     base_media_url,
-    last_snapshot,
-  }: { holder: Holder; account: Account; base_media_url: string; last_snapshot?: Snapshot } = $props();
+  }: { holder: Holder; account: Account; base_media_url: string } = $props();
 
   const initials = (custodian: Custodian): string => {
     let words = custodian.name().split(/\s/);
@@ -30,7 +29,7 @@
   };
 
   let snapshotModal: boolean = $state(false);
-  let newSnapshot = $state(new NewSnapshot(account, last_snapshot));
+  let newSnapshot = $state(new NewSnapshot(account, account.last_snapshot()));
   const on_snapshot = async (e: MouseEvent) => {
     e.preventDefault();
     if (newSnapshot.isValid()) {
@@ -85,9 +84,9 @@
             </p>
           </div>
         </div>
-        {#if last_snapshot}
+        {#if account.last_snapshot()}
           <div class="truncate inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-            {last_snapshot.amount()}
+            {account.last_snapshot()!.amount().amount()}
           </div>
         {/if}
       </div>

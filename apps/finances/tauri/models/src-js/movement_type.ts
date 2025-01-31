@@ -7,6 +7,10 @@ export class MovementType {
         this.movement_type = movement_type;
     }
 
+    toString() : string {
+        return this.name()
+    }
+
     pk(): number {
         return Number(this.movement_type.pk);
     }
