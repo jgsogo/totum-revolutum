@@ -4,7 +4,7 @@ mod account_type;
 pub use account_category::AccountCategory;
 pub use account_type::AccountType;
 
-use crate::{google_type::CurrencyCode, Custodian, Error, Result};
+use crate::{google_type::CurrencyCode, Custodian, Error, Result, Snapshot};
 
 use proto_wrapper::ProtoWrapper;
 
@@ -27,6 +27,7 @@ impl Account {
         open: google_type::Date,
         holder_owns_money: bool,
         is_numerable: bool,
+        last_snapshot: Option<Snapshot>,
     ) -> Self {
         Self(crate::protos::finances_app_models::Account {
             pk,
@@ -39,6 +40,7 @@ impl Account {
             open: Some(open.into()),
             holder_owns_money,
             is_numerable,
+            last_snapshot: last_snapshot.map(|v| v.into()),
         })
     }
 
@@ -92,5 +94,13 @@ impl Account {
 
     pub fn is_numerable(&self) -> bool {
         self.0.is_numerable
+    }
+
+    pub fn last_snapshot(&self) -> Result<&Snapshot> {
+        self.0
+            .last_snapshot
+            .as_ref()
+            .map(Snapshot::new_ref)
+            .ok_or(Error::MissingRequiredField("last_snapshot".to_string()))
     }
 }

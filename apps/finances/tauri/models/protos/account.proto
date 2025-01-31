@@ -3,6 +3,7 @@ package finances_app_models;
 
 import "apps/finances/tauri/models/protos/custodian.proto";
 import "libraries/googleapis/protos/google/type/date.proto";
+import "apps/finances/tauri/models/protos/snapshot.proto";
 
 // Main account categories
 enum AccountCategory {
@@ -34,8 +35,10 @@ message Account {
   optional string identifier = 6;
   optional string description = 7;
 
-  optional google.type.Date open = 8;
+  google.type.Date open = 8;
 
   bool holder_owns_money = 9;
   bool is_numerable = 10;
+
+  optional Snapshot last_snapshot = 11;
 }

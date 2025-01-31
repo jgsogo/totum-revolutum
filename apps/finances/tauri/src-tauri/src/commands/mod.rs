@@ -81,6 +81,11 @@ pub async fn get_holder_context(
                         "Account type 'pk={}' not found in main context",
                         account_type.id
                     )))?;
+
+                // FIXME: We only want the last snapshot
+                let snapshots = get_snapshots(&account, &mut conn)?;
+                let last_snapshot = snapshots.get(0).cloned();
+
                 Ok::<_, Error>(AccountProto::new(
                     account.id,
                     account.name,
@@ -92,6 +97,7 @@ pub async fn get_holder_context(
                     account.open.into(),
                     account_holder_role.owns_money,
                     account.is_numerable,
+                    last_snapshot,
                 ))
             })
             .collect::<Result<Vec<_>>>()?
@@ -110,7 +116,7 @@ pub async fn get_account_context(
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
     // TODO: Can we just retrieve it from the MainContext and save one DB call.
-    let account = {
+    let (account, snapshots) = {
         let (account, account_holder_role, custodian, account_type) = Account::details_for_pk(account_pk, &mut conn)?;
         let account_type = main_context
             .find_account_type(account_type.id)
@@ -118,7 +124,11 @@ pub async fn get_account_context(
                 "Account type 'pk={}' not found in main context",
                 account_type.id
             )))?;
-        AccountProto::new(
+
+        let snapshots = get_snapshots(&account, &mut conn)?;
+        let last_snapshot = snapshots.first().cloned();
+
+        let account = AccountProto::new(
             account.id,
             account.name,
             custodian.into(),
@@ -129,41 +139,10 @@ pub async fn get_account_context(
             account.open.into(),
             account_holder_role.owns_money,
             account.is_numerable,
-        )
-    };
+            last_snapshot,
+        );
 
-    let account_ccy = account.currency_code()?;
-
-    // Snapshots
-    let snapshots: Vec<SnapshotProto> = if !account.is_numerable() {
-        Account::snapshots_for_pk(account_pk, &mut conn)?
-            .into_iter()
-            .map(|v| {
-                let amount = google_type::Money::new(v.amount, account_ccy)?;
-                let money_amount = MoneyAmountProto::new_non_numerable(amount);
-                Ok::<_, Error>(SnapshotProto::new(
-                    Some(v.id),
-                    v.date_value.into(),
-                    money_amount,
-                    *account.pk(),
-                ))
-            })
-            .collect::<Result<Vec<_>>>()?
-    } else {
-        all_snapshotnumerable_for_account_id(account_pk, &mut conn)?
-            .into_iter()
-            .map(|v: SnapshotNumerable| {
-                let unit_value = google_type::Money::new(v.snapshot_numerable.unit_value, account_ccy)?;
-                let quantity = google_type::Decimal::new(v.snapshot_numerable.quantity);
-                let money_amount = MoneyAmountProto::new_numerable(unit_value, quantity);
-                Ok::<_, Error>(SnapshotProto::new(
-                    Some(v.snapshot.id),
-                    v.snapshot.date_value.into(),
-                    money_amount,
-                    *account.pk(),
-                ))
-            })
-            .collect::<Result<Vec<_>>>()?
+        (account, snapshots)
     };
 
     // Movements
@@ -253,4 +232,42 @@ pub fn movement_into_model_movement(
         fx,
         *account.pk(),
     ))
+}
+
+pub(crate) fn get_snapshots(account: &Account, conn: &mut PgConnection) -> Result<Vec<SnapshotProto>> {
+    let account_ccy = google_type::CurrencyCode::new(&account.ccy)?;
+
+    // Snapshots
+    let snapshots: Vec<SnapshotProto> = if !account.is_numerable {
+        Account::snapshots_for_pk(account.id, conn)?
+            .into_iter()
+            .map(|v| {
+                let amount = google_type::Money::new(v.amount, account_ccy)?;
+                let money_amount = MoneyAmountProto::new_non_numerable(amount);
+                Ok::<_, Error>(SnapshotProto::new(
+                    Some(v.id),
+                    v.date_value.into(),
+                    money_amount,
+                    account.id,
+                ))
+            })
+            .collect::<Result<Vec<_>>>()?
+    } else {
+        all_snapshotnumerable_for_account_id(account.id, conn)?
+            .into_iter()
+            .map(|v: SnapshotNumerable| {
+                let unit_value = google_type::Money::new(v.snapshot_numerable.unit_value, account_ccy)?;
+                let quantity = google_type::Decimal::new(v.snapshot_numerable.quantity);
+                let money_amount = MoneyAmountProto::new_numerable(unit_value, quantity);
+                Ok::<_, Error>(SnapshotProto::new(
+                    Some(v.snapshot.id),
+                    v.snapshot.date_value.into(),
+                    money_amount,
+                    account.id,
+                ))
+            })
+            .collect::<Result<Vec<_>>>()?
+    };
+
+    Ok(snapshots)
 }
