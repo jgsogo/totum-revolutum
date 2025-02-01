@@ -99,7 +99,7 @@ syn = { version = "2.0.96", features = ["visit"] }
 tauri-build = { version = "2.0.3", features = [] }
 tauri = { version = "2.1.1", features = [] }
 tauri-plugin-shell = "2.0.2"
-tempfile = { version = "3.10.1" }
+tempfile = { version = "3.16.0" }
 testing_logger = "0.1.1"
 thiserror = "1.0.69"  # FIXME: v2 requires https://github.com/diesel-rs/diesel/pull/4337 (diesel 2.2.7?)
 time = { version = "0.3.36" }
