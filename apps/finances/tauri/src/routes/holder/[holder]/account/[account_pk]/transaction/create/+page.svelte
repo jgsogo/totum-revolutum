@@ -13,6 +13,7 @@
     AppState,
     AccountContext,
     HolderContext,
+    Transaction,
   } from "../../../../../../../../models/src-js/index.js";
 
   /** @type {{ data: import('./$types').PageData }} */
@@ -25,6 +26,7 @@
 
   let from_account: Account | null = data.from_account;
   let to_account: Account | null = data.to_account;
+  let last_transactions: Transaction[] = data.last_transactions;
 
   let initial_movements_from = from_account
     ? [
@@ -74,6 +76,10 @@
 <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
 
 <form>
+  {#each last_transactions as transaction}
+    <p>{transaction}</p>
+  {/each}
+
   <div class="mt-px space-y-4">
     <Card
       size="xl"
@@ -102,7 +108,10 @@
         </Heading>
 
         {#each transaction.movements_from as mov, i}
-          <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}">
+          <Card
+            size="xl"
+            class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}"
+          >
             <MovementForm
               bind:new_movement={transaction.movements_from[i]}
               base_ccy={app_state.base_ccy()}
@@ -134,7 +143,10 @@
           </div>
         </Heading>
         {#each transaction.movements_to as mov, i}
-          <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}">
+          <Card
+            size="xl"
+            class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}"
+          >
             <MovementForm
               bind:new_movement={transaction.movements_to[i]}
               base_ccy={app_state.base_ccy()}

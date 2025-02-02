@@ -47,9 +47,9 @@ impl Movement {
 
     pub fn account_id(&self) -> i64 {
         match self {
-            Movement::NonNumerable(movement) => movement.id,
-            Movement::Numerable(movement_numerable) => movement_numerable.movement.id,
-            Movement::Dividend(movement_dividend) => movement_dividend.movement.id,
+            Movement::NonNumerable(movement) => movement.account_id,
+            Movement::Numerable(movement_numerable) => movement_numerable.movement.account_id,
+            Movement::Dividend(movement_dividend) => movement_dividend.movement.account_id,
         }
     }
 
