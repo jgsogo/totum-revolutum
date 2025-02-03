@@ -13,7 +13,7 @@ fn main() -> Result<()> {
                 "apps/finances/tauri/models/protos/account.proto",
                 "apps/finances/tauri/models/protos/app_state.proto",
                 "apps/finances/tauri/models/protos/custodian.proto",
-                "apps/finances/tauri/models/protos/fx.proto",
+                "apps/finances/tauri/models/protos/fx_quote.proto",
                 "apps/finances/tauri/models/protos/holder_context.proto",
                 "apps/finances/tauri/models/protos/holder.proto",
                 "apps/finances/tauri/models/protos/main_context.proto",

@@ -1,7 +1,6 @@
 use super::DB_POOL;
 use crate::models::{NewSnapshotNumerable, SnapshotNumerable};
 use crate::sql::queries::all_snapshotnumerable_for_account_id;
-use diesel::prelude::*;
 use finances_accounts::models::NewSnapshot;
 
 #[test]
@@ -12,10 +11,8 @@ fn test_queries() {
 
     // All snapshots (as SnapshotNumerable) for a given account
     {
-        let all: Vec<SnapshotNumerable> = all_snapshotnumerable_for_account_id()
-            .bind::<diesel::sql_types::Int8, _>(account_id)
-            .load(&mut conn)
-            .expect("Error loading snapshots");
+        let all: Vec<SnapshotNumerable> =
+            all_snapshotnumerable_for_account_id(account_id, &mut conn).expect("Error loading snapshots");
         assert_eq!(all.len(), 2);
     }
 
@@ -35,9 +32,7 @@ fn test_queries() {
     };
     new_snapshot_numerable.insert_into_db(&mut conn).unwrap();
 
-    let all: Vec<SnapshotNumerable> = all_snapshotnumerable_for_account_id()
-        .bind::<diesel::sql_types::Int8, _>(account_id)
-        .load(&mut conn)
-        .expect("Error loading snapshots");
+    let all: Vec<SnapshotNumerable> =
+        all_snapshotnumerable_for_account_id(account_id, &mut conn).expect("Error loading snapshots");
     assert_eq!(all.len(), 3);
 }

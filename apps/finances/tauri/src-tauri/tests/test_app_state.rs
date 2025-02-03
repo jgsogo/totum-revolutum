@@ -2,7 +2,7 @@ use serde_json::json;
 
 mod common;
 use common::call_command;
-use finances_app_models::AppState;
+use finances_app_models::{google_type, AppState};
 
 #[test]
 fn test_app_state() {
@@ -14,7 +14,7 @@ fn test_app_state() {
 
         assert!(r.is_ok());
         let app_state: AppState = r.unwrap().try_into_proto().unwrap();
-        assert_eq!(app_state.base_ccy(), "USD");
-        assert_eq!(app_state.postgres_url(), "postgres_url");
+        assert_eq!(app_state.base_ccy().unwrap(), google_type::CurrencyCode::USD);
+        assert_eq!(app_state.postgres_url().unwrap(), "postgres_url");
     }
 }

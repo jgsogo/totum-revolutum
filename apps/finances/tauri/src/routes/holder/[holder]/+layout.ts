@@ -23,21 +23,21 @@ export async function load({ params, depends }) {
 
 		let menu = []
 		// Menu - All accounts
-		menu.push(new SidebarEntry(`All (${holder_context.accounts().length})`, ClipboardSolid, `/holder/${holder.pk}/accounts/all`));
+		menu.push(new SidebarEntry(`All (${holder_context.accounts().length})`, ClipboardSolid, `/holder/${holder.pk()}/accounts/all`));
 
 		// Menu - custodians
 		let accounts_by_custodian = holder_context.grouped_by_custodian();
 		let custodians_entry = new SidebarEntry(`By custodian (${accounts_by_custodian.size})`, LandmarkSolid);
 		for (const [_, accounts] of accounts_by_custodian) {
 			let custodian = accounts[0].custodian();
-			custodians_entry.addChildren(`${custodian.name} (${accounts.length})`, `/holder/${holder.pk}/accounts/custodian/${custodian.pk as unknown as number}`);
+			custodians_entry.addChildren(`${custodian.name()} (${accounts.length})`, `/holder/${holder.pk()}/accounts/custodian/${custodian.pk() as unknown as number}`);
 		}
 		menu.push(custodians_entry);
 
 		// Menu - other entries
-		menu.push(new SidebarEntry(`Savings (${holder_context.savings_accounts().length})`, CashSolid, `/holder/${holder.pk}/accounts/savings`));
-		menu.push(new SidebarEntry(`Investment (${holder_context.investments_accounts().length})`, ChartMixedDollarSolid, `/holder/${holder.pk}/accounts/investment`));
-		menu.push(new SidebarEntry(`Retirement (${holder_context.retirement_accounts().length})`, LockSolid, `/holder/${holder.pk}/accounts/retirement`));
+		menu.push(new SidebarEntry(`Savings (${holder_context.savings_accounts().length})`, CashSolid, `/holder/${holder.pk()}/accounts/savings`));
+		menu.push(new SidebarEntry(`Investment (${holder_context.investments_accounts().length})`, ChartMixedDollarSolid, `/holder/${holder.pk()}/accounts/investment`));
+		menu.push(new SidebarEntry(`Retirement (${holder_context.retirement_accounts().length})`, LockSolid, `/holder/${holder.pk()}/accounts/retirement`));
 
 		return {
 			holder_context,
@@ -45,6 +45,6 @@ export async function load({ params, depends }) {
 		};
 	}
 	catch (e) {
-		error(404, `Cannot get URL: ${e}`);
+		error(404, `Cannot get URL: ${JSON.stringify(e)}`);
 	}
 }

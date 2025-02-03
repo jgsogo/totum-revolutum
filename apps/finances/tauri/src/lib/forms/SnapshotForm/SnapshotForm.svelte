@@ -3,6 +3,7 @@
   import Datepicker from "../Datepicker.svelte";
   import type { NewSnapshot } from "./NewSnapshot.svelte";
 
+
   let {
     snapshot = $bindable(),
   }: {

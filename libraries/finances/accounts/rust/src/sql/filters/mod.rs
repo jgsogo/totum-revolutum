@@ -1,3 +1,4 @@
+use crate::fields::MovementDirection;
 use diesel::prelude::*;
 
 /// Returns a query fragment to filter all the [`Account`]s that are opened as of today (they don't have close date or it is later than today or equal)
@@ -94,6 +95,18 @@ pub fn movement_filter_account_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_movement::account_id.eq(pk)
 }
 
+/// Returns a query fragment to filter [`Movement`]s by account_id
+#[diesel::dsl::auto_type]
+pub fn movement_filter_transaction_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_movement::transaction_id.eq(pk)
+}
+
+/// Returns a query fragment to filter [`Movement`]s by direction
+#[diesel::dsl::auto_type]
+pub fn movement_filter_by_direction(direction: MovementDirection) -> _ {
+    crate::schema::finances_accounts_movement::direction.eq(direction)
+}
+
 /// Returns a query fragment to filter [`Snapshot`]s by account_id
 #[diesel::dsl::auto_type]
 pub fn snapshot_filter_account_by_pk(pk: i64) -> _ {
@@ -118,4 +131,10 @@ pub fn transaction_group_active() -> _ {
     crate::schema::finances_accounts_transactiongroup::end
         .is_null()
         .or(crate::schema::finances_accounts_transactiongroup::end.ge(diesel::dsl::today))
+}
+
+/// Returns a query fragment to filter [`TransactionGroup`]s by pk
+#[diesel::dsl::auto_type]
+pub fn transactiongroup_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_transactiongroup::id.eq(pk)
 }

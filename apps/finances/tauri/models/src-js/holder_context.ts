@@ -1,10 +1,11 @@
 import { HolderContext as HolderContextProto, HolderContextSchema } from "../protos/holder_context_pb.js";
-import { Account as AccountProto, AccountCategory } from "../protos/account_pb.js";
-import { Account } from "./account.js";
-import { Holder } from "../protos/holder_pb.js";
+import { Account as AccountProto } from "../protos/account_pb.js";
+import { Account, AccountCategory } from "./account.js";
 import { Buffer } from 'buffer';
 import { fromBinary } from "@bufbuild/protobuf";
 import { IncomingMessageConstructor, staticImplements } from "./message.js";
+import { Holder } from "./holder.js";
+
 export class HolderContext {
     private readonly holder_context: HolderContextProto;
     private readonly _accounts: Account[];
@@ -20,7 +21,7 @@ export class HolderContext {
     }
 
     holder(): Holder {
-        return this.holder_context.holder!;
+        return new Holder(this.holder_context.holder!);
     }
 
     accounts(): Account[] {
@@ -28,7 +29,7 @@ export class HolderContext {
     }
 
     private filter_accounts(category: AccountCategory): Account[] {
-        return this._accounts.filter((account) => account.type().category === category);
+        return this._accounts.filter((account) => account.type().category() === category);
     }
 
     savings_accounts(): Account[] {
@@ -49,7 +50,7 @@ export class HolderContext {
 
     grouped_by_custodian(): Map<number, Account[]> {
         return this._accounts.reduce((store, account: Account) => {
-            let key = Number(account.custodian().pk);
+            let key = Number(account.custodian().pk());
             if (!store.has(key)) {
                 store.set(key, [account])
             } else {

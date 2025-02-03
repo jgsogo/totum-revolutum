@@ -23,18 +23,35 @@ The Tauri frontend will start, and Django app is running as well in http://local
 
 ---
 
-The following command starts the application from the workspace:
+Backend and frontend can also be started using their corresponding targets:
 
-```sh
-bazel run //apps/finances/tauri:dev
-```
+> **Note.-** You need to execute the frontend first, and then the backend, so the initial connection
+  is stablished. Afterwards you can kill and run the frontend and it will work (see watch mode with ibazel).
 
-> **Note.-** See [this issue](https://github.com/jgsogo/totum-revolutum/issues/508), sometimes
-> it doesn't work and this command needs to be run first:
+ * For the **fronted** execute:
 
-> ```sh
-> bazel run //apps/finances/tauri:devserver
-> ```
+   ```sh
+   bazel run //apps/finances:frontend
+   ```
+
+   You can also execute [this target in watch mode](https://github.com/aspect-build/rules_js/blob/main/docs/js_run_devserver.md)
+   using ibazel (this tool monitors the files in the `data` attribute and re-run the target
+   if they are modified):
+
+   ```sh
+   ibazel run //apps/finances:frontend
+   ```
+
+ * For the **backend** execute
+
+   ```sh
+   bazel run //apps/finances:backend
+   ```
+
+   This target executes a docker compose providing all the underlying infrastructure
+   that is needed for this application to run (database, Django admin,...) and then
+   executes the Tauri backend connecting to the DB inside docker compose.
+
 
 It is also possible to execute the dev environment using non-Bazel tooling:
 

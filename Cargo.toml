@@ -16,6 +16,8 @@ members = [
     "libraries/openexchangerates",
     "libraries/pcloud_sdk",
     "libraries/rebrickable",
+    "libraries/rust/proto_wrapper",
+    "libraries/rust/proto_wrapper_derive",
     "libraries/utils",
     # A placeholder to depend on _external_ crates (see [this note](./notes/2024-05-04-1923.md))
     "bazel/external",
@@ -30,7 +32,7 @@ anyhow = "1.0.82"
 async-std = { version = "1.12" }
 async-trait = "0.1.80"
 bigdecimal = "0.4.7"
-bitflags = "2.6"
+bitflags = "2.8"
 bytes = "1.6.0"
 camino = "1.1.6"
 camino-tempfile = "1.1.1"
@@ -46,7 +48,7 @@ diesel = { version = "2.2.6", default-features = false, features = ["sqlite", "r
 diesel_migrations = { version = "2.2.0", default-features = false, features = ["sqlite"] }
 diesel_table_macro_syntax = "0.2.0"
 diffy = "0.4.0"
-dirs = { version = "5.0.1" }
+dirs = { version = "6.0.0" }
 dotenvy = "0.15.7"
 dyn-clone = "1.0.17"
 env_logger = "0.11.3"
@@ -62,7 +64,7 @@ http = "1.2.0"
 http-body = "1.0.1"
 http-body-util = "0.1.1"
 httpmock = { version = "0.7" }
-hyper = { version = "1.5.2" }
+hyper = { version = "1.6.0" }
 hyper-util = { version = "0.1.6" }
 ignore = { version = "0.4.22" }
 ignore-files = "3.0.1"
@@ -93,7 +95,7 @@ serde_yaml = "0.9.34"
 sha256 = { version = "1.5" }
 strum = "0.26.3"
 strum_macros = "0.26.2"
-syn = { version = "2.0.93", features = ["visit"] }
+syn = { version = "2.0.96", features = ["visit"] }
 tauri-build = { version = "2.0.3", features = [] }
 tauri = { version = "2.1.1", features = [] }
 tauri-plugin-shell = "2.0.2"

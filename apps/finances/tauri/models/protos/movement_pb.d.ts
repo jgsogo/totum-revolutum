@@ -4,9 +4,9 @@
 
 import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import type { Message } from "@bufbuild/protobuf";
+import type { MoneyAmount_NonNumerable, MoneyAmount_Numerable } from "./money_amount_pb.js";
 import type { Date } from "../../../../../libraries/googleapis/protos/google/type/date_pb.js";
-import type { MoneyAmount, MoneyAmount_NonNumerable, MoneyAmount_Numerable } from "./money_amount_pb.js";
-import type { Fx } from "./fx_pb.js";
+import type { FxQuote } from "./fx_quote_pb.js";
 
 /**
  * Describes the file apps/finances/tauri/models/protos/movement.proto.
@@ -40,77 +40,11 @@ export declare type MovementType = Message<"finances_app_models.MovementType"> &
 export declare const MovementTypeSchema: GenMessage<MovementType>;
 
 /**
- * @generated from message finances_app_models.Movement
+ * @generated from message finances_app_models.MovementAmount
  */
-export declare type Movement = Message<"finances_app_models.Movement"> & {
+export declare type MovementAmount = Message<"finances_app_models.MovementAmount"> & {
   /**
-   * @generated from field: int64 pk = 1;
-   */
-  pk: bigint;
-
-  /**
-   * @generated from field: google.type.Date date_value = 2;
-   */
-  dateValue?: Date;
-
-  /**
-   * @generated from field: int64 transaction_pk = 3;
-   */
-  transactionPk: bigint;
-
-  /**
-   * @generated from field: finances_app_models.MovementType type = 4;
-   */
-  type?: MovementType;
-
-  /**
-   * @generated from field: finances_app_models.MovementDirection direction = 5;
-   */
-  direction: MovementDirection;
-
-  /**
-   * @generated from field: finances_app_models.MoneyAmount amount = 6;
-   */
-  amount?: MoneyAmount;
-
-  /**
-   * @generated from field: finances_app_models.Fx fx = 7;
-   */
-  fx?: Fx;
-};
-
-/**
- * Describes the message finances_app_models.Movement.
- * Use `create(MovementSchema)` to create a new message.
- */
-export declare const MovementSchema: GenMessage<Movement>;
-
-/**
- * @generated from message finances_app_models.NewMovement
- */
-export declare type NewMovement = Message<"finances_app_models.NewMovement"> & {
-  /**
-   * @generated from field: int64 account_pk = 1;
-   */
-  accountPk: bigint;
-
-  /**
-   * @generated from field: int64 movement_type_pk = 2;
-   */
-  movementTypePk: bigint;
-
-  /**
-   * @generated from field: google.type.Date date_value = 3;
-   */
-  dateValue?: Date;
-
-  /**
-   * @generated from field: finances_app_models.Fx fx = 4;
-   */
-  fx?: Fx;
-
-  /**
-   * @generated from oneof finances_app_models.NewMovement.amount
+   * @generated from oneof finances_app_models.MovementAmount.amount
    */
   amount: {
     /**
@@ -126,32 +60,27 @@ export declare type NewMovement = Message<"finances_app_models.NewMovement"> & {
     case: "numerable";
   } | {
     /**
-     * @generated from field: finances_app_models.NewMovement.DividendAmount dividend = 7;
+     * @generated from field: finances_app_models.MovementAmount.Dividend dividend = 7;
      */
-    value: NewMovement_DividendAmount;
+    value: MovementAmount_Dividend;
     case: "dividend";
   } | { case: undefined; value?: undefined };
 };
 
 /**
- * Describes the message finances_app_models.NewMovement.
- * Use `create(NewMovementSchema)` to create a new message.
+ * Describes the message finances_app_models.MovementAmount.
+ * Use `create(MovementAmountSchema)` to create a new message.
  */
-export declare const NewMovementSchema: GenMessage<NewMovement>;
+export declare const MovementAmountSchema: GenMessage<MovementAmount>;
 
 /**
- * @generated from message finances_app_models.NewMovement.DividendAmount
+ * @generated from message finances_app_models.MovementAmount.Dividend
  */
-export declare type NewMovement_DividendAmount = Message<"finances_app_models.NewMovement.DividendAmount"> & {
+export declare type MovementAmount_Dividend = Message<"finances_app_models.MovementAmount.Dividend"> & {
   /**
    * @generated from field: google.type.Date ex_dividend_date = 1;
    */
   exDividendDate?: Date;
-
-  /**
-   * @generated from field: int64 ex_dividend_snapshot_pk = 2;
-   */
-  exDividendSnapshotPk: bigint;
 
   /**
    * @generated from field: finances_app_models.MoneyAmount.Numerable payout = 3;
@@ -160,10 +89,61 @@ export declare type NewMovement_DividendAmount = Message<"finances_app_models.Ne
 };
 
 /**
- * Describes the message finances_app_models.NewMovement.DividendAmount.
- * Use `create(NewMovement_DividendAmountSchema)` to create a new message.
+ * Describes the message finances_app_models.MovementAmount.Dividend.
+ * Use `create(MovementAmount_DividendSchema)` to create a new message.
  */
-export declare const NewMovement_DividendAmountSchema: GenMessage<NewMovement_DividendAmount>;
+export declare const MovementAmount_DividendSchema: GenMessage<MovementAmount_Dividend>;
+
+/**
+ * @generated from message finances_app_models.Movement
+ */
+export declare type Movement = Message<"finances_app_models.Movement"> & {
+  /**
+   * @generated from field: optional int64 pk = 1;
+   */
+  pk?: bigint;
+
+  /**
+   * @generated from field: google.type.Date date_value = 2;
+   */
+  dateValue?: Date;
+
+  /**
+   * @generated from field: optional int64 transaction_pk = 3;
+   */
+  transactionPk?: bigint;
+
+  /**
+   * @generated from field: finances_app_models.MovementType type = 4;
+   */
+  type?: MovementType;
+
+  /**
+   * @generated from field: finances_app_models.MovementDirection direction = 5;
+   */
+  direction: MovementDirection;
+
+  /**
+   * @generated from field: finances_app_models.MovementAmount amount = 6;
+   */
+  amount?: MovementAmount;
+
+  /**
+   * @generated from field: finances_app_models.FxQuote fx = 7;
+   */
+  fx?: FxQuote;
+
+  /**
+   * @generated from field: int64 account_pk = 8;
+   */
+  accountPk: bigint;
+};
+
+/**
+ * Describes the message finances_app_models.Movement.
+ * Use `create(MovementSchema)` to create a new message.
+ */
+export declare const MovementSchema: GenMessage<Movement>;
 
 /**
  * @generated from enum finances_app_models.MovementDirection

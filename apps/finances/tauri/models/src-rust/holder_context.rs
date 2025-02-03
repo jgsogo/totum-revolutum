@@ -1,27 +1,29 @@
-use super::{Account, Holder, OutgoingModel};
-use prost::Message;
+use super::{Account, Holder};
+
+use crate::{Error, Result};
+use proto_wrapper::ProtoWrapper;
+
+#[repr(transparent)]
+#[derive(ProtoWrapper, Debug)]
 pub struct HolderContext(crate::protos::finances_app_models::HolderContext);
 
-impl TryFrom<Vec<u8>> for HolderContext {
-    type Error = prost::DecodeError;
-
-    fn try_from(v: Vec<u8>) -> Result<Self, Self::Error> {
-        Ok(Self(crate::protos::finances_app_models::HolderContext::decode(&*v)?))
-    }
-}
-
 impl HolderContext {
-    pub fn new(holder: finances_accounts::models::AccountHolder, accounts: Vec<Account>) -> Self {
-        let holder: Holder = holder.into();
+    pub fn new(holder: Holder, accounts: Vec<Account>) -> Self {
         Self(crate::protos::finances_app_models::HolderContext {
-            holder: Some(holder.0),
-            accounts: accounts.into_iter().map(|v| v.0).collect(),
+            holder: Some(holder.into()),
+            accounts: accounts.into_iter().map(|v| v.into()).collect(),
         })
     }
-}
 
-impl OutgoingModel for HolderContext {
-    fn encode_to_vec(&self) -> Vec<u8> {
-        self.0.encode_to_vec()
+    pub fn holder(&self) -> Result<&Holder> {
+        self.0
+            .holder
+            .as_ref()
+            .map(Holder::new_ref)
+            .ok_or(Error::MissingRequiredField("holder".to_string()))
+    }
+
+    pub fn accounts(&self) -> Vec<&Account> {
+        self.0.accounts.iter().map(Account::new_ref).collect()
     }
 }

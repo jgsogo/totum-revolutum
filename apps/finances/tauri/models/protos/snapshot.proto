@@ -5,15 +5,11 @@ import "libraries/googleapis/protos/google/type/date.proto";
 import "apps/finances/tauri/models/protos/money_amount.proto";
 
 message Snapshot {
-    int64 pk = 1;
+    // optional - New snapshots doesn't have pk yet
+    optional int64 pk = 1;
     google.type.Date date_value = 2;
 
     MoneyAmount amount = 3;
-}
 
-message NewSnapshot {
-    int64 account_pk = 1;
-    google.type.Date date_value = 2;
-
-    MoneyAmount amount = 3;
+    int64 account_pk = 4;
 }

@@ -1,12 +1,21 @@
 use chrono::{Datelike, NaiveDate};
 
-// FIXME: Move this to //libraries/googleapis and reuse it.
+use proto_wrapper::ProtoWrapper;
 
-pub struct Date(pub(crate) crate::protos::google::r#type::Date);
+#[repr(transparent)]
+#[derive(ProtoWrapper, Clone)]
+pub struct Date(crate::protos::google::r#type::Date);
 
-impl From<crate::protos::google::r#type::Date> for Date {
-    fn from(v: crate::protos::google::r#type::Date) -> Self {
-        Self(v)
+impl Date {
+    /// Creates a new [`Date`] following the same rules as the [`NaiveDate::from_ymd_opt`] implementation
+    pub fn new(year: i32, month: u32, day: u32) -> Result<Self, crate::errors::ConversionError> {
+        let date =
+            NaiveDate::from_ymd_opt(year, month, day).ok_or(crate::errors::ConversionError::FromDateComponents {
+                year,
+                month: month.try_into()?,
+                day: day.try_into()?,
+            })?;
+        Ok(date.into())
     }
 }
 
@@ -20,14 +29,31 @@ impl From<NaiveDate> for Date {
     }
 }
 
-impl From<Date> for NaiveDate {
-    fn from(val: Date) -> Self {
-        NaiveDate::from_ymd_opt(val.0.year, val.0.month as u32, val.0.day as u32).unwrap_or_else(|| {
-            panic!(
-                "Failed to convert to NaiveDate: {}/{}/{}",
-                val.0.year, val.0.month, val.0.day
-            )
-        })
+impl TryFrom<Date> for NaiveDate {
+    type Error = crate::errors::ConversionError;
+
+    fn try_from(val: Date) -> Result<Self, Self::Error> {
+        NaiveDate::from_ymd_opt(val.0.year, val.0.month as u32, val.0.day as u32).ok_or(
+            crate::errors::ConversionError::FromDateComponents {
+                year: val.0.year,
+                month: val.0.month,
+                day: val.0.day,
+            },
+        )
+    }
+}
+
+impl TryFrom<&Date> for NaiveDate {
+    type Error = crate::errors::ConversionError;
+
+    fn try_from(val: &Date) -> Result<Self, Self::Error> {
+        NaiveDate::from_ymd_opt(val.0.year, val.0.month as u32, val.0.day as u32).ok_or(
+            crate::errors::ConversionError::FromDateComponents {
+                year: val.0.year,
+                month: val.0.month,
+                day: val.0.day,
+            },
+        )
     }
 }
 
@@ -44,7 +70,7 @@ mod tests {
         assert_eq!(date_proto.0.month, 1);
         assert_eq!(date_proto.0.day, 10);
 
-        let naive_date: NaiveDate = date_proto.into();
+        let naive_date: NaiveDate = date_proto.try_into().unwrap();
         assert_eq!(naive_date.to_string(), "2025-01-10");
     }
 }

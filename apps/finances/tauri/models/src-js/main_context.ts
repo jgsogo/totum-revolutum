@@ -1,13 +1,11 @@
 import { MainContext as MainContextProto, MainContextSchema } from "../protos/main_context_pb.js";
-import { Account as AccountProto } from "../protos/account_pb.js";
-import { MovementType as MovementTypeProto } from "../protos/movement_pb.js";
-import { Account } from "./account.js";
-import { Holder } from "../protos/holder_pb.js";
-import { TransactionGroup } from "../protos/transaction_pb.js";
+import { Account, AccountType } from "./account.js";
 import { MovementType } from './movement_type.js';
 import { staticImplements, IncomingMessageConstructor } from "./message.js";
 import { fromBinary } from "@bufbuild/protobuf";
 import { Buffer } from 'buffer';
+import { Holder } from "./holder.js";
+import { TransactionGroup } from "./transaction.js";
 
 export class MainContext {
     private readonly main_context: MainContextProto;
@@ -22,23 +20,27 @@ export class MainContext {
     }
 
     accounts(): Account[] {
-        return this.main_context.accounts.map((value: AccountProto) => new Account(value))
+        return this.main_context.accounts.map((value) => new Account(value))
     }
 
     holders(): Holder[] {
-        return this.main_context.holders;
+        return this.main_context.holders.map((value) => new Holder(value))
+    }
+
+    transaction_groups(): TransactionGroup[] {
+        return this.main_context.transactionGroups.map((value) => new TransactionGroup(value))
+    }
+
+    movement_types(): MovementType[] {
+        return this.main_context.movementTypes.map((value) => new MovementType(value));
+    }
+
+    account_types(): AccountType[] {
+        return this.main_context.accountTypes.map((value) => new AccountType(value));
     }
 
     find_account(pk: number): Account | undefined {
         return this.accounts().find((value: Account) => value.pk() === pk);
-    }
-
-    transaction_groups(): TransactionGroup[] {
-        return this.main_context.transactionGroups;
-    }
-
-    movement_types(): MovementType[] {
-        return this.main_context.movementTypes.map((value: MovementTypeProto) => new MovementType(value));
     }
 }
 staticImplements<IncomingMessageConstructor<MainContext>>(MainContext);

@@ -37,10 +37,8 @@ fn test_queries() {
 
     // All movements (as MovementNumerable) for a given account
     {
-        let all: Vec<MovementNumerable> = all_movementnumerable_for_account_id()
-            .bind::<diesel::sql_types::Int8, _>(account_id)
-            .load(&mut conn)
-            .expect("Error loading numerable movements");
+        let all: Vec<MovementNumerable> =
+            all_movementnumerable_for_account_id(account_id, &mut conn).expect("Error loading numerable movements");
         assert_eq!(all.len(), 3);
     }
 
@@ -76,10 +74,8 @@ fn test_queries() {
     };
     new_movement_numerable.insert_into_db(&mut conn).unwrap();
 
-    let all: Vec<MovementNumerable> = all_movementnumerable_for_account_id()
-        .bind::<diesel::sql_types::Int8, _>(account_id)
-        .load(&mut conn)
-        .expect("Error loading numerable movements");
+    let all: Vec<MovementNumerable> =
+        all_movementnumerable_for_account_id(account_id, &mut conn).expect("Error loading numerable movements");
     assert_eq!(all.len(), 4);
 
     // Fail to insert another movement
@@ -95,10 +91,8 @@ fn test_queries() {
         assert!(matches!(r.unwrap_err(), diesel::result::Error::NotFound));
 
         // We should have the same 4 movements we had before
-        let all: Vec<MovementNumerable> = all_movementnumerable_for_account_id()
-            .bind::<diesel::sql_types::Int8, _>(account_id)
-            .load(&mut conn)
-            .expect("Error loading numerable movements");
+        let all: Vec<MovementNumerable> =
+            all_movementnumerable_for_account_id(account_id, &mut conn).expect("Error loading numerable movements");
         assert_eq!(all.len(), 4);
     }
 }

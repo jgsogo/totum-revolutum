@@ -1,28 +1,40 @@
 use bigdecimal::BigDecimal;
 use std::str::FromStr;
 
-// FIXME: Move this to //libraries/googleapis and reuse it.
+use crate::protos::google::r#type::Decimal as DecimalProto;
 
-pub struct Decimal(pub(crate) crate::protos::google::r#type::Decimal);
+use proto_wrapper::ProtoWrapper;
 
-impl From<Decimal> for crate::protos::google::r#type::Decimal {
-    fn from(val: Decimal) -> Self {
-        val.0
-    }
-}
+/// A wrapper over the `google::type::Decimal` protobuf provided by the `googleapis` ([link](https://github.com/googleapis/googleapis/blob/master/google/type/decimal.proto))
+#[repr(transparent)]
+#[derive(ProtoWrapper)]
+pub struct Decimal(DecimalProto);
 
-impl From<BigDecimal> for Decimal {
-    fn from(value: BigDecimal) -> Self {
-        Self(crate::protos::google::r#type::Decimal {
-            value: value.to_scientific_notation(),
+impl Decimal {
+    pub fn new(value: BigDecimal) -> Self {
+        Self(DecimalProto {
+            value: value.normalized().to_scientific_notation(),
         })
     }
+
+    pub fn value(&self) -> Result<BigDecimal, crate::errors::ConversionError> {
+        Ok(BigDecimal::from_str(&self.0.value)?)
+    }
 }
 
-impl TryInto<BigDecimal> for Decimal {
-    type Error = bigdecimal::ParseBigDecimalError;
-    fn try_into(self) -> Result<BigDecimal, Self::Error> {
-        BigDecimal::from_str(&self.0.value)
+impl TryFrom<Decimal> for BigDecimal {
+    type Error = crate::errors::ConversionError;
+
+    fn try_from(value: Decimal) -> Result<Self, Self::Error> {
+        value.value()
+    }
+}
+
+impl TryFrom<&Decimal> for BigDecimal {
+    type Error = crate::errors::ConversionError;
+
+    fn try_from(value: &Decimal) -> Result<Self, Self::Error> {
+        value.value()
     }
 }
 
@@ -35,7 +47,7 @@ mod tests {
     fn roundtrip() {
         let amount = BigDecimal::from_str("-00.01234").unwrap();
 
-        let dec: Decimal = amount.into();
+        let dec = Decimal::new(amount);
         assert_eq!(dec.0.value, "-1.234e-2");
 
         let big_decimal: BigDecimal = dec.try_into().unwrap();
@@ -46,7 +58,7 @@ mod tests {
     fn roundtrip_zero() {
         let amount = BigDecimal::zero();
 
-        let dec: Decimal = amount.into();
+        let dec = Decimal::new(amount);
         assert_eq!(dec.0.value, "0e0");
 
         let big_decimal: BigDecimal = dec.try_into().unwrap();

@@ -9,9 +9,9 @@
   }: { all_holders: Holder[]; active_holder: Holder; app_state: AppState } = $props();
 
   const initials = (holder: Holder): string => {
-    let words = holder.name.split(/\s/);
+    let words = holder.name().split(/\s/);
     if (words.length == 1) {
-      return holder.name.substring(0, 3);
+      return holder.name().substring(0, 3);
     } else {
       let acronym = words
         .map((word) => word.replace("(", ""))
@@ -23,7 +23,7 @@
   let dropdownOpen = $state(false);
   let searchTerm = $state("");
   const people = all_holders.map((h) => {
-    return { name: h.name, holder: h };
+    return { name: h.name(), holder: h };
   });
   let filteredItems = $derived(
     people.filter((person) => person.name.toLowerCase().indexOf(searchTerm?.toLowerCase()) !== -1)
@@ -31,10 +31,10 @@
 </script>
 
 <button class="ms-3 rounded-full ring-gray-400 focus:ring-4 dark:ring-gray-600">
-  {#if active_holder.photo}
-    <Avatar title={active_holder.name} src="{app_state.base_media_url()}{active_holder.photo}">{active_holder.name}</Avatar>
+  {#if active_holder.photo()}
+    <Avatar title={active_holder.name()} src="{app_state.base_media_url()}{active_holder.photo()}">{active_holder.name()}</Avatar>
   {:else}
-    <Avatar title={active_holder.name}>{initials(active_holder).toUpperCase()}</Avatar>
+    <Avatar title={active_holder.name()}>{initials(active_holder).toUpperCase()}</Avatar>
   {/if}
 </button>
 <Dropdown bind:open={dropdownOpen} class="overflow-y-auto h-96" placement="bottom-end">
@@ -43,7 +43,7 @@
   </div>
   {#each filteredItems as holder (holder)}
     <DropdownItem
-      href="/holder/{holder.holder.pk}"
+      href="/holder/{holder.holder.pk()}"
       on:click={() => {
         dropdownOpen = false;
         searchTerm = "";
