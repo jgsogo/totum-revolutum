@@ -4,12 +4,12 @@ load("@rules_rust//rust:defs.bzl", "rust_binary")
 
 rust_binary(
     name = "diesel_cli",
-    srcs = glob(["src/**/*.rs"]),
+    srcs = glob(["diesel_cli/src/**/*.rs"]),
     compile_data = [
-        "src/default_files/diesel.toml",
-        "src/infer_schema_internals/load_foreign_keys.sql",
-        "src/setup_sql/postgres/initial_setup/down.sql",
-        "src/setup_sql/postgres/initial_setup/up.sql",
+        "diesel_cli/src/default_files/diesel.toml",
+        "diesel_cli/src/infer_schema_internals/load_foreign_keys.sql",
+        "diesel_cli/src/setup_sql/postgres/initial_setup/down.sql",
+        "diesel_cli/src/setup_sql/postgres/initial_setup/up.sql",
     ],
     crate_features = [
         "sqlite",
@@ -26,10 +26,13 @@ rust_binary(
         "@crates_libraries//:diesel_table_macro_syntax",
         "@crates_libraries//:diffy",
         "@crates_libraries//:dotenvy",
+        "@crates_libraries//:fd-lock",
         "@crates_libraries//:heck",
+        "@crates_libraries//:pq-sys",
         "@crates_libraries//:regex",
         "@crates_libraries//:serde",
         "@crates_libraries//:serde_regex",
+        "@crates_libraries//:similar-asserts",
         "@crates_libraries//:syn",
         "@crates_libraries//:thiserror",
         "@crates_libraries//:toml",
