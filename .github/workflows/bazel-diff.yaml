@@ -17,8 +17,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  head_commit_message:
+    name: Head commit message
+    runs-on: ubuntu-latest
+    outputs:
+      head-commit-message: ${{ steps.get_head_commit_message.outputs.commit-message }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Print head git commit message
+        id: get_head_commit_message
+        run: |
+          echo "commit-message=$(git show -s --format=%s)"
+          echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
+
   bazel-diff-test:
     runs-on: ubuntu-24.04
+    needs: head_commit_message
     services:
       docker:
         image: docker:dind
@@ -36,12 +52,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Get Head Commit Message
-        id: get_head_commit_message
-        run: |
-          echo "commit-message=$(git show -s --format=%s)"
-          echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
-
       - name: Install some requirements
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
@@ -58,14 +68,14 @@ jobs:
             librsvg2-dev
  
       - name: Base from base branch (PR)
-        if: ${{ (github.event_name == 'pull_request') && !contains(steps.get_head_commit_message.outputs.commit-message, '[skip-diff]') }}
+        if: ${{ (github.event_name == 'pull_request') && !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           echo "I'm a PR to base '${{ github.event.pull_request.base.ref }}'"
           git fetch origin ${{ github.event.pull_request.base.ref }}
           git worktree add ${{ runner.temp }}/base ${{ github.event.pull_request.base.ref }}
 
       - name: Base from previous commit (not PR)
-        if: ${{ (github.event_name == 'push') && !contains(steps.get_head_commit_message.outputs.commit-message, '[skip-diff]') }}
+        if: ${{ (github.event_name == 'push') && !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           echo "I'm NOT a PR"
           git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
@@ -81,7 +91,7 @@ jobs:
             ${{ runner.os }}-bazel-
 
       - name: Generate hashes from base
-        if: ${{ !contains(steps.get_head_commit_message.outputs.commit-message, '[skip-diff]') }}
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
           cat ${{ runner.temp }}/base-hashes.json
@@ -90,11 +100,11 @@ jobs:
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
 
       - name: Compute impacted targets
-        if: ${{ !contains(steps.get_head_commit_message.outputs.commit-message, '[skip-diff]') }}
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
 
       - name: Save impacted-targets as an artifact
-        if: ${{ !contains(steps.get_head_commit_message.outputs.commit-message, '[skip-diff]') }}
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         uses: actions/upload-artifact@v4
         with:
           name: impacted-targets.txt
@@ -107,7 +117,7 @@ jobs:
           path: ${{ runner.temp }}/current-hashes.json
 
       - name: Test impacted targets
-        if: ${{ !contains(steps.get_head_commit_message.outputs.commit-message, '[skip-diff]') }}
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           impacted_targets=()
           IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
@@ -125,7 +135,7 @@ jobs:
           err=$? ; if (( $err != 4 )) ; then exit $err ; fi
 
       - name: Test impacted targets
-        if: ${{ contains(steps.get_head_commit_message.outputs.commit-message, '[skip-diff]') }}
+        if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           # Do not fail for next command
           set +e
