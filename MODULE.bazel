@@ -94,7 +94,7 @@ crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
 # Diesel CLI is a binary only package. We need to build it "manually" (see [this note](./notes/2024-05-04-1923.md))
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# TODO: We are building Diesel CLI from sources, we should use crate.from_spec instead (see https://github.com/jgsogo/totum-revolutum/issues/691)
+# TODO: We are building Diesel CLI from sources, we should use crate.from_spec instead (see https://github.com/jgsogo/totum-revolutum/issues/691). We build from repo sources (not crate ones)
 http_archive(
     name = "diesel_cli",
     build_file = "//bazel/external:BUILD.diesel_cli.bazel",
