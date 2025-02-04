@@ -186,6 +186,8 @@ jobs:
     env:
       BAZEL_CONFIG: "--config=ci"
     steps:
+      - uses: actions/checkout@v4
+
       - name: Install requirements for Tauri v2
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
