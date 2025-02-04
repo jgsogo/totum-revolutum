@@ -174,7 +174,7 @@ jobs:
   run-tests:
     needs:
       - head_commit_message
-      # - compute-diff
+      - compute-diff
     # runs-on: ${{ needs.check-runner.outputs.runner-label }}
     runs-on: ubuntu-latest
     services:
