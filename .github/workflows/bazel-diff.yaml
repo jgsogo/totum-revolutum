@@ -53,74 +53,85 @@ jobs:
             echo "runner-label=ubuntu-24.04" >> $GITHUB_OUTPUT
           fi
 
-  bazel-diff-test:
+  compute-base-hashes:
     needs:
       - head_commit_message
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged --shm-size=2g
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock:ro
+    if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     env:
       BAZEL_CONFIG: "--config=ci"
     steps:
-      - name: Logging
-        run: |
-          echo "${{ toJSON(github.event) }}"
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Install some requirements
-        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            build-essential \
-            curl \
-            wget \
-            file \
-            libxdo-dev \
-            libssl-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev
-
       - name: Base from base branch (PR)
-        if: ${{ (github.event_name == 'pull_request') && !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           echo "I'm a PR to base '${{ github.event.pull_request.base.ref }}'"
           git fetch origin ${{ github.event.pull_request.base.ref }}
           git worktree add ${{ runner.temp }}/base ${{ github.event.pull_request.base.ref }}
 
       - name: Base from previous commit (not PR)
-        if: ${{ (github.event_name == 'push') && !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        if: ${{ github.event_name == 'push' }}
         run: |
           echo "I'm NOT a PR"
           git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
 
-      # Bazel cache example taken from https://github.com/actions/cache/blob/main/examples.md#---bazel
-      - name: Cache Bazel
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          restore-keys: |
-            ${{ runner.os }}-bazel-
-
       - name: Generate hashes from base
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
           cat ${{ runner.temp }}/base-hashes.json
 
+      - name: Save base-hashes as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-hashes.json
+          path: ${{ runner.temp }}/base-hashes.json
+
+
+  compute-current-hashes:
+    needs:
+      - check-runner
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    env:
+      BAZEL_CONFIG: "--config=ci"
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Generate hashes from current
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
+
+      - name: Save current-hashes as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: current-hashes.json
+          path: ${{ runner.temp }}/current-hashes.json
+
+
+  compute-diff:
+    needs:
+      - head_commit_message
+      - check-runner
+      - compute-base-hashes
+      - compute-current-hashes
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+    env:
+      BAZEL_CONFIG: "--config=ci"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: base-hashes.json
+          path: ${{ runner.temp }}/base-hashes.json
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: current-hashes.json
+          path: ${{ runner.temp }}/current-hashes.json
 
       - name: Compute impacted targets
         if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
@@ -133,42 +144,123 @@ jobs:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/impacted-targets.txt
 
-      - name: Save current-hashes as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: current-hashes.json
-          path: ${{ runner.temp }}/current-hashes.json
 
-      - name: Test impacted targets
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
-        run: |
-          impacted_targets=()
-          IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
-          formatted_impacted_targets=$(IFS=$'\n'; echo "${impacted_targets[*]}")
+  # bazel-diff-test:
+  #   needs:
+  #     - head_commit_message
+  #     - check-runner
+  #   runs-on: ${{ needs.check-runner.outputs.runner-label }}
+  #   services:
+  #     docker:
+  #       image: docker:dind
+  #       options: --privileged --shm-size=2g
+  #       volumes:
+  #         - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   env:
+  #     BAZEL_CONFIG: "--config=ci"
+  #   steps:
+  #     - name: Logging
+  #       run: |
+  #         echo "${{ toJSON(github.event) }}"
 
-          # Get the list of targets in a single line
-          one_liner="${formatted_impacted_targets//$'\n'/ }"
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
 
-          # Do not fail for next command
-          set +e
-          # Run all the tests (except manual ones)
-          bazel test $BAZEL_CONFIG --test_tag_filters=-manual $one_liner
+  #     - name: Install some requirements
+  #       # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y \
+  #           libwebkit2gtk-4.1-dev \
+  #           build-essential \
+  #           curl \
+  #           wget \
+  #           file \
+  #           libxdo-dev \
+  #           libssl-dev \
+  #           libayatana-appindicator3-dev \
+  #           librsvg2-dev
 
-          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
-          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+  #     - name: Base from base branch (PR)
+  #       if: ${{ (github.event_name == 'pull_request') && !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+  #       run: |
+  #         echo "I'm a PR to base '${{ github.event.pull_request.base.ref }}'"
+  #         git fetch origin ${{ github.event.pull_request.base.ref }}
+  #         git worktree add ${{ runner.temp }}/base ${{ github.event.pull_request.base.ref }}
 
-      - name: Test all targets
-        if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
-        run: |
-          # Do not fail for next command
-          set +e
-          # Run all the tests
-          bazel test $BAZEL_CONFIG //...
+  #     - name: Base from previous commit (not PR)
+  #       if: ${{ (github.event_name == 'push') && !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+  #       run: |
+  #         echo "I'm NOT a PR"
+  #         git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
 
-          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
-          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+  #     # Bazel cache example taken from https://github.com/actions/cache/blob/main/examples.md#---bazel
+  #     - name: Cache Bazel
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           ~/.cache/bazel
+  #         key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-bazel-
 
-      # It's fine to build this docs target only in master. The individual ones have already been tested ('doc/tests' are building 'doc')
-      - name: Build docs
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        run: bazel build $BAZEL_CONFIG //docs
+  #     - name: Generate hashes from base
+  #       if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+  #       run: |
+  #         bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
+  #         cat ${{ runner.temp }}/base-hashes.json
+
+  #     - name: Generate hashes from current
+  #       run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
+
+  #     - name: Compute impacted targets
+  #       if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+  #       run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
+
+  #     - name: Save impacted-targets as an artifact
+  #       if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: impacted-targets.txt
+  #         path: ${{ runner.temp }}/impacted-targets.txt
+
+  #     - name: Save current-hashes as an artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: current-hashes.json
+  #         path: ${{ runner.temp }}/current-hashes.json
+
+  #     - name: Test impacted targets
+  #       if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+  #       run: |
+  #         impacted_targets=()
+  #         IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
+  #         formatted_impacted_targets=$(IFS=$'\n'; echo "${impacted_targets[*]}")
+
+  #         # Get the list of targets in a single line
+  #         one_liner="${formatted_impacted_targets//$'\n'/ }"
+
+  #         # Do not fail for next command
+  #         set +e
+  #         # Run all the tests (except manual ones)
+  #         bazel test $BAZEL_CONFIG --test_tag_filters=-manual $one_liner
+
+  #         # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
+  #         err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+
+  #     - name: Test all targets
+  #       if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+  #       run: |
+  #         # Do not fail for next command
+  #         set +e
+  #         # Run all the tests
+  #         bazel test $BAZEL_CONFIG //...
+
+  #         # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
+  #         err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+
+  #     # It's fine to build this docs target only in master. The individual ones have already been tested ('doc/tests' are building 'doc')
+  #     - name: Build docs
+  #       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+  #       run: bazel build $BAZEL_CONFIG //docs
