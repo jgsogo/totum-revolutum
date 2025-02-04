@@ -32,9 +32,31 @@ jobs:
           echo "commit-message=$(git show -s --format=%s)"
           echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
+  # This job will find out if any self-hosted runner is available and return it. otherwise it returns the 'ubuntu-latest'
+  #
+  # Credit: https://github.com/orgs/community/discussions/20019#discussioncomment-7173595
+  check-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runner-label: ${{ steps.set-runner.outputs.runner-label }}
+
+    steps:
+      - name: Set runner
+        id: set-runner
+        run: |
+          runners=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runners")
+          available=$(echo "$runners" | jq '.runners[] | select(.status == "online" and .busy == false and .labels[] .name == "self-hosted")')
+          if [ -n "$available" ]; then
+            echo "runner-label=self-hosted" >> $GITHUB_OUTPUT
+          else
+            echo "runner-label=ubuntu-24.04" >> $GITHUB_OUTPUT
+          fi
+
   bazel-diff-test:
-    runs-on: ubuntu-24.04
-    needs: head_commit_message
+    needs:
+      - head_commit_message
+      - check-runner
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
     services:
       docker:
         image: docker:dind
@@ -66,7 +88,7 @@ jobs:
             libssl-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev
- 
+
       - name: Base from base branch (PR)
         if: ${{ (github.event_name == 'pull_request') && !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
