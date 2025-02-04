@@ -176,6 +176,7 @@ jobs:
       - head_commit_message
       - compute-diff
     # runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    if: always()
     runs-on: ubuntu-latest
     services:
       docker:
