@@ -169,7 +169,6 @@ jobs:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/impacted-targets.txt
 
-
   # bazel-diff-test:
   #   needs:
   #     - head_commit_message
