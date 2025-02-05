@@ -7,8 +7,6 @@ name: bazel-diff
 #
 # If `[skip-diff]` is provided in the commit message it will skip the bazel-diff stuff and just run all the tests.
 
-
-# Controls when the action will run.
 on:
   push:
     branches: [master]
@@ -17,21 +15,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  head_commit_message:
-    runs-on: ubuntu-latest
-    outputs:
-      head-commit-message: ${{ steps.get_head_commit_message.outputs.commit-message }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Print head git commit message
-        id: get_head_commit_message
-        run: |
-          echo "commit-message=$(git show -s --format=%s)"
-          echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
-
-  # This job will find out if any self-hosted runner is available and return it. otherwise it returns the 'ubuntu-latest'
+  # This job will find out if any self-hosted runner is available and return it
+  # (otherwise it returns the 'ubuntu-latest'). The purpose is to use self-hosted runners as
+  # much as possible to save GitHub quota.
   #
   # Credit: https://github.com/orgs/community/discussions/20019#discussioncomment-7173595
   check-runner:
@@ -48,8 +34,24 @@ jobs:
           if [ -n "$available" ]; then
             echo "runner-label=self-hosted" >> $GITHUB_OUTPUT
           else
-            echo "runner-label=ubuntu-24.04" >> $GITHUB_OUTPUT
+            echo "runner-label=ubuntu-latest" >> $GITHUB_OUTPUT
           fi
+
+  head_commit_message:
+    needs:
+      - check-runner
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    outputs:
+      head-commit-message: ${{ steps.get_head_commit_message.outputs.commit-message }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Print head git commit message
+        id: get_head_commit_message
+        run: |
+          echo "commit-message=$(git show -s --format=%s)"
+          echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
   compute-base-hashes:
     needs:
@@ -99,7 +101,6 @@ jobs:
           name: base-hashes.json
           path: ${{ runner.temp }}/base-hashes.json
 
-
   compute-current-hashes:
     needs:
       - check-runner
@@ -126,7 +127,6 @@ jobs:
         with:
           name: current-hashes.json
           path: ${{ runner.temp }}/current-hashes.json
-
 
   compute-diff:
     needs:
@@ -175,34 +175,35 @@ jobs:
     needs:
       - head_commit_message
       - compute-diff
-    # runs-on: ${{ needs.check-runner.outputs.runner-label }}
-    if: always()
-    runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged --shm-size=2g
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock:ro
+      - check-runner
+    if: always() && !failure() && !cancelled() # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    # runs-on: ubuntu-latest
+    # services:
+    #   docker:
+    #     image: docker:dind
+    #     options: --privileged --shm-size=2g
+    #     volumes:
+    #       - /var/run/docker.sock:/var/run/docker.sock:ro
     env:
       BAZEL_CONFIG: "--config=ci"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install requirements for Tauri v2
-        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            build-essential \
-            curl \
-            wget \
-            file \
-            libxdo-dev \
-            libssl-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev
+      # - name: Install requirements for Tauri v2
+      #   # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y \
+      #       libwebkit2gtk-4.1-dev \
+      #       build-essential \
+      #       curl \
+      #       wget \
+      #       file \
+      #       libxdo-dev \
+      #       libssl-dev \
+      #       libayatana-appindicator3-dev \
+      #       librsvg2-dev
 
       - name: Cache Bazel
         uses: actions/cache@v4
