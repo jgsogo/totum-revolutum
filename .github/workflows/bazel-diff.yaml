@@ -14,6 +14,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  BAZEL_CONFIG: "--config=ci"
+
 jobs:
   # This job will find out if any self-hosted runner is available and return it
   # (otherwise it returns the 'ubuntu-latest'). The purpose is to use self-hosted runners as
@@ -59,8 +62,6 @@ jobs:
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
-    env:
-      BAZEL_CONFIG: "--config=ci"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -105,8 +106,6 @@ jobs:
     needs:
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
-    env:
-      BAZEL_CONFIG: "--config=ci"
     steps:
       - uses: actions/checkout@v4
 
@@ -136,8 +135,6 @@ jobs:
       - compute-current-hashes
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
-    env:
-      BAZEL_CONFIG: "--config=ci"
     steps:
       - uses: actions/checkout@v4
 
@@ -171,39 +168,96 @@ jobs:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/impacted-targets.txt
 
-  run-tests:
+  # Run the tests in a Github runner
+  run-tests-github:
     needs:
       - head_commit_message
       - compute-diff
       - check-runner
-    if: always() && !failure() && !cancelled() # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
+    if: ${{ needs.check-runner.outputs.runner-label != "self-hosted" && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
-    # runs-on: ubuntu-latest
-    # services:
-    #   docker:
-    #     image: docker:dind
-    #     options: --privileged --shm-size=2g
-    #     volumes:
-    #       - /var/run/docker.sock:/var/run/docker.sock:ro
-    env:
-      BAZEL_CONFIG: "--config=ci"
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --shm-size=2g
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
       - uses: actions/checkout@v4
+      - name: Install requirements for Tauri v2
+        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
 
-      # - name: Install requirements for Tauri v2
-      #   # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y \
-      #       libwebkit2gtk-4.1-dev \
-      #       build-essential \
-      #       curl \
-      #       wget \
-      #       file \
-      #       libxdo-dev \
-      #       libssl-dev \
-      #       libayatana-appindicator3-dev \
-      #       librsvg2-dev
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          # restore-keys: |
+          #   ${{ runner.os }}-bazel-
+
+      - uses: actions/download-artifact@v4
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        with:
+          name: impacted-targets.txt
+          path: ${{ runner.temp }}/
+
+      - name: Test impacted targets
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        run: |
+          impacted_targets=()
+          IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
+          formatted_impacted_targets=$(IFS=$'\n'; echo "${impacted_targets[*]}")
+
+          # Get the list of targets in a single line
+          one_liner="${formatted_impacted_targets//$'\n'/ }"
+
+          # Do not fail for next command
+          set +e
+          # Run all the tests (except manual ones)
+          bazel test $BAZEL_CONFIG --test_tag_filters=-manual $one_liner
+
+          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
+          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+
+      - name: Test all targets
+        if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        run: |
+          # Do not fail for next command
+          set +e
+          # Run all the tests
+          bazel test $BAZEL_CONFIG //...
+
+          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
+          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+
+      # It's fine to build this docs target only in master. The individual ones have already been tested ('doc/tests' are building 'doc')
+      - name: Build docs
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        run: bazel build $BAZEL_CONFIG //docs
+
+
+  run-tests-self-hosted:
+    needs:
+      - head_commit_message
+      - compute-diff
+      - check-runner
+    if: ${{ needs.check-runner.outputs.runner-label == "self-hosted" && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Cache Bazel
         uses: actions/cache@v4
