@@ -1,5 +1,13 @@
 name: bazel-diff
 
+# Docs:
+#
+# Regular build will compute the diff with a previous commit (either from `main` or from the `base` branch in PRs),
+# then it will use bazel-diff tool to find the impacted targets and execute just those tests.
+#
+# If `[skip-diff]` is provided in the commit message it will skip the bazel-diff stuff and just run all the tests.
+
+
 # Controls when the action will run.
 on:
   push:
@@ -9,35 +17,52 @@ on:
   workflow_dispatch:
 
 jobs:
-  bazel-diff-test:
-    runs-on: ubuntu-24.04
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged --shm-size=2g
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock:ro
+  head_commit_message:
+    runs-on: ubuntu-latest
+    outputs:
+      head-commit-message: ${{ steps.get_head_commit_message.outputs.commit-message }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Print head git commit message
+        id: get_head_commit_message
+        run: |
+          echo "commit-message=$(git show -s --format=%s)"
+          echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
+
+  # This job will find out if any self-hosted runner is available and return it. otherwise it returns the 'ubuntu-latest'
+  #
+  # Credit: https://github.com/orgs/community/discussions/20019#discussioncomment-7173595
+  check-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runner-label: ${{ steps.set-runner.outputs.runner-label }}
+    steps:
+      - name: Set runner
+        id: set-runner
+        run: |
+          runners=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runners")
+          echo "runners: $runners"
+          available=$(echo "$runners" | jq '.runners[] | select(.status == "online" and .busy == false and .labels[] .name == "self-hosted")')
+          if [ -n "$available" ]; then
+            echo "runner-label=self-hosted" >> $GITHUB_OUTPUT
+          else
+            echo "runner-label=ubuntu-24.04" >> $GITHUB_OUTPUT
+          fi
+
+  compute-base-hashes:
+    needs:
+      - head_commit_message
+      - check-runner
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     env:
       BAZEL_CONFIG: "--config=ci"
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-
-      - name: Install some requirements
-        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            build-essential \
-            curl \
-            wget \
-            file \
-            libxdo-dev \
-            libssl-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev
 
       - name: Base from base branch (PR)
         if: ${{ github.event_name == 'pull_request' }}
@@ -52,7 +77,38 @@ jobs:
           echo "I'm NOT a PR"
           git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
 
-      # Bazel cache example taken from https://github.com/actions/cache/blob/main/examples.md#---bazel
+      - name: Cache Bazel
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
+      - name: Generate hashes from base
+        run: |
+          bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
+          cat ${{ runner.temp }}/base-hashes.json
+          rm -fr ${{ runner.temp }}/base
+          git worktree prune
+
+      - name: Save base-hashes as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-hashes.json
+          path: ${{ runner.temp }}/base-hashes.json
+
+
+  compute-current-hashes:
+    needs:
+      - check-runner
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    env:
+      BAZEL_CONFIG: "--config=ci"
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Cache Bazel
         uses: actions/cache@v4
         with:
@@ -62,22 +118,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bazel-
 
-      - name: Generate hashes from base
-        run: |
-          bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
-          cat ${{ runner.temp }}/base-hashes.json
-
       - name: Generate hashes from current
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
-
-      - name: Compute impacted targets
-        run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
-
-      - name: Save impacted-targets as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: impacted-targets.txt
-          path: ${{ runner.temp }}/impacted-targets.txt
 
       - name: Save current-hashes as an artifact
         uses: actions/upload-artifact@v4
@@ -85,7 +127,100 @@ jobs:
           name: current-hashes.json
           path: ${{ runner.temp }}/current-hashes.json
 
+
+  compute-diff:
+    needs:
+      - head_commit_message
+      - check-runner
+      - compute-base-hashes
+      - compute-current-hashes
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+    env:
+      BAZEL_CONFIG: "--config=ci"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: base-hashes.json
+          path: ${{ runner.temp }}/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: current-hashes.json
+          path: ${{ runner.temp }}/
+
+      - name: Cache Bazel
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          # restore-keys: |
+          #   ${{ runner.os }}-bazel-
+
+      - name: Compute impacted targets
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
+
+      - name: Save impacted-targets as an artifact
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: impacted-targets.txt
+          path: ${{ runner.temp }}/impacted-targets.txt
+
+  run-tests:
+    needs:
+      - head_commit_message
+      - compute-diff
+    # runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    if: always()
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --shm-size=2g
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+    env:
+      BAZEL_CONFIG: "--config=ci"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install requirements for Tauri v2
+        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/bazel
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          # restore-keys: |
+          #   ${{ runner.os }}-bazel-
+
+      - uses: actions/download-artifact@v4
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        with:
+          name: impacted-targets.txt
+          path: ${{ runner.temp }}/
+
       - name: Test impacted targets
+        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           impacted_targets=()
           IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
@@ -98,6 +233,17 @@ jobs:
           set +e
           # Run all the tests (except manual ones)
           bazel test $BAZEL_CONFIG --test_tag_filters=-manual $one_liner
+
+          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
+          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+
+      - name: Test all targets
+        if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+        run: |
+          # Do not fail for next command
+          set +e
+          # Run all the tests
+          bazel test $BAZEL_CONFIG //...
 
           # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
           err=$? ; if (( $err != 4 )) ; then exit $err ; fi
