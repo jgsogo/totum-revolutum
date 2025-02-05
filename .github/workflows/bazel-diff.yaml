@@ -174,7 +174,7 @@ jobs:
       - head_commit_message
       - compute-diff
       - check-runner
-    if: ${{ needs.check-runner.outputs.runner-label != "self-hosted" && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
+    if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     services:
       docker:
@@ -254,7 +254,7 @@ jobs:
       - head_commit_message
       - compute-diff
       - check-runner
-    if: ${{ needs.check-runner.outputs.runner-label == "self-hosted" && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
+    if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     steps:
       - uses: actions/checkout@v4
