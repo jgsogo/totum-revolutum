@@ -138,3 +138,9 @@ pub fn transaction_group_active() -> _ {
 pub fn transactiongroup_by_pk(pk: i64) -> _ {
     crate::schema::finances_accounts_transactiongroup::id.eq(pk)
 }
+
+/// Returns a query fragment to filter [`Transaction`]s by pk
+#[diesel::dsl::auto_type]
+pub fn transaction_by_pk(pk: i64) -> _ {
+    crate::schema::finances_accounts_transaction::id.eq(pk)
+}

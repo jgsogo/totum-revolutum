@@ -39,6 +39,7 @@ message Movement {
 
     // optional - New movements doesn't belong to a transaction yet
     optional int64 transaction_pk = 3;
+    optional string transaction_name = 9;
     MovementType type = 4;
     MovementDirection direction = 5;
 

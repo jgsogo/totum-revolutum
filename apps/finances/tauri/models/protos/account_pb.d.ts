@@ -6,6 +6,7 @@ import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1"
 import type { Message } from "@bufbuild/protobuf";
 import type { Custodian } from "./custodian_pb.js";
 import type { Date } from "../../../../../libraries/googleapis/protos/google/type/date_pb.js";
+import type { Snapshot } from "./snapshot_pb.js";
 
 /**
  * Describes the file apps/finances/tauri/models/protos/account.proto.
@@ -83,7 +84,7 @@ export declare type Account = Message<"finances_app_models.Account"> & {
   description?: string;
 
   /**
-   * @generated from field: optional google.type.Date open = 8;
+   * @generated from field: google.type.Date open = 8;
    */
   open?: Date;
 
@@ -96,6 +97,11 @@ export declare type Account = Message<"finances_app_models.Account"> & {
    * @generated from field: bool is_numerable = 10;
    */
   isNumerable: boolean;
+
+  /**
+   * @generated from field: optional finances_app_models.Snapshot last_snapshot = 11;
+   */
+  lastSnapshot?: Snapshot;
 };
 
 /**

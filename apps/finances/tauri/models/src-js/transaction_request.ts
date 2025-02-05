@@ -4,6 +4,7 @@ import { IncomingMessageConstructor, OutgoingMessage, staticImplements } from ".
 import { MovementDirection } from "./movement.js";
 import { MovementDirection as MovementDirectionProto } from "../protos/movement_pb.js";
 import { Transaction } from "./transaction.js";
+import { Buffer } from 'buffer';
 
 export class LastTransactionsRequest extends OutgoingMessage {
     private readonly data: LastTransactionsRequestProto;

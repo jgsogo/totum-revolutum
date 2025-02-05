@@ -59,6 +59,8 @@ pub fn create_app<R: tauri::Runtime>(
             // Sending data
             commands::snapshot::create_snapshot,
             commands::transaction::create_transaction,
+            //
+            commands::last_transactions::past_transactions,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
@@ -147,6 +149,10 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
                         "Account type 'pk={}' not found in main context",
                         account_type.id
                     )))?;
+
+                let snapshots = commands::get_snapshots(&account, conn)?;
+                let last_snapshot = snapshots.first().cloned();
+
                 Ok::<_, Error>(AccountProto::new(
                     account.id,
                     account.name,
@@ -158,6 +164,7 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
                     account.open.into(),
                     account_holder_role.owns_money,
                     account.is_numerable,
+                    last_snapshot,
                 ))
             })
             .collect::<Result<Vec<_>>>()?

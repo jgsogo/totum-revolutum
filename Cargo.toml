@@ -33,7 +33,7 @@ async-std = { version = "1.12" }
 async-trait = "0.1.80"
 bigdecimal = "0.4.7"
 bitflags = "2.8"
-bytes = "1.6.0"
+bytes = "1.10.0"
 camino = "1.1.6"
 camino-tempfile = "1.1.1"
 chrono = { version = "0.4.38" }
@@ -44,7 +44,7 @@ clap-verbosity-flag = { version = "3.0.0" }
 confy = { version = "0.6.1", default-features = false, features = ["yaml_conf"] }
 cron-parser = "0.10.0"
 data-encoding = "2.6.0"
-diesel = { version = "2.2.6", default-features = false, features = ["sqlite", "r2d2"] }
+diesel = { version = "2.2.7", default-features = false, features = ["sqlite", "r2d2"] }
 diesel_migrations = { version = "2.2.0", default-features = false, features = ["sqlite"] }
 diesel_table_macro_syntax = "0.2.0"
 diffy = "0.4.0"
@@ -52,6 +52,7 @@ dirs = { version = "6.0.0" }
 dotenvy = "0.15.7"
 dyn-clone = "1.0.17"
 env_logger = "0.11.3"
+fd-lock = "4.0.2"
 kamadak-exif = "0.6.1"
 flume = "0.11.0"
 fs4 = { version = "0.12.0" }
@@ -79,6 +80,7 @@ mockall = { version = "0.13.0" }
 num-bigint = "0.4.4"
 num-traits = "0.2.19"
 oxipng = { version = "9.0", features = ["parallel", "zopfli", "filetime"], default-features = false }
+pq-sys = "0.6.3"
 prost = "0.13.4"
 prost-types = "0.13.4"
 prost-build = "0.13.4"
@@ -93,15 +95,16 @@ serde_regex = "1.1.0"
 serde_repr = "0.1.19"
 serde_yaml = "0.9.34"
 sha256 = { version = "1.5" }
+similar-asserts = "1.6.1"
 strum = "0.26.3"
 strum_macros = "0.26.2"
-syn = { version = "2.0.96", features = ["visit"] }
+syn = { version = "2.0.98", features = ["visit"] }
 tauri-build = { version = "2.0.3", features = [] }
 tauri = { version = "2.1.1", features = [] }
 tauri-plugin-shell = "2.0.2"
 tempfile = { version = "3.10.1" }
 testing_logger = "0.1.1"
-thiserror = "1.0.69"  # FIXME: v2 requires https://github.com/diesel-rs/diesel/pull/4337 (diesel 2.2.7?)
+thiserror = "2.0.11"
 time = { version = "0.3.36" }
 tokio = { version = "1.40" }
 tokio-stream = "0.1.15"

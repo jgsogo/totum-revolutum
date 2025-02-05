@@ -15,7 +15,7 @@ name = "finances_app_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.3", features = [] }
+tauri-build = { version = "2.0.5", features = [] }
 
 [dependencies]
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
@@ -24,22 +24,22 @@ openexchangerates = { path = "../../../../libraries/openexchangerates" }
 finances-app-models = { path = "../models" }
 
 bigdecimal = "0.4.7"
-chrono = { version = "0.4.38" }
-chrono-tz = { version = "0.10.0" }
-diesel = { version = "2.2.6", features = ["r2d2", "chrono"] }
+chrono = { version = "0.4.39" }
+chrono-tz = { version = "0.10.1" }
+diesel = { version = "2.2.7", features = ["r2d2", "chrono"] }
 
-tauri-build = { version = "2.0.3", features = [] } # FIXME: If I don't list it here, Bazel doesn't include it in crate_libraries
-tauri = { version = "2.1.1", features = [] }
-tauri-plugin-shell = "2.0.2"
-serde = { version = "1.0.215", features = ["derive"] }
-serde_json = "1.0.133"
-thiserror = "1.0.69"
-log = "0.4.22"
-tauri-plugin-log = "2.0.3"
+tauri-build = { version = "2.0.5", features = [] } # FIXME: If I don't list it here, Bazel doesn't include it in crate_libraries
+tauri = { version = "2.2.5", features = [] }
+tauri-plugin-shell = "2.2.0"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.138"
+thiserror = "2.0.11"
+log = "0.4.25"
+tauri-plugin-log = "2.2.1"
 itertools = "0.14.0"
 
 [dev-dependencies]
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust", features = ["postgres", "test_utils"] }
 finances_investments = { path = "../../../../libraries/finances/investments/rust", features = ["postgres"] }
 finances-app = { path = ".", default-features = false, features = ["postgres"] }
-tauri = { version = "2.1.1", features = ["test"] }
+tauri = { version = "2.2.5", features = ["test"] }

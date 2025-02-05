@@ -22,7 +22,14 @@ export async function goToAccountDetail(holder: Holder, account: Account) {
  * @param {Account} to - If provided, it prepopulates transaction target with this account
  */
 export async function goToTransactionCreate(holder: Holder, account: Account, from?: Account, to?: Account) {
-    await goto(`/holder/${holder.pk()}/account/${account.pk()}/transaction/create?from=${from?.pk()}&to=${to?.pk()}`);
+    let params = new URLSearchParams();
+    if (from) {
+      params.append("from", from.pk().toString());
+    }
+    if (to) {
+      params.append("to", to.pk().toString());
+    }
+    await goto(`/holder/${holder.pk()}/account/${account.pk()}/transaction/create?${params}`);
 }
 
 /**

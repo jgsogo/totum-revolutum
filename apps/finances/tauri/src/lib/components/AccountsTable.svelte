@@ -46,7 +46,7 @@
             {/if}
             <TableBodyCell>{account.name()}</TableBodyCell>
             <TableBodyCell>{account.type().name()}</TableBodyCell>
-            <TableBodyCell>{account.ccy()}</TableBodyCell>
+            <TableBodyCell>{account.last_snapshot() ? account.last_snapshot()!.amount().amount(): "-"}</TableBodyCell>
           </TableBodyRow>
         {/each}
       </TableBody>
