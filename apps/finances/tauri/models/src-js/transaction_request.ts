@@ -38,7 +38,7 @@ export class LastTransactionsResponse {
         this.proto = proto;
     }
 
-    static create_from(data: ArrayBuffer): LastTransactionsResponse {
+    static create_from_array(data: ArrayBuffer): LastTransactionsResponse {
         const context: LastTransactionsResponseProto = fromBinary(LastTransactionsResponseSchema, Buffer.from(data, 0, data.byteLength));
         return new LastTransactionsResponse(context);
     }

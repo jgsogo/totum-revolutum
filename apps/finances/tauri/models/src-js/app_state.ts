@@ -23,7 +23,7 @@ export class AppState {
         this.app_state = app_state;
     }
 
-    static create_from(data: ArrayBuffer): AppState {
+    static create_from_array(data: ArrayBuffer): AppState {
         const context: AppStateProto = fromBinary(AppStateSchema, Buffer.from(data, 0, data.byteLength));
         return new AppState(context);
     }

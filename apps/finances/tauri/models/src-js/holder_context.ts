@@ -15,7 +15,7 @@ export class HolderContext {
         this._accounts = this.holder_context.accounts.map((value: AccountProto) => new Account(value))
     }
 
-    static create_from(data: ArrayBuffer): HolderContext {
+    static create_from_array(data: ArrayBuffer): HolderContext {
         const context: HolderContextProto = fromBinary(HolderContextSchema, Buffer.from(data, 0, data.byteLength));
         return new HolderContext(context);
     }

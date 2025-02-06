@@ -14,7 +14,7 @@ export class MainContext {
         this.main_context = main_context;
     }
 
-    static create_from(data: ArrayBuffer): MainContext {
+    static create_from_array(data: ArrayBuffer): MainContext {
         const context: MainContextProto = fromBinary(MainContextSchema, Buffer.from(data, 0, data.byteLength));
         return new MainContext(context);
     }
