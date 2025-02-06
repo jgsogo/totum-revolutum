@@ -173,7 +173,7 @@ export class Movement {
     }
 
 
-    static create_from(date_value: DateWrapper, transaction_pk: number, movement_type: MovementType, direction: MovementDirection, movement_amount: MovementAmount, account: Account, fx_quote?: FxQuote): Movement {
+    static create_from(date_value: DateWrapper, transaction_pk: number | undefined, movement_type: MovementType, direction: MovementDirection, movement_amount: MovementAmount, account: Account, fx_quote?: FxQuote): Movement {
         let mov_direction: MovementDirectionProto = MovementDirectionProto.In;
         switch (direction) {
             case MovementDirection.In:
@@ -188,7 +188,7 @@ export class Movement {
 
         const proto = create(MovementSchema, {
             dateValue: date_value.as_proto(),
-            transactionPk: BigInt(transaction_pk),
+            transactionPk: transaction_pk ? BigInt(transaction_pk) : undefined,
             type: movement_type.as_proto(),
             direction: mov_direction,
             amount: movement_amount.as_proto(),

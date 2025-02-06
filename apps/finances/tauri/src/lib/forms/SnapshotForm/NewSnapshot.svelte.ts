@@ -1,6 +1,8 @@
-import { Account, Snapshot } from "../../../../models/src-js";
-import { NewSnapshot as NewSnapshotModel } from "../../../../models/src-js/snapshot";
+import { Account, MoneyAmount, MoneyAmountNonNumerable, MoneyAmountNumerable, Snapshot } from "../../../../models/src-js";
+import { Snapshot as SnapshotModel } from "../../../../models/src-js";
 import { DateWrapper, sort_date_wrapper } from "../../../../../../../libraries/googleapis/src-js/date";
+import { Money as MoneyModel } from "../../../../../../../libraries/googleapis/src-js/money";
+import { Decimal as DecimalModel } from "../../../../../../../libraries/googleapis/src-js/decimal";
 
 export class NewSnapshot {
     readonly account: Account;
@@ -66,18 +68,13 @@ export class NewSnapshot {
         return !(this.error_date_value || this.error_quantity || this.error_unit_value || this.error_amount)
     }
 
-    toMessage(): NewSnapshotModel {
-        let data: NewSnapshotModel = new NewSnapshotModel();
-        data.setAccountPk(this.account.pk());
-
+    toMessage(): SnapshotModel {
         let date_wrapper = DateWrapper.create_from_yyyy_mm_dd(this.date_value.getFullYear(), this.date_value.getMonth() + 1, this.date_value.getDate());
-        data.setDate(date_wrapper);
-
-        if (this.account.is_numerable()) {
-            data.setNumerableAmount(this.account.ccy(), this.quantity!, this.unit_value!);
-        } else {
-            data.setNonNumerableAmount(this.account.ccy(), this.amount!);
-        }
+        let money_amount = MoneyAmount.create_from(
+            this.account.is_numerable() ?
+                MoneyAmountNumerable.create_from(MoneyModel.create_from_number(this.account.ccy(), this.unit_value!), DecimalModel.create_from_number(this.quantity!)) :
+                MoneyAmountNonNumerable.create_from(MoneyModel.create_from_number(this.account.ccy(), this.amount!)));
+        let data = SnapshotModel.create_from(this.account.pk(), date_wrapper, money_amount)
         return data;
     }
 };

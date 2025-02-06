@@ -1,6 +1,9 @@
 import { toFixedNumber } from "$lib/utils";
+import { Decimal, Money, type CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
 import { DateWrapper } from "../../../../../../../libraries/googleapis/src-js/date";
-import { Account, MovementType, Snapshot, NewMovement as NewMovementModel } from "../../../../models/src-js";
+import { Account, MovementType, Snapshot, Movement as MovementModel, MoneyAmountNumerable, MoneyAmountNonNumerable } from "../../../../models/src-js";
+import { FxQuote } from "../../../../models/src-js/fx_quote";
+import { MovementAmount, MovementAmountDividend, type MovementDirection } from "../../../../models/src-js/movement";
 
 
 export enum NewMovementType {
@@ -65,8 +68,10 @@ export class NewMovement {
                 total = this.quantity * this.unit_value;
                 break;
             case NewMovementType.Dividend:
-                if (!this.ex_dividend_snapshot || !this.ex_dividend_snapshot.amount().quantity() || !this.unit_value) return undefined;
-                total = this.ex_dividend_snapshot.amount().quantity()!.as_number() * this.unit_value;
+                if (!this.ex_dividend_snapshot) return undefined;
+                let amount_numerable = this.ex_dividend_snapshot.amount().as_numerable();
+                if (!amount_numerable) return undefined;
+                total = amount_numerable.amount().amount();
                 break;
         }
 
@@ -78,21 +83,32 @@ export class NewMovement {
     }
 
 
-    toMessage(): NewMovementModel {
+    toMessage(direction: MovementDirection, base_ccy: CurrencyCode): MovementModel {
         let date_value = DateWrapper.create_from_yyyy_mm_dd(this.date_value!.getFullYear(), this.date_value!.getMonth() + 1, this.date_value!.getDay());
-        let data: NewMovementModel = new NewMovementModel(this.account!, this.mov_type!, date_value);
+
+        let fx_quote = undefined;
+        if (this.fx) {
+            const fx = Decimal.create_from_number(this.fx);
+            fx_quote = FxQuote.create_from(date_value, base_ccy, this.account!.ccy(), fx);
+        }
+
+        let amount: MoneyAmountNumerable | MoneyAmountNonNumerable | MovementAmountDividend;
         switch (this.type) {
             case NewMovementType.NonNumerable:
-                data.setNonNumerableAmount(this.amount!);
+                amount = MoneyAmountNonNumerable.create_from(Money.create_from_number(this.account!.ccy(), this.amount!));
                 break;
             case NewMovementType.Numerable:
-                data.setNumerableAmount(this.quantity!, this.unit_value!);
+                amount = MoneyAmountNumerable.create_from(Money.create_from_number(this.account!.ccy(), this.unit_value!), Decimal.create_from_number(this.quantity!));
                 break;
             case NewMovementType.Dividend:
                 let ex_dividend_date = DateWrapper.create_from_yyyy_mm_dd(this.ex_dividend_date!.getFullYear(), this.ex_dividend_date!.getMonth() + 1, this.ex_dividend_date!.getDay());
-                data.setDividendAmount(this.unit_value!, ex_dividend_date, this.ex_dividend_snapshot!)
+                const payout = MoneyAmountNumerable.create_from(Money.create_from_number(this.account!.ccy(), this.unit_value!), this.ex_dividend_snapshot!.amount().as_numerable()!.quantity());
+                amount = MovementAmountDividend.create_from(ex_dividend_date, payout);
                 break;
         }
+        let movement_amount: MovementAmount = MovementAmount.create_from(amount);
+
+        const data = MovementModel.create_from(date_value, undefined, this.mov_type!, direction, movement_amount, this.account!, fx_quote);
         return data;
     }
 };
