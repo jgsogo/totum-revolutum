@@ -23,20 +23,16 @@ export class MoneyAmountNumerable {
         const amount = this.unit_value().amount() * this.quantity().as_number();
         return Money.create_from_number(this.unit_value().currency_code(), amount);
     }
-}
 
-export class NewMoneyAmountNumerable {
-    private readonly data: MoneyAmount_NumerableProto;
-
-    constructor(unit_value: Money, quantity: Decimal) {
-        this.data = create(MoneyAmount_NumerableSchema, { unitValue: unit_value.as_proto(), quantity: quantity.as_proto() });
+    static create_from(unit_value: Money, quantity: Decimal): MoneyAmountNumerable {
+        const proto = create(MoneyAmount_NumerableSchema, { unitValue: unit_value.as_proto(), quantity: quantity.as_proto() });
+        return new MoneyAmountNumerable(proto)
     }
 
     as_proto(): MoneyAmount_NumerableProto {
-        return this.data;
+        return this.proto
     }
 }
-
 
 export class MoneyAmountNonNumerable {
     private readonly proto: MoneyAmount_NonNumerableProto;
@@ -48,21 +44,16 @@ export class MoneyAmountNonNumerable {
     amount(): Money {
         return new Money(this.proto.amount!);
     }
-}
 
-export class NewMoneyAmountNonNumerable {
-    private readonly data: MoneyAmount_NonNumerableProto;
-
-    constructor(amount: Money) {
-        this.data = create(MoneyAmount_NonNumerableSchema, { amount: amount.as_proto() });
+    static create_from(amount: Money): MoneyAmountNonNumerable {
+        const proto = create(MoneyAmount_NonNumerableSchema, { amount: amount.as_proto() });
+        return new MoneyAmountNonNumerable(proto)
     }
 
     as_proto(): MoneyAmount_NonNumerableProto {
-        return this.data;
+        return this.proto
     }
 }
-
-
 
 export class MoneyAmount {
     private readonly money_amount: MoneyAmountProto;
@@ -97,32 +88,27 @@ export class MoneyAmount {
                 throw new Error(`MoneyAmount alternative not handled: ${this.money_amount.amount.case}`);
         }
     }
-}
 
-export class NewMoneyAmount {
-    private data: MoneyAmountProto;
-
-    constructor() {
-        this.data = create(MoneyAmountSchema, {});
-    }
-
-    set_amount(amount: NewMoneyAmountNumerable | NewMoneyAmountNonNumerable) {
-        if (amount instanceof NewMoneyAmountNumerable) {
-            this.data.amount = {
+    static create_from(amount: MoneyAmountNumerable | MoneyAmountNonNumerable): MoneyAmount {
+        const proto = create(MoneyAmountSchema, {});
+        if (amount instanceof MoneyAmountNumerable) {
+            proto.amount = {
                 case: "numerable",
                 value: amount.as_proto(),
             }
-        } else if (amount instanceof NewMoneyAmountNonNumerable) {
-            this.data.amount = {
+        } else if (amount instanceof MoneyAmountNonNumerable) {
+            proto.amount = {
                 case: "nonNumerable",
                 value: amount.as_proto(),
             }
         } else {
             throw new Error(`Unexpected amount type: ${typeof amount}`)
         }
+
+        return new MoneyAmount(proto)
     }
 
     as_proto(): MoneyAmountProto {
-        return this.data;
+        return this.money_amount
     }
 }

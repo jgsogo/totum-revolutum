@@ -36,22 +36,19 @@ export class FxQuote {
     quote(): Decimal {
         return new Decimal(this.proto.quote!);
     }
-}
 
 
-export class NewFxQuote {
-    private data: FxQuoteProto;
-
-    constructor(date_value: DateWrapper, base_ccy: CurrencyCode, quote_ccy: CurrencyCode, rate: Decimal) {
-        this.data = create(FxQuoteSchema, {
+    static create_from(date_value: DateWrapper, base_ccy: CurrencyCode, quote_ccy: CurrencyCode, rate: Decimal): FxQuote {
+        const proto = create(FxQuoteSchema, {
             dateValue: date_value.as_proto(),
             baseCcyCode: base_ccy.toString(),
             quoteCcyCode: quote_ccy.toString(),
             quote: rate.as_proto()
         });
+        return new FxQuote(proto)
     }
 
     as_proto(): FxQuoteProto {
-        return this.data;
+        return this.proto
     }
 }

@@ -1,12 +1,12 @@
 import { Movement as MovementProto, MovementAmount as MovementAmountProto, MovementDirection as MovementDirectionProto, MovementAmount_Dividend as MovementAmount_DividendProto, MovementAmount_DividendSchema, MovementAmountSchema, MovementSchema } from "../protos/movement_pb.js";
-import { MoneyAmountNonNumerable, MoneyAmountNumerable, NewMoneyAmountNonNumerable, NewMoneyAmountNumerable } from "./money_amount.js";
+import { MoneyAmountNonNumerable, MoneyAmountNumerable } from "./money_amount.js";
 import { DateWrapper } from "../../../../../libraries/googleapis/src-js/date.js";
 import { create } from "@bufbuild/protobuf";
 import { Money } from "../../../../../libraries/googleapis/src-js/money.js";
 import { Account } from "./account.js";
 import { MovementType } from "./movement_type.js";
 
-import { FxQuote, NewFxQuote } from "./fx_quote.js";
+import { FxQuote } from "./fx_quote.js";
 
 
 export enum MovementDirection {
@@ -28,19 +28,18 @@ export class MovementAmountDividend {
     payout(): MoneyAmountNumerable {
         return new MoneyAmountNumerable(this.proto.payout!);
     }
-}
 
-export class NewMovementAmountDividend {
-    private data: MovementAmount_DividendProto;
 
-    constructor(ex_dividend_date: DateWrapper, payout: NewMoneyAmountNumerable) {
-        this.data = create(MovementAmount_DividendSchema, { exDividendDate: ex_dividend_date.as_proto(), payout: payout.as_proto() });
+    static create_from(ex_dividend_date: DateWrapper, payout: MoneyAmountNumerable): MovementAmountDividend {
+        const proto = create(MovementAmount_DividendSchema, { exDividendDate: ex_dividend_date.as_proto(), payout: payout.as_proto() });
+        return new MovementAmountDividend(proto)
     }
 
     as_proto(): MovementAmount_DividendProto {
-        return this.data
+        return this.proto
     }
 }
+
 
 export class MovementAmount {
     private readonly proto: MovementAmountProto;
@@ -85,26 +84,22 @@ export class MovementAmount {
                 throw new Error(`MoneyAmount alternative not handled: ${this.proto.amount.case}`);
         }
     }
-}
 
-export class NewMovementAmount {
-    private data: MovementAmountProto;
+    static create_from(amount: MoneyAmountNumerable | MoneyAmountNonNumerable | MovementAmountDividend): MovementAmount {
+        let proto = create(MovementAmountSchema, {});
 
-    constructor(amount: NewMoneyAmountNumerable | NewMoneyAmountNonNumerable | NewMovementAmountDividend) {
-        this.data = create(MovementAmountSchema, {});
-
-        if (amount instanceof NewMoneyAmountNumerable) {
-            this.data.amount = {
+        if (amount instanceof MoneyAmountNumerable) {
+            proto.amount = {
                 case: "numerable",
                 value: amount.as_proto(),
             }
-        } else if (amount instanceof NewMoneyAmountNonNumerable) {
-            this.data.amount = {
+        } else if (amount instanceof MoneyAmountNonNumerable) {
+            proto.amount = {
                 case: "nonNumerable",
                 value: amount.as_proto(),
             }
-        } else if (amount instanceof NewMovementAmountDividend) {
-            this.data.amount = {
+        } else if (amount instanceof MovementAmountDividend) {
+            proto.amount = {
                 case: "dividend",
                 value: amount.as_proto(),
             }
@@ -112,12 +107,16 @@ export class NewMovementAmount {
         else {
             throw new Error(`Unexpected amount type: ${typeof amount}`)
         }
+
+        return new MovementAmount(proto)
     }
 
     as_proto(): MovementAmountProto {
-        return this.data;
+        return this.proto
     }
+
 }
+
 
 export class Movement {
     private readonly movement: MovementProto;
@@ -173,12 +172,8 @@ export class Movement {
         return Number(this.movement.accountPk);
     }
 
-}
 
-export class NewMovement {
-    private data: MovementProto;
-
-    constructor(date_value: DateWrapper, transaction_pk: number, movement_type: MovementType, direction: MovementDirection, movement_amount: NewMovementAmount, account: Account, fx_quote?: NewFxQuote) {
+    static create_from(date_value: DateWrapper, transaction_pk: number, movement_type: MovementType, direction: MovementDirection, movement_amount: MovementAmount, account: Account, fx_quote?: FxQuote): Movement {
         let mov_direction: MovementDirectionProto = MovementDirectionProto.In;
         switch (direction) {
             case MovementDirection.In:
@@ -191,7 +186,7 @@ export class NewMovement {
                 throw new Error(`<unknown MovementDirection '${mov_direction}'>`);
         }
 
-        this.data = create(MovementSchema, {
+        const proto = create(MovementSchema, {
             dateValue: date_value.as_proto(),
             transactionPk: BigInt(transaction_pk),
             type: movement_type.as_proto(),
@@ -200,9 +195,10 @@ export class NewMovement {
             fx: fx_quote ? fx_quote.as_proto() : undefined,
             accountPk: BigInt(account.pk())
         });
+        return new Movement(proto)
     }
 
     as_proto(): MovementProto {
-        return this.data
+        return this.movement
     }
 }
