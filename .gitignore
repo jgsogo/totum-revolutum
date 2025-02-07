@@ -17,3 +17,4 @@ secret.json
 secrets/
 target/
 test/
+user.bazelrc

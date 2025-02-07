@@ -1,4 +1,0 @@
-# Use the remote cache that is spawn with the docker-compose. Fail after 5s. Upload artifacts
-build --remote_cache=http://localhost:9092
-build --remote_timeout=5
-build --remote_upload_local_results
