@@ -10,8 +10,6 @@ import type { AppState, MainContext } from '../../models/src-js/index.js';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ depends }) {
-    depends('invalidate:refresh');
-
 	try {
 		let main_context: MainContext = await get_main_context();
 		let app_state: AppState = await get_app_state();

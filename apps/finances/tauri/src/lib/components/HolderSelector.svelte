@@ -1,24 +1,10 @@
 <script lang="ts">
-  import { Avatar, Dropdown, DropdownItem, Search } from "flowbite-svelte";
+  import { Dropdown, DropdownItem, Search } from "flowbite-svelte";
   import type { AppState, Holder } from "../../../models/src-js/index";
+  import Avatar from "./Avatar.svelte";
 
-  let {
-    all_holders,
-    active_holder,
-    app_state,
-  }: { all_holders: Holder[]; active_holder: Holder; app_state: AppState } = $props();
-
-  const initials = (holder: Holder): string => {
-    let words = holder.name().split(/\s/);
-    if (words.length == 1) {
-      return holder.name().substring(0, 3);
-    } else {
-      let acronym = words
-        .map((word) => word.replace("(", ""))
-        .reduce((response, word) => (response += word.slice(0, 1)), "");
-      return acronym.substring(0, 3);
-    }
-  };
+  let { all_holders, active_holder, app_state }: { all_holders: Holder[]; active_holder: Holder; app_state: AppState } =
+    $props();
 
   let dropdownOpen = $state(false);
   let searchTerm = $state("");
@@ -31,11 +17,7 @@
 </script>
 
 <button class="ms-3 rounded-full ring-gray-400 focus:ring-4 dark:ring-gray-600">
-  {#if active_holder.photo()}
-    <Avatar title={active_holder.name()} src="{app_state.base_media_url()}{active_holder.photo()}">{active_holder.name()}</Avatar>
-  {:else}
-    <Avatar title={active_holder.name()}>{initials(active_holder).toUpperCase()}</Avatar>
-  {/if}
+  <Avatar photo_url={app_state.base_media_url() + active_holder.photo()} name={active_holder.name()} />
 </button>
 <Dropdown bind:open={dropdownOpen} class="overflow-y-auto h-96" placement="bottom-end">
   <div slot="header" class="p-3">

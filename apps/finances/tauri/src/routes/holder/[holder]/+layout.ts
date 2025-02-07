@@ -12,8 +12,6 @@ import {
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ params, depends }) {
-	depends('invalidate:refresh');
-
 	// TODO: Choose better default, see https://github.com/jgsogo/totum-revolutum/issues/637
 	let holder_pk = params.holder === '<unknown>' ? 1 : parseInt(params.holder, 10);
 
