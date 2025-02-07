@@ -5,7 +5,7 @@
   import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
   import { goToTransactionCreate } from "$lib/utils";
   import { create_snapshot } from "$lib/commands";
-  import { invalidate } from "$app/navigation";
+
   import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
   import { type Holder, Account } from "../../../models/src-js";
   import Avatar from "./Avatar.svelte";
@@ -19,7 +19,6 @@
     if (newSnapshot.isValid()) {
       await create_snapshot(newSnapshot.toMessage());
       // TODO: Handle error if it fails to create the snapshot
-      await invalidate("invalidate:account"); // FIXME: Only binded properties?
       snapshotModal = false;
     }
   };
