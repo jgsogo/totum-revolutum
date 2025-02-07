@@ -14,6 +14,14 @@ export class FxQuotePair {
     toString(): string {
         return `${this.base}/${this.quote}`
     }
+
+    static create_from(base_ccy: CurrencyCode, quote_ccy: CurrencyCode): FxQuotePair {
+        if (base_ccy == quote_ccy) {
+            throw new Error(`Base (${base_ccy}) and quote (${quote_ccy}) currencies have to be different`);
+        } else {
+            return new FxQuotePair(base_ccy, quote_ccy);
+        }
+    }
 }
 
 export class FxQuote {
@@ -53,17 +61,17 @@ export class FxQuote {
         }
     }
 
-    static create_from(date_value: DateWrapper, base_ccy: CurrencyCode, quote_ccy: CurrencyCode, rate: Decimal): FxQuote {
-    const proto = create(FxQuoteSchema, {
-        dateValue: date_value.as_proto(),
-        baseCcyCode: base_ccy.toString(),
-        quoteCcyCode: quote_ccy.toString(),
-        quote: rate.as_proto()
-    });
-    return new FxQuote(proto)
-}
+    static create_from(date_value: DateWrapper, fx_quote_pair: FxQuotePair, rate: Decimal): FxQuote {
+        const proto = create(FxQuoteSchema, {
+            dateValue: date_value.as_proto(),
+            baseCcyCode: fx_quote_pair.base.toString(),
+            quoteCcyCode: fx_quote_pair.quote.toString(),
+            quote: rate.as_proto()
+        });
+        return new FxQuote(proto)
+    }
 
-as_proto(): FxQuoteProto {
-    return this.proto
-}
+    as_proto(): FxQuoteProto {
+        return this.proto
+    }
 }

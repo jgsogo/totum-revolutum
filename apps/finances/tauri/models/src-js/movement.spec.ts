@@ -7,7 +7,7 @@ import { Movement, MovementAmount, MovementAmountDividend, MovementDirection } f
 import { DateWrapper } from '../../../../../libraries/googleapis/src-js/date.js';
 import { MovementType } from './movement_type.js';
 import { Account, AccountCategory, AccountType } from './account.js';
-import { FxQuote } from './fx_quote.js';
+import { FxQuote, FxQuotePair } from './fx_quote.js';
 import { create } from '@bufbuild/protobuf';
 import { MovementTypeSchema } from '../protos/movement_pb.js';
 import { AccountSchema, AccountTypeSchema } from '../protos/account_pb.js';
@@ -59,7 +59,8 @@ describe('Movement dividend', () => {
     let date_value = DateWrapper.create_from_yyyy_mm_dd(2025, 2, 6);
     let transaction_pk = undefined;
     let movement_type = get_movement_type();
-    let fx_quote = FxQuote.create_from(date_value, CurrencyCode.EUR, CurrencyCode.USD, Decimal.create_from_number(0.5));
+    let fx_pair = FxQuotePair.create_from(CurrencyCode.EUR, CurrencyCode.USD);
+    let fx_quote = FxQuote.create_from(date_value, fx_pair, Decimal.create_from_number(0.5));
 
     let account: Account = get_account();
     let movement = Movement.create_from(date_value, transaction_pk, movement_type, MovementDirection.In, mov_amount_dividend, account, fx_quote);
