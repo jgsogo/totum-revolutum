@@ -23,6 +23,11 @@ RUN apt-get install -y \
 
 RUN rm -rf /var/lib/apt/lists/*
 
+# Install bazelisk
+RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-linux-amd64 && \
+    chmod +x bazelisk-linux-amd64 && \
+    mv bazelisk-linux-amd64 /usr/local/bin/bazel
+
 # Set environment variables
 ENV RUNNER_USER=runner
 ENV RUNNER_WORKDIR=/home/runner/actions-runner

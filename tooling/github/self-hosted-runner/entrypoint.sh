@@ -8,7 +8,7 @@ if [[ -z "$GH_REPO_URL" || -z "$GH_RUNNER_TOKEN" ]]; then
 fi
 
 # Register the GitHub Actions Runner
-./config.sh --url "$GH_REPO_URL" --token "$GH_RUNNER_TOKEN" --unattended --name "$(hostname)" --work "_work"
+./config.sh --url "$GH_REPO_URL" --token "$GH_RUNNER_TOKEN" --unattended --name "$(hostname)" --replace
 
 # Run the GitHub Actions Runner
 cleanup() {
@@ -17,4 +17,4 @@ cleanup() {
 }
 trap cleanup EXIT
 
-exec ./run.sh --once
+exec ./run.sh
