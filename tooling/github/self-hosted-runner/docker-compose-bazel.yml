@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.runner
     # image: ghcr.io/actions/actions-runner:latest
     container_name: github-runner
-    hostname: github-runner-macos-compose
+    hostname: github-runner-docker-compose
     restart: unless-stopped
     environment:
       - GH_REPO_URL=https://github.com/jgsogo/totum-revolutum
