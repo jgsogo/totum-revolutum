@@ -1,0 +1,36 @@
+services:
+  runner:
+    image: ghcr.io/actions/actions-runner:latest
+    container_name: github-runner
+    restart: unless-stopped
+    environment:
+      - GH_REPO_URL=https://github.com/jgsogo/totum-revolutum
+      - GH_RUNNER_TOKEN=${GH_RUNNER_TOKEN} # Pass via .env or CLI
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Allow Docker-in-Docker if needed
+      # - gh-self-hosted-runner-data:/home/github/actions-runner
+    depends_on:
+      - bazel-remote
+    command: >
+      bash -c "
+      ./config.sh remove --token ${GH_RUNNER_TOKEN} &&
+      ./config.sh --url ${GH_REPO_URL} --token ${GH_RUNNER_TOKEN} --unattended --replace --name macos-docker &&
+      ./run.sh
+      "
+    # deploy:
+    #   replicas: 2
+
+  bazel-remote:
+    image: buchgr/bazel-remote-cache:latest
+    container_name: bazel-remote
+    restart: unless-stopped
+    volumes:
+      - bazel-cache:/data
+    environment:
+      - BAZEL_REMOTE_MAX_SIZE=${BAZEL_REMOTE_MAX_SIZE:-10} # Default to 10GB if not set
+    ports:
+      - "9092:8080"  # Expose Bazel Remote on port 9092
+
+volumes:
+  # gh-self-hosted-runner-data:
+  bazel-cache:

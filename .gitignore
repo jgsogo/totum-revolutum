@@ -2,6 +2,7 @@
 *.sqlite3
 .DS_Store
 .bazelrc.user
+.env
 .idea/
 .svelte-kit/
 __pycache__/

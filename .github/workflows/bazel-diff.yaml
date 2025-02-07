@@ -259,20 +259,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Bazel
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-bazel-
-
       - uses: actions/download-artifact@v4
         if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         with:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/
+
+      - name: Configure bazel-remote
+        run: |
+          echo "build --remote_cache=http://bazel-remote:9092" >> .bazelrc
+          echo "build --remote_timeout=10" >> .bazelrc
+          echo "build --remote_upload_local_results" >> .bazelrc
+          curl http://bazel-remote:9092/status
 
       - name: Test impacted targets
         if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}

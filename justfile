@@ -72,3 +72,15 @@ clean:
 
 # Reset: removes all temporary files and recreates the workspace (Cargo and Bazel). This can take a while
 reset: clean build test
+
+# Run bazel-remote (cache) and github runner
+gh-run-self-hosted-runner:
+    docker-compose --env-file .env -f ./tooling/github/docker-compose-bazel.yml up
+
+# Stops bazel-remote (cache) and github runner
+gh-stop-self-hosted-runner:
+    docker-compose -f ./tooling/github/docker-compose-bazel.yml down
+
+# See logs from bazel-remote (cache) and github runner
+gh-logs-self-hosted-runner:
+    docker-compose -f ./tooling/github/docker-compose-bazel.yml logs -f
