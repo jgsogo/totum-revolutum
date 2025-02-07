@@ -46,6 +46,10 @@ export class AccountType {
         }
     }
 
+    as_proto(): AccountTypeProto {
+        return this.data;
+    }
+
 }
 
 export class Account {
@@ -89,5 +93,9 @@ export class Account {
 
     last_snapshot(): Snapshot | undefined {
         return this.account.lastSnapshot ? new Snapshot(this.account.lastSnapshot) : undefined;
+    }
+
+    as_proto(): AccountProto {
+        return this.account;
     }
 }

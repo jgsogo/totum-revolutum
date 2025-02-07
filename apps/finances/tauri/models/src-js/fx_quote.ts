@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { currency_code_from_str, CurrencyCode, DateWrapper, Decimal } from "../../../../../libraries/googleapis/src-js/index.js";
+import { currency_code_from_str, CurrencyCode, DateWrapper, Decimal, Money } from "../../../../../libraries/googleapis/src-js/index.js";
 import { FxQuote as FxQuoteProto, FxQuoteSchema } from "../protos/fx_quote_pb.js";
 
 export class FxQuotePair {
@@ -37,18 +37,33 @@ export class FxQuote {
         return new Decimal(this.proto.quote!);
     }
 
+    /// Applies FX transformation to the given money. It will raise if the CCYs doesn't match
+    apply_to(amount: Money): Money {
+        let fx_pair = this.fx_pair();
+        if (amount.currency_code() == fx_pair.base) {
+            let new_amount = amount.amount() * this.quote().as_number();
+            return Money.create_from_number(fx_pair.quote, new_amount);
+        }
+        else if (amount.currency_code() == fx_pair.quote) {
+            let new_amount = amount.amount() / this.quote().as_number();
+            return Money.create_from_number(fx_pair.base, new_amount);
+        }
+        else {
+            throw new Error(`FxQuote '${fx_pair}' cannot be applied to amount in '${amount.currency_code()}'`)
+        }
+    }
 
     static create_from(date_value: DateWrapper, base_ccy: CurrencyCode, quote_ccy: CurrencyCode, rate: Decimal): FxQuote {
-        const proto = create(FxQuoteSchema, {
-            dateValue: date_value.as_proto(),
-            baseCcyCode: base_ccy.toString(),
-            quoteCcyCode: quote_ccy.toString(),
-            quote: rate.as_proto()
-        });
-        return new FxQuote(proto)
-    }
+    const proto = create(FxQuoteSchema, {
+        dateValue: date_value.as_proto(),
+        baseCcyCode: base_ccy.toString(),
+        quoteCcyCode: quote_ccy.toString(),
+        quote: rate.as_proto()
+    });
+    return new FxQuote(proto)
+}
 
-    as_proto(): FxQuoteProto {
-        return this.proto
-    }
+as_proto(): FxQuoteProto {
+    return this.proto
+}
 }

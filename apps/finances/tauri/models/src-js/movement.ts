@@ -125,8 +125,8 @@ export class Movement {
         this.movement = movement;
     }
 
-    pk(): number {
-        return Number(this.movement.pk);
+    pk(): number | undefined {
+        return this.movement.pk ? Number(this.movement.pk) : undefined;
     }
 
     date_value(): DateWrapper {
@@ -134,7 +134,7 @@ export class Movement {
     }
 
     transaction_pk(): number | undefined {
-        return Number(this.movement.transactionPk);
+        return this.movement.transactionPk ? Number(this.movement.transactionPk) : undefined;
     }
 
     transaction_name(): string | undefined {
@@ -160,8 +160,15 @@ export class Movement {
         return new MovementAmount(this.movement.amount!);
     }
 
+    /// Returns the Money amount in the base currency (use [`Self::movement_amount`] to get the raw information)
     amount(): Money {
-        return this.movement_amount().amount();
+        let raw_amount = this.movement_amount().amount();
+        let fx_quote = this.fx_quote();
+        if (fx_quote) {
+            return fx_quote.apply_to(raw_amount);
+        } else {
+            return raw_amount;
+        }
     }
 
     fx_quote(): FxQuote | undefined {
