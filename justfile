@@ -1,3 +1,5 @@
+set dotenv-load := true
+
 _default: _just-check
     @{{ just_executable() }} --choose  # Requires 'fzf' (https://formulae.brew.sh/formula/fzf)
 
@@ -74,13 +76,33 @@ clean:
 reset: clean build test
 
 # Run bazel-remote (cache) and github runner
-gh-run-self-hosted-runner:
-    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --build
+gh-run-self-hosted-runner-linux:
+    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --build -d
 
 # Stops bazel-remote (cache) and github runner
-gh-stop-self-hosted-runner:
+gh-stop-self-hosted-runner-linux:
     docker-compose -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml down
 
 # See logs from bazel-remote (cache) and github runner
-gh-logs-self-hosted-runner:
+gh-logs-self-hosted-runner-linux:
     docker-compose -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml logs -f
+
+# Run gh self-hosted runner for Macos
+[working-directory('actions-runner')]
+gh-run-self-hosted-runner-macos:
+    curl -o actions-runner-osx-x64-2.322.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.322.0/actions-runner-osx-x64-2.322.0.tar.gz
+    echo "aa0fc262363912167dcdbc746ffcdf7b8996bc587f51cf1bab38ad86cf70b6ea  actions-runner-osx-x64-2.322.0.tar.gz" | shasum -a 256 -c
+    tar xzf ./actions-runner-osx-x64-2.322.0.tar.gz
+    rm actions-runner-osx-x64-2.322.0.tar.gz
+    ./../tooling/github/self-hosted-runner/entrypoint.sh &
+
+# Stop gh self-hosted runner for Macos
+[working-directory('actions-runner')]
+gh-stop-self-hosted-runner-macos:
+    ./config.sh remove --token "$GH_RUNNER_TOKEN"
+
+# Run self-hosted runners for Linux and Macos
+gh-run-self-hosted-runner: gh-run-self-hosted-runner-linux gh-run-self-hosted-runner-macos
+
+# Stop self-hosted runners for Linux and Macos
+gh-stop-self-hosted-runner: gh-stop-self-hosted-runner-linux gh-stop-self-hosted-runner-macos

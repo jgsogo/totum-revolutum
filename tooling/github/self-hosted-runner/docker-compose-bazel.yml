@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile.runner
     # image: ghcr.io/actions/actions-runner:latest
     container_name: github-runner
+    hostname: github-runner-macos-compose
     restart: unless-stopped
     environment:
       - GH_REPO_URL=https://github.com/jgsogo/totum-revolutum
@@ -14,14 +15,6 @@ services:
       - runner-data:/home/github/actions-runner
     depends_on:
       - bazel-remote
-    command: >
-      bash -c "
-      ./config.sh remove --token ${GH_RUNNER_TOKEN} &&
-      ./config.sh --url ${GH_REPO_URL} --token ${GH_RUNNER_TOKEN} --unattended --replace --name macos-docker &&
-      ./run.sh
-      "
-    # deploy:
-    #   replicas: 2
 
   bazel-remote:
     image: buchgr/bazel-remote-cache:latest

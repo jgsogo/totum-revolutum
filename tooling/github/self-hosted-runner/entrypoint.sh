@@ -13,7 +13,7 @@ fi
 # Run the GitHub Actions Runner
 cleanup() {
   echo "Removing runner..."
-  ./config.sh remove --unattended --token "$GH_RUNNER_TOKEN"
+  ./config.sh remove --token "$GH_RUNNER_TOKEN"
 }
 trap cleanup EXIT
 
