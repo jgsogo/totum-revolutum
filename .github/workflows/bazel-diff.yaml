@@ -17,7 +17,7 @@ on:
 env:
   BAZEL_CONFIG: "--config=ci"
   BAZEL_REMOTE_CACHE_URL: "grpc://bazel-remote:9092"
-  BAZEL_DISK_CACHE_PATH: "$BAZEL_REMOTE_CACHE_URL"
+  BAZEL_DISK_CACHE_PATH: "~/.cache/bazel-disk-cache"
 
 jobs:
   # This job will find out if any self-hosted runner is available and return it
@@ -89,7 +89,7 @@ jobs:
           path: |
             ~/.cache/bazel-disk-cache
           # key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel') }}
-          key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel.lock', '${{ runner.temp }}/Cargo.lock', '${{ runner.temp }}/pnpm-lock.yaml', '${{ runner.temp }}/bazel/third_party/requirements.lock') }}
+          key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/base/.bazelversion', '${{ runner.temp }}/base/.bazelrc', '${{ runner.temp }}/base/MODULE.bazel.lock', '${{ runner.temp }}/base/Cargo.lock', '${{ runner.temp }}/base/pnpm-lock.yaml', '${{ runner.temp }}/base/bazel/third_party/requirements.lock') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
 
@@ -305,7 +305,7 @@ jobs:
       #   run: |
       #     git clone --depth 1 https://github.com/bazelbuild/bazel.git bazel-gc
       #     cd bazel-gc
-      #     bazel run //src/tools/diskcache:gc -- --cache_dir=~/.cache/bazel-disk-cache --max_size=2GB
+      #     bazel run //src/tools/diskcache:gc -- --disk_cache=~/.cache/bazel-disk-cache --max_size=2GB
 
   run-tests-self-hosted:
     needs:

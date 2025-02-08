@@ -17,7 +17,7 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN} # We are using it for token renewal
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # Allow Docker-in-Docker if needed
-      - runner-data:/home/github/actions-runner
+      - runner-data:/home/runner/actions-runner
     depends_on:
       - bazel-remote
 
