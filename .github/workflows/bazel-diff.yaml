@@ -88,7 +88,8 @@ jobs:
         with:
           path: |
             ~/.cache/bazel-disk-cache
-          key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel') }}
+          # key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel') }}
+          key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel.lock', '${{ runner.temp }}/Cargo.lock', '${{ runner.temp }}/pnpm-lock.yaml', '${{ runner.temp }}/bazel/third_party/requirements.lock') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
 
@@ -130,7 +131,8 @@ jobs:
         with:
           path: |
             ~/.cache/bazel-disk-cache
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          # key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel.lock', 'Cargo.lock', 'pnpm-lock.yaml', 'bazel/third_party/requirements.lock') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
 
@@ -182,7 +184,8 @@ jobs:
         with:
           path: |
             ~/.cache/bazel-disk-cache
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          # key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel.lock', 'Cargo.lock', 'pnpm-lock.yaml', 'bazel/third_party/requirements.lock') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
 
@@ -246,7 +249,8 @@ jobs:
         with:
           path: |
             ~/.cache/bazel-disk-cache
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          # key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel.lock', 'Cargo.lock', 'pnpm-lock.yaml', 'bazel/third_party/requirements.lock') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
 
@@ -295,11 +299,13 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: bazel build $BAZEL_CONFIG //docs
 
-      - name: Clean Bazel disk-cache
-        run: |
-          git clone --depth 1 https://github.com/bazelbuild/bazel.git bazel-gc
-          cd bazel-gc
-          bazel run //src/tools/diskcache:gc -- --cache_dir=~/.cache/bazel-disk-cache --max_size=2GB
+      # # Clean the build cache before storing it again. We can skip this step if there was a cache-hit, as it won't cache it.
+      # - name: Clean Bazel disk-cache
+      #   if: steps.cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     git clone --depth 1 https://github.com/bazelbuild/bazel.git bazel-gc
+      #     cd bazel-gc
+      #     bazel run //src/tools/diskcache:gc -- --cache_dir=~/.cache/bazel-disk-cache --max_size=2GB
 
   run-tests-self-hosted:
     needs:
