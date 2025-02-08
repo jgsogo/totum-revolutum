@@ -37,7 +37,7 @@ CONTAINER_PORT=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 2)
 
 # Wait until Postgres is ready
 RETRY_COUNT=0
-RETRY_MAX=10
+RETRY_MAX=20
 RETRY_INTERVAL=3
 while ! pg_isready --username=$POSTGRES_USER --dbname=$POSTGRES_DB --host=$CONTAINER_HOST --port=$CONTAINER_PORT 2>/dev/null; do
   RETRY_COUNT=$(($RETRY_COUNT + 1))
