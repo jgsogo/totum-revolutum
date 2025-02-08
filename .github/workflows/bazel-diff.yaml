@@ -16,6 +16,8 @@ on:
 
 env:
   BAZEL_CONFIG: "--config=ci"
+  BAZEL_REMOTE_CACHE_URL: "grpc://bazel-remote:9092"
+  BAZEL_DISK_CACHE_PATH: "$BAZEL_REMOTE_CACHE_URL"
 
 jobs:
   # This job will find out if any self-hosted runner is available and return it
@@ -98,10 +100,9 @@ jobs:
       - name: Configure bazel-remote
         if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
-          echo "build --remote_cache=http://bazel-remote:8080" >> .bazelrc
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
           echo "build --remote_timeout=10" >> .bazelrc
           echo "build --remote_upload_local_results" >> .bazelrc
-          curl http://bazel-remote:8080/status
 
       - name: Generate hashes from base
         run: |
@@ -141,10 +142,9 @@ jobs:
       - name: Configure bazel-remote
         if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
-          echo "build --remote_cache=http://bazel-remote:8080" >> .bazelrc
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
           echo "build --remote_timeout=10" >> .bazelrc
           echo "build --remote_upload_local_results" >> .bazelrc
-          curl http://bazel-remote:8080/status
 
       - name: Generate hashes from current
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
@@ -194,10 +194,9 @@ jobs:
       - name: Configure bazel-remote
         if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
-          echo "build --remote_cache=http://bazel-remote:8080" >> .bazelrc
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
           echo "build --remote_timeout=10" >> .bazelrc
           echo "build --remote_upload_local_results" >> .bazelrc
-          curl http://bazel-remote:8080/status
 
       - name: Compute impacted targets
         if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
@@ -317,10 +316,9 @@ jobs:
       - name: Configure bazel-remote
         if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
-          echo "build --remote_cache=http://bazel-remote:8080" >> .bazelrc
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
           echo "build --remote_timeout=10" >> .bazelrc
           echo "build --remote_upload_local_results" >> .bazelrc
-          curl http://bazel-remote:8080/status
 
       - name: Test impacted targets
         if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
