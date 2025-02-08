@@ -81,13 +81,27 @@ jobs:
           git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
 
       - name: Cache Bazel
+        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         uses: actions/cache/restore@v4
         with:
           path: |
-            ~/.cache/bazel
+            ~/.cache/bazel-disk-cache
           key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
+
+      - name: Configure disk-cache
+        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        run: |
+          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+
+      - name: Configure bazel-remote
+        if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
+        run: |
+          echo "build --remote_cache=http://bazel-remote:9092" >> .bazelrc
+          echo "build --remote_timeout=10" >> .bazelrc
+          echo "build --remote_upload_local_results" >> .bazelrc
+          curl http://bazel-remote:9092/status
 
       - name: Generate hashes from base
         run: |
@@ -110,13 +124,27 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Cache Bazel
+        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/bazel
+            ~/.cache/bazel-disk-cache
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
+
+      - name: Configure disk-cache
+        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        run: |
+          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+
+      - name: Configure bazel-remote
+        if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
+        run: |
+          echo "build --remote_cache=http://bazel-remote:9092" >> .bazelrc
+          echo "build --remote_timeout=10" >> .bazelrc
+          echo "build --remote_upload_local_results" >> .bazelrc
+          curl http://bazel-remote:9092/status
 
       - name: Generate hashes from current
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
@@ -149,13 +177,27 @@ jobs:
           path: ${{ runner.temp }}/
 
       - name: Cache Bazel
+        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         uses: actions/cache/restore@v4
         with:
           path: |
-            ~/.cache/bazel
+            ~/.cache/bazel-disk-cache
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-bazel-
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
+      - name: Configure disk-cache
+        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        run: |
+          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+
+      - name: Configure bazel-remote
+        if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
+        run: |
+          echo "build --remote_cache=http://bazel-remote:9092" >> .bazelrc
+          echo "build --remote_timeout=10" >> .bazelrc
+          echo "build --remote_upload_local_results" >> .bazelrc
+          curl http://bazel-remote:9092/status
 
       - name: Compute impacted targets
         if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
@@ -200,13 +242,19 @@ jobs:
             librsvg2-dev
 
       - name: Cache Bazel
+        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/bazel
+            ~/.cache/bazel-disk-cache
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-bazel-
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
+      - name: Configure disk-cache
+        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        run: |
+          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
 
       - uses: actions/download-artifact@v4
         if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
@@ -248,6 +296,7 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: bazel build $BAZEL_CONFIG //docs
 
+      # TODO: clean Bazel disk-cache
 
   run-tests-self-hosted:
     needs:
@@ -266,6 +315,7 @@ jobs:
           path: ${{ runner.temp }}/
 
       - name: Configure bazel-remote
+        if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
           echo "build --remote_cache=http://bazel-remote:9092" >> .bazelrc
           echo "build --remote_timeout=10" >> .bazelrc
