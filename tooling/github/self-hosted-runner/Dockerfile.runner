@@ -46,6 +46,8 @@ ENV RUNNER_WORKDIR=/home/runner/actions-runner
 
 # Create a user and working directory
 RUN useradd -m $RUNNER_USER && mkdir -p $RUNNER_WORKDIR && chown -R $RUNNER_USER:$RUNNER_USER $RUNNER_WORKDIR
+# Add the user to the docker group, so it can use it
+RUN sudo usermod -a -G docker $RUNNER_USER
 WORKDIR $RUNNER_WORKDIR
 USER $RUNNER_USER
 
