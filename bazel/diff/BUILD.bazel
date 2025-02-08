@@ -1,5 +1,6 @@
 load("@rules_java//java:defs.bzl", "java_binary")
 
+# FIXME: bazel-diff is now a module!  https://registry.bazel.build/modules/bazel-diff
 java_binary(
     name = "diff",
     main_class = "com.bazel_diff.Main",
