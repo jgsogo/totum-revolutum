@@ -58,66 +58,6 @@ jobs:
           echo "commit-message=$(git show -s --format=%s)"
           echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
-  compute-base-hashes:
-    needs:
-      - head_commit_message
-      - check-runner
-    runs-on: ${{ needs.check-runner.outputs.runner-label }}
-    if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Base from base branch (PR)
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          echo "I'm a PR to base '${{ github.event.pull_request.base.ref }}'"
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          git worktree add ${{ runner.temp }}/base ${{ github.event.pull_request.base.ref }}
-
-      - name: Base from previous commit (not PR)
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          echo "I'm NOT a PR"
-          git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
-
-      - name: Cache Bazel
-        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.cache/bazel-disk-cache
-          # key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel') }}
-          key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/base/.bazelversion', '${{ runner.temp }}/base/.bazelrc', '${{ runner.temp }}/base/MODULE.bazel.lock', '${{ runner.temp }}/base/Cargo.lock', '${{ runner.temp }}/base/pnpm-lock.yaml', '${{ runner.temp }}/base/bazel/third_party/requirements.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bazel-
-
-      - name: Configure disk-cache
-        if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        run: |
-          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
-
-      - name: Configure bazel-remote
-        if:  ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
-        run: |
-          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
-          echo "build --remote_timeout=10" >> .bazelrc
-          echo "build --remote_upload_local_results" >> .bazelrc
-
-      - name: Generate hashes from base
-        run: |
-          bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
-          cat ${{ runner.temp }}/base-hashes.json
-          rm -fr ${{ runner.temp }}/base
-          git worktree prune
-
-      - name: Save base-hashes as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: base-hashes.json
-          path: ${{ runner.temp }}/base-hashes.json
-
   compute-current-hashes:
     needs:
       - check-runner
@@ -157,26 +97,30 @@ jobs:
           name: current-hashes.json
           path: ${{ runner.temp }}/current-hashes.json
 
-  compute-diff:
+  compute-base-hashes:
     needs:
       - head_commit_message
       - check-runner
-      - compute-base-hashes
       - compute-current-hashes
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
         with:
-          name: base-hashes.json
-          path: ${{ runner.temp }}/
+          fetch-depth: 2
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: current-hashes.json
-          path: ${{ runner.temp }}/
+      - name: Base from base branch (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          echo "I'm a PR to base '${{ github.event.pull_request.base.ref }}'"
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git worktree add ${{ runner.temp }}/base ${{ github.event.pull_request.base.ref }}
+
+      - name: Base from previous commit (not PR)
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo "I'm NOT a PR"
+          git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
 
       - name: Cache Bazel
         if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
@@ -184,7 +128,8 @@ jobs:
         with:
           path: |
             ~/.cache/bazel-disk-cache
-          # key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          # key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel') }}
+          # key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/base/.bazelversion', '${{ runner.temp }}/base/.bazelrc', '${{ runner.temp }}/base/MODULE.bazel.lock', '${{ runner.temp }}/base/Cargo.lock', '${{ runner.temp }}/base/pnpm-lock.yaml', '${{ runner.temp }}/base/bazel/third_party/requirements.lock') }}
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel.lock', 'Cargo.lock', 'pnpm-lock.yaml', 'bazel/third_party/requirements.lock') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
@@ -201,23 +146,40 @@ jobs:
           echo "build --remote_timeout=10" >> .bazelrc
           echo "build --remote_upload_local_results" >> .bazelrc
 
+      - name: Generate hashes from base
+        run: |
+          bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ runner.temp }}/base ${{ runner.temp }}/base-hashes.json
+          cat ${{ runner.temp }}/base-hashes.json
+          rm -fr ${{ runner.temp }}/base
+          git worktree prune
+
+      - name: Save base-hashes as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-hashes.json
+          path: ${{ runner.temp }}/base-hashes.json
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: current-hashes.json
+          path: ${{ runner.temp }}/
+
       - name: Compute impacted targets
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
 
       - name: Save impacted-targets as an artifact
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         uses: actions/upload-artifact@v4
         with:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/impacted-targets.txt
 
+
   # Run the tests in a Github runner
   run-tests-github:
     needs:
       - head_commit_message
-      - compute-diff
       - check-runner
+      - compute-base-hashes
     if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     services:
@@ -311,8 +273,8 @@ jobs:
   run-tests-self-hosted:
     needs:
       - head_commit_message
-      - compute-diff
       - check-runner
+      - compute-base-hashes
     if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     steps:
