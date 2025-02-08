@@ -3,7 +3,7 @@ set -e
 
 ####
 # DOCKER
-#### 
+####
 
 # Ensure Docker socket is accessible
 if [ ! -S /var/run/docker.sock ]; then
@@ -25,7 +25,7 @@ echo "✅ User added to group $DOCKER_GROUP_NAME ($DOCKER_GROUP_ID)"
 
 ####
 # GH CLI
-#### 
+####
 
 # Ensure GitHub CLI is authenticated
 echo "🔐 Checking GitHub CLI authentication..."
@@ -58,7 +58,7 @@ echo "✅ New token obtained successfully!"
 
 ####
 # SELF-HOSTED RUNNER
-#### 
+####
 
 # Stop and unregister the old runner
 echo "🛑 Stopping and unregistering the old runner..."
@@ -80,7 +80,7 @@ cleanup() {
 trap cleanup EXIT SIGTERM SIGINT
 
 echo "🔄 Starting runner manually..."
-./run.sh &
+exec sg "$DOCKER_GROUP_NAME" ./run.sh &
 
 # Wait for the process to finish (needed for signal handling)
 echo "🎉 GitHub self-hosted runner has been updated and restarted!"
