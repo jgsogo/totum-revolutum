@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 
 # Install dependencies (for Bazel)
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
     curl \
     git \
     jq \
@@ -9,19 +10,29 @@ RUN apt-get update && apt-get install -y \
     sudo \
     unzip \
     wget \
-    default-jdk \
-    docker.io
+    default-jdk
+
+# Install Docker and Docker compose plugin (using Docker's official GPG key):
+RUN install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc \
+    && chmod a+r /etc/apt/keyrings/docker.asc \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli docker-compose-plugin
+
 
 # Install GH CLI
 RUN mkdir -p -m 755 /etc/apt/keyrings \
     && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     && cat $out | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-	&& chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-	&& apt update \
-	&& apt install gh -y
+    && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt update \
+    && apt install -y gh
 
-# Install dependencies (for Tauri v2): https://v2.tauri.app/start/prerequisites/#linux
+# Install dependencies:
+# * Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+# * and others
 RUN apt-get install -y \
     libwebkit2gtk-4.1-dev \
     build-essential \
@@ -31,7 +42,8 @@ RUN apt-get install -y \
     libxdo-dev \
     libssl-dev \
     libayatana-appindicator3-dev \
-    librsvg2-dev
+    librsvg2-dev \
+    libpq-dev
 
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -47,7 +59,6 @@ ARG USER_GID=1000
 
 RUN groupadd -g $USER_GID $RUNNER_USER && \
     useradd -m -u $USER_UID -g $USER_GID -s /bin/bash $RUNNER_USER && \
-    usermod -aG docker $RUNNER_USER && \
     echo "$RUNNER_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 ENV RUNNER_WORKDIR=/home/runner/actions-runner
