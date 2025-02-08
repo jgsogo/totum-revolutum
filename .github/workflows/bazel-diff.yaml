@@ -184,7 +184,7 @@ jobs:
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     services:
       docker:
-        image: docker:dind
+        image: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' && 'docker:dind' || '' }}
         options: --privileged --shm-size=2g
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -273,6 +273,12 @@ jobs:
     # if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
     if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    services:
+      docker:
+        image: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' && 'docker:dind' || '' }}
+        options: --privileged --shm-size=2g
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
       - uses: actions/checkout@v4
 
