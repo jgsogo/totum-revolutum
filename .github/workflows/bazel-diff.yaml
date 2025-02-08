@@ -295,7 +295,11 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: bazel build $BAZEL_CONFIG //docs
 
-      # TODO: clean Bazel disk-cache
+      - name: Clean Bazel disk-cache
+        run: |
+          git clone --depth 1 https://github.com/bazelbuild/bazel.git bazel-gc
+          cd bazel-gc
+          bazel run //src/tools/diskcache:gc -- --cache_dir=~/.cache/bazel-disk-cache --max_size=2GB
 
   run-tests-self-hosted:
     needs:

@@ -1,6 +1,12 @@
 load("@rules_java//java:defs.bzl", "java_binary")
 
 # FIXME: bazel-diff is now a module!  https://registry.bazel.build/modules/bazel-diff
+# ... or maybe we can just use it from `.jar` (see docs: https://github.com/Tinder/bazel-diff?tab=readme-ov-file#run-via-jar-release):
+#
+# ```
+# curl -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
+# java -jar bazel-diff.jar -h
+# ```
 java_binary(
     name = "diff",
     main_class = "com.bazel_diff.Main",
