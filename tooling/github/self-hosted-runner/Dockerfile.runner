@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     jq \
     bash \
     sudo \
-    unzip
+    unzip \
+    default-jre
 
 # Install dependencies (for Tauri v2): https://v2.tauri.app/start/prerequisites/#linux
 RUN apt-get install -y \
