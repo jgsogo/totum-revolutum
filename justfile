@@ -94,7 +94,7 @@ gh-run-self-hosted-runner-macos:
     echo "aa0fc262363912167dcdbc746ffcdf7b8996bc587f51cf1bab38ad86cf70b6ea  actions-runner-osx-x64-2.322.0.tar.gz" | shasum -a 256 -c
     tar xzf ./actions-runner-osx-x64-2.322.0.tar.gz
     rm actions-runner-osx-x64-2.322.0.tar.gz
-    ./../tooling/github/self-hosted-runner/entrypoint.sh &
+    ./../tooling/github/self-hosted-runner/entrypoint.sh
 
 # Stop gh self-hosted runner for Macos
 [working-directory('actions-runner')]
