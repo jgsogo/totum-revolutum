@@ -34,9 +34,9 @@ services:
     healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:%DJANGO_PORT%/admin"]
         interval: 10s
-        retries: 5
+        retries: 10
         start_period: 60s
-        timeout: 10s
+        timeout: 20s
 
   db:
     image: postgres:17
@@ -49,9 +49,9 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
-      retries: 5
+      retries: 10
       start_period: 30s
-      timeout: 10s
+      timeout: 20s
 
   nginx:
     image: ghcr.io/jgsogo/nginx_django:%NGINX_DJANGO_TAG%
