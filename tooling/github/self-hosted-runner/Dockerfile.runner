@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     sudo \
     unzip \
     wget \
-    default-jdk
+    default-jdk \
+    docker.io
 
 # Install GH CLI
 RUN mkdir -p -m 755 /etc/apt/keyrings \
