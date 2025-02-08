@@ -127,7 +127,7 @@ jobs:
 
       - name: Cache Bazel
         if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -258,6 +258,7 @@ jobs:
         if:  ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         run: |
           echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+          echo "test --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
 
       - uses: actions/download-artifact@v4
         if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
