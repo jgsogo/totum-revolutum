@@ -3,11 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.runner
+    user: "1000:1000"  # Ensure user matches the created user
     # image: ghcr.io/actions/actions-runner:latest
     container_name: github-runner
     hostname: github-runner-docker-compose
     restart: unless-stopped
     environment:
+      - RUNNER_USER=myuser
       - GH_REPO_URL=${GH_REPO_URL}
       - GITHUB_OWNER=${GITHUB_OWNER}
       - GITHUB_REPO=${GITHUB_REPO}

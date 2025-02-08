@@ -1,6 +1,32 @@
 #!/bin/bash
 set -e
 
+####
+# DOCKER
+#### 
+
+# Ensure Docker socket is accessible
+if [ ! -S /var/run/docker.sock ]; then
+    echo "❌ Docker socket not found! Make sure to mount it with -v /var/run/docker.sock:/var/run/docker.sock"
+    exit 1
+fi
+
+# Fix permissions if needed
+DOCKER_GROUP_ID=$(stat -c %g /var/run/docker.sock)
+DOCKER_GROUP_NAME=$(getent group "$DOCKER_GROUP_ID" | cut -d: -f1)
+# If the group doesn't exist, create it
+if [ -z "$DOCKER_GROUP_NAME" ]; then
+    DOCKER_GROUP_NAME="dockersocket"
+    sudo groupadd -g "$DOCKER_GROUP_ID" "$DOCKER_GROUP_NAME"
+fi
+# Add the current user to the group
+sudo usermod -aG "$DOCKER_GROUP_NAME" $RUNNER_USER
+echo "✅ User added to group $DOCKER_GROUP_NAME ($DOCKER_GROUP_ID)"
+
+####
+# GH CLI
+#### 
+
 # Ensure GitHub CLI is authenticated
 echo "🔐 Checking GitHub CLI authentication..."
 if ! gh auth status 2>/dev/null; then
@@ -29,6 +55,10 @@ if [ -z "$GH_RUNNER_TOKEN" ]; then
   exit 1
 fi
 echo "✅ New token obtained successfully!"
+
+####
+# SELF-HOSTED RUNNER
+#### 
 
 # Stop and unregister the old runner
 echo "🛑 Stopping and unregistering the old runner..."

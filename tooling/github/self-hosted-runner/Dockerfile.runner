@@ -40,14 +40,18 @@ RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazeli
     chmod +x bazelisk-linux-amd64 && \
     mv bazelisk-linux-amd64 /usr/local/bin/bazel
 
-# Set environment variables
-ENV RUNNER_USER=runner
-ENV RUNNER_WORKDIR=/home/runner/actions-runner
+# Create a non-root user and add to docker group
+ARG RUNNER_USER=myuser
+ARG USER_UID=1000
+ARG USER_GID=1000
 
-# Create a user and working directory
-RUN useradd -m $RUNNER_USER && mkdir -p $RUNNER_WORKDIR && chown -R $RUNNER_USER:$RUNNER_USER $RUNNER_WORKDIR
-# Add the user to the docker group, so it can use it
-RUN sudo usermod -a -G docker $RUNNER_USER
+RUN groupadd -g $USER_GID $RUNNER_USER && \
+    useradd -m -u $USER_UID -g $USER_GID -s /bin/bash $RUNNER_USER && \
+    usermod -aG docker $RUNNER_USER && \
+    echo "$RUNNER_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+ENV RUNNER_WORKDIR=/home/runner/actions-runner
+RUN mkdir -p $RUNNER_WORKDIR && chown -R $RUNNER_USER:$RUNNER_USER $RUNNER_WORKDIR
 WORKDIR $RUNNER_WORKDIR
 USER $RUNNER_USER
 
