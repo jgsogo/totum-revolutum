@@ -15,6 +15,9 @@ cleanup() {
   echo "Removing runner..."
   ./config.sh remove --token "$GH_RUNNER_TOKEN"
 }
-trap cleanup EXIT
+trap cleanup EXIT SIGTERM SIGINT
 
-exec ./run.sh
+./run.sh &
+
+# Wait for the process to finish (needed for signal handling)
+wait $!
