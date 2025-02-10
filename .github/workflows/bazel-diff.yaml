@@ -70,10 +70,12 @@ jobs:
           whoami
           groups
           docker ps
+          docker run -e POSTGRES_PASSWORD=password postgres:17
 
 
   compute-current-hashes:
     needs:
+      - debugging
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     steps:
