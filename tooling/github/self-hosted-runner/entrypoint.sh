@@ -22,7 +22,7 @@ function wait_for_process () {
 }
 
 echo "🔄 Waiting for docker to be running"
-sudo /usr/bin/dockerd & # TODO: Use supervisor to ensure this command is running
+sudo /usr/bin/dockerd &
 wait_for_process dockerd
 if [ $? -ne 0 ]; then
     echo "❌ dockerd is not running after max time"
@@ -105,3 +105,10 @@ exec sg "$DOCKER_GROUP_NAME" ./run.sh &
 # Wait for the process to finish (needed for signal handling)
 echo "🎉 GitHub self-hosted runner has been updated and restarted!"
 wait $!
+
+
+# TODO:
+# - Use supervisor to ensure that dockerd (line 25) and the GH runner (line 103) are actually running
+# - Clean docker from time to time.
+#   - It might happen that we are not killing all the running images
+#   - Clean docker cache: docker system prune.
