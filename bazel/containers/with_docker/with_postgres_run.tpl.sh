@@ -24,8 +24,7 @@ fi
 function finish {
     "$CONTAINER_CLI" stop %CONTAINER_NAME%
 }
-trap finish EXIT
-trap finish INT  # Capture Ctrl_C (SIGINT)
+trap finish EXIT SIGTERM SIGINT
 
 # Start postgres container
 "$CONTAINER_CLI" run --rm -p 5432 --name=%CONTAINER_NAME% --env-file=%ENV_FILE% -d postgres:%POSTGRES_IMAGE_TAG%
@@ -46,6 +45,7 @@ while ! pg_isready --username=$POSTGRES_USER --dbname=$POSTGRES_DB --host=$CONTA
     exit 1
   fi
   echo "Waiting for PostgreSQL to be ready... Attempt: ${RETRY_COUNT}"
+  echo "--username=$POSTGRES_USER --dbname=$POSTGRES_DB --host=$CONTAINER_HOST --port=$CONTAINER_PORT"
   sleep "${RETRY_INTERVAL}"
 done
 
