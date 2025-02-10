@@ -31,12 +31,6 @@ else
     echo "✅ dockerd is running"
 fi
 
-# Ensure Docker socket is accessible
-if [ ! -S /var/run/docker.sock ]; then
-    echo "❌ Docker socket not found! Make sure to mount it with -v /var/run/docker.sock:/var/run/docker.sock"
-    exit 1
-fi
-
 # Fix permissions if needed
 DOCKER_GROUP_ID=$(stat -c %g /var/run/docker.sock)
 DOCKER_GROUP_NAME=$(getent group "$DOCKER_GROUP_ID" | cut -d: -f1)

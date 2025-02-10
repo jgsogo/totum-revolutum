@@ -58,32 +58,32 @@ jobs:
           echo "commit-message=$(git show -s --format=%s)"
           echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
-  debugging:
-    needs:
-      - check-runner
-    runs-on: ${{ needs.check-runner.outputs.runner-label }}
-    steps:
-      - uses: actions/checkout@v4
+  # debugging:
+  #   needs:
+  #     - check-runner
+  #   runs-on: ${{ needs.check-runner.outputs.runner-label }}
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Detect docker host
-        run: |
-          docker run --rm -p 5432 --name=test-pg-dc -e POSTGRES_PASSWORD=password postgres:17
+  #     - name: Detect docker host
+  #       run: |
+  #         docker run --rm -p 5432 --name=test-pg-dc -e POSTGRES_PASSWORD=password postgres:17
 
-      - name: Docker debugging
-        run: |
-          whoami
-          groups
-          docker ps
-          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
-          echo "build --remote_timeout=10" >> .bazelrc
-          echo "build --remote_upload_local_results" >> .bazelrc
-          bazel test $BAZEL_CONFIG --test_output=streamed //libraries/finances/accounts/rust:tests-postgres
+  #     - name: Docker debugging
+  #       run: |
+  #         whoami
+  #         groups
+  #         docker ps
+  #         echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
+  #         echo "build --remote_timeout=10" >> .bazelrc
+  #         echo "build --remote_upload_local_results" >> .bazelrc
+  #         bazel test $BAZEL_CONFIG --test_output=streamed //libraries/finances/accounts/rust:tests-postgres
 
 
 
   compute-current-hashes:
     needs:
-      - debugging
+      # - debugging
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     steps:
