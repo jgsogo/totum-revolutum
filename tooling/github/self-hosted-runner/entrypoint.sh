@@ -53,7 +53,8 @@ exec sg "$DOCKER_GROUP_NAME" /runner.sh
 
 
 # TODO:
-# - Use supervisor to ensure that dockerd (line 25) and the GH runner (line 103) are actually running
+# - Use supervisor to ensure that dockerd (line 25) and the GH runner (line 52) are actually running
+# - Sometimes, tests timeout because it takes too long to load the docker images in DIND
 # - Clean docker from time to time.
 #   - It might happen that we are not killing all the running images
 #   - Clean docker cache: docker system prune.
