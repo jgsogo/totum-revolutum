@@ -35,7 +35,7 @@ impl Money {
             }));
         }
 
-        let (int_val, scale) = amount.as_bigint_and_scale();
+        let (int_val, scale) = amount.into_bigint_and_scale();
         let (sign, mut digits) = int_val.to_radix_be(10);
         let (integer_part, fractional_part) = if scale <= 0 {
             let scale: usize = scale.unsigned_abs().try_into()?;
@@ -45,11 +45,19 @@ impl Money {
             (integer_part, num_bigint::BigInt::zero())
         } else {
             let scale: usize = scale.try_into()?;
-            let idx = digits.len() - scale;
-            let integer_part = num_bigint::BigInt::from_radix_be(sign, &digits[0..idx], 10)
-                .ok_or(crate::errors::ConversionError::BigIntFromRadix10Error)?;
-            let mut fractional_digits = digits[idx..].to_vec();
-            fractional_digits.resize(NANO_EXP, u8::zero());
+            let (integer_part, fractional_digits) = if digits.len() >= scale {
+                let idx = digits.len() - scale;
+                let integer_part = num_bigint::BigInt::from_radix_be(sign, &digits[0..idx], 10)
+                    .ok_or(crate::errors::ConversionError::BigIntFromRadix10Error)?;
+                let mut fractional_digits = digits[idx..].to_vec();
+                fractional_digits.resize(NANO_EXP, u8::zero());
+                (integer_part, fractional_digits)
+            } else {
+                let integer_part = num_bigint::BigInt::zero();
+                let mut fractional_digits = digits.clone();
+                fractional_digits.resize(NANO_EXP - (scale - digits.len()), u8::zero());
+                (integer_part, fractional_digits)
+            };
             let fractional_part = num_bigint::BigInt::from_radix_be(sign, &fractional_digits, 10)
                 .ok_or(crate::errors::ConversionError::BigIntFromRadix10Error)?;
             (integer_part, fractional_part)
@@ -239,5 +247,23 @@ mod tests {
         assert_eq!(result.0.currency_code, "USD");
         assert_eq!(result.0.units, -1i64);
         assert_eq!(result.0.nanos, 0i32);
+    }
+
+    #[test]
+    fn money_small() {
+        let money = Money::new(BigDecimal::from_str("0.0600").unwrap(), CurrencyCode::EUR).unwrap();
+        assert_eq!(money.0.units, 0i64);
+        assert_eq!(money.0.nanos, 60_000_000i32);
+        assert_eq!(money.amount().to_string(), "0.06");
+
+        let money = Money::new(BigDecimal::from_str("-0.0600").unwrap(), CurrencyCode::EUR).unwrap();
+        assert_eq!(money.0.units, 0i64);
+        assert_eq!(money.0.nanos, -60_000_000i32);
+        assert_eq!(money.amount().to_string(), "-0.06");
+
+        let money = Money::new(BigDecimal::from_str("0000.000600").unwrap(), CurrencyCode::EUR).unwrap();
+        assert_eq!(money.0.units, 0i64);
+        assert_eq!(money.0.nanos, 600_000i32);
+        assert_eq!(money.amount().to_string(), "0.0006");
     }
 }

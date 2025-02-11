@@ -22,6 +22,9 @@ fn test_queries() {
         group_id: None,
     };
 
-    let r = new_transaction.insert_into_db(&mut conn);
-    assert!(r.is_ok());
+    let r1 = new_transaction.insert_into_db(&mut conn);
+    assert!(r1.is_ok(), "Error: {:?}", r1.unwrap_err());
+
+    let r2 = new_transaction.insert_into_db(&mut conn);
+    assert!(r2.is_ok(), "Error: {:?}", r2.unwrap_err());
 }

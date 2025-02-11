@@ -176,31 +176,29 @@ pub(crate) fn get_transaction_details(
         .transpose()?
         .map(|g| TransactionGroupProto::new(g.id, g.name, g.description));
 
-    // let all_movements = finances_investments::sql::queries::all_movements_for_transaction_id(t.id, conn)?
-    //     .into_iter()
-    //     .map(|mov| {
-    //         let account = main_context.find_account(mov.account_id()).ok_or(Error::Other(format!(
-    //             "Cannot find account pk '{}' for movement",
-    //             mov.account_id()
-    //         )))?;
+    let all_movements = finances_investments::sql::queries::all_movements_for_transaction_id(t.id, conn)?
+        .into_iter()
+        .map(|mov| {
+            let account = main_context.find_account(mov.account_id()).ok_or(Error::Other(format!(
+                "Cannot find account pk '{}' for movement",
+                mov.account_id()
+            )))?;
 
-    //         let mov = movement_into_model_movement(mov, account, &main_context, None, conn)?;
-    //         let direction = mov.direction()?;
-    //         Ok((mov, direction))
-    //     })
-    //     .collect::<Result<Vec<_>>>()?;
-    // let (movements_from, movements_to): (Vec<_>, Vec<_>) = all_movements
-    //     .into_iter()
-    //     .partition(|(_, direction)| direction == &MovementDirection::out());
+            let mov = movement_into_model_movement(mov, account, &main_context, Some(t.id), conn)?;
+            let direction = mov.direction()?;
+            Ok((mov, direction))
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let (movements_from, movements_to): (Vec<_>, Vec<_>) = all_movements
+        .into_iter()
+        .partition(|(_, direction)| direction == &MovementDirection::out());
 
     Ok::<_, Error>(TransactionProto::new(
         Some(t.id),
         t.name,
         t.description,
         group,
-        Vec::new(),
-        Vec::new(),
-        // movements_from.into_iter().map(|(mov, _)| mov).collect(),
-        // movements_to.into_iter().map(|(mov, _)| mov).collect(),
+        movements_from.into_iter().map(|(mov, _)| mov).collect(),
+        movements_to.into_iter().map(|(mov, _)| mov).collect(),
     ))
 }

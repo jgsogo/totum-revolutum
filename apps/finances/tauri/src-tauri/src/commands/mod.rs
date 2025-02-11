@@ -206,7 +206,9 @@ pub fn movement_into_model_movement(
             "Movement type 'pk={}' not found in main context",
             v.type_id()
         )))?;
+
     let direction: MovementDirectionProto = v.direction().into();
+
     let fx = v
         .fx_id()
         .map(|v| {
