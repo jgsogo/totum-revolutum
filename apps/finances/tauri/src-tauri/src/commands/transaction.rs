@@ -149,7 +149,6 @@ pub async fn get_transaction(
 
     let mut conn = pool.get().expect("Get a connection from the Pool");
 
-    // Get the last transactions involving the given account and direction
     let transaction = TransactionDb::all()
         .inner_join(finances_accounts::schema::finances_accounts_movement::table)
         .select(TransactionDb::as_select())
