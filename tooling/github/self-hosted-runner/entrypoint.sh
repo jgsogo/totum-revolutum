@@ -47,7 +47,9 @@ echo "✅ User added to group $DOCKER_GROUP_NAME ($DOCKER_GROUP_ID)"
 # EXECUTE THE RUNNER
 ####
 
-/runner.sh
+DOCKER_GROUP_ID=$(stat -c %g /var/run/docker.sock)
+DOCKER_GROUP_NAME=$(getent group "$DOCKER_GROUP_ID" | cut -d: -f1)
+exec sg "$DOCKER_GROUP_NAME" /runner.sh
 
 
 # TODO:

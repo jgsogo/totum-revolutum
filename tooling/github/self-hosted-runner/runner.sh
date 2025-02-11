@@ -59,9 +59,7 @@ cleanup() {
 trap cleanup EXIT SIGTERM SIGINT
 
 echo "🔄 Starting runner manually..."
-DOCKER_GROUP_ID=$(stat -c %g /var/run/docker.sock)
-DOCKER_GROUP_NAME=$(getent group "$DOCKER_GROUP_ID" | cut -d: -f1)
-exec sg "$DOCKER_GROUP_NAME" ./run.sh &
+./run.sh &
 
 # Wait for the process to finish (needed for signal handling)
 echo "🎉 GitHub self-hosted runner has been updated and restarted!"
