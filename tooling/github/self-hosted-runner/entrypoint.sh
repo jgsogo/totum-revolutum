@@ -22,6 +22,8 @@ function wait_for_process () {
 }
 
 echo "🔄 Waiting for docker to be running"
+sudo rm -f /var/run/docker.sock
+sudo rm -f /var/run/docker.pid
 sudo /usr/bin/dockerd &
 wait_for_process dockerd
 if [ $? -ne 0 ]; then
