@@ -1,4 +1,5 @@
 .DS_Store
+actions-runner/
 apps/finances/tauri/models/node_modules/
 apps/finances/tauri/node_modules/
 libraries/googleapis/node_modules/

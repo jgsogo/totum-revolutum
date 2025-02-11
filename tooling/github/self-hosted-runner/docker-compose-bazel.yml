@@ -1,0 +1,39 @@
+services:
+  runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.runner
+    privileged: true  # We need this to run docker-in-docker
+    user: "1000:1000"  # Ensure user matches the created user
+    # image: ghcr.io/actions/actions-runner:latest
+    container_name: github-runner
+    hostname: github-runner-docker-compose
+    restart: unless-stopped
+    environment:
+      - RUNNER_USER=myuser
+      - GH_REPO_URL=${GH_REPO_URL}
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPO=${GITHUB_REPO}
+      # - GH_RUNNER_TOKEN=${GH_RUNNER_TOKEN} # Pass via .env or CLI
+      - GITHUB_TOKEN=${GITHUB_TOKEN} # We are using it for token renewal
+    volumes:
+      - runner-data:/home/runner/actions-runner
+    depends_on:
+      - bazel-remote
+
+
+  bazel-remote:
+    image: buchgr/bazel-remote-cache:latest
+    container_name: bazel-remote
+    restart: unless-stopped
+    volumes:
+      - bazel-cache:/data
+    environment:
+      - BAZEL_REMOTE_MAX_SIZE=${BAZEL_REMOTE_MAX_SIZE:-10} # Default to 10GB if not set
+    ports:
+      - "9092:9092"  # gRPC server on port 9092
+      - "9090:8080"  # HTTP server on port 8080, exposed to 9090
+
+volumes:
+  runner-data:
+  bazel-cache:

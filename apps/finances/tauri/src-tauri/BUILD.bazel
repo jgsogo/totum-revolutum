@@ -120,6 +120,9 @@ with_postgres_test(
         "SQL_HOST": "POSTGRES_HOST",
         "SQL_PORT": "POSTGRES_PORT",
     },
+    tags = [
+        "no-sandbox",  # The tauri-plugin-log generates some output files.
+    ],
 )
 
 # TODO: Add targets to generate docs and to doc-testing

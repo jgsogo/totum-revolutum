@@ -96,8 +96,8 @@ serde_repr = "0.1.19"
 serde_yaml = "0.9.34"
 sha256 = { version = "1.5" }
 similar-asserts = "1.6.1"
-strum = "0.26.3"
-strum_macros = "0.26.2"
+strum = "0.27.0"
+strum_macros = "0.27.0"
 syn = { version = "2.0.98", features = ["visit"] }
 tauri-build = { version = "2.0.3", features = [] }
 tauri = { version = "2.1.1", features = [] }
@@ -108,7 +108,7 @@ thiserror = "2.0.11"
 time = { version = "0.3.36" }
 tokio = { version = "1.40" }
 tokio-stream = "0.1.15"
-toml = "0.8.19"
+toml = "0.8.20"
 # tonic = {version = "0.12.3", features = ["transport"]}
 # tonic-build = "0.12.3"
 tracing = { version = "0.1.40" }

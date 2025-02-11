@@ -16,6 +16,8 @@ on:
 
 env:
   BAZEL_CONFIG: "--config=ci"
+  BAZEL_REMOTE_CACHE_URL: "grpc://bazel-remote:9092"
+  BAZEL_DISK_CACHE_PATH: "~/.cache/bazel-disk-cache"
 
 jobs:
   # This job will find out if any self-hosted runner is available and return it
@@ -56,10 +58,50 @@ jobs:
           echo "commit-message=$(git show -s --format=%s)"
           echo "commit-message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
+  compute-current-hashes:
+    needs:
+      # - debugging
+      - check-runner
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Bazel
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cache/bazel-disk-cache
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel.lock', 'Cargo.lock', 'pnpm-lock.yaml', 'bazel/third_party/requirements.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
+      - name: Configure disk-cache
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        run: |
+          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+
+      - name: Configure bazel-remote
+        if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
+        run: |
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
+          echo "build --remote_timeout=10" >> .bazelrc
+          echo "build --remote_upload_local_results" >> .bazelrc
+
+      - name: Generate hashes from current
+        run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
+
+      - name: Save current-hashes as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: current-hashes.json
+          path: ${{ runner.temp }}/current-hashes.json
+
   compute-base-hashes:
     needs:
       - head_commit_message
       - check-runner
+      - compute-current-hashes
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     steps:
@@ -81,13 +123,26 @@ jobs:
           git worktree add ${{ runner.temp }}/base $(git rev-parse HEAD^)
 
       - name: Cache Bazel
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         uses: actions/cache/restore@v4
         with:
           path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('${{ runner.temp }}/.bazelversion', '${{ runner.temp }}/.bazelrc', '${{ runner.temp }}/MODULE.bazel') }}
+            ~/.cache/bazel-disk-cache
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel.lock', 'Cargo.lock', 'pnpm-lock.yaml', 'bazel/third_party/requirements.lock') }}
           restore-keys: |
             ${{ runner.os }}-bazel-
+
+      - name: Configure disk-cache
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        run: |
+          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+
+      - name: Configure bazel-remote
+        if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
+        run: |
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
+          echo "build --remote_timeout=10" >> .bazelrc
+          echo "build --remote_upload_local_results" >> .bazelrc
 
       - name: Generate hashes from base
         run: |
@@ -102,89 +157,39 @@ jobs:
           name: base-hashes.json
           path: ${{ runner.temp }}/base-hashes.json
 
-  compute-current-hashes:
-    needs:
-      - check-runner
-    runs-on: ${{ needs.check-runner.outputs.runner-label }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Cache Bazel
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          restore-keys: |
-            ${{ runner.os }}-bazel-
-
-      - name: Generate hashes from current
-        run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
-
-      - name: Save current-hashes as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: current-hashes.json
-          path: ${{ runner.temp }}/current-hashes.json
-
-  compute-diff:
-    needs:
-      - head_commit_message
-      - check-runner
-      - compute-base-hashes
-      - compute-current-hashes
-    runs-on: ${{ needs.check-runner.outputs.runner-label }}
-    if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: base-hashes.json
-          path: ${{ runner.temp }}/
-
       - uses: actions/download-artifact@v4
         with:
           name: current-hashes.json
           path: ${{ runner.temp }}/
-
-      - name: Cache Bazel
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-bazel-
 
       - name: Compute impacted targets
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
 
       - name: Save impacted-targets as an artifact
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         uses: actions/upload-artifact@v4
         with:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/impacted-targets.txt
 
   # Run the tests in a Github runner
-  run-tests-github:
+  run-impacted-tests:
     needs:
       - head_commit_message
-      - compute-diff
       - check-runner
-    if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
+      - compute-base-hashes
+    if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     services:
       docker:
-        image: docker:dind
+        image: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' && 'docker:dind' || '' }}
         options: --privileged --shm-size=2g
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
       - uses: actions/checkout@v4
+
       - name: Install requirements for Tauri v2
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
         run: |
           sudo apt-get update
@@ -200,22 +205,34 @@ jobs:
             librsvg2-dev
 
       - name: Cache Bazel
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-bazel-
+            ~/.cache/bazel-disk-cache
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel.lock', 'Cargo.lock', 'pnpm-lock.yaml', 'bazel/third_party/requirements.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
+      - name: Configure disk-cache
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        run: |
+          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+          echo "test --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+
+      - name: Configure bazel-remote
+        if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
+        run: |
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
+          echo "build --remote_timeout=10" >> .bazelrc
+          echo "build --remote_upload_local_results" >> .bazelrc
 
       - uses: actions/download-artifact@v4
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         with:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/
 
       - name: Test impacted targets
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           impacted_targets=()
           IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
@@ -228,17 +245,6 @@ jobs:
           set +e
           # Run all the tests (except manual ones)
           bazel test $BAZEL_CONFIG --test_tag_filters=-manual $one_liner
-
-          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
-          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
-
-      - name: Test all targets
-        if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
-        run: |
-          # Do not fail for next command
-          set +e
-          # Run all the tests
-          bazel test $BAZEL_CONFIG //...
 
           # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
           err=$? ; if (( $err != 4 )) ; then exit $err ; fi
@@ -248,52 +254,70 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: bazel build $BAZEL_CONFIG //docs
 
+      # # Clean the build cache before storing it again. We can skip this step if there was a cache-hit, as it won't cache it.
+      # # FIXME: It takes too long to build the binary!!!
+      # - name: Clean Bazel disk-cache
+      #   if: steps.cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     git clone --depth 1 https://github.com/bazelbuild/bazel.git bazel-gc
+      #     cd bazel-gc
+      #     bazel run //src/tools/diskcache:gc -- --disk_cache=~/.cache/bazel-disk-cache --max_size=2GB
 
-  run-tests-self-hosted:
+  run-all-tests:
     needs:
       - head_commit_message
-      - compute-diff
       - check-runner
-    if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' && always() && !failure() && !cancelled() }} # when none of the needed jobs fail or are cancelled (skipped or successful jobs are ok).
+    if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    services:
+      docker:
+        image: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' && 'docker:dind' || '' }}
+        options: --privileged --shm-size=2g
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install requirements for Tauri v2
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
       - name: Cache Bazel
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/bazel
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-bazel-
+            ~/.cache/bazel-disk-cache
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel.lock', 'Cargo.lock', 'pnpm-lock.yaml', 'bazel/third_party/requirements.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
 
-      - uses: actions/download-artifact@v4
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
-        with:
-          name: impacted-targets.txt
-          path: ${{ runner.temp }}/
-
-      - name: Test impacted targets
-        if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
+      - name: Configure disk-cache
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         run: |
-          impacted_targets=()
-          IFS=$'\n' read -d '' -r -a impacted_targets < ${{ runner.temp }}/impacted-targets.txt || true
-          formatted_impacted_targets=$(IFS=$'\n'; echo "${impacted_targets[*]}")
+          echo "build --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
+          echo "test --disk_cache=~/.cache/bazel-disk-cache" >> .bazelrc
 
-          # Get the list of targets in a single line
-          one_liner="${formatted_impacted_targets//$'\n'/ }"
-
-          # Do not fail for next command
-          set +e
-          # Run all the tests (except manual ones)
-          bazel test $BAZEL_CONFIG --test_tag_filters=-manual $one_liner
-
-          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
-          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+      - name: Configure bazel-remote
+        if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
+        run: |
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> .bazelrc
+          echo "build --remote_timeout=10" >> .bazelrc
+          echo "build --remote_upload_local_results" >> .bazelrc
 
       - name: Test all targets
-        if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
         run: |
           # Do not fail for next command
           set +e
