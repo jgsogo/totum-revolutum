@@ -1,7 +1,17 @@
 <script lang="ts">
-  import { Card, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
-  import { Snapshot, Movement } from "../../../models/src-js";
+  import {
+    Card,
+    Spinner,
+    Table,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
+    TableHead,
+    TableHeadCell,
+  } from "flowbite-svelte";
+  import { Snapshot, Movement, Transaction } from "../../../models/src-js";
   import { sort_date_wrapper } from "../../../../../../libraries/googleapis/src-js/date";
+  import { get_transaction } from "$lib/commands";
 
   let { snapshots, movements }: { snapshots: Snapshot[]; movements: Movement[] } = $props();
 
@@ -26,7 +36,6 @@
       {#each entries as entry}
         {#if entry instanceof Snapshot}
           <TableBodyRow class={class_row_snapshot}>
-            <!-- FIXME: Dates from the backend arrive in "User-local", but without timezone info -->
             <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell></TableBodyCell>
@@ -34,14 +43,21 @@
             <TableBodyCell></TableBodyCell>
           </TableBodyRow>
         {:else}
-          <!-- TODO: On click, we can show the information about the Transaction this movement belongs to. There is an example in the official Flowbite documentation about Table component (https://flowbite-svelte.com/docs/components/table#Click_and_double-click_on_row) -->
           <TableBodyRow class={class_row_movement}>
-            <!-- FIXME: Dates from the backend arrive in "User-local", but without timezone info -->
             <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell>{entry.direction()}</TableBodyCell>
             <TableBodyCell>{entry.type()}</TableBodyCell>
             <TableBodyCell>{entry.amount()}</TableBodyCell>
-            <TableBodyCell>{entry.transaction_name()}</TableBodyCell>
+            {#await get_transaction(entry.transaction_pk()!)}
+              <TableBodyCell><Spinner /></TableBodyCell>
+            {:then transaction: Transaction}
+              <!-- TODO: On click, we can show the information about the Transaction this movement belongs to. There is an example in the official Flowbite documentation about Table component (https://flowbite-svelte.com/docs/components/table#Click_and_double-click_on_row) -->
+              <TableBodyCell>
+                {transaction.name()} ({transaction.movements_from().length} - {transaction.movements_to().length})
+              </TableBodyCell>
+            {:catch e}
+              <TableBodyCell>{e}</TableBodyCell>
+            {/await}
           </TableBodyRow>
         {/if}
       {/each}

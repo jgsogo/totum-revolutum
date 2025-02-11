@@ -59,6 +59,7 @@ pub fn create_app<R: tauri::Runtime>(
             // Sending data
             commands::snapshot::create_snapshot,
             commands::transaction::create_transaction,
+            commands::transaction::get_transaction,
             //
             commands::last_transactions::past_transactions,
         ])

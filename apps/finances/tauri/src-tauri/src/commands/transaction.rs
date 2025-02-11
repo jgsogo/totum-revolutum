@@ -1,3 +1,4 @@
+use super::movement_into_model_movement;
 use crate::types::ConnectionType;
 use crate::{Error, Result};
 use bigdecimal::BigDecimal;
@@ -5,10 +6,15 @@ use bigdecimal::ToPrimitive;
 use bigdecimal::Zero;
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
+use finances_accounts::models::{Transaction as TransactionDb, TransactionGroup as TransactionGroupDb};
+use finances_accounts::sql::filters::{transaction_by_pk, transactiongroup_by_pk};
+use finances_app_models::ProtoWrapper;
 use finances_app_models::{
-    FxQuote as FxQuoteProto, Movement as MovementProto, MovementDirection as MovementDirectionProto,
-    Transaction as TransactionProto,
+    FxQuote as FxQuoteProto, MainContext as MainContextProto, Movement as MovementProto,
+    MovementDirection as MovementDirectionProto, MovementDirection, Transaction as TransactionProto,
+    TransactionGroup as TransactionGroupProto,
 };
+use tauri::ipc::Response;
 use tauri::State;
 
 #[tauri::command]
@@ -131,4 +137,67 @@ fn insert_movement_into_db(
     // Amount in the base currency
     let amount = movement.amount()?;
     Ok(amount.amount())
+}
+
+#[tauri::command]
+pub async fn get_transaction(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+    main_context: State<'_, MainContextProto>,
+    transaction_pk: i64,
+) -> Result<Response> {
+    log::info!("Get transaction details (pk: {})", transaction_pk);
+
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    let transaction = TransactionDb::all()
+        .inner_join(finances_accounts::schema::finances_accounts_movement::table)
+        .select(TransactionDb::as_select())
+        .filter(transaction_by_pk(transaction_pk))
+        .first::<TransactionDb>(&mut conn)?;
+
+    let transaction = get_transaction_details(&mut conn, &main_context, transaction)?;
+    Ok(tauri::ipc::Response::new(transaction.encode_to_vec()))
+}
+
+pub(crate) fn get_transaction_details(
+    conn: &mut PgConnection,
+    main_context: &MainContextProto,
+    t: TransactionDb,
+) -> Result<TransactionProto> {
+    let group = t
+        .group_id
+        .map(|group_id| {
+            finances_accounts::schema::finances_accounts_transactiongroup::table
+                .filter(transactiongroup_by_pk(group_id))
+                .select(TransactionGroupDb::as_select())
+                .first::<TransactionGroupDb>(conn)
+        })
+        .transpose()?
+        .map(|g| TransactionGroupProto::new(g.id, g.name, g.description));
+
+    let all_movements = finances_investments::sql::queries::all_movements_for_transaction_id(t.id, conn)?
+        .into_iter()
+        .map(|mov| {
+            let account = main_context.find_account(mov.account_id()).ok_or(Error::Other(format!(
+                "Cannot find account pk '{}' for movement",
+                mov.account_id()
+            )))?;
+
+            let mov = movement_into_model_movement(mov, account, &main_context, Some(t.id), conn)?;
+            let direction = mov.direction()?;
+            Ok((mov, direction))
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let (movements_from, movements_to): (Vec<_>, Vec<_>) = all_movements
+        .into_iter()
+        .partition(|(_, direction)| direction == &MovementDirection::out());
+
+    Ok::<_, Error>(TransactionProto::new(
+        Some(t.id),
+        t.name,
+        t.description,
+        group,
+        movements_from.into_iter().map(|(mov, _)| mov).collect(),
+        movements_to.into_iter().map(|(mov, _)| mov).collect(),
+    ))
 }

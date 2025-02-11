@@ -69,7 +69,6 @@ describe('Movement dividend', () => {
         expect(movement.pk()).toBeUndefined();
         expect(movement.date_value().toString()).toStrictEqual("2025-02-06");
         expect(movement.transaction_pk()).toBeUndefined();
-        expect(movement.transaction_name()).toBeUndefined();
         expect(movement.type().name()).toBe('mov-type');
         expect(movement.direction()).toBe(MovementDirection.In);
         expect(movement.account_pk()).toBe(0);

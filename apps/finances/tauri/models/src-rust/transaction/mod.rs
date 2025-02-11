@@ -6,7 +6,7 @@ use crate::Movement;
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
-#[derive(ProtoWrapper)]
+#[derive(ProtoWrapper, Debug)]
 pub struct Transaction(crate::protos::finances_app_models::Transaction);
 
 impl Transaction {
