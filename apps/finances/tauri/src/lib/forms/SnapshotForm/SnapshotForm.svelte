@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Input, Label, ButtonGroup, InputAddon, Helper, Alert } from "flowbite-svelte";
+  import { Input, Label, ButtonGroup, InputAddon, Helper } from "flowbite-svelte";
   import Datepicker from "../Datepicker.svelte";
   import type { NewSnapshot } from "./NewSnapshot.svelte";
 

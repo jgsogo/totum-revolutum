@@ -18,4 +18,8 @@ export class Custodian {
     photo(): string | undefined {
         return this.custodian.photo
     }
+
+    as_proto(): CustodianProto {
+        return this.custodian;
+    }
 }

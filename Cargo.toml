@@ -96,8 +96,8 @@ serde_repr = "0.1.19"
 serde_yaml = "0.9.34"
 sha256 = { version = "1.5" }
 similar-asserts = "1.6.1"
-strum = "0.26.3"
-strum_macros = "0.26.2"
+strum = "0.27.0"
+strum_macros = "0.27.0"
 syn = { version = "2.0.98", features = ["visit"] }
 tauri-build = { version = "2.0.3", features = [] }
 tauri = { version = "2.1.1", features = [] }

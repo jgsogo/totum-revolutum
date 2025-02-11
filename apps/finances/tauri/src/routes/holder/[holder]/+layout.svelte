@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "../../../app.css";
+  import "../../../app.postcss";
   import Navbar from "$lib/components/Navbar.svelte";
   import SidebarMenu from "$lib/components/SidebarMenu/SidebarMenu.svelte";
   import type { AppState, Holder, HolderContext, MainContext } from "../../../../models/src-js";

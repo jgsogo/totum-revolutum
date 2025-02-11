@@ -79,6 +79,9 @@ reset: clean build test
 # GH self-hosted runners
 ###
 
+bazel-remote:
+    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --build -d bazel-remote
+
 # Run bazel-remote (cache) and github runner
 gh-runner-linux:
     docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --build -d

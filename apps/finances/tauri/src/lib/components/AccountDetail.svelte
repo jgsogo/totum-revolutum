@@ -1,32 +1,16 @@
 <script lang="ts">
-  import { Avatar, Button, Card, Img, Modal } from "flowbite-svelte";
+  import { Button, Card, Img, Modal } from "flowbite-svelte";
 
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
   import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
   import { goToTransactionCreate } from "$lib/utils";
   import { create_snapshot } from "$lib/commands";
-  import { invalidate } from "$app/navigation";
+
   import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
-  import { type Holder, Account, Snapshot, type Custodian } from "../../../models/src-js";
+  import { type Holder, Account } from "../../../models/src-js";
+  import Avatar from "./Avatar.svelte";
 
-
-  let {
-    holder,
-    account,
-    base_media_url,
-  }: { holder: Holder; account: Account; base_media_url: string } = $props();
-
-  const initials = (custodian: Custodian): string => {
-    let words = custodian.name().split(/\s/);
-    if (words.length == 1) {
-      return custodian.name().substring(0, 3);
-    } else {
-      let acronym = words
-        .map((word) => word.replace("(", ""))
-        .reduce((response, word) => (response += word.slice(0, 1)), "");
-      return acronym.substring(0, 3);
-    }
-  };
+  let { holder, account, base_media_url }: { holder: Holder; account: Account; base_media_url: string } = $props();
 
   let snapshotModal: boolean = $state(false);
   let newSnapshot = $state(new NewSnapshot(account, account.last_snapshot()));
@@ -35,7 +19,6 @@
     if (newSnapshot.isValid()) {
       await create_snapshot(newSnapshot.toMessage());
       // TODO: Handle error if it fails to create the snapshot
-      await invalidate("invalidate:account"); // FIXME: Only binded properties?
       snapshotModal = false;
     }
   };
@@ -46,14 +29,7 @@
     <li class="py-3 sm:py-3.5">
       <div class="flex items-center justify-between">
         <div class="flex min-w-0 items-center">
-          {#if account.custodian().photo()}
-            <Img size="w-20" src="{base_media_url}{account.custodian().photo()}" />
-            <!-- <Avatar title={account.custodian.name} src="{base_media_url}{account.custodian.photo}"
-                >{account.custodian.name}</Avatar
-              > -->
-          {:else}
-            <Avatar size="lg" title={account.custodian().name()}>{initials(account.custodian())}</Avatar>
-          {/if}
+          <Avatar photo_url={base_media_url + account.custodian().photo()} name={account.custodian().name()} />
 
           <div class="ml-3">
             <p class="truncate font-medium text-gray-900 dark:text-white">

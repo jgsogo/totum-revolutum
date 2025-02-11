@@ -1,7 +1,9 @@
 import type { TransactionGroup } from "../../../../models/src-js";
 
 import { NewMovement, NewMovementType } from "../MovementForm/NewMovement.svelte";
-import { Account, NewTransaction as NewTransactionModel } from "../../../../models/src-js";
+import { Account, Transaction as TransactionModel } from "../../../../models/src-js";
+import { MovementDirection } from "../../../../models/src-js/movement";
+import { CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
 
 export class NewTransaction {
     name?: string = $state();
@@ -81,10 +83,10 @@ export class NewTransaction {
         this.movements_to.forEach((value) => value.date_value = date);
     }
 
-    toMessage(): NewTransactionModel {
-        let data: NewTransactionModel = new NewTransactionModel(this.name!, this.description, this.transaction_group);
-        this.movements_from.forEach((v) => data.pushFromMovement(v.toMessage()));
-        this.movements_to.forEach((v) => data.pushToMovement(v.toMessage()));
+    toMessage(base_ccy: CurrencyCode): TransactionModel {
+        let data = TransactionModel.create_from(this.name!, this.description, this.transaction_group);
+        this.movements_from.forEach((v) => data.pushFromMovement(v.toMessage(MovementDirection.Out, base_ccy)));
+        this.movements_to.forEach((v) => data.pushToMovement(v.toMessage(MovementDirection.In, base_ccy)));
         return data;
     }
 };

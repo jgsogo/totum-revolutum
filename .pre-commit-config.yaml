@@ -42,7 +42,7 @@ repos:
 
   # Enforce that commit messages allow for later changelog generation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.1.1
+    rev: v4.2.1
     hooks:
       # Requires that commitizen is already installed
       - id: commitizen
@@ -50,7 +50,7 @@ repos:
 
   # Lint and format SQL files
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.3.0
+    rev: 3.3.1
     hooks:
       - id: sqlfluff-lint
       - id: sqlfluff-fix

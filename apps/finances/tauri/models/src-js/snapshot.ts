@@ -1,14 +1,15 @@
 import { Snapshot as SnapshotProto, SnapshotSchema } from "../protos/snapshot_pb.js";
-import { MoneyAmount, NewMoneyAmount } from "./money_amount.js";
+import { MoneyAmount } from "./money_amount.js";
 import { DateWrapper } from "../../../../../libraries/googleapis/src-js/date.js";
 import { create, toBinary } from "@bufbuild/protobuf";
 import { OutgoingMessage } from "./message.js";
 
 
-export class Snapshot {
+export class Snapshot extends OutgoingMessage {
     private readonly proto: SnapshotProto;
 
     constructor(proto: SnapshotProto) {
+        super()
         this.proto = proto;
     }
 
@@ -27,29 +28,15 @@ export class Snapshot {
     account_pk(): number {
         return Number(this.proto.accountPk);
     }
-}
 
-export class NewSnapshot extends OutgoingMessage {
-    private data: SnapshotProto;
-
-    constructor() {
-        super();
-        this.data = create(SnapshotSchema, {});
+    static create_from(account_pk: number, date_value: DateWrapper, money_amount: MoneyAmount): Snapshot {
+        const proto = create(SnapshotSchema, { accountPk: BigInt(account_pk), dateValue: date_value.as_proto(), amount: money_amount.as_proto() });
+        return new Snapshot(proto)
     }
 
     toBinary(): Uint8Array {
-        return toBinary(SnapshotSchema, this.data);
+        return toBinary(SnapshotSchema, this.proto);
     }
 
-    setAccountPk(account_pk: number) {
-        this.data.accountPk = BigInt(account_pk)
-    }
 
-    setDate(date: DateWrapper) {
-        this.data.dateValue = date.as_proto();
-    }
-
-    set_money_amount(money_amount: NewMoneyAmount) {
-        this.data.amount = money_amount.as_proto();
-    }
 }

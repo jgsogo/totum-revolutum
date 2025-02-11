@@ -15,7 +15,7 @@ export class AccountContext {
         this.account_context = account_context;
     }
 
-    static create_from(data: ArrayBuffer): AccountContext {
+    static create_from_array(data: ArrayBuffer): AccountContext {
         const context: AccountContextProto = fromBinary(AccountContextSchema, Buffer.from(data, 0, data.byteLength));
         return new AccountContext(context);
     }
