@@ -2,9 +2,11 @@
 *.sqlite3
 .DS_Store
 .bazelrc.user
+.env
 .idea/
 .svelte-kit/
 __pycache__/
+actions-runner/
 bazel-bin
 bazel-out
 bazel-testlogs
@@ -16,3 +18,4 @@ secret.json
 secrets/
 target/
 test/
+user.bazelrc

@@ -11,8 +11,6 @@ test --verbose_failures --test_output=errors
 common:stamp --workspace_status_command=bazel/workspace_status.sh
 
 build:ci --verbose_failures --show_progress_rate_limit=10
-# In the CI we are not doing incremental builds... and we don't want to keep state
-build:ci --discard_analysis_cache --notrack_incremental_state --nokeep_state_after_build
 build:stamp --stamp
 
 test:ci --verbose_failures --test_output=all --keep_going
