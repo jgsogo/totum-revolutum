@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { Card, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
-  import { Snapshot, Movement } from "../../../models/src-js";
+  import { Card, Spinner, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
+  import { Snapshot, Movement, Transaction } from "../../../models/src-js";
   import { sort_date_wrapper } from "../../../../../../libraries/googleapis/src-js/date";
+  import { get_transaction } from "$lib/commands";
 
   let { snapshots, movements }: { snapshots: Snapshot[]; movements: Movement[] } = $props();
 
@@ -41,7 +42,13 @@
             <TableBodyCell>{entry.direction()}</TableBodyCell>
             <TableBodyCell>{entry.type()}</TableBodyCell>
             <TableBodyCell>{entry.amount()}</TableBodyCell>
-            <TableBodyCell>{entry.transaction_name()}</TableBodyCell>
+            {#await get_transaction(entry.transaction_pk()!)}
+              <TableBodyCell><Spinner /></TableBodyCell>
+            {:then transaction: Transaction}
+              <TableBodyCell>{transaction.name()}</TableBodyCell>
+            {:catch e}
+              <TableBodyCell> {e} </TableBodyCell>
+            {/await}
           </TableBodyRow>
         {/if}
       {/each}

@@ -1,6 +1,5 @@
 import { invoke, } from "@tauri-apps/api/core";
-import { AppState, MainContext, HolderContext, AccountContext, LastTransactionsResponse, LastTransactionsRequest } from "../../models/src-js/index";
-import { Snapshot, Transaction } from "../../models/src-js";
+import { AppState, MainContext, HolderContext, AccountContext, LastTransactionsResponse, LastTransactionsRequest, Snapshot, Transaction } from "../../models/src-js";
 
 /**
  * Returns (a promise to) the app configuration
@@ -45,6 +44,15 @@ export const get_account_context = async (account_pk: number): Promise<AccountCo
 export const get_past_transactions = async (last_transactions_request: LastTransactionsRequest): Promise<LastTransactionsResponse> => {
     const data: ArrayBuffer = await invoke("past_transactions", last_transactions_request.toBinary());
     return LastTransactionsResponse.create_from_array(data);
+}
+
+/**
+ * Returns (a promise to) a transaction, given its pk
+ * @returns {Transaction}
+ */
+export const get_transaction = async (transaction_pk: number): Promise<Transaction> => {
+    const data: ArrayBuffer = await invoke("get_transaction", { transactionPk: transaction_pk });
+    return Transaction.create_from_array(data);
 }
 
 /**

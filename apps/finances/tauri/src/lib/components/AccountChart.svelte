@@ -6,7 +6,7 @@
 
   let dates = snapshots.map((snapshot) => {
     const date_value = new Date(snapshot.date_value().year(), snapshot.date_value().month() - 1, snapshot.date_value().day());
-    let y = snapshot.amount().amount();
+    let y = snapshot.amount().amount().amount();
     return { x: date_value.getTime(), y };
   });
 

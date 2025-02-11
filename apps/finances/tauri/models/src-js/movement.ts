@@ -137,10 +137,6 @@ export class Movement {
         return this.movement.transactionPk ? Number(this.movement.transactionPk) : undefined;
     }
 
-    transaction_name(): string | undefined {
-        return this.movement.transactionName;
-    }
-
     type(): MovementType {
         return new MovementType(this.movement.type!);
     }

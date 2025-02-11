@@ -1,7 +1,8 @@
 import { Transaction as TransactionProto, TransactionGroup as TransactionGroupProto, TransactionSchema } from "../protos/transaction_pb.js";
-import { create, toBinary } from "@bufbuild/protobuf";
-import { OutgoingMessage } from "./message.js";
+import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
+import { IncomingMessageConstructor, OutgoingMessage, staticImplements } from "./message.js";
 import { Movement } from "./movement.js";
+import { Buffer } from 'buffer';
 
 export class TransactionGroup {
     private proto: TransactionGroupProto;
@@ -82,4 +83,10 @@ export class Transaction extends OutgoingMessage {
         this.proto.movementsTo.push(movement.as_proto());
     }
 
+    static create_from_array(data: ArrayBuffer): Transaction {
+        const proto: TransactionProto = fromBinary(TransactionSchema, Buffer.from(data, 0, data.byteLength));
+        return new Transaction(proto);
+    }
+
 }
+staticImplements<IncomingMessageConstructor<Transaction>>(Transaction);
