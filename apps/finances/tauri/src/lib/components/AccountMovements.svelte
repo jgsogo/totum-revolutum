@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     Card,
+    ImagePlaceholder,
     Spinner,
     Table,
     TableBody,
@@ -12,6 +13,8 @@
   import { Snapshot, Movement, Transaction } from "../../../models/src-js";
   import { sort_date_wrapper } from "../../../../../../libraries/googleapis/src-js/date";
   import { get_transaction } from "$lib/commands";
+  import { slide } from "svelte/transition";
+  import TransactionDetailCard from "./TransactionDetailCard.svelte";
 
   let { snapshots, movements }: { snapshots: Snapshot[]; movements: Movement[] } = $props();
 
@@ -21,6 +24,12 @@
 
   let class_row_snapshot = "bg-gray-300 dark:bg-gray-700";
   let class_row_movement = "";
+
+  let openRow: number | null = $state(null);
+
+  const toggleRow = (i: number) => {
+    openRow = openRow === i ? null : i;
+  };
 </script>
 
 <Card size="xl" class="shadow-sm max-w-none">
@@ -33,7 +42,7 @@
       <TableHeadCell>Transaction</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
-      {#each entries as entry}
+      {#each entries as entry, i}
         {#if entry instanceof Snapshot}
           <TableBodyRow class={class_row_snapshot}>
             <TableBodyCell>{entry.date_value()}</TableBodyCell>
@@ -43,22 +52,34 @@
             <TableBodyCell></TableBodyCell>
           </TableBodyRow>
         {:else}
-          <TableBodyRow class={class_row_movement}>
-            <TableBodyCell>{entry.date_value()}</TableBodyCell>
-            <TableBodyCell>{entry.direction()}</TableBodyCell>
-            <TableBodyCell>{entry.type()}</TableBodyCell>
-            <TableBodyCell>{entry.amount()}</TableBodyCell>
-            {#await get_transaction(entry.transaction_pk()!)}
+          {#await get_transaction(entry.transaction_pk()!)}
+            <TableBodyRow class={class_row_movement} on:click={() => toggleRow(i)}>
+              <TableBodyCell>{entry.date_value()}</TableBodyCell>
+              <TableBodyCell>{entry.direction()}</TableBodyCell>
+              <TableBodyCell>{entry.type()}</TableBodyCell>
+              <TableBodyCell>{entry.amount()}</TableBodyCell>
               <TableBodyCell><Spinner /></TableBodyCell>
-            {:then transaction: Transaction}
-              <!-- TODO: On click, we can show the information about the Transaction this movement belongs to. There is an example in the official Flowbite documentation about Table component (https://flowbite-svelte.com/docs/components/table#Click_and_double-click_on_row) -->
+            </TableBodyRow>
+          {:then transaction: Transaction}
+            <TableBodyRow class={class_row_movement} on:click={() => toggleRow(i)}>
+              <TableBodyCell>{entry.date_value()}</TableBodyCell>
+              <TableBodyCell>{entry.direction()}</TableBodyCell>
+              <TableBodyCell>{entry.type()}</TableBodyCell>
+              <TableBodyCell>{entry.amount()}</TableBodyCell>
               <TableBodyCell>
                 {transaction.name()} ({transaction.movements_from().length} - {transaction.movements_to().length})
               </TableBodyCell>
-            {:catch e}
-              <TableBodyCell>{e}</TableBodyCell>
-            {/await}
-          </TableBodyRow>
+            </TableBodyRow>
+            {#if openRow === i}
+              <TableBodyRow>
+                <TableBodyCell colspan="5" class="p-0">
+                  <div class="px-2 py-3" transition:slide={{ duration: 300, axis: "y" }}>
+                    <TransactionDetailCard {transaction}/>
+                  </div>
+                </TableBodyCell>
+              </TableBodyRow>
+            {/if}
+          {/await}
         {/if}
       {/each}
     </TableBody>
