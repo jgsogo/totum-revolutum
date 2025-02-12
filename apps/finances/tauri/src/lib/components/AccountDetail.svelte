@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Card, Img, Modal } from "flowbite-svelte";
+  import { Button, Card, Modal } from "flowbite-svelte";
 
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
   import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";

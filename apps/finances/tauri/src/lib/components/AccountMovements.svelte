@@ -1,7 +1,6 @@
 <script lang="ts">
   import {
     Card,
-    ImagePlaceholder,
     Modal,
     Spinner,
     Table,
@@ -14,7 +13,6 @@
   import { Snapshot, Movement, Transaction, MainContext } from "../../../models/src-js";
   import { sort_date_wrapper } from "../../../../../../libraries/googleapis/src-js/date";
   import { get_transaction } from "$lib/commands";
-  import { slide } from "svelte/transition";
   import TransactionDetailCard from "./TransactionDetailCard.svelte";
 
   let {
