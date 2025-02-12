@@ -2,7 +2,14 @@
   import AccountChart from "$lib/components/AccountChart.svelte";
   import AccountDetail from "$lib/components/AccountDetail.svelte";
   import AccountMovements from "$lib/components/AccountMovements.svelte";
-  import { Account, AccountContext, type AppState, type Holder, type HolderContext } from "../../../../../../../../models/src-js";
+  import {
+    Account,
+    AccountContext,
+    MainContext,
+    type AppState,
+    type Holder,
+    type HolderContext,
+  } from "../../../../../../../../models/src-js";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -15,6 +22,7 @@
   let account_context: AccountContext = data.account_context;
   let account: Account = account_context.account();
 
+  let main_context: MainContext = data.main_context;
 </script>
 
 <div class="mt-px space-y-4">
@@ -22,6 +30,6 @@
     <AccountDetail {holder} base_media_url={app_state.base_media_url()} {account}></AccountDetail>
     <AccountChart {account} snapshots={account_context.snapshots()}></AccountChart>
   </div>
-  <AccountMovements snapshots={account_context.snapshots()} movements={account_context.movements()}
+  <AccountMovements snapshots={account_context.snapshots()} movements={account_context.movements()} {main_context}
   ></AccountMovements>
 </div>

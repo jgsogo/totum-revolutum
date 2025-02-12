@@ -183,7 +183,7 @@ pub(crate) fn get_transaction_details(
                 mov.account_id()
             )))?;
 
-            let mov = movement_into_model_movement(mov, account, &main_context, Some(t.id), conn)?;
+            let mov = movement_into_model_movement(mov, account, main_context, Some(t.id), conn)?;
             let direction = mov.direction()?;
             Ok((mov, direction))
         })

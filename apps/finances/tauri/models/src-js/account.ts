@@ -1,5 +1,6 @@
 import { DateWrapper, CurrencyCode, currency_code_from_str } from "../../../../../libraries/googleapis/src-js/index.js";
 import { AccountCategory as AccountCategoryProto, Account as AccountProto, AccountType as AccountTypeProto } from "../protos/account_pb.js";
+import { Breadcrumb } from "./breadcrumb.js";
 
 import { Custodian } from "./custodian.js";
 import { Snapshot } from "./snapshot.js";
@@ -27,8 +28,8 @@ export class AccountType {
         return this.data.name;
     }
 
-    breadcrumb(): string[] | undefined {
-        return this.data.breadcrumb;
+    breadcrumb(): Breadcrumb | undefined {
+        return this.data.breadcrumb? new Breadcrumb(this.data.breadcrumb) : undefined;
     }
 
     category(): AccountCategory {

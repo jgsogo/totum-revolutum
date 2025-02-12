@@ -70,7 +70,7 @@
   </ul>
 </Card>
 
-<Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose={false}>
+<Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose outsideclose>
   <form>
     <SnapshotForm bind:snapshot={newSnapshot} />
     <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">

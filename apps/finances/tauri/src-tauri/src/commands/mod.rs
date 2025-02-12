@@ -84,7 +84,7 @@ pub async fn get_holder_context(
 
                 // FIXME: We only want the last snapshot
                 let snapshots = get_snapshots(&account, &mut conn)?;
-                let last_snapshot = snapshots.get(0).cloned();
+                let last_snapshot = snapshots.first().cloned();
 
                 Ok::<_, Error>(AccountProto::new(
                     account.id,

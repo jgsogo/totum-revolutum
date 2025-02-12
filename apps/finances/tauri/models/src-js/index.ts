@@ -11,5 +11,6 @@ export { MainContext } from './main_context.js';
 export { MovementType } from './movement_type.js';
 export { TransactionGroup, Transaction } from './transaction.js';
 export { LastTransactionsRequest, LastTransactionsResponse } from './transaction_request.js'
+export { Breadcrumb } from './breadcrumb.js'
 
 export { OutgoingMessage } from './message.js';

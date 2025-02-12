@@ -1,29 +1,30 @@
 import { MovementType as MovementTypeProto } from "../protos/movement_pb.js";
+import { Breadcrumb } from "./breadcrumb.js";
 
 export class MovementType {
-    private readonly movement_type: MovementTypeProto;
+    private readonly data: MovementTypeProto;
 
     constructor(movement_type: MovementTypeProto) {
-        this.movement_type = movement_type;
+        this.data = movement_type;
     }
 
-    toString() : string {
+    toString(): string {
         return this.name()
     }
 
     pk(): number {
-        return Number(this.movement_type.pk);
+        return Number(this.data.pk);
     }
 
     name(): string {
-        return this.movement_type.name
+        return this.data.name
     }
 
-    breadcrumb(): string[] {
-        return this.movement_type.breadcrumb;
+    breadcrumb(): Breadcrumb | undefined {
+        return this.data.breadcrumb ? new Breadcrumb(this.data.breadcrumb) : undefined;
     }
 
     as_proto(): MovementTypeProto {
-        return this.movement_type;
+        return this.data;
     }
 }
