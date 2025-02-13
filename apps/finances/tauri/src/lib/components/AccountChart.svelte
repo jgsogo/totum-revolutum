@@ -1,11 +1,12 @@
 <script lang="ts">
   import { Card, Chart } from "flowbite-svelte";
   import { Account, Snapshot } from "../../../models/src-js";
+  import { dateWrapper2Date } from "$lib/utils";
 
   let { account, snapshots }: { account: Account; snapshots: Snapshot[] } = $props();
 
   let dates = snapshots.map((snapshot) => {
-    const date_value = new Date(snapshot.date_value().year(), snapshot.date_value().month() - 1, snapshot.date_value().day());
+    const date_value = dateWrapper2Date(snapshot.date_value());
     let y = snapshot.amount().amount().amount();
     return { x: date_value.getTime(), y };
   });

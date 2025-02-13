@@ -49,7 +49,7 @@
         new_movement.ex_dividend_date.getDate()
       );
       let snapshot = snapshots?.find((s: Snapshot) => {
-        return sort_date_wrapper(s.dateValue(), ex_dividend_date) <= 0;
+        return sort_date_wrapper(s.date_value(), ex_dividend_date) <= 0;
       });
       console.log("Found snapshot: ", snapshot);
       new_movement.ex_dividend_snapshot = snapshot;
@@ -78,7 +78,6 @@
     {/each}
   </ul>
 
-  <!-- Common fields -->
   <AccountDropdown bind:account={new_movement.account} {all_accounts} on:change={handleDividendDateSnapshot} />
   <MovementTypeDropdown bind:movementtype={new_movement.mov_type} {all_movementtypes} />
   {#if show_date}
@@ -116,9 +115,10 @@
           <span>Ex dividend date</span>
           <Datepicker required bind:value={new_movement.ex_dividend_date} on:select={handleDividendDateSnapshot} />
           <Helper
-            >snapshot @ {new_movement.ex_dividend_snapshot?.dateValue().toString()} ({new_movement.ex_dividend_snapshot
+            >snapshot @ {new_movement.ex_dividend_snapshot?.date_value().toString()} ({new_movement.ex_dividend_snapshot
               ?.amount()
-              .quantity()!} ud.)</Helper
+              .as_numerable()
+              ?.quantity()} ud.)</Helper
           >
         </Label>
         <Label class="ml-4 flex flex-col">

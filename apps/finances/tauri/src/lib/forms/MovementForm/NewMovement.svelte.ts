@@ -1,9 +1,9 @@
-import { toFixedNumber } from "$lib/utils";
+import { dateWrapper2Date, toFixedNumber } from "$lib/utils";
 import { Decimal, Money, type CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
 import { DateWrapper } from "../../../../../../../libraries/googleapis/src-js/date";
 import { Account, MovementType, Snapshot, Movement as MovementModel, MoneyAmountNumerable, MoneyAmountNonNumerable } from "../../../../models/src-js";
-import { FxQuote } from "../../../../models/src-js/fx_quote";
-import { MovementAmount, MovementAmountDividend, type MovementDirection } from "../../../../models/src-js/movement";
+import { FxQuote, FxQuotePair } from "../../../../models/src-js/fx_quote";
+import { MovementAmount, MovementAmountDividend, MovementDirection } from "../../../../models/src-js";
 
 
 export enum NewMovementType {
@@ -37,6 +37,33 @@ export class NewMovement {
         this.account = account;
         this.snapshots = snapshots;
         this.date_value = date_value;
+    }
+
+    static create_from(movement: MovementModel, account: Account): NewMovement {
+        let type = NewMovementType.NonNumerable;
+        if (movement.movement_amount().as_numerable()) {
+            type = NewMovementType.Numerable;
+        } else if (movement.movement_amount().as_non_numerable()) {
+            type = NewMovementType.NonNumerable;
+        } else if (movement.movement_amount().as_dividend()) {
+            type = NewMovementType.Dividend;
+        } else {
+            throw new Error("Movement type not recognized");
+        }
+
+        let date = dateWrapper2Date(movement.date_value());
+        let new_movement = new NewMovement(type, account, date);
+        new_movement.mov_type = movement.type();
+        // new_movement.fx = movement.
+        new_movement.amount = movement.amount().amount();
+        new_movement.quantity = movement.movement_amount().as_numerable()?.quantity().as_number();
+        new_movement.unit_value = movement.movement_amount().as_numerable()?.unit_value().amount();
+        let ex_dividend_date = movement.movement_amount().as_dividend()?.ex_dividend_date();
+        if (ex_dividend_date) {
+            new_movement.ex_dividend_date = dateWrapper2Date(ex_dividend_date);
+        }
+        // new_movement.ex_dividend_snapshot = movement.movement_amount().as_dividend()?.
+        return new_movement;
     }
 
     is_valid(date_required: boolean, base_ccy: string): boolean {
@@ -89,7 +116,8 @@ export class NewMovement {
         let fx_quote = undefined;
         if (this.fx) {
             const fx = Decimal.create_from_number(this.fx);
-            fx_quote = FxQuote.create_from(date_value, base_ccy, this.account!.ccy(), fx);
+            const fx_pair = FxQuotePair.create_from(base_ccy, this.account!.ccy());
+            fx_quote = FxQuote.create_from(date_value, fx_pair, fx);
         }
 
         let amount: MoneyAmountNumerable | MoneyAmountNonNumerable | MovementAmountDividend;

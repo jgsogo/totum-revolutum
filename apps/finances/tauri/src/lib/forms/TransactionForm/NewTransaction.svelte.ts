@@ -1,7 +1,7 @@
-import type { TransactionGroup } from "../../../../models/src-js";
+import type { MainContext, TransactionGroup } from "../../../../models/src-js";
 
 import { NewMovement, NewMovementType } from "../MovementForm/NewMovement.svelte";
-import { Account, Transaction as TransactionModel } from "../../../../models/src-js";
+import { Account, Transaction as TransactionModel, Movement as MovementModel } from "../../../../models/src-js";
 import { MovementDirection } from "../../../../models/src-js/movement";
 import { CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
 
@@ -81,6 +81,21 @@ export class NewTransaction {
     set_date(date: Date) {
         this.movements_from.forEach((value) => value.date_value = date);
         this.movements_to.forEach((value) => value.date_value = date);
+    }
+
+    // Substitutes the existing data with the data from the input transaction
+    take(transaction: TransactionModel, main_context: MainContext) {
+        this.name = transaction.name()
+        this.description = transaction.description()
+        this.transaction_group = transaction.group()
+        this.movements_from = transaction.movements_from().map((mov: MovementModel) => {
+            let account = main_context.find_account(mov.account_pk())!;
+            return NewMovement.create_from(mov, account);
+        });
+        this.movements_to = transaction.movements_to().map((mov: MovementModel) => {
+            let account = main_context.find_account(mov.account_pk())!;
+            return NewMovement.create_from(mov, account);
+        })
     }
 
     toMessage(base_ccy: CurrencyCode): TransactionModel {

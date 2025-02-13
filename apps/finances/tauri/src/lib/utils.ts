@@ -1,4 +1,5 @@
 import { goto } from "$app/navigation";
+import type { DateWrapper } from "../../../../../libraries/googleapis/src-js";
 import type { Holder, Account } from "../../models/src-js";
 
 /**
@@ -44,3 +45,14 @@ export function toFixedNumber(num: number, digits: number = 4, base?: number){
     const pow = Math.pow(base ?? 10, digits);
     return Math.round(num*pow) / pow;
   }
+
+
+/**
+ * Converts the given DateWrapper into a Date
+ *
+ * @param {DateWrapper} date - Number to round
+ * @returns - The the Date object
+ */
+export function dateWrapper2Date(date: DateWrapper) : Date {
+  return new Date(date.year(), date.month() - 1, date.day());
+}

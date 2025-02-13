@@ -8,4 +8,12 @@ export class Breadcrumb {
     toString(): string {
         return this.breadcrumb.join(' / ');
     }
+
+    length(): number {
+        return this.breadcrumb.length
+    }
+
+    slice(start?: number, end?: number): Breadcrumb {
+        return new Breadcrumb( this.breadcrumb.slice(start, end))
+    }
 }

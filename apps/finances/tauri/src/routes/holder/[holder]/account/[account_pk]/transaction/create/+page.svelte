@@ -89,8 +89,17 @@
     <form>
       <ul>
         Reuse past transactions:
-        {#each last_transactions as transaction}
-          <li><p>{transaction.name()}</p></li>
+        {#each last_transactions as last_transaction}
+          <li>
+            <p>{last_transaction.name()}</p>
+            <Button
+              onclick={() => {
+                transaction.take(last_transaction, main_context);
+              }}
+            >
+              Use
+            </Button>
+          </li>
         {/each}
       </ul>
 

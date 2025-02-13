@@ -17,7 +17,7 @@
   } = $props();
 
   let transaction_groups = all_transaction_groups.map((value) => {
-    return { value: value, name: value.name };
+    return { value: value, name: value.name() };
   });
 </script>
 
