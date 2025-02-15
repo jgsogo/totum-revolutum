@@ -36,7 +36,7 @@ export class NewMovement {
         this.type = type;
         this.account = account;
         this.snapshots = snapshots;
-        this.date_value = date_value;
+        this.date_value = date_value ?? new Date();
     }
 
     static create_from(movement: MovementModel, account: Account): NewMovement {

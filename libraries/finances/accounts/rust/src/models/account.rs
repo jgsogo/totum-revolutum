@@ -27,6 +27,12 @@ pub struct Account {
 }
 
 impl Account {
+    /// Returns (a query to) all the [`Account`]s (opened and closed)
+    #[diesel::dsl::auto_type(no_type_alias)]
+    pub fn all_all() -> _ {
+        crate::schema::finances_accounts_account::table
+    }
+
     /// Returns (a query to) all the [`Account`]s (only opened ones)
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn all() -> _ {

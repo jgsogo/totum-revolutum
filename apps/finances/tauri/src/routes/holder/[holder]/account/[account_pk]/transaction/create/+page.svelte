@@ -14,7 +14,7 @@
     type AccountContext,
     type HolderContext,
     Transaction,
-  } from "../../../../../../../../models/src-js/index.js";
+  } from "../../../../../../../../models/src-js";
   import AccountDetail from "$lib/components/AccountDetail.svelte";
 
   /** @type {{ data: import('./$types').PageData }} */
@@ -33,8 +33,7 @@
     ? [
         new NewMovement(
           from_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable,
-          from_account,
-          new Date()
+          from_account
         ),
       ]
     : [];
@@ -42,16 +41,13 @@
     ? [
         new NewMovement(
           to_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable,
-          to_account,
-          new Date()
+          to_account
         ),
       ]
     : [];
 
   let common_date = $state(new Date());
-  let transaction: NewTransaction = $state(
-    new NewTransaction(new Date(), initial_movements_from, initial_movements_to)
-  );
+  let transaction: NewTransaction = $state(new NewTransaction(initial_movements_from, initial_movements_to));
   let show_transaction_date = $state(true);
   let show_individual_dates = $derived(!show_transaction_date);
 
@@ -210,7 +206,7 @@
               Cannot create empty transactions.
             </Alert>
           {/if}
-          {#if transaction.total_from(app_state.base_ccy()) != transaction.total_to(app_state.base_ccy())}
+          {#if !transaction.equal_from_and_to_amount(app_state.base_ccy())}
             <Alert class="mb-6">
               <InfoCircleSolid slot="icon" class="w-5 h-5" />
               <span class="font-medium">Source and target mismatch!</span>

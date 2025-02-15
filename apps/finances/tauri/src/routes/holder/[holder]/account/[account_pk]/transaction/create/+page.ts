@@ -1,6 +1,6 @@
 import { get_past_transactions } from '$lib/commands';
-import { type MainContext, type Account, type Transaction, LastTransactionsRequest } from '../../../../../../../../models/src-js';
-import { MovementDirection } from '../../../../../../../../models/src-js/movement';
+import { type MainContext, type Account, type Transaction, LastTransactionsRequest, MovementDirection } from '../../../../../../../../models/src-js';
+
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ url, parent }) {

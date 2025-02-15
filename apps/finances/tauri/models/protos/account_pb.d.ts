@@ -89,17 +89,22 @@ export declare type Account = Message<"finances_app_models.Account"> & {
   open?: Date;
 
   /**
-   * @generated from field: bool holder_owns_money = 9;
+   * @generated from field: optional google.type.Date close = 9;
+   */
+  close?: Date;
+
+  /**
+   * @generated from field: bool holder_owns_money = 10;
    */
   holderOwnsMoney: boolean;
 
   /**
-   * @generated from field: bool is_numerable = 10;
+   * @generated from field: bool is_numerable = 11;
    */
   isNumerable: boolean;
 
   /**
-   * @generated from field: optional finances_app_models.Snapshot last_snapshot = 11;
+   * @generated from field: optional finances_app_models.Snapshot last_snapshot = 12;
    */
   lastSnapshot?: Snapshot;
 };

@@ -1,9 +1,9 @@
-import type { MainContext, TransactionGroup } from "../../../../models/src-js";
+
 
 import { NewMovement, NewMovementType } from "../MovementForm/NewMovement.svelte";
-import { Account, Transaction as TransactionModel, Movement as MovementModel } from "../../../../models/src-js";
-import { MovementDirection } from "../../../../models/src-js/movement";
+import { Account, Transaction as TransactionModel, Movement as MovementModel, MainContext, TransactionGroup, MovementDirection } from "../../../../models/src-js";
 import { CurrencyCode, Money } from "../../../../../../../libraries/googleapis/src-js";
+
 
 export class NewTransaction {
     name?: string = $state();
@@ -13,7 +13,7 @@ export class NewTransaction {
     movements_from: NewMovement[] = $state([]);
     movements_to: NewMovement[] = $state([]);
 
-    constructor(date_value?: Date, initial_movements_from?: NewMovement[], initial_movements_to?: NewMovement[]) {
+    constructor(initial_movements_from?: NewMovement[], initial_movements_to?: NewMovement[]) {
         this.movements_from = initial_movements_from ?? [];
         this.movements_to = initial_movements_to ?? [];
     }
@@ -46,13 +46,22 @@ export class NewTransaction {
         );
     }
 
+    equal_from_and_to_amount(base_ccy: CurrencyCode): boolean {
+        const total_to = this.total_to(base_ccy);
+        const total_from = this.total_from(base_ccy);
+        if (total_to && total_from) {
+            return total_from.equal(total_to);
+        }
+        return false;
+    }
+
     is_valid(date_required: boolean, base_ccy: CurrencyCode): boolean {
         return (this.name !== undefined &&
             this.movements_from.length > 0 &&
             this.movements_from.every((v) => v.is_valid(!date_required, base_ccy)) &&
             this.movements_to.length > 0 &&
             this.movements_to.every((v) => v.is_valid(!date_required, base_ccy))
-        ) && (this.total_from(base_ccy) === this.total_to(base_ccy))
+        ) && (this.equal_from_and_to_amount(base_ccy));
     }
 
     total_from(base_ccy: CurrencyCode): Money | undefined {

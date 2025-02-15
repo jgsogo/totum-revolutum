@@ -1,13 +1,37 @@
 <script lang="ts">
-  import { Card, Modal, Spinner, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
+  import {
+    Card,
+    Modal,
+    Spinner,
+    Table,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
+    TableHead,
+    TableHeadCell,
+  } from "flowbite-svelte";
   import { Snapshot, Movement, Transaction, MainContext } from "../../../models/src-js";
   import { sort_date_wrapper } from "../../../../../../libraries/googleapis/src-js/date";
   import { get_transaction } from "$lib/commands";
   import TransactionDetailCard from "./TransactionDetailCard.svelte";
 
-  let { snapshots, movements, main_context }: { snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
+  let {
+    snapshots,
+    movements,
+    main_context,
+  }: { snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
 
-  const entries = $derived([...snapshots, ...movements].sort((lhs, rhs) => sort_date_wrapper(rhs.date_value(), lhs.date_value())));
+  // Order together movements and snapshots: more recent items go first, snapshots go first (EOD)
+  const entries = $derived(
+    [...snapshots, ...movements].sort((lhs, rhs) => {
+      const r = sort_date_wrapper(rhs.date_value(), lhs.date_value());
+      if (r === 0) {
+        return rhs instanceof Snapshot ? -1 : lhs instanceof Snapshot ? 1 : 0;
+      } else {
+        return r;
+      }
+    })
+  );
 
   let class_row_snapshot = "bg-gray-300 dark:bg-gray-700";
   let class_row_movement = "";
@@ -54,9 +78,7 @@
               <TableBodyCell>{entry.direction()}</TableBodyCell>
               <TableBodyCell>{entry.type()}</TableBodyCell>
               <TableBodyCell>{entry.amount()}</TableBodyCell>
-              <TableBodyCell>
-                {transaction.name()} ({transaction.movements_from().length} - {transaction.movements_to().length})
-              </TableBodyCell>
+              <TableBodyCell>{transaction.name()}</TableBodyCell>
             </TableBodyRow>
           {/await}
         {/if}

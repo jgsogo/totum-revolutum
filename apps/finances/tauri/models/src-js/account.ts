@@ -29,7 +29,7 @@ export class AccountType {
     }
 
     breadcrumb(): Breadcrumb | undefined {
-        return this.data.breadcrumb? new Breadcrumb(this.data.breadcrumb) : undefined;
+        return this.data.breadcrumb ? new Breadcrumb(this.data.breadcrumb) : undefined;
     }
 
     category(): AccountCategory {
@@ -90,6 +90,10 @@ export class Account {
 
     open(): DateWrapper {
         return new DateWrapper(this.account.open!);
+    }
+
+    close(): DateWrapper | undefined {
+        return this.account.close ? new DateWrapper(this.account.close) : undefined;
     }
 
     last_snapshot(): Snapshot | undefined {

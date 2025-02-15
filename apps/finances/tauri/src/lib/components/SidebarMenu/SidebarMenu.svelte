@@ -1,15 +1,14 @@
 <script lang="ts">
   import { Sidebar, SidebarDropdownWrapper, SidebarGroup, SidebarItem, SidebarWrapper } from "flowbite-svelte";
-  import {
-    AngleDownOutline,
-    AngleUpOutline,
-    GithubSolid,
-    ColumnSolid,
-  } from "flowbite-svelte-icons";
+  import { AngleDownOutline, AngleUpOutline, GithubSolid, ColumnSolid } from "flowbite-svelte-icons";
   import type { SidebarEntry } from "./SidebarEntry";
-  import type { AppState } from "../../../../models/src-js/index";
+  import type { AppState } from "../../../../models/src-js";
 
-  let { menu, drawerHidden = $bindable(), app_state }: { menu: SidebarEntry[]; drawerHidden: boolean, app_state: AppState } = $props();
+  let {
+    menu,
+    drawerHidden = $bindable(),
+    app_state,
+  }: { menu: SidebarEntry[]; drawerHidden: boolean; app_state: AppState } = $props();
 
   const closeDrawer = () => {
     drawerHidden = true;
@@ -46,6 +45,17 @@
   >
     <nav class="divide-y divide-gray-200 dark:divide-gray-700">
       <SidebarGroup ulClass={groupClass} class="mb-3">
+
+
+        SEE TODO in source code
+        <!-- TODO: This menu should contain the list with ALL the accounts from main_context, and here we should provide filters:
+          * show open or closed accounts
+          * show accounts related to some holders (dropdown with checkboxes)
+          * ...
+
+          And the entries in the menú will always be the same: all accounts (satisfying filters), per custodian, investments,...
+          -->
+
         {#each menu as menuItem}
           {#if menuItem.children.length != 0}
             <SidebarDropdownWrapper isOpen={true} label={menuItem.label} class="pr-3">

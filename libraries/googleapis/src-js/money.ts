@@ -32,7 +32,7 @@ export class Money {
 
     static create_from_number(currencyCode: CurrencyCode, amount: number): Money {
         let units = Math.trunc(amount);
-        let decimal_part = (amount - units) * Math.pow(10, 9);
+        let decimal_part = Math.round((amount - units) * Math.pow(10, 9));
         let proto = create(MoneySchema, { currencyCode: currencyCode.toString(), units: BigInt(units), nanos: decimal_part }) as MoneyProto;
         return new Money(proto);
     }
@@ -80,8 +80,8 @@ export class Money {
         return Money.create_from_number(this.currency_code(), this.amount() + other.amount());
     }
 
-    // toBinary(): Uint8Array {
-    //     return toBinary(MoneySchema, this.money);
-    // }
+    equal(other: Money): boolean {
+        return ((this.currency_code() === other.currency_code()) && this.amount() === other.amount());
+    }
 
 }

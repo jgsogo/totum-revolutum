@@ -10,9 +10,7 @@ mod views;
 use crate::types::ConnectionType;
 use diesel::prelude::*;
 use finances_accounts::fields::TreeNodeList;
-use finances_accounts::models::{
-    Account, AccountHolder, AccountHolderRole, AccountType, Custodian, MovementType, TransactionGroup,
-};
+use finances_accounts::models::{Account, AccountHolder, AccountType, Custodian, MovementType, TransactionGroup};
 use finances_accounts::sql::filters::accounttype_by_unique_names;
 use finances_app_models::{
     google_type, Account as AccountProto, AccountCategory as AccountCategoryProto, AccountType as AccountTypeProto,
@@ -124,9 +122,9 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
 
     // All the accounts
     let accounts: Vec<AccountProto> = {
-        // Get all accounts for a given holder
-        let accounts = Account::all()
-            .inner_join(
+        // Get all accounts (opened and closed). This is important because some movements in old transactions might refer to closed accounts
+        let accounts = Account::all_all()
+            .left_join(
                 finances_accounts::schema::finances_accounts_accountholderrole::table
                     .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
             )
@@ -134,15 +132,16 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
             .inner_join(AccountType::all())
             .select((
                 Account::as_select(),
-                AccountHolderRole::as_select(),
+                finances_accounts::schema::finances_accounts_accountholderrole::owns_money.nullable(),
+                // AccountHolderRole::nullable(),
                 Custodian::as_select(),
                 AccountType::as_select(),
             ))
-            .load::<(Account, AccountHolderRole, Custodian, AccountType)>(conn)?;
+            .load::<(Account, Option<bool>, Custodian, AccountType)>(conn)?;
 
         accounts
             .into_iter()
-            .map(|(account, account_holder_role, custodian, account_type)| {
+            .map(|(account, account_holder_role_owns_money, custodian, account_type)| {
                 let account_type = account_types
                     .iter()
                     .find(|&acc_type| acc_type.pk() == account_type.id)
@@ -163,7 +162,8 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
                     account.identifier,
                     account.description,
                     account.open.into(),
-                    account_holder_role.owns_money,
+                    account.close.map(|v| v.into()),
+                    account_holder_role_owns_money.unwrap_or(false), // FIXME: Get the holder
                     account.is_numerable,
                     last_snapshot,
                 ))

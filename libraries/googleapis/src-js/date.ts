@@ -1,7 +1,6 @@
 import { Date as DateProto, DateSchema } from "../protos/google/type/date_pb.js";
 import { create } from "@bufbuild/protobuf";
 
-
 /**
  * Wraps a `google::type::Date` protobuf message.
  *
@@ -25,6 +24,16 @@ export class DateWrapper {
         let proto = create(DateSchema, { year, month, day }) as DateProto;
         return new DateWrapper(proto);
     }
+
+    /**
+     * Creates a new DateWrapper, using local time
+     * @param {Date} date
+     * @returns the DateWrapper object
+     */
+    static create_from_date(date: Date): DateWrapper {
+        return DateWrapper.create_from_yyyy_mm_dd(date.getFullYear(), date.getMonth() + 1, date.getDay());
+    }
+
 
     as_proto(): DateProto {
         return this.date;

@@ -11,7 +11,7 @@ use proto_wrapper::ProtoWrapper;
 use crate::google_type;
 
 #[repr(transparent)]
-#[derive(ProtoWrapper)]
+#[derive(ProtoWrapper, Clone)]
 pub struct Account(crate::protos::finances_app_models::Account);
 
 impl Account {
@@ -25,6 +25,7 @@ impl Account {
         identifier: Option<String>,
         description: Option<String>,
         open: google_type::Date,
+        close: Option<google_type::Date>,
         holder_owns_money: bool,
         is_numerable: bool,
         last_snapshot: Option<Snapshot>,
@@ -38,6 +39,7 @@ impl Account {
             identifier,
             description,
             open: Some(open.into()),
+            close: close.map(|v| v.into()),
             holder_owns_money,
             is_numerable,
             last_snapshot: last_snapshot.map(|v| v.into()),
@@ -86,6 +88,14 @@ impl Account {
             .as_ref()
             .map(google_type::Date::new_ref)
             .ok_or(Error::MissingRequiredField("open".to_string()))
+    }
+
+    pub fn close(&self) -> Result<&google_type::Date> {
+        self.0
+            .close
+            .as_ref()
+            .map(google_type::Date::new_ref)
+            .ok_or(Error::MissingRequiredField("close".to_string()))
     }
 
     pub fn holder_owns_money(&self) -> bool {
