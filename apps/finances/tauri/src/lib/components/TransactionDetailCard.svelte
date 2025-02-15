@@ -36,23 +36,23 @@
       <TableHead class="bg-gray-700 text-gray-50 dark:bg-gray-300 dark:text-gray-950">
         <TableHeadCell>Date</TableHeadCell>
         <TableHeadCell>Account</TableHeadCell>
-        <TableHeadCell>Movement Type</TableHeadCell>
         <TableHeadCell>Out</TableHeadCell>
         <TableHeadCell>In</TableHeadCell>
+        <TableHeadCell>Movement Type</TableHeadCell>
       </TableHead>
       <TableBody tableBodyClass="divide-y">
         {#each movements as mov}
           <TableBodyRow>
             <TableBodyCell>{mov.date_value()}</TableBodyCell>
             <TableBodyCell>{main_context.find_account(mov.account_pk())?.name() ?? mov.account_pk()}</TableBodyCell>
-            <TableBodyCell>{mov.type().breadcrumb()}</TableBodyCell>
             {#if mov.direction() === MovementDirection.Out}
-              <TableBodyCell>{mov.amount()}</TableBodyCell>
-              <TableBodyCell></TableBodyCell>
+            <TableBodyCell>{mov.amount()}</TableBodyCell>
+            <TableBodyCell></TableBodyCell>
             {:else}
-              <TableBodyCell></TableBodyCell>
-              <TableBodyCell>{mov.amount()}</TableBodyCell>
+            <TableBodyCell></TableBodyCell>
+            <TableBodyCell>{mov.amount()}</TableBodyCell>
             {/if}
+            <TableBodyCell>{mov.type().breadcrumb()}</TableBodyCell>
           </TableBodyRow>
         {/each}
       </TableBody>

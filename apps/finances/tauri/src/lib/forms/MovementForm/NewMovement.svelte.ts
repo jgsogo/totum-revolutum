@@ -1,9 +1,6 @@
 import { dateWrapper2Date } from "$lib/utils";
-import { Decimal, Money, type CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
-import { DateWrapper } from "../../../../../../../libraries/googleapis/src-js/date";
-import { Account, MovementType, Snapshot, Movement as MovementModel, MoneyAmountNumerable, MoneyAmountNonNumerable } from "../../../../models/src-js";
-import { FxQuote, FxQuotePair } from "../../../../models/src-js/fx_quote";
-import { MovementAmount, MovementAmountDividend, MovementDirection } from "../../../../models/src-js";
+import { Decimal, Money, type CurrencyCode, DateWrapper } from "../../../../../../../libraries/googleapis/src-js";
+import { Account, MovementType, Snapshot, Movement as MovementModel, MoneyAmountNumerable, MoneyAmountNonNumerable, MovementAmount, MovementAmountDividend, MovementDirection, FxQuote, FxQuotePair } from "../../../../models/src-js";
 
 
 export enum NewMovementType {

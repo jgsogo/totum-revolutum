@@ -5,8 +5,12 @@
   import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
   import Datepicker from "../Datepicker.svelte";
   import { Account, Snapshot, MovementType } from "../../../../models/src-js";
-  import { DateWrapper, sort_date_wrapper } from "../../../../../../../libraries/googleapis/src-js/date";
-  import { ccy_symbol, CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
+  import {
+    ccy_symbol,
+    CurrencyCode,
+    DateWrapper,
+    sort_date_wrapper,
+  } from "../../../../../../../libraries/googleapis/src-js";
 
   let {
     new_movement = $bindable(),

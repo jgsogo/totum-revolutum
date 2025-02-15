@@ -1,7 +1,7 @@
 <script lang="ts">
   import MovementForm from "$lib/forms/MovementForm/MovementForm.svelte";
   import TransactionForm from "$lib/forms/TransactionForm/TransactionForm.svelte";
-  import { Alert, Button, Card, Heading, Secondary, TextPlaceholder } from "flowbite-svelte";
+  import { Alert, Button, Card, Heading, Modal, Secondary, TextPlaceholder } from "flowbite-svelte";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
   import { NewTransaction } from "$lib/forms/TransactionForm/NewTransaction.svelte.js";
   import { NewMovement, NewMovementType } from "$lib/forms/MovementForm/NewMovement.svelte.js";
@@ -17,6 +17,7 @@
     MovementDirection,
   } from "../../../../../../../../models/src-js";
   import AccountDetail from "$lib/components/AccountDetail.svelte";
+  import TransactionDetailCard from "$lib/components/TransactionDetailCard.svelte";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -85,6 +86,13 @@
   };
 
   let card_error_style = "border-red-600 dark:border-red-600";
+
+  let transaction_details_modal: boolean = $state(false);
+  let transaction_details: Transaction | null = $state(null);
+  const showModal = async (details: Transaction) => {
+    transaction_details_modal = true;
+    transaction_details = details;
+  };
 </script>
 
 <div class="mt-px space-y-4">
@@ -114,6 +122,14 @@
                   }}
                 >
                   Use
+                </Button>
+
+                <Button
+                  onclick={() => {
+                    showModal(last_transaction);
+                  }}
+                >
+                  Show
                 </Button>
               </p>
             </li>
@@ -236,3 +252,11 @@
     </form>
   </div>
 </div>
+
+<Modal bind:open={transaction_details_modal} size="xl" class="w-full h-full" autoclose outsideclose>
+  {#if transaction_details}
+    <TransactionDetailCard transaction={transaction_details} {main_context} />
+  {:else}
+    Error: There is no transaction to show!
+  {/if}
+</Modal>
