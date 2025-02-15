@@ -5,7 +5,7 @@
   import { InfoCircleSolid } from "flowbite-svelte-icons";
   import { NewTransaction } from "$lib/forms/TransactionForm/NewTransaction.svelte.js";
   import { NewMovement, NewMovementType } from "$lib/forms/MovementForm/NewMovement.svelte.js";
-  import { create_transaction } from "$lib/commands.js";
+  import { create_transaction, get_past_transactions } from "$lib/commands.js";
   import { goToAccountDetail } from "$lib/utils.js";
   import {
     type MainContext,
@@ -14,6 +14,7 @@
     type AccountContext,
     type HolderContext,
     Transaction,
+    MovementDirection,
   } from "../../../../../../../../models/src-js";
   import AccountDetail from "$lib/components/AccountDetail.svelte";
 
@@ -27,7 +28,6 @@
 
   let from_account: Account | null = data.from_account;
   let to_account: Account | null = data.to_account;
-  let last_transactions: Transaction[] = data.last_transactions;
 
   let initial_movements_from = from_account
     ? [
@@ -71,6 +71,17 @@
     // I need to reset before updating the transaction, otherwise changes are not reflected.
     await transaction.reset();
     await transaction.take(next_transaction, main_context);
+    await transaction.set_date(common_date);
+  };
+
+  const get_last_transactions = async () => {
+    if (from_account) {
+      return await get_past_transactions(from_account.pk(), MovementDirection.Out);
+    }
+    if (to_account) {
+      return await get_past_transactions(to_account.pk(), MovementDirection.In);
+    }
+    return [];
   };
 
   let card_error_style = "border-red-600 dark:border-red-600";
@@ -89,24 +100,26 @@
     >
 
     <form>
-      <ul>
-        Reuse past transactions:
-        {#each last_transactions as last_transaction}
-          <li>
-            <p>
-              {last_transaction.name()}
+      {#await get_last_transactions() then last_transactions}
+        <ul>
+          Reuse past transactions:
+          {#each last_transactions as last_transaction}
+            <li>
+              <p>
+                {last_transaction.name()}
 
-              <Button
-                onclick={() => {
-                  take_transaction(last_transaction);
-                }}
-              >
-                Use
-              </Button>
-            </p>
-          </li>
-        {/each}
-      </ul>
+                <Button
+                  onclick={() => {
+                    take_transaction(last_transaction);
+                  }}
+                >
+                  Use
+                </Button>
+              </p>
+            </li>
+          {/each}
+        </ul>
+      {/await}
 
       <div class="mt-px space-y-4">
         <Card
