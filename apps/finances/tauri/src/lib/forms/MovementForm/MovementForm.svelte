@@ -31,11 +31,9 @@
     }
   }
 
-  const movement_types = Object.keys(NewMovementType)
-    .filter((v) => isNaN(Number(v)))
-    .map((key) => {
-      return { label: key, value: NewMovementType[key] };
-    });
+  // const movement_types = Object.keys(NewMovementType).map((key) => {
+  //   return { label: key, value: key as NewMovementType };
+  // });
 
   async function handleDividendDateSnapshot() {
     if (!new_movement.ex_dividend_date) {
@@ -66,15 +64,27 @@
     }
     return `${total} ${symbol}`;
   });
+
+  // let new_movement_type = $state(movement_types.find((it) => it.label === new_movement.type)?.value)!;
+  // $effect(() => {
+  //   new_movement.type = new_movement_type;
+  // });
+  // let selected = $state();
+
+  const unique_id = "_" + Math.random().toString(36).slice(2, 9);
 </script>
 
 <div class="flex flex-col space-y-6" action="#">
   <!-- Radio button to choose the movement type -->
+  {new_movement.type?.toString()} -
   <ul
     class="items-center w-full rounded-lg border border-gray-200 sm:flex dark:bg-gray-800 dark:border-gray-600 divide-x rtl:divide-x-reverse divide-gray-200 dark:divide-gray-600"
   >
-    {#each movement_types as { label, value }, i}
-      <li class="w-full"><Radio bind:group={new_movement.type} {value} name="hor-list" class="p-3">{label}</Radio></li>
+    {#each Object.values(NewMovementType) as value}
+      <li class="w-full">
+        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3">{value} | {new_movement.type === value}</Radio
+        >
+      </li>
     {/each}
   </ul>
 

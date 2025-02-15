@@ -7,12 +7,12 @@
   import { NewMovement, NewMovementType } from "$lib/forms/MovementForm/NewMovement.svelte.js";
   import { create_transaction } from "$lib/commands.js";
   import { goToAccountDetail } from "$lib/utils.js";
-  import type {
-    MainContext,
-    Account,
-    AppState,
-    AccountContext,
-    HolderContext,
+  import {
+    type MainContext,
+    type Account,
+    type AppState,
+    type AccountContext,
+    type HolderContext,
     Transaction,
   } from "../../../../../../../../models/src-js/index.js";
   import AccountDetail from "$lib/components/AccountDetail.svelte";
@@ -71,6 +71,12 @@
     }
   };
 
+  const take_transaction = async (next_transaction: Transaction) => {
+    // I need to reset before updating the transaction, otherwise changes are not reflected.
+    await transaction.reset();
+    await transaction.take(next_transaction, main_context);
+  };
+
   let card_error_style = "border-red-600 dark:border-red-600";
 </script>
 
@@ -94,7 +100,7 @@
             <p>{last_transaction.name()}</p>
             <Button
               onclick={() => {
-                transaction.take(last_transaction, main_context);
+                take_transaction(last_transaction);
               }}
             >
               Use

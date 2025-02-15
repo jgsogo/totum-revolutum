@@ -27,6 +27,9 @@
   <div>
     {transaction.description()}
   </div>
+  <div>
+    {transaction.group()}
+  </div>
 
   <div>
     <Table noborder class="mt-6 min-w-full divide-y divide-gray-200 dark:divide-gray-600">
@@ -34,8 +37,8 @@
         <TableHeadCell>Date</TableHeadCell>
         <TableHeadCell>Account</TableHeadCell>
         <TableHeadCell>Movement Type</TableHeadCell>
-        <TableHeadCell>In</TableHeadCell>
         <TableHeadCell>Out</TableHeadCell>
+        <TableHeadCell>In</TableHeadCell>
       </TableHead>
       <TableBody tableBodyClass="divide-y">
         {#each movements as mov}
@@ -43,21 +46,7 @@
             <TableBodyCell>{mov.date_value()}</TableBodyCell>
             <TableBodyCell>{main_context.find_account(mov.account_pk())?.name() ?? mov.account_pk()}</TableBodyCell>
             <TableBodyCell>{mov.type().breadcrumb()}</TableBodyCell>
-            {#if mov.direction() == MovementDirection.Out}
-              <TableBodyCell>{mov.amount()}</TableBodyCell>
-              <TableBodyCell></TableBodyCell>
-            {:else}
-              <TableBodyCell></TableBodyCell>
-              <TableBodyCell>{mov.amount()}</TableBodyCell>
-            {/if}
-          </TableBodyRow>
-        {/each}
-        {#each transaction.movements_to() as mov}
-          <TableBodyRow>
-            <TableBodyCell>{mov.date_value()}</TableBodyCell>
-            <TableBodyCell>{main_context.find_account(mov.account_pk())?.name() ?? mov.account_pk()}</TableBodyCell>
-            <TableBodyCell>{mov.type().breadcrumb()}</TableBodyCell>
-            {#if mov.direction() == MovementDirection.Out}
+            {#if mov.direction() === MovementDirection.Out}
               <TableBodyCell>{mov.amount()}</TableBodyCell>
               <TableBodyCell></TableBodyCell>
             {:else}

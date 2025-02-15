@@ -7,9 +7,9 @@ import { MovementAmount, MovementAmountDividend, MovementDirection } from "../..
 
 
 export enum NewMovementType {
-    NonNumerable,
-    Numerable,
-    Dividend,
+    NonNumerable = 'NonNumerable',
+    Numerable = 'Numerable',
+    Dividend = 'Dividend',
 }
 
 export class NewMovement {

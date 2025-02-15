@@ -83,15 +83,25 @@ export class NewTransaction {
         this.movements_to.forEach((value) => value.date_value = date);
     }
 
+    reset() {
+        this.name = undefined;
+        this.description = undefined;
+        this.transaction_group = undefined;
+        this.movements_from.length = 0;
+        this.movements_to.length = 0;
+    }
+
     // Substitutes the existing data with the data from the input transaction
     take(transaction: TransactionModel, main_context: MainContext) {
         this.name = transaction.name()
         this.description = transaction.description()
         this.transaction_group = transaction.group()
+
         this.movements_from = transaction.movements_from().map((mov: MovementModel) => {
             let account = main_context.find_account(mov.account_pk())!;
             return NewMovement.create_from(mov, account);
         });
+
         this.movements_to = transaction.movements_to().map((mov: MovementModel) => {
             let account = main_context.find_account(mov.account_pk())!;
             return NewMovement.create_from(mov, account);
