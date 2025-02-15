@@ -97,14 +97,17 @@
         Reuse past transactions:
         {#each last_transactions as last_transaction}
           <li>
-            <p>{last_transaction.name()}</p>
-            <Button
-              onclick={() => {
-                take_transaction(last_transaction);
-              }}
-            >
-              Use
-            </Button>
+            <p>
+              {last_transaction.name()}
+
+              <Button
+                onclick={() => {
+                  take_transaction(last_transaction);
+                }}
+              >
+                Use
+              </Button>
+            </p>
           </li>
         {/each}
       </ul>
@@ -211,13 +214,13 @@
             <Alert class="mb-6">
               <InfoCircleSolid slot="icon" class="w-5 h-5" />
               <span class="font-medium">Source and target mismatch!</span>
-              Source total is EUR {transaction.total_from(app_state.base_ccy())} while target total is EUR {transaction.total_to(
+              Source total is {transaction.total_from(app_state.base_ccy())} while target total is {transaction.total_to(
                 app_state.base_ccy()
               )}.
             </Alert>
           {/if}
           <Button onclick={submit} disabled={submit_disabled}>
-            Submit (Total: {transaction.total_from(app_state.base_ccy())} EUR)
+            Submit (Total: {transaction.total_from(app_state.base_ccy())})
           </Button>
         </Card>
       </div>

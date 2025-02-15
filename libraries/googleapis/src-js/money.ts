@@ -6,15 +6,15 @@ export enum CurrencyCode {
     USD = "USD",
 }
 
-function ccy_symbol(ccy: CurrencyCode): string {
+export function ccy_symbol(ccy: CurrencyCode): string {
     if (ccy === CurrencyCode.EUR) {
-      return "€";
+        return "€";
     } else if (ccy === CurrencyCode.USD) {
-      return "$";
+        return "$";
     } else {
-      return ccy;
+        return ccy;
     }
-  }
+}
 
 function enumFromStringValue<T>(enm: { [s: string]: T }, value: string): T | undefined {
     return (Object.values(enm) as unknown as string[]).includes(value)
@@ -71,6 +71,13 @@ export class Money {
 
     as_proto(): MoneyProto {
         return this.money;
+    }
+
+    sum(other: Money): Money {
+        if (this.currency_code() != other.currency_code()) {
+            throw new Error(`Cannot sum ${this.currency_code()} with ${other.currency_code()}`);
+        }
+        return Money.create_from_number(this.currency_code(), this.amount() + other.amount());
     }
 
     // toBinary(): Uint8Array {
