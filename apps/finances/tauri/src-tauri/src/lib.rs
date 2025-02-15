@@ -133,7 +133,6 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
             .select((
                 Account::as_select(),
                 finances_accounts::schema::finances_accounts_accountholderrole::owns_money.nullable(),
-                // AccountHolderRole::nullable(),
                 Custodian::as_select(),
                 AccountType::as_select(),
             ))
