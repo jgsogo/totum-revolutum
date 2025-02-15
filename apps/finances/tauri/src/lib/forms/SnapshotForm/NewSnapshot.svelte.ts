@@ -40,12 +40,12 @@ export class NewSnapshot {
         this.cleanErrors();
 
         // Validate date_value
-        let date_value = DateWrapper.create_from_yyyy_mm_dd(this.date_value.getFullYear(), this.date_value.getMonth() + 1, this.date_value.getDate());
+        let date_value = DateWrapper.create_from_date(this.date_value);
         if (sort_date_wrapper(date_value, this.account.open()) < 0) {
             this.error_date_value = "Cannot take an snapshot before the account was opened.";
         }
         let today = new Date();
-        let today_date = DateWrapper.create_from_yyyy_mm_dd(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        let today_date = DateWrapper.create_from_date(today);
         if (sort_date_wrapper(today_date, date_value) < 0) {
             this.error_date_value = "Cannot take an snapshot of the future.";
         }
@@ -69,7 +69,7 @@ export class NewSnapshot {
     }
 
     toMessage(): SnapshotModel {
-        let date_wrapper = DateWrapper.create_from_yyyy_mm_dd(this.date_value.getFullYear(), this.date_value.getMonth() + 1, this.date_value.getDate());
+        let date_wrapper = DateWrapper.create_from_date(this.date_value);
         let money_amount = MoneyAmount.create_from(
             this.account.is_numerable() ?
                 MoneyAmountNumerable.create_from(MoneyModel.create_from_number(this.account.ccy(), this.unit_value!), DecimalModel.create_from_number(this.quantity!)) :

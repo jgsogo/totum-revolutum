@@ -28,11 +28,7 @@
     } else {
       // Get the closest (equal or before) snapshot to the given date
       let snapshots: Snapshot[] = []; // FIXME: Retrieve the snapshosts for this account
-      let ex_dividend_date = DateWrapper.create_from_yyyy_mm_dd(
-        new_movement.ex_dividend_date.getFullYear(),
-        new_movement.ex_dividend_date.getMonth() + 1,
-        new_movement.ex_dividend_date.getDate(),
-      );
+      let ex_dividend_date = DateWrapper.create_from_date(new_movement.ex_dividend_date);
       let snapshot = snapshots?.find((s: Snapshot) => {
         return sort_date_wrapper(s.date_value(), ex_dividend_date) <= 0;
       });
@@ -51,7 +47,9 @@
   >
     {#each Object.values(NewMovementType) as value}
       <li class="w-full">
-        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3">{value} | {new_movement.type === value}</Radio>
+        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3"
+          >{value} | {new_movement.type === value}</Radio
+        >
       </li>
     {/each}
   </ul>

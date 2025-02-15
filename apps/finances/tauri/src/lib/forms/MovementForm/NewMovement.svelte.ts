@@ -113,7 +113,7 @@ export class NewMovement {
 
 
     toMessage(direction: MovementDirection, base_ccy: CurrencyCode): MovementModel {
-        let date_value = DateWrapper.create_from_yyyy_mm_dd(this.date_value!.getFullYear(), this.date_value!.getMonth() + 1, this.date_value!.getDay());
+        let date_value = DateWrapper.create_from_date(this.date_value!);
 
         let fx_quote = undefined;
         if (this.fx) {
@@ -131,7 +131,7 @@ export class NewMovement {
                 amount = MoneyAmountNumerable.create_from(Money.create_from_number(this.account!.ccy(), this.unit_value!), Decimal.create_from_number(this.quantity!));
                 break;
             case NewMovementType.Dividend:
-                let ex_dividend_date = DateWrapper.create_from_yyyy_mm_dd(this.ex_dividend_date!.getFullYear(), this.ex_dividend_date!.getMonth() + 1, this.ex_dividend_date!.getDay());
+                let ex_dividend_date = DateWrapper.create_from_date(this.ex_dividend_date!);
                 const payout = MoneyAmountNumerable.create_from(Money.create_from_number(this.account!.ccy(), this.unit_value!), this.ex_dividend_snapshot!.amount().as_numerable()!.quantity());
                 amount = MovementAmountDividend.create_from(ex_dividend_date, payout);
                 break;

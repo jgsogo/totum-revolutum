@@ -19,7 +19,7 @@ export class DateWrapper {
             throw new Error("Month has to be in the [1, 12] range (1-January, 2-February).");
         }
         if (day < 1 || day > 31) {
-            throw new Error("Day in the range [1-31]");
+            throw new Error(`Day ${day} not in the range [1-31]`);
         }
         let proto = create(DateSchema, { year, month, day }) as DateProto;
         return new DateWrapper(proto);
@@ -31,7 +31,7 @@ export class DateWrapper {
      * @returns the DateWrapper object
      */
     static create_from_date(date: Date): DateWrapper {
-        return DateWrapper.create_from_yyyy_mm_dd(date.getFullYear(), date.getMonth() + 1, date.getDay());
+        return DateWrapper.create_from_yyyy_mm_dd(date.getFullYear(), date.getMonth() + 1, date.getDate());
     }
 
 
