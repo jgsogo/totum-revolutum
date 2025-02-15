@@ -42,17 +42,11 @@
                   <CameraPhotoOutline class="w-4 h-4 mr-1" />
                   Snapshot
                 </button>
-                <button
-                  class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(holder, account, undefined, account)}
-                >
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(holder, account, undefined, account)}>
                   <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
                   Income
                 </button>
-                <button
-                  class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(holder, account, account, undefined)}
-                >
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(holder, account, account, undefined)}>
                   <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
                   Expense
                 </button>
@@ -73,8 +67,6 @@
 <Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose outsideclose>
   <form>
     <SnapshotForm bind:snapshot={newSnapshot} />
-    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">
-      Submit
-    </Button>
+    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">Submit</Button>
   </form>
 </Modal>

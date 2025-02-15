@@ -1,4 +1,4 @@
-import { dateWrapper2Date, toFixedNumber } from "$lib/utils";
+import { dateWrapper2Date } from "$lib/utils";
 import { Decimal, Money, type CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
 import { DateWrapper } from "../../../../../../../libraries/googleapis/src-js/date";
 import { Account, MovementType, Snapshot, Movement as MovementModel, MoneyAmountNumerable, MoneyAmountNonNumerable } from "../../../../models/src-js";
@@ -54,8 +54,10 @@ export class NewMovement {
         let date = dateWrapper2Date(movement.date_value());
         let new_movement = new NewMovement(type, account, date);
         new_movement.mov_type = movement.type();
-        // new_movement.fx = movement.
-        new_movement.amount = movement.amount().amount();
+        if (movement.fx_quote()) {
+            new_movement.fx = movement.fx_quote()?.quote().as_number();
+        }
+        new_movement.amount = movement.movement_amount().amount().amount();
         new_movement.quantity = movement.movement_amount().as_numerable()?.quantity().as_number();
         new_movement.unit_value = movement.movement_amount().as_numerable()?.unit_value().amount();
         let ex_dividend_date = movement.movement_amount().as_dividend()?.ex_dividend_date();
@@ -81,7 +83,7 @@ export class NewMovement {
         }
     }
 
-    total(base_ccy: string): number | undefined {
+    total(base_ccy: CurrencyCode): Money | undefined {
         if (!this.account) return undefined;
 
         let total = 0;
@@ -106,7 +108,7 @@ export class NewMovement {
             if (!this.fx) return undefined;
             total = total / this.fx;
         }
-        return toFixedNumber(total, 4);
+        return Money.create_from_number(base_ccy, total);
     }
 
 

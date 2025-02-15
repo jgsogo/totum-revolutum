@@ -1,23 +1,21 @@
 <script lang="ts">
   import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
-  import type { MainContext, Transaction, Movement } from "../../../models/src-js/index";
+  import type { MainContext, Transaction, Movement, MovementDirection } from "../../../models/src-js";
   import { sort_date_wrapper } from "../../../../../../libraries/googleapis/src-js/date";
-  import { MovementDirection } from "../../../models/src-js/movement";
 
   let { transaction, main_context }: { transaction: Transaction; main_context: MainContext } = $props();
 
-  let movements = [...transaction.movements_from(), ...transaction.movements_to()].sort(
-    (lhs: Movement, rhs: Movement) => {
-      const lhs_date = lhs.date_value()!;
-      const rhs_date = rhs.date_value()!;
-      let v = sort_date_wrapper(lhs_date, rhs_date);
-      if (v === 0) {
-        return lhs.type().breadcrumb()!.toString().localeCompare(rhs.type().breadcrumb()!.toString());
-      } else {
-        return v;
-      }
+  // Order movements by date and type
+  let movements = [...transaction.movements_from(), ...transaction.movements_to()].sort((lhs: Movement, rhs: Movement) => {
+    const lhs_date = lhs.date_value()!;
+    const rhs_date = rhs.date_value()!;
+    let v = sort_date_wrapper(lhs_date, rhs_date);
+    if (v === 0) {
+      return lhs.type().breadcrumb()!.toString().localeCompare(rhs.type().breadcrumb()!.toString());
+    } else {
+      return v;
     }
-  );
+  });
 </script>
 
 <div class="flex flex-col">

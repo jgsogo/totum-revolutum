@@ -6,6 +6,7 @@
   import Datepicker from "../Datepicker.svelte";
   import { Account, Snapshot, MovementType } from "../../../../models/src-js";
   import { DateWrapper, sort_date_wrapper } from "../../../../../../../libraries/googleapis/src-js/date";
+  import { ccy_symbol, CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
 
   let {
     new_movement = $bindable(),
@@ -15,25 +16,11 @@
     all_movementtypes,
   }: {
     new_movement: NewMovement;
-    base_ccy: string;
+    base_ccy: CurrencyCode;
     show_date: boolean;
     all_accounts: Account[];
     all_movementtypes: MovementType[];
   } = $props();
-
-  function ccy_symbol(ccy: string): string {
-    if (ccy === "EUR") {
-      return "€";
-    } else if (ccy === "USD") {
-      return "$";
-    } else {
-      return ccy;
-    }
-  }
-
-  // const movement_types = Object.keys(NewMovementType).map((key) => {
-  //   return { label: key, value: key as NewMovementType };
-  // });
 
   async function handleDividendDateSnapshot() {
     if (!new_movement.ex_dividend_date) {
@@ -44,7 +31,7 @@
       let ex_dividend_date = DateWrapper.create_from_yyyy_mm_dd(
         new_movement.ex_dividend_date.getFullYear(),
         new_movement.ex_dividend_date.getMonth() + 1,
-        new_movement.ex_dividend_date.getDate()
+        new_movement.ex_dividend_date.getDate(),
       );
       let snapshot = snapshots?.find((s: Snapshot) => {
         return sort_date_wrapper(s.date_value(), ex_dividend_date) <= 0;
@@ -53,24 +40,6 @@
       new_movement.ex_dividend_snapshot = snapshot;
     }
   }
-
-  let total_str = $derived.by(() => {
-    let _ = new_movement.ex_dividend_snapshot;
-
-    let total = new_movement.total(base_ccy);
-    let symbol = ccy_symbol(base_ccy);
-    if (total === undefined) {
-      return `- ${symbol}`;
-    }
-    return `${total} ${symbol}`;
-  });
-
-  // let new_movement_type = $state(movement_types.find((it) => it.label === new_movement.type)?.value)!;
-  // $effect(() => {
-  //   new_movement.type = new_movement_type;
-  // });
-  // let selected = $state();
-
   const unique_id = "_" + Math.random().toString(36).slice(2, 9);
 </script>
 
@@ -82,8 +51,7 @@
   >
     {#each Object.values(NewMovementType) as value}
       <li class="w-full">
-        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3">{value} | {new_movement.type === value}</Radio
-        >
+        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3">{value} | {new_movement.type === value}</Radio>
       </li>
     {/each}
   </ul>
@@ -154,7 +122,7 @@
     </div>
 
     <div class="flex flex-col text-left text-xs mt-2">
-      <span class="font-semibold">Total: {total_str}</span>
+      <span class="font-semibold">Total: {new_movement.total(base_ccy)}</span>
     </div>
   {/if}
 </div>

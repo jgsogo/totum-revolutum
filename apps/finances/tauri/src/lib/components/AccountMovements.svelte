@@ -1,29 +1,13 @@
 <script lang="ts">
-  import {
-    Card,
-    Modal,
-    Spinner,
-    Table,
-    TableBody,
-    TableBodyCell,
-    TableBodyRow,
-    TableHead,
-    TableHeadCell,
-  } from "flowbite-svelte";
+  import { Card, Modal, Spinner, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
   import { Snapshot, Movement, Transaction, MainContext } from "../../../models/src-js";
   import { sort_date_wrapper } from "../../../../../../libraries/googleapis/src-js/date";
   import { get_transaction } from "$lib/commands";
   import TransactionDetailCard from "./TransactionDetailCard.svelte";
 
-  let {
-    snapshots,
-    movements,
-    main_context,
-  }: { snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
+  let { snapshots, movements, main_context }: { snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
 
-  const entries = $derived(
-    [...snapshots, ...movements].sort((lhs, rhs) => sort_date_wrapper(rhs.date_value(), lhs.date_value()))
-  );
+  const entries = $derived([...snapshots, ...movements].sort((lhs, rhs) => sort_date_wrapper(rhs.date_value(), lhs.date_value())));
 
   let class_row_snapshot = "bg-gray-300 dark:bg-gray-700";
   let class_row_movement = "";
@@ -75,16 +59,6 @@
               </TableBodyCell>
             </TableBodyRow>
           {/await}
-
-          <!-- {#if openRow === i}
-            <TableBodyRow>
-              <TableBodyCell colspan="5" class="p-0">
-                <div class="px-2 py-3" transition:slide={{ duration: 300, axis: "y" }}>
-                  <TransactionDetailCard {transaction} {holder_context} />
-                </div>
-              </TableBodyCell>
-            </TableBodyRow>
-          {/if} -->
         {/if}
       {/each}
     </TableBody>

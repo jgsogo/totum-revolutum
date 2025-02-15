@@ -3,17 +3,14 @@
   import type { AppState, Holder } from "../../../models/src-js/index";
   import Avatar from "./Avatar.svelte";
 
-  let { all_holders, active_holder, app_state }: { all_holders: Holder[]; active_holder: Holder; app_state: AppState } =
-    $props();
+  let { all_holders, active_holder, app_state }: { all_holders: Holder[]; active_holder: Holder; app_state: AppState } = $props();
 
   let dropdownOpen = $state(false);
   let searchTerm = $state("");
   const people = all_holders.map((h) => {
     return { name: h.name(), holder: h };
   });
-  let filteredItems = $derived(
-    people.filter((person) => person.name.toLowerCase().indexOf(searchTerm?.toLowerCase()) !== -1)
-  );
+  let filteredItems = $derived(people.filter((person) => person.name.toLowerCase().indexOf(searchTerm?.toLowerCase()) !== -1));
 </script>
 
 <button class="ms-3 rounded-full ring-gray-400 focus:ring-4 dark:ring-gray-600">

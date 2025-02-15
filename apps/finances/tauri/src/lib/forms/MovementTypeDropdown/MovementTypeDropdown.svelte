@@ -24,12 +24,4 @@
 </script>
 
 <!-- Common fields -->
-<MultilevelDropdown
-  bind:value={movementtype}
-  items={all_movementtypes}
-  {labelForItem}
-  {equalItems}
-  {groupBy}
-  {labelInGroup}
-  on:change
-/>
+<MultilevelDropdown bind:value={movementtype} items={all_movementtypes} {labelForItem} {equalItems} {groupBy} {labelInGroup} on:change />

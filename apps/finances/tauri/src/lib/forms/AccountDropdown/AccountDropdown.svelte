@@ -22,12 +22,4 @@
 </script>
 
 <!-- Common fields -->
-<MultilevelDropdown
-  bind:value={account}
-  items={all_accounts}
-  {labelForItem}
-  {equalItems}
-  {groupBy}
-  {labelInGroup}
-  on:change
-/>
+<MultilevelDropdown bind:value={account} items={all_accounts} {labelForItem} {equalItems} {groupBy} {labelInGroup} on:change />
