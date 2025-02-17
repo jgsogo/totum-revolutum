@@ -1,28 +1,19 @@
-load("@aspect_rules_py//py:defs.bzl", "py_pytest_main")
 load("@py_deps//:requirements.bzl", "requirement")
-load("@rules_python//python:defs.bzl", "py_test")
+load("//bazel/tools/pytest:defs.bzl", "pytest_test")
 
-py_pytest_main(
-    name = "__test__",
-)
-
-py_test(
+pytest_test(
     name = "tests",
-    srcs = [
-        "__test__.py",
-    ] + glob(["**/*.py"]),
+    srcs = glob(["**/*.py"]),
     data = [
         "//apps/finances/django:app-docker_compose",
         "//apps/finances/django:app-tarball",
         "//bazel/python/django/containers/nginx:nginx-tarball",
     ],
-    main = ":__test__.py",
     tags = [
         "requires-docker",
         "requires-network",
     ],
     deps = [
-        requirement("pytest"),
         requirement("testcontainers"),
     ],
 )

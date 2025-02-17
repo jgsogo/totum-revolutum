@@ -56,7 +56,7 @@ diesel_setup = rule(
             mandatory = False,
         ),
         "_diesel_cli": attr.label(
-            default = Label("@diesel_cli//:diesel_cli"),
+            default = Label("@diesel_cli"),
             allow_single_file = True,
             executable = True,
             cfg = "exec",
@@ -108,7 +108,7 @@ diesel_print_schema = rule(
             default = Label("//bazel/rust/diesel:skip_rustfmt.patch"),
         ),
         "_diesel_cli": attr.label(
-            default = Label("@diesel_cli//:diesel_cli"),
+            default = Label("@diesel_cli"),
             allow_single_file = True,
             executable = True,
             cfg = "exec",

@@ -5,23 +5,23 @@ module(
 )
 
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
-bazel_dep(name = "platforms", version = "0.0.10")
+bazel_dep(name = "platforms", version = "0.0.11")
 
 bazel_dep(name = "rules_python", version = "1.1.0", dev_dependency = True)
 bazel_dep(name = "rules_rust", version = "0.57.1", dev_dependency = True)
 
 bazel_dep(name = "rules_nodejs", version = "6.3.3")
-bazel_dep(name = "aspect_rules_py", version = "1.0.0")
-bazel_dep(name = "rules_oci", version = "2.2.1")
+bazel_dep(name = "aspect_rules_py", version = "1.3.2")
+bazel_dep(name = "rules_oci", version = "2.2.2")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
 
-bazel_dep(name = "rules_java", version = "8.8.0", dev_dependency = True)
+bazel_dep(name = "rules_java", version = "8.9.0", dev_dependency = True)
 bazel_dep(name = "aspect_bazel_lib", version = "2.13.0", dev_dependency = True)
 
 bazel_dep(name = "aspect_rules_js", version = "2.1.3")
-bazel_dep(name = "aspect_rules_ts", version = "3.4.0")
+bazel_dep(name = "aspect_rules_ts", version = "3.5.0")
 
-bazel_dep(name = "rules_uv", version = "0.53.0", dev_dependency = True)
+bazel_dep(name = "rules_uv", version = "0.56.0", dev_dependency = True)
 
 # FIXME: Override rules_rust to add this patch: https://github.com/bazelbuild/rules_rust/pull/3102, required for the protobuf-stuff
 archive_override(
@@ -185,8 +185,8 @@ use_repo(npm, "npm")
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
     name = "pnpm",
-    pnpm_version = "9.15.2",
-    pnpm_version_integrity = "sha512-k+V7ASbw33TOa/8paAOUwLpU7Ecka5zzIfASHY2bsD91CnBfJO3DwRgIU6/XwsO5QZbQo9U9PgadnieT7xHzIQ==",
+    pnpm_version = "10.4.1",
+    pnpm_version_integrity = "sha512-x1O2w616+hOvOI+m2AgDWgCOMOqZk/WMZmPivF/yFnmqg02wlJhxKapNSIuG31f3tjSYGy+CfNysxpjMDPuIrw==",
 )
 
 # Allows developers to use the matching pnpm version, for example:
