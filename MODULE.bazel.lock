@@ -1280,7 +1280,7 @@
         "bzlTransitiveDigest": "zpjNzuG+OyknZCywqTQ2p+Ai4A/nCo91rg3pHHmMRes=",
         "usagesDigest": "hxCbr7UwQLxOdqYISg+qN+vpdLwwo9OfXjhBCGYft9U=",
         "recordedFileInputs": {
-          "@@//bazel/third_party/requirements.lock": "79385aeb517d5a9b6d1432339866261b8f77649e60cbd31c2e0713a949859c07",
+          "@@//bazel/third_party/requirements.lock": "b1ec6673d139bf70e64150fb7824837f5207d243c87d1eed83261c76c4e8163b",
           "@@protobuf+//python/requirements.txt": "983be60d3cec4b319dcab6d48aeb3f5b2f7c3350f26b3a9e97486c37967c73c5",
           "@@rules_fuzzing+//fuzzing/requirements.txt": "ab04664be026b632a0d2a2446c4f65982b7654f5b6851d2f9d399a19b7242a5b",
           "@@rules_python+//tools/publish/requirements_darwin.txt": "095d4a4f3d639dce831cd493367631cd51b53665292ab20194bac2c0c6458fa8",
@@ -1615,19 +1615,6 @@
               "python_interpreter_target": "@@rules_python++python+python_3_13_host//:python",
               "repo": "py_deps_313",
               "requirement": "pytest==8.3.4 --hash=sha256:50e16d954148559c9a74109af1eaf0c945ba2d8f30f0a3d3335edde19788b6f6 --hash=sha256:965370d062bce11e73868e0335abac31b4d3de0e82f4007408d242b4f8610761"
-            }
-          },
-          "py_deps_313_pytest_shard": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@py_deps//{name}:{target}",
-              "extra_pip_args": [
-                "--index-url",
-                "https://pypi.org/simple"
-              ],
-              "python_interpreter_target": "@@rules_python++python+python_3_13_host//:python",
-              "repo": "py_deps_313",
-              "requirement": "pytest-shard==0.1.2 --hash=sha256:407a1df385cebe1feb9b4d2e7eeee8b044f8a24f0919421233159a17c59be2b9 --hash=sha256:b86a967fbfd1c8e50295095ccda031b7e890862ee06531d5142844f4c1d1cd67"
             }
           },
           "py_deps_313_python_dotenv": {
@@ -4211,7 +4198,6 @@
                 "psycopg": "{\"py_deps_313_psycopg\":[{\"version\":\"3.13\"}]}",
                 "py_moneyed": "{\"py_deps_313_py_moneyed\":[{\"version\":\"3.13\"}]}",
                 "pytest": "{\"py_deps_313_pytest\":[{\"version\":\"3.13\"}]}",
-                "pytest_shard": "{\"py_deps_313_pytest_shard\":[{\"version\":\"3.13\"}]}",
                 "python_dotenv": "{\"py_deps_313_python_dotenv\":[{\"version\":\"3.13\"}]}",
                 "requests": "{\"py_deps_313_requests\":[{\"version\":\"3.13\"}]}",
                 "semver": "{\"py_deps_313_semver\":[{\"version\":\"3.13\"}]}",
@@ -4243,7 +4229,6 @@
                 "psycopg",
                 "py_moneyed",
                 "pytest",
-                "pytest_shard",
                 "python_dotenv",
                 "requests",
                 "semver",
