@@ -1,9 +1,9 @@
-import type { TransactionGroup } from "../../../../models/src-js";
+
 
 import { NewMovement, NewMovementType } from "../MovementForm/NewMovement.svelte";
-import { Account, Transaction as TransactionModel } from "../../../../models/src-js";
-import { MovementDirection } from "../../../../models/src-js/movement";
-import { CurrencyCode } from "../../../../../../../libraries/googleapis/src-js";
+import { Account, Transaction as TransactionModel, Movement as MovementModel, MainContext, TransactionGroup, MovementDirection } from "../../../../models/src-js";
+import { CurrencyCode, Money } from "../../../../../../../libraries/googleapis/src-js";
+
 
 export class NewTransaction {
     name?: string = $state();
@@ -13,7 +13,7 @@ export class NewTransaction {
     movements_from: NewMovement[] = $state([]);
     movements_to: NewMovement[] = $state([]);
 
-    constructor(date_value?: Date, initial_movements_from?: NewMovement[], initial_movements_to?: NewMovement[]) {
+    constructor(initial_movements_from?: NewMovement[], initial_movements_to?: NewMovement[]) {
         this.movements_from = initial_movements_from ?? [];
         this.movements_to = initial_movements_to ?? [];
     }
@@ -46,33 +46,42 @@ export class NewTransaction {
         );
     }
 
-    is_valid(date_required: boolean, base_ccy: string): boolean {
+    equal_from_and_to_amount(base_ccy: CurrencyCode): boolean {
+        const total_to = this.total_to(base_ccy);
+        const total_from = this.total_from(base_ccy);
+        if (total_to && total_from) {
+            return total_from.equal(total_to);
+        }
+        return false;
+    }
+
+    is_valid(date_required: boolean, base_ccy: CurrencyCode): boolean {
         return (this.name !== undefined &&
             this.movements_from.length > 0 &&
             this.movements_from.every((v) => v.is_valid(!date_required, base_ccy)) &&
             this.movements_to.length > 0 &&
             this.movements_to.every((v) => v.is_valid(!date_required, base_ccy))
-        ) && (this.total_from(base_ccy) === this.total_to(base_ccy))
+        ) && (this.equal_from_and_to_amount(base_ccy));
     }
 
-    total_from(base_ccy: string): number | undefined {
-        let initial = 0;
-        let total = this.movements_from.reduce((prev: number | undefined, curr: NewMovement) => {
+    total_from(base_ccy: CurrencyCode): Money | undefined {
+        let initial = Money.create_from_number(base_ccy, 0);
+        let total = this.movements_from.reduce((prev: Money | undefined, curr: NewMovement) => {
             if (prev === undefined) return undefined;
             let total_mov = curr.total(base_ccy);
             if (total_mov === undefined) return undefined;
-            return prev + total_mov;
+            return prev.sum(total_mov);
         }, initial);
         return total;
     }
 
-    total_to(base_ccy: string): number | undefined {
-        let initial = 0;
-        let total = this.movements_to.reduce((prev: number | undefined, curr: NewMovement) => {
+    total_to(base_ccy: CurrencyCode): Money | undefined {
+        let initial = Money.create_from_number(base_ccy, 0);
+        let total = this.movements_to.reduce((prev: Money | undefined, curr: NewMovement) => {
             if (prev === undefined) return undefined;
             let total_mov = curr.total(base_ccy);
             if (total_mov === undefined) return undefined;
-            return prev + total_mov;
+            return prev.sum(total_mov);
         }, initial);
         return total;
     }
@@ -81,6 +90,31 @@ export class NewTransaction {
     set_date(date: Date) {
         this.movements_from.forEach((value) => value.date_value = date);
         this.movements_to.forEach((value) => value.date_value = date);
+    }
+
+    reset() {
+        this.name = undefined;
+        this.description = undefined;
+        this.transaction_group = undefined;
+        this.movements_from.length = 0;
+        this.movements_to.length = 0;
+    }
+
+    // Substitutes the existing data with the data from the input transaction
+    take(transaction: TransactionModel, main_context: MainContext) {
+        this.name = transaction.name()
+        this.description = transaction.description()
+        this.transaction_group = transaction.group()
+
+        this.movements_from = transaction.movements_from().map((mov: MovementModel) => {
+            let account = main_context.find_account(mov.account_pk())!;
+            return NewMovement.create_from(mov, account);
+        });
+
+        this.movements_to = transaction.movements_to().map((mov: MovementModel) => {
+            let account = main_context.find_account(mov.account_pk())!;
+            return NewMovement.create_from(mov, account);
+        })
     }
 
     toMessage(base_ccy: CurrencyCode): TransactionModel {

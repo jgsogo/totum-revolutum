@@ -10,8 +10,8 @@ import { FxQuote } from "./fx_quote.js";
 
 
 export enum MovementDirection {
-    In = 0,
-    Out = 1,
+    In = 'In',
+    Out = 'Out',
 }
 
 export class MovementAmountDividend {

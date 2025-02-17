@@ -59,5 +59,9 @@ export class HolderContext {
             return store;
         }, new Map<number, Account[]>())
     }
+
+    find_account(account_pk: number): Account | undefined {
+        return this._accounts.find((account) => account.pk() === account_pk)
+    }
 }
 staticImplements<IncomingMessageConstructor<HolderContext>>(HolderContext);

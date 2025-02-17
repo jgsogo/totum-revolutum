@@ -5,6 +5,7 @@
   import {
     Account,
     AccountContext,
+    MainContext,
     type AppState,
     type Holder,
     type HolderContext,
@@ -20,15 +21,15 @@
 
   let account_context: AccountContext = data.account_context;
   let account: Account = account_context.account();
-  console.log(`account_context: ${JSON.stringify(account_context, (_, v) => typeof v === 'bigint' ? v.toString() : v, "\t")}`);
-  let last_snapshot = account_context.snapshots().at(0);
+
+  let main_context: MainContext = data.main_context;
 </script>
 
 <div class="mt-px space-y-4">
   <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-    <AccountDetail {holder} base_media_url={app_state.base_media_url()} {account} {last_snapshot}></AccountDetail>
+    <AccountDetail {holder} base_media_url={app_state.base_media_url()} {account}></AccountDetail>
     <AccountChart {account} snapshots={account_context.snapshots()}></AccountChart>
   </div>
-  <AccountMovements snapshots={account_context.snapshots()} movements={account_context.movements()}
+  <AccountMovements snapshots={account_context.snapshots()} movements={account_context.movements()} {main_context}
   ></AccountMovements>
 </div>

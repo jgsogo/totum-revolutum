@@ -11,7 +11,7 @@ use crate::types::ConnectionType;
 
 use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
-use finances_accounts::models::{Account, AccountHolder, AccountHolderRole, AccountType, Custodian, Fx};
+use finances_accounts::models::{Account, AccountHolder, Fx};
 use finances_accounts::sql::filters::{accountholder_by_pk, fx_by_pk};
 use finances_app_models::{
     google_type, Account as AccountProto, AccountContext as AccountContextProto, AppState as AppStateProto,
@@ -61,49 +61,23 @@ pub async fn get_holder_context(
                 finances_accounts::schema::finances_accounts_accountholderrole::table
                     .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
             )
-            .inner_join(Custodian::all())
-            .inner_join(AccountType::all())
             .filter(accountholder_by_pk(holder_pk))
-            .select((
-                Account::as_select(),
-                AccountHolderRole::as_select(),
-                Custodian::as_select(),
-                AccountType::as_select(),
-            ))
-            .load::<(Account, AccountHolderRole, Custodian, AccountType)>(&mut conn)?;
+            .select(finances_accounts::schema::finances_accounts_account::id)
+            .load::<i64>(&mut conn)?;
 
         accounts
             .into_iter()
-            .map(|(account, account_holder_role, custodian, account_type)| {
-                let account_type = main_context
-                    .find_account_type(account_type.id)
-                    .ok_or(Error::Other(format!(
-                        "Account type 'pk={}' not found in main context",
-                        account_type.id
-                    )))?;
-
-                // FIXME: We only want the last snapshot
-                let snapshots = get_snapshots(&account, &mut conn)?;
-                let last_snapshot = snapshots.get(0).cloned();
-
-                Ok::<_, Error>(AccountProto::new(
-                    account.id,
-                    account.name,
-                    custodian.into(),
-                    account_type.clone(),
-                    google_type::CurrencyCode::new(&account.ccy)?,
-                    account.identifier,
-                    account.description,
-                    account.open.into(),
-                    account_holder_role.owns_money,
-                    account.is_numerable,
-                    last_snapshot,
-                ))
+            .map(|acc_pk| {
+                let acc = main_context.find_account(acc_pk).ok_or(Error::Other(format!(
+                    "Account with pk={} not found in main context",
+                    acc_pk
+                )))?;
+                Ok(acc)
             })
             .collect::<Result<Vec<_>>>()?
     };
 
-    let context = HolderContextProto::new(acc_holder, accounts);
+    let context = HolderContextProto::new(acc_holder, accounts.into_iter().cloned().collect());
     Ok(Response::new(context.encode_to_vec()))
 }
 
@@ -138,6 +112,7 @@ pub async fn get_account_context(
             account.identifier,
             account.description,
             account.open.into(),
+            account.close.map(|v| v.into()),
             account_holder_role.owns_money,
             account.is_numerable,
             last_snapshot,

@@ -36,9 +36,10 @@ message Account {
   optional string description = 7;
 
   google.type.Date open = 8;
+  optional google.type.Date close = 9;
 
-  bool holder_owns_money = 9;
-  bool is_numerable = 10;
+  bool holder_owns_money = 10;
+  bool is_numerable = 11;
 
-  optional Snapshot last_snapshot = 11;
+  optional Snapshot last_snapshot = 12;
 }

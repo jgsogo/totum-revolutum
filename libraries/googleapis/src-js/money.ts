@@ -6,6 +6,16 @@ export enum CurrencyCode {
     USD = "USD",
 }
 
+export function ccy_symbol(ccy: CurrencyCode): string {
+    if (ccy === CurrencyCode.EUR) {
+        return "€";
+    } else if (ccy === CurrencyCode.USD) {
+        return "$";
+    } else {
+        return ccy;
+    }
+}
+
 function enumFromStringValue<T>(enm: { [s: string]: T }, value: string): T | undefined {
     return (Object.values(enm) as unknown as string[]).includes(value)
         ? value as unknown as T
@@ -22,7 +32,7 @@ export class Money {
 
     static create_from_number(currencyCode: CurrencyCode, amount: number): Money {
         let units = Math.trunc(amount);
-        let decimal_part = (amount - units) * Math.pow(10, 9);
+        let decimal_part = Math.round((amount - units) * Math.pow(10, 9));
         let proto = create(MoneySchema, { currencyCode: currencyCode.toString(), units: BigInt(units), nanos: decimal_part }) as MoneyProto;
         return new Money(proto);
     }
@@ -63,8 +73,15 @@ export class Money {
         return this.money;
     }
 
-    // toBinary(): Uint8Array {
-    //     return toBinary(MoneySchema, this.money);
-    // }
+    sum(other: Money): Money {
+        if (this.currency_code() != other.currency_code()) {
+            throw new Error(`Cannot sum ${this.currency_code()} with ${other.currency_code()}`);
+        }
+        return Money.create_from_number(this.currency_code(), this.amount() + other.amount());
+    }
+
+    equal(other: Money): boolean {
+        return ((this.currency_code() === other.currency_code()) && this.amount() === other.amount());
+    }
 
 }

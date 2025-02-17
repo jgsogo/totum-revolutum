@@ -36,6 +36,15 @@ describe('DateWrapper create_from_yyyy_mm_dd', () => {
 
 });
 
+describe('DateWrapper create_from_date', () => {
+    let value = DateWrapper.create_from_date(new Date(2025, 0, 1));
+
+    test('toString', () => {
+        expect(value.toString()).toBe("2025-01-01");
+    });
+
+});
+
 // describe('DateWrapper from Date UTC-1', () => {
 //     let date = new Date("2025-01-19T00:00:00-0030");
 //     let value = DateWrapper.create_from_date_utc(date);

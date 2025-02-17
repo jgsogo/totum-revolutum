@@ -1,7 +1,6 @@
 import { Date as DateProto, DateSchema } from "../protos/google/type/date_pb.js";
 import { create } from "@bufbuild/protobuf";
 
-
 /**
  * Wraps a `google::type::Date` protobuf message.
  *
@@ -20,11 +19,21 @@ export class DateWrapper {
             throw new Error("Month has to be in the [1, 12] range (1-January, 2-February).");
         }
         if (day < 1 || day > 31) {
-            throw new Error("Day in the range [1-31]");
+            throw new Error(`Day ${day} not in the range [1-31]`);
         }
         let proto = create(DateSchema, { year, month, day }) as DateProto;
         return new DateWrapper(proto);
     }
+
+    /**
+     * Creates a new DateWrapper, using local time
+     * @param {Date} date
+     * @returns the DateWrapper object
+     */
+    static create_from_date(date: Date): DateWrapper {
+        return DateWrapper.create_from_yyyy_mm_dd(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    }
+
 
     as_proto(): DateProto {
         return this.date;

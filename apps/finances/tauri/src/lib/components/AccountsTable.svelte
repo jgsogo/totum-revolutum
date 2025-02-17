@@ -1,22 +1,9 @@
 <script lang="ts">
-  import {
-    Table,
-    TableBody,
-    TableBodyCell,
-    TableBodyRow,
-    TableHead,
-    TableHeadCell,
-    Card,
-    Heading,
-  } from "flowbite-svelte";
+  import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Card, Heading } from "flowbite-svelte";
   import type { Holder, Account } from "../../../models/src-js";
   import { goToAccountDetail } from "$lib/utils";
 
-  let {
-    holder,
-    accounts,
-    show_custodian = true,
-  }: { holder: Holder; accounts: Account[]; show_custodian?: boolean } = $props();
+  let { holder, accounts, show_custodian = true }: { holder: Holder; accounts: Account[]; show_custodian?: boolean } = $props();
 </script>
 
 <Card size="xl" class="shadow-sm max-w-none">
@@ -46,7 +33,7 @@
             {/if}
             <TableBodyCell>{account.name()}</TableBodyCell>
             <TableBodyCell>{account.type().name()}</TableBodyCell>
-            <TableBodyCell>{account.last_snapshot() ? account.last_snapshot()!.amount().amount(): "-"}</TableBodyCell>
+            <TableBodyCell>{account.last_snapshot() ? account.last_snapshot()!.amount().amount() : "-"}</TableBodyCell>
           </TableBodyRow>
         {/each}
       </TableBody>

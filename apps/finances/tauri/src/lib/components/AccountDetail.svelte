@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Card, Img, Modal } from "flowbite-svelte";
+  import { Button, Card, Modal } from "flowbite-svelte";
 
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
   import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
@@ -42,17 +42,11 @@
                   <CameraPhotoOutline class="w-4 h-4 mr-1" />
                   Snapshot
                 </button>
-                <button
-                  class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(holder, account, undefined, account)}
-                >
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(holder, account, undefined, account)}>
                   <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
                   Income
                 </button>
-                <button
-                  class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(holder, account, account, undefined)}
-                >
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(holder, account, account, undefined)}>
                   <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
                   Expense
                 </button>
@@ -70,11 +64,9 @@
   </ul>
 </Card>
 
-<Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose={false}>
+<Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose outsideclose>
   <form>
     <SnapshotForm bind:snapshot={newSnapshot} />
-    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">
-      Submit
-    </Button>
+    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">Submit</Button>
   </form>
 </Modal>

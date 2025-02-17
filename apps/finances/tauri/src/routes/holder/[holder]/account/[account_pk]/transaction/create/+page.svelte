@@ -1,21 +1,23 @@
 <script lang="ts">
   import MovementForm from "$lib/forms/MovementForm/MovementForm.svelte";
   import TransactionForm from "$lib/forms/TransactionForm/TransactionForm.svelte";
-  import { Alert, Button, Card, Heading, Secondary, TextPlaceholder } from "flowbite-svelte";
+  import { Alert, Button, Card, Heading, Modal, Secondary, TextPlaceholder } from "flowbite-svelte";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
   import { NewTransaction } from "$lib/forms/TransactionForm/NewTransaction.svelte.js";
   import { NewMovement, NewMovementType } from "$lib/forms/MovementForm/NewMovement.svelte.js";
-  import { create_transaction } from "$lib/commands.js";
+  import { create_transaction, get_past_transactions } from "$lib/commands.js";
   import { goToAccountDetail } from "$lib/utils.js";
-  import type {
-    MainContext,
-    Account,
-    AppState,
-    AccountContext,
-    HolderContext,
+  import {
+    type MainContext,
+    type Account,
+    type AppState,
+    type AccountContext,
+    type HolderContext,
     Transaction,
-  } from "../../../../../../../../models/src-js/index.js";
+    MovementDirection,
+  } from "../../../../../../../../models/src-js";
   import AccountDetail from "$lib/components/AccountDetail.svelte";
+  import TransactionDetailCard from "$lib/components/TransactionDetailCard.svelte";
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -27,14 +29,12 @@
 
   let from_account: Account | null = data.from_account;
   let to_account: Account | null = data.to_account;
-  let last_transactions: Transaction[] = data.last_transactions;
 
   let initial_movements_from = from_account
     ? [
         new NewMovement(
           from_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable,
-          from_account,
-          new Date()
+          from_account
         ),
       ]
     : [];
@@ -42,16 +42,13 @@
     ? [
         new NewMovement(
           to_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable,
-          to_account,
-          new Date()
+          to_account
         ),
       ]
     : [];
 
   let common_date = $state(new Date());
-  let transaction: NewTransaction = $state(
-    new NewTransaction(new Date(), initial_movements_from, initial_movements_to)
-  );
+  let transaction: NewTransaction = $state(new NewTransaction(initial_movements_from, initial_movements_to));
   let show_transaction_date = $state(true);
   let show_individual_dates = $derived(!show_transaction_date);
 
@@ -71,7 +68,31 @@
     }
   };
 
+  const take_transaction = async (next_transaction: Transaction) => {
+    // I need to reset before updating the transaction, otherwise changes are not reflected.
+    await transaction.reset();
+    await transaction.take(next_transaction, main_context);
+    await transaction.set_date(common_date);
+  };
+
+  const get_last_transactions = async () => {
+    if (from_account) {
+      return await get_past_transactions(from_account.pk(), MovementDirection.Out);
+    }
+    if (to_account) {
+      return await get_past_transactions(to_account.pk(), MovementDirection.In);
+    }
+    return [];
+  };
+
   let card_error_style = "border-red-600 dark:border-red-600";
+
+  let transaction_details_modal: boolean = $state(false);
+  let transaction_details: Transaction | null = $state(null);
+  const showModal = async (details: Transaction) => {
+    transaction_details_modal = true;
+    transaction_details = details;
+  };
 </script>
 
 <div class="mt-px space-y-4">
@@ -87,12 +108,34 @@
     >
 
     <form>
-      <ul>
-        Reuse past transactions:
-        {#each last_transactions as transaction}
-          <li><p>{transaction.name()}</p></li>
-        {/each}
-      </ul>
+      {#await get_last_transactions() then last_transactions}
+        <ul>
+          Reuse past transactions:
+          {#each last_transactions as last_transaction}
+            <li>
+              <p>
+                {last_transaction.name()}
+
+                <Button
+                  onclick={() => {
+                    take_transaction(last_transaction);
+                  }}
+                >
+                  Use
+                </Button>
+
+                <Button
+                  onclick={() => {
+                    showModal(last_transaction);
+                  }}
+                >
+                  Show
+                </Button>
+              </p>
+            </li>
+          {/each}
+        </ul>
+      {/await}
 
       <div class="mt-px space-y-4">
         <Card
@@ -192,20 +235,28 @@
               Cannot create empty transactions.
             </Alert>
           {/if}
-          {#if transaction.total_from(app_state.base_ccy()) != transaction.total_to(app_state.base_ccy())}
+          {#if !transaction.equal_from_and_to_amount(app_state.base_ccy())}
             <Alert class="mb-6">
               <InfoCircleSolid slot="icon" class="w-5 h-5" />
               <span class="font-medium">Source and target mismatch!</span>
-              Source total is EUR {transaction.total_from(app_state.base_ccy())} while target total is EUR {transaction.total_to(
+              Source total is {transaction.total_from(app_state.base_ccy())} while target total is {transaction.total_to(
                 app_state.base_ccy()
               )}.
             </Alert>
           {/if}
           <Button onclick={submit} disabled={submit_disabled}>
-            Submit (Total: {transaction.total_from(app_state.base_ccy())} EUR)
+            Submit (Total: {transaction.total_from(app_state.base_ccy())})
           </Button>
         </Card>
       </div>
     </form>
   </div>
 </div>
+
+<Modal bind:open={transaction_details_modal} size="xl" class="w-full h-full" autoclose outsideclose>
+  {#if transaction_details}
+    <TransactionDetailCard transaction={transaction_details} {main_context} />
+  {:else}
+    Error: There is no transaction to show!
+  {/if}
+</Modal>

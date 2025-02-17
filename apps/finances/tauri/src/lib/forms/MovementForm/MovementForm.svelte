@@ -5,7 +5,12 @@
   import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
   import Datepicker from "../Datepicker.svelte";
   import { Account, Snapshot, MovementType } from "../../../../models/src-js";
-  import { DateWrapper, sort_date_wrapper } from "../../../../../../../libraries/googleapis/src-js/date";
+  import {
+    ccy_symbol,
+    CurrencyCode,
+    DateWrapper,
+    sort_date_wrapper,
+  } from "../../../../../../../libraries/googleapis/src-js";
 
   let {
     new_movement = $bindable(),
@@ -15,27 +20,11 @@
     all_movementtypes,
   }: {
     new_movement: NewMovement;
-    base_ccy: string;
+    base_ccy: CurrencyCode;
     show_date: boolean;
     all_accounts: Account[];
     all_movementtypes: MovementType[];
   } = $props();
-
-  function ccy_symbol(ccy: string): string {
-    if (ccy === "EUR") {
-      return "€";
-    } else if (ccy === "USD") {
-      return "$";
-    } else {
-      return ccy;
-    }
-  }
-
-  const movement_types = Object.keys(NewMovementType)
-    .filter((v) => isNaN(Number(v)))
-    .map((key) => {
-      return { label: key, value: NewMovementType[key] };
-    });
 
   async function handleDividendDateSnapshot() {
     if (!new_movement.ex_dividend_date) {
@@ -43,42 +32,32 @@
     } else {
       // Get the closest (equal or before) snapshot to the given date
       let snapshots: Snapshot[] = []; // FIXME: Retrieve the snapshosts for this account
-      let ex_dividend_date = DateWrapper.create_from_yyyy_mm_dd(
-        new_movement.ex_dividend_date.getFullYear(),
-        new_movement.ex_dividend_date.getMonth() + 1,
-        new_movement.ex_dividend_date.getDate()
-      );
+      let ex_dividend_date = DateWrapper.create_from_date(new_movement.ex_dividend_date);
       let snapshot = snapshots?.find((s: Snapshot) => {
-        return sort_date_wrapper(s.dateValue(), ex_dividend_date) <= 0;
+        return sort_date_wrapper(s.date_value(), ex_dividend_date) <= 0;
       });
       console.log("Found snapshot: ", snapshot);
       new_movement.ex_dividend_snapshot = snapshot;
     }
   }
-
-  let total_str = $derived.by(() => {
-    let _ = new_movement.ex_dividend_snapshot;
-
-    let total = new_movement.total(base_ccy);
-    let symbol = ccy_symbol(base_ccy);
-    if (total === undefined) {
-      return `- ${symbol}`;
-    }
-    return `${total} ${symbol}`;
-  });
+  const unique_id = "_" + Math.random().toString(36).slice(2, 9);
 </script>
 
 <div class="flex flex-col space-y-6" action="#">
   <!-- Radio button to choose the movement type -->
+  {new_movement.type?.toString()} -
   <ul
     class="items-center w-full rounded-lg border border-gray-200 sm:flex dark:bg-gray-800 dark:border-gray-600 divide-x rtl:divide-x-reverse divide-gray-200 dark:divide-gray-600"
   >
-    {#each movement_types as { label, value }, i}
-      <li class="w-full"><Radio bind:group={new_movement.type} {value} name="hor-list" class="p-3">{label}</Radio></li>
+    {#each Object.values(NewMovementType) as value}
+      <li class="w-full">
+        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3"
+          >{value} | {new_movement.type === value}</Radio
+        >
+      </li>
     {/each}
   </ul>
 
-  <!-- Common fields -->
   <AccountDropdown bind:account={new_movement.account} {all_accounts} on:change={handleDividendDateSnapshot} />
   <MovementTypeDropdown bind:movementtype={new_movement.mov_type} {all_movementtypes} />
   {#if show_date}
@@ -116,9 +95,10 @@
           <span>Ex dividend date</span>
           <Datepicker required bind:value={new_movement.ex_dividend_date} on:select={handleDividendDateSnapshot} />
           <Helper
-            >snapshot @ {new_movement.ex_dividend_snapshot?.dateValue().toString()} ({new_movement.ex_dividend_snapshot
+            >snapshot @ {new_movement.ex_dividend_snapshot?.date_value().toString()} ({new_movement.ex_dividend_snapshot
               ?.amount()
-              .quantity()!} ud.)</Helper
+              .as_numerable()
+              ?.quantity()} ud.)</Helper
           >
         </Label>
         <Label class="ml-4 flex flex-col">
@@ -144,7 +124,7 @@
     </div>
 
     <div class="flex flex-col text-left text-xs mt-2">
-      <span class="font-semibold">Total: {total_str}</span>
+      <span class="font-semibold">Total: {new_movement.total(base_ccy)}</span>
     </div>
   {/if}
 </div>

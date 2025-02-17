@@ -22,6 +22,7 @@ pub fn create_transaction(
     pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
     request: tauri::ipc::Request,
 ) -> Result<f32> {
+    log::info!("create_transaction");
     let tauri::ipc::InvokeBody::Raw(data) = request.body() else {
         return Err(Error::Other("Error::RequestBodyMustBeRaw".to_string()));
     };
@@ -179,11 +180,12 @@ pub(crate) fn get_transaction_details(
         .into_iter()
         .map(|mov| {
             let account = main_context.find_account(mov.account_id()).ok_or(Error::Other(format!(
-                "Cannot find account pk '{}' for movement",
-                mov.account_id()
+                "Cannot find account pk '{}' for movement '{}' in the main context",
+                mov.account_id(),
+                mov.id()
             )))?;
 
-            let mov = movement_into_model_movement(mov, account, &main_context, Some(t.id), conn)?;
+            let mov = movement_into_model_movement(mov, account, main_context, Some(t.id), conn)?;
             let direction = mov.direction()?;
             Ok((mov, direction))
         })
