@@ -72,11 +72,11 @@ impl DirectoriesFile {
 
 impl ReadWrite<DirectoriesContent> for DirectoriesContent {
     fn deserialize(content: &str) -> std::io::Result<DirectoriesContent> {
-        Ok(serde_yaml::from_str(content).expect("cannot deserialize content"))
+        Ok(serde_yml::from_str(content).expect("cannot deserialize content"))
     }
 
     fn serialize(object: &DirectoriesContent) -> std::io::Result<String> {
-        Ok(serde_yaml::to_string(&object).expect("Cannot serialize content"))
+        Ok(serde_yml::to_string(&object).expect("Cannot serialize content"))
     }
 }
 

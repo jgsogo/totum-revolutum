@@ -46,11 +46,11 @@ impl AppsFile {
 
 impl ReadWrite<AppsFileContent> for AppsFileContent {
     fn deserialize(content: &str) -> std::io::Result<AppsFileContent> {
-        Ok(serde_yaml::from_str(content).expect("cannot deserialize content"))
+        Ok(serde_yml::from_str(content).expect("cannot deserialize content"))
     }
 
     fn serialize(object: &AppsFileContent) -> std::io::Result<String> {
-        Ok(serde_yaml::to_string(&object).expect("Cannot serialize content"))
+        Ok(serde_yml::to_string(&object).expect("Cannot serialize content"))
     }
 }
 

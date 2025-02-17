@@ -151,11 +151,11 @@ impl ConfigFile {
 
 impl ReadWrite<ConfigFileContent> for ConfigFileContent {
     fn deserialize(content: &str) -> std::io::Result<ConfigFileContent> {
-        Ok(serde_yaml::from_str(content).expect("cannot deserialize content"))
+        Ok(serde_yml::from_str(content).expect("cannot deserialize content"))
     }
 
     fn serialize(object: &ConfigFileContent) -> std::io::Result<String> {
-        Ok(serde_yaml::to_string(&object).expect("Cannot serialize content"))
+        Ok(serde_yml::to_string(&object).expect("Cannot serialize content"))
     }
 }
 
