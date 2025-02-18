@@ -47,7 +47,9 @@
     let groups = all_items.map((it) => {
       return it.group!;
     });
-    return groups.filter((value: string, index: number) => groups.indexOf(value) === index).sort((lhs, rhs) => (lhs < rhs ? -1 : 1));
+    return groups
+      .filter((value: string, index: number) => groups.indexOf(value) === index)
+      .sort((lhs, rhs) => (lhs < rhs ? -1 : 1));
   }
   const groups_items = groupBy ? get_groups() : null;
   let groups_selected = $state(allGroupsLabel);

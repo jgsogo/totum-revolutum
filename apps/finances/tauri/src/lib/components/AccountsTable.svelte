@@ -1,9 +1,23 @@
 <script lang="ts">
-  import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Card, Heading } from "flowbite-svelte";
-  import type { Holder, Account } from "../../../models/src-js";
+  import {
+    Table,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
+    TableHead,
+    TableHeadCell,
+    Card,
+    Heading,
+  } from "flowbite-svelte";
+  import type { Account } from "../../../models/src-js";
   import { goToAccountDetail } from "$lib/utils";
 
-  let { holder, accounts, show_custodian = true }: { holder: Holder; accounts: Account[]; show_custodian?: boolean } = $props();
+  let {
+    accounts,
+    show_custodian = true,
+    show_holders = true,
+    show_category = true,
+  }: { accounts: Account[]; show_custodian?: boolean; show_holders?: boolean; show_category?: boolean } = $props();
 </script>
 
 <Card size="xl" class="shadow-sm max-w-none">
@@ -21,17 +35,34 @@
         {#if show_custodian}
           <TableHeadCell>Custodian</TableHeadCell>
         {/if}
+        {#if show_holders}
+          <TableHeadCell>Holders</TableHeadCell>
+        {/if}
         <TableHeadCell>Name</TableHeadCell>
+        {#if show_category}
+          <TableHeadCell>Category</TableHeadCell>
+        {/if}
         <TableHeadCell>Type</TableHeadCell>
         <TableHeadCell>Snapshot</TableHeadCell>
       </TableHead>
       <TableBody tableBodyClass="divide-y">
         {#each accounts as account}
-          <TableBodyRow onclick={() => goToAccountDetail(holder, account)}>
+          <TableBodyRow onclick={() => goToAccountDetail(account)}>
             {#if show_custodian}
               <TableBodyCell>{account.custodian().name()}</TableBodyCell>
             {/if}
+            {#if show_holders}
+              <TableBodyCell
+                >{account
+                  .holders()
+                  .map((v) => v.name())
+                  .join(", ")}</TableBodyCell
+              >
+            {/if}
             <TableBodyCell>{account.name()}</TableBodyCell>
+            {#if show_category}
+              <TableBodyCell>{account.type().category()}</TableBodyCell>
+            {/if}
             <TableBodyCell>{account.type().name()}</TableBodyCell>
             <TableBodyCell>{account.last_snapshot() ? account.last_snapshot()!.amount().amount() : "-"}</TableBodyCell>
           </TableBodyRow>

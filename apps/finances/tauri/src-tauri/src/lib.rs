@@ -124,23 +124,14 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
     let accounts: Vec<AccountProto> = {
         // Get all accounts (opened and closed). This is important because some movements in old transactions might refer to closed accounts
         let accounts = Account::all_all()
-            .left_join(
-                finances_accounts::schema::finances_accounts_accountholderrole::table
-                    .inner_join(finances_accounts::schema::finances_accounts_accountholder::table),
-            )
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
-            .select((
-                Account::as_select(),
-                finances_accounts::schema::finances_accounts_accountholderrole::owns_money.nullable(),
-                Custodian::as_select(),
-                AccountType::as_select(),
-            ))
-            .load::<(Account, Option<bool>, Custodian, AccountType)>(conn)?;
+            .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
+            .load::<(Account, Custodian, AccountType)>(conn)?;
 
         accounts
             .into_iter()
-            .map(|(account, account_holder_role_owns_money, custodian, account_type)| {
+            .map(|(account, custodian, account_type)| {
                 let account_type = account_types
                     .iter()
                     .find(|&acc_type| acc_type.pk() == account_type.id)
@@ -149,6 +140,11 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
                         account_type.id
                     )))?;
 
+                let holders_owning_money: Vec<HolderProto> = Account::holders_for_pk(account.id, conn)?
+                    .into_iter()
+                    .filter(|(_, owns_money)| *owns_money)
+                    .map(|(v, _)| HolderProto::new(v.id, v.name, v.is_company, v.photo))
+                    .collect();
                 let snapshots = commands::get_snapshots(&account, conn)?;
                 let last_snapshot = snapshots.first().cloned();
 
@@ -162,7 +158,7 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
                     account.description,
                     account.open.into(),
                     account.close.map(|v| v.into()),
-                    account_holder_role_owns_money.unwrap_or(false), // FIXME: Get the holder
+                    holders_owning_money,
                     account.is_numerable,
                     last_snapshot,
                 ))

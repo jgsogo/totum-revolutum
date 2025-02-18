@@ -56,6 +56,24 @@ export class DateWrapper {
     day(): number {
         return this.date.day;
     }
+
+    less_than(other: DateWrapper): boolean {
+        if (this.year() === other.year()) {
+            if (this.month() === other.month()) {
+                return this.day() < other.day();
+            }
+            else {
+                return this.month() < other.month();
+            }
+        }
+        else {
+            return this.year() < other.year();
+        }
+    }
+
+    equal(other: DateWrapper): boolean {
+        return (this.year() === other.year()) && (this.month() === other.month()) && (this.day() === other.day())
+    }
 }
 
 /**

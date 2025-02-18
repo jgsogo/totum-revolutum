@@ -2,7 +2,7 @@ export { AppState, DatabaseConnection } from './app_state.js';
 export { Custodian } from './custodian.js';
 export { Holder } from './holder.js';
 export { HolderContext } from './holder_context.js';
-export { Account, AccountCategory, AccountType } from './account.js';
+export { Account, AccountCategory, AccountType, account_category_from_str } from './account.js';
 export { Snapshot } from './snapshot.js';
 export { Movement, MovementAmount, MovementAmountDividend, MovementDirection } from './movement.js';
 export { AccountContext } from './account_context.js';

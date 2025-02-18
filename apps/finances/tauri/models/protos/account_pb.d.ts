@@ -6,6 +6,7 @@ import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1"
 import type { Message } from "@bufbuild/protobuf";
 import type { Custodian } from "./custodian_pb.js";
 import type { Date } from "../../../../../libraries/googleapis/protos/google/type/date_pb.js";
+import type { Holder } from "./holder_pb.js";
 import type { Snapshot } from "./snapshot_pb.js";
 
 /**
@@ -94,9 +95,9 @@ export declare type Account = Message<"finances_app_models.Account"> & {
   close?: Date;
 
   /**
-   * @generated from field: bool holder_owns_money = 10;
+   * @generated from field: repeated finances_app_models.Holder holders = 10;
    */
-  holderOwnsMoney: boolean;
+  holders: Holder[];
 
   /**
    * @generated from field: bool is_numerable = 11;

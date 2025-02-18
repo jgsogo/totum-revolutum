@@ -1,0 +1,165 @@
+<script lang="ts">
+  import { Sidebar, SidebarWrapper, SidebarItem, SidebarGroup, SidebarDropdownWrapper } from "flowbite-svelte";
+  import { AccountCategory, type Account, type AppState, type Holder } from "../../../models/src-js";
+  import {
+    AngleDownOutline,
+    AngleUpOutline,
+    GithubSolid,
+    ColumnSolid,
+    ClipboardSolid,
+    LandmarkSolid,
+    ChartMixedDollarSolid,
+    UserSolid,
+  } from "flowbite-svelte-icons";
+
+  let {
+    accounts,
+    holders,
+    drawerHidden = $bindable(),
+    app_state,
+  }: {
+    accounts: Account[];
+    holders: Holder[];
+    drawerHidden: boolean;
+    app_state: AppState;
+  } = $props();
+
+  // Get all custodians
+  const custodians_ = accounts.map((acc: Account) => {
+    return {
+      id: acc.custodian().pk(),
+      value: acc.custodian(),
+    };
+  });
+  const custodians = custodians_
+    .filter((item, index) => custodians_.findIndex((value) => item.id === value.id) === index)
+    .sort((lhs, rhs) => lhs.value.name().localeCompare(rhs.value.name()));
+
+  // UI stuff
+  const closeDrawer = () => {
+    drawerHidden = true;
+  };
+
+  const groupClass = "pt-2 space-y-2";
+
+  const iconClass =
+    "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white";
+
+  const itemClass =
+    "flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700";
+</script>
+
+<Sidebar
+  class={drawerHidden ? "hidden" : ""}
+  activeClass="bg-gray-100 dark:bg-gray-700"
+  asideClass="fixed inset-0 z-30 flex-none h-full w-64 lg:h-auto border-e border-gray-200 dark:border-gray-600 lg:overflow-y-visible lg:pt-16 lg:block"
+>
+  <h4 class="sr-only">Main menu</h4>
+  <SidebarWrapper
+    divClass="overflow-y-auto px-3 pt-20 lg:pt-5 h-full bg-white scrolling-touch max-w-2xs lg:h-[calc(100vh-4rem)] lg:block dark:bg-gray-800 lg:me-0 lg:sticky top-2"
+  >
+    <nav class="divide-y divide-gray-200 dark:divide-gray-700">
+      <SidebarGroup ulClass={groupClass} class="mb-3">
+        <SidebarItem label="All" href="/">
+          <svelte:fragment slot="icon">
+            <ClipboardSolid class={iconClass} />
+          </svelte:fragment>
+        </SidebarItem>
+
+        <SidebarDropdownWrapper isOpen={false} label="By custodian" class="pr-3">
+          <svelte:fragment slot="icon">
+            <LandmarkSolid class={iconClass} />
+          </svelte:fragment>
+          <svelte:fragment slot="arrowup">
+            <AngleDownOutline class="w-6 h-6" />
+          </svelte:fragment>
+          <svelte:fragment slot="arrowdown">
+            <AngleUpOutline class="w-6 h-6" />
+          </svelte:fragment>
+          {#each custodians as custodian}
+            <SidebarItem
+              label={custodian.value.name()}
+              href="/custodian/{custodian.id}/accounts/all"
+              spanClass="ml-9"
+              class={itemClass}
+            />
+          {/each}
+        </SidebarDropdownWrapper>
+
+        <SidebarDropdownWrapper isOpen={false} label="By category" class="pr-3">
+          <svelte:fragment slot="icon">
+            <ChartMixedDollarSolid class={iconClass} />
+          </svelte:fragment>
+          <svelte:fragment slot="arrowup">
+            <AngleDownOutline class="w-6 h-6" />
+          </svelte:fragment>
+          <svelte:fragment slot="arrowdown">
+            <AngleUpOutline class="w-6 h-6" />
+          </svelte:fragment>
+          {#each Object.values(AccountCategory) as value}
+            <SidebarItem
+              class={itemClass}
+              spanClass="ml-9"
+              label={value}
+              href="/category/{value.toString().toLowerCase()}/accounts/all"
+            ></SidebarItem>
+          {/each}
+        </SidebarDropdownWrapper>
+
+        <SidebarDropdownWrapper isOpen={false} label="By holder" class="pr-3">
+          <svelte:fragment slot="icon">
+            <UserSolid class={iconClass} />
+          </svelte:fragment>
+          <svelte:fragment slot="arrowup">
+            <AngleDownOutline class="w-6 h-6" />
+          </svelte:fragment>
+          <svelte:fragment slot="arrowdown">
+            <AngleUpOutline class="w-6 h-6" />
+          </svelte:fragment>
+          {#each holders as holder}
+            <SidebarItem
+              label={holder.name()}
+              href="/holder/{holder.pk()}/accounts/all"
+              spanClass="ml-9"
+              class={itemClass}
+            />
+          {/each}
+        </SidebarDropdownWrapper>
+      </SidebarGroup>
+
+      <SidebarGroup ulClass={groupClass}>
+        <SidebarItem
+          label="totum-revolutum"
+          href="https://github.com/jgsogo/totum-revolutum"
+          ulClass={groupClass}
+          spanClass="ml-3"
+          target="_blank"
+        >
+          <svelte:fragment slot="icon">
+            <GithubSolid class={iconClass} />
+          </svelte:fragment>
+        </SidebarItem>
+
+        <SidebarItem
+          label="Admin interface"
+          href={`${app_state.base_url()}/admin`}
+          ulClass={groupClass}
+          spanClass="ml-3"
+          target="_blank"
+        >
+          <svelte:fragment slot="icon">
+            <ColumnSolid class={iconClass} />
+          </svelte:fragment>
+        </SidebarItem>
+      </SidebarGroup>
+    </nav>
+  </SidebarWrapper>
+</Sidebar>
+
+<div
+  hidden={drawerHidden}
+  class="fixed inset-0 z-20 bg-gray-900/50 dark:bg-gray-900/60"
+  onclick={closeDrawer}
+  onkeydown={closeDrawer}
+  role="presentation"
+></div>

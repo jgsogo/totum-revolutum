@@ -4,7 +4,7 @@ mod account_type;
 pub use account_category::AccountCategory;
 pub use account_type::AccountType;
 
-use crate::{google_type::CurrencyCode, Custodian, Error, Result, Snapshot};
+use crate::{google_type::CurrencyCode, Custodian, Error, Holder, Result, Snapshot};
 
 use proto_wrapper::ProtoWrapper;
 
@@ -26,7 +26,7 @@ impl Account {
         description: Option<String>,
         open: google_type::Date,
         close: Option<google_type::Date>,
-        holder_owns_money: bool,
+        holders: Vec<Holder>,
         is_numerable: bool,
         last_snapshot: Option<Snapshot>,
     ) -> Self {
@@ -40,7 +40,7 @@ impl Account {
             description,
             open: Some(open.into()),
             close: close.map(|v| v.into()),
-            holder_owns_money,
+            holders: holders.into_iter().map(|v| v.into()).collect(),
             is_numerable,
             last_snapshot: last_snapshot.map(|v| v.into()),
         })
@@ -98,8 +98,8 @@ impl Account {
             .ok_or(Error::MissingRequiredField("close".to_string()))
     }
 
-    pub fn holder_owns_money(&self) -> bool {
-        self.0.holder_owns_money
+    pub fn holders(&self) -> Vec<&Holder> {
+        self.0.holders.iter().map(Holder::new_ref).collect()
     }
 
     pub fn is_numerable(&self) -> bool {

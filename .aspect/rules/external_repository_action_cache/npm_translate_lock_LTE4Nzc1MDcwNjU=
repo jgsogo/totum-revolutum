@@ -6,6 +6,6 @@ apps/finances/tauri/models/package.json=675923745
 apps/finances/tauri/package.json=713179618
 libraries/googleapis/package.json=1961643759
 package.json=-187702278
-pnpm-lock.yaml=349925771
+pnpm-lock.yaml=-110375449
 pnpm-workspace.yaml=-1435849929
 sandbox/svelte-hello-world/package.json=-2042872513

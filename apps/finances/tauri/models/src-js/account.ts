@@ -3,13 +3,28 @@ import { AccountCategory as AccountCategoryProto, Account as AccountProto, Accou
 import { Breadcrumb } from "./breadcrumb.js";
 
 import { Custodian } from "./custodian.js";
+import { Holder } from "./holder.js";
 import { Snapshot } from "./snapshot.js";
 
 export enum AccountCategory {
-    Other = 0,
-    Savings = 1,
-    Investment = 2,
-    Retirement = 3,
+    Other = 'Other',
+    Savings = 'Savings',
+    Investment = 'Investment',
+    Retirement = 'Retirement',
+}
+
+function capitalizeFirstLetter(val: string) {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
+function enumFromStringValue<T>(enm: { [s: string]: T }, value: string): T | undefined {
+    return (Object.values(enm) as unknown as string[]).includes(value)
+        ? value as unknown as T
+        : undefined;
+}
+
+export function account_category_from_str(category: string): AccountCategory | undefined {
+    return enumFromStringValue(AccountCategory, capitalizeFirstLetter(category.toLowerCase()));
 }
 
 
@@ -102,5 +117,12 @@ export class Account {
 
     as_proto(): AccountProto {
         return this.account;
+    }
+
+    /**
+     * Return the list of holders owning the money in this account
+     */
+    holders(): Holder[] {
+        return this.account.holders.map((v) => new Holder(v));
     }
 }
