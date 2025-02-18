@@ -1,26 +1,28 @@
 <script lang="ts">
-  import HolderSelector from "./HolderSelector.svelte";
-  import { DarkMode, Dropdown, DropdownItem, NavBrand, NavHamburger, NavLi, NavUl, Navbar, Search } from "flowbite-svelte";
+  import {
+    DarkMode,
+    Dropdown,
+    DropdownItem,
+    NavBrand,
+    NavHamburger,
+    NavLi,
+    NavUl,
+    Navbar,
+    Search,
+  } from "flowbite-svelte";
   import { invalidateAll } from "$app/navigation";
   import { ChevronDownOutline, RefreshOutline } from "flowbite-svelte-icons";
-  import type { AppState, Holder } from "../../../models/src-js/index";
 
   let {
     fluid = true,
     drawerHidden = $bindable(),
     list = false,
-    // all_holders,
-    // active_holder,
     home_href = "/",
-    app_state,
   }: {
     fluid: boolean;
     drawerHidden: boolean;
     list: boolean;
-    // all_holders: Holder[];
-    // active_holder: Holder;
     home_href: string;
-    app_state: AppState;
   } = $props();
 </script>
 
@@ -29,7 +31,9 @@
 
   <NavBrand href={home_href} class={list ? "w-40" : "lg:w-60"}>
     <img src="/favicon.png" class="me-2.5 h-6 sm:h-8" alt="Flowbite Logo" />
-    <span class="ml-px self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:text-2xl"> Finances </span>
+    <span class="ml-px self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:text-2xl">
+      Finances
+    </span>
   </NavBrand>
 
   <div class="hidden lg:block lg:ps-3">
@@ -65,6 +69,5 @@
     </button>
 
     <DarkMode />
-    <!-- <HolderSelector {active_holder} {all_holders} {app_state} /> -->
   </div>
 </Navbar>

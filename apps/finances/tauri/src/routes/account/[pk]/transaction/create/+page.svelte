@@ -12,10 +12,9 @@
     type Account,
     type AppState,
     type AccountContext,
-    type HolderContext,
     Transaction,
     MovementDirection,
-  } from "../../../../../../../../models/src-js";
+  } from "../../../../../../models/src-js";
   import AccountDetail from "$lib/components/AccountDetail.svelte";
   import TransactionDetailCard from "$lib/components/TransactionDetailCard.svelte";
 
@@ -23,7 +22,6 @@
   let { data } = $props();
 
   let app_state: AppState = data.app_state;
-  let holder_context: HolderContext = data.holder_context;
   let account_context: AccountContext = data.account_context;
   let main_context: MainContext = data.main_context;
 
@@ -64,7 +62,7 @@
     if (transaction.is_valid(show_transaction_date, app_state.base_ccy())) {
       await create_transaction(transaction.toMessage(app_state.base_ccy()));
       // TODO: Show error when it fails
-      await goToAccountDetail(holder_context.holder(), account_context.account());
+      await goToAccountDetail(account_context.account());
     }
   };
 
@@ -97,11 +95,7 @@
 
 <div class="mt-px space-y-4">
   <div class="grid gap-4">
-    <AccountDetail
-      holder={holder_context.holder()}
-      base_media_url={app_state.base_media_url()}
-      account={account_context.account()}
-    ></AccountDetail>
+    <AccountDetail base_media_url={app_state.base_media_url()} account={account_context.account()}></AccountDetail>
 
     <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl"
       >New transaction</Heading

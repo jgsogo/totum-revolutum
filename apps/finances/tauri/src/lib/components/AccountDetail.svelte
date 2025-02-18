@@ -7,7 +7,7 @@
   import { create_snapshot } from "$lib/commands";
 
   import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
-  import { type Holder, Account } from "../../../models/src-js";
+  import { Account } from "../../../models/src-js";
   import Avatar from "./Avatar.svelte";
 
   let { account, base_media_url }: { account: Account; base_media_url: string } = $props();

@@ -3,7 +3,7 @@
 </script>
 
 <div class="mt-px space-y-4">
-  Category detail card for: {data.category}
+  Holder detail card for: {data.holder_context.holder().name()}
 
   {@render children()}
 </div>

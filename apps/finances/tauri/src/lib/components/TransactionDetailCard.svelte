@@ -46,11 +46,11 @@
             <TableBodyCell>{mov.date_value()}</TableBodyCell>
             <TableBodyCell>{main_context.find_account(mov.account_pk())?.name() ?? mov.account_pk()}</TableBodyCell>
             {#if mov.direction() === MovementDirection.Out}
-            <TableBodyCell>{mov.amount()}</TableBodyCell>
-            <TableBodyCell></TableBodyCell>
+              <TableBodyCell>{mov.amount()}</TableBodyCell>
+              <TableBodyCell></TableBodyCell>
             {:else}
-            <TableBodyCell></TableBodyCell>
-            <TableBodyCell>{mov.amount()}</TableBodyCell>
+              <TableBodyCell></TableBodyCell>
+              <TableBodyCell>{mov.amount()}</TableBodyCell>
             {/if}
             <TableBodyCell>{mov.type().breadcrumb()}</TableBodyCell>
           </TableBodyRow>

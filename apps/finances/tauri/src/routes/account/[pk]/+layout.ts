@@ -1,4 +1,4 @@
-import {get_account_context} from '$lib/commands';
+import { get_account_context } from '$lib/commands';
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ params }) {

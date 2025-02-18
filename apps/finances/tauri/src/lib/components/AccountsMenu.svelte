@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { DateWrapper } from "../../../../../../libraries/googleapis/src-js";
   import { Sidebar, SidebarWrapper, SidebarItem, SidebarGroup, SidebarDropdownWrapper } from "flowbite-svelte";
   import { AccountCategory, type Account, type AppState, type Holder } from "../../../models/src-js";
   import {
@@ -9,10 +8,7 @@
     ColumnSolid,
     ClipboardSolid,
     LandmarkSolid,
-    CashSolid,
     ChartMixedDollarSolid,
-    LockSolid,
-    GridSolid,
     UserSolid,
   } from "flowbite-svelte-icons";
 
@@ -21,19 +17,12 @@
     holders,
     drawerHidden = $bindable(),
     app_state,
-    // selectedAccounts = $bindable(),
   }: {
     accounts: Account[];
     holders: Holder[];
     drawerHidden: boolean;
     app_state: AppState;
-    // selectedAccounts: Account[];
   } = $props();
-
-  //
-  // let hide_closed_accounts = $state(true); // Start with opened accounts
-  // let shown_holders = $state(holders); // Show all holders
-  // let now = DateWrapper.create_from_date(new Date());
 
   // Get all custodians
   const custodians_ = accounts.map((acc: Account) => {
@@ -45,40 +34,6 @@
   const custodians = custodians_
     .filter((item, index) => custodians_.findIndex((value) => item.id === value.id) === index)
     .sort((lhs, rhs) => lhs.value.name().localeCompare(rhs.value.name()));
-
-  // const holders_ = accounts.reduce((accumulator: Holder[], value: Account) => accumulator.concat(value.holders()), []);
-  // const holders = holders_
-  //   .filter((item, index) => holders_.findIndex((value) => item.pk() === value.pk()))
-  //   .sort((lhs, rhs) => lhs.name().localeCompare(rhs.name()));
-
-  // // All the accounts that satisfy the filters
-  // const filtered_accounts = () => {
-  //   return accounts.filter((acc: Account) => {
-  //     // Consider if closed
-  //     if (hide_closed_accounts && acc.close()?.less_than(now)) {
-  //       return false;
-  //     }
-
-  //     // Consider holders
-  //     return shown_holders.find((holder: Holder) => {
-  //       return acc.holders().find((h: Holder) => h.pk() === holder.pk()) !== undefined;
-  //     });
-  //   });
-  // };
-
-  // const all_accounts = () => {
-  //   selectedAccounts = filtered_accounts();
-  // };
-
-  // // Accounts (filtered) for a given custodian
-  // const accounts_for_custodian = (custodian_pk: number) => {
-  //   selectedAccounts = filtered_accounts().filter((acc: Account) => acc.custodian().pk() === custodian_pk);
-  // };
-
-  // // Accounts (filtered) for a given category
-  // const accounts_for_category = (category: AccountCategory) => {
-  //   selectedAccounts = filtered_accounts().filter((acc: Account) => acc.type().category() === category);
-  // };
 
   // UI stuff
   const closeDrawer = () => {
