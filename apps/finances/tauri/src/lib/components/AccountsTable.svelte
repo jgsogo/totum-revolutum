@@ -1,9 +1,18 @@
 <script lang="ts">
-  import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Card, Heading } from "flowbite-svelte";
-  import type { Holder, Account } from "../../../models/src-js";
+  import {
+    Table,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
+    TableHead,
+    TableHeadCell,
+    Card,
+    Heading,
+  } from "flowbite-svelte";
+  import type { Account } from "../../../models/src-js";
   import { goToAccountDetail } from "$lib/utils";
 
-  let { holder, accounts, show_custodian = true }: { holder: Holder; accounts: Account[]; show_custodian?: boolean } = $props();
+  let { accounts, show_custodian = true }: { accounts: Account[]; show_custodian?: boolean } = $props();
 </script>
 
 <Card size="xl" class="shadow-sm max-w-none">
@@ -27,7 +36,7 @@
       </TableHead>
       <TableBody tableBodyClass="divide-y">
         {#each accounts as account}
-          <TableBodyRow onclick={() => goToAccountDetail(holder, account)}>
+          <TableBodyRow onclick={() => goToAccountDetail(account)}>
             {#if show_custodian}
               <TableBodyCell>{account.custodian().name()}</TableBodyCell>
             {/if}

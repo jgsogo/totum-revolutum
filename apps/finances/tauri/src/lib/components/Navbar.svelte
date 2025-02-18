@@ -9,16 +9,16 @@
     fluid = true,
     drawerHidden = $bindable(),
     list = false,
-    all_holders,
-    active_holder,
+    // all_holders,
+    // active_holder,
     home_href = "/",
     app_state,
   }: {
     fluid: boolean;
     drawerHidden: boolean;
     list: boolean;
-    all_holders: Holder[];
-    active_holder: Holder;
+    // all_holders: Holder[];
+    // active_holder: Holder;
     home_href: string;
     app_state: AppState;
   } = $props();
@@ -65,6 +65,6 @@
     </button>
 
     <DarkMode />
-    <HolderSelector {active_holder} {all_holders} {app_state} />
+    <!-- <HolderSelector {active_holder} {all_holders} {app_state} /> -->
   </div>
 </Navbar>

@@ -39,7 +39,6 @@ function get_account(): Account {
         type: get_account_type().as_proto(),
         currencyCode: CurrencyCode.USD.toString(),
         open: open.as_proto(),
-        holderOwnsMoney: false,
         isNumerable: true,
         lastSnapshot: undefined,
     });

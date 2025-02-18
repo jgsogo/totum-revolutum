@@ -1,8 +1,8 @@
 use diesel::prelude::*;
 
-use super::{AccountType, Custodian};
+use super::{AccountHolder, AccountType, Custodian};
 use crate::fields::MovementDirection;
-use crate::models::{AccountHolderRole, Movement, MovementType, Snapshot, Transaction};
+use crate::models::{Movement, MovementType, Snapshot, Transaction};
 use crate::sql::filters::{account_by_pk, movement_filter_account_by_pk, snapshot_filter_account_by_pk};
 use crate::sql::filters::{account_closed, account_opened};
 use crate::types::NumericType;
@@ -62,46 +62,48 @@ impl Account {
             .first::<Account>(conn)
     }
 
+    /// Returns the list of [`AccountHolder`]a that are related to this account together with a mark
+    /// wether this holder owns money in the account or not.
+    pub fn holders_for_pk(
+        pk: i64,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(AccountHolder, bool)>, diesel::result::Error> {
+        Self::all()
+            .inner_join(
+                crate::schema::finances_accounts_accountholderrole::table
+                    .inner_join(crate::schema::finances_accounts_accountholder::table),
+            )
+            .select((
+                AccountHolder::as_select(),
+                crate::schema::finances_accounts_accountholderrole::owns_money,
+            ))
+            .filter(account_by_pk(pk))
+            .load::<(AccountHolder, bool)>(conn)
+    }
+
     pub fn details_for_pk(
         pk: i64,
         conn: &mut PgConnection,
-    ) -> Result<(Account, AccountHolderRole, Custodian, AccountType), diesel::result::Error> {
+    ) -> Result<(Account, Custodian, AccountType), diesel::result::Error> {
         Self::all()
-            .inner_join(
-                crate::schema::finances_accounts_accountholderrole::table
-                    .inner_join(crate::schema::finances_accounts_accountholder::table),
-            )
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
-            .select((
-                Account::as_select(),
-                AccountHolderRole::as_select(),
-                Custodian::as_select(),
-                AccountType::as_select(),
-            ))
+            .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
             .filter(account_by_pk(pk))
-            .first::<(Account, AccountHolderRole, Custodian, AccountType)>(conn)
+            .first::<(Account, Custodian, AccountType)>(conn)
     }
 
-    pub fn details(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<(AccountHolderRole, Custodian, AccountType), diesel::result::Error> {
+    pub fn details(&self, conn: &mut PgConnection) -> Result<(Custodian, AccountType), diesel::result::Error> {
         Self::all()
-            .inner_join(
-                crate::schema::finances_accounts_accountholderrole::table
-                    .inner_join(crate::schema::finances_accounts_accountholder::table),
-            )
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
             .select((
                 // Account::as_select(),
-                AccountHolderRole::as_select(),
                 Custodian::as_select(),
                 AccountType::as_select(),
             ))
             .filter(account_by_pk(self.id))
-            .first::<(AccountHolderRole, Custodian, AccountType)>(conn)
+            .first::<(Custodian, AccountType)>(conn)
     }
 
     pub fn latest_snapshot_for_pk(pk: i64, conn: &mut PgConnection) -> Result<Option<Snapshot>, diesel::result::Error> {

@@ -3,6 +3,7 @@ import { AccountCategory as AccountCategoryProto, Account as AccountProto, Accou
 import { Breadcrumb } from "./breadcrumb.js";
 
 import { Custodian } from "./custodian.js";
+import { Holder } from "./holder.js";
 import { Snapshot } from "./snapshot.js";
 
 export enum AccountCategory {
@@ -102,5 +103,12 @@ export class Account {
 
     as_proto(): AccountProto {
         return this.account;
+    }
+
+    /**
+     * Return the list of holders owning the money in this account
+     */
+    holders(): Holder[] {
+        return this.account.holders.map((v) => new Holder(v));
     }
 }
