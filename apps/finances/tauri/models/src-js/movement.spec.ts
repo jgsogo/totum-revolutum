@@ -6,11 +6,11 @@ import { Decimal } from "../../../../../libraries/googleapis/src-js/decimal.js";
 import { Movement, MovementAmount, MovementAmountDividend, MovementDirection } from './movement.js';
 import { DateWrapper } from '../../../../../libraries/googleapis/src-js/date.js';
 import { MovementType } from './movement_type.js';
-import { Account, AccountCategory, AccountType } from './account.js';
+import { Account, AccountType } from './account.js';
 import { FxQuote, FxQuotePair } from './fx_quote.js';
 import { create } from '@bufbuild/protobuf';
 import { MovementTypeSchema } from '../protos/movement_pb.js';
-import { AccountSchema, AccountTypeSchema } from '../protos/account_pb.js';
+import { AccountSchema, AccountTypeSchema, AccountCategory } from '../protos/account_pb.js';
 import { CustodianSchema } from '../protos/custodian_pb.js';
 import { Custodian } from './custodian.js';
 

@@ -87,3 +87,36 @@ describe('sort_date_wrapper', () => {
     });
 
 });
+
+describe('less_than', () => {
+    let d1 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 20);
+    let d2 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 20);
+
+    test('equal', () => {
+        expect(d1.less_than(d2)).toBe(false);
+        expect(d2.less_than(d1)).toBe(false);
+    });
+
+    let d3 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 21);
+    test('less than', () => {
+        expect(d1.less_than(d3)).toBe(true);
+        expect(d3.less_than(d1)).toBe(false);
+    });
+});
+
+
+describe('equal', () => {
+    let d1 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 20);
+    let d2 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 20);
+
+    test('equal', () => {
+        expect(d1.equal(d2)).toBe(true);
+        expect(d2.equal(d1)).toBe(true);
+    });
+
+    let d3 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 21);
+    test('less than', () => {
+        expect(d1.equal(d3)).toBe(false);
+        expect(d3.equal(d1)).toBe(false);
+    });
+});
