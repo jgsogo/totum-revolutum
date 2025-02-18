@@ -12,6 +12,8 @@
     CashSolid,
     ChartMixedDollarSolid,
     LockSolid,
+    GridSolid,
+    UserSolid,
   } from "flowbite-svelte-icons";
 
   let {
@@ -29,9 +31,9 @@
   } = $props();
 
   //
-  let hide_closed_accounts = $state(true); // Start with opened accounts
-  let shown_holders = $state(holders); // Show all holders
-  let now = DateWrapper.create_from_date(new Date());
+  // let hide_closed_accounts = $state(true); // Start with opened accounts
+  // let shown_holders = $state(holders); // Show all holders
+  // let now = DateWrapper.create_from_date(new Date());
 
   // Get all custodians
   const custodians_ = accounts.map((acc: Account) => {
@@ -43,6 +45,11 @@
   const custodians = custodians_
     .filter((item, index) => custodians_.findIndex((value) => item.id === value.id) === index)
     .sort((lhs, rhs) => lhs.value.name().localeCompare(rhs.value.name()));
+
+  // const holders_ = accounts.reduce((accumulator: Holder[], value: Account) => accumulator.concat(value.holders()), []);
+  // const holders = holders_
+  //   .filter((item, index) => holders_.findIndex((value) => item.pk() === value.pk()))
+  //   .sort((lhs, rhs) => lhs.name().localeCompare(rhs.name()));
 
   // // All the accounts that satisfy the filters
   // const filtered_accounts = () => {
@@ -124,44 +131,45 @@
           {/each}
         </SidebarDropdownWrapper>
 
-        {#each Object.values(AccountCategory) as value}
-          <SidebarItem
-            ulClass={groupClass}
-            spanClass="ml-3"
-            label={value}
-            href="/category/{value.toString().toLowerCase()}/accounts/all"
-          >
-            <svelte:fragment slot="icon">
-              {#if value === AccountCategory.Investment}
-                <ChartMixedDollarSolid class={iconClass} />
-              {:else if value === AccountCategory.Savings}
-                <CashSolid class={iconClass} />
-              {:else if value === AccountCategory.Retirement}
-                <LockSolid class={iconClass} />
-              {:else}
-                <ColumnSolid class={iconClass} />
-              {/if}
-            </svelte:fragment>
-          </SidebarItem>
-        {/each}
-
-        <SidebarItem ulClass={groupClass} spanClass="ml-3" label="Savings" href="/category/savings/accounts/all">
-          <svelte:fragment slot="icon">
-            <CashSolid class={iconClass} />
-          </svelte:fragment>
-        </SidebarItem>
-
-        <SidebarItem ulClass={groupClass} spanClass="ml-3" label="Investment" href="/category/investment/accounts/all">
+        <SidebarDropdownWrapper isOpen={false} label="By category" class="pr-3">
           <svelte:fragment slot="icon">
             <ChartMixedDollarSolid class={iconClass} />
           </svelte:fragment>
-        </SidebarItem>
-
-        <SidebarItem ulClass={groupClass} spanClass="ml-3" label="Retirement" href="/category/retirement/accounts/all">
-          <svelte:fragment slot="icon">
-            <LockSolid class={iconClass} />
+          <svelte:fragment slot="arrowup">
+            <AngleDownOutline class="w-6 h-6" />
           </svelte:fragment>
-        </SidebarItem>
+          <svelte:fragment slot="arrowdown">
+            <AngleUpOutline class="w-6 h-6" />
+          </svelte:fragment>
+          {#each Object.values(AccountCategory) as value}
+            <SidebarItem
+              class={itemClass}
+              spanClass="ml-9"
+              label={value}
+              href="/category/{value.toString().toLowerCase()}/accounts/all"
+            ></SidebarItem>
+          {/each}
+        </SidebarDropdownWrapper>
+
+        <SidebarDropdownWrapper isOpen={false} label="By holder" class="pr-3">
+          <svelte:fragment slot="icon">
+            <UserSolid class={iconClass} />
+          </svelte:fragment>
+          <svelte:fragment slot="arrowup">
+            <AngleDownOutline class="w-6 h-6" />
+          </svelte:fragment>
+          <svelte:fragment slot="arrowdown">
+            <AngleUpOutline class="w-6 h-6" />
+          </svelte:fragment>
+          {#each holders as holder}
+            <SidebarItem
+              label={holder.name()}
+              href="/holder/{holder.pk()}/accounts/all"
+              spanClass="ml-9"
+              class={itemClass}
+            />
+          {/each}
+        </SidebarDropdownWrapper>
       </SidebarGroup>
 
       <SidebarGroup ulClass={groupClass}>
