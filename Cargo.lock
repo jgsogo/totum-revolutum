@@ -1808,6 +1808,7 @@ dependencies = [
  "log",
  "openexchangerates",
  "postgresql_commands",
+ "reqwest",
  "serde",
  "serde_json",
  "tauri",

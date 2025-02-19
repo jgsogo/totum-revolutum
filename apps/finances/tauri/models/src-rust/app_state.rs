@@ -74,6 +74,14 @@ impl AppState {
         Ok(CurrencyCode::new(&self.0.base_ccy)?)
     }
 
+    pub fn base_url(&self) -> Result<&str> {
+        Ok(&self.0.base_url)
+    }
+
+    pub fn base_media_url(&self) -> Result<&str> {
+        Ok(&self.0.base_media_url)
+    }
+
     pub fn db(&self) -> Result<&DatabaseConnection> {
         self.0
             .db
