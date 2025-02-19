@@ -76,3 +76,12 @@ export const create_transaction = async (transaction: Transaction) => {
     let data = transaction.toBinary();
     await invoke("create_transaction", data);
 }
+
+
+/**
+ * Executes a backup of the database and media files
+ * @returns - A promise with info about the backup process
+ */
+export const do_backup = async (): Promise<string> => {
+    return await invoke("do_backup");
+}

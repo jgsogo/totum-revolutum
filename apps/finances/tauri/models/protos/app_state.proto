@@ -2,12 +2,12 @@ syntax = "proto3";
 package finances_app_models;
 
 message DatabaseConnection {
-    string postgres_url = 1;
-    // string user = 1;
-    // string password = 2;
-    // string host = 3;
-    // uint32 port = 4;
-    // string dbname = 5;
+    string user = 1;
+    string password = 2;
+    string host = 3;
+    // Expecting u16
+    uint32 port = 4;
+    string dbname = 5;
 }
 
 message AppState {

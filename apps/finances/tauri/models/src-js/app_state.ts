@@ -11,9 +11,30 @@ export class DatabaseConnection {
         this.proto = proto;
     }
 
-    postgres_url(): string {
-        return this.proto.postgresUrl;
+    user(): string {
+        return this.proto.user;
     }
+
+    password(): string {
+        return this.proto.password;
+    }
+
+    host(): string {
+        return this.proto.host;
+    }
+
+    port(): number {
+        return this.proto.port;
+    }
+
+    dbname(): string {
+        return this.proto.dbname;
+    }
+
+    postgres_url(): string {
+        return `postgres://${this.user()}:${this.password()}@${this.host()}:${this.port()}/${this.dbname()}`;
+    }
+
 }
 
 export class AppState {

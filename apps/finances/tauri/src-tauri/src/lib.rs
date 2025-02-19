@@ -60,6 +60,8 @@ pub fn create_app<R: tauri::Runtime>(
             commands::transaction::get_transaction,
             //
             commands::last_transactions::past_transactions,
+            //
+            commands::backup::do_backup,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
