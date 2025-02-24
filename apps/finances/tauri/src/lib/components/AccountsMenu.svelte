@@ -141,7 +141,7 @@
         </SidebarItem>
 
         <SidebarItem
-          label="Admin interface ({`${app_state.base_url()}/admin`})"
+          label="Admin interface"
           href={`${app_state.base_url()}/admin`}
           ulClass={groupClass}
           spanClass="ml-3"

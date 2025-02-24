@@ -74,6 +74,11 @@ export declare type AppState = Message<"finances_app_models.AppState"> & {
    * @generated from field: finances_app_models.DatabaseConnection db = 5;
    */
   db?: DatabaseConnection;
+
+  /**
+   * @generated from field: string backup_folder = 6;
+   */
+  backupFolder: string;
 };
 
 /**
