@@ -80,11 +80,11 @@ reset: clean build test
 ###
 
 bazel-remote:
-    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --build -d bazel-remote
+    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --remove-orphans --build -d bazel-remote
 
 # Run bazel-remote (cache) and github runner
 gh-runner-linux:
-    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --build -d
+    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --remove-orphans --build -d
 
 gh-runner-linux-logs:
     docker-compose -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml logs -f

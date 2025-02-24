@@ -25,4 +25,7 @@ message AppState {
 
     // Current DB connection
     DatabaseConnection db = 5;
+
+    // Backup directory
+    string backup_folder = 6;
 }

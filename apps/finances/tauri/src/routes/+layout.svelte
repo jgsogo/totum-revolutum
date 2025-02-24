@@ -1,10 +1,10 @@
 <script lang="ts">
-  import "../app.postcss";
-  import Navbar from "$lib/components/Navbar.svelte";
-  import AccountsMenu from "$lib/components/AccountsMenu.svelte";
-  import type { AppState, MainContext } from "../../models/src-js";
-  import { do_backup } from "$lib/commands";
-  import { Button } from "flowbite-svelte";
+  import '../app.postcss';
+  import Navbar from '$lib/components/Navbar.svelte';
+  import AccountsMenu from '$lib/components/AccountsMenu.svelte';
+  import type { AppState, MainContext } from '../../models/src-js';
+  import { do_backup } from '$lib/commands';
+  import { Button } from 'flowbite-svelte';
 
   let { data, children } = $props();
   let app_state: AppState = data.app_state;
@@ -12,15 +12,13 @@
 
   let drawerHidden = $state(false);
 
-  let backup_info: string = $state("not run yet");
+  let backup_info: string = $state('not run yet');
   const run_backup = async () => {
     backup_info = await do_backup();
   };
 </script>
 
-<header
-  class="fixed top-0 z-40 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800"
->
+<header class="fixed top-0 z-40 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800">
   <Navbar bind:drawerHidden home_href="/" />
 </header>
 <div class="overflow-hidden lg:flex">

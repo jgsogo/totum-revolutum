@@ -1,5 +1,6 @@
 use crate::google_type::CurrencyCode;
 use crate::{Error, Result};
+use camino::{Utf8Path, Utf8PathBuf};
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
@@ -60,6 +61,7 @@ impl AppState {
         base_static_url: String,
         base_url: String,
         db: DatabaseConnection,
+        backup_directory: &Utf8Path,
     ) -> Self {
         Self(crate::protos::finances_app_models::AppState {
             base_ccy: base_ccy.to_string(),
@@ -67,6 +69,7 @@ impl AppState {
             base_static_url,
             base_url,
             db: Some(db.into()),
+            backup_folder: backup_directory.to_string(),
         })
     }
 
@@ -88,5 +91,9 @@ impl AppState {
             .as_ref()
             .map(DatabaseConnection::new_ref)
             .ok_or(Error::MissingRequiredField("db".to_string()))
+    }
+
+    pub fn backup_directory(&self) -> Utf8PathBuf {
+        Utf8PathBuf::from(&self.0.backup_folder)
     }
 }

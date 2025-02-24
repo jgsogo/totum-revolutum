@@ -1797,6 +1797,7 @@ name = "finances-app"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "camino",
  "chrono",
  "chrono-tz",
  "diesel",
@@ -1804,6 +1805,7 @@ dependencies = [
  "finances-app-models",
  "finances_accounts",
  "finances_investments",
+ "futures-util",
  "itertools 0.14.0",
  "log",
  "openexchangerates",
@@ -1824,6 +1826,7 @@ name = "finances-app-models"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "camino",
  "chrono",
  "diesel",
  "finances_accounts",

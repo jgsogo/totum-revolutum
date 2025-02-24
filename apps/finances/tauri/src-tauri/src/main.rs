@@ -18,12 +18,17 @@ fn main() {
         let base_url = std::env::var("BASE_URL").expect("BASE_URL envvar is required");
         let media_url = std::env::var("MEDIA_URL").expect("MEDIA_URL envvar is required");
         let static_url = std::env::var("STATIC_URL").expect("STATIC_URL envvar is required");
+        let backup_folder = std::env::var("BACKUP_DIRECTORY")
+            .map(|s| std::path::PathBuf::from(&s))
+            .unwrap_or_else(|_| std::env::temp_dir());
+        let backup_folder = camino::Utf8PathBuf::from_path_buf(backup_folder).expect("Invalid tmp folder");
         AppState::new(
             google_type::CurrencyCode::EUR,
             media_url,
             static_url,
             base_url,
             postgres_db,
+            &backup_folder,
         )
     };
     let pool =

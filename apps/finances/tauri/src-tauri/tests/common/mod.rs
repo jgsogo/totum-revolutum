@@ -13,6 +13,7 @@ pub fn webview() -> WebviewWindow<MockRuntime> {
         "static_url".to_string(),
         "base_url".to_string(),
         db,
+        &camino::Utf8PathBuf::from("backup_dir"),
     );
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone());

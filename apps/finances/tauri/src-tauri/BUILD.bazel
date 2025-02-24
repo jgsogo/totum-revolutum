@@ -94,6 +94,7 @@ rust_test_suite(
         "//apps/finances/tauri/models:models/rust",
         "//libraries/finances/accounts/rust:finances_accounts/test_utils",
         "@crates_libraries//:bigdecimal",
+        "@crates_libraries//:camino",
         "@crates_libraries//:chrono",
         "@crates_libraries//:prost",
         "@crates_libraries//:serde",
