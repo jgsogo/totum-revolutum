@@ -11,7 +11,7 @@ def _fetch_buildx_impl(_ctx):
         urls = [
             "https://github.com/docker/buildx/releases/download/v{version}/buildx-v{version}.linux-amd64".format(version = BUILDX_VERSION),
         ],
-        integrity = "",
+        integrity = "sha256-Lo9FQGLSHyv4d/WzZMItANbDNG+tW4EO/X4c646yZOQ=",
         executable = True,
     )
 
@@ -20,7 +20,7 @@ def _fetch_buildx_impl(_ctx):
         urls = [
             "https://github.com/docker/buildx/releases/download/v{version}/buildx-v{version}.darwin-arm64".format(version = BUILDX_VERSION),
         ],
-        integrity = "",
+        integrity = "sha256-Lo9FQGLSHyv4d/WzZMItANbDNG+tW4EO/X4c646yZOQ=",
         executable = True,
     )
 
