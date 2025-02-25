@@ -6,13 +6,14 @@ use tauri::{test::MockRuntime, Manager, WebviewWindow};
 
 pub fn webview() -> WebviewWindow<MockRuntime> {
     let pool = establish_connection();
-    let db = DatabaseConnection::new("postgres_url".to_string());
+    let db = DatabaseConnection::new("user", "password", "host", 1234, "dbname");
     let app_state = AppState::new(
         google_type::CurrencyCode::USD,
         "media_url".to_string(),
         "static_url".to_string(),
         "base_url".to_string(),
         db,
+        &camino::Utf8PathBuf::from("backup_dir"),
     );
 
     let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone());
