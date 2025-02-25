@@ -62,13 +62,19 @@ def _with_docker_run_impl(ctx):
         for dep in ctx.attr.binaries
     ])
 
+    # Environment
+    environment = env
+    for dep in ctx.attr.binaries:
+        if RunEnvironmentInfo in dep:
+            environment = environment | dep[RunEnvironmentInfo].environment
+
     return [
         DefaultInfo(
             executable = executable,
             runfiles = runfiles,
         ),
         RunEnvironmentInfo(
-            environment = env,
+            environment = environment,
         ),
     ]
 

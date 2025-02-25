@@ -1,0 +1,14 @@
+[db]
+host = "$${${APP_PREFIX}POSTGRES_HOST:-localhost}"
+port = $${${APP_PREFIX}POSTGRES_PORT:-5432}
+username = "$${${APP_PREFIX}POSTGRES_USER}"
+password = "$${${APP_PREFIX}POSTGRES_PASSWORD}"
+name = "$${${APP_PREFIX}POSTGRES_DB}"
+
+[django]
+base_url = "$${${APP_PREFIX}BASE_URL}"
+media_url = "$${${APP_PREFIX}MEDIA_URL:-/media/}"
+static_url = "$${${APP_PREFIX}STATIC_URL:-/static/}"
+
+[tauri]
+backup_directory = "$${${APP_PREFIX}BACKUP_DIRECTORY:-~/backups}"

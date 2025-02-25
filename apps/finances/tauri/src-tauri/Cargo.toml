@@ -49,6 +49,9 @@ tempfile = "3.17.1"
 reqwest = { version = "0.12.12", features = ["json"] }
 futures-util = { version = "0.3.31", default-features = false, features = ["alloc"] }
 camino = "1.1.9"
+clap = "4.5.31"
+clap-stdin = "0.6.0"
+toml = "0.8.20"
 
 [dev-dependencies]
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust", features = [

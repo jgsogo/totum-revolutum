@@ -9,9 +9,9 @@ def _with_docker_compose_run_impl(ctx):
 
     # Environment: we will use both a file (for docker) and environment variables
     env = {
-        "SQL_USER": "with_docker_compose",
-        # "POSTGRES_DB": "with_postgres",
-        "SQL_PASSWORD": "with_docker_compose",
+        "POSTGRES_USER": "with_docker_compose",
+        "POSTGRES_DB": "with_docker_compose",
+        "POSTGRES_PASSWORD": "with_docker_compose",
     } | ctx.attr.env
 
     env_file = ctx.actions.declare_file(ctx.label.name + ".env")
@@ -72,13 +72,19 @@ def _with_docker_compose_run_impl(ctx):
         for dep in ctx.attr.binaries
     ])
 
+    # Environment
+    environment = env
+    for dep in ctx.attr.binaries:
+        if RunEnvironmentInfo in dep:
+            environment = environment | dep[RunEnvironmentInfo].environment
+
     return [
         DefaultInfo(
             executable = executable,
             runfiles = runfiles,
         ),
         RunEnvironmentInfo(
-            environment = env,
+            environment = environment,
         ),
     ]
 

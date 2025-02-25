@@ -25,6 +25,7 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-toml
+        exclude: ".tpl.toml"
       - id: check-xml
       - id: pretty-format-json
         args: [ --autofix ]
