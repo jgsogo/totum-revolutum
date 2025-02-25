@@ -2,6 +2,7 @@ load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
 load("//bazel/containers/with_docker:with_docker_compose_run.bzl", "with_docker_compose_run")
 load("//bazel/run:defs.bzl", "run_together")
+load("//bazel/tools/envsubst:with_envsubst_run.bzl", "with_envsubst_run")
 
 value_from_stable_status(
     name = "version",
@@ -27,18 +28,29 @@ expand_template(
     ],
 )
 
+with_envsubst_run(
+    name = "backend_cfg",
+    binary = "//apps/finances/tauri/src-tauri:app",
+    config = "//apps/finances/tauri/config:finances-config.tpl.toml",
+    env = {
+        "APP_PREFIX": "FINANCES_",
+        # "FINANCES_BASE_URL": "FINANCES_",
+        # "FINANCES_BACKUP_DIRECTORY": "FINANCES_",
+    },
+)
+
 # The backend requires a database (and the Django application to access the admin interface)
 with_docker_compose_run(
     name = "backend",
     binaries = [
-        "//apps/finances/tauri/src-tauri:app",
+        # "//apps/finances/tauri/src-tauri:app",
+        ":backend_cfg",
     ],
     docker_compose = [
         "//apps/finances/django:app-docker_compose",
         ":expose_postgresql",
     ],
     env = {
-        "SQL_DATABASE": "finances-dev",
         "SECRET_KEY": "development-environment",
         # Create superuser
         "DJANGO_SUPERUSER_PASSWORD": "django",
@@ -47,12 +59,19 @@ with_docker_compose_run(
         # Migrate data from legacy DB ('host.docker.internal' is the host for the _external localhost_)
         # "LEGACY_DATABASE_URL": "postgres://finances_ro:finances_ro@host.docker.internal:5432/finances",
         # Need to keep this data synced with the docker_compose (port) and the django settings
-        "BASE_URL": "http://localhost:1337",
-        "MEDIA_URL": "/media/",
-        "STATIC_URL": "/static/",
+        "FINANCES_BASE_URL": "http://localhost:1337",
+        # "MEDIA_URL": "/media/",
+        # "STATIC_URL": "/static/",
         # Rust debugging
         "RUST_BACKTRACE": "1",
         "RUST_LOG": "debug",
+    },
+    env_transpose = {
+        "FINANCES_POSTGRES_USER": "POSTGRES_USER",
+        "FINANCES_POSTGRES_PASSWORD": "POSTGRES_PASSWORD",
+        "FINANCES_POSTGRES_DB": "POSTGRES_DB",
+        "FINANCES_POSTGRES_HOST": "POSTGRES_HOST",
+        "FINANCES_POSTGRES_PORT": "POSTGRES_PORT",
     },
     remove_volumes = False,
 )

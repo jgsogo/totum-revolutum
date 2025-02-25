@@ -1,9 +1,58 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use camino::Utf8PathBuf;
+use clap::{Args, Parser};
+use clap_stdin::FileOrStdin;
 use finances_app_models::{google_type, AppState, DatabaseConnection};
+use serde::Deserialize;
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+#[command(propagate_version = true)]
+struct Cli {
+    /// Path to configuration file
+    #[clap(long, default_value = "-")]
+    config: FileOrStdin,
+    // TODO: If not provided, go to dirs::home_dir / .finances / config.toml
+    // TODO: Implement this logic as something reusable
+}
+
+#[derive(Deserialize, Debug)]
+struct Config {
+    db: DbConfig,
+    tauri: TauriConfig,
+    django: DjangoConfig,
+}
+
+#[derive(Deserialize, Debug)]
+struct DbConfig {
+    host: String,
+    port: u16,
+    username: String,
+    password: String,
+    name: String,
+}
+
+#[derive(Deserialize, Debug)]
+struct TauriConfig {
+    backup_directory: Utf8PathBuf,
+}
+
+#[derive(Deserialize, Debug)]
+struct DjangoConfig {
+    base_url: String,
+    media_url: String,
+    static_url: String,
+}
 
 fn main() {
+    let cli = Cli::parse();
+    println!("cli: {:?}", cli);
+    // println!("cli={}", cli.config.contents().expect("lolo"));
+    let config: Config = toml::from_str(&cli.config.contents().expect("lolo")).expect("lolailo");
+    println!("config: {:?}", config);
+
     let state = {
         let postgres_db = {
             let user = std::env::var("POSTGRES_USER").expect("POSTGRES_USER envvar is required");

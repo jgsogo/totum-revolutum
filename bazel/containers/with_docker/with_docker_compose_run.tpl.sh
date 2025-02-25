@@ -27,8 +27,7 @@ function finish {
     echo "docker compose down"
     $DOCKER_COMPOSE_COMMAND down %DOCKER_COMPOSE_DOWN_ARGS%
 }
-trap finish EXIT
-trap finish INT  # Capture Ctrl_C (SIGINT)
+trap finish EXIT SIGTERM SIGINT
 
 # Start docker compose UP
 # $DOCKER_COMPOSE_COMMAND config %SERVICES%
@@ -46,7 +45,7 @@ CONTAINER_PORT=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 2)
 RETRY_COUNT=0
 RETRY_MAX=10
 RETRY_INTERVAL=3
-while ! pg_isready --username=$SQL_USER --dbname=$SQL_DATABASE --host=$CONTAINER_HOST --port=$CONTAINER_PORT 2>/dev/null; do
+while ! pg_isready --username=$POSTGRES_USER --dbname=$POSTGRES_DB --host=$CONTAINER_HOST --port=$CONTAINER_PORT 2>/dev/null; do
   RETRY_COUNT=$(($RETRY_COUNT + 1))
   if [ $RETRY_COUNT -ge $RETRY_MAX ]; then
     echo "PostgreSQL not ready after ${RETRY_MAX} attempts. Exiting."
@@ -60,7 +59,7 @@ done
 # Run the script
 export POSTGRES_HOST=$CONTAINER_HOST
 export POSTGRES_PORT=$CONTAINER_PORT
-export POSTGRES_URL="postgres://$SQL_USER:$SQL_PASSWORD@$CONTAINER_HOST:$CONTAINER_PORT/$SQL_DATABASE"
+export POSTGRES_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB"
 %ENV_TRANSPOSE%
 for binary in %BINARIES%; do
     BINARY_CLI="$(rlocation "$binary")"

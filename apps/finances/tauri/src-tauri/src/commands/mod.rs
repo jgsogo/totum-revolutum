@@ -4,6 +4,7 @@
 //! to be unique for each Tauri application. We enforce this guarantee if all the commands are
 //! defined in the same module.
 
+pub mod backup;
 pub mod last_transactions;
 pub mod snapshot;
 pub mod transaction;

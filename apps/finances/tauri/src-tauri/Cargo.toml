@@ -8,7 +8,12 @@ edition = "2021"
 [features]
 default = ["postgres"]
 # sqlite = ["finances_db/sqlite", "diesel/sqlite", "diesel/returning_clauses_for_sqlite_3_35"]
-postgres = ["finances_accounts/postgres", "finances_investments/postgres", "diesel/postgres", "diesel/numeric"]
+postgres = [
+    "finances_accounts/postgres",
+    "finances_investments/postgres",
+    "diesel/postgres",
+    "diesel/numeric",
+]
 
 [lib]
 name = "finances_app_lib"
@@ -18,7 +23,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 tauri-build = { version = "2.0.5", features = [] }
 
 [dependencies]
-finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
+finances_accounts = { path = "../../../../libraries/finances/accounts/rust" }
 finances_investments = { path = "../../../../libraries/finances/investments/rust" }
 openexchangerates = { path = "../../../../libraries/openexchangerates" }
 finances-app-models = { path = "../models" }
@@ -29,7 +34,8 @@ chrono = { version = "0.4.39" }
 chrono-tz = { version = "0.10.1" }
 diesel = { version = "2.2.7", features = ["r2d2", "chrono"] }
 
-tauri-build = { version = "2.0.5", features = [] } # FIXME: If I don't list it here, Bazel doesn't include it in crate_libraries
+tauri-build = { version = "2.0.5", features = [
+] } # FIXME: If I don't list it here, Bazel doesn't include it in crate_libraries
 tauri = { version = "2.2.5", features = [] }
 tauri-plugin-shell = "2.2.0"
 serde = { version = "1.0.217", features = ["derive"] }
@@ -39,8 +45,22 @@ log = "0.4.25"
 tauri-plugin-log = "2.2.1"
 itertools = "0.14.0"
 
+postgresql_commands = "0.17.5"
+tempfile = "3.17.1"
+reqwest = { version = "0.12.12", features = ["json"] }
+futures-util = { version = "0.3.31", default-features = false, features = ["alloc"] }
+camino = "1.1.9"
+clap = "4.5.31"
+clap-stdin = "0.6.0"
+toml = "0.8.20"
+
 [dev-dependencies]
-finances_accounts = { path = "../../../../libraries/finances/accounts/rust", features = ["postgres", "test_utils"] }
-finances_investments = { path = "../../../../libraries/finances/investments/rust", features = ["postgres"] }
+finances_accounts = { path = "../../../../libraries/finances/accounts/rust", features = [
+    "postgres",
+    "test_utils",
+] }
+finances_investments = { path = "../../../../libraries/finances/investments/rust", features = [
+    "postgres",
+] }
 finances-app = { path = ".", default-features = false, features = ["postgres"] }
 tauri = { version = "2.2.5", features = ["test"] }

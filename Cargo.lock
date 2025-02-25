@@ -880,6 +880,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "clap-stdin"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1101d998d15574d862ee282bcb93e0cf2d192c2fb12338dec35daa91425769a9"
+dependencies = [
+ "thiserror 2.0.11",
+]
+
+[[package]]
 name = "clap-verbosity-flag"
 version = "3.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1809,21 +1818,28 @@ dependencies = [
  "camino",
  "chrono",
  "chrono-tz",
+ "clap",
+ "clap-stdin",
  "diesel",
  "finances-app",
  "finances-app-models",
  "finances_accounts",
  "finances_investments",
+ "futures-util",
  "itertools 0.14.0",
  "log",
  "openexchangerates",
+ "postgresql_commands",
+ "reqwest",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-log",
  "tauri-plugin-shell",
+ "tempfile",
  "thiserror 2.0.11",
+ "toml 0.8.20",
 ]
 
 [[package]]
@@ -5010,6 +5026,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "postgresql_commands"
+version = "0.17.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38513212330c0ec1bb365d5fb42a48204f9e54ba7fa376dc62707884314cfcac"
+dependencies = [
+ "thiserror 2.0.11",
+ "tracing",
+]
+
+[[package]]
 name = "powerfmt"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7256,6 +7282,7 @@ version = "0.1.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "784e0ac535deb450455cbfa28a6f0df145ea1bb7ae51b821cf5e7927fdcfbdd0"
 dependencies = [
+ "log",
  "pin-project-lite",
  "tracing-attributes",
  "tracing-core",
