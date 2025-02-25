@@ -15,9 +15,29 @@ export declare const file_apps_finances_tauri_models_protos_app_state: GenFile;
  */
 export declare type DatabaseConnection = Message<"finances_app_models.DatabaseConnection"> & {
   /**
-   * @generated from field: string postgres_url = 1;
+   * @generated from field: string user = 1;
    */
-  postgresUrl: string;
+  user: string;
+
+  /**
+   * @generated from field: string password = 2;
+   */
+  password: string;
+
+  /**
+   * @generated from field: string host = 3;
+   */
+  host: string;
+
+  /**
+   * @generated from field: uint32 port = 4;
+   */
+  port: number;
+
+  /**
+   * @generated from field: string dbname = 5;
+   */
+  dbname: string;
 };
 
 /**
@@ -54,6 +74,11 @@ export declare type AppState = Message<"finances_app_models.AppState"> & {
    * @generated from field: finances_app_models.DatabaseConnection db = 5;
    */
   db?: DatabaseConnection;
+
+  /**
+   * @generated from field: string backup_folder = 6;
+   */
+  backupFolder: string;
 };
 
 /**
