@@ -6,7 +6,7 @@ import { Buffer } from 'buffer';
 import { CurrencyCode } from "../../../../../libraries/googleapis/src-js/money.js";
 
 describe('AppState', () => {
-    let db = create(DatabaseConnectionSchema, { postgresUrl: 'postgres-url' });
+    let db = create(DatabaseConnectionSchema, { user: 'user', password: 'password', host: 'host', port: 1234, dbname: 'dbname' });
     let app_state_proto = create(AppStateSchema, { baseCcy: 'EUR', baseMediaUrl: 'base-media-url', baseStaticUrl: 'base-static-url', baseUrl: 'base-url', db });
     let app_state_uint8_buffer = toBinary(AppStateSchema, app_state_proto);
     const arrayBuffer = Buffer.from(app_state_uint8_buffer.buffer, 0, app_state_uint8_buffer.byteLength);

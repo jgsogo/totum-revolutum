@@ -1,4 +1,6 @@
-use crate::{google_type::CurrencyCode, Error, Result};
+use crate::google_type::CurrencyCode;
+use crate::{Error, Result};
+use camino::{Utf8Path, Utf8PathBuf};
 use proto_wrapper::ProtoWrapper;
 
 #[repr(transparent)]
@@ -6,12 +8,45 @@ use proto_wrapper::ProtoWrapper;
 pub struct DatabaseConnection(crate::protos::finances_app_models::DatabaseConnection);
 
 impl DatabaseConnection {
-    pub fn new(postgres_url: String) -> Self {
-        Self(crate::protos::finances_app_models::DatabaseConnection { postgres_url })
+    pub fn new(user: &str, password: &str, host: &str, port: u16, dbname: &str) -> Self {
+        Self(crate::protos::finances_app_models::DatabaseConnection {
+            user: user.to_string(),
+            password: password.to_string(),
+            host: host.to_string(),
+            port: port.into(),
+            dbname: dbname.to_string(),
+        })
     }
 
-    pub fn postgres_url(&self) -> &str {
-        &self.0.postgres_url
+    pub fn user(&self) -> &str {
+        &self.0.user
+    }
+
+    pub fn password(&self) -> &str {
+        &self.0.password
+    }
+
+    pub fn host(&self) -> &str {
+        &self.0.host
+    }
+
+    pub fn port(&self) -> u16 {
+        self.0.port.try_into().expect("Port doesn't fit into u16")
+    }
+
+    pub fn dbname(&self) -> &str {
+        &self.0.dbname
+    }
+
+    pub fn postgres_url(&self) -> String {
+        format!(
+            "postgres://{}:{}@{}:{}/{}",
+            self.user(),
+            self.password(),
+            self.host(),
+            self.port(),
+            self.dbname()
+        )
     }
 }
 
@@ -26,6 +61,7 @@ impl AppState {
         base_static_url: String,
         base_url: String,
         db: DatabaseConnection,
+        backup_directory: &Utf8Path,
     ) -> Self {
         Self(crate::protos::finances_app_models::AppState {
             base_ccy: base_ccy.to_string(),
@@ -33,6 +69,7 @@ impl AppState {
             base_static_url,
             base_url,
             db: Some(db.into()),
+            backup_folder: backup_directory.to_string(),
         })
     }
 
@@ -40,13 +77,23 @@ impl AppState {
         Ok(CurrencyCode::new(&self.0.base_ccy)?)
     }
 
-    pub fn postgres_url(&self) -> Result<&str> {
-        Ok(self
-            .0
+    pub fn base_url(&self) -> Result<&str> {
+        Ok(&self.0.base_url)
+    }
+
+    pub fn base_media_url(&self) -> Result<&str> {
+        Ok(&self.0.base_media_url)
+    }
+
+    pub fn db(&self) -> Result<&DatabaseConnection> {
+        self.0
             .db
             .as_ref()
             .map(DatabaseConnection::new_ref)
-            .ok_or(Error::MissingRequiredField("db".to_string()))?
-            .postgres_url())
+            .ok_or(Error::MissingRequiredField("db".to_string()))
+    }
+
+    pub fn backup_directory(&self) -> Utf8PathBuf {
+        Utf8PathBuf::from(&self.0.backup_folder)
     }
 }

@@ -1806,6 +1806,7 @@ name = "finances-app"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "camino",
  "chrono",
  "chrono-tz",
  "diesel",
@@ -1830,6 +1831,7 @@ name = "finances-app-models"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "camino",
  "chrono",
  "diesel",
  "finances_accounts",
