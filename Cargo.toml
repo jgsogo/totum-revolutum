@@ -80,7 +80,7 @@ mockall = { version = "0.13.1" }
 num-bigint = "0.4.6"
 num-traits = "0.2.19"
 oxipng = { version = "9.1.4", features = ["parallel", "zopfli", "filetime"], default-features = false }
-pq-sys = "0.7.0"
+pq-sys = "0.6.3"
 prost = "0.13.5"
 prost-types = "0.13.5"
 prost-build = "0.13.5"
