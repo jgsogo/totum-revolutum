@@ -3,7 +3,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 load("//bazel/containers/buildx:configure_buildx.bzl", "configure_buildx")
 
-BUILDX_VERSION = "0.14.0"
+BUILDX_VERSION = "0.21.1"
 
 def _fetch_buildx_impl(_ctx):
     http_file(
@@ -11,7 +11,7 @@ def _fetch_buildx_impl(_ctx):
         urls = [
             "https://github.com/docker/buildx/releases/download/v{version}/buildx-v{version}.linux-amd64".format(version = BUILDX_VERSION),
         ],
-        integrity = "sha256-Mvjxfso1vy7+bA5H9A5Gkqh280UxtCHvyYR5mltBIm4=",
+        integrity = "sha256-fzVVJb+vQRMCVwtwURgYG3IPGAcfS+Pw6qx7IpfYJuI=",
         executable = True,
     )
 
@@ -20,7 +20,7 @@ def _fetch_buildx_impl(_ctx):
         urls = [
             "https://github.com/docker/buildx/releases/download/v{version}/buildx-v{version}.darwin-arm64".format(version = BUILDX_VERSION),
         ],
-        integrity = "sha256-3BdvI2ZgnMITKubwi7IZOjL5/ZNUv9Agz3+juNt0hA0=",
+        integrity = "sha256-rhR8+gxWuNhtc1iWLDH/gQ8dlDoBHddKZDpfvf3Vqhk=",
         executable = True,
     )
 
@@ -29,7 +29,7 @@ def _fetch_buildx_impl(_ctx):
         urls = [
             "https://github.com/docker/buildx/releases/download/v{version}/buildx-v{version}.darwin-amd64".format(version = BUILDX_VERSION),
         ],
-        integrity = "sha256-J6rZfENSvCzFBHDgnA8Oqq2FDXR+M9CTejhhg9DruPU=",
+        integrity = "sha256-Lo9FQGLSHyv4d/WzZMItANbDNG+tW4EO/X4c646yZOQ=",
         executable = True,
     )
 
