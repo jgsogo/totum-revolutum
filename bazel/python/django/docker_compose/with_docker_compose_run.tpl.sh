@@ -27,8 +27,7 @@ function finish {
     echo "docker compose down"
     $DOCKER_COMPOSE_COMMAND down %DOCKER_COMPOSE_DOWN_ARGS%
 }
-trap finish EXIT
-trap finish INT  # Capture Ctrl_C (SIGINT)
+trap finish EXIT SIGTERM SIGINT  # Capture Ctrl_C (SIGINT)
 
 # Start docker compose UP
 # $DOCKER_COMPOSE_COMMAND config %SERVICES%
@@ -39,8 +38,8 @@ $DOCKER_COMPOSE_COMMAND up %SERVICES% --wait --wait-timeout 120
 SERVICE_NAME="db"
 SERVICE_PORT=5432
 CONTAINER_HOST_AND_PORT=$($DOCKER_COMPOSE_COMMAND port $SERVICE_NAME $SERVICE_PORT | head -n 1)
-POSTGRES_HOST=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 1)
-POSTGRES_PORT=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 2)
+export POSTGRES_HOST=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 1)
+export POSTGRES_PORT=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 2)
 
 # Wait until Postgres is ready
 RETRY_COUNT=0

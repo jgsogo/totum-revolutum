@@ -24,15 +24,15 @@ fi
 function finish {
     "$CONTAINER_CLI" stop %CONTAINER_NAME%
 }
-trap finish EXIT SIGTERM SIGINT
+trap finish EXIT SIGTERM SIGINT # Capture Ctrl_C (SIGINT)
 
 # Start postgres container
 "$CONTAINER_CLI" run --rm -p 5432 --name=%CONTAINER_NAME% --env-file=%ENV_FILE% -d postgres:%POSTGRES_IMAGE_TAG%
 
 # Get the external port for internal 5432
 CONTAINER_HOST_AND_PORT=$("$CONTAINER_CLI" port %CONTAINER_NAME% 5432 | head -n 1)
-POSTGRES_HOST=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 1)
-POSTGRES_PORT=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 2)
+export POSTGRES_HOST=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 1)
+export POSTGRES_PORT=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 2)
 
 # Wait until Postgres is ready
 RETRY_COUNT=0

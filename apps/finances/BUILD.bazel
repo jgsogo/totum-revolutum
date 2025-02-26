@@ -56,7 +56,7 @@ with_docker_compose_run(
     env_transpose = {
         "POSTGRES_USER": "SQL_USER",
         "POSTGRES_PASSWORD": "SQL_PASSWORD",
-        "POSTGRES_DATABASE": "SQL_DATABASE",
+        "POSTGRES_DB": "SQL_DATABASE",
     },
     remove_volumes = False,
 )
