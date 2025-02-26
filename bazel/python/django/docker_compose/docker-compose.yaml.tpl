@@ -10,13 +10,12 @@ services:
       - SECRET_KEY=${SECRET_KEY}  # Django fails if this is empty, so the user really needs to set it from somewhere else
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 0.0.0.0 [::1]  # TODO: Sure I can remove some of them
       # Database
-      - SQL_ENGINE=django.db.backends.postgresql
-      - SQL_DATABASE=${SQL_DATABASE:-hello_django_dev}
-      - SQL_USER=${SQL_USER:-hello_django}
-      - SQL_PASSWORD=${SQL_PASSWORD:-hello_django}
-      - SQL_HOST=db
-      - SQL_PORT=5432
-      - DATABASE=postgres
+      - DJANGO_SQL_ENGINE=django.db.backends.postgresql
+      - DJANGO_SQL_DATABASE=${SQL_DATABASE:-hello_django_dev}
+      - DJANGO_SQL_USER=${SQL_USER:-hello_django}
+      - DJANGO_SQL_PASSWORD=${SQL_PASSWORD:-hello_django}
+      - DJANGO_SQL_HOST=db
+      - DJANGO_SQL_PORT=5432
       # Django static and media files
       - STATIC_ROOT=/home/%USER%/web/staticfiles/
       - MEDIA_ROOT=/home/%USER%/web/mediafiles/
@@ -39,7 +38,7 @@ services:
         timeout: 10s
 
   db:
-    image: postgres:17
+    image: postgres:%POSTGRES_IMAGE_TAG%
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:

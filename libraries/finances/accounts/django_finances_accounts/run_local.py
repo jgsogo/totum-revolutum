@@ -19,12 +19,12 @@ def setup_application():
         DEBUG=True,
         DATABASES={
             "default": {
-                "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-                "NAME": os.environ.get("SQL_DATABASE", "db.sqlite3"),
-                "USER": os.environ.get("SQL_USER", "user"),
-                "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-                "HOST": os.environ.get("SQL_HOST", "localhost"),
-                "PORT": os.environ.get("SQL_PORT", "5432"),
+                "ENGINE": os.environ.get("DJANGO_SQL_ENGINE", "django.db.backends.sqlite3"),
+                "NAME": os.environ.get("DJANGO_SQL_DATABASE", "db.sqlite3"),
+                "USER": os.environ.get("DJANGO_SQL_USER", "user"),
+                "PASSWORD": os.environ.get("DJANGO_SQL_PASSWORD", "password"),
+                "HOST": os.environ.get("DJANGO_SQL_HOST", "localhost"),
+                "PORT": os.environ.get("DJANGO_SQL_PORT", "5432"),
             }
         },
         TIME_ZONE="UTC",

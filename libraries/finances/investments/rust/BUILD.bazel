@@ -63,16 +63,15 @@ with_postgres_test(
         ":_tests",
     ],
     env = {
-        "SQL_ENGINE": "django.db.backends.postgresql",
+        "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
     },
     env_transpose = {
-        "SQL_DATABASE": "POSTGRES_DB",
-        "SQL_USER": "POSTGRES_USER",
-        "SQL_PASSWORD": "POSTGRES_PASSWORD",
-        "SQL_HOST": "POSTGRES_HOST",
-        "SQL_PORT": "POSTGRES_PORT",
+        "DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "DJANGO_SQL_USER": "POSTGRES_USER",
+        "DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "DJANGO_SQL_PORT": "POSTGRES_PORT",
     },
-    postgres_image_tag = "17",
 )
 
 ###
@@ -114,16 +113,15 @@ with_postgres_run(
         ":gen_constants_bin",
     ],
     env = {
-        "SQL_ENGINE": "django.db.backends.postgresql",
+        "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
     },
     env_transpose = {
-        "SQL_DATABASE": "POSTGRES_DB",
-        "SQL_USER": "POSTGRES_USER",
-        "SQL_PASSWORD": "POSTGRES_PASSWORD",
-        "SQL_HOST": "POSTGRES_HOST",
-        "SQL_PORT": "POSTGRES_PORT",
+        "DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "DJANGO_SQL_USER": "POSTGRES_USER",
+        "DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "DJANGO_SQL_PORT": "POSTGRES_PORT",
     },
-    postgres_image_tag = "17",
     tags = [
         "manual",
         "update",

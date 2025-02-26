@@ -109,7 +109,17 @@ with_postgres_run = rule(
         ),
     },
     executable = True,
-    doc = """Ensure postgres is running while executing the 'binary'. The binary will receive the postgres URL as argument""",
+    doc = """
+    Ensure postgres is running while executing the given 'binaries'.
+
+    Binaries will have the following environment variables available:
+        * POSTGRES_DB, SQL_DATABASE: Name of the database
+        * POSTGRES_USER, SQL_USER
+        * POSTGRES_PASSWORD, SQL_PASSWORD
+        * POSTGRES_HOST, SQL_HOST
+        * POSTGRES_PORT, SQL_PORT
+        * POSTGRES_URL: connection string for postgres database (i.e.: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB")
+    """,
 )
 
 with_postgres_test = rule(
@@ -149,5 +159,15 @@ with_postgres_test = rule(
         ),
     },
     test = True,
-    doc = """Ensure postgres is running while executing the 'binary'. The binary will receive the postgres URL as argument""",
+    doc = """
+    Ensure postgres is running while executing the given 'binaries'.
+
+    Binaries will have the following environment variables available:
+        * POSTGRES_DB, SQL_DATABASE: Name of the database
+        * POSTGRES_USER, SQL_USER
+        * POSTGRES_PASSWORD, SQL_PASSWORD
+        * POSTGRES_HOST, SQL_HOST
+        * POSTGRES_PORT, SQL_PORT
+        * POSTGRES_URL: connection string for postgres database (i.e.: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB")
+    """,
 )
