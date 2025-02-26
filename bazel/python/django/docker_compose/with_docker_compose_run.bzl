@@ -10,7 +10,7 @@ def _with_docker_compose_run_impl(ctx):
     # Environment: we will use both a file (for docker) and environment variables
     env = {
         "SQL_USER": "with_docker_compose",
-        # "POSTGRES_DB": "with_postgres",
+        "SQL_DATABASE": "with_docker_compose",
         "SQL_PASSWORD": "with_docker_compose",
     } | ctx.attr.env
 
@@ -104,7 +104,7 @@ with_docker_compose_run = rule(
             cfg = "target",
         ),
         "_run_template": attr.label(
-            default = Label("//bazel/containers/with_docker:with_docker_compose_run.tpl.sh"),
+            default = Label("//bazel/python/django/docker_compose:with_docker_compose_run.tpl.sh"),
             allow_single_file = True,
         ),
         "env": attr.string_dict(

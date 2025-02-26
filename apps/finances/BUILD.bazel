@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
-load("//bazel/containers/with_docker:with_docker_compose_run.bzl", "with_docker_compose_run")
+load("//bazel/python/django/docker_compose:with_docker_compose_run.bzl", "with_docker_compose_run")
 load("//bazel/run:defs.bzl", "run_together")
 
 value_from_stable_status(
@@ -38,7 +38,6 @@ with_docker_compose_run(
         ":expose_postgresql",
     ],
     env = {
-        "SQL_DATABASE": "finances-dev",
         "SECRET_KEY": "development-environment",
         # Create superuser
         "DJANGO_SUPERUSER_PASSWORD": "django",
@@ -53,6 +52,11 @@ with_docker_compose_run(
         # Rust debugging
         "RUST_BACKTRACE": "1",
         "RUST_LOG": "debug",
+    },
+    env_transpose = {
+        "POSTGRES_USER": "SQL_USER",
+        "POSTGRES_PASSWORD": "SQL_PASSWORD",
+        "POSTGRES_DATABASE": "SQL_DATABASE",
     },
     remove_volumes = False,
 )
