@@ -45,17 +45,9 @@ with_docker_compose_run(
         "DJANGO_SUPERUSER_EMAIL": "django@django.com",
         # Migrate data from legacy DB ('host.docker.internal' is the host for the _external localhost_)
         # "LEGACY_DATABASE_URL": "postgres://finances_ro:finances_ro@host.docker.internal:5432/finances",
-        # Need to keep this data synced with the docker_compose (port) and the django settings
-        "MEDIA_URL": "/media/",
-        "STATIC_URL": "/static/",
         # Rust debugging
         "RUST_BACKTRACE": "1",
         "RUST_LOG": "debug",
-    },
-    env_transpose = {
-        "POSTGRES_USER": "SQL_USER",
-        "POSTGRES_PASSWORD": "SQL_PASSWORD",
-        "POSTGRES_DB": "SQL_DATABASE",
     },
     remove_volumes = False,
 )

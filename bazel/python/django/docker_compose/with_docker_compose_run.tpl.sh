@@ -60,10 +60,18 @@ while ! pg_isready --username=$SQL_USER --dbname=$SQL_DATABASE --host=$POSTGRES_
   sleep "${RETRY_INTERVAL}"
 done
 
+# Variables related to postgres
+export POSTGRES_USER=$SQL_USER
+export POSTGRES_PASSWORD=$SQL_PASSWORD
+export POSTGRES_DB=$SQL_DATABASE
+export POSTGRES_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB"
 
-# Run the script
-export POSTGRES_URL="postgres://$SQL_USER:$SQL_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$SQL_DATABASE"
+# Same URLs in the nginx image, and inside django settings.
+export MEDIA_URL="/media/"
+export STATIC_URL="/static/"
+
 %ENV_TRANSPOSE%
+# Run the script
 for binary in %BINARIES%; do
     BINARY_CLI="$(rlocation "$binary")"
     echo "Execute: $binary"
