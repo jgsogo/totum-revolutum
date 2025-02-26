@@ -38,7 +38,7 @@ services:
         timeout: 10s
 
   db:
-    image: postgres:17
+    image: postgres:%POSTGRES_IMAGE_TAG%
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:

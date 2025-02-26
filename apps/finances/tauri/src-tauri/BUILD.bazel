@@ -112,14 +112,14 @@ with_postgres_test(
         "//libraries/finances/investments/django_finances_investments:populate_test_database",
     ] + ["_integration_tests_{}".format(it.replace(".rs", "")) for it in integration_tests_files],  # NOTE: The rust_test_suite is just a group of tests! # TODO: Bazel multicommand!!!
     env = {
-        "SQL_ENGINE": "django.db.backends.postgresql",
+        "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
     },
     env_transpose = {
-        "SQL_DATABASE": "POSTGRES_DB",
-        "SQL_USER": "POSTGRES_USER",
-        "SQL_PASSWORD": "POSTGRES_PASSWORD",
-        "SQL_HOST": "POSTGRES_HOST",
-        "SQL_PORT": "POSTGRES_PORT",
+        "DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "DJANGO_SQL_USER": "POSTGRES_USER",
+        "DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "DJANGO_SQL_PORT": "POSTGRES_PORT",
     },
     tags = [
         "no-sandbox",  # The tauri-plugin-log generates some output files.
