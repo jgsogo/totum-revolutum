@@ -22,7 +22,7 @@ expand_template(
         "services:",
         "  db:",
         "    ports:",
-        "      - 5431:5432",
+        "      - 5432",
         "",
     ],
 )
