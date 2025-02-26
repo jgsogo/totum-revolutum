@@ -80,7 +80,7 @@ mockall = { version = "0.13.1" }
 num-bigint = "0.4.6"
 num-traits = "0.2.19"
 oxipng = { version = "9.1.4", features = ["parallel", "zopfli", "filetime"], default-features = false }
-pq-sys = "0.7.0"
+pq-sys = "0.6.3"
 prost = "0.13.5"
 prost-types = "0.13.5"
 prost-build = "0.13.5"
@@ -99,8 +99,8 @@ similar-asserts = "1.7.0"
 strum = "0.27.1"
 strum_macros = "0.27.1"
 syn = { version = "2.0.98", features = ["visit"] }
-tauri-build = { version = "2.0.5", features = [] }
-tauri = { version = "2.2.5", features = [] }
+tauri-build = { version = "2.0.6", features = [] }
+tauri = { version = "2.3.0", features = [] }
 tauri-plugin-shell = "2.2.0"
 tempfile = { version = "3.17.1" }
 testing_logger = "0.1.1"
