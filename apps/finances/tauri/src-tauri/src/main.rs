@@ -15,7 +15,7 @@ fn main() {
             DatabaseConnection::new(&user, &password, &host, port, &dbname)
         };
 
-        let base_url = std::env::var("BASE_URL").expect("BASE_URL envvar is required");
+        let base_url = std::env::var("DJANGO_BASE_URL").expect("DJANGO_BASE_URL envvar is required");
         let media_url = std::env::var("MEDIA_URL").expect("MEDIA_URL envvar is required");
         let static_url = std::env::var("STATIC_URL").expect("STATIC_URL envvar is required");
         let backup_folder = std::env::var("BACKUP_DIRECTORY")

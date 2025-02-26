@@ -37,9 +37,14 @@ $DOCKER_COMPOSE_COMMAND up %SERVICES% --wait --wait-timeout 120
 # Get the external port for internal 5432
 SERVICE_NAME="db"
 SERVICE_PORT=5432
-CONTAINER_HOST_AND_PORT=$($DOCKER_COMPOSE_COMMAND port $SERVICE_NAME $SERVICE_PORT | head -n 1)
-export POSTGRES_HOST=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 1)
-export POSTGRES_PORT=$(echo "$CONTAINER_HOST_AND_PORT" | cut -d ":" -f 2)
+POSTGRES_HOST_AND_PORT=$($DOCKER_COMPOSE_COMMAND port db 5432 | head -n 1)
+export POSTGRES_HOST=$(echo "$POSTGRES_HOST_AND_PORT" | cut -d ":" -f 1)
+export POSTGRES_PORT=$(echo "$POSTGRES_HOST_AND_PORT" | cut -d ":" -f 2)
+
+DJANGO_HOST_AND_PORT=$($DOCKER_COMPOSE_COMMAND port nginx 80 | head -n 1)
+export DJANGO_HOST=$(echo "$DJANGO_HOST_AND_PORT" | cut -d ":" -f 1)
+export DJANGO_PORT=$(echo "$DJANGO_HOST_AND_PORT" | cut -d ":" -f 2)
+export DJANGO_BASE_URL="http://$DJANGO_HOST:$DJANGO_PORT"
 
 # Wait until Postgres is ready
 RETRY_COUNT=0
