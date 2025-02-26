@@ -10,6 +10,7 @@ from testcontainers.compose import DockerCompose
 
 @pytest.fixture(scope="session")
 def env_file():
+    """This is the environment file provided to the docker compose"""
     with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
         fp.write(b"SECRET_KEY=testing-app")
         fp.write(b"SQL_DATABASE=hello_django_finances_tests")
