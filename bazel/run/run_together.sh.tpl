@@ -31,8 +31,7 @@ function finish {
         kill $pid
     done
 }
-trap finish EXIT
-trap finish INT  # Capture Ctrl_C (SIGINT)
+trap finish EXIT SIGTERM SIGINT # Capture Ctrl_C (SIGINT)
 
 # Run the 'before' detached
 echo "Running first executable '$BEFORE_PATH'"

@@ -55,7 +55,7 @@ services:
   nginx:
     image: ghcr.io/jgsogo/nginx_django:%NGINX_DJANGO_TAG%
     ports:
-      - 1337:80
+      - 80
     depends_on:
       - web
     volumes:
