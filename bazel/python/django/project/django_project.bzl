@@ -53,6 +53,7 @@ def django_project(name, deps, srcs, **kwargs):
         srcs = [":{}-admin".format(name)],
         mode = "0755",
         tags = ["manual"],
+        include_runfiles = True,
     )
 
     # Gunicorn
@@ -82,6 +83,7 @@ def django_project(name, deps, srcs, **kwargs):
         srcs = [":{}-gunicorn".format(name)],
         mode = "0755",
         tags = ["manual"],
+        include_runfiles = True,
     )
 
 def django_project_container(name, version, repository, env = None, entrypoint = None, visibility = None):

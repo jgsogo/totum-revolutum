@@ -107,3 +107,20 @@ gh-runner: gh-runner-linux gh-runner-macos
 
 # Stop self-hosted runners for Linux
 gh-runner-stop: gh-runner-linux-stop
+
+###
+# RELEASES
+###
+
+# Builds and copies the release artifacts to the given output-dir
+release-finances output_dir="./releases":
+    #!/usr/bin/env bash
+    set -euxo pipefail
+    echo "Generating releases to {{ output_dir }}…"
+    bazel build --config=opt --config=stamp //apps/finances:version //apps/finances/django:app-gunicorn.tar //apps/finances/django:app-admin.tar
+    VERSION_FILE=$(bazel cquery --config=opt --config=stamp --output=files //apps/finances:version)
+    VERSION=$(cat $VERSION_FILE)
+    OUTPUT_DIR="{{ output_dir }}/finances/$VERSION/"
+    mkdir -p $OUTPUT_DIR
+    cp -f $(bazel cquery --config=opt --config=stamp --output=files //apps/finances/django:app-gunicorn.tar) $OUTPUT_DIR/app-gunicorn.tar
+    cp -f $(bazel cquery --config=opt --config=stamp --output=files //apps/finances/django:app-admin.tar) $OUTPUT_DIR/app-admin.tar

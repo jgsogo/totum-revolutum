@@ -14,6 +14,7 @@ bazel-totum-revolutum
 build/
 examples/files/
 node_modules/
+releases/
 secret.json
 secrets/
 target/
