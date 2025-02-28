@@ -10,13 +10,14 @@ load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
 
-def django_project(name, deps, **kwargs):
+def django_project(name, deps, srcs, **kwargs):
     """
     An opinionated macro to create a Django project.
 
     Args:
         name(str): A name for the project
         deps(List[str]): List of dependencies.
+        srcs(List[str]): List of sources to include in the project.
         **kwargs(dict): Other arguments for the rules
     """
     settings_module = "{}.settings".format(native.package_name().replace("/", "."))
@@ -30,10 +31,7 @@ def django_project(name, deps, **kwargs):
     # The library, with all the application files
     py_library(
         name = "{}-project".format(name),
-        srcs = [
-            "settings.py",
-            "urls.py",
-        ],
+        srcs = srcs,
         imports = ["."],
         deps = deps + [
             requirement("django"),
@@ -60,7 +58,7 @@ def django_project(name, deps, **kwargs):
         srcs = ["//bazel/python/django/project:manage.py"],
         main = "manage.py",
         deps = [
-            ":{}-wsgi".format(name),
+            ":{}-project".format(name),
         ],
         env = env,
         **kwargs
