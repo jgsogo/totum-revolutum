@@ -48,6 +48,8 @@ with_docker_compose_run(
         # Rust debugging
         "RUST_BACKTRACE": "1",
         "RUST_LOG": "debug",
+        #
+        "NGINX_PUBLIC_PORT": "1337",
     },
     remove_volumes = False,
 )

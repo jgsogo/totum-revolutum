@@ -7,6 +7,7 @@ load("@py_deps//:requirements.bzl", "requirement")
 load("@rules_oci//oci:defs.bzl", "oci_load")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
+load("//bazel/python/celery:defs.bzl", "celery_binary")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
 
@@ -33,6 +34,7 @@ def django_project(name, deps, **kwargs):
         srcs = [
             "settings.py",
             "urls.py",
+            "tasks.py",
         ],
         imports = ["."],
         deps = deps + [
@@ -77,6 +79,44 @@ def django_project(name, deps, **kwargs):
         deps = [
             ":{}-wsgi".format(name),
         ],
+        **kwargs
+    )
+
+    # py_binary(
+    #     name = "{}-admin".format(name),
+    #     srcs = ["//bazel/python/django/project:manage.py"],
+    #     main = "manage.py",
+    #     deps = [
+    #         ":{}-wsgi".format(name),
+    #     ],
+    #     env = env,
+    #     **kwargs
+    # )
+
+    py_library(
+        name = "{}-celery-lib".format(name),
+        srcs = [
+            "celery_app.py",
+            # "tasks.py"
+        ],
+        deps = [
+            ":{}-project".format(name),
+        ],
+        **kwargs
+    )
+
+    celery_binary(
+        name = "{}-celery".format(name),
+        args = [
+            "-A apps.finances.django.celery:app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler",
+        ],
+        # args = [
+        #     "bazel.python.django.project.wsgi:application",
+        #     "--bind 0.0.0.0:{}".format(DJANGO_PORT),
+        #     "--access-logfile '-'",
+        # ],
+        env = env,
+        deps = [":{}-celery-lib".format(name)],
         **kwargs
     )
 
@@ -125,6 +165,8 @@ def django_project_container(name, version, repository, env = None, entrypoint =
         binaries = [
             ":{}-gunicorn".format(name),
             ":{}-admin".format(name),
+            ":{}-celery".format(name),  # FIXME: This should be optional
+            # "//bazel/python/celery", # FIXME: This should be optional
         ],
         entrypoint = ["/entrypoint.sh"],
         exposed_ports = [DJANGO_PORT],

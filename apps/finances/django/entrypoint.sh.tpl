@@ -27,4 +27,8 @@ if [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
     /apps/finances/django/app-admin createsuperuser --noinput
 fi
 
+# Execute celery (TODO: User supervisord? Move to another dockers in the docker compose?)
+/apps/finances/django/app-celery -A apps.finances.django.celery_app:app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler &
+/apps/finances/django/app-celery -A apps.finances.django.celery_app:app worker -l INFO &
+
 /apps/finances/django/app-gunicorn bazel.python.django.project.wsgi:application --bind 0.0.0.0:%DJANGO_PORT%
