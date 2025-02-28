@@ -22,11 +22,17 @@ test -d $GUNICORN_WORKING_DIR || mkdir -p $GUNICORN_WORKING_DIR
 test -d $GUNICORN_WORKING_DIR/run || mkdir -p $GUNICORN_WORKING_DIR/run
 test -d $GUNICORN_WORKING_DIR/log || mkdir -p $GUNICORN_WORKING_DIR/log
 
+BIND_SOCKET="unix:${GUNICORN_WORKING_DIR}/run/gunicorn.sock"
+BIND=${GUNICORN_BIND:-$BIND_SOCKET}
+echo " - binding to: $BIND"
+
 # Execute gunicorn
 DJANGO_SETTINGS_MODULE="%SETTINGS%" $GUNICORN bazel.python.django.project.wsgi:application \
     --name $GUNICORN_APP_NAME \
-    --user=${USER:-jgsogo} --group=${GROUP:-staff} \
-    --bind unix:${GUNICORN_WORKING_DIR}/run/gunicorn.sock \
+    --user=${GUNICORN_USER:-jgsogo} --group=${GUNICORN_GROUP:-staff} \
+    --bind $BIND \
     --workers ${GUNICORN_WORKERS:-3} \
     --log-level ${GUNICORN_LOG_LEVEL:-info} \
-    --log-file ${GUNICORN_WORKING_DIR}/log/gunicorn.log
+    --access-logfile ${GUNICORN_WORKING_DIR}/log/gunicorn-access.log \
+    --error-logfile ${GUNICORN_WORKING_DIR}/log/gunicorn-errors.log \
+    ${GUNICORN_EXTRA_ARGS:=}

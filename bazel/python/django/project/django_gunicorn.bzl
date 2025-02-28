@@ -27,10 +27,15 @@ def _django_gunicorn_sh_impl(ctx):
             executable = executable,
             runfiles = runfiles,
         ),
+        # This environment is only available when using `bazel run <this-rule>`
         RunEnvironmentInfo(
             environment = {
                 "GUNICORN_APP_NAME": ctx.label.package.replace("/", "_"),
                 "GUNICORN_WORKING_DIR": "/tmp/{}".format(ctx.label.package.replace("/", "_")),
+                "GUNICORN_BIND": "localhost:0",
+                "DEBUG": "1",
+                "SECRET_KEY": "the-secret-key",
+                "GUNICORN_EXTRA_ARGS": "--capture-output --error-logfile - --access-logfile -",
             },
         ),
     ]

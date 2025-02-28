@@ -40,6 +40,22 @@ def django_project(name, deps, srcs, **kwargs):
         ],
     )
 
+    # Django admin
+    django_admin(
+        name = "{}-admin".format(name),
+        django_project = ":{}-project".format(name),
+        settings = settings_module,
+        tags = ["manual"],
+    )
+
+    pkg_tar(
+        name = "{}-admin.tar".format(name),
+        srcs = [":{}-admin".format(name)],
+        mode = "0755",
+        tags = ["manual"],
+    )
+
+    # Gunicorn
     py_library(
         name = "{}-wsgi".format(name),
         srcs = ["//bazel/python/django/project:wsgi.py"],
@@ -54,17 +70,17 @@ def django_project(name, deps, srcs, **kwargs):
         **kwargs
     )
 
-    django_admin(
-        name = "{}-admin".format(name),
-        django_project = ":{}-project".format(name),
-        settings = settings_module,
-        tags = ["manual"],
-    )
-
     django_gunicorn(
         name = "{}-gunicorn".format(name),
         django_project = ":{}-wsgi".format(name),
         settings = settings_module,
+        tags = ["manual"],
+    )
+
+    pkg_tar(
+        name = "{}-gunicorn.tar".format(name),
+        srcs = [":{}-gunicorn".format(name)],
+        mode = "0755",
         tags = ["manual"],
     )
 
@@ -118,6 +134,7 @@ def django_project_container(name, version, repository, env = None, entrypoint =
         exposed_ports = [DJANGO_PORT],
         tags = [
             "manual",
+            "no-remote-cache",
         ],
         tars = [
             entrypoint,
@@ -172,6 +189,7 @@ def django_project_container(name, version, repository, env = None, entrypoint =
         repo_tags = ":{}-repo_tags".format(name),
         tags = [
             "manual",
+            "no-remote-cache",
         ],
     )
 
