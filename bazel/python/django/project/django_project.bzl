@@ -2,12 +2,13 @@
 
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
-load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+load("@aspect_rules_py//py:defs.bzl", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
 load("@rules_oci//oci:defs.bzl", "oci_load")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
+load("//bazel/python/django/project:django_admin.bzl", "django_admin")
 load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
 
 def django_project(name, deps, srcs, **kwargs):
@@ -53,15 +54,10 @@ def django_project(name, deps, srcs, **kwargs):
         **kwargs
     )
 
-    py_binary(
+    django_admin(
         name = "{}-admin".format(name),
-        srcs = ["//bazel/python/django/project:manage.py"],
-        main = "manage.py",
-        deps = [
-            ":{}-project".format(name),
-        ],
-        env = env,
-        **kwargs
+        django_project = ":{}-project".format(name),
+        settings = settings_module,
     )
 
     gunicorn_binary(
