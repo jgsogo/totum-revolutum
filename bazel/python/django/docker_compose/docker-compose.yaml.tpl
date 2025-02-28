@@ -9,6 +9,7 @@ services:
       - DEBUG=${DEBUG:-true}
       - SECRET_KEY=${SECRET_KEY}  # Django fails if this is empty, so the user really needs to set it from somewhere else
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 0.0.0.0 [::1]  # TODO: Sure I can remove some of them
+      - CSRF_TRUSTED_ORIGINS=http://localhost:${NGINX_PUBLIC_PORT:-1337}
       # Database
       - DJANGO_SQL_ENGINE=django.db.backends.postgresql
       - DJANGO_SQL_DATABASE=${SQL_DATABASE:-hello_django_dev}
@@ -25,11 +26,15 @@ services:
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
       # Django if we execute the migration legacy DB first (FIXME: Remove, this doesn't belong to all apps)
       - LEGACY_DATABASE_URL=${LEGACY_DATABASE_URL}
+      # Django dbbackup
+      - DJANGO_DBBACKUP_DIRECTORY=/home/%USER%/backups
     depends_on:
       - db
+      - redis
     volumes:
       - static_volume:/home/%USER%/web/staticfiles
       - media_volume:/home/%USER%/web/mediafiles
+      - backup_volume:/home/%USER%/backups
     healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:%DJANGO_PORT%/admin"]
         interval: 10s
@@ -55,14 +60,18 @@ services:
   nginx:
     image: ghcr.io/jgsogo/nginx_django:%NGINX_DJANGO_TAG%
     ports:
-      - 80
+      - ${NGINX_PUBLIC_PORT:-1337}:80
     depends_on:
       - web
     volumes:
       - static_volume:/home/%USER%/web/staticfiles
       - media_volume:/home/%USER%/web/mediafiles
 
+  redis:
+    image: redis:alpine
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  backup_volume:

@@ -1,0 +1,14 @@
+load("@py_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+exports_files(["celery_wrapper.py"])
+
+py_binary(
+    name = "celery",
+    srcs = ["//bazel/python/celery:celery_wrapper.py"],
+    main = "//bazel/python/celery:celery_wrapper.py",
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("celery"),
+    ],
+)

@@ -21,6 +21,7 @@ ENV APP_HOME=/home/%USER%/web
 RUN mkdir $APP_HOME
 RUN mkdir $APP_HOME/staticfiles
 RUN mkdir $APP_HOME/mediafiles
+RUN mkdir $APP_HOME/backups
 
 # chown all the files to the app user
 RUN chown -R %USER%:%GROUP% $APP_HOME

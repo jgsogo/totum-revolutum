@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
+import apps.finances.django.tasks  # noqa: F401
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,6 +46,8 @@ INSTALLED_APPS = [
     "treenode",
     "djmoney",
     "django_countries",
+    "dbbackup",  # django-dbbackup
+    "django_celery_beat",
     # My apps
     "django_finances_accounts.apps.FinancesAccountsConfig",
     "django_finances_investments.apps.FinancesInvestmentsConfig",
@@ -155,3 +161,21 @@ CURRENCIES = ("EUR", "USD")
 
 # Configure django-countries
 COUNTRIES_ONLY = ["ES", "US", "NL"]
+
+# django-dbbackup
+DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
+DBBACKUP_STORAGE_OPTIONS = {
+    "location": os.environ.get("DJANGO_DBBACKUP_DIRECTORY", BASE_DIR / "backup")
+}
+
+# django-celery-beat
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "apps.finances.django.tasks.sample_task",
+        "schedule": crontab(minute="*/1"),
+    },
+}
