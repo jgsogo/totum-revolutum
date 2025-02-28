@@ -117,10 +117,11 @@ release-finances output_dir="./releases":
     #!/usr/bin/env bash
     set -euxo pipefail
     echo "Generating releases to {{ output_dir }}…"
-    bazel build --config=opt --config=stamp //apps/finances:version //apps/finances/django:app-gunicorn.tar //apps/finances/django:app-admin.tar
+    bazel build --config=opt --config=stamp //apps/finances:version //apps/finances:release //apps/finances/django:app-admin-release //apps/finances/django:app-gunicorn-release
     VERSION_FILE=$(bazel cquery --config=opt --config=stamp --output=files //apps/finances:version)
     VERSION=$(cat $VERSION_FILE)
-    OUTPUT_DIR="{{ output_dir }}/finances/$VERSION/"
+    OUTPUT_DIR="{{ output_dir }}/finances/$VERSION"
     mkdir -p $OUTPUT_DIR
-    cp -f $(bazel cquery --config=opt --config=stamp --output=files //apps/finances/django:app-gunicorn.tar) $OUTPUT_DIR/app-gunicorn.tar
-    cp -f $(bazel cquery --config=opt --config=stamp --output=files //apps/finances/django:app-admin.tar) $OUTPUT_DIR/app-admin.tar
+    # cp -f $(bazel cquery --config=opt --config=stamp --output=files //apps/finances:release) $OUTPUT_DIR/release.tar  # FIXME: https://github.com/bazelbuild/rules_pkg/issues/902
+    cp -f $(bazel cquery --config=opt --config=stamp --output=files //apps/finances/django:app-admin-release) $OUTPUT_DIR/app-admin-release.tar
+    cp -f $(bazel cquery --config=opt --config=stamp --output=files //apps/finances/django:app-gunicorn-release) $OUTPUT_DIR/app-gunicorn-release.tar
