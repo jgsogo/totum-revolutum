@@ -64,6 +64,7 @@ def django_admin(name, django_project, **kwargs):
         deps = [
             django_project,
         ],
+        tags = ["manual"],
     )
 
     django_admin_sh(

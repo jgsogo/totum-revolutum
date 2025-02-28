@@ -58,12 +58,14 @@ def django_project(name, deps, srcs, **kwargs):
         name = "{}-admin".format(name),
         django_project = ":{}-project".format(name),
         settings = settings_module,
+        tags = ["manual"],
     )
 
     django_gunicorn(
         name = "{}-gunicorn".format(name),
         django_project = ":{}-wsgi".format(name),
         settings = settings_module,
+        tags = ["manual"],
     )
 
 def django_project_container(name, version, repository, env = None, entrypoint = None, visibility = None):

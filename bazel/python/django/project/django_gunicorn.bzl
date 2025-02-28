@@ -1,8 +1,7 @@
 """Rule implementation to run gunicorn"""
 
 load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_rlocation_path")
-load("@aspect_rules_py//py:defs.bzl", "py_binary")
-load("@py_deps//:requirements.bzl", "requirement")
+load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_console_script_binary")
 
 def _django_gunicorn_sh_impl(ctx):
     executable = ctx.actions.declare_file(ctx.label.name)
@@ -62,19 +61,18 @@ django_gunicorn_sh = rule(
 
 def django_gunicorn(name, django_project, **kwargs):
     # Django project plus the gunicorn
-    py_binary(
-        name = "{}-bin".format(name),
-        srcs = ["//bazel/python/gunicorn:gunicorn_wrapper.py"],
-        main = "//bazel/python/gunicorn:gunicorn_wrapper.py",
+    py_console_script_binary(
+        name = "gunicorn",
+        pkg = "@py_deps//gunicorn",
         deps = [
             django_project,
-            requirement("gunicorn"),
         ],
+        tags = ["manual"],
     )
 
     # Shell script to execute it
     django_gunicorn_sh(
         name = name,
-        gunicorn_binary = ":{}-bin".format(name),
+        gunicorn_binary = ":gunicorn",
         **kwargs
     )
