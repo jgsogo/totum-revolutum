@@ -9,7 +9,7 @@ load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
 load("//bazel/python/django/project:django_admin.bzl", "django_admin")
-load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
+load("//bazel/python/django/project:django_gunicorn.bzl", "django_gunicorn")
 
 def django_project(name, deps, srcs, **kwargs):
     """
@@ -60,18 +60,10 @@ def django_project(name, deps, srcs, **kwargs):
         settings = settings_module,
     )
 
-    gunicorn_binary(
+    django_gunicorn(
         name = "{}-gunicorn".format(name),
-        args = [
-            "bazel.python.django.project.wsgi:application",
-            "--bind 0.0.0.0:{}".format(DJANGO_PORT),
-            "--access-logfile '-'",
-        ],
-        env = env,
-        deps = [
-            ":{}-wsgi".format(name),
-        ],
-        **kwargs
+        django_project = ":{}-wsgi".format(name),
+        settings = settings_module,
     )
 
 def django_project_container(name, version, repository, env = None, entrypoint = None, visibility = None):

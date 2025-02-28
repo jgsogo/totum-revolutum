@@ -4,4 +4,5 @@ exports_files([
     "asgi.py",
     "entrypoint.sh.tpl",
     "django_admin.tpl.sh",
+    "django_gunicorn.tpl.sh",
 ])
