@@ -87,7 +87,7 @@ function install_file() {
   $sudo install \
     -T -- "${source}" "${target_dir}/${target_name}"
 
-  if [ -z "${untar}" ]; then
+  if [ ! -z "${untar}" ]; then
     echo "Untar file '${target_dir}/${target_name}'"
     $sudo tar -xf "${target_dir}/${target_name}" -C "${target_dir}"
     $sudo rm "${target_dir}/${target_name}"

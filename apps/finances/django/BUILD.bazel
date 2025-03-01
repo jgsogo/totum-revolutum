@@ -27,22 +27,51 @@ django_project(
     ],
 )
 
-# installer(
-#     name = "install_local",
-#     data = [
-#         ":{}-admin".format(name),
-#         ":{}-gunicorn".format(name),
-#     ],
-# )
+substitutions = {
+    "%NAME%": package_name().replace("/", "_"),
+    "%GUNICORN_APP%": "{}-gunicorn".format(name),
+    "%DJANGO_ADMIN_APP%": "{}-admin".format(name),
+}
+
+expand_template(
+    name = "env",
+    out = ".env",
+    substitutions = substitutions,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:.env.tpl",
+)
+
+expand_template(
+    name = "supervisor_ini",
+    out = "supervisord.ini",
+    substitutions = substitutions,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:supervisord.tpl.ini",
+)
+
+expand_template(
+    name = "nginx_conf",
+    out = "nginx.conf",
+    substitutions = substitutions,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:nginx.tpl.conf",
+)
 
 deploy_local(
     name = "deploy_local",
     admin = ":{}-admin".format(name),
+    data = [
+        ":env",
+        ":nginx_conf",
+        ":supervisor_ini",
+    ],
     gunicorn = ":{}-gunicorn".format(name),
-    # data = [
-    #     ":{}-admin".format(name),
-    #     ":{}-gunicorn".format(name),
-    # ],
     target_subdir = "finances",
 )
 

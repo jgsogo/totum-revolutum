@@ -8,6 +8,17 @@ runfiles_export_envvars
 
 readonly GUNICORN="$(rlocation "%GUNICORN%")"
 
+# Read .env file if available
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ENV_FILE=$SCRIPT_DIR/.env
+if [ -f ${ENV_FILE} ]; then
+    echo "Load environment from '.env' file"
+    set -a
+    source ${ENV_FILE}
+    set +a
+fi
+
+# Prepare the environment to run the command
 if [[ -z "${GUNICORN_APP_NAME}" ]]; then
     >&2 echo "Envvar 'GUNICORN_APP_NAME' is required"
 fi
