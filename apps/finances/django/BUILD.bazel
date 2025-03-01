@@ -70,6 +70,7 @@ deploy_local(
         ":env",
         ":nginx_conf",
         ":supervisor_ini",
+        "//bazel/tools/envsubst",
     ],
     gunicorn = ":{}-gunicorn".format(name),
     target_subdir = "finances",

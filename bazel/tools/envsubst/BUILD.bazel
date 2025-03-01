@@ -1,0 +1,21 @@
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+
+exports_files([
+    "with_envsubst_run.tpl.sh",
+])
+
+native_binary(
+    name = "envsubst",
+    src = select({
+        "@bazel_tools//src/conditions:linux_x86_64": "@envsubst_linux_arm64//file",
+        "@bazel_tools//src/conditions:darwin_arm64": "@envsubst_darwin_arm64//file",
+        "@bazel_tools//src/conditions:darwin_x86_64": "@envsubst_darwin_x86_64//file",
+    }),
+    out = "envsubst",
+    tags = [
+        "manual",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)
