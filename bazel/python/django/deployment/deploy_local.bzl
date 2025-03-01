@@ -86,6 +86,7 @@ def _deploy_local_impl(ctx):
     targets = targets + targets_tars + targets_envs
     transitive_runfiles = transitive_runfiles + transitive_runfiles_tars + transitive_runfiles_envs
 
+    # If needed, copy envsubst tool too
     if len(sources_envs):
         transitive_runfiles_envsubst, sources_envsubst, targets_envsubst = _collect_files_in_default_info(ctx, ctx.attr._envsubst)
         sources = sources + sources_envsubst
@@ -94,6 +95,19 @@ def _deploy_local_impl(ctx):
         untars = untars + [""]
         envs = envs + [""]
 
+    # The install file
+    install_file_output = ctx.actions.declare_file(ctx.label.name + "_install.sh")
+    ctx.actions.write(
+        output = install_file_output,
+        content = "$pwd",
+        is_executable = True,
+    )
+    sources = sources + [paths.join(ctx.workspace_name, install_file_output.short_path)]
+    targets = targets + [paths.join(ctx.attr.target_subdir, "install.sh")]
+    untars = untars + [""]
+    envs = envs + [""]
+
+    # Render the template to do the copy
     ctx.actions.expand_template(
         template = ctx.file._run_template,
         output = executable,
@@ -114,7 +128,7 @@ def _deploy_local_impl(ctx):
     )
 
     runfiles = ctx.runfiles(
-        files = [executable],
+        files = [executable, install_file_output],
         transitive_files = depset(transitive = transitive_runfiles),
     )
     runfiles = runfiles.merge(ctx.attr._runfiles.default_runfiles)
