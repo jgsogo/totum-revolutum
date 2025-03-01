@@ -1,4 +1,5 @@
 exports_files([
     "deployment.tpl.sh",
+    "deploy_local.tpl.sh",
     "local.env",
 ])

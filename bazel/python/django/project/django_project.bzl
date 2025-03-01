@@ -29,8 +29,6 @@ def django_project(name, deps, srcs, **kwargs):
     env["DEBUG"] = "1"
     env["SECRET_KEY"] = "4niv*0w++!1y%x59x(ma165cni2-0%m-jmx-7rpav1zmgp#no9-{}".format(settings_module)
 
-    release_targets = []
-
     # The library, with all the application files
     py_library(
         name = "{}-project".format(name),
@@ -48,19 +46,6 @@ def django_project(name, deps, srcs, **kwargs):
         django_project = ":{}-project".format(name),
         settings = settings_module,
         tags = ["manual"],
-    )
-
-    release_targets.append(":{}-admin".format(name))
-
-    # FIXME: Remove when this is fixed https://github.com/bazelbuild/rules_pkg/issues/902
-    pkg_tar(
-        name = "{}-admin-release".format(name),
-        srcs = [
-            ":{}-admin".format(name),
-        ],
-        mode = "0755",
-        tags = ["manual"],
-        include_runfiles = True,
     )
 
     # Gunicorn
@@ -83,25 +68,6 @@ def django_project(name, deps, srcs, **kwargs):
         django_project = ":{}-wsgi".format(name),
         settings = settings_module,
         tags = ["manual"],
-    )
-
-    release_targets.append(":{}-gunicorn".format(name))
-
-    # FIXME: Remove when this is fixed https://github.com/bazelbuild/rules_pkg/issues/902
-    pkg_tar(
-        name = "{}-gunicorn-release".format(name),
-        srcs = [
-            ":{}-gunicorn".format(name),
-        ],
-        mode = "0755",
-        tags = ["manual"],
-        include_runfiles = True,
-    )
-
-    native.filegroup(
-        name = "{}-release".format(name),
-        srcs = release_targets,
-        **kwargs
     )
 
 def django_project_container(name, version, repository, env = None, entrypoint = None, visibility = None):
