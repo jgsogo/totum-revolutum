@@ -79,8 +79,8 @@ def _deploy_local_impl(ctx):
     transitive_runfiles_tars, sources_tars, targets_tars = _collect_files(ctx, ctx.attr.tars)
     transitive_runfiles_envs, sources_envs, targets_envs = _collect_files(ctx, ctx.attr.envs)
 
-    untars = ["" for x in range(len(sources))] + ["1" for x in range(len(sources_tars))] + ["" for x in range(len(sources_envs))]
-    envs = ["" for x in range(len(sources))] + ["" for x in range(len(sources_tars))] + ["1" for x in range(len(sources_envs))]
+    untars = ["" for x in range(len(sources))] + ["" for x in range(len(sources_tars))] + ["" for x in range(len(sources_envs))]
+    envs = ["" for x in range(len(sources))] + ["" for x in range(len(sources_tars))] + ["" for x in range(len(sources_envs))]
 
     sources = sources + sources_tars + sources_envs
     targets = targets + targets_tars + targets_envs
@@ -97,9 +97,33 @@ def _deploy_local_impl(ctx):
 
     # The install file
     install_file_output = ctx.actions.declare_file(ctx.label.name + "_install.sh")
+    content = [
+        "#!/usr/bin/env bash",
+        "set -o pipefail -o errexit -o nounset",
+        "",
+        "SCRIPT_DIR=$( cd -- \"$( dirname -- \"${BASH_SOURCE[0]}\" )\" &> /dev/null && pwd )",
+    ]
+    for tgt_tar in targets_tars:
+        content = content + [
+            "",
+            "echo \"Untar file '${{SCRIPT_DIR}}/{}'\"".format(tgt_tar),
+            "tar -xf \"${{SCRIPT_DIR}}/{}\" -C \"${{SCRIPT_DIR}}\"".format(tgt_tar),
+            "rm \"${{SCRIPT_DIR}}/{}\"".format(tgt_tar),
+        ]
+    for tgt_tar in targets_envs:
+        content = content + [
+            "",
+            "echo \"Apply envsubst in file '${{SCRIPT_DIR}}/{}'\"".format(tgt_tar),
+            "envsubst -no-unset -no-empty < \"${{SCRIPT_DIR}}/{}\" > \"${{SCRIPT_DIR}}/{}\"".format(tgt_tar, tgt_tar),
+        ]
+    if len(targets_envs):
+        content = content + [
+            "",
+            "rm envsubst",
+        ]
     ctx.actions.write(
         output = install_file_output,
-        content = "$pwd",
+        content = "\n".join(content),
         is_executable = True,
     )
     sources = sources + [paths.join(ctx.workspace_name, install_file_output.short_path)]
