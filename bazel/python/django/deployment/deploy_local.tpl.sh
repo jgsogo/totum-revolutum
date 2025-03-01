@@ -11,8 +11,10 @@ runfiles_export_envvars
 declare -r -a SOURCE_FILES=@@SOURCE_FILES@@
 # Array of paths relative to prefix.
 declare -r -a TARGET_NAMES=@@TARGET_NAMES@@
-# Array marking the files to unt.
+# Array marking the files to untar.
 declare -r -a UNTARS=@@UNTARS@@
+# Array marking the files to apply envsubst.
+declare -r -a ENVS=@@ENVS@@
 # Set executable mode of files
 # declare -r EXECUTABLE=@@EXECUTABLE@@
 # Fully specified bazel label of INSTALLER_LABEL installer() rule.
@@ -36,6 +38,7 @@ function verify_templates() {
   if [[ "${SOURCE_FILES[@]:0:2}" =~ ^@@ ]] ||
     [[ "${TARGET_NAMES[@]:0:2}" =~ ^@@ ]] ||
     [[ "${UNTARS[@]:0:2}" =~ ^@@ ]] ||
+    [[ "${ENVS[@]:0:2}" =~ ^@@ ]] ||
     [[ "${INSTALLER_LABEL:0:2}" =~ ^@@ ]]; then
     error "template substitution failed"
   fi
@@ -46,6 +49,10 @@ function verify_templates() {
 
   if [[ "${#SOURCE_FILES[@]}" != "${#UNTARS[@]}" ]]; then
     error "the number of source files is different thant the number or untar marks"
+  fi
+
+  if [[ "${#SOURCE_FILES[@]}" != "${#ENVS[@]}" ]]; then
+    error "the number of source files is different thant the number or envs marks"
   fi
 }
 
@@ -66,6 +73,7 @@ function install_file() {
   local source="$(rlocation ${SOURCE_FILES[${i}]})"
   local target="${TARGET_NAMES[${i}]}"
   local untar="${UNTARS[${i}]}"
+  local envs="${ENVS[${i}]}"
   local target_dir
   target_dir="$(dirname -- "${prefix}/${target}")"
   local target_name
@@ -86,6 +94,11 @@ function install_file() {
   echo "Copy file '${target_dir}/${target_name}'"
   $sudo install \
     -T -- "${source}" "${target_dir}/${target_name}"
+
+  if [ ! -z "${envs}" ]; then
+    echo "Apply envsubst on file '${target_dir}/${target_name}'"
+
+  fi
 
   if [ ! -z "${untar}" ]; then
     echo "Untar file '${target_dir}/${target_name}'"

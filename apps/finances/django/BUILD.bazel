@@ -67,10 +67,14 @@ deploy_local(
     name = "deploy_local",
     admin = ":{}-admin".format(name),
     data = [
+        # ":env",
+        # ":nginx_conf",
+        # ":supervisor_ini",
+    ],
+    envs = [
         ":env",
         ":nginx_conf",
         ":supervisor_ini",
-        "//bazel/tools/envsubst",
     ],
     gunicorn = ":{}-gunicorn".format(name),
     target_subdir = "finances",
