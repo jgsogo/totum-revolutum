@@ -12,9 +12,9 @@ We deploy this application in MacOS using a PKG:
     │   │   ├── .env
     │   ├── usr/local/etc/
     │   │   ├── supervisor.d/
-    │   │   |   ├── myapp.ini
+    │   │   |   ├── finances.ini
     │   ├   ├── nginx/servers/
-    │   │       ├── myapp.conf
+    │   │       ├── finances.conf
     │   ├── usr/local/var/log/              # Path to store logs
     │   ├── usr/local/var/run/              # PIDs and sockets
     │── scripts/
@@ -27,22 +27,35 @@ We deploy this application in MacOS using a PKG:
 
    ```sh
    pkgbuild --root payload
-        --identifier com.mycompany.myapp
+        --identifier com.totum-revolutum.finances
         --version 1.0
         --scripts scripts
-        myapp.pkg
+        finances.pkg
    ```
 
  * it should be installable using
 
    ```sh
-   sudo installer -pkg myapp.pkg -target /
+   sudo installer -pkg finances.pkg -target /
    ```
+
+After installation, you check installed packages with
+
+```
+pkgutil --pkgs
+```
+
+and remove them with
+
+ * list all files with `pkgutil --files <package name>`
+ * remove the files and folders manually (be careful not to remove directories that contain other files)
+
 """
 
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files", "pkg_mkdirs")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("//bazel/tools/pkgbuild:pkgbuild.bzl", "pkgbuild")
 
 pkg_tar(
     name = "app-admin-tar",
@@ -170,8 +183,7 @@ pkg_filegroup(
 )
 
 pkg_tar(
-    name = "tar",
-    # include_runfiles = True,
+    name = "payload",
     srcs = [
         # "README.txt",
         # ":manpages",
@@ -181,4 +193,65 @@ pkg_tar(
         # "//src/server:arch",
         ":arch",
     ],
+    include_runfiles = True,
+)
+
+genrule(
+    name = "preinstall-script",
+    outs = ["preinstall"],
+    cmd = """
+cat <<EOF > $@
+#!/bin/bash
+echo 'This is a single-quoted message'
+echo "Starting pre-install checks..." | logger -t FinancesInstaller
+osascript -e 'display dialog "Installation is in progress..." with title "MyApp Installer"'
+exit 1
+EOF
+chmod +x $@
+    """,
+    tags = ["manual"],
+)
+
+pkg_files(
+    name = "scripts-group",
+    srcs = [
+        ":preinstall-script",
+    ],
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0551",
+        owner = "root",
+    ),
+    # prefix = "/usr/local/etc/nginx/server/",
+)
+
+# pkg_filegroup(
+#     name = "scripts-group",
+#     srcs = [
+#         ":preinstall-script",
+#     ],
+#     visibility = ["//visibility:public"],
+# )
+
+pkg_tar(
+    name = "scripts",
+    srcs = [
+        # "README.txt",
+        # ":manpages",
+        # ":share_doc",
+        # "//resources/l10n:all",
+        # "//src/client:arch",
+        # "//src/server:arch",
+        ":scripts-group",
+    ],
+    include_runfiles = True,
+)
+
+pkgbuild(
+    name = "finances",
+    identifier = "com.totum-revolutum.finances",
+    root = ":payload",
+    scripts = ":scripts",
+    version = "0.0.0",
+    # scripts = "/scripts",
 )
