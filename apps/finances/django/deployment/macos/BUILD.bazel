@@ -1,0 +1,184 @@
+"""
+We deploy this application in MacOS using a PKG:
+
+ * create the package payload
+
+   ```
+    finances-pkg/
+    │── payload/
+    │   ├── usr/local/finances/
+    │   │   ├── finances-django-admin
+    │   │   ├── finances-django-gunicorn
+    │   │   ├── .env
+    │   ├── usr/local/etc/
+    │   │   ├── supervisor.d/
+    │   │   |   ├── myapp.ini
+    │   ├   ├── nginx/servers/
+    │   │       ├── myapp.conf
+    │   ├── usr/local/var/log/              # Path to store logs
+    │   ├── usr/local/var/run/              # PIDs and sockets
+    │── scripts/
+    │   ├── preinstall            # ✅ NEW: Pre-install checks
+    │   ├── postinstall           # Runs setup after installation
+    │── finances.pkg
+   ```
+
+ * use `pkgbuild` to build the MacOS PKG
+
+   ```sh
+   pkgbuild --root payload
+        --identifier com.mycompany.myapp
+        --version 1.0
+        --scripts scripts
+        myapp.pkg
+   ```
+
+ * it should be installable using
+
+   ```sh
+   sudo installer -pkg myapp.pkg -target /
+   ```
+"""
+
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files", "pkg_mkdirs")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+
+pkg_tar(
+    name = "app-admin-tar",
+    srcs = [
+        "//apps/finances/django:app-admin",
+    ],
+    include_runfiles = True,
+    mode = "0551",
+    tags = ["manual"],
+)
+
+pkg_tar(
+    name = "app-gunicorn-tar",
+    srcs = [
+        "//apps/finances/django:app-gunicorn",
+    ],
+    include_runfiles = True,
+    mode = "0551",
+    tags = ["manual"],
+)
+
+pkg_files(
+    name = "binary",
+    srcs = [
+        ":app-admin-tar",
+        ":app-gunicorn-tar",
+    ],
+    # We should include here the actual targets, but then they don't
+    # include duplicated runfiles https://github.com/bazelbuild/rules_pkg/issues/902
+    # srcs = [
+    #     "//apps/finances/django:app-admin",
+    #     "//apps/finances/django:app-gunicorn",
+    # ],
+    # attributes = pkg_attributes(
+    #     group = "root",
+    #     mode = "0551",
+    #     owner = "root",
+    # ),
+    include_runfiles = True,
+    prefix = "/usr/local/finances/",
+)
+
+substitutions = {
+    "%NAME%": "finances",
+    "%GUNICORN_APP%": "app-gunicorn",
+    "%DJANGO_ADMIN_APP%": "app-admin",
+}
+
+expand_template(
+    name = "supervisor_ini-file",
+    out = "finances.ini",
+    substitutions = substitutions,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:supervisord.tpl.ini",
+)
+
+pkg_files(
+    name = "supervisor_ini",
+    srcs = [
+        ":supervisor_ini-file",
+    ],
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0440",
+        owner = "root",
+    ),
+    prefix = "/usr/local/etc/supervisor.d/",
+)
+
+expand_template(
+    name = "nginx_conf-file",
+    out = "finances.conf",
+    substitutions = substitutions,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:nginx.tpl.conf",
+)
+
+pkg_files(
+    name = "nginx_conf",
+    srcs = [
+        ":nginx_conf-file",
+    ],
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0440",
+        owner = "root",
+    ),
+    prefix = "/usr/local/etc/nginx/server/",
+)
+
+pkg_mkdirs(
+    name = "log",
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0755",
+        owner = "root",
+    ),
+    dirs = ["/usr/local/var/log/"],
+)
+
+pkg_mkdirs(
+    name = "run",
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0755",
+        owner = "root",
+    ),
+    dirs = ["/usr/local/var/run/"],
+)
+
+pkg_filegroup(
+    name = "arch",
+    srcs = [
+        ":binary",
+        ":log",
+        ":nginx_conf",
+        ":run",
+        ":supervisor_ini",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+pkg_tar(
+    name = "tar",
+    # include_runfiles = True,
+    srcs = [
+        # "README.txt",
+        # ":manpages",
+        # ":share_doc",
+        # "//resources/l10n:all",
+        # "//src/client:arch",
+        # "//src/server:arch",
+        ":arch",
+    ],
+)

@@ -46,6 +46,7 @@ def django_project(name, deps, srcs, **kwargs):
         django_project = ":{}-project".format(name),
         settings = settings_module,
         tags = ["manual"],
+        **kwargs
     )
 
     # Gunicorn
@@ -68,6 +69,7 @@ def django_project(name, deps, srcs, **kwargs):
         django_project = ":{}-wsgi".format(name),
         settings = settings_module,
         tags = ["manual"],
+        **kwargs
     )
 
 def django_project_container(name, version, repository, env = None, entrypoint = None, visibility = None):
