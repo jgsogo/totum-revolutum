@@ -32,7 +32,7 @@ anyhow = "1.0.96"
 async-std = { version = "1.13" }
 async-trait = "0.1.86"
 bigdecimal = "0.4.7"
-bitflags = "2.8"
+bitflags = "2.9"
 bytes = "1.10.0"
 camino = "1.1.9"
 camino-tempfile = "1.1.1"
@@ -80,7 +80,7 @@ mockall = { version = "0.13.1" }
 num-bigint = "0.4.6"
 num-traits = "0.2.19"
 oxipng = { version = "9.1.4", features = ["parallel", "zopfli", "filetime"], default-features = false }
-pq-sys = "0.7.0"
+pq-sys = "0.6.3"
 prost = "0.13.5"
 prost-types = "0.13.5"
 prost-build = "0.13.5"
@@ -90,7 +90,7 @@ regex = "1.11.1"
 reqwest = { version = "0.12.12" }
 ring = "0.17.11"
 serde = { version = "1.0.218" }
-serde_json = "1.0.139"
+serde_json = "1.0.140"
 serde_regex = "1.1.0"
 serde_repr = "0.1.19"
 serde_yml = "0.0.12"
@@ -98,13 +98,13 @@ sha256 = { version = "1.5" }
 similar-asserts = "1.7.0"
 strum = "0.27.1"
 strum_macros = "0.27.1"
-syn = { version = "2.0.98", features = ["visit"] }
+syn = { version = "2.0.99", features = ["visit"] }
 tauri-build = { version = "2.0.6", features = [] }
-tauri = { version = "2.3.0", features = [] }
+tauri = { version = "2.3.1", features = [] }
 tauri-plugin-shell = "2.2.0"
 tempfile = { version = "3.17.1" }
 testing_logger = "0.1.1"
-thiserror = "2.0.11"
+thiserror = "2.0.12"
 time = { version = "0.3.37" }
 tokio = { version = "1.43" }
 tokio-stream = "0.1.17"
