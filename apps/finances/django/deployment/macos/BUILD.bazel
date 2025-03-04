@@ -55,7 +55,9 @@ and remove them with
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files", "pkg_mkdirs")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("//bazel/tools/pkgbuild:checks.bzl", "check_freespace")
 load("//bazel/tools/pkgbuild:pkgbuild.bzl", "pkgbuild")
+load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall", "preinstall")
 
 pkg_tar(
     name = "app-admin-tar",
@@ -147,7 +149,7 @@ pkg_files(
         mode = "0440",
         owner = "root",
     ),
-    prefix = "/usr/local/etc/nginx/server/",
+    prefix = "/usr/local/etc/nginx/servers/",
 )
 
 pkg_mkdirs(
@@ -196,25 +198,36 @@ pkg_tar(
     include_runfiles = True,
 )
 
-genrule(
+check_freespace(
+    name = "check-free-space",
+    folder = "/usr/local",
+    megabytes = "300",
+    tags = ["manual"],
+)
+
+preinstall(
     name = "preinstall-script",
-    outs = ["preinstall"],
-    cmd = """
-cat <<EOF > $@
-#!/bin/bash
-echo 'This is a single-quoted message'
-echo "Starting pre-install checks..." | logger -t FinancesInstaller
-osascript -e 'display dialog "Installation is in progress..." with title "MyApp Installer"'
-exit 1
-EOF
-chmod +x $@
-    """,
+    chunks = [
+        ":check-free-space",
+        "//bazel/tools/pkgbuild:check_supervisor.sh",
+        "//bazel/tools/pkgbuild:check_nginx.sh",
+    ],
+    pkgbuild_name = "finances",
+    tags = ["manual"],
+)
+
+postinstall(
+    name = "postinstall-script",
+    chunks = [
+    ],
+    pkgbuild_name = "finances",
     tags = ["manual"],
 )
 
 pkg_files(
     name = "scripts-group",
     srcs = [
+        ":postinstall-script",
         ":preinstall-script",
     ],
     attributes = pkg_attributes(
@@ -224,14 +237,6 @@ pkg_files(
     ),
     # prefix = "/usr/local/etc/nginx/server/",
 )
-
-# pkg_filegroup(
-#     name = "scripts-group",
-#     srcs = [
-#         ":preinstall-script",
-#     ],
-#     visibility = ["//visibility:public"],
-# )
 
 pkg_tar(
     name = "scripts",

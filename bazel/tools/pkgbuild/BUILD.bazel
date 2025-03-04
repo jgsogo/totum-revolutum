@@ -1,0 +1,8 @@
+exports_files([
+    "check_supervisor.sh",
+    "check_nginx.sh",
+    "preinstall_prelude.sh",
+    "preinstall_ending.sh",
+    "postinstall_prelude.sh",
+    "postinstall_ending.sh",
+])
