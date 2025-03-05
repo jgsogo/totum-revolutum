@@ -1,30 +1,43 @@
 """Generate preinstall script for pkgbuild"""
 
 def _composable_script_impl(ctx):
-    output = ctx.actions.declare_file(ctx.attr._output)
+    output = ctx.actions.declare_file(ctx.attr.output)
 
     prelude = ctx.actions.declare_file(ctx.label.name + "-prelude")
     ctx.actions.expand_template(
-        template = ctx.file._prelude,
+        template = ctx.file.prelude,
         output = prelude,
         substitutions = {
             "%NAME%": ctx.attr.pkgbuild_name,
+            "%LOG_LEVEL%": ctx.attr.log_level,
         },
+    )
+
+    format_dir = {"pkgbuild_name": ctx.attr.pkgbuild_name, "base_folder": ctx.attr.base_folder}
+    folders = ctx.actions.declare_file(ctx.label.name + "-folders")
+    ctx.actions.write(
+        output = folders,
+        content = """
+# Provide folders as environment variables
+export INSTALL_FOLDER="$3"
+export BINARY_FOLDER="$(realpath ${{INSTALL_FOLDER}}{binary_folder})"
+export LOGS_FOLDER="$(realpath ${{INSTALL_FOLDER}}{logs_folder})"
+        """.format(binary_folder = ctx.attr.binary_folder.format(**format_dir), logs_folder = ctx.attr.logs_folder.format(**format_dir)),
     )
 
     ending = ctx.actions.declare_file(ctx.label.name + "-ending")
     ctx.actions.expand_template(
-        template = ctx.file._ending,
+        template = ctx.file.ending,
         output = ending,
         substitutions = {
             "%NAME%": ctx.attr.pkgbuild_name,
         },
     )
 
-    chunks_files = [prelude.path] + [f.path for f in ctx.files.chunks] + [ending.path]
+    chunks_files = [prelude.path, folders.path] + [f.path for f in ctx.files.chunks] + [ending.path]
 
     ctx.actions.run_shell(
-        inputs = ctx.files.chunks + [prelude, ending],
+        inputs = ctx.files.chunks + [prelude, folders, ending],
         outputs = [output],
         command = "cat {files} > {output}".format(files = " ".join(chunks_files), output = output.path),
     )
@@ -33,38 +46,57 @@ def _composable_script_impl(ctx):
         DefaultInfo(files = depset([output])),
     ]
 
-preinstall = rule(
+_composable_script = rule(
     implementation = _composable_script_impl,
     attrs = {
         "pkgbuild_name": attr.string(mandatory = True),
-        "chunks": attr.label_list(mandatory = True, allow_files = True),
-        "_prelude": attr.label(
-            default = Label("//bazel/tools/pkgbuild:preinstall_prelude.sh"),
+        "chunks": attr.label_list(
+            mandatory = True,
+            allow_files = True,
+        ),
+        "prelude": attr.label(
+            mandatory = True,
             allow_single_file = True,
         ),
-        "_ending": attr.label(
-            default = Label("//bazel/tools/pkgbuild:preinstall_ending.sh"),
+        "ending": attr.label(
+            mandatory = True,
             allow_single_file = True,
         ),
-        "_output": attr.string(default = "preinstall"),
+        "output": attr.string(),
+        "base_folder": attr.string(
+            default = "/usr/local"
+        ),
+        "binary_folder": attr.string(
+            default = "{base_folder}/{pkgbuild_name}",
+        ),
+        "logs_folder": attr.string(
+            default = "{base_folder}/var/log",
+        ),
+        "log_level": attr.string(
+            default = "INFO",
+        ),
     },
-    doc = "A rule to create a preinstall script",
+    doc = "A rule to create a script with a prelude, some chunks and an ending",
 )
 
-postinstall = rule(
-    implementation = _composable_script_impl,
-    attrs = {
-        "pkgbuild_name": attr.string(mandatory = True),
-        "chunks": attr.label_list(mandatory = True, allow_files = True),
-        "_prelude": attr.label(
-            default = Label("//bazel/tools/pkgbuild:postinstall_prelude.sh"),
-            allow_single_file = True,
-        ),
-        "_ending": attr.label(
-            default = Label("//bazel/tools/pkgbuild:postinstall_ending.sh"),
-            allow_single_file = True,
-        ),
-        "_output": attr.string(default = "postinstall"),
-    },
-    doc = "A rule to create a postinstall script",
-)
+def preinstall(name, pkgbuild_name, chunks, **kwargs):
+    _composable_script(
+        name = name,
+        pkgbuild_name = pkgbuild_name,
+        chunks = chunks,
+        prelude = "//bazel/tools/pkgbuild:prelude.sh",
+        ending = "//bazel/tools/pkgbuild:empty.sh",
+        output = "preinstall",
+        **kwargs
+    )
+
+def postinstall(name, pkgbuild_name, chunks, **kwargs):
+    _composable_script(
+        name = name,
+        pkgbuild_name = pkgbuild_name,
+        chunks = chunks,
+        prelude = "//bazel/tools/pkgbuild:prelude.sh",
+        ending = "//bazel/tools/pkgbuild:empty.sh",
+        output = "postinstall",
+        **kwargs
+    )

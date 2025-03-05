@@ -19,8 +19,11 @@ def _pkgbuild_impl(ctx):
         inputs = [ctx.file.root, ctx.file.scripts],
         outputs = [output_pkg, payload_dir, scripts_dir],
         arguments = [args],
-        command = "tar -xzf \"$1\" -C \"$2\"; tar -xzf \"$6\" -C \"$7\"; pkgbuild --root \"$2\" --scripts \"$7\" --identifier \"$3\" --version \"$4\" \"$5\"",
-        # command = "pkgbuild --nopayload --identifier \"$2\" --version \"$3\" $4",
+        command = """
+            tar -xzf $1 -C $2
+            tar -xzf $6 -C $7
+            pkgbuild --root $2 --scripts $7 --identifier $3 --version $4 $5
+        """,
     )
 
 pkgbuild = rule(

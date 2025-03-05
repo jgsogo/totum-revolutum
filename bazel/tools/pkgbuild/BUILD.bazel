@@ -1,8 +1,8 @@
 exports_files([
+    "apply_envsubst.tpl.sh",
     "check_supervisor.sh",
     "check_nginx.sh",
-    "preinstall_prelude.sh",
-    "preinstall_ending.sh",
-    "postinstall_prelude.sh",
-    "postinstall_ending.sh",
+    "prelude.sh",
+    "empty.sh",
+    "untar_files.tpl.sh",
 ])
