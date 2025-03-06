@@ -28,7 +28,11 @@ log_debug "BINARY_FOLDER: '${{INSTALL_FOLDER}}{binary_folder}' resolved to '$BIN
 LOGS_FOLDER="${{INSTALL_FOLDER}}{logs_folder}"
 export LOGS_FOLDER="$(realpath $LOGS_FOLDER || $LOGS_FOLDER)"
 log_debug "LOGS_FOLDER: '${{INSTALL_FOLDER}}{logs_folder}' resolved to '$LOGS_FOLDER'"
-        """.format(binary_folder = ctx.attr.bin_folder, logs_folder = ctx.attr.logs_folder),
+
+RUN_FOLDER="${{INSTALL_FOLDER}}{run_folder}"
+export RUN_FOLDER="$(realpath $RUN_FOLDER || $RUN_FOLDER)"
+log_debug "RUN_FOLDER: '${{INSTALL_FOLDER}}{run_folder}' resolved to '$RUN_FOLDER'"
+        """.format(binary_folder = ctx.attr.bin_folder, logs_folder = ctx.attr.logs_folder, run_folder = ctx.attr.run_folder),
     )
 
     ending = ctx.actions.declare_file(ctx.label.name + "-ending")
@@ -71,6 +75,7 @@ _composable_script = rule(
         "output": attr.string(),
         "bin_folder": attr.string(),
         "logs_folder": attr.string(),
+        "run_folder": attr.string(),
         "log_level": attr.string(
             default = "DEBUG",
         ),

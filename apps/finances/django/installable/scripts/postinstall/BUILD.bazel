@@ -1,4 +1,4 @@
-load("//apps/finances/django/installable:defs.bzl", "BIN_FOLDER", "LOGS_FOLDER")
+load("//apps/finances/django/installable:defs.bzl", "BIN_FOLDER", "LOGS_FOLDER", "RUN_FOLDER")
 load("//bazel/tools/pkgbuild:apply_envsubst.bzl", "apply_envsubst")
 load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
 load("//bazel/tools/pkgbuild:untar_files.bzl", "untar_files")
@@ -31,6 +31,7 @@ postinstall(
     ],
     logs_folder = LOGS_FOLDER,
     pkgbuild_name = "finances",
+    run_folder = RUN_FOLDER,
     tags = ["manual"],
     visibility = ["//apps/finances/django/installable/scripts:__subpackages__"],
 )

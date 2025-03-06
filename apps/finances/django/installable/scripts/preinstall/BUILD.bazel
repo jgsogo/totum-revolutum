@@ -1,4 +1,4 @@
-load("//apps/finances/django/installable:defs.bzl", "BIN_FOLDER", "LOGS_FOLDER")
+load("//apps/finances/django/installable:defs.bzl", "BIN_FOLDER", "LOGS_FOLDER", "RUN_FOLDER")
 load("//bazel/tools/pkgbuild:checks.bzl", "check_freespace")
 load("//bazel/tools/pkgbuild:scripts.bzl", "preinstall")
 
@@ -18,6 +18,7 @@ preinstall(
     ],
     logs_folder = LOGS_FOLDER,
     pkgbuild_name = "finances",
+    run_folder = RUN_FOLDER,
     tags = ["manual"],
     visibility = ["//apps/finances/django/installable/scripts:__subpackages__"],
 )
