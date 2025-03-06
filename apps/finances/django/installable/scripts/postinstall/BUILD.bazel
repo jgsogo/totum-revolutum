@@ -1,0 +1,36 @@
+load("//apps/finances/django/installable:defs.bzl", "BIN_FOLDER", "LOGS_FOLDER")
+load("//bazel/tools/pkgbuild:apply_envsubst.bzl", "apply_envsubst")
+load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
+load("//bazel/tools/pkgbuild:untar_files.bzl", "untar_files")
+
+apply_envsubst(
+    name = "envsubst-supervisor",
+    files = [
+        "/usr/local/finances/data/supervisord.ini",
+        "/usr/local/finances/data/nginx.conf",
+        # DATA_FOLDER + "/supervisord.ini",
+    ],
+)
+
+untar_files(
+    name = "untar-files",
+    files = [
+        "/usr/local/finances/bin/app-admin-tar.tar",
+        "/usr/local/finances/bin/app-gunicorn-tar.tar",
+        # BIN_FOLDER + "/app-admin-tar.tar",  # "location :app-admin-tar"
+        # BIN_FOLDER + "/app-gunicorn-tar.tar",  # "location :app-gunicorn-tar"
+    ],
+)
+
+postinstall(
+    name = "postinstall",
+    bin_folder = BIN_FOLDER,
+    chunks = [
+        ":envsubst-supervisor",
+        ":untar-files",
+    ],
+    logs_folder = LOGS_FOLDER,
+    pkgbuild_name = "finances",
+    tags = ["manual"],
+    visibility = ["//apps/finances/django/installable/scripts:__subpackages__"],
+)

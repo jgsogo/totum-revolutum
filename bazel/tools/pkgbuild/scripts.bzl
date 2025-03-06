@@ -13,7 +13,6 @@ def _composable_script_impl(ctx):
         },
     )
 
-    format_dir = {"pkgbuild_name": ctx.attr.pkgbuild_name, "base_folder": ctx.attr.base_folder}
     folders = ctx.actions.declare_file(ctx.label.name + "-folders")
     ctx.actions.write(
         output = folders,
@@ -29,7 +28,7 @@ log_debug "BINARY_FOLDER: '${{INSTALL_FOLDER}}{binary_folder}' resolved to '$BIN
 LOGS_FOLDER="${{INSTALL_FOLDER}}{logs_folder}"
 export LOGS_FOLDER="$(realpath $LOGS_FOLDER || $LOGS_FOLDER)"
 log_debug "LOGS_FOLDER: '${{INSTALL_FOLDER}}{logs_folder}' resolved to '$LOGS_FOLDER'"
-        """.format(binary_folder = ctx.attr.binary_folder.format(**format_dir), logs_folder = ctx.attr.logs_folder.format(**format_dir)),
+        """.format(binary_folder = ctx.attr.bin_folder, logs_folder = ctx.attr.logs_folder),
     )
 
     ending = ctx.actions.declare_file(ctx.label.name + "-ending")
@@ -70,15 +69,8 @@ _composable_script = rule(
             allow_single_file = True,
         ),
         "output": attr.string(),
-        "base_folder": attr.string(
-            default = "/usr/local",
-        ),
-        "binary_folder": attr.string(
-            default = "{base_folder}/{pkgbuild_name}",
-        ),
-        "logs_folder": attr.string(
-            default = "{base_folder}/var/log",
-        ),
+        "bin_folder": attr.string(),
+        "logs_folder": attr.string(),
         "log_level": attr.string(
             default = "DEBUG",
         ),

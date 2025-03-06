@@ -1,0 +1,71 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files", "pkg_mklink")
+load("//apps/finances/django/installable:defs.bzl", "DATA_FOLDER", "SUBSTITUTIONS")
+
+expand_template(
+    name = "supervisor_ini-file",
+    out = "supervisord.ini",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:supervisord.tpl.ini",
+)
+
+expand_template(
+    name = "nginx_conf-file",
+    out = "nginx.conf",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:nginx.tpl.conf",
+)
+
+pkg_files(
+    name = "data-files",
+    srcs = [
+        ":nginx_conf-file",
+        ":supervisor_ini-file",
+    ],
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0440",
+        owner = "root",
+    ),
+    prefix = DATA_FOLDER,
+)
+
+pkg_mklink(
+    name = "supervisor_ini-link",
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0440",
+        owner = "root",
+    ),
+    link_name = "usr/local/etc/supervisor.d/finances.ini",
+    # target = DATA_FOLDER + "/supervisord.ini",
+    target = "../../finances/data/supervisord.ini",
+)
+
+pkg_mklink(
+    name = "nginx_conf-link",
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0440",
+        owner = "root",
+    ),
+    link_name = "usr/local/etc/nginx/servers/finances.conf",
+    # target = DATA_FOLDER + "/nginx.conf",
+    target = "../../../finances/data/nginx.conf",
+)
+
+pkg_filegroup(
+    name = "data",
+    srcs = [
+        "nginx_conf-link",
+        ":data-files",
+        ":supervisor_ini-link",
+    ],
+    visibility = ["//apps/finances/django/installable:__subpackages__"],
+)
