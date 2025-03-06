@@ -20,8 +20,13 @@ def _composable_script_impl(ctx):
         content = """
 # Provide folders as environment variables
 export INSTALL_FOLDER="$3"
-export BINARY_FOLDER="$(realpath ${{INSTALL_FOLDER}}{binary_folder})"
-export LOGS_FOLDER="$(realpath ${{INSTALL_FOLDER}}{logs_folder})"
+log_debug "INSTALL_FOLDER: $INSTALL_FOLDER"
+
+export BINARY_FOLDER="${{INSTALL_FOLDER}}{binary_folder}"
+log_debug "BINARY_FOLDER: '${{INSTALL_FOLDER}}{binary_folder}' resolved to '$BINARY_FOLDER'"
+
+export LOGS_FOLDER="${{INSTALL_FOLDER}}{logs_folder}"
+log_debug "LOGS_FOLDER: '${{INSTALL_FOLDER}}{logs_folder}' resolved to '$LOGS_FOLDER'"
         """.format(binary_folder = ctx.attr.binary_folder.format(**format_dir), logs_folder = ctx.attr.logs_folder.format(**format_dir)),
     )
 
@@ -64,7 +69,7 @@ _composable_script = rule(
         ),
         "output": attr.string(),
         "base_folder": attr.string(
-            default = "/usr/local"
+            default = "/usr/local",
         ),
         "binary_folder": attr.string(
             default = "{base_folder}/{pkgbuild_name}",
@@ -73,7 +78,7 @@ _composable_script = rule(
             default = "{base_folder}/var/log",
         ),
         "log_level": attr.string(
-            default = "INFO",
+            default = "DEBUG",
         ),
     },
     doc = "A rule to create a script with a prelude, some chunks and an ending",

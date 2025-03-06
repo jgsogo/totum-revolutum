@@ -44,3 +44,5 @@ LogMsg()
   read IN # This reads a string from stdin and stores it in a variable called IN
   log_info "$IN"
 }
+
+log_debug "Execute install script '$1'"
