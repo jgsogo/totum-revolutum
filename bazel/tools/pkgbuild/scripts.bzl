@@ -22,10 +22,12 @@ def _composable_script_impl(ctx):
 export INSTALL_FOLDER="$3"
 log_debug "INSTALL_FOLDER: $INSTALL_FOLDER"
 
-export BINARY_FOLDER="${{INSTALL_FOLDER}}{binary_folder}"
+BINARY_FOLDER="${{INSTALL_FOLDER}}{binary_folder}"
+export BINARY_FOLDER="$(realpath $BINARY_FOLDER || $BINARY_FOLDER)"
 log_debug "BINARY_FOLDER: '${{INSTALL_FOLDER}}{binary_folder}' resolved to '$BINARY_FOLDER'"
 
-export LOGS_FOLDER="${{INSTALL_FOLDER}}{logs_folder}"
+LOGS_FOLDER="${{INSTALL_FOLDER}}{logs_folder}"
+export LOGS_FOLDER="$(realpath $LOGS_FOLDER || $LOGS_FOLDER)"
 log_debug "LOGS_FOLDER: '${{INSTALL_FOLDER}}{logs_folder}' resolved to '$LOGS_FOLDER'"
         """.format(binary_folder = ctx.attr.binary_folder.format(**format_dir), logs_folder = ctx.attr.logs_folder.format(**format_dir)),
     )

@@ -8,10 +8,22 @@ INSTALLER_NAME="%NAME%"
 LOGFILE="/var/log/%NAME%_install.log"
 LOGLEVEL='%LOG_LEVEL%'
 
+# Captures all stdout and stderr, prepends a timestamp and appends it to the logfile (and to the console)
+log_with_timestamp() {
+    local log_file="$1"
+
+    # exec > >(while read line; do echo "[$(date '+%Y-%m-%d %H:%M:%S')] $line"; done | tee -a "$logfile") \
+    #      2>&1
+    exec > >(while read line; do echo "[$(date '+%Y-%m-%d %H:%M:%S')] $line"; done >> "$log_file") \
+         2>&1
+}
+
+log_with_timestamp $LOGFILE
+
+
 # Logging functions
 function log_output {
   echo `date "+%Y/%m/%d %H:%M:%S"`" $1"
-  echo `date "+%Y/%m/%d %H:%M:%S"`" $1" >> $LOGFILE
 }
 
 function log_debug {
@@ -39,10 +51,5 @@ function log_error {
   fi
 }
 
-LogMsg()
-{
-  read IN # This reads a string from stdin and stores it in a variable called IN
-  log_info "$IN"
-}
 
 log_debug "Execute install script '$1'"
