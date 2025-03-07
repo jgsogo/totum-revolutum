@@ -14,25 +14,20 @@ def _composable_script_impl(ctx):
     )
 
     folders = ctx.actions.declare_file(ctx.label.name + "-folders")
-    ctx.actions.write(
-        output = folders,
-        content = """
+    content = ["""
 # Provide folders as environment variables
 export INSTALL_FOLDER="$3"
 log_debug "INSTALL_FOLDER: $INSTALL_FOLDER"
-
-BINARY_FOLDER="${{INSTALL_FOLDER}}{binary_folder}"
-export BINARY_FOLDER="$(realpath $BINARY_FOLDER || $BINARY_FOLDER)"
-log_debug "BINARY_FOLDER: '${{INSTALL_FOLDER}}{binary_folder}' resolved to '$BINARY_FOLDER'"
-
-LOGS_FOLDER="${{INSTALL_FOLDER}}{logs_folder}"
-export LOGS_FOLDER="$(realpath $LOGS_FOLDER || $LOGS_FOLDER)"
-log_debug "LOGS_FOLDER: '${{INSTALL_FOLDER}}{logs_folder}' resolved to '$LOGS_FOLDER'"
-
-RUN_FOLDER="${{INSTALL_FOLDER}}{run_folder}"
-export RUN_FOLDER="$(realpath $RUN_FOLDER || $RUN_FOLDER)"
-log_debug "RUN_FOLDER: '${{INSTALL_FOLDER}}{run_folder}' resolved to '$RUN_FOLDER'"
-        """.format(binary_folder = ctx.attr.bin_folder, logs_folder = ctx.attr.logs_folder, run_folder = ctx.attr.run_folder),
+"""]
+    for key, folder in ctx.attr.folders.items():
+        content.append("""
+{key}="${{INSTALL_FOLDER}}{value}"
+export {key}="$(realpath ${key} || ${key})"
+log_debug "{key}: '${{INSTALL_FOLDER}}{value}' resolved to '${key}'"
+""".format(key = key, value = folder))
+    ctx.actions.write(
+        output = folders,
+        content = "\n\n".join(content),
     )
 
     ending = ctx.actions.declare_file(ctx.label.name + "-ending")
@@ -73,9 +68,10 @@ _composable_script = rule(
             allow_single_file = True,
         ),
         "output": attr.string(),
-        "bin_folder": attr.string(),
-        "logs_folder": attr.string(),
-        "run_folder": attr.string(),
+        "folders": attr.string_dict(),
+        # "bin_folder": attr.string(),
+        # "logs_folder": attr.string(),
+        # "run_folder": attr.string(),
         "log_level": attr.string(
             default = "DEBUG",
         ),

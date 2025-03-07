@@ -18,3 +18,27 @@ BIN_FOLDER = select(path_selector) + "/bin"
 
 LOGS_FOLDER = "/usr/local/var/log"
 RUN_FOLDER = "/usr/local/var/run"
+WWW_DATA_FOLDER = "/usr/local/var/data"
+
+# ALL_FOLDERS = {
+#     "LOGS_FOLDER": LOGS_FOLDER,
+#     "BIN_FOLDER": BIN_FOLDER,
+#     "RUN_FOLDER": RUN_FOLDER,
+#     "DATA_FOLDER": DATA_FOLDER,
+#     "WWW_DATA_FOLDER": WWW_DATA_FOLDER,
+# }
+
+ALL_FOLDERS = select(
+    {
+        "@platforms//os:linux": {},
+        "@platforms//os:macos": {
+            "LOGS_FOLDER": LOGS_FOLDER,
+            "BIN_FOLDER": "/usr/local/finances/bin",
+            "RUN_FOLDER": RUN_FOLDER,
+            "DATA_FOLDER": "/usr/local/finances/data",
+            "WWW_DATA_FOLDER": WWW_DATA_FOLDER,
+        },
+        # "@platforms//os:windows": "/Program Files/Finances",
+        "//conditions:default": {},
+    },
+)

@@ -4,27 +4,32 @@ We deploy this application in MacOS using a PKG:
  * create the package payload
 
    ```
-    finances-pkg/
-    │── payload/
-    │   ├── usr/local/finances/
-    │   │   ├── finances-django-admin
-    │   │   ├── finances-django-gunicorn
-    │   │   ├── envsubst
-    │   │   ├── .env
-    │   │   ├── data/
-    │   │       ├── supervisor.d/finances.ini
-    │   │       ├── nginx/finances.conf
-    │   ├── usr/local/etc/
-    │   │   ├── supervisor.d/
-    │   │   |   ├── finances.ini
-    │   ├   ├── nginx/servers/
-    │   │       ├── finances.conf
-    │   ├── usr/local/var/log/              # Path to store logs
-    │   ├── usr/local/var/run/              # PIDs and sockets
-    │── scripts/
-    │   ├── preinstall            # ✅ NEW: Pre-install checks
-    │   ├── postinstall           # Runs setup after installation
-    │── finances.pkg
+    |-- finances-payload
+    |   `-- usr
+    |       `-- local
+    |           |-- etc
+    |           |   |-- nginx
+    |           |   |   `-- servers
+    |           |   |       `-- finances.conf -> ../../../finances/data/nginx.conf
+    |           |   `-- supervisor.d
+    |           |       `-- finances.ini -> ../../finances/data/supervisord.ini
+    |           |-- finances
+    |           |   |-- bin
+    |           |   |   |-- app-admin-tar.tar
+    |           |   |   |-- app-gunicorn-tar.tar
+    |           |   |   `-- envsubst
+    |           |   `-- data
+    |           |   |   |-- nginx.conf
+    |           |   |   `-- supervisord.ini
+    |           |   `-- www-data
+    |           |       |-- static
+    |           |       `-- media
+    |           `-- var
+    |               |-- log
+    |               `-- run
+    |-- finances-scripts
+    |   |-- postinstall
+    |   `-- preinstall
    ```
 
  * use `pkgbuild` to build the MacOS PKG
@@ -58,7 +63,7 @@ and remove them with
 
 load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_mkdirs")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("//apps/finances/django/installable:defs.bzl", "LOGS_FOLDER", "RUN_FOLDER")
+load("//apps/finances/django/installable:defs.bzl", "LOGS_FOLDER", "RUN_FOLDER", "WWW_DATA_FOLDER")
 load("//bazel/tools/pkgbuild:pkgbuild.bzl", "pkgbuild")
 
 pkg_mkdirs(
@@ -71,6 +76,7 @@ pkg_mkdirs(
     dirs = [
         LOGS_FOLDER,
         RUN_FOLDER,
+        WWW_DATA_FOLDER,
     ],
 )
 

@@ -2,7 +2,7 @@
 # Apply envsubst to some files
 log_debug "Apply envsubst to files"
 
-ENVSUBST_TOOL="$BINARY_FOLDER/envsubst"
+ENVSUBST_TOOL="$BIN_FOLDER/envsubst"
 chmod +x $ENVSUBST_TOOL
 
 TEMP_FILE="$(mktemp -d)/file.tmp"
