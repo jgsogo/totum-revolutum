@@ -1,9 +1,11 @@
 """Some constant definitions for the finances installable"""
 
+DJANGO_ADMIN_APP = "app-admin"
+
 SUBSTITUTIONS = {
     "%NAME%": "finances",
     "%GUNICORN_APP%": "app-gunicorn",
-    "%DJANGO_ADMIN_APP%": "app-admin",
+    "%DJANGO_ADMIN_APP%": DJANGO_ADMIN_APP,
 }
 
 path_selector = {

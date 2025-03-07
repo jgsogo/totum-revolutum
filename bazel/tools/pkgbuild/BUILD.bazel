@@ -6,4 +6,5 @@ exports_files([
     "empty.sh",
     "untar_files.tpl.sh",
     "combine_envfiles.tpl.sh",
+    "django_command.tpl.sh",
 ])

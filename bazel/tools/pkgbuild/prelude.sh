@@ -34,13 +34,13 @@ function log_debug {
 
 function log_info {
   if [[ "$LOGLEVEL" =~ ^(DEBUG|INFO)$ ]]; then
-    log_output "INFO $1"
+    log_output "INFO  $1"
   fi
 }
 
 function log_warn {
   if [[ "$LOGLEVEL" =~ ^(DEBUG|INFO|WARN)$ ]]; then
-    log_output "WARN $1"
+    log_output "WARN  $1"
   fi
 }
 
