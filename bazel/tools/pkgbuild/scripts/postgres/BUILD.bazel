@@ -1,0 +1,3 @@
+exports_files([
+    "pg_create_database.tpl.sh",
+])

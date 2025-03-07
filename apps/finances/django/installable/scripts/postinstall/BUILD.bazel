@@ -4,6 +4,7 @@ load("//bazel/tools/pkgbuild:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/tools/pkgbuild:django_command.bzl", "django_command")
 load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
 load("//bazel/tools/pkgbuild:untar_files.bzl", "untar_files")
+load("//bazel/tools/pkgbuild/scripts/envfile:envfile_load.bzl", "envfile_load")
 
 apply_envsubst(
     name = "envsubst-supervisor",
@@ -31,6 +32,11 @@ combine_envfiles(
     target = "/usr/local/finances/bin/.env",
 )
 
+envfile_load(
+    name = "envfile-load",
+    envfile = "/usr/local/finances/bin/.env",
+)
+
 django_command(
     name = "django-migrate",
     command = [
@@ -44,13 +50,10 @@ django_command(
     command = [
         "collectstatic",
         "--no-input",
-        "clear",
+        "--clear",
     ],
     django_admin_app = DJANGO_ADMIN_APP,
 )
-
-# TODO: Reload gunicorn
-# TODO: Reload nignx
 
 postinstall(
     name = "postinstall",
@@ -58,8 +61,13 @@ postinstall(
         ":envsubst-supervisor",
         ":untar-files",
         ":combine-env",
+        ":envfile-load",
+        "//bazel/tools/pkgbuild/scripts/postgres:pg_create_database.tpl.sh",
         ":django-migrate",
         ":django-collectstatic",
+
+        # TODO: Reload supervisorctl
+        # TODO: Reload nignx
     ],
     folders = ALL_FOLDERS,
     pkgbuild_name = "finances",
