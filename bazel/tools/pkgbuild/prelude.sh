@@ -23,7 +23,7 @@ log_with_timestamp $LOGFILE
 
 # Logging functions
 function log_output {
-  echo `date "+%Y/%m/%d %H:%M:%S"`" $1"
+  echo "$1"
 }
 
 function log_debug {

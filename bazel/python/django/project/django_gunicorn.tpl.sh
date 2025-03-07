@@ -23,17 +23,19 @@ if [[ -z "${GUNICORN_APP_NAME}" ]]; then
     >&2 echo "Envvar 'GUNICORN_APP_NAME' is required"
 fi
 
-if [[ -z "${GUNICORN_WORKING_DIR}" ]]; then
-    >&2 echo "Envvar 'GUNICORN_WORKING_DIR' is required"
+if [[ -z "${GUNICORN_RUN_FOLDER}" ]]; then
+    >&2 echo "Envvar 'GUNICORN_RUN_FOLDER' is required"
+fi
+
+if [[ -z "${GUNICORN_LOGS_FOLDER}" ]]; then
+    >&2 echo "Envvar 'GUNICORN_LOGS_FOLDER' is required"
 fi
 
 # Create directories if needed
-echo "Working directory: $GUNICORN_WORKING_DIR"
-test -d $GUNICORN_WORKING_DIR || mkdir -p $GUNICORN_WORKING_DIR
-test -d $GUNICORN_WORKING_DIR/run || mkdir -p $GUNICORN_WORKING_DIR/run
-test -d $GUNICORN_WORKING_DIR/log || mkdir -p $GUNICORN_WORKING_DIR/log
+test -d $GUNICORN_RUN_FOLDER || mkdir -p $GUNICORN_RUN_FOLDER
+test -d $GUNICORN_LOGS_FOLDER || mkdir -p $GUNICORN_LOGS_FOLDER
 
-BIND_SOCKET="unix:${GUNICORN_WORKING_DIR}/run/gunicorn.sock"
+BIND_SOCKET="unix:${GUNICORN_RUN_FOLDER}/gunicorn.sock"
 BIND=${GUNICORN_BIND:-$BIND_SOCKET}
 echo " - binding to: $BIND"
 
@@ -44,6 +46,6 @@ DJANGO_SETTINGS_MODULE="%SETTINGS%" $GUNICORN bazel.python.django.project.wsgi:a
     --bind $BIND \
     --workers ${GUNICORN_WORKERS:-3} \
     --log-level ${GUNICORN_LOG_LEVEL:-info} \
-    --access-logfile ${GUNICORN_WORKING_DIR}/log/gunicorn-access.log \
-    --error-logfile ${GUNICORN_WORKING_DIR}/log/gunicorn-errors.log \
+    --access-logfile ${GUNICORN_LOGS_FOLDER}/gunicorn-access.log \
+    --error-logfile ${GUNICORN_LOGS_FOLDER}/gunicorn-errors.log \
     ${GUNICORN_EXTRA_ARGS:=}

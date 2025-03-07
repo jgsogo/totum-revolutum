@@ -27,7 +27,7 @@ log_debug "{key}: '${{INSTALL_FOLDER}}{value}' resolved to '${key}'"
 """.format(key = key, value = folder))
     ctx.actions.write(
         output = folders,
-        content = "\n\n".join(content),
+        content = "\n".join(content),
     )
 
     ending = ctx.actions.declare_file(ctx.label.name + "-ending")

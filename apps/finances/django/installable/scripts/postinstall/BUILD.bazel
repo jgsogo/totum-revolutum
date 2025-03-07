@@ -1,5 +1,6 @@
 load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS")
 load("//bazel/tools/pkgbuild:apply_envsubst.bzl", "apply_envsubst")
+load("//bazel/tools/pkgbuild:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
 load("//bazel/tools/pkgbuild:untar_files.bzl", "untar_files")
 
@@ -8,6 +9,7 @@ apply_envsubst(
     files = [
         "/usr/local/finances/data/supervisord.ini",
         "/usr/local/finances/data/nginx.conf",
+        "/usr/local/finances/data/envfile",
         # DATA_FOLDER + "/supervisord.ini",
     ],
 )
@@ -22,11 +24,18 @@ untar_files(
     ],
 )
 
+combine_envfiles(
+    name = "combine-env",
+    source = "/usr/local/finances/data/envfile",
+    target = "/usr/local/finances/bin/.env",
+)
+
 postinstall(
     name = "postinstall",
     chunks = [
         ":envsubst-supervisor",
         ":untar-files",
+        ":combine-env",
     ],
     folders = ALL_FOLDERS,
     pkgbuild_name = "finances",

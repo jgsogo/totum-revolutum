@@ -5,4 +5,5 @@ exports_files([
     "prelude.sh",
     "empty.sh",
     "untar_files.tpl.sh",
+    "combine_envfiles.tpl.sh",
 ])

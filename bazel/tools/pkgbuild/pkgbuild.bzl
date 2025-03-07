@@ -22,7 +22,7 @@ def _pkgbuild_impl(ctx):
         command = """
             tar -xzf $1 -C $2
             tar -xzf $6 -C $7
-            tree .
+            tree -a .
             pkgbuild --root $2 --scripts $7 --identifier $3 --version $4 $5
         """,
     )

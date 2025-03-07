@@ -16,9 +16,9 @@ path_selector = {
 DATA_FOLDER = select(path_selector) + "/data"
 BIN_FOLDER = select(path_selector) + "/bin"
 
-LOGS_FOLDER = "/usr/local/var/log"
-RUN_FOLDER = "/usr/local/var/run"
-WWW_DATA_FOLDER = "/usr/local/var/data"
+LOGS_FOLDER = "/usr/local/finances/log"
+RUN_FOLDER = "/usr/local/finances/run"
+WWW_DATA_FOLDER = "/usr/local/finances/www-data"
 
 # ALL_FOLDERS = {
 #     "LOGS_FOLDER": LOGS_FOLDER,

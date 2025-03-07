@@ -22,9 +22,20 @@ expand_template(
     template = "//bazel/python/django/deployment:nginx.tpl.conf",
 )
 
+expand_template(
+    name = "env-file",
+    out = "envfile",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:.env.tpl",
+)
+
 pkg_files(
     name = "data-files",
     srcs = [
+        ":env-file",
         ":nginx_conf-file",
         ":supervisor_ini-file",
     ],
@@ -60,12 +71,25 @@ pkg_mklink(
     target = "../../../finances/data/nginx.conf",
 )
 
+# pkg_mklink(
+#     name = "env_file-link",
+#     attributes = pkg_attributes(
+#         group = "root",
+#         mode = "0440",
+#         owner = "root",
+#     ),
+#     link_name = "usr/local/finances/bin/.env",
+#     # target = DATA_FOLDER + "/nginx.conf",
+#     target = "../../finances/data/envfile",
+# )
+
 pkg_filegroup(
     name = "data",
     srcs = [
         "nginx_conf-link",
         ":data-files",
         ":supervisor_ini-link",
+        # ":env_file-link",
     ],
     visibility = ["//apps/finances/django/installable:__subpackages__"],
 )
