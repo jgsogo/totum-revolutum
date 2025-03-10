@@ -88,7 +88,7 @@ prost-build = "0.13.5"
 # protoc-gen-tonic = "0.4.1"
 regex = "1.11.1"
 reqwest = { version = "0.12.12" }
-ring = "0.17.11"
+ring = "0.17.13"
 serde = { version = "1.0.218" }
 serde_json = "1.0.140"
 serde_regex = "1.1.0"
@@ -98,7 +98,7 @@ sha256 = { version = "1.5" }
 similar-asserts = "1.7.0"
 strum = "0.27.1"
 strum_macros = "0.27.1"
-syn = { version = "2.0.99", features = ["visit"] }
+syn = { version = "2.0.100", features = ["visit"] }
 tauri-build = { version = "2.0.6", features = [] }
 tauri = { version = "2.3.1", features = [] }
 tauri-plugin-shell = "2.2.0"
