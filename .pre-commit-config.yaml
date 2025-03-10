@@ -42,7 +42,7 @@ repos:
 
   # Enforce that commit messages allow for later changelog generation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.2.2
+    rev: v4.4.1
     hooks:
       # Requires that commitizen is already installed
       - id: commitizen
@@ -72,7 +72,7 @@ repos:
           - "--max-line-length=100"
 
   - repo: https://github.com/pycqa/isort
-    rev: 6.0.0
+    rev: 6.0.1
     hooks:
       - id: isort
         args: ["--profile", "black"]
