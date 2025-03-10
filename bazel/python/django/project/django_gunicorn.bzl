@@ -31,7 +31,8 @@ def _django_gunicorn_sh_impl(ctx):
         RunEnvironmentInfo(
             environment = {
                 "GUNICORN_APP_NAME": ctx.label.package.replace("/", "_"),
-                "GUNICORN_WORKING_DIR": "/tmp/{}".format(ctx.label.package.replace("/", "_")),
+                "GUNICORN_RUN_FOLDER": "/tmp/{}/run".format(ctx.label.package.replace("/", "_")),
+                "GUNICORN_LOGS_FOLDER": "/tmp/{}/logs".format(ctx.label.package.replace("/", "_")),
                 "GUNICORN_BIND": "localhost:0",
                 "DEBUG": "1",
                 "SECRET_KEY": "the-secret-key",

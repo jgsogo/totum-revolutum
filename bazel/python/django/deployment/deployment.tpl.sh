@@ -62,6 +62,7 @@ echo "" >> $ENV_FILE
 
 echo "# gunicorn" >> $ENV_FILE
 echo "GUNICORN_APP_NAME=%NAME%" >> $ENV_FILE
+TODO: We are removing all this file, right!?
 echo "GUNICORN_WORKING_DIR=$OUTPUT_DIRECTORY" >> $ENV_FILE
 echo "GUNICORN_USER=$(whoami)" >> $ENV_FILE
 echo "GUNICORN_GROUP=$(id -gn jgsogo)" >> $ENV_FILE
