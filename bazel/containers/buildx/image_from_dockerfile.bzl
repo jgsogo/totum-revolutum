@@ -20,6 +20,8 @@ def image_from_dockerfile(name, srcs, repository, loadable = False, **kwargs):
      * <name>-load: (Only if `loadable`) Execute this rule to load the image into the docker registry
      * <name>-tarball: (Only if `loadable`) A tarball with the OCI image. Use it to load the image into a registry at runtime
     """
+    tags = depset(kwargs.pop("tags", []) + ["no-remote-cache"]).to_list()
+
     copy_to_directory(
         name = "{}-docker-files".format(name),
         srcs = srcs,
@@ -40,6 +42,7 @@ def image_from_dockerfile(name, srcs, repository, loadable = False, **kwargs):
         out_dirs = [name],
         target_compatible_with = TARGET_COMPATIBLE_WITH,
         tool = "//bazel/containers/buildx",
+        tags = tags,
         **kwargs
     )
 
@@ -57,6 +60,7 @@ def image_from_dockerfile(name, srcs, repository, loadable = False, **kwargs):
             name = "{}-load".format(name),
             image = ":{}".format(name),
             repo_tags = ":{}-repo_tags".format(name),
+            tags = tags,
             **kwargs
         )
 
@@ -67,5 +71,6 @@ def image_from_dockerfile(name, srcs, repository, loadable = False, **kwargs):
             name = "{}-tarball".format(name),
             srcs = [":{}-load".format(name)],
             output_group = "tarball",
+            tags = tags,
             **kwargs
         )
