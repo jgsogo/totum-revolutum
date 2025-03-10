@@ -3,6 +3,9 @@
 def _composable_script_impl(ctx):
     output = ctx.actions.declare_file(ctx.attr.output)
 
+    pre_files = []
+
+    # Prelude
     prelude = ctx.actions.declare_file(ctx.label.name + "-prelude")
     ctx.actions.expand_template(
         template = ctx.file.prelude,
@@ -12,9 +15,16 @@ def _composable_script_impl(ctx):
             "%LOG_LEVEL%": ctx.attr.log_level,
         },
     )
+    pre_files.append(prelude)
 
+    # The logger
+    pre_files.append(ctx.file._logger)
+
+    # Configure the logger + Some variables with some folders
     folders = ctx.actions.declare_file(ctx.label.name + "-folders")
     content = ["""
+log_with_timestamp $LOGFILE
+
 # Provide folders as environment variables
 export INSTALL_FOLDER="$3"
 log_debug "INSTALL_FOLDER: $INSTALL_FOLDER"
@@ -29,7 +39,9 @@ log_debug "{key}: '${{INSTALL_FOLDER}}{value}' resolved to '${key}'"
         output = folders,
         content = "\n".join(content),
     )
+    pre_files.append(folders)
 
+    # Ending
     ending = ctx.actions.declare_file(ctx.label.name + "-ending")
     ctx.actions.expand_template(
         template = ctx.file.ending,
@@ -39,10 +51,10 @@ log_debug "{key}: '${{INSTALL_FOLDER}}{value}' resolved to '${key}'"
         },
     )
 
-    chunks_files = [prelude.path, folders.path] + [f.path for f in ctx.files.chunks] + [ending.path]
+    chunks_files = [f.path for f in pre_files] + [f.path for f in ctx.files.chunks] + [ending.path]
 
     ctx.actions.run_shell(
-        inputs = ctx.files.chunks + [prelude, folders, ending],
+        inputs = ctx.files.chunks + pre_files + [ending],
         outputs = [output],
         command = "cat {files} > {output}".format(files = " ".join(chunks_files), output = output.path),
     )
@@ -72,6 +84,10 @@ _composable_script = rule(
         # "bin_folder": attr.string(),
         # "logs_folder": attr.string(),
         # "run_folder": attr.string(),
+        "_logger": attr.label(
+            default = Label("//bazel/tools/pkgbuild/scripts/bash:logger.sh"),
+            allow_single_file = True,
+        ),
         "log_level": attr.string(
             default = "DEBUG",
         ),
