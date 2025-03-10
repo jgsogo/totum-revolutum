@@ -19,7 +19,7 @@ apply_envsubst = rule(
     attrs = {
         "files": attr.string_list(mandatory = True),
         "_template": attr.label(
-            default = Label("//bazel/tools/pkgbuild:apply_envsubst.tpl.sh"),
+            default = Label("//bazel/tools/pkgbuild/scripts/envsubst:apply_envsubst.tpl.sh"),
             allow_single_file = True,
         ),
     },

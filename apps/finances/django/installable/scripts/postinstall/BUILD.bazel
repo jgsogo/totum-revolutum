@@ -1,10 +1,10 @@
 load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP")
-load("//bazel/tools/pkgbuild:apply_envsubst.bzl", "apply_envsubst")
-load("//bazel/tools/pkgbuild:combine_envfiles.bzl", "combine_envfiles")
-load("//bazel/tools/pkgbuild:django_command.bzl", "django_command")
 load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
-load("//bazel/tools/pkgbuild:untar_files.bzl", "untar_files")
+load("//bazel/tools/pkgbuild/scripts/django:django_command.bzl", "django_command")
+load("//bazel/tools/pkgbuild/scripts/envfile:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/tools/pkgbuild/scripts/envfile:envfile_load.bzl", "envfile_load")
+load("//bazel/tools/pkgbuild/scripts/envsubst:apply_envsubst.bzl", "apply_envsubst")
+load("//bazel/tools/pkgbuild/scripts/filesystem:untar_files.bzl", "untar_files")
 
 apply_envsubst(
     name = "envsubst-supervisor",

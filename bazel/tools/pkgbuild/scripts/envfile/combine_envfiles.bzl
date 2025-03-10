@@ -21,7 +21,7 @@ combine_envfiles = rule(
         "source": attr.string(mandatory = True),
         "target": attr.string(mandatory = True),
         "_template": attr.label(
-            default = Label("//bazel/tools/pkgbuild:combine_envfiles.tpl.sh"),
+            default = Label("//bazel/tools/pkgbuild/scripts/envfile:combine_envfiles.tpl.sh"),
             allow_single_file = True,
         ),
     },

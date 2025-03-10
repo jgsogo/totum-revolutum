@@ -19,7 +19,7 @@ untar_files = rule(
     attrs = {
         "files": attr.string_list(mandatory = True),
         "_template": attr.label(
-            default = Label("//bazel/tools/pkgbuild:untar_files.tpl.sh"),
+            default = Label("//bazel/tools/pkgbuild/scripts/filesystem:untar_files.tpl.sh"),
             allow_single_file = True,
         ),
     },

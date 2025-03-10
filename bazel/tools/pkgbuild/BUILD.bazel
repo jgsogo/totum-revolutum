@@ -1,10 +1,4 @@
 exports_files([
-    "apply_envsubst.tpl.sh",
-    "check_supervisor.sh",
-    "check_nginx.sh",
     "prelude.sh",
     "empty.sh",
-    "untar_files.tpl.sh",
-    "combine_envfiles.tpl.sh",
-    "django_command.tpl.sh",
 ])
