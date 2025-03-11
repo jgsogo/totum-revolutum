@@ -55,14 +55,14 @@ jobs:
         run: |
           echo "Get latest release for application ${{ inputs.app }}"
           bazel run $BAZEL_CONFIG //tools/gh -- release list --exclude-drafts --json tagName,name | jq '.[].tagName' | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
-          PREV_RELEASE=$(bazel run //bazel/tools/semver:bin -- max --filter-prefix=${{ inputs.app }} $(<${{ runner.temp }}/${{ inputs.app }}-releases.json))
+          PREV_RELEASE=$(bazel run //tools/semver:bin -- max --filter-prefix=${{ inputs.app }} $(<${{ runner.temp }}/${{ inputs.app }}-releases.json))
           echo ">>>> PREV_RELEASE=$PREV_RELEASE"
 
           echo "Compute new release"
           if [ "${{ inputs.prerelease }}" == "true" ]; then
-            NEW_RELEASE=$(bazel run //bazel/tools/semver:bin -- bump --prerelease --component ${{ inputs.bump_component }} $PREV_RELEASE)
+            NEW_RELEASE=$(bazel run //tools/semver:bin -- bump --prerelease --component ${{ inputs.bump_component }} $PREV_RELEASE)
           else
-            NEW_RELEASE=$(bazel run //bazel/tools/semver:bin -- bump --component ${{ inputs.bump_component }} $PREV_RELEASE)
+            NEW_RELEASE=$(bazel run //tools/semver:bin -- bump --component ${{ inputs.bump_component }} $PREV_RELEASE)
           fi
           echo ">>>> NEW_RELEASE=$NEW_RELEASE"
 

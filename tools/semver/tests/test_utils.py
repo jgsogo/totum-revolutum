@@ -1,7 +1,7 @@
 import pytest
 from semver import Version
 
-from bazel.tools.semver.utils import (
+from tools.semver.utils import (
     compose_version,
     parse_version,
     sanitize_version_list,

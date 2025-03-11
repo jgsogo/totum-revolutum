@@ -2,9 +2,9 @@ import argparse
 import logging
 import sys
 
-from bazel.tools.semver.bump import VersionComponent, bump_version
-from bazel.tools.semver.max_version import max_version
-from bazel.tools.semver.min_version import min_version
+from tools.semver.bump import VersionComponent, bump_version
+from tools.semver.max_version import max_version
+from tools.semver.min_version import min_version
 
 logger = logging.getLogger(__name__)
 

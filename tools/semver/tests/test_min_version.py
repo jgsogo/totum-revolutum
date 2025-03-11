@@ -1,6 +1,6 @@
 import pytest
 
-from bazel.tools.semver.min_version import _min_version
+from tools.semver.min_version import _min_version
 
 
 def test_min_version():

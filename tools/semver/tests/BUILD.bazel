@@ -4,6 +4,6 @@ pytest_test(
     name = "tests",
     srcs = glob(["**/*.py"]),
     deps = [
-        "//bazel/tools/semver",
+        "//tools/semver",
     ],
 )

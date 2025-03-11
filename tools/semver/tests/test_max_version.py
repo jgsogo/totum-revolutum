@@ -1,6 +1,6 @@
 import pytest
 
-from bazel.tools.semver.max_version import _max_version
+from tools.semver.max_version import _max_version
 
 
 def test_max_version():

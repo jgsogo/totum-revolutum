@@ -1,4 +1,4 @@
-from bazel.tools.semver.bump import VersionComponent, _bump_version
+from tools.semver.bump import VersionComponent, _bump_version
 
 
 def test_bump_major():
