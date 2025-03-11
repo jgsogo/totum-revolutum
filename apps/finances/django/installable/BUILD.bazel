@@ -112,5 +112,6 @@ pkgbuild(
     tags = [
         "no-remote-cache",
     ],
-    version = "0.0.0",
+    target_compatible_with = ["@platforms//os:macos"],
+    version = "//apps/finances:version",
 )
