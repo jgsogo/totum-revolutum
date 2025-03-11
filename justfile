@@ -80,18 +80,18 @@ reset: clean build test
 ###
 
 bazel-remote:
-    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --build -d bazel-remote
+    docker-compose --env-file .env -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml up --build -d bazel-remote
 
 # Run bazel-remote (cache) and github runner
 gh-runner-linux:
-    docker-compose --env-file .env -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml up --build -d
+    docker-compose --env-file .env -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml up --build -d
 
 gh-runner-linux-logs:
-    docker-compose -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml logs -f
+    docker-compose -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml logs -f
 
 # Stops bazel-remote (cache) and github runner
 gh-runner-linux-stop:
-    docker-compose -f ./tooling/github/self-hosted-runner/docker-compose-bazel.yml down
+    docker-compose -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml down
 
 # Run gh self-hosted runner for Macos
 [working-directory('actions-runner')]
@@ -100,7 +100,7 @@ gh-runner-macos:
     echo "aa0fc262363912167dcdbc746ffcdf7b8996bc587f51cf1bab38ad86cf70b6ea  actions-runner-osx-x64-2.322.0.tar.gz" | shasum -a 256 -c
     tar xzf ./actions-runner-osx-x64-2.322.0.tar.gz
     rm actions-runner-osx-x64-2.322.0.tar.gz
-    ./../tooling/github/self-hosted-runner/runner.sh # Do not detach
+    ./../tools/github/self-hosted-runner/runner.sh # Do not detach
 
 # Run self-hosted runners for Linux and Macos
 gh-runner: gh-runner-linux gh-runner-macos

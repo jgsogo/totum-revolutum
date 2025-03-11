@@ -31,6 +31,10 @@ Applications in this repository:
 * [syncronia](apps/syncronia/): a tool to run sync operations between different
   directories and storages
 
+## Bazel
+
+Libraries, rules,... and things that are reusable from Bazel.
+
 ## Libraries
 
 You can find the following libraries in this repository:
@@ -50,7 +54,7 @@ You can find the following libraries in this repository:
 Shell scripts with some handy functionality (check [justfile](justfile) too).
 
 
-## Tooling
+## Tools
 
 Tools that can be reused from this repository:
 
