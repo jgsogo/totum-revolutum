@@ -29,7 +29,7 @@ do_gh_release = rule(
         "_gh_tool": attr.label(
             executable = True,
             cfg = "exec",
-            default = "//bazel/tools/gh",
+            default = "//tools/gh",
         ),
         "data": attr.label(
             allow_single_file = True,
