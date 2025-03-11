@@ -64,10 +64,10 @@ with_envsubst_run = rule(
             doc = "Envsubst application",
             allow_single_file = True,
             cfg = "exec",
-            default = "//bazel/tools/envsubst",
+            default = "//tools/envsubst",
         ),
         "_run_template": attr.label(
-            default = Label("//bazel/tools/envsubst:with_envsubst_run.tpl.sh"),
+            default = Label("//tools/envsubst:with_envsubst_run.tpl.sh"),
             allow_single_file = True,
         ),
         "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),

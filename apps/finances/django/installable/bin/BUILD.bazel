@@ -33,7 +33,7 @@ pkg_files(
     srcs = [
         ":app-admin-tar",
         ":app-gunicorn-tar",
-        "//bazel/tools/envsubst",
+        "//tools/envsubst",
     ],
     # We should include here the actual targets, but then they don't
     # include duplicated runfiles https://github.com/bazelbuild/rules_pkg/issues/902
