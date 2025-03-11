@@ -2,7 +2,6 @@ load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_oci//oci:defs.bzl", "oci_push")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT")
-load("//bazel/python/django/deployment:deploy_local.bzl", "deploy_local")
 load("//bazel/python/django/docker_compose:defs.bzl", "docker_compose")
 load("//bazel/python/django/project:django_project.bzl", "django_project", "django_project_container")
 load("//bazel/tools/gh:release.bzl", "gh_release")
@@ -25,59 +24,6 @@ django_project(
         "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
         "//libraries/finances/investments/django_finances_investments:finances_investments",
     ],
-)
-
-substitutions = {
-    "%NAME%": package_name().replace("/", "_"),
-    "%GUNICORN_APP%": "{}-gunicorn".format(name),
-    "%DJANGO_ADMIN_APP%": "{}-admin".format(name),
-}
-
-expand_template(
-    name = "env",
-    out = ".env",
-    substitutions = substitutions,
-    tags = [
-        "manual",
-    ],
-    template = "//bazel/python/django/deployment:.env.tpl",
-)
-
-expand_template(
-    name = "supervisor_ini",
-    out = "supervisord.ini",
-    substitutions = substitutions,
-    tags = [
-        "manual",
-    ],
-    template = "//bazel/python/django/deployment:supervisord.tpl.ini",
-)
-
-expand_template(
-    name = "nginx_conf",
-    out = "nginx.conf",
-    substitutions = substitutions,
-    tags = [
-        "manual",
-    ],
-    template = "//bazel/python/django/deployment:nginx.tpl.conf",
-)
-
-deploy_local(
-    name = "deploy_local",
-    admin = ":{}-admin".format(name),
-    data = [
-        # ":env",
-        # ":nginx_conf",
-        # ":supervisor_ini",
-    ],
-    envs = [
-        ":env",
-        ":nginx_conf",
-        ":supervisor_ini",
-    ],
-    gunicorn = ":{}-gunicorn".format(name),
-    target_subdir = "finances",
 )
 
 ####

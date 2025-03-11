@@ -1,5 +1,4 @@
 exports_files([
-    "deploy_local.tpl.sh",
     ".env.tpl",
     "nginx.tpl.conf",
     "supervisord.tpl.ini",
