@@ -1,0 +1,5 @@
+exports_files([
+    ".env.tpl",
+    "nginx.tpl.conf",
+    "supervisord.tpl.ini",
+])

@@ -1,0 +1,4 @@
+exports_files([
+    "envfile_load.tpl.sh",
+    "combine_envfiles.tpl.sh",
+])

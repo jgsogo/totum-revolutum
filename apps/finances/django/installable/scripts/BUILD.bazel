@@ -1,0 +1,15 @@
+load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_files")
+
+pkg_files(
+    name = "scripts",
+    srcs = [
+        "//apps/finances/django/installable/scripts/postinstall",
+        "//apps/finances/django/installable/scripts/preinstall",
+    ],
+    attributes = pkg_attributes(
+        group = "root",
+        mode = "0551",
+        owner = "root",
+    ),
+    visibility = ["//apps/finances/django/installable:__subpackages__"],
+)

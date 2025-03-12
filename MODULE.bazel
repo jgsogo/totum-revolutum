@@ -216,4 +216,7 @@ use_repo(fetch_buildx, "buildx_darwin_amd64", "buildx_darwin_arm64", "buildx_lin
 fetch_gh = use_extension("//bazel/tools/gh:extensions.bzl", "fetch_gh")
 use_repo(fetch_gh, "gh_darwin_amd64", "gh_darwin_arm64", "gh_linux_amd64")
 
+fetch_envsubst = use_extension("//tools/envsubst:extensions.bzl", "fetch_envsubst")
+use_repo(fetch_envsubst, "envsubst_darwin_arm64", "envsubst_darwin_x86_64", "envsubst_linux_arm64")
+
 include("//:protobuf.MODULE.bazel")

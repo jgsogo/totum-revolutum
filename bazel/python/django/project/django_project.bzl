@@ -2,21 +2,23 @@
 
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
-load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+load("@aspect_rules_py//py:defs.bzl", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
 load("@rules_oci//oci:defs.bzl", "oci_load")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
-load("//bazel/python/gunicorn:defs.bzl", "gunicorn_binary")
+load("//bazel/python/django/project:django_admin.bzl", "django_admin")
+load("//bazel/python/django/project:django_gunicorn.bzl", "django_gunicorn")
 
-def django_project(name, deps, **kwargs):
+def django_project(name, deps, srcs, **kwargs):
     """
     An opinionated macro to create a Django project.
 
     Args:
         name(str): A name for the project
         deps(List[str]): List of dependencies.
+        srcs(List[str]): List of sources to include in the project.
         **kwargs(dict): Other arguments for the rules
     """
     settings_module = "{}.settings".format(native.package_name().replace("/", "."))
@@ -30,10 +32,7 @@ def django_project(name, deps, **kwargs):
     # The library, with all the application files
     py_library(
         name = "{}-project".format(name),
-        srcs = [
-            "settings.py",
-            "urls.py",
-        ],
+        srcs = srcs,
         imports = ["."],
         deps = deps + [
             requirement("django"),
@@ -41,6 +40,16 @@ def django_project(name, deps, **kwargs):
         ],
     )
 
+    # Django admin
+    django_admin(
+        name = "{}-admin".format(name),
+        django_project = ":{}-project".format(name),
+        settings = settings_module,
+        tags = ["manual"],
+        **kwargs
+    )
+
+    # Gunicorn
     py_library(
         name = "{}-wsgi".format(name),
         srcs = ["//bazel/python/django/project:wsgi.py"],
@@ -55,28 +64,11 @@ def django_project(name, deps, **kwargs):
         **kwargs
     )
 
-    py_binary(
-        name = "{}-admin".format(name),
-        srcs = ["//bazel/python/django/project:manage.py"],
-        main = "manage.py",
-        deps = [
-            ":{}-wsgi".format(name),
-        ],
-        env = env,
-        **kwargs
-    )
-
-    gunicorn_binary(
+    django_gunicorn(
         name = "{}-gunicorn".format(name),
-        args = [
-            "bazel.python.django.project.wsgi:application",
-            "--bind 0.0.0.0:{}".format(DJANGO_PORT),
-            "--access-logfile '-'",
-        ],
-        env = env,
-        deps = [
-            ":{}-wsgi".format(name),
-        ],
+        django_project = ":{}-wsgi".format(name),
+        settings = settings_module,
+        tags = ["manual"],
         **kwargs
     )
 
@@ -130,6 +122,7 @@ def django_project_container(name, version, repository, env = None, entrypoint =
         exposed_ports = [DJANGO_PORT],
         tags = [
             "manual",
+            "no-remote-cache",
         ],
         tars = [
             entrypoint,
@@ -184,6 +177,7 @@ def django_project_container(name, version, repository, env = None, entrypoint =
         repo_tags = ":{}-repo_tags".format(name),
         tags = [
             "manual",
+            "no-remote-cache",
         ],
     )
 

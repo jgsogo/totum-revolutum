@@ -15,6 +15,14 @@ build:stamp --stamp
 
 test:ci --verbose_failures --test_output=all --keep_going
 
+####################
+# Optimization flags
+####################
+
+build:opt -c opt
+build:opt --@rules_rust//:extra_rustc_flags=--codegen=lto=fat,--codegen=codegen-units=1
+
+
 ###################
 # Typescript
 ###################

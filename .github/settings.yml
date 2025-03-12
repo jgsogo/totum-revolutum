@@ -188,5 +188,5 @@ labels:
     color: "000000"
   - name: cmp:scripts
     color: "000000"
-  - name: cmp:tooling/python
+  - name: cmp:tools
     color: "000000"

@@ -1,9 +1,0 @@
-load("//bazel/tools/pytest:defs.bzl", "pytest_test")
-
-pytest_test(
-    name = "tests",
-    srcs = glob(["**/*.py"]),
-    deps = [
-        "//bazel/tools/semver",
-    ],
-)

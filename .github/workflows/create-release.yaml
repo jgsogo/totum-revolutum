@@ -54,15 +54,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Get latest release for application ${{ inputs.app }}"
-          bazel run $BAZEL_CONFIG //bazel/tools/gh -- release list --exclude-drafts --json tagName,name | jq '.[].tagName' | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
-          PREV_RELEASE=$(bazel run //bazel/tools/semver:bin -- max --filter-prefix=${{ inputs.app }} $(<${{ runner.temp }}/${{ inputs.app }}-releases.json))
+          bazel run $BAZEL_CONFIG //tools/gh -- release list --exclude-drafts --json tagName,name | jq '.[].tagName' | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
+          PREV_RELEASE=$(bazel run //tools/semver:bin -- max --filter-prefix=${{ inputs.app }} $(<${{ runner.temp }}/${{ inputs.app }}-releases.json))
           echo ">>>> PREV_RELEASE=$PREV_RELEASE"
 
           echo "Compute new release"
           if [ "${{ inputs.prerelease }}" == "true" ]; then
-            NEW_RELEASE=$(bazel run //bazel/tools/semver:bin -- bump --prerelease --component ${{ inputs.bump_component }} $PREV_RELEASE)
+            NEW_RELEASE=$(bazel run //tools/semver:bin -- bump --prerelease --component ${{ inputs.bump_component }} $PREV_RELEASE)
           else
-            NEW_RELEASE=$(bazel run //bazel/tools/semver:bin -- bump --component ${{ inputs.bump_component }} $PREV_RELEASE)
+            NEW_RELEASE=$(bazel run //tools/semver:bin -- bump --component ${{ inputs.bump_component }} $PREV_RELEASE)
           fi
           echo ">>>> NEW_RELEASE=$NEW_RELEASE"
 
@@ -78,11 +78,11 @@ jobs:
         run: |
           echo "Create new release ($NEW_RELEASE) and generate notes starting on the prev one ($PREV_RELEASE)"
           if [ "${{ inputs.bump_component }}" == "prerelease" ]; then
-              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
+              bazel run $BAZEL_CONFIG //tools/gh -- release create $NEW_RELEASE --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
           elif [ "${{ inputs.prerelease }}" == "true" ]; then
-              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
+              bazel run $BAZEL_CONFIG //tools/gh -- release create $NEW_RELEASE --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
           else
-              bazel run $BAZEL_CONFIG //bazel/tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE
+              bazel run $BAZEL_CONFIG //tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE
           fi
           git fetch --tags
           git tag
@@ -107,7 +107,7 @@ jobs:
       #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   run: |
       #     echo "${{ inputs.release_tag }}"
-      #     bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE //bazel/tools/gh -- release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
+      #     bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE //tools/gh -- release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
 
       # # Release containers (stamped + optimized build)
       # # FIXME: Release only modified images!

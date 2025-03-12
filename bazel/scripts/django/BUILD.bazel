@@ -1,0 +1,3 @@
+exports_files([
+    "django_command.tpl.sh",
+])

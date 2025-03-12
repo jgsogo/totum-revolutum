@@ -27,4 +27,4 @@ if [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
     /apps/finances/django/app-admin createsuperuser --noinput
 fi
 
-/apps/finances/django/app-gunicorn bazel.python.django.project.wsgi:application --bind 0.0.0.0:%DJANGO_PORT%
+/apps/finances/django/app-gunicorn

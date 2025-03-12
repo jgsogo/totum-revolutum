@@ -39,6 +39,7 @@ image_from_dockerfile(
     ],
     tags = [
         "manual",
+        "no-remote-cache",
     ],
     visibility = [
         "//apps:__subpackages__",

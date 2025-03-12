@@ -26,6 +26,7 @@ image_from_dockerfile(
     repository = repository,
     tags = [
         "manual",
+        "no-remote-cache",
     ],
     visibility = [
         "//visibility:public",

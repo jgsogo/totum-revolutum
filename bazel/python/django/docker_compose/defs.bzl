@@ -2,7 +2,7 @@
 
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "POSTGRES_IMAGE_TAG")
-load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER")
+load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "GROUP", "USER")
 
 def docker_compose(name, app_repository, app_image_tag_stamped, **kwargs):
     expand_template(
@@ -11,6 +11,7 @@ def docker_compose(name, app_repository, app_image_tag_stamped, **kwargs):
         substitutions = {
             "%APP_REPOSITORY%": app_repository,  # TODO: Better name
             "%USER%": USER,
+            "%GROUP%": GROUP,
             "%APP_IMAGE_TAG%": native.module_name(),
             "%NGINX_DJANGO_TAG%": native.module_name(),
             "%ENV_FILE%": ".env.dev",

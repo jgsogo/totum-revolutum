@@ -1,0 +1,3 @@
+exports_files([
+    "check_nginx.sh",
+])

@@ -1,0 +1,76 @@
+load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP")
+load("//bazel/scripts/django:django_command.bzl", "django_command")
+load("//bazel/scripts/envfile:combine_envfiles.bzl", "combine_envfiles")
+load("//bazel/scripts/envfile:envfile_load.bzl", "envfile_load")
+load("//bazel/scripts/envsubst:apply_envsubst.bzl", "apply_envsubst")
+load("//bazel/scripts/filesystem:untar_files.bzl", "untar_files")
+load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
+
+apply_envsubst(
+    name = "envsubst-supervisor",
+    files = [
+        "/usr/local/finances/data/supervisord.ini",
+        "/usr/local/finances/data/nginx.conf",
+        "/usr/local/finances/data/envfile",
+        # DATA_FOLDER + "/supervisord.ini",
+    ],
+)
+
+untar_files(
+    name = "untar-files",
+    files = [
+        "/usr/local/finances/bin/app-admin-tar.tar",
+        "/usr/local/finances/bin/app-gunicorn-tar.tar",
+        # BIN_FOLDER + "/app-admin-tar.tar",  # "location :app-admin-tar"
+        # BIN_FOLDER + "/app-gunicorn-tar.tar",  # "location :app-gunicorn-tar"
+    ],
+)
+
+combine_envfiles(
+    name = "combine-env",
+    source = "/usr/local/finances/data/envfile",
+    target = "/usr/local/finances/bin/.env",
+)
+
+envfile_load(
+    name = "envfile-load",
+    envfile = "/usr/local/finances/bin/.env",
+)
+
+django_command(
+    name = "django-migrate",
+    command = [
+        "migrate",
+    ],
+    django_admin_app = DJANGO_ADMIN_APP,
+)
+
+django_command(
+    name = "django-collectstatic",
+    command = [
+        "collectstatic",
+        "--no-input",
+        "--clear",
+    ],
+    django_admin_app = DJANGO_ADMIN_APP,
+)
+
+postinstall(
+    name = "postinstall",
+    chunks = [
+        ":envsubst-supervisor",
+        ":untar-files",
+        ":combine-env",
+        ":envfile-load",
+        "//bazel/scripts/postgres:pg_create_database.tpl.sh",
+        ":django-migrate",
+        ":django-collectstatic",
+
+        # TODO: Reload supervisorctl
+        # TODO: Reload nignx
+    ],
+    folders = ALL_FOLDERS,
+    pkgbuild_name = "finances",
+    tags = ["manual"],
+    visibility = ["//apps/finances/django/installable/scripts:__subpackages__"],
+)

@@ -14,6 +14,10 @@ name = "app"
 
 django_project(
     name = name,
+    srcs = [
+        "settings.py",
+        "urls.py",
+    ],
     visibility = ["//apps/finances:__subpackages__"],
     deps = [
         "//apps/finances/django/migrate_legacy",
