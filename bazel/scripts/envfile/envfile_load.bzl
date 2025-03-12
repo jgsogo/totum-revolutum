@@ -19,7 +19,7 @@ envfile_load = rule(
     attrs = {
         "envfile": attr.string(mandatory = True),
         "_template": attr.label(
-            default = Label("//bazel/tools/pkgbuild/scripts/envfile:envfile_load.tpl.sh"),
+            default = Label("//bazel/scripts/envfile:envfile_load.tpl.sh"),
             allow_single_file = True,
         ),
     },

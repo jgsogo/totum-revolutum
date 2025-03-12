@@ -85,7 +85,7 @@ _composable_script = rule(
         # "logs_folder": attr.string(),
         # "run_folder": attr.string(),
         "_logger": attr.label(
-            default = Label("//bazel/tools/pkgbuild/scripts/bash:logger.sh"),
+            default = Label("//bazel/scripts/bash:logger.sh"),
             allow_single_file = True,
         ),
         "log_level": attr.string(

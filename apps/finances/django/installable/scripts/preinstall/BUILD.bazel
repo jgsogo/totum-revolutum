@@ -1,6 +1,6 @@
 load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS")
+load("//bazel/scripts/filesystem:check_freespace.bzl", "check_freespace")
 load("//bazel/tools/pkgbuild:scripts.bzl", "preinstall")
-load("//bazel/tools/pkgbuild/scripts/filesystem:check_freespace.bzl", "check_freespace")
 
 check_freespace(
     name = "check-free-space",
@@ -12,8 +12,8 @@ preinstall(
     name = "preinstall",
     chunks = [
         ":check-free-space",
-        "//bazel/tools/pkgbuild/scripts/supervisor:check_supervisor.sh",
-        "//bazel/tools/pkgbuild/scripts/nginx:check_nginx.sh",
+        "//bazel/scripts/supervisor:check_supervisor.sh",
+        "//bazel/scripts/nginx:check_nginx.sh",
     ],
     folders = ALL_FOLDERS,
     pkgbuild_name = "finances",

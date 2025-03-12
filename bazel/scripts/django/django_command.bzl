@@ -21,7 +21,7 @@ django_command = rule(
         "django_admin_app": attr.string(mandatory = True),
         "command": attr.string_list(mandatory = True),
         "_template": attr.label(
-            default = Label("//bazel/tools/pkgbuild/scripts/django:django_command.tpl.sh"),
+            default = Label("//bazel/scripts/django:django_command.tpl.sh"),
             allow_single_file = True,
         ),
     },
