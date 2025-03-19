@@ -1,9 +1,10 @@
 """Some constant definitions for the finances installable"""
 
+NAME = "finances2"
 DJANGO_ADMIN_APP = "app-admin"
 
 SUBSTITUTIONS = {
-    "%NAME%": "finances",
+    "%NAME%": NAME,
     "%GUNICORN_APP%": "app-gunicorn",
     "%DJANGO_ADMIN_APP%": DJANGO_ADMIN_APP,
 }

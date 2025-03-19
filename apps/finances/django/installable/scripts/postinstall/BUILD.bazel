@@ -1,4 +1,4 @@
-load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP")
+load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP", "NAME")
 load("//bazel/scripts/django:django_command.bzl", "django_command")
 load("//bazel/scripts/envfile:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/scripts/envfile:envfile_load.bzl", "envfile_load")
@@ -62,15 +62,16 @@ postinstall(
         ":untar-files",
         ":combine-env",
         ":envfile-load",
-        "//bazel/scripts/postgres:pg_create_database.tpl.sh",
+        "//bazel/scripts/postgres:pg_create_database.sh",
         ":django-migrate",
         ":django-collectstatic",
 
         # TODO: Reload supervisorctl
+        "//bazel/scripts/supervisor:update_and_start.sh",
         # TODO: Reload nignx
     ],
     folders = ALL_FOLDERS,
-    pkgbuild_name = "finances",
+    pkgbuild_name = NAME,
     tags = ["manual"],
     visibility = ["//apps/finances/django/installable/scripts:__subpackages__"],
 )

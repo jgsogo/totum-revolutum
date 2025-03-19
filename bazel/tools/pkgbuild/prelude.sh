@@ -7,6 +7,3 @@ export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 INSTALLER_NAME="%NAME%"
 LOGFILE="/var/log/%NAME%_install.log"
 LOGLEVEL='%LOG_LEVEL%'
-
-
-log_debug "Execute install script '$1'"
