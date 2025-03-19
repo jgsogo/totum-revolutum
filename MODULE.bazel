@@ -19,7 +19,7 @@ bazel_dep(name = "rules_java", version = "8.9.0", dev_dependency = True)
 bazel_dep(name = "aspect_bazel_lib", version = "2.13.0", dev_dependency = True)
 
 bazel_dep(name = "aspect_rules_js", version = "2.2.0")
-bazel_dep(name = "aspect_rules_ts", version = "3.5.0")
+bazel_dep(name = "aspect_rules_ts", version = "3.5.1")
 
 bazel_dep(name = "rules_uv", version = "0.56.0", dev_dependency = True)
 
@@ -199,9 +199,9 @@ use_repo(pnpm, "pnpm")
 
 rules_ts_ext = use_extension("@aspect_rules_ts//ts:extensions.bzl", "ext", dev_dependency = True)
 rules_ts_ext.deps(
-    # Use "curl --silent https://registry.npmjs.org/typescript/5.7.2 | jq -r '.dist.integrity'"
+    # Use "curl --silent https://registry.npmjs.org/typescript/5.8.2 | jq -r '.dist.integrity'"
     # see docs: https://github.com/aspect-build/rules_ts/blob/bbce47640f888e56f48399cdc1e5af1dbf7e0c75/ts/repositories.bzl#L52
-    ts_integrity = "sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==",
+    ts_integrity = "sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==",
     ts_version_from = "//:package.json",
 )
 use_repo(rules_ts_ext, "npm_typescript")
