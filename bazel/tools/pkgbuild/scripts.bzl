@@ -1,4 +1,4 @@
-"""Generate preinstall script for pkgbuild"""
+"""Generate pkgbuild installable"""
 
 def _composable_script_impl(ctx):
     output = ctx.actions.declare_file(ctx.attr.output)
@@ -81,9 +81,6 @@ _composable_script = rule(
         ),
         "output": attr.string(),
         "folders": attr.string_dict(),
-        # "bin_folder": attr.string(),
-        # "logs_folder": attr.string(),
-        # "run_folder": attr.string(),
         "_logger": attr.label(
             default = Label("//bazel/scripts/bash:logger.sh"),
             allow_single_file = True,
