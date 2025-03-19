@@ -2,10 +2,10 @@
 # Input hashes for repository rule npm_translate_lock(name = "npm", pnpm_lock = "@@//:pnpm-lock.yaml").
 # This file should be checked into version control along with the pnpm-lock.yaml file.
 .npmrc=1669329300
-apps/finances/tauri/models/package.json=-209224589
-apps/finances/tauri/package.json=1943957772
-libraries/googleapis/package.json=-1686545707
+apps/finances/tauri/models/package.json=-1341802254
+apps/finances/tauri/package.json=-969132783
+libraries/googleapis/package.json=1147291382
 package.json=-1219163495
-pnpm-lock.yaml=-1657703364
+pnpm-lock.yaml=-118196050
 pnpm-workspace.yaml=-1435849929
-sandbox/svelte-hello-world/package.json=-218815400
+sandbox/svelte-hello-world/package.json=1132905759
