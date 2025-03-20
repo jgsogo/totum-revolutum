@@ -16,6 +16,7 @@ path_selector = {
     "//conditions:default": "/usr/local/finances",
 }
 
+ROOT_FOLDER = select(path_selector)
 DATA_FOLDER = select(path_selector) + "/data"
 BIN_FOLDER = select(path_selector) + "/bin"
 
@@ -35,6 +36,7 @@ ALL_FOLDERS = select(
     {
         "@platforms//os:linux": {},
         "@platforms//os:macos": {
+            "ROOT_FOLDER": "/usr/local/finances",
             "LOGS_FOLDER": LOGS_FOLDER,
             "BIN_FOLDER": "/usr/local/finances/bin",
             "RUN_FOLDER": RUN_FOLDER,
