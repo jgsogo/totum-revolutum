@@ -2,7 +2,7 @@
 # Django
 DEBUG=False
 SECRET_KEY=
-DJANGO_ALLOWED_HOSTS="localhost 127.0.0.1 0.0.0.0 [::1]"
+DJANGO_ALLOWED_HOSTS="localhost 127.0.0.1 0.0.0.0 [::1] localhost.%NAME%"
 
 # Database"
 DJANGO_SQL_ENGINE=
