@@ -56,7 +56,7 @@ pkg_mklink(
     ),
     link_name = "usr/local/etc/supervisor.d/{}.ini".format(NAME),
     # target = DATA_FOLDER + "/supervisord.ini",
-    target = "../../finances/data/supervisord.ini",
+    target = "../../{}/data/supervisord.ini".format(NAME),
 )
 
 pkg_mklink(
@@ -68,20 +68,8 @@ pkg_mklink(
     ),
     link_name = "usr/local/etc/nginx/servers/{}.conf".format(NAME),
     # target = DATA_FOLDER + "/nginx.conf",
-    target = "../../../finances/data/nginx.conf",
+    target = "../../../{}/data/nginx.conf".format(NAME),
 )
-
-# pkg_mklink(
-#     name = "env_file-link",
-#     attributes = pkg_attributes(
-#         group = "admin",
-#         mode = "0440",
-#         owner = "root",
-#     ),
-#     link_name = "usr/local/finances/bin/.env",
-#     # target = DATA_FOLDER + "/nginx.conf",
-#     target = "../../finances/data/envfile",
-# )
 
 pkg_filegroup(
     name = "data",
