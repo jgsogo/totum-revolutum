@@ -40,7 +40,7 @@ pkg_files(
         ":supervisor_ini-file",
     ],
     attributes = pkg_attributes(
-        group = "root",
+        group = "admin",
         mode = "0555",
         owner = "root",
     ),
@@ -50,7 +50,7 @@ pkg_files(
 pkg_mklink(
     name = "supervisor_ini-link",
     attributes = pkg_attributes(
-        group = "root",
+        group = "admin",
         mode = "0555",
         owner = "root",
     ),
@@ -62,7 +62,7 @@ pkg_mklink(
 pkg_mklink(
     name = "nginx_conf-link",
     attributes = pkg_attributes(
-        group = "root",
+        group = "admin",
         mode = "0555",
         owner = "root",
     ),
@@ -74,7 +74,7 @@ pkg_mklink(
 # pkg_mklink(
 #     name = "env_file-link",
 #     attributes = pkg_attributes(
-#         group = "root",
+#         group = "admin",
 #         mode = "0440",
 #         owner = "root",
 #     ),

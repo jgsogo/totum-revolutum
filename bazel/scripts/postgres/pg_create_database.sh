@@ -1,5 +1,5 @@
 # TODO: In the rule we can request the mapping from whatever are the envvars I have to the standard 'DB_xxx' ones
-DB_ROOT_USER=jgsogo
+DB_ROOT_USER=$INSTALLER_USER
 
 # Function to check database connectivity
 check_db_connection() {

@@ -70,7 +70,7 @@ load("//bazel/tools/pytest:defs.bzl", "pytest_test")
 pkg_mkdirs(
     name = "dirs",
     attributes = pkg_attributes(
-        group = "root",
+        group = "admin",
         mode = "0755",
         owner = "root",
     ),
