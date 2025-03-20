@@ -47,17 +47,17 @@ pkg_files(
     prefix = DATA_FOLDER,
 )
 
-# pkg_mklink(
-#     name = "supervisor_ini-link",
-#     attributes = pkg_attributes(
-#         group = "admin",
-#         mode = "0555",
-#         owner = "root",
-#     ),
-#     link_name = "usr/local/etc/supervisor.d/{}.ini".format(NAME),
-#     # target = DATA_FOLDER + "/supervisord.ini",
-#     target = "../../finances/data/supervisord.ini",
-# )
+pkg_mklink(
+    name = "supervisor_ini-link",
+    attributes = pkg_attributes(
+        group = "admin",
+        mode = "0555",
+        owner = "root",
+    ),
+    link_name = "usr/local/etc/supervisor.d/{}.ini".format(NAME),
+    # target = DATA_FOLDER + "/supervisord.ini",
+    target = "../../finances/data/supervisord.ini",
+)
 
 pkg_mklink(
     name = "nginx_conf-link",
@@ -88,7 +88,7 @@ pkg_filegroup(
     srcs = [
         "nginx_conf-link",
         ":data-files",
-        # ":supervisor_ini-link",
+        ":supervisor_ini-link",
         # ":env_file-link",
     ],
     visibility = ["//apps/finances/django/installable:__subpackages__"],

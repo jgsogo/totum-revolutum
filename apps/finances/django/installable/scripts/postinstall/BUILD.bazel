@@ -1,5 +1,4 @@
-load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DATA_FOLDER", "DJANGO_ADMIN_APP", "NAME")
-load("//bazel/scripts/bash:create_symlink.bzl", "create_symlink")
+load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP", "NAME")
 load("//bazel/scripts/django:django_command.bzl", "django_command")
 load("//bazel/scripts/envfile:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/scripts/envfile:envfile_load.bzl", "envfile_load")
@@ -56,13 +55,6 @@ django_command(
     django_admin_app = DJANGO_ADMIN_APP,
 )
 
-create_symlink(
-    name = "symlink-supervisor",
-    assign_to_installer_user = True,
-    source = DATA_FOLDER + "/supervisord.ini",
-    target = "/usr/local/etc/supervisor.d/{}.ini".format(NAME),
-)
-
 postinstall(
     name = "postinstall",
     chunks = [
@@ -78,8 +70,9 @@ postinstall(
         "//bazel/scripts/bash:chown_root_folder.sh",
 
         # Supervisorctl
-        ":symlink-supervisor",
         "//bazel/scripts/supervisor:update_and_start.sh",
+
+        # Nginx
         # TODO: Reload nignx
     ],
     folders = ALL_FOLDERS,

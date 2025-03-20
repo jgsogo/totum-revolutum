@@ -7,10 +7,6 @@ def _create_symlink_impl(ctx):
         "%SOURCE%": ctx.attr.source,
         "%TARGET%": ctx.attr.target,
     }
-    if ctx.attr.assign_to_installer_user:
-        substitutions["%DO_CHOWN%"] = "apply chown"
-    else:
-        substitutions["%DO_CHOWN%"] = ""
 
     ctx.actions.expand_template(
         template = ctx.file._template,
@@ -26,11 +22,10 @@ create_symlink = rule(
     attrs = {
         "source": attr.string(mandatory = True),
         "target": attr.string(mandatory = True),
-        "assign_to_installer_user": attr.bool(default = False),
         "_template": attr.label(
             default = Label("//bazel/scripts/bash:create_symlink.tpl.sh"),
             allow_single_file = True,
         ),
     },
-    doc = "Instantiates a script that creates ",
+    doc = "Instantiates a script that creates a symlink",
 )

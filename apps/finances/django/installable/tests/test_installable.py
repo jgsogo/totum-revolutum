@@ -61,7 +61,7 @@ def test_pkg_info(pkg_info, version):
 
 
 def test_preinstall(preinstall, version):
-    assert 'INSTALLER_NAME="finances"' in preinstall
+    assert 'INSTALLER_NAME="finances2"' in preinstall
     assert "Check free space" in preinstall
     assert "Check if nginx is running" in preinstall
     assert "Check if supervisord is running" in preinstall
