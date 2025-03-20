@@ -1,5 +1,5 @@
 # TODO: In the rule we can request the mapping from whatever are the envvars I have to the standard 'DB_xxx' ones
-DB_ROOT_USER=jgsogo
+DB_ROOT_USER=$INSTALLER_USER
 
 # Function to check database connectivity
 check_db_connection() {
@@ -25,7 +25,7 @@ create_database() {
 }
 
 if ! check_db_connection; then
-    log_error "Cannot connect to database with the given credentials"
+    log_error "Cannot connect to database with the given credentials: host '$DJANGO_SQL_HOST', port '$DJANGO_SQL_PORT', user '$DJANGO_SQL_USER'"
     exit 1
 fi
 

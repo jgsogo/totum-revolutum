@@ -1,4 +1,4 @@
-load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP")
+load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP", "NAME")
 load("//bazel/scripts/django:django_command.bzl", "django_command")
 load("//bazel/scripts/envfile:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/scripts/envfile:envfile_load.bzl", "envfile_load")
@@ -9,9 +9,9 @@ load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
 apply_envsubst(
     name = "envsubst-supervisor",
     files = [
-        "/usr/local/finances/data/supervisord.ini",
-        "/usr/local/finances/data/nginx.conf",
-        "/usr/local/finances/data/envfile",
+        "/usr/local/{}/data/supervisord.ini".format(NAME),
+        "/usr/local/{}/data/nginx.conf".format(NAME),
+        "/usr/local/{}/data/envfile".format(NAME),
         # DATA_FOLDER + "/supervisord.ini",
     ],
 )
@@ -19,8 +19,8 @@ apply_envsubst(
 untar_files(
     name = "untar-files",
     files = [
-        "/usr/local/finances/bin/app-admin-tar.tar",
-        "/usr/local/finances/bin/app-gunicorn-tar.tar",
+        "/usr/local/{}/bin/app-admin-tar.tar".format(NAME),
+        "/usr/local/{}/bin/app-gunicorn-tar.tar".format(NAME),
         # BIN_FOLDER + "/app-admin-tar.tar",  # "location :app-admin-tar"
         # BIN_FOLDER + "/app-gunicorn-tar.tar",  # "location :app-gunicorn-tar"
     ],
@@ -28,13 +28,13 @@ untar_files(
 
 combine_envfiles(
     name = "combine-env",
-    source = "/usr/local/finances/data/envfile",
-    target = "/usr/local/finances/bin/.env",
+    source = "/usr/local/{}/data/envfile".format(NAME),
+    target = "/usr/local/{}/bin/.env".format(NAME),
 )
 
 envfile_load(
     name = "envfile-load",
-    envfile = "/usr/local/finances/bin/.env",
+    envfile = "/usr/local/{}/bin/.env".format(NAME),
 )
 
 django_command(
@@ -62,15 +62,21 @@ postinstall(
         ":untar-files",
         ":combine-env",
         ":envfile-load",
-        "//bazel/scripts/postgres:pg_create_database.tpl.sh",
+        "//bazel/scripts/postgres:pg_create_database.sh",
         ":django-migrate",
         ":django-collectstatic",
 
-        # TODO: Reload supervisorctl
+        # Once we are done installing and creating all the files, we chown them
+        "//bazel/scripts/bash:chown_root_folder.sh",
+
+        # Supervisorctl
+        "//bazel/scripts/supervisor:update_and_start.sh",
+
+        # Nginx
         # TODO: Reload nignx
     ],
     folders = ALL_FOLDERS,
-    pkgbuild_name = "finances",
+    pkgbuild_name = NAME,
     tags = ["manual"],
     visibility = ["//apps/finances/django/installable/scripts:__subpackages__"],
 )

@@ -42,7 +42,7 @@ pkg_files(
     #     "//apps/finances/django:app-gunicorn",
     # ],
     # attributes = pkg_attributes(
-    #     group = "root",
+    #     group = "admin",
     #     mode = "0551",
     #     owner = "root",
     # ),

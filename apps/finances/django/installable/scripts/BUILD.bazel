@@ -7,7 +7,7 @@ pkg_files(
         "//apps/finances/django/installable/scripts/preinstall",
     ],
     attributes = pkg_attributes(
-        group = "root",
+        group = "admin",
         mode = "0551",
         owner = "root",
     ),

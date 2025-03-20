@@ -1,0 +1,2 @@
+log_debug "Change owner of '$ROOT_FOLDER' to '$INSTALLER_USER:admin'"
+chown -R $INSTALLER_USER:admin $ROOT_FOLDER
