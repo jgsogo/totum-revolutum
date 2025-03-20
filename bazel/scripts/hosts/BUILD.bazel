@@ -1,0 +1,3 @@
+exports_files([
+    "append_hosts.tpl.sh",
+])

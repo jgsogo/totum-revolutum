@@ -4,6 +4,7 @@ load("//bazel/scripts/envfile:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/scripts/envfile:envfile_load.bzl", "envfile_load")
 load("//bazel/scripts/envsubst:apply_envsubst.bzl", "apply_envsubst")
 load("//bazel/scripts/filesystem:untar_files.bzl", "untar_files")
+load("//bazel/scripts/hosts:append_hosts.bzl", "append_hosts")
 load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
 
 apply_envsubst(
@@ -55,6 +56,11 @@ django_command(
     django_admin_app = DJANGO_ADMIN_APP,
 )
 
+append_hosts(
+    name = "nginx-append-app",
+    host = "localhost.{}".format(NAME),  # This should match the gunicorn configuration
+)
+
 postinstall(
     name = "postinstall",
     chunks = [
@@ -66,6 +72,8 @@ postinstall(
         ":django-migrate",
         ":django-collectstatic",
 
+        # TODO: Add django-createsuperuser (use GUI app to collect data)
+
         # Once we are done installing and creating all the files, we chown them
         "//bazel/scripts/bash:chown_root_folder.sh",
 
@@ -73,7 +81,8 @@ postinstall(
         "//bazel/scripts/supervisor:update_and_start.sh",
 
         # Nginx
-        # TODO: Reload nignx
+        "//bazel/scripts/nginx:reload.sh",
+        ":nginx-append-app",
     ],
     folders = ALL_FOLDERS,
     pkgbuild_name = NAME,
