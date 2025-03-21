@@ -1,0 +1,12 @@
+{
+  "author": "author",
+  "description": "A package.json to provide some NPM tools",
+  "devDependencies": {
+    "@sveltejs/package": "^2.0.2",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2"
+  },
+  "license": "MIT",
+  "name": "tools",
+  "version": "0.0.0"
+}

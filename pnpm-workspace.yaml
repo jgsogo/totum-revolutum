@@ -4,3 +4,4 @@ packages:
   - 'apps/finances/tauri'
   - 'apps/finances/tauri/models'
   - 'libraries/googleapis'
+  - 'bazel/tools/npm'

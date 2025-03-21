@@ -17,8 +17,10 @@
   "scripts": {},
   "version": "0.0.0",
   "workspaces": [
-    "sandbox/*",
+    "sandbox/svelte-hello-world",
     "apps/finances/tauri",
-    "apps/finances/tauri/models"
+    "apps/finances/tauri/models",
+    "libraries/googleapis",
+    "bazel/tools/npm"
   ]
 }

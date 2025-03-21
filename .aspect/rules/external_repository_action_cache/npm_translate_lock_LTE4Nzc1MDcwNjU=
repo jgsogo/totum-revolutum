@@ -4,8 +4,9 @@
 .npmrc=1669329300
 apps/finances/tauri/models/package.json=-1341802254
 apps/finances/tauri/package.json=-969132783
+bazel/tools/npm/package.json=1821812751
 libraries/googleapis/package.json=1147291382
-package.json=-1219163495
-pnpm-lock.yaml=-118196050
-pnpm-workspace.yaml=-1435849929
+package.json=-596062444
+pnpm-lock.yaml=1294177111
+pnpm-workspace.yaml=1594305712
 sandbox/svelte-hello-world/package.json=1132905759

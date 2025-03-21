@@ -1,5 +1,9 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//bazel/tools/npm:@sveltejs/package/package_json.bzl", svelte_package_bin = "bin")
+
+# load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//bazel/tools/npm:vite/package_json.bzl", vite_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -11,6 +15,93 @@ filegroup(
 filegroup(
     name = "static",
     srcs = glob(["static/**/*.*"]),
+)
+
+# js_binary(
+#     name = "app"
+
+#     data = [
+#         # Configs
+#         "package.json",
+#         "postcss.config.cjs",
+#         "svelte.config.js",
+#         "tailwind.config.js",
+#         "tsconfig.json",
+#         "vite.config.js",
+
+#         # Build deps
+#         ":node_modules",  # TODO: Use //:node_modules instead
+#         "//apps/finances/tauri/models:models/ts",
+
+#         # Sources
+#         ":src",
+#         ":static",
+#     ],
+#     entry_point = "require_acorn.js",
+# )
+
+# npm_link_all_packages(name = "node_modules")
+
+vite_bin.vite_binary(
+    name = "vite_binary",
+    # visibility = ["//visibility:public"],
+)
+
+svelte_package_bin.svelte_package_binary(
+    name = "svelte_package",
+    # visibility = ["//visibility:public"],
+)
+
+# js_run_binary(
+#     name = "package",
+#     srcs = [
+#         # Configs
+#         "package.json",
+#         "postcss.config.cjs",
+#         "svelte.config.js",
+#         "tailwind.config.js",
+#         "tsconfig.json",
+#         "vite.config.js",
+
+#         # Build deps
+#         ":node_modules",  # TODO: Use //:node_modules instead
+#         "//apps/finances/tauri/models:models/ts",
+
+#         # Sources
+#         ":src",
+#         ":static",
+#     ],
+#     args = ["--tsconfig", "tsconfig.json"],
+#     chdir = package_name(),
+#     out_dirs = ["dist"],
+#     tool = ":svelte_package",
+#     # visibility = ["//packages:__subpackages__"],
+# )
+
+js_run_binary(
+    name = "build",
+    srcs = [
+        # Configs
+        "package.json",
+        "postcss.config.cjs",
+        "svelte.config.js",
+        "tailwind.config.js",
+        "tsconfig.json",
+        "vite.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+        "//apps/finances/tauri/models:models/ts",
+
+        # Sources
+        ":src",
+        ":static",
+    ],
+    args = ["build --config vite.config.js"],
+    chdir = package_name(),
+    out_dirs = ["build"],
+    tool = ":vite_binary",
+    # visibility = ["//packages:__subpackages__"],
 )
 
 js_run_devserver(

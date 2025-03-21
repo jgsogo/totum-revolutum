@@ -171,6 +171,7 @@ npm.npm_translate_lock(
         "//:pnpm-workspace.yaml",
         "//apps/finances/tauri:package.json",
         "//apps/finances/tauri/models:package.json",
+        "//bazel/tools/npm:package.json",
         "//libraries/googleapis:package.json",
         "//sandbox/svelte-hello-world:package.json",
     ],
