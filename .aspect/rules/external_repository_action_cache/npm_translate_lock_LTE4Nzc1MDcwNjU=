@@ -4,7 +4,7 @@
 .npmrc=1669329300
 apps/finances/tauri/models/package.json=-1341802254
 apps/finances/tauri/package.json=-969132783
-bazel/tools/npm/package.json=1821812751
+bazel/tools/npm/package.json=-1707334731
 libraries/googleapis/package.json=1147291382
 package.json=-596062444
 pnpm-lock.yaml=1294177111
