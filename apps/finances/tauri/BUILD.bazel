@@ -102,6 +102,7 @@ js_run_binary(
     out_dirs = ["build"],
     tool = ":vite_binary",
     # visibility = ["//packages:__subpackages__"],
+    visibility = ["//apps/finances/tauri/src-tauri:__pkg__"],
 )
 
 js_run_devserver(

@@ -28,10 +28,17 @@ cargo_build_script(
     build_script_env = {
         "DEP_TAURI_DEV": "false",
     },
+    compile_data = [
+        "Cargo.toml",
+        "tauri.conf.json",
+        ":srcs_lib",
+        "//apps/finances/tauri:build",
+    ],
     data = [
         "Cargo.toml",
         "tauri.conf.json",
         ":srcs_lib",
+        "//apps/finances/tauri:build",
     ],
     deps = [
         "@crates_libraries//:tauri-build",
@@ -45,6 +52,13 @@ rust_library(
         "tauri.conf.json",
         ":icons",
         ":capabilities",
+        "//apps/finances/tauri:build",
+    ],
+    data = [
+        "tauri.conf.json",
+        ":icons",
+        ":capabilities",
+        "//apps/finances/tauri:build",
     ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",
@@ -134,10 +148,23 @@ rust_binary(
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
+    compile_data = [
+        "tauri.conf.json",
+        ":icons",
+        ":capabilities",
+        "//apps/finances/tauri:build",
+    ],
+    data = [
+        "tauri.conf.json",
+        ":icons",
+        ":capabilities",
+        "//apps/finances/tauri:build",
+    ],
     visibility = ["//apps/finances:__pkg__"],
     deps = all_crate_deps(
         normal = True,
     ) + [
+        ":build",
         ":applib",
         "//apps/finances/tauri/models:models/rust",
     ],

@@ -4,7 +4,6 @@ package finances_app_models;
 import "libraries/googleapis/protos/google/type/date.proto";
 import "apps/finances/tauri/models/protos/money_amount.proto";
 import "apps/finances/tauri/models/protos/fx_quote.proto";
-import "libraries/googleapis/protos/google/type/money.proto";
 
 message MovementType {
     int64 pk = 1;
