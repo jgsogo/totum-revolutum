@@ -22,6 +22,11 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+filegroup(
+    name = "gen",
+    srcs = glob(["gen/**/*.*"]),
+)
+
 cargo_build_script(
     name = "build",
     srcs = ["build.rs"],
@@ -29,6 +34,8 @@ cargo_build_script(
         "DEP_TAURI_DEV": "false",
     },
     compile_data = [
+        ":gen",
+        ":capabilities",
         "Cargo.toml",
         "tauri.conf.json",
         ":srcs_lib",
@@ -37,9 +44,12 @@ cargo_build_script(
     data = [
         "Cargo.toml",
         "tauri.conf.json",
+        ":capabilities",
+        ":gen",
         ":srcs_lib",
         "//apps/finances/tauri:build",
     ],
+    tags = ["no-sandbox"],
     deps = [
         "@crates_libraries//:tauri-build",
     ],
@@ -54,14 +64,14 @@ rust_library(
         ":capabilities",
         "//apps/finances/tauri:build",
     ],
-    data = [
-        "tauri.conf.json",
-        ":icons",
-        ":capabilities",
-        "//apps/finances/tauri:build",
-    ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",
+    data = [
+        "tauri.conf.json",
+        ":capabilities",
+        ":icons",
+        "//apps/finances/tauri:build",
+    ],
     proc_macro_deps = all_crate_deps(
         proc_macro = True,
     ),
@@ -145,9 +155,6 @@ with_postgres_test(
 rust_binary(
     name = "app",
     srcs = ["src/main.rs"],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
     compile_data = [
         "tauri.conf.json",
         ":icons",
@@ -156,16 +163,19 @@ rust_binary(
     ],
     data = [
         "tauri.conf.json",
-        ":icons",
         ":capabilities",
+        ":icons",
         "//apps/finances/tauri:build",
     ],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
     visibility = ["//apps/finances:__pkg__"],
     deps = all_crate_deps(
         normal = True,
     ) + [
-        ":build",
         ":applib",
+        ":build",
         "//apps/finances/tauri/models:models/rust",
     ],
 )
