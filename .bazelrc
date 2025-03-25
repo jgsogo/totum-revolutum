@@ -38,10 +38,16 @@ common --@aspect_rules_ts//ts:default_to_tsc_transpiler
 
 build --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 build --incompatible_enable_cc_toolchain_resolution
-build --cxxopt=-std=c++17
+build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
+# build --features=-supports_dynamic_linker
+# build --features=-libtool
 
-build:nollvm --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=0
-build:nollvm --noincompatible_enable_cc_toolchain_resolution
+# build:generic_clang --repo_env=CC=clang
+# build:generic_clang --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=0
+# build:generic_clang --noincompatible_enable_cc_toolchain_resolution
+# # lld links faster than other linkers. Assume that anybody using clang also has
+# # lld available (`brew install lld`)
+build --linkopt=-fuse-ld=lld --host_linkopt=-fuse-ld=lld
 
 ##############
 # user.bazelrc
