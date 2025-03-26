@@ -53,6 +53,7 @@ cargo_build_script(
     deps = [
         "@crates_libraries//:tauri-build",
     ],
+    # rustc_flags = ["-Wl","-rpath","/Users/jgsogo/personal/totum-revolutum/tools/llvm-19.1.1/lib"]
 )
 
 rust_library(

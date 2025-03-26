@@ -87,7 +87,7 @@ cmake -S llvm -B build \
     -DCMAKE_INSTALL_PREFIX="$OUTPUT_DIR" \
     -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_TARGETS_TO_BUILD=X86 \
-    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld"
 echo "${BLUE}🔨 Building LLVM...${RESET}"
 ninja -C build install

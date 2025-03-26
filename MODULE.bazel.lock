@@ -4528,7 +4528,7 @@
           "CARGO_BAZEL_DEBUG": null,
           "CARGO_BAZEL_GENERATOR_SHA256": null,
           "CARGO_BAZEL_GENERATOR_URL": null,
-          "CARGO_BAZEL_ISOLATED": "false",
+          "CARGO_BAZEL_ISOLATED": null,
           "CARGO_BAZEL_REPIN": null,
           "CARGO_BAZEL_REPIN_ONLY": null,
           "REPIN": null
@@ -22959,7 +22959,7 @@
     "@@toolchains_llvm+//toolchain/extensions:llvm.bzl%llvm": {
       "general": {
         "bzlTransitiveDigest": "2eLMaPh4QKrn3wPljYBu5jSkkp9DfCf4yGKTR9lBN3c=",
-        "usagesDigest": "kwUsZBxMyMP9xtfIH6iuy4s+KNVrje8/gFblACN+N8Y=",
+        "usagesDigest": "cn0md4OlxhAggHkv5v0Zadlct7jDygE4Tx+LI8WKET8=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -22984,7 +22984,7 @@
               "link_flags": {},
               "link_libs": {},
               "llvm_versions": {
-                "": "17.0.6"
+                "": "19.1.1"
               },
               "opt_compile_flags": {},
               "opt_link_flags": {},
