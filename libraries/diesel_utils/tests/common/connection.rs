@@ -8,6 +8,7 @@ pub type TestConnection = SqliteConnection;
 const MIGRATIONS: diesel_migrations::EmbeddedMigrations =
     diesel_migrations::embed_migrations!("tests/common/migrations");
 
+
 pub fn connection() -> TestConnection {
     let mut result = connection_without_transaction();
     result.begin_test_transaction().unwrap();

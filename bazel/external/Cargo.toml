@@ -21,3 +21,5 @@ tracing-subscriber = { workspace = true, features = ["env-filter"] }
 pq-sys = { workspace = true }
 similar-asserts = { workspace = true }
 fd-lock = { workspace = true }
+tonic = {workspace =  true}
+prost = {workspace =  true}

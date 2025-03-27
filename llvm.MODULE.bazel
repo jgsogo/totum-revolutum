@@ -1,0 +1,30 @@
+"""
+Configure LLVM toolchains
+"""
+
+bazel_dep(name = "toolchains_llvm", version = "1.3.0")
+
+# ###############################################################################
+# # L L V M
+# #
+# # TODO: This LLVM stuff is related to C++, move it outside this protobuf related module
+# # https://github.com/bazel-contrib/toolchains_llvm/blob/master/tests/MODULE.bazel
+# ###############################################################################
+llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+
+# # LLVM Versions and platforms
+# # https://github.com/bazel-contrib/toolchains_llvm/blob/master/toolchain/internal/llvm_distributions.bzl
+LLVM_VERSIONS = {
+    "": "19.1.0",
+    # "darwin-aarch64": "16.0.3",
+    # "darwin-x86_64": "15.0.7",
+}
+
+# LLVM toolchain.
+llvm.toolchain(
+    name = "llvm_toolchain",
+    llvm_versions = LLVM_VERSIONS,
+)
+use_repo(llvm, "llvm_toolchain", "llvm_toolchain_llvm")
+
+register_toolchains("@llvm_toolchain//:all")

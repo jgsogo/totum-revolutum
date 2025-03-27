@@ -1,3 +1,4 @@
+load("@rules_proto//proto:proto_toolchain.bzl", "proto_toolchain")
 load("@rules_rust//rust:defs.bzl", "rust_library_group")
 load("@rules_rust_prost//:defs.bzl", "rust_prost_toolchain")
 
@@ -8,13 +9,13 @@ rust_library_group(
     ],
 )
 
-# rust_library_group(
-#     name = "tonic_runtime",
-#     deps = [
-#         ":prost_runtime",
-#         "@crates_libraries//:tonic",
-#     ],
-# )
+rust_library_group(
+    name = "tonic_runtime",
+    deps = [
+        ":prost_runtime",
+        "@crates_libraries//:tonic",
+    ],
+)
 
 rust_prost_toolchain(
     name = "prost_toolchain_impl",
@@ -22,14 +23,20 @@ rust_prost_toolchain(
     prost_plugin = "@crates_protoc//:protoc-gen-prost__protoc-gen-prost",
     prost_runtime = ":prost_runtime",
     prost_types = "@crates_libraries//:prost-types",
+    # proto_compiler = "@protobuf//:protoc",
     # Tonic is about gRPC
-    # tonic_plugin = "@crates_protoc//:protoc-gen-tonic__protoc-gen-tonic",
-    # tonic_runtime = ":tonic_runtime",
-    tonic_plugin_flag = "",  # FIXME: Just to bypass this check https://github.com/bazelbuild/rules_rust/blob/7a1f0373f3c763e7d0b8a5c306641bc6a01603f0/extensions/prost/private/prost.bzl#L416, remove if using tonic/gRPC
+    tonic_plugin = "@crates_protoc//:protoc-gen-tonic__protoc-gen-tonic",
+    tonic_runtime = ":tonic_runtime",
 )
 
 toolchain(
     name = "prost_toolchain",
     toolchain = "prost_toolchain_impl",
     toolchain_type = "@rules_rust_prost//:toolchain_type",
+)
+
+# This macro implicitly creates `{name}_toolchain`
+proto_toolchain(
+    name = "proto",
+    proto_compiler = "@protobuf//:protoc",
 )

@@ -1,6 +1,11 @@
 
 # Needed to build some crate libraries. Taken from https://github.com/bazelbuild/rules_rust/issues/70
-build --action_env=CARGO_PKG_AUTHORS=mock --action_env=CARGO_PKG_DESCRIPTION=mock --action_env=CARGO_PKG_HOMEPAGE=mock --action_env=CARGO_PKG_LICENSE=mock --action_env=CARGO_PKG_REPOSITORY=mock --action_env=RUSTDOC=mock
+build --action_env=CARGO_PKG_AUTHORS=mock \
+      --action_env=CARGO_PKG_DESCRIPTION=mock \
+      --action_env=CARGO_PKG_HOMEPAGE=mock \
+      --action_env=CARGO_PKG_LICENSE=mock \
+      --action_env=CARGO_PKG_REPOSITORY=mock \
+      --action_env=RUSTDOC=mock
 
 # Always show errors from testing
 test --verbose_failures --test_output=errors
