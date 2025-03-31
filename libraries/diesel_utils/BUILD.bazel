@@ -29,7 +29,7 @@ rust_test_suite(
     compile_data = [":migrations"],
     crate_features = ["sqlite"],
     # FIXME: This additional envvar should not be needed.
-    rustc_env = {"CARGO_MANIFEST_DIR": "$${pwd}/bazel-out/darwin_x86_64-fastbuild/bin/libraries/diesel_utils/"},
+    # rustc_env = {"CARGO_MANIFEST_DIR": "$${pwd}/bazel-out/darwin_x86_64-fastbuild/bin/libraries/diesel_utils/"},
     shared_srcs = glob(
         ["tests/common/**/*.rs"],
         exclude = ["tests/common/schema.rs"],

@@ -65,7 +65,7 @@ rust_library(
         proc_macro = True,
     ),
     # FIXME: This additional envvar should not be needed.
-    rustc_env = {"CARGO_MANIFEST_DIR": "$${pwd}/bazel-out/darwin_x86_64-fastbuild/bin/apps/photodb/"},
+    # rustc_env = {"CARGO_MANIFEST_DIR": "$${pwd}/bazel-out/darwin_x86_64-fastbuild/bin/apps/photodb/"},
     deps = all_crate_deps(
         normal = True,
     ) + [
