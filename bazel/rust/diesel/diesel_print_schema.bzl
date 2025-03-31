@@ -74,5 +74,6 @@ def diesel_print_schema(name, target, **kwargs):
         name = "{}.test".format(name),
         file1 = ":{}".format(name),
         file2 = target,
+        tags = ["check"],
         failure_message = "\n\nRun `bazel run {}:{}.update` to update the schema file".format(native.package_name(), name),
     )
