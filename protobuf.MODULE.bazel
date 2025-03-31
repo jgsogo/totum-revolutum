@@ -5,12 +5,12 @@
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "toolchains_protoc", version = "0.3.7")
 bazel_dep(name = "protobuf", version = "30.2")
-bazel_dep(name = "rules_rust_prost", version = "0.59.2")
+bazel_dep(name = "rules_rust_prost", version = "0.57.1")  # It has to match the version of `rules_rust`
 
 # 2 Register Proto toolchain
 ###############################################################################
 # Proto toolchain
-register_toolchains("@rules_rust_prost//:default_prost_toolchain")
+# register_toolchains("@rules_rust_prost//:default_prost_toolchain")
 
 # Custom Prost toolchain
 register_toolchains(
