@@ -1328,11 +1328,10 @@
     },
     "@@rules_python+//python/extensions:pip.bzl%pip": {
       "general": {
-        "bzlTransitiveDigest": "N3DyVw8HOz5FM5VfQTFwMhHr99bmmV+G9CxKg4iUfHw=",
-        "usagesDigest": "FoiHu6semrdnLareteq8f6GsfDUT1LdKpksTdgFrJCg=",
+        "bzlTransitiveDigest": "tHwBII5X/ZNgbfMZLxO3BUTugk5/ve7Zc6xBvhTPAH8=",
+        "usagesDigest": "hQo/sG/4cY+H9oJLoCXppq8PY14ihpbEqcvJyUkbbZ4=",
         "recordedFileInputs": {
           "@@//bazel/third_party/requirements.lock": "b1ec6673d139bf70e64150fb7824837f5207d243c87d1eed83261c76c4e8163b",
-          "@@protobuf+//python/requirements.txt": "983be60d3cec4b319dcab6d48aeb3f5b2f7c3350f26b3a9e97486c37967c73c5",
           "@@rules_fuzzing+//fuzzing/requirements.txt": "ab04664be026b632a0d2a2446c4f65982b7654f5b6851d2f9d399a19b7242a5b",
           "@@rules_python+//tools/publish/requirements_darwin.txt": "095d4a4f3d639dce831cd493367631cd51b53665292ab20194bac2c0c6458fa8",
           "@@rules_python+//tools/publish/requirements_linux.txt": "d576e0d8542df61396a9b38deeaa183c24135ed5e8e73bb9622f298f2671811e",
@@ -1344,96 +1343,6 @@
           "RULES_PYTHON_REPO_DEBUG_VERBOSITY": null
         },
         "generatedRepoSpecs": {
-          "pip_deps_310_numpy": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_10_host//:python",
-              "repo": "pip_deps_310",
-              "requirement": "numpy<=1.26.1"
-            }
-          },
-          "pip_deps_310_setuptools": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_10_host//:python",
-              "repo": "pip_deps_310",
-              "requirement": "setuptools<=70.3.0"
-            }
-          },
-          "pip_deps_311_numpy": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
-              "repo": "pip_deps_311",
-              "requirement": "numpy<=1.26.1"
-            }
-          },
-          "pip_deps_311_setuptools": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_11_host//:python",
-              "repo": "pip_deps_311",
-              "requirement": "setuptools<=70.3.0"
-            }
-          },
-          "pip_deps_312_numpy": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_12_host//:python",
-              "repo": "pip_deps_312",
-              "requirement": "numpy<=1.26.1"
-            }
-          },
-          "pip_deps_312_setuptools": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_12_host//:python",
-              "repo": "pip_deps_312",
-              "requirement": "setuptools<=70.3.0"
-            }
-          },
-          "pip_deps_38_numpy": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_8_host//:python",
-              "repo": "pip_deps_38",
-              "requirement": "numpy<=1.26.1"
-            }
-          },
-          "pip_deps_38_setuptools": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_8_host//:python",
-              "repo": "pip_deps_38",
-              "requirement": "setuptools<=70.3.0"
-            }
-          },
-          "pip_deps_39_numpy": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_9_host//:python",
-              "repo": "pip_deps_39",
-              "requirement": "numpy<=1.26.1"
-            }
-          },
-          "pip_deps_39_setuptools": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
-            "attributes": {
-              "dep_template": "@pip_deps//{name}:{target}",
-              "python_interpreter_target": "@@rules_python++python+python_3_9_host//:python",
-              "repo": "pip_deps_39",
-              "requirement": "setuptools<=70.3.0"
-            }
-          },
           "py_deps_313_asgiref": {
             "repoRuleId": "@@rules_python+//python/private/pypi:whl_library.bzl%whl_library",
             "attributes": {
@@ -4209,22 +4118,6 @@
               ]
             }
           },
-          "pip_deps": {
-            "repoRuleId": "@@rules_python+//python/private/pypi:hub_repository.bzl%hub_repository",
-            "attributes": {
-              "repo_name": "pip_deps",
-              "extra_hub_aliases": {},
-              "whl_map": {
-                "numpy": "{\"pip_deps_310_numpy\":[{\"version\":\"3.10\"}],\"pip_deps_311_numpy\":[{\"version\":\"3.11\"}],\"pip_deps_312_numpy\":[{\"version\":\"3.12\"}],\"pip_deps_38_numpy\":[{\"version\":\"3.8\"}],\"pip_deps_39_numpy\":[{\"version\":\"3.9\"}]}",
-                "setuptools": "{\"pip_deps_310_setuptools\":[{\"version\":\"3.10\"}],\"pip_deps_311_setuptools\":[{\"version\":\"3.11\"}],\"pip_deps_312_setuptools\":[{\"version\":\"3.12\"}],\"pip_deps_38_setuptools\":[{\"version\":\"3.8\"}],\"pip_deps_39_setuptools\":[{\"version\":\"3.9\"}]}"
-              },
-              "packages": [
-                "numpy",
-                "setuptools"
-              ],
-              "groups": {}
-            }
-          },
           "py_deps": {
             "repoRuleId": "@@rules_python+//python/private/pypi:hub_repository.bzl%hub_repository",
             "attributes": {
@@ -4553,7 +4446,7 @@
           "CARGO_BAZEL_DEBUG": null,
           "CARGO_BAZEL_GENERATOR_SHA256": null,
           "CARGO_BAZEL_GENERATOR_URL": null,
-          "CARGO_BAZEL_ISOLATED": null,
+          "CARGO_BAZEL_ISOLATED": "false",
           "CARGO_BAZEL_REPIN": null,
           "CARGO_BAZEL_REPIN_ONLY": null,
           "REPIN": null
