@@ -9,7 +9,7 @@ proto_library(
     name = "protos",
     srcs = [...],
     deps = [
-        "@protobuf//:timestamp_proto",
+        "@com_google_protobuf//:timestamp_proto",
         "@googleapis//google/type:date_proto",
         "@googleapis//google/type:money_proto",
         "@googleapis//google/type:decimal_proto",

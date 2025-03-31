@@ -15,11 +15,12 @@ path = "src-rust/lib.rs"
 bazel = []
 
 [build-dependencies]
-prost-build = { workspace = true }
+tonic-build = { workspace = true }
 
 [dependencies]
 prost = { workspace = true }
-prost-types = { workspace = true }
+tonic = { workspace = true }
+# prost-types = { workspace = true }
 serde = { workspace = true }
 chrono = { workspace = true }
 bigdecimal = { workspace = true }

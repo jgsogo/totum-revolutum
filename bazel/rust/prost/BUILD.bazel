@@ -22,8 +22,8 @@ rust_prost_toolchain(
     # Prost is to compile protobuf
     prost_plugin = "@crates_protoc//:protoc-gen-prost__protoc-gen-prost",
     prost_runtime = ":prost_runtime",
-    prost_types = "@crates_libraries//:prost-types",
-    # proto_compiler = "@protobuf//:protoc",
+    prost_types = "@crates_protoc//:prost-types",
+    # proto_compiler = "@com_google_protobuf//:protoc",
     # Tonic is about gRPC
     tonic_plugin = "@crates_protoc//:protoc-gen-tonic__protoc-gen-tonic",
     tonic_runtime = ":tonic_runtime",
@@ -38,5 +38,5 @@ toolchain(
 # This macro implicitly creates `{name}_toolchain`
 proto_toolchain(
     name = "proto",
-    proto_compiler = "@protobuf//:protoc",
+    proto_compiler = "@com_google_protobuf//:protoc",
 )

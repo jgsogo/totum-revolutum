@@ -24,7 +24,7 @@ proto_library(
         "//libraries/googleapis/protos/google/type:date_proto",
         "//libraries/googleapis/protos/google/type:decimal_proto",
         "//libraries/googleapis/protos/google/type:money_proto",
-        "@protobuf//:timestamp_proto",
+        "@com_google_protobuf//:timestamp_proto",
     ],
 )
 
