@@ -80,7 +80,7 @@ use_repo(pip, "py_deps")
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
     edition = "2021",
-    versions = ["1.84.1"],
+    versions = ["1.85.1"],
 )
 use_repo(rust, "rust_toolchains")
 
