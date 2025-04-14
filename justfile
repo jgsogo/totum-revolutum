@@ -13,10 +13,11 @@ update-precommit:
     pre-commit autoupdate
 
 # Updates only the dependencies
-update-deps: update-cargo update-npm update-python
+update-deps: update-rust update-npm update-python
 
-update-cargo:
+update-rust:
     cargo update
+    bazel run //bazel/third_party:crates_vendor
 
 update-npm:
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines

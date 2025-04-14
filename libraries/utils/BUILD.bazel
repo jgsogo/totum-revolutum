@@ -1,24 +1,56 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
-load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test")
 
-rust_library_tests_and_docs(
+exports_files(["Cargo.toml"])
+
+rust_library(
     name = "utils",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
-    all_features = {
-        "filesystem": ["filesystem"],
-        "async": ["async"],
-        "http": ["http"],
-        "dates": ["dates"],
-    },
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    test_deps = [
-        "@crates_libraries//:anyhow",
-        "@crates_libraries//:testing_logger",
+    crate_features = [
+        "filesystem",
+        "async",
+        "http",
+        "dates",
     ],
-    deps = all_crate_deps(
-        normal = True,
-    ),
+    proc_macro_deps = [
+        "//bazel/third_party/crates:async-trait",
+    ],
+    deps = [
+        "//bazel/third_party/crates:camino",
+        "//bazel/third_party/crates:headers",
+        "//bazel/third_party/crates:lazy_static",
+        "//bazel/third_party/crates:log",
+        "//bazel/third_party/crates:regex",
+        "//bazel/third_party/crates:reqwest",
+        "//bazel/third_party/crates:serde",
+        "//bazel/third_party/crates:serde_json",
+        "//bazel/third_party/crates:thiserror",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tracing",
+    ],
+)
+
+rust_test(
+    name = "tests",
+    crate = ":utils",
+    crate_features = [
+        "filesystem",
+        "async",
+        "http",
+        "dates",
+    ],
+    deps = [
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:testing_logger",
+    ],
+)
+
+rust_doc(
+    name = "doc",
+    crate = ":utils",
+    visibility = ["//visibility:public"],
+)
+
+rust_doc_test(
+    name = "doc/tests",
+    crate = ":utils",
 )
