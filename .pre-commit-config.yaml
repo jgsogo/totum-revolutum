@@ -35,14 +35,14 @@ repos:
 
   # Check formatting and lint for starlark code
   - repo: https://github.com/keith/pre-commit-buildifier
-    rev: 8.0.1
+    rev: 8.0.3
     hooks:
       - id: buildifier
       - id: buildifier-lint
 
   # Enforce that commit messages allow for later changelog generation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.4.1
+    rev: v4.6.0
     hooks:
       # Requires that commitizen is already installed
       - id: commitizen
@@ -64,7 +64,7 @@ repos:
           - "-l 100"
 
   - repo: https://github.com/PyCQA/flake8.git
-    rev: 7.1.2
+    rev: 7.2.0
     hooks:
       - id: flake8
         exclude: "migrations/"  # Python regex
