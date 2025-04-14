@@ -8,9 +8,9 @@
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^2.2.5",
     "@connectrpc/protoc-gen-connect-es": "^1.6.1",
-    "@types/node": "^22.13.13",
-    "typescript": "^5.8.2",
-    "vitest": "^3.0.9"
+    "@types/node": "^22.14.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
   },
   "name": "@totum-revolutum/finances-app-models",
   "private": true,
