@@ -1,9 +1,6 @@
-load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
-###########
-# Rust library
-###########
+exports_files(["Cargo.toml"])
 
 rust_library(
     name = "proto_wrapper",
@@ -11,13 +8,11 @@ rust_library(
         ["src/**/*.rs"],
     ),
     crate_features = ["derive_macro"],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ) + [
+    proc_macro_deps = [
         "//libraries/rust/proto_wrapper_derive",
     ],
     visibility = ["//visibility:public"],
-    deps = all_crate_deps(
-        normal = True,
-    ),
+    deps = [
+        "//bazel/third_party/crates:prost",
+    ],
 )
