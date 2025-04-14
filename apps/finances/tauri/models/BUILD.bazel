@@ -1,8 +1,10 @@
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
-load("@crates_libraries//:defs.bzl", "all_crate_deps")
+
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+exports_files(["Cargo.toml"])
 
 npm_link_all_packages(name = "node_modules")
 
@@ -17,17 +19,18 @@ rust_library(
     ),
     crate_features = ["bazel"],
     crate_name = "finances_app_models",
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
     visibility = ["//apps/finances/tauri/src-tauri:__subpackages__"],
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
-        "//libraries/rust/proto_wrapper",
+    deps = [
+        "//bazel/third_party/crates:num-bigint",
+        "//bazel/third_party/crates:prost",
         "//apps/finances/tauri/models/protos:protos_rs",
+        "//libraries/rust/proto_wrapper",
         "//libraries/finances/accounts/rust:finances_accounts",
         # "//libraries/googleapis:googleapis/rust", # FIXME: Rust regenerates the googleapis/protos so we can't reuse here
+        "//bazel/third_party/crates:bigdecimal",
+        "//bazel/third_party/crates:thiserror",
+        "//bazel/third_party/crates:chrono",
+        "//bazel/third_party/crates:camino",
     ],
 )
 
