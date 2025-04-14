@@ -1281,7 +1281,7 @@
         "bzlTransitiveDigest": "N3DyVw8HOz5FM5VfQTFwMhHr99bmmV+G9CxKg4iUfHw=",
         "usagesDigest": "T4w1hZTd+2KAk/2zQYSDXYWoXIIkpm0jZl5IiZBNUDA=",
         "recordedFileInputs": {
-          "@@//bazel/third_party/requirements.lock": "b1ec6673d139bf70e64150fb7824837f5207d243c87d1eed83261c76c4e8163b",
+          "@@//bazel/third_party/requirements.lock": "97359d2f77a1c9afd9d9d9a573f99805c7fc0bec22db5495bf809d9de73a0d93",
           "@@protobuf+//python/requirements.txt": "983be60d3cec4b319dcab6d48aeb3f5b2f7c3350f26b3a9e97486c37967c73c5",
           "@@rules_fuzzing+//fuzzing/requirements.txt": "ab04664be026b632a0d2a2446c4f65982b7654f5b6851d2f9d399a19b7242a5b",
           "@@rules_python+//tools/publish/requirements_darwin.txt": "095d4a4f3d639dce831cd493367631cd51b53665292ab20194bac2c0c6458fa8",
@@ -1446,7 +1446,7 @@
               ],
               "python_interpreter_target": "@@rules_python++python+python_3_13_host//:python",
               "repo": "py_deps_313",
-              "requirement": "django==5.1.4 --hash=sha256:236e023f021f5ce7dee5779de7b286565fdea5f4ab86bae5338e3f7b69896cf0 --hash=sha256:de450c09e91879fa5a307f696e57c851955c910a438a35e6b4c895e86bedc82a"
+              "requirement": "django==5.2 --hash=sha256:1a47f7a7a3d43ce64570d350e008d2949abe8c7e21737b351b6a1611277c6d89 --hash=sha256:91ceed4e3a6db5aedced65e3c8f963118ea9ba753fc620831c77074e620e7d83"
             }
           },
           "py_deps_313_django_appconf": {
@@ -1459,7 +1459,7 @@
               ],
               "python_interpreter_target": "@@rules_python++python+python_3_13_host//:python",
               "repo": "py_deps_313",
-              "requirement": "django-appconf==1.0.6 --hash=sha256:c3ae442fba1ff7ec830412c5184b17169a7a1e71cf0864a4c3f93cf4c98a1993 --hash=sha256:cfe87ea827c4ee04b9a70fab90b86d704cb02f2981f89da8423cb0fabf88efbf"
+              "requirement": "django-appconf==1.1.0 --hash=sha256:7abd5a163ff57557f216e84d3ce9dac36c37ffce1ab9a044d3d53b7c943dd10f --hash=sha256:9fcead372f82a0f21ee189434e7ae9c007cbb29af1118c18251720f3d06243e4"
             }
           },
           "py_deps_313_django_countries": {
@@ -1498,7 +1498,7 @@
               ],
               "python_interpreter_target": "@@rules_python++python+python_3_13_host//:python",
               "repo": "py_deps_313",
-              "requirement": "django-treenode==0.22.1 --hash=sha256:0618693ef3e9e150d2bdc0d828fba8335b2fe376a2faed0d1e3310f9fe1db2bc --hash=sha256:2759300b4560f09bea42aba6a0f11c4b20f6b36dfc484a1f807587a7206bdfe1"
+              "requirement": "django-treenode==0.23.0 --hash=sha256:2e27183f3a0bcece42c2540682d33e70530080196f32ca6f2b476f4f53e8d20f --hash=sha256:66ba50988f0400d560a3839bc1618b87dc12eb740537121445988ca212fb5a64"
             }
           },
           "py_deps_313_docker": {
@@ -1706,7 +1706,7 @@
               ],
               "python_interpreter_target": "@@rules_python++python+python_3_13_host//:python",
               "repo": "py_deps_313",
-              "requirement": "testcontainers==4.9.0 --hash=sha256:2cd6af070109ff68c1ab5389dc89c86c2dc3ab30a21ca734b2cb8f0f80ad479e --hash=sha256:c6fee929990972c40bf6b91b7072c94064ff3649b405a14fde0274c8b2479d32"
+              "requirement": "testcontainers==4.10.0 --hash=sha256:03f85c3e505d8b4edeb192c72a961cebbcba0dd94344ae778b4a159cb6dcf8d3 --hash=sha256:31ed1a81238c7e131a2a29df6db8f23717d892b592fa5a1977fd0dcd0c23fc23"
             }
           },
           "py_deps_313_tqdm": {
