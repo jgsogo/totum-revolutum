@@ -1,7 +1,7 @@
 load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_library", "rust_test", "rust_test_suite")
-load("//bazel:run_copy_to_workspace.bzl", "run_copy_to_workspace")
-load("//bazel/rust/diesel:defs.bzl", "diesel_print_schema", "diesel_setup")
+load("//bazel/rust/diesel:diesel_print_schema.bzl", "diesel_print_schema")
+load("//bazel/rust/diesel:diesel_setup.bzl", "diesel_setup")
 
 rust_library(
     name = "diesel_utils",
@@ -73,13 +73,5 @@ diesel_print_schema(
     name = "schema",
     config_file = ":diesel_config",
     database_url = ":setup",
-    schema = "tests/common/schema.rs",
-)
-
-# We need to run this rule so we can build using Cargo
-run_copy_to_workspace(
-    name = "schema.update",
-    origin = ":schema",
-    tags = ["update"],
     target = "tests/common/schema.rs",
 )
