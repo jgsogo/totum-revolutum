@@ -1,8 +1,9 @@
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
-load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
 load("@rules_rust//rust:defs.bzl", "rust_library")
+
+exports_files(["Cargo.toml"])
 
 npm_link_all_packages(name = "node_modules")
 
@@ -17,23 +18,11 @@ rust_library(
     ),
     crate_features = ["bazel"],
     crate_name = "googleapis",
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
     visibility = ["//visibility:public"],
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
         "//libraries/googleapis/protos/google/type:protos_rs",
     ],
 )
-
-# # Unittests
-# rust_test(
-#     name = "tests",
-#     crate = ":models/rust",
-#     crate_features = ["bazel"],
-# )
 
 ###########
 # Javascript library

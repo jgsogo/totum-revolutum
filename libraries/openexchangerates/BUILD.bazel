@@ -1,43 +1,44 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+
+exports_files(["Cargo.toml"])
 
 rust_library_tests_and_docs(
     name = "openexchangerates",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
     all_features = {
         "bin": [
             "bin",
         ],
     },
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ),
+    deps = [
+        "//bazel/third_party/crates:chrono",
+        "//bazel/third_party/crates:reqwest",
+        "//bazel/third_party/crates:serde",
+        "//bazel/third_party/crates:serde_json",
+        "//bazel/third_party/crates:thiserror",
+        "//bazel/third_party/crates:time",
+        "//bazel/third_party/crates:tracing",
+    ],
 )
 
 rust_binary(
     name = "cli",
     srcs = glob(["src/bin/cli/**/*.rs"]),
-    aliases = aliases(),
     crate_features = [
         "bin",
     ],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
-        ":openexchangerates/bin",
-        "@crates_libraries//:anyhow",
-        "@crates_libraries//:clap",
-        "@crates_libraries//:clap-verbosity-flag",
-        "@crates_libraries//:log",
-        "@crates_libraries//:reqwest",
-        "@crates_libraries//:tracing-subscriber",
+    deps = [
+        ":openexchangerates",
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:chrono",
+        "//bazel/third_party/crates:clap",
+        "//bazel/third_party/crates:clap-verbosity-flag",
+        "//bazel/third_party/crates:log",
+        "//bazel/third_party/crates:serde",
+        "//bazel/third_party/crates:serde_json",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tracing",
+        "//bazel/third_party/crates:tracing-subscriber",
     ],
 )

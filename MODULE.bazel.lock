@@ -13962,7 +13962,7 @@
     "@@rules_rust+//crate_universe:extensions.bzl%crate": {
       "os:osx,arch:x86_64": {
         "bzlTransitiveDigest": "6qTNnl/e26Oh14RFEmrxOHyNXTvEwbIHHRVC+Kyzt78=",
-        "usagesDigest": "i2a1iQkW7s9PmTRKrbfIRr7gvLvfHEhjD7PrL24tTh8=",
+        "usagesDigest": "yV3NkMssv7y6TPNIJxUvgG7i3KotY1AfpBcwyP7DLsk=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

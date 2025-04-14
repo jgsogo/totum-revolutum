@@ -1,20 +1,17 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 load("//bazel/rust/diesel:diesel_print_schema.bzl", "diesel_print_schema")
 load("//bazel/rust/diesel:diesel_setup.bzl", "diesel_setup")
 
+exports_files(["Cargo.toml"])
+
 rust_library_tests_and_docs(
     name = "diesel_utils",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
     all_features = {
         "sqlite": [
             "sqlite",
         ],
     },
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
     test_compile_data = glob([
         "tests/common/migrations/**",
     ]),
@@ -22,12 +19,14 @@ rust_library_tests_and_docs(
         ["tests/common/**/*.rs"],
     ),
     test_suite_deps = [
-        "@crates_libraries//:diesel_migrations",
-        "@crates_libraries//:testing_logger",
+        "//bazel/third_party/crates:diesel_migrations",
+        "//bazel/third_party/crates:testing_logger",
     ],
-    deps = all_crate_deps(
-        normal = True,
-    ),
+    deps = [
+        "//bazel/third_party/crates:diesel",
+        "//bazel/third_party/crates:log",
+        "//bazel/third_party/crates:thiserror",
+    ],
 )
 
 # Create the schema.rs file for integration tests

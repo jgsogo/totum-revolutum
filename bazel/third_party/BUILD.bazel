@@ -11,25 +11,7 @@ pip_compile(
 
 crates_vendor(
     name = "crates_vendor",
-    # annotations = {
-    #     "utils": [
-    #         crate.annotation(
-    #             crate_features = [
-    #                 "filesystem",
-    #                 "async",
-    #                 "http",
-    #                 "dates",
-    #             ],
-    #         ),
-    #     ],
-    # },
-    # annotations = {
-    #     "bzip2-sys": [crate.annotation(
-    #         gen_build_script = True,
-    #     )],
-    # },
     cargo_lockfile = "//:Cargo.lock",
-    # generate_build_scripts = True,
     manifests = [
         "//:Cargo.toml",
         "//apps/finances/tauri/src-tauri:Cargo.toml",
@@ -55,11 +37,6 @@ crates_vendor(
         # Sandbox apps
     ],
     mode = "remote",
-    # packages = {
-    #     "bzip2": crate.spec(
-    #         version = "=0.3.3",
-    #     ),
-    # },
     repository_name = "crates",
     supported_platform_triples = [
         # "aarch64-apple-darwin",
@@ -70,39 +47,3 @@ crates_vendor(
     tags = ["manual"],
     vendor_path = "crates",
 )
-
-# crate.from_cargo(
-#     name = "crates_libraries",
-#     cargo_lockfile = "//:Cargo.lock",
-#     manifests = [
-#         "//:Cargo.toml",
-#         "//apps/finances/tauri/src-tauri:Cargo.toml",
-#         "//apps/finances/tauri/models:Cargo.toml",
-#         "//apps/photodb:Cargo.toml",
-#         "//apps/syncronia:Cargo.toml",
-#         "//libraries/conductus:Cargo.toml",
-#         "//libraries/constants:Cargo.toml",
-#         "//libraries/cron:Cargo.toml",
-#         "//libraries/diesel_utils:Cargo.toml",
-#         "//libraries/filesystem:Cargo.toml",
-#         "//libraries/finances/accounts/rust:Cargo.toml",
-#         "//libraries/finances/investments/rust:Cargo.toml",
-#         "//libraries/googleapis:Cargo.toml",
-#         "//libraries/openexchangerates:Cargo.toml",
-#         "//libraries/pcloud_sdk:Cargo.toml",
-#         "//libraries/rebrickable:Cargo.toml",
-#         "//libraries/rust/proto_wrapper:Cargo.toml",
-#         "//libraries/rust/proto_wrapper_derive:Cargo.toml",
-#         "//libraries/utils:Cargo.toml",
-#         # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
-#         "//bazel/external:Cargo.toml",
-#         # Sandbox apps
-#     ],
-#     # Limiting the number of supported platforms can help with performance: https://github.com/bazelbuild/rules_rust/discussions/2259
-#     supported_platform_triples = [
-#         "aarch64-apple-darwin",  # FIXME: https://github.com/bazelbuild/rules_rust/issues/3011#issuecomment-2488307333
-#         # "aarch64-unknown-linux-gnu",
-#         "x86_64-apple-darwin",
-#         "x86_64-unknown-linux-gnu",
-#     ],
-# )

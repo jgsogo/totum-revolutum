@@ -180,59 +180,20 @@ use_repo(
     "crates__uuid-1.16.0",
 )
 
-# crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+# Diesel CLI is a binary only package. We need to build it "manually" (see [this note](./notes/2024-05-04-1923.md))
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# # Diesel CLI is a binary only package. We need to build it "manually" (see [this note](./notes/2024-05-04-1923.md))
-# http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-# # TODO: We are building Diesel CLI from sources, we should use crate.from_spec instead (see https://github.com/jgsogo/totum-revolutum/issues/691). We build from repo sources (not crate ones)
-# http_archive(
-#     name = "diesel_cli",
-#     build_file = "//bazel/external:BUILD.diesel_cli.bazel",
-#     sha256 = "b5ce382f9021c1f22ed137b8e1ab65aaab89bba5d6631223d76a993fa61dafd6",
-#     # strip_prefix = "diesel_cli-2.2.7",
-#     strip_prefix = "diesel-1c5cf1c88cace42869add2258cb636a2cc7163e2",
-#     type = "tar.gz",
-#     # urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.7/download"],
-#     urls = ["https://github.com/diesel-rs/diesel/archive/1c5cf1c88cace42869add2258cb636a2cc7163e2.tar.gz"],
-# )
-
-# crate.from_cargo(
-#     name = "crates_libraries",
-#     cargo_lockfile = "//:Cargo.lock",
-#     manifests = [
-#         "//:Cargo.toml",
-#         "//apps/finances/tauri/src-tauri:Cargo.toml",
-#         "//apps/finances/tauri/models:Cargo.toml",
-#         "//apps/photodb:Cargo.toml",
-#         "//apps/syncronia:Cargo.toml",
-#         "//libraries/conductus:Cargo.toml",
-#         "//libraries/constants:Cargo.toml",
-#         "//libraries/cron:Cargo.toml",
-#         "//libraries/diesel_utils:Cargo.toml",
-#         "//libraries/filesystem:Cargo.toml",
-#         "//libraries/finances/accounts/rust:Cargo.toml",
-#         "//libraries/finances/investments/rust:Cargo.toml",
-#         "//libraries/googleapis:Cargo.toml",
-#         "//libraries/openexchangerates:Cargo.toml",
-#         "//libraries/pcloud_sdk:Cargo.toml",
-#         "//libraries/rebrickable:Cargo.toml",
-#         "//libraries/rust/proto_wrapper:Cargo.toml",
-#         "//libraries/rust/proto_wrapper_derive:Cargo.toml",
-#         "//libraries/utils:Cargo.toml",
-#         # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
-#         "//bazel/external:Cargo.toml",
-#         # Sandbox apps
-#     ],
-#     # Limiting the number of supported platforms can help with performance: https://github.com/bazelbuild/rules_rust/discussions/2259
-#     supported_platform_triples = [
-#         "aarch64-apple-darwin",  # FIXME: https://github.com/bazelbuild/rules_rust/issues/3011#issuecomment-2488307333
-#         # "aarch64-unknown-linux-gnu",
-#         "x86_64-apple-darwin",
-#         "x86_64-unknown-linux-gnu",
-#     ],
-# )
-# use_repo(crate, "crates_libraries")
+# TODO: We are building Diesel CLI from sources, we should use crate.from_spec instead (see https://github.com/jgsogo/totum-revolutum/issues/691). We build from repo sources (not crate ones)
+http_archive(
+    name = "diesel_cli",
+    build_file = "//bazel/external:BUILD.diesel_cli.bazel",
+    sha256 = "b5ce382f9021c1f22ed137b8e1ab65aaab89bba5d6631223d76a993fa61dafd6",
+    # strip_prefix = "diesel_cli-2.2.7",
+    strip_prefix = "diesel-1c5cf1c88cace42869add2258cb636a2cc7163e2",
+    type = "tar.gz",
+    # urls = ["https://crates.io/api/v1/crates/diesel_cli/2.2.7/download"],
+    urls = ["https://github.com/diesel-rs/diesel/archive/1c5cf1c88cace42869add2258cb636a2cc7163e2.tar.gz"],
+)
 
 #####
 # Node

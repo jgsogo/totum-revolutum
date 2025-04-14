@@ -1,12 +1,12 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 load("//bazel/rust/diesel:diesel_print_schema.bzl", "diesel_print_schema")
 load("//bazel/rust/diesel:diesel_setup.bzl", "diesel_setup")
 
+exports_files(["Cargo.toml"])
+
 rust_library_tests_and_docs(
     name = "filesystem",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
     all_features = {
         "local": ["local"],
         "diesel_indexed_impl": ["diesel_indexed_impl"],
@@ -18,27 +18,32 @@ rust_library_tests_and_docs(
         "test_utils": ["test_utils"],
     },
     compile_data = [":migrations"],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
+    proc_macro_deps = [
+        "//bazel/third_party/crates:async-trait",
+    ],
     test_data = [
         "//libraries/pcloud_sdk:test_data",
     ],
-    test_deps = [
-        "@crates_libraries//:anyhow",
-        "@crates_libraries//:headers",
-    ],
-    test_suite_deps = [
-        "@crates_libraries//:anyhow",
-    ],
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:async-std",
+        "//bazel/third_party/crates:camino",
+        "//bazel/third_party/crates:camino-tempfile",
+        "//bazel/third_party/crates:diesel",
+        "//bazel/third_party/crates:diesel_migrations",
+        "//bazel/third_party/crates:flume",
+        "//bazel/third_party/crates:futures",
+        "//bazel/third_party/crates:headers",
+        "//bazel/third_party/crates:ignore",
+        "//bazel/third_party/crates:ignore-files",
+        "//bazel/third_party/crates:sha256",
+        "//bazel/third_party/crates:thiserror",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tracing",
+        "//bazel/third_party/crates:uuid",
         "//libraries/diesel_utils",
         "//libraries/pcloud_sdk",
         "//libraries/utils",
-        "@crates_libraries//:diesel",
-        "@crates_libraries//:diesel_migrations",
     ],
 )
 
