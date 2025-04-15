@@ -11,6 +11,11 @@ pip_compile(
 
 crates_vendor(
     name = "crates_vendor",
+    # annotations = {
+    #     "pq-sys": [crate.annotation(
+    #         gen_build_script = False,
+    #     )],
+    # },
     cargo_lockfile = "//:Cargo.lock",
     manifests = [
         "//:Cargo.toml",
