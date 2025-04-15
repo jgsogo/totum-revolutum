@@ -176,18 +176,6 @@ alias(
 )
 
 alias(
-    name = "finances-app",
-    actual = "@crates__finances-app-0.1.0//:finances_app_lib",
-    tags = ["manual"],
-)
-
-alias(
-    name = "finances-app-models",
-    actual = "@crates__finances-app-models-0.1.0//:finances_app_models",
-    tags = ["manual"],
-)
-
-alias(
     name = "flume",
     actual = "@crates__flume-0.11.1//:flume",
     tags = ["manual"],
@@ -208,12 +196,6 @@ alias(
 alias(
     name = "futures-util",
     actual = "@crates__futures-util-0.3.31//:futures_util",
-    tags = ["manual"],
-)
-
-alias(
-    name = "googleapis",
-    actual = "@crates__googleapis-0.1.0//:googleapis",
     tags = ["manual"],
 )
 
