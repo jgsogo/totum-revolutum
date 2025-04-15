@@ -19,7 +19,7 @@ rust_test(
     name = "capture_args_and_env/tests",
     crate = ":capture_args_and_env",
     deps = [
-        "@crates_libraries//:tempfile",
+        "//bazel/third_party/crates:tempfile",
     ],
 )
 

@@ -75,7 +75,7 @@ def rust_library_tests_and_docs(name, all_features = {}, test_data = None, test_
     )
 
     # Integration tests
-    deps = kwargs.pop("deps", None)
+    deps = kwargs.pop("deps", [])
     test_suite_deps = test_suite_deps or []
     rust_test_suite(
         name = "integration_tests",

@@ -1,7 +1,8 @@
-load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
+
+exports_files(["Cargo.toml"])
 
 filegroup(
     name = "capabilities",
@@ -34,7 +35,7 @@ cargo_build_script(
         ":srcs_lib",
     ],
     deps = [
-        "@crates_libraries//:tauri-build",
+        "//bazel/third_party/crates:tauri-build",
     ],
 )
 
@@ -48,14 +49,18 @@ rust_library(
     ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
         ":build",
         "//apps/finances/tauri/models:models/rust",
+        "//bazel/third_party/crates:bigdecimal",
+        "//bazel/third_party/crates:chrono",
+        "//bazel/third_party/crates:diesel",
+        "//bazel/third_party/crates:log",
+        "//bazel/third_party/crates:serde",
+        "//bazel/third_party/crates:tauri",
+        "//bazel/third_party/crates:tauri-plugin-log",
+        "//bazel/third_party/crates:tauri-plugin-shell",
+        "//bazel/third_party/crates:thiserror",
         "//libraries/finances/accounts/rust:finances_accounts",
         "//libraries/finances/investments/rust:finances_investments",
     ],
@@ -82,9 +87,6 @@ rust_test_suite(
     name = "_integration_tests",
     srcs = integration_tests_files,
     crate_features = ["postgres"],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
     shared_srcs = glob(["tests/common/**/*.rs"]),
     tags = [
         "manual",
@@ -92,14 +94,14 @@ rust_test_suite(
     deps = [
         ":applib",
         "//apps/finances/tauri/models:models/rust",
+        "//bazel/third_party/crates:bigdecimal",
+        "//bazel/third_party/crates:camino",
+        "//bazel/third_party/crates:chrono",
+        "//bazel/third_party/crates:prost",
+        "//bazel/third_party/crates:serde",
+        "//bazel/third_party/crates:serde_json",
+        "//bazel/third_party/crates:tauri",
         "//libraries/finances/accounts/rust:finances_accounts/test_utils",
-        "@crates_libraries//:bigdecimal",
-        "@crates_libraries//:camino",
-        "@crates_libraries//:chrono",
-        "@crates_libraries//:prost",
-        "@crates_libraries//:serde",
-        "@crates_libraries//:serde_json",
-        "@crates_libraries//:tauri",
     ],
 )
 
@@ -131,14 +133,11 @@ with_postgres_test(
 rust_binary(
     name = "app",
     srcs = ["src/main.rs"],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
     visibility = ["//apps/finances:__pkg__"],
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
         ":applib",
         "//apps/finances/tauri/models:models/rust",
+        "//bazel/third_party/crates:camino",
+        "//bazel/third_party/crates:tauri",
     ],
 )

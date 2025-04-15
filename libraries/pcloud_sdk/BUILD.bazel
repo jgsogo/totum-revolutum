@@ -1,6 +1,7 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+
+exports_files(["Cargo.toml"])
 
 filegroup(
     name = "test_data",
@@ -11,7 +12,6 @@ filegroup(
 rust_library_tests_and_docs(
     name = "pcloud_sdk",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
     all_features = {
         "bin": [
             "bin",
@@ -25,13 +25,38 @@ rust_library_tests_and_docs(
         "use_indicatif": ["use_indicatif"],
         "test_utils": ["test_utils"],
     },
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
+    proc_macro_deps = [
+        "//bazel/third_party/crates:serde_repr",
+        "//bazel/third_party/crates:strum_macros",
+        "//bazel/third_party/crates:async-trait",
+    ],
     test_data = [":test_data"],
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
+        "//bazel/third_party/crates:bitflags",
+        "//bazel/third_party/crates:camino",
+        "//bazel/third_party/crates:clap",
+        "//bazel/third_party/crates:futures-util",
+        "//bazel/third_party/crates:headers",
+        "//bazel/third_party/crates:http",
+        "//bazel/third_party/crates:http-body-util",
+        "//bazel/third_party/crates:httpmock",
+        "//bazel/third_party/crates:hyper",
+        "//bazel/third_party/crates:hyper-util",
+        "//bazel/third_party/crates:indicatif",
+        "//bazel/third_party/crates:itertools",
+        "//bazel/third_party/crates:mime",
+        "//bazel/third_party/crates:mockall",
+        "//bazel/third_party/crates:reqwest",
+        "//bazel/third_party/crates:serde",
+        "//bazel/third_party/crates:serde_json",
+        "//bazel/third_party/crates:strum",
+        "//bazel/third_party/crates:tempfile",
+        "//bazel/third_party/crates:thiserror",
+        "//bazel/third_party/crates:time",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tracing",
+        "//bazel/third_party/crates:tryhard",
+        "//bazel/third_party/crates:url",
         "//libraries/utils",
     ],
 )
@@ -39,19 +64,23 @@ rust_library_tests_and_docs(
 rust_binary(
     name = "cli",
     srcs = glob(["src/bin/pcloud_sdk/**/*.rs"]),
-    aliases = aliases(),
     crate_features = [
         "bin",
         "cli",
         "use_indicatif",
     ],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
         ":pcloud_sdk",
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:camino",
+        "//bazel/third_party/crates:clap",
+        "//bazel/third_party/crates:clap-verbosity-flag",
+        "//bazel/third_party/crates:futures",
+        "//bazel/third_party/crates:indicatif",
+        "//bazel/third_party/crates:log",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tracing",
+        "//bazel/third_party/crates:tracing-subscriber",
         "//libraries/utils",
     ],
 )

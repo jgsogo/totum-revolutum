@@ -1,11 +1,11 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+
+exports_files(["Cargo.toml"])
 
 rust_library_tests_and_docs(
     name = "rebrickable",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
     all_features = {
         "cli": [
             "cli",
@@ -14,12 +14,17 @@ rust_library_tests_and_docs(
         "use_indicatif": ["use_indicatif"],
         "test_utils": ["test_utils"],
     },
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    proc_macro_deps = [
+        "//bazel/third_party/crates:async-trait",
+    ],
+    deps = [
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:http",
+        "//bazel/third_party/crates:reqwest",
+        "//bazel/third_party/crates:serde",
+        "//bazel/third_party/crates:serde_json",
+        "//bazel/third_party/crates:thiserror",
+        "//bazel/third_party/crates:time",
         "//libraries/utils",
     ],
 )
@@ -27,14 +32,15 @@ rust_library_tests_and_docs(
 rust_binary(
     name = "cli",
     srcs = glob(["src/cli/**/*.rs"]),
-    aliases = aliases(),
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
         ":rebrickable",
-        "//libraries/utils",
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:clap",
+        "//bazel/third_party/crates:clap-verbosity-flag",
+        "//bazel/third_party/crates:log",
+        "//bazel/third_party/crates:serde_json",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tracing",
+        "//bazel/third_party/crates:tracing-subscriber",
     ],
 )

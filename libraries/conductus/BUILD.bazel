@@ -1,10 +1,10 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
+
+exports_files(["Cargo.toml"])
 
 rust_library_tests_and_docs(
     name = "conductus",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
     all_features = {
         "sync": [
             "sync",
@@ -13,13 +13,15 @@ rust_library_tests_and_docs(
             "tokio-async",
         ],
     },
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    test_docs_deps = [
-        "@crates_libraries//:futures",
+    proc_macro_deps = [
+        "//bazel/third_party/crates:async-trait",
     ],
-    deps = all_crate_deps(
-        normal = True,
-    ),
+    deps = [
+        "//bazel/third_party/crates:flume",
+        "//bazel/third_party/crates:futures",
+        "//bazel/third_party/crates:log",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tokio-stream",
+        "//bazel/third_party/crates:tracing",
+    ],
 )

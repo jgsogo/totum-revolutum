@@ -1,16 +1,10 @@
-load("@crates_libraries//:defs.bzl", "aliases")
 load("@rules_rust//rust:defs.bzl", "rust_doc", "rust_doc_test", "rust_proc_macro", "rust_test")
+
+exports_files(["Cargo.toml"])
 
 rust_proc_macro(
     name = "constants",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
-    # proc_macro_deps = all_crate_deps(
-    #     proc_macro = True,
-    # ),
-    # deps = all_crate_deps(
-    #     normal = True,
-    # ),
     visibility = ["//visibility:public"],
 )
 

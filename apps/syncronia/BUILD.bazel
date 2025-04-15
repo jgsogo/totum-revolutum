@@ -1,8 +1,9 @@
-load("@crates_libraries//:defs.bzl", "aliases", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
 load("//bazel/rust:defs.bzl", "rust_library_tests_and_docs")
 load("//bazel/rust/docs:defs.bzl", "rust_docs")
+
+exports_files(["Cargo.toml"])
 
 value_from_stable_status(
     name = "version",
@@ -14,18 +15,26 @@ value_from_stable_status(
 rust_library_tests_and_docs(
     name = "syncronia_lib",
     srcs = glob(["src/**/*.rs"]),
-    aliases = aliases(),
     all_features = {
         "cli": ["cli"],
         "test_utils": ["test_utils"],
     },
     crate_name = "syncronia",
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:camino",
+        "//bazel/third_party/crates:chrono",
+        "//bazel/third_party/crates:chrono-tz",
+        "//bazel/third_party/crates:clap",
+        "//bazel/third_party/crates:diesel",
+        "//bazel/third_party/crates:fs4",
+        "//bazel/third_party/crates:ignore-files",
+        "//bazel/third_party/crates:serde",
+        "//bazel/third_party/crates:serde_yml",
+        "//bazel/third_party/crates:tempfile",
+        "//bazel/third_party/crates:thiserror",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tracing",
         "//libraries/cron",
         "//libraries/filesystem",
         "//libraries/pcloud_sdk",
@@ -38,15 +47,19 @@ rust_binary(
     crate_features = [
         "cli",
     ],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
         ":syncronia_lib",
-        "//libraries/cron",
-        "//libraries/filesystem",
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:camino",
+        "//bazel/third_party/crates:chrono-tz",
+        "//bazel/third_party/crates:clap",
+        "//bazel/third_party/crates:clap-verbosity-flag",
+        "//bazel/third_party/crates:home",
+        "//bazel/third_party/crates:log",
+        "//bazel/third_party/crates:thiserror",
+        "//bazel/third_party/crates:tokio",
+        "//bazel/third_party/crates:tracing",
+        "//bazel/third_party/crates:tracing-subscriber",
         "//libraries/pcloud_sdk",
     ],
 )

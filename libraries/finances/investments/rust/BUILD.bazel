@@ -1,19 +1,17 @@
-load("@crates_libraries//:defs.bzl", "all_crate_deps")
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
 load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run", "with_postgres_test")
+
+exports_files(["Cargo.toml"])
 
 rust_library(
     name = "finances_investments",
     srcs = glob(["src/**/*.rs"]),
     crate_features = ["postgres"],
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
     visibility = ["//apps/finances:__subpackages__"],
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
+        "//bazel/third_party/crates:chrono",
+        "//bazel/third_party/crates:diesel",
         "//libraries/finances/accounts/rust:finances_accounts",
     ],
 )
@@ -26,13 +24,10 @@ rust_library(
         "test_utils",
     ],
     crate_name = "finances_investments",
-    proc_macro_deps = all_crate_deps(
-        proc_macro = True,
-    ),
     visibility = ["//apps/finances:__subpackages__"],
-    deps = all_crate_deps(
-        normal = True,
-    ) + [
+    deps = [
+        "//bazel/third_party/crates:chrono",
+        "//bazel/third_party/crates:diesel",
         "//libraries/finances/accounts/rust:finances_accounts/test_utils",
     ],
 )
@@ -47,9 +42,8 @@ rust_test(
     ],
     tags = ["manual"],
     deps = [
-        "@crates_libraries//:anyhow",
-        "@crates_libraries//:lazy_static",
-        "@crates_libraries//:tempfile",
+        "//bazel/third_party/crates:bigdecimal",
+        "//bazel/third_party/crates:lazy_static",
     ],
 )
 

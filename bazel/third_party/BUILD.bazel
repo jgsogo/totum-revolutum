@@ -1,3 +1,4 @@
+load("@rules_rust//crate_universe:defs.bzl", "crates_vendor")
 load("@rules_uv//uv:pip.bzl", "pip_compile")
 
 pip_compile(
@@ -6,4 +7,43 @@ pip_compile(
     requirements_in = ":requirements.in",
     requirements_txt = "requirements.lock",
     tags = ["no-sandbox"],
+)
+
+crates_vendor(
+    name = "crates_vendor",
+    cargo_lockfile = "//:Cargo.lock",
+    manifests = [
+        "//:Cargo.toml",
+        "//apps/finances/tauri/src-tauri:Cargo.toml",
+        "//apps/finances/tauri/models:Cargo.toml",
+        "//apps/photodb:Cargo.toml",
+        "//apps/syncronia:Cargo.toml",
+        "//libraries/conductus:Cargo.toml",
+        "//libraries/constants:Cargo.toml",
+        "//libraries/cron:Cargo.toml",
+        "//libraries/diesel_utils:Cargo.toml",
+        "//libraries/filesystem:Cargo.toml",
+        "//libraries/finances/accounts/rust:Cargo.toml",
+        "//libraries/finances/investments/rust:Cargo.toml",
+        "//libraries/googleapis:Cargo.toml",
+        "//libraries/openexchangerates:Cargo.toml",
+        "//libraries/pcloud_sdk:Cargo.toml",
+        "//libraries/rebrickable:Cargo.toml",
+        "//libraries/rust/proto_wrapper:Cargo.toml",
+        "//libraries/rust/proto_wrapper_derive:Cargo.toml",
+        "//libraries/utils:Cargo.toml",
+        # This is added to the workspace as a workaround for binary packages (see [this note](./notes/2024-05-04-1923.md))
+        "//bazel/external:Cargo.toml",
+        # Sandbox apps
+    ],
+    mode = "remote",
+    repository_name = "crates",
+    supported_platform_triples = [
+        # "aarch64-apple-darwin",
+        # "aarch64-unknown-linux-gnu",
+        "x86_64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+    ],
+    tags = ["manual"],
+    vendor_path = "crates",
 )
