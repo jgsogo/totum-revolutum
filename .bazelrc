@@ -10,6 +10,8 @@ build --action_env=CARGO_PKG_AUTHORS=mock \
 # Always show errors from testing
 test --verbose_failures --test_output=errors
 
+build --enable_platform_specific_config
+
 ###################
 # CI Specific flags
 ###################
@@ -27,6 +29,30 @@ test:ci --verbose_failures --test_output=all --keep_going
 build:opt -c opt
 build:opt --@rules_rust//:extra_rustc_flags=--codegen=lto=fat,--codegen=codegen-units=1
 
+# ####
+# C++
+# ####
+
+build --cxxopt=-std=c++20 --host_cxxopt=-std=c++20 --cxxopt=-Werror
+build --copt=-fdiagnostics-color=always
+
+build:macos --features=-supports_dynamic_linker --features=-libtool --linkopt=-framework --linkopt=CoreFoundation --host_linkopt=-framework --host_linkopt=CoreFoundation
+
+build --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+build --incompatible_enable_cc_toolchain_resolution
+build --linkopt=-fuse-ld=lld
+build --host_linkopt=-fuse-ld=lld
+# build --host_features=-layering_check --features=-layering_check
+
+# #########################################
+# # Disable using our hermetic llvm package
+# #########################################
+
+# common:nollvm --@rules_python//python/config_settings:bootstrap_impl=system_python
+
+# build:nollvm --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=0
+# build:nollvm --noincompatible_enable_cc_toolchain_resolution
+# build:nollvm --repo_env=CC=clang
 
 ###################
 # Typescript

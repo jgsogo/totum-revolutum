@@ -23,17 +23,34 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+filegroup(
+    name = "gen",
+    srcs = glob(["gen/**/*.*"]),
+)
+
 cargo_build_script(
     name = "build",
     srcs = ["build.rs"],
     build_script_env = {
         "DEP_TAURI_DEV": "false",
     },
-    data = [
+    compile_data = [
+        ":gen",
+        ":capabilities",
         "Cargo.toml",
         "tauri.conf.json",
         ":srcs_lib",
+        "//apps/finances/tauri:build",
     ],
+    data = [
+        "Cargo.toml",
+        "tauri.conf.json",
+        ":capabilities",
+        ":gen",
+        ":srcs_lib",
+        "//apps/finances/tauri:build",
+    ],
+    tags = ["no-sandbox"],
     deps = [
         "//bazel/third_party/crates:tauri-build",
     ],
