@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
@@ -37,4 +37,31 @@ js_run_devserver(
     ],
     grant_sandbox_write_permissions = True,
     visibility = ["//apps/finances:__pkg__"],
+)
+
+js_run_binary(
+    name = "build",
+    srcs = [
+        # Configs
+        "package.json",
+        "postcss.config.cjs",
+        "svelte.config.js",
+        "tailwind.config.js",
+        "tsconfig.json",
+        "vite.config.js",
+
+        # Build deps
+        ":node_modules",  # TODO: Use //:node_modules instead
+        "//apps/finances/tauri/models:models/ts",
+
+        # Sources
+        ":src",
+        ":static",
+    ],
+    args = ["build --config vite.config.js"],
+    chdir = package_name(),
+    out_dirs = ["build"],
+    tool = "//bazel/tools/npm:vite_binary",
+    # visibility = ["//packages:__subpackages__"],
+    visibility = ["//apps/finances/tauri/src-tauri:__pkg__"],
 )
