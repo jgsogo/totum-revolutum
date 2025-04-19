@@ -9,7 +9,7 @@ bazel_dep(name = "toolchains_llvm", version = "1.4.0")
 #
 # https://github.com/bazel-contrib/toolchains_llvm/blob/master/tests/MODULE.bazel
 ###############################################################################
-llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm", dev_dependency = True)
 
 # LLVM Versions and platforms
 # https://github.com/bazel-contrib/toolchains_llvm/blob/master/toolchain/internal/llvm_distributions.bzl
@@ -26,4 +26,7 @@ llvm.toolchain(
 )
 use_repo(llvm, "llvm_toolchain", "llvm_toolchain_llvm")
 
-register_toolchains("@llvm_toolchain//:all")
+register_toolchains(
+    "@llvm_toolchain//:all",
+    dev_dependency = True,
+)
