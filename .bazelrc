@@ -10,6 +10,8 @@ build --action_env=CARGO_PKG_AUTHORS=mock \
 # Always show errors from testing
 test --verbose_failures --test_output=errors
 
+build --enable_platform_specific_config
+
 ###################
 # CI Specific flags
 ###################
@@ -36,6 +38,14 @@ build:opt --@rules_rust//:extra_rustc_flags=--codegen=lto=fat,--codegen=codegen-
 common --@aspect_rules_ts//ts:skipLibCheck=honor_tsconfig
 # Define a transpiler for all ts_project rules. TSC is slower, but no extra deps are required (https://github.com/aspect-build/rules_ts/blob/main/docs/transpiler.md)
 common --@aspect_rules_ts//ts:default_to_tsc_transpiler
+
+##############
+# rules_apple.
+##############
+# Optimizing remote cache and build execution performance: https://github.com/bazelbuild/rules_apple/blob/master/doc/common_info.md#optimizing-remote-cache-and-build-execution-performance
+common --modify_execution_info=^(BitcodeSymbolsCopy|BundleApp|BundleTreeApp|DsymDwarf|DsymLipo|GenerateAppleSymbolsFile|ObjcBinarySymbolStrip|CppArchive|CppLink|ObjcLink|ProcessAndSign|SignBinary|SwiftArchive|SwiftStdlibCopy)$=+no-remote,^(BundleResources|ImportedDynamicFrameworkProcessor)$=+no-remote-exec
+# Invalidate cache when xcode version changes: https://github.com/bazelbuild/rules_apple/blob/master/doc/common_info.md#xcode-version-selection-and-invalidation
+try-import xcode.bazelrc
 
 ##############
 # user.bazelrc
