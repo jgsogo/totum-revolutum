@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Bazelisk will use this file as the bazel executable: https://github.com/bazelbuild/rules_apple/blob/master/doc/common_info.md#xcode-version-selection-and-invalidation
+
 bazel_real="$BAZEL_REAL"
 bazelrc_lines=()
 

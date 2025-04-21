@@ -71,7 +71,6 @@ common --modify_execution_info=^(BitcodeSymbolsCopy|BundleApp|BundleTreeApp|Dsym
 # Invalidate cache when xcode version changes: https://github.com/bazelbuild/rules_apple/blob/master/doc/common_info.md#xcode-version-selection-and-invalidation
 try-import xcode.bazelrc
 
-
 ##############
 # user.bazelrc
 ##############
