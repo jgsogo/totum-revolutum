@@ -111,4 +111,4 @@ gh-runner-stop: gh-runner-linux-stop
 
 # Builds LLVM from sources and installs the binaries into `tools/llvm` directory
 llvm-dist version:
-    ./scripts/build_llvm.sh {{version}} $(pwd)/tools/llvm-{{version}}
+    ./scripts/build_llvm.sh {{ version }} $(pwd)/tools/llvm-{{ version }}
