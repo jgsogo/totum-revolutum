@@ -23,32 +23,41 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-filegroup(
-    name = "gen",
-    srcs = glob(["gen/**/*.*"]),
-)
+# filegroup(
+#     name = "gen",
+#     srcs = glob(["gen/**/*.*"]),
+# )
 
 cargo_build_script(
     name = "build",
     srcs = ["build.rs"],
     build_script_env = {
         "DEP_TAURI_DEV": "false",
+        # "DEP_TAURI_CORE__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location @crates__tauri-2.4.1//:build_script_build)/LOL/tauri-core-permission-files",
+        "DEP_TAURI_CORE__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(BINDIR)/external/+crates+crates__tauri-2.4.1/_bs.out_dir/tauri-core-permission-files",
     },
     compile_data = [
-        ":gen",
+        # ":gen",
         ":capabilities",
         "Cargo.toml",
         "tauri.conf.json",
         ":srcs_lib",
         "//apps/finances/tauri:build",
+        # The build_script of 'tauri' creates all the 'app-permission-files' for the core functionality (TODO: Add other plugins)
+        # "//bazel/third_party/crates:tauri",
+        # "@crates__tauri-2.4.1//:build_script_build",
     ],
     data = [
         "Cargo.toml",
         "tauri.conf.json",
         ":capabilities",
-        ":gen",
+        # ":gen",
         ":srcs_lib",
         "//apps/finances/tauri:build",
+        # The build_script of 'tauri' creates all the 'app-permission-files' for the core functionality (TODO: Add other plugins?)
+        "@crates__tauri-2.4.1//:build_script_build",
+        # "//bazel/third_party/crates:tauri",
+        # "//bazel/third_party/crates:tauri",
     ],
     tags = ["no-sandbox"],
     deps = [

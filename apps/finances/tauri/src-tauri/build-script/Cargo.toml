@@ -1,0 +1,14 @@
+[[bin]]
+name = "build_script"
+path = "../build.rs"
+
+[package]
+name = "build_script"
+version = "0.0.0"
+
+[dependencies]
+tauri-build = { version = "2.2.0", features = [], path = "/Users/jgsogo/personal/tauri/crates/tauri-build" }
+# tauri-plugin-log = "2.4.0"
+# tauri-plugin-shell = "2.2.1"
+tauri = { version = "2.5.1", features = ["custom-protocol"]  }
+tauri-utils = { version = "2.2.0", features = ["build"], path = "/Users/jgsogo/personal/tauri/crates/tauri-utils" }

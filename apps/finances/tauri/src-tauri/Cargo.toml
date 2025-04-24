@@ -15,7 +15,8 @@ name = "finances_app_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.5", features = [] }
+tauri-build = { version = "2.2.0", features = [], path = "/Users/jgsogo/personal/tauri/crates/tauri-build" }
+# tauri-utils = { version = "2.2.0", features = ["build"] }
 
 [dependencies]
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
@@ -29,7 +30,7 @@ chrono = { version = "0.4.39" }
 chrono-tz = { version = "0.10.1" }
 diesel = { version = "2.2.7", features = ["r2d2", "chrono"] }
 
-tauri-build = { version = "2.2.0", features = [] }
+tauri-build = { version = "2.2.0", features = [], path = "/Users/jgsogo/personal/tauri/crates/tauri-build" }
 tauri = { version = "2.5.1", features = ["custom-protocol"]  }
 tauri-plugin-log = "2.4.0"
 tauri-plugin-shell = "2.2.1"
