@@ -872,6 +872,66 @@ alias(
 )
 
 alias(
+    name = "tauri-core-app-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-app-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-event-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-event-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-image-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-image-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-menu-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-menu-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-path-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-path-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-resources-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-resources-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-tray-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-tray-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-webview-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-webview-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-window-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-window-permission-files",
+    tags = ["manual"],
+)
+
+alias(
     name = "tauri-build-2.2.0",
     actual = "@crates__tauri-build-2.2.0//:tauri_build",
     tags = ["manual"],
@@ -896,6 +956,12 @@ alias(
 )
 
 alias(
+    name = "tauri-plugin-log-permission-files",
+    actual = "@crates__tauri-plugin-log-2.4.0//:tauri-plugin-log-permission-files",
+    tags = ["manual"],
+)
+
+alias(
     name = "tauri-plugin-shell-2.2.1",
     actual = "@crates__tauri-plugin-shell-2.2.1//:tauri_plugin_shell",
     tags = ["manual"],
@@ -904,6 +970,12 @@ alias(
 alias(
     name = "tauri-plugin-shell",
     actual = "@crates__tauri-plugin-shell-2.2.1//:tauri_plugin_shell",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-plugin-shell-permission-files",
+    actual = "@crates__tauri-plugin-shell-2.2.1//:tauri-plugin-shell-permission-files",
     tags = ["manual"],
 )
 
