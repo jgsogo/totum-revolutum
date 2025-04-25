@@ -32,6 +32,7 @@ rust_library(
     crate_features = [
         "common-controls-v6",
         "compression",
+        "custom-protocol",
         "default",
         "tauri-runtime-wry",
         "test",
@@ -43,7 +44,7 @@ rust_library(
     edition = "2021",
     proc_macro_deps = [
         "@crates__serde_repr-0.1.20//:serde_repr",
-        "@crates__tauri-macros-2.1.1//:tauri_macros",
+        "@crates__tauri-macros-2.2.0//:tauri_macros",
     ],
     rustc_flags = [
         "--cap-lints=allow",
@@ -60,7 +61,7 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "2.4.1",
+    version = "2.5.1",
     deps = [
         "@crates__anyhow-1.0.98//:anyhow",
         "@crates__dirs-6.0.0//:dirs",
@@ -77,10 +78,10 @@ rust_library(
         "@crates__serde-1.0.219//:serde",
         "@crates__serde_json-1.0.140//:serde_json",
         "@crates__serialize-to-javascript-0.1.1//:serialize_to_javascript",
-        "@crates__tauri-2.4.1//:build_script_build",
-        "@crates__tauri-runtime-2.5.1//:tauri_runtime",
-        "@crates__tauri-runtime-wry-2.5.1//:tauri_runtime_wry",
-        "@crates__tauri-utils-2.3.1//:tauri_utils",
+        "@crates__tauri-2.5.1//:build_script_build",
+        "@crates__tauri-runtime-2.6.0//:tauri_runtime",
+        "@crates__tauri-runtime-wry-2.6.0//:tauri_runtime_wry",
+        "@crates__tauri-utils-2.4.0//:tauri_utils",
         "@crates__thiserror-2.0.12//:thiserror",
         "@crates__tokio-1.44.2//:tokio",
         "@crates__url-2.5.4//:url",
@@ -89,7 +90,7 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
             "@crates__embed_plist-1.2.2//:embed_plist",  # cfg(target_os = "macos")
             "@crates__muda-0.16.1//:muda",  # cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", target_os = "windows", target_os = "macos"))
-            "@crates__objc2-0.6.0//:objc2",  # cfg(target_os = "macos")
+            "@crates__objc2-0.6.0//:objc2",  # cfg(target_vendor = "apple")
             "@crates__objc2-app-kit-0.3.0//:objc2_app_kit",  # cfg(target_os = "macos")
             "@crates__objc2-foundation-0.3.0//:objc2_foundation",  # cfg(target_os = "macos")
             "@crates__plist-1.7.1//:plist",  # cfg(target_os = "macos")
@@ -126,6 +127,7 @@ cargo_build_script(
     crate_features = [
         "common-controls-v6",
         "compression",
+        "custom-protocol",
         "default",
         "tauri-runtime-wry",
         "test",
@@ -160,13 +162,13 @@ cargo_build_script(
         "noclippy",
         "norustfmt",
     ],
-    version = "2.4.1",
+    version = "2.5.1",
     visibility = ["//visibility:private"],
     deps = [
         "@crates__glob-0.3.2//:glob",
         "@crates__heck-0.5.0//:heck",
-        "@crates__tauri-build-2.1.1//:tauri_build",
-        "@crates__tauri-utils-2.3.1//:tauri_utils",
+        "@crates__tauri-build-2.2.0//:tauri_build",
+        "@crates__tauri-utils-2.4.0//:tauri_utils",
     ],
 )
 
@@ -175,3 +177,42 @@ alias(
     actual = ":_bs",
     tags = ["manual"],
 )
+
+# Additive BUILD file content
+
+[
+    genrule(
+        name = "tauri-{}-permission-files".format(it),
+        srcs = [
+            ":build_script_build",
+        ],
+        outs = [
+            "tauri-{}-permission-files.tar".format(it),
+        ],
+        cmd = '''
+            STRIP_PREFIX="$(location :build_script_build)"
+            TMP_DIR=$$(mktemp -d)
+            jq -r '.[]' "$(location :build_script_build)/tauri-{}-permission-files" | while read -r file; do
+                relative_path="$${{file#*$$STRIP_PREFIX/}}"
+                dest="$$TMP_DIR/$$relative_path"
+                mkdir -p "$$(dirname "$$dest")"
+                cp "$(location :build_script_build)/$$relative_path" "$$dest"
+            done
+            tar -czf "$@" -C "$$TMP_DIR" .
+            rm -fr $$TMP_DIR
+        '''.format(it),
+        tags = ["manual"],
+    )
+    for it in [
+        "core",
+        "core-app",
+        "core-event",
+        "core-image",
+        "core-menu",
+        "core-path",
+        "core-resources",
+        "core-tray",
+        "core-webview",
+        "core-window",
+    ]
+]

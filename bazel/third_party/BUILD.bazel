@@ -1,4 +1,4 @@
-load("@rules_rust//crate_universe:defs.bzl", "crates_vendor")
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_vendor")
 load("@rules_uv//uv:pip.bzl", "pip_compile")
 
 pip_compile(
@@ -11,11 +11,88 @@ pip_compile(
 
 crates_vendor(
     name = "crates_vendor",
-    # annotations = {
-    #     "pq-sys": [crate.annotation(
-    #         gen_build_script = False,
-    #     )],
-    # },
+    annotations = {
+        "tauri": [crate.annotation(
+            additive_build_file_content = """
+                [
+                    genrule(
+                        name = "tauri-{}-permission-files".format(it),
+                        srcs = [
+                            ":build_script_build",
+                        ],
+                        cmd = '''
+                            STRIP_PREFIX="$(location :build_script_build)"
+                            TMP_DIR=$$(mktemp -d)
+                            jq -r '.[]' "$(location :build_script_build)/tauri-{}-permission-files" | while read -r file; do
+                                relative_path="$${{file#*$$STRIP_PREFIX/}}"
+                                dest="$$TMP_DIR/$$relative_path"
+                                mkdir -p "$$(dirname "$$dest")"
+                                cp "$(location :build_script_build)/$$relative_path" "$$dest"
+                            done
+                            tar -czf "$@" -C "$$TMP_DIR" .
+                            rm -fr $$TMP_DIR
+                        '''.format(it),
+                        outs = [
+                            "tauri-{}-permission-files.tar".format(it),
+                        ],
+                        tags = ["manual"],
+                    )
+                for it in ['core', 'core-app', 'core-event', 'core-image', 'core-menu', 'core-path', 'core-resources', 'core-tray', 'core-webview', 'core-window']]
+            """,
+        )],
+        "tauri-plugin-log": [crate.annotation(
+            additive_build_file_content = """
+                genrule(
+                    name = "tauri-plugin-log-permission-files",
+                    srcs = [
+                        ":build_script_build",
+                    ],
+                    cmd = '''
+                        STRIP_PREFIX="permissions"
+                        TMP_DIR=$$(mktemp -d)
+                        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-log-permission-files" | while read -r file; do
+                            relative_path="$${file#*$$STRIP_PREFIX/}"
+                            dest="$$TMP_DIR/permissions/$$relative_path"
+                            mkdir -p "$$(dirname "$$dest")"
+                            cp "$$file" "$$dest"
+                        done
+                        tar -czf "$@" -C "$$TMP_DIR" .
+                        rm -fr $$TMP_DIR
+                    ''',
+                    outs = [
+                        "tauri-plugin-log-permission-files.tar",
+                    ],
+                    tags = ["manual"],
+                )
+            """,
+        )],
+        "tauri-plugin-shell": [crate.annotation(
+            additive_build_file_content = """
+                genrule(
+                    name = "tauri-plugin-shell-permission-files",
+                    srcs = [
+                        ":build_script_build",
+                    ],
+                    cmd = '''
+                        STRIP_PREFIX="permissions"
+                        TMP_DIR=$$(mktemp -d)
+                        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-shell-permission-files" | while read -r file; do
+                            relative_path="$${file#*$$STRIP_PREFIX/}"
+                            dest="$$TMP_DIR/permissions/$$relative_path"
+                            mkdir -p "$$(dirname "$$dest")"
+                            cp "$$file" "$$dest"
+                        done
+                        tar -czf "$@" -C "$$TMP_DIR" .
+                        rm -fr $$TMP_DIR
+                    ''',
+                    outs = [
+                        "tauri-plugin-shell-permission-files.tar",
+                    ],
+                    tags = ["manual"],
+                )
+            """,
+        )],
+    },
     cargo_lockfile = "//:Cargo.lock",
     manifests = [
         "//:Cargo.toml",

@@ -56,7 +56,7 @@ rust_library(
         "@crates__serde-1.0.219//:serde",
         "@crates__serde_json-1.0.140//:serde_json",
         "@crates__shared_child-1.0.1//:shared_child",
-        "@crates__tauri-2.4.1//:tauri",
+        "@crates__tauri-2.5.1//:tauri",
         "@crates__tauri-plugin-shell-2.2.1//:build_script_build",
         "@crates__thiserror-2.0.12//:thiserror",
         "@crates__tokio-1.44.2//:tokio",
@@ -98,7 +98,7 @@ cargo_build_script(
     ),
     edition = "2021",
     link_deps = [
-        "@crates__tauri-2.4.1//:tauri",
+        "@crates__tauri-2.5.1//:tauri",
     ],
     links = "tauri-plugin-shell",
     pkg_name = "tauri-plugin-shell",
@@ -124,5 +124,30 @@ cargo_build_script(
 alias(
     name = "build_script_build",
     actual = ":_bs",
+    tags = ["manual"],
+)
+
+# Additive BUILD file content
+
+genrule(
+    name = "tauri-plugin-shell-permission-files",
+    srcs = [
+        ":build_script_build",
+    ],
+    outs = [
+        "tauri-plugin-shell-permission-files.tar",
+    ],
+    cmd = '''
+        STRIP_PREFIX="permissions"
+        TMP_DIR=$$(mktemp -d)
+        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-shell-permission-files" | while read -r file; do
+            relative_path="$${file#*$$STRIP_PREFIX/}"
+            dest="$$TMP_DIR/permissions/$$relative_path"
+            mkdir -p "$$(dirname "$$dest")"
+            cp "$$file" "$$dest"
+        done
+        tar -czf "$@" -C "$$TMP_DIR" .
+        rm -fr $$TMP_DIR
+    ''',
     tags = ["manual"],
 )
