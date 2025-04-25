@@ -124,3 +124,28 @@ alias(
     actual = ":_bs",
     tags = ["manual"],
 )
+
+# Additive BUILD file content
+
+genrule(
+    name = "tauri-plugin-log-permission-files",
+    srcs = [
+        ":build_script_build",
+    ],
+    outs = [
+        "tauri-plugin-log-permission-files.tar",
+    ],
+    cmd = '''
+        STRIP_PREFIX="permissions"
+        TMP_DIR=$$(mktemp -d)
+        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-log-permission-files" | while read -r file; do
+            relative_path="$${file#*$$STRIP_PREFIX/}"
+            dest="$$TMP_DIR/permissions/$$relative_path"
+            mkdir -p "$$(dirname "$$dest")"
+            cp "$$file" "$$dest"
+        done
+        tar -czf "$@" -C "$$TMP_DIR" .
+        rm -fr $$TMP_DIR
+    ''',
+    tags = ["manual"],
+)
