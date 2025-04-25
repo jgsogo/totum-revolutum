@@ -14,27 +14,30 @@ crates_vendor(
     annotations = {
         "tauri": [crate.annotation(
             additive_build_file_content = """
-                genrule(
-                    name = "tauri-core-app-permission-files",
-                    srcs = [
-                        ":build_script_build",
-                    ],
-                    cmd = '''
-                        STRIP_PREFIX="$(location :build_script_build)"
-                        TMP_DIR=$$(mktemp -d)
-                        jq -r '.[]' "$(location :build_script_build)/tauri-core-app-permission-files" | while read -r file; do
-                            relative_path="$${file#*$$STRIP_PREFIX/}"
-                            dest="$$TMP_DIR/$$relative_path"
-                            mkdir -p "$$(dirname "$$dest")"
-                            cp "$(location :build_script_build)/$$relative_path" "$$dest"
-                        done
-                        tar -czf "$@" -C "$$TMP_DIR" .
-                        rm -fr $$TMP_DIR
-                    ''',
-                    outs = [
-                        "tauri-core-app-permission-files.tar",
-                    ],
-                )
+                [
+                    genrule(
+                        name = "tauri-{}-permission-files".format(it),
+                        srcs = [
+                            ":build_script_build",
+                        ],
+                        cmd = '''
+                            STRIP_PREFIX="$(location :build_script_build)"
+                            TMP_DIR=$$(mktemp -d)
+                            jq -r '.[]' "$(location :build_script_build)/tauri-{}-permission-files" | while read -r file; do
+                                relative_path="$${{file#*$$STRIP_PREFIX/}}"
+                                dest="$$TMP_DIR/$$relative_path"
+                                mkdir -p "$$(dirname "$$dest")"
+                                cp "$(location :build_script_build)/$$relative_path" "$$dest"
+                            done
+                            tar -czf "$@" -C "$$TMP_DIR" .
+                            rm -fr $$TMP_DIR
+                        '''.format(it),
+                        outs = [
+                            "tauri-{}-permission-files.tar".format(it),
+                        ],
+                        tags = ["manual"],
+                    )
+                for it in ['core', 'core-app', 'core-event', 'core-image', 'core-menu', 'core-path', 'core-resources', 'core-tray', 'core-webview', 'core-window']]
             """,
         )],
     },
