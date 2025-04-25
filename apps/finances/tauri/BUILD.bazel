@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_run_devserver")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
@@ -13,25 +13,50 @@ filegroup(
     srcs = glob(["static/**/*.*"]),
 )
 
+filegroup(
+    name = "configs",
+    srcs = [
+        "postcss.config.cjs",
+        "svelte.config.js",
+        "tailwind.config.js",
+        "tsconfig.json",
+        "vite.config.js",
+    ],
+)
+
+js_run_binary(
+    name = "frontend",
+    srcs = [
+        # Build deps
+        "package.json",
+        ":node_modules",  # TODO: Use //:node_modules instead
+        "//apps/finances/tauri/models:models/ts",
+
+        # Sources
+        ":configs",
+        ":src",
+        ":static",
+    ],
+    args = ["build --config vite.config.js"],
+    chdir = package_name(),
+    out_dirs = ["build"],
+    tool = "//bazel/tools/npm:vite_binary",
+    visibility = ["//apps/finances/tauri/src-tauri:__pkg__"],
+)
+
 js_run_devserver(
     name = "devserver",
     args = ["dev --config vite.config.js"],
     chdir = package_name(),
     command = "./node_modules/.bin/vite",
     data = [
-        # Configs
-        "package.json",
-        "postcss.config.cjs",
-        "svelte.config.js",
-        "tailwind.config.js",
-        "tsconfig.json",
-        "vite.config.js",
-
         # Build deps
+        "package.json",
         ":node_modules",  # TODO: Use //:node_modules instead
         "//apps/finances/tauri/models:models/ts",
 
         # Sources
+        ":configs",
         ":src",
         ":static",
     ],
