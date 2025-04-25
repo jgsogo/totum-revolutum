@@ -11,7 +11,7 @@ load("@rules_rust//rust:defs.bzl", "rust_library")
 package(default_visibility = ["//visibility:public"])
 
 rust_library(
-    name = "windows_future",
+    name = "windows_numerics",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -35,7 +35,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=windows-future",
+        "crate-name=windows-numerics",
         "manual",
         "noclippy",
         "norustfmt",
@@ -45,9 +45,9 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.1.1",
+    version = "0.2.0",
     deps = [
-        "@crates__windows-core-0.60.1//:windows_core",
+        "@crates__windows-core-0.61.0//:windows_core",
         "@crates__windows-link-0.1.1//:windows_link",
     ],
 )

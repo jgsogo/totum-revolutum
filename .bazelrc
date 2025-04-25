@@ -29,6 +29,14 @@ test:ci --verbose_failures --test_output=all --keep_going
 build:opt -c opt
 build:opt --@rules_rust//:extra_rustc_flags=--codegen=lto=fat,--codegen=codegen-units=1
 
+# ####
+# C++
+# ####
+
+build --cxxopt=-std=c++20 --host_cxxopt=-std=c++20 --cxxopt=-Werror
+build --copt=-fdiagnostics-color=always
+
+build:macos --features=-supports_dynamic_linker --features=-libtool --linkopt=-framework --linkopt=CoreFoundation --host_linkopt=-framework --host_linkopt=CoreFoundation
 
 ###################
 # Typescript

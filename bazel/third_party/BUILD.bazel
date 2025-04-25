@@ -1,4 +1,4 @@
-load("@rules_rust//crate_universe:defs.bzl", "crates_vendor")
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_vendor")
 load("@rules_uv//uv:pip.bzl", "pip_compile")
 
 pip_compile(
@@ -11,11 +11,33 @@ pip_compile(
 
 crates_vendor(
     name = "crates_vendor",
-    # annotations = {
-    #     "pq-sys": [crate.annotation(
-    #         gen_build_script = False,
-    #     )],
-    # },
+    annotations = {
+        "tauri": [crate.annotation(
+            additive_build_file_content = """
+                genrule(
+                    name = "tauri-core-app-permission-files",
+                    srcs = [
+                        ":build_script_build",
+                    ],
+                    cmd = '''
+                        STRIP_PREFIX="$(location :build_script_build)"
+                        TMP_DIR=$$(mktemp -d)
+                        jq -r '.[]' "$(location :build_script_build)/tauri-core-app-permission-files" | while read -r file; do
+                            relative_path="$${file#*$$STRIP_PREFIX/}"
+                            dest="$$TMP_DIR/$$relative_path"
+                            mkdir -p "$$(dirname "$$dest")"
+                            cp "$(location :build_script_build)/$$relative_path" "$$dest"
+                        done
+                        tar -czf "$@" -C "$$TMP_DIR" .
+                        rm -fr $$TMP_DIR
+                    ''',
+                    outs = [
+                        "tauri-core-app-permission-files.tar",
+                    ],
+                )
+            """,
+        )],
+    },
     cargo_lockfile = "//:Cargo.lock",
     manifests = [
         "//:Cargo.toml",

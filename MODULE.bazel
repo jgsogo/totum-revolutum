@@ -150,9 +150,9 @@ use_repo(
     "crates__strum-0.27.1",
     "crates__strum_macros-0.27.1",
     "crates__syn-2.0.100",
-    "crates__tauri-2.4.1",
-    "crates__tauri-build-2.1.1",
-    "crates__tauri-plugin-log-2.3.1",
+    "crates__tauri-2.5.1",
+    "crates__tauri-build-2.2.0",
+    "crates__tauri-plugin-log-2.4.0",
     "crates__tauri-plugin-shell-2.2.1",
     "crates__tempfile-3.19.1",
     "crates__testing_logger-0.1.1",
@@ -259,6 +259,6 @@ use_repo(fetch_gh, "gh_darwin_amd64", "gh_darwin_arm64", "gh_linux_amd64")
 fetch_envsubst = use_extension("//tools/envsubst:extensions.bzl", "fetch_envsubst")
 use_repo(fetch_envsubst, "envsubst_darwin_arm64", "envsubst_darwin_x86_64", "envsubst_linux_arm64")
 
-include("//:llvm.MODULE.bazel")
+# include("//:llvm.MODULE.bazel")
 
 include("//:protobuf.MODULE.bazel")

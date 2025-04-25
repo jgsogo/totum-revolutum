@@ -45,12 +45,12 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.60.0",
+    version = "0.61.1",
     deps = [
-        "@crates__windows-collections-0.1.1//:windows_collections",
-        "@crates__windows-core-0.60.1//:windows_core",
-        "@crates__windows-future-0.1.1//:windows_future",
+        "@crates__windows-collections-0.2.0//:windows_collections",
+        "@crates__windows-core-0.61.0//:windows_core",
+        "@crates__windows-future-0.2.0//:windows_future",
         "@crates__windows-link-0.1.1//:windows_link",
-        "@crates__windows-numerics-0.1.1//:windows_numerics",
+        "@crates__windows-numerics-0.2.0//:windows_numerics",
     ],
 )

@@ -19,5 +19,6 @@ secret.json
 secrets/
 target/
 test/
+tools/llvm-*
 user.bazelrc
 xcode.bazelrc
