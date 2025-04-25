@@ -187,7 +187,7 @@ alias(
             ":build_script_build",
         ],
         outs = [
-            "tauri-{}-permission-files.tar".format(it),
+            "tauri-{}-permission-files.tar.gz".format(it),
         ],
         cmd = '''
             STRIP_PREFIX="$(location :build_script_build)"

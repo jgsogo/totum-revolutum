@@ -28,13 +28,25 @@ cargo_build_script(
     srcs = ["build.rs"],
     build_script_env = {
         "DEP_TAURI_DEV": "false",
+        "UNTAR-DEP_TAURI_CORE__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-permission-files)",
+        "UNTAR-DEP_TAURI_CORE__CORE_PLUGIN___PERMISSION_FILES_PATH1": "$(location //bazel/third_party/crates:tauri-core-app-permission-files)",
+        "UNTAR-DEP_TAURI_CORE__CORE_PLUGIN___PERMISSION_FILES_PATH2": "$(location //bazel/third_party/crates:tauri-plugin-log-permission-files)",
+        "UNTAR-DEP_TAURI_CORE__CORE_PLUGIN___PERMISSION_FILES_PATH3": "$(location //bazel/third_party/crates:tauri-plugin-shell-permission-files)",
     },
     data = [
         "Cargo.toml",
         "tauri.conf.json",
         ":srcs_lib",
+        ":capabilities",
+        # We should create aliases for these targets
+        "//bazel/third_party/crates:tauri-core-permission-files",
+        "//bazel/third_party/crates:tauri-core-app-permission-files",
+        "//bazel/third_party/crates:tauri-plugin-log-permission-files",
+        "//bazel/third_party/crates:tauri-plugin-shell-permission-files",
     ],
     deps = [
+        "//bazel/third_party/crates:flate2",
+        "//bazel/third_party/crates:tar",
         "//bazel/third_party/crates:tauri-build",
     ],
 )

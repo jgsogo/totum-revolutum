@@ -135,7 +135,7 @@ genrule(
         ":build_script_build",
     ],
     outs = [
-        "tauri-plugin-shell-permission-files.tar",
+        "tauri-plugin-shell-permission-files.tar.gz",
     ],
     cmd = '''
         STRIP_PREFIX="permissions"

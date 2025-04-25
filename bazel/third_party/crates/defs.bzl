@@ -313,10 +313,12 @@ _NORMAL_DEPENDENCIES = {
             "chrono": Label("@crates//:chrono-0.4.40"),
             "chrono-tz": Label("@crates//:chrono-tz-0.10.3"),
             "diesel": Label("@crates//:diesel-2.2.9"),
+            "flate2": Label("@crates//:flate2-1.1.1"),
             "itertools": Label("@crates//:itertools-0.14.0"),
             "log": Label("@crates//:log-0.4.27"),
             "serde": Label("@crates//:serde-1.0.219"),
             "serde_json": Label("@crates//:serde_json-1.0.140"),
+            "tar": Label("@crates//:tar-0.4.44"),
             "tauri": Label("@crates//:tauri-2.5.1"),
             "tauri-build": Label("@crates//:tauri-build-2.2.0"),
             "tauri-plugin-log": Label("@crates//:tauri-plugin-log-2.4.0"),
@@ -994,6 +996,8 @@ _BUILD_DEPENDENCIES = {
     },
     "apps/finances/tauri/src-tauri": {
         _COMMON_CONDITION: {
+            "flate2": Label("@crates//:flate2-1.1.1"),
+            "tar": Label("@crates//:tar-0.4.44"),
             "tauri-build": Label("@crates//:tauri-build-2.2.0"),
         },
     },
@@ -1203,8 +1207,10 @@ _CONDITIONS = {
     "cfg(any(target_arch = \"aarch64\", target_arch = \"x86\", target_arch = \"x86_64\"))": ["@rules_rust//rust/platform:x86_64-apple-darwin", "@rules_rust//rust/platform:x86_64-unknown-linux-gnu"],
     "cfg(any(target_arch = \"aarch64\", target_arch = \"x86_64\", target_arch = \"x86\"))": ["@rules_rust//rust/platform:x86_64-apple-darwin", "@rules_rust//rust/platform:x86_64-unknown-linux-gnu"],
     "cfg(any(target_os = \"android\", all(target_vendor = \"apple\", not(target_os = \"macos\"))))": [],
+    "cfg(any(target_os = \"android\", target_os = \"linux\", target_os = \"macos\", target_os = \"hurd\"))": ["@rules_rust//rust/platform:x86_64-apple-darwin", "@rules_rust//rust/platform:x86_64-unknown-linux-gnu"],
     "cfg(any(target_os = \"android\", target_os = \"windows\"))": [],
     "cfg(any(target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"hurd\", target_os = \"illumos\", target_os = \"cygwin\", all(target_os = \"horizon\", target_arch = \"arm\")))": [],
+    "cfg(any(target_os = \"freebsd\", target_os = \"netbsd\"))": [],
     "cfg(any(target_os = \"haiku\", target_os = \"redox\", target_os = \"nto\", target_os = \"aix\"))": [],
     "cfg(any(target_os = \"ios\", target_os = \"macos\"))": ["@rules_rust//rust/platform:x86_64-apple-darwin"],
     "cfg(any(target_os = \"ios\", target_os = \"visionos\", target_os = \"watchos\", target_os = \"tvos\"))": [],
@@ -7165,6 +7171,16 @@ def crate_repositories():
 
     maybe(
         http_archive,
+        name = "crates__tar-0.4.44",
+        sha256 = "1d863878d212c87a19c1a610eb53bb01fe12951c0501cf5a0d65f724914a667a",
+        type = "tar.gz",
+        urls = ["https://static.crates.io/crates/tar/0.4.44/download"],
+        strip_prefix = "tar-0.4.44",
+        build_file = Label("//bazel/third_party/crates:BUILD.tar-0.4.44.bazel"),
+    )
+
+    maybe(
+        http_archive,
         name = "crates__target-lexicon-0.12.16",
         sha256 = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1",
         type = "tar.gz",
@@ -8885,6 +8901,16 @@ def crate_repositories():
 
     maybe(
         http_archive,
+        name = "crates__xattr-1.5.0",
+        sha256 = "0d65cbf2f12c15564212d48f4e3dfb87923d25d611f2aed18f4cb23f0413d89e",
+        type = "tar.gz",
+        urls = ["https://static.crates.io/crates/xattr/1.5.0/download"],
+        strip_prefix = "xattr-1.5.0",
+        build_file = Label("//bazel/third_party/crates:BUILD.xattr-1.5.0.bazel"),
+    )
+
+    maybe(
+        http_archive,
         name = "crates__yoke-0.7.5",
         sha256 = "120e6aef9aa629e3d4f52dc8cc43a015c7724194c97dfaf45180d2daf2b77f40",
         type = "tar.gz",
@@ -9037,6 +9063,7 @@ def crate_repositories():
         struct(repo = "crates__dirs-6.0.0", is_dev_dep = False),
         struct(repo = "crates__dotenvy-0.15.7", is_dev_dep = False),
         struct(repo = "crates__fd-lock-4.0.4", is_dev_dep = False),
+        struct(repo = "crates__flate2-1.1.1", is_dev_dep = False),
         struct(repo = "crates__flume-0.11.1", is_dev_dep = False),
         struct(repo = "crates__fs4-0.13.1", is_dev_dep = False),
         struct(repo = "crates__futures-0.3.31", is_dev_dep = False),
@@ -9080,6 +9107,7 @@ def crate_repositories():
         struct(repo = "crates__strum-0.27.1", is_dev_dep = False),
         struct(repo = "crates__strum_macros-0.27.1", is_dev_dep = False),
         struct(repo = "crates__syn-2.0.100", is_dev_dep = False),
+        struct(repo = "crates__tar-0.4.44", is_dev_dep = False),
         struct(repo = "crates__tauri-2.5.1", is_dev_dep = False),
         struct(repo = "crates__tauri-build-2.2.0", is_dev_dep = False),
         struct(repo = "crates__tauri-plugin-log-2.4.0", is_dev_dep = False),

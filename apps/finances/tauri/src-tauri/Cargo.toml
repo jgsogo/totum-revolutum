@@ -16,6 +16,8 @@ crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
 tauri-build = { version = "2.2.0", features = [] }
+tar = { version  = "0.4.44"}
+flate2 = { version = "1.1.1" }
 
 [dependencies]
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust"}
@@ -29,7 +31,11 @@ chrono = { version = "0.4.39" }
 chrono-tz = { version = "0.10.1" }
 diesel = { version = "2.2.7", features = ["r2d2", "chrono"] }
 
-tauri-build = { version = "2.2.0", features = [] } # FIXME: If I don't list it here, Bazel doesn't include it in crate_libraries
+# FIXME: These are build-dependencies - If I don't list it here, Bazel doesn't include it in crate_libraries
+tauri-build = { version = "2.2.0", features = [] }
+tar = { version  = "0.4.44"}
+flate2 = { version = "1.1.1" }
+
 tauri = { version = "2.5.1", features = ["custom-protocol"] }
 tauri-plugin-log = "2.4.0"
 tauri-plugin-shell = "2.2.1"

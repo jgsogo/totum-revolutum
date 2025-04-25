@@ -33,7 +33,7 @@ crates_vendor(
                             rm -fr $$TMP_DIR
                         '''.format(it),
                         outs = [
-                            "tauri-{}-permission-files.tar".format(it),
+                            "tauri-{}-permission-files.tar.gz".format(it),
                         ],
                         tags = ["manual"],
                     )
@@ -72,7 +72,7 @@ crates_vendor(
                         rm -fr $$TMP_DIR
                     ''',
                     outs = [
-                        "tauri-plugin-log-permission-files.tar",
+                        "tauri-plugin-log-permission-files.tar.gz",
                     ],
                     tags = ["manual"],
                 )
@@ -101,7 +101,7 @@ crates_vendor(
                         rm -fr $$TMP_DIR
                     ''',
                     outs = [
-                        "tauri-plugin-shell-permission-files.tar",
+                        "tauri-plugin-shell-permission-files.tar.gz",
                     ],
                     tags = ["manual"],
                 )
