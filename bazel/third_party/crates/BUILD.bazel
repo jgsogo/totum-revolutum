@@ -10,7 +10,7 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(
     [
-        "cargo-bazel.json",
+        # "cargo-bazel.json",
         "crates.bzl",
         "defs.bzl",
     ] + glob(
@@ -319,29 +319,29 @@ alias(
     tags = ["manual"],
 )
 
-alias(
-    name = "finances-app-0.1.0",
-    actual = "@crates__finances-app-0.1.0//:finances_app_lib",
-    tags = ["manual"],
-)
+# alias(
+#     name = "finances-app-0.1.0",
+#     actual = "@crates__finances-app-0.1.0//:finances_app_lib",
+#     tags = ["manual"],
+# )
 
-alias(
-    name = "finances-app",
-    actual = "@crates__finances-app-0.1.0//:finances_app_lib",
-    tags = ["manual"],
-)
+# alias(
+#     name = "finances-app",
+#     actual = "@crates__finances-app-0.1.0//:finances_app_lib",
+#     tags = ["manual"],
+# )
 
-alias(
-    name = "finances-app-models-0.1.0",
-    actual = "@crates__finances-app-models-0.1.0//:finances_app_models",
-    tags = ["manual"],
-)
+# alias(
+#     name = "finances-app-models-0.1.0",
+#     actual = "@crates__finances-app-models-0.1.0//:finances_app_models",
+#     tags = ["manual"],
+# )
 
-alias(
-    name = "finances-app-models",
-    actual = "@crates__finances-app-models-0.1.0//:finances_app_models",
-    tags = ["manual"],
-)
+# alias(
+#     name = "finances-app-models",
+#     actual = "@crates__finances-app-models-0.1.0//:finances_app_models",
+#     tags = ["manual"],
+# )
 
 alias(
     name = "flume-0.11.1",
@@ -391,17 +391,17 @@ alias(
     tags = ["manual"],
 )
 
-alias(
-    name = "googleapis-0.1.0",
-    actual = "@crates__googleapis-0.1.0//:googleapis",
-    tags = ["manual"],
-)
+# alias(
+#     name = "googleapis-0.1.0",
+#     actual = "@crates__googleapis-0.1.0//:googleapis",
+#     tags = ["manual"],
+# )
 
-alias(
-    name = "googleapis",
-    actual = "@crates__googleapis-0.1.0//:googleapis",
-    tags = ["manual"],
-)
+# alias(
+#     name = "googleapis",
+#     actual = "@crates__googleapis-0.1.0//:googleapis",
+#     tags = ["manual"],
+# )
 
 alias(
     name = "headers-0.4.0",
