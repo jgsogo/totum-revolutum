@@ -63,26 +63,22 @@ crates_vendor(
         )],
         "tauri-plugin-log": [crate.annotation(
             additive_build_file_content = """
-                genrule(
+                filegroup(
                     name = "permission-files",
+                    srcs = glob(["permissions/**/*"]),
+                    tags = ["manual"],
+                )
+
+                genrule(
+                    name = "permission-files-index",
                     srcs = [
+                        ":permission-files",
                         ":build_script_build",
                     ],
                     cmd = '''
-                        STRIP_PREFIX="permissions"
-                        TMP_DIR=$$(mktemp -d)
-                        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-log-permission-files" | while read -r file; do
-                            relative_path="$${file#*$$STRIP_PREFIX/}"
-                            dest="$$TMP_DIR/permissions/$$relative_path"
-                            mkdir -p "$$(dirname "$$dest")"
-                            cp "$$file" "$$dest"
-                        done
-                        tar -czf "$@" -C "$$TMP_DIR" .
-                        rm -fr $$TMP_DIR
+                        cp "$(location :build_script_build)/tauri-plugin-log-permission-files" "$@"
                     ''',
-                    outs = [
-                        "tauri-plugin-log-permission-files.tar.gz",
-                    ],
+                    outs = ["tauri-plugin-log-permission-files-path"],
                     tags = ["manual"],
                 )
 
@@ -95,32 +91,29 @@ crates_vendor(
                 )
             """,
             extra_aliased_targets = {
-                "tauri-plugin-log-permission-files": "permission-files",
+                # "tauri-plugin-log-permission-files": "permission-files",
+                "tauri-plugin-log-permission-files-index": "permission-files-index",
                 "tauri-plugin-log-global-api-script": "global-api-script",
             },
         )],
         "tauri-plugin-shell": [crate.annotation(
             additive_build_file_content = """
-                genrule(
+                filegroup(
                     name = "permission-files",
+                    srcs = glob(["permissions/**/*"]),
+                    tags = ["manual"],
+                )
+
+                genrule(
+                    name = "permission-files-index",
                     srcs = [
+                        ":permission-files",
                         ":build_script_build",
                     ],
                     cmd = '''
-                        STRIP_PREFIX="permissions"
-                        TMP_DIR=$$(mktemp -d)
-                        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-shell-permission-files" | while read -r file; do
-                            relative_path="$${file#*$$STRIP_PREFIX/}"
-                            dest="$$TMP_DIR/permissions/$$relative_path"
-                            mkdir -p "$$(dirname "$$dest")"
-                            cp "$$file" "$$dest"
-                        done
-                        tar -czf "$@" -C "$$TMP_DIR" .
-                        rm -fr $$TMP_DIR
+                        cp "$(location :build_script_build)/tauri-plugin-shell-permission-files" "$@"
                     ''',
-                    outs = [
-                        "tauri-plugin-shell-permission-files.tar.gz",
-                    ],
+                    outs = ["tauri-plugin-shell-permission-files-path"],
                     tags = ["manual"],
                 )
 
@@ -147,7 +140,8 @@ crates_vendor(
                 )
             """,
             extra_aliased_targets = {
-                "tauri-plugin-shell-permission-files": "permission-files",
+                # "tauri-plugin-shell-permission-files": "permission-files",
+                "tauri-plugin-shell-permission-files-index": "permission-files-index",
                 "tauri-plugin-shell-global-scope": "global-scope",
                 "tauri-plugin-shell-global-api-script": "global-api-script",
             },

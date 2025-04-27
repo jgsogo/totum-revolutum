@@ -992,8 +992,8 @@ alias(
 )
 
 alias(
-    name = "tauri-plugin-log-permission-files",
-    actual = "@crates__tauri-plugin-log-2.4.0//:permission-files",
+    name = "tauri-plugin-log-permission-files-index",
+    actual = "@crates__tauri-plugin-log-2.4.0//:permission-files-index",
     tags = ["manual"],
 )
 
@@ -1022,8 +1022,8 @@ alias(
 )
 
 alias(
-    name = "tauri-plugin-shell-permission-files",
-    actual = "@crates__tauri-plugin-shell-2.2.1//:permission-files",
+    name = "tauri-plugin-shell-permission-files-index",
+    actual = "@crates__tauri-plugin-shell-2.2.1//:permission-files-index",
     tags = ["manual"],
 )
 

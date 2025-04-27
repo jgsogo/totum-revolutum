@@ -129,25 +129,21 @@ alias(
 
 # Additive BUILD file content
 
-genrule(
+filegroup(
     name = "permission-files",
+    srcs = glob(["permissions/**/*"]),
+    tags = ["manual"],
+)
+
+genrule(
+    name = "permission-files-index",
     srcs = [
+        ":permission-files",
         ":build_script_build",
     ],
-    outs = [
-        "tauri-plugin-shell-permission-files.tar.gz",
-    ],
+    outs = ["tauri-plugin-shell-permission-files-path"],
     cmd = '''
-        STRIP_PREFIX="permissions"
-        TMP_DIR=$$(mktemp -d)
-        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-shell-permission-files" | while read -r file; do
-            relative_path="$${file#*$$STRIP_PREFIX/}"
-            dest="$$TMP_DIR/permissions/$$relative_path"
-            mkdir -p "$$(dirname "$$dest")"
-            cp "$$file" "$$dest"
-        done
-        tar -czf "$@" -C "$$TMP_DIR" .
-        rm -fr $$TMP_DIR
+        cp "$(location :build_script_build)/tauri-plugin-shell-permission-files" "$@"
     ''',
     tags = ["manual"],
 )
