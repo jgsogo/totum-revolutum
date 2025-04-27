@@ -41,13 +41,17 @@ cargo_build_script(
         "UNTAR-DEP_TAURI_CORE:WINDOW__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-window-permission-files)",
         # Tauri plugins
         "UNTAR-DEP_TAURI_PLUGIN_LOG_PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-plugin-log-permission-files)",
+        "DEP_TAURI_PLUGIN_LOG_GLOBAL_API_SCRIPT_PATH": "$(location //bazel/third_party/crates:tauri-plugin-log-global-api-script)",
         "UNTAR-DEP_TAURI_PLUGIN_SHELL_PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-plugin-shell-permission-files)",
+        "DEP_TAURI_PLUGIN_SHELL_GLOBAL_SCOPE_SCHEMA_PATH": "$(location //bazel/third_party/crates:tauri-plugin-shell-global-scope)",
+        "DEP_TAURI_PLUGIN_SHELL_GLOBAL_API_SCRIPT_PATH": "$(location //bazel/third_party/crates:tauri-plugin-shell-global-api-script)",
     },
     data = [
         "Cargo.toml",
         "tauri.conf.json",
-        ":srcs_lib",
+        # ":srcs_lib",
         ":capabilities",
+        ":icons",
         # Tauri core
         "//bazel/third_party/crates:tauri-core-permission-files",
         "//bazel/third_party/crates:tauri-core-app-permission-files",
@@ -61,7 +65,10 @@ cargo_build_script(
         "//bazel/third_party/crates:tauri-core-window-permission-files",
         # Tauri plugins
         "//bazel/third_party/crates:tauri-plugin-log-permission-files",
+        "//bazel/third_party/crates:tauri-plugin-log-global-api-script",
         "//bazel/third_party/crates:tauri-plugin-shell-permission-files",
+        "//bazel/third_party/crates:tauri-plugin-shell-global-scope",
+        "//bazel/third_party/crates:tauri-plugin-shell-global-api-script",
     ],
     deps = [
         "//bazel/third_party/crates:anyhow",
@@ -79,6 +86,7 @@ rust_library(
         "tauri.conf.json",
         ":icons",
         ":capabilities",
+        "//apps/finances/tauri:frontend",
     ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",

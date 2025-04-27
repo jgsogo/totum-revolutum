@@ -128,7 +128,7 @@ alias(
 # Additive BUILD file content
 
 genrule(
-    name = "tauri-plugin-log-permission-files",
+    name = "permission-files",
     srcs = [
         ":build_script_build",
     ],
@@ -147,5 +147,13 @@ genrule(
         tar -czf "$@" -C "$$TMP_DIR" .
         rm -fr $$TMP_DIR
     ''',
+    tags = ["manual"],
+)
+
+filegroup(
+    name = "global-api-script",
+    srcs = [
+        "api-iife.js",
+    ],
     tags = ["manual"],
 )

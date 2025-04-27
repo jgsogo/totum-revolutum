@@ -996,7 +996,9 @@ _BUILD_DEPENDENCIES = {
     },
     "apps/finances/tauri/src-tauri": {
         _COMMON_CONDITION: {
+            "anyhow": Label("@crates//:anyhow-1.0.98"),
             "flate2": Label("@crates//:flate2-1.1.1"),
+            "serde_json": Label("@crates//:serde_json-1.0.140"),
             "tar": Label("@crates//:tar-0.4.44"),
             "tauri-build": Label("@crates//:tauri-build-2.2.0"),
         },

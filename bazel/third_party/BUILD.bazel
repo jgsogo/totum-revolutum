@@ -55,7 +55,7 @@ crates_vendor(
         "tauri-plugin-log": [crate.annotation(
             additive_build_file_content = """
                 genrule(
-                    name = "tauri-plugin-log-permission-files",
+                    name = "permission-files",
                     srcs = [
                         ":build_script_build",
                     ],
@@ -76,15 +76,24 @@ crates_vendor(
                     ],
                     tags = ["manual"],
                 )
+
+                filegroup(
+                    name = "global-api-script",
+                    srcs = [
+                        "api-iife.js",
+                    ],
+                    tags = ["manual"],
+                )
             """,
             extra_aliased_targets = {
-                "tauri-plugin-log-permission-files": "tauri-plugin-log-permission-files",
+                "tauri-plugin-log-permission-files": "permission-files",
+                "tauri-plugin-log-global-api-script": "global-api-script",
             },
         )],
         "tauri-plugin-shell": [crate.annotation(
             additive_build_file_content = """
                 genrule(
-                    name = "tauri-plugin-shell-permission-files",
+                    name = "permission-files",
                     srcs = [
                         ":build_script_build",
                     ],
@@ -105,9 +114,33 @@ crates_vendor(
                     ],
                     tags = ["manual"],
                 )
+
+                genrule(
+                    name = "global-scope",
+                    srcs = [
+                        ":build_script_build",
+                    ],
+                    cmd = '''
+                        cp $(location :build_script_build)/global-scope.json "$@"
+                    ''',
+                    outs = [
+                        "global-scope.json",
+                    ],
+                    tags = ["manual"],
+                )
+
+                filegroup(
+                    name = "global-api-script",
+                    srcs = [
+                        "api-iife.js",
+                    ],
+                    tags = ["manual"],
+                )
             """,
             extra_aliased_targets = {
-                "tauri-plugin-shell-permission-files": "tauri-plugin-shell-permission-files",
+                "tauri-plugin-shell-permission-files": "permission-files",
+                "tauri-plugin-shell-global-scope": "global-scope",
+                "tauri-plugin-shell-global-api-script": "global-api-script",
             },
         )],
     },

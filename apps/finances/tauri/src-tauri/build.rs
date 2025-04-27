@@ -59,34 +59,13 @@ fn create_permission_files() -> Result<()> {
             let json = serde_json::to_string(&all_files)?;
             plugin_permission_file.write_all(json.as_bytes())?;
 
-            println!(
-                ">>>> {}: {}",
-                actual_env_var_name,
-                plugin_permission_file_path.display()
-            );
+            // println!(
+            //     ">>>> {}: {}",
+            //     actual_env_var_name,
+            //     plugin_permission_file_path.display()
+            // );
             std::env::set_var(actual_env_var_name, plugin_permission_file_path);
         }
-
-        // if key.starts_with("UNTAR-") {
-        //     let path = std::path::PathBuf::from(value);
-        //     // println!(">>>>>> {}", path.display());
-
-        //     let tar_gz = File::open(path)?;
-        //     let tar = GzDecoder::new(tar_gz);
-
-        //     let mut archive = Archive::new(tar);
-
-        //     for entry in archive.entries()? {
-        //         // Make sure there wasn't an I/O error
-        //         let mut entry = entry?;
-
-        //         entry.unpack_in(&out_dir)?;
-
-        //         // if tar::EntryType::Regular == entry.header().entry_type() {
-        //         //     println!(">>>>>> - {}", entry.path().unwrap().display());
-        //         // }
-        //     }
-        // }
     }
     Ok(())
 }

@@ -57,7 +57,7 @@ tempfile = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [[bin]]
-name = "briclink"
+name = "bricklink"
 path = "src/cli/main.rs"
 # Waiting for https://github.com/rust-lang/cargo/issues/4663 (and related: https://github.com/rust-lang/rfcs/pull/3374)
 required-features = ["cli"]

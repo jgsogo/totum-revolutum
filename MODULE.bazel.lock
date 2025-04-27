@@ -244,7 +244,7 @@
   "moduleExtensions": {
     "//bazel/third_party:crates_extension.bzl%crates": {
       "general": {
-        "bzlTransitiveDigest": "Mg0NNDfqcouut2+/K4i89XisnFt0+RbGn2RG2dVSbKE=",
+        "bzlTransitiveDigest": "/wAqDBNrE0GBrn4aUxbRsKxJ/RF5zzS5Fki7jZRmwKk=",
         "usagesDigest": "UZi47EDbuhi59B5MHXLB3w4CtOqzRBXenANK0zLSEdM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

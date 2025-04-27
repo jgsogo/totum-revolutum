@@ -10,7 +10,7 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(
     [
-        # "cargo-bazel.json",
+        "cargo-bazel.json",
         "crates.bzl",
         "defs.bzl",
     ] + glob(
@@ -980,8 +980,14 @@ alias(
 )
 
 alias(
+    name = "tauri-plugin-log-global-api-script",
+    actual = "@crates__tauri-plugin-log-2.4.0//:global-api-script",
+    tags = ["manual"],
+)
+
+alias(
     name = "tauri-plugin-log-permission-files",
-    actual = "@crates__tauri-plugin-log-2.4.0//:tauri-plugin-log-permission-files",
+    actual = "@crates__tauri-plugin-log-2.4.0//:permission-files",
     tags = ["manual"],
 )
 
@@ -998,8 +1004,20 @@ alias(
 )
 
 alias(
+    name = "tauri-plugin-shell-global-api-script",
+    actual = "@crates__tauri-plugin-shell-2.2.1//:global-api-script",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-plugin-shell-global-scope",
+    actual = "@crates__tauri-plugin-shell-2.2.1//:global-scope",
+    tags = ["manual"],
+)
+
+alias(
     name = "tauri-plugin-shell-permission-files",
-    actual = "@crates__tauri-plugin-shell-2.2.1//:tauri-plugin-shell-permission-files",
+    actual = "@crates__tauri-plugin-shell-2.2.1//:permission-files",
     tags = ["manual"],
 )
 
