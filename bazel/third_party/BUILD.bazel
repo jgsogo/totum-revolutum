@@ -38,6 +38,14 @@ crates_vendor(
                         tags = ["manual"],
                     )
                 for it in ['core', 'core-app', 'core-event', 'core-image', 'core-menu', 'core-path', 'core-resources', 'core-tray', 'core-webview', 'core-window']]
+
+                filegroup(
+                    name = "global-api-script",
+                    srcs = [
+                        "scripts/bundle.global.js",
+                    ],
+                    tags = ["manual"],
+                )
             """,
             extra_aliased_targets = {
                 "tauri-core-permission-files": "tauri-core-permission-files",
@@ -50,6 +58,7 @@ crates_vendor(
                 "tauri-core-tray-permission-files": "tauri-core-tray-permission-files",
                 "tauri-core-webview-permission-files": "tauri-core-webview-permission-files",
                 "tauri-core-window-permission-files": "tauri-core-window-permission-files",
+                "tauri-global-api-script": "global-api-script",
             },
         )],
         "tauri-plugin-log": [crate.annotation(

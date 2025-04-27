@@ -39,6 +39,7 @@ cargo_build_script(
         "UNTAR-DEP_TAURI_CORE:TRAY__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-tray-permission-files)",
         "UNTAR-DEP_TAURI_CORE:WEBVIEW__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-webview-permission-files)",
         "UNTAR-DEP_TAURI_CORE:WINDOW__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-window-permission-files)",
+        "DEP_TAURI_GLOBAL_API_SCRIPT_PATH": "$(location //bazel/third_party/crates:tauri-global-api-script)",
         # Tauri plugins
         "UNTAR-DEP_TAURI_PLUGIN_LOG_PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-plugin-log-permission-files)",
         "DEP_TAURI_PLUGIN_LOG_GLOBAL_API_SCRIPT_PATH": "$(location //bazel/third_party/crates:tauri-plugin-log-global-api-script)",
@@ -53,6 +54,7 @@ cargo_build_script(
         ":capabilities",
         ":icons",
         # Tauri core
+        "//bazel/third_party/crates:tauri-global-api-script",
         "//bazel/third_party/crates:tauri-core-permission-files",
         "//bazel/third_party/crates:tauri-core-app-permission-files",
         "//bazel/third_party/crates:tauri-core-event-permission-files",

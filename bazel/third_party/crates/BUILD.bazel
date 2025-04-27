@@ -956,6 +956,12 @@ alias(
 )
 
 alias(
+    name = "tauri-global-api-script",
+    actual = "@crates__tauri-2.5.1//:global-api-script",
+    tags = ["manual"],
+)
+
+alias(
     name = "tauri-build-2.2.0",
     actual = "@crates__tauri-build-2.2.0//:tauri_build",
     tags = ["manual"],
