@@ -15,7 +15,7 @@ name = "finances_app_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.2.0", features = [] }
+tauri-build = { version = "2.2.0", features = [], path = "/Users/jgsogo/personal/tauri/crates/tauri-build" }
 tar = { version  = "0.4.44"}
 flate2 = { version = "1.1.1" }
 
@@ -32,7 +32,7 @@ chrono-tz = { version = "0.10.1" }
 diesel = { version = "2.2.7", features = ["r2d2", "chrono"] }
 
 # FIXME: These are build-dependencies - If I don't list it here, Bazel doesn't include it in crate_libraries
-tauri-build = { version = "2.2.0", features = [] }
+tauri-build = { version = "2.2.0", features = [], path = "/Users/jgsogo/personal/tauri/crates/tauri-build" }
 tar = { version  = "0.4.44"}
 flate2 = { version = "1.1.1" }
 
