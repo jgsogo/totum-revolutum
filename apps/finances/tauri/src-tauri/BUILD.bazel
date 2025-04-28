@@ -50,7 +50,6 @@ cargo_build_script(
     data = [
         "Cargo.toml",
         "tauri.conf.json",
-        # ":srcs_lib",
         ":capabilities",
         ":icons",
         # Tauri core
@@ -86,12 +85,13 @@ cargo_build_script(
 rust_library(
     name = "applib",
     srcs = [":srcs_lib"],
-    compile_data = [
-        "tauri.conf.json",
-        ":icons",
-        ":capabilities",
-        "//apps/finances/tauri:frontend",
-    ],
+    # compile_data = [
+    #     # "tauri.conf.json",
+    #     # ":icons",
+    #     # ":capabilities",
+    #     # ":gen",
+    #     # "//apps/finances/tauri:frontend",
+    # ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",
     deps = [
