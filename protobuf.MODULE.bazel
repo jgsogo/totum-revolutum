@@ -5,7 +5,7 @@
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "toolchains_protoc", version = "0.3.7")
 bazel_dep(name = "protobuf", version = "30.2")
-bazel_dep(name = "rules_rust_prost", version = "0.57.1")
+bazel_dep(name = "rules_rust_prost", version = "0.60.0")
 
 # 2 Register Proto toolchain
 ###############################################################################
@@ -32,5 +32,13 @@ crate.annotation(
     crate = "protoc-gen-tonic",
     gen_binaries = ["protoc-gen-tonic"],
 )
-crate.from_specs(name = "crates_protoc")
+crate.from_specs(
+    name = "crates_protoc",
+    supported_platform_triples = [
+        # "aarch64-apple-darwin",
+        # "aarch64-unknown-linux-gnu",
+        "x86_64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+    ],
+)
 use_repo(crate, "crates_protoc")
