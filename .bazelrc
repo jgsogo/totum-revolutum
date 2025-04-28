@@ -1,12 +1,4 @@
 
-# Needed to build some crate libraries. Taken from https://github.com/bazelbuild/rules_rust/issues/70
-build --action_env=CARGO_PKG_AUTHORS=mock \
-      --action_env=CARGO_PKG_DESCRIPTION=mock \
-      --action_env=CARGO_PKG_HOMEPAGE=mock \
-      --action_env=CARGO_PKG_LICENSE=mock \
-      --action_env=CARGO_PKG_REPOSITORY=mock \
-      --action_env=RUSTDOC=mock
-
 # Always show errors from testing
 test --verbose_failures --test_output=errors
 
@@ -23,11 +15,26 @@ build:stamp --stamp
 test:ci --verbose_failures --test_output=all --keep_going
 
 ####################
-# Optimization flags
+# Rust
 ####################
 
-build:opt -c opt
-build:opt --@rules_rust//:extra_rustc_flags=--codegen=lto=fat,--codegen=codegen-units=1
+# Needed to build some crate libraries. Taken from https://github.com/bazelbuild/rules_rust/issues/70
+build --action_env=CARGO_PKG_AUTHORS=mock \
+      --action_env=CARGO_PKG_DESCRIPTION=mock \
+      --action_env=CARGO_PKG_HOMEPAGE=mock \
+      --action_env=CARGO_PKG_LICENSE=mock \
+      --action_env=CARGO_PKG_REPOSITORY=mock \
+      --action_env=RUSTDOC=mock
+
+# I need debug-assertions because the Tauri macros have different signatures with and without them.
+build --@rules_rust//rust/settings:extra_exec_rustc_flag=-Cdebug-assertions=on
+
+build:release --compilation_mode=opt
+build:release --@rules_rust//rust/settings:lto=fat
+build:release --@rules_rust//rust/settings:codegen_units=1
+build:release --@rules_rust//rust/settings:extra_rustc_flag=-Copt-level=3
+build:release --@rules_rust//rust/settings:extra_rustc_flag=-Cdebug-assertions=off
+build:release --@rules_rust//rust/settings:extra_rustc_flag=-Coverflow-checks=off
 
 # ####
 # C++

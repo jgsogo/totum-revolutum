@@ -1,8 +1,22 @@
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
+# load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 
 exports_files(["Cargo.toml"])
+
+# expand_template(
+#     name = "tauri_conf_json",
+#     out = "tauri.conf.json",
+#     tags = [
+#         "manual",
+#     ],
+#     template = ":tauri.conf.json.tpl",
+#     substitutions = {
+#         "%FRONTEND_DIST%": "$(location //apps/finances/tauri:frontend)"
+#     },
+#     data = ["//apps/finances/tauri:frontend"],
+# )
 
 filegroup(
     name = "capabilities",
@@ -50,6 +64,7 @@ cargo_build_script(
     data = [
         "Cargo.toml",
         "tauri.conf.json",
+        # ":tauri_conf_json",
         ":capabilities",
         ":icons",
         # Tauri core
@@ -85,13 +100,11 @@ cargo_build_script(
 rust_library(
     name = "applib",
     srcs = [":srcs_lib"],
-    # compile_data = [
-    #     # "tauri.conf.json",
-    #     # ":icons",
-    #     # ":capabilities",
-    #     # ":gen",
-    #     # "//apps/finances/tauri:frontend",
-    # ],
+    compile_data = [
+        "//apps/finances/tauri:frontend",
+        # ":tauri_conf_json",
+        # "tauri.conf.json",
+    ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",
     deps = [
@@ -119,7 +132,6 @@ rust_test(
         "postgres",
     ],
     data = [
-        "tauri.conf.json",
         ":capabilities",
         ":icons",
     ],
