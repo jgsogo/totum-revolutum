@@ -92,12 +92,13 @@ repos:
         language: script
         files: \.rs$
 
-      - id: cargo-check
-        name: Run cargo check (rules_rust managed version)
-        entry: bazel/tools/cargocheck.sh
-        language: script
-        pass_filenames: false
-        files: \.rs$
+      # Removed, it takes too long
+      # - id: cargo-check
+      #   name: Run cargo check (rules_rust managed version)
+      #   entry: bazel/tools/cargocheck.sh
+      #   language: script
+      #   pass_filenames: false
+      #   files: \.rs$
 
       - id: cargo-clippy
         name: Run cargo clippy (rules_rust managed version)
