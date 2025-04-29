@@ -80,17 +80,17 @@ repos:
   # Some local scripts
   - repo: local
     hooks:
+      - id: rules_lint
+        name: Bazel rules_lint - Format
+        language: system
+        entry: bazel run //bazel/tools/format
+        files: .*
+
       #      - id: branch-updated
       #        name: Branch up-to-date with master
       #        entry: scripts/branch_updated.sh
       #        language: script
       #        always_run: true
-
-      - id: rustfmt
-        name: Run rustfmt (rules_rust managed version)
-        entry: bazel/tools/rustfmt.sh
-        language: script
-        files: \.rs$
 
       # Removed, it takes too long
       # - id: cargo-check
@@ -99,13 +99,6 @@ repos:
       #   language: script
       #   pass_filenames: false
       #   files: \.rs$
-
-      - id: cargo-clippy
-        name: Run cargo clippy (rules_rust managed version)
-        entry: bazel/tools/cargoclippy.sh
-        language: script
-        pass_filenames: false
-        files: \.rs$
 
       - id: bazel-check
         name: Run all Bazel targets with 'check' tag

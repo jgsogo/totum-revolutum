@@ -54,6 +54,18 @@ common --@aspect_rules_ts//ts:skipLibCheck=honor_tsconfig
 # Define a transpiler for all ts_project rules. TSC is slower, but no extra deps are required (https://github.com/aspect-build/rules_ts/blob/main/docs/transpiler.md)
 common --@aspect_rules_ts//ts:default_to_tsc_transpiler
 
+####################
+# Formatting aspects
+####################
+
+build:clippy --aspects=@rules_rust//rust:defs.bzl%rust_clippy_aspect
+build:clippy --output_groups=+clippy_checks
+build:clippy --@rules_rust//:clippy.toml=//:clippy.toml
+
+build:rustfmt --aspects=@rules_rust//rust:defs.bzl%rustfmt_aspect
+build:rustfmt --output_groups=+rustfmt_checks
+build:rustfmt --@rules_rust//:rustfmt.toml=//:rustfmt.toml
+
 ##############
 # rules_apple.
 ##############
