@@ -102,6 +102,7 @@ rust_library(
     compile_data = [
         "//apps/finances/tauri:frontend",
         ":tauri_conf_json",
+        ":icons",
     ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",

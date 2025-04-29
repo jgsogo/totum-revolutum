@@ -15,7 +15,7 @@
     "beforeBuildCommand": "pnpm build",
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
-    "frontendDist": "%FRONTEND_DIST%"
+    "frontendDist": "../build"
   },
   "bundle": {
     "active": true,
