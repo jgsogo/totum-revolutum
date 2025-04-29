@@ -4,6 +4,8 @@ load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
 exports_files([
     "Cargo.toml",
     "Cargo.lock",
+    "clippy.toml",
+    "rustfmt.toml",
 ])
 
 # Link all packages from the /MODULE.bazel npm_translate_lock(name = "npm") and also packages from

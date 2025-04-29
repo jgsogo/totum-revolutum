@@ -7,23 +7,15 @@ use tar::Archive;
 fn main() -> Result<()> {
     create_permission_files()?;
     tauri_build::build();
-
-    let out_dir = std::env::var("OUT_DIR")?;
-    let out_dir = std::path::PathBuf::from(out_dir);
-    let mut file = File::create(out_dir.join("tauri.conf.json"))?;
-    file.write_all(b"Hello, world!")?;
-
     Ok(())
 }
 
 fn create_permission_files() -> Result<()> {
     let out_dir = std::env::var("OUT_DIR")?;
     let out_dir = std::path::PathBuf::from(out_dir);
-    // println!(">>>> OUT_DIR: {}", out_dir.display());
 
     for (key, value) in std::env::vars_os() {
         let key = key.to_string_lossy();
-        // println!("{}: {}", key, value.to_string_lossy());
 
         if let Some(actual_env_var_name) = key.strip_prefix("UNTAR-") {
             // This envvar points to a zipped file containing the permission files
@@ -43,9 +35,8 @@ fn create_permission_files() -> Result<()> {
                 plugin_dir
             };
             let mut all_files: Vec<std::path::PathBuf> = Vec::new();
-            // - unpack everything into a directory
-            // println!(">>>>>> {} -> {}", actual_env_var_name, plugin_dir.display());
 
+            // - unpack everything into a directory
             let path = std::path::PathBuf::from(value);
             let tar_gz = File::open(path)?;
             let tar = GzDecoder::new(tar_gz);
@@ -58,18 +49,11 @@ fn create_permission_files() -> Result<()> {
                 }
             }
 
-            // println!(">>>>>> {:?}", all_files);
-
             let plugin_permission_file_path = out_dir.join(format!("{}.json", plugin_dir.display()));
             let mut plugin_permission_file = File::create(&plugin_permission_file_path)?;
             let json = serde_json::to_string(&all_files)?;
             plugin_permission_file.write_all(json.as_bytes())?;
 
-            // println!(
-            //     ">>>> {}: {}",
-            //     actual_env_var_name,
-            //     plugin_permission_file_path.display()
-            // );
             std::env::set_var(actual_env_var_name, plugin_permission_file_path);
         }
     }

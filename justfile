@@ -30,8 +30,9 @@ update-python:
 
 # Run all testing
 test: build bazel-check
-    cargo check
-    cargo clippy
+    # cargo check
+    # cargo clippy
+    bazel run //bazel/tools/format
     bazel test --test_keep_going //...
 
 # Build everything

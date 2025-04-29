@@ -1,8 +1,8 @@
 diff --git a/src/context.rs b/src/context.rs
-index 9469ea17f..96329133a 100644
+index 9469ea17f..045ca1f81 100644
 --- a/src/context.rs
 +++ b/src/context.rs
-@@ -125,9 +125,16 @@ impl Parse for ContextItems {
+@@ -125,8 +125,13 @@ impl Parse for ContextItems {
      Ok(Self {
        config_file: config_file
          .unwrap_or_else(|| {
@@ -11,13 +11,10 @@ index 9469ea17f..96329133a 100644
 +          // Returns the path from 'TAURI_CONF_JSON' if available, otherwise
 +          // creates a path like 'CARGO_MANIFEST_DIR/tauri.conf.json'
 +          std::env::var("TAURI_CONF_JSON")
-+            .map(|m| PathBuf::from(m))
-             .map_err(|e| e.to_string())
++            .map(PathBuf::from)
 +            .or(
-+              std::env::var("CARGO_MANIFEST_DIR")
-+                .map(|m| PathBuf::from(m).join("tauri.conf.json"))
-+                .map_err(|e| e.to_string()),
++              std::env::var("CARGO_MANIFEST_DIR").map(|m| PathBuf::from(m).join("tauri.conf.json")),
 +            )
+             .map_err(|e| e.to_string())
          })
          .map_err(|e| input.error(e))?,
-       root: root.unwrap_or_else(|| {
