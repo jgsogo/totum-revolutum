@@ -6,10 +6,19 @@
 #     bazel run @@//bazel/third_party:crates_vendor
 ###############################################################################
 
-load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
+load(
+    "@rules_rust//cargo:defs.bzl",
+    "cargo_build_script",
+    "cargo_toml_env_vars",
+)
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 package(default_visibility = ["//visibility:public"])
+
+cargo_toml_env_vars(
+    name = "cargo_toml_env_vars",
+    src = "Cargo.toml",
+)
 
 rust_library(
     name = "tauri",
@@ -45,6 +54,9 @@ rust_library(
     proc_macro_deps = [
         "@crates__serde_repr-0.1.20//:serde_repr",
         "@crates__tauri-macros-2.2.0//:tauri_macros",
+    ],
+    rustc_env_files = [
+        ":cargo_toml_env_vars",
     ],
     rustc_flags = [
         "--cap-lints=allow",
@@ -152,6 +164,9 @@ cargo_build_script(
     edition = "2021",
     links = "Tauri",
     pkg_name = "tauri",
+    rustc_env_files = [
+        ":cargo_toml_env_vars",
+    ],
     rustc_flags = [
         "--cap-lints=allow",
     ],

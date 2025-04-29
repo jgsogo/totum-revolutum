@@ -10,7 +10,6 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(
     [
-        "cargo-bazel.json",
         "crates.bzl",
         "defs.bzl",
     ] + glob(
@@ -688,6 +687,18 @@ alias(
 alias(
     name = "prost",
     actual = "@crates__prost-0.13.5//:prost",
+    tags = ["manual"],
+)
+
+alias(
+    name = "prost-build-0.13.5",
+    actual = "@crates__prost-build-0.13.5//:prost_build",
+    tags = ["manual"],
+)
+
+alias(
+    name = "prost-build",
+    actual = "@crates__prost-build-0.13.5//:prost_build",
     tags = ["manual"],
 )
 

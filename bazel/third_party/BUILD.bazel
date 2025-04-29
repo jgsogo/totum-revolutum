@@ -146,6 +146,12 @@ crates_vendor(
                 "tauri-plugin-shell-global-api-script": "global-api-script",
             },
         )],
+        "tauri-macros": [crate.annotation(
+            patch_args = ["-p1"],
+            patches = [
+                "@@//bazel/external:tauri-macros-0001-envvar-for-tauri-conf-json.patch",
+            ],
+        )],
     },
     cargo_lockfile = "//:Cargo.lock",
     manifests = [

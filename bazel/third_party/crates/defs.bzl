@@ -7224,6 +7224,12 @@ def crate_repositories():
     maybe(
         http_archive,
         name = "crates__tauri-macros-2.2.0",
+        patch_args = [
+            "-p1",
+        ],
+        patches = [
+            "@@//bazel/external:tauri-macros-0001-envvar-for-tauri-conf-json.patch",
+        ],
         sha256 = "8db4df25e2d9d45de0c4c910da61cd5500190da14ae4830749fee3466dddd112",
         type = "tar.gz",
         urls = ["https://static.crates.io/crates/tauri-macros/2.2.0/download"],

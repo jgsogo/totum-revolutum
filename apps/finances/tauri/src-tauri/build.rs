@@ -7,6 +7,12 @@ use tar::Archive;
 fn main() -> Result<()> {
     create_permission_files()?;
     tauri_build::build();
+
+    let out_dir = std::env::var("OUT_DIR")?;
+    let out_dir = std::path::PathBuf::from(out_dir);
+    let mut file = File::create(out_dir.join("tauri.conf.json"))?;
+    file.write_all(b"Hello, world!")?;
+
     Ok(())
 }
 

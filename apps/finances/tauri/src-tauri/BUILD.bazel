@@ -1,22 +1,22 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
-# load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 
 exports_files(["Cargo.toml"])
 
-# expand_template(
-#     name = "tauri_conf_json",
-#     out = "tauri.conf.json",
-#     tags = [
-#         "manual",
-#     ],
-#     template = ":tauri.conf.json.tpl",
-#     substitutions = {
-#         "%FRONTEND_DIST%": "$(location //apps/finances/tauri:frontend)"
-#     },
-#     data = ["//apps/finances/tauri:frontend"],
-# )
+expand_template(
+    name = "tauri_conf_json",
+    out = "tauri.conf.json",
+    data = ["//apps/finances/tauri:frontend"],
+    substitutions = {
+        "%FRONTEND_DIST%": "$(location //apps/finances/tauri:frontend)",
+    },
+    tags = [
+        "manual",
+    ],
+    template = ":tauri.conf.json.tpl",
+)
 
 filegroup(
     name = "capabilities",
@@ -63,8 +63,7 @@ cargo_build_script(
     },
     data = [
         "Cargo.toml",
-        "tauri.conf.json",
-        # ":tauri_conf_json",
+        ":tauri_conf_json",
         ":capabilities",
         ":icons",
         # Tauri core
@@ -102,11 +101,13 @@ rust_library(
     srcs = [":srcs_lib"],
     compile_data = [
         "//apps/finances/tauri:frontend",
-        # ":tauri_conf_json",
-        # "tauri.conf.json",
+        ":tauri_conf_json",
     ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",
+    rustc_env = {
+        "TAURI_CONF_JSON": "$(location :tauri_conf_json)",
+    },
     deps = [
         ":build",
         "//apps/finances/tauri/models:models/rust",
@@ -169,7 +170,7 @@ with_postgres_test(
         "//libraries/finances/investments/django_finances_investments:migrate",
         "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
         "//libraries/finances/investments/django_finances_investments:populate_test_database",
-    ] + ["_integration_tests_{}".format(it.replace(".rs", "")) for it in integration_tests_files],  # NOTE: The rust_test_suite is just a group of tests! # TODO: Bazel multicommand!!!
+    ] + ["_integration_tests_{}_test".format(it.replace(".rs", "")) for it in integration_tests_files],  # NOTE: The rust_test_suite is just a group of tests! # TODO: Bazel multicommand!!!
     env = {
         "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
     },
