@@ -15,7 +15,7 @@
     "beforeBuildCommand": "pnpm build",
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
-    "frontendDist": "/Users/jgsogo/personal/totum-revolutum/bazel-bin/apps/finances/tauri/build"
+    "frontendDist": "../build"
   },
   "bundle": {
     "active": true,

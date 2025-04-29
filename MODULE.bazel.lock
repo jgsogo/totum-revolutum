@@ -246,7 +246,7 @@
   "moduleExtensions": {
     "//bazel/third_party:crates_extension.bzl%crates": {
       "general": {
-        "bzlTransitiveDigest": "BI/M/6y5F3MfjVc9+H/e8bBWil5l34K/+Pl7B9xx1gY=",
+        "bzlTransitiveDigest": "zkmXh7cR45g1Mk3O7nzCuEJyOIALdzDnXUZv2F3uJi0=",
         "usagesDigest": "UZi47EDbuhi59B5MHXLB3w4CtOqzRBXenANK0zLSEdM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -7327,6 +7327,18 @@
               "build_file": "@@//bazel/third_party/crates:BUILD.tap-1.0.1.bazel"
             }
           },
+          "crates__tar-0.4.44": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "sha256": "1d863878d212c87a19c1a610eb53bb01fe12951c0501cf5a0d65f724914a667a",
+              "type": "tar.gz",
+              "urls": [
+                "https://static.crates.io/crates/tar/0.4.44/download"
+              ],
+              "strip_prefix": "tar-0.4.44",
+              "build_file": "@@//bazel/third_party/crates:BUILD.tar-0.4.44.bazel"
+            }
+          },
           "crates__target-lexicon-0.12.16": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
             "attributes": {
@@ -7378,6 +7390,12 @@
           "crates__tauri-macros-2.2.0": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
             "attributes": {
+              "patch_args": [
+                "-p1"
+              ],
+              "patches": [
+                "@@//bazel/external:tauri-macros-0001-envvar-for-tauri-conf-json.patch"
+              ],
               "sha256": "8db4df25e2d9d45de0c4c910da61cd5500190da14ae4830749fee3466dddd112",
               "type": "tar.gz",
               "urls": [
@@ -9391,6 +9409,18 @@
               "build_file": "@@//bazel/third_party/crates:BUILD.x11-dl-2.21.0.bazel"
             }
           },
+          "crates__xattr-1.5.0": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "sha256": "0d65cbf2f12c15564212d48f4e3dfb87923d25d611f2aed18f4cb23f0413d89e",
+              "type": "tar.gz",
+              "urls": [
+                "https://static.crates.io/crates/xattr/1.5.0/download"
+              ],
+              "strip_prefix": "xattr-1.5.0",
+              "build_file": "@@//bazel/third_party/crates:BUILD.xattr-1.5.0.bazel"
+            }
+          },
           "crates__yoke-0.7.5": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
             "attributes": {
@@ -9574,6 +9604,7 @@
             "crates__dirs-6.0.0",
             "crates__dotenvy-0.15.7",
             "crates__fd-lock-4.0.4",
+            "crates__flate2-1.1.1",
             "crates__flume-0.11.1",
             "crates__fs4-0.13.1",
             "crates__futures-0.3.31",
@@ -9617,6 +9648,7 @@
             "crates__strum-0.27.1",
             "crates__strum_macros-0.27.1",
             "crates__syn-2.0.100",
+            "crates__tar-0.4.44",
             "crates__tauri-2.5.1",
             "crates__tauri-build-2.2.0",
             "crates__tauri-plugin-log-2.4.0",

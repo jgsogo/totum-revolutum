@@ -33,64 +33,124 @@ crates_vendor(
                             rm -fr $$TMP_DIR
                         '''.format(it),
                         outs = [
-                            "tauri-{}-permission-files.tar".format(it),
+                            "tauri-{}-permission-files.tar.gz".format(it),
                         ],
                         tags = ["manual"],
                     )
                 for it in ['core', 'core-app', 'core-event', 'core-image', 'core-menu', 'core-path', 'core-resources', 'core-tray', 'core-webview', 'core-window']]
+
+                filegroup(
+                    name = "global-api-script",
+                    srcs = [
+                        "scripts/bundle.global.js",
+                    ],
+                    tags = ["manual"],
+                )
             """,
+            extra_aliased_targets = {
+                "tauri-core-permission-files": "tauri-core-permission-files",
+                "tauri-core-app-permission-files": "tauri-core-app-permission-files",
+                "tauri-core-event-permission-files": "tauri-core-event-permission-files",
+                "tauri-core-image-permission-files": "tauri-core-image-permission-files",
+                "tauri-core-menu-permission-files": "tauri-core-menu-permission-files",
+                "tauri-core-path-permission-files": "tauri-core-path-permission-files",
+                "tauri-core-resources-permission-files": "tauri-core-resources-permission-files",
+                "tauri-core-tray-permission-files": "tauri-core-tray-permission-files",
+                "tauri-core-webview-permission-files": "tauri-core-webview-permission-files",
+                "tauri-core-window-permission-files": "tauri-core-window-permission-files",
+                "tauri-global-api-script": "global-api-script",
+            },
         )],
         "tauri-plugin-log": [crate.annotation(
             additive_build_file_content = """
+                filegroup(
+                    name = "permission-files",
+                    srcs = glob(["permissions/**/*"]),
+                    tags = ["manual"],
+                )
+
                 genrule(
-                    name = "tauri-plugin-log-permission-files",
+                    name = "permission-files-index",
                     srcs = [
+                        ":permission-files",
                         ":build_script_build",
                     ],
                     cmd = '''
-                        STRIP_PREFIX="permissions"
-                        TMP_DIR=$$(mktemp -d)
-                        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-log-permission-files" | while read -r file; do
-                            relative_path="$${file#*$$STRIP_PREFIX/}"
-                            dest="$$TMP_DIR/permissions/$$relative_path"
-                            mkdir -p "$$(dirname "$$dest")"
-                            cp "$$file" "$$dest"
-                        done
-                        tar -czf "$@" -C "$$TMP_DIR" .
-                        rm -fr $$TMP_DIR
+                        cp "$(location :build_script_build)/tauri-plugin-log-permission-files" "$@"
                     ''',
-                    outs = [
-                        "tauri-plugin-log-permission-files.tar",
+                    outs = ["tauri-plugin-log-permission-files-path"],
+                    tags = ["manual"],
+                )
+
+                filegroup(
+                    name = "global-api-script",
+                    srcs = [
+                        "api-iife.js",
                     ],
                     tags = ["manual"],
                 )
             """,
+            extra_aliased_targets = {
+                # "tauri-plugin-log-permission-files": "permission-files",
+                "tauri-plugin-log-permission-files-index": "permission-files-index",
+                "tauri-plugin-log-global-api-script": "global-api-script",
+            },
         )],
         "tauri-plugin-shell": [crate.annotation(
             additive_build_file_content = """
+                filegroup(
+                    name = "permission-files",
+                    srcs = glob(["permissions/**/*"]),
+                    tags = ["manual"],
+                )
+
                 genrule(
-                    name = "tauri-plugin-shell-permission-files",
+                    name = "permission-files-index",
+                    srcs = [
+                        ":permission-files",
+                        ":build_script_build",
+                    ],
+                    cmd = '''
+                        cp "$(location :build_script_build)/tauri-plugin-shell-permission-files" "$@"
+                    ''',
+                    outs = ["tauri-plugin-shell-permission-files-path"],
+                    tags = ["manual"],
+                )
+
+                genrule(
+                    name = "global-scope",
                     srcs = [
                         ":build_script_build",
                     ],
                     cmd = '''
-                        STRIP_PREFIX="permissions"
-                        TMP_DIR=$$(mktemp -d)
-                        jq -r '.[]' "$(location :build_script_build)/tauri-plugin-shell-permission-files" | while read -r file; do
-                            relative_path="$${file#*$$STRIP_PREFIX/}"
-                            dest="$$TMP_DIR/permissions/$$relative_path"
-                            mkdir -p "$$(dirname "$$dest")"
-                            cp "$$file" "$$dest"
-                        done
-                        tar -czf "$@" -C "$$TMP_DIR" .
-                        rm -fr $$TMP_DIR
+                        cp $(location :build_script_build)/global-scope.json "$@"
                     ''',
                     outs = [
-                        "tauri-plugin-shell-permission-files.tar",
+                        "global-scope.json",
+                    ],
+                    tags = ["manual"],
+                )
+
+                filegroup(
+                    name = "global-api-script",
+                    srcs = [
+                        "api-iife.js",
                     ],
                     tags = ["manual"],
                 )
             """,
+            extra_aliased_targets = {
+                # "tauri-plugin-shell-permission-files": "permission-files",
+                "tauri-plugin-shell-permission-files-index": "permission-files-index",
+                "tauri-plugin-shell-global-scope": "global-scope",
+                "tauri-plugin-shell-global-api-script": "global-api-script",
+            },
+        )],
+        "tauri-macros": [crate.annotation(
+            patch_args = ["-p1"],
+            patches = [
+                "@@//bazel/external:tauri-macros-0001-envvar-for-tauri-conf-json.patch",
+            ],
         )],
     },
     cargo_lockfile = "//:Cargo.lock",

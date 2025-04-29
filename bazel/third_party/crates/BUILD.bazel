@@ -10,7 +10,6 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(
     [
-        # "cargo-bazel.json",
         "crates.bzl",
         "defs.bzl",
     ] + glob(
@@ -342,6 +341,18 @@ alias(
 #     actual = "@crates__finances-app-models-0.1.0//:finances_app_models",
 #     tags = ["manual"],
 # )
+
+alias(
+    name = "flate2-1.1.1",
+    actual = "@crates__flate2-1.1.1//:flate2",
+    tags = ["manual"],
+)
+
+alias(
+    name = "flate2",
+    actual = "@crates__flate2-1.1.1//:flate2",
+    tags = ["manual"],
+)
 
 alias(
     name = "flume-0.11.1",
@@ -680,6 +691,18 @@ alias(
 )
 
 alias(
+    name = "prost-build-0.13.5",
+    actual = "@crates__prost-build-0.13.5//:prost_build",
+    tags = ["manual"],
+)
+
+alias(
+    name = "prost-build",
+    actual = "@crates__prost-build-0.13.5//:prost_build",
+    tags = ["manual"],
+)
+
+alias(
     name = "prost-types-0.13.5",
     actual = "@crates__prost-types-0.13.5//:prost_types",
     tags = ["manual"],
@@ -860,6 +883,18 @@ alias(
 )
 
 alias(
+    name = "tar-0.4.44",
+    actual = "@crates__tar-0.4.44//:tar",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tar",
+    actual = "@crates__tar-0.4.44//:tar",
+    tags = ["manual"],
+)
+
+alias(
     name = "tauri-2.5.1",
     actual = "@crates__tauri-2.5.1//:tauri",
     tags = ["manual"],
@@ -868,6 +903,72 @@ alias(
 alias(
     name = "tauri",
     actual = "@crates__tauri-2.5.1//:tauri",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-app-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-app-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-event-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-event-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-image-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-image-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-menu-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-menu-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-path-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-path-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-resources-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-resources-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-tray-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-tray-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-webview-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-webview-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-core-window-permission-files",
+    actual = "@crates__tauri-2.5.1//:tauri-core-window-permission-files",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-global-api-script",
+    actual = "@crates__tauri-2.5.1//:global-api-script",
     tags = ["manual"],
 )
 
@@ -896,6 +997,18 @@ alias(
 )
 
 alias(
+    name = "tauri-plugin-log-global-api-script",
+    actual = "@crates__tauri-plugin-log-2.4.0//:global-api-script",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-plugin-log-permission-files-index",
+    actual = "@crates__tauri-plugin-log-2.4.0//:permission-files-index",
+    tags = ["manual"],
+)
+
+alias(
     name = "tauri-plugin-shell-2.2.1",
     actual = "@crates__tauri-plugin-shell-2.2.1//:tauri_plugin_shell",
     tags = ["manual"],
@@ -904,6 +1017,24 @@ alias(
 alias(
     name = "tauri-plugin-shell",
     actual = "@crates__tauri-plugin-shell-2.2.1//:tauri_plugin_shell",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-plugin-shell-global-api-script",
+    actual = "@crates__tauri-plugin-shell-2.2.1//:global-api-script",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-plugin-shell-global-scope",
+    actual = "@crates__tauri-plugin-shell-2.2.1//:global-scope",
+    tags = ["manual"],
+)
+
+alias(
+    name = "tauri-plugin-shell-permission-files-index",
+    actual = "@crates__tauri-plugin-shell-2.2.1//:permission-files-index",
     tags = ["manual"],
 )
 

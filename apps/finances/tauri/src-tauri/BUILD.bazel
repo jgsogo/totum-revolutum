@@ -1,8 +1,22 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
 
 exports_files(["Cargo.toml"])
+
+expand_template(
+    name = "tauri_conf_json",
+    out = "tauri.conf.json",
+    data = ["//apps/finances/tauri:frontend"],
+    substitutions = {
+        "%FRONTEND_DIST%": "$(location //apps/finances/tauri:frontend)",
+    },
+    tags = [
+        "manual",
+    ],
+    template = ":tauri.conf.json.tpl",
+)
 
 filegroup(
     name = "capabilities",
@@ -28,13 +42,56 @@ cargo_build_script(
     srcs = ["build.rs"],
     build_script_env = {
         "DEP_TAURI_DEV": "false",
+        # Tauri core
+        "UNTAR-DEP_TAURI_CORE__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:APP__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-app-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:EVENT__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-event-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:IMAGE__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-image-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:MENU__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-menu-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:PATH__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-path-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:RESOURCES__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-resources-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:TRAY__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-tray-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:WEBVIEW__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-webview-permission-files)",
+        "UNTAR-DEP_TAURI_CORE:WINDOW__CORE_PLUGIN___PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-core-window-permission-files)",
+        "DEP_TAURI_GLOBAL_API_SCRIPT_PATH": "$(location //bazel/third_party/crates:tauri-global-api-script)",
+        # Tauri plugins
+        "DEP_TAURI_PLUGIN_LOG_PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-plugin-log-permission-files-index)",
+        "DEP_TAURI_PLUGIN_LOG_GLOBAL_API_SCRIPT_PATH": "$(location //bazel/third_party/crates:tauri-plugin-log-global-api-script)",
+        "DEP_TAURI_PLUGIN_SHELL_PERMISSION_FILES_PATH": "$(location //bazel/third_party/crates:tauri-plugin-shell-permission-files-index)",
+        "DEP_TAURI_PLUGIN_SHELL_GLOBAL_SCOPE_SCHEMA_PATH": "$(location //bazel/third_party/crates:tauri-plugin-shell-global-scope)",
+        "DEP_TAURI_PLUGIN_SHELL_GLOBAL_API_SCRIPT_PATH": "$(location //bazel/third_party/crates:tauri-plugin-shell-global-api-script)",
     },
     data = [
         "Cargo.toml",
-        "tauri.conf.json",
-        ":srcs_lib",
+        ":tauri_conf_json",
+        ":capabilities",
+        ":icons",
+        # Tauri core
+        "//bazel/third_party/crates:tauri-global-api-script",
+        "//bazel/third_party/crates:tauri-core-permission-files",
+        "//bazel/third_party/crates:tauri-core-app-permission-files",
+        "//bazel/third_party/crates:tauri-core-event-permission-files",
+        "//bazel/third_party/crates:tauri-core-image-permission-files",
+        "//bazel/third_party/crates:tauri-core-menu-permission-files",
+        "//bazel/third_party/crates:tauri-core-path-permission-files",
+        "//bazel/third_party/crates:tauri-core-resources-permission-files",
+        "//bazel/third_party/crates:tauri-core-tray-permission-files",
+        "//bazel/third_party/crates:tauri-core-webview-permission-files",
+        "//bazel/third_party/crates:tauri-core-window-permission-files",
+        # Tauri plugins
+        # "//bazel/third_party/crates:tauri-plugin-log-permission-files",
+        "//bazel/third_party/crates:tauri-plugin-log-permission-files-index",
+        "//bazel/third_party/crates:tauri-plugin-log-global-api-script",
+        # "//bazel/third_party/crates:tauri-plugin-shell-permission-files",
+        "//bazel/third_party/crates:tauri-plugin-shell-permission-files-index",
+        "//bazel/third_party/crates:tauri-plugin-shell-global-scope",
+        "//bazel/third_party/crates:tauri-plugin-shell-global-api-script",
     ],
     deps = [
+        "//bazel/third_party/crates:anyhow",
+        "//bazel/third_party/crates:flate2",
+        "//bazel/third_party/crates:serde_json",
+        "//bazel/third_party/crates:tar",
         "//bazel/third_party/crates:tauri-build",
     ],
 )
@@ -43,12 +100,15 @@ rust_library(
     name = "applib",
     srcs = [":srcs_lib"],
     compile_data = [
-        "tauri.conf.json",
+        "//apps/finances/tauri:frontend",
+        ":tauri_conf_json",
         ":icons",
-        ":capabilities",
     ],
     crate_features = ["postgres"],
     crate_name = "finances_app_lib",
+    rustc_env = {
+        "TAURI_CONF_JSON": "$(location :tauri_conf_json)",
+    },
     deps = [
         ":build",
         "//apps/finances/tauri/models:models/rust",
@@ -74,7 +134,6 @@ rust_test(
         "postgres",
     ],
     data = [
-        "tauri.conf.json",
         ":capabilities",
         ":icons",
     ],
