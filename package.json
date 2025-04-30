@@ -2,7 +2,7 @@
   "dependencies": {
     "@sveltejs/package": "2.3.11",
     "typescript": "5.8.3",
-    "vite": "6.3.3"
+    "vite": "6.2.7"
   },
   "name": "totum-revolutum",
   "pnpm": {
