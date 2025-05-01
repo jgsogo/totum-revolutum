@@ -60,7 +60,7 @@ rust_library(
         "@crates__gix-config-value-0.14.12//:gix_config_value",
         "@crates__gix-features-0.39.1//:gix_features",
         "@crates__gix-glob-0.17.1//:gix_glob",
-        "@crates__gix-path-0.10.15//:gix_path",
+        "@crates__gix-path-0.10.17//:gix_path",
         "@crates__gix-ref-0.49.1//:gix_ref",
         "@crates__gix-sec-0.10.12//:gix_sec",
         "@crates__memchr-2.7.4//:memchr",

@@ -65,7 +65,7 @@ rust_library(
         "@crates__indexmap-2.9.0//:indexmap",
         "@crates__slab-0.4.9//:slab",
         "@crates__tokio-1.44.2//:tokio",
-        "@crates__tokio-util-0.7.14//:tokio_util",
+        "@crates__tokio-util-0.7.15//:tokio_util",
         "@crates__tracing-0.1.41//:tracing",
     ],
 )

@@ -66,7 +66,7 @@ rust_library(
         "@crates__crossbeam-channel-0.5.15//:crossbeam_channel",
         "@crates__dpi-0.1.1//:dpi",
         "@crates__lazy_static-1.5.0//:lazy_static",
-        "@crates__libc-0.2.171//:libc",
+        "@crates__libc-0.2.172//:libc",
         "@crates__log-0.4.27//:log",
         "@crates__raw-window-handle-0.6.2//:raw_window_handle",
         "@crates__url-2.5.4//:url",
@@ -75,9 +75,9 @@ rust_library(
             "@crates__core-foundation-0.10.0//:core_foundation",  # cfg(target_os = "macos")
             "@crates__core-graphics-0.24.0//:core_graphics",  # cfg(target_os = "macos")
             "@crates__dispatch-0.2.0//:dispatch",  # cfg(target_os = "macos")
-            "@crates__objc2-0.6.0//:objc2",  # cfg(any(target_os = "ios", target_os = "macos"))
-            "@crates__objc2-app-kit-0.3.0//:objc2_app_kit",  # cfg(target_os = "macos")
-            "@crates__objc2-foundation-0.3.0//:objc2_foundation",  # cfg(target_os = "macos")
+            "@crates__objc2-0.6.1//:objc2",  # cfg(any(target_os = "ios", target_os = "macos"))
+            "@crates__objc2-app-kit-0.3.1//:objc2_app_kit",  # cfg(target_os = "macos")
+            "@crates__objc2-foundation-0.3.1//:objc2_foundation",  # cfg(target_os = "macos")
             "@crates__scopeguard-1.2.0//:scopeguard",  # cfg(target_os = "macos")
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [

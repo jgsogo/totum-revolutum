@@ -70,7 +70,7 @@ rust_library(
         "@crates__prost-0.13.5//:prost",
         "@crates__prost-types-0.13.5//:prost_types",
         "@crates__regex-1.11.1//:regex",
-        "@crates__syn-2.0.100//:syn",
+        "@crates__syn-2.0.101//:syn",
         "@crates__tempfile-3.19.1//:tempfile",
     ],
 )

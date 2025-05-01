@@ -60,10 +60,10 @@ rust_library(
     version = "0.3.11",
     deps = select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.171//:libc",  # cfg(unix)
+            "@crates__libc-0.2.172//:libc",  # cfg(unix)
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.171//:libc",  # cfg(unix)
+            "@crates__libc-0.2.172//:libc",  # cfg(unix)
         ],
         "//conditions:default": [],
     }),

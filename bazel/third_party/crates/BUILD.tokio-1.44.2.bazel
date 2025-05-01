@@ -83,11 +83,11 @@ rust_library(
     version = "1.44.2",
     deps = [
         "@crates__bytes-1.10.1//:bytes",
-        "@crates__libc-0.2.171//:libc",
+        "@crates__libc-0.2.172//:libc",
         "@crates__mio-1.0.3//:mio",
         "@crates__parking_lot-0.12.3//:parking_lot",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
-        "@crates__signal-hook-registry-1.4.2//:signal_hook_registry",
+        "@crates__signal-hook-registry-1.4.5//:signal_hook_registry",
         "@crates__socket2-0.5.9//:socket2",
     ],
 )

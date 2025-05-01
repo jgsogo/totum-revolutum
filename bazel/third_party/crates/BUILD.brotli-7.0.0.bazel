@@ -62,6 +62,6 @@ rust_library(
     deps = [
         "@crates__alloc-no-stdlib-2.0.4//:alloc_no_stdlib",
         "@crates__alloc-stdlib-0.2.2//:alloc_stdlib",
-        "@crates__brotli-decompressor-4.0.2//:brotli_decompressor",
+        "@crates__brotli-decompressor-4.0.3//:brotli_decompressor",
     ],
 )

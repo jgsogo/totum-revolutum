@@ -59,10 +59,10 @@ rust_library(
         "@crates__bitflags-2.9.0//:bitflags",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.171//:libc",  # cfg(not(windows))
+            "@crates__libc-0.2.172//:libc",  # cfg(not(windows))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.171//:libc",  # cfg(not(windows))
+            "@crates__libc-0.2.172//:libc",  # cfg(not(windows))
         ],
         "//conditions:default": [],
     }),

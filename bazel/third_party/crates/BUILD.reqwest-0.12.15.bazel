@@ -83,7 +83,7 @@ rust_library(
         "@crates__serde_urlencoded-0.7.1//:serde_urlencoded",
         "@crates__sync_wrapper-1.0.2//:sync_wrapper",
         "@crates__tokio-native-tls-0.3.1//:tokio_native_tls",
-        "@crates__tokio-util-0.7.14//:tokio_util",
+        "@crates__tokio-util-0.7.15//:tokio_util",
         "@crates__tower-service-0.3.3//:tower_service",
         "@crates__url-2.5.4//:url",
     ] + select({

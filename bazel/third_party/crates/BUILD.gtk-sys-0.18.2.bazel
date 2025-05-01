@@ -81,7 +81,7 @@ rust_library(
         "@crates__glib-sys-0.18.1//:glib_sys",
         "@crates__gobject-sys-0.18.0//:gobject_sys",
         "@crates__gtk-sys-0.18.2//:build_script_build",
-        "@crates__libc-0.2.171//:libc",
+        "@crates__libc-0.2.172//:libc",
         "@crates__pango-sys-0.18.0//:pango_sys",
     ],
 )

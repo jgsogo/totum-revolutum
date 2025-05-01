@@ -59,8 +59,8 @@ rust_proc_macro(
         "@crates__heck-0.4.1//:heck",
         "@crates__proc-macro-crate-2.0.0//:proc_macro_crate",
         "@crates__proc-macro-error-1.0.4//:proc_macro_error",
-        "@crates__proc-macro2-1.0.94//:proc_macro2",
+        "@crates__proc-macro2-1.0.95//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
-        "@crates__syn-2.0.100//:syn",
+        "@crates__syn-2.0.101//:syn",
     ],
 )

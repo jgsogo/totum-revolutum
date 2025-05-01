@@ -62,9 +62,9 @@ rust_library(
     deps = [
         "@crates__fnv-1.0.7//:fnv",
         "@crates__ident_case-1.0.1//:ident_case",
-        "@crates__proc-macro2-1.0.94//:proc_macro2",
+        "@crates__proc-macro2-1.0.95//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
         "@crates__strsim-0.11.1//:strsim",
-        "@crates__syn-2.0.100//:syn",
+        "@crates__syn-2.0.101//:syn",
     ],
 )

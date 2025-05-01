@@ -63,7 +63,7 @@ rust_library(
         "@crates__native-tls-0.2.14//:build_script_build",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.171//:libc",  # cfg(target_vendor = "apple")
+            "@crates__libc-0.2.172//:libc",  # cfg(target_vendor = "apple")
             "@crates__security-framework-2.11.1//:security_framework",  # cfg(target_vendor = "apple")
             "@crates__security-framework-sys-2.14.0//:security_framework_sys",  # cfg(target_vendor = "apple")
             "@crates__tempfile-3.19.1//:tempfile",  # cfg(target_os = "macos")
@@ -72,7 +72,7 @@ rust_library(
             "@crates__log-0.4.27//:log",  # cfg(not(any(target_os = "windows", target_vendor = "apple")))
             "@crates__openssl-0.10.72//:openssl",  # cfg(not(any(target_os = "windows", target_vendor = "apple")))
             "@crates__openssl-probe-0.1.6//:openssl_probe",  # cfg(not(any(target_os = "windows", target_vendor = "apple")))
-            "@crates__openssl-sys-0.9.107//:openssl_sys",  # cfg(not(any(target_os = "windows", target_vendor = "apple")))
+            "@crates__openssl-sys-0.9.108//:openssl_sys",  # cfg(not(any(target_os = "windows", target_vendor = "apple")))
         ],
         "//conditions:default": [],
     }),
@@ -114,7 +114,7 @@ cargo_build_script(
     edition = "2015",
     link_deps = select({
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__openssl-sys-0.9.107//:openssl_sys",  # cfg(not(any(target_os = "windows", target_vendor = "apple")))
+            "@crates__openssl-sys-0.9.108//:openssl_sys",  # cfg(not(any(target_os = "windows", target_vendor = "apple")))
         ],
         "//conditions:default": [],
     }),

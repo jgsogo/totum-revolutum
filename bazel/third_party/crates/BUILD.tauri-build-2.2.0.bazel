@@ -71,8 +71,8 @@ rust_library(
         "@crates__serde-1.0.219//:serde",
         "@crates__serde_json-1.0.140//:serde_json",
         "@crates__tauri-utils-2.4.0//:tauri_utils",
-        "@crates__tauri-winres-0.3.0//:tauri_winres",
-        "@crates__toml-0.8.20//:toml",
+        "@crates__tauri-winres-0.3.1//:tauri_winres",
+        "@crates__toml-0.8.22//:toml",
         "@crates__walkdir-2.5.0//:walkdir",
     ],
 )
