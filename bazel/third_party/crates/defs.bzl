@@ -396,7 +396,7 @@ _NORMAL_DEPENDENCIES = {
             "diffy": Label("@crates//:diffy-0.4.2"),
             "fd-lock": Label("@crates//:fd-lock-4.0.4"),
             "heck": Label("@crates//:heck-0.5.0"),
-            "pq-sys": Label("@crates//:pq-sys-0.6.3"),
+            "pq-sys": Label("@crates//:pq-sys-0.7.1"),
             "regex": Label("@crates//:regex-1.11.1"),
             "serde_regex": Label("@crates//:serde_regex-1.1.0"),
             "similar-asserts": Label("@crates//:similar-asserts-1.7.0"),
@@ -5813,12 +5813,12 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__pq-sys-0.6.3",
-        sha256 = "f6cc05d7ea95200187117196eee9edd0644424911821aeb28a18ce60ea0b8793",
+        name = "crates__pq-sys-0.7.1",
+        sha256 = "41c852911b98f5981956037b2ca976660612e548986c30af075e753107bc3400",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/pq-sys/0.6.3/download"],
-        strip_prefix = "pq-sys-0.6.3",
-        build_file = Label("//bazel/third_party/crates:BUILD.pq-sys-0.6.3.bazel"),
+        urls = ["https://static.crates.io/crates/pq-sys/0.7.1/download"],
+        strip_prefix = "pq-sys-0.7.1",
+        build_file = Label("//bazel/third_party/crates:BUILD.pq-sys-0.7.1.bazel"),
     )
 
     maybe(
@@ -9117,7 +9117,7 @@ def crate_repositories():
         struct(repo = "crates__mockall-0.13.1", is_dev_dep = False),
         struct(repo = "crates__num-bigint-0.4.6", is_dev_dep = False),
         struct(repo = "crates__oxipng-9.1.5", is_dev_dep = False),
-        struct(repo = "crates__pq-sys-0.6.3", is_dev_dep = False),
+        struct(repo = "crates__pq-sys-0.7.1", is_dev_dep = False),
         struct(repo = "crates__prost-0.13.5", is_dev_dep = False),
         struct(repo = "crates__prost-build-0.13.5", is_dev_dep = False),
         struct(repo = "crates__prost-types-0.13.5", is_dev_dep = False),

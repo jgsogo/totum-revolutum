@@ -140,7 +140,7 @@ use_repo(
     "crates__mockall-0.13.1",
     "crates__num-bigint-0.4.6",
     "crates__oxipng-9.1.5",
-    "crates__pq-sys-0.6.3",
+    "crates__pq-sys-0.7.1",
     "crates__prost-0.13.5",
     "crates__prost-build-0.13.5",
     "crates__prost-types-0.13.5",

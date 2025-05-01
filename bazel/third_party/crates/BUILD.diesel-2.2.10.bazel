@@ -80,7 +80,7 @@ rust_library(
         "@crates__num-bigint-0.4.6//:num_bigint",
         "@crates__num-integer-0.1.46//:num_integer",
         "@crates__num-traits-0.2.19//:num_traits",
-        "@crates__pq-sys-0.6.3//:pq_sys",
+        "@crates__pq-sys-0.7.1//:pq_sys",
         "@crates__r2d2-0.8.10//:r2d2",
     ],
 )

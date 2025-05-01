@@ -267,7 +267,7 @@
   "moduleExtensions": {
     "//bazel/third_party:crates_extension.bzl%crates": {
       "general": {
-        "bzlTransitiveDigest": "4YskpswWSr4xaWYC2WmsWSR6xdDaXiTJDFf7tyKYtD0=",
+        "bzlTransitiveDigest": "lik931HUgGp4V/FR4RyLx3ludfbEWV68h6Uyw5JLJXM=",
         "usagesDigest": "UZi47EDbuhi59B5MHXLB3w4CtOqzRBXenANK0zLSEdM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -5716,16 +5716,16 @@
               "build_file": "@@//bazel/third_party/crates:BUILD.ppv-lite86-0.2.21.bazel"
             }
           },
-          "crates__pq-sys-0.6.3": {
+          "crates__pq-sys-0.7.1": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
             "attributes": {
-              "sha256": "f6cc05d7ea95200187117196eee9edd0644424911821aeb28a18ce60ea0b8793",
+              "sha256": "41c852911b98f5981956037b2ca976660612e548986c30af075e753107bc3400",
               "type": "tar.gz",
               "urls": [
-                "https://static.crates.io/crates/pq-sys/0.6.3/download"
+                "https://static.crates.io/crates/pq-sys/0.7.1/download"
               ],
-              "strip_prefix": "pq-sys-0.6.3",
-              "build_file": "@@//bazel/third_party/crates:BUILD.pq-sys-0.6.3.bazel"
+              "strip_prefix": "pq-sys-0.7.1",
+              "build_file": "@@//bazel/third_party/crates:BUILD.pq-sys-0.7.1.bazel"
             }
           },
           "crates__precomputed-hash-0.1.1": {
@@ -9675,7 +9675,7 @@
             "crates__mockall-0.13.1",
             "crates__num-bigint-0.4.6",
             "crates__oxipng-9.1.5",
-            "crates__pq-sys-0.6.3",
+            "crates__pq-sys-0.7.1",
             "crates__prost-0.13.5",
             "crates__prost-build-0.13.5",
             "crates__prost-types-0.13.5",

@@ -667,14 +667,14 @@ alias(
 )
 
 alias(
-    name = "pq-sys-0.6.3",
-    actual = "@crates__pq-sys-0.6.3//:pq_sys",
+    name = "pq-sys-0.7.1",
+    actual = "@crates__pq-sys-0.7.1//:pq_sys",
     tags = ["manual"],
 )
 
 alias(
     name = "pq-sys",
-    actual = "@crates__pq-sys-0.6.3//:pq_sys",
+    actual = "@crates__pq-sys-0.7.1//:pq_sys",
     tags = ["manual"],
 )
 
