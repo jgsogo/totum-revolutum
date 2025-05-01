@@ -63,7 +63,7 @@ rust_library(
         "@crates__futures-0.3.31//:futures",
         "@crates__gix-config-0.42.0//:gix_config",
         "@crates__ignore-0.4.23//:ignore",
-        "@crates__miette-7.5.0//:miette",
+        "@crates__miette-7.6.0//:miette",
         "@crates__normalize-path-0.2.1//:normalize_path",
         "@crates__project-origins-1.4.1//:project_origins",
         "@crates__radix_trie-0.2.1//:radix_trie",

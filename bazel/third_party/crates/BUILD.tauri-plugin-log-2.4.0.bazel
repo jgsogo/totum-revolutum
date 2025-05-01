@@ -130,7 +130,7 @@ cargo_build_script(
     version = "2.4.0",
     visibility = ["//visibility:private"],
     deps = [
-        "@crates__tauri-plugin-2.1.1//:tauri_plugin",
+        "@crates__tauri-plugin-2.2.0//:tauri_plugin",
     ],
 )
 

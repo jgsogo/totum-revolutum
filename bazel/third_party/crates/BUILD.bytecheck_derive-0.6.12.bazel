@@ -56,7 +56,7 @@ rust_proc_macro(
     }),
     version = "0.6.12",
     deps = [
-        "@crates__proc-macro2-1.0.94//:proc_macro2",
+        "@crates__proc-macro2-1.0.95//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
         "@crates__syn-1.0.109//:syn",
     ],

@@ -59,10 +59,10 @@ rust_library(
         "@crates__option-ext-0.2.0//:option_ext",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.171//:libc",  # cfg(unix)
+            "@crates__libc-0.2.172//:libc",  # cfg(unix)
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.171//:libc",  # cfg(unix)
+            "@crates__libc-0.2.172//:libc",  # cfg(unix)
         ],
         "//conditions:default": [],
     }),

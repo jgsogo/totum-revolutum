@@ -62,7 +62,7 @@ rust_library(
         "@crates__gix-features-0.39.1//:gix_features",
         "@crates__gix-hash-0.15.1//:gix_hash",
         "@crates__gix-hashtable-0.6.0//:gix_hashtable",
-        "@crates__gix-path-0.10.15//:gix_path",
+        "@crates__gix-path-0.10.17//:gix_path",
         "@crates__gix-utils-0.1.14//:gix_utils",
         "@crates__gix-validate-0.9.4//:gix_validate",
         "@crates__itoa-1.0.15//:itoa",

@@ -68,10 +68,10 @@ rust_library(
         "@crates__thiserror-2.0.12//:thiserror",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__objc2-0.6.0//:objc2",  # cfg(target_os = "macos")
-            "@crates__objc2-app-kit-0.3.0//:objc2_app_kit",  # cfg(target_os = "macos")
-            "@crates__objc2-core-foundation-0.3.0//:objc2_core_foundation",  # cfg(target_os = "macos")
-            "@crates__objc2-foundation-0.3.0//:objc2_foundation",  # cfg(target_os = "macos")
+            "@crates__objc2-0.6.1//:objc2",  # cfg(target_os = "macos")
+            "@crates__objc2-app-kit-0.3.1//:objc2_app_kit",  # cfg(target_os = "macos")
+            "@crates__objc2-core-foundation-0.3.1//:objc2_core_foundation",  # cfg(target_os = "macos")
+            "@crates__objc2-foundation-0.3.1//:objc2_foundation",  # cfg(target_os = "macos")
             "@crates__png-0.17.16//:png",  # cfg(target_os = "macos")
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [

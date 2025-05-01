@@ -65,10 +65,10 @@ rust_library(
         "@crates__once_cell-1.21.3//:once_cell",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__rustix-1.0.5//:rustix",  # cfg(any(unix, target_os = "wasi"))
+            "@crates__rustix-1.0.7//:rustix",  # cfg(any(unix, target_os = "wasi"))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__rustix-1.0.5//:rustix",  # cfg(any(unix, target_os = "wasi"))
+            "@crates__rustix-1.0.7//:rustix",  # cfg(any(unix, target_os = "wasi"))
         ],
         "//conditions:default": [],
     }),

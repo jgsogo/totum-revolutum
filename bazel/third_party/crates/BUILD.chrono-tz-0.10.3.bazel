@@ -64,7 +64,7 @@ rust_library(
     }),
     version = "0.10.3",
     deps = [
-        "@crates__chrono-0.4.40//:chrono",
+        "@crates__chrono-0.4.41//:chrono",
         "@crates__chrono-tz-0.10.3//:build_script_build",
         "@crates__phf-0.11.3//:phf",
     ],
