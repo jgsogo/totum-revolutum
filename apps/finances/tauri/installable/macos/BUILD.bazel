@@ -17,7 +17,7 @@ We deploy this application in MacOS using a DMG:
  * maybe use `codesign`
  * maybe use `strip`
 
-
+More info about the Tauri bundle: https://v2.tauri.app/distribute/macos-application-bundle/
 
 """
 
