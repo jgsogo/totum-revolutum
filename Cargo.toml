@@ -87,7 +87,7 @@ mime = "0.3.17"
 mockall = { version = "0.13.1" }
 num-bigint = "0.4.6"
 num-traits = "0.2.19"
-oxipng = { version = "9.1.4", features = [
+oxipng = { version = "9.1.5", features = [
     "parallel",
     "zopfli",
     "filetime",
