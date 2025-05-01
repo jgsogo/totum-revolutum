@@ -36,7 +36,7 @@ bitflags = "2.9"
 bytes = "1.10.0"
 camino = "1.1.9"
 camino-tempfile = "1.1.1"
-chrono = { version = "0.4.39" }
+chrono = { version = "0.4.41" }
 chrono-tz = { version = "0.10.1" }
 clap = { version = "4.5.31", features = ["cargo", "string"] }
 clap_complete = "4.5.46"
