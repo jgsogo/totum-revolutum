@@ -1,5 +1,6 @@
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
 
+# TODO: Populate these envvars in the same way we are populating them for the Django app
 genrule(
     name = "app_wrapper",
     outs = ["app.sh"],

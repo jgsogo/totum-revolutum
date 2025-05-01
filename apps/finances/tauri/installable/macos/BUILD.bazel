@@ -19,10 +19,12 @@ We deploy this application in MacOS using a DMG:
 
 More info about the Tauri bundle: https://v2.tauri.app/distribute/macos-application-bundle/
 
+TODO: Create the DMG installable
+
 """
 
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("//bazel/tools/macos:dmg.bzl", "create_app")
+load("//bazel/tools/macos:dmg.bzl", "create_dmg")
 
 pkg_tar(
     name = "contents",
@@ -37,8 +39,9 @@ pkg_tar(
     ],
 )
 
-create_app(
-    name = "app",
+create_dmg(
+    name = "dmg",
     app_name = "Finances.app",
     contents = ":contents",
+    tags = ["no-sandbox"],
 )
