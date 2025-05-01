@@ -1,0 +1,44 @@
+"""
+We deploy this application in MacOS using a DMG:
+
+> Credit: I'm following this script in the Widelands repo: https://github.com/widelands/widelands/blob/master/utils/macos/build_app.sh
+
+ * create the package payload
+
+   ```
+    |-- Finances.app/Contents
+    |                |-- Resources
+    |                |   `-- finances.icns
+    |                |-- MacOS
+    |                |   `-- app
+    |                `-- Info.plist
+   ```
+
+ * maybe use `codesign`
+ * maybe use `strip`
+
+
+
+"""
+
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("//bazel/tools/macos:dmg.bzl", "create_app")
+
+pkg_tar(
+    name = "contents",
+    srcs = [
+        "//apps/finances/tauri/installable/macos/contents:info-plist",
+        "//apps/finances/tauri/installable/macos/contents/MacOS:app",
+        "//apps/finances/tauri/installable/macos/contents/Resources:icns",
+    ],
+    # include_runfiles = True,
+    tags = [
+        "no-remote-cache",
+    ],
+)
+
+create_app(
+    name = "app",
+    app_name = "Finances.app",
+    contents = ":contents",
+)
