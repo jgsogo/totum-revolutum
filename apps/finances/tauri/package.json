@@ -20,7 +20,7 @@
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-svelte": "^3.5.1",
     "flowbite": "^3.1.2",
-    "flowbite-svelte": "^0.48.6",
+    "flowbite-svelte": "^1.0.0",
     "flowbite-svelte-icons": "^2.1.1",
     "globalyzer": "^0.1.4",
     "globrex": "^0.1.2",
