@@ -1,6 +1,6 @@
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("//apps/finances/django/installable:defs.bzl", "BIN_FOLDER")
+load("//apps/finances/installable:defs.bzl", "BIN_FOLDER")
 
 pkg_tar(
     name = "app-admin-tar",
@@ -48,5 +48,5 @@ pkg_files(
     # ),
     include_runfiles = True,
     prefix = BIN_FOLDER,
-    visibility = ["//apps/finances/django/installable:__subpackages__"],
+    visibility = ["//apps/finances/installable:__subpackages__"],
 )

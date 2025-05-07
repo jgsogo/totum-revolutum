@@ -1,4 +1,4 @@
-load("//apps/finances/django/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP", "NAME")
+load("//apps/finances/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP", "NAME")
 load("//bazel/scripts/django:django_command.bzl", "django_command")
 load("//bazel/scripts/envfile:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/scripts/envfile:envfile_load.bzl", "envfile_load")
@@ -87,5 +87,5 @@ postinstall(
     folders = ALL_FOLDERS,
     pkgbuild_name = NAME,
     tags = ["manual"],
-    visibility = ["//apps/finances/django/installable/scripts:__subpackages__"],
+    visibility = ["//apps/finances/installable/scripts:__subpackages__"],
 )

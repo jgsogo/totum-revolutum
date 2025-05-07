@@ -16,7 +16,7 @@ def version():
 
 @pytest.fixture(scope="session")
 def pkg_expanded_dir():
-    PKG_FILE = os.getenv("TEST_SRCDIR") + "/_main/apps/finances/django/installable/installable.pkg"
+    PKG_FILE = os.getenv("TEST_SRCDIR") + "/_main/apps/finances/installable/installable.pkg"
     assert os.path.isfile(PKG_FILE), "PKG is missing"
 
     with TemporaryDirectory() as tmpdirname:
