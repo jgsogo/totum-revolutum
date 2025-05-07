@@ -43,5 +43,8 @@ create_dmg(
     name = "dmg",
     app_name = "Finances.app",
     contents = ":contents",
-    tags = ["no-sandbox"],
+    tags = [
+        "no-remote-cache",
+        "no-sandbox",
+    ],
 )
