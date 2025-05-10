@@ -37,9 +37,9 @@ fn main() {
     let builder = tauri::Builder::default();
     let app = finances_app_lib::create_app(builder, pool, state);
 
-    app.run(|_app_handle, event| {
-        if let tauri::RunEvent::ExitRequested { api, .. } = event {
-            api.prevent_exit();
-        }
+    app.run(|_app_handle, _event| {
+        // if let tauri::RunEvent::ExitRequested { api, .. } = event {
+        //     api.prevent_exit();
+        // }
     });
 }
