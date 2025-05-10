@@ -22,6 +22,7 @@ untar_files(
     files = [
         "/usr/local/{}/bin/app-admin-tar.tar".format(NAME),
         "/usr/local/{}/bin/app-gunicorn-tar.tar".format(NAME),
+        "/usr/local/{}/bin/app-finances-tar.tar".format(NAME),
         # BIN_FOLDER + "/app-admin-tar.tar",  # "location :app-admin-tar"
         # BIN_FOLDER + "/app-gunicorn-tar.tar",  # "location :app-gunicorn-tar"
     ],
@@ -30,6 +31,12 @@ untar_files(
 combine_envfiles(
     name = "combine-env",
     source = "/usr/local/{}/data/envfile".format(NAME),
+    target = "/usr/local/{}/data/.env".format(NAME),
+)
+
+combine_envfiles(
+    name = "combine-env-finances-app",
+    source = "/usr/local/{}/data/envfile-finances-app".format(NAME),
     target = "/usr/local/{}/bin/.env".format(NAME),
 )
 
@@ -67,6 +74,7 @@ postinstall(
         ":envsubst-supervisor",
         ":untar-files",
         ":combine-env",
+        ":combine-env-finances-app",
         ":envfile-load",
         "//bazel/scripts/postgres:pg_create_database.sh",
         ":django-migrate",

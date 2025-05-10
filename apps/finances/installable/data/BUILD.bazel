@@ -32,10 +32,21 @@ expand_template(
     template = "//bazel/python/django/deployment:.env.tpl",
 )
 
+expand_template(
+    name = "env-finances-app-file",
+    out = "envfile-finances-app",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//apps/finances/tauri/src-tauri:.env.tpl",
+)
+
 pkg_files(
     name = "data-files",
     srcs = [
         ":env-file",
+        ":env-finances-app-file",
         ":nginx_conf-file",
         ":supervisor_ini-file",
     ],

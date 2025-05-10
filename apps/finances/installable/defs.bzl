@@ -22,6 +22,7 @@ BIN_FOLDER = select(path_selector) + "/bin"
 LOGS_FOLDER = "/usr/local/{}/log".format(NAME)
 RUN_FOLDER = "/usr/local/{}/run".format(NAME)
 WWW_DATA_FOLDER = "/usr/local/{}/www-data".format(NAME)
+APPLICATIONS_FOLDER = "/Applications"
 
 # ALL_FOLDERS = {
 #     "LOGS_FOLDER": LOGS_FOLDER,
@@ -41,6 +42,7 @@ ALL_FOLDERS = select(
             "RUN_FOLDER": RUN_FOLDER,
             "DATA_FOLDER": "/usr/local/{}/data".format(NAME),
             "WWW_DATA_FOLDER": WWW_DATA_FOLDER,
+            "APPLICATIONS_FOLDER": APPLICATIONS_FOLDER,
         },
         # "@platforms//os:windows": "/Program Files/Finances",
         "//conditions:default": {},

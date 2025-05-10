@@ -15,8 +15,10 @@ We deploy this application in MacOS using a PKG:
     |           |       `-- finances.ini -> ../../finances/data/supervisord.ini
     |           |-- finances
     |           |   |-- bin
+    |           |   |   |-- .env
     |           |   |   |-- app-admin-tar.tar
     |           |   |   |-- app-gunicorn-tar.tar
+    |           |   |   |-- app-finances-tar.tar
     |           |   |   `-- envsubst
     |           |   `-- data
     |           |   |   |-- nginx.conf

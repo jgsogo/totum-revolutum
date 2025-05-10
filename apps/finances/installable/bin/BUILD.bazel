@@ -28,10 +28,24 @@ pkg_tar(
     ],
 )
 
+pkg_tar(
+    name = "app-finances-tar",
+    srcs = [
+        "//apps/finances:finances-app",
+    ],
+    include_runfiles = True,
+    mode = "0551",
+    tags = [
+        "manual",
+        "no-remote-cache",
+    ],
+)
+
 pkg_files(
     name = "bin",
     srcs = [
         ":app-admin-tar",
+        ":app-finances-tar",
         ":app-gunicorn-tar",
         "//tools/envsubst",
     ],

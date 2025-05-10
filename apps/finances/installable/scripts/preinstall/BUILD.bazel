@@ -14,6 +14,7 @@ preinstall(
         ":check-free-space",
         "//bazel/scripts/supervisor:check_supervisor.sh",
         "//bazel/scripts/nginx:check_nginx.sh",
+        "//bazel/scripts/supervisor:stop.sh",
     ],
     folders = ALL_FOLDERS,
     pkgbuild_name = NAME,
