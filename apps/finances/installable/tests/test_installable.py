@@ -65,13 +65,15 @@ def test_preinstall(preinstall, version):
     assert "Check free space" in preinstall
     assert "Check if nginx is running" in preinstall
     assert "Check if supervisord is running" in preinstall
+    assert "Stop supervisor application" in preinstall
 
 
 def test_postinstall(postinstall):
-    print(postinstall)
     assert "# Load the envvars" in postinstall  # We are loading an environment file
     assert "if ! check_db_connection; then" in postinstall  # No DB connection has consequences
     assert "if ! check_database_exists; then" in postinstall  # No DB has consequences
     assert "create_database" in postinstall  # We create the database
     assert "Execute Django command 'collectstatic" in postinstall
     assert "Execute Django command 'migrate'" in postinstall
+    assert "Change owner of '$ROOT_FOLDER'" in postinstall
+    assert "Change owner of '$MACOS_APPLICATION_FOLDER'" in postinstall
