@@ -64,7 +64,7 @@ rust_library(
     deps = [
         "@crates__bitflags-2.9.0//:bitflags",
         "@crates__crossbeam-channel-0.5.15//:crossbeam_channel",
-        "@crates__dpi-0.1.1//:dpi",
+        "@crates__dpi-0.1.2//:dpi",
         "@crates__lazy_static-1.5.0//:lazy_static",
         "@crates__libc-0.2.172//:libc",
         "@crates__log-0.4.27//:log",

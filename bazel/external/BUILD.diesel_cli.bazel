@@ -20,7 +20,7 @@ rust_binary(
     deps = [
         "@crates__chrono-0.4.41//:chrono",
         "@crates__clap-4.5.37//:clap",
-        "@crates__clap_complete-4.5.48//:clap_complete",
+        "@crates__clap_complete-4.5.50//:clap_complete",
         "@crates__diesel-2.2.10//:diesel",
         "@crates__diesel_migrations-2.2.0//:diesel_migrations",
         "@crates__diesel_table_macro_syntax-0.2.0//:diesel_table_macro_syntax",

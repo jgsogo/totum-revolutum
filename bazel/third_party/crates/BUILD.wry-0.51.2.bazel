@@ -73,7 +73,7 @@ rust_library(
     version = "0.51.2",
     deps = [
         "@crates__cookie-0.18.1//:cookie",
-        "@crates__dpi-0.1.1//:dpi",
+        "@crates__dpi-0.1.2//:dpi",
         "@crates__http-1.3.1//:http",
         "@crates__once_cell-1.21.3//:once_cell",
         "@crates__raw-window-handle-0.6.2//:raw_window_handle",

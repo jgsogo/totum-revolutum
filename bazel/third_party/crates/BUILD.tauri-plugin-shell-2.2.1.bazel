@@ -71,7 +71,7 @@ rust_library(
         "@crates__tauri-2.5.1//:tauri",
         "@crates__tauri-plugin-shell-2.2.1//:build_script_build",
         "@crates__thiserror-2.0.12//:thiserror",
-        "@crates__tokio-1.44.2//:tokio",
+        "@crates__tokio-1.45.0//:tokio",
     ],
 )
 

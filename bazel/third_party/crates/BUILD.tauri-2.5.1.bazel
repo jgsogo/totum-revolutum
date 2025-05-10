@@ -95,7 +95,7 @@ rust_library(
         "@crates__tauri-runtime-wry-2.6.0//:tauri_runtime_wry",
         "@crates__tauri-utils-2.4.0//:tauri_utils",
         "@crates__thiserror-2.0.12//:thiserror",
-        "@crates__tokio-1.44.2//:tokio",
+        "@crates__tokio-1.45.0//:tokio",
         "@crates__url-2.5.4//:url",
         "@crates__urlpattern-0.3.0//:urlpattern",
     ] + select({

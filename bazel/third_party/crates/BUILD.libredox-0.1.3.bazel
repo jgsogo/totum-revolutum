@@ -58,6 +58,6 @@ rust_library(
     deps = [
         "@crates__bitflags-2.9.0//:bitflags",
         "@crates__libc-0.2.172//:libc",
-        "@crates__redox_syscall-0.5.11//:syscall",
+        "@crates__redox_syscall-0.5.12//:syscall",
     ],
 )

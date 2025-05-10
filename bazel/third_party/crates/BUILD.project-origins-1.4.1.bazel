@@ -57,7 +57,7 @@ rust_library(
     version = "1.4.1",
     deps = [
         "@crates__futures-0.3.31//:futures",
-        "@crates__tokio-1.44.2//:tokio",
+        "@crates__tokio-1.45.0//:tokio",
         "@crates__tokio-stream-0.1.17//:tokio_stream",
     ],
 )
