@@ -29,7 +29,7 @@ services:
     volumes:
       - bazel-cache:/data
     environment:
-      - BAZEL_REMOTE_MAX_SIZE=${BAZEL_REMOTE_MAX_SIZE:-10} # Default to 10GB if not set
+      - BAZEL_REMOTE_MAX_SIZE=${BAZEL_REMOTE_MAX_SIZE:-5} # Default to 10GB if not set
     ports:
       - "9092:9092"  # gRPC server on port 9092
       - "9090:8080"  # HTTP server on port 8080, exposed to 9090
