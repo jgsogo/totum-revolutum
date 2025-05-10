@@ -5,6 +5,13 @@ We deploy this application in MacOS using a PKG:
 
    ```
     |-- finances-payload
+    |   |-- Applications
+    |   |   `-- Contents
+    |   |       |-- Resources
+    |   |       |   `-- finances.icns
+    |   |       |-- MacOS
+    |   |       |   `-- finances-app-executable
+    |   |       `-- Info.plist
     |   `-- usr
     |       `-- local
     |           |-- etc
@@ -87,6 +94,7 @@ pkg_tar(
     name = "payload",
     srcs = [
         ":dirs",
+        "//apps/finances/installable/application",
         "//apps/finances/installable/bin",
         "//apps/finances/installable/data",
     ],

@@ -34,7 +34,7 @@ filegroup(
 filegroup(
     name = "icons-icns",
     srcs = glob(["icons/**/*.icns"]),
-    visibility = ["//apps/finances/tauri/installable:__subpackages__"],
+    visibility = ["//apps/finances/installable:__subpackages__"],
 )
 
 filegroup(

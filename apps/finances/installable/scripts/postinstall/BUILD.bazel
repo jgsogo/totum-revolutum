@@ -1,4 +1,5 @@
 load("//apps/finances/installable:defs.bzl", "ALL_FOLDERS", "DJANGO_ADMIN_APP", "NAME")
+load("//bazel/scripts/bash:chown_folder.bzl", "chown_folder")
 load("//bazel/scripts/django:django_command.bzl", "django_command")
 load("//bazel/scripts/envfile:combine_envfiles.bzl", "combine_envfiles")
 load("//bazel/scripts/envfile:envfile_load.bzl", "envfile_load")
@@ -68,6 +69,16 @@ append_hosts(
     host = "localhost.{}".format(NAME),  # This should match the gunicorn configuration
 )
 
+chown_folder(
+    name = "chown-root",
+    folder = "$ROOT_FOLDER",
+)
+
+chown_folder(
+    name = "chown-macos-app",
+    folder = "$MACOS_APPLICATION_FOLDER",
+)
+
 postinstall(
     name = "postinstall",
     chunks = [
@@ -83,7 +94,8 @@ postinstall(
         # TODO: Add django-createsuperuser (use GUI app to collect data)
 
         # Once we are done installing and creating all the files, we chown them
-        "//bazel/scripts/bash:chown_root_folder.sh",
+        ":chown-root",
+        ":chown-macos-app",
 
         # Supervisorctl
         "//bazel/scripts/supervisor:update_and_start.sh",
