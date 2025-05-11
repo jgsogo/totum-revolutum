@@ -69,7 +69,6 @@ run_together(
 
 sh_with_runfiles_binary(
     name = "finances-app",
-    args = ["--help"],
     tags = ["no-remote-cache"],
     tool = "//apps/finances/tauri/src-tauri:app",
     visibility = ["//apps/finances/installable:__subpackages__"],
