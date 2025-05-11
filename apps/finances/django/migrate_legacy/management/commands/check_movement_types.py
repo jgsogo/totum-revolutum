@@ -55,6 +55,8 @@ def get_movement_types_mapping() -> Dict[str, MovementType]:
         "IVA 4%": MovementType.objects.get(name="4% (tarifa superreducida)"),
         "IVA 10%": MovementType.objects.get(name="10% (tarifa reducida)"),
         "IVA 21%": MovementType.objects.get(name="21% (tarifa general)"),
+        "IVA 2%": MovementType.objects.get(name="2% (RDL 4/2024)"),
+        "IVA 7,50% (finales 2024)": MovementType.objects.get(name="7.50% (RDL 4/2024)"),
         "Supermercado": MovementType.objects.get(name="Supermercado"),
         "Internet": MovementType.objects.get(name="Internet"),
         "Teléfono": MovementType.objects.get(name="Teléfono"),
@@ -183,6 +185,10 @@ def get_movement_types_mapping() -> Dict[str, MovementType]:
         "Total especies": MovementType.objects.get(name="Total Especies"),
         "Pagos especie (no repercutidos)": MovementType.objects.get(
             name="Retención IRPF Pagos Esp. No Reperc."
+        ),
+        "Donación": MovementType.objects.get(name="Donaciones/Regalos"),
+        "QIE Distribution Capital Gain": MovementType.objects.get(
+            name="QIE Distribution Capital Gain"
         ),
     }
 

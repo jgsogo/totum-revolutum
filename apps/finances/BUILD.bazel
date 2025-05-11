@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
 load("//bazel:value_from_stable_status.bzl", "value_from_stable_status")
 load("//bazel/python/django/docker_compose:with_docker_compose_run.bzl", "with_docker_compose_run")
 load("//bazel/run:defs.bzl", "run_together")
@@ -64,4 +65,11 @@ run_together(
     after = ":backend",
     before = ":frontend",
     delay_seconds = 1,
+)
+
+sh_with_runfiles_binary(
+    name = "finances-app",
+    tags = ["no-remote-cache"],
+    tool = "//apps/finances/tauri/src-tauri:app",
+    visibility = ["//apps/finances/installable:__subpackages__"],
 )

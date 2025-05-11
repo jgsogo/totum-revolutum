@@ -1,0 +1,94 @@
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files", "pkg_mklink")
+load("//apps/finances/installable:defs.bzl", "DATA_FOLDER", "NAME", "SUBSTITUTIONS")
+
+expand_template(
+    name = "supervisor_ini-file",
+    out = "supervisord.ini",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:supervisord.tpl.ini",
+)
+
+expand_template(
+    name = "nginx_conf-file",
+    out = "nginx.conf",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:nginx.tpl.conf",
+)
+
+expand_template(
+    name = "env-file",
+    out = "envfile",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//bazel/python/django/deployment:.env.tpl",
+)
+
+expand_template(
+    name = "env-finances-app-file",
+    out = "envfile-finances-app",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//apps/finances/tauri/src-tauri:.env.tpl",
+)
+
+pkg_files(
+    name = "data-files",
+    srcs = [
+        ":env-file",
+        ":env-finances-app-file",
+        ":nginx_conf-file",
+        ":supervisor_ini-file",
+    ],
+    attributes = pkg_attributes(
+        group = "admin",
+        mode = "0555",
+        owner = "root",
+    ),
+    prefix = DATA_FOLDER,
+)
+
+pkg_mklink(
+    name = "supervisor_ini-link",
+    attributes = pkg_attributes(
+        group = "admin",
+        mode = "0555",
+        owner = "root",
+    ),
+    link_name = "usr/local/etc/supervisor.d/{}.ini".format(NAME),
+    # target = DATA_FOLDER + "/supervisord.ini",
+    target = "../../{}/data/supervisord.ini".format(NAME),
+)
+
+pkg_mklink(
+    name = "nginx_conf-link",
+    attributes = pkg_attributes(
+        group = "admin",
+        mode = "0555",
+        owner = "root",
+    ),
+    link_name = "usr/local/etc/nginx/servers/{}.conf".format(NAME),
+    # target = DATA_FOLDER + "/nginx.conf",
+    target = "../../../{}/data/nginx.conf".format(NAME),
+)
+
+pkg_filegroup(
+    name = "data",
+    srcs = [
+        "nginx_conf-link",
+        ":data-files",
+        ":supervisor_ini-link",
+        # ":env_file-link",
+    ],
+    visibility = ["//apps/finances/installable:__subpackages__"],
+)

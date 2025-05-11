@@ -1,0 +1,15 @@
+load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_files")
+
+pkg_files(
+    name = "scripts",
+    srcs = [
+        "//apps/finances/installable/scripts/postinstall",
+        "//apps/finances/installable/scripts/preinstall",
+    ],
+    attributes = pkg_attributes(
+        group = "admin",
+        mode = "0551",
+        owner = "root",
+    ),
+    visibility = ["//apps/finances/installable:__subpackages__"],
+)

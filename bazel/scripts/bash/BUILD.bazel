@@ -1,5 +1,5 @@
 exports_files([
     "logger.sh",
     "create_symlink.tpl.sh",
-    "chown_root_folder.sh",
+    "chown_folder.tpl.sh",
 ])

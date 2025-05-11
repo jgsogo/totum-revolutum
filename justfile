@@ -17,7 +17,7 @@ update-deps: update-rust update-npm update-python
 
 update-rust:
     cargo update
-    bazel run @@//bazel/third_party:crates_vendor
+    bazel run @@//bazel/third_party:crates_vendor # FIXME: And I need to modify the BUILD.bazel file manually
 
 update-npm:
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines

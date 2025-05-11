@@ -10,15 +10,13 @@ def _sh_with_runfiles_binary_impl(ctx):
     for it in ctx.attr.args:
         args.append(it.replace("$$", "$"))
 
-    tool = ctx.attr.tool.files_to_run.executable
-
     # Render the script we are executing
     ctx.actions.expand_template(
         template = ctx.file._run_template,
         output = executable,
         substitutions = {
             "%BASH_RLOCATION_FUNCTION%": BASH_RLOCATION_FUNCTION,
-            "%TOOL%": to_rlocation_path(ctx, tool),
+            "%TOOL%": to_rlocation_path(ctx, ctx.attr.tool.files_to_run.executable),
             "%TOOL_ARGS%": " ".join(args),
         },
         is_executable = True,
@@ -26,6 +24,7 @@ def _sh_with_runfiles_binary_impl(ctx):
 
     runfiles = ctx.runfiles([], transitive_files = depset([]), collect_data = True)
     runfiles = runfiles.merge(ctx.attr.tool.default_runfiles)
+    runfiles = runfiles.merge(ctx.attr.tool[DefaultInfo].default_runfiles)
     runfiles = runfiles.merge(ctx.attr._runfiles.default_runfiles)
 
     return [
@@ -42,12 +41,12 @@ sh_with_runfiles_binary = rule(
         "tool": attr.label(
             # allow_single_file = True,
             executable = True,
-            cfg = "exec",
+            cfg = "target",
             mandatory = True,
         ),
-        "data": attr.label_list(
-            allow_files = True,
-        ),
+        # "data": attr.label_list(
+        #     allow_files = True,
+        # ),
         "_run_template": attr.label(
             default = Label("//bazel:sh_with_runfiles_binary.tpl.sh"),
             allow_single_file = True,

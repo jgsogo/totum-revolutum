@@ -3,7 +3,10 @@ load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
 
-exports_files(["Cargo.toml"])
+exports_files([
+    "Cargo.toml",
+    ".env.tpl",
+])
 
 expand_template(
     name = "tauri_conf_json",
@@ -31,7 +34,7 @@ filegroup(
 filegroup(
     name = "icons-icns",
     srcs = glob(["icons/**/*.icns"]),
-    visibility = ["//apps/finances/tauri/installable:__subpackages__"],
+    visibility = ["//apps/finances/installable:__subpackages__"],
 )
 
 filegroup(
@@ -200,7 +203,6 @@ rust_binary(
     srcs = ["src/main.rs"],
     visibility = [
         "//apps/finances:__pkg__",
-        "//apps/finances/tauri/installable:__subpackages__",
     ],
     deps = [
         ":applib",

@@ -65,6 +65,6 @@ rust_library(
         "@crates__futures-core-0.3.31//:futures_core",
         "@crates__futures-sink-0.3.31//:futures_sink",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
-        "@crates__tokio-1.44.2//:tokio",
+        "@crates__tokio-1.45.0//:tokio",
     ],
 )

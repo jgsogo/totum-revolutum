@@ -61,7 +61,7 @@ rust_library(
     version = "2.6.0",
     deps = [
         "@crates__cookie-0.18.1//:cookie",
-        "@crates__dpi-0.1.1//:dpi",
+        "@crates__dpi-0.1.2//:dpi",
         "@crates__http-1.3.1//:http",
         "@crates__raw-window-handle-0.6.2//:raw_window_handle",
         "@crates__serde-1.0.219//:serde",

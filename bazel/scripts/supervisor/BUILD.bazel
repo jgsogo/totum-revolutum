@@ -1,4 +1,5 @@
 exports_files([
     "check_supervisor.sh",
     "update_and_start.sh",
+    "stop.sh",
 ])

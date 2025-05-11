@@ -65,7 +65,7 @@ rust_library(
     version = "0.4.8",
     deps = [
         "@crates__bigdecimal-0.4.8//:build_script_build",
-        "@crates__libm-0.2.13//:libm",
+        "@crates__libm-0.2.15//:libm",
         "@crates__num-bigint-0.4.6//:num_bigint",
         "@crates__num-integer-0.1.46//:num_integer",
         "@crates__num-traits-0.2.19//:num_traits",

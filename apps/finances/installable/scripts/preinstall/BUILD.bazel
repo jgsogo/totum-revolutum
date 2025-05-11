@@ -1,0 +1,23 @@
+load("//apps/finances/installable:defs.bzl", "ALL_FOLDERS", "NAME")
+load("//bazel/scripts/filesystem:check_freespace.bzl", "check_freespace")
+load("//bazel/tools/pkgbuild:scripts.bzl", "preinstall")
+
+check_freespace(
+    name = "check-free-space",
+    megabytes = "300",
+    tags = ["manual"],
+)
+
+preinstall(
+    name = "preinstall",
+    chunks = [
+        ":check-free-space",
+        "//bazel/scripts/supervisor:check_supervisor.sh",
+        "//bazel/scripts/nginx:check_nginx.sh",
+        "//bazel/scripts/supervisor:stop.sh",
+    ],
+    folders = ALL_FOLDERS,
+    pkgbuild_name = NAME,
+    tags = ["manual"],
+    visibility = ["//apps/finances/installable/scripts:__subpackages__"],
+)

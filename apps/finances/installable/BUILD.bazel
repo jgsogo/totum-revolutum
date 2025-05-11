@@ -1,0 +1,139 @@
+"""
+We deploy this application in MacOS using a PKG:
+
+ * create the package payload
+
+   ```
+    |-- finances-payload
+    |   |-- Applications
+    |   |   `-- Contents
+    |   |       |-- Resources
+    |   |       |   `-- finances.icns
+    |   |       |-- MacOS
+    |   |       |   `-- finances-app-executable
+    |   |       `-- Info.plist
+    |   `-- usr
+    |       `-- local
+    |           |-- etc
+    |           |   |-- nginx
+    |           |   |   `-- servers
+    |           |   |       `-- finances.conf -> ../../../finances/data/nginx.conf
+    |           |   `-- supervisor.d
+    |           |       `-- finances.ini -> ../../finances/data/supervisord.ini
+    |           |-- finances
+    |           |   |-- bin
+    |           |   |   |-- .env
+    |           |   |   |-- app-admin-tar.tar
+    |           |   |   |-- app-gunicorn-tar.tar
+    |           |   |   |-- app-finances-tar.tar
+    |           |   |   `-- envsubst
+    |           |   `-- data
+    |           |   |   |-- nginx.conf
+    |           |   |   `-- supervisord.ini
+    |           |   `-- www-data
+    |           |       |-- static
+    |           |       `-- media
+    |           `-- var
+    |               |-- log
+    |               `-- run
+    |-- finances-scripts
+    |   |-- postinstall
+    |   `-- preinstall
+   ```
+
+ * use `pkgbuild` to build the MacOS PKG
+
+   ```sh
+   pkgbuild --root payload
+        --identifier com.totum-revolutum.finances
+        --version 1.0
+        --scripts scripts
+        finances.pkg
+   ```
+
+ * it should be installable using
+
+   ```sh
+   sudo installer -pkg finances.pkg -target /
+   ```
+
+After installation, you check installed packages with
+
+```
+pkgutil --pkgs
+```
+
+and remove them with
+
+ * list all files with `pkgutil --files <package name>`
+ * remove the files and folders manually (be careful not to remove directories that contain other files)
+
+"""
+
+load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_mkdirs")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("//apps/finances/installable:defs.bzl", "LOGS_FOLDER", "RUN_FOLDER", "WWW_DATA_FOLDER")
+load("//bazel/tools/pkgbuild:pkgbuild.bzl", "pkgbuild")
+load("//bazel/tools/pytest:defs.bzl", "pytest_test")
+
+pkg_mkdirs(
+    name = "dirs",
+    attributes = pkg_attributes(
+        group = "admin",
+        mode = "0755",
+        owner = "root",
+    ),
+    dirs = [
+        LOGS_FOLDER,
+        RUN_FOLDER,
+        WWW_DATA_FOLDER,
+    ],
+)
+
+pkg_tar(
+    name = "payload",
+    srcs = [
+        ":dirs",
+        "//apps/finances/installable/application",
+        "//apps/finances/installable/bin",
+        "//apps/finances/installable/data",
+    ],
+    include_runfiles = True,
+    tags = [
+        "no-remote-cache",
+    ],
+)
+
+pkg_tar(
+    name = "scripts",
+    srcs = [
+        "//apps/finances/installable/scripts",
+    ],
+    include_runfiles = True,
+    tags = [
+        "no-remote-cache",
+    ],
+)
+
+pkgbuild(
+    name = "installable",
+    identifier = "com.totum-revolutum.finances",
+    root = ":payload",
+    scripts = ":scripts",
+    tags = [
+        "no-remote-cache",
+    ],
+    target_compatible_with = ["@platforms//os:macos"],
+    version = "//apps/finances:version",
+)
+
+pytest_test(
+    name = "test",
+    srcs = glob(["tests/**/*.py"]),
+    data = [
+        "//apps/finances:version",
+        "//apps/finances/installable",
+    ],
+    deps = [
+    ],
+)
