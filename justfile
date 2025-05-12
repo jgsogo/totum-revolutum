@@ -1,5 +1,7 @@
 set dotenv-load := true
 
+mod apps
+
 _default: _just-check
     @{{ just_executable() }} --choose  # Requires 'fzf' (https://formulae.brew.sh/formula/fzf)
 
