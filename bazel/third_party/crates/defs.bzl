@@ -330,9 +330,9 @@ _NORMAL_DEPENDENCIES = {
         _COMMON_CONDITION: {
             "anyhow": Label("@crates//:anyhow-1.0.98"),
             "camino": Label("@crates//:camino-1.1.9"),
-            "camino-tempfile": Label("@crates//:camino-tempfile-1.3.0"),
+            "camino-tempfile": Label("@crates//:camino-tempfile-1.4.1"),
             "chrono": Label("@crates//:chrono-0.4.41"),
-            "clap": Label("@crates//:clap-4.5.37"),
+            "clap": Label("@crates//:clap-4.5.38"),
             "clap-verbosity-flag": Label("@crates//:clap-verbosity-flag-3.0.2"),
             "data-encoding": Label("@crates//:data-encoding-2.9.0"),
             "diesel": Label("@crates//:diesel-2.2.10"),
@@ -351,7 +351,7 @@ _NORMAL_DEPENDENCIES = {
             "serde": Label("@crates//:serde-1.0.219"),
             "serde_json": Label("@crates//:serde_json-1.0.140"),
             "strum": Label("@crates//:strum-0.27.1"),
-            "tempfile": Label("@crates//:tempfile-3.19.1"),
+            "tempfile": Label("@crates//:tempfile-3.20.0"),
             "tokio": Label("@crates//:tokio-1.45.0"),
             "tracing": Label("@crates//:tracing-0.1.41"),
             "tracing-subscriber": Label("@crates//:tracing-subscriber-0.3.19"),
@@ -365,7 +365,7 @@ _NORMAL_DEPENDENCIES = {
             "camino": Label("@crates//:camino-1.1.9"),
             "chrono": Label("@crates//:chrono-0.4.41"),
             "chrono-tz": Label("@crates//:chrono-tz-0.10.3"),
-            "clap": Label("@crates//:clap-4.5.37"),
+            "clap": Label("@crates//:clap-4.5.38"),
             "clap-verbosity-flag": Label("@crates//:clap-verbosity-flag-3.0.2"),
             "confy": Label("@crates//:confy-0.6.1"),
             "cron-parser": Label("@crates//:cron-parser-0.10.0"),
@@ -381,7 +381,7 @@ _NORMAL_DEPENDENCIES = {
             "serde_json": Label("@crates//:serde_json-1.0.140"),
             "serde_yml": Label("@crates//:serde_yml-0.0.12"),
             "sha256": Label("@crates//:sha256-1.6.0"),
-            "tempfile": Label("@crates//:tempfile-3.19.1"),
+            "tempfile": Label("@crates//:tempfile-3.20.0"),
             "thiserror": Label("@crates//:thiserror-2.0.12"),
             "time": Label("@crates//:time-0.3.41"),
             "tokio": Label("@crates//:tokio-1.45.0"),
@@ -437,7 +437,7 @@ _NORMAL_DEPENDENCIES = {
         _COMMON_CONDITION: {
             "async-std": Label("@crates//:async-std-1.13.1"),
             "camino": Label("@crates//:camino-1.1.9"),
-            "camino-tempfile": Label("@crates//:camino-tempfile-1.3.0"),
+            "camino-tempfile": Label("@crates//:camino-tempfile-1.4.1"),
             "diesel": Label("@crates//:diesel-2.2.10"),
             "diesel_migrations": Label("@crates//:diesel_migrations-2.2.0"),
             "flume": Label("@crates//:flume-0.11.1"),
@@ -495,7 +495,7 @@ _NORMAL_DEPENDENCIES = {
             "bitflags": Label("@crates//:bitflags-2.9.0"),
             "bytes": Label("@crates//:bytes-1.10.1"),
             "camino": Label("@crates//:camino-1.1.9"),
-            "clap": Label("@crates//:clap-4.5.37"),
+            "clap": Label("@crates//:clap-4.5.38"),
             "clap-verbosity-flag": Label("@crates//:clap-verbosity-flag-3.0.2"),
             "dirs": Label("@crates//:dirs-6.0.0"),
             "futures": Label("@crates//:futures-0.3.31"),
@@ -516,7 +516,7 @@ _NORMAL_DEPENDENCIES = {
             "serde": Label("@crates//:serde-1.0.219"),
             "serde_json": Label("@crates//:serde_json-1.0.140"),
             "strum": Label("@crates//:strum-0.27.1"),
-            "tempfile": Label("@crates//:tempfile-3.19.1"),
+            "tempfile": Label("@crates//:tempfile-3.20.0"),
             "thiserror": Label("@crates//:thiserror-2.0.12"),
             "time": Label("@crates//:time-0.3.41"),
             "tokio": Label("@crates//:tokio-1.45.0"),
@@ -530,7 +530,7 @@ _NORMAL_DEPENDENCIES = {
         _COMMON_CONDITION: {
             "anyhow": Label("@crates//:anyhow-1.0.98"),
             "camino": Label("@crates//:camino-1.1.9"),
-            "clap": Label("@crates//:clap-4.5.37"),
+            "clap": Label("@crates//:clap-4.5.38"),
             "clap-verbosity-flag": Label("@crates//:clap-verbosity-flag-3.0.2"),
             "headers": Label("@crates//:headers-0.4.0"),
             "http": Label("@crates//:http-1.3.1"),
@@ -711,7 +711,7 @@ _NORMAL_DEV_DEPENDENCIES = {
     "libraries/rebrickable": {
         _COMMON_CONDITION: {
             "env_logger": Label("@crates//:env_logger-0.11.8"),
-            "tempfile": Label("@crates//:tempfile-3.19.1"),
+            "tempfile": Label("@crates//:tempfile-3.20.0"),
         },
     },
     "libraries/rust/proto_wrapper": {
@@ -2024,12 +2024,12 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__camino-tempfile-1.3.0",
-        sha256 = "4f37f0bd2bfeb019b359945a89e5a3541ac105195da0b30219a0a1b84d681dda",
+        name = "crates__camino-tempfile-1.4.1",
+        sha256 = "64308c4c82a5c38679945ddf88738dc1483dcc563bbb5780755ae9f8497d2b20",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/camino-tempfile/1.3.0/download"],
-        strip_prefix = "camino-tempfile-1.3.0",
-        build_file = Label("//bazel/third_party/crates:BUILD.camino-tempfile-1.3.0.bazel"),
+        urls = ["https://static.crates.io/crates/camino-tempfile/1.4.1/download"],
+        strip_prefix = "camino-tempfile-1.4.1",
+        build_file = Label("//bazel/third_party/crates:BUILD.camino-tempfile-1.4.1.bazel"),
     )
 
     maybe(
@@ -2154,12 +2154,12 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__clap-4.5.37",
-        sha256 = "eccb054f56cbd38340b380d4a8e69ef1f02f1af43db2f0cc817a4774d80ae071",
+        name = "crates__clap-4.5.38",
+        sha256 = "ed93b9805f8ba930df42c2590f05453d5ec36cbb85d018868a5b24d31f6ac000",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/clap/4.5.37/download"],
-        strip_prefix = "clap-4.5.37",
-        build_file = Label("//bazel/third_party/crates:BUILD.clap-4.5.37.bazel"),
+        urls = ["https://static.crates.io/crates/clap/4.5.38/download"],
+        strip_prefix = "clap-4.5.38",
+        build_file = Label("//bazel/third_party/crates:BUILD.clap-4.5.38.bazel"),
     )
 
     maybe(
@@ -2174,12 +2174,12 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__clap_builder-4.5.37",
-        sha256 = "efd9466fac8543255d3b1fcad4762c5e116ffe808c8a3043d4263cd4fd4862a2",
+        name = "crates__clap_builder-4.5.38",
+        sha256 = "379026ff283facf611b0ea629334361c4211d1b12ee01024eec1591133b04120",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/clap_builder/4.5.37/download"],
-        strip_prefix = "clap_builder-4.5.37",
-        build_file = Label("//bazel/third_party/crates:BUILD.clap_builder-4.5.37.bazel"),
+        urls = ["https://static.crates.io/crates/clap_builder/4.5.38/download"],
+        strip_prefix = "clap_builder-4.5.38",
+        build_file = Label("//bazel/third_party/crates:BUILD.clap_builder-4.5.38.bazel"),
     )
 
     maybe(
@@ -3524,12 +3524,12 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__gix-path-0.10.17",
-        sha256 = "c091d2e887e02c3462f52252c5ea61150270c0f2657b642e8d0d6df56c16e642",
+        name = "crates__gix-path-0.10.18",
+        sha256 = "567f65fec4ef10dfab97ae71f26a27fd4d7fe7b8e3f90c8a58551c41ff3fb65b",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/gix-path/0.10.17/download"],
-        strip_prefix = "gix-path-0.10.17",
-        build_file = Label("//bazel/third_party/crates:BUILD.gix-path-0.10.17.bazel"),
+        urls = ["https://static.crates.io/crates/gix-path/0.10.18/download"],
+        strip_prefix = "gix-path-0.10.18",
+        build_file = Label("//bazel/third_party/crates:BUILD.gix-path-0.10.18.bazel"),
     )
 
     maybe(
@@ -4534,22 +4534,22 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__libdeflate-sys-1.23.1",
-        sha256 = "38b72ad3fbf5ac78f2df7b36075e48adf2459b57c150b9e63937d0204d0f9cd7",
+        name = "crates__libdeflate-sys-1.24.0",
+        sha256 = "805824325366c44599dfeb62850fe3c7d7b3e3d75f9ab46785bc7dba3676815c",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/libdeflate-sys/1.23.1/download"],
-        strip_prefix = "libdeflate-sys-1.23.1",
-        build_file = Label("//bazel/third_party/crates:BUILD.libdeflate-sys-1.23.1.bazel"),
+        urls = ["https://static.crates.io/crates/libdeflate-sys/1.24.0/download"],
+        strip_prefix = "libdeflate-sys-1.24.0",
+        build_file = Label("//bazel/third_party/crates:BUILD.libdeflate-sys-1.24.0.bazel"),
     )
 
     maybe(
         http_archive,
-        name = "crates__libdeflater-1.23.1",
-        sha256 = "013344b17f9dceddff4872559ae19378bd8ee0479eccdd266d2dd2e894b4792f",
+        name = "crates__libdeflater-1.24.0",
+        sha256 = "b270bcc7e9d6dce967a504a55b1b0444f966aa9184e8605b531bc0492abb30bb",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/libdeflater/1.23.1/download"],
-        strip_prefix = "libdeflater-1.23.1",
-        build_file = Label("//bazel/third_party/crates:BUILD.libdeflater-1.23.1.bazel"),
+        urls = ["https://static.crates.io/crates/libdeflater/1.24.0/download"],
+        strip_prefix = "libdeflater-1.24.0",
+        build_file = Label("//bazel/third_party/crates:BUILD.libdeflater-1.24.0.bazel"),
     )
 
     maybe(
@@ -4864,12 +4864,12 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__multimap-0.10.0",
-        sha256 = "defc4c55412d89136f966bbb339008b474350e5e6e78d2714439c386b3137a03",
+        name = "crates__multimap-0.10.1",
+        sha256 = "1d87ecb2933e8aeadb3e3a02b828fed80a7528047e68b4f424523a0981a3a084",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/multimap/0.10.0/download"],
-        strip_prefix = "multimap-0.10.0",
-        build_file = Label("//bazel/third_party/crates:BUILD.multimap-0.10.0.bazel"),
+        urls = ["https://static.crates.io/crates/multimap/0.10.1/download"],
+        strip_prefix = "multimap-0.10.1",
+        build_file = Label("//bazel/third_party/crates:BUILD.multimap-0.10.1.bazel"),
     )
 
     maybe(
@@ -7300,12 +7300,12 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__tempfile-3.19.1",
-        sha256 = "7437ac7763b9b123ccf33c338a5cc1bac6f69b45a136c19bdd8a65e3916435bf",
+        name = "crates__tempfile-3.20.0",
+        sha256 = "e8a64e3985349f2441a1a9ef0b853f869006c3855f2cda6862a94d26ebb9d6a1",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/tempfile/3.19.1/download"],
-        strip_prefix = "tempfile-3.19.1",
-        build_file = Label("//bazel/third_party/crates:BUILD.tempfile-3.19.1.bazel"),
+        urls = ["https://static.crates.io/crates/tempfile/3.20.0/download"],
+        strip_prefix = "tempfile-3.20.0",
+        build_file = Label("//bazel/third_party/crates:BUILD.tempfile-3.20.0.bazel"),
     )
 
     maybe(
@@ -9046,10 +9046,10 @@ def crate_repositories():
         struct(repo = "crates__bitflags-2.9.0", is_dev_dep = False),
         struct(repo = "crates__bytes-1.10.1", is_dev_dep = False),
         struct(repo = "crates__camino-1.1.9", is_dev_dep = False),
-        struct(repo = "crates__camino-tempfile-1.3.0", is_dev_dep = False),
+        struct(repo = "crates__camino-tempfile-1.4.1", is_dev_dep = False),
         struct(repo = "crates__chrono-0.4.41", is_dev_dep = False),
         struct(repo = "crates__chrono-tz-0.10.3", is_dev_dep = False),
-        struct(repo = "crates__clap-4.5.37", is_dev_dep = False),
+        struct(repo = "crates__clap-4.5.38", is_dev_dep = False),
         struct(repo = "crates__clap-verbosity-flag-3.0.2", is_dev_dep = False),
         struct(repo = "crates__clap_complete-4.5.50", is_dev_dep = False),
         struct(repo = "crates__confy-0.6.1", is_dev_dep = False),
@@ -9111,7 +9111,7 @@ def crate_repositories():
         struct(repo = "crates__tauri-build-2.2.0", is_dev_dep = False),
         struct(repo = "crates__tauri-plugin-log-2.4.0", is_dev_dep = False),
         struct(repo = "crates__tauri-plugin-shell-2.2.1", is_dev_dep = False),
-        struct(repo = "crates__tempfile-3.19.1", is_dev_dep = False),
+        struct(repo = "crates__tempfile-3.20.0", is_dev_dep = False),
         struct(repo = "crates__thiserror-2.0.12", is_dev_dep = False),
         struct(repo = "crates__time-0.3.41", is_dev_dep = False),
         struct(repo = "crates__tokio-1.45.0", is_dev_dep = False),
