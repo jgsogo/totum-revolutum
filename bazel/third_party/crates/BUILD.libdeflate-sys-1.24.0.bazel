@@ -58,9 +58,9 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "1.23.1",
+    version = "1.24.0",
     deps = [
-        "@crates__libdeflate-sys-1.23.1//:build_script_build",
+        "@crates__libdeflate-sys-1.24.0//:build_script_build",
     ],
 )
 
@@ -113,7 +113,7 @@ cargo_build_script(
         "noclippy",
         "norustfmt",
     ],
-    version = "1.23.1",
+    version = "1.24.0",
     visibility = ["//visibility:private"],
     deps = [
         "@crates__cc-1.2.22//:cc",

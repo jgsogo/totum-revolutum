@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "tempfile",
+    name = "clap",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -35,11 +35,22 @@ rust_library(
         ],
     ),
     crate_features = [
+        "cargo",
+        "color",
         "default",
-        "getrandom",
+        "derive",
+        "error-context",
+        "help",
+        "std",
+        "string",
+        "suggestions",
+        "usage",
     ],
     crate_root = "src/lib.rs",
     edition = "2021",
+    proc_macro_deps = [
+        "@crates__clap_derive-4.5.32//:clap_derive",
+    ],
     rustc_env_files = [
         ":cargo_toml_env_vars",
     ],
@@ -48,7 +59,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=tempfile",
+        "crate-name=clap",
         "manual",
         "noclippy",
         "norustfmt",
@@ -58,18 +69,8 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "3.19.1",
+    version = "4.5.38",
     deps = [
-        "@crates__fastrand-2.3.0//:fastrand",
-        "@crates__getrandom-0.3.3//:getrandom",
-        "@crates__once_cell-1.21.3//:once_cell",
-    ] + select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__rustix-1.0.7//:rustix",  # cfg(any(unix, target_os = "wasi"))
-        ],
-        "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__rustix-1.0.7//:rustix",  # cfg(any(unix, target_os = "wasi"))
-        ],
-        "//conditions:default": [],
-    }),
+        "@crates__clap_builder-4.5.38//:clap_builder",
+    ],
 )
