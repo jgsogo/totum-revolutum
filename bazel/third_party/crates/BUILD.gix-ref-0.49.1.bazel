@@ -62,7 +62,7 @@ rust_library(
         "@crates__gix-hash-0.15.1//:gix_hash",
         "@crates__gix-lock-15.0.1//:gix_lock",
         "@crates__gix-object-0.46.1//:gix_object",
-        "@crates__gix-path-0.10.17//:gix_path",
+        "@crates__gix-path-0.10.18//:gix_path",
         "@crates__gix-tempfile-15.0.0//:gix_tempfile",
         "@crates__gix-utils-0.1.14//:gix_utils",
         "@crates__gix-validate-0.9.4//:gix_validate",

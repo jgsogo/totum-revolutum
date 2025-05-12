@@ -65,7 +65,7 @@ rust_library(
         "@crates__crossbeam-channel-0.5.15//:crossbeam_channel",
         "@crates__filetime-0.2.25//:filetime",
         "@crates__indexmap-2.9.0//:indexmap",
-        "@crates__libdeflater-1.23.1//:libdeflater",
+        "@crates__libdeflater-1.24.0//:libdeflater",
         "@crates__log-0.4.27//:log",
         "@crates__rayon-1.10.0//:rayon",
         "@crates__rgb-0.8.50//:rgb",
