@@ -92,7 +92,9 @@ pub async fn get_account_context(
 
     // TODO: Can we just retrieve it from the MainContext and save one DB call.
     let (account, snapshots) = {
+        log::debug!(" - get details: {account_pk}");
         let (account, custodian, account_type) = Account::details_for_pk(account_pk, &mut conn)?;
+        log::debug!(" - get the account type from the main context");
         let account_type = main_context
             .find_account_type(account_type.id)
             .ok_or(Error::Other(format!(
@@ -100,11 +102,13 @@ pub async fn get_account_context(
                 account_type.id
             )))?;
 
+        log::debug!(" - get holders that own the money");
         let holders_owning_money: Vec<HolderProto> = Account::holders_for_pk(account_pk, &mut conn)?
             .into_iter()
             .filter(|(_, owns_money)| *owns_money)
             .map(|(v, _)| HolderProto::new(v.id, v.name, v.is_company, v.photo))
             .collect();
+        log::debug!(" - get all the snapshots");
         let snapshots = get_snapshots(&account, &mut conn)?;
         let last_snapshot = snapshots.first().cloned();
 
