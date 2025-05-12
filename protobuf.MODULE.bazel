@@ -5,7 +5,7 @@
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "toolchains_protoc", version = "0.4.1")
 bazel_dep(name = "protobuf", version = "30.2")
-bazel_dep(name = "rules_rust_prost", version = "0.60.0")
+bazel_dep(name = "rules_rust_prost", version = "0.61.0")
 
 # 2 Register Proto toolchain
 ###############################################################################
