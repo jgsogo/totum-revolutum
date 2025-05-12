@@ -85,7 +85,7 @@ impl Account {
         pk: i64,
         conn: &mut PgConnection,
     ) -> Result<(Account, Custodian, AccountType), diesel::result::Error> {
-        Self::all()
+        Self::all_all()
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
