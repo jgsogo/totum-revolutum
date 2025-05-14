@@ -11,15 +11,12 @@
     show_category = true,
   }: { accounts: Account[]; show_custodian?: boolean; show_holders?: boolean; show_category?: boolean } = $props();
 
-  // Sum all snapshots
-  let total = $state(0);
-
   // Filters and search
   let searchTerm = $state('');
   let show_closed = $state(false);
   // let show_others = $state('');
   let today = DateWrapper.create_from_date(new Date());
-  let filteredAccounts = $derived(
+  let filteredAccounts: Account[] = $derived(
     accounts.filter((item) => {
       let matched = item.open().lte(today);
 
@@ -32,12 +29,13 @@
       // Match show others
       // matched = matched && (show_others || item.holders().find((h: Holder) => h.) )
 
-      if (matched && item.last_snapshot()) {
-        // FIXME: Note that here we don't care about FX
-        total = total + item.last_snapshot()!.amount().amount().amount();
-      }
       return matched;
     }),
+  );
+
+  // Total sum
+  let total = $derived(
+    filteredAccounts.reduce((sum, item) => sum + (item.last_snapshot() ? item.last_snapshot()!.amount().amount().amount() : 0), 0),
   );
 </script>
 
