@@ -33,9 +33,11 @@ pub fn create_app<R: tauri::Runtime>(
 ) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
 
+    log::debug!("Get the main context");
     let mut conn = db_pool.get().expect("Get a connection from the Pool");
     let main_context = get_main_context(&mut conn).expect("Error creating main context");
 
+    log::debug!("Crete the tauri app object");
     builder
         .plugin(
             tauri_plugin_log::Builder::new()
