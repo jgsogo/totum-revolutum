@@ -29,13 +29,13 @@ pub struct Account {
 impl Account {
     /// Returns (a query to) all the [`Account`]s (opened and closed)
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn all_all() -> _ {
+    pub fn all() -> _ {
         crate::schema::finances_accounts_account::table
     }
 
     /// Returns (a query to) all the [`Account`]s (only opened ones)
     #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn all() -> _ {
+    pub fn all_opened() -> _ {
         crate::schema::finances_accounts_account::table.filter(account_opened())
     }
 
@@ -43,14 +43,6 @@ impl Account {
     #[diesel::dsl::auto_type(no_type_alias)]
     pub fn all_closed() -> _ {
         crate::schema::finances_accounts_account::table.filter(account_closed())
-    }
-
-    /// Returns a query fragment to filter all the [`Account`]s that are opened as of today
-    #[diesel::dsl::auto_type(no_type_alias)]
-    pub fn opened() -> _ {
-        crate::schema::finances_accounts_account::close
-            .is_null()
-            .or(crate::schema::finances_accounts_account::close.ge(diesel::dsl::today))
     }
 }
 
@@ -85,7 +77,7 @@ impl Account {
         pk: i64,
         conn: &mut PgConnection,
     ) -> Result<(Account, Custodian, AccountType), diesel::result::Error> {
-        Self::all_all()
+        Self::all()
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))

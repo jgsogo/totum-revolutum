@@ -136,7 +136,7 @@ pub fn get_main_context(conn: &mut PgConnection) -> Result<MainContextProto> {
     // All the accounts
     let accounts: Vec<AccountProto> = {
         // Get all accounts (opened and closed). This is important because some movements in old transactions might refer to closed accounts
-        let accounts = Account::all_all()
+        let accounts = Account::all()
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))

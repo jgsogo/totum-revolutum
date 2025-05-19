@@ -8,7 +8,7 @@ fn test_queries() {
     let mut conn = DB_POOL.get().unwrap();
 
     {
-        let all: i64 = Account::all()
+        let all: i64 = Account::all_opened()
             .count()
             .get_result(&mut conn)
             .expect("Error counting 'all' accounts");
@@ -19,12 +19,12 @@ fn test_queries() {
             .get_result(&mut conn)
             .expect("Error counting 'opened' accounts");
         assert_eq!(opened, 3);
-        let closed: i64 = Account::all()
+        let closed: i64 = Account::all_opened()
             .filter(account_closed())
             .count()
             .get_result(&mut conn)
             .expect("Error counting 'closed' accounts");
-        assert_eq!(closed, 0); // 'all' returns only the opened ones, then we filter for the closed ones :D
+        assert_eq!(closed, 0); // 'all_opened' returns only the opened ones, then we filter for the closed ones :D
         let all_closed: i64 = Account::all_closed()
             .count()
             .get_result(&mut conn)
@@ -34,7 +34,7 @@ fn test_queries() {
 
     // All accounts (opened ones)
     {
-        let all = Account::all()
+        let all = Account::all_opened()
             .inner_join(Custodian::all())
             .inner_join(AccountType::all())
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
@@ -93,10 +93,17 @@ fn test_queries() {
             .select((Account::as_select(), Custodian::as_select(), AccountType::as_select()))
             .load::<(Account, Custodian, AccountType)>(&mut conn)
             .expect("Error loading accounts");
-        assert_eq!(accounts.len(), 1);
+        assert_eq!(accounts.len(), 2);
 
         let (acc, custodian, acc_type) = accounts.get(0).unwrap();
         assert_eq!(acc.name, "Gastos compartidos");
+        assert!(acc.close.is_none());
+        assert_eq!(custodian.name, "custodian0");
+        assert_eq!(acc_type.name, "Cuenta bancaria");
+
+        let (acc, custodian, acc_type) = accounts.get(1).unwrap();
+        assert_eq!(acc.name, "Old account");
+        assert!(acc.close.is_some());
         assert_eq!(custodian.name, "custodian0");
         assert_eq!(acc_type.name, "Cuenta bancaria");
     }
