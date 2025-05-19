@@ -6,15 +6,23 @@
 
   let {
     accounts,
+    holder,
     show_custodian = true,
     show_holders = true,
     show_category = true,
-  }: { accounts: Account[]; show_custodian?: boolean; show_holders?: boolean; show_category?: boolean } = $props();
+  }: {
+    accounts: Account[];
+    holder: Holder | undefined;
+    show_custodian?: boolean;
+    show_holders?: boolean;
+    show_category?: boolean;
+  } = $props();
 
   // Filters and search
   let searchTerm = $state('');
   let show_closed = $state(false);
-  // let show_others = $state('');
+  let show_other_holders = $state(false);
+
   let today = DateWrapper.create_from_date(new Date());
   let filteredAccounts: Account[] = $derived(
     accounts.filter((item) => {
@@ -27,7 +35,7 @@
       matched = matched && (show_closed || !item.close()?.lte(today));
 
       // Match show others
-      // matched = matched && (show_others || item.holders().find((h: Holder) => h.) )
+      matched = matched && (show_other_holders || item.holders().findIndex((h: Holder) => h.pk() == holder?.pk()) !== -1);
 
       return matched;
     }),
@@ -45,7 +53,7 @@
       <Heading tag="h3" class="-ml-0.25 mb-2 text-xl font-semibold dark:text-white">Accounts</Heading>
     </div>
     <Toggle bind:checked={show_closed}>Show closed</Toggle>
-    <!-- <Toggle checked={show_others}>Show others</Toggle> -->
+    <Toggle bind:checked={show_other_holders}>Show other holders</Toggle>
   </div>
   <TableSearch
     placeholder="Search any column"

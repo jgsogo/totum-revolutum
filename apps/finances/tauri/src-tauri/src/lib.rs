@@ -30,12 +30,23 @@ pub fn create_app<R: tauri::Runtime>(
     builder: tauri::Builder<R>,
     db_pool: Pool<ConnectionManager<ConnectionType>>,
     state: AppStateProto,
+    initial_holder_pk: i64,
 ) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
 
     log::debug!("Get the main context");
     let mut conn = db_pool.get().expect("Get a connection from the Pool");
     let main_context = get_main_context(&mut conn).expect("Error creating main context");
+    let holder = AccountHolder::from_pk(initial_holder_pk, &mut conn).expect("Initial holder doesn't exist");
+
+    // TODO: `AppStateProto` should be mutable during application lifetime
+    let mut app_state = state.clone();
+    app_state.set_holder(HolderProto::new(
+        holder.id,
+        holder.name,
+        holder.is_company,
+        holder.photo,
+    ));
 
     log::debug!("Crete the tauri app object");
     builder
@@ -46,7 +57,7 @@ pub fn create_app<R: tauri::Runtime>(
         )
         .setup(|app| {
             app.manage(db_pool);
-            app.manage(state);
+            app.manage(app_state);
             app.manage(main_context);
             Ok(())
         })

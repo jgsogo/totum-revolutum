@@ -210,5 +210,6 @@ rust_binary(
         "//bazel/third_party/crates:camino",
         "//bazel/third_party/crates:log",
         "//bazel/third_party/crates:tauri",
+        "//libraries/finances/accounts/rust:finances_accounts",
     ],
 )

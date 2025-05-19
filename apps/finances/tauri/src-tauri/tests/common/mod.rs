@@ -14,9 +14,10 @@ pub fn webview() -> WebviewWindow<MockRuntime> {
         "base_url".to_string(),
         db,
         &camino::Utf8PathBuf::from("backup_dir"),
+        None,
     );
 
-    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone());
+    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone(), 0);
     // FIXME: The `.manage` inside `create_app` is not working for the mock.
     app.manage(app_state);
 

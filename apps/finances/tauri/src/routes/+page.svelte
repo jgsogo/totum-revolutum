@@ -6,5 +6,5 @@
 </script>
 
 <div class="mt-px space-y-4">
-  <AccountsTable accounts={data.main_context.accounts()} />
+  <AccountsTable accounts={data.main_context.accounts()} holder={data.app_state.holder()}/>
 </div>
