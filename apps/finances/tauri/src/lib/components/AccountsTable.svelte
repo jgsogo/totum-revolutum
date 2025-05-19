@@ -43,6 +43,7 @@
 
   // Total sum
   let total = $derived(
+    // FIXME: Take into account FX (today - spot) when summing different ccys
     filteredAccounts.reduce((sum, item) => sum + (item.last_snapshot() ? item.last_snapshot()!.amount().amount().amount() : 0), 0),
   );
 </script>
