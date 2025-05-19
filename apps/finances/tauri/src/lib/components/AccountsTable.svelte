@@ -35,7 +35,7 @@
       matched = matched && (show_closed || !item.close()?.lte(today));
 
       // Match show others
-      matched = matched && (show_other_holders || item.holders().findIndex((h: Holder) => h.pk() == holder?.pk()) !== -1);
+      matched = matched && (show_other_holders || item.holders().findIndex((h: Holder) => h.pk() === holder?.pk()) !== -1);
 
       return matched;
     }),
@@ -84,12 +84,12 @@
             <TableBodyCell>{account.custodian().name()}</TableBodyCell>
           {/if}
           {#if show_holders}
-            <TableBodyCell
-              >{account
+            <TableBodyCell>
+              {account
                 .holders()
                 .map((v) => v.name())
-                .join(', ')}</TableBodyCell
-            >
+                .join(', ')}
+            </TableBodyCell>
           {/if}
           <TableBodyCell>{account.name()}</TableBodyCell>
           {#if show_category}
