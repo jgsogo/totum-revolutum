@@ -4,6 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import type { Message } from "@bufbuild/protobuf";
+import type { Holder } from "./holder_pb.js";
 
 /**
  * Describes the file apps/finances/tauri/models/protos/app_state.proto.
@@ -79,6 +80,11 @@ export declare type AppState = Message<"finances_app_models.AppState"> & {
    * @generated from field: string backup_folder = 6;
    */
   backupFolder: string;
+
+  /**
+   * @generated from field: optional finances_app_models.Holder holder = 7;
+   */
+  holder?: Holder;
 };
 
 /**

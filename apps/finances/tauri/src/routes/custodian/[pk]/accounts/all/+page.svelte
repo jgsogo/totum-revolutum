@@ -6,5 +6,5 @@
 </script>
 
 <div class="mt-px space-y-4">
-  <AccountsTable show_custodian={false} accounts={data.custodian_accounts} />
+  <AccountsTable show_custodian={false} accounts={data.custodian_accounts} holder={data.app_state.holder()}/>
 </div>

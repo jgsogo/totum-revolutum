@@ -29,14 +29,17 @@ fn main() {
             base_url,
             postgres_db,
             &backup_folder,
+            None,
         )
     };
     let pool =
         finances_app_lib::db::establish_connection(&state.db().expect("Database connection missing").postgres_url());
 
     let builder = tauri::Builder::default();
-    let app = finances_app_lib::create_app(builder, pool, state);
+    let initial_holder_pk = 48; // TODO: We don't want to hardcode the initial holder here
+    let app = finances_app_lib::create_app(builder, pool, state, initial_holder_pk);
 
+    log::debug!("Run application");
     app.run(|_app_handle, _event| {
         // if let tauri::RunEvent::ExitRequested { api, .. } = event {
         //     api.prevent_exit();

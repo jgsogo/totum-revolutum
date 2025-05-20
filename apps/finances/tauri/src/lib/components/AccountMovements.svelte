@@ -21,12 +21,12 @@
     main_context,
   }: { snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
 
-  // Order together movements and snapshots: more recent items go first, snapshots go first (EOD)
+  // Order together movements and snapshots: more recent items go first, snapshots go last (EOD)
   const entries = $derived(
     [...snapshots, ...movements].sort((lhs, rhs) => {
       const r = sort_date_wrapper(rhs.date_value(), lhs.date_value());
       if (r === 0) {
-        return rhs instanceof Snapshot ? -1 : lhs instanceof Snapshot ? 1 : 0;
+        return rhs instanceof Snapshot ? 1 : lhs instanceof Snapshot ? -1 : 0;
       } else {
         return r;
       }

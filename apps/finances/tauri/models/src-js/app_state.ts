@@ -3,6 +3,7 @@ import { fromBinary } from "@bufbuild/protobuf";
 import { Buffer } from 'buffer';
 import { IncomingMessageConstructor, staticImplements } from "./message.js";
 import { CurrencyCode, currency_code_from_str } from "../../../../../libraries/googleapis/src-js/index.js";
+import { Holder } from "./holder.js";
 
 export class DatabaseConnection {
     private readonly proto: DatabaseConnectionProto;
@@ -34,7 +35,6 @@ export class DatabaseConnection {
     postgres_url(): string {
         return `postgres://${this.user()}:${this.password()}@${this.host()}:${this.port()}/${this.dbname()}`;
     }
-
 }
 
 export class AppState {
@@ -63,6 +63,10 @@ export class AppState {
 
     base_url(): string {
         return this.app_state.baseUrl;
+    }
+
+    holder(): Holder | undefined {
+        return this.app_state.holder ? new Holder(this.app_state.holder) : undefined;
     }
 }
 staticImplements<IncomingMessageConstructor<AppState>>(AppState);

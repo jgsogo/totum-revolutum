@@ -1,5 +1,5 @@
 use crate::google_type::CurrencyCode;
-use crate::{Error, Result};
+use crate::{Error, Holder, Result};
 use camino::{Utf8Path, Utf8PathBuf};
 use proto_wrapper::ProtoWrapper;
 
@@ -62,6 +62,7 @@ impl AppState {
         base_url: String,
         db: DatabaseConnection,
         backup_directory: &Utf8Path,
+        holder: Option<Holder>,
     ) -> Self {
         Self(crate::protos::finances_app_models::AppState {
             base_ccy: base_ccy.to_string(),
@@ -70,6 +71,7 @@ impl AppState {
             base_url,
             db: Some(db.into()),
             backup_folder: backup_directory.to_string(),
+            holder: holder.map(|v| v.into()),
         })
     }
 
@@ -95,5 +97,9 @@ impl AppState {
 
     pub fn backup_directory(&self) -> Utf8PathBuf {
         Utf8PathBuf::from(&self.0.backup_folder)
+    }
+
+    pub fn set_holder(&mut self, holder: Holder) {
+        self.0.holder = Some(holder.into());
     }
 }

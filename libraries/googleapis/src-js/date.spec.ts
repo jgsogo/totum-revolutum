@@ -120,3 +120,21 @@ describe('equal', () => {
         expect(d3.equal(d1)).toBe(false);
     });
 });
+
+describe('lte', () => {
+    let d1 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 20);
+    let d2 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 20);
+
+    test('when they are equal', () => {
+        expect(d1.lte(d2)).toBe(true);
+        expect(d2.lte(d1)).toBe(true);
+        expect(d2.equal(d1)).toBe(true);
+    });
+
+    let d3 = DateWrapper.create_from_yyyy_mm_dd(2025, 1, 21);
+    test('when one is less than the other', () => {
+        expect(d1.lte(d3)).toBe(true);
+        expect(d3.lte(d1)).toBe(false);
+        expect(d1.equal(d3)).toBe(false);
+    });
+});

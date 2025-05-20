@@ -74,6 +74,10 @@ export class DateWrapper {
     equal(other: DateWrapper): boolean {
         return (this.year() === other.year()) && (this.month() === other.month()) && (this.day() === other.day())
     }
+
+    lte(other: DateWrapper): boolean {
+        return this.equal(other) || this.less_than(other)
+    }
 }
 
 /**

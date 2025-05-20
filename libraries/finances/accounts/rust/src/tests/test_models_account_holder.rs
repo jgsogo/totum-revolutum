@@ -51,7 +51,7 @@ fn test_queries() {
     {
         // Acconts (only opened ones) for a given holder
         let holder_id = 1i64;
-        let accounts = Account::all()
+        let accounts = Account::all_opened()
             .inner_join(
                 crate::schema::finances_accounts_accountholderrole::table
                     .inner_join(crate::schema::finances_accounts_accountholder::table),

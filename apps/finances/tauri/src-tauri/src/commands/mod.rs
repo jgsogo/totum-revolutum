@@ -32,11 +32,13 @@ use tauri::State;
 
 #[tauri::command]
 pub async fn get_app_state(state: State<'_, AppStateProto>) -> Result<Response> {
+    log::info!("Get app state");
     Ok(Response::new(state.encode_to_vec()))
 }
 
 #[tauri::command]
 pub async fn get_main_context(main_context: State<'_, MainContextProto>) -> Result<Response> {
+    log::info!("Get main context");
     Ok(Response::new(main_context.encode_to_vec()))
 }
 
