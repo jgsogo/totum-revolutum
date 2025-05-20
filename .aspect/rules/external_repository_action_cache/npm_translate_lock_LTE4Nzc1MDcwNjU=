@@ -3,9 +3,9 @@
 # This file should be checked into version control along with the pnpm-lock.yaml file.
 .npmrc=1669329300
 apps/finances/tauri/models/package.json=1366311761
-apps/finances/tauri/package.json=-1671711206
+apps/finances/tauri/package.json=2034455526
 libraries/googleapis/package.json=-732299593
-package.json=-1961358561
-pnpm-lock.yaml=-6191169
+package.json=-1834871044
+pnpm-lock.yaml=-1502977350
 pnpm-workspace.yaml=-1435849929
 sandbox/svelte-hello-world/package.json=260369461

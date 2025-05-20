@@ -9968,7 +9968,7 @@
         "bzlTransitiveDigest": "iJvsN76EW+mv1wsZWDG0aueIsNWokdUxnx51SeHZmP4=",
         "usagesDigest": "Qtcp1NR3qm2VeLtKcde5rfYKAoVIGXMJXEiF2GfVWzs=",
         "recordedFileInputs": {
-          "@@//package.json": "63dc9ea753848984e9c81b78790a0a664fa17eb3e16559e89ebebd4100d61d60"
+          "@@//package.json": "1b91a18ed61df6d3d1f61fcb48aea23afb80a0c66bcc381314a22de7dd8c2488"
         },
         "recordedDirentsInputs": {},
         "envVariables": {},
