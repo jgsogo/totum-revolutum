@@ -7,9 +7,9 @@
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^2.4.0",
     "@connectrpc/protoc-gen-connect-es": "^1.6.1",
-    "@types/node": "^22.15.17",
+    "@types/node": "^22.15.20",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.3"
+    "vitest": "^3.1.4"
   },
   "name": "@totum-revolutum/googleapis",
   "private": true,

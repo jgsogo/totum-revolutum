@@ -37,6 +37,7 @@ js_run_binary(
         ":src",
         ":static",
     ],
+    # args = ["build --sourcemap --config vite.config.js"], # TODO: Source map allow us to go from the error to the source code. Use it in debug builds!
     args = ["build --config vite.config.js"],
     chdir = package_name(),
     out_dirs = ["build"],
