@@ -19,7 +19,7 @@
   } = $props();
 </script>
 
-<Navbar {fluid} class="text-black" color="default" let:NavContainer>
+<Navbar {fluid} class="text-black" color="default">
   <NavHamburger onClick={() => (drawerHidden = !drawerHidden)} class="m-0 me-3 md:block lg:hidden" />
 
   <NavBrand href={home_href} class={list ? 'w-40' : 'lg:w-60'}>
