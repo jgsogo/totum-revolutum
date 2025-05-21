@@ -48,11 +48,8 @@
   );
 </script>
 
-<Card size="xl" class="shadow-sm max-w-none">
+<Card size="xl" class="block p-4 shadow-sm sm:flex sm:space-x-4 sm:p-6 sm:py-6 xl:block xl:space-x-0 2xl:flex 2xl:space-x-4" horizontal>
   <div class="items-center justify-between lg:flex">
-    <div class="mb-4 mt-px lg:mb-0">
-      <Heading tag="h3" class="-ml-0.25 mb-2 text-xl font-semibold dark:text-white">Accounts</Heading>
-    </div>
     <Toggle bind:checked={show_closed}>Show closed</Toggle>
     <Toggle bind:checked={show_other_holders}>Show other holders</Toggle>
   </div>

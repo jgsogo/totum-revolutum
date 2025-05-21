@@ -18,7 +18,6 @@ filegroup(
     srcs = [
         "postcss.config.cjs",
         "svelte.config.js",
-        "tailwind.config.js",
         "tsconfig.json",
         "vite.config.js",
     ],
