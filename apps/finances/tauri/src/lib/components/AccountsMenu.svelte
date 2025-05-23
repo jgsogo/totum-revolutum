@@ -37,7 +37,7 @@
 <Sidebar
   breakpoint="lg"
   backdrop={false}
-  isOpen={true}
+  isOpen={false}
   params={{ x: -50, duration: 50 }}
   class="top-0 left-0 w-64 h-screen transition-transform bg-gray-50 dark:bg-gray-800 lg:block mt-[69px]"
   divClass="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800"
