@@ -17,8 +17,9 @@
       <Heading tag="h1" class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white"
         >Accounts for {data.holder_context.holder().name()}</Heading
       >
+
     </div>
-    <div class="col-span-full space-y-4">
+    <div class="col-span-full space-y-4 xl:col-auto">
       {@render children()}
     </div>
   </div>

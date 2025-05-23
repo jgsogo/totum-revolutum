@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Toggle, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Card, Heading, TableSearch } from 'flowbite-svelte';
+  import { Toggle,Toolbar,Input, ToolbarButton, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Card, Heading, Table } from 'flowbite-svelte';
   import type { Account, Holder } from '../../../models/src-js';
   import { goToAccountDetail } from '$lib/utils';
   import { DateWrapper } from '../../../../../../libraries/googleapis/src-js';
@@ -49,13 +49,13 @@
 </script>
 
 <Card size="xl" class="block p-4 shadow-sm sm:flex sm:space-x-4 sm:p-6 sm:py-6 xl:block xl:space-x-0 2xl:flex 2xl:space-x-4" horizontal>
-  <div class="items-center justify-between lg:flex">
+  <Toolbar embedded class="w-full py-4 text-gray-500 dark:text-gray-300">
+    <Input bind:value={searchTerm} placeholder="Search for accounts" class="me-6 w-80 border xl:w-96" />
     <Toggle bind:checked={show_closed}>Show closed</Toggle>
     <Toggle bind:checked={show_other_holders}>Show other holders</Toggle>
-  </div>
-  <TableSearch
-    placeholder="Search any column"
-    bind:inputValue={searchTerm}
+  </Toolbar>
+
+  <Table
     hoverable={true}
     noborder
     striped
@@ -108,5 +108,5 @@
         <td class="px-6 py-3">{total}</td>
       </tr>
     </tfoot>
-  </TableSearch>
+  </Table>
 </Card>
