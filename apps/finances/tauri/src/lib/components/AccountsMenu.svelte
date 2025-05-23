@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Sidebar, SidebarWrapper, SidebarItem, SidebarGroup, SidebarDropdownWrapper, SidebarButton } from 'flowbite-svelte';
+  import { Sidebar, SidebarWrapper, SidebarItem, SidebarGroup, SidebarDropdownWrapper } from 'flowbite-svelte';
   import { AccountCategory, type Account, type AppState, type Holder } from '../../../models/src-js';
   import { AngleDownOutline, AngleUpOutline, GithubSolid, ColumnSolid, ClipboardSolid, LandmarkSolid } from 'flowbite-svelte-icons';
 

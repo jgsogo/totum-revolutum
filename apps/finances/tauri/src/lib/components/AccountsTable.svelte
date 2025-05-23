@@ -1,5 +1,18 @@
 <script lang="ts">
-  import { Toggle,Toolbar,Input, ToolbarButton, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Card, Heading, Table } from 'flowbite-svelte';
+  import {
+    Toggle,
+    Toolbar,
+    Input,
+    ToolbarButton,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
+    TableHead,
+    TableHeadCell,
+    Card,
+    Heading,
+    Table,
+  } from 'flowbite-svelte';
   import type { Account, Holder } from '../../../models/src-js';
   import { goToAccountDetail } from '$lib/utils';
   import { DateWrapper } from '../../../../../../libraries/googleapis/src-js';
@@ -55,12 +68,7 @@
     <Toggle bind:checked={show_other_holders}>Show other holders</Toggle>
   </Toolbar>
 
-  <Table
-    hoverable={true}
-    noborder
-    striped
-    class="mt-6 min-w-full divide-y divide-gray-200 dark:divide-gray-600"
-  >
+  <Table hoverable={true} noborder striped class="mt-6 min-w-full divide-y divide-gray-200 dark:divide-gray-600">
     <TableHead class="bg-gray-50 dark:bg-gray-700">
       {#if show_custodian}
         <TableHeadCell>Custodian</TableHeadCell>

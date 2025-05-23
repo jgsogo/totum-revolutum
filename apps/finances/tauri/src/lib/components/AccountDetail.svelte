@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { Button, Card, Modal } from "flowbite-svelte";
+  import { Button, Card, Modal } from 'flowbite-svelte';
 
-  import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
-  import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
-  import { goToTransactionCreate } from "$lib/utils";
-  import { create_snapshot } from "$lib/commands";
+  import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from 'flowbite-svelte-icons';
+  import SnapshotForm from '$lib/forms/SnapshotForm/SnapshotForm.svelte';
+  import { goToTransactionCreate } from '$lib/utils';
+  import { create_snapshot } from '$lib/commands';
 
-  import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
-  import { Account } from "../../../models/src-js";
-  import Avatar from "./Avatar.svelte";
+  import { NewSnapshot } from '$lib/forms/SnapshotForm/NewSnapshot.svelte';
+  import { Account } from '../../../models/src-js';
+  import Avatar from './Avatar.svelte';
 
   let { account, base_media_url }: { account: Account; base_media_url: string } = $props();
 
@@ -42,17 +42,11 @@
                   <CameraPhotoOutline class="w-4 h-4 mr-1" />
                   Snapshot
                 </button>
-                <button
-                  class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(account, undefined, account)}
-                >
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(account, undefined, account)}>
                   <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
                   Income
                 </button>
-                <button
-                  class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(account, account, undefined)}
-                >
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(account, account, undefined)}>
                   <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
                   Expense
                 </button>
@@ -73,8 +67,6 @@
 <Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose outsideclose>
   <form>
     <SnapshotForm bind:snapshot={newSnapshot} />
-    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4"
-      >Submit</Button
-    >
+    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">Submit</Button>
   </form>
 </Modal>

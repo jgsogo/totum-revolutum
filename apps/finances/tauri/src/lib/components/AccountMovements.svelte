@@ -1,25 +1,11 @@
 <script lang="ts">
-  import {
-    Card,
-    Modal,
-    Spinner,
-    Table,
-    TableBody,
-    TableBodyCell,
-    TableBodyRow,
-    TableHead,
-    TableHeadCell,
-  } from "flowbite-svelte";
-  import { Snapshot, Movement, Transaction, MainContext } from "../../../models/src-js";
-  import { sort_date_wrapper } from "../../../../../../libraries/googleapis/src-js/date";
-  import { get_transaction } from "$lib/commands";
-  import TransactionDetailCard from "./TransactionDetailCard.svelte";
+  import { Card, Modal, Spinner, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
+  import { Snapshot, Movement, Transaction, MainContext } from '../../../models/src-js';
+  import { sort_date_wrapper } from '../../../../../../libraries/googleapis/src-js/date';
+  import { get_transaction } from '$lib/commands';
+  import TransactionDetailCard from './TransactionDetailCard.svelte';
 
-  let {
-    snapshots,
-    movements,
-    main_context,
-  }: { snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
+  let { snapshots, movements, main_context }: { snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
 
   // Order together movements and snapshots: more recent items go first, snapshots go last (EOD)
   const entries = $derived(
@@ -30,11 +16,11 @@
       } else {
         return r;
       }
-    })
+    }),
   );
 
-  let class_row_snapshot = "bg-gray-300 dark:bg-gray-700";
-  let class_row_movement = "";
+  let class_row_snapshot = 'bg-gray-300 dark:bg-gray-700';
+  let class_row_movement = '';
 
   let transaction_details_modal: boolean = $state(false);
   let transaction_details: Transaction | null = $state(null);
@@ -73,7 +59,7 @@
               <TableBodyCell><Spinner /></TableBodyCell>
             </TableBodyRow>
           {:then transaction: Transaction}
-            <TableBodyRow class={class_row_movement} on:click={() => showModal(transaction)}>
+            <TableBodyRow class={class_row_movement} onclick={() => showModal(transaction)}>
               <TableBodyCell>{entry.date_value()}</TableBodyCell>
               <TableBodyCell>{entry.direction()}</TableBodyCell>
               <TableBodyCell>{entry.type()}</TableBodyCell>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Avatar } from "flowbite-svelte";
+  import { Avatar } from 'flowbite-svelte';
 
   let {
     photo_url,
@@ -15,9 +15,7 @@
     if (words.length == 1) {
       return name.substring(0, 3);
     } else {
-      let acronym = words
-        .map((word) => word.replace("(", ""))
-        .reduce((response, word) => (response += word.slice(0, 1)), "");
+      let acronym = words.map((word) => word.replace('(', '')).reduce((response, word) => (response += word.slice(0, 1)), '');
       return acronym.substring(0, 3);
     }
   };
