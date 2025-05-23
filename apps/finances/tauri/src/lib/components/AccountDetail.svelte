@@ -24,7 +24,7 @@
   };
 </script>
 
-<Card size="xl">
+<Card size="xl" class="p-4 sm:p-6">
   <ul class="-m-3 divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
     <li class="py-3 sm:py-3.5">
       <div class="flex items-center justify-between">

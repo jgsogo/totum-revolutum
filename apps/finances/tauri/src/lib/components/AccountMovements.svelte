@@ -44,7 +44,7 @@
   };
 </script>
 
-<Card size="xl" class="shadow-sm max-w-none">
+<Card size="xl" class="p-4 sm:p-6">
   <Table noborder class="mt-6 min-w-full divide-y divide-gray-200 dark:divide-gray-600">
     <TableHead class="bg-gray-700 text-gray-50 dark:bg-gray-300 dark:text-gray-950">
       <TableHeadCell>Date</TableHeadCell>

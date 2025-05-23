@@ -48,7 +48,7 @@
   );
 </script>
 
-<Card size="xl" class="block p-4 shadow-sm sm:flex sm:space-x-4 sm:p-6 sm:py-6 xl:block xl:space-x-0 2xl:flex 2xl:space-x-4" horizontal>
+<Card size="xl" class="block p-4 shadow-sm sm:flex sm:space-x-4 sm:p-6 sm:py-6 xl:block xl:space-x-0" horizontal>
   <Toolbar embedded class="w-full py-4 text-gray-500 dark:text-gray-300">
     <Input bind:value={searchTerm} placeholder="Search for accounts" class="me-6 w-80 border xl:w-96" />
     <Toggle bind:checked={show_closed}>Show closed</Toggle>

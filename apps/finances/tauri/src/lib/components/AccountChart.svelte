@@ -93,6 +93,6 @@
   };
 </script>
 
-<Card size="xl" class="w-full max-w-none 2xl:col-span-2">
+<Card size="xl" class="p-4 sm:p-6">
   <Chart {options}></Chart>
 </Card>
