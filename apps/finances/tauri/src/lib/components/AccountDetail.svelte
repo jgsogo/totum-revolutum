@@ -13,15 +13,18 @@
   let { account, base_media_url }: { account: Account; base_media_url: string } = $props();
 
   let snapshotModal: boolean = $state(false);
-  let newSnapshot = $state(new NewSnapshot(account, account.last_snapshot()));
-  const on_snapshot = async (e: MouseEvent) => {
-    e.preventDefault();
-    if (newSnapshot.isValid()) {
-      await create_snapshot(newSnapshot.toMessage());
-      // TODO: Handle error if it fails to create the snapshot
-      snapshotModal = false;
-    }
-  };
+
+  function on_new_snapshot(newSnapshot: NewSnapshot) {
+    create_snapshot(newSnapshot.toMessage())
+      .then(() => {
+        console.log('New snapshot created');
+        // TODO: Refresh movements!
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        // TODO: Show some kind of banner
+      });
+  }
 </script>
 
 <Card size="xl" class="p-4 sm:p-6">
@@ -64,9 +67,6 @@
   </ul>
 </Card>
 
-<Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose outsideclose>
-  <form>
-    <SnapshotForm bind:snapshot={newSnapshot} />
-    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4">Submit</Button>
-  </form>
+<Modal bind:open={snapshotModal} size="xl" class="w-full h-full">
+  <SnapshotForm {account} handleSubmit={on_new_snapshot} method="dialog" />
 </Modal>

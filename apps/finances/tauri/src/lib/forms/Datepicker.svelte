@@ -25,4 +25,4 @@
 Just a regular DatePicker with opinionated DateTime formating
 -->
 
-<Datepicker {required} {inline} bind:value {dateFormat} {locale} on:apply on:clear on:select />
+<Datepicker {required} {inline} autohide={false} bind:value {dateFormat} {locale}/>

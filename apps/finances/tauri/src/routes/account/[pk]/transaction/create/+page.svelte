@@ -1,12 +1,12 @@
 <script lang="ts">
-  import MovementForm from "$lib/forms/MovementForm/MovementForm.svelte";
-  import TransactionForm from "$lib/forms/TransactionForm/TransactionForm.svelte";
-  import { Alert, Button, Card, Heading, Modal, Secondary, TextPlaceholder } from "flowbite-svelte";
-  import { InfoCircleSolid } from "flowbite-svelte-icons";
-  import { NewTransaction } from "$lib/forms/TransactionForm/NewTransaction.svelte.js";
-  import { NewMovement, NewMovementType } from "$lib/forms/MovementForm/NewMovement.svelte.js";
-  import { create_transaction, get_past_transactions } from "$lib/commands.js";
-  import { goToAccountDetail } from "$lib/utils.js";
+  import MovementForm from '$lib/forms/MovementForm/MovementForm.svelte';
+  import TransactionForm from '$lib/forms/TransactionForm/TransactionForm.svelte';
+  import { Alert, Button, Card, Heading, Modal, Secondary, TextPlaceholder } from 'flowbite-svelte';
+  import { InfoCircleSolid } from 'flowbite-svelte-icons';
+  import { NewTransaction } from '$lib/forms/TransactionForm/NewTransaction.svelte.js';
+  import { NewMovement, NewMovementType } from '$lib/forms/MovementForm/NewMovement.svelte.js';
+  import { create_transaction, get_past_transactions } from '$lib/commands.js';
+  import { goToAccountDetail } from '$lib/utils.js';
   import {
     type MainContext,
     type Account,
@@ -14,9 +14,9 @@
     type AccountContext,
     Transaction,
     MovementDirection,
-  } from "../../../../../../models/src-js";
-  import AccountDetail from "$lib/components/AccountDetail.svelte";
-  import TransactionDetailCard from "$lib/components/TransactionDetailCard.svelte";
+  } from '../../../../../../models/src-js';
+  import AccountDetail from '$lib/components/AccountDetail.svelte';
+  import TransactionDetailCard from '$lib/components/TransactionDetailCard.svelte';
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -29,20 +29,10 @@
   let to_account: Account | null = data.to_account;
 
   let initial_movements_from = from_account
-    ? [
-        new NewMovement(
-          from_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable,
-          from_account
-        ),
-      ]
+    ? [new NewMovement(from_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable, from_account)]
     : [];
   let initial_movements_to = to_account
-    ? [
-        new NewMovement(
-          to_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable,
-          to_account
-        ),
-      ]
+    ? [new NewMovement(to_account.is_numerable() ? NewMovementType.Numerable : NewMovementType.NonNumerable, to_account)]
     : [];
 
   let common_date = $state(new Date());
@@ -83,7 +73,7 @@
     return [];
   };
 
-  let card_error_style = "border-red-600 dark:border-red-600";
+  let card_error_style = 'border-red-600 dark:border-red-600';
 
   let transaction_details_modal: boolean = $state(false);
   let transaction_details: Transaction | null = $state(null);
@@ -97,9 +87,7 @@
   <div class="grid gap-4">
     <AccountDetail base_media_url={app_state.base_media_url()} account={account_context.account()}></AccountDetail>
 
-    <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl"
-      >New transaction</Heading
-    >
+    <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
 
     <form>
       {#await get_last_transactions() then last_transactions}
@@ -132,10 +120,7 @@
       {/await}
 
       <div class="mt-px space-y-4">
-        <Card
-          size="xl"
-          class="mt-6 {transaction.is_valid(show_transaction_date, app_state.base_ccy()) ? '' : card_error_style}"
-        >
+        <Card size="xl" class="mt-6 {transaction.is_valid(show_transaction_date, app_state.base_ccy()) ? '' : card_error_style}">
           <TransactionForm
             bind:transaction
             bind:show_date={show_transaction_date}
@@ -159,10 +144,7 @@
             </Heading>
 
             {#each transaction.movements_from as mov, i}
-              <Card
-                size="xl"
-                class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}"
-              >
+              <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}">
                 <MovementForm
                   bind:new_movement={transaction.movements_from[i]}
                   base_ccy={app_state.base_ccy()}
@@ -194,10 +176,7 @@
               </div>
             </Heading>
             {#each transaction.movements_to as mov, i}
-              <Card
-                size="xl"
-                class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}"
-              >
+              <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}">
                 <MovementForm
                   bind:new_movement={transaction.movements_to[i]}
                   base_ccy={app_state.base_ccy()}
@@ -234,7 +213,7 @@
               <InfoCircleSolid slot="icon" class="w-5 h-5" />
               <span class="font-medium">Source and target mismatch!</span>
               Source total is {transaction.total_from(app_state.base_ccy())} while target total is {transaction.total_to(
-                app_state.base_ccy()
+                app_state.base_ccy(),
               )}.
             </Alert>
           {/if}
