@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Card, Chart } from "flowbite-svelte";
-  import { Account, Snapshot } from "../../../models/src-js";
-  import { dateWrapper2Date } from "$lib/utils";
+  import { Card, Chart } from 'flowbite-svelte';
+  import { Account, Snapshot } from '../../../models/src-js';
+  import { dateWrapper2Date } from '$lib/utils';
 
   let { account, snapshots }: { account: Account; snapshots: Snapshot[] } = $props();
 
@@ -19,16 +19,16 @@
       },
     ],
     chart: {
-      type: "area",
+      type: 'area',
       stacked: false,
       height: 350,
       zoom: {
-        type: "x",
+        type: 'x',
         enabled: true,
         autoScaleYaxis: true,
       },
       toolbar: {
-        autoSelected: "zoom",
+        autoSelected: 'zoom',
       },
     },
     dataLabels: {
@@ -46,7 +46,7 @@
     //     },
     // },
     fill: {
-      type: "gradient",
+      type: 'gradient',
       gradient: {
         shadeIntensity: 1,
         inverseColors: false,
@@ -61,26 +61,26 @@
           return val;
         },
         style: {
-          cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+          cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400',
         },
       },
       title: {
         text: `Snapshot (${account.ccy()})`,
         style: {
-          cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+          cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400',
         },
       },
     },
     xaxis: {
-      type: "datetime",
+      type: 'datetime',
       labels: {
         style: {
-          cssClass: "text-xs font-normal fill-gray-500 dark:fill-gray-400",
+          cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400',
         },
       },
     },
     stroke: {
-      curve: "smooth",
+      curve: 'smooth',
     },
     tooltip: {
       shared: false,
@@ -93,6 +93,6 @@
   };
 </script>
 
-<Card size="xl" class="w-full max-w-none 2xl:col-span-2">
+<Card size="xl" class="p-4 sm:p-6">
   <Chart {options}></Chart>
 </Card>

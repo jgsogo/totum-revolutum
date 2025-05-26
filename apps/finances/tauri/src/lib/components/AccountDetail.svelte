@@ -1,30 +1,33 @@
 <script lang="ts">
-  import { Button, Card, Modal } from "flowbite-svelte";
+  import { Button, Card, Modal } from 'flowbite-svelte';
 
-  import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from "flowbite-svelte-icons";
-  import SnapshotForm from "$lib/forms/SnapshotForm/SnapshotForm.svelte";
-  import { goToTransactionCreate } from "$lib/utils";
-  import { create_snapshot } from "$lib/commands";
+  import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from 'flowbite-svelte-icons';
+  import SnapshotForm from '$lib/forms/SnapshotForm/SnapshotForm.svelte';
+  import { goToTransactionCreate } from '$lib/utils';
+  import { create_snapshot } from '$lib/commands';
 
-  import { NewSnapshot } from "$lib/forms/SnapshotForm/NewSnapshot.svelte";
-  import { Account } from "../../../models/src-js";
-  import Avatar from "./Avatar.svelte";
+  import { NewSnapshot } from '$lib/forms/SnapshotForm/NewSnapshot.svelte';
+  import { Account } from '../../../models/src-js';
+  import Avatar from './Avatar.svelte';
 
   let { account, base_media_url }: { account: Account; base_media_url: string } = $props();
 
   let snapshotModal: boolean = $state(false);
-  let newSnapshot = $state(new NewSnapshot(account, account.last_snapshot()));
-  const on_snapshot = async (e: MouseEvent) => {
-    e.preventDefault();
-    if (newSnapshot.isValid()) {
-      await create_snapshot(newSnapshot.toMessage());
-      // TODO: Handle error if it fails to create the snapshot
-      snapshotModal = false;
-    }
-  };
+
+  function on_new_snapshot(newSnapshot: NewSnapshot) {
+    create_snapshot(newSnapshot.toMessage())
+      .then(() => {
+        console.log('New snapshot created');
+        // TODO: Refresh movements!
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        // TODO: Show some kind of banner
+      });
+  }
 </script>
 
-<Card size="xl">
+<Card size="xl" class="p-4 sm:p-6">
   <ul class="-m-3 divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
     <li class="py-3 sm:py-3.5">
       <div class="flex items-center justify-between">
@@ -42,17 +45,11 @@
                   <CameraPhotoOutline class="w-4 h-4 mr-1" />
                   Snapshot
                 </button>
-                <button
-                  class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(account, undefined, account)}
-                >
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(account, undefined, account)}>
                   <ArrowDownToBracketOutline class="w-4 h-4 mr-1" />
                   Income
                 </button>
-                <button
-                  class="flex hover:underline mr-2"
-                  onclick={() => goToTransactionCreate(account, account, undefined)}
-                >
+                <button class="flex hover:underline mr-2" onclick={() => goToTransactionCreate(account, account, undefined)}>
                   <ArrowUpFromBracketOutline class="w-4 h-4 mr-1" />
                   Expense
                 </button>
@@ -70,11 +67,6 @@
   </ul>
 </Card>
 
-<Modal bind:open={snapshotModal} size="xs" class="w-full h-full" autoclose outsideclose>
-  <form>
-    <SnapshotForm bind:snapshot={newSnapshot} />
-    <Button disabled={newSnapshot.isValid() ? false : true} onclick={on_snapshot} type="submit" class="w-full, mt-4"
-      >Submit</Button
-    >
-  </form>
+<Modal bind:open={snapshotModal} size="md">
+  <SnapshotForm {account} handleSubmit={on_new_snapshot} method={null} />
 </Modal>

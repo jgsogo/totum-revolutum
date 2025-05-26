@@ -12,6 +12,12 @@
         "dependencies": {
           "tailwindcss": "*"
         }
+      },
+      "flowbite-svelte": {
+        "dependencies": {
+          "clsx": "*",
+          "deepmerge": "*"
+        }
       }
     }
   },
