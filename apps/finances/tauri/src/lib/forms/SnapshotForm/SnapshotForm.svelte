@@ -7,7 +7,7 @@
 
   interface Props {
     account: Account;
-    method: 'dialog' | 'get' | 'post';
+    method: 'dialog' | 'get' | 'post' | null;
     handleSubmit: (arg0: NewSnapshot) => void;
   }
 
@@ -84,8 +84,7 @@
   <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Add snapshot for {account.name()}</h3>
 
   <Label class="space-y-2">
-    <!-- <Datepicker required={true} inline={true} bind:value={date_value} /> -->
-    <Datepicker required={true} inline={true} bind:value={date_value} />
+    <Datepicker required={true} inline={false} bind:value={date_value} />
     {#if date_value_error}
       <Helper class="mt-2" color="red"><span class="font-medium">Error!</span> {date_value_error}</Helper>
     {/if}
@@ -102,30 +101,28 @@
       {/if}
     </Label>
   {:else}
-    <div class="flex items-start w-full">
-      <Label>
-        <span>Quantity</span>
-        <Input type="number" required placeholder="quantity" bind:value={quantity} />
-        {#if quantity_error}
-          <Helper class="mt-2" color="red"><span class="font-medium">Error!</span> {quantity_error}</Helper>
-        {/if}
-      </Label>
-      <Label class="ml-4">
-        <span>Unit value</span>
-        <ButtonGroup>
-          <InputAddon>{account.ccy()}</InputAddon>
-          <Input type="number" required placeholder="unit_value" bind:value={unit_value} />
-        </ButtonGroup>
-        {#if unit_value_error}
-          <Helper class="mt-2" color="red"><span class="font-medium">Error!</span> {unit_value_error}</Helper>
-        {/if}
-      </Label>
-    </div>
+  <Label class="space-y-2">
+      <span>Quantity</span>
+      <Input type="number" required placeholder="quantity" bind:value={quantity} />
+      {#if quantity_error}
+        <Helper class="mt-2" color="red"><span class="font-medium">Error!</span> {quantity_error}</Helper>
+      {/if}
+    </Label>
+    <Label class="space-y-2">
+      <span>Unit value</span>
+      <ButtonGroup class="w-full">
+        <InputAddon>{account.ccy()}</InputAddon>
+        <Input type="number" required placeholder="unit_value" bind:value={unit_value} />
+      </ButtonGroup>
+      {#if unit_value_error}
+        <Helper class="mt-2" color="red"><span class="font-medium">Error!</span> {unit_value_error}</Helper>
+      {/if}
+    </Label>
   {/if}
   <Button
     disabled={date_value_error || amount_error || quantity_error || unit_value_error}
     onclick={validate_and_submit}
     type="submit"
-    class="w-full, mt-4">Submit</Button
+    class="w-full">Submit</Button
   >
 </form>

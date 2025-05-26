@@ -67,6 +67,6 @@
   </ul>
 </Card>
 
-<Modal bind:open={snapshotModal} size="xl" class="w-full h-full">
-  <SnapshotForm {account} handleSubmit={on_new_snapshot} method="dialog" />
+<Modal bind:open={snapshotModal} size="md">
+  <SnapshotForm {account} handleSubmit={on_new_snapshot} method={null} />
 </Modal>
