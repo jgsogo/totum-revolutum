@@ -1,7 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use finances_app_models::{google_type, AppState, DatabaseConnection};
+use bigdecimal::BigDecimal;
+use bigdecimal::One;
+use finances_app_models::{google_type, AppState, DatabaseConnection, FxQuote, FxQuotePair};
 
 fn main() {
     let state = {
@@ -22,14 +24,25 @@ fn main() {
             .map(|s| std::path::PathBuf::from(&s))
             .unwrap_or_else(|_| std::env::temp_dir());
         let backup_folder = camino::Utf8PathBuf::from_path_buf(backup_folder).expect("Invalid tmp folder");
+        let base_ccy = google_type::CurrencyCode::EUR;
+        let fx_spots = [google_type::CurrencyCode::USD]
+            .into_iter()
+            .map(|other_ccy| {
+                let pair = FxQuotePair::new(base_ccy, other_ccy).unwrap();
+                let today = google_type::Date::new(2025, 1, 24).unwrap(); // FIXME: This is not today
+                let quote = google_type::Decimal::new(BigDecimal::one()); // FIXME: This is not the actual FX we want
+                FxQuote::new(pair, today, quote)
+            })
+            .collect::<Vec<_>>();
         AppState::new(
-            google_type::CurrencyCode::EUR,
+            base_ccy,
             media_url,
             static_url,
             base_url,
             postgres_db,
             &backup_folder,
             None,
+            fx_spots,
         )
     };
     let pool =

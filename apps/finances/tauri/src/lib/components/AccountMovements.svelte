@@ -46,7 +46,7 @@
             <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell></TableBodyCell>
-            <TableBodyCell>{entry.amount().amount()}</TableBodyCell>
+            <TableBodyCell class="text-right">{entry.amount().amount()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
           </TableBodyRow>
         {:else}
@@ -55,7 +55,7 @@
               <TableBodyCell>{entry.date_value()}</TableBodyCell>
               <TableBodyCell>{entry.direction()}</TableBodyCell>
               <TableBodyCell>{entry.type()}</TableBodyCell>
-              <TableBodyCell>{entry.amount()}</TableBodyCell>
+              <TableBodyCell class="text-right">{entry.amount()}</TableBodyCell>
               <TableBodyCell><Spinner /></TableBodyCell>
             </TableBodyRow>
           {:then transaction: Transaction}
@@ -63,7 +63,7 @@
               <TableBodyCell>{entry.date_value()}</TableBodyCell>
               <TableBodyCell>{entry.direction()}</TableBodyCell>
               <TableBodyCell>{entry.type()}</TableBodyCell>
-              <TableBodyCell>{entry.amount()}</TableBodyCell>
+              <TableBodyCell class="text-right">{entry.amount()}</TableBodyCell>
               <TableBodyCell>{transaction.name()}</TableBodyCell>
             </TableBodyRow>
           {/await}

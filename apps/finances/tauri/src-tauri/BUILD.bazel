@@ -207,6 +207,7 @@ rust_binary(
     deps = [
         ":applib",
         "//apps/finances/tauri/models:models/rust",
+        "//bazel/third_party/crates:bigdecimal",
         "//bazel/third_party/crates:camino",
         "//bazel/third_party/crates:log",
         "//bazel/third_party/crates:tauri",

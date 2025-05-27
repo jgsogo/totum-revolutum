@@ -102,7 +102,7 @@
             <TableBodyCell>{account.type().category()}</TableBodyCell>
           {/if}
           <TableBodyCell>{account.type().name()}</TableBodyCell>
-          <TableBodyCell>{account.last_snapshot() ? account.last_snapshot()!.amount().amount() : '-'}</TableBodyCell>
+          <TableBodyCell class="text-right">{account.last_snapshot() ? account.last_snapshot()!.amount().amount() : '-'}</TableBodyCell>
         </TableBodyRow>
       {/each}
     </TableBody>

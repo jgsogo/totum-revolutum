@@ -5,6 +5,7 @@
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 import type { Holder } from "./holder_pb.js";
+import type { FxQuote } from "./fx_quote_pb.js";
 
 /**
  * Describes the file apps/finances/tauri/models/protos/app_state.proto.
@@ -85,6 +86,11 @@ export declare type AppState = Message<"finances_app_models.AppState"> & {
    * @generated from field: optional finances_app_models.Holder holder = 7;
    */
   holder?: Holder;
+
+  /**
+   * @generated from field: repeated finances_app_models.FxQuote fx_spots = 8;
+   */
+  fxSpots: FxQuote[];
 };
 
 /**
