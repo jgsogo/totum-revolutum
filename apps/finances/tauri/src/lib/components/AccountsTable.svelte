@@ -13,23 +13,25 @@
     Heading,
     Table,
   } from 'flowbite-svelte';
-  import type { Account, Holder } from '../../../models/src-js';
+  import { FxQuotePair, type Account, type AppState, type Holder } from '../../../models/src-js';
   import { goToAccountDetail } from '$lib/utils';
-  import { DateWrapper } from '../../../../../../libraries/googleapis/src-js';
+  import { CurrencyCode, DateWrapper, Money } from '../../../../../../libraries/googleapis/src-js';
 
   let {
+    app_state,
     accounts,
-    holder,
     show_custodian = true,
     show_holders = true,
     show_category = true,
   }: {
+    app_state: AppState;
     accounts: Account[];
-    holder: Holder | undefined;
     show_custodian?: boolean;
     show_holders?: boolean;
     show_category?: boolean;
   } = $props();
+
+  let holder = app_state.holder();
 
   // Filters and search
   let searchTerm = $state('');
@@ -55,10 +57,27 @@
   );
 
   // Total sum
-  let total = $derived(
-    // FIXME: Take into account FX (today - spot) when summing different ccys
-    filteredAccounts.reduce((sum, item) => sum + (item.last_snapshot() ? item.last_snapshot()!.amount().amount().amount() : 0), 0),
-  );
+  let total = $derived.by<Money>(() => {
+    let zero_eur = Money.create_from_number(app_state.base_ccy(), 0);
+
+    return filteredAccounts.reduce((total: Money, item: Account) => {
+      if (item.last_snapshot()) {
+        const amount_snapshot = item.last_snapshot()!.amount().amount();
+        if (amount_snapshot.currency_code() === total.currency_code()) {
+          return total.sum(amount_snapshot);
+        } else {
+          const fx = app_state.fx_spot(FxQuotePair.create_from(total.currency_code(), amount_snapshot.currency_code()));
+          const amount_snapshot_local = fx?.apply_to(amount_snapshot)!;
+          return total.sum(amount_snapshot_local);
+        }
+      }
+      return total;
+    }, zero_eur);
+  });
+
+  // FIXME: Take into account FX (today - spot) when summing different ccys
+  //   filteredAccounts.reduce((sum, item) => sum + (item.last_snapshot() ? item.last_snapshot()!.amount().amount().amount() : 0), 0),
+  // );
 </script>
 
 <Card size="xl" class="block p-4 shadow-sm sm:flex sm:space-x-4 sm:p-6 sm:py-6 xl:block xl:space-x-0" horizontal>
@@ -113,7 +132,7 @@
         <td></td>
         {#if show_category}<td></td>{/if}
         <th scope="row" class="px-6 py-3 text-base">Total</th>
-        <td class="px-6 py-3">{total}</td>
+        <td class="px-6 py-3 text-right">{total}</td>
       </tr>
     </tfoot>
   </Table>

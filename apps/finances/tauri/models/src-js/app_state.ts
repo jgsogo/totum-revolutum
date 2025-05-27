@@ -4,6 +4,7 @@ import { Buffer } from 'buffer';
 import { IncomingMessageConstructor, staticImplements } from "./message.js";
 import { CurrencyCode, currency_code_from_str } from "../../../../../libraries/googleapis/src-js/index.js";
 import { Holder } from "./holder.js";
+import { FxQuote, FxQuotePair } from "./fx_quote.js";
 
 export class DatabaseConnection {
     private readonly proto: DatabaseConnectionProto;
@@ -67,6 +68,14 @@ export class AppState {
 
     holder(): Holder | undefined {
         return this.app_state.holder ? new Holder(this.app_state.holder) : undefined;
+    }
+
+    fx_spot(pair: FxQuotePair): FxQuote | undefined {
+        let found = this.app_state.fxSpots.find((v) => {
+            const fx_quote = new FxQuote(v);
+            return (fx_quote.fx_pair().base === pair.base && fx_quote.fx_pair().quote === pair.quote)
+        });
+        return found ? new FxQuote(found) : undefined
     }
 }
 staticImplements<IncomingMessageConstructor<AppState>>(AppState);
