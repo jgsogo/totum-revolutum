@@ -132,6 +132,7 @@ rust_library(
         "//bazel/third_party/crates:thiserror",
         "//libraries/finances/accounts/rust:finances_accounts",
         "//libraries/finances/investments/rust:finances_investments",
+        "//libraries/openexchangerates",
     ],
 )
 
@@ -212,5 +213,6 @@ rust_binary(
         "//bazel/third_party/crates:log",
         "//bazel/third_party/crates:tauri",
         "//libraries/finances/accounts/rust:finances_accounts",
+        "//libraries/openexchangerates",
     ],
 )

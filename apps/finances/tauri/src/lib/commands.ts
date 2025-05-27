@@ -76,3 +76,12 @@ export const create_transaction = async (transaction: Transaction) => {
     let data = transaction.toBinary();
     await invoke("create_transaction", data);
 }
+
+/**
+ * Returns FX spot for a given CCY (it uses 'base_ccy' from AppState context)
+ * @param {string} quoted - The ccy to quote
+ * @returns - A promise that resolves when the quote is available, or the error if it was not possible
+ */
+export const get_fx_spot = async (quoted: string): Promise<number> => {
+    return await invoke("get_fx_spot", { quotedCcy: quoted });
+}

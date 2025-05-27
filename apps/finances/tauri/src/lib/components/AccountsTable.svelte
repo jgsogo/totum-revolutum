@@ -13,9 +13,10 @@
     Heading,
     Table,
   } from 'flowbite-svelte';
-  import { FxQuotePair, type Account, type AppState, type Holder } from '../../../models/src-js';
+  import { FxQuote, FxQuotePair, type Account, type AppState, type Holder } from '../../../models/src-js';
   import { goToAccountDetail } from '$lib/utils';
-  import { CurrencyCode, DateWrapper, Money } from '../../../../../../libraries/googleapis/src-js';
+  import { CurrencyCode, DateWrapper, Decimal, Money } from '../../../../../../libraries/googleapis/src-js';
+  import { get_fx_spot } from '$lib/commands';
 
   let {
     app_state,
@@ -57,27 +58,31 @@
   );
 
   // Total sum
-  let total = $derived.by<Money>(() => {
-    let zero_eur = Money.create_from_number(app_state.base_ccy(), 0);
+  let total = $state<Money | undefined>();
+  $effect(() => {
+    const x = async () => {
+      let zero_eur = Money.create_from_number(app_state.base_ccy(), 0);
+      total = await filteredAccounts.reduce(async (totalP: Promise<Money>, item: Account) => {
+        const total: Money = await totalP;
+        if (item.last_snapshot()) {
+          const amount_snapshot = item.last_snapshot()!.amount().amount();
+          if (amount_snapshot.currency_code() === total.currency_code()) {
+            return total.sum(amount_snapshot);
+          } else {
+            const fx_rate = await get_fx_spot(amount_snapshot.currency_code().toString());
+            const fx_pair = FxQuotePair.create_from(total.currency_code(), amount_snapshot.currency_code());
+            const fx = FxQuote.create_from(DateWrapper.create_from_date(new Date()), fx_pair, Decimal.create_from_number(fx_rate));
 
-    return filteredAccounts.reduce((total: Money, item: Account) => {
-      if (item.last_snapshot()) {
-        const amount_snapshot = item.last_snapshot()!.amount().amount();
-        if (amount_snapshot.currency_code() === total.currency_code()) {
-          return total.sum(amount_snapshot);
-        } else {
-          const fx = app_state.fx_spot(FxQuotePair.create_from(total.currency_code(), amount_snapshot.currency_code()));
-          const amount_snapshot_local = fx?.apply_to(amount_snapshot)!;
-          return total.sum(amount_snapshot_local);
+            const amount_snapshot_local = fx?.apply_to(amount_snapshot)!;
+            return total.sum(amount_snapshot_local);
+            return total;
+          }
         }
-      }
-      return total;
-    }, zero_eur);
+        return total;
+      }, Promise.resolve(zero_eur));
+    };
+    x();
   });
-
-  // FIXME: Take into account FX (today - spot) when summing different ccys
-  //   filteredAccounts.reduce((sum, item) => sum + (item.last_snapshot() ? item.last_snapshot()!.amount().amount().amount() : 0), 0),
-  // );
 </script>
 
 <Card size="xl" class="block p-4 shadow-sm sm:flex sm:space-x-4 sm:p-6 sm:py-6 xl:block xl:space-x-0" horizontal>
