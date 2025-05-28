@@ -40,7 +40,6 @@
   <Table noborder class="mt-6 min-w-full divide-y divide-gray-200 dark:divide-gray-600">
     <TableHead class="bg-gray-700 text-gray-50 dark:bg-gray-300 dark:text-gray-950">
       <TableHeadCell>Date</TableHeadCell>
-      <TableHeadCell>Direction</TableHeadCell>
       <TableHeadCell>Type</TableHeadCell>
       <TableHeadCell>Amount</TableHeadCell>
       <TableHeadCell>Transaction</TableHeadCell>
@@ -51,25 +50,22 @@
           <TableBodyRow class={class_row_snapshot}>
             <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
-            <TableBodyCell></TableBodyCell>
-            <TableBodyCell class="text-right"><MoneyString {app_state} money={entry.amount().amount()} font_mono={true} /></TableBodyCell>
+            <TableBodyCell class="text-right"><MoneyString {app_state} money={entry} font_mono={true} /></TableBodyCell>
             <TableBodyCell></TableBodyCell>
           </TableBodyRow>
         {:else}
           {#await get_transaction(entry.transaction_pk()!)}
             <TableBodyRow class={class_row_movement}>
               <TableBodyCell>{entry.date_value()}</TableBodyCell>
-              <TableBodyCell>{entry.direction()}</TableBodyCell>
               <TableBodyCell>{entry.type()}</TableBodyCell>
-              <TableBodyCell class="text-right"><MoneyString {app_state} money={entry.amount()} font_mono={true} /></TableBodyCell>
+              <TableBodyCell class="text-right"><MoneyString {app_state} money={entry} font_mono={true} /></TableBodyCell>
               <TableBodyCell><Spinner /></TableBodyCell>
             </TableBodyRow>
           {:then transaction: Transaction}
             <TableBodyRow class={class_row_movement} onclick={() => showModal(transaction)}>
               <TableBodyCell>{entry.date_value()}</TableBodyCell>
-              <TableBodyCell>{entry.direction()}</TableBodyCell>
               <TableBodyCell>{entry.type()}</TableBodyCell>
-              <TableBodyCell class="text-right"><MoneyString {app_state} money={entry.amount()} font_mono={true} /></TableBodyCell>
+              <TableBodyCell class="text-right"><MoneyString {app_state} money={entry} font_mono={true} /></TableBodyCell>
               <TableBodyCell>{transaction.name()}</TableBodyCell>
             </TableBodyRow>
           {/await}
@@ -81,7 +77,7 @@
 
 <Modal bind:open={transaction_details_modal} size="xl" class="w-full h-full" autoclose outsideclose>
   {#if transaction_details}
-    <TransactionDetailCard transaction={transaction_details} {main_context} />
+    <TransactionDetailCard {app_state} transaction={transaction_details} {main_context} />
   {:else}
     Error: There is no transaction to show!
   {/if}

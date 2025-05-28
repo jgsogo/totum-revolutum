@@ -45,7 +45,7 @@
     accounts.filter((item) => {
       let matched = item.open().lte(today);
 
-      // Match search term
+      // Match search term to account name
       matched = matched && (!searchTerm || item.name().toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1);
 
       // Match show closed
@@ -127,7 +127,7 @@
           {/if}
           <TableBodyCell>{account.type().name()}</TableBodyCell>
           <TableBodyCell class="text-right"
-            ><MoneyString {app_state} money={account.last_snapshot()?.amount().amount()} font_mono={true} tooltip={true} /></TableBodyCell
+            ><MoneyString {app_state} money={account.last_snapshot()} font_mono={true} tooltip={true} /></TableBodyCell
           >
         </TableBodyRow>
       {/each}
@@ -139,7 +139,7 @@
         <td></td>
         {#if show_category}<td></td>{/if}
         <th scope="row" class="px-6 py-3 text-base">Total</th>
-        <td class="px-6 py-3 text-right"><MoneyString {app_state} money={total} font_mono={true} tooltip={true} /></td>
+        <td class="px-6 py-3 text-right"><MoneyString {app_state} bind:money={total} font_mono={true} tooltip={true} /></td>
       </tr>
     </tfoot>
   </Table>
