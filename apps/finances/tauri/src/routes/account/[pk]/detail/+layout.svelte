@@ -1,7 +1,7 @@
 <script lang="ts">
   import AccountChart from '$lib/components/AccountChart.svelte';
   import AccountDetail from '$lib/components/AccountDetail.svelte';
-  import type { Account, AccountContext, AppState, MainContext } from '../../../../../../models/src-js';
+  import type { Account, AccountContext, AppState } from '../../../../../../models/src-js';
   import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
 
   /** @type {{ data: import('./$types').PageData }} */
@@ -28,7 +28,7 @@
     </div>
 
     <div class="grid grid-cols-2 gap-4 dark:bg-gray-900">
-      <AccountDetail base_media_url={app_state.base_media_url()} {account}></AccountDetail>
+      <AccountDetail {app_state} {account}></AccountDetail>
       <AccountChart {account} snapshots={account_context.snapshots()}></AccountChart>
     </div>
 
