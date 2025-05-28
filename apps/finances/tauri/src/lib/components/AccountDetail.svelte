@@ -60,7 +60,7 @@
         </div>
         {#if account.last_snapshot()}
           <div class="truncate inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-            <MoneyString {app_state} money={account.last_snapshot()!.amount().amount()} tooltip={true} />
+            <MoneyString {app_state} money={account.last_snapshot()} tooltip={true} />
           </div>
         {/if}
       </div>

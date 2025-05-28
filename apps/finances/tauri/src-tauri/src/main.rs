@@ -1,9 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use bigdecimal::BigDecimal;
-use bigdecimal::One;
-use finances_app_models::{google_type, AppState, DatabaseConnection, FxQuote, FxQuotePair};
+use finances_app_models::{google_type, AppState, DatabaseConnection};
 use openexchangerates::OXRClient;
 
 fn main() {
