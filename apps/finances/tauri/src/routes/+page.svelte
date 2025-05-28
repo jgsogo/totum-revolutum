@@ -20,7 +20,7 @@
       <Heading tag="h1" class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">All accounts</Heading>
     </div>
     <div class="col-span-full space-y-4 xl:col-auto">
-      <AccountsTable accounts={data.main_context.accounts()} holder={data.app_state.holder()} />
+      <AccountsTable accounts={data.main_context.accounts()} app_state={data.app_state} />
     </div>
   </div>
 </main>

@@ -9,3 +9,6 @@ DJANGO_BASE_URL=http://localhost.%NAME%
 
 MEDIA_URL=media
 STATIC_URL=static
+
+# Openexchangerates API
+OPENEXCHANGERATES_APIKEY=

@@ -6,4 +6,4 @@
 </script>
 
 Custodian detail card for: {data.custodian.name()}
-<AccountsTable show_custodian={false} accounts={data.custodian_accounts} holder={data.app_state.holder()} />
+<AccountsTable show_custodian={false} accounts={data.custodian_accounts} app_state={data.app_state} />

@@ -13,23 +13,27 @@
     Heading,
     Table,
   } from 'flowbite-svelte';
-  import type { Account, Holder } from '../../../models/src-js';
+  import { FxQuote, FxQuotePair, type Account, type AppState, type Holder } from '../../../models/src-js';
   import { goToAccountDetail } from '$lib/utils';
-  import { DateWrapper } from '../../../../../../libraries/googleapis/src-js';
+  import { DateWrapper, Decimal, Money } from '../../../../../../libraries/googleapis/src-js';
+  import { get_fx_spot } from '$lib/commands';
+  import MoneyString from './MoneyString.svelte';
 
   let {
+    app_state,
     accounts,
-    holder,
     show_custodian = true,
     show_holders = true,
     show_category = true,
   }: {
+    app_state: AppState;
     accounts: Account[];
-    holder: Holder | undefined;
     show_custodian?: boolean;
     show_holders?: boolean;
     show_category?: boolean;
   } = $props();
+
+  let holder = app_state.holder();
 
   // Filters and search
   let searchTerm = $state('');
@@ -55,10 +59,30 @@
   );
 
   // Total sum
-  let total = $derived(
-    // FIXME: Take into account FX (today - spot) when summing different ccys
-    filteredAccounts.reduce((sum, item) => sum + (item.last_snapshot() ? item.last_snapshot()!.amount().amount().amount() : 0), 0),
-  );
+  let total = $state<Money | undefined>();
+  $effect(() => {
+    const x = async () => {
+      let zero_eur = Money.create_from_number(app_state.base_ccy(), 0);
+      total = await filteredAccounts.reduce(async (totalP: Promise<Money>, item: Account) => {
+        const total: Money = await totalP;
+        if (item.last_snapshot()) {
+          const amount_snapshot = item.last_snapshot()!.amount().amount();
+          if (amount_snapshot.currency_code() === total.currency_code()) {
+            return total.sum(amount_snapshot);
+          } else {
+            const fx_rate = await get_fx_spot(amount_snapshot.currency_code().toString());
+            const fx_pair = FxQuotePair.create_from(total.currency_code(), amount_snapshot.currency_code());
+            const fx = FxQuote.create_from(DateWrapper.create_from_date(new Date()), fx_pair, Decimal.create_from_number(fx_rate));
+
+            const amount_snapshot_local = fx?.apply_to(amount_snapshot)!;
+            return total.sum(amount_snapshot_local);
+          }
+        }
+        return total;
+      }, Promise.resolve(zero_eur));
+    };
+    x();
+  });
 </script>
 
 <Card size="xl" class="block p-4 shadow-sm sm:flex sm:space-x-4 sm:p-6 sm:py-6 xl:block xl:space-x-0" horizontal>
@@ -102,7 +126,9 @@
             <TableBodyCell>{account.type().category()}</TableBodyCell>
           {/if}
           <TableBodyCell>{account.type().name()}</TableBodyCell>
-          <TableBodyCell>{account.last_snapshot() ? account.last_snapshot()!.amount().amount() : '-'}</TableBodyCell>
+          <TableBodyCell class="text-right"
+            ><MoneyString {app_state} money={account.last_snapshot()?.amount().amount()} font_mono={true} tooltip={true} /></TableBodyCell
+          >
         </TableBodyRow>
       {/each}
     </TableBody>
@@ -113,7 +139,7 @@
         <td></td>
         {#if show_category}<td></td>{/if}
         <th scope="row" class="px-6 py-3 text-base">Total</th>
-        <td class="px-6 py-3">{total}</td>
+        <td class="px-6 py-3 text-right"><MoneyString {app_state} money={total} font_mono={true} tooltip={true} /></td>
       </tr>
     </tfoot>
   </Table>

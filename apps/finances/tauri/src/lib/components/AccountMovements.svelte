@@ -1,11 +1,17 @@
 <script lang="ts">
   import { Card, Modal, Spinner, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
-  import { Snapshot, Movement, Transaction, MainContext } from '../../../models/src-js';
+  import { Snapshot, Movement, Transaction, MainContext, AppState } from '../../../models/src-js';
   import { sort_date_wrapper } from '../../../../../../libraries/googleapis/src-js/date';
   import { get_transaction } from '$lib/commands';
   import TransactionDetailCard from './TransactionDetailCard.svelte';
+  import MoneyString from './MoneyString.svelte';
 
-  let { snapshots, movements, main_context }: { snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
+  let {
+    app_state,
+    snapshots,
+    movements,
+    main_context,
+  }: { app_state: AppState; snapshots: Snapshot[]; movements: Movement[]; main_context: MainContext } = $props();
 
   // Order together movements and snapshots: more recent items go first, snapshots go last (EOD)
   const entries = $derived(
@@ -46,7 +52,7 @@
             <TableBodyCell>{entry.date_value()}</TableBodyCell>
             <TableBodyCell></TableBodyCell>
             <TableBodyCell></TableBodyCell>
-            <TableBodyCell>{entry.amount().amount()}</TableBodyCell>
+            <TableBodyCell class="text-right"><MoneyString {app_state} money={entry.amount().amount()} font_mono={true} /></TableBodyCell>
             <TableBodyCell></TableBodyCell>
           </TableBodyRow>
         {:else}
@@ -55,7 +61,7 @@
               <TableBodyCell>{entry.date_value()}</TableBodyCell>
               <TableBodyCell>{entry.direction()}</TableBodyCell>
               <TableBodyCell>{entry.type()}</TableBodyCell>
-              <TableBodyCell>{entry.amount()}</TableBodyCell>
+              <TableBodyCell class="text-right"><MoneyString {app_state} money={entry.amount()} font_mono={true} /></TableBodyCell>
               <TableBodyCell><Spinner /></TableBodyCell>
             </TableBodyRow>
           {:then transaction: Transaction}
@@ -63,7 +69,7 @@
               <TableBodyCell>{entry.date_value()}</TableBodyCell>
               <TableBodyCell>{entry.direction()}</TableBodyCell>
               <TableBodyCell>{entry.type()}</TableBodyCell>
-              <TableBodyCell>{entry.amount()}</TableBodyCell>
+              <TableBodyCell class="text-right"><MoneyString {app_state} money={entry.amount()} font_mono={true} /></TableBodyCell>
               <TableBodyCell>{transaction.name()}</TableBodyCell>
             </TableBodyRow>
           {/await}

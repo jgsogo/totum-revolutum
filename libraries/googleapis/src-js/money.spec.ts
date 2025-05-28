@@ -36,15 +36,15 @@ describe('Money USD units', () => {
     });
 
     test('test toString default', ()=> {
-        expect(money.toString()).toEqual('1234,79\xa0US$'); // Use '\xa0', which is a non-breaking space
+        expect(money.toString()).toEqual('1234,79\xa0USD'); // Use '\xa0', which is a non-breaking space
     });
 
     test('test toString es-ES', ()=> {
-        expect(money.toString('es-ES')).toEqual('1234,79\xa0US$');
+        expect(money.toString('es-ES')).toEqual('1234,79\xa0USD');
     });
 
     test('test toString en-US', ()=> {
-        expect(money.toString('en-US')).toEqual('$1,234.79');
+        expect(money.toString('en-US')).toEqual('USD\xa01,234.79');
     });
 });
 
@@ -57,15 +57,15 @@ describe('Money EUR units', () => {
     });
 
     test('test toString default', ()=> {
-        expect(money.toString()).toEqual('1234,79\xa0€');
+        expect(money.toString()).toEqual('1234,79\xa0EUR');
     });
 
     test('test toString es-ES', ()=> {
-        expect(money.toString('es-ES')).toEqual('1234,79\xa0€');
+        expect(money.toString('es-ES')).toEqual('1234,79\xa0EUR');
     });
 
     test('test toString en-US', ()=> {
-        expect(money.toString('en-US')).toEqual('€1,234.79');
+        expect(money.toString('en-US')).toEqual('EUR\xa01,234.79');
     });
 });
 
@@ -78,14 +78,14 @@ describe('Money rounded: five rounded up', () => {
     });
 
     test('test toString default', ()=> {
-        expect(money.toString()).toEqual('1234,79\xa0€');
+        expect(money.toString()).toEqual('1234,79\xa0EUR');
     });
 
     test('test toString es-ES', ()=> {
-        expect(money.toString('es-ES')).toEqual('1234,79\xa0€');
+        expect(money.toString('es-ES')).toEqual('1234,79\xa0EUR');
     });
 
     test('test toString en-US', ()=> {
-        expect(money.toString('en-US')).toEqual('€1,234.79');
+        expect(money.toString('en-US')).toEqual('EUR\xa01,234.79');
     });
 });

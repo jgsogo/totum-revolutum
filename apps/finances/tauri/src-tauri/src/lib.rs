@@ -3,8 +3,9 @@ use tauri::Manager;
 pub mod commands;
 pub mod db;
 pub mod errors;
+pub mod oxr;
 pub use errors::{Error, Result};
-
+use tauri::async_runtime::Mutex;
 mod types;
 mod views;
 use crate::types::ConnectionType;
@@ -17,7 +18,8 @@ use finances_app_models::{
     AppState as AppStateProto, Holder as HolderProto, MainContext as MainContextProto,
     MovementType as MovementTypeProto, TransactionGroup as TransactionGroupProto,
 };
-
+use openexchangerates::OXRClient;
+use oxr::OXRWrapper;
 const SAVINGS_UNIQUE_NAMES: &[&str] = &[finances_accounts::constants::accounttype::ASSETS_CURRENT_SAVINGS];
 const INVESTMENT_UNIQUE_NAMES: &[&str] = &[
     finances_investments::constants::accounttype::ASSETS_CURRENT_INVESTMENT,
@@ -31,6 +33,7 @@ pub fn create_app<R: tauri::Runtime>(
     db_pool: Pool<ConnectionManager<ConnectionType>>,
     state: AppStateProto,
     initial_holder_pk: i64,
+    oxr_client: Option<OXRClient>,
 ) -> tauri::App<R> {
     // TODO: See mutability example in the App::manage method. It shows how to update the connection. Of course we don't want here a hardcoded pool. User may want to switch to different DBs
 
@@ -48,6 +51,9 @@ pub fn create_app<R: tauri::Runtime>(
         holder.photo,
     ));
 
+    // A mutable OXRClient inside a wrapper, so I can cache data returned from server
+    let oxr_client = oxr_client.map(|v| OXRWrapper::new(v));
+
     log::debug!("Crete the tauri app object");
     builder
         .plugin(
@@ -59,6 +65,7 @@ pub fn create_app<R: tauri::Runtime>(
             app.manage(db_pool);
             app.manage(app_state);
             app.manage(main_context);
+            app.manage(Mutex::new(oxr_client));
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
@@ -73,6 +80,7 @@ pub fn create_app<R: tauri::Runtime>(
             commands::transaction::get_transaction,
             //
             commands::last_transactions::past_transactions,
+            oxr::commands::get_fx_spot,
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

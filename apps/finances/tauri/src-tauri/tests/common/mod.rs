@@ -17,7 +17,7 @@ pub fn webview() -> WebviewWindow<MockRuntime> {
         None,
     );
 
-    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone(), 0);
+    let app = finances_app_lib::create_app(tauri::test::mock_builder(), pool.clone(), app_state.clone(), 0, None);
     // FIXME: The `.manage` inside `create_app` is not working for the mock.
     app.manage(app_state);
 

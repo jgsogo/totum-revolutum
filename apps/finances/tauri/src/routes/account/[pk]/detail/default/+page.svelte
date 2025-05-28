@@ -1,6 +1,6 @@
 <script lang="ts">
-  import AccountMovements from "$lib/components/AccountMovements.svelte";
-  import type { AccountContext, MainContext } from "../../../../../../models/src-js";
+  import AccountMovements from '$lib/components/AccountMovements.svelte';
+  import type { AccountContext, MainContext } from '../../../../../../models/src-js';
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -10,5 +10,5 @@
   let main_context: MainContext = data.main_context;
 </script>
 
-<AccountMovements snapshots={account_context.snapshots()} movements={account_context.movements()} {main_context}
+<AccountMovements app_state={data.app_state} snapshots={account_context.snapshots()} movements={account_context.movements()} {main_context}
 ></AccountMovements>

@@ -63,7 +63,12 @@ export class Money {
         const formatter = Intl.NumberFormat(locale, {
             style: 'currency',
             currency: this.money.currencyCode,
-            notation: 'standard'
+            notation: 'standard',
+            currencySign: "accounting",
+            // signDisplay: "always",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            currencyDisplay: "code",
         });
 
         return formatter.format(this.amount());

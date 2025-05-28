@@ -2,3 +2,11 @@
 # Runs finances app (Rust frontend) connecting (read-only) to production database
 run:
     RUST_LOG=debug bazel run //apps/finances:finances-app
+
+release:
+    bazel build --config=release //apps/finances/installable/...
+    @echo ""
+    @echo "🎉 Execute the following to install the package:"
+    @echo ""
+    @echo "\033[1;32msudo installer -pkg bazel-bin/apps/finances/installable/installable.pkg -target / -verboseR\033[0m"
+    @echo ""

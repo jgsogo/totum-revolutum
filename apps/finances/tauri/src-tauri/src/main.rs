@@ -1,7 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use finances_app_models::{google_type, AppState, DatabaseConnection};
+use bigdecimal::BigDecimal;
+use bigdecimal::One;
+use finances_app_models::{google_type, AppState, DatabaseConnection, FxQuote, FxQuotePair};
+use openexchangerates::OXRClient;
 
 fn main() {
     let state = {
@@ -22,8 +25,9 @@ fn main() {
             .map(|s| std::path::PathBuf::from(&s))
             .unwrap_or_else(|_| std::env::temp_dir());
         let backup_folder = camino::Utf8PathBuf::from_path_buf(backup_folder).expect("Invalid tmp folder");
+        let base_ccy = google_type::CurrencyCode::EUR;
         AppState::new(
-            google_type::CurrencyCode::EUR,
+            base_ccy,
             media_url,
             static_url,
             base_url,
@@ -37,7 +41,11 @@ fn main() {
 
     let builder = tauri::Builder::default();
     let initial_holder_pk = 48; // TODO: We don't want to hardcode the initial holder here
-    let app = finances_app_lib::create_app(builder, pool, state, initial_holder_pk);
+    let oxr_client = {
+        let api_key = std::env::var("OPENEXCHANGERATES_APIKEY").expect("OPENEXCHANGERATES_APIKEY envvar is required");
+        OXRClient::new(api_key).unwrap()
+    };
+    let app = finances_app_lib::create_app(builder, pool, state, initial_holder_pk, Some(oxr_client));
 
     log::debug!("Run application");
     app.run(|_app_handle, _event| {

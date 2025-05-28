@@ -6,4 +6,4 @@
 </script>
 
 Category detail card for: {data.category}
-<AccountsTable show_category={false} accounts={data.category_accounts} holder={data.app_state.holder()} />
+<AccountsTable show_category={false} accounts={data.category_accounts} app_state={data.app_state}/>

@@ -10,5 +10,5 @@
   let main_context: MainContext = data.main_context;
 </script>
 
-<AccountMovements snapshots={account_context.snapshots()} movements={account_context.movements()} {main_context}
+<AccountMovements app_state={data.app_state} snapshots={account_context.snapshots()} movements={account_context.movements()} {main_context}
 ></AccountMovements>
