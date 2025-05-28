@@ -1,5 +1,5 @@
 use crate::google_type::CurrencyCode;
-use crate::{Error, FxQuote, Holder, Result};
+use crate::{Error, Holder, Result};
 use camino::{Utf8Path, Utf8PathBuf};
 use proto_wrapper::ProtoWrapper;
 
@@ -63,7 +63,6 @@ impl AppState {
         db: DatabaseConnection,
         backup_directory: &Utf8Path,
         holder: Option<Holder>,
-        fx_spots: Vec<FxQuote>,
     ) -> Self {
         Self(crate::protos::finances_app_models::AppState {
             base_ccy: base_ccy.to_string(),
@@ -73,7 +72,6 @@ impl AppState {
             db: Some(db.into()),
             backup_folder: backup_directory.to_string(),
             holder: holder.map(|v| v.into()),
-            fx_spots: fx_spots.into_iter().map(|v| v.into()).collect(),
         })
     }
 

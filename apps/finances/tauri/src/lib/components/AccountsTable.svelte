@@ -15,7 +15,7 @@
   } from 'flowbite-svelte';
   import { FxQuote, FxQuotePair, type Account, type AppState, type Holder } from '../../../models/src-js';
   import { goToAccountDetail } from '$lib/utils';
-  import { CurrencyCode, DateWrapper, Decimal, Money } from '../../../../../../libraries/googleapis/src-js';
+  import { DateWrapper, Decimal, Money } from '../../../../../../libraries/googleapis/src-js';
   import { get_fx_spot } from '$lib/commands';
   import MoneyString from './MoneyString.svelte';
 
@@ -126,7 +126,9 @@
             <TableBodyCell>{account.type().category()}</TableBodyCell>
           {/if}
           <TableBodyCell>{account.type().name()}</TableBodyCell>
-          <TableBodyCell class="text-right"><MoneyString {app_state} money={account.last_snapshot()?.amount().amount()} font_mono={true} tooltip={true}/></TableBodyCell>
+          <TableBodyCell class="text-right"
+            ><MoneyString {app_state} money={account.last_snapshot()?.amount().amount()} font_mono={true} tooltip={true} /></TableBodyCell
+          >
         </TableBodyRow>
       {/each}
     </TableBody>
@@ -137,7 +139,7 @@
         <td></td>
         {#if show_category}<td></td>{/if}
         <th scope="row" class="px-6 py-3 text-base">Total</th>
-        <td class="px-6 py-3 text-right"><MoneyString money={total} /></td>
+        <td class="px-6 py-3 text-right"><MoneyString {app_state} money={total} font_mono={true} tooltip={true} /></td>
       </tr>
     </tfoot>
   </Table>

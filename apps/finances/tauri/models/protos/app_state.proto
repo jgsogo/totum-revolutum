@@ -2,7 +2,6 @@ syntax = "proto3";
 package finances_app_models;
 
 import "apps/finances/tauri/models/protos/holder.proto";
-import "apps/finances/tauri/models/protos/fx_quote.proto";
 
 message DatabaseConnection {
     string user = 1;
@@ -34,7 +33,4 @@ message AppState {
 
     // Active account holder. Used as filter if applicable
     optional Holder holder = 7;
-
-    // Fx spot for others CCYs to 'base_ccy'
-    repeated FxQuote fx_spots = 8;
 }
