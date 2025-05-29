@@ -89,4 +89,7 @@ export class Money {
         return ((this.currency_code() === other.currency_code()) && this.amount() === other.amount());
     }
 
+    equal_with_tolerance(other: Money, tolerance: number): boolean {
+        return this.currency_code() === other.currency_code() && Math.abs(this.amount() - other.amount()) < tolerance;
+    }
 }

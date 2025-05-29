@@ -50,7 +50,7 @@ export class NewTransaction {
         const total_to = this.total_to(base_ccy);
         const total_from = this.total_from(base_ccy);
         if (total_to && total_from) {
-            return total_from.equal(total_to);
+            return total_from.equal_with_tolerance(total_to, 1e-4);
         }
         return false;
     }
