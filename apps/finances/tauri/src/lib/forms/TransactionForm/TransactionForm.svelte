@@ -45,7 +45,7 @@
     <div class="w-1/2 px-2">
       <Label class="space-y-2 py-2">
         <span>Description</span>
-        <Textarea placeholder="Long description" rows="8" bind:value={transaction.description} />
+        <Textarea placeholder="Long description" rows={8} bind:value={transaction.description} />
       </Label>
       <Checkbox bind:checked={show_date}>All movements the same date</Checkbox>
     </div>
