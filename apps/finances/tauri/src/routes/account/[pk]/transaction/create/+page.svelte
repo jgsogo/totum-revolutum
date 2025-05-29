@@ -85,7 +85,7 @@
 
 <div class="mt-px space-y-4">
   <div class="grid gap-4">
-    <AccountDetail base_media_url={app_state.base_media_url()} account={account_context.account()}></AccountDetail>
+    <AccountDetail {app_state} account={account_context.account()}></AccountDetail>
 
     <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
 
@@ -228,7 +228,7 @@
 
 <Modal bind:open={transaction_details_modal} size="xl" class="w-full h-full" autoclose outsideclose>
   {#if transaction_details}
-    <TransactionDetailCard transaction={transaction_details} {main_context} />
+    <TransactionDetailCard {app_state} transaction={transaction_details} {main_context} />
   {:else}
     Error: There is no transaction to show!
   {/if}
