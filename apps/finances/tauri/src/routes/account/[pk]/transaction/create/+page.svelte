@@ -85,7 +85,7 @@
 
 <div class="mt-px space-y-4">
   <div class="grid gap-4">
-    <AccountDetail {app_state} account={account_context.account()}></AccountDetail>
+    <AccountDetail {app_state} account={account_context.account()} movements={account_context.movements()}></AccountDetail>
 
     <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-4xl lg:text-5xl">New transaction</Heading>
 

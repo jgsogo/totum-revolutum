@@ -85,6 +85,13 @@ export class Money {
         return Money.create_from_number(this.currency_code(), this.amount() + other.amount());
     }
 
+    substract(other: Money): Money {
+        if (this.currency_code() != other.currency_code()) {
+            throw new Error(`Cannot sum ${this.currency_code()} with ${other.currency_code()}`);
+        }
+        return Money.create_from_number(this.currency_code(), this.amount() - other.amount());
+    }
+
     equal(other: Money): boolean {
         return ((this.currency_code() === other.currency_code()) && this.amount() === other.amount());
     }

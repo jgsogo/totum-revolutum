@@ -125,4 +125,8 @@ export class Account {
     holders(): Holder[] {
         return this.account.holders.map((v) => new Holder(v));
     }
+
+    holded_by(holder: Holder): boolean {
+        return this.account.holders.findIndex((v) => Number(v.pk) === holder.pk()) !== -1;
+    }
 }

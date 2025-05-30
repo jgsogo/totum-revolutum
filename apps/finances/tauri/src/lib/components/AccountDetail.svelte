@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Card, Modal } from 'flowbite-svelte';
+  import { Card, Modal } from 'flowbite-svelte';
 
   import { CameraPhotoOutline, ArrowDownToBracketOutline, ArrowUpFromBracketOutline } from 'flowbite-svelte-icons';
   import SnapshotForm from '$lib/forms/SnapshotForm/SnapshotForm.svelte';
@@ -7,11 +7,11 @@
   import { create_snapshot } from '$lib/commands';
 
   import { NewSnapshot } from '$lib/forms/SnapshotForm/NewSnapshot.svelte';
-  import { Account, AppState } from '../../../models/src-js';
+  import { Account, AppState, Movement } from '../../../models/src-js';
   import Avatar from './Avatar.svelte';
-  import MoneyString from './MoneyString.svelte';
+  import LastSnapshotMoneyString from './LastSnapshotMoneyString.svelte';
 
-  let { app_state, account }: { app_state: AppState; account: Account } = $props();
+  let { app_state, account, movements }: { app_state: AppState; account: Account; movements?: Movement[] | undefined } = $props();
 
   let snapshotModal: boolean = $state(false);
 
@@ -60,7 +60,7 @@
         </div>
         {#if account.last_snapshot()}
           <div class="truncate inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-            <MoneyString {app_state} money={account.last_snapshot()} tooltip={true} />
+            <LastSnapshotMoneyString {app_state} {account} {movements} tooltip={true} />
           </div>
         {/if}
       </div>

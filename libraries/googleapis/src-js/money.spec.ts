@@ -117,3 +117,21 @@ describe('Money equal with tolerance: five rounded up', () => {
         expect(money1.equal_with_tolerance(money2, 1e-2)).toBe(true);
     });
 });
+
+
+describe('Money operations', () => {
+    let proto1 = create(MoneySchema, { currencyCode: 'EUR', units: BigInt(5) });
+    let money1 = new Money(proto1);
+
+    let proto2 = create(MoneySchema, { currencyCode: 'EUR', units: BigInt(8) });
+    let money2 = new Money(proto2);
+
+    test('sum', ()=> {
+        expect(money1.sum(money2).amount()).toBe(13);
+    });
+
+    test('substract', ()=> {
+        expect(money1.substract(money2).amount()).toBe(-3);
+        expect(money2.substract(money1).amount()).toBe(3);
+    });
+});
