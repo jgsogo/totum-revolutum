@@ -206,6 +206,7 @@
     </TableBody>
     <tfoot>
       <tr class="font-semibold text-gray-900 dark:text-white">
+        <td></td>
         {#if show_custodian}<td></td>{/if}
         {#if show_holders}<td></td>{/if}
         <td></td>

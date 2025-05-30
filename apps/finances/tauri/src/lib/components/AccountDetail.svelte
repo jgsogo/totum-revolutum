@@ -33,7 +33,7 @@
     <li class="py-3 sm:py-3.5">
       <div class="flex items-center justify-between">
         <div class="flex min-w-0 items-center">
-          <Avatar photo_url={app_state.base_media_url() + account.custodian().photo()} name={account.custodian().name()} />
+          <Avatar photo_url={ app_state.base_url() + app_state.base_media_url() + account.custodian().photo()} name={account.custodian().name()} />
 
           <div class="ml-3">
             <p class="truncate font-medium text-gray-900 dark:text-white">
