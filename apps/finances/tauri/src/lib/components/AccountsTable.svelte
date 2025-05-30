@@ -96,7 +96,7 @@
     }
 
     // Closed accounts
-    if (account.close()) {
+    if (account.close()?.less_than(today)) {
       if (!last_snapshot) {
         color_level = Math.max(color_level, 2);
         notifications.push('Account is closed, but there is no snapshot!');
