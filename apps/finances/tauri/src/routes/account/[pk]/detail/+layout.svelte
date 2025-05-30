@@ -28,7 +28,7 @@
     </div>
 
     <div class="grid grid-cols-2 gap-4 dark:bg-gray-900">
-      <AccountDetail {app_state} {account}></AccountDetail>
+      <AccountDetail {app_state} {account} movements={account_context.movements()}></AccountDetail>
       <AccountChart {account} snapshots={account_context.snapshots()}></AccountChart>
     </div>
 

@@ -7,8 +7,8 @@ POSTGRES_DB=${DJANGO_SQL_DATABASE}
 
 DJANGO_BASE_URL=http://localhost.%NAME%
 
-MEDIA_URL=media
-STATIC_URL=static
+MEDIA_URL=/media/
+STATIC_URL=/static/
 
 # Openexchangerates API
 OPENEXCHANGERATES_APIKEY=
