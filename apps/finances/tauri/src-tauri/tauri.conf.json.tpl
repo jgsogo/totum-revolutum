@@ -7,7 +7,7 @@
       {
         "height": 1500,
         "title": "finances",
-        "width": 1500
+        "width": 1800
       }
     ]
   },

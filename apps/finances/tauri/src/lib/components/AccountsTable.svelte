@@ -1,23 +1,25 @@
 <script lang="ts">
   import {
     Toggle,
+    Tooltip,
     Toolbar,
     Input,
-    ToolbarButton,
     TableBody,
     TableBodyCell,
     TableBodyRow,
     TableHead,
     TableHeadCell,
     Card,
-    Heading,
     Table,
+    Button,
+    Indicator,
   } from 'flowbite-svelte';
-  import { FxQuote, FxQuotePair, type Account, type AppState, type Holder } from '../../../models/src-js';
+  import { FxQuote, FxQuotePair, Snapshot, type Account, type AppState, type Holder } from '../../../models/src-js';
   import { goToAccountDetail } from '$lib/utils';
   import { DateWrapper, Decimal, Money } from '../../../../../../libraries/googleapis/src-js';
   import { get_fx_spot } from '$lib/commands';
   import MoneyString from './MoneyString.svelte';
+  import { EnvelopeSolid } from 'flowbite-svelte-icons';
 
   let {
     app_state,
@@ -58,6 +60,44 @@
     }),
   );
 
+  // Notes associated to accounts
+  const max_days_old_for_warning = 20;
+  const date_warning = DateWrapper.create_from_date(new Date(new Date().setDate(new Date().getDate() - max_days_old_for_warning)));
+  const max_days_old_for_error = 35;
+  const date_error = DateWrapper.create_from_date(new Date(new Date().setDate(new Date().getDate() - max_days_old_for_error)));
+  const colors = new Map([
+    [0, 'blue'],
+    [1, 'yellow'],
+    [2, 'red'],
+  ]);
+  async function get_account_notes(account: Account): Promise<[string, string[]]> {
+    let color_level = 0;
+    let notifications: string[] = [];
+    const last_snapshot = account.last_snapshot();
+
+    // Closed accounts
+    if (account.close() && !last_snapshot) {
+      color_level = Math.max(color_level, 2);
+      notifications.push('Account is closed, but there is no snapshot!');
+    }
+    if (account.close() && last_snapshot && last_snapshot.date_value().less_than(account.close()!)) {
+      color_level = Math.max(color_level, 1);
+      notifications.push('Account is closed, but last snapshot is for a previous date');
+    }
+
+    // Snapshot date
+    if (last_snapshot && last_snapshot.date_value().less_than(date_error)) {
+      color_level = Math.max(color_level, 2);
+      notifications.push(`Last snapshot is ${max_days_old_for_error} old or more. Please, add one snapshot`);
+    } else if (last_snapshot && last_snapshot?.date_value().less_than(date_warning)) {
+      color_level = Math.max(color_level, 1);
+      notifications.push(`Last snapshot is ${max_days_old_for_warning} old or more.`);
+    }
+
+    const color = colors.get(color_level);
+    return [color || 'red', notifications];
+  }
+
   // Total sum
   let total = $state<Money | undefined>();
   $effect(() => {
@@ -94,6 +134,7 @@
 
   <Table hoverable={true} noborder striped class="mt-6 min-w-full divide-y divide-gray-200 dark:divide-gray-600">
     <TableHead class="bg-gray-50 dark:bg-gray-700">
+      <TableHeadCell></TableHeadCell>
       {#if show_custodian}
         <TableHeadCell>Custodian</TableHeadCell>
       {/if}
@@ -110,6 +151,18 @@
     <TableBody tableBodyClass="divide-y">
       {#each filteredAccounts as account}
         <TableBodyRow onclick={() => goToAccountDetail(account)}>
+          <TableBodyCell>
+            {#await get_account_notes(account) then [color, notifications]}
+              {#if notifications.length}
+                <Button class="relative" size="sm">
+                  <EnvelopeSolid class="text-white dark:text-white" />
+                  <span class="sr-only">Notifications</span>
+                  <Indicator {color} border size="xl" placement="top-right" class="text-xs font-bold">{notifications.length}</Indicator>
+                </Button>
+                <Tooltip>{notifications.join('<br/>')}</Tooltip>
+              {/if}
+            {/await}
+          </TableBodyCell>
           {#if show_custodian}
             <TableBodyCell>{account.custodian().name()}</TableBodyCell>
           {/if}
@@ -126,9 +179,9 @@
             <TableBodyCell>{account.type().category()}</TableBodyCell>
           {/if}
           <TableBodyCell>{account.type().name()}</TableBodyCell>
-          <TableBodyCell class="text-right"
-            ><MoneyString {app_state} money={account.last_snapshot()} font_mono={true} tooltip={true} /></TableBodyCell
-          >
+          <TableBodyCell class="text-right">
+            <MoneyString {app_state} money={account.last_snapshot()} font_mono={true} tooltip={true} />
+          </TableBodyCell>
         </TableBodyRow>
       {/each}
     </TableBody>
