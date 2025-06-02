@@ -46,7 +46,7 @@ DJANGO_HOST_AND_PORT=$($DOCKER_COMPOSE_COMMAND port nginx 80 | head -n 1)
 export DJANGO_HOST=$(echo "$DJANGO_HOST_AND_PORT" | cut -d ":" -f 1)
 export DJANGO_PORT=$(echo "$DJANGO_HOST_AND_PORT" | cut -d ":" -f 2)
 export DJANGO_BASE_URL="http://$DJANGO_HOST:$DJANGO_PORT"
-echo "Django ready at '$DJANGO_BASE_URL'"
+echo "Django ready at '$DJANGO_BASE_URL/admin'"
 
 # Wait until Postgres is ready
 RETRY_COUNT=0

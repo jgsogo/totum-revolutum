@@ -3,12 +3,12 @@ from django_finances_accounts.models import MovementDirection
 from django_finances_investments.models import (
     MovementDividend,
     MovementNumerable,
-    SnapshotNumerable,
 )
 
 
 class MovementNumerableInInline(admin.TabularInline):
     model = MovementNumerable
+    readonly_fields = ("amount",)
     extra = 1
 
     verbose_name = "Movement Numerable IN"
@@ -21,6 +21,7 @@ class MovementNumerableInInline(admin.TabularInline):
 
 class MovementNumerableOutInline(admin.TabularInline):
     model = MovementNumerable
+    readonly_fields = ("amount",)
     extra = 1
 
     verbose_name = "Movement Numerable OUT"
@@ -33,6 +34,7 @@ class MovementNumerableOutInline(admin.TabularInline):
 
 class MovementDividendInInline(admin.TabularInline):
     model = MovementDividend
+    readonly_fields = ("amount",)
     extra = 1
 
     verbose_name = "Movement Dividend IN"
@@ -45,6 +47,7 @@ class MovementDividendInInline(admin.TabularInline):
 
 class MovementDividendOutInline(admin.TabularInline):
     model = MovementDividend
+    readonly_fields = ("amount",)
     extra = 1
 
     verbose_name = "Movement Dividend OUT"
@@ -53,11 +56,3 @@ class MovementDividendOutInline(admin.TabularInline):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.filter(direction=MovementDirection.OUT)
-
-
-class SnapshotNumerableInline(admin.TabularInline):
-    model = SnapshotNumerable
-    extra = 1
-
-    verbose_name = "Snapshot numerable"
-    verbose_name_plural = "Snapshots numerable"

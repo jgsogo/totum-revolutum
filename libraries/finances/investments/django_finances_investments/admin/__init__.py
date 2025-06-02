@@ -13,8 +13,8 @@ from .inlines import (
     MovementDividendOutInline,
     MovementNumerableInInline,
     MovementNumerableOutInline,
-    SnapshotNumerableInline,
 )
+from .snapshot_numerable import SnapshotNumerableInline, SnapshotNumerableModelAdmin
 
 # Append more inlines to models from finances/accounts (taken from
 # https://stackoverflow.com/questions/32590901/how-can-i-add-inlines-to-the-modeladmin-of-another-app-without-a-circular-depen)
@@ -62,12 +62,6 @@ admin.site._registry[Account].inlines = [
 ]
 
 
-class SnapshotNumerableModelAdmin(admin.ModelAdmin):
-    list_display = ("account", "date_value", "quantity", "unit_value")
-    list_filter = ("account", "date_value")
-    search_fields = ("account",)
-
-
 admin.site.register(SnapshotNumerable, SnapshotNumerableModelAdmin)
 
 
@@ -87,6 +81,7 @@ class MovementNumerableAdmin(admin.ModelAdmin):
         "type",
     )
     search_fields = ("transaction__group", "account", "transaction")
+    readonly_fields = ("amount",)
 
 
 admin.site.register(MovementNumerable, MovementNumerableAdmin)
@@ -109,6 +104,7 @@ class MovementDividendAdmin(admin.ModelAdmin):
         "type",
     )
     search_fields = ("transaction__group", "account", "transaction")
+    readonly_fields = ("amount",)
 
 
 admin.site.register(MovementDividend, MovementDividendAdmin)
