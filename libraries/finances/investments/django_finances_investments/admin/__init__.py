@@ -1,21 +1,65 @@
 from django.contrib import admin
+from django_finances_accounts.admin.inlines import (
+    AccountHolderRoleInline,
+    MovementInInline,
+    MovementOutInline,
+    SnapshotInline,
+)
+from django_finances_accounts.models import Account, Transaction
 
 from ..models import MovementDividend, MovementNumerable, SnapshotNumerable
+from .inlines import (
+    MovementDividendInInline,
+    MovementDividendOutInline,
+    MovementNumerableInInline,
+    MovementNumerableOutInline,
+    SnapshotNumerableInline,
+)
 
-# from django_finances_accounts.models import Transaction, Account
-# from .inlines import (
-#     MovementNumerableInInline,
-#     MovementNumerableOutInline,
-#     MovementDividendInInline,
-#     MovementDividendOutInline,
-#     SnapshotNumerableInline,
-# )
+# Append more inlines to models from finances/accounts (taken from
+# https://stackoverflow.com/questions/32590901/how-can-i-add-inlines-to-the-modeladmin-of-another-app-without-a-circular-depen)
 
-# Append more inlines to models from finances/accounts
-# (taken from https://stackoverflow.com/questions/32590901/how-can-i-add-inlines-to-the-modeladmin-of-another-app-without-a-circular-depen)
-# admin.site._registry[Transaction].inlines.extend([MovementNumerableInInline, MovementNumerableOutInline, MovementDividendInInline, MovementDividendOutInline])
-# admin.site._registry[Account].inlines.append(SnapshotNumerableInline)
-# FIXME: Remove snapshots/movements that are instances of these child classes. We want them to show up in these inlines, not the parent's
+
+class MovementInInline(MovementInInline):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Filter out all snapshots that are MovementNumerable
+        qs = qs.exclude(pk__in=MovementNumerable.objects.all().values_list("pk", flat=True))
+        return qs
+
+
+class MovementOutInline(MovementOutInline):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Filter out all snapshots that are MovementNumerable
+        qs = qs.exclude(pk__in=MovementNumerable.objects.all().values_list("pk", flat=True))
+        return qs
+
+
+admin.site._registry[Transaction].inlines = [
+    MovementInInline,
+    MovementOutInline,
+    MovementNumerableInInline,
+    MovementNumerableOutInline,
+    MovementDividendInInline,
+    MovementDividendOutInline,
+]
+
+
+class SnapshotInline(SnapshotInline):
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Filter out all snapshots that are SnapshotNumerable
+        qs = qs.exclude(pk__in=SnapshotNumerable.objects.all().values_list("pk", flat=True))
+        return qs
+
+
+admin.site._registry[Account].inlines = [
+    AccountHolderRoleInline,
+    SnapshotInline,
+    SnapshotNumerableInline,
+]
 
 
 class SnapshotNumerableModelAdmin(admin.ModelAdmin):

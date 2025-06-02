@@ -1,18 +1,18 @@
 from django.contrib import admin
+from django_finances_accounts.models import MovementDirection
 from django_finances_investments.models import (
-    MovementNumerable,
     MovementDividend,
+    MovementNumerable,
     SnapshotNumerable,
 )
-from django_finances_accounts.models import MovementDirection
 
 
 class MovementNumerableInInline(admin.TabularInline):
     model = MovementNumerable
     extra = 1
 
-    verbose_name = "MovementNumerable IN"
-    verbose_name_plural = "MovementsNumerable IN"
+    verbose_name = "Movement Numerable IN"
+    verbose_name_plural = "Movements Numerable IN"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -23,8 +23,8 @@ class MovementNumerableOutInline(admin.TabularInline):
     model = MovementNumerable
     extra = 1
 
-    verbose_name = "MovementNumerable OUT"
-    verbose_name_plural = "MovementsNumerable OUT"
+    verbose_name = "Movement Numerable OUT"
+    verbose_name_plural = "Movements Numerable OUT"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -35,8 +35,8 @@ class MovementDividendInInline(admin.TabularInline):
     model = MovementDividend
     extra = 1
 
-    verbose_name = "MovementDividend IN"
-    verbose_name_plural = "MovementsDividend IN"
+    verbose_name = "Movement Dividend IN"
+    verbose_name_plural = "Movements Dividend IN"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -47,8 +47,8 @@ class MovementDividendOutInline(admin.TabularInline):
     model = MovementDividend
     extra = 1
 
-    verbose_name = "MovementDividend OUT"
-    verbose_name_plural = "MovementsDividend OUT"
+    verbose_name = "Movement Dividend OUT"
+    verbose_name_plural = "Movements Dividend OUT"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -58,3 +58,6 @@ class MovementDividendOutInline(admin.TabularInline):
 class SnapshotNumerableInline(admin.TabularInline):
     model = SnapshotNumerable
     extra = 1
+
+    verbose_name = "Snapshot numerable"
+    verbose_name_plural = "Snapshots numerable"

@@ -11,7 +11,7 @@ class MovementInInline(admin.TabularInline):
     verbose_name_plural = "Movements IN"
 
     def get_queryset(self, request):
-        qs = super(MovementInInline, self).get_queryset(request)
+        qs = super().get_queryset(request)
         return qs.filter(direction=MovementDirection.IN)
 
 
@@ -23,13 +23,16 @@ class MovementOutInline(admin.TabularInline):
     verbose_name_plural = "Movements OUT"
 
     def get_queryset(self, request):
-        qs = super(MovementOutInline, self).get_queryset(request)
+        qs = super().get_queryset(request)
         return qs.filter(direction=MovementDirection.OUT)
 
 
 class SnapshotInline(admin.TabularInline):
     model = Snapshot
     extra = 1
+
+    verbose_name = "Snapshot"
+    verbose_name_plural = "Snapshots"
 
 
 class AccountHolderRoleInline(admin.TabularInline):
