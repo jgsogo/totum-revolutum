@@ -8,19 +8,29 @@ from django_finances_accounts.admin.inlines import (
 from django_finances_accounts.models import Account, Transaction
 
 from ..models import MovementDividend, MovementNumerable, SnapshotNumerable
-from .inlines import (
+from ._filter_numerable_accounts import _FilterNonNumerableAccounts
+from .movement_dividend import (
+    MovementDividendAdmin,
     MovementDividendInInline,
     MovementDividendOutInline,
+)
+from .movement_numerable import (
+    MovementNumerableAdmin,
     MovementNumerableInInline,
     MovementNumerableOutInline,
 )
 from .snapshot_numerable import SnapshotNumerableInline, SnapshotNumerableModelAdmin
 
+admin.site.register(SnapshotNumerable, SnapshotNumerableModelAdmin)
+admin.site.register(MovementNumerable, MovementNumerableAdmin)
+admin.site.register(MovementDividend, MovementDividendAdmin)
+
+
 # Append more inlines to models from finances/accounts (taken from
 # https://stackoverflow.com/questions/32590901/how-can-i-add-inlines-to-the-modeladmin-of-another-app-without-a-circular-depen)
 
 
-class MovementInInline(MovementInInline):
+class MovementInInline(_FilterNonNumerableAccounts, MovementInInline):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         # Filter out all snapshots that are MovementNumerable
@@ -28,7 +38,7 @@ class MovementInInline(MovementInInline):
         return qs
 
 
-class MovementOutInline(MovementOutInline):
+class MovementOutInline(_FilterNonNumerableAccounts, MovementOutInline):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         # Filter out all snapshots that are MovementNumerable
@@ -46,7 +56,7 @@ admin.site._registry[Transaction].inlines = [
 ]
 
 
-class SnapshotInline(SnapshotInline):
+class SnapshotInline(_FilterNonNumerableAccounts, SnapshotInline):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -60,51 +70,3 @@ admin.site._registry[Account].inlines = [
     SnapshotInline,
     SnapshotNumerableInline,
 ]
-
-
-admin.site.register(SnapshotNumerable, SnapshotNumerableModelAdmin)
-
-
-class MovementNumerableAdmin(admin.ModelAdmin):
-    list_display = (
-        "account",
-        "date_value",
-        "direction",
-        "transaction__group",
-        "type",
-        "quantity",
-        "unit_value",
-    )
-    list_filter = (
-        "date_value",
-        "direction",
-        "type",
-    )
-    search_fields = ("transaction__group", "account", "transaction")
-    readonly_fields = ("amount",)
-
-
-admin.site.register(MovementNumerable, MovementNumerableAdmin)
-
-
-class MovementDividendAdmin(admin.ModelAdmin):
-    list_display = (
-        "account",
-        "date_value",
-        "direction",
-        "transaction__group",
-        "type",
-        "ex_dividend_date",
-        "unit_value",
-    )
-    list_filter = (
-        "ex_dividend_date",
-        "date_value",
-        "direction",
-        "type",
-    )
-    search_fields = ("transaction__group", "account", "transaction")
-    readonly_fields = ("amount",)
-
-
-admin.site.register(MovementDividend, MovementDividendAdmin)

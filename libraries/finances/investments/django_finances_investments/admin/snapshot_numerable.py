@@ -1,13 +1,7 @@
 from django.contrib import admin
-from django_finances_accounts.models import Account
 from django_finances_investments.models import SnapshotNumerable
 
-
-class _FilterNumerableAccounts:
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "account":
-            kwargs["queryset"] = Account.objects.filter(is_numerable=True)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+from ._filter_numerable_accounts import _FilterNumerableAccounts
 
 
 class SnapshotNumerableInline(_FilterNumerableAccounts, admin.TabularInline):

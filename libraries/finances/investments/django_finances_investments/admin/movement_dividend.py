@@ -2,23 +2,24 @@ from django.contrib import admin
 from django_finances_accounts.admin.inlines import get_movement_inline_form
 from django_finances_accounts.models import MovementDirection
 from django_finances_investments.models import (
-    MovementNumerable,
+    MovementDividend,
 )
 
 from ._filter_numerable_accounts import _FilterNumerableAccounts
 
 
-class MovementNumerableAdmin(_FilterNumerableAccounts, admin.ModelAdmin):
+class MovementDividendAdmin(_FilterNumerableAccounts, admin.ModelAdmin):
     list_display = (
         "account",
         "date_value",
         "direction",
         "transaction__group",
         "type",
-        "quantity",
+        "ex_dividend_date",
         "unit_value",
     )
     list_filter = (
+        "ex_dividend_date",
         "date_value",
         "direction",
         "type",
@@ -27,30 +28,30 @@ class MovementNumerableAdmin(_FilterNumerableAccounts, admin.ModelAdmin):
     readonly_fields = ("amount",)
 
 
-class MovementNumerableInInline(_FilterNumerableAccounts, admin.TabularInline):
-    model = MovementNumerable
+class MovementDividendInInline(_FilterNumerableAccounts, admin.TabularInline):
+    model = MovementDividend
     form = get_movement_inline_form(MovementDirection.IN)
     exclude = ("direction",)
     readonly_fields = ("amount",)
     extra = 1
 
-    verbose_name = "Movement Numerable IN"
-    verbose_name_plural = "Movements Numerable IN"
+    verbose_name = "Movement Dividend IN"
+    verbose_name_plural = "Movements Dividend IN"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.filter(direction=MovementDirection.IN)
 
 
-class MovementNumerableOutInline(_FilterNumerableAccounts, admin.TabularInline):
-    model = MovementNumerable
+class MovementDividendOutInline(_FilterNumerableAccounts, admin.TabularInline):
+    model = MovementDividend
     form = get_movement_inline_form(MovementDirection.IN)
     exclude = ("direction",)
     readonly_fields = ("amount",)
     extra = 1
 
-    verbose_name = "Movement Numerable OUT"
-    verbose_name_plural = "Movements Numerable OUT"
+    verbose_name = "Movement Dividend OUT"
+    verbose_name_plural = "Movements Dividend OUT"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
