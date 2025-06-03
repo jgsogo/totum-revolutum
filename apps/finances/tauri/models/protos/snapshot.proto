@@ -13,3 +13,29 @@ message Snapshot {
 
     int64 account_pk = 4;
 }
+
+
+/**
+ * Request to get the `Snapshot`s for a given account.enum
+ *
+ * The request can include to optional dates to limit the range to
+ * consider in the query. Snapshot matching any of those dates
+ * should be considered in the query.
+ */
+message SnapshotsRequest {
+    int64 account_pk = 1;
+    optional google.type.Date start_date = 2;
+    optional google.type.Date end_date = 3;
+}
+
+/**
+ * A response to the `SnapshotsRequests` query. It includes all
+ * the snapshots between two dates for a given account. Snapshots
+ * are ordered according to their dates.
+ */
+message SnapshotsResponse {
+    int64 account_pk = 1;
+    repeated Snapshot snapshots = 2;
+    optional google.type.Date start_date = 3;
+    optional google.type.Date end_date = 4;
+}
