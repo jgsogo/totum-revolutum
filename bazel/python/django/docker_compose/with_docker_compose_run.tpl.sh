@@ -24,7 +24,7 @@ DOCKER_COMPOSE_COMMAND="$CONTAINER_CLI compose --project-name=%PROJECT_NAME% %DO
 
 # Ensure we execute the docker compose DOWN
 function finish {
-    echo "docker compose down"
+    echo "docker compose down (%DOCKER_COMPOSE_DOWN_ARGS%)"
     $DOCKER_COMPOSE_COMMAND down %DOCKER_COMPOSE_DOWN_ARGS%
 }
 trap finish EXIT SIGTERM SIGINT  # Capture Ctrl_C (SIGINT)
@@ -33,6 +33,7 @@ trap finish EXIT SIGTERM SIGINT  # Capture Ctrl_C (SIGINT)
 # $DOCKER_COMPOSE_COMMAND config %SERVICES%
 $DOCKER_COMPOSE_COMMAND up %SERVICES% --wait --wait-timeout 120
 # $DOCKER_COMPOSE_COMMAND up %SERVICES%
+# $DOCKER_COMPOSE_COMMAND logs -t -f --tail 5 %SERVICES%
 
 # Get the external port for internal 5432
 SERVICE_NAME="db"
@@ -45,6 +46,7 @@ DJANGO_HOST_AND_PORT=$($DOCKER_COMPOSE_COMMAND port nginx 80 | head -n 1)
 export DJANGO_HOST=$(echo "$DJANGO_HOST_AND_PORT" | cut -d ":" -f 1)
 export DJANGO_PORT=$(echo "$DJANGO_HOST_AND_PORT" | cut -d ":" -f 2)
 export DJANGO_BASE_URL="http://$DJANGO_HOST:$DJANGO_PORT"
+echo "Django ready at '$DJANGO_BASE_URL/admin'"
 
 # Wait until Postgres is ready
 RETRY_COUNT=0

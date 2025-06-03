@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Run all the '$1' targets
+set -euox pipefail
 
 targets=$(bazel query 'kind("oci_load", //...)')
 

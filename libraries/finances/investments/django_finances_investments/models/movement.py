@@ -60,7 +60,8 @@ class MovementDividend(Movement):
         ).first()
         if not snapshot:
             raise ObjectDoesNotExist(
-                "Associated account doesn't have any Snapshot previous to the dividend ex_date"
+                "Associated account doesn't have any Snapshot previous to the dividend ex_date."
+                " Create the snapshot first"
             )
         return snapshot
 

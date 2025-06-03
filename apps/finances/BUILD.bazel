@@ -44,13 +44,14 @@ with_docker_compose_run(
         "DJANGO_SUPERUSER_PASSWORD": "django",
         "DJANGO_SUPERUSER_USERNAME": "django",
         "DJANGO_SUPERUSER_EMAIL": "django@django.com",
-        # Migrate data from legacy DB ('host.docker.internal' is the host for the _external localhost_)
-        # "LEGACY_DATABASE_URL": "postgres://finances_ro:finances_ro@host.docker.internal:5432/finances",
+        # Copy DB into the dev server ('host.docker.internal' is the host for the _external localhost_)
+        "PRODUCTION_DATABASE_URL": "postgres://finances_ro:finances_ro@host.docker.internal:5433/finances",
         # Rust debugging
         "RUST_BACKTRACE": "1",
         "RUST_LOG": "debug",
+        "OPENEXCHANGERATES_APIKEY": "empty",
     },
-    remove_volumes = False,
+    remove_volumes = True,
 )
 
 # The frontend is just a regular Svelte application with SSR enabled
