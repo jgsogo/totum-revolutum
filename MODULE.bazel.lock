@@ -40,8 +40,8 @@
     "https://bcr.bazel.build/modules/aspect_rules_lint/0.12.0/MODULE.bazel": "e767c5dbfeb254ec03275a7701b5cfde2c4d2873676804bc7cb27ddff3728fed",
     "https://bcr.bazel.build/modules/aspect_rules_lint/1.4.4/MODULE.bazel": "24459eeeeb084bc3e7628c338e494746718bc17b3a3cbd94415c8df5c7c6dc37",
     "https://bcr.bazel.build/modules/aspect_rules_lint/1.4.4/source.json": "68a98376c993a8113ac3a5e75eaab588bd61f67e5d633dee31770f9a9a6c785b",
-    "https://bcr.bazel.build/modules/aspect_rules_py/1.5.2/MODULE.bazel": "7e34964847c5ddf391a927a765d8b26147df5b25242f2da4fa3c4a77671383bb",
-    "https://bcr.bazel.build/modules/aspect_rules_py/1.5.2/source.json": "020d2bd6b07210cee97226ee2215d80c4cf91e455a6702c9af1e5788d072e673",
+    "https://bcr.bazel.build/modules/aspect_rules_py/1.4.0/MODULE.bazel": "6fd29b93207a31445d5d3ab9d9882fd5511e43c95e8e82e7492872663720fd44",
+    "https://bcr.bazel.build/modules/aspect_rules_py/1.4.0/source.json": "fb1ba946478fb6dbb26d49307d756b0fd2ff88be339af23c39c0397d59143d2c",
     "https://bcr.bazel.build/modules/aspect_rules_ts/3.6.0/MODULE.bazel": "d0045b5eabb012be550a609589b3e5e47eba682344b19cfd9365d4d896ed07df",
     "https://bcr.bazel.build/modules/aspect_rules_ts/3.6.0/source.json": "5593e3f1cd0dd5147f7748e163307fd5c2e1077913d6945b58739ad8d770a290",
     "https://bcr.bazel.build/modules/bazel_features/0.1.0/MODULE.bazel": "47011d645b0f949f42ee67f2e8775188a9cf4a0a1528aa2fa4952f2fd00906fd",
@@ -9882,8 +9882,8 @@
     },
     "@@aspect_rules_py+//py:extensions.bzl%py_tools": {
       "general": {
-        "bzlTransitiveDigest": "EUuiPgLpYNMBPhlXij+YTCunTYXO0xc8lbYrT30PN2c=",
-        "usagesDigest": "NF8rrFAtM0OxyfflUbQNlgnkIH3YSHU4jCm3dhvpGY4=",
+        "bzlTransitiveDigest": "r1tb6Z5Q+hIKmjACY2D+BorcGgFPYXVG5xxZLOh0RwA=",
+        "usagesDigest": "NC1b49l5tenTBVWEUGzzC0j5Kg1GH+l5lBw5JRCldIU=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -9931,25 +9931,25 @@
             }
           },
           "rules_py_tools.darwin_amd64": {
-            "repoRuleId": "@@aspect_rules_py+//py/private/toolchain:repo.bzl%prebuilt_tool_repo",
+            "repoRuleId": "@@aspect_rules_py+//py/private/toolchain:tools.bzl%prebuilt_tool_repo",
             "attributes": {
               "platform": "darwin_amd64"
             }
           },
           "rules_py_tools.darwin_arm64": {
-            "repoRuleId": "@@aspect_rules_py+//py/private/toolchain:repo.bzl%prebuilt_tool_repo",
+            "repoRuleId": "@@aspect_rules_py+//py/private/toolchain:tools.bzl%prebuilt_tool_repo",
             "attributes": {
               "platform": "darwin_arm64"
             }
           },
           "rules_py_tools.linux_amd64": {
-            "repoRuleId": "@@aspect_rules_py+//py/private/toolchain:repo.bzl%prebuilt_tool_repo",
+            "repoRuleId": "@@aspect_rules_py+//py/private/toolchain:tools.bzl%prebuilt_tool_repo",
             "attributes": {
               "platform": "linux_amd64"
             }
           },
           "rules_py_tools.linux_arm64": {
-            "repoRuleId": "@@aspect_rules_py+//py/private/toolchain:repo.bzl%prebuilt_tool_repo",
+            "repoRuleId": "@@aspect_rules_py+//py/private/toolchain:tools.bzl%prebuilt_tool_repo",
             "attributes": {
               "platform": "linux_arm64"
             }
@@ -9981,11 +9981,6 @@
             "aspect_rules_py+",
             "aspect_bazel_lib",
             "aspect_bazel_lib+"
-          ],
-          [
-            "aspect_rules_py+",
-            "bazel_skylib",
-            "bazel_skylib+"
           ],
           [
             "aspect_rules_py+",
