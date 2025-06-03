@@ -61,7 +61,7 @@
   );
 
   // Notes associated to accounts
-  const max_days_old_for_warning = 35;
+  const max_days_old_for_warning = 25;
   const date_warning = DateWrapper.create_from_date(new Date(new Date().setDate(new Date().getDate() - max_days_old_for_warning)));
   const max_days_old_for_error = 50;
   const date_error = DateWrapper.create_from_date(new Date(new Date().setDate(new Date().getDate() - max_days_old_for_error)));
@@ -96,7 +96,7 @@
     }
 
     // Closed accounts
-    if (account.close()) {
+    if (account.close()?.less_than(today)) {
       if (!last_snapshot) {
         color_level = Math.max(color_level, 2);
         notifications.push('Account is closed, but there is no snapshot!');

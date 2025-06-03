@@ -89,21 +89,12 @@ admin.site.register(Transaction, TransactionModelAdmin)
 
 
 class AccountModelAdmin(admin.ModelAdmin):
-    inlines = (
+    inlines = [
         AccountHolderRoleInline,
         SnapshotInline,
-    )
+    ]
     list_display = ("name", "custodian", "type", "open", "close", "is_numerable")
     list_filter = ("custodian", "type__name", "close", "is_numerable")
-
-    def get_inline_instances(self, request, obj=None):
-        # Return no inlines when obj is being created
-        if not obj:
-            return []
-        unfiltered = super().get_inline_instances(request, obj)
-        # filter out the Inlines you don't want
-        filter = [AccountHolderRoleInline, SnapshotInline]
-        return [x for x in unfiltered if any([isinstance(x, it) for it in filter])]
 
 
 admin.site.register(Account, AccountModelAdmin)

@@ -73,5 +73,8 @@ class Account(models.Model):
         ),
     )
 
+    class Meta:
+        ordering = ["custodian", "name"]
+
     def __str__(self) -> str:
         return f"{self.custodian} - {self.name}"
