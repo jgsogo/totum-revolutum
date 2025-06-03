@@ -13,7 +13,7 @@ export class NewMovement {
     account?: Account = $state();
     snapshots?: Snapshot[] = $state();
     mov_type?: MovementType = $state();
-    date_value?: Date | null = $state();
+    date_value?: Date | undefined = $state();
     fx?: number = $state();
 
     type: NewMovementType = $state(NewMovementType.NonNumerable);
@@ -26,7 +26,7 @@ export class NewMovement {
     unit_value?: number = $state();
 
     // dividend movement
-    ex_dividend_date?: Date | null = $state();
+    ex_dividend_date?: Date | undefined = $state();
     ex_dividend_snapshot?: Snapshot = $state();
 
     constructor(type: NewMovementType, account?: Account, date_value?: Date, snapshots?: Snapshot[]) {
@@ -97,7 +97,8 @@ export class NewMovement {
                 if (!this.ex_dividend_snapshot) return undefined;
                 let amount_numerable = this.ex_dividend_snapshot.amount().as_numerable();
                 if (!amount_numerable) return undefined;
-                total = amount_numerable.amount().amount();
+                if (!this.unit_value) return undefined;
+                total = amount_numerable.quantity().as_number() * this.unit_value;
                 break;
         }
 
