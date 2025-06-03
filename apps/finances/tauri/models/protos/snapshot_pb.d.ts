@@ -43,3 +43,60 @@ export declare type Snapshot = Message<"finances_app_models.Snapshot"> & {
  */
 export declare const SnapshotSchema: GenMessage<Snapshot>;
 
+/**
+ * @generated from message finances_app_models.SnapshotsRequest
+ */
+export declare type SnapshotsRequest = Message<"finances_app_models.SnapshotsRequest"> & {
+  /**
+   * @generated from field: int64 account_pk = 1;
+   */
+  accountPk: bigint;
+
+  /**
+   * @generated from field: optional google.type.Date start_date = 2;
+   */
+  startDate?: Date;
+
+  /**
+   * @generated from field: optional google.type.Date end_date = 3;
+   */
+  endDate?: Date;
+};
+
+/**
+ * Describes the message finances_app_models.SnapshotsRequest.
+ * Use `create(SnapshotsRequestSchema)` to create a new message.
+ */
+export declare const SnapshotsRequestSchema: GenMessage<SnapshotsRequest>;
+
+/**
+ * @generated from message finances_app_models.SnapshotsResponse
+ */
+export declare type SnapshotsResponse = Message<"finances_app_models.SnapshotsResponse"> & {
+  /**
+   * @generated from field: int64 account_pk = 1;
+   */
+  accountPk: bigint;
+
+  /**
+   * @generated from field: repeated finances_app_models.Snapshot snapshots = 2;
+   */
+  snapshots: Snapshot[];
+
+  /**
+   * @generated from field: optional google.type.Date start_date = 3;
+   */
+  startDate?: Date;
+
+  /**
+   * @generated from field: optional google.type.Date end_date = 4;
+   */
+  endDate?: Date;
+};
+
+/**
+ * Describes the message finances_app_models.SnapshotsResponse.
+ * Use `create(SnapshotsResponseSchema)` to create a new message.
+ */
+export declare const SnapshotsResponseSchema: GenMessage<SnapshotsResponse>;
+

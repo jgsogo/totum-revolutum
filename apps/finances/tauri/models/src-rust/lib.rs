@@ -13,6 +13,8 @@ mod money_amount;
 pub(crate) mod movement;
 pub(crate) mod protos;
 mod snapshot;
+mod snapshots_request;
+mod snapshots_response;
 mod transaction;
 
 pub use account::{Account, AccountCategory, AccountType};
@@ -27,7 +29,8 @@ pub use last_transactions::{LastTransactionsRequest, LastTransactionsResponse};
 pub use main_context::MainContext;
 pub use money_amount::MoneyAmount;
 pub use movement::{Movement, MovementAmount, MovementDirection, MovementType};
-pub use snapshot::Snapshot;
-pub use transaction::{Transaction, TransactionGroup};
-
 pub use proto_wrapper::ProtoWrapper;
+pub use snapshot::Snapshot;
+pub use snapshots_request::SnapshotsRequest;
+pub use snapshots_response::SnapshotsResponse;
+pub use transaction::{Transaction, TransactionGroup};

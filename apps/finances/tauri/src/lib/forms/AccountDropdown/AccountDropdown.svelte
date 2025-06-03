@@ -4,10 +4,10 @@
 
   let {
     account = $bindable(),
-    all_accounts,
+    accounts = $bindable(),
   }: {
     account: Account | undefined;
-    all_accounts: Account[];
+    accounts: Account[];
   } = $props();
 
   const groupBy = (acc: Account) => acc.custodian().name();
@@ -22,4 +22,4 @@
 </script>
 
 <!-- Common fields -->
-<MultilevelDropdown bind:value={account} items={all_accounts} {labelForItem} {equalItems} {groupBy} {labelInGroup} on:change />
+<MultilevelDropdown bind:value={account} items={accounts} {labelForItem} {equalItems} {groupBy} {labelInGroup} on:change />

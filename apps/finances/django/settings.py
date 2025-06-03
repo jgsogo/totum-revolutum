@@ -28,7 +28,6 @@ DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1")
 
 ALLOWED_HOSTS = list(filter(None, os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(" ")))
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,7 +44,6 @@ INSTALLED_APPS = [
     # My apps
     "django_finances_accounts.apps.FinancesAccountsConfig",
     "django_finances_investments.apps.FinancesInvestmentsConfig",
-    "migrate_legacy",
 ]
 
 MIDDLEWARE = [
@@ -141,7 +139,9 @@ MEDIA_ROOT = os.environ.get("MEDIA_ROOT", BASE_DIR / "mediafiles")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = list(filter(None, os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(" ")))
+CSRF_TRUSTED_ORIGINS = list(
+    filter(None, os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(" "))
+)
 
 # finances-data
 MONEY_TOLERANCE = 0

@@ -23,8 +23,6 @@ services:
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
-      # Django if we execute the migration legacy DB first (FIXME: Remove, this doesn't belong to all apps)
-      - LEGACY_DATABASE_URL=${LEGACY_DATABASE_URL}
       # gunicorn
       - GUNICORN_APP_NAME=${GUNICORN_APP_NAME:-django_app}
       - GUNICORN_RUN_FOLDER=${GUNICORN_RUN_FOLDER:-/home/%USER%/web/run}
@@ -32,6 +30,8 @@ services:
       - GUNICORN_USER=%USER%
       - GUNICORN_GROUP=%GROUP%
       - GUNICORN_BIND=0.0.0.0:%DJANGO_PORT%
+      # Django - if provided it will copy the contents from this database into the dev one.
+      - PRODUCTION_DATABASE_URL=${PRODUCTION_DATABASE_URL}
     depends_on:
       - db
     volumes:
