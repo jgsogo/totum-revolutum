@@ -1,16 +1,12 @@
 <script lang="ts">
-  import { Input, Label, ButtonGroup, InputAddon, Radio, Helper } from "flowbite-svelte";
-  import AccountDropdown from "../AccountDropdown/AccountDropdown.svelte";
-  import MovementTypeDropdown from "../MovementTypeDropdown/MovementTypeDropdown.svelte";
-  import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
-  import Datepicker from "../Datepicker.svelte";
-  import { Account, Snapshot, MovementType } from "../../../../models/src-js";
-  import {
-    ccy_symbol,
-    CurrencyCode,
-    DateWrapper,
-    sort_date_wrapper,
-  } from "../../../../../../../libraries/googleapis/src-js";
+  import { Input, Label, ButtonGroup, InputAddon, Radio, Helper } from 'flowbite-svelte';
+  import AccountDropdown from '../AccountDropdown/AccountDropdown.svelte';
+  import MovementTypeDropdown from '../MovementTypeDropdown/MovementTypeDropdown.svelte';
+  import { NewMovementType, type NewMovement } from './NewMovement.svelte';
+  import Datepicker from '../Datepicker.svelte';
+  import { Account, Snapshot, MovementType } from '../../../../models/src-js';
+  import { ccy_symbol, CurrencyCode, DateWrapper, sort_date_wrapper } from '../../../../../../../libraries/googleapis/src-js';
+  import { get_account_snapshots } from '$lib/commands';
 
   let {
     new_movement = $bindable(),
@@ -27,38 +23,50 @@
   } = $props();
 
   async function handleDividendDateSnapshot() {
+    console.log(`handleDividendDateSnapshot!!!`);
     if (!new_movement.ex_dividend_date) {
+      console.log(` - no ex_dividend_date, so ex_dividend_snapshot is undefined`);
       new_movement.ex_dividend_snapshot = undefined;
     } else {
       // Get the closest (equal or before) snapshot to the given date
-      let snapshots: Snapshot[] = []; // FIXME: Retrieve the snapshosts for this account
       let ex_dividend_date = DateWrapper.create_from_date(new_movement.ex_dividend_date);
+      console.log(` - get all snapshots for account ${new_movement.account} until date ${ex_dividend_date}`);
+      let snapshots: Snapshot[] = await get_account_snapshots(new_movement.account!, undefined, ex_dividend_date);
+      console.log(` - found ${snapshots.length} snapshots`);
       let snapshot = snapshots?.find((s: Snapshot) => {
         return sort_date_wrapper(s.date_value(), ex_dividend_date) <= 0;
       });
-      console.log("Found snapshot: ", snapshot);
+      console.log(' - found snapshot: ', snapshot);
       new_movement.ex_dividend_snapshot = snapshot;
     }
   }
-  const unique_id = "_" + Math.random().toString(36).slice(2, 9);
+  const unique_id = '_' + Math.random().toString(36).slice(2, 9);
+
+  let filtered_accounts = $derived.by(() => {
+    switch (new_movement.type) {
+      case NewMovementType.NonNumerable:
+        return all_accounts.filter((v) => !v.is_numerable());
+      case NewMovementType.Numerable:
+      case NewMovementType.Dividend:
+        return all_accounts.filter((v) => v.is_numerable());
+    }
+  });
 </script>
 
 <div class="flex flex-col space-y-6" action="#">
   <!-- Radio button to choose the movement type -->
-  {new_movement.type?.toString()} -
   <ul
     class="items-center w-full rounded-lg border border-gray-200 sm:flex dark:bg-gray-800 dark:border-gray-600 divide-x rtl:divide-x-reverse divide-gray-200 dark:divide-gray-600"
   >
     {#each Object.values(NewMovementType) as value}
       <li class="w-full">
-        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3"
-          >{value} | {new_movement.type === value}</Radio
-        >
+        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3">{value} | {new_movement.type === value}</Radio>
       </li>
     {/each}
   </ul>
 
-  <AccountDropdown bind:account={new_movement.account} {all_accounts} on:change={handleDividendDateSnapshot} />
+  <!-- # FIXME: We cannot use `filtered_accounts` here yet, becase `MultilevelDropdown` doesn't support binding. -->
+  <AccountDropdown bind:account={new_movement.account} bind:accounts={all_accounts} on:change={handleDividendDateSnapshot} />
   <MovementTypeDropdown bind:movementtype={new_movement.mov_type} {all_movementtypes} />
   {#if show_date}
     <Label class="space-y-2">
@@ -93,12 +101,13 @@
       {:else if new_movement.type === NewMovementType.Dividend}
         <Label class="flex flex-col">
           <span>Ex dividend date</span>
-          <Datepicker required bind:value={new_movement.ex_dividend_date} on:select={handleDividendDateSnapshot} />
+          <Datepicker required bind:value={new_movement.ex_dividend_date} onselect={handleDividendDateSnapshot} />
           <Helper
             >snapshot @ {new_movement.ex_dividend_snapshot?.date_value().toString()} ({new_movement.ex_dividend_snapshot
               ?.amount()
               .as_numerable()
-              ?.quantity()} ud.)</Helper
+              ?.quantity()
+              .as_number()} ud.)</Helper
           >
         </Label>
         <Label class="ml-4 flex flex-col">

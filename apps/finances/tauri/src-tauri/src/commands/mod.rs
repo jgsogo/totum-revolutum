@@ -18,7 +18,8 @@ use finances_app_models::{
     FxQuote as FxQuoteProto, FxQuotePair as FxQuotePairProto, Holder as HolderProto,
     HolderContext as HolderContextProto, MainContext as MainContextProto, MoneyAmount as MoneyAmountProto,
     Movement as MovementProto, MovementAmount as MovementAmountProto, MovementDirection as MovementDirectionProto,
-    ProtoWrapper, Snapshot as SnapshotProto,
+    ProtoWrapper, Snapshot as SnapshotProto, SnapshotsRequest as SnapshotsRequestProto,
+    SnapshotsResponse as SnapshotsResponseProto,
 };
 use finances_investments::models::Movement;
 
@@ -225,6 +226,30 @@ pub fn movement_into_model_movement(
         fx,
         *account.pk(),
     ))
+}
+
+#[tauri::command]
+pub async fn get_account_snapshots(
+    pool: State<'_, Pool<ConnectionManager<ConnectionType>>>,
+    request: tauri::ipc::Request<'_>,
+) -> Result<Response> {
+    let tauri::ipc::InvokeBody::Raw(data) = request.body() else {
+        return Err(Error::Other("Error::RequestBodyMustBeRaw".to_string()));
+    };
+
+    let snapshots_request = SnapshotsRequestProto::decode(data.to_vec())
+        .map_err(|e| Error::Other(format!("Failed to decode data to SnapshotsRequestProto: {e}")))?;
+
+    log::info!("Get snapshots for {} context", snapshots_request.account_pk());
+    let mut conn = pool.get().expect("Get a connection from the Pool");
+
+    let (account, _, _) = Account::details_for_pk(*snapshots_request.account_pk(), &mut conn)?;
+
+    // TODO: Apply filters based on snapshots_request.start_date() and snapshots_request.end_date()
+    let snapshots = get_snapshots(&account, &mut conn)?;
+
+    let response = SnapshotsResponseProto::new(*snapshots_request.account_pk(), snapshots, None, None);
+    Ok(tauri::ipc::Response::new(response.encode_to_vec()))
 }
 
 pub(crate) fn get_snapshots(account: &Account, conn: &mut PgConnection) -> Result<Vec<SnapshotProto>> {
