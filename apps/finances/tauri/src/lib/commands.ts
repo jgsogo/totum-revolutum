@@ -1,5 +1,6 @@
 import { invoke, } from "@tauri-apps/api/core";
-import { AppState, MainContext, HolderContext, AccountContext, LastTransactionsResponse, LastTransactionsRequest, Snapshot, Transaction, MovementDirection } from "../../models/src-js";
+import { AppState, MainContext, HolderContext, AccountContext, LastTransactionsResponse, LastTransactionsRequest, Snapshot, Transaction, MovementDirection, Account, SnapshotsRequest, SnapshotsResponse } from "../../models/src-js";
+import type { DateWrapper } from "../../../../../libraries/googleapis/src-js";
 
 /**
  * Returns (a promise to) the app configuration
@@ -84,4 +85,19 @@ export const create_transaction = async (transaction: Transaction) => {
  */
 export const get_fx_spot = async (quoted: string): Promise<number> => {
     return await invoke("get_fx_spot", { quotedCcy: quoted });
+}
+
+
+/**
+ * Returns all the snapshots associated to a given account between two dates.
+ * @param {Account} account - The account we want the snapshots for
+ * @param {DateWrapper} start_date
+ * @param {DateWrapper} end_date
+ * @returns - A promise that resolves when the quote is available, or the error if it was not possible
+ */
+export const get_account_snapshots = async (account: Account, start_date?: DateWrapper, end_date?: DateWrapper): Promise<Snapshot[]> => {
+    const snapshots_request = new SnapshotsRequest(account.pk(), start_date, end_date);
+    const data: ArrayBuffer = await invoke("get_account_snapshots", snapshots_request.toBinary());
+    const response = SnapshotsResponse.create_from_array(data);
+    return response.snapshots();
 }

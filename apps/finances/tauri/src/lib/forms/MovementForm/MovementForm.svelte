@@ -1,16 +1,12 @@
 <script lang="ts">
-  import { Input, Label, ButtonGroup, InputAddon, Radio, Helper } from "flowbite-svelte";
-  import AccountDropdown from "../AccountDropdown/AccountDropdown.svelte";
-  import MovementTypeDropdown from "../MovementTypeDropdown/MovementTypeDropdown.svelte";
-  import { NewMovementType, type NewMovement } from "./NewMovement.svelte";
-  import Datepicker from "../Datepicker.svelte";
-  import { Account, Snapshot, MovementType } from "../../../../models/src-js";
-  import {
-    ccy_symbol,
-    CurrencyCode,
-    DateWrapper,
-    sort_date_wrapper,
-  } from "../../../../../../../libraries/googleapis/src-js";
+  import { Input, Label, ButtonGroup, InputAddon, Radio, Helper } from 'flowbite-svelte';
+  import AccountDropdown from '../AccountDropdown/AccountDropdown.svelte';
+  import MovementTypeDropdown from '../MovementTypeDropdown/MovementTypeDropdown.svelte';
+  import { NewMovementType, type NewMovement } from './NewMovement.svelte';
+  import Datepicker from '../Datepicker.svelte';
+  import { Account, Snapshot, MovementType } from '../../../../models/src-js';
+  import { ccy_symbol, CurrencyCode, DateWrapper, sort_date_wrapper } from '../../../../../../../libraries/googleapis/src-js';
+  import { get_account_snapshots } from '$lib/commands';
 
   let {
     new_movement = $bindable(),
@@ -31,16 +27,16 @@
       new_movement.ex_dividend_snapshot = undefined;
     } else {
       // Get the closest (equal or before) snapshot to the given date
-      let snapshots: Snapshot[] = []; // FIXME: Retrieve the snapshosts for this account
       let ex_dividend_date = DateWrapper.create_from_date(new_movement.ex_dividend_date);
+      let snapshots: Snapshot[] = await get_account_snapshots(new_movement.account!, undefined, ex_dividend_date);
       let snapshot = snapshots?.find((s: Snapshot) => {
         return sort_date_wrapper(s.date_value(), ex_dividend_date) <= 0;
       });
-      console.log("Found snapshot: ", snapshot);
+      console.log('Found snapshot: ', snapshot);
       new_movement.ex_dividend_snapshot = snapshot;
     }
   }
-  const unique_id = "_" + Math.random().toString(36).slice(2, 9);
+  const unique_id = '_' + Math.random().toString(36).slice(2, 9);
 </script>
 
 <div class="flex flex-col space-y-6" action="#">
@@ -51,9 +47,7 @@
   >
     {#each Object.values(NewMovementType) as value}
       <li class="w-full">
-        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3"
-          >{value} | {new_movement.type === value}</Radio
-        >
+        <Radio bind:group={new_movement.type} {value} name={unique_id} class="p-3">{value} | {new_movement.type === value}</Radio>
       </li>
     {/each}
   </ul>

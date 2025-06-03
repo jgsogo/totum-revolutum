@@ -245,7 +245,7 @@ pub async fn get_account_snapshots(
 
     let (account, _, _) = Account::details_for_pk(*snapshots_request.account_pk(), &mut conn)?;
 
-    // TOOD: Apply filters based on snapshots_request.start_date() and snapshots_request.end_date()
+    // TODO: Apply filters based on snapshots_request.start_date() and snapshots_request.end_date()
     let snapshots = get_snapshots(&account, &mut conn)?;
 
     let response = SnapshotsResponseProto::new(*snapshots_request.account_pk(), snapshots, None, None);

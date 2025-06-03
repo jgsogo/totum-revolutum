@@ -74,6 +74,7 @@ pub fn create_app<R: tauri::Runtime>(
             commands::get_main_context,
             commands::get_holder_context,
             commands::get_account_context,
+            commands::get_account_snapshots,
             // Sending data
             commands::snapshot::create_snapshot,
             commands::transaction::create_transaction,
