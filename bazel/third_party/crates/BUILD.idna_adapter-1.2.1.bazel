@@ -60,6 +60,6 @@ rust_library(
     version = "1.2.1",
     deps = [
         "@crates__icu_normalizer-2.0.0//:icu_normalizer",
-        "@crates__icu_properties-2.0.0//:icu_properties",
+        "@crates__icu_properties-2.0.1//:icu_properties",
     ],
 )

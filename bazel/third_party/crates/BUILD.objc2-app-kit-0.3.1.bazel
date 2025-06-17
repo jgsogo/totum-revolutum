@@ -357,9 +357,9 @@ rust_library(
     }),
     version = "0.3.1",
     deps = [
-        "@crates__bitflags-2.9.0//:bitflags",
+        "@crates__bitflags-2.9.1//:bitflags",
         "@crates__block2-0.6.1//:block2",
-        "@crates__libc-0.2.172//:libc",
+        "@crates__libc-0.2.173//:libc",
         "@crates__objc2-0.6.1//:objc2",
         "@crates__objc2-cloud-kit-0.3.1//:objc2_cloud_kit",
         "@crates__objc2-core-data-0.3.1//:objc2_core_data",

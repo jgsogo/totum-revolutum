@@ -72,7 +72,7 @@ rust_library(
     version = "2.2.10",
     deps = [
         "@crates__bigdecimal-0.4.8//:bigdecimal",
-        "@crates__bitflags-2.9.0//:bitflags",
+        "@crates__bitflags-2.9.1//:bitflags",
         "@crates__byteorder-1.5.0//:byteorder",
         "@crates__chrono-0.4.41//:chrono",
         "@crates__itoa-1.0.15//:itoa",
@@ -80,7 +80,7 @@ rust_library(
         "@crates__num-bigint-0.4.6//:num_bigint",
         "@crates__num-integer-0.1.46//:num_integer",
         "@crates__num-traits-0.2.19//:num_traits",
-        "@crates__pq-sys-0.7.1//:pq_sys",
+        "@crates__pq-sys-0.7.2//:pq_sys",
         "@crates__r2d2-0.8.10//:r2d2",
     ],
 )

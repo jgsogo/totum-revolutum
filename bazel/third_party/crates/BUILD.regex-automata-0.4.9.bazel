@@ -84,7 +84,7 @@ rust_library(
     version = "0.4.9",
     deps = [
         "@crates__aho-corasick-1.1.3//:aho_corasick",
-        "@crates__memchr-2.7.4//:memchr",
+        "@crates__memchr-2.7.5//:memchr",
         "@crates__regex-syntax-0.8.5//:regex_syntax",
     ],
 )

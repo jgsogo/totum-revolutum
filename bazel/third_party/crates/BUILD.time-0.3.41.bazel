@@ -71,7 +71,7 @@ rust_library(
     deps = [
         "@crates__deranged-0.4.0//:deranged",
         "@crates__itoa-1.0.15//:itoa",
-        "@crates__libc-0.2.172//:libc",
+        "@crates__libc-0.2.173//:libc",
         "@crates__num-conv-0.1.0//:num_conv",
         "@crates__num_threads-0.1.7//:num_threads",
         "@crates__powerfmt-0.2.0//:powerfmt",

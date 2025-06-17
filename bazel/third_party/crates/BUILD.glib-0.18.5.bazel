@@ -76,7 +76,7 @@ rust_library(
     }),
     version = "0.18.5",
     deps = [
-        "@crates__bitflags-2.9.0//:bitflags",
+        "@crates__bitflags-2.9.1//:bitflags",
         "@crates__futures-channel-0.3.31//:futures_channel",
         "@crates__futures-core-0.3.31//:futures_core",
         "@crates__futures-executor-0.3.31//:futures_executor",
@@ -85,10 +85,10 @@ rust_library(
         "@crates__gio-sys-0.18.1//:gio_sys",
         "@crates__glib-sys-0.18.1//:glib_sys",
         "@crates__gobject-sys-0.18.0//:gobject_sys",
-        "@crates__libc-0.2.172//:libc",
-        "@crates__memchr-2.7.4//:memchr",
+        "@crates__libc-0.2.173//:libc",
+        "@crates__memchr-2.7.5//:memchr",
         "@crates__once_cell-1.21.3//:once_cell",
-        "@crates__smallvec-1.15.0//:smallvec",
+        "@crates__smallvec-1.15.1//:smallvec",
         "@crates__thiserror-1.0.69//:thiserror",
     ],
 )

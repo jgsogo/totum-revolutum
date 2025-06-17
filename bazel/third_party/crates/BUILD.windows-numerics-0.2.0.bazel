@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.2.0",
     deps = [
-        "@crates__windows-core-0.61.0//:windows_core",
-        "@crates__windows-link-0.1.1//:windows_link",
+        "@crates__windows-core-0.61.2//:windows_core",
+        "@crates__windows-link-0.1.3//:windows_link",
     ],
 )

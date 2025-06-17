@@ -62,6 +62,6 @@ rust_library(
     deps = [
         "@crates__proc-macro2-1.0.95//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
-        "@crates__syn-2.0.101//:syn",
+        "@crates__syn-2.0.103//:syn",
     ],
 )
