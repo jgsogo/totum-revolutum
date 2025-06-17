@@ -1,12 +1,11 @@
 <script lang="ts">
   import { Input, Label, ButtonGroup, InputAddon, Radio, Helper } from 'flowbite-svelte';
-  import AccountDropdown from '../AccountDropdown/AccountDropdown.svelte';
-  import MovementTypeDropdown from '../MovementTypeDropdown/MovementTypeDropdown.svelte';
   import { NewMovementType, type NewMovement } from './NewMovement.svelte';
   import Datepicker from '../Datepicker.svelte';
   import { Account, Snapshot, MovementType } from '../../../../models/src-js';
   import { ccy_symbol, CurrencyCode, DateWrapper, sort_date_wrapper } from '../../../../../../../libraries/googleapis/src-js';
   import { get_account_snapshots } from '$lib/commands';
+  import DropdownWithSearch from '../DropdownWithSearch.svelte';
 
   let {
     new_movement = $bindable(),
@@ -65,9 +64,20 @@
     {/each}
   </ul>
 
-  <!-- # FIXME: We cannot use `filtered_accounts` here yet, becase `MultilevelDropdown` doesn't support binding. -->
-  <AccountDropdown bind:account={new_movement.account} bind:accounts={all_accounts} on:change={handleDividendDateSnapshot} />
-  <MovementTypeDropdown bind:movementtype={new_movement.mov_type} {all_movementtypes} />
+  <DropdownWithSearch
+    bind:value={new_movement.account}
+    bind:items={filtered_accounts}
+    searchEl="Account"
+    labelForItem={(v: Account | undefined) => `${v?.custodian().name()} | ${v?.name()}`}
+  />
+  <!-- TODO: Filter 'all_movementtypes' to use only the ones allowed for the selected account -->
+  <DropdownWithSearch
+    bind:value={new_movement.mov_type}
+    bind:items={all_movementtypes}
+    searchEl="Mov type"
+    labelForItem={(v: MovementType | undefined) => v?.breadcrumb()!.toString()}
+  />
+
   {#if show_date}
     <Label class="space-y-2">
       <span>Date value</span>
