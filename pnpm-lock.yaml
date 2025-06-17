@@ -107,6 +107,9 @@ importers:
       svelte-check:
         specifier: ^4.2.1
         version: 4.2.1(picomatch@4.0.2)(svelte@5.33.2)(typescript@5.8.3)
+      svelte-multiselect:
+        specifier: ^11.1.1
+        version: 11.1.1(svelte@5.33.2)
       tailwind-merge:
         specifier: ^3.3.0
         version: 3.3.0
@@ -1977,6 +1980,11 @@ packages:
     peerDependenciesMeta:
       svelte:
         optional: true
+
+  svelte-multiselect@11.1.1:
+    resolution: {integrity: sha512-G9rhfpMVYxnfT1XMqVsmAV91TYhUwKgAIPXxe5QSVwNGmr6po8L/Vjmqrd8nmANYdM6anmPqi3eRX9W1KrgXLw==}
+    peerDependencies:
+      svelte: ^5.8.0
 
   svelte2tsx@0.7.39:
     resolution: {integrity: sha512-NX8a7eSqF1hr6WKArvXr7TV7DeE+y0kDFD7L5JP7TWqlwFidzGKaG415p992MHREiiEWOv2xIWXJ+mlONofs0A==}
@@ -3906,6 +3914,10 @@ snapshots:
       postcss-scss: 4.0.9(postcss@8.5.3)
       postcss-selector-parser: 7.1.0
     optionalDependencies:
+      svelte: 5.33.2
+
+  svelte-multiselect@11.1.1(svelte@5.33.2):
+    dependencies:
       svelte: 5.33.2
 
   svelte2tsx@0.7.39(svelte@5.33.14)(typescript@5.8.3):
