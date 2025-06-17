@@ -1,15 +1,15 @@
 {
   "dependencies": {
-    "@bufbuild/protobuf": "^2.4.0",
+    "@bufbuild/protobuf": "^2.5.2",
     "decimal.js": "^10.5.0"
   },
   "description": "GoogleApis protos",
   "devDependencies": {
-    "@bufbuild/protoc-gen-es": "^2.4.0",
+    "@bufbuild/protoc-gen-es": "^2.5.2",
     "@connectrpc/protoc-gen-connect-es": "^1.6.1",
-    "@types/node": "^22.15.20",
+    "@types/node": "^22.15.32",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
+    "vitest": "^3.2.3"
   },
   "name": "@totum-revolutum/googleapis",
   "private": true,
