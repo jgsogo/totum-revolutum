@@ -120,7 +120,10 @@
       {/await}
 
       <div class="mt-px space-y-4">
-        <Card size="xl" class="mt-6 {transaction.is_valid(show_transaction_date, app_state.base_ccy()) ? '' : card_error_style}">
+        <Card
+          size="xl"
+          class="mt-6 p-4 shadow-sm {transaction.is_valid(show_transaction_date, app_state.base_ccy()) ? '' : card_error_style}"
+        >
           <TransactionForm
             bind:transaction
             bind:show_date={show_transaction_date}
@@ -144,7 +147,10 @@
             </Heading>
 
             {#each transaction.movements_from as mov, i}
-              <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}">
+              <Card
+                size="xl"
+                class="mt-6 p-4 shadow-sm {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}"
+              >
                 <MovementForm
                   bind:new_movement={transaction.movements_from[i]}
                   base_ccy={app_state.base_ccy()}
@@ -163,6 +169,9 @@
                 <TextPlaceholder size="xxxl" class="mt-4" />
               </Card>
             {/each}
+            <button onclick={() => transaction.add_movement_from()} class="ml-4">
+              <Secondary class="text-xs">Add movement</Secondary>
+            </button>
           </div>
 
           <!-- to movements -->
@@ -176,7 +185,10 @@
               </div>
             </Heading>
             {#each transaction.movements_to as mov, i}
-              <Card size="xl" class="mt-6 {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}">
+              <Card
+                size="xl"
+                class="mt-6 p-4 shadow-sm {mov.is_valid(show_individual_dates, app_state.base_ccy()) ? '' : card_error_style}"
+              >
                 <MovementForm
                   bind:new_movement={transaction.movements_to[i]}
                   base_ccy={app_state.base_ccy()}
@@ -195,6 +207,9 @@
                 <TextPlaceholder size="xxxl" class="mt-8" />
               </Card>
             {/each}
+            <button onclick={() => transaction.add_movement_to()} class="ml-4">
+              <Secondary class="text-xs">Add movement</Secondary>
+            </button>
           </div>
         </div>
       </div>
