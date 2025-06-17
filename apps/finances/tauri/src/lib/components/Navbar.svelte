@@ -1,8 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { DarkMode, Dropdown, DropdownItem, NavBrand, NavHamburger, NavLi, NavUl, Navbar, Search } from 'flowbite-svelte';
-  import { invalidateAll } from '$app/navigation';
-  import { ChevronDownOutline, RefreshOutline } from 'flowbite-svelte-icons';
+  import { DarkMode, NavBrand, Navbar, Search } from 'flowbite-svelte';
   import type { Holder } from '../../../models/src-js';
 
   let {
