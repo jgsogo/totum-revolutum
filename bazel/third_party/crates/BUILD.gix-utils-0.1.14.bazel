@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "gix_hashtable",
+    name = "gix_utils",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -44,7 +44,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=gix-hashtable",
+        "crate-name=gix-utils",
         "manual",
         "noclippy",
         "norustfmt",
@@ -54,10 +54,9 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.8.1",
+    version = "0.1.14",
     deps = [
-        "@crates__gix-hash-0.18.0//:gix_hash",
-        "@crates__hashbrown-0.14.5//:hashbrown",
-        "@crates__parking_lot-0.12.4//:parking_lot",
+        "@crates__fastrand-2.3.0//:fastrand",
+        "@crates__unicode-normalization-0.1.24//:unicode_normalization",
     ],
 )

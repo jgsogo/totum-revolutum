@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "gix_hash",
+    name = "gix_fs",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -44,7 +44,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=gix-hash",
+        "crate-name=gix-fs",
         "manual",
         "noclippy",
         "norustfmt",
@@ -54,11 +54,10 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.18.0",
+    version = "0.12.1",
     deps = [
-        "@crates__faster-hex-0.10.0//:faster_hex",
-        "@crates__gix-features-0.42.1//:gix_features",
-        "@crates__sha1-checked-0.10.0//:sha1_checked",
-        "@crates__thiserror-2.0.12//:thiserror",
+        "@crates__fastrand-2.3.0//:fastrand",
+        "@crates__gix-features-0.39.1//:gix_features",
+        "@crates__gix-utils-0.1.14//:gix_utils",
     ],
 )

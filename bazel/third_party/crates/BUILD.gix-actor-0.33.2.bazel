@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "gix_config_value",
+    name = "gix_actor",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -44,7 +44,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=gix-config-value",
+        "crate-name=gix-actor",
         "manual",
         "noclippy",
         "norustfmt",
@@ -54,19 +54,13 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.15.0",
+    version = "0.33.2",
     deps = [
-        "@crates__bitflags-2.9.1//:bitflags",
         "@crates__bstr-1.12.0//:bstr",
-        "@crates__gix-path-0.10.18//:gix_path",
+        "@crates__gix-date-0.9.4//:gix_date",
+        "@crates__gix-utils-0.1.14//:gix_utils",
+        "@crates__itoa-1.0.15//:itoa",
         "@crates__thiserror-2.0.12//:thiserror",
-    ] + select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.173//:libc",  # cfg(not(windows))
-        ],
-        "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.173//:libc",  # cfg(not(windows))
-        ],
-        "//conditions:default": [],
-    }),
+        "@crates__winnow-0.6.26//:winnow",
+    ],
 )

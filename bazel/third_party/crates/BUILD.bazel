@@ -500,14 +500,14 @@ alias(
 )
 
 alias(
-    name = "ignore-files-3.0.4",
-    actual = "@crates__ignore-files-3.0.4//:ignore_files",
+    name = "ignore-files-3.0.3",
+    actual = "@crates__ignore-files-3.0.3//:ignore_files",
     tags = ["manual"],
 )
 
 alias(
     name = "ignore-files",
-    actual = "@crates__ignore-files-3.0.4//:ignore_files",
+    actual = "@crates__ignore-files-3.0.3//:ignore_files",
     tags = ["manual"],
 )
 

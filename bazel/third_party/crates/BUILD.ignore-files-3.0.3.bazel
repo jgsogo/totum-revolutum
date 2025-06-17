@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "gix_date",
+    name = "ignore_files",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -34,6 +34,9 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
+    crate_features = [
+        "default",
+    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -44,7 +47,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=gix-date",
+        "crate-name=ignore-files",
         "manual",
         "noclippy",
         "norustfmt",
@@ -54,12 +57,18 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.10.2",
+    version = "3.0.3",
     deps = [
-        "@crates__bstr-1.12.0//:bstr",
-        "@crates__itoa-1.0.15//:itoa",
-        "@crates__jiff-0.2.15//:jiff",
-        "@crates__smallvec-1.15.1//:smallvec",
+        "@crates__dunce-1.0.5//:dunce",
+        "@crates__futures-0.3.31//:futures",
+        "@crates__gix-config-0.42.0//:gix_config",
+        "@crates__ignore-0.4.23//:ignore",
+        "@crates__miette-7.6.0//:miette",
+        "@crates__normalize-path-0.2.1//:normalize_path",
+        "@crates__project-origins-1.4.2//:project_origins",
+        "@crates__radix_trie-0.2.1//:radix_trie",
         "@crates__thiserror-2.0.12//:thiserror",
+        "@crates__tokio-1.45.1//:tokio",
+        "@crates__tracing-0.1.41//:tracing",
     ],
 )
