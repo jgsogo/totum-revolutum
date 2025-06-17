@@ -15,7 +15,8 @@ impl IgnoreFilterT for IgnoreFilter {
 
     fn visit_file(&self, filepath: &FilePath) -> bool {
         match self.match_path(filepath.as_std_path(), false) {
-            Match::None => true,
+            Match::None => {
+                true},
             Match::Ignore(glob) => {
                 if glob
                     .from()
@@ -28,7 +29,8 @@ impl IgnoreFilterT for IgnoreFilter {
                     true
                 }
             }
-            Match::Whitelist(_) => true,
+            Match::Whitelist(_) => {
+                true},
         }
     }
 }

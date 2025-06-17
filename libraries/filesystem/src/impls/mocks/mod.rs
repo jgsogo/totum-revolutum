@@ -45,6 +45,11 @@ impl Filesystem for FilesystemMock {
         )))
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        self.called.write().unwrap().push(("create_ignore_filter".to_string(), vec![]));
+        todo!("not implemented")
+    }
+
     async fn walk_directory(&self, _tx: Sender<FileMetadata>, _ignore_filter: IgnoreFilter) -> Result<()> {
         self.called
             .write()

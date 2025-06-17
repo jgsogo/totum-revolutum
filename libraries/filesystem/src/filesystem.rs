@@ -15,6 +15,9 @@ pub trait Filesystem: Send + Sync {
     /// Waits for any pending operation and finishes this filesystem.
     async fn sync_all(self) -> Result<()>;
 
+    /// Creates and returns a [`IgnoreFilter`] starting at the root of this filesystem
+    async fn create_ignore_filter(&self) -> IgnoreFilter;
+
     /// Walk files in the filesystem, for each file found it will send it via `tx`. This belongs
     /// to the [`Filesystem`] because it **reads** the contents of the directories.
     ///

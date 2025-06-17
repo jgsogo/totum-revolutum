@@ -438,7 +438,7 @@ mod tests {
 
         // Filter all txt files
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = db.create_ignore_filter().await;
             ignore_filter.add_globs(&["*.txt"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -452,7 +452,7 @@ mod tests {
 
         // Filter '*subdir2/' folders
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = db.create_ignore_filter().await;
             ignore_filter.add_globs(&["*subdir2/"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);

@@ -60,6 +60,10 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        IgnoreFilter::new(&self.root_path, &[]).await.unwrap()
+    }
+
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
@@ -829,7 +833,7 @@ mod tests {
 
         // Root directory, empty filters
         {
-            let ignore_filter = IgnoreFilter::empty("");
+            let ignore_filter = fs.create_ignore_filter().await;
 
             let (tx, rx) = flume::bounded(100);
             fs.walk_directory(tx, ignore_filter).await.unwrap();
@@ -859,7 +863,7 @@ mod tests {
 
         // Ignore all '*.rs' files
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -884,7 +888,7 @@ mod tests {
 
         // Ignore everything inside "dir1/" directory (also if nested)
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["dir1/"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -910,7 +914,7 @@ mod tests {
         // Ignore everything inside "dir1/" directory (only if root), and ignore all `.rs` files
         // inside folder1/ path
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["/dir1/", "folder1/**/*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);

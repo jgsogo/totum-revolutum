@@ -128,6 +128,10 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
         self.filesystem.lock().await.take().unwrap().sync_all().await
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        self.filesystem.lock().await.as_ref().unwrap().create_ignore_filter().await
+    }
+
     async fn walk_directory(&self, tx: flume::Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         self.filesystem
             .lock()

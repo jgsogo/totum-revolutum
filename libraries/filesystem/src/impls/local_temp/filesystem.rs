@@ -54,6 +54,10 @@ impl Filesystem for FilesystemLocalTemp {
         self.local.sync_all().await
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        self.local.create_ignore_filter().await
+    }
+
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         self.local.walk_directory(tx, ignore_filter).await
     }

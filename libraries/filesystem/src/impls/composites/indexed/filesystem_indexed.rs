@@ -98,6 +98,10 @@ impl<TIndex: Filesystem, TStorage: Filesystem> Filesystem for FilesystemIndexed<
         self.index.lock().await.take().unwrap().sync_all().await
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        self.index.lock().await.as_ref().unwrap().create_ignore_filter().await
+    }
+
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         self.index
             .lock()

@@ -112,6 +112,10 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
         self.rhs.lock().await.take().unwrap().sync_all().await
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        self.lhs.create_ignore_filter().await
+    }
+
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         self.lhs.walk_directory(tx, ignore_filter).await
     }

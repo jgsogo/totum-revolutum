@@ -128,20 +128,20 @@ impl<TFile: File + FileExtras + 'static> Filesystem for FilesystemLocal<TFile> {
         Ok(())
     }
 
-    async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
-        let root = self.root.clone();
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        // let origin = std::fs::canonicalize(self.root).unwrap();
+        IgnoreFilter::new(&self.root, &[]).await.unwrap()
+    }
 
+    async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         let walker = WalkBuilder::new(&self.root)
-            .threads(4) // TODO: How to configure this default? Builder patter that accepts this init value?
+            .threads(4) // TODO: How to configure this default? Builder pattern that accepts this init value?
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
             .filter_entry(move |entry| {
                 if let Some(file_type) = entry.file_type() {
-                    let relative_path = entry
-                        .path()
-                        .strip_prefix(&root)
-                        .expect("File not contained inside root!");
+                    let canonical_path = std::fs::canonicalize(entry.path()).unwrap();
                     let directory_path =
-                        unsafe { DirectoryPath::assume_valid(Utf8Path::from_path(relative_path).unwrap()) };
+                        unsafe { DirectoryPath::assume_valid(Utf8Path::from_path(&canonical_path).unwrap()) };
 
                     if file_type.is_dir() {
                         ignore_filter.visit_directory(directory_path)
@@ -416,7 +416,7 @@ mod tests {
 
         // Ignore all "*.rs" files
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -439,7 +439,7 @@ mod tests {
 
         // Ignore everything inside "another/" directory (also if nested)
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["another/"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -464,7 +464,7 @@ mod tests {
         // Ignore everything inside "another/" directory (only if root), and ignore all `.rs` files
         // inside a/path
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["/another/", "a/path/**/*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
