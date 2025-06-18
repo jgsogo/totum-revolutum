@@ -1,5 +1,5 @@
 use anyhow::Result;
-use ignore_files::IgnoreFilter;
+
 use serde::{Deserialize, Serialize};
 
 use filesystem::FilesystemOps;
@@ -64,7 +64,8 @@ pub async fn run<FsLhs: FilesystemOps, FsRhs: FilesystemOps>(
                 OnConflict::RenameLocal => todo!("not impl"),
                 OnConflict::KeepLatest => todo!("not impl"),
             };
-            filesystem::diff::impls::backup(&lhs_fs, &mut rhs_fs, backup_conflict, IgnoreFilter::empty("")).await?;
+            let lhs_ignore_filter = lhs_fs.create_ignore_filter().await;
+            filesystem::diff::impls::backup(&lhs_fs, &mut rhs_fs, backup_conflict, lhs_ignore_filter).await?;
             Ok(())
         }
         Actions::ZipBackup => todo!("impl pending"),

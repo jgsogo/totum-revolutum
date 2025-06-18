@@ -20,3 +20,4 @@ mod ignore_filter;
 pub mod impls;
 mod paths;
 pub mod wrappers;
+pub use ignore_filter::IgnoreFilter;

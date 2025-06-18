@@ -7,7 +7,7 @@ use camino::{Utf8Path, Utf8PathBuf};
 /// of the underlying filesystem it applies to.
 ///
 /// The main purpose is to hide `root_path` from the user, this is required for
-/// some implementations of [`Filesystem`] where the exposed filesystem is just
+/// some implementations of [`crate::Filesystem`] where the exposed filesystem is just
 /// a subdirectory (or remote) of some underlying filesystem
 pub struct IgnoreFilter {
     ignore_filter: ignore_files::IgnoreFilter,
