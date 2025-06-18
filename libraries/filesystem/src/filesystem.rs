@@ -1,5 +1,5 @@
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
-use ignore_files::IgnoreFilter;
 use std::str::FromStr;
 use tokio::sync::oneshot::Receiver;
 use tracing::trace;

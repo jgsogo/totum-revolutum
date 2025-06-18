@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use flume::Sender;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
@@ -160,8 +160,6 @@ mod tests {
     use std::str::FromStr;
     use std::sync::{Arc, RwLock};
 
-    use ignore_files::IgnoreFilter;
-
     use crate::impls::composites::FilesystemIndexed;
     use crate::impls::mocks::{FilesystemMock, SUCCESS};
     use crate::{DirectoryPathBuf, FileMetadata, FilePathBuf, FilenameBuf, Filesystem};
@@ -186,12 +184,16 @@ mod tests {
         // walk_directory
         {
             let (tx, _) = flume::bounded::<FileMetadata>(0);
-            let r = indexed_filesystem.walk_directory(tx, IgnoreFilter::empty("")).await;
+            let ignore_filter = indexed_filesystem.create_ignore_filter().await;
+            let r = indexed_filesystem.walk_directory(tx, ignore_filter).await;
             assert!(r.is_err());
             // index was called
             assert_eq!(
                 index_called.read().unwrap().deref(),
-                &vec![("walk_directory".to_string(), vec![])]
+                &vec![
+                    ("create_ignore_filter".to_string(), vec![]),
+                    ("walk_directory".to_string(), vec![])
+                ]
             );
             // storage was not hit
             assert!(storage_called.read().unwrap().is_empty());

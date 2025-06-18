@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use flume::Sender;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 

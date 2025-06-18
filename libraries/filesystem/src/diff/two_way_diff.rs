@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use ignore_files::IgnoreFilter;
+use crate::ignore_filter::IgnoreFilter;
 use tracing::{debug, error, info, trace};
 
 use crate::diff::receiver::{FileMetadataPair, Receiver};
@@ -159,12 +159,14 @@ mod tests {
         let diff_mocks = DiffMocks::new().await?;
 
         let mut receiver = ReceiverMock::default();
+        let lhs_ignore_filter = diff_mocks.fs_lhs.create_ignore_filter().await;
+        let rhs_ignore_filter = diff_mocks.fs_rhs.create_ignore_filter().await;
         full_run(
             &diff_mocks.fs_lhs,
             &diff_mocks.fs_rhs,
             &mut receiver,
-            IgnoreFilter::empty(""),
-            IgnoreFilter::empty(""),
+            lhs_ignore_filter,
+            rhs_ignore_filter,
         )
         .await?;
 

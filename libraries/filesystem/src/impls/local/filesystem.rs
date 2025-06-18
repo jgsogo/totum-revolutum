@@ -2,17 +2,16 @@ use std::fs;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use ignore::WalkBuilder;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{error, info};
 
 use crate::filesystem::FilesystemOps;
-use crate::ignore_filter::IgnoreFilterT;
 use crate::paths::FilesystemPath;
 use crate::{
     DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result,
@@ -129,8 +128,7 @@ impl<TFile: File + FileExtras + 'static> Filesystem for FilesystemLocal<TFile> {
     }
 
     async fn create_ignore_filter(&self) -> IgnoreFilter {
-        // let origin = std::fs::canonicalize(self.root).unwrap();
-        IgnoreFilter::new(&self.root, &[]).await.unwrap()
+        IgnoreFilter::new(&self.root)
     }
 
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
@@ -465,7 +463,10 @@ mod tests {
         // inside a/path
         {
             let mut ignore_filter = fs.create_ignore_filter().await;
-            ignore_filter.add_globs(&["/another/", "a/path/**/*.rs"], None).unwrap();
+            ignore_filter
+                .add_globs(&["another/"], Some(&DirectoryPathBuf::root()))
+                .unwrap();
+            ignore_filter.add_globs(&["a/path/**/*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
             fs.walk_directory(tx, ignore_filter).await.unwrap();

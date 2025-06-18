@@ -1,8 +1,8 @@
 use std::sync::{Arc, RwLock};
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use flume::Sender;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 
 use crate::{DirectoryPath, Error, File, FileMetadata, FilePath, Filesystem, FilesystemOps, Result};
@@ -46,8 +46,11 @@ impl Filesystem for FilesystemMock {
     }
 
     async fn create_ignore_filter(&self) -> IgnoreFilter {
-        self.called.write().unwrap().push(("create_ignore_filter".to_string(), vec![]));
-        todo!("not implemented")
+        self.called
+            .write()
+            .unwrap()
+            .push(("create_ignore_filter".to_string(), vec![]));
+        IgnoreFilter::new("".into())
     }
 
     async fn walk_directory(&self, _tx: Sender<FileMetadata>, _ignore_filter: IgnoreFilter) -> Result<()> {

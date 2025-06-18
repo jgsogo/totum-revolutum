@@ -22,8 +22,8 @@ update-rust:
     bazel run @@//bazel/third_party:crates_vendor # FIXME: And I need to modify the BUILD.bazel file manually
     @echo ""
     @echo "⚠️ Rust dependencies are updated. Now you need to modify some files manually"
-    @echo "  - bazel/third_party/crates/BUILD.bazel"
-    @echo "  - bazel/external/BUILD.diesel_cli.bazel"
+    @echo "  - bazel/third_party/crates/BUILD.bazel: remove 'googleapis' and 'finances' libraries, remove 'cargo-bazel.json' reference"
+    @echo "  - bazel/external/BUILD.diesel_cli.bazel: update dependencies"
     @echo ""
 
 

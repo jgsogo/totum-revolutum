@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use camino::Utf8PathBuf;
 use camino_tempfile::{tempdir, Utf8TempDir};
 use flume::Sender;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 
 use crate::filesystem::FilesystemOps;

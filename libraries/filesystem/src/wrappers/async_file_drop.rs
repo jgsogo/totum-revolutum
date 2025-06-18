@@ -1,8 +1,8 @@
 use std::future::Future;
 use std::sync::Arc;
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::{Receiver, Sender};
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
@@ -129,7 +129,13 @@ impl<T: Filesystem> Filesystem for AsyncFileDropImpl<T> {
     }
 
     async fn create_ignore_filter(&self) -> IgnoreFilter {
-        self.filesystem.lock().await.as_ref().unwrap().create_ignore_filter().await
+        self.filesystem
+            .lock()
+            .await
+            .as_ref()
+            .unwrap()
+            .create_ignore_filter()
+            .await
     }
 
     async fn walk_directory(&self, tx: flume::Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {

@@ -1,5 +1,5 @@
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
-use ignore_files::IgnoreFilter;
 
 use crate::diff::two_way_diff::full_run;
 use crate::diff::Receiver;
@@ -40,15 +40,16 @@ pub async fn drain<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
     lhs_filesystem: &mut LHSFilesystem,
     rhs_filesystem: &RHSFilesystem,
     on_conflict: DrainConflict,
-    rhs_ignore_file: IgnoreFilter,
+    rhs_ignore_filter: IgnoreFilter,
 ) -> Result<()> {
     let mut drain_receiver = DrainReceiver::default();
+    let lhs_ignore_filter = lhs_filesystem.create_ignore_filter().await;
     full_run(
         lhs_filesystem,
         rhs_filesystem,
         &mut drain_receiver,
-        IgnoreFilter::empty(""),
-        rhs_ignore_file,
+        lhs_ignore_filter,
+        rhs_ignore_filter,
     )
     .await?;
 
@@ -87,11 +88,12 @@ mod tests {
         let original_diff_hash_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_hash).await?;
         let original_diff_size_metadata = diff_mocks.fs_lhs.get_metadata(&diff_mocks.diff_size).await?;
 
+        let rhs_ignore_filter = diff_mocks.fs_rhs.create_ignore_filter().await;
         drain(
             &mut diff_mocks.fs_lhs,
             &diff_mocks.fs_rhs,
             DrainConflict::Keep,
-            IgnoreFilter::empty(""),
+            rhs_ignore_filter,
         )
         .await?;
 
@@ -125,11 +127,12 @@ mod tests {
         assert!(diff_mocks.fs_lhs.exists(&diff_mocks.diff_hash).await?);
         assert!(diff_mocks.fs_lhs.exists(&diff_mocks.diff_size).await?);
 
+        let rhs_ignore_filter = diff_mocks.fs_rhs.create_ignore_filter().await;
         drain(
             &mut diff_mocks.fs_lhs,
             &diff_mocks.fs_rhs,
             DrainConflict::Remove,
-            IgnoreFilter::empty(""),
+            rhs_ignore_filter,
         )
         .await?;
 
