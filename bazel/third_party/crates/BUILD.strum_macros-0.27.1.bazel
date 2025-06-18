@@ -37,7 +37,7 @@ rust_proc_macro(
     crate_root = "src/lib.rs",
     edition = "2021",
     proc_macro_deps = [
-        "@crates__rustversion-1.0.20//:rustversion",
+        "@crates__rustversion-1.0.21//:rustversion",
     ],
     rustc_env_files = [
         ":cargo_toml_env_vars",
@@ -62,6 +62,6 @@ rust_proc_macro(
         "@crates__heck-0.5.0//:heck",
         "@crates__proc-macro2-1.0.95//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
-        "@crates__syn-2.0.101//:syn",
+        "@crates__syn-2.0.103//:syn",
     ],
 )

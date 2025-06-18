@@ -95,7 +95,7 @@ rust_library(
         "@crates__tauri-runtime-wry-2.6.0//:tauri_runtime_wry",
         "@crates__tauri-utils-2.4.0//:tauri_utils",
         "@crates__thiserror-2.0.12//:thiserror",
-        "@crates__tokio-1.45.0//:tokio",
+        "@crates__tokio-1.45.1//:tokio",
         "@crates__url-2.5.4//:url",
         "@crates__urlpattern-0.3.0//:urlpattern",
     ] + select({
@@ -105,7 +105,7 @@ rust_library(
             "@crates__objc2-0.6.1//:objc2",  # cfg(target_vendor = "apple")
             "@crates__objc2-app-kit-0.3.1//:objc2_app_kit",  # cfg(target_os = "macos")
             "@crates__objc2-foundation-0.3.1//:objc2_foundation",  # cfg(target_os = "macos")
-            "@crates__plist-1.7.1//:plist",  # cfg(target_os = "macos")
+            "@crates__plist-1.7.2//:plist",  # cfg(target_os = "macos")
             "@crates__window-vibrancy-0.6.0//:window_vibrancy",  # cfg(target_os = "macos")
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [

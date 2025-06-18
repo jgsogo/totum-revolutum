@@ -58,7 +58,7 @@ rust_library(
     deps = [
         "@crates__bstr-1.12.0//:bstr",
         "@crates__itoa-1.0.15//:itoa",
-        "@crates__jiff-0.2.13//:jiff",
+        "@crates__jiff-0.2.15//:jiff",
         "@crates__thiserror-2.0.12//:thiserror",
     ],
 )

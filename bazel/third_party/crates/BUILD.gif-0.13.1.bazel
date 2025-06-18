@@ -63,6 +63,6 @@ rust_library(
     version = "0.13.1",
     deps = [
         "@crates__color_quant-1.1.0//:color_quant",
-        "@crates__weezl-0.1.8//:weezl",
+        "@crates__weezl-0.1.10//:weezl",
     ],
 )

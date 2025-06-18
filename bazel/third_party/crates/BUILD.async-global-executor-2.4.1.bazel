@@ -62,7 +62,7 @@ rust_library(
     deps = [
         "@crates__async-channel-2.3.1//:async_channel",
         "@crates__async-executor-1.13.2//:async_executor",
-        "@crates__async-io-2.4.0//:async_io",
+        "@crates__async-io-2.4.1//:async_io",
         "@crates__async-lock-3.4.0//:async_lock",
         "@crates__blocking-1.6.1//:blocking",
         "@crates__futures-lite-2.6.0//:futures_lite",

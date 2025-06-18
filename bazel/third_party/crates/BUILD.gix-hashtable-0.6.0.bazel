@@ -58,6 +58,6 @@ rust_library(
     deps = [
         "@crates__gix-hash-0.15.1//:gix_hash",
         "@crates__hashbrown-0.14.5//:hashbrown",
-        "@crates__parking_lot-0.12.3//:parking_lot",
+        "@crates__parking_lot-0.12.4//:parking_lot",
     ],
 )

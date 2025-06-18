@@ -65,10 +65,10 @@ rust_library(
         "@crates__ignore-0.4.23//:ignore",
         "@crates__miette-7.6.0//:miette",
         "@crates__normalize-path-0.2.1//:normalize_path",
-        "@crates__project-origins-1.4.1//:project_origins",
+        "@crates__project-origins-1.4.2//:project_origins",
         "@crates__radix_trie-0.2.1//:radix_trie",
         "@crates__thiserror-2.0.12//:thiserror",
-        "@crates__tokio-1.45.0//:tokio",
+        "@crates__tokio-1.45.1//:tokio",
         "@crates__tracing-0.1.41//:tracing",
     ],
 )

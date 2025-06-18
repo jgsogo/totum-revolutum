@@ -56,6 +56,6 @@ rust_library(
     }),
     version = "0.2.7",
     deps = [
-        "@crates__parking_lot-0.12.3//:parking_lot",
+        "@crates__parking_lot-0.12.4//:parking_lot",
     ],
 )

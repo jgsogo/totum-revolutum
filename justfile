@@ -20,6 +20,11 @@ update-deps: update-rust update-npm update-python
 update-rust:
     cargo update
     bazel run @@//bazel/third_party:crates_vendor # FIXME: And I need to modify the BUILD.bazel file manually
+    @echo ""
+    @echo "⚠️ Rust dependencies are updated. Now you need to modify some files manually"
+    @echo "  - bazel/third_party/crates/BUILD.bazel"
+    @echo "  - bazel/external/BUILD.diesel_cli.bazel"
+    @echo ""
 
 update-npm:
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines
@@ -39,7 +44,7 @@ test: build bazel-check
 
 # Build everything
 build: bazel-update npm-install
-    cargo build
+    # cargo build
     bazel build --keep_going //...
 
 npm-install:

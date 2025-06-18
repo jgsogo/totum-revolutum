@@ -74,8 +74,8 @@ rust_library(
         "@crates__httpdate-1.0.3//:httpdate",
         "@crates__itoa-1.0.15//:itoa",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
-        "@crates__smallvec-1.15.0//:smallvec",
-        "@crates__tokio-1.45.0//:tokio",
+        "@crates__smallvec-1.15.1//:smallvec",
+        "@crates__tokio-1.45.1//:tokio",
         "@crates__want-0.3.1//:want",
     ],
 )

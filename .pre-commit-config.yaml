@@ -35,14 +35,14 @@ repos:
 
   # Check formatting and lint for starlark code
   - repo: https://github.com/keith/pre-commit-buildifier
-    rev: 8.0.3
+    rev: 8.2.0
     hooks:
       - id: buildifier
       - id: buildifier-lint
 
   # Enforce that commit messages allow for later changelog generation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.7.0
+    rev: v4.8.3
     hooks:
       # Requires that commitizen is already installed
       - id: commitizen
@@ -50,7 +50,7 @@ repos:
 
   # Lint and format SQL files
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.4.0
+    rev: 3.4.1
     hooks:
       - id: sqlfluff-lint
       - id: sqlfluff-fix

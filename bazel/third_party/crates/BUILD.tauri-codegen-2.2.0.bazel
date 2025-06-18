@@ -71,15 +71,15 @@ rust_library(
         "@crates__serde-1.0.219//:serde",
         "@crates__serde_json-1.0.140//:serde_json",
         "@crates__sha2-0.10.9//:sha2",
-        "@crates__syn-2.0.101//:syn",
+        "@crates__syn-2.0.103//:syn",
         "@crates__tauri-utils-2.4.0//:tauri_utils",
         "@crates__thiserror-2.0.12//:thiserror",
         "@crates__url-2.5.4//:url",
-        "@crates__uuid-1.16.0//:uuid",
+        "@crates__uuid-1.17.0//:uuid",
         "@crates__walkdir-2.5.0//:walkdir",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__plist-1.7.1//:plist",  # cfg(target_os = "macos")
+            "@crates__plist-1.7.2//:plist",  # cfg(target_os = "macos")
             "@crates__time-0.3.41//:time",  # cfg(target_os = "macos")
         ],
         "//conditions:default": [],

@@ -62,7 +62,7 @@ rust_library(
     version = "0.8.9",
     deps = [
         "@crates__new_debug_unreachable-1.0.6//:debug_unreachable",
-        "@crates__parking_lot-0.12.3//:parking_lot",
+        "@crates__parking_lot-0.12.4//:parking_lot",
         "@crates__phf_shared-0.11.3//:phf_shared",
         "@crates__precomputed-hash-0.1.1//:precomputed_hash",
         "@crates__serde-1.0.219//:serde",

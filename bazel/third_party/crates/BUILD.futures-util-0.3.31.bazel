@@ -80,9 +80,9 @@ rust_library(
         "@crates__futures-io-0.3.31//:futures_io",
         "@crates__futures-sink-0.3.31//:futures_sink",
         "@crates__futures-task-0.3.31//:futures_task",
-        "@crates__memchr-2.7.4//:memchr",
+        "@crates__memchr-2.7.5//:memchr",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
         "@crates__pin-utils-0.1.0//:pin_utils",
-        "@crates__slab-0.4.9//:slab",
+        "@crates__slab-0.4.10//:slab",
     ],
 )

@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "2.0.0",
     deps = [
-        "@crates__cfg-if-1.0.0//:cfg_if",
+        "@crates__cfg-if-1.0.1//:cfg_if",
         "@crates__dirs-sys-next-0.1.2//:dirs_sys_next",
     ],
 )

@@ -56,8 +56,8 @@ rust_library(
     }),
     version = "0.1.3",
     deps = [
-        "@crates__bitflags-2.9.0//:bitflags",
-        "@crates__libc-0.2.172//:libc",
-        "@crates__redox_syscall-0.5.12//:syscall",
+        "@crates__bitflags-2.9.1//:bitflags",
+        "@crates__libc-0.2.173//:libc",
+        "@crates__redox_syscall-0.5.13//:syscall",
     ],
 )

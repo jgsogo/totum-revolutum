@@ -76,12 +76,12 @@ rust_library(
     }),
     version = "0.25.6",
     deps = [
-        "@crates__bytemuck-1.23.0//:bytemuck",
+        "@crates__bytemuck-1.23.1//:bytemuck",
         "@crates__byteorder-lite-0.1.0//:byteorder_lite",
         "@crates__color_quant-1.1.0//:color_quant",
         "@crates__exr-1.73.0//:exr",
         "@crates__gif-0.13.1//:gif",
-        "@crates__image-webp-0.2.1//:image_webp",
+        "@crates__image-webp-0.2.2//:image_webp",
         "@crates__num-traits-0.2.19//:num_traits",
         "@crates__png-0.17.16//:png",
         "@crates__qoi-0.4.1//:qoi",
@@ -90,6 +90,6 @@ rust_library(
         "@crates__rgb-0.8.50//:rgb",
         "@crates__tiff-0.9.1//:tiff",
         "@crates__zune-core-0.4.12//:zune_core",
-        "@crates__zune-jpeg-0.4.14//:zune_jpeg",
+        "@crates__zune-jpeg-0.4.17//:zune_jpeg",
     ],
 )
