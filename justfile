@@ -26,7 +26,6 @@ update-rust:
     @echo "  - bazel/external/BUILD.diesel_cli.bazel"
     @echo ""
 
-
 update-npm:
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace  # FIXME: This command should include per-project ones in the following lines
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri update
