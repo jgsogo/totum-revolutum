@@ -923,11 +923,7 @@ mod tests {
         // inside a 'folder1/' path
         {
             let mut ignore_filter = fs.create_ignore_filter().await;
-            // ignore_filter.add_globs(&["dir1/", "folder1/**/*.rs"], None).unwrap();
-            ignore_filter
-                .add_globs(&["dir1/"], Some(&DirectoryPathBuf::root()))
-                .unwrap();
-            ignore_filter.add_globs(&["folder1/**/*.rs"], None).unwrap();
+            ignore_filter.add_globs(&["/dir1/", "folder1/**/*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
             fs.walk_directory(tx, ignore_filter).await.unwrap();

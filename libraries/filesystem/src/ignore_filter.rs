@@ -47,7 +47,9 @@ impl IgnoreFilter {
     /// Add ignore patterns. Use `applies_in` argument to indicate that the patterns should only
     /// apply to some subdirectories.
     pub fn add_globs(&mut self, globs: &[&str], applies_in: Option<&DirectoryPath>) -> Result<()> {
-        let applies_in = applies_in.map(|v| self.root_path.join(v).into_std_path_buf());
-        Ok(self.ignore_filter.add_globs(globs, applies_in.as_ref())?)
+        let applies_in = applies_in
+            .map_or(self.root_path.clone(), |v| self.root_path.join(v))
+            .into_std_path_buf();
+        Ok(self.ignore_filter.add_globs(globs, Some(&applies_in))?)
     }
 }
