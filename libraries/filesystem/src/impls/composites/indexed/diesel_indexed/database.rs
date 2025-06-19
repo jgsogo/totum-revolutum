@@ -359,8 +359,6 @@ mod tests {
     use camino_tempfile::NamedUtf8TempFile;
     use std::str::FromStr;
 
-    use ignore_files::IgnoreFilter;
-
     use crate::impls::FilesystemLocalTemp;
     use crate::{DirectoryPath, DirectoryPathBuf, FilePathBuf, FilenameBuf, Filesystem, FilesystemOps};
 
@@ -416,7 +414,8 @@ mod tests {
         // No filters
         {
             let (tx, rx) = flume::bounded(100);
-            db.walk_directory(tx, IgnoreFilter::empty("")).await.unwrap();
+            let ignore_filter = db.create_ignore_filter().await;
+            db.walk_directory(tx, ignore_filter).await.unwrap();
 
             let all_files = rx.try_iter().collect::<Vec<_>>();
             let mut all_files_str: Vec<&str> = all_files.iter().map(|p| p.path().as_str()).collect();
@@ -438,7 +437,7 @@ mod tests {
 
         // Filter all txt files
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = db.create_ignore_filter().await;
             ignore_filter.add_globs(&["*.txt"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -452,7 +451,7 @@ mod tests {
 
         // Filter '*subdir2/' folders
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = db.create_ignore_filter().await;
             ignore_filter.add_globs(&["*subdir2/"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);

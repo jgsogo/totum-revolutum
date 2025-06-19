@@ -19,11 +19,12 @@ update-deps: update-rust update-npm update-python
 
 update-rust:
     cargo update
+    rm -fr bazel/third_party/crates # Remove everything in the 3rd party directory
     bazel run @@//bazel/third_party:crates_vendor # FIXME: And I need to modify the BUILD.bazel file manually
     @echo ""
     @echo "⚠️ Rust dependencies are updated. Now you need to modify some files manually"
-    @echo "  - bazel/third_party/crates/BUILD.bazel"
-    @echo "  - bazel/external/BUILD.diesel_cli.bazel"
+    @echo "  - bazel/third_party/crates/BUILD.bazel: remove 'googleapis' and 'finances' libraries, remove 'cargo-bazel.json' reference"
+    @echo "  - bazel/external/BUILD.diesel_cli.bazel: update dependencies"
     @echo ""
 
 update-npm:

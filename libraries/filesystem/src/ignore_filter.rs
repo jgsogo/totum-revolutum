@@ -1,26 +1,38 @@
 use ignore::Match;
-use ignore_files::IgnoreFilter;
 
-use crate::{DirectoryPath, FilePath};
+use super::{DirectoryPath, FilePath, Result};
+use camino::{Utf8Path, Utf8PathBuf};
 
-pub trait IgnoreFilterT {
-    fn visit_directory(&self, dir: &DirectoryPath) -> bool;
-    fn visit_file(&self, filepath: &FilePath) -> bool;
+/// A wrapper over [`ignore_files::IgnoreFilter`] that stores the root path
+/// of the underlying filesystem it applies to.
+///
+/// The main purpose is to hide `root_path` from the user, this is required for
+/// some implementations of [`crate::Filesystem`] where the exposed filesystem is just
+/// a subdirectory (or remote) of some underlying filesystem
+pub struct IgnoreFilter {
+    ignore_filter: ignore_files::IgnoreFilter,
+    root_path: Utf8PathBuf,
 }
 
-impl IgnoreFilterT for IgnoreFilter {
-    fn visit_directory(&self, dir: &DirectoryPath) -> bool {
-        self.check_dir(dir.as_std_path())
+impl IgnoreFilter {
+    pub(crate) fn new(root_path: &Utf8Path) -> Self {
+        Self {
+            root_path: root_path.into(),
+            ignore_filter: ignore_files::IgnoreFilter::empty(root_path),
+        }
     }
 
-    fn visit_file(&self, filepath: &FilePath) -> bool {
-        match self.match_path(filepath.as_std_path(), false) {
+    pub fn visit_directory(&self, dir: &DirectoryPath) -> bool {
+        let fullpath = self.root_path.join(dir);
+        self.ignore_filter.check_dir(fullpath.as_std_path())
+    }
+
+    pub fn visit_file(&self, filepath: &FilePath) -> bool {
+        let fullpath = self.root_path.join(filepath);
+        match self.ignore_filter.match_path(fullpath.as_std_path(), false) {
             Match::None => true,
             Match::Ignore(glob) => {
-                if glob
-                    .from()
-                    .map_or(true, |f| filepath.as_std_path().strip_prefix(f).is_ok())
-                {
+                if glob.from().map_or(true, |f| fullpath.strip_prefix(f).is_ok()) {
                     // Positive match (fail)
                     false
                 } else {
@@ -30,5 +42,14 @@ impl IgnoreFilterT for IgnoreFilter {
             }
             Match::Whitelist(_) => true,
         }
+    }
+
+    /// Add ignore patterns. Use `applies_in` argument to indicate that the patterns should only
+    /// apply to some subdirectories.
+    pub fn add_globs(&mut self, globs: &[&str], applies_in: Option<&DirectoryPath>) -> Result<()> {
+        let applies_in = applies_in
+            .map_or(self.root_path.clone(), |v| self.root_path.join(v))
+            .into_std_path_buf();
+        Ok(self.ignore_filter.add_globs(globs, Some(&applies_in))?)
     }
 }

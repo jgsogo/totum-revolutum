@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use flume::Sender;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::sync::Mutex;
 
@@ -110,6 +110,10 @@ impl<LHS: Filesystem, RHS: Filesystem> Filesystem for FilesystemBackup<LHS, RHS>
     async fn sync_all(self) -> Result<()> {
         self.lhs.sync_all().await?;
         self.rhs.lock().await.take().unwrap().sync_all().await
+    }
+
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        self.lhs.create_ignore_filter().await
     }
 
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {

@@ -2,17 +2,16 @@ use std::fs;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use camino::{Utf8Path, Utf8PathBuf};
 use flume::Sender;
 use ignore::WalkBuilder;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{error, info};
 
 use crate::filesystem::FilesystemOps;
-use crate::ignore_filter::IgnoreFilterT;
 use crate::paths::FilesystemPath;
 use crate::{
     DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result,
@@ -128,11 +127,15 @@ impl<TFile: File + FileExtras + 'static> Filesystem for FilesystemLocal<TFile> {
         Ok(())
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        IgnoreFilter::new(&self.root)
+    }
+
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         let root = self.root.clone();
 
         let walker = WalkBuilder::new(&self.root)
-            .threads(4) // TODO: How to configure this default? Builder patter that accepts this init value?
+            .threads(4) // TODO: How to configure this default? Builder pattern that accepts this init value?
             .git_global(false) // TODO: Disable all ignore files: https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/walk.rs#L750
             .filter_entry(move |entry| {
                 if let Some(file_type) = entry.file_type() {
@@ -140,8 +143,10 @@ impl<TFile: File + FileExtras + 'static> Filesystem for FilesystemLocal<TFile> {
                         .path()
                         .strip_prefix(&root)
                         .expect("File not contained inside root!");
+
+                    // let canonical_path = std::fs::canonicalize(entry.path()).unwrap();
                     let directory_path =
-                        unsafe { DirectoryPath::assume_valid(Utf8Path::from_path(relative_path).unwrap()) };
+                        unsafe { DirectoryPath::assume_valid(Utf8Path::from_path(&relative_path).unwrap()) };
 
                     if file_type.is_dir() {
                         ignore_filter.visit_directory(directory_path)
@@ -416,8 +421,8 @@ mod tests {
 
         // Ignore all "*.rs" files
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
-            ignore_filter.add_globs(&["*.rs"], None).unwrap();
+            let mut ignore_filter = fs.create_ignore_filter().await;
+            ignore_filter.add_globs(&["**/*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
             fs.walk_directory(tx, ignore_filter).await.unwrap();
@@ -439,7 +444,7 @@ mod tests {
 
         // Ignore everything inside "another/" directory (also if nested)
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["another/"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -464,7 +469,7 @@ mod tests {
         // Ignore everything inside "another/" directory (only if root), and ignore all `.rs` files
         // inside a/path
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["/another/", "a/path/**/*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);

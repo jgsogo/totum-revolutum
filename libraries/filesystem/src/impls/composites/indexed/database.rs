@@ -1,11 +1,10 @@
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use camino::Utf8Component;
 use flume::Sender;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 use tracing::trace;
 
-use crate::ignore_filter::IgnoreFilterT;
 use crate::{DirectoryPath, DirectoryPathBuf, Error, FilePath, FilePathBuf, Filename, FilesystemOps, Result};
 use crate::{File, FileMetadata, Filesystem};
 
@@ -106,11 +105,16 @@ impl<T: FilesystemIndexedDatabase + Sync + Send> Filesystem for T {
         Ok(())
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        IgnoreFilter::new("/".into()) // FIXME: Which one is the root here?
+    }
+
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         for dir in self.all_directories()? {
             if ignore_filter.visit_directory(dir.full_path()) {
                 for file in self.get_files_in_directory(&dir)? {
                     let filepath = FilePathBuf::new(dir.full_path(), file.filename());
+                    println!("filepath: {:?}", filepath);
                     if ignore_filter.visit_file(&filepath) {
                         let file_wrapper = FileMetadata {
                             path: filepath,

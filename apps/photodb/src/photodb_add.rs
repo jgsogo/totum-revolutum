@@ -1,7 +1,7 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use camino::Utf8Path;
-use ignore_files::IgnoreFilter;
+
 use log::error;
 use tracing::{debug, info};
 
@@ -37,7 +37,8 @@ pub trait PhotoDBAdd<FS: Filesystem + Clone + 'static> {
 
         let fs = filesystem.clone();
         tokio::spawn(async move {
-            if let Err(e) = fs.walk_directory(tx, IgnoreFilter::empty("")).await {
+            let ignore_filter = fs.create_ignore_filter().await;
+            if let Err(e) = fs.walk_directory(tx, ignore_filter).await {
                 error!("Error executing 'Filesystem::walk_directory': {e}");
             }
         });

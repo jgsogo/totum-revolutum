@@ -42,6 +42,9 @@ pub enum Error {
     #[error(transparent)]
     DieselError(#[from] diesel::result::Error),
 
+    #[error(transparent)]
+    IgnoreFilesError(#[from] ignore_files::Error),
+
     #[error("{0}")]
     Other(String),
 }

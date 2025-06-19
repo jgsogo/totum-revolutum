@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
 use camino::Utf8PathBuf;
 use camino_tempfile::{tempdir, Utf8TempDir};
 use flume::Sender;
-use ignore_files::IgnoreFilter;
 use tokio::sync::oneshot::Receiver;
 
 use crate::filesystem::FilesystemOps;
@@ -52,6 +52,10 @@ impl Default for FilesystemLocalTemp {
 impl Filesystem for FilesystemLocalTemp {
     async fn sync_all(self) -> Result<()> {
         self.local.sync_all().await
+    }
+
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        self.local.create_ignore_filter().await
     }
 
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {

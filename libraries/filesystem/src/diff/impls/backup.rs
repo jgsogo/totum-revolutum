@@ -1,5 +1,5 @@
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
-use ignore_files::IgnoreFilter;
 use tracing::error;
 
 use crate::diff::two_way_diff::full_run;
@@ -45,12 +45,13 @@ pub async fn backup<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
     lhs_ignore_filter: IgnoreFilter,
 ) -> Result<()> {
     let mut backup_receiver = BackupReceiver::default();
+    let rhs_ignore_filter = rhs_filesystem.create_ignore_filter().await;
     full_run(
         lhs_filesystem,
         rhs_filesystem,
         &mut backup_receiver,
         lhs_ignore_filter,
-        IgnoreFilter::empty(""),
+        rhs_ignore_filter,
     )
     .await?;
 
@@ -110,11 +111,12 @@ mod tests {
         let original_diff_hash_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_hash).await?;
         let original_diff_size_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_size).await?;
 
+        let lhs_ignore_filter = diff_mocks.fs_lhs.create_ignore_filter().await;
         backup(
             &diff_mocks.fs_lhs,
             &mut diff_mocks.fs_rhs,
             BackupConflict::Override,
-            IgnoreFilter::empty(""),
+            lhs_ignore_filter,
         )
         .await?;
 
@@ -153,11 +155,12 @@ mod tests {
         let original_diff_hash_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_hash).await?;
         let original_diff_size_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_size).await?;
 
+        let lhs_ignore_filter = diff_mocks.fs_lhs.create_ignore_filter().await;
         backup(
             &diff_mocks.fs_lhs,
             &mut diff_mocks.fs_rhs,
             BackupConflict::Skip,
-            IgnoreFilter::empty(""),
+            lhs_ignore_filter,
         )
         .await?;
 

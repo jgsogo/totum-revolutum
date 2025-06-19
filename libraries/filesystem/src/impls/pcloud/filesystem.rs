@@ -4,7 +4,7 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use camino::Utf8PathBuf;
 use flume::Sender;
-use ignore_files::IgnoreFilter;
+
 use tokio::sync::oneshot::Receiver;
 use tokio::time::Instant;
 use tracing::{info, trace, warn};
@@ -23,9 +23,11 @@ use pcloud_sdk::types::errors::{InvalidFileError, InvalidFolderError};
 use pcloud_sdk::types::{File as PCloudFile, FolderID, RemotePath};
 
 use crate::filesystem::FilesystemOps;
-use crate::ignore_filter::IgnoreFilterT;
+use crate::ignore_filter::IgnoreFilter;
 use crate::impls::pcloud::file::RemoteFile;
-use crate::{DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilenameBuf, Filesystem, Result};
+use crate::{
+    DirectoryPath, DirectoryPathBuf, Error, File, FileMetadata, FilePath, FilePathBuf, FilenameBuf, Filesystem, Result,
+};
 
 /// Implementation of [`Filesystem`] using a PCloud account as storage
 #[derive(Clone)]
@@ -60,6 +62,10 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
         Ok(())
     }
 
+    async fn create_ignore_filter(&self) -> IgnoreFilter {
+        IgnoreFilter::new(&self.root_path)
+    }
+
     async fn walk_directory(&self, tx: Sender<FileMetadata>, ignore_filter: IgnoreFilter) -> Result<()> {
         // FIXME: Here we can implement two different strategies. One of them is to iterate everything
         //  from the ROOT folder recursively, the other one is to list the files in each directory
@@ -82,9 +88,14 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
                     match it {
                         Metadata::MetadataFile(m) => {
                             let filename = FilenameBuf::from_str(m.common.name.as_ref().unwrap())?;
-                            let filepath = base_path.join_filename(&filename);
+                            let parent_dir = self.root_path.join(&base_path);
+                            let parent_dir = unsafe { DirectoryPath::assume_valid(&parent_dir) };
+
+                            let filepath = FilePathBuf::new(&parent_dir, &filename);
+
                             trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), filepath);
 
+                            println!("filepath: {:?}", filepath);
                             if ignore_filter.visit_file(&filepath) {
                                 let remote_file = pcloud_sdk::types::File::FileID(m.fileid);
                                 let checksumfile = self
@@ -98,7 +109,7 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
                                 }
 
                                 let data = FileMetadata {
-                                    path: filepath,
+                                    path: base_path.join_filename(&filename),
                                     hash: checksumfile.sha256.unwrap(),
                                     size: checksumfile.metadata.size.unwrap(),
                                 };
@@ -106,12 +117,13 @@ impl<HttpClient: PCloudClient + Send + Clone + 'static> Filesystem for Filesyste
                             }
                         }
                         Metadata::MetadataFolder(m) => {
-                            let path =
+                            let relpath =
                                 base_path.join(DirectoryPathBuf::from_str(m.common.name.as_ref().unwrap()).unwrap());
-                            trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), path);
-
-                            if ignore_filter.visit_directory(&path) {
-                                folders.push((m.folderid, path, depth + 1));
+                            trace!("{}{}", format!("{}|-- ", " ".repeat(depth * 4)), relpath);
+                            let fullpath = self.root_path.join(&relpath);
+                            let fullpath = unsafe { DirectoryPath::assume_valid(&fullpath) };
+                            if ignore_filter.visit_directory(&fullpath) {
+                                folders.push((m.folderid, relpath, depth + 1));
                             }
                         }
                     }
@@ -829,7 +841,7 @@ mod tests {
 
         // Root directory, empty filters
         {
-            let ignore_filter = IgnoreFilter::empty("");
+            let ignore_filter = fs.create_ignore_filter().await;
 
             let (tx, rx) = flume::bounded(100);
             fs.walk_directory(tx, ignore_filter).await.unwrap();
@@ -859,7 +871,7 @@ mod tests {
 
         // Ignore all '*.rs' files
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -884,7 +896,7 @@ mod tests {
 
         // Ignore everything inside "dir1/" directory (also if nested)
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["dir1/"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);
@@ -908,9 +920,9 @@ mod tests {
         }
 
         // Ignore everything inside "dir1/" directory (only if root), and ignore all `.rs` files
-        // inside folder1/ path
+        // inside a 'folder1/' path
         {
-            let mut ignore_filter = IgnoreFilter::empty("");
+            let mut ignore_filter = fs.create_ignore_filter().await;
             ignore_filter.add_globs(&["/dir1/", "folder1/**/*.rs"], None).unwrap();
 
             let (tx, rx) = flume::bounded(100);

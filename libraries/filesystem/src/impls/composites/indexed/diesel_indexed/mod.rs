@@ -1,7 +1,7 @@
 //! Default implementation for [`super::FilesystemIndexedDatabase`] using a database implemented
 //! with the `diesel` crate.
 
-use ignore_files::IgnoreFilter;
+use crate::ignore_filter::IgnoreFilter;
 
 pub use database::{DatabaseImpl, MIGRATIONS};
 
@@ -32,7 +32,6 @@ mod tests {
     use std::str::FromStr;
 
     use camino_tempfile::NamedUtf8TempFile;
-    use ignore_files::IgnoreFilter;
 
     use crate::impls::composites::indexed::diesel_indexed::database::DatabaseImpl;
     use crate::impls::composites::{new_filesystem_indexed_with_db, FilesystemIndexedDatabase};
@@ -44,7 +43,8 @@ mod tests {
         let database_file = NamedUtf8TempFile::new()?;
         let mut fs = {
             let fs = FilesystemLocalTemp::default();
-            new_filesystem_indexed_with_db(database_file.path().as_str(), fs, true, IgnoreFilter::empty("")).await?
+            let ignore_filter = fs.create_ignore_filter().await;
+            new_filesystem_indexed_with_db(database_file.path().as_str(), fs, true, ignore_filter).await?
         };
 
         // Populate the filesystem with some files and directories
@@ -79,7 +79,8 @@ mod tests {
 
         // The filesystem tell us about the files available
         let (tx, rx) = flume::bounded(10);
-        fs.walk_directory(tx, IgnoreFilter::empty("")).await?;
+        let ignore_filter = fs.create_ignore_filter().await;
+        fs.walk_directory(tx, ignore_filter).await?;
         let all_files = rx.try_iter().collect::<Vec<_>>();
         assert_eq!(all_files.len(), 2);
 

@@ -1,5 +1,5 @@
+use crate::ignore_filter::IgnoreFilter;
 use async_trait::async_trait;
-use ignore_files::IgnoreFilter;
 use tracing::{debug, error};
 
 use crate::diff::two_way_diff::full_run;
@@ -40,15 +40,16 @@ impl Receiver for MirrorReceiver {
 pub async fn mirror<LHSFilesystem: Filesystem, RHSFilesystem: FilesystemOps>(
     lhs_filesystem: &LHSFilesystem,
     rhs_filesystem: &mut RHSFilesystem,
-    lhs_ignore_file: IgnoreFilter,
+    lhs_ignore_filter: IgnoreFilter,
 ) -> Result<()> {
     let mut mirror_receiver = MirrorReceiver::default();
+    let rhs_ignore_filter = rhs_filesystem.create_ignore_filter().await;
     full_run(
         lhs_filesystem,
         rhs_filesystem,
         &mut mirror_receiver,
-        lhs_ignore_file,
-        IgnoreFilter::empty(""),
+        lhs_ignore_filter,
+        rhs_ignore_filter,
     )
     .await?;
 
@@ -108,7 +109,8 @@ mod tests {
         let original_diff_hash_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_hash).await?;
         let original_diff_size_metadata = diff_mocks.fs_rhs.get_metadata(&diff_mocks.diff_size).await?;
 
-        mirror(&diff_mocks.fs_lhs, &mut diff_mocks.fs_rhs, IgnoreFilter::empty("")).await?;
+        let lhs_ignore_filter = diff_mocks.fs_lhs.create_ignore_filter().await;
+        mirror(&diff_mocks.fs_lhs, &mut diff_mocks.fs_rhs, lhs_ignore_filter).await?;
 
         // checks
         assert!(diff_mocks.fs_rhs.exists(&diff_mocks.lhs_only).await?);
