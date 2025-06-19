@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "gix_object",
+    name = "gix_sec",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -44,7 +44,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=gix-object",
+        "crate-name=gix-sec",
         "manual",
         "noclippy",
         "norustfmt",
@@ -54,20 +54,16 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.49.1",
+    version = "0.10.12",
     deps = [
-        "@crates__bstr-1.12.0//:bstr",
-        "@crates__gix-actor-0.35.1//:gix_actor",
-        "@crates__gix-date-0.10.2//:gix_date",
-        "@crates__gix-features-0.42.1//:gix_features",
-        "@crates__gix-hash-0.18.0//:gix_hash",
-        "@crates__gix-hashtable-0.8.1//:gix_hashtable",
-        "@crates__gix-path-0.10.18//:gix_path",
-        "@crates__gix-utils-0.3.0//:gix_utils",
-        "@crates__gix-validate-0.10.0//:gix_validate",
-        "@crates__itoa-1.0.15//:itoa",
-        "@crates__smallvec-1.15.1//:smallvec",
-        "@crates__thiserror-2.0.12//:thiserror",
-        "@crates__winnow-0.7.11//:winnow",
-    ],
+        "@crates__bitflags-2.9.1//:bitflags",
+    ] + select({
+        "@rules_rust//rust/platform:x86_64-apple-darwin": [
+            "@crates__libc-0.2.173//:libc",  # cfg(not(windows))
+        ],
+        "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
+            "@crates__libc-0.2.173//:libc",  # cfg(not(windows))
+        ],
+        "//conditions:default": [],
+    }),
 )

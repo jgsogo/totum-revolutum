@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "gix_features",
+    name = "gix_config_value",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -34,13 +34,6 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
-    crate_features = [
-        "default",
-        "fs-read-dir",
-        "prodash",
-        "progress",
-        "walkdir",
-    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -51,7 +44,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=gix-features",
+        "crate-name=gix-config-value",
         "manual",
         "noclippy",
         "norustfmt",
@@ -61,19 +54,18 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.42.1",
+    version = "0.14.12",
     deps = [
+        "@crates__bitflags-2.9.1//:bitflags",
+        "@crates__bstr-1.12.0//:bstr",
         "@crates__gix-path-0.10.18//:gix_path",
-        "@crates__gix-trace-0.1.12//:gix_trace",
-        "@crates__gix-utils-0.3.0//:gix_utils",
-        "@crates__prodash-29.0.2//:prodash",
-        "@crates__walkdir-2.5.0//:walkdir",
+        "@crates__thiserror-2.0.12//:thiserror",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.173//:libc",  # cfg(unix)
+            "@crates__libc-0.2.173//:libc",  # cfg(not(windows))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.173//:libc",  # cfg(unix)
+            "@crates__libc-0.2.173//:libc",  # cfg(not(windows))
         ],
         "//conditions:default": [],
     }),

@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "gix_utils",
+    name = "gix_date",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -44,7 +44,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=gix-utils",
+        "crate-name=gix-date",
         "manual",
         "noclippy",
         "norustfmt",
@@ -54,9 +54,11 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.3.0",
+    version = "0.9.4",
     deps = [
-        "@crates__fastrand-2.3.0//:fastrand",
-        "@crates__unicode-normalization-0.1.24//:unicode_normalization",
+        "@crates__bstr-1.12.0//:bstr",
+        "@crates__itoa-1.0.15//:itoa",
+        "@crates__jiff-0.2.15//:jiff",
+        "@crates__thiserror-2.0.12//:thiserror",
     ],
 )

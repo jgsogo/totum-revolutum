@@ -129,7 +129,7 @@ use_repo(
     "crates__hyper-1.6.0",
     "crates__hyper-util-0.1.14",
     "crates__ignore-0.4.23",
-    "crates__ignore-files-3.0.4",
+    "crates__ignore-files-3.0.3",
     "crates__image-0.25.6",
     "crates__indicatif-0.17.11",
     "crates__itertools-0.14.0",

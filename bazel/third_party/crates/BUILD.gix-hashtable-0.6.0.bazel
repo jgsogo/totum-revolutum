@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "ignore_files",
+    name = "gix_hashtable",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -34,9 +34,6 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
-    crate_features = [
-        "default",
-    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -47,7 +44,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=ignore-files",
+        "crate-name=gix-hashtable",
         "manual",
         "noclippy",
         "norustfmt",
@@ -57,18 +54,10 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "3.0.4",
+    version = "0.6.0",
     deps = [
-        "@crates__dunce-1.0.5//:dunce",
-        "@crates__futures-0.3.31//:futures",
-        "@crates__gix-config-0.45.1//:gix_config",
-        "@crates__ignore-0.4.23//:ignore",
-        "@crates__miette-7.6.0//:miette",
-        "@crates__normalize-path-0.2.1//:normalize_path",
-        "@crates__project-origins-1.4.2//:project_origins",
-        "@crates__radix_trie-0.2.1//:radix_trie",
-        "@crates__thiserror-2.0.12//:thiserror",
-        "@crates__tokio-1.45.1//:tokio",
-        "@crates__tracing-0.1.41//:tracing",
+        "@crates__gix-hash-0.15.1//:gix_hash",
+        "@crates__hashbrown-0.14.5//:hashbrown",
+        "@crates__parking_lot-0.12.4//:parking_lot",
     ],
 )
