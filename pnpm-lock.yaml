@@ -191,8 +191,8 @@ importers:
   sandbox/svelte-hello-world:
     dependencies:
       svelte-datatables-net:
-        specifier: ^1.0.12
-        version: 1.0.12(svelte@5.33.19)
+        specifier: ^2.0.0
+        version: 2.0.4(svelte@5.33.19)
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^6.0.1
@@ -1994,8 +1994,8 @@ packages:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
 
-  svelte-datatables-net@1.0.12:
-    resolution: {integrity: sha512-aX3chevR16g7OaRB7K8hYzvAMW1CCnV4tw7VjhDg8vqPO0kMYVaSGlq3016lWmT70lM1NsfettRr/qxuNv4L4A==}
+  svelte-datatables-net@2.0.4:
+    resolution: {integrity: sha512-414bhPoQzS9Tt/LQdBbBh0mwwfyJoCabsXjw7/Fg0D0N2uPmlGof/+OFaM8ap2kMw7ww8qdB6lmygpuSPuAlWw==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -3927,7 +3927,7 @@ snapshots:
     transitivePeerDependencies:
       - picomatch
 
-  svelte-datatables-net@1.0.12(svelte@5.33.19):
+  svelte-datatables-net@2.0.4(svelte@5.33.19):
     dependencies:
       svelte: 5.33.19
 

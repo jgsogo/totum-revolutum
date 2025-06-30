@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "svelte-datatables-net": "^1.0.12"
+    "svelte-datatables-net": "^2.0.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^6.0.1",
