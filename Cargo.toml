@@ -115,7 +115,7 @@ tar = { version = "0.4.44" }
 tauri-build = { version = "2.2.0", features = [] }
 tauri = { version = "2.5.1", features = [] }
 tauri-plugin-shell = "2.2.1"
-tauri-plugin-log = "2.4.0"
+tauri-plugin-log = "2.5.1"
 tempfile = { version = "3.17.1" }
 testing_logger = "0.1.1"
 thiserror = "2.0.12"
