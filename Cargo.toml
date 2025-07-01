@@ -127,6 +127,6 @@ toml = "0.8.20"
 # tonic-build = "0.12.3"
 tracing = { version = "0.1.41" }
 tracing-subscriber = { version = "0.3.19" }
-tryhard = { version = "0.5.1" }
+tryhard = { version = "0.5.2" }
 url = "2.5.4"
 uuid = "1.14.0"
