@@ -6,25 +6,19 @@ module(
 
 bazel_dep(name = "bazel_skylib", version = "1.8.1")
 bazel_dep(name = "platforms", version = "1.0.0")
-
-bazel_dep(name = "rules_python", version = "1.5.1", dev_dependency = True)
-
 bazel_dep(name = "aspect_rules_py", version = "1.5.1")
-
-bazel_dep(name = "rules_rust", version = "0.62.0", dev_dependency = True)
-
+bazel_dep(name = "rules_rust", version = "0.62.0")
 bazel_dep(name = "rules_nodejs", version = "6.4.0")
 bazel_dep(name = "rules_oci", version = "2.2.6")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
 bazel_dep(name = "rules_shell", version = "0.5.0")
-
-bazel_dep(name = "rules_java", version = "8.13.0", dev_dependency = True)
-bazel_dep(name = "aspect_bazel_lib", version = "2.19.4", dev_dependency = True)
-
 bazel_dep(name = "aspect_rules_js", version = "2.3.8")
 bazel_dep(name = "aspect_rules_ts", version = "3.6.0")
 bazel_dep(name = "aspect_rules_lint", version = "1.4.4")
 
+bazel_dep(name = "rules_python", version = "1.5.1", dev_dependency = True)
+bazel_dep(name = "rules_java", version = "8.13.0", dev_dependency = True)
+bazel_dep(name = "aspect_bazel_lib", version = "2.19.4", dev_dependency = True)
 bazel_dep(name = "rules_uv", version = "0.79.0", dev_dependency = True)
 
 RUST_VERSION = "1.88.0"
