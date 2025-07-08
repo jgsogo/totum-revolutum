@@ -72,10 +72,10 @@ rust_library(
         "@crates__walkdir-2.5.0//:walkdir",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.173//:libc",  # cfg(unix)
+            "@crates__libc-0.2.174//:libc",  # cfg(unix)
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.173//:libc",  # cfg(unix)
+            "@crates__libc-0.2.174//:libc",  # cfg(unix)
         ],
         "//conditions:default": [],
     }),

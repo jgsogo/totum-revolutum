@@ -70,7 +70,7 @@ rust_library(
         "@crates__futures-util-0.3.31//:futures_util",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
         "@crates__sync_wrapper-1.0.2//:sync_wrapper",
-        "@crates__tokio-1.45.1//:tokio",
+        "@crates__tokio-1.46.1//:tokio",
         "@crates__tower-layer-0.3.3//:tower_layer",
         "@crates__tower-service-0.3.3//:tower_service",
     ],

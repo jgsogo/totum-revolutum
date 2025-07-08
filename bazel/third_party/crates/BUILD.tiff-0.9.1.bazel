@@ -23,7 +23,7 @@ rust_library(
         allow_empty = True,
     ),
     aliases = {
-        "@crates__jpeg-decoder-0.3.1//:jpeg_decoder": "jpeg",
+        "@crates__jpeg-decoder-0.3.2//:jpeg_decoder": "jpeg",
     },
     compile_data = glob(
         include = ["**"],
@@ -60,7 +60,7 @@ rust_library(
     version = "0.9.1",
     deps = [
         "@crates__flate2-1.1.2//:flate2",
-        "@crates__jpeg-decoder-0.3.1//:jpeg_decoder",
+        "@crates__jpeg-decoder-0.3.2//:jpeg_decoder",
         "@crates__weezl-0.1.10//:weezl",
     ],
 )

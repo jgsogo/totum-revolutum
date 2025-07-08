@@ -64,7 +64,7 @@ repos:
           - "-l 100"
 
   - repo: https://github.com/PyCQA/flake8.git
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         exclude: "migrations/"  # Python regex

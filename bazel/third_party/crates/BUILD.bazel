@@ -223,14 +223,14 @@ alias(
 )
 
 alias(
-    name = "diesel-2.2.10",
-    actual = "@crates__diesel-2.2.10//:diesel",
+    name = "diesel-2.2.11",
+    actual = "@crates__diesel-2.2.11//:diesel",
     tags = ["manual"],
 )
 
 alias(
     name = "diesel",
-    actual = "@crates__diesel-2.2.10//:diesel",
+    actual = "@crates__diesel-2.2.11//:diesel",
     tags = ["manual"],
 )
 
@@ -475,14 +475,14 @@ alias(
 )
 
 alias(
-    name = "hyper-util-0.1.14",
-    actual = "@crates__hyper-util-0.1.14//:hyper_util",
+    name = "hyper-util-0.1.15",
+    actual = "@crates__hyper-util-0.1.15//:hyper_util",
     tags = ["manual"],
 )
 
 alias(
     name = "hyper-util",
-    actual = "@crates__hyper-util-0.1.14//:hyper_util",
+    actual = "@crates__hyper-util-0.1.15//:hyper_util",
     tags = ["manual"],
 )
 
@@ -703,14 +703,14 @@ alias(
 )
 
 alias(
-    name = "reqwest-0.12.20",
-    actual = "@crates__reqwest-0.12.20//:reqwest",
+    name = "reqwest-0.12.22",
+    actual = "@crates__reqwest-0.12.22//:reqwest",
     tags = ["manual"],
 )
 
 alias(
     name = "reqwest",
-    actual = "@crates__reqwest-0.12.20//:reqwest",
+    actual = "@crates__reqwest-0.12.22//:reqwest",
     tags = ["manual"],
 )
 
@@ -835,14 +835,14 @@ alias(
 )
 
 alias(
-    name = "syn-2.0.103",
-    actual = "@crates__syn-2.0.103//:syn",
+    name = "syn-2.0.104",
+    actual = "@crates__syn-2.0.104//:syn",
     tags = ["manual"],
 )
 
 alias(
     name = "syn",
-    actual = "@crates__syn-2.0.103//:syn",
+    actual = "@crates__syn-2.0.104//:syn",
     tags = ["manual"],
 )
 
@@ -859,146 +859,146 @@ alias(
 )
 
 alias(
-    name = "tauri-2.5.1",
-    actual = "@crates__tauri-2.5.1//:tauri",
+    name = "tauri-2.6.2",
+    actual = "@crates__tauri-2.6.2//:tauri",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri",
-    actual = "@crates__tauri-2.5.1//:tauri",
+    actual = "@crates__tauri-2.6.2//:tauri",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-app-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-app-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-app-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-event-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-event-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-event-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-image-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-image-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-image-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-menu-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-menu-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-menu-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-path-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-path-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-path-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-resources-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-resources-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-resources-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-tray-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-tray-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-tray-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-webview-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-webview-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-webview-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-window-permission-files",
-    actual = "@crates__tauri-2.5.1//:tauri-core-window-permission-files",
+    actual = "@crates__tauri-2.6.2//:tauri-core-window-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-global-api-script",
-    actual = "@crates__tauri-2.5.1//:global-api-script",
+    actual = "@crates__tauri-2.6.2//:global-api-script",
     tags = ["manual"],
 )
 
 alias(
-    name = "tauri-build-2.2.0",
-    actual = "@crates__tauri-build-2.2.0//:tauri_build",
+    name = "tauri-build-2.3.0",
+    actual = "@crates__tauri-build-2.3.0//:tauri_build",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-build",
-    actual = "@crates__tauri-build-2.2.0//:tauri_build",
+    actual = "@crates__tauri-build-2.3.0//:tauri_build",
     tags = ["manual"],
 )
 
 alias(
-    name = "tauri-plugin-log-2.5.0",
-    actual = "@crates__tauri-plugin-log-2.5.0//:tauri_plugin_log",
+    name = "tauri-plugin-log-2.6.0",
+    actual = "@crates__tauri-plugin-log-2.6.0//:tauri_plugin_log",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-plugin-log",
-    actual = "@crates__tauri-plugin-log-2.5.0//:tauri_plugin_log",
+    actual = "@crates__tauri-plugin-log-2.6.0//:tauri_plugin_log",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-plugin-log-global-api-script",
-    actual = "@crates__tauri-plugin-log-2.5.0//:global-api-script",
+    actual = "@crates__tauri-plugin-log-2.6.0//:global-api-script",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-plugin-log-permission-files-index",
-    actual = "@crates__tauri-plugin-log-2.5.0//:permission-files-index",
+    actual = "@crates__tauri-plugin-log-2.6.0//:permission-files-index",
     tags = ["manual"],
 )
 
 alias(
-    name = "tauri-plugin-shell-2.2.2",
-    actual = "@crates__tauri-plugin-shell-2.2.2//:tauri_plugin_shell",
+    name = "tauri-plugin-shell-2.3.0",
+    actual = "@crates__tauri-plugin-shell-2.3.0//:tauri_plugin_shell",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-plugin-shell",
-    actual = "@crates__tauri-plugin-shell-2.2.2//:tauri_plugin_shell",
+    actual = "@crates__tauri-plugin-shell-2.3.0//:tauri_plugin_shell",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-plugin-shell-global-api-script",
-    actual = "@crates__tauri-plugin-shell-2.2.2//:global-api-script",
+    actual = "@crates__tauri-plugin-shell-2.3.0//:global-api-script",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-plugin-shell-global-scope",
-    actual = "@crates__tauri-plugin-shell-2.2.2//:global-scope",
+    actual = "@crates__tauri-plugin-shell-2.3.0//:global-scope",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-plugin-shell-permission-files-index",
-    actual = "@crates__tauri-plugin-shell-2.2.2//:permission-files-index",
+    actual = "@crates__tauri-plugin-shell-2.3.0//:permission-files-index",
     tags = ["manual"],
 )
 
@@ -1051,14 +1051,14 @@ alias(
 )
 
 alias(
-    name = "tokio-1.45.1",
-    actual = "@crates__tokio-1.45.1//:tokio",
+    name = "tokio-1.46.1",
+    actual = "@crates__tokio-1.46.1//:tokio",
     tags = ["manual"],
 )
 
 alias(
     name = "tokio",
-    actual = "@crates__tokio-1.45.1//:tokio",
+    actual = "@crates__tokio-1.46.1//:tokio",
     tags = ["manual"],
 )
 
@@ -1111,14 +1111,14 @@ alias(
 )
 
 alias(
-    name = "tryhard-0.5.1",
-    actual = "@crates__tryhard-0.5.1//:tryhard",
+    name = "tryhard-0.5.2",
+    actual = "@crates__tryhard-0.5.2//:tryhard",
     tags = ["manual"],
 )
 
 alias(
     name = "tryhard",
-    actual = "@crates__tryhard-0.5.1//:tryhard",
+    actual = "@crates__tryhard-0.5.2//:tryhard",
     tags = ["manual"],
 )
 
