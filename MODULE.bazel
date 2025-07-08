@@ -27,6 +27,10 @@ bazel_dep(name = "aspect_rules_lint", version = "1.4.4")
 
 bazel_dep(name = "rules_uv", version = "0.79.0", dev_dependency = True)
 
+RUST_VERSION = "1.88.0"
+
+PYTHON_VERSION = "3.13"
+
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
 # Bazel-diff: https://github.com/Tinder/bazel-diff
@@ -51,14 +55,14 @@ http_jar(
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     configure_coverage_tool = True,
-    python_version = "3.13",
+    python_version = PYTHON_VERSION,
 )
 # use_repo(python, python_3 = "python_3_12") # Adds target @python_3//:python3, which is the Python interpreter
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "py_deps",
-    python_version = "3.13",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//bazel/third_party:requirements.lock",
 )
 use_repo(pip, "py_deps")
@@ -70,9 +74,6 @@ use_repo(pip, "py_deps")
 # Rust setup is mostly taken from rust = use_extension("//rust:extensions.bzl", "rust")
 ######
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
-
-RUST_VERSION = "1.85.1"
-
 rust.toolchain(
     edition = "2021",
     rust_analyzer_version = RUST_VERSION,
