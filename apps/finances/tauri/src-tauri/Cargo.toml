@@ -32,7 +32,7 @@ bigdecimal = "0.4.7"
 camino = "1.1.9"
 chrono = { version = "0.4.39" }
 chrono-tz = { version = "0.10.1" }
-diesel = { version = "2.2.7", features = ["r2d2", "chrono"] }
+diesel = { version = "2.2.12", features = ["r2d2", "chrono"] }
 
 # FIXME: These are build-dependencies - If I don't list it here, Bazel doesn't include it in crate_libraries
 # tauri-build = { version = "2.2.0", features = [], path = "/Users/jgsogo/personal/tauri/crates/tauri-build" }
