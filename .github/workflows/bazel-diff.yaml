@@ -241,10 +241,15 @@ jobs:
           # Get the list of targets in a single line
           one_liner="${formatted_impacted_targets//$'\n'/ }"
 
+          # # Remove 'manual' targets
+          # bazel query "($one_liner) - (attr(tags, 'manual', '//...'))" 2>/dev/null > /tmp/targets_to_test
+          # cat /tmp/targets_to_test
+
           # Do not fail for next command
           set +e
-          # Run all the tests (except manual ones)
-          bazel test $BAZEL_CONFIG --test_tag_filters=-manual $one_liner
+          # Run all the tests (do not build 'manual' ones)
+          # $BAZEL test --build_tests_only --target_pattern_file=$FILENAME
+          bazel test $BAZEL_CONFIG --build_tag_filters=-manual --target_pattern_file=${{ runner.temp }}/impacted-targets.txt
 
           # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
           err=$? ; if (( $err != 4 )) ; then exit $err ; fi
