@@ -33,9 +33,9 @@ http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_j
 # TODO: _"mostly a pure Go port of the excellent Tinder/bazel-diff"_
 http_jar(
     name = "bazel_diff",
-    sha256 = "725e4012d8f68ecbe967138bc973bf0bca22b2b219a34cafbd3e392fb451b2e6",
+    sha256 = "dfa1957bd5d23ff5886d3d0f69394106d520b0a5c3d251b55fdd4d57b52992a4",
     urls = [
-        "https://github.com/Tinder/bazel-diff/releases/download/8.1.4/bazel-diff_deploy.jar",
+        "https://github.com/Tinder/bazel-diff/releases/download/10.0.0/bazel-diff_deploy.jar",
     ],
 )
 
