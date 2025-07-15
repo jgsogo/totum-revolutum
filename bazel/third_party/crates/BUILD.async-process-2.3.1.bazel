@@ -68,7 +68,7 @@ rust_library(
             "@crates__rustix-1.0.7//:rustix",  # cfg(all(unix, not(target_os = "linux"))), cfg(unix)
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__async-channel-2.3.1//:async_channel",  # cfg(any(windows, target_os = "linux"))
+            "@crates__async-channel-2.5.0//:async_channel",  # cfg(any(windows, target_os = "linux"))
             "@crates__async-signal-0.2.11//:async_signal",  # cfg(unix)
             "@crates__async-task-4.7.1//:async_task",  # cfg(any(windows, target_os = "linux"))
             "@crates__rustix-1.0.7//:rustix",  # cfg(unix)

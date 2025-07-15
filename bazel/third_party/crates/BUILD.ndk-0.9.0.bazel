@@ -63,7 +63,7 @@ rust_library(
         "@crates__jni-sys-0.3.0//:jni_sys",
         "@crates__log-0.4.27//:log",
         "@crates__ndk-sys-0.6.0-11769913//:ndk_sys",
-        "@crates__num_enum-0.7.3//:num_enum",
+        "@crates__num_enum-0.7.4//:num_enum",
         "@crates__thiserror-1.0.69//:thiserror",
     ],
 )

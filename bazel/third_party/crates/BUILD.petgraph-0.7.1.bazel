@@ -57,6 +57,6 @@ rust_library(
     version = "0.7.1",
     deps = [
         "@crates__fixedbitset-0.5.7//:fixedbitset",
-        "@crates__indexmap-2.9.0//:indexmap",
+        "@crates__indexmap-2.10.0//:indexmap",
     ],
 )

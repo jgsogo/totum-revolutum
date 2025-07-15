@@ -64,7 +64,7 @@ rust_library(
         "@crates__gdk-sys-0.18.2//:gdk_sys",
         "@crates__gio-0.18.4//:gio",
         "@crates__glib-0.18.5//:glib",
-        "@crates__libc-0.2.173//:libc",
+        "@crates__libc-0.2.174//:libc",
         "@crates__pango-0.18.3//:pango",
     ],
 )

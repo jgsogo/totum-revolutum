@@ -64,6 +64,6 @@ rust_library(
         "@crates__core-foundation-0.10.1//:core_foundation",
         "@crates__core-graphics-types-0.2.0//:core_graphics_types",
         "@crates__foreign-types-0.5.0//:foreign_types",
-        "@crates__libc-0.2.173//:libc",
+        "@crates__libc-0.2.174//:libc",
     ],
 )

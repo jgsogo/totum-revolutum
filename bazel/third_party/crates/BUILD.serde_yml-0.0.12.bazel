@@ -63,7 +63,7 @@ rust_library(
     }),
     version = "0.0.12",
     deps = [
-        "@crates__indexmap-2.9.0//:indexmap",
+        "@crates__indexmap-2.10.0//:indexmap",
         "@crates__itoa-1.0.15//:itoa",
         "@crates__libyml-0.0.5//:libyml",
         "@crates__memchr-2.7.5//:memchr",

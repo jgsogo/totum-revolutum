@@ -73,7 +73,7 @@ def app_url(docker_compose):
 def session(app_url):
 
     def new_request(prefix, f, method, url, *args, **kwargs):
-        return f(method, prefix + url, *args, **kwargs)
+        return f(method, prefix + url, timeout=90, *args, **kwargs)
 
     s = requests.Session()
     s.request = functools.partial(new_request, app_url, s.request)
