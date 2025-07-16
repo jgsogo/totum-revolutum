@@ -7,7 +7,7 @@
 ###############################################################################
 
 load("@rules_rust//cargo:defs.bzl", "cargo_toml_env_vars")
-load("@rules_rust//rust:defs.bzl", "rust_proc_macro")
+load("@rules_rust//rust:defs.bzl", "rust_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,8 +16,8 @@ cargo_toml_env_vars(
     src = "Cargo.toml",
 )
 
-rust_proc_macro(
-    name = "clap_derive",
+rust_library(
+    name = "gix_path",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -34,9 +34,6 @@ rust_proc_macro(
             "WORKSPACE.bazel",
         ],
     ),
-    crate_features = [
-        "default",
-    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -47,7 +44,7 @@ rust_proc_macro(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=clap_derive",
+        "crate-name=gix-path",
         "manual",
         "noclippy",
         "norustfmt",
@@ -57,11 +54,20 @@ rust_proc_macro(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "4.5.40",
+    version = "0.10.19",
     deps = [
-        "@crates__heck-0.5.0//:heck",
-        "@crates__proc-macro2-1.0.95//:proc_macro2",
-        "@crates__quote-1.0.40//:quote",
-        "@crates__syn-2.0.104//:syn",
-    ],
+        "@crates__bstr-1.12.0//:bstr",
+        "@crates__gix-trace-0.1.13//:gix_trace",
+        "@crates__gix-validate-0.10.0//:gix_validate",
+        "@crates__once_cell-1.21.3//:once_cell",
+        "@crates__thiserror-2.0.12//:thiserror",
+    ] + select({
+        "@rules_rust//rust/platform:x86_64-apple-darwin": [
+            "@crates__home-0.5.11//:home",  # cfg(not(target_family = "wasm"))
+        ],
+        "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
+            "@crates__home-0.5.11//:home",  # cfg(not(target_family = "wasm"))
+        ],
+        "//conditions:default": [],
+    }),
 )

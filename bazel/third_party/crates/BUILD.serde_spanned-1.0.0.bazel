@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "clap",
+    name = "serde_spanned",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -35,22 +35,12 @@ rust_library(
         ],
     ),
     crate_features = [
-        "cargo",
-        "color",
-        "default",
-        "derive",
-        "error-context",
-        "help",
+        "alloc",
+        "serde",
         "std",
-        "string",
-        "suggestions",
-        "usage",
     ],
     crate_root = "src/lib.rs",
     edition = "2021",
-    proc_macro_deps = [
-        "@crates__clap_derive-4.5.40//:clap_derive",
-    ],
     rustc_env_files = [
         ":cargo_toml_env_vars",
     ],
@@ -59,7 +49,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=clap",
+        "crate-name=serde_spanned",
         "manual",
         "noclippy",
         "norustfmt",
@@ -69,8 +59,8 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "4.5.40",
+    version = "1.0.0",
     deps = [
-        "@crates__clap_builder-4.5.40//:clap_builder",
+        "@crates__serde-1.0.219//:serde",
     ],
 )

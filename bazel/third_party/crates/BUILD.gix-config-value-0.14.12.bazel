@@ -58,7 +58,7 @@ rust_library(
     deps = [
         "@crates__bitflags-2.9.1//:bitflags",
         "@crates__bstr-1.12.0//:bstr",
-        "@crates__gix-path-0.10.18//:gix_path",
+        "@crates__gix-path-0.10.19//:gix_path",
         "@crates__thiserror-2.0.12//:thiserror",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [

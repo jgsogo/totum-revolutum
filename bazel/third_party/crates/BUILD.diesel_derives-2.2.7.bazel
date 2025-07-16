@@ -7,7 +7,7 @@
 ###############################################################################
 
 load("@rules_rust//cargo:defs.bzl", "cargo_toml_env_vars")
-load("@rules_rust//rust:defs.bzl", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_proc_macro")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,8 +16,8 @@ cargo_toml_env_vars(
     src = "Cargo.toml",
 )
 
-rust_library(
-    name = "crc32fast",
+rust_proc_macro(
+    name = "diesel_derives",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -35,11 +35,16 @@ rust_library(
         ],
     ),
     crate_features = [
+        "32-column-tables",
+        "chrono",
         "default",
-        "std",
+        "postgres",
+        "r2d2",
+        "sqlite",
+        "with-deprecated",
     ],
     crate_root = "src/lib.rs",
-    edition = "2015",
+    edition = "2021",
     rustc_env_files = [
         ":cargo_toml_env_vars",
     ],
@@ -48,7 +53,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=crc32fast",
+        "crate-name=diesel_derives",
         "manual",
         "noclippy",
         "norustfmt",
@@ -58,8 +63,12 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "1.4.2",
+    version = "2.2.7",
     deps = [
-        "@crates__cfg-if-1.0.1//:cfg_if",
+        "@crates__diesel_table_macro_syntax-0.2.0//:diesel_table_macro_syntax",
+        "@crates__dsl_auto_type-0.1.3//:dsl_auto_type",
+        "@crates__proc-macro2-1.0.95//:proc_macro2",
+        "@crates__quote-1.0.40//:quote",
+        "@crates__syn-2.0.104//:syn",
     ],
 )

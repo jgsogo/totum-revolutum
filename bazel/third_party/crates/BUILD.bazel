@@ -139,26 +139,26 @@ alias(
 )
 
 alias(
-    name = "chrono-tz-0.10.3",
-    actual = "@crates__chrono-tz-0.10.3//:chrono_tz",
+    name = "chrono-tz-0.10.4",
+    actual = "@crates__chrono-tz-0.10.4//:chrono_tz",
     tags = ["manual"],
 )
 
 alias(
     name = "chrono-tz",
-    actual = "@crates__chrono-tz-0.10.3//:chrono_tz",
+    actual = "@crates__chrono-tz-0.10.4//:chrono_tz",
     tags = ["manual"],
 )
 
 alias(
-    name = "clap-4.5.40",
-    actual = "@crates__clap-4.5.40//:clap",
+    name = "clap-4.5.41",
+    actual = "@crates__clap-4.5.41//:clap",
     tags = ["manual"],
 )
 
 alias(
     name = "clap",
-    actual = "@crates__clap-4.5.40//:clap",
+    actual = "@crates__clap-4.5.41//:clap",
     tags = ["manual"],
 )
 
@@ -175,14 +175,14 @@ alias(
 )
 
 alias(
-    name = "clap_complete-4.5.54",
-    actual = "@crates__clap_complete-4.5.54//:clap_complete",
+    name = "clap_complete-4.5.55",
+    actual = "@crates__clap_complete-4.5.55//:clap_complete",
     tags = ["manual"],
 )
 
 alias(
     name = "clap_complete",
-    actual = "@crates__clap_complete-4.5.54//:clap_complete",
+    actual = "@crates__clap_complete-4.5.55//:clap_complete",
     tags = ["manual"],
 )
 
@@ -223,14 +223,14 @@ alias(
 )
 
 alias(
-    name = "diesel-2.2.11",
-    actual = "@crates__diesel-2.2.11//:diesel",
+    name = "diesel-2.2.12",
+    actual = "@crates__diesel-2.2.12//:diesel",
     tags = ["manual"],
 )
 
 alias(
     name = "diesel",
-    actual = "@crates__diesel-2.2.11//:diesel",
+    actual = "@crates__diesel-2.2.12//:diesel",
     tags = ["manual"],
 )
 

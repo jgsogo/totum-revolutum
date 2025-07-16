@@ -59,7 +59,7 @@ rust_proc_macro(
     }),
     version = "2.2.0",
     deps = [
-        "@crates__migrations_internals-2.2.0//:migrations_internals",
+        "@crates__migrations_internals-2.2.1//:migrations_internals",
         "@crates__proc-macro2-1.0.95//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
     ],

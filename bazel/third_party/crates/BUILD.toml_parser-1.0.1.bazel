@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "clap_builder",
+    name = "toml_parser",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -35,14 +35,8 @@ rust_library(
         ],
     ),
     crate_features = [
-        "cargo",
-        "color",
-        "error-context",
-        "help",
+        "alloc",
         "std",
-        "string",
-        "suggestions",
-        "usage",
     ],
     crate_root = "src/lib.rs",
     edition = "2021",
@@ -54,7 +48,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=clap_builder",
+        "crate-name=toml_parser",
         "manual",
         "noclippy",
         "norustfmt",
@@ -64,11 +58,8 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "4.5.40",
+    version = "1.0.1",
     deps = [
-        "@crates__anstream-0.6.19//:anstream",
-        "@crates__anstyle-1.0.11//:anstyle",
-        "@crates__clap_lex-0.7.5//:clap_lex",
-        "@crates__strsim-0.11.1//:strsim",
+        "@crates__winnow-0.7.12//:winnow",
     ],
 )
