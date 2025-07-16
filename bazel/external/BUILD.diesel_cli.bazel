@@ -19,9 +19,9 @@ rust_binary(
     visibility = ["//visibility:public"],
     deps = [
         "@crates__chrono-0.4.41//:chrono",
-        "@crates__clap-4.5.40//:clap",
-        "@crates__clap_complete-4.5.54//:clap_complete",
-        "@crates__diesel-2.2.11//:diesel",
+        "@crates__clap-4.5.41//:clap",
+        "@crates__clap_complete-4.5.55//:clap_complete",
+        "@crates__diesel-2.2.12//:diesel",
         "@crates__diesel_migrations-2.2.0//:diesel_migrations",
         "@crates__diesel_table_macro_syntax-0.2.0//:diesel_table_macro_syntax",
         "@crates__diffy-0.4.2//:diffy",

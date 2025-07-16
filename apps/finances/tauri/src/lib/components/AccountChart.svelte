@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { Card, Chart } from 'flowbite-svelte';
+  import { Card } from 'flowbite-svelte';
   import { Account, Snapshot } from '../../../models/src-js';
   import { dateWrapper2Date } from '$lib/utils';
+  import { Chart } from "@flowbite-svelte-plugins/chart";
 
   let { account, snapshots }: { account: Account; snapshots: Snapshot[] } = $props();
 

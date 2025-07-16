@@ -7,7 +7,7 @@
 ###############################################################################
 
 load("@rules_rust//cargo:defs.bzl", "cargo_toml_env_vars")
-load("@rules_rust//rust:defs.bzl", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_proc_macro")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,8 +16,8 @@ cargo_toml_env_vars(
     src = "Cargo.toml",
 )
 
-rust_library(
-    name = "diesel",
+rust_proc_macro(
+    name = "clap_derive",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -35,22 +35,10 @@ rust_library(
         ],
     ),
     crate_features = [
-        "32-column-tables",
-        "chrono",
         "default",
-        "numeric",
-        "postgres",
-        "postgres_backend",
-        "r2d2",
-        "returning_clauses_for_sqlite_3_35",
-        "sqlite",
-        "with-deprecated",
     ],
     crate_root = "src/lib.rs",
     edition = "2021",
-    proc_macro_deps = [
-        "@crates__diesel_derives-2.2.6//:diesel_derives",
-    ],
     rustc_env_files = [
         ":cargo_toml_env_vars",
     ],
@@ -59,7 +47,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=diesel",
+        "crate-name=clap_derive",
         "manual",
         "noclippy",
         "norustfmt",
@@ -69,18 +57,11 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "2.2.11",
+    version = "4.5.41",
     deps = [
-        "@crates__bigdecimal-0.4.8//:bigdecimal",
-        "@crates__bitflags-2.9.1//:bitflags",
-        "@crates__byteorder-1.5.0//:byteorder",
-        "@crates__chrono-0.4.41//:chrono",
-        "@crates__itoa-1.0.15//:itoa",
-        "@crates__libsqlite3-sys-0.33.0//:libsqlite3_sys",
-        "@crates__num-bigint-0.4.6//:num_bigint",
-        "@crates__num-integer-0.1.46//:num_integer",
-        "@crates__num-traits-0.2.19//:num_traits",
-        "@crates__pq-sys-0.7.2//:pq_sys",
-        "@crates__r2d2-0.8.10//:r2d2",
+        "@crates__heck-0.5.0//:heck",
+        "@crates__proc-macro2-1.0.95//:proc_macro2",
+        "@crates__quote-1.0.40//:quote",
+        "@crates__syn-2.0.104//:syn",
     ],
 )

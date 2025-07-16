@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "rgb",
+    name = "memmap2",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -34,13 +34,6 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
-    crate_features = [
-        "argb",
-        "as-bytes",
-        "bytemuck",
-        "default",
-        "grb",
-    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -51,7 +44,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=rgb",
+        "crate-name=memmap2",
         "manual",
         "noclippy",
         "norustfmt",
@@ -61,8 +54,14 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.8.51",
-    deps = [
-        "@crates__bytemuck-1.23.1//:bytemuck",
-    ],
+    version = "0.9.7",
+    deps = select({
+        "@rules_rust//rust/platform:x86_64-apple-darwin": [
+            "@crates__libc-0.2.174//:libc",  # cfg(unix)
+        ],
+        "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
+            "@crates__libc-0.2.174//:libc",  # cfg(unix)
+        ],
+        "//conditions:default": [],
+    }),
 )

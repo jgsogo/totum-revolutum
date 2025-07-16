@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "gix_trace",
+    name = "clap_complete",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -47,7 +47,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=gix-trace",
+        "crate-name=clap_complete",
         "manual",
         "noclippy",
         "norustfmt",
@@ -57,5 +57,8 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.1.12",
+    version = "4.5.55",
+    deps = [
+        "@crates__clap-4.5.41//:clap",
+    ],
 )

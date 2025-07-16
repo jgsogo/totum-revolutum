@@ -65,7 +65,7 @@ rust_library(
     version = "0.39.1",
     deps = [
         "@crates__gix-hash-0.15.1//:gix_hash",
-        "@crates__gix-trace-0.1.12//:gix_trace",
+        "@crates__gix-trace-0.1.13//:gix_trace",
         "@crates__gix-utils-0.1.14//:gix_utils",
         "@crates__prodash-29.0.2//:prodash",
         "@crates__sha1_smol-1.0.1//:sha1_smol",

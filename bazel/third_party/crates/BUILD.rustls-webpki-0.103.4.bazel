@@ -7,7 +7,7 @@
 ###############################################################################
 
 load("@rules_rust//cargo:defs.bzl", "cargo_toml_env_vars")
-load("@rules_rust//rust:defs.bzl", "rust_proc_macro")
+load("@rules_rust//rust:defs.bzl", "rust_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,12 +16,15 @@ cargo_toml_env_vars(
     src = "Cargo.toml",
 )
 
-rust_proc_macro(
-    name = "diesel_derives",
+rust_library(
+    name = "webpki",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
     ),
+    aliases = {
+        "@crates__rustls-pki-types-1.12.0//:rustls_pki_types": "pki_types",
+    },
     compile_data = glob(
         include = ["**"],
         allow_empty = True,
@@ -34,15 +37,6 @@ rust_proc_macro(
             "WORKSPACE.bazel",
         ],
     ),
-    crate_features = [
-        "32-column-tables",
-        "chrono",
-        "default",
-        "postgres",
-        "r2d2",
-        "sqlite",
-        "with-deprecated",
-    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -53,7 +47,7 @@ rust_proc_macro(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=diesel_derives",
+        "crate-name=rustls-webpki",
         "manual",
         "noclippy",
         "norustfmt",
@@ -63,12 +57,9 @@ rust_proc_macro(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "2.2.6",
+    version = "0.103.4",
     deps = [
-        "@crates__diesel_table_macro_syntax-0.2.0//:diesel_table_macro_syntax",
-        "@crates__dsl_auto_type-0.1.3//:dsl_auto_type",
-        "@crates__proc-macro2-1.0.95//:proc_macro2",
-        "@crates__quote-1.0.40//:quote",
-        "@crates__syn-2.0.104//:syn",
+        "@crates__rustls-pki-types-1.12.0//:rustls_pki_types",
+        "@crates__untrusted-0.9.0//:untrusted",
     ],
 )

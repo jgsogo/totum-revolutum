@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "winnow",
+    name = "toml_datetime",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -36,7 +36,7 @@ rust_library(
     ),
     crate_features = [
         "alloc",
-        "default",
+        "serde",
         "std",
     ],
     crate_root = "src/lib.rs",
@@ -49,7 +49,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=winnow",
+        "crate-name=toml_datetime",
         "manual",
         "noclippy",
         "norustfmt",
@@ -59,5 +59,8 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.7.11",
+    version = "0.7.0",
+    deps = [
+        "@crates__serde-1.0.219//:serde",
+    ],
 )
