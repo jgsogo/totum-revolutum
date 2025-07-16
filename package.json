@@ -8,6 +8,12 @@
   "pnpm": {
     "onlyBuiltDependencies": [],
     "packageExtensions": {
+      "@flowbite-svelte-plugins/chart": {
+        "dependencies": {
+          "clsx": "*",
+          "tailwind-merge": "*"
+        }
+      },
       "flowbite": {
         "dependencies": {
           "tailwindcss": "*"
