@@ -1,4 +1,4 @@
-FROM nginx:1.28
+FROM nginx:1.29
 
 LABEL org.opencontainers.image.source=https://github.com/jgsogo/totum-revolutum
 
