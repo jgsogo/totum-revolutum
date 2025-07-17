@@ -15,6 +15,8 @@ import type { TransactionGroup } from "./transaction_pb.js";
 export declare const file_apps_finances_tauri_models_protos_main_context: GenFile;
 
 /**
+ * Data that is shared across all the application
+ *
  * @generated from message finances_app_models.MainContext
  */
 export declare type MainContext = Message<"finances_app_models.MainContext"> & {
@@ -34,6 +36,9 @@ export declare type MainContext = Message<"finances_app_models.MainContext"> & {
   movementTypes: MovementType[];
 
   /**
+   * FIXME: I'm not sure I want to retrieve all the accounts here (maybe some holders cannot see some accounts)
+   * FIXME: If I have all the accounts here, then others can just return the pks (see 'holder_context' and 'account_context')
+   *
    * @generated from field: repeated finances_app_models.Account accounts = 4;
    */
   accounts: Account[];

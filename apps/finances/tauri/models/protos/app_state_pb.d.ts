@@ -31,6 +31,8 @@ export declare type DatabaseConnection = Message<"finances_app_models.DatabaseCo
   host: string;
 
   /**
+   * Expecting u16
+   *
    * @generated from field: uint32 port = 4;
    */
   port: number;
@@ -52,36 +54,50 @@ export declare const DatabaseConnectionSchema: GenMessage<DatabaseConnection>;
  */
 export declare type AppState = Message<"finances_app_models.AppState"> & {
   /**
+   * The three-letter currency code defined in ISO 4217.
+   *
    * @generated from field: string base_ccy = 1;
    */
   baseCcy: string;
 
   /**
+   * Base URL to all media resources
+   *
    * @generated from field: string base_media_url = 2;
    */
   baseMediaUrl: string;
 
   /**
+   * Base URL to static content
+   *
    * @generated from field: string base_static_url = 3;
    */
   baseStaticUrl: string;
 
   /**
+   * Base URL to the site root
+   *
    * @generated from field: string base_url = 4;
    */
   baseUrl: string;
 
   /**
+   * Current DB connection
+   *
    * @generated from field: finances_app_models.DatabaseConnection db = 5;
    */
   db?: DatabaseConnection;
 
   /**
+   * Backup directory
+   *
    * @generated from field: string backup_folder = 6;
    */
   backupFolder: string;
 
   /**
+   * Active account holder. Used as filter if applicable
+   *
    * @generated from field: optional finances_app_models.Holder holder = 7;
    */
   holder?: Holder;

@@ -14,6 +14,8 @@ import type { Snapshot } from "./snapshot_pb.js";
 export declare const file_apps_finances_tauri_models_protos_account_context: GenFile;
 
 /**
+ * Data available for the selected account
+ *
  * @generated from message finances_app_models.AccountContext
  */
 export declare type AccountContext = Message<"finances_app_models.AccountContext"> & {

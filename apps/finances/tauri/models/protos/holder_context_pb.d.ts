@@ -13,6 +13,8 @@ import type { Account } from "./account_pb.js";
 export declare const file_apps_finances_tauri_models_protos_holder_context: GenFile;
 
 /**
+ * Data available for the selected holder
+ *
  * @generated from message finances_app_models.HolderContext
  */
 export declare type HolderContext = Message<"finances_app_models.HolderContext"> & {
@@ -22,6 +24,8 @@ export declare type HolderContext = Message<"finances_app_models.HolderContext">
   holder?: Holder;
 
   /**
+   * All accounts for the selected holder
+   *
    * @generated from field: repeated finances_app_models.Account accounts = 2;
    */
   accounts: Account[];

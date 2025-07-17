@@ -28,6 +28,8 @@ export declare type MovementType = Message<"finances_app_models.MovementType"> &
   name: string;
 
   /**
+   * Last element in the breadcrumb is the movement-type itself. This way, if the breadcrumb is empty, it has not been populated.
+   *
    * @generated from field: repeated string breadcrumb = 3;
    */
   breadcrumb: string[];
@@ -44,6 +46,8 @@ export declare const MovementTypeSchema: GenMessage<MovementType>;
  */
 export declare type MovementAmount = Message<"finances_app_models.MovementAmount"> & {
   /**
+   * This is also used to classify the Movement into Numerable/NonNumerable/Dividend
+   *
    * @generated from oneof finances_app_models.MovementAmount.amount
    */
   amount: {
@@ -83,6 +87,8 @@ export declare type MovementAmount_Dividend = Message<"finances_app_models.Movem
   exDividendDate?: Date;
 
   /**
+   * Payout per share (and quantity from the snapshot)
+   *
    * @generated from field: finances_app_models.MoneyAmount.Numerable payout = 3;
    */
   payout?: MoneyAmount_Numerable;
@@ -109,6 +115,8 @@ export declare type Movement = Message<"finances_app_models.Movement"> & {
   dateValue?: Date;
 
   /**
+   * optional - New movements doesn't belong to a transaction yet
+   *
    * @generated from field: optional int64 transaction_pk = 3;
    */
   transactionPk?: bigint;
