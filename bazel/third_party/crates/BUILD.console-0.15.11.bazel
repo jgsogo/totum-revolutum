@@ -34,10 +34,6 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
-    crate_features = [
-        "ansi-parsing",
-        "unicode-width",
-    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -62,6 +58,5 @@ rust_library(
     deps = [
         "@crates__libc-0.2.174//:libc",
         "@crates__once_cell-1.21.3//:once_cell",
-        "@crates__unicode-width-0.2.1//:unicode_width",
     ],
 )

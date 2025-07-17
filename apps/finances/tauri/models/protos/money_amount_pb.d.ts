@@ -13,6 +13,9 @@ import type { Decimal } from "../../../../../libraries/googleapis/protos/google/
 export declare const file_apps_finances_tauri_models_protos_money_amount: GenFile;
 
 /**
+ * Encodes an amount of money. It can be a non-numerable amount or
+ * a numerable amount that encodes the quantity and the unit value.
+ *
  * @generated from message finances_app_models.MoneyAmount
  */
 export declare type MoneyAmount = Message<"finances_app_models.MoneyAmount"> & {

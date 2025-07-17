@@ -17,6 +17,8 @@ export declare const file_apps_finances_tauri_models_protos_snapshot: GenFile;
  */
 export declare type Snapshot = Message<"finances_app_models.Snapshot"> & {
   /**
+   * optional - New snapshots doesn't have pk yet
+   *
    * @generated from field: optional int64 pk = 1;
    */
   pk?: bigint;
@@ -44,6 +46,13 @@ export declare type Snapshot = Message<"finances_app_models.Snapshot"> & {
 export declare const SnapshotSchema: GenMessage<Snapshot>;
 
 /**
+ * *
+ * Request to get the `Snapshot`s for a given account.enum
+ *
+ * The request can include to optional dates to limit the range to
+ * consider in the query. Snapshot matching any of those dates
+ * should be considered in the query.
+ *
  * @generated from message finances_app_models.SnapshotsRequest
  */
 export declare type SnapshotsRequest = Message<"finances_app_models.SnapshotsRequest"> & {
@@ -70,6 +79,11 @@ export declare type SnapshotsRequest = Message<"finances_app_models.SnapshotsReq
 export declare const SnapshotsRequestSchema: GenMessage<SnapshotsRequest>;
 
 /**
+ * *
+ * A response to the `SnapshotsRequests` query. It includes all
+ * the snapshots between two dates for a given account. Snapshots
+ * are ordered according to their dates.
+ *
  * @generated from message finances_app_models.SnapshotsResponse
  */
 export declare type SnapshotsResponse = Message<"finances_app_models.SnapshotsResponse"> & {

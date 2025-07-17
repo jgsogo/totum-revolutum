@@ -35,7 +35,7 @@ rust_binary(
         "@crates__similar-asserts-1.7.0//:similar_asserts",
         "@crates__syn-2.0.104//:syn",
         "@crates__thiserror-2.0.12//:thiserror",
-        "@crates__toml-0.8.23//:toml",
+        "@crates__toml-0.9.2//:toml",
         "@crates__tracing-0.1.41//:tracing",
         "@crates__tracing-subscriber-0.3.19//:tracing_subscriber",
         "@crates__url-2.5.4//:url",

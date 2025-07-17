@@ -15,6 +15,8 @@ import type { Snapshot } from "./snapshot_pb.js";
 export declare const file_apps_finances_tauri_models_protos_account: GenFile;
 
 /**
+ * Fine-grained account type
+ *
  * @generated from message finances_app_models.AccountType
  */
 export declare type AccountType = Message<"finances_app_models.AccountType"> & {
@@ -29,6 +31,8 @@ export declare type AccountType = Message<"finances_app_models.AccountType"> & {
   name: string;
 
   /**
+   * Last element in the breadcrumb is the account-type itself. This way, if the breadcrumb is empty, it has not been populated.
+   *
    * @generated from field: repeated string breadcrumb = 3;
    */
   breadcrumb: string[];
@@ -70,6 +74,8 @@ export declare type Account = Message<"finances_app_models.Account"> & {
   type?: AccountType;
 
   /**
+   * The three-letter currency code defined in ISO 4217.
+   *
    * @generated from field: string currency_code = 5;
    */
   currencyCode: string;
@@ -95,6 +101,8 @@ export declare type Account = Message<"finances_app_models.Account"> & {
   close?: Date;
 
   /**
+   * Holders owning the money in this account
+   *
    * @generated from field: repeated finances_app_models.Holder holders = 10;
    */
   holders: Holder[];
@@ -117,6 +125,8 @@ export declare type Account = Message<"finances_app_models.Account"> & {
 export declare const AccountSchema: GenMessage<Account>;
 
 /**
+ * Main account categories
+ *
  * @generated from enum finances_app_models.AccountCategory
  */
 export enum AccountCategory {

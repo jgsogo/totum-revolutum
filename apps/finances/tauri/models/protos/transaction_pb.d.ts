@@ -38,10 +38,14 @@ export declare type TransactionGroup = Message<"finances_app_models.TransactionG
 export declare const TransactionGroupSchema: GenMessage<TransactionGroup>;
 
 /**
+ * Details for a given transaction
+ *
  * @generated from message finances_app_models.Transaction
  */
 export declare type Transaction = Message<"finances_app_models.Transaction"> & {
   /**
+   * optional - New transaction don't have pk yet
+   *
    * @generated from field: optional int64 pk = 1;
    */
   pk?: bigint;

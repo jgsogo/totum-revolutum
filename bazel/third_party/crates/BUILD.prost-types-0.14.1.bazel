@@ -17,7 +17,7 @@ cargo_toml_env_vars(
 )
 
 rust_library(
-    name = "sha1",
+    name = "prost_types",
     srcs = glob(
         include = ["**/*.rs"],
         allow_empty = True,
@@ -35,12 +35,11 @@ rust_library(
         ],
     ),
     crate_features = [
-        "compress",
         "default",
         "std",
     ],
     crate_root = "src/lib.rs",
-    edition = "2018",
+    edition = "2021",
     rustc_env_files = [
         ":cargo_toml_env_vars",
     ],
@@ -49,7 +48,7 @@ rust_library(
     ],
     tags = [
         "cargo-bazel",
-        "crate-name=sha1",
+        "crate-name=prost-types",
         "manual",
         "noclippy",
         "norustfmt",
@@ -59,17 +58,8 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.10.6",
+    version = "0.14.1",
     deps = [
-        "@crates__cfg-if-1.0.1//:cfg_if",
-        "@crates__digest-0.10.7//:digest",
-    ] + select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__cpufeatures-0.2.17//:cpufeatures",  # cfg(any(target_arch = "aarch64", target_arch = "x86", target_arch = "x86_64"))
-        ],
-        "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__cpufeatures-0.2.17//:cpufeatures",  # cfg(any(target_arch = "aarch64", target_arch = "x86", target_arch = "x86_64"))
-        ],
-        "//conditions:default": [],
-    }),
+        "@crates__prost-0.14.1//:prost",
+    ],
 )

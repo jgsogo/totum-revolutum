@@ -17,11 +17,15 @@ export declare const file_apps_finances_tauri_models_protos_fx_quote: GenFile;
  */
 export declare type FxQuote = Message<"finances_app_models.FxQuote"> & {
   /**
+   * The three-letter currency code defined in ISO 4217.
+   *
    * @generated from field: string base_ccy_code = 1;
    */
   baseCcyCode: string;
 
   /**
+   * The three-letter currency code defined in ISO 4217.
+   *
    * @generated from field: string quote_ccy_code = 2;
    */
   quoteCcyCode: string;

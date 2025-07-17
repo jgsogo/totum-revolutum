@@ -37,6 +37,7 @@ rust_library(
     crate_features = [
         "alloc",
         "default",
+        "simd",
         "std",
     ],
     crate_root = "src/lib.rs",
@@ -60,4 +61,7 @@ rust_library(
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "0.7.12",
+    deps = [
+        "@crates__memchr-2.7.5//:memchr",
+    ],
 )
