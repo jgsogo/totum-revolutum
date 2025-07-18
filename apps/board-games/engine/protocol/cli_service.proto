@@ -6,9 +6,9 @@ import "google/protobuf/empty.proto";
 
 
 service Cli {
-  rpc Status(google.protobuf.Empty) returns (StatusResponse);
+  rpc GetStatus(google.protobuf.Empty) returns (Status) {};
 }
 
-message StatusResponse {
+message Status {
   string msg = 1;
 }

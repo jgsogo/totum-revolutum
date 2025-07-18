@@ -1,4 +1,3 @@
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_proto_grpc_cpp//:defs.bzl", "cpp_grpc_library")
 
@@ -23,19 +22,15 @@ proto_library(
 )
 
 cpp_grpc_library(
-    name = "cli_service_proto_cpp",
-    # include_prefix = "system_config/server/protocol",
-    protos = [
-        ":cli_service_proto",
-    ],
-    # strip_include_prefix = "management_service_proto_cpp_pb",
-    # deps = [":common_proto_cpp"],
+    name = "cli_service_cpp_grpc",
+    protos = [":cli_service_proto"],
+    visibility = ["//visibility:public"],
 )
 
-cc_library(
-    name = "protocol_lib",
-    # visibility = ["//visibility:public"],
-    deps = [
-        ":cli_service_proto_cpp",
-    ],
-)
+# cc_library(
+#     name = "protocol_lib",
+#     # visibility = ["//visibility:public"],
+#     deps = [
+#         ":cli_service_cpp_grpc",
+#     ],
+# )
