@@ -1,16 +1,15 @@
-#include <iostream>
-#include <grpcpp/server_builder.h>
-#include <grpcpp/security/server_credentials.h>
 #include "apps/board-games/engine/protocol/cli_service.grpc.pb.h"
+#include <grpcpp/security/server_credentials.h>
+#include <grpcpp/server_builder.h>
+#include <iostream>
 
 class CliServiceImpl final : public board_game::Cli::Service {
- public:
-
-   grpc::Status GetStatus(grpc::ServerContext* context, const google::protobuf::Empty* request, board_game::Status* response) override {
-    response->set_msg("I'm alive!");
-    return grpc::Status::OK;
-  }
-
+  public:
+    grpc::Status GetStatus(grpc::ServerContext* context, const google::protobuf::Empty* request,
+                           board_game::Status* response) override {
+        response->set_msg("I'm alive!");
+        return grpc::Status::OK;
+    }
 };
 
 int main(int argc, char** argv) {

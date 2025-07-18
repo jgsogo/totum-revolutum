@@ -23,6 +23,7 @@ repos:
         exclude: ".patch$"
       # - id: check-illegal-windows-names # Introduced in next version
       - id: check-yaml
+        exclude: ".clang-format$"
       - id: check-json
       - id: check-toml
       - id: check-xml
