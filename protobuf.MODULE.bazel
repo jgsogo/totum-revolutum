@@ -1,16 +1,24 @@
-# All the Bazel stuff required to have protobuf available
+# All the Bazel stuff required to have protobuf and grpc available
 #
 # Copied from: https://github.com/bazelbuild/rules_rust/blob/main/examples/bzlmod/proto/MODULE.bazel
 
+PROTOBUF_VERSION = "31.1"
+
 bazel_dep(name = "rules_proto", version = "7.1.0")
+bazel_dep(name = "rules_proto_grpc", version = "5.1.0")
+bazel_dep(name = "rules_proto_grpc_cpp", version = "5.1.0")
 bazel_dep(name = "toolchains_protoc", version = "0.4.3")
-bazel_dep(name = "protobuf", version = "31.1")
+bazel_dep(name = "protobuf", version = PROTOBUF_VERSION)
 bazel_dep(name = "rules_rust_prost", version = "0.62.0")
 
 # 2 Register Proto toolchain
 ###############################################################################
 # Proto toolchain
-# register_toolchains("@rules_rust_prost//:default_prost_toolchain")
+protoc = use_extension("@toolchains_protoc//protoc:extensions.bzl", "protoc")
+protoc.toolchain(
+    google_protobuf = "com_google_protobuf",
+    version = "v{}".format(PROTOBUF_VERSION),
+)
 
 # Custom Prost toolchain
 register_toolchains("@//bazel/rust/prost:prost_toolchain")

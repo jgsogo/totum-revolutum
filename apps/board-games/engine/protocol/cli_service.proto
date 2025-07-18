@@ -1,0 +1,14 @@
+syntax = "proto3";
+package board_game;
+
+import "google/protobuf/empty.proto";
+
+
+
+service Cli {
+  rpc Status(google.protobuf.Empty) returns (StatusResponse);
+}
+
+message StatusResponse {
+  string msg = 1;
+}
