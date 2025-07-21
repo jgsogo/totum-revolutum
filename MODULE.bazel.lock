@@ -9897,7 +9897,7 @@
     },
     "//third_party/libpqxx:extensions.bzl%non_module_dependencies": {
       "general": {
-        "bzlTransitiveDigest": "hUIbuhH+ZUt1rlkfqu8S9wrbgouocIsE7RJU3iuqits=",
+        "bzlTransitiveDigest": "+ll7BY8rhL4K1Seg1ld7B8ZBDdIH98r7YL30cfJILCI=",
         "usagesDigest": "dZhxGpoiRNXj9JbnmUgboq2D9hUQK0ilZinY2hYkQW8=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

@@ -27,15 +27,15 @@ cmake(
     },
     generate_crosstool_file = False,
     lib_source = ":all_srcs",
+    # TODO: Use @postgres bazel module (https://registry.bazel.build/modules/postgres) to consume `pq` library from it
     linkopts = [
-        #   "-L/opt/homebrew/opt/libpq/lib",
+        "-L/usr/local/Cellar/libpq/17.5/lib",
         "-lpq",
     ],
     out_static_libs = [
         "libpqxx.a",
     ],
     visibility = ["//visibility:public"],
-    deps = [],
 )
 
 # configure_make(
