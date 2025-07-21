@@ -6,8 +6,15 @@ from django.utils import timezone
 from .game import Game
 
 
-# Participants in a game (can be players or spectators)
 class Participant(models.Model):
+    """
+    Represents a player participating in a room.
+
+    **Notes:**
+    Player authentication is not managed. Player names are assumed to
+    be ephemeral or anonymous initially.
+    """
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,

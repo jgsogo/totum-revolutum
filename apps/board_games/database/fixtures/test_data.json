@@ -33,6 +33,28 @@
   },
   {
     "fields": {
+      "action_index": 0,
+      "game": "33333333-3333-3333-3333-333333333333",
+      "participant": "44444444-4444-4444-4444-444444444444",
+      "payload": "",
+      "timestamp": "2025-07-16T10:05:00Z"
+    },
+    "model": "board_games_core.gameaction",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "action_index": 1,
+      "game": "33333333-3333-3333-3333-333333333333",
+      "participant": "55555555-5555-5555-5555-555555555555",
+      "payload": "",
+      "timestamp": "2025-07-16T10:06:00Z"
+    },
+    "model": "board_games_core.gameaction",
+    "pk": 2
+  },
+  {
+    "fields": {
       "created_at": "2025-07-16T10:01:00Z",
       "current_state": "",
       "game_type": "11111111-1111-1111-1111-111111111111",

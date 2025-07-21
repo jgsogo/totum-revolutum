@@ -8,6 +8,14 @@ from .room import Room
 
 # Game is a session of a given type in a room
 class Game(models.Model):
+    """
+    Represents a specific game instance (e.g. a chess match between two players).
+
+    **Notes:**
+    The `state` column stores the authoritative game state in serialized protobuf format.
+    This allows the engine to restore a game at any time.
+    """
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,

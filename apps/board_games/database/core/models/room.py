@@ -3,8 +3,15 @@ import uuid
 from django.db import models
 
 
-# A room hosts a single game instance
 class Room(models.Model):
+    """
+    Represents a room where players gather and play a game.
+
+    **Notes:**
+    A room may only have one game active at a time. The web UI subscribes to
+    room events via `LISTEN room_<id>`.
+    """
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,

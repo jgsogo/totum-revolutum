@@ -6,6 +6,13 @@ from .game import Game
 
 # Events describe changes that occurred during a game
 class EventLog(models.Model):
+    """
+    Logs notable events, such as game state transitions or system actions.
+
+    **Notes:**
+    Used for debugging, analytics, and UI enhancements.
+    """
+
     id = models.BigAutoField(
         primary_key=True, help_text="Auto-incrementing ID for ordering events."
     )

@@ -3,8 +3,15 @@ import uuid
 from django.db import models
 
 
-# Game types define the ruleset (e.g., checkers, chess, go)
 class GameType(models.Model):
+    """
+    Stores information about the types of games supported by the system (e.g. chess, checkers).
+
+    **Notes:**
+    Each game type defines its rules externally in the engine. This table allows
+    multi-game support in the same database.
+    """
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,

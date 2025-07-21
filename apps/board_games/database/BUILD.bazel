@@ -10,7 +10,7 @@ django_project(
         "settings.py",
         "urls.py",
     ],
-    visibility = ["//apps/finances:__subpackages__"],
+    visibility = ["//apps/board_games:__subpackages__"],
     deps = [
         "//apps/board_games/database/core:board_games_core",
     ],
@@ -67,7 +67,7 @@ sh_with_runfiles_binary(
 )
 
 with_postgres_run(
-    name = "devserver",
+    name = "dev",
     binaries = [
         ":_migrate",
         ":_populate_test_database",
