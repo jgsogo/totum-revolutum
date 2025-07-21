@@ -27,7 +27,15 @@ int main(int argc, char** argv) {
     // server->Wait();
 
     // PostgreSQL NOTIFY
-    pqxx::connection conn("dbname=your_db_name user=your_user password=your_password host=localhost");
+    const char* sql_database = std::getenv("BOARD_GAMES_ENGINE_SQL_DATABASE");
+    const char* sql_user = std::getenv("BOARD_GAMES_ENGINE_SQL_USER");
+    const char* sql_password = std::getenv("BOARD_GAMES_ENGINE_SQL_PASSWORD");
+    const char* sql_host = std::getenv("BOARD_GAMES_ENGINE_SQL_HOST");
+    const char* sql_port = std::getenv("BOARD_GAMES_ENGINE_SQL_PORT");
+    const std::string connection_str = std::format("dbname={} user={} password={} host={} port={}", sql_database,
+                                                   sql_user, sql_password, sql_host, sql_port);
+    std::cout << "Connecting to DB in " << connection_str << std::endl;
+    pqxx::connection conn(connection_str.c_str());
     pqxx::work txn(conn);
 
     return 0;

@@ -23,6 +23,7 @@ sh_with_runfiles_binary(
     ],
     tags = ["manual"],
     tool = ":app-admin",
+    visibility = ["//apps/board_games:__subpackages__"],
 )
 
 sh_with_runfiles_binary(
@@ -34,6 +35,7 @@ sh_with_runfiles_binary(
     data = ["fixtures/test_data.json"],
     tags = ["manual"],
     tool = ":app-admin",
+    visibility = ["//apps/board_games:__subpackages__"],
 )
 
 sh_with_runfiles_binary(

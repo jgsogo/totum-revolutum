@@ -1,4 +1,5 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 
 cc_binary(
     name = "engine",
@@ -9,4 +10,20 @@ cc_binary(
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",
         "@libpqxx",
     ],
+)
+
+with_postgres_run(
+    name = "dev",
+    binaries = [
+        "//apps/board_games/database:_migrate",
+        "//apps/board_games/database:_populate_test_database",
+        ":engine",
+    ],
+    env_transpose = {
+        "BOARD_GAMES_ENGINE_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_ENGINE_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_ENGINE_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_ENGINE_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_ENGINE_SQL_PORT": "POSTGRES_PORT",
+    },
 )
