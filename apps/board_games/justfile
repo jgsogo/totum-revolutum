@@ -1,0 +1,6 @@
+
+# Runs board_games/database app (Django backend) using a temporary PostgreSQL with some test data.
+# Useful to develop the database component.
+database-dev:
+    (sleep 10 ; open http://127.0.0.1:8000/admin) &
+    bazel run //apps/board_games/database:dev

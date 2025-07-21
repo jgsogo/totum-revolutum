@@ -1,0 +1,6 @@
+load("//bazel/python/django/app:django_app.bzl", "django_app")
+
+django_app(
+    name = "board_games_core",
+    visibility = ["//apps/board_games/database:__pkg__"],
+)

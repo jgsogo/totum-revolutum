@@ -4,7 +4,7 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 
-#include "apps/board-games/engine/protocol/cli_service.grpc.pb.h"
+#include "apps/board_games/engine/protocol/cli_service.grpc.pb.h"
 
 int main(int argc, char** argv) {
     std::string server_address = "localhost:50051";

@@ -1,0 +1,87 @@
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("//bazel/python/django/project:django_project.bzl", "django_project")
+
+name = "app"
+
+django_project(
+    name = name,
+    srcs = [
+        "settings.py",
+        "urls.py",
+    ],
+    visibility = ["//apps/board_games:__subpackages__"],
+    deps = [
+        "//apps/board_games/database/core:board_games_core",
+    ],
+)
+
+sh_with_runfiles_binary(
+    name = "_migrate",
+    args = [
+        "migrate",
+    ],
+    tags = ["manual"],
+    tool = ":app-admin",
+)
+
+sh_with_runfiles_binary(
+    name = "_populate_test_database",
+    args = [
+        "loaddata",
+        "$(location :fixtures/test_data.json)",
+    ],
+    data = ["fixtures/test_data.json"],
+    tags = ["manual"],
+    tool = ":app-admin",
+)
+
+sh_with_runfiles_binary(
+    name = "_create_superuser",
+    args = [
+        "createsuperuser",
+        "--noinput",
+        # "--username=jgsogo",
+        # "--email=jgsogo@jgsogo.es",
+    ],
+    env = {
+        "DJANGO_SUPERUSER_PASSWORD": "jgsogo",
+        "DJANGO_SUPERUSER_USERNAME": "jgsogo",
+        "DJANGO_SUPERUSER_EMAIL": "jgsogo@jgsogo.es",
+    },
+    tags = ["manual"],
+    tool = ":app-admin",
+)
+
+sh_with_runfiles_binary(
+    name = "_runserver",
+    args = [
+        "runserver",
+    ],
+    env = {
+        "DEBUG": "True",
+        "BOARD_GAMES_DATABASE_DJANGO_SECRET_KEY": "whatever",
+    },
+    tags = ["manual"],
+    tool = ":app-admin",
+)
+
+with_postgres_run(
+    name = "dev",
+    binaries = [
+        ":_migrate",
+        ":_populate_test_database",
+        ":_create_superuser",
+        ":_runserver",
+    ],
+    env = {
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_PORT": "POSTGRES_PORT",
+    },
+)
