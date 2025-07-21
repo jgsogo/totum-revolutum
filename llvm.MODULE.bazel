@@ -16,14 +16,6 @@ LLVM_VERSION = "19.1.7"
 ###############################################################################
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
 
-# LLVM Versions and platforms
-# https://github.com/bazel-contrib/toolchains_llvm/blob/master/toolchain/internal/llvm_distributions.bzl
-# LLVM_VERSIONS = {
-#     "": "19.1.0",
-#     # "darwin-aarch64": "16.0.3",
-#     # "darwin-x86_64": "15.0.7",
-# }
-
 # LLVM toolchain.
 llvm.toolchain(
     llvm_version = LLVM_VERSION,
