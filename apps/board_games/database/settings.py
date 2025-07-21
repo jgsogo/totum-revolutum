@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # My apps
+    "apps.board_games.database.core.apps.BoardGamesCoreConfig",
 ]
 
 MIDDLEWARE = [

@@ -15,18 +15,16 @@ django_project(
         "urls.py",
     ],
     visibility = ["//apps/finances:__subpackages__"],
-    deps = [],
-    # deps = [
-    #     "//libraries/finances/accounts/django_finances_accounts:finances_accounts",
-    #     "//libraries/finances/investments/django_finances_investments:finances_investments",
-    # ],
+    deps = [
+        "//apps/board_games/database/core:board_games_core",
+    ],
 )
 
 django_project_container(
     name = name,
     repository = repository,
-    version = "//apps/board-games:version",
-    visibility = ["//apps/board-games:__subpackages__"],
+    version = "//apps/board_games:version",
+    visibility = ["//apps/board_games:__subpackages__"],
 )
 
 ####
@@ -37,7 +35,7 @@ docker_compose(
     name = "{}-docker_compose".format(name),
     app_image_tag_stamped = "{{STABLE_BOARD_GAMES_VERSION}}",
     app_repository = repository,
-    visibility = ["//apps/board-games:__subpackages__"],
+    visibility = ["//apps/board_games:__subpackages__"],
     # FIXME: To ensure we are using the right deps, we need to load DjangoApp and Nginx container first
 )
 
@@ -49,7 +47,7 @@ docker_compose(
 oci_push(
     name = "release-app",
     image = ":{}-container".format(name),
-    remote_tags = "//apps/board-games:version",
+    remote_tags = "//apps/board_games:version",
     repository = repository,
     tags = [
         "manual",
@@ -58,8 +56,8 @@ oci_push(
     ],
 )
 
-# An alias to find the nging-release target inside this //apps/board-games directory. Useful so we ensure we capture
-# everything that needs to be released when querying //apps/board-games dir.
+# An alias to find the nging-release target inside this //apps/board_games directory. Useful so we ensure we capture
+# everything that needs to be released when querying //apps/board_games dir.
 alias(
     name = "release-nginx",
     actual = "//bazel/python/django/containers/nginx:release",

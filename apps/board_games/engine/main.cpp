@@ -1,4 +1,4 @@
-#include "apps/board-games/engine/protocol/cli_service.grpc.pb.h"
+#include "apps/board_games/engine/protocol/cli_service.grpc.pb.h"
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
 #include <iostream>
