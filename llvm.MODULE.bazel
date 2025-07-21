@@ -3,6 +3,7 @@ Configure LLVM toolchains
 """
 
 bazel_dep(name = "toolchains_llvm", version = "1.4.0")
+bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
 
 # LLVM Versions and platforms
 # https://github.com/bazel-contrib/toolchains_llvm/blob/master/toolchain/internal/llvm_distributions.bzl
@@ -23,3 +24,6 @@ use_repo(llvm, "llvm_toolchain")
 use_repo(llvm, "llvm_toolchain_llvm")  # if you depend on specific tools in scripts
 
 register_toolchains("@llvm_toolchain//:all")
+
+non_module_dependencies = use_extension("//third_party/libpqxx:extensions.bzl", "non_module_dependencies")
+use_repo(non_module_dependencies, "libpqxx")
