@@ -1,22 +1,11 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_proto_grpc_cpp//:defs.bzl", "cpp_grpc_library")
 
-# exports_files(
-#     [
-#         "common.proto",
-#         "management_service.proto",
-#         "semantic_graph_access_service.proto",
-#     ],
-#     visibility = ["//visibility:public"],
-# )
-
 proto_library(
     name = "cli_service_proto",
     srcs = ["cli_service.proto"],
-    # strip_import_prefix = "/sysconfig/server/protocol/schemas",
     visibility = ["//visibility:public"],
     deps = [
-        # ":common_proto",
         "@protobuf//:empty_proto",
     ],
 )
@@ -26,11 +15,3 @@ cpp_grpc_library(
     protos = [":cli_service_proto"],
     visibility = ["//visibility:public"],
 )
-
-# cc_library(
-#     name = "protocol_lib",
-#     # visibility = ["//visibility:public"],
-#     deps = [
-#         ":cli_service_cpp_grpc",
-#     ],
-# )

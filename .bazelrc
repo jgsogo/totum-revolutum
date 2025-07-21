@@ -15,8 +15,6 @@ build:stamp --stamp
 test:ci --verbose_failures --test_output=all --keep_going
 
 
-# common --noincompatible_disallow_ctx_resolve_tools  # rules_proto_grpc bug in bazel 8 https://github.com/rules-proto-grpc/rules_proto_grpc/issues/390
-
 ####################
 # Rust
 ####################
