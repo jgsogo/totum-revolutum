@@ -1,12 +1,11 @@
-from django.contrib import admin
-
-from apps.board_games.database.core.models import (
+from core.models import (
     EventLog,
     Game,
     GameType,
     Participant,
     Room,
 )
+from django.contrib import admin
 
 admin.site.register(EventLog)
 admin.site.register(GameType)
