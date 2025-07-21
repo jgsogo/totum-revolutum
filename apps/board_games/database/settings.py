@@ -21,12 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("BOARD_GAMES_DATABASE_DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1")
 
-ALLOWED_HOSTS = list(filter(None, os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(" ")))
+ALLOWED_HOSTS = list(
+    filter(None, os.environ.get("BOARD_GAMES_DATABASE_DJANGO_ALLOWED_HOSTS", "").split(" "))
+)
 
 # Application definition
 
@@ -77,12 +79,14 @@ WSGI_APPLICATION = "wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("DJANGO_SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("DJANGO_SQL_DATABASE", BASE_DIR / "db.sqlite3"),
-        "USER": os.environ.get("DJANGO_SQL_USER", "user"),
-        "PASSWORD": os.environ.get("DJANGO_SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("DJANGO_SQL_HOST", "localhost"),
-        "PORT": os.environ.get("DJANGO_SQL_PORT", "5432"),
+        "ENGINE": os.environ.get(
+            "BOARD_GAMES_DATABASE_DJANGO_SQL_ENGINE", "django.db.backends.sqlite3"
+        ),
+        "NAME": os.environ.get("BOARD_GAMES_DATABASE_DJANGO_SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("BOARD_GAMES_DATABASE_DJANGO_SQL_USER", "user"),
+        "PASSWORD": os.environ.get("BOARD_GAMES_DATABASE_DJANGO_SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("BOARD_GAMES_DATABASE_DJANGO_SQL_HOST", "localhost"),
+        "PORT": os.environ.get("BOARD_GAMES_DATABASE_DJANGO_SQL_PORT", "5432"),
     }
 }
 
@@ -124,10 +128,10 @@ DATE_FORMAT = "Y-m-d"
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles")
+STATIC_ROOT = os.environ.get("BOARD_GAMES_DATABASE_DJANGO_STATIC_ROOT", BASE_DIR / "staticfiles")
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.environ.get("MEDIA_ROOT", BASE_DIR / "mediafiles")
+MEDIA_ROOT = os.environ.get("BOARD_GAMES_DATABASE_DJANGO_MEDIA_ROOT", BASE_DIR / "mediafiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -135,5 +139,5 @@ MEDIA_ROOT = os.environ.get("MEDIA_ROOT", BASE_DIR / "mediafiles")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CSRF_TRUSTED_ORIGINS = list(
-    filter(None, os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(" "))
+    filter(None, os.environ.get("BOARD_GAMES_DATABASE_DJANGO_CSRF_TRUSTED_ORIGINS", "").split(" "))
 )

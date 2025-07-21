@@ -1,0 +1,10 @@
+
+# Runs board_games/databbase app (Django backend) using a temporary database with some test data
+database-runserver $BOARD_GAMES_DATABASE_DJANGO_SECRET_KEY="123" $DEBUG="true":
+    bazel run //apps/board_games/database:app-admin -- flush --noinput
+    bazel run //apps/board_games/database:app-admin -- migrate
+    @echo "🦸‍♂️ Create superuser 'jgsogo':"
+    DJANGO_SUPERUSER_PASSWORD=jgsogo bazel run //apps/board_games/database:app-admin -- createsuperuser --noinput --email=jgsogo@jgsogo.es --username=jgsogo
+    bazel run //apps/board_games/database:app-admin -- loaddata ./apps/board_games/database/core/fixtures/test_data.json
+    (sleep 10 ; open http://127.0.0.1:8000/admin) &
+    bazel run //apps/board_games/database:app-admin -- runserver
