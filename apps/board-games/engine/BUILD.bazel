@@ -1,0 +1,11 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+cc_binary(
+    name = "engine",
+    srcs = [
+        "main.cpp",
+    ],
+    deps = [
+        "//apps/board-games/engine/protocol:cli_service_cpp_grpc",
+    ],
+)
