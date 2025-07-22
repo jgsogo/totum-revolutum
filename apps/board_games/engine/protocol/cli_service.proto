@@ -6,9 +6,9 @@ import "google/protobuf/empty.proto";
 
 
 service Cli {
-  rpc GetStatus(google.protobuf.Empty) returns (Status) {};
+  rpc ListPlayingRooms(google.protobuf.Empty) returns (RoomList);
 }
 
-message Status {
-  string msg = 1;
+message RoomList {
+  repeated string room_ids = 1;
 }

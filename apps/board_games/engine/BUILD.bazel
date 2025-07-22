@@ -3,9 +3,10 @@ load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run"
 
 cc_binary(
     name = "engine",
-    srcs = [
-        "main.cpp",
-    ],
+    srcs = glob([
+        "**/*.h",
+        "**/*.cpp",
+    ]),
     deps = [
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",
         "@libpqxx",
@@ -19,7 +20,18 @@ with_postgres_run(
         "//apps/board_games/database:_populate_test_database",
         ":engine",
     ],
+    env = {
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
+    },
     env_transpose = {
+        # Envvars for the 'database' component
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_PORT": "POSTGRES_PORT",
+
+        # Envvars for the 'engine' component
         "BOARD_GAMES_ENGINE_SQL_DATABASE": "POSTGRES_DB",
         "BOARD_GAMES_ENGINE_SQL_USER": "POSTGRES_USER",
         "BOARD_GAMES_ENGINE_SQL_PASSWORD": "POSTGRES_PASSWORD",
