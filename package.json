@@ -6,7 +6,9 @@
   },
   "name": "totum-revolutum",
   "pnpm": {
-    "onlyBuiltDependencies": [],
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ],
     "packageExtensions": {
       "@flowbite-svelte-plugins/chart": {
         "dependencies": {
