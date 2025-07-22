@@ -13,12 +13,9 @@ class GameAction(models.Model):
     Each move is stored in protobuf format and can be replayed for auditing or visualization.
     """
 
-    id = models.BigAutoField(primary_key=True)
-
     game = models.ForeignKey(
         Game,
         on_delete=models.CASCADE,
-        related_name="actions",
         help_text="The game in which this action was performed.",
     )
 
@@ -27,7 +24,6 @@ class GameAction(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="actions",
         help_text="The participant who performed this action. Can be null for system actions.",
     )
 

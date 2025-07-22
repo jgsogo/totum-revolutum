@@ -1,28 +1,32 @@
-import uuid
-
 from django.db import models
 
 
 class GameType(models.Model):
     """
-    Stores information about the types of games supported by the system (e.g. chess, checkers).
+    Represents a type of game that can be played in a room.
+
+    Examples: Checkers, Chess, Tic Tac Toe.
 
     **Notes:**
-    Each game type defines its rules externally in the engine. This table allows
-    multi-game support in the same database.
+    - This model allows us to support multiple games with different rulesets.
+    - Games in the `Game` table reference a `GameType` via a foreign key.
     """
 
-    id = models.UUIDField(
+    slug = models.SlugField(
         primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        help_text="Unique identifier for the game type (e.g., checkers, chess).",
+        max_length=50,
+        help_text=(
+            "Unique identifier for the game type, used in URLs and references. "
+            "Examples: 'checkers', 'chess', 'tic_tac_toe'."
+        ),
     )
     name = models.CharField(
-        max_length=100, unique=True, help_text="Human-readable name of the game (e.g., Checkers)."
+        max_length=100,
+        help_text="Human-readable name of the game type. Example: 'Checkers'.",
     )
     description = models.TextField(
-        blank=True, help_text="Optional description of the game rules or objectives."
+        blank=True,
+        help_text="Optional description of the game type and its rules or characteristics.",
     )
 
     def __str__(self):

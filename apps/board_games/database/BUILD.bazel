@@ -1,3 +1,4 @@
+load("@py_deps//:requirements.bzl", "requirement")
 load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/python/django/project:django_project.bzl", "django_project")
@@ -13,6 +14,7 @@ django_project(
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
         "//apps/board_games/database/core:board_games_core",
+        requirement("pyyaml"),
     ],
 )
 
@@ -30,9 +32,21 @@ sh_with_runfiles_binary(
     name = "_populate_test_database",
     args = [
         "loaddata",
-        "$(location :fixtures/test_data.json)",
+        "$(location :fixtures/testing/game_types.yaml)",
+        "$(location :fixtures/testing/games.yaml)",
+        "$(location :fixtures/testing/participants.yaml)",
+        "$(location :fixtures/testing/rooms.yaml)",
+        "$(location :fixtures/testing/game_actions.yaml)",
+        "$(location :fixtures/testing/event_logs.yaml)",
     ],
-    data = ["fixtures/test_data.json"],
+    data = [
+        "fixtures/testing/event_logs.yaml",
+        "fixtures/testing/game_actions.yaml",
+        "fixtures/testing/game_types.yaml",
+        "fixtures/testing/games.yaml",
+        "fixtures/testing/participants.yaml",
+        "fixtures/testing/rooms.yaml",
+    ],
     tags = ["manual"],
     tool = ":app-admin",
     visibility = ["//apps/board_games:__subpackages__"],
