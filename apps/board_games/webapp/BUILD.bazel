@@ -24,14 +24,6 @@ filegroup(
     ],
 )
 
-# This target (use `bazel run`) executes `vite dev` which starts the development server
-# at 'http://localhost:5173/' with live CLI output!.
-#
-# However as Bazel moves its files out of the WORKSPACE into build directories,
-# hot reloading doesn't work.
-#
-# We could use 'ibazel' to rerun this target whenever sources change, but it doesn't work
-# with MODULE.bazel file (FIXME: https://github.com/bazelbuild/bazel-watcher/pull/647)
 js_run_devserver(
     name = "devserver",
     args = ["dev --config vite.config.ts"],
