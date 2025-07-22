@@ -36,6 +36,7 @@
     "sandbox/svelte-hello-world",
     "apps/finances/tauri",
     "apps/finances/tauri/models",
-    "libraries/googleapis"
+    "libraries/googleapis",
+    "apps/board_games/webapp"
   ]
 }
