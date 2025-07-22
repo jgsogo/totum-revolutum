@@ -10202,7 +10202,7 @@
         "bzlTransitiveDigest": "aVqwKoRPrSXO367SJABlye04kmpR/9VM2xiXB3nh3Ls=",
         "usagesDigest": "D9fZN3wqz1pGq6Pkf+5RXWeKtXBDhJ8ZCbkNg1cdlmc=",
         "recordedFileInputs": {
-          "@@//package.json": "9c522b663f3bbd88b704cd809d46ae7a105a02c409978fe3c58ca97c3c887370"
+          "@@//package.json": "e32bd77515508b8f2abb25f29bf7f219124ef43528aa0fc006f62cf53f04852c"
         },
         "recordedDirentsInputs": {},
         "envVariables": {},
