@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/run:defs.bzl", "run_together")
@@ -24,12 +24,9 @@ filegroup(
     ],
 )
 
-js_run_devserver(
-    name = "devserver",
-    args = ["dev --config vite.config.ts"],
-    chdir = package_name(),
-    command = "./node_modules/.bin/vite",
-    data = [
+js_run_binary(
+    name = "binary",
+    srcs = [
         # Configs
         "package.json",
 
@@ -41,12 +38,26 @@ js_run_devserver(
         ":src",
         ":static",
     ],
-    grant_sandbox_write_permissions = True,
+    args = ["build --sourcemap --config vite.config.js"],  # TODO: Source map allow us to go from the error to the source code. Use it in debug builds!
+    # args = ["build --config vite.config.js"],
+    chdir = package_name(),
+    out_dirs = ["build"],
+    tool = "//bazel/tools/npm:vite_binary",
+    # visibility = ["//apps/finances/tauri/src-tauri:__pkg__"],
+)
+
+js_binary(
+    name = "bin",
+    data = [
+        ":binary",
+        ":server.js",
+    ],
+    entry_point = "server.js",
 )
 
 run_together(
     name = "engine+devserver",
-    after = ":devserver",
+    after = ":bin",
     before = "//apps/board_games/engine",
 )
 
