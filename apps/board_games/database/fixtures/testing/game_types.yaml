@@ -1,0 +1,17 @@
+- model: board_games_core.gametype
+  pk: tic_tac_toe
+  fields:
+    name: "Tic Tac Toe"
+    description: "A simple 3x3 grid game where two players alternate marking X and O."
+
+- model: board_games_core.gametype
+  pk: chess
+  fields:
+    name: "Chess"
+    description: "A strategic board game played on an 8x8 grid with various unique pieces."
+
+- model: board_games_core.gametype
+  pk: go
+  fields:
+    name: "Go"
+    description: "An abstract strategy board game for two players in which the aim is to surround more territory."

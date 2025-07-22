@@ -10,3 +10,4 @@ semver~=3.0
 SQLAlchemy~=2.0
 testcontainers~=4.10
 tqdm~=4.67
+PyYAML~=6.0

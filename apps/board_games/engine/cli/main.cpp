@@ -16,15 +16,18 @@ int main(int argc, char** argv) {
     std::cout << "Server started." << std::endl;
 
     grpc::ClientContext context;
-    board_game::Status status;
-    grpc::Status r = stub_->GetStatus(&context, google::protobuf::Empty{}, &status);
+    board_game::RoomList room_list;
+    grpc::Status r = stub_->ListPlayingRooms(&context, google::protobuf::Empty{}, &room_list);
 
     if (!r.ok()) {
-        std::cout << "GetStatus rpc failed: " << r.error_message() << std::endl;
+        std::cout << "GetStatus rpc failed (" << r.error_code() << "): " << r.error_message() << std::endl;
         std::exit(EXIT_FAILURE);
         return -1;
     } else {
-        std::cout << "GetStatus rpc succeeded: " << status.msg() << std::endl;
+        std::cout << "Playing rooms: " << std::endl;
+        for (const auto& room_id : room_list.room_ids()) {
+            std::cout << " - " << room_id << std::endl;
+        }
     }
 
     return 0;

@@ -1,0 +1,26 @@
+- model: board_games_core.eventlog
+  pk: 1
+  fields:
+    game: 1
+    timestamp: 2024-01-01T10:02:00Z
+    event_type: move_made
+    payload: !!binary |
+      ERITFA==  # Placeholder protobuf bytes
+
+- model: board_games_core.eventlog
+  pk: 2
+  fields:
+    game: 1
+    timestamp: 2024-01-01T10:03:00Z
+    event_type: game_over
+    payload: !!binary |
+      GBkaGxw=  # Placeholder protobuf bytes
+
+- model: board_games_core.eventlog
+  pk: 3
+  fields:
+    game: 2
+    timestamp: 2024-01-02T11:01:00Z
+    event_type: move_made
+    payload: !!binary |
+      HR4fIA==  # Placeholder protobuf bytes

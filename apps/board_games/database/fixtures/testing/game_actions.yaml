@@ -1,0 +1,29 @@
+- model: board_games_core.gameaction
+  pk: 1
+  fields:
+    game: 1
+    participant: 00000000-0000-0000-0000-000000000001
+    action_index: 0
+    timestamp: 2024-01-01T10:00:00Z
+    payload: !!binary |
+      AQIDBA==  # Placeholder protobuf bytes
+
+- model: board_games_core.gameaction
+  pk: 2
+  fields:
+    game: 1
+    participant: 00000000-0000-0000-0000-000000000002
+    action_index: 1
+    timestamp: 2024-01-01T10:01:00Z
+    payload: !!binary |
+      BQYHCA==  # Placeholder protobuf bytes
+
+- model: board_games_core.gameaction
+  pk: 3
+  fields:
+    game: 2
+    participant: 00000000-0000-0000-0000-000000000003
+    action_index: 0
+    timestamp: 2024-01-02T11:00:00Z
+    payload: !!binary |
+      CQoLDA==  # Placeholder protobuf bytes
