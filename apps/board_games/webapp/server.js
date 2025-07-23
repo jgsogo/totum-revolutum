@@ -1,4 +1,7 @@
-// server.js
+// Implementation of a custom server: https://svelte.dev/docs/kit/adapter-node#Custom-server
+//
+// On top of the regular Svelte server, we are adding websockets.
+
 import { createServer } from 'http';
 import { handler } from './build/handler.js';
 import { WebSocketServer } from 'ws';
