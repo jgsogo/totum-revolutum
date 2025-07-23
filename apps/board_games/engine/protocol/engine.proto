@@ -1,0 +1,20 @@
+syntax = "proto3";
+package board_game;
+
+import "google/protobuf/empty.proto";
+
+
+service EngineService {
+  rpc SubmitCommand (CommandRequest) returns (CommandResponse);
+}
+
+message CommandRequest {
+  string game_id = 1;
+  string player_id = 2;
+  bytes payload = 3; // Serialized game-specific command
+}
+
+message CommandResponse {
+  bool success = 1;
+  string message = 2;
+}

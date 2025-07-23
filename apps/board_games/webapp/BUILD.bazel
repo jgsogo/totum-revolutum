@@ -2,6 +2,7 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/run:defs.bzl", "run_together")
+# load("@rules_proto_grpc_js//:defs.bzl", "js_grpc_library")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -24,6 +25,16 @@ filegroup(
     ],
 )
 
+# js_grpc_library(
+#     name = "engine_js_grpc",
+#     protos = [":engine_proto"],
+#     visibility = ["//visibility:public"],
+#     deps = [
+#         ":node_modules/google-protobuf",
+#         ":node_modules/@grpc/grpc-js"
+#     ]
+# )
+
 js_run_binary(
     name = "binary",
     srcs = [
@@ -32,6 +43,7 @@ js_run_binary(
 
         # Build deps
         ":node_modules",
+        "//apps/board_games/engine/protocol:engine_js_grpc",
 
         # Sources
         ":configs",

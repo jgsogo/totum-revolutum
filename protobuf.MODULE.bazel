@@ -5,8 +5,9 @@
 PROTOBUF_VERSION = "31.1"
 
 bazel_dep(name = "rules_proto", version = "7.1.0")
-bazel_dep(name = "rules_proto_grpc", version = "5.1.0")
-bazel_dep(name = "rules_proto_grpc_cpp", version = "5.1.0")
+bazel_dep(name = "rules_proto_grpc", version = "5.5.0")
+bazel_dep(name = "rules_proto_grpc_cpp", version = "5.5.0")
+bazel_dep(name = "rules_proto_grpc_js", version = "5.5.0")
 bazel_dep(name = "toolchains_protoc", version = "0.4.3")
 bazel_dep(name = "protobuf", version = PROTOBUF_VERSION)
 bazel_dep(name = "rules_rust_prost", version = "0.62.0")

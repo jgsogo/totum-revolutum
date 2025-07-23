@@ -1,5 +1,6 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_proto_grpc_cpp//:defs.bzl", "cpp_grpc_library")
+load("@rules_proto_grpc_js//:defs.bzl", "js_grpc_library")
 
 proto_library(
     name = "cli_service_proto",
@@ -13,5 +14,26 @@ proto_library(
 cpp_grpc_library(
     name = "cli_service_cpp_grpc",
     protos = [":cli_service_proto"],
+    visibility = ["//visibility:public"],
+)
+
+proto_library(
+    name = "engine_proto",
+    srcs = ["engine.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@protobuf//:empty_proto",
+    ],
+)
+
+cpp_grpc_library(
+    name = "engine_cpp_grpc",
+    protos = [":engine_proto"],
+    visibility = ["//visibility:public"],
+)
+
+js_grpc_library(
+    name = "engine_js_grpc",
+    protos = [":engine_proto"],
     visibility = ["//visibility:public"],
 )

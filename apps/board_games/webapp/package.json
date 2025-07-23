@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "ws": "8.18.3"
+    "@grpc/grpc-js": "^1.13.4",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",
