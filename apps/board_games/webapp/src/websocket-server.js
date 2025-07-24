@@ -7,14 +7,15 @@ import { createServer } from 'http';
 import { handler } from '../build/handler.js';
 import { WebSocketServer } from 'ws';
 import { parse } from 'url';
+import {addToRoom , removeFromRoom} from './websocket_rooms.js';
 
 const server = createServer(handler);
 
 // Create WebSocketServer using the same HTTP server
 const wss = new WebSocketServer({ noServer: true });
 
-/** @type {Map<string, Set<WebSocket>>} */
-const rooms = new Map();
+// /** @type {Map<string, Set<WebSocket>>} */
+// const rooms = new Map();
 
 wss.on('connection', (ws, request, client) => {
 	const { pathname } = parse(request.url, true);
@@ -23,17 +24,19 @@ wss.on('connection', (ws, request, client) => {
 	const roomId = String(pathname).split("/")[2];
 	console.log('Client connected to roomID', roomId);
 
-	if (!rooms.has(roomId)) {
-		rooms.set(roomId, new Set());
-	}
-	rooms.get(roomId).add(ws);
+	addToRoom(roomId, ws);
+	// if (!rooms.has(roomId)) {
+	// 	rooms.set(roomId, new Set());
+	// }
+	// rooms.get(roomId).add(ws);
 
 	ws.send(JSON.stringify({ type: 'connected', room: pathname }));
 
 	// On close
 	ws.on('close', () => {
 		console.log('Client disconnected from roomID', roomId);
-		rooms.get(roomId)?.delete(ws);
+		removeFromRoom(roomId, ws);
+		// rooms.get(roomId)?.delete(ws);
 	});
 });
 

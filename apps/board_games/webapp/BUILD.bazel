@@ -76,6 +76,7 @@ js_run_binary(
 js_binary(
     name = "bin",
     data = [
+        "src/websocket_rooms.js",
         ":binary",
     ],
     entry_point = "src/websocket-server.js",
