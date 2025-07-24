@@ -8,12 +8,16 @@ import { handler } from '../build/handler.js';
 import { WebSocketServer } from 'ws';
 import { parse } from 'url';
 import {addToRoom , removeFromRoom} from './websocket_rooms.js';
+import {listen_pg_notifications} from './websocket_pg_notifications.js';
+import process from 'process';
 
 const server = createServer(handler);
 
 // Create WebSocketServer using the same HTTP server
 const wss = new WebSocketServer({ noServer: true });
 
+const connectionString = `postgresql://${process.env.BOARD_GAMES_WEBAPP_SQL_USER}:${process.env.BOARD_GAMES_WEBAPP_SQL_PASSWORD}@${process.env.BOARD_GAMES_WEBAPP_SQL_HOST}:${process.env.BOARD_GAMES_WEBAPP_SQL_PORT}/${process.env.BOARD_GAMES_WEBAPP_SQL_DATABASE}`
+const pg_client = listen_pg_notifications(connectionString);
 // /** @type {Map<string, Set<WebSocket>>} */
 // const rooms = new Map();
 

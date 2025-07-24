@@ -18,6 +18,7 @@ class CliServiceImpl final : public board_game::Cli::Service {
         for (const auto& room_id : db::get_playing_room_ids(*conn)) {
             response->add_room_ids(room_id);
         }
+        std::cout << " - listed" << std::endl;
         return grpc::Status::OK;
     }
 

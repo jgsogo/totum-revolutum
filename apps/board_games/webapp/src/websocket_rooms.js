@@ -28,3 +28,15 @@ export function broadcastToRoom(roomId, msg) {
     }
   }
 }
+
+
+export function broadcastToAllRooms(msg) {
+  for (const [room, clients] of rooms) {
+      for (const ws of clients) {
+      if (ws.readyState === ws.OPEN) {
+        ws.send(JSON.stringify({ type: 'broadcast', msg }));
+      }
+    }
+  }
+
+}

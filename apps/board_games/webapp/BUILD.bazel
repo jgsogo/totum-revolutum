@@ -76,6 +76,7 @@ js_run_binary(
 js_binary(
     name = "bin",
     data = [
+        "src/websocket_pg_notifications.js",
         "src/websocket_rooms.js",
         ":binary",
     ],
@@ -112,5 +113,12 @@ with_postgres_run(
         "BOARD_GAMES_ENGINE_SQL_PASSWORD": "POSTGRES_PASSWORD",
         "BOARD_GAMES_ENGINE_SQL_HOST": "POSTGRES_HOST",
         "BOARD_GAMES_ENGINE_SQL_PORT": "POSTGRES_PORT",
+
+        # Envvars for the 'webapp' component
+        "BOARD_GAMES_WEBAPP_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_WEBAPP_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_WEBAPP_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_WEBAPP_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_WEBAPP_SQL_PORT": "POSTGRES_PORT",
     },
 )
