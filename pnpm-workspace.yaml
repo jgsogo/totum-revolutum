@@ -5,3 +5,4 @@ packages:
   - 'apps/finances/tauri/models'
   - 'libraries/googleapis'
   - 'apps/board_games/webapp'
+  - 'apps/board_games/engine/protocol'

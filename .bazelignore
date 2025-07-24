@@ -1,6 +1,7 @@
 .DS_Store
 actions-runner/
-apps/board_games/webapp/node_modules
+apps/board_games/engine/protocol/node_modules/
+apps/board_games/webapp/node_modules/
 apps/finances/tauri/models/node_modules/
 apps/finances/tauri/node_modules/
 libraries/googleapis/node_modules/

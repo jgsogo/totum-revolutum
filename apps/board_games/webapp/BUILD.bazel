@@ -2,7 +2,6 @@ load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/run:defs.bzl", "run_together")
-# load("@rules_proto_grpc_js//:defs.bzl", "js_grpc_library")
 
 npm_link_all_packages(name = "node_modules")
 
@@ -35,6 +34,22 @@ filegroup(
 #     ]
 # )
 
+# ts_config(
+#     name = "tsconfig",
+#     src = "tsconfig.json",
+# )
+
+# ts_project(
+#     name = "engine_proto_grpc",
+#     # srcs = ["main.ts"],
+#     data = [
+#         "package.json",  # for type=module
+#     ],
+#     deps = [
+#        "//apps/board_games/engine/protocol:engine_ts_proto",
+#     ],
+# )
+
 js_run_binary(
     name = "binary",
     srcs = [
@@ -43,7 +58,7 @@ js_run_binary(
 
         # Build deps
         ":node_modules",
-        "//apps/board_games/engine/protocol:engine_js_grpc",
+        "//apps/board_games/engine/protocol:engine_proto/ts",
 
         # Sources
         ":configs",

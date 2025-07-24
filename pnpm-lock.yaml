@@ -10,15 +10,9 @@ importers:
 
   .:
     dependencies:
-      '@grpc/grpc-js':
-        specifier: ^1.13.4
-        version: 1.13.4
       '@sveltejs/package':
         specifier: 2.4.0
         version: 2.4.0(svelte@5.36.5)(typescript@5.8.3)
-      google-protobuf:
-        specifier: ^3.21.4
-        version: 3.21.4
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -26,15 +20,58 @@ importers:
         specifier: 6.3.5
         version: 6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)
 
-  apps/board_games/webapp:
+  apps/board_games/engine/protocol:
     dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.6.0
+        version: 2.6.0
       '@grpc/grpc-js':
         specifier: ^1.13.4
         version: 1.13.4
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
+    devDependencies:
+      '@bufbuild/protoc-gen-es':
+        specifier: ^2.6.0
+        version: 2.6.0(@bufbuild/protobuf@2.6.0)
+      '@connectrpc/connect':
+        specifier: ^2.0.2
+        version: 2.0.2(@bufbuild/protobuf@2.6.0)
+      '@connectrpc/protoc-gen-connect-es':
+        specifier: ^1.6.1
+        version: 1.6.1(@bufbuild/protoc-gen-es@2.6.0(@bufbuild/protobuf@2.6.0))(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
+      '@types/node':
+        specifier: ^24.0.14
+        version: 24.0.14
+      grpc-es-bridge:
+        specifier: ^0.2.0
+        version: 0.2.0(@bufbuild/protobuf@2.6.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))(@grpc/grpc-js@1.13.4)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@24.0.14)(@vitest/browser@3.2.4)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)
+
+  apps/board_games/webapp:
+    dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.6.0
+        version: 2.6.0
+      '@grpc/grpc-js':
+        specifier: ^1.13.4
+        version: 1.13.4
+      google-protobuf:
+        specifier: ^3.21.4
+        version: 3.21.4
       ws:
         specifier: ^8.18.3
         version: 8.18.3
     devDependencies:
+      '@bufbuild/protoc-gen-es':
+        specifier: ^2.6.0
+        version: 2.6.0(@bufbuild/protobuf@2.6.0)
       '@eslint/compat':
         specifier: ^1.2.5
         version: 1.3.1(eslint@9.31.0(jiti@2.4.2))
@@ -240,7 +277,7 @@ importers:
         version: 2.6.0(@bufbuild/protobuf@2.6.0)
       '@connectrpc/protoc-gen-connect-es':
         specifier: ^1.6.1
-        version: 1.6.1(@bufbuild/protoc-gen-es@2.6.0(@bufbuild/protobuf@2.6.0))
+        version: 1.6.1(@bufbuild/protoc-gen-es@2.6.0(@bufbuild/protobuf@2.6.0))(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
       '@types/node':
         specifier: ^24.0.14
         version: 24.0.14
@@ -265,7 +302,7 @@ importers:
         version: 2.6.0(@bufbuild/protobuf@2.6.0)
       '@connectrpc/protoc-gen-connect-es':
         specifier: ^1.6.1
-        version: 1.6.1(@bufbuild/protoc-gen-es@2.6.0(@bufbuild/protobuf@2.6.0))
+        version: 1.6.1(@bufbuild/protoc-gen-es@2.6.0(@bufbuild/protobuf@2.6.0))(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
       '@types/node':
         specifier: ^24.0.14
         version: 24.0.14
@@ -374,6 +411,11 @@ packages:
 
   '@bufbuild/protoplugin@2.6.0':
     resolution: {integrity: sha512-mfAwI+4GqUtbw/ddfyolEHaAL86ozRIVlOg2A+SVRbjx1CjsMc1YJO+hBSkt/pqfpR+PmWBbZLstHbXP8KGtMQ==}
+
+  '@connectrpc/connect@2.0.2':
+    resolution: {integrity: sha512-xZuylIUNvNlH52e/4eQsZvY4QZyDJRtEFEDnn/yBrv5Xi5ZZI/p8X+GAHH35ucVaBvv9u7OzHZo8+tEh1EFTxA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.2.0
 
   '@connectrpc/protoc-gen-connect-es@1.6.1':
     resolution: {integrity: sha512-0fHcaADd+GKM0I/koIQpmKg7b+QL18bXlggTUYEAlMFzsd4zN/ApG3235hdUcRyhrAOAItTXxh8ZAV/nNd43Gg==}
@@ -1708,6 +1750,16 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
+  grpc-es-bridge@0.2.0:
+    resolution: {integrity: sha512-gShEgLxPyqKKYfnuqaJfxiDoj6BZoBTR0DNPTr6DmyXhmFSc/tSacZ0hhaJLCLJPsGDNIEObROFG7YMlGlQZBg==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2
+      '@connectrpc/connect': ^2
+      '@grpc/grpc-js': ^1
+    peerDependenciesMeta:
+      '@connectrpc/connect':
+        optional: true
+
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
@@ -2674,12 +2726,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@connectrpc/protoc-gen-connect-es@1.6.1(@bufbuild/protoc-gen-es@2.6.0(@bufbuild/protobuf@2.6.0))':
+  '@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0)':
+    dependencies:
+      '@bufbuild/protobuf': 2.6.0
+
+  '@connectrpc/protoc-gen-connect-es@1.6.1(@bufbuild/protoc-gen-es@2.6.0(@bufbuild/protobuf@2.6.0))(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))':
     dependencies:
       '@bufbuild/protobuf': 1.10.1
       '@bufbuild/protoplugin': 1.10.1
     optionalDependencies:
       '@bufbuild/protoc-gen-es': 2.6.0(@bufbuild/protobuf@2.6.0)
+      '@connectrpc/connect': 2.0.2(@bufbuild/protobuf@2.6.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -4008,6 +4065,13 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   graphemer@1.4.0: {}
+
+  grpc-es-bridge@0.2.0(@bufbuild/protobuf@2.6.0)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))(@grpc/grpc-js@1.13.4):
+    dependencies:
+      '@bufbuild/protobuf': 2.6.0
+      '@grpc/grpc-js': 1.13.4
+    optionalDependencies:
+      '@connectrpc/connect': 2.0.2(@bufbuild/protobuf@2.6.0)
 
   has-flag@4.0.0: {}
 
