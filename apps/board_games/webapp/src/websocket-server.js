@@ -4,7 +4,7 @@
 // TODO: Convert this file to typescript .ts
 
 import { createServer } from 'http';
-import { handler } from './build/handler.js';
+import { handler } from '../build/handler.js';
 import { WebSocketServer } from 'ws';
 import { parse } from 'url';
 
