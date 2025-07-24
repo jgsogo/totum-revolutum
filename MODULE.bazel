@@ -214,6 +214,8 @@ npm.npm_translate_lock(
     data = [
         "//:package.json",
         "//:pnpm-workspace.yaml",
+        "//apps/board_games/engine/protocol:package.json",
+        "//apps/board_games/webapp:package.json",
         "//apps/finances/tauri:package.json",
         "//apps/finances/tauri/models:package.json",
         "//libraries/googleapis:package.json",

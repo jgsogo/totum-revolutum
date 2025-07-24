@@ -11,7 +11,7 @@ def _fetch_envsubst_impl(_ctx):
         urls = [
             "https://github.com/a8m/envsubst/releases/download/v{version}/envsubst-Linux-arm64".format(version = VERSION),
         ],
-        integrity = "sha256-Lo9FQGLSHyv4d/WzZMItANbDNG+tW4EO/X4c646yZOQ=",
+        integrity = "sha256-cBuUAkerO2+Z0d4LIZnsgIKPkJItRns2+Yuor0yZjkg=",
         executable = True,
     )
 

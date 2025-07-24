@@ -1,4 +1,5 @@
 #include "apps/board_games/engine/protocol/cli_service.grpc.pb.h"
+#include "apps/board_games/engine/protocol/engine.grpc.pb.h"
 #include "db/connection_pool.h"
 #include "db/get_playing_room_ids.h"
 #include <grpcpp/security/server_credentials.h>
@@ -17,6 +18,24 @@ class CliServiceImpl final : public board_game::Cli::Service {
         for (const auto& room_id : db::get_playing_room_ids(*conn)) {
             response->add_room_ids(room_id);
         }
+        std::cout << " - listed" << std::endl;
+        return grpc::Status::OK;
+    }
+
+  private:
+    db::ConnectionPool& pool;
+};
+
+class EngineServiceImpl final : public board_game::EngineService::Service {
+  public:
+    EngineServiceImpl(db::ConnectionPool& pool) : pool{pool} {}
+
+    grpc::Status SubmitCommand(grpc::ServerContext* context, const board_game::CommandRequest* request,
+                               board_game::CommandResponse* response) override {
+        auto conn = pool.acquire();
+        std::cout << "EngineService::SubmitCommand" << std::endl;
+        response->set_success(true);
+        response->set_message("message from server");
         return grpc::Status::OK;
     }
 
@@ -30,9 +49,11 @@ int main(int argc, char** argv) {
     // Working as a gRPC server
     std::string server_address = "[::]:50051";
     CliServiceImpl service{pool};
+    EngineServiceImpl engine_service{pool};
     grpc::ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
+    builder.RegisterService(&engine_service);
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
     std::cout << "C++ server listening on " << server_address << std::endl;
     server->Wait();

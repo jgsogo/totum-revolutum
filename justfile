@@ -32,6 +32,8 @@ update-npm:
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri update
     bazel run -- @pnpm --dir $(pwd)/apps/finances/tauri/models update
     bazel run -- @pnpm --dir $(pwd)/sandbox/svelte-hello-world update
+    bazel run -- @pnpm --dir $(pwd)/apps/board_games/webapp update
+    bazel run -- @pnpm --dir $(pwd)/apps/board_games/engine/protocol update
 
 update-python:
     bazel run @@//bazel/third_party:python_requirements

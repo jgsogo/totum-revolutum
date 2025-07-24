@@ -1,0 +1,124 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("//bazel/run:defs.bzl", "run_together")
+
+npm_link_all_packages(name = "node_modules")
+
+filegroup(
+    name = "src",
+    srcs = glob(["src/**/*.*"]),
+)
+
+filegroup(
+    name = "static",
+    srcs = glob(["static/**/*.*"]),
+)
+
+filegroup(
+    name = "configs",
+    srcs = [
+        "svelte.config.js",
+        "tsconfig.json",
+        "vite.config.ts",
+    ],
+)
+
+# js_grpc_library(
+#     name = "engine_js_grpc",
+#     protos = [":engine_proto"],
+#     visibility = ["//visibility:public"],
+#     deps = [
+#         ":node_modules/google-protobuf",
+#         ":node_modules/@grpc/grpc-js"
+#     ]
+# )
+
+# ts_config(
+#     name = "tsconfig",
+#     src = "tsconfig.json",
+# )
+
+# ts_project(
+#     name = "engine_proto_grpc",
+#     # srcs = ["main.ts"],
+#     data = [
+#         "package.json",  # for type=module
+#     ],
+#     deps = [
+#        "//apps/board_games/engine/protocol:engine_ts_proto",
+#     ],
+# )
+
+js_run_binary(
+    name = "binary",
+    srcs = [
+        # Configs
+        "package.json",
+
+        # Build deps
+        ":node_modules",
+        "//apps/board_games/engine/protocol:engine_proto/ts",
+
+        # Sources
+        ":configs",
+        ":src",
+        ":static",
+    ],
+    args = ["build --sourcemap --config vite.config.js"],  # TODO: Source map allow us to go from the error to the source code. Use it in debug builds!
+    # args = ["build --config vite.config.js"],
+    chdir = package_name(),
+    out_dirs = ["build"],
+    tool = "//bazel/tools/npm:vite_binary",
+    # visibility = ["//apps/finances/tauri/src-tauri:__pkg__"],
+)
+
+js_binary(
+    name = "bin",
+    data = [
+        "src/websocket_pg_notifications.js",
+        "src/websocket_rooms.js",
+        ":binary",
+    ],
+    entry_point = "src/websocket-server.js",
+)
+
+run_together(
+    name = "engine+devserver",
+    after = ":bin",
+    before = "//apps/board_games/engine",
+)
+
+with_postgres_run(
+    name = "dev",
+    binaries = [
+        "//apps/board_games/database:_migrate",
+        "//apps/board_games/database:_populate_test_database",
+        ":engine+devserver",
+    ],
+    env = {
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        # Envvars for the 'database' component
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_PORT": "POSTGRES_PORT",
+
+        # Envvars for the 'engine' component
+        "BOARD_GAMES_ENGINE_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_ENGINE_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_ENGINE_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_ENGINE_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_ENGINE_SQL_PORT": "POSTGRES_PORT",
+
+        # Envvars for the 'webapp' component
+        "BOARD_GAMES_WEBAPP_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_WEBAPP_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_WEBAPP_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_WEBAPP_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_WEBAPP_SQL_PORT": "POSTGRES_PORT",
+    },
+)

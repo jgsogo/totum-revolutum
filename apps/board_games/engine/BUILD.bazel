@@ -7,8 +7,10 @@ cc_binary(
         "**/*.h",
         "**/*.cpp",
     ]),
+    visibility = ["//apps/board_games:__subpackages__"],
     deps = [
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",
+        "//apps/board_games/engine/protocol:engine_cpp_grpc",
         "@libpqxx",
     ],
 )
