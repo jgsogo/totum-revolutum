@@ -1,9 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
-load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/run:defs.bzl", "run_together")
-
-npm_link_all_packages(name = "node_modules")
 
 filegroup(
     name = "src",
@@ -57,7 +54,7 @@ js_run_binary(
         "package.json",
 
         # Build deps
-        ":node_modules",
+        "//:node_modules",  # TODO: Consume only the required deps
         "//apps/board_games/engine/protocol:engine_proto/ts",
 
         # Sources

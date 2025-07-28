@@ -1,10 +1,7 @@
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
 load("@aspect_rules_ts//ts:proto.bzl", "ts_proto_library")
-load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_proto_grpc_cpp//:defs.bzl", "cpp_grpc_library")
-
-npm_link_all_packages(name = "node_modules")
 
 proto_library(
     name = "cli_service_proto",
@@ -39,7 +36,7 @@ cpp_grpc_library(
 ts_proto_library(
     name = "engine_ts_proto",
     copy_files = True,
-    node_modules = ":node_modules",
+    node_modules = "//:node_modules",
     proto = ":engine_proto",
     proto_srcs = ["engine.proto"],
     protoc_gen_options = {
@@ -64,9 +61,7 @@ ts_project(
     tsconfig = ":tsconfig",
     visibility = ["//visibility:public"],
     deps = [
-        ":node_modules",
-        # ":node_modules/@grpc/grpc-js",
-        # ":node_modules/buffer",
         ":engine_ts_proto",
+        "//:node_modules",  # TODO: Consume only the required deps
     ],
 )
