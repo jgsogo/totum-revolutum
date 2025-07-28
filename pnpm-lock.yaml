@@ -16,6 +16,15 @@ importers:
       '@sveltejs/package':
         specifier: 2.4.0
         version: 2.4.0(svelte@5.36.5)(typescript@5.8.3)
+      '@tauri-apps/api':
+        specifier: ^2.6.0
+        version: 2.6.0
+      '@tauri-apps/plugin-log':
+        specifier: ^2.6.0
+        version: 2.6.0
+      '@tauri-apps/plugin-shell':
+        specifier: ^2.3.0
+        version: 2.3.0
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -32,21 +41,51 @@ importers:
       '@connectrpc/protoc-gen-connect-es':
         specifier: ^1.6.1
         version: 1.6.1(@bufbuild/protoc-gen-es@2.6.0(@bufbuild/protobuf@2.6.0))(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.0))
+      '@flowbite-svelte-plugins/chart':
+        specifier: ^0.2.4
+        version: 0.2.4(svelte@5.36.5)(tailwindcss@4.1.11)
       '@sveltejs/adapter-auto':
         specifier: ^6.0.1
         version: 6.0.1(@sveltejs/kit@2.25.0(@sveltejs/vite-plugin-svelte@6.1.0(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))
+      '@sveltejs/adapter-static':
+        specifier: ^3.0.8
+        version: 3.0.8(@sveltejs/kit@2.25.0(@sveltejs/vite-plugin-svelte@6.1.0(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))
       '@sveltejs/kit':
         specifier: ^2.25.0
         version: 2.25.0(@sveltejs/vite-plugin-svelte@6.1.0(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
       '@sveltejs/vite-plugin-svelte':
         specifier: 6.1.0
         version: 6.1.0(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
+      '@tailwindcss/forms':
+        specifier: ^0.5.10
+        version: 0.5.10(tailwindcss@4.1.11)
+      '@tailwindcss/postcss':
+        specifier: ^4.1.11
+        version: 4.1.11
+      '@tailwindcss/vite':
+        specifier: ^4.1.11
+        version: 4.1.11(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
+      '@tauri-apps/cli':
+        specifier: ^2.6.2
+        version: 2.6.2
       '@types/eslint':
         specifier: ^9.6.1
         version: 9.6.1
       '@types/node':
         specifier: ^24.0.14
         version: 24.0.14
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.37.0
+        version: 8.37.0(@typescript-eslint/parser@8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.37.0
+        version: 8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
+      apexcharts:
+        specifier: ^5.2.0
+        version: 5.2.0
+      autoprefixer:
+        specifier: ^10.4.21
+        version: 10.4.21(postcss@8.5.6)
       eslint:
         specifier: ^9.31.0
         version: 9.31.0(jiti@2.4.2)
@@ -56,21 +95,57 @@ importers:
       eslint-plugin-svelte:
         specifier: ^3.11.0
         version: 3.11.0(eslint@9.31.0(jiti@2.4.2))(svelte@5.36.5)
+      flowbite:
+        specifier: ^3.1.2
+        version: 3.1.2(rollup@4.45.1)
+      flowbite-svelte:
+        specifier: ^1.10.7
+        version: 1.10.7(rollup@4.45.1)(svelte@5.36.5)(tailwindcss@4.1.11)
+      flowbite-svelte-icons:
+        specifier: ^2.2.1
+        version: 2.2.1(svelte@5.36.5)
       globals:
         specifier: ^16.3.0
         version: 16.3.0
+      globalyzer:
+        specifier: ^0.1.4
+        version: 0.1.4
+      globrex:
+        specifier: ^0.1.2
+        version: 0.1.2
+      postcss:
+        specifier: ^8.5.6
+        version: 8.5.6
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.4.0
         version: 3.4.0(prettier@3.6.2)(svelte@5.36.5)
+      prettier-plugin-tailwindcss:
+        specifier: ^0.6.14
+        version: 0.6.14(prettier-plugin-svelte@3.4.0(prettier@3.6.2)(svelte@5.36.5))(prettier@3.6.2)
       svelte:
         specifier: 5.36.5
         version: 5.36.5
       svelte-check:
         specifier: ^4.2.2
         version: 4.2.2(picomatch@4.0.3)(svelte@5.36.5)(typescript@5.8.3)
+      svelte-multiselect:
+        specifier: ^11.2.2
+        version: 11.2.2(svelte@5.36.5)
+      tailwind-merge:
+        specifier: ^3.3.1
+        version: 3.3.1
+      tailwindcss:
+        specifier: ^4.1.11
+        version: 4.1.11
+      tiny-glob:
+        specifier: ^0.2.9
+        version: 0.2.9
+      tslib:
+        specifier: ^2.8.1
+        version: 2.8.1
       typescript:
         specifier: 5.8.3
         version: 5.8.3
@@ -80,6 +155,9 @@ importers:
       vite:
         specifier: ^6.3.5
         version: 6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)
+      vite-plugin-tailwind-purgecss:
+        specifier: ^0.3.5
+        version: 0.3.5(tailwindcss@4.1.11)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@24.0.14)(@vitest/browser@3.2.4)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)
@@ -209,123 +287,7 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0(@vitest/browser@3.2.4)(svelte@5.36.5)(vitest@3.2.4)
 
-  apps/finances/tauri:
-    dependencies:
-      '@tauri-apps/api':
-        specifier: ^2.6.0
-        version: 2.6.0
-      '@tauri-apps/plugin-log':
-        specifier: ^2.6.0
-        version: 2.6.0
-      '@tauri-apps/plugin-shell':
-        specifier: ^2.3.0
-        version: 2.3.0
-    devDependencies:
-      '@flowbite-svelte-plugins/chart':
-        specifier: ^0.2.4
-        version: 0.2.4(svelte@5.36.5)(tailwindcss@4.1.11)
-      '@sveltejs/adapter-static':
-        specifier: ^3.0.8
-        version: 3.0.8(@sveltejs/kit@2.25.0(@sveltejs/vite-plugin-svelte@6.1.0(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))
-      '@sveltejs/kit':
-        specifier: ^2.25.0
-        version: 2.25.0(@sveltejs/vite-plugin-svelte@6.1.0(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
-      '@sveltejs/vite-plugin-svelte':
-        specifier: ^6.1.0
-        version: 6.1.0(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
-      '@tailwindcss/forms':
-        specifier: ^0.5.10
-        version: 0.5.10(tailwindcss@4.1.11)
-      '@tailwindcss/postcss':
-        specifier: ^4.1.11
-        version: 4.1.11
-      '@tailwindcss/vite':
-        specifier: ^4.1.11
-        version: 4.1.11(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
-      '@tauri-apps/cli':
-        specifier: ^2.6.2
-        version: 2.6.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^8.37.0
-        version: 8.37.0(@typescript-eslint/parser@8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
-      '@typescript-eslint/parser':
-        specifier: ^8.37.0
-        version: 8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
-      apexcharts:
-        specifier: ^5.2.0
-        version: 5.2.0
-      autoprefixer:
-        specifier: ^10.4.21
-        version: 10.4.21(postcss@8.5.6)
-      eslint:
-        specifier: ^9.31.0
-        version: 9.31.0(jiti@2.4.2)
-      eslint-config-prettier:
-        specifier: ^10.1.5
-        version: 10.1.5(eslint@9.31.0(jiti@2.4.2))
-      eslint-plugin-svelte:
-        specifier: ^3.11.0
-        version: 3.11.0(eslint@9.31.0(jiti@2.4.2))(svelte@5.36.5)
-      flowbite:
-        specifier: ^3.1.2
-        version: 3.1.2(rollup@4.45.1)
-      flowbite-svelte:
-        specifier: ^1.10.7
-        version: 1.10.7(rollup@4.45.1)(svelte@5.36.5)(tailwindcss@4.1.11)
-      flowbite-svelte-icons:
-        specifier: ^2.2.1
-        version: 2.2.1(svelte@5.36.5)
-      globalyzer:
-        specifier: ^0.1.4
-        version: 0.1.4
-      globrex:
-        specifier: ^0.1.2
-        version: 0.1.2
-      postcss:
-        specifier: ^8.5.6
-        version: 8.5.6
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
-      prettier-plugin-svelte:
-        specifier: ^3.4.0
-        version: 3.4.0(prettier@3.6.2)(svelte@5.36.5)
-      prettier-plugin-tailwindcss:
-        specifier: ^0.6.14
-        version: 0.6.14(prettier-plugin-svelte@3.4.0(prettier@3.6.2)(svelte@5.36.5))(prettier@3.6.2)
-      svelte:
-        specifier: ^5.36.5
-        version: 5.36.5
-      svelte-check:
-        specifier: ^4.2.2
-        version: 4.2.2(picomatch@4.0.3)(svelte@5.36.5)(typescript@5.8.3)
-      svelte-multiselect:
-        specifier: ^11.2.2
-        version: 11.2.2(svelte@5.36.5)
-      tailwind-merge:
-        specifier: ^3.3.1
-        version: 3.3.1
-      tailwindcss:
-        specifier: ^4.1.11
-        version: 4.1.11
-      tiny-glob:
-        specifier: ^0.2.9
-        version: 0.2.9
-      tslib:
-        specifier: ^2.8.1
-        version: 2.8.1
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-      typescript-eslint:
-        specifier: ^8.37.0
-        version: 8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
-      vite:
-        specifier: ^6.3.5
-        version: 6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)
-      vite-plugin-tailwind-purgecss:
-        specifier: ^0.3.5
-        version: 0.3.5(tailwindcss@4.1.11)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0))
+  apps/finances/tauri: {}
 
   apps/finances/tauri/models: {}
 
