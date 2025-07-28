@@ -32,7 +32,7 @@ proto_library(
 ts_proto_library(
     name = "protos_ts",
     copy_files = True,
-    node_modules = "//apps/finances/tauri/models:node_modules",
+    node_modules = "//:node_modules",
     proto = ":protos",
     proto_srcs = protos,
     protoc_gen_options = {

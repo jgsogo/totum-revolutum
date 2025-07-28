@@ -2,6 +2,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.6.0",
     "@sveltejs/package": "2.4.0",
+    "buffer": "^6.0.3",
     "decimal.js": "^10.6.0",
     "svelte-datatables-net": "^2.0.4"
   },

@@ -1,17 +1,5 @@
 {
-  "dependencies": {
-    "@bufbuild/protobuf": "^2.6.0",
-    "buffer": "^6.0.3",
-    "decimal.js": "^10.6.0"
-  },
   "description": "Models used to exchange information between Tauri backend and frontend (see protobuf)",
-  "devDependencies": {
-    "@bufbuild/protoc-gen-es": "^2.6.0",
-    "@connectrpc/protoc-gen-connect-es": "^1.6.1",
-    "@types/node": "^24.0.14",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
-  },
   "name": "@totum-revolutum/finances-app-models",
   "private": true,
   "type": "module"
