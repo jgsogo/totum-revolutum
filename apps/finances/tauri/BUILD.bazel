@@ -1,7 +1,4 @@
 load("@aspect_rules_js//js:defs.bzl", "js_run_binary", "js_run_devserver")
-load("@npm//:defs.bzl", "npm_link_all_packages")
-
-npm_link_all_packages(name = "node_modules")
 
 filegroup(
     name = "src",
@@ -28,7 +25,7 @@ js_run_binary(
     srcs = [
         # Build deps
         "package.json",
-        ":node_modules",  # TODO: Use //:node_modules instead
+        "//:node_modules",  # TODO: Consume only the required deps
         "//apps/finances/tauri/models:models/ts",
 
         # Sources
@@ -52,7 +49,7 @@ js_run_devserver(
     data = [
         # Build deps
         "package.json",
-        ":node_modules",  # TODO: Use //:node_modules instead
+        "//:node_modules",  # TODO: Consume only the required deps
         "//apps/finances/tauri/models:models/ts",
 
         # Sources

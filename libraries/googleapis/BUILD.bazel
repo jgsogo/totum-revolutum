@@ -1,11 +1,8 @@
 load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
-load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
+load("@npm//:vitest/package_json.bzl", vitest_bin = "bin")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 exports_files(["Cargo.toml"])
-
-npm_link_all_packages(name = "node_modules")
 
 ###########
 # Rust library
@@ -47,8 +44,8 @@ ts_project(
     tsconfig = ":tsconfig",
     visibility = ["//visibility:public"],
     deps = [
-        ":node_modules/@types/node",
-        ":node_modules/decimal.js",
+        "//:node_modules/@types/node",
+        "//:node_modules/decimal.js",
         "//libraries/googleapis/protos/google/type:protos_ts",
     ],
 )
@@ -64,7 +61,7 @@ ts_project(
     tsconfig = ":tsconfig",
     deps = [
         ":googleapis/ts",
-        ":node_modules/vitest",
+        "//:node_modules/vitest",
     ],
 )
 
@@ -74,7 +71,7 @@ vitest_bin.vitest_test(
     chdir = package_name(),
     data = [
         "package.json",
-        ":node_modules",
         ":src_test_ts",
+        "//:node_modules",  # TODO: Consume only the required deps
     ],
 )

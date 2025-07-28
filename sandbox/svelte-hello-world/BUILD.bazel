@@ -1,9 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_run_devserver")
-load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//sandbox/svelte-hello-world:vite/package_json.bzl", vite_bin = "bin")
-load("@npm//sandbox/svelte-hello-world:vitest/package_json.bzl", vitest_bin = "bin")
-
-npm_link_all_packages(name = "node_modules")
+load("@npm//:vite/package_json.bzl", vite_bin = "bin")
+load("@npm//:vitest/package_json.bzl", vitest_bin = "bin")
 
 # TODO: Some of these rules can be generalized and moved to `bazel/js/svelte`
 # so they are reused by other libraries
@@ -31,7 +28,7 @@ vite_bin.vite(
         "svelte.config.js",
 
         # Build deps
-        ":node_modules",  # TODO: Use //:node_modules instead
+        "//:node_modules",  # TODO: Consume only the required deps
 
         # Sources
         ":src",
@@ -64,7 +61,7 @@ js_run_devserver(
         "svelte.config.js",
 
         # Build deps
-        ":node_modules",  # TODO: Use //:node_modules instead
+        "//:node_modules",  # TODO: Consume only the required deps
 
         # Sources
         ":src",
@@ -86,7 +83,7 @@ vitest_bin.vitest_test(
         "svelte.config.js",
 
         # Build deps
-        ":node_modules",  # TODO: Use //:node_modules instead
+        "//:node_modules",  # TODO: Consume only the required deps
 
         # Sources
         ":src",
