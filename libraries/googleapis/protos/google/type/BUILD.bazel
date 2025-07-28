@@ -38,7 +38,7 @@ ts_proto_library(
         "//bazel:machine_user": True,
         "//conditions:default": False,
     }),
-    node_modules = "//libraries/googleapis:node_modules",
+    node_modules = "//:node_modules",
     proto = ":protos",
     proto_srcs = protos,
     protoc_gen_options = {
