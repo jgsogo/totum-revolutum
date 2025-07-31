@@ -16,9 +16,19 @@ class ConnectionPool {
     std::shared_ptr<pqxx::connection> acquire();
     void release(std::shared_ptr<pqxx::connection> conn);
 
+    template <typename R> R with_conn(std::function<R(pqxx::connection& conn)> work) {
+        auto conn = this->acquire();
+        auto r = work(*conn);
+        this->release(conn);
+        return r;
+    }
+
   private:
     std::queue<std::shared_ptr<pqxx::connection>> pool;
     std::mutex mutex;
     std::condition_variable cond;
 };
+
+template <> void ConnectionPool::with_conn<void>(std::function<void(pqxx::connection& conn)> work);
+
 } // namespace db
