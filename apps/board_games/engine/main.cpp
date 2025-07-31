@@ -13,12 +13,14 @@ class CliServiceImpl final : public board_game::Cli::Service {
 
     grpc::Status ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
                                   board_game::RoomList* response) override {
+        std::cout << "[engine] pool.acquire" << std::endl;
         auto conn = pool.acquire();
-        std::cout << "ListPlayingRooms" << std::endl;
+        std::cout << "[engine] ListPlayingRooms" << std::endl;
         for (const auto& room_id : db::get_playing_room_ids(*conn)) {
             response->add_room_ids(room_id);
         }
-        std::cout << " - listed" << std::endl;
+        std::cout << "[engine]  - listed" << std::endl;
+        pool.release(conn);
         return grpc::Status::OK;
     }
 
@@ -32,10 +34,13 @@ class EngineServiceImpl final : public board_game::EngineService::Service {
 
     grpc::Status SubmitCommand(grpc::ServerContext* context, const board_game::CommandRequest* request,
                                board_game::CommandResponse* response) override {
+        std::cout << "[engine] pool.acquire" << std::endl;
         auto conn = pool.acquire();
-        std::cout << "EngineService::SubmitCommand" << std::endl;
+        pool.release(conn);
+        std::cout << "[engine] EngineService::SubmitCommand" << std::endl;
         response->set_success(true);
-        response->set_message("message from server");
+        static int i = 0;
+        response->set_message(std::format("message from server: {}", i++));
         return grpc::Status::OK;
     }
 

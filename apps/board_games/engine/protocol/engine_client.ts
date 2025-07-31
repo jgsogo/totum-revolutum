@@ -13,10 +13,10 @@ const client = createConnectRpcClient(EngineService, address, credentials)
 //   grpc.credentials.createInsecure()
 // );
 
-export function sendCommandToEngine(game_id: string, player_id: string, payload: Uint8Array): Promise<CommandResponseProto> {
+export async function sendCommandToEngine(game_id: string, player_id: string, payload: Uint8Array): Promise<CommandResponseProto> {
   const request: CommandRequestProto = create(CommandRequestSchema, { gameId: game_id, playerId: player_id, payload });
-  console.log(`Created the request!`);
-  return client.submitCommand(request);
+  console.log(`[backend] Submit request using gRPC client`);
+  return await client.submitCommand(request);
   // return new Promise((resolve, reject) => {
   //   // const request_binary = toBinary(CommandRequestSchema, request);
 

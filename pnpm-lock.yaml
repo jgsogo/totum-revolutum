@@ -37,6 +37,9 @@ importers:
       svelte-datatables-net:
         specifier: ^2.0.4
         version: 2.0.4(svelte@5.36.5)
+      svelte-persisted-store:
+        specifier: ^0.12.0
+        version: 0.12.0(svelte@5.36.5)
     devDependencies:
       '@bufbuild/protoc-gen-es':
         specifier: ^2.6.0
@@ -50,6 +53,9 @@ importers:
       '@flowbite-svelte-plugins/chart':
         specifier: ^0.2.4
         version: 0.2.4(svelte@5.36.5)(tailwindcss@4.1.11)
+      '@svelte-put/qr':
+        specifier: 2.1.0
+        version: 2.1.0(svelte@5.36.5)
       '@sveltejs/adapter-auto':
         specifier: ^6.0.1
         version: 6.0.1(@sveltejs/kit@2.25.0(@sveltejs/vite-plugin-svelte@6.1.0(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))(svelte@5.36.5)(vite@6.3.5(@types/node@24.0.14)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.7.0)))
@@ -706,6 +712,11 @@ packages:
     resolution: {integrity: sha512-M/fKi4sasCdM8i0aWJjCSFm2qEnYRR8AMLG2kxp6wD13+tMGA4Z1tVAuHkNRjud5SW2EM3naLuK35w9twvf6aA==}
     cpu: [x64]
     os: [win32]
+
+  '@svelte-put/qr@2.1.0':
+    resolution: {integrity: sha512-7HzQjoNZI9k6J4R6tnMi0ZGtRQKIFmZqzeo2GtkKZkumtPYByuqjGcB/ApFkxfg+J5mARKezWzKiq9EDJ6htRg==}
+    peerDependencies:
+      svelte: ^5.1.0
 
   '@sveltejs/acorn-typescript@1.0.5':
     resolution: {integrity: sha512-IwQk4yfwLdibDlrXVE04jTZYlLnwsTT2PIOQQGNLWfjavGifnk1JD1LcZjZaBTRcxZu2FfPfNLOE04DSu9lqtQ==}
@@ -1574,6 +1585,9 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
+  headless-qr@1.0.3:
+    resolution: {integrity: sha512-HHVwf1i++Ho2vFstHxAdfP0OjB7Di44nGXbh3VXciuzwkuFb1oeFDCrfOLjFgHip/Kbc/wq2GOaSTiKQ81K/Yg==}
+
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
@@ -2167,6 +2181,12 @@ packages:
     resolution: {integrity: sha512-KSb9E6ctf+boEg+c9pGZ1B6ehc7dH5Ka33csFzN7oJWQtMgO9AiTcfOuHKAoefhMrabqxnFB+g/yjHujcynVHA==}
     peerDependencies:
       svelte: ^5.35.6
+
+  svelte-persisted-store@0.12.0:
+    resolution: {integrity: sha512-BdBQr2SGSJ+rDWH8/aEV5GthBJDapVP0GP3fuUCA7TjYG5ctcB+O9Mj9ZC0+Jo1oJMfZUd1y9H68NFRR5MyIJA==}
+    engines: {node: '>=0.14'}
+    peerDependencies:
+      svelte: ^3.48.0 || ^4 || ^5
 
   svelte2tsx@0.7.40:
     resolution: {integrity: sha512-Fgqe2lzC9DWT/kQTIXqN39O2ot9rUqzUu9dqpbuI6EsaEJ6+RSXVmXnxcNYMlKb2LRPDoIg9TVzXYWwi0zhCmQ==}
@@ -2883,6 +2903,11 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.45.1':
     optional: true
+
+  '@svelte-put/qr@2.1.0(svelte@5.36.5)':
+    dependencies:
+      headless-qr: 1.0.3
+      svelte: 5.36.5
 
   '@sveltejs/acorn-typescript@1.0.5(acorn@8.15.0)':
     dependencies:
@@ -3827,6 +3852,8 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
+  headless-qr@1.0.3: {}
+
   ieee754@1.2.1: {}
 
   ignore@5.3.2: {}
@@ -4313,6 +4340,10 @@ snapshots:
       svelte: 5.36.5
 
   svelte-multiselect@11.2.2(svelte@5.36.5):
+    dependencies:
+      svelte: 5.36.5
+
+  svelte-persisted-store@0.12.0(svelte@5.36.5):
     dependencies:
       svelte: 5.36.5
 
