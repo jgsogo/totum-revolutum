@@ -57,7 +57,7 @@ diesel_table_macro_syntax = "0.2.0"
 diffy = "0.4.2"
 dirs = { version = "6.0.0" }
 dotenvy = "0.15.7"
-dyn-clone = "1.0.18"
+dyn-clone = "1.0.20"
 env_logger = "0.11.6"
 fd-lock = "4.0.2"
 kamadak-exif = "0.6.1"
