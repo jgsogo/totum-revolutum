@@ -19,7 +19,7 @@ crate-type = ["lib", "cdylib", "staticlib"]
 tauri-build = { version = "2.2.0", features = [] }
 tar = { version  = "0.4.44"}
 flate2 = { version = "1.1.1" }
-serde_json = { version = "1.0.140"}
+serde_json = { version = "1.0.142"}
 anyhow = { version = "*"}
 
 [dependencies]
@@ -44,7 +44,7 @@ tauri = { version = "2.5.1", features = ["custom-protocol"] }
 tauri-plugin-log = "2.4.0"
 tauri-plugin-shell = "2.2.1"
 serde = { version = "1.0.217", features = ["derive"] }
-serde_json = "1.0.138"
+serde_json = "1.0.142"
 thiserror = "2.0.11"
 log = "0.4.25"
 itertools = "0.14.0"
