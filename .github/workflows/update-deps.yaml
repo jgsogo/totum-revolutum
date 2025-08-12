@@ -43,8 +43,9 @@ jobs:
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
-        commit-message: bump deps
-        title: 🤖 Bump deps (`just update`)
-        assignees: jgsogo
-        reviewers: jgsogo
-        labels: dependencies
+        with:
+          commit-message: bump deps
+          title: 🤖 Bump deps (`just update`)
+          assignees: jgsogo
+          reviewers: jgsogo
+          labels: dependencies
