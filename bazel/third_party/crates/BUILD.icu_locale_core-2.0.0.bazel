@@ -65,6 +65,6 @@ rust_library(
         "@crates__litemap-0.8.0//:litemap",
         "@crates__tinystr-0.8.1//:tinystr",
         "@crates__writeable-0.6.1//:writeable",
-        "@crates__zerovec-0.11.2//:zerovec",
+        "@crates__zerovec-0.11.4//:zerovec",
     ],
 )

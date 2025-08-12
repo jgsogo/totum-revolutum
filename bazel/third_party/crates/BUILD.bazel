@@ -31,14 +31,14 @@ filegroup(
 
 # Workspace Member Dependencies
 alias(
-    name = "anyhow-1.0.98",
-    actual = "@crates__anyhow-1.0.98//:anyhow",
+    name = "anyhow-1.0.99",
+    actual = "@crates__anyhow-1.0.99//:anyhow",
     tags = ["manual"],
 )
 
 alias(
     name = "anyhow",
-    actual = "@crates__anyhow-1.0.98//:anyhow",
+    actual = "@crates__anyhow-1.0.99//:anyhow",
     tags = ["manual"],
 )
 
@@ -103,14 +103,14 @@ alias(
 )
 
 alias(
-    name = "camino-1.1.10",
-    actual = "@crates__camino-1.1.10//:camino",
+    name = "camino-1.1.11",
+    actual = "@crates__camino-1.1.11//:camino",
     tags = ["manual"],
 )
 
 alias(
     name = "camino",
-    actual = "@crates__camino-1.1.10//:camino",
+    actual = "@crates__camino-1.1.11//:camino",
     tags = ["manual"],
 )
 
@@ -151,14 +151,14 @@ alias(
 )
 
 alias(
-    name = "clap-4.5.41",
-    actual = "@crates__clap-4.5.41//:clap",
+    name = "clap-4.5.45",
+    actual = "@crates__clap-4.5.45//:clap",
     tags = ["manual"],
 )
 
 alias(
     name = "clap",
-    actual = "@crates__clap-4.5.41//:clap",
+    actual = "@crates__clap-4.5.45//:clap",
     tags = ["manual"],
 )
 
@@ -175,14 +175,14 @@ alias(
 )
 
 alias(
-    name = "clap_complete-4.5.55",
-    actual = "@crates__clap_complete-4.5.55//:clap_complete",
+    name = "clap_complete-4.5.57",
+    actual = "@crates__clap_complete-4.5.57//:clap_complete",
     tags = ["manual"],
 )
 
 alias(
     name = "clap_complete",
-    actual = "@crates__clap_complete-4.5.55//:clap_complete",
+    actual = "@crates__clap_complete-4.5.57//:clap_complete",
     tags = ["manual"],
 )
 
@@ -475,14 +475,14 @@ alias(
 )
 
 alias(
-    name = "hyper-util-0.1.15",
-    actual = "@crates__hyper-util-0.1.15//:hyper_util",
+    name = "hyper-util-0.1.16",
+    actual = "@crates__hyper-util-0.1.16//:hyper_util",
     tags = ["manual"],
 )
 
 alias(
     name = "hyper-util",
-    actual = "@crates__hyper-util-0.1.15//:hyper_util",
+    actual = "@crates__hyper-util-0.1.16//:hyper_util",
     tags = ["manual"],
 )
 
@@ -703,14 +703,14 @@ alias(
 )
 
 alias(
-    name = "reqwest-0.12.22",
-    actual = "@crates__reqwest-0.12.22//:reqwest",
+    name = "reqwest-0.12.23",
+    actual = "@crates__reqwest-0.12.23//:reqwest",
     tags = ["manual"],
 )
 
 alias(
     name = "reqwest",
-    actual = "@crates__reqwest-0.12.22//:reqwest",
+    actual = "@crates__reqwest-0.12.23//:reqwest",
     tags = ["manual"],
 )
 
@@ -739,14 +739,14 @@ alias(
 )
 
 alias(
-    name = "serde_json-1.0.140",
-    actual = "@crates__serde_json-1.0.140//:serde_json",
+    name = "serde_json-1.0.142",
+    actual = "@crates__serde_json-1.0.142//:serde_json",
     tags = ["manual"],
 )
 
 alias(
     name = "serde_json",
-    actual = "@crates__serde_json-1.0.140//:serde_json",
+    actual = "@crates__serde_json-1.0.142//:serde_json",
     tags = ["manual"],
 )
 
@@ -811,26 +811,26 @@ alias(
 )
 
 alias(
-    name = "strum-0.27.1",
-    actual = "@crates__strum-0.27.1//:strum",
+    name = "strum-0.27.2",
+    actual = "@crates__strum-0.27.2//:strum",
     tags = ["manual"],
 )
 
 alias(
     name = "strum",
-    actual = "@crates__strum-0.27.1//:strum",
+    actual = "@crates__strum-0.27.2//:strum",
     tags = ["manual"],
 )
 
 alias(
-    name = "strum_macros-0.27.1",
-    actual = "@crates__strum_macros-0.27.1//:strum_macros",
+    name = "strum_macros-0.27.2",
+    actual = "@crates__strum_macros-0.27.2//:strum_macros",
     tags = ["manual"],
 )
 
 alias(
     name = "strum_macros",
-    actual = "@crates__strum_macros-0.27.1//:strum_macros",
+    actual = "@crates__strum_macros-0.27.2//:strum_macros",
     tags = ["manual"],
 )
 
@@ -859,92 +859,92 @@ alias(
 )
 
 alias(
-    name = "tauri-2.6.2",
-    actual = "@crates__tauri-2.6.2//:tauri",
+    name = "tauri-2.7.0",
+    actual = "@crates__tauri-2.7.0//:tauri",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri",
-    actual = "@crates__tauri-2.6.2//:tauri",
+    actual = "@crates__tauri-2.7.0//:tauri",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-app-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-app-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-app-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-event-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-event-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-event-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-image-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-image-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-image-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-menu-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-menu-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-menu-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-path-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-path-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-path-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-resources-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-resources-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-resources-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-tray-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-tray-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-tray-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-webview-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-webview-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-webview-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-window-permission-files",
-    actual = "@crates__tauri-2.6.2//:tauri-core-window-permission-files",
+    actual = "@crates__tauri-2.7.0//:tauri-core-window-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-global-api-script",
-    actual = "@crates__tauri-2.6.2//:global-api-script",
+    actual = "@crates__tauri-2.7.0//:global-api-script",
     tags = ["manual"],
 )
 
 alias(
-    name = "tauri-build-2.3.0",
-    actual = "@crates__tauri-build-2.3.0//:tauri_build",
+    name = "tauri-build-2.3.1",
+    actual = "@crates__tauri-build-2.3.1//:tauri_build",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-build",
-    actual = "@crates__tauri-build-2.3.0//:tauri_build",
+    actual = "@crates__tauri-build-2.3.1//:tauri_build",
     tags = ["manual"],
 )
 
@@ -1027,14 +1027,14 @@ alias(
 )
 
 alias(
-    name = "thiserror-2.0.12",
-    actual = "@crates__thiserror-2.0.12//:thiserror",
+    name = "thiserror-2.0.14",
+    actual = "@crates__thiserror-2.0.14//:thiserror",
     tags = ["manual"],
 )
 
 alias(
     name = "thiserror",
-    actual = "@crates__thiserror-2.0.12//:thiserror",
+    actual = "@crates__thiserror-2.0.14//:thiserror",
     tags = ["manual"],
 )
 
@@ -1051,14 +1051,14 @@ alias(
 )
 
 alias(
-    name = "tokio-1.46.1",
-    actual = "@crates__tokio-1.46.1//:tokio",
+    name = "tokio-1.47.1",
+    actual = "@crates__tokio-1.47.1//:tokio",
     tags = ["manual"],
 )
 
 alias(
     name = "tokio",
-    actual = "@crates__tokio-1.46.1//:tokio",
+    actual = "@crates__tokio-1.47.1//:tokio",
     tags = ["manual"],
 )
 
@@ -1075,14 +1075,14 @@ alias(
 )
 
 alias(
-    name = "toml-0.9.2",
-    actual = "@crates__toml-0.9.2//:toml",
+    name = "toml-0.9.5",
+    actual = "@crates__toml-0.9.5//:toml",
     tags = ["manual"],
 )
 
 alias(
     name = "toml",
-    actual = "@crates__toml-0.9.2//:toml",
+    actual = "@crates__toml-0.9.5//:toml",
     tags = ["manual"],
 )
 
@@ -1135,13 +1135,13 @@ alias(
 )
 
 alias(
-    name = "uuid-1.17.0",
-    actual = "@crates__uuid-1.17.0//:uuid",
+    name = "uuid-1.18.0",
+    actual = "@crates__uuid-1.18.0//:uuid",
     tags = ["manual"],
 )
 
 alias(
     name = "uuid",
-    actual = "@crates__uuid-1.17.0//:uuid",
+    actual = "@crates__uuid-1.18.0//:uuid",
     tags = ["manual"],
 )

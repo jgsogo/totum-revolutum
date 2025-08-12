@@ -67,7 +67,7 @@ rust_proc_macro(
     deps = [
         "@crates__diesel_table_macro_syntax-0.2.0//:diesel_table_macro_syntax",
         "@crates__dsl_auto_type-0.1.3//:dsl_auto_type",
-        "@crates__proc-macro2-1.0.95//:proc_macro2",
+        "@crates__proc-macro2-1.0.97//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
         "@crates__syn-2.0.104//:syn",
     ],

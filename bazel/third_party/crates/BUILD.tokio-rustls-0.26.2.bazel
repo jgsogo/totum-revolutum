@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.26.2",
     deps = [
-        "@crates__rustls-0.23.29//:rustls",
-        "@crates__tokio-1.46.1//:tokio",
+        "@crates__rustls-0.23.31//:rustls",
+        "@crates__tokio-1.47.1//:tokio",
     ],
 )

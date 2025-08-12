@@ -66,6 +66,6 @@ rust_library(
         "@crates__icu_normalizer_data-2.0.0//:icu_normalizer_data",
         "@crates__icu_provider-2.0.0//:icu_provider",
         "@crates__smallvec-1.15.1//:smallvec",
-        "@crates__zerovec-0.11.2//:zerovec",
+        "@crates__zerovec-0.11.4//:zerovec",
     ],
 )

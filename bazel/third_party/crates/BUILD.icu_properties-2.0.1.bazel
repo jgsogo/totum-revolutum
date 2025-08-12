@@ -68,6 +68,6 @@ rust_library(
         "@crates__icu_provider-2.0.0//:icu_provider",
         "@crates__potential_utf-0.1.2//:potential_utf",
         "@crates__zerotrie-0.2.2//:zerotrie",
-        "@crates__zerovec-0.11.2//:zerovec",
+        "@crates__zerovec-0.11.4//:zerovec",
     ],
 )

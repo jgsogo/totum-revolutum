@@ -70,6 +70,6 @@ rust_library(
         "@crates__yoke-0.8.0//:yoke",
         "@crates__zerofrom-0.1.6//:zerofrom",
         "@crates__zerotrie-0.2.2//:zerotrie",
-        "@crates__zerovec-0.11.2//:zerovec",
+        "@crates__zerovec-0.11.4//:zerovec",
     ],
 )
