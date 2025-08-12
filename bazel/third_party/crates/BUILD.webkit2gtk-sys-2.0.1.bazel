@@ -98,7 +98,7 @@ rust_library(
         "@crates__gobject-sys-0.18.0//:gobject_sys",
         "@crates__gtk-sys-0.18.2//:gtk_sys",
         "@crates__javascriptcore-rs-sys-1.1.1//:javascriptcore_rs_sys",
-        "@crates__libc-0.2.174//:libc",
+        "@crates__libc-0.2.175//:libc",
         "@crates__soup3-sys-0.5.0//:soup3_sys",
         "@crates__webkit2gtk-sys-2.0.1//:build_script_build",
     ],

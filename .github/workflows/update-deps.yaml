@@ -1,0 +1,50 @@
+name: Update deps
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 10 * * 2"
+
+jobs:
+  # This job will find out if any self-hosted runner is available and return it
+  # (otherwise it returns the 'ubuntu-latest'). The purpose is to use self-hosted runners as
+  # much as possible to save GitHub quota.
+  #
+  # Credit: https://github.com/orgs/community/discussions/20019#discussioncomment-7173595
+  check-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runner-label: ${{ steps.set-runner.outputs.runner-label }}
+    steps:
+      - name: Set runner
+        id: set-runner
+        run: |
+          runners=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runners")
+          echo "runners: $runners"
+          available=$(echo "$runners" | jq '.runners[] | select(.status == "online" and .busy == false and .labels[] .name == "self-hosted")' || "")
+          if [ -n "$available" ]; then
+            echo "runner-label=self-hosted" >> $GITHUB_OUTPUT
+          else
+            echo "runner-label=ubuntu-latest" >> $GITHUB_OUTPUT
+          fi
+
+  just-update:
+    needs:
+      - check-runner
+    runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install just
+        if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
+        run: apt install -y just
+
+      - name: Run just update
+        run: just update
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        commit-message: bump deps
+        title: 🤖 Bump deps (`just update`)
+        assignees: jgsogo
+        reviewers: jgsogo
+        labels: dependencies

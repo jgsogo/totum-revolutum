@@ -59,8 +59,8 @@ rust_library(
         "@crates__async-task-4.7.1//:async_task",
         "@crates__concurrent-queue-2.5.0//:concurrent_queue",
         "@crates__fastrand-2.3.0//:fastrand",
-        "@crates__futures-lite-2.6.0//:futures_lite",
+        "@crates__futures-lite-2.6.1//:futures_lite",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
-        "@crates__slab-0.4.10//:slab",
+        "@crates__slab-0.4.11//:slab",
     ],
 )

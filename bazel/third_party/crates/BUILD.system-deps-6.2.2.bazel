@@ -59,7 +59,7 @@ rust_library(
         "@crates__cfg-expr-0.15.8//:cfg_expr",
         "@crates__heck-0.5.0//:heck",
         "@crates__pkg-config-0.3.32//:pkg_config",
-        "@crates__toml-0.8.23//:toml",
+        "@crates__toml-0.8.2//:toml",
         "@crates__version-compare-0.2.0//:version_compare",
     ],
 )

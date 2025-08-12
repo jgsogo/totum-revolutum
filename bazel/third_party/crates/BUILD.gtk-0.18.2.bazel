@@ -79,7 +79,7 @@ rust_library(
         "@crates__glib-0.18.5//:glib",
         "@crates__gtk-0.18.2//:build_script_build",
         "@crates__gtk-sys-0.18.2//:gtk_sys",
-        "@crates__libc-0.2.174//:libc",
+        "@crates__libc-0.2.175//:libc",
         "@crates__pango-0.18.3//:pango",
     ],
 )

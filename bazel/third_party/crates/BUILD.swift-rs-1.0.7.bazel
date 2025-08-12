@@ -68,7 +68,7 @@ rust_library(
     deps = [
         "@crates__base64-0.21.7//:base64",
         "@crates__serde-1.0.219//:serde",
-        "@crates__serde_json-1.0.140//:serde_json",
+        "@crates__serde_json-1.0.142//:serde_json",
         "@crates__swift-rs-1.0.7//:build_script_test_build",
     ],
 )
@@ -131,7 +131,7 @@ cargo_build_script(
     visibility = ["//visibility:private"],
     deps = [
         "@crates__serde-1.0.219//:serde",
-        "@crates__serde_json-1.0.140//:serde_json",
+        "@crates__serde_json-1.0.142//:serde_json",
     ],
 )
 

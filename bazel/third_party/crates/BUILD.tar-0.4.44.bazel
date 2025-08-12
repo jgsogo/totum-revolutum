@@ -64,10 +64,10 @@ rust_library(
         "@crates__xattr-1.5.1//:xattr",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.174//:libc",  # cfg(unix)
+            "@crates__libc-0.2.175//:libc",  # cfg(unix)
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.174//:libc",  # cfg(unix)
+            "@crates__libc-0.2.175//:libc",  # cfg(unix)
         ],
         "//conditions:default": [],
     }),

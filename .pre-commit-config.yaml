@@ -10,7 +10,7 @@ fail_fast: true
 repos:
   # Some common pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: fix-byte-order-marker
       - id: check-case-conflict

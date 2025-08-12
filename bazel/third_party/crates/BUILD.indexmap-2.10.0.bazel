@@ -62,7 +62,7 @@ rust_library(
     version = "2.10.0",
     deps = [
         "@crates__equivalent-1.0.2//:equivalent",
-        "@crates__hashbrown-0.15.4//:hashbrown",
+        "@crates__hashbrown-0.15.5//:hashbrown",
         "@crates__rayon-1.10.0//:rayon",
     ],
 )

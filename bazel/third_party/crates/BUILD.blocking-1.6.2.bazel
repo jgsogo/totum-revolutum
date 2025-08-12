@@ -59,7 +59,7 @@ rust_library(
         "@crates__async-channel-2.5.0//:async_channel",
         "@crates__async-task-4.7.1//:async_task",
         "@crates__futures-io-0.3.31//:futures_io",
-        "@crates__futures-lite-2.6.0//:futures_lite",
+        "@crates__futures-lite-2.6.1//:futures_lite",
         "@crates__piper-0.2.4//:piper",
     ],
 )

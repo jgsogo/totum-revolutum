@@ -1,3 +1,4 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary")
 load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_vendor")
 load("@rules_uv//uv:pip.bzl", "pip_compile")
 
@@ -188,4 +189,10 @@ crates_vendor(
     ],
     tags = ["manual"],
     vendor_path = "crates",
+)
+
+py_binary(
+    name = "patch_crates_vendor",
+    srcs = ["patch_crates_vendor.py"],
+    deps = [],
 )

@@ -59,6 +59,6 @@ rust_library(
         "@crates__faster-hex-0.10.0//:faster_hex",
         "@crates__gix-features-0.42.1//:gix_features",
         "@crates__sha1-checked-0.10.0//:sha1_checked",
-        "@crates__thiserror-2.0.12//:thiserror",
+        "@crates__thiserror-2.0.14//:thiserror",
     ],
 )
