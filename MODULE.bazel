@@ -24,6 +24,8 @@ bazel_dep(name = "rules_uv", version = "0.86.0", dev_dependency = True)
 
 RUST_VERSION = "1.88.0"
 
+RUST_EDITION = "2021"
+
 PYTHON_VERSION = "3.13"
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
@@ -70,7 +72,7 @@ use_repo(pip, "py_deps")
 ######
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
-    edition = "2021",
+    edition = RUST_EDITION,
     rust_analyzer_version = RUST_VERSION,
     rustfmt_version = RUST_VERSION,
     versions = [RUST_VERSION],
