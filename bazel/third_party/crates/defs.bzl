@@ -3431,12 +3431,12 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__gix-actor-0.35.3",
-        sha256 = "d1b1ec302f8dc059df125ed46dfdc7e9d33fe7724df19843aea53b5ffd32d5bb",
+        name = "crates__gix-actor-0.35.4",
+        sha256 = "2d36dcf9efe32b51b12dfa33cedff8414926124e760a32f9e7a6b5580d280967",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/gix-actor/0.35.3/download"],
-        strip_prefix = "gix-actor-0.35.3",
-        build_file = Label("//bazel/third_party/crates:BUILD.gix-actor-0.35.3.bazel"),
+        urls = ["https://static.crates.io/crates/gix-actor/0.35.4/download"],
+        strip_prefix = "gix-actor-0.35.4",
+        build_file = Label("//bazel/third_party/crates:BUILD.gix-actor-0.35.4.bazel"),
     )
 
     maybe(
@@ -6241,22 +6241,22 @@ def crate_repositories():
 
     maybe(
         http_archive,
-        name = "crates__rayon-1.10.0",
-        sha256 = "b418a60154510ca1a002a752ca9714984e21e4241e804d32555251faf8b78ffa",
+        name = "crates__rayon-1.11.0",
+        sha256 = "368f01d005bf8fd9b1206fb6fa653e6c4a81ceb1466406b81792d87c5677a58f",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/rayon/1.10.0/download"],
-        strip_prefix = "rayon-1.10.0",
-        build_file = Label("//bazel/third_party/crates:BUILD.rayon-1.10.0.bazel"),
+        urls = ["https://static.crates.io/crates/rayon/1.11.0/download"],
+        strip_prefix = "rayon-1.11.0",
+        build_file = Label("//bazel/third_party/crates:BUILD.rayon-1.11.0.bazel"),
     )
 
     maybe(
         http_archive,
-        name = "crates__rayon-core-1.12.1",
-        sha256 = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2",
+        name = "crates__rayon-core-1.13.0",
+        sha256 = "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91",
         type = "tar.gz",
-        urls = ["https://static.crates.io/crates/rayon-core/1.12.1/download"],
-        strip_prefix = "rayon-core-1.12.1",
-        build_file = Label("//bazel/third_party/crates:BUILD.rayon-core-1.12.1.bazel"),
+        urls = ["https://static.crates.io/crates/rayon-core/1.13.0/download"],
+        strip_prefix = "rayon-core-1.13.0",
+        build_file = Label("//bazel/third_party/crates:BUILD.rayon-core-1.13.0.bazel"),
     )
 
     maybe(

@@ -20,7 +20,7 @@ bazel_dep(name = "aspect_rules_lint", version = "1.5.1")
 bazel_dep(name = "rules_python", version = "1.5.3", dev_dependency = True)
 bazel_dep(name = "rules_java", version = "8.15.1", dev_dependency = True)
 bazel_dep(name = "aspect_bazel_lib", version = "2.20.0", dev_dependency = True)
-bazel_dep(name = "rules_uv", version = "0.86.0", dev_dependency = True)
+bazel_dep(name = "rules_uv", version = "0.87.0", dev_dependency = True)
 
 RUST_VERSION = "1.88.0"
 
@@ -269,4 +269,5 @@ fetch_envsubst = use_extension("//tools/envsubst:extensions.bzl", "fetch_envsubs
 use_repo(fetch_envsubst, "envsubst_darwin_arm64", "envsubst_darwin_x86_64", "envsubst_linux_arm64")
 
 include("//:llvm.MODULE.bazel")
+
 include("//:protobuf.MODULE.bazel")

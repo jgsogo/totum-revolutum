@@ -384,8 +384,8 @@
     "https://bcr.bazel.build/modules/rules_swift/1.18.0/MODULE.bazel": "a6aba73625d0dc64c7b4a1e831549b6e375fbddb9d2dde9d80c9de6ec45b24c9",
     "https://bcr.bazel.build/modules/rules_swift/2.1.1/MODULE.bazel": "494900a80f944fc7aa61500c2073d9729dff0b764f0e89b824eb746959bc1046",
     "https://bcr.bazel.build/modules/rules_swift/2.1.1/source.json": "40fc69dfaac64deddbb75bd99cdac55f4427d9ca0afbe408576a65428427a186",
-    "https://bcr.bazel.build/modules/rules_uv/0.86.0/MODULE.bazel": "77417675ce4488aab2a5e647b8b16c357317b7a6326e5971b73b0406cb374426",
-    "https://bcr.bazel.build/modules/rules_uv/0.86.0/source.json": "f01cf43e08da469d363512b517c2721fbaf6502c18d48be98c7deaaa01597601",
+    "https://bcr.bazel.build/modules/rules_uv/0.87.0/MODULE.bazel": "1f50b350458384f5c327ce04d943361435c772a80834536fc0eeebe92f3a7b95",
+    "https://bcr.bazel.build/modules/rules_uv/0.87.0/source.json": "2d75593d5c1126f6b7a014d14fb0771a24b7bd2e1de700f3e5e522ff0554b95c",
     "https://bcr.bazel.build/modules/spdlog/1.15.3/MODULE.bazel": "ae35d34be11620a14416fb8978951bb3e95910c47f81b47789022632d77e3e99",
     "https://bcr.bazel.build/modules/spdlog/1.15.3/source.json": "c31abe1910dac293edb16ebb0e3fca808ae5330cfbd9bd6373cb1cf25329fc52",
     "https://bcr.bazel.build/modules/stardoc/0.5.0/MODULE.bazel": "f9f1f46ba8d9c3362648eea571c6f9100680efc44913618811b58cc9c02cd678",
@@ -430,7 +430,7 @@
   "moduleExtensions": {
     "//bazel/third_party:crates_extension.bzl%crates": {
       "general": {
-        "bzlTransitiveDigest": "lMJen10oLA19xixPkHAIqCm2R2UvWZwKt2MWGvIXdK0=",
+        "bzlTransitiveDigest": "VhFD2rlpqQanYSZ8hkmfflAae2MPAs3DvjvLVYSgGWM=",
         "usagesDigest": "UZi47EDbuhi59B5MHXLB3w4CtOqzRBXenANK0zLSEdM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -3023,16 +3023,16 @@
               "build_file": "@@//bazel/third_party/crates:BUILD.gio-sys-0.18.1.bazel"
             }
           },
-          "crates__gix-actor-0.35.3": {
+          "crates__gix-actor-0.35.4": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
             "attributes": {
-              "sha256": "d1b1ec302f8dc059df125ed46dfdc7e9d33fe7724df19843aea53b5ffd32d5bb",
+              "sha256": "2d36dcf9efe32b51b12dfa33cedff8414926124e760a32f9e7a6b5580d280967",
               "type": "tar.gz",
               "urls": [
-                "https://static.crates.io/crates/gix-actor/0.35.3/download"
+                "https://static.crates.io/crates/gix-actor/0.35.4/download"
               ],
-              "strip_prefix": "gix-actor-0.35.3",
-              "build_file": "@@//bazel/third_party/crates:BUILD.gix-actor-0.35.3.bazel"
+              "strip_prefix": "gix-actor-0.35.4",
+              "build_file": "@@//bazel/third_party/crates:BUILD.gix-actor-0.35.4.bazel"
             }
           },
           "crates__gix-config-0.45.1": {
@@ -6395,28 +6395,28 @@
               "build_file": "@@//bazel/third_party/crates:BUILD.raw-window-handle-0.6.2.bazel"
             }
           },
-          "crates__rayon-1.10.0": {
+          "crates__rayon-1.11.0": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
             "attributes": {
-              "sha256": "b418a60154510ca1a002a752ca9714984e21e4241e804d32555251faf8b78ffa",
+              "sha256": "368f01d005bf8fd9b1206fb6fa653e6c4a81ceb1466406b81792d87c5677a58f",
               "type": "tar.gz",
               "urls": [
-                "https://static.crates.io/crates/rayon/1.10.0/download"
+                "https://static.crates.io/crates/rayon/1.11.0/download"
               ],
-              "strip_prefix": "rayon-1.10.0",
-              "build_file": "@@//bazel/third_party/crates:BUILD.rayon-1.10.0.bazel"
+              "strip_prefix": "rayon-1.11.0",
+              "build_file": "@@//bazel/third_party/crates:BUILD.rayon-1.11.0.bazel"
             }
           },
-          "crates__rayon-core-1.12.1": {
+          "crates__rayon-core-1.13.0": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
             "attributes": {
-              "sha256": "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2",
+              "sha256": "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91",
               "type": "tar.gz",
               "urls": [
-                "https://static.crates.io/crates/rayon-core/1.12.1/download"
+                "https://static.crates.io/crates/rayon-core/1.13.0/download"
               ],
-              "strip_prefix": "rayon-core-1.12.1",
-              "build_file": "@@//bazel/third_party/crates:BUILD.rayon-core-1.12.1.bazel"
+              "strip_prefix": "rayon-core-1.13.0",
+              "build_file": "@@//bazel/third_party/crates:BUILD.rayon-core-1.13.0.bazel"
             }
           },
           "crates__redox_syscall-0.5.17": {
@@ -10237,7 +10237,7 @@
         "bzlTransitiveDigest": "aVqwKoRPrSXO367SJABlye04kmpR/9VM2xiXB3nh3Ls=",
         "usagesDigest": "zYYoNlaA2SZHuB0ZL+NeJZmOwGpH42tguCw0E0SOa8M=",
         "recordedFileInputs": {
-          "@@//package.json": "94700a16f8970d6fc56d79e3c529c52b8cd384a96dc825d741703e86d9606a0e"
+          "@@//package.json": "f1282809e55e4b0de34603c142ce1fa64cef20e18b117e900434dc6c535d79c1"
         },
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -11039,7 +11039,7 @@
     "@@rules_multitool+//multitool:extension.bzl%multitool": {
       "general": {
         "bzlTransitiveDigest": "F/gq5cF9lcIjruwcMimPkE1tSGYtXAE1r4NFG6NkBFg=",
-        "usagesDigest": "L2J/VEl3SnH1lEY0yAuaCAxzgdFLi69PbehVQNA5qp0=",
+        "usagesDigest": "HZSTO0iy6zpFNJxzwiI0Tw7Czgw1eEua+tpJ+K+b3fk=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

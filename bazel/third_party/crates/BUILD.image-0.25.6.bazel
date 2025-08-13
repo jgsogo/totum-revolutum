@@ -86,7 +86,7 @@ rust_library(
         "@crates__png-0.17.16//:png",
         "@crates__qoi-0.4.1//:qoi",
         "@crates__ravif-0.11.20//:ravif",
-        "@crates__rayon-1.10.0//:rayon",
+        "@crates__rayon-1.11.0//:rayon",
         "@crates__rgb-0.8.52//:rgb",
         "@crates__tiff-0.9.1//:tiff",
         "@crates__zune-core-0.4.12//:zune_core",
