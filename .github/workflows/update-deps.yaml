@@ -43,13 +43,17 @@ jobs:
           git checkout $BRANCH_NAME || git checkout -b "$BRANCH_NAME" --track "origin/$BRANCH_NAME" || git checkout -b "$BRANCH_NAME"
           git push -u origin "$BRANCH_NAME"
 
-      - name: Install just
+      - name: Install requirements
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
         run: |
+          # Install just
           mkdir -p ~/bin
           curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin
           export PATH="$PATH:$HOME/bin"
           ~/bin/just --help
+          # Install precommit
+          pip install pre-commit
+          pre-commit install
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
