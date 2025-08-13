@@ -64,7 +64,7 @@ rust_library(
         "@crates__loop9-0.1.5//:loop9",
         "@crates__quick-error-2.0.1//:quick_error",
         "@crates__rav1e-0.7.1//:rav1e",
-        "@crates__rayon-1.10.0//:rayon",
+        "@crates__rayon-1.11.0//:rayon",
         "@crates__rgb-0.8.52//:rgb",
     ],
 )

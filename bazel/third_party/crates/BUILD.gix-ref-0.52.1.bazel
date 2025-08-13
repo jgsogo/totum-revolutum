@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.52.1",
     deps = [
-        "@crates__gix-actor-0.35.3//:gix_actor",
+        "@crates__gix-actor-0.35.4//:gix_actor",
         "@crates__gix-features-0.42.1//:gix_features",
         "@crates__gix-fs-0.15.0//:gix_fs",
         "@crates__gix-hash-0.18.0//:gix_hash",

@@ -57,7 +57,7 @@ rust_library(
     version = "0.49.1",
     deps = [
         "@crates__bstr-1.12.0//:bstr",
-        "@crates__gix-actor-0.35.3//:gix_actor",
+        "@crates__gix-actor-0.35.4//:gix_actor",
         "@crates__gix-date-0.10.5//:gix_date",
         "@crates__gix-features-0.42.1//:gix_features",
         "@crates__gix-hash-0.18.0//:gix_hash",

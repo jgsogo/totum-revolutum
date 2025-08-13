@@ -58,11 +58,11 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "1.12.1",
+    version = "1.13.0",
     deps = [
         "@crates__crossbeam-deque-0.8.6//:crossbeam_deque",
         "@crates__crossbeam-utils-0.8.21//:crossbeam_utils",
-        "@crates__rayon-core-1.12.1//:build_script_build",
+        "@crates__rayon-core-1.13.0//:build_script_build",
     ],
 )
 
@@ -115,7 +115,7 @@ cargo_build_script(
         "noclippy",
         "norustfmt",
     ],
-    version = "1.12.1",
+    version = "1.13.0",
     visibility = ["//visibility:private"],
 )
 

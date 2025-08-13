@@ -54,9 +54,9 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "1.10.0",
+    version = "1.11.0",
     deps = [
         "@crates__either-1.15.0//:either",
-        "@crates__rayon-core-1.12.1//:rayon_core",
+        "@crates__rayon-core-1.13.0//:rayon_core",
     ],
 )

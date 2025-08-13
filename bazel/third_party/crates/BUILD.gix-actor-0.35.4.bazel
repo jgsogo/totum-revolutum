@@ -54,7 +54,7 @@ rust_library(
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    version = "0.35.3",
+    version = "0.35.4",
     deps = [
         "@crates__bstr-1.12.0//:bstr",
         "@crates__gix-date-0.10.5//:gix_date",
