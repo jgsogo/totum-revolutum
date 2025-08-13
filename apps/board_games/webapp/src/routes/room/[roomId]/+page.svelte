@@ -5,8 +5,10 @@
   import { sendCommand } from '$lib/api/send_command';
   import { qr } from '@svelte-put/qr/svg';
   import { player_id } from '$lib/player_id';
+  import { redirect } from '@sveltejs/kit';
 
-  const roomId = $page.params.roomId;
+
+  const roomId = $page.params.roomId!;
   onMount(() => {
     connectToRoom(roomId);
   });
@@ -22,6 +24,14 @@
     } catch (err) {
       console.error('[browser] Failed to send command', err);
     }
+  }
+
+  async function becomeObserver() {
+    redirect(307, $page.url.pathname + "/observe");
+  }
+
+  async function joinGame() {
+    redirect(307, $page.url.pathname + "/join");
   }
 
   const full_domain = 'http://localhost:3000'; // FIXME: Read from envvar
@@ -57,5 +67,8 @@ Join: {join_url}
 
 <h2>Commands</h2>
 <button on:click={handleClick} class="px-4 py-2 bg-blue-600 text-white rounded"> Send Test Command </button>
+<button on:click={becomeObserver} class="px-4 py-2 bg-blue-600 text-white rounded"> Become observer </button>
+<button on:click={joinGame} class="px-4 py-2 bg-blue-600 text-white rounded"> Join the game </button>
+
 <hr />
 <hr />
