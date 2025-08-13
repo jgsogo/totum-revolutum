@@ -89,6 +89,7 @@ jobs:
           git status
           # Commit (--no-verify), we really want to create the PR
           git -c author.name=jgsogo -c author.email=jgsogo@users.noreply.github.com -c committer.name=github-actions[bot] -c committer.email=github-actions[bot]@users.noreply.github.com commit -m "Update all deps" --no-verify
+          git push
           gh pr create -B master -H $BRANCH_NAME --title '🤖 Bump deps (`just update`)' --body 'Dependency updates using `just update`'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
