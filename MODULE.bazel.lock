@@ -10237,7 +10237,7 @@
         "bzlTransitiveDigest": "aVqwKoRPrSXO367SJABlye04kmpR/9VM2xiXB3nh3Ls=",
         "usagesDigest": "zYYoNlaA2SZHuB0ZL+NeJZmOwGpH42tguCw0E0SOa8M=",
         "recordedFileInputs": {
-          "@@//package.json": "7f3a6f640beaf338bd0bc980ef02654f708fae4e458b65532db7a3d97fd101a2"
+          "@@//package.json": "94700a16f8970d6fc56d79e3c529c52b8cd384a96dc825d741703e86d9606a0e"
         },
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -10444,7 +10444,7 @@
     "@@googleapis+//:extensions.bzl%switched_rules": {
       "general": {
         "bzlTransitiveDigest": "vG6fuTzXD8MMvHWZEQud0MMH7eoC4GXY0va7VrFFh04=",
-        "usagesDigest": "wim8EKEwMC8MGhQFXcQM3CAtCivRhJUZtBgWZtR/3lg=",
+        "usagesDigest": "Uvwo21LEsEORfk0QiWNM31Xp39pBKi57n878VZ+SJiQ=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
