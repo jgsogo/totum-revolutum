@@ -12,7 +12,7 @@ _just-check:
 update: update-deps update-precommit
 
 update-precommit:
-    pre-commit autoupdate
+    max=10; until pre-commit autoupdate || [[ "$max" -le 0 ]]; do sleep 1; ((--max)); done # Run 10 times (it frequently fails with SSL errors)
 
 # Updates only the dependencies
 update-deps: update-rust update-npm update-python
