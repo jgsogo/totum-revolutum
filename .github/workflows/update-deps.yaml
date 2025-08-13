@@ -80,7 +80,7 @@ jobs:
 
       - name: Run just update
         run: |
-          ~/bin/just update
+          ~/bin/just update || just update
           pre-commit run
 
       - name: Create Pull Request
