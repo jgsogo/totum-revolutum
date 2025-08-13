@@ -45,7 +45,9 @@ jobs:
 
       - name: Install just
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        run: sudo apt install -y just
+        run: |
+          sudo apt update
+          sudo apt install -y just
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
