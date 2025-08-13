@@ -39,8 +39,9 @@ jobs:
 
       - name: Checkout $BRANCH_NAME
         run: |
-          git checkout -b $BRANCH_NAME origin/$BRANCH_NAME || git checkout -b $BRANCH_NAME
-          git branch --set-upstream-to origin/$BRANCH_NAME
+          git fetch origin
+          git checkout $BRANCH_NAME || git checkout -b "$BRANCH_NAME" --track "origin/$BRANCH_NAME" || git checkout -b "$BRANCH_NAME"
+          git push -u origin "$BRANCH_NAME"
 
       - name: Install just
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
