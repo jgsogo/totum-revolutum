@@ -83,6 +83,6 @@ rust_library(
         "@crates__memchr-2.7.5//:memchr",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
         "@crates__pin-utils-0.1.0//:pin_utils",
-        "@crates__slab-0.4.10//:slab",
+        "@crates__slab-0.4.11//:slab",
     ],
 )

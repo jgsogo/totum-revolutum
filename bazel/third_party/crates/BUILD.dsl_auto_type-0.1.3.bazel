@@ -59,7 +59,7 @@ rust_library(
         "@crates__darling-0.20.11//:darling",
         "@crates__either-1.15.0//:either",
         "@crates__heck-0.5.0//:heck",
-        "@crates__proc-macro2-1.0.95//:proc_macro2",
+        "@crates__proc-macro2-1.0.97//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
         "@crates__syn-2.0.104//:syn",
     ],
