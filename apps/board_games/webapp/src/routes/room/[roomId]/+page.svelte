@@ -6,6 +6,8 @@
   import { qr } from '@svelte-put/qr/svg';
   import { player_id } from '$lib/player_id';
   import { redirect } from '@sveltejs/kit';
+  import { goto } from '$app/navigation';
+
 
 
   const roomId = $page.params.roomId!;
@@ -27,11 +29,11 @@
   }
 
   async function becomeObserver() {
-    redirect(307, $page.url.pathname + "/observe");
+    goto($page.url.pathname + "/observe");
   }
 
   async function joinGame() {
-    redirect(307, $page.url.pathname + "/join");
+    goto($page.url.pathname + "/join");
   }
 
   const full_domain = 'http://localhost:3000'; // FIXME: Read from envvar
