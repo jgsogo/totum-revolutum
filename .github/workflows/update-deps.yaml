@@ -2,7 +2,7 @@ name: Update deps
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 10 * * 2"
+    - cron: "0 11 * * 2"
 
 jobs:
   # This job will find out if any self-hosted runner is available and return it
