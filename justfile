@@ -15,7 +15,7 @@ update-precommit:
     max=10; until pre-commit autoupdate || [[ "$max" -le 0 ]]; do sleep 1; ((--max)); done # Run 10 times (it frequently fails with SSL errors)
 
 # Updates only the dependencies
-update-deps: update-rust update-npm update-python
+update-deps: update-bazel update-rust update-npm update-python
 
 update-rust:
     cargo update
@@ -36,6 +36,11 @@ update-npm:
 
 update-python:
     bazel run @@//bazel/third_party:python_requirements
+
+update-bazel:
+    scripts/update_bazel_version.sh
+    scripts/update_bazel_modules.sh MODULE.bazel protobuf.MODULE.bazel llvm.MODULE.bazel
+    bazel mod tidy
 
 # Run all testing
 test: build bazel-check
