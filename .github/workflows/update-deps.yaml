@@ -49,7 +49,7 @@ jobs:
           mkdir -p ~/bin
           curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin
           export PATH="$PATH:$HOME/bin"
-          just --help
+          ~/bin/just --help
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
@@ -75,7 +75,7 @@ jobs:
           echo "build --remote_upload_local_results" >> user.bazelrc
 
       - name: Run just update
-        run: just update
+        run: ~/bin/just update
 
       - name: Create Pull Request
         run: |
