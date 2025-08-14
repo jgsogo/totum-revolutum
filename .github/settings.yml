@@ -92,9 +92,6 @@ labels:
   - name: cmp:ALL
     color: "000000"
     description: Apply to all components
-  - name: cmp:NEW
-    color: "000000"
-    description: Applies to a new component not yet in the repo
   - name: cmp:pre-commit-hooks
     color: "000000"
     description: Related to pre-commit-hooks and automated validations
@@ -152,6 +149,8 @@ labels:
     description: Related to Raspberry platform
 
   # Specific to this repo
+  - name: cmp:apps/board_games
+    color: "000000"
   - name: cmp:apps/photodb
     color: "000000"
   - name: cmp:apps/syncronia
@@ -160,9 +159,7 @@ labels:
     color: "000000"
   - name: cmp:apps/task_manager
     color: "000000"
-  - name: cmp:bazel/diff
-    color: "000000"
-  - name: cmp:bazel/rust
+  - name: cmp:bazel
     color: "000000"
   - name: cmp:docs
     color: "000000"
@@ -176,15 +173,19 @@ labels:
     color: "000000"
   - name: cmp:libraries/filesystem
     color: "000000"
+  - name: cmp:libraries/finances
+    color: "000000"
+  - name: cmp:libraries/openexchangerates
+    color: "000000"
   - name: cmp:libraries/pcloud_sdk
     color: "000000"
   - name: cmp:libraries/rebrickable
     color: "000000"
+  - name: cmp:libraries/rust
+    color: "000000"
   - name: cmp:libraries/utils
     color: "000000"
   - name: cmp:notes
-    color: "000000"
-  - name: cmp:sandbox/svelte-hello-world
     color: "000000"
   - name: cmp:scripts
     color: "000000"

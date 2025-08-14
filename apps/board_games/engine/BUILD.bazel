@@ -12,6 +12,7 @@ cc_binary(
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",
         "//apps/board_games/engine/protocol:engine_cpp_grpc",
         "@libpqxx",
+        "@spdlog",
     ],
 )
 

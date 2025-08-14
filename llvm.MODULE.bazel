@@ -4,6 +4,7 @@ Configure LLVM toolchains
 
 bazel_dep(name = "toolchains_llvm", version = "1.4.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
+bazel_dep(name = "spdlog", version = "1.15.3")
 
 # LLVM Versions and platforms
 # https://github.com/bazel-contrib/toolchains_llvm/blob/master/toolchain/internal/llvm_distributions.bzl

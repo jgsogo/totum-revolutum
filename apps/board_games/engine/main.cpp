@@ -4,8 +4,8 @@
 #include "db/get_playing_room_ids.h"
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
-#include <iostream>
 #include <pqxx/pqxx>
+#include <spdlog/spdlog.h>
 
 class CliServiceImpl final : public board_game::Cli::Service {
   public:
@@ -13,12 +13,12 @@ class CliServiceImpl final : public board_game::Cli::Service {
 
     grpc::Status ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
                                   board_game::RoomList* response) override {
-        auto conn = pool.acquire();
-        std::cout << "ListPlayingRooms" << std::endl;
-        for (const auto& room_id : db::get_playing_room_ids(*conn)) {
-            response->add_room_ids(room_id);
-        }
-        std::cout << " - listed" << std::endl;
+        SPDLOG_DEBUG("ListPlayingRooms");
+        pool.with_conn<void>([response](pqxx::connection& conn) {
+            for (const auto& room_id : db::get_playing_room_ids(conn)) {
+                response->add_room_ids(room_id);
+            }
+        });
         return grpc::Status::OK;
     }
 
@@ -32,10 +32,8 @@ class EngineServiceImpl final : public board_game::EngineService::Service {
 
     grpc::Status SubmitCommand(grpc::ServerContext* context, const board_game::CommandRequest* request,
                                board_game::CommandResponse* response) override {
-        auto conn = pool.acquire();
-        std::cout << "EngineService::SubmitCommand" << std::endl;
-        response->set_success(true);
-        response->set_message("message from server");
+        SPDLOG_DEBUG("SubmitCommand");
+        pool.with_conn<void>([response](pqxx::connection& conn) { response->set_success(true); });
         return grpc::Status::OK;
     }
 
@@ -44,24 +42,26 @@ class EngineServiceImpl final : public board_game::EngineService::Service {
 };
 
 int main(int argc, char** argv) {
+    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%8l%$][engine] %v (%@)");
+
     auto pool = db::ConnectionPool::from_env("BOARD_GAMES_ENGINE_", 4);
 
     // Working as a gRPC server
     std::string server_address = "[::]:50051";
+
     CliServiceImpl service{pool};
     EngineServiceImpl engine_service{pool};
+
     grpc::ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
     builder.RegisterService(&engine_service);
+
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-    std::cout << "C++ server listening on " << server_address << std::endl;
+    SPDLOG_INFO("Board games engine listening on {}", server_address);
     server->Wait();
 
-    // PostgreSQL NOTIFY
-
-    // pqxx::connection conn(connection_str.c_str());
-    // pqxx::work txn(conn);
-
+    SPDLOG_INFO("Board games engine is finished");
     return 0;
 }

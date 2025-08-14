@@ -35,3 +35,9 @@ void ConnectionPool::release(std::shared_ptr<pqxx::connection> conn) {
     pool.push(conn);
     cond.notify_one();
 }
+
+template <> void ConnectionPool::with_conn<void>(std::function<void(pqxx::connection& conn)> work) {
+    auto conn = this->acquire();
+    work(*conn);
+    this->release(conn);
+}
