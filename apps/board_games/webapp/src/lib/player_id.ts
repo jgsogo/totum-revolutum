@@ -1,4 +1,3 @@
-// import { localStore } from '$lib/local_store.svelte.ts';
 import { persisted } from 'svelte-persisted-store'
 import { get, type Writable } from 'svelte/store'
 import { browser } from "$app/environment"
