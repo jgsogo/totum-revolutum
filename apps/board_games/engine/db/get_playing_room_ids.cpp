@@ -1,17 +1,11 @@
 #include "get_playing_room_ids.h"
 
+#include "notify.h"
 #include <iostream>
 
 std::vector<std::string> db::get_playing_room_ids(pqxx::connection& conn) {
-    pqxx::work tx(conn);
-
-    // TODO: Remove. Just a place to send a notify call
-    try {
-        tx.exec("NOTIFY game_update, 'payload'").no_rows();
-        tx.commit();
-    } catch (std::exception const& e) {
-        std::cerr << e.what() << std::endl;
-    }
+    // TODO: Remove, this is just sending a notification
+    ::db::notify(conn, "game_update", "payload");
 
     pqxx::work tx2(conn);
     std::vector<std::string> res;

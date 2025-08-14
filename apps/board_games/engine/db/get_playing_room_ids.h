@@ -4,5 +4,5 @@
 #include <vector>
 
 namespace db {
-std::vector<std::string> get_playing_room_ids(pqxx::connection& conn);
+    std::vector<std::string> get_playing_room_ids(pqxx::connection& conn);
 }
