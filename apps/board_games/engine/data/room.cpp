@@ -32,4 +32,7 @@ namespace data {
         }
     }
 
+    std::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, std::string game) {
+        return std::unexpected(Error::SelectError);
+    }
 } // namespace data

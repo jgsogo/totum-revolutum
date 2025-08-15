@@ -5,7 +5,19 @@ import "google/protobuf/empty.proto";
 
 
 service EngineService {
+  rpc CreateNewRoom (NewRoomRequest) returns (google.protobuf.Empty);
+  rpc StartGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc SubmitCommand (CommandRequest) returns (CommandResponse);
+}
+
+message NewRoomRequest {
+  string uuid = 1;
+  string name = 2;
+}
+
+message StartGameRequest {
+  string room_uuid = 1;
+  string game_type = 2;
 }
 
 message CommandRequest {

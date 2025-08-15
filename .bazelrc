@@ -41,6 +41,7 @@ build:release --@rules_rust//rust/settings:extra_exec_rustc_flag=-Cdebug-asserti
 # ####
 # C++
 # ####
+build:macos --macos_minimum_os=15.3.2 --host_macos_minimum_os=15.3.2 --apple_platform_type=macos
 
 build --cxxopt=-std=c++23
 build --host_cxxopt=-std=c++23
