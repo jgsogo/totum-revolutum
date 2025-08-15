@@ -9946,6 +9946,32 @@
         ]
       }
     },
+    "//third_party/tl-expected:extensions.bzl%non_module_dependencies": {
+      "general": {
+        "bzlTransitiveDigest": "8KbcQZS/LbYGKmxERmLnKNeeFAz806N5kenZ4EaH3Bg=",
+        "usagesDigest": "vitNWNUmT4qpJlWigB4+r1DtoSDBEiUTRyspY9fv2KM=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "tl-expected": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/TartanLlama/expected/archive/refs/tags/v1.2.0.tar.gz",
+              "build_file": "@@//third_party/tl-expected:tl-expected.BUILD",
+              "strip_prefix": "expected-1.2.0"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
     "@@apple_support+//crosstool:setup.bzl%apple_cc_configure_extension": {
       "general": {
         "bzlTransitiveDigest": "xcBTf2+GaloFpg7YEh/Bv+1yAczRkiCt3DGws4K7kSk=",

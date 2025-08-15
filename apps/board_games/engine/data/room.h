@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tl/expected.hpp"
 #include "uuid.hpp"
 #include <expected>
 #include <pqxx/pqxx>
@@ -15,14 +16,14 @@ namespace data {
         SelectError,
     };
 
-    [[maybe_unused]] std::expected<void, Error> insert_new_room(pqxx::connection& conn, RoomUUID uuid,
-                                                                std::string_view name);
+    [[maybe_unused]] tl::expected<void, Error> insert_new_room(pqxx::connection& conn, RoomUUID uuid,
+                                                               std::string_view name);
 
-    [[maybe_unused]] std::expected<std::vector<RoomUUID>, Error> get_playing_rooms(pqxx::connection& conn);
+    [[maybe_unused]] tl::expected<std::vector<RoomUUID>, Error> get_playing_rooms(pqxx::connection& conn);
 
     // Starts a new game in the given room. If there was a game already playing, it will be obliterated and
     // substituted by the new one.
-    std::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid,
-                                          std::string game /* FIXME: Use strong type for game_type */);
+    tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid,
+                                         std::string game /* FIXME: Use strong type for game_type */);
 
 } // namespace data

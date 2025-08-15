@@ -13,5 +13,6 @@ cc_library(
     deps = [
         "//apps/board_games/engine/db",
         "@spdlog",
+        "@tl-expected",
     ],
 )

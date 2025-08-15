@@ -6,7 +6,7 @@ namespace db {
     namespace {
 
         int _send_notify(pqxx::connection& conn, std::string_view notification) {
-            SPDLOG_DEBUG("Send DB notification: {}", notification);
+            spdlog::debug("Send DB notification: {}", notification);
 
             pqxx::work tx(conn);
             try {

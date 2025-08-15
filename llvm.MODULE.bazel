@@ -26,5 +26,8 @@ use_repo(llvm, "llvm_toolchain_llvm")  # if you depend on specific tools in scri
 
 register_toolchains("@llvm_toolchain//:all")
 
-non_module_dependencies = use_extension("//third_party/libpqxx:extensions.bzl", "non_module_dependencies")
-use_repo(non_module_dependencies, "libpqxx")
+libpqxx_non_module_dependencies = use_extension("//third_party/libpqxx:extensions.bzl", "non_module_dependencies")
+use_repo(libpqxx_non_module_dependencies, "libpqxx")
+
+tl_expected_non_module_dependencies = use_extension("//third_party/tl-expected:extensions.bzl", "non_module_dependencies")
+use_repo(tl_expected_non_module_dependencies, "tl-expected")
