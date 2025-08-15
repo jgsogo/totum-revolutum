@@ -1,0 +1,17 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "data",
+    srcs = [
+        "room.cpp",
+    ],
+    hdrs = [
+        "room.h",
+        "uuid.hpp",
+    ],
+    visibility = ["//apps/board_games/engine:__subpackages__"],
+    deps = [
+        "//apps/board_games/engine/db",
+        "@spdlog",
+    ],
+)

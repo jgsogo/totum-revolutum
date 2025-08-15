@@ -1,7 +1,7 @@
+#include "apps/board_games/engine/data/room.h"
+#include "apps/board_games/engine/db/connection_pool.h"
 #include "apps/board_games/engine/protocol/cli_service.grpc.pb.h"
 #include "apps/board_games/engine/protocol/engine.grpc.pb.h"
-#include "db/connection_pool.h"
-#include "db/get_playing_room_ids.h"
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
 #include <pqxx/pqxx>
@@ -14,12 +14,17 @@ class CliServiceImpl final : public board_game::Cli::Service {
     grpc::Status ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
                                   board_game::RoomList* response) override {
         SPDLOG_DEBUG("ListPlayingRooms");
-        pool.with_conn<void>([response](pqxx::connection& conn) {
-            for (const auto& room_id : db::get_playing_room_ids(conn)) {
-                response->add_room_ids(room_id);
+        return pool.with_conn<grpc::Status>([response](pqxx::connection& conn) {
+            auto playing_rooms = data::get_playing_rooms(conn);
+            if (playing_rooms) {
+                for (const auto& room_id : playing_rooms.value()) {
+                    response->add_room_ids(room_id);
+                }
+                return grpc::Status::OK;
+            } else {
+                return grpc::Status{grpc::StatusCode::INTERNAL, "Failed to retrieve playing rooms"};
             }
         });
-        return grpc::Status::OK;
     }
 
   private:

@@ -1,0 +1,14 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "db",
+    srcs = glob([
+        "**/*.h",
+        "**/*.cpp",
+    ]),
+    visibility = ["//apps/board_games/engine/data:__pkg__"],
+    deps = [
+        "@libpqxx",
+        "@spdlog",
+    ],
+)

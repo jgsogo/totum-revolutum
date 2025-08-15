@@ -4,11 +4,12 @@ load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run"
 cc_binary(
     name = "engine",
     srcs = glob([
-        "**/*.h",
+        # "**/*.h",
         "**/*.cpp",
     ]),
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
+        "//apps/board_games/engine/data",
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",
         "//apps/board_games/engine/protocol:engine_cpp_grpc",
         "@libpqxx",
