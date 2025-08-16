@@ -9,6 +9,9 @@ cc_library(
         "room.h",
         "uuid.hpp",
     ],
+    defines = [
+        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
+    ],
     visibility = ["//apps/board_games/engine:__subpackages__"],
     deps = [
         "//apps/board_games/engine/db",

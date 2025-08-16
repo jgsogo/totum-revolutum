@@ -13,7 +13,7 @@ class CliServiceImpl final : public board_game::Cli::Service {
 
     grpc::Status ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
                                   board_game::RoomList* response) override {
-        spdlog::debug("ListPlayingRooms");
+        SPDLOG_DEBUG("ListPlayingRooms");
         return pool.with_conn<grpc::Status>([response](pqxx::connection& conn) {
             auto r = data::get_playing_rooms(conn)
                          .and_then([response](auto playing_rooms) {
@@ -40,14 +40,14 @@ class EngineServiceImpl final : public board_game::EngineService::Service {
 
     grpc::Status SubmitCommand(grpc::ServerContext* context, const board_game::CommandRequest* request,
                                board_game::CommandResponse* response) override {
-        spdlog::debug("SubmitCommand");
+        SPDLOG_DEBUG("SubmitCommand");
         pool.with_conn<void>([response](pqxx::connection& conn) { response->set_success(true); });
         return grpc::Status::OK;
     }
 
     grpc::Status CreateNewRoom(grpc::ServerContext* context, const board_game::NewRoomRequest* request,
                                google::protobuf::Empty* response) override {
-        spdlog::debug("CreateNewRoom");
+        SPDLOG_DEBUG("CreateNewRoom");
         return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) -> grpc::Status {
             auto r = data::insert_new_room(conn, data::RoomUUID{std::string{request->uuid()}}, request->name())
                          .and_then([]() { return tl::expected<grpc::Status, data::Error>{grpc::Status::OK}; })
@@ -61,7 +61,7 @@ class EngineServiceImpl final : public board_game::EngineService::Service {
 
     grpc::Status StartGame(grpc::ServerContext* context, const board_game::StartGameRequest* request,
                            google::protobuf::Empty* response) override {
-        spdlog::debug("StartGame");
+        SPDLOG_DEBUG("StartGame");
         auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Not implemented"};
         return status;
     }
@@ -88,9 +88,9 @@ int main(int argc, char** argv) {
     builder.RegisterService(&engine_service);
 
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-    spdlog::info("Board games engine listening on {}", server_address);
+    SPDLOG_INFO("Board games engine listening on {}", server_address);
     server->Wait();
 
-    spdlog::info("Board games engine is finished");
+    SPDLOG_INFO("Board games engine is finished");
     return 0;
 }

@@ -6,6 +6,9 @@ cc_library(
         "**/*.h",
         "**/*.cpp",
     ]),
+    defines = [
+        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
+    ],
     visibility = ["//apps/board_games/engine/data:__pkg__"],
     deps = [
         "@libpqxx",

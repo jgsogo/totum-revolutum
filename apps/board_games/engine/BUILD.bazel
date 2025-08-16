@@ -7,6 +7,9 @@ cc_binary(
         # "**/*.h",
         "**/*.cpp",
     ]),
+    defines = [
+        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
+    ],
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
         "//apps/board_games/engine/data",
