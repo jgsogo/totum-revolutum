@@ -6,6 +6,7 @@ cc_library(
         "room.cpp",
     ],
     hdrs = [
+        "game_type.hpp",
         "room.h",
         "uuid.hpp",
     ],
