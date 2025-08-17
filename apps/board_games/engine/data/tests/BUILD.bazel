@@ -1,29 +1,18 @@
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
-
-cc_library(
-    name = "fixtures",
-    hdrs = [
-        "fixtures.hpp",
-    ],
-    visibility = [
-        "//apps/board_games/engine:__subpackages__",
-    ],
-)
 
 cc_test(
     name = "_tests",
     srcs = [
-        # "fixtures.hpp",
-        "test_connection_pool.cpp",
-        "test_notify.cpp",
+        "test_game.cpp",
+        "test_room.cpp",
     ],
     tags = ["manual"],
     deps = [
-        ":fixtures",
-        "//apps/board_games/engine/db",
+        "//apps/board_games/engine/data",
+        "//apps/board_games/engine/db/tests:fixtures",
         "@catch2//:catch2_main",
+        "@spdlog",
     ],
 )
 

@@ -1,8 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "fixtures.hpp"
-
-#include "apps/board_games/engine/db/connection_pool.h"
+#include "apps/board_games/engine/db/tests/fixtures.hpp"
 
 TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test connection pool") {
 
