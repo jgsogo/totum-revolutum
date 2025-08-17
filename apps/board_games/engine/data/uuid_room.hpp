@@ -1,12 +1,19 @@
 #pragma once
 
 #include <pqxx/pqxx>
+#include <spdlog/spdlog.h>
 
 #include "uuid.hpp"
 
 namespace data {
     using RoomUUID = _detail::UUID<_detail::UUIDType::Room>;
 } // namespace data
+
+template <> struct fmt::formatter<data::RoomUUID> : fmt::formatter<std::string> {
+    auto format(data::RoomUUID room, format_context& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(), "room-{}", static_cast<std::string_view>(room));
+    }
+};
 
 // Custom datatype for libpqxx: https://libpqxx.readthedocs.io/stable/datatypes.html#autotoc_md10,
 // most of the implementation taken from https://gist.github.com/tomlankhorst/5c41127a3f4fe3e6b1b4cb114ec7e3be

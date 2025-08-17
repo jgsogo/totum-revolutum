@@ -11,7 +11,7 @@ namespace data {
     tl::expected<void, Error> insert_new_room(pqxx::connection& conn, RoomUUID uuid, std::string_view name) {
         try {
             pqxx::work tx(conn);
-            SPDLOG_DEBUG("Insert new room with uuid '{}'", static_cast<std::string_view>(uuid));
+            SPDLOG_DEBUG("Insert new room with uuid '{}'", uuid);
             tx.exec(std::format("INSERT INTO {} (id, name, created_at, updated_at, is_public, is_open) VALUES ($1, $2, "
                                 "NOW(), NOW(), True, True);",
                                 ROOMS_TABLE),
@@ -43,7 +43,7 @@ namespace data {
     tl::expected<std::optional<int64_t>, Error> game_in_room(pqxx::connection& conn, RoomUUID room_uuid) {
         try {
             pqxx::work tx(conn);
-            SPDLOG_DEBUG("Return the game being played in room '{}'", static_cast<std::string_view>(room_uuid));
+            SPDLOG_DEBUG("Return the game being played in room '{}'", room_uuid);
 
             auto r = tx.exec(std::format("SELECT id FROM {} WHERE room_id = $1 LIMIT 1;", GAMES_TABLE),
                              pqxx::params{room_uuid})
@@ -62,8 +62,7 @@ namespace data {
     tl::expected<void, Error> add_participant(pqxx::connection& conn, RoomUUID room, ParticipantUUID participant,
                                               ParticipantRole role) {
         try {
-            SPDLOG_DEBUG("Insert participant '{}' into room '{}' with role '{}'",
-                         static_cast<std::string_view>(participant), static_cast<std::string_view>(room), role);
+            SPDLOG_DEBUG("Insert participant '{}' into room '{}' with role '{}'", participant, room, role);
 
             std::optional<int64_t> game_id = std::nullopt;
             if (role == ParticipantRole::PLAYER) {
