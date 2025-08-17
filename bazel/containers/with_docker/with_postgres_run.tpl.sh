@@ -23,6 +23,7 @@ fi
 # Ensure we stop the docker container
 function finish {
     "$CONTAINER_CLI" stop %CONTAINER_NAME%
+    "$CONTAINER_CLI" rm -f -v %CONTAINER_NAME%
 }
 trap finish EXIT SIGTERM SIGINT # Capture Ctrl_C (SIGINT)
 

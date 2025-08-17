@@ -11,6 +11,7 @@ cc_test(
     deps = [
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/db/tests:fixtures",
+        "//libraries/cpp/spdlog:utils",
         "@catch2//:catch2_main",
         "@spdlog",
     ],
