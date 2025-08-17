@@ -1,0 +1,43 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
+
+cc_test(
+    name = "_tests",
+    srcs = [
+        "fixtures.hpp",
+        "test_connection_pool.cpp",
+        "test_notify.cpp",
+    ],
+    tags = ["manual"],
+    deps = [
+        "//apps/board_games/engine/db",
+        "@catch2//:catch2_main",
+    ],
+)
+
+with_postgres_test(
+    name = "tests",
+    binaries = [
+        "//apps/board_games/database:_migrate",
+        "//apps/board_games/database:_populate_test_database",
+        ":_tests",
+    ],
+    env = {
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        # Envvars for the 'database' component
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_DATABASE_DJANGO_SQL_PORT": "POSTGRES_PORT",
+
+        # Envvars for the 'engine' component
+        "BOARD_GAMES_ENGINE_SQL_DATABASE": "POSTGRES_DB",
+        "BOARD_GAMES_ENGINE_SQL_USER": "POSTGRES_USER",
+        "BOARD_GAMES_ENGINE_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "BOARD_GAMES_ENGINE_SQL_HOST": "POSTGRES_HOST",
+        "BOARD_GAMES_ENGINE_SQL_PORT": "POSTGRES_PORT",
+    },
+)
