@@ -7,7 +7,7 @@
 
 #include "errors.h"
 #include "game_type.hpp"
-#include "uuid.hpp"
+#include "uuid_room.hpp"
 
 namespace data {
 

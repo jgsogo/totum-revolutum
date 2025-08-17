@@ -3,6 +3,7 @@
 
 #include "libraries/cpp/spdlog/utils.hpp"
 
+#include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/room.h"
 #include "apps/board_games/engine/db/tests/fixtures.hpp"
 
@@ -35,6 +36,29 @@ TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test room associated methods") {
                 auto r = data::insert_new_room(conn, uuid, "room_name");
                 REQUIRE(!r.has_value());
             });
+        });
+    }
+
+    SECTION("Add participants to a room") {
+        pool.with_conn<void>([](pqxx::connection& conn) {
+            data::RoomUUID room_uuid{"01d1e662-3591-4d6f-aa05-d92dfacaa287"};
+            data::ParticipantUUID player{"6d603593-0aaf-4c37-9b7b-fe548def909c"};
+            data::ParticipantUUID spectator{"4c79d891-084e-49ad-b8b5-cb5618cde04a"};
+
+            REQUIRE(data::insert_new_room(conn, room_uuid, "another_name").has_value());
+
+            // Inserting a player fails if there is no game yet
+            auto r = data::add_participant(conn, room_uuid, player, data::ParticipantRole::PLAYER);
+            REQUIRE(!r.has_value());
+
+            // ...but I can insert a spectator
+            r = data::add_participant(conn, room_uuid, spectator, data::ParticipantRole::SPECTATOR);
+
+            // After adding a game, I can insert the player
+            REQUIRE(data::start_game(conn, room_uuid, data::GameType{"tic_tac_toe"}).has_value());
+            REQUIRE(data::add_participant(conn, room_uuid, player, data::ParticipantRole::PLAYER).has_value());
+
+            // TODO: Retrieve the participants in the room and run some asserts
         });
     }
 }
