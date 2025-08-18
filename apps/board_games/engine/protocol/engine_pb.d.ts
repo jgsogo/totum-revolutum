@@ -54,6 +54,32 @@ export declare type StartGameRequest = Message<"board_game.StartGameRequest"> & 
 export declare const StartGameRequestSchema: GenMessage<StartGameRequest>;
 
 /**
+ * @generated from message board_game.AddParticipantRequest
+ */
+export declare type AddParticipantRequest = Message<"board_game.AddParticipantRequest"> & {
+  /**
+   * @generated from field: string room_uuid = 1;
+   */
+  roomUuid: string;
+
+  /**
+   * @generated from field: string participant_uuid = 2;
+   */
+  participantUuid: string;
+
+  /**
+   * @generated from field: string participant_role = 3;
+   */
+  participantRole: string;
+};
+
+/**
+ * Describes the message board_game.AddParticipantRequest.
+ * Use `create(AddParticipantRequestSchema)` to create a new message.
+ */
+export declare const AddParticipantRequestSchema: GenMessage<AddParticipantRequest>;
+
+/**
  * @generated from message board_game.CommandRequest
  */
 export declare type CommandRequest = Message<"board_game.CommandRequest"> & {
@@ -120,6 +146,14 @@ export declare const EngineService: GenService<{
   startGame: {
     methodKind: "unary";
     input: typeof StartGameRequestSchema;
+    output: typeof EmptySchema;
+  },
+  /**
+   * @generated from rpc board_game.EngineService.AddParticipant
+   */
+  addParticipant: {
+    methodKind: "unary";
+    input: typeof AddParticipantRequestSchema;
     output: typeof EmptySchema;
   },
   /**
