@@ -10,8 +10,7 @@ cc_library(
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
     ],
     visibility = [
-        "//apps/board_games/engine/data:__pkg__",
-        "//apps/board_games/engine/db/tests:__pkg__",
+        "//apps/board_games/engine:__subpackages__",
     ],
     deps = [
         "@libpqxx",

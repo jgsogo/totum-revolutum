@@ -1,74 +1,10 @@
-#include "apps/board_games/engine/data/room.h"
-#include "apps/board_games/engine/db/connection_pool.h"
-#include "apps/board_games/engine/protocol/cli_service.grpc.pb.h"
-#include "apps/board_games/engine/protocol/engine.grpc.pb.h"
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
-#include <pqxx/pqxx>
 #include <spdlog/spdlog.h>
 
-class CliServiceImpl final : public board_game::Cli::Service {
-  public:
-    CliServiceImpl(db::ConnectionPool& pool) : pool{pool} {}
-
-    grpc::Status ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
-                                  board_game::RoomList* response) override {
-        SPDLOG_DEBUG("ListPlayingRooms");
-        return pool.with_conn<grpc::Status>([response](pqxx::connection& conn) {
-            auto r = data::get_playing_rooms(conn)
-                         .and_then([response](auto playing_rooms) {
-                             for (const auto& room_id : playing_rooms) {
-                                 response->add_room_ids(room_id);
-                             }
-                             return tl::expected<grpc::Status, data::Error>{grpc::Status::OK};
-                         })
-                         .or_else([](data::Error _e) {
-                             auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to retrieve playing rooms"};
-                             return tl::expected<grpc::Status, data::Error>{status};
-                         });
-            return r.value();
-        });
-    }
-
-  private:
-    db::ConnectionPool& pool;
-};
-
-class EngineServiceImpl final : public board_game::EngineService::Service {
-  public:
-    EngineServiceImpl(db::ConnectionPool& pool) : pool{pool} {}
-
-    grpc::Status SubmitCommand(grpc::ServerContext* context, const board_game::CommandRequest* request,
-                               board_game::CommandResponse* response) override {
-        SPDLOG_DEBUG("SubmitCommand");
-        pool.with_conn<void>([response](pqxx::connection& conn) { response->set_success(true); });
-        return grpc::Status::OK;
-    }
-
-    grpc::Status CreateNewRoom(grpc::ServerContext* context, const board_game::NewRoomRequest* request,
-                               google::protobuf::Empty* response) override {
-        SPDLOG_DEBUG("CreateNewRoom");
-        return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) -> grpc::Status {
-            auto r = data::insert_new_room(conn, data::RoomUUID{std::string{request->uuid()}}, request->name())
-                         .and_then([]() { return tl::expected<grpc::Status, data::Error>{grpc::Status::OK}; })
-                         .or_else([](const data::Error& e) {
-                             auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to insert new room"};
-                             return tl::expected<grpc::Status, data::Error>{status};
-                         });
-            return r.value();
-        });
-    }
-
-    grpc::Status StartGame(grpc::ServerContext* context, const board_game::StartGameRequest* request,
-                           google::protobuf::Empty* response) override {
-        SPDLOG_DEBUG("StartGame");
-        auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Not implemented"};
-        return status;
-    }
-
-  private:
-    db::ConnectionPool& pool;
-};
+#include "apps/board_games/engine/db/connection_pool.h"
+#include "apps/board_games/engine/services/cli_service.h"
+#include "apps/board_games/engine/services/engine_service.h"
 
 int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::debug); // TODO: Configurable via CLI and/or envvar
@@ -79,8 +15,8 @@ int main(int argc, char** argv) {
     // Working as a gRPC server
     std::string server_address = "[::]:50051";
 
-    CliServiceImpl service{pool};
-    EngineServiceImpl engine_service{pool};
+    services::CliServiceImpl service{pool};
+    services::EngineServiceImpl engine_service{pool};
 
     grpc::ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

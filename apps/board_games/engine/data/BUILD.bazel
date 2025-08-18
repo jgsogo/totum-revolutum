@@ -21,7 +21,6 @@ cc_library(
     ],
     visibility = [
         "//apps/board_games/engine:__subpackages__",
-        "//apps/board_games/engine/data/tests:__pkg__",
     ],
     deps = [
         "//apps/board_games/engine/db",
