@@ -2,10 +2,14 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
     name = "services",
-    srcs = glob([
-        "**/*.h",
-        "**/*.cpp",
-    ]),
+    srcs = [
+        "cli_service.cpp",
+        "engine_service.cpp",
+    ],
+    hdrs = [
+        "cli_service.h",
+        "engine_service.h",
+    ],
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
     ],
@@ -13,11 +17,10 @@ cc_library(
         "//apps/board_games/engine:__pkg__",
     ],
     deps = [
-        "//apps/board_games/engine/db",
         "//apps/board_games/engine/data",
-        "//apps/board_games/engine/protocol:engine_cpp_grpc",
+        "//apps/board_games/engine/db",
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",
-        # "@libpqxx",
+        "//apps/board_games/engine/protocol:engine_cpp_grpc",
         "@spdlog",
     ],
 )

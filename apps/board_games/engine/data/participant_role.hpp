@@ -8,7 +8,16 @@ namespace data {
         PLAYER,
         SPECTATOR,
     };
-}
+
+    inline tl::expected<ParticipantRole, std::string> participant_role_from_string(std::string_view role) {
+        if (role == "player")
+            return {data::ParticipantRole::PLAYER};
+        else if (role == "spectator")
+            return {data::ParticipantRole::SPECTATOR};
+        else
+            return tl::unexpected{std::string{role}};
+    }
+} // namespace data
 
 template <> struct fmt::formatter<data::ParticipantRole> : fmt::formatter<std::string> {
     auto format(data::ParticipantRole role, format_context& ctx) const -> decltype(ctx.out()) {
@@ -30,12 +39,12 @@ namespace pqxx {
 
     template <> struct string_traits<data::ParticipantRole> {
         static data::ParticipantRole from_string(std::string_view text) {
-            if (text == "player")
-                return data::ParticipantRole::PLAYER;
-            else if (text == "spectator")
-                return data::ParticipantRole::SPECTATOR;
-            else
+            auto r = data::participant_role_from_string(text);
+            if (r.has_value()) {
+                return r.value();
+            } else {
                 throw pqxx::conversion_error(std::string{text});
+            }
         }
 
         static zview to_buf(char* begin, char* end, const data::ParticipantRole& value) {

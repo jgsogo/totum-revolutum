@@ -18,6 +18,9 @@ namespace services {
         grpc::Status StartGame(grpc::ServerContext* context, const board_game::StartGameRequest* request,
                                google::protobuf::Empty* response) override;
 
+        grpc::Status AddParticipant(grpc::ServerContext* context, const board_game::AddParticipantRequest* request,
+                                    google::protobuf::Empty* response) override;
+
       private:
         db::ConnectionPool& pool;
     };
