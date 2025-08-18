@@ -11,7 +11,7 @@ namespace data {
 
 template <> struct fmt::formatter<data::RoomUUID> : fmt::formatter<std::string> {
     auto format(data::RoomUUID room, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "room-{}", static_cast<std::string_view>(room));
+        return fmt::format_to(ctx.out(), "{}", static_cast<std::string_view>(room));
     }
 };
 

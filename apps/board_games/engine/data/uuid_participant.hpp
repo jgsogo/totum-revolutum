@@ -10,7 +10,7 @@ namespace data {
 
 template <> struct fmt::formatter<data::ParticipantUUID> : fmt::formatter<std::string> {
     auto format(data::ParticipantUUID participant, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "participant-{}", static_cast<std::string_view>(participant));
+        return fmt::format_to(ctx.out(), "{}", static_cast<std::string_view>(participant));
     }
 };
 

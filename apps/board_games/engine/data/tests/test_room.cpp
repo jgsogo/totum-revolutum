@@ -61,4 +61,32 @@ TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test room associated methods") {
             // TODO: Retrieve the participants in the room and run some asserts
         });
     }
+
+    SECTION("Notify room_update") {
+        pool.with_conn<void>([](pqxx::connection& conn) {
+            std::string payload;
+            conn.listen("room_update", [&payload](pqxx::notification n) { payload = n.payload; });
+            conn.get_notifs();
+
+            {
+                data::RoomUUID room{"08b4bef1-3663-4d00-9869-b6e850ac5525"};
+                auto r = data::notify_room_update(conn, room);
+                REQUIRE(r.has_value());
+
+                int received{conn.await_notification(3)};
+                REQUIRE(received == 1);
+                REQUIRE(payload == std::string{room});
+            }
+
+            {
+                data::RoomUUID room{"6313687b-cbd4-485f-aaa1-53d8971f5259"};
+                auto r = data::notify_room_update(conn, room);
+                REQUIRE(r.has_value());
+
+                int received{conn.await_notification(3)};
+                REQUIRE(received == 1);
+                REQUIRE(payload == std::string{room});
+            }
+        });
+    }
 }
