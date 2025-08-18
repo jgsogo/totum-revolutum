@@ -16,11 +16,13 @@ namespace data {
 
     tl::expected<std::vector<RoomUUID>, Error> get_playing_rooms(pqxx::connection& conn);
 
-    tl::expected<std::optional<int64_t>, Error> game_in_room(pqxx::connection& conn, RoomUUID room_uuid);
+    tl::expected<std::optional<int64_t>, Error> game_in_room(pqxx::connection& conn, RoomUUID room);
 
-    tl::expected<void, Error> insert_new_room(pqxx::connection& conn, RoomUUID uuid, std::string_view name);
+    tl::expected<void, Error> insert_new_room(pqxx::connection& conn, RoomUUID room, std::string_view name);
 
     tl::expected<void, Error> add_participant(pqxx::connection& conn, RoomUUID room, ParticipantUUID participant,
                                               ParticipantRole role);
+
+    tl::expected<void, Error> notify_room_update(pqxx::connection& conn, RoomUUID room);
 
 } // namespace data

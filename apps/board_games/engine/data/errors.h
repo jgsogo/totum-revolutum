@@ -9,6 +9,7 @@ namespace data {
         InsertError,
         SelectError,
         DBError,
+        NotifcationFailed,
     };
 
 } // namespace data

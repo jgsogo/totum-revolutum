@@ -22,7 +22,10 @@ namespace services {
                                                   google::protobuf::Empty* response) {
         SPDLOG_DEBUG("CreateNewRoom");
         return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) -> grpc::Status {
-            auto r = data::insert_new_room(conn, data::RoomUUID{std::string{request->uuid()}}, request->name())
+            data::RoomUUID room{std::string{request->uuid()}};
+            auto r = data::insert_new_room(conn, room, request->name())
+                         .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
+
                          .and_then([]() { return tl::expected<grpc::Status, data::Error>{grpc::Status::OK}; })
                          .or_else([](const data::Error& e) {
                              auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to insert new room"};
@@ -39,8 +42,11 @@ namespace services {
             data::RoomUUID room{std::string{request->room_uuid()}};
             data::GameType game_type{std::string{request->game_type()}};
 
+            // FIXME: remove_game and start_game should go inside the same transaction
             auto r = data::remove_game(conn, room)
                          .and_then([&conn, &room, &game_type]() { return data::start_game(conn, room, game_type); })
+                         .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
+
                          .and_then([]() { return tl::expected<grpc::Status, data::Error>{grpc::Status::OK}; })
                          .or_else([](const data::Error& e) {
                              auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to start game"};
@@ -65,6 +71,8 @@ namespace services {
             data::ParticipantRole role = role_expected.value();
 
             auto r = data::add_participant(conn, room, participant, role)
+                         .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
+
                          .and_then([]() { return tl::expected<grpc::Status, data::Error>{grpc::Status::OK}; })
                          .or_else([](const data::Error& e) {
                              auto status =
