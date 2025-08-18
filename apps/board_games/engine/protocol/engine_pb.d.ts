@@ -4,11 +4,80 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
+import type { EmptySchema } from "@bufbuild/protobuf/wkt";
 
 /**
  * Describes the file apps/board_games/engine/protocol/engine.proto.
  */
 export declare const file_apps_board_games_engine_protocol_engine: GenFile;
+
+/**
+ * @generated from message board_game.NewRoomRequest
+ */
+export declare type NewRoomRequest = Message<"board_game.NewRoomRequest"> & {
+  /**
+   * @generated from field: string uuid = 1;
+   */
+  uuid: string;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+};
+
+/**
+ * Describes the message board_game.NewRoomRequest.
+ * Use `create(NewRoomRequestSchema)` to create a new message.
+ */
+export declare const NewRoomRequestSchema: GenMessage<NewRoomRequest>;
+
+/**
+ * @generated from message board_game.StartGameRequest
+ */
+export declare type StartGameRequest = Message<"board_game.StartGameRequest"> & {
+  /**
+   * @generated from field: string room_uuid = 1;
+   */
+  roomUuid: string;
+
+  /**
+   * @generated from field: string game_type = 2;
+   */
+  gameType: string;
+};
+
+/**
+ * Describes the message board_game.StartGameRequest.
+ * Use `create(StartGameRequestSchema)` to create a new message.
+ */
+export declare const StartGameRequestSchema: GenMessage<StartGameRequest>;
+
+/**
+ * @generated from message board_game.AddParticipantRequest
+ */
+export declare type AddParticipantRequest = Message<"board_game.AddParticipantRequest"> & {
+  /**
+   * @generated from field: string room_uuid = 1;
+   */
+  roomUuid: string;
+
+  /**
+   * @generated from field: string participant_uuid = 2;
+   */
+  participantUuid: string;
+
+  /**
+   * @generated from field: string participant_role = 3;
+   */
+  participantRole: string;
+};
+
+/**
+ * Describes the message board_game.AddParticipantRequest.
+ * Use `create(AddParticipantRequestSchema)` to create a new message.
+ */
+export declare const AddParticipantRequestSchema: GenMessage<AddParticipantRequest>;
 
 /**
  * @generated from message board_game.CommandRequest
@@ -63,6 +132,30 @@ export declare const CommandResponseSchema: GenMessage<CommandResponse>;
  * @generated from service board_game.EngineService
  */
 export declare const EngineService: GenService<{
+  /**
+   * @generated from rpc board_game.EngineService.CreateNewRoom
+   */
+  createNewRoom: {
+    methodKind: "unary";
+    input: typeof NewRoomRequestSchema;
+    output: typeof EmptySchema;
+  },
+  /**
+   * @generated from rpc board_game.EngineService.StartGame
+   */
+  startGame: {
+    methodKind: "unary";
+    input: typeof StartGameRequestSchema;
+    output: typeof EmptySchema;
+  },
+  /**
+   * @generated from rpc board_game.EngineService.AddParticipant
+   */
+  addParticipant: {
+    methodKind: "unary";
+    input: typeof AddParticipantRequestSchema;
+    output: typeof EmptySchema;
+  },
   /**
    * @generated from rpc board_game.EngineService.SubmitCommand
    */

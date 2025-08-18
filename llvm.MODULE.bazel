@@ -5,6 +5,7 @@ Configure LLVM toolchains
 bazel_dep(name = "toolchains_llvm", version = "1.4.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
 bazel_dep(name = "spdlog", version = "1.15.3")
+bazel_dep(name = "catch2", version = "3.8.1")
 
 # LLVM Versions and platforms
 # https://github.com/bazel-contrib/toolchains_llvm/blob/master/toolchain/internal/llvm_distributions.bzl
@@ -26,5 +27,8 @@ use_repo(llvm, "llvm_toolchain_llvm")  # if you depend on specific tools in scri
 
 register_toolchains("@llvm_toolchain//:all")
 
-non_module_dependencies = use_extension("//third_party/libpqxx:extensions.bzl", "non_module_dependencies")
-use_repo(non_module_dependencies, "libpqxx")
+libpqxx_non_module_dependencies = use_extension("//third_party/libpqxx:extensions.bzl", "non_module_dependencies")
+use_repo(libpqxx_non_module_dependencies, "libpqxx")
+
+tl_expected_non_module_dependencies = use_extension("//third_party/tl-expected:extensions.bzl", "non_module_dependencies")
+use_repo(tl_expected_non_module_dependencies, "tl-expected")

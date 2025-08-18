@@ -5,7 +5,26 @@ import "google/protobuf/empty.proto";
 
 
 service EngineService {
+  rpc CreateNewRoom (NewRoomRequest) returns (google.protobuf.Empty);
+  rpc StartGame (StartGameRequest) returns (google.protobuf.Empty);
+  rpc AddParticipant (AddParticipantRequest) returns (google.protobuf.Empty);
   rpc SubmitCommand (CommandRequest) returns (CommandResponse);
+}
+
+message NewRoomRequest {
+  string uuid = 1;
+  string name = 2;
+}
+
+message StartGameRequest {
+  string room_uuid = 1;
+  string game_type = 2;
+}
+
+message AddParticipantRequest {
+  string room_uuid = 1;
+  string participant_uuid = 2;
+  string participant_role = 3;
 }
 
 message CommandRequest {

@@ -1,48 +1,13 @@
-#include "apps/board_games/engine/protocol/cli_service.grpc.pb.h"
-#include "apps/board_games/engine/protocol/engine.grpc.pb.h"
-#include "db/connection_pool.h"
-#include "db/get_playing_room_ids.h"
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
-#include <pqxx/pqxx>
 #include <spdlog/spdlog.h>
 
-class CliServiceImpl final : public board_game::Cli::Service {
-  public:
-    CliServiceImpl(db::ConnectionPool& pool) : pool{pool} {}
-
-    grpc::Status ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
-                                  board_game::RoomList* response) override {
-        SPDLOG_DEBUG("ListPlayingRooms");
-        pool.with_conn<void>([response](pqxx::connection& conn) {
-            for (const auto& room_id : db::get_playing_room_ids(conn)) {
-                response->add_room_ids(room_id);
-            }
-        });
-        return grpc::Status::OK;
-    }
-
-  private:
-    db::ConnectionPool& pool;
-};
-
-class EngineServiceImpl final : public board_game::EngineService::Service {
-  public:
-    EngineServiceImpl(db::ConnectionPool& pool) : pool{pool} {}
-
-    grpc::Status SubmitCommand(grpc::ServerContext* context, const board_game::CommandRequest* request,
-                               board_game::CommandResponse* response) override {
-        SPDLOG_DEBUG("SubmitCommand");
-        pool.with_conn<void>([response](pqxx::connection& conn) { response->set_success(true); });
-        return grpc::Status::OK;
-    }
-
-  private:
-    db::ConnectionPool& pool;
-};
+#include "apps/board_games/engine/db/connection_pool.h"
+#include "apps/board_games/engine/services/cli_service.h"
+#include "apps/board_games/engine/services/engine_service.h"
 
 int main(int argc, char** argv) {
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::debug); // TODO: Configurable via CLI and/or envvar
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%8l%$][engine] %v (%@)");
 
     auto pool = db::ConnectionPool::from_env("BOARD_GAMES_ENGINE_", 4);
@@ -50,8 +15,8 @@ int main(int argc, char** argv) {
     // Working as a gRPC server
     std::string server_address = "[::]:50051";
 
-    CliServiceImpl service{pool};
-    EngineServiceImpl engine_service{pool};
+    services::CliServiceImpl service{pool};
+    services::EngineServiceImpl engine_service{pool};
 
     grpc::ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

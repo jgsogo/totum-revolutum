@@ -1,29 +1,38 @@
-load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
 
-cc_binary(
-    name = "engine",
-    srcs = glob([
-        # "**/*.h",
-        "**/*.cpp",
-    ]),
-    defines = [
-        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
+cc_library(
+    name = "fixtures",
+    hdrs = [
+        "fixtures.hpp",
     ],
-    visibility = ["//apps/board_games:__subpackages__"],
-    deps = [
-        "//apps/board_games/engine/db",
-        "//apps/board_games/engine/services",
-        "@spdlog",
+    visibility = [
+        "//apps/board_games/engine:__subpackages__",
     ],
 )
 
-with_postgres_run(
-    name = "dev",
+cc_test(
+    name = "_tests",
+    srcs = [
+        # "fixtures.hpp",
+        "test_connection_pool.cpp",
+        "test_notify.cpp",
+    ],
+    tags = ["manual"],
+    deps = [
+        ":fixtures",
+        "//apps/board_games/engine/db",
+        "@catch2//:catch2_main",
+    ],
+)
+
+with_postgres_test(
+    name = "tests",
     binaries = [
         "//apps/board_games/database:_migrate",
         "//apps/board_games/database:_populate_test_database",
-        ":engine",
+        ":_tests",
     ],
     env = {
         "BOARD_GAMES_DATABASE_DJANGO_SQL_ENGINE": "django.db.backends.postgresql",

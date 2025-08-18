@@ -1,0 +1,30 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "data",
+    srcs = [
+        "game.cpp",
+        "room.cpp",
+    ],
+    hdrs = [
+        "errors.h",
+        "game.h",
+        "game_type.hpp",
+        "participant_role.hpp",
+        "room.h",
+        "uuid.hpp",
+        "uuid_participant.hpp",
+        "uuid_room.hpp",
+    ],
+    defines = [
+        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
+    ],
+    visibility = [
+        "//apps/board_games/engine:__subpackages__",
+    ],
+    deps = [
+        "//apps/board_games/engine/db",
+        "@spdlog",
+        "@tl-expected",
+    ],
+)
