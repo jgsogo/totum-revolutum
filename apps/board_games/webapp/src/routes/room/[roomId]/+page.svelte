@@ -1,11 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { connectToRoom } from '$lib/api/socket';
-  import { page, get } from '$app/stores';
+  import { page } from '$app/stores';
   import { sendCommand } from '$lib/api/send_command';
   import { qr } from '@svelte-put/qr/svg';
   import { player_id } from '$lib/player_id';
-  import { redirect } from '@sveltejs/kit';
   import { goto } from '$app/navigation';
 
 
