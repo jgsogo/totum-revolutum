@@ -1,5 +1,7 @@
 #include "connection_pool.h"
+
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace db;
 
@@ -17,7 +19,7 @@ ConnectionPool ConnectionPool::from_env(const std::string& prefix, std::size_t p
     const char* sql_port = std::getenv(std::format("{}SQL_PORT", prefix).c_str());
     const std::string connection_str = std::format("dbname={} user={} password={} host={} port={}", sql_database,
                                                    sql_user, sql_password, sql_host, sql_port);
-    std::cout << "Connection string: " << connection_str << std::endl;
+    SPDLOG_DEBUG("Connection string: {}", connection_str);
     return ConnectionPool{connection_str, pool_size};
 }
 
