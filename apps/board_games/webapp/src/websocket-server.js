@@ -7,7 +7,7 @@ import { createServer } from 'http';
 import { handler } from '../build/handler.js';
 import { WebSocketServer } from 'ws';
 import { parse } from 'url';
-import { addToRoom , removeFromRoom, sendRoomUpdate} from './websocket_rooms.js';
+import { addToRoom , removeFromRoom} from './websocket_rooms.js';
 import {get_game, get_participants, get_room_data, listen_pg_notifications} from './websocket_pg_notifications.js';
 import process from 'process';
 

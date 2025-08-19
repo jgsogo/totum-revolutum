@@ -8,6 +8,7 @@ service EngineService {
   rpc CreateNewRoom (NewRoomRequest) returns (google.protobuf.Empty);
   rpc StartGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc AddParticipant (AddParticipantRequest) returns (google.protobuf.Empty);
+
   rpc SubmitCommand (CommandRequest) returns (CommandResponse);
 }
 
