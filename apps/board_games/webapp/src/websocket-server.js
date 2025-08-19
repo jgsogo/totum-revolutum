@@ -31,9 +31,9 @@ wss.on('connection', async (ws, request, client) => {
 	const room = await get_room_data(pg_client, roomId);
 	const participants = await get_participants(pg_client, roomId);
 	const game = await get_game(pg_client, roomId);
-	ws.send(JSON.stringify({ type: 'room_update', room }));
-	ws.send(JSON.stringify({ type: 'participants_update', participants }));
-	ws.send(JSON.stringify({ type: 'game_update', game }));
+	ws.send(JSON.stringify({ type: 'room_update', payload: room }));
+	ws.send(JSON.stringify({ type: 'participants_update', payload: participants }));
+	ws.send(JSON.stringify({ type: 'game_update', payload: game }));
 
 	console.log('[backend] Add websocket to room subscribers');
 	addToRoom(roomId, ws);

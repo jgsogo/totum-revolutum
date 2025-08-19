@@ -24,7 +24,7 @@ export function sendRoomUpdate(room_uuid, room) {
 
   for (const ws of clients) {
     if (ws.readyState === ws.OPEN) {
-      ws.send(JSON.stringify({ type: 'room_update', room }));
+      ws.send(JSON.stringify({ type: 'room_update', payload: room }));
     }
   }
 }
@@ -35,7 +35,7 @@ export function sendParticipantsUpdate(room_uuid, participants) {
 
   for (const ws of clients) {
     if (ws.readyState === ws.OPEN) {
-      ws.send(JSON.stringify({ type: 'participants_update', participants }));
+      ws.send(JSON.stringify({ type: 'participants_update', payload: participants }));
     }
   }
 }
@@ -46,7 +46,7 @@ export function sendGameUpdate(room_uuid, game) {
 
   for (const ws of clients) {
     if (ws.readyState === ws.OPEN) {
-      ws.send(JSON.stringify({ type: 'game_update', game }));
+      ws.send(JSON.stringify({ type: 'game_update', payload: game }));
     }
   }
 }
