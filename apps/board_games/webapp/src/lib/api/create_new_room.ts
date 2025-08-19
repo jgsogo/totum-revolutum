@@ -1,4 +1,5 @@
 export async function createNewRoom(roomUUID: string, name: string) {
+
     const res = await fetch(`/room/${roomUUID}/create_new_room`, {
         method: 'POST',
         headers: {
