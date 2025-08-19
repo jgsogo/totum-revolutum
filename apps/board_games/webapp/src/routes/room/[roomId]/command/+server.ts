@@ -1,6 +1,6 @@
 import { sendCommandToEngine } from '../../../../../../engine/protocol/engine_client';
 import { json } from '@sveltejs/kit';
-import { CommandResponse } from '../../../../../../engine/protocol/engine_pb';
+import type { CommandResponse } from '../../../../../../engine/protocol/engine_pb';
 
 export async function POST({ request, params }) {
   const { roomId } = params;
