@@ -1,5 +1,5 @@
 export async function startGame(roomUUID: string, gameType: string) {
-    const res = await fetch(`/room/${roomUUID}/start_game`, {
+    const res = await fetch(`/room/${roomUUID}/_commands/start_game`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/octet-stream'

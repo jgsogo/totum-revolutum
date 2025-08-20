@@ -1,5 +1,5 @@
 export async function addParticipant(roomUUID: string, participantUUID: string, participantRole: string) {
-    const res = await fetch(`/room/${roomUUID}/add_participant`, {
+    const res = await fetch(`/room/${roomUUID}/_commands/add_participant`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/octet-stream'
