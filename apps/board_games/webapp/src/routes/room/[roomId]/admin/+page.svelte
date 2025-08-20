@@ -3,22 +3,38 @@
   import { player_id } from '$lib/player_id';
   import type { PageProps } from './$types';
   import { startGame } from '$lib/api/start_game';
+  import { onMount } from 'svelte';
+  import { connectToRoom } from '$lib/api/socket';
+  import { goto } from '$app/navigation';
 
   let { data }: PageProps = $props();
   const roomUUID: string = $page.params.roomId!;
+
+  const on_game_update = async (payload: { game_type_id: string } | undefined) => {
+    console.log(`[frontend] Get game update for room ${roomUUID}`);
+    if (payload !== undefined) {
+      goto(`/${payload.game_type_id}/${roomUUID}/admin`);
+    }
+  };
+
+  onMount(() => {
+    connectToRoom(
+      roomUUID,
+      async (arg: any) => {},
+      async (arg: any) => {},
+      on_game_update,
+    );
+  });
 
   async function selectGame(game_type_slug: string) {
     try {
       console.log(`[frontend] Select game_type '${game_type_slug}'`);
       let r = await startGame(roomUUID, game_type_slug);
       console.log(`[frontend] Response: ${JSON.stringify(r)}`);
-
-      // TODO: Show 'Do you want to play/join?' link
     } catch (err) {
       console.error('[frontend] Failed to select game', err);
     }
   }
-
 </script>
 
 <h1>Admin view</h1>
@@ -27,14 +43,11 @@
 <p>Player ID: {JSON.stringify(player_id)}</p>
 <h1>Room: {roomUUID}</h1>
 
-<hr/>
-<hr/>
+<hr />
+<hr />
 {#each data.game_types as game_type}
   <p>Game type: {game_type.name} - {game_type.slug} - {game_type.description}</p>
   <button onclick={() => selectGame(game_type.slug)} class="px-4 py-2 bg-blue-600 text-white rounded"> {game_type.name} </button>
-  <hr/>
+  <hr />
 {/each}
-<hr/>
-
-Wanna join? Click the link:
-<a href="/room/{roomUUID}/join">Join the game!</a>
+<hr />
