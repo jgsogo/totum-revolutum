@@ -1,4 +1,4 @@
-import { startGame } from '../../../../../../engine/protocol/engine_client';
+import { startGame } from '../../../../../../../engine/protocol/engine_client';
 import { json } from '@sveltejs/kit';
 import type { Empty } from "@bufbuild/protobuf/wkt";
 
