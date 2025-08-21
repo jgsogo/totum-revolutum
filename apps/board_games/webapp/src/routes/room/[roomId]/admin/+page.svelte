@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { player_id } from '$lib/player_id';
+  import { page } from '$app/state';
   import type { PageProps } from './$types';
   import { startGame } from '$lib/api/start_game';
   import { onMount } from 'svelte';
@@ -8,7 +7,7 @@
   import { goto } from '$app/navigation';
 
   let { data }: PageProps = $props();
-  const roomUUID: string = $page.params.roomId!;
+  const roomUUID: string = page.params.roomId!;
 
   const on_game_update = async (payload: { game_type_id: string } | undefined) => {
     console.log(`[frontend] Get game update for room ${roomUUID}`);
@@ -20,8 +19,8 @@
   onMount(() => {
     connectToRoom(
       roomUUID,
-      async (arg: any) => {},
-      async (arg: any) => {},
+      async () => {},
+      async () => {},
       on_game_update,
     );
   });
@@ -37,11 +36,8 @@
   }
 </script>
 
-<h1>Admin view</h1>
-<hr />
+<h3>= Admin view =</h3>
 
-<p>Player ID: {JSON.stringify(player_id)}</p>
-<h1>Room: {roomUUID}</h1>
 
 <hr />
 <hr />

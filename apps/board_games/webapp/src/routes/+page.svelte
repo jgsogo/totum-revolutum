@@ -1,2 +1,2 @@
 <h1>Board games</h1>
-<p>Redirect to new room...</p>
+<p>Redirecting to new room...</p>
