@@ -10,6 +10,7 @@ cc_library(
         "errors.h",
         "game.h",
         "game_type.hpp",
+        "participant.hpp",
         "participant_role.hpp",
         "room.h",
         "uuid.hpp",

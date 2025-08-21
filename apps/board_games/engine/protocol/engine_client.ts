@@ -7,8 +7,9 @@ import {
   NewRoomRequestSchema,
   StartGameRequest as StartGameRequestProto,
   StartGameRequestSchema,
-  AddParticipantRequest as AddParticipantRequestProto,
-  AddParticipantRequestSchema
+  GetOrCreateParticipantRequest as GetOrCreateParticipantRequestProto,
+  GetOrCreateParticipantRequestSchema,
+  Participant as ParticipantProto
 } from './engine_pb.js';
 import { Empty } from "@bufbuild/protobuf/wkt";
 import grpc from '@grpc/grpc-js';
@@ -38,8 +39,8 @@ export async function startGame(room_uuid: string, game_type: string): Promise<E
   return await client.startGame(request);
 }
 
-export async function addParticipant(room_uuid: string, participant_uuid: string, participant_role: string): Promise<Empty> {
+export async function getOrCreateParticipant(room_uuid: string, participant_uuid: string, participant_role: string): Promise<ParticipantProto> {
   console.log(`[backend] addParticipant(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, participant_role=${participant_role})`);
-  const request: AddParticipantRequestProto = create(AddParticipantRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, participantRole: participant_role });
-  return await client.addParticipant(request);
+  const request: GetOrCreateParticipantRequestProto = create(GetOrCreateParticipantRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, participantRole: participant_role });
+  return await client.getOrCreateParticipant(request);
 }

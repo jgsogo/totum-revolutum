@@ -12,7 +12,7 @@
     room_data = payload;
   };
 
-  let participants_data = $state({});
+  let participants_data = $state([]);
   const on_participants_update = async (payload: JSON) => {
     console.log(`[frontend] Get participants update for room ${roomUUID}`);
     participants_data = payload;
@@ -48,7 +48,7 @@
 <hr />
 
 <h2>Participants data</h2>
-{#each Object.entries(participants_data) as participant_data}
+{#each participants_data as participant_data}
   <p>-- Participant</p>
   <table>
     {#each Object.entries(participant_data) as [key, value]}

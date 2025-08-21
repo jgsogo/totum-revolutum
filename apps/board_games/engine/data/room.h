@@ -8,6 +8,7 @@
 
 #include "errors.h"
 #include "game_type.hpp"
+#include "participant.hpp"
 #include "participant_role.hpp"
 #include "uuid_participant.hpp"
 #include "uuid_room.hpp"
@@ -20,8 +21,11 @@ namespace data {
 
     tl::expected<void, Error> insert_new_room(pqxx::connection& conn, RoomUUID room, std::string_view name);
 
-    tl::expected<void, Error> add_participant(pqxx::connection& conn, RoomUUID room, ParticipantUUID participant,
-                                              ParticipantRole role);
+    tl::expected<std::optional<Participant>, Error> get_participant(pqxx::connection& conn, RoomUUID room,
+                                                                    ParticipantUUID participant);
+
+    tl::expected<Participant, Error> add_participant(pqxx::connection& conn, RoomUUID room, ParticipantUUID participant,
+                                                     ParticipantRole role);
 
     tl::expected<void, Error> notify_room_update(pqxx::connection& conn, RoomUUID room);
 
