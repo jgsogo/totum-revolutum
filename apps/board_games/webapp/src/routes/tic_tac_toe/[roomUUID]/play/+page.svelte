@@ -3,7 +3,7 @@
 
 </script>
 
-<h2>= Play view =</h2>
+<h3>= Play view =</h3>
 <hr/>
 Session-id: {page.data.session_id}
 <hr/>

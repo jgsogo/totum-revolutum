@@ -1,4 +1,4 @@
-<h3>= Admin view =</h2>
+<h3>= Admin view =</h3>
 
 <!--
     Show participants, enable some actions on them
