@@ -4,15 +4,17 @@ import { getOrCreateParticipant } from '../../../../../../engine/protocol/engine
 import { Participant as ParticipantProto } from '../../../../../../engine/protocol/engine_pb';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
-    // Get/assign a session-id
+    const roomUUID = params.roomUUID;
+
+    // Get/assign a session-id. We assign a different session-id per game/UUID, so the
+    // same user can play multiple games at the same time from the same browser.
     let session_id = cookies.get('session-id');
     if (session_id === undefined) {
         session_id = crypto.randomUUID();
     }
-    cookies.set('session-id', session_id, { path: '/' }); // FIXME: Make it per game/room so the same user can participate in multiple rooms?
+    cookies.set('session-id', session_id, { path: `/tic_tac_toe/${roomUUID}` });
 
     // Add or retrieve me as a participant
-    const roomUUID = params.roomUUID;
     try {
         const role = "player";
         console.log(`[backend] GRPC request: getOrCreateParticipant(roomUUID=${roomUUID}, participantUUID=${session_id}, role=${role})`);
