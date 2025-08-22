@@ -66,7 +66,7 @@ namespace services {
 
             {
                 // Try to get already existing participant
-                auto r = data::get_participant(conn, room, participant);
+                auto r = data::find_participant(conn, room, participant);
                 if (r.has_value() && r.value().has_value()) {
                     data::Participant participant = r.value().value();
                     response->set_room_uuid(participant.room);

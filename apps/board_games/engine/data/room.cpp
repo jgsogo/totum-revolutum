@@ -45,7 +45,7 @@ namespace data {
         }
     }
 
-    tl::expected<std::optional<int64_t>, Error> game_in_room(pqxx::connection& conn, RoomUUID room_uuid) {
+    tl::expected<std::optional<int64_t>, Error> find_game(pqxx::connection& conn, RoomUUID room_uuid) {
         try {
             pqxx::work tx(conn);
             SPDLOG_DEBUG("Return the game being played in room '{}'", room_uuid);
@@ -64,8 +64,8 @@ namespace data {
         }
     }
 
-    tl::expected<std::optional<Participant>, Error> get_participant(pqxx::connection& conn, RoomUUID room,
-                                                                    ParticipantUUID participant_uuid) {
+    tl::expected<std::optional<Participant>, Error> find_participant(pqxx::connection& conn, RoomUUID room,
+                                                                     ParticipantUUID participant_uuid) {
         try {
             pqxx::work tx(conn);
             SPDLOG_DEBUG("Return participant '{}' in room '{}'", participant_uuid, room);
@@ -99,7 +99,7 @@ namespace data {
             std::optional<int32_t> player_number = std::nullopt;
             if (role == ParticipantRole::PLAYER) {
                 // Check (and return) game in the room
-                auto r = game_in_room(conn, room);
+                auto r = find_game(conn, room);
                 if (!r.has_value()) {
                     return tl::unexpected(Error::DBError);
                 }

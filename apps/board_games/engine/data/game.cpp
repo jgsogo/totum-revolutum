@@ -36,9 +36,8 @@ namespace data {
             // If the database is created using Django, the 'on_delete.CASCADE' are not propagated
             // to the database, so we need to handle them ourselves
             //  - Get the 'game' associated to the room
-            // TODO: Use 'room/game_in_room' above
             SPDLOG_TRACE("Check (and retrieve) if there is any game associated to the given room");
-            auto game_id_expected = game_in_room(conn, room_uuid);
+            auto game_id_expected = find_game(conn, room_uuid);
             if (!game_id_expected.has_value()) {
                 return tl::unexpected(Error::DBError);
             }
