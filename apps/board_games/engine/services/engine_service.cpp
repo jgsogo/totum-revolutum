@@ -5,6 +5,8 @@
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/room.h"
 
+#include "apps/board_games/games/tic_tac_toe/engine/tic_tac_toe.h"
+
 namespace services {
 
     EngineServiceImpl::EngineServiceImpl(db::ConnectionPool& pool) : pool{pool} {}
@@ -115,9 +117,36 @@ namespace services {
             data::RoomUUID room{std::string{request->room_uuid()}};
             data::ParticipantUUID participant{std::string{request->participant_uuid()}};
 
-            // Get the game from 'room_uuid'
-
-            // Check the participant data (mostly interested in player-number)
+            // Get the game and the participant from 'room_uuid'
+            auto game_and_participant =
+                data::find_game(conn, room)
+                    .and_then([&conn, &room, &participant](std::optional<data::Game> game)
+                                  -> tl::expected<std::pair<data::Game, data::Participant>, data::Error> {
+                        if (game) {
+                            return data::find_participant(conn, room, participant)
+                                .and_then([&game, &room, &participant](std::optional<data::Participant> participant_opt)
+                                              -> tl::expected<std::pair<data::Game, data::Participant>, data::Error> {
+                                    if (participant_opt) {
+                                        std::pair<data::Game, data::Participant> data{game.value(),
+                                                                                      participant_opt.value()};
+                                        return {data};
+                                    } else {
+                                        SPDLOG_ERROR("No participant found in room {} with uuid {}", room, participant);
+                                        return tl::unexpected{data::Error::NotFound};
+                                    }
+                                });
+                        } else {
+                            SPDLOG_ERROR("No game found in room {}", room);
+                            return tl::unexpected{data::Error::NotFound};
+                        }
+                    })
+                    .and_then([](std::pair<data::Game, data::Participant> game_and_participant)
+                                  -> tl::expected<std::pair<data::Game, data::Participant>, data::Error> {
+                        auto [game, participant] = game_and_participant;
+                        if (game.type == board_games::tic_tac_toe::GAME_TYPE) {
+                        }
+                        return tl::unexpected{data::Error::NotFound};
+                    });
 
             // Switch based on game.game_type and execute the run function
 

@@ -10,6 +10,7 @@ namespace data {
         SelectError,
         DBError,
         NotifcationFailed,
+        NotFound,
     };
 
 } // namespace data

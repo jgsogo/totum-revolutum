@@ -8,9 +8,11 @@ namespace data {
     namespace _detail {
         template <typename T> class StringType {
           public:
-            explicit StringType(std::string&& value) : value{std::move(value)} {}
+            constexpr explicit StringType(std::string&& value) : value{std::move(value)} {}
 
             operator std::string_view() const { return value; }
+
+            auto operator<=>(const StringType<T>&) const = default;
 
           private:
             std::string value;
