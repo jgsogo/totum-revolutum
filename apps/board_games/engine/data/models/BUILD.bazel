@@ -3,8 +3,6 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "models",
     srcs = [
-        # "game.cpp",
-        # "room.cpp",
     ],
     hdrs = [
         "game.hpp",
@@ -21,10 +19,11 @@ cc_library(
     ],
     visibility = [
         "//apps/board_games/engine:__subpackages__",
+        "//apps/board_games/games:__subpackages__",
     ],
     deps = [
-        # "//apps/board_games/engine/db",
-        # "@spdlog",
-        # "@tl-expected",
+        "@libpqxx",  # FIXME: Move libpqxx stuff to a different library
+        "@spdlog",
+        "@tl-expected",
     ],
 )
