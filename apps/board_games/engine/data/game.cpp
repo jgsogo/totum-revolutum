@@ -75,4 +75,21 @@ namespace data {
             return tl::unexpected(Error::DBError);
         }
     }
+
+    tl::expected<std::uint8_t, Error> count_players(pqxx::connection& conn, std::int32_t game_id) {
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Count players for game '{}'", game_id);
+            auto r =
+                tx.exec(std::format("SELECT count(*)::int AS count FROM {} WHERE game_id = $1;", PARTICIPANT_TABLE),
+                        pqxx::params{game_id})
+                    .one_field();
+            auto num_players = r.as<int>();
+            SPDLOG_DEBUG(" - There are {} players in the game already", num_players);
+            return {num_players};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to count players for game: {}", e.what());
+            return tl::unexpected(Error::DBError);
+        }
+    }
 } // namespace data

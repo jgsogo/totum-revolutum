@@ -4,18 +4,31 @@
 // #include <spdlog/fmt/ostr.h>
 
 namespace data {
+
+    static constexpr std::string_view ParticipantRolePlayer = "player";
+    static constexpr std::string_view ParticipantRoleSpectator = "spectator";
+
     enum class ParticipantRole {
         PLAYER,
         SPECTATOR,
     };
 
     inline tl::expected<ParticipantRole, std::string> participant_role_from_string(std::string_view role) {
-        if (role == "player")
+        if (role == ParticipantRolePlayer)
             return {data::ParticipantRole::PLAYER};
-        else if (role == "spectator")
+        else if (role == ParticipantRoleSpectator)
             return {data::ParticipantRole::SPECTATOR};
         else
             return tl::unexpected{std::string{role}};
+    }
+
+    inline std::string_view participant_role_to_string(const ParticipantRole& role) {
+        switch (role) {
+        case data::ParticipantRole::PLAYER:
+            return ParticipantRolePlayer;
+        case data::ParticipantRole::SPECTATOR:
+            return ParticipantRoleSpectator;
+        }
     }
 } // namespace data
 
@@ -23,9 +36,9 @@ template <> struct fmt::formatter<data::ParticipantRole> : fmt::formatter<std::s
     auto format(data::ParticipantRole role, format_context& ctx) const -> decltype(ctx.out()) {
         switch (role) {
         case data::ParticipantRole::PLAYER:
-            return fmt::format_to(ctx.out(), "player");
+            return fmt::format_to(ctx.out(), data::ParticipantRolePlayer);
         case data::ParticipantRole::SPECTATOR:
-            return fmt::format_to(ctx.out(), "spectator");
+            return fmt::format_to(ctx.out(), data::ParticipantRoleSpectator);
         }
     }
 };
@@ -50,15 +63,7 @@ namespace pqxx {
         static zview to_buf(char* begin, char* end, const data::ParticipantRole& value) {
             // std::string string = std::format("{}", value); // FIXME: This should work, but
             // https://github.com/llvm/llvm-project/issues/66466
-            std::string string;
-            switch (value) {
-            case data::ParticipantRole::PLAYER:
-                string = "player";
-                break;
-            case data::ParticipantRole::SPECTATOR:
-                string = "spectator";
-                break;
-            }
+            std::string_view string = data::participant_role_to_string(value);
 
             if (std::distance(begin, end) < static_cast<signed long>(string.size() + 1)) {
                 throw pqxx::conversion_overrun{"could not convert ParticipantRole"};

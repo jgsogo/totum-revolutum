@@ -17,4 +17,6 @@ namespace data {
     // Removes a game, if it exists, from the given room
     tl::expected<void, Error> remove_game(pqxx::connection& conn, RoomUUID uuid);
 
+    tl::expected<std::uint8_t, Error> count_players(pqxx::connection& conn, std::int32_t game_id);
+
 } // namespace data

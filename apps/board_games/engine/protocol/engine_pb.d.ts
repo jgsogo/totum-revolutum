@@ -54,9 +54,9 @@ export declare type StartGameRequest = Message<"board_game.StartGameRequest"> & 
 export declare const StartGameRequestSchema: GenMessage<StartGameRequest>;
 
 /**
- * @generated from message board_game.AddParticipantRequest
+ * @generated from message board_game.GetOrCreateParticipantRequest
  */
-export declare type AddParticipantRequest = Message<"board_game.AddParticipantRequest"> & {
+export declare type GetOrCreateParticipantRequest = Message<"board_game.GetOrCreateParticipantRequest"> & {
   /**
    * @generated from field: string room_uuid = 1;
    */
@@ -74,10 +74,41 @@ export declare type AddParticipantRequest = Message<"board_game.AddParticipantRe
 };
 
 /**
- * Describes the message board_game.AddParticipantRequest.
- * Use `create(AddParticipantRequestSchema)` to create a new message.
+ * Describes the message board_game.GetOrCreateParticipantRequest.
+ * Use `create(GetOrCreateParticipantRequestSchema)` to create a new message.
  */
-export declare const AddParticipantRequestSchema: GenMessage<AddParticipantRequest>;
+export declare const GetOrCreateParticipantRequestSchema: GenMessage<GetOrCreateParticipantRequest>;
+
+/**
+ * @generated from message board_game.Participant
+ */
+export declare type Participant = Message<"board_game.Participant"> & {
+  /**
+   * @generated from field: string room_uuid = 1;
+   */
+  roomUuid: string;
+
+  /**
+   * @generated from field: string uuid = 2;
+   */
+  uuid: string;
+
+  /**
+   * @generated from field: string role = 3;
+   */
+  role: string;
+
+  /**
+   * @generated from field: uint32 player_number = 4;
+   */
+  playerNumber: number;
+};
+
+/**
+ * Describes the message board_game.Participant.
+ * Use `create(ParticipantSchema)` to create a new message.
+ */
+export declare const ParticipantSchema: GenMessage<Participant>;
 
 /**
  * @generated from message board_game.CommandRequest
@@ -149,12 +180,12 @@ export declare const EngineService: GenService<{
     output: typeof EmptySchema;
   },
   /**
-   * @generated from rpc board_game.EngineService.AddParticipant
+   * @generated from rpc board_game.EngineService.GetOrCreateParticipant
    */
-  addParticipant: {
+  getOrCreateParticipant: {
     methodKind: "unary";
-    input: typeof AddParticipantRequestSchema;
-    output: typeof EmptySchema;
+    input: typeof GetOrCreateParticipantRequestSchema;
+    output: typeof ParticipantSchema;
   },
   /**
    * @generated from rpc board_game.EngineService.SubmitCommand
