@@ -6,8 +6,8 @@
 #include "tl/expected.hpp"
 
 #include "errors.h"
-#include "game_type.hpp"
-#include "uuid_room.hpp"
+#include "models/game_type.hpp"
+#include "models/uuid_room.hpp"
 
 namespace data {
 

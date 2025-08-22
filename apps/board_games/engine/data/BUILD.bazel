@@ -9,13 +9,7 @@ cc_library(
     hdrs = [
         "errors.h",
         "game.h",
-        "game_type.hpp",
-        "participant.hpp",
-        "participant_role.hpp",
         "room.h",
-        "uuid.hpp",
-        "uuid_participant.hpp",
-        "uuid_room.hpp",
     ],
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
@@ -24,6 +18,7 @@ cc_library(
         "//apps/board_games/engine:__subpackages__",
     ],
     deps = [
+        "//apps/board_games/engine/data/models",
         "//apps/board_games/engine/db",
         "@spdlog",
         "@tl-expected",

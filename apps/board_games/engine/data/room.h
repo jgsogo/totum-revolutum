@@ -7,11 +7,11 @@
 #include "tl/expected.hpp"
 
 #include "errors.h"
-#include "game_type.hpp"
-#include "participant.hpp"
-#include "participant_role.hpp"
-#include "uuid_participant.hpp"
-#include "uuid_room.hpp"
+#include "models/game_type.hpp"
+#include "models/participant.hpp"
+#include "models/participant_role.hpp"
+#include "models/uuid_participant.hpp"
+#include "models/uuid_room.hpp"
 
 namespace data {
 
