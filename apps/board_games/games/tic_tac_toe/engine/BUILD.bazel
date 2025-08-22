@@ -1,0 +1,19 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "engine",
+    srcs = [
+        "tic_tac_toe.cpp",
+    ],
+    hdrs = [
+        "tic_tac_toe.h",
+    ],
+    defines = [
+        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
+    ],
+    visibility = ["//apps/board_games:__subpackages__"],
+    deps = [
+        "//apps/board_games/games/tic_tac_toe/models:models_cc_proto",
+        "@spdlog",
+    ],
+)

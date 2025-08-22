@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from .game import Game
+from .game_action import GameAction
 
 
 class EventLog(models.Model):
@@ -25,6 +26,12 @@ class EventLog(models.Model):
         max_length=64, help_text="Type or name of the event (e.g., 'move_made', 'game_over')."
     )
     payload = models.BinaryField(help_text="Serialized payload of the event (e.g., protobuf).")
+
+    action = models.OneToOneField(
+        GameAction,
+        on_delete=models.CASCADE,
+        help_text="Associated action that generated this EventLog.",
+    )
 
     def __str__(self):
         return f"Event {self.event_type} at {self.timestamp} in {self.game}"

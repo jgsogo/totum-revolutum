@@ -107,4 +107,30 @@ namespace services {
         });
     }
 
+    grpc::Status EngineServiceImpl::SendGameAction(grpc::ServerContext* context,
+                                                   const board_game::SendGameActionRequest* request,
+                                                   google::protobuf::Empty* response) {
+        SPDLOG_DEBUG("GetOrCreateParticipant");
+        return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) {
+            data::RoomUUID room{std::string{request->room_uuid()}};
+            data::ParticipantUUID participant{std::string{request->participant_uuid()}};
+
+            // Get the game from 'room_uuid'
+
+            // Check the participant data (mostly interested in player-number)
+
+            // Switch based on game.game_type and execute the run function
+
+            // On failure: RETURN to the user that the action could not be understood.
+
+            // Store to the database the action + new status + event_log
+            //  - store if the 'action' was successfully applied or not
+            //  - associate the 'event_log' to the action that generated it (also failures).
+
+            // Send notification to the room
+
+            auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Not implemented"};
+            return status;
+        });
+    }
 } // namespace services

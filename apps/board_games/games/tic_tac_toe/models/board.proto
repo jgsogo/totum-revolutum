@@ -1,0 +1,15 @@
+syntax = "proto3";
+package board_game.tic_tac_toe;
+
+
+message Board {
+    // Linearized 3x3 board. Values: 'X', 'O', or ' ' (empty).
+    string board_status = 1;
+
+    oneof test_oneof { // FIXME: Every game will have this?
+        uint32 current_turn = 2;
+
+        // If there is a winner, the game has finished
+        uint32 winner = 3;
+    }
+}

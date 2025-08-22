@@ -111,6 +111,32 @@ export declare type Participant = Message<"board_game.Participant"> & {
 export declare const ParticipantSchema: GenMessage<Participant>;
 
 /**
+ * @generated from message board_game.SendGameActionRequest
+ */
+export declare type SendGameActionRequest = Message<"board_game.SendGameActionRequest"> & {
+  /**
+   * @generated from field: string room_uuid = 1;
+   */
+  roomUuid: string;
+
+  /**
+   * @generated from field: string participant_uuid = 2;
+   */
+  participantUuid: string;
+
+  /**
+   * @generated from field: bytes payload = 3;
+   */
+  payload: Uint8Array;
+};
+
+/**
+ * Describes the message board_game.SendGameActionRequest.
+ * Use `create(SendGameActionRequestSchema)` to create a new message.
+ */
+export declare const SendGameActionRequestSchema: GenMessage<SendGameActionRequest>;
+
+/**
  * @generated from message board_game.CommandRequest
  */
 export declare type CommandRequest = Message<"board_game.CommandRequest"> & {
@@ -188,6 +214,16 @@ export declare const EngineService: GenService<{
     output: typeof ParticipantSchema;
   },
   /**
+   * @generated from rpc board_game.EngineService.SendGameAction
+   */
+  sendGameAction: {
+    methodKind: "unary";
+    input: typeof SendGameActionRequestSchema;
+    output: typeof EmptySchema;
+  },
+  /**
+   * TODO: Remove this
+   *
    * @generated from rpc board_game.EngineService.SubmitCommand
    */
   submitCommand: {
