@@ -7,6 +7,8 @@ cc_library(
         # "room.cpp",
     ],
     hdrs = [
+        "game.hpp",
+        "game_state.hpp",
         "game_type.hpp",
         "participant.hpp",
         "participant_role.hpp",
