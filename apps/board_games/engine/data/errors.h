@@ -14,6 +14,8 @@ namespace data {
         GameEngineError,
         GameDecodeError,
         GameIsFinished,
+        GameActionFailed,
+        NotImplemented,
     };
 
 } // namespace data

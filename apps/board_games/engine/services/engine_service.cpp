@@ -174,12 +174,12 @@ namespace services {
                                         });
                                 })
                                 // On failure: RETURN to the user that the action could not be understood.
-                                .or_else([&conn, &game, &participant, &request](const data::Error& e) {
-                                    return data::store_action(conn, game.id, participant.uuid, "unknown",
-                                                              request->payload(), false)
-                                        .and_then([](const auto& _action_id) -> tl::expected<void, data::Error> {
-                                            return {};
-                                        });
+                                .or_else([&conn, &game, &participant,
+                                          &request](const data::Error& e) -> tl::expected<void, data::Error> {
+                                    SPDLOG_ERROR("Failed to apply action to the game");
+                                    std::ignore = data::store_action(conn, game.id, participant.uuid, "unknown",
+                                                                     request->payload(), false);
+                                    return tl::unexpected{data::Error::GameActionFailed};
                                 });
                         } else {
                             SPDLOG_ERROR("Game type {} not known", game.type);
@@ -194,7 +194,7 @@ namespace services {
             if (res.has_value()) {
                 return grpc::Status::OK;
             } else {
-                auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to add participant to room"};
+                auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to apply action to game"};
                 return status;
             }
         });

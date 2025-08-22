@@ -96,17 +96,17 @@ namespace data {
     tl::expected<std::int64_t, Error> store_action(pqxx::connection& conn, std::int32_t game_id,
                                                    ParticipantUUID participant, std::string_view action_type,
                                                    std::string_view payload, bool applied) {
-        return tl::unexpected(Error::DBError);
+        return tl::unexpected(Error::NotImplemented);
     }
 
     tl::expected<void, Error> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
                                              std::string_view payload, std::int64_t action_id) {
-        return tl::unexpected(Error::DBError);
+        return tl::unexpected(Error::NotImplemented);
     }
 
     tl::expected<void, Error> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
                                                 std::string_view state_data) {
-        return tl::unexpected(Error::DBError);
+        return tl::unexpected(Error::NotImplemented);
     }
 
 } // namespace data
