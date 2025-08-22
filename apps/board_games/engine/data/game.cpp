@@ -45,23 +45,23 @@ namespace data {
                 SPDLOG_TRACE("There is no game associated to the given room. Nothing to do");
                 return {};
             }
-            int64_t game_id = game_id_expected.value().value();
+            Game game = game_id_expected.value().value();
 
             pqxx::work tx(conn);
             //  - remove 'event_log'
             SPDLOG_TRACE("Remove event_log entries associated to the game in the room");
-            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENT_LOG_TABLE), pqxx::params{game_id})
+            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENT_LOG_TABLE), pqxx::params{game.id})
                 .no_rows();
 
             //  - remove 'game_action'
             SPDLOG_TRACE("Remove game_action entries associated to the game in the room");
-            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", GAME_ACTION_TABLE), pqxx::params{game_id})
+            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", GAME_ACTION_TABLE), pqxx::params{game.id})
                 .no_rows();
 
             //  - remove 'game' from 'participants
             SPDLOG_TRACE("Clear the 'game_id' entry from the participants playing the game we are about to remove");
             tx.exec(std::format("UPDATE {} SET game_id = NULL WHERE game_id = $1;", PARTICIPANT_TABLE),
-                    pqxx::params{game_id})
+                    pqxx::params{game.id})
                 .no_rows();
 
             // And now we can finally remove the row from the games table

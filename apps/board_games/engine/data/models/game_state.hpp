@@ -50,8 +50,6 @@ template <> struct fmt::formatter<data::GameState> : fmt::formatter<std::string>
         case data::GameState::FINISHED:
             return fmt::format_to(ctx.out(), data::GameStateFinished);
         }
-
-        return fmt::format_to(ctx.out(), game_state_to_string(state));
     }
 };
 
