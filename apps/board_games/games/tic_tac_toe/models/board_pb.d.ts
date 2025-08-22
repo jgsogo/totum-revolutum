@@ -24,9 +24,9 @@ export declare type Board = Message<"board_game.tic_tac_toe.Board"> & {
   /**
    * FIXME: Every game will have this?
    *
-   * @generated from oneof board_game.tic_tac_toe.Board.test_oneof
+   * @generated from oneof board_game.tic_tac_toe.Board.turn_state
    */
-  testOneof: {
+  turnState: {
     /**
      * @generated from field: uint32 current_turn = 2;
      */
@@ -40,6 +40,12 @@ export declare type Board = Message<"board_game.tic_tac_toe.Board"> & {
      */
     value: number;
     case: "winner";
+  } | {
+    /**
+     * @generated from field: bool draw = 4;
+     */
+    value: boolean;
+    case: "draw";
   } | { case: undefined; value?: undefined };
 };
 
@@ -48,4 +54,43 @@ export declare type Board = Message<"board_game.tic_tac_toe.Board"> & {
  * Use `create(BoardSchema)` to create a new message.
  */
 export declare const BoardSchema: GenMessage<Board>;
+
+/**
+ * @generated from message board_game.tic_tac_toe.Action
+ */
+export declare type Action = Message<"board_game.tic_tac_toe.Action"> & {
+  /**
+   * Position 0–8, mapped left-to-right, top-to-bottom.
+   *
+   * @generated from field: uint32 position = 1;
+   */
+  position: number;
+};
+
+/**
+ * Describes the message board_game.tic_tac_toe.Action.
+ * Use `create(ActionSchema)` to create a new message.
+ */
+export declare const ActionSchema: GenMessage<Action>;
+
+/**
+ * @generated from message board_game.tic_tac_toe.EventLog
+ */
+export declare type EventLog = Message<"board_game.tic_tac_toe.EventLog"> & {
+  /**
+   * @generated from field: uint32 mark_placed_at_position = 1;
+   */
+  markPlacedAtPosition: number;
+
+  /**
+   * @generated from field: uint32 player = 2;
+   */
+  player: number;
+};
+
+/**
+ * Describes the message board_game.tic_tac_toe.EventLog.
+ * Use `create(EventLogSchema)` to create a new message.
+ */
+export declare const EventLogSchema: GenMessage<EventLog>;
 

@@ -6,6 +6,7 @@ cc_library(
     ],
     hdrs = [
         "game.hpp",
+        "game_action_response.hpp",
         "game_state.hpp",
         "game_type.hpp",
         "participant.hpp",

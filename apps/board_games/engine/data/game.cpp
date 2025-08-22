@@ -12,14 +12,15 @@ namespace data {
     static constexpr std::string_view GAME_ACTION_TABLE = "board_games_core_gameaction";
     static constexpr std::string_view PARTICIPANT_TABLE = "board_games_core_participant";
 
-    tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game) {
+    tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game,
+                                         std::string_view game_state_data) {
         try {
             pqxx::work tx(conn);
             SPDLOG_DEBUG("Insert game into room '{}'", uuid);
             tx.exec(std::format("INSERT INTO {} (room_id, game_type_id, created_at, updated_at, state, state_data) "
-                                "VALUES ($1, $2, NOW(), NOW(), 'waiting', '');",
+                                "VALUES ($1, $2, NOW(), NOW(), 'waiting', $3);",
                                 GAMES_TABLE),
-                    pqxx::params{uuid, game})
+                    pqxx::params{uuid, game, game_state_data})
                 .no_rows();
             tx.commit();
             return {};
@@ -91,4 +92,21 @@ namespace data {
             return tl::unexpected(Error::DBError);
         }
     }
+
+    tl::expected<std::int64_t, Error> store_action(pqxx::connection& conn, std::int32_t game_id,
+                                                   ParticipantUUID participant, std::string_view action_type,
+                                                   std::string_view payload, bool applied) {
+        return tl::unexpected(Error::DBError);
+    }
+
+    tl::expected<void, Error> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
+                                             std::string_view payload, std::int64_t action_id) {
+        return tl::unexpected(Error::DBError);
+    }
+
+    tl::expected<void, Error> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
+                                                std::string_view state_data) {
+        return tl::unexpected(Error::DBError);
+    }
+
 } // namespace data

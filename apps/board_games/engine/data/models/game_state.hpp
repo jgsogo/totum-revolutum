@@ -1,7 +1,7 @@
 #pragma once
 
+#include <pqxx/pqxx>
 #include <spdlog/spdlog.h>
-// #include <spdlog/fmt/ostr.h>
 
 namespace data {
 

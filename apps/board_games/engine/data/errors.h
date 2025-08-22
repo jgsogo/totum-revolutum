@@ -11,6 +11,9 @@ namespace data {
         DBError,
         NotifcationFailed,
         NotFound,
+        GameEngineError,
+        GameDecodeError,
+        GameIsFinished,
     };
 
 } // namespace data
