@@ -11,6 +11,7 @@ cc_library(
         "game_type.hpp",
         "participant.hpp",
         "participant_role.hpp",
+        "payload.hpp",
         "uuid.hpp",
         "uuid_participant.hpp",
         "uuid_room.hpp",

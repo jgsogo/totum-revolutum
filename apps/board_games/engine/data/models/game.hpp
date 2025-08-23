@@ -2,6 +2,7 @@
 
 #include "game_state.hpp"
 #include "game_type.hpp"
+#include "payload.hpp"
 #include "uuid_room.hpp"
 
 namespace data {
@@ -10,6 +11,6 @@ namespace data {
         RoomUUID room;
         GameType type;
         GameState state;
-        std::string state_data;
+        GameStatePayload state_data;
     };
 } // namespace data

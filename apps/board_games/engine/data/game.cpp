@@ -13,7 +13,7 @@ namespace data {
     static constexpr std::string_view PARTICIPANT_TABLE = "board_games_core_participant";
 
     tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game,
-                                         std::string_view game_state_data) {
+                                         GameStatePayload game_state_data) {
         try {
             pqxx::work tx(conn);
             SPDLOG_DEBUG("Insert game into room '{}'", uuid);
@@ -95,7 +95,7 @@ namespace data {
 
     tl::expected<std::int64_t, Error> store_action(pqxx::connection& conn, std::int32_t game_id,
                                                    ParticipantUUID participant, std::string_view action_type,
-                                                   std::string_view payload, bool applied) {
+                                                   GameActionPayload payload, bool applied) {
         try {
             pqxx::work tx(conn);
             SPDLOG_DEBUG("Insert game_action for game '{}'", game_id);
@@ -115,7 +115,7 @@ namespace data {
     }
 
     tl::expected<void, Error> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
-                                             std::string_view payload, std::int64_t action_id) {
+                                             EventLogPayload payload, std::int64_t action_id) {
         try {
             pqxx::work tx(conn);
             SPDLOG_DEBUG("Insert eventlog for game '{}'", game_id);
@@ -132,7 +132,7 @@ namespace data {
     }
 
     tl::expected<void, Error> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
-                                                std::string_view state_data) {
+                                                GameStatePayload state_data) {
         try {
             pqxx::work tx(conn);
             SPDLOG_DEBUG("Update game state for game '{}'", game_id);

@@ -49,7 +49,7 @@ namespace services {
                          .and_then([&conn, &room, &game_type]() -> tl::expected<void, data::Error> {
                              if (game_type == board_games::tic_tac_toe::GAME_TYPE) {
                                  return board_games::tic_tac_toe::new_board().and_then(
-                                     [&conn, &room, &game_type](const std::string& initial_board_status) {
+                                     [&conn, &room, &game_type](const data::GameStatePayload& initial_board_status) {
                                          return data::start_game(conn, room, game_type, initial_board_status);
                                      });
                              } else {
@@ -158,27 +158,29 @@ namespace services {
 
                         // TODO: Factory + register different games
                         if (game.type == board_games::tic_tac_toe::GAME_TYPE) {
-                            return board_games::tic_tac_toe::run(game.state_data, request->payload(),
+                            data::GameActionPayload action_payload{std::string(request->payload())};
+                            return board_games::tic_tac_toe::run(game.state_data, action_payload,
                                                                  participant.player_number)
                                 // Store to the database the action + new status + event_log
-                                .and_then([&conn, &game, &participant, &request](const data::GameActionResponse& res) {
-                                    return data::store_action(conn, game.id, participant.uuid, res.action_type,
-                                                              request->payload(), true)
-                                        .and_then([&conn, &game, &res](const std::int64_t& action_id) {
-                                            return data::store_eventlog(conn, game.id, res.eventlog_type,
-                                                                        res.eventlog_payload, action_id);
-                                        })
-                                        .and_then([&conn, &game, &res]() {
-                                            return data::update_game_state(conn, game.id, res.new_game_state,
-                                                                           res.new_game_state_data);
-                                        });
-                                })
+                                .and_then(
+                                    [&conn, &game, &participant, &action_payload](const data::GameActionResponse& res) {
+                                        return data::store_action(conn, game.id, participant.uuid, res.action_type,
+                                                                  action_payload, true)
+                                            .and_then([&conn, &game, &res](const std::int64_t& action_id) {
+                                                return data::store_eventlog(conn, game.id, res.eventlog_type,
+                                                                            res.eventlog_payload, action_id);
+                                            })
+                                            .and_then([&conn, &game, &res]() {
+                                                return data::update_game_state(conn, game.id, res.new_game_state,
+                                                                               res.new_game_state_data);
+                                            });
+                                    })
                                 // On failure: RETURN to the user that the action could not be understood.
                                 .or_else([&conn, &game, &participant,
-                                          &request](const data::Error& e) -> tl::expected<void, data::Error> {
+                                          &action_payload](const data::Error& e) -> tl::expected<void, data::Error> {
                                     SPDLOG_ERROR("Failed to apply action to the game");
                                     std::ignore = data::store_action(conn, game.id, participant.uuid, "unknown",
-                                                                     request->payload(), false);
+                                                                     action_payload, false);
                                     return tl::unexpected{data::Error::GameActionFailed};
                                 });
                         } else {

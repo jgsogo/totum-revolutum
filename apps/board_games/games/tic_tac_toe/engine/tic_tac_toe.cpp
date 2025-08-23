@@ -25,7 +25,7 @@ namespace board_games::tic_tac_toe {
 
     } // namespace
 
-    tl::expected<std::string, data::Error> new_board() {
+    tl::expected<data::GameStatePayload, data::Error> new_board() {
         board_game::tic_tac_toe::Board board;
         board.set_board_status({9, EMPTY_SYMBOL});
         board.set_current_turn(0);
@@ -35,21 +35,22 @@ namespace board_games::tic_tac_toe {
             SPDLOG_ERROR("Error encoding board_game::tic_tac_toe::Board protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
-        return {response};
+        return {data::GameStatePayload{std::move(response)}};
     }
 
-    tl::expected<data::GameActionResponse, data::Error> run(const std::string& game_state,
-                                                            const std::string& action_payload, uint8_t player_number) {
+    tl::expected<data::GameActionResponse, data::Error> run(const data::GameStatePayload& game_state,
+                                                            const data::GameActionPayload& action_payload,
+                                                            uint8_t player_number) {
         // Decode 'game_state', check if it's possible that 'player_number' plays an action
         board_game::tic_tac_toe::Board board;
-        if (!board.ParseFromString(game_state.c_str())) {
+        if (!board.ParseFromString(static_cast<std::string_view>(game_state))) {
             SPDLOG_ERROR("Error decoding board_game::tic_tac_toe::Board protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
 
         // Decode 'action_payload'
         board_game::tic_tac_toe::Action action;
-        if (!action.ParseFromString(action_payload.c_str())) {
+        if (!action.ParseFromString(static_cast<std::string_view>(action_payload))) {
             SPDLOG_ERROR("Error decoding board_game::tic_tac_toe::Action protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
@@ -88,16 +89,16 @@ namespace board_games::tic_tac_toe {
         std::string board_status = board.board_status();
         board_status[action.position()] = player_number == 0 ? PLAYER1_SYMBOL : PLAYER2_SYMBOL;
 
-        data::GameActionResponse response;
+        data::GameState new_game_state;
         board_game::tic_tac_toe::Board new_board;
         new_board.set_board_status(board_status);
         auto winner = check_winner(board_status);
         if (winner) {
             new_board.set_winner(winner == PLAYER1_SYMBOL ? 0 : 1);
-            response.new_game_state = data::GameState::FINISHED;
+            new_game_state = data::GameState::FINISHED;
         } else if (is_draw(board_status)) {
             new_board.set_draw(true);
-            response.new_game_state = data::GameState::FINISHED;
+            new_game_state = data::GameState::FINISHED;
         } else {
             new_board.set_current_turn((player_number + 1) % 2);
         }
@@ -107,17 +108,18 @@ namespace board_games::tic_tac_toe {
         event_log.set_mark_placed_at_position(action.position());
         event_log.set_player(player_number);
 
-        response.action_type = "place_mark";
-        response.eventlog_type = "mark_placed";
-        if (!event_log.SerializeToString(&response.eventlog_payload)) {
+        std::string eventlog_payload, new_game_state_data;
+        if (!event_log.SerializeToString(&eventlog_payload)) {
             SPDLOG_ERROR("Error encoding board_game::tic_tac_toe::EventLog protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
-        if (!new_board.SerializeToString(&response.new_game_state_data)) {
+        if (!new_board.SerializeToString(&new_game_state_data)) {
             SPDLOG_ERROR("Error encoding board_game::tic_tac_toe::Board protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
-
+        data::GameActionResponse response{"place_mark", "mark_placed",
+                                          data::EventLogPayload{std::move(eventlog_payload)},
+                                          data::GameStatePayload{std::move(new_game_state_data)}, new_game_state};
         return {response};
     }
 } // namespace board_games::tic_tac_toe
