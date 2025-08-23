@@ -60,8 +60,8 @@ namespace data {
             }
 
             // game_type_id is already the game_type.slug
-            auto [id, game_type, state, state_data] = r->as<std::int64_t, GameType, GameState, std::string>();
-            return {{Game{id, room_uuid, game_type, state, state_data}}};
+            auto [id, game_type, state, state_data] = r->as<std::int64_t, GameType, GameState, GameStatePayload>();
+            return {std::make_optional<Game>(id, room_uuid, game_type, state, std::move(state_data))};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get game for the given room: {}", e.what());
             return tl::unexpected(Error::DBError);
@@ -99,22 +99,27 @@ namespace data {
             // FIXME: We can only add participants if there is already a game associated in the room. All
             //        participants are PLAYERs. We can simplify this a lot.
 
-            std::optional<int64_t> game_id = std::nullopt;
-            std::optional<int32_t> player_number = std::nullopt;
+            std::optional<std::int64_t> game_id = std::nullopt;
+            std::optional<std::int32_t> player_number = std::nullopt;
             if (role == ParticipantRole::PLAYER) {
                 // Check (and return) game in the room
-                auto r = find_game(conn, room);
+                auto r = find_game(conn, room)
+                             .and_then([&role](std::optional<Game>&& game) -> tl::expected<std::int64_t, Error> {
+                                 if (!game) {
+                                     SPDLOG_ERROR("There is no game associated to that room. Participant cannot be yet "
+                                                  "assigned the role '{}'",
+                                                  role);
+                                     return tl::unexpected(Error::DBError);
+                                 } else {
+                                     return {game->id};
+                                 }
+                             });
+
                 if (!r.has_value()) {
                     return tl::unexpected(Error::DBError);
                 }
-                auto r_value = r.value();
-                if (!r_value) {
-                    SPDLOG_ERROR(
-                        "There is no game associated to that room. Participant cannot be yet assigned the role '{}'",
-                        role);
-                    return tl::unexpected(Error::DBError);
-                }
-                game_id = r_value.value().id;
+
+                game_id = r.value();
                 SPDLOG_DEBUG(" - There is a game ({}) being played in the room", game_id.value());
 
                 // Count number of player for the game and assign next one
