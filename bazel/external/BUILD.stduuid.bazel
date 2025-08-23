@@ -1,0 +1,14 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "stduuid",
+    hdrs = [
+        "include/uuid.h",
+    ],
+    defines = ["UUID_SYSTEM_GENERATOR"],
+    include_prefix = "stduuid",
+    strip_include_prefix = "include",
+    visibility = [
+        "//visibility:public",
+    ],
+)

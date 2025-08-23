@@ -1,6 +1,7 @@
 #pragma once
 
 #include "apps/board_games/engine/db/connection_pool.h"
+#include <stduuid/uuid.h>
 
 constexpr static std::string_view PREFIX = "BOARD_GAMES_ENGINE_";
 
@@ -32,10 +33,14 @@ class UniqueDBConnectionPool {
         // Clone the original DB and return the new prefix
         auto original_db = db::ConnectionPool::from_env(PREFIX, 1); // FIXME: Use a single connection instead of a pool
         std::string new_db = original_db.with_conn<std::string>([](pqxx::connection& conn) {
-            static int clone_idx = 0; // TODO: Ensure uniqueness. Use UUID
-            std::string tmp_database = std::format("{}{}_db", PREFIX, clone_idx++);
+            // Use UUID so there are no collisions even across multiple processes, this way it would
+            // be possible to use the same PostgreSQL instance for all the tests in the repo.
+            std::string id = uuids::to_string(uuids::uuid_system_generator{}());
+
+            // Database names need to be lowercase and some chars are forbidden: '-'
+            std::string tmp_database = std::format("{}{}_db", PREFIX, id);
             std::transform(tmp_database.begin(), tmp_database.end(), tmp_database.begin(),
-                           [](unsigned char c) { return std::tolower(c); });
+                           [](unsigned char c) { return c == '-' ? '_' : std::tolower(c); });
 
             pqxx::nontransaction tx{conn};
             const char* original_sql_database = std::getenv(std::format("{}SQL_DATABASE", PREFIX).c_str());

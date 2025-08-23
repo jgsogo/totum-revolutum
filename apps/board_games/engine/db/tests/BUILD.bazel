@@ -10,6 +10,9 @@ cc_library(
     visibility = [
         "//apps/board_games/engine:__subpackages__",
     ],
+    deps = [
+        "@stduuid",
+    ],
 )
 
 cc_test(
