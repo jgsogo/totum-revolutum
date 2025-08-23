@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.24.0",
     deps = [
-        "@crates__bitflags-2.9.1//:bitflags",
+        "@crates__bitflags-2.9.3//:bitflags",
         "@crates__core-foundation-0.10.1//:core_foundation",
         "@crates__core-graphics-types-0.2.0//:core_graphics_types",
         "@crates__foreign-types-0.5.0//:foreign_types",

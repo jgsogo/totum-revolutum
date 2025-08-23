@@ -59,7 +59,7 @@ rust_library(
     }),
     version = "0.11.20",
     deps = [
-        "@crates__avif-serialize-0.8.5//:avif_serialize",
+        "@crates__avif-serialize-0.8.6//:avif_serialize",
         "@crates__imgref-1.11.0//:imgref",
         "@crates__loop9-0.1.5//:loop9",
         "@crates__quick-error-2.0.1//:quick_error",

@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.1.1",
     deps = [
-        "@crates__cfg-if-1.0.1//:cfg_if",
+        "@crates__cfg-if-1.0.3//:cfg_if",
         "@crates__rayon-1.11.0//:rayon",
     ],
 )

@@ -63,7 +63,7 @@ rust_library(
         "@crates__cargo-platform-0.1.9//:cargo_platform",
         "@crates__semver-1.0.26//:semver",
         "@crates__serde-1.0.219//:serde",
-        "@crates__serde_json-1.0.142//:serde_json",
-        "@crates__thiserror-2.0.14//:thiserror",
+        "@crates__serde_json-1.0.143//:serde_json",
+        "@crates__thiserror-2.0.16//:thiserror",
     ],
 )

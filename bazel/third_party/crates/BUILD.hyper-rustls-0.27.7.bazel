@@ -60,7 +60,7 @@ rust_library(
     version = "0.27.7",
     deps = [
         "@crates__http-1.3.1//:http",
-        "@crates__hyper-1.6.0//:hyper",
+        "@crates__hyper-1.7.0//:hyper",
         "@crates__hyper-util-0.1.16//:hyper_util",
         "@crates__rustls-0.23.31//:rustls",
         "@crates__rustls-pki-types-1.12.0//:rustls_pki_types",

@@ -42,7 +42,7 @@ rust_library(
     crate_root = "src/lib.rs",
     edition = "2018",
     proc_macro_deps = [
-        "@crates__async-trait-0.1.88//:async_trait",
+        "@crates__async-trait-0.1.89//:async_trait",
     ],
     rustc_env_files = [
         ":cargo_toml_env_vars",
@@ -66,11 +66,11 @@ rust_library(
     deps = [
         "@crates__assert-json-diff-2.0.2//:assert_json_diff",
         "@crates__async-object-pool-0.1.5//:async_object_pool",
-        "@crates__async-std-1.13.1//:async_std",
+        "@crates__async-std-1.13.2//:async_std",
         "@crates__base64-0.21.7//:base64",
         "@crates__basic-cookies-0.1.5//:basic_cookies",
         "@crates__crossbeam-utils-0.8.21//:crossbeam_utils",
-        "@crates__form_urlencoded-1.2.1//:form_urlencoded",
+        "@crates__form_urlencoded-1.2.2//:form_urlencoded",
         "@crates__futures-util-0.3.31//:futures_util",
         "@crates__hyper-0.14.32//:hyper",
         "@crates__lazy_static-1.5.0//:lazy_static",
@@ -78,10 +78,10 @@ rust_library(
         "@crates__log-0.4.27//:log",
         "@crates__regex-1.11.1//:regex",
         "@crates__serde-1.0.219//:serde",
-        "@crates__serde_json-1.0.142//:serde_json",
+        "@crates__serde_json-1.0.143//:serde_json",
         "@crates__serde_regex-1.1.0//:serde_regex",
         "@crates__similar-2.7.0//:similar",
         "@crates__tokio-1.47.1//:tokio",
-        "@crates__url-2.5.4//:url",
+        "@crates__url-2.5.7//:url",
     ],
 )

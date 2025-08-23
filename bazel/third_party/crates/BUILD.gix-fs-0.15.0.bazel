@@ -61,6 +61,6 @@ rust_library(
         "@crates__gix-features-0.42.1//:gix_features",
         "@crates__gix-path-0.10.20//:gix_path",
         "@crates__gix-utils-0.3.0//:gix_utils",
-        "@crates__thiserror-2.0.14//:thiserror",
+        "@crates__thiserror-2.0.16//:thiserror",
     ],
 )

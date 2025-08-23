@@ -58,6 +58,6 @@ rust_proc_macro(
     deps = [
         "@crates__darling_core-0.20.11//:darling_core",
         "@crates__quote-1.0.40//:quote",
-        "@crates__syn-2.0.104//:syn",
+        "@crates__syn-2.0.106//:syn",
     ],
 )

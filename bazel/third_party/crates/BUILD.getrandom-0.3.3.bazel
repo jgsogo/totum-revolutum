@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.3.3",
     deps = [
-        "@crates__cfg-if-1.0.1//:cfg_if",
+        "@crates__cfg-if-1.0.3//:cfg_if",
         "@crates__getrandom-0.3.3//:build_script_build",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
