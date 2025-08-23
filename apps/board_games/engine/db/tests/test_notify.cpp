@@ -3,7 +3,7 @@
 #include "apps/board_games/engine/db/notify.h"
 #include "fixtures.hpp"
 
-TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test notify") {
+TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test notify") {
 
     SECTION("Test notify without payload") {
         const std::string channel = "channel";

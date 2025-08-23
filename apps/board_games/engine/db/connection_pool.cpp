@@ -11,12 +11,18 @@ ConnectionPool::ConnectionPool(const std::string& conninfo, std::size_t pool_siz
     }
 }
 
-ConnectionPool ConnectionPool::from_env(const std::string& prefix, std::size_t pool_size) {
+ConnectionPool ConnectionPool::from_env(std::string_view prefix, std::size_t pool_size) {
     const char* sql_database = std::getenv(std::format("{}SQL_DATABASE", prefix).c_str());
     const char* sql_user = std::getenv(std::format("{}SQL_USER", prefix).c_str());
     const char* sql_password = std::getenv(std::format("{}SQL_PASSWORD", prefix).c_str());
     const char* sql_host = std::getenv(std::format("{}SQL_HOST", prefix).c_str());
     const char* sql_port = std::getenv(std::format("{}SQL_PORT", prefix).c_str());
+    return ConnectionPool::from(sql_database, sql_user, sql_password, sql_host, sql_port, pool_size);
+}
+
+ConnectionPool ConnectionPool::from(std::string_view sql_database, std::string_view sql_user,
+                                    std::string_view sql_password, std::string_view sql_host, std::string_view sql_port,
+                                    std::size_t pool_size) {
     const std::string connection_str = std::format("dbname={} user={} password={} host={} port={}", sql_database,
                                                    sql_user, sql_password, sql_host, sql_port);
     SPDLOG_DEBUG("Connection string: {}", connection_str);
@@ -42,4 +48,13 @@ template <> void ConnectionPool::with_conn<void>(std::function<void(pqxx::connec
     auto conn = this->acquire();
     work(*conn);
     this->release(conn);
+}
+
+std::queue<std::shared_ptr<pqxx::connection>> ConnectionPool::drain() {
+    std::lock_guard<std::mutex> lock(mutex);
+
+    // Clearing the queue by swapping with an empty queue
+    std::queue<std::shared_ptr<pqxx::connection>> empty;
+    std::swap(pool, empty);
+    return empty;
 }

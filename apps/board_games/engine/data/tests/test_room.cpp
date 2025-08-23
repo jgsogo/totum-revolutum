@@ -7,7 +7,7 @@
 #include "apps/board_games/engine/data/room.h"
 #include "apps/board_games/engine/db/tests/fixtures.hpp"
 
-TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test room associated methods") {
+TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test room associated methods") {
 
     SECTION("Get playing rooms") {
         pool.with_conn<void>([](pqxx::connection& conn) {

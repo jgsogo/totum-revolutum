@@ -6,7 +6,7 @@
 #include "apps/board_games/engine/data/room.h"
 #include "apps/board_games/engine/db/tests/fixtures.hpp"
 
-TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test game associated methods") {
+TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game associated methods") {
 
     SECTION("Remove game from non-existing room") {
         pool.with_conn<void>([](pqxx::connection& conn) {

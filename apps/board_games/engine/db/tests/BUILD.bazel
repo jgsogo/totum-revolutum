@@ -15,7 +15,6 @@ cc_library(
 cc_test(
     name = "_tests",
     srcs = [
-        # "fixtures.hpp",
         "test_connection_pool.cpp",
         "test_notify.cpp",
     ],
@@ -24,6 +23,7 @@ cc_test(
         ":fixtures",
         "//apps/board_games/engine/db",
         "@catch2//:catch2_main",
+        "@spdlog",
     ],
 )
 
