@@ -61,11 +61,7 @@ namespace data {
 
             // game_type_id is already the game_type.slug
             auto [id, game_type, state, state_data] = r->as<std::int64_t, GameType, GameState, GameStatePayload>();
-            Game game{id, room_uuid, game_type, state, std::move(state_data)};
-            auto game_opt = std::make_optional<Game>(std::move(game));
-            tl::expected<std::optional<Game>, Error> ret{std::move(game_opt)};
-            return ret;
-            // return {{std::move(game)}};
+            return {std::make_optional<Game>(id, room_uuid, game_type, state, std::move(state_data))};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get game for the given room: {}", e.what());
             return tl::unexpected(Error::DBError);
@@ -123,17 +119,6 @@ namespace data {
                     return tl::unexpected(Error::DBError);
                 }
 
-                // auto r = find_game(conn, room);
-                // if (!r.has_value()) {
-                //     return tl::unexpected(Error::DBError);
-                // }
-                // auto r_value = r.value();
-                // if (!r_value) {
-                //     SPDLOG_ERROR(
-                //         "There is no game associated to that room. Participant cannot be yet assigned the role '{}'",
-                //         role);
-                //     return tl::unexpected(Error::DBError);
-                // }
                 game_id = r.value();
                 SPDLOG_DEBUG(" - There is a game ({}) being played in the room", game_id.value());
 

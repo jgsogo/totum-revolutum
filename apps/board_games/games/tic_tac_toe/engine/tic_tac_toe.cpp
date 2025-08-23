@@ -36,8 +36,7 @@ namespace board_games::tic_tac_toe {
             return tl::unexpected(data::Error::GameDecodeError);
         }
         data::GameStatePayload game_state_payload{std::move(response)};
-        tl::expected<data::GameStatePayload, data::Error> ret{std::move(game_state_payload)};
-        return ret;
+        return tl::expected<data::GameStatePayload, data::Error>(std::move(game_state_payload));
     }
 
     tl::expected<data::GameActionResponse, data::Error> run(const data::GameStatePayload& game_state,
