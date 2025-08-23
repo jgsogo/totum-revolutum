@@ -1,22 +1,15 @@
 #pragma once
 
-#include "tl/expected.hpp"
-
-#include "apps/board_games/engine/data/errors.h"
-#include "apps/board_games/engine/data/models/game_action_response.hpp"
-#include "apps/board_games/engine/data/models/game_type.hpp"
-
 #include "apps/board_games/engin/game_plugin.hpp"
 #include "apps/board_games/games/tic_tac_toe/models/board.pb.h"
 
 namespace board_games::tic_tac_toe {
 
-    static constexpr data::GameType GAME_TYPE{"tic_tac_toe"};
 
     class TicTacToePlugin final: public engine::GamePlugin<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::Action, board_game::tic_tac_toe::EventLog> {
         using GamePlugin = engine::GamePlugin<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::Action, board_game::tic_tac_toe::EventLog>;
         public:
-            explicit GamePlugin() : GamePlugin{std::string{GAME_TYPE}, std::string{"Tic-Tac-Toe"}, std::string{"Basic Tic-Tac-Toe board game"}} {}
+            explicit GamePlugin(std::string&& slug, std::string&& name, std::string&& description) : GamePlugin{std::move(slug), std::move(name), std::move(description)} {}
 
             virtual std::string_view get_action_type(const TGameActionProto& action) const = 0;
             virtual std::string_view get_eventlog_type(const TEventLogProto& eventlog) const = 0;
@@ -25,13 +18,4 @@ namespace board_games::tic_tac_toe {
             virtual tl::expected<std::pair<TGameStateProto, TEventLogProto>, data::Error> _run(TGameStateProto&& game_state, TGameActionProto&& action, uint8_t player_number) = 0;
     }
 
-
-
-    
-
-    tl::expected<std::string, data::Error> new_board();
-
-    tl::expected<data::GameActionResponse, data::Error> run(const std::string& game_state_payload,
-                                                            const std::string& action_payload, uint8_t player_number);
-
-} // namespace board_games::tic_tac_toe
+}

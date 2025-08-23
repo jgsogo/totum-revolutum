@@ -4,9 +4,10 @@ cc_library(
     name = "engine",
     srcs = [
         "tic_tac_toe.cpp",
+        "tic_tac_toe.h",
     ],
     hdrs = [
-        "tic_tac_toe.h",
+        "plugin.h",
     ],
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
@@ -14,6 +15,7 @@ cc_library(
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
         "//apps/board_games/engine/data",
+        "//apps/board_games/engine:plugin",
         "//apps/board_games/engine/data/models",
         "//apps/board_games/games/tic_tac_toe/models:models_cc_proto",
         "@spdlog",

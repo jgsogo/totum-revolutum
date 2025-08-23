@@ -13,6 +13,7 @@ namespace data {
         NotFound,
         GameEngineError,
         GameDecodeError,
+        GameEncodeError,
         GameIsFinished,
         GameActionFailed,
         NotImplemented,

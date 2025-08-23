@@ -19,7 +19,7 @@ namespace data {
         else if (role == ParticipantRoleSpectator)
             return {data::ParticipantRole::SPECTATOR};
         else
-            return tl::unexpected{std::string{role}};
+            return tl::unexpected{std::format("Unknow participant role value: {}", role)};
     }
 
     inline std::string_view participant_role_to_string(const ParticipantRole& role) {

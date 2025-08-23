@@ -14,6 +14,7 @@ cc_library(
         "uuid.hpp",
         "uuid_participant.hpp",
         "uuid_room.hpp",
+        "payload.hpp",
     ],
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",

@@ -88,7 +88,7 @@ namespace board_games::tic_tac_toe {
         std::string board_status = board.board_status();
         board_status[action.position()] = player_number == 0 ? PLAYER1_SYMBOL : PLAYER2_SYMBOL;
 
-        data::GameActionResponse response;
+        data::GameStatePayload response;
         board_game::tic_tac_toe::Board new_board;
         new_board.set_board_status(board_status);
         auto winner = check_winner(board_status);

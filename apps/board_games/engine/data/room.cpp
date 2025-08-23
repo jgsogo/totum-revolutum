@@ -60,7 +60,7 @@ namespace data {
             }
 
             // game_type_id is already the game_type.slug
-            auto [id, game_type, state, state_data] = r->as<std::int64_t, GameType, GameState, std::string>();
+            auto [id, game_type, state, state_data] = r->as<std::int64_t, GameType, GameState, GameStatePayload>();
             return {{Game{id, room_uuid, game_type, state, state_data}}};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get game for the given room: {}", e.what());
