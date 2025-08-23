@@ -9,7 +9,8 @@ service EngineService {
   rpc StartGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (Participant);
 
-  rpc SubmitCommand (CommandRequest) returns (CommandResponse);
+  rpc SendGameAction(SendGameActionRequest) returns (google.protobuf.Empty);
+  rpc SubmitCommand (CommandRequest) returns (CommandResponse); // TODO: Remove this
 }
 
 message NewRoomRequest {
@@ -33,6 +34,12 @@ message Participant {
   string uuid = 2;
   string role = 3;
   uint32 player_number = 4;
+}
+
+message SendGameActionRequest {
+  string room_uuid = 1;
+  string participant_uuid = 2;
+  bytes payload = 3;
 }
 
 message CommandRequest {

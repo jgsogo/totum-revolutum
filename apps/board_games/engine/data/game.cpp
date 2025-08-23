@@ -12,14 +12,15 @@ namespace data {
     static constexpr std::string_view GAME_ACTION_TABLE = "board_games_core_gameaction";
     static constexpr std::string_view PARTICIPANT_TABLE = "board_games_core_participant";
 
-    tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game) {
+    tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game,
+                                         std::string_view game_state_data) {
         try {
             pqxx::work tx(conn);
             SPDLOG_DEBUG("Insert game into room '{}'", uuid);
             tx.exec(std::format("INSERT INTO {} (room_id, game_type_id, created_at, updated_at, state, state_data) "
-                                "VALUES ($1, $2, NOW(), NOW(), 'waiting', '');",
+                                "VALUES ($1, $2, NOW(), NOW(), 'waiting', $3);",
                                 GAMES_TABLE),
-                    pqxx::params{uuid, game})
+                    pqxx::params{uuid, game, game_state_data})
                 .no_rows();
             tx.commit();
             return {};
@@ -36,9 +37,8 @@ namespace data {
             // If the database is created using Django, the 'on_delete.CASCADE' are not propagated
             // to the database, so we need to handle them ourselves
             //  - Get the 'game' associated to the room
-            // TODO: Use 'room/game_in_room' above
             SPDLOG_TRACE("Check (and retrieve) if there is any game associated to the given room");
-            auto game_id_expected = game_in_room(conn, room_uuid);
+            auto game_id_expected = find_game(conn, room_uuid);
             if (!game_id_expected.has_value()) {
                 return tl::unexpected(Error::DBError);
             }
@@ -46,23 +46,23 @@ namespace data {
                 SPDLOG_TRACE("There is no game associated to the given room. Nothing to do");
                 return {};
             }
-            int64_t game_id = game_id_expected.value().value();
+            Game game = game_id_expected.value().value();
 
             pqxx::work tx(conn);
             //  - remove 'event_log'
             SPDLOG_TRACE("Remove event_log entries associated to the game in the room");
-            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENT_LOG_TABLE), pqxx::params{game_id})
+            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENT_LOG_TABLE), pqxx::params{game.id})
                 .no_rows();
 
             //  - remove 'game_action'
             SPDLOG_TRACE("Remove game_action entries associated to the game in the room");
-            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", GAME_ACTION_TABLE), pqxx::params{game_id})
+            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", GAME_ACTION_TABLE), pqxx::params{game.id})
                 .no_rows();
 
             //  - remove 'game' from 'participants
             SPDLOG_TRACE("Clear the 'game_id' entry from the participants playing the game we are about to remove");
             tx.exec(std::format("UPDATE {} SET game_id = NULL WHERE game_id = $1;", PARTICIPANT_TABLE),
-                    pqxx::params{game_id})
+                    pqxx::params{game.id})
                 .no_rows();
 
             // And now we can finally remove the row from the games table
@@ -92,4 +92,58 @@ namespace data {
             return tl::unexpected(Error::DBError);
         }
     }
+
+    tl::expected<std::int64_t, Error> store_action(pqxx::connection& conn, std::int32_t game_id,
+                                                   ParticipantUUID participant, std::string_view action_type,
+                                                   std::string_view payload, bool applied) {
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Insert game_action for game '{}'", game_id);
+            auto r = tx.exec(std::format(
+                                 "INSERT INTO {} (game_id, participant_id, timestamp, action_type, payload, applied) "
+                                 "VALUES ($1, $2, NOW(), $3, $4, $5) RETURNING id;",
+                                 GAME_ACTION_TABLE),
+                             pqxx::params{game_id, participant, action_type, payload, applied})
+                         .one_field();
+            auto game_action_id = r.as<std::int64_t>();
+            tx.commit();
+            return {game_action_id};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to insert game_action: {}", e.what());
+            return tl::unexpected(Error::DBError);
+        }
+    }
+
+    tl::expected<void, Error> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
+                                             std::string_view payload, std::int64_t action_id) {
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Insert eventlog for game '{}'", game_id);
+            tx.exec(std::format("INSERT INTO {} (game_id, timestamp, event_type, payload, action_id) "
+                                "VALUES ($1, NOW(), $2, $3, $4);",
+                                EVENT_LOG_TABLE),
+                    pqxx::params{game_id, event_type, payload, action_id});
+            tx.commit();
+            return {};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to insert event_log: {}", e.what());
+            return tl::unexpected(Error::DBError);
+        }
+    }
+
+    tl::expected<void, Error> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
+                                                std::string_view state_data) {
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Update game state for game '{}'", game_id);
+            tx.exec(std::format("UPDATE {} SET state = $2, state_data = $3 WHERE id = $1;", GAMES_TABLE),
+                    pqxx::params{game_id, state, state_data});
+            tx.commit();
+            return {};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to update game state: {}", e.what());
+            return tl::unexpected(Error::DBError);
+        }
+    }
+
 } // namespace data

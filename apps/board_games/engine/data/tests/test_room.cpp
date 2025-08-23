@@ -7,7 +7,7 @@
 #include "apps/board_games/engine/data/room.h"
 #include "apps/board_games/engine/db/tests/fixtures.hpp"
 
-TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test room associated methods") {
+TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test room associated methods") {
 
     SECTION("Get playing rooms") {
         pool.with_conn<void>([](pqxx::connection& conn) {
@@ -55,7 +55,7 @@ TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test room associated methods") {
             r = data::add_participant(conn, room_uuid, spectator, data::ParticipantRole::SPECTATOR);
 
             // After adding a game, I can insert the player
-            REQUIRE(data::start_game(conn, room_uuid, data::GameType{"tic_tac_toe"}).has_value());
+            REQUIRE(data::start_game(conn, room_uuid, data::GameType{"tic_tac_toe"}, "").has_value());
             REQUIRE(data::add_participant(conn, room_uuid, player, data::ParticipantRole::PLAYER).has_value());
 
             // TODO: Retrieve the participants in the room and run some asserts

@@ -10,6 +10,12 @@ namespace data {
         SelectError,
         DBError,
         NotifcationFailed,
+        NotFound,
+        GameEngineError,
+        GameDecodeError,
+        GameIsFinished,
+        GameActionFailed,
+        NotImplemented,
     };
 
 } // namespace data

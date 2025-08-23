@@ -1,26 +1,21 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
-    name = "data",
+    name = "engine",
     srcs = [
-        "game.cpp",
-        "room.cpp",
+        "tic_tac_toe.cpp",
     ],
     hdrs = [
-        "errors.h",
-        "game.h",
-        "room.h",
+        "tic_tac_toe.h",
     ],
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
     ],
-    visibility = [
-        "//apps/board_games/engine:__subpackages__",
-        "//apps/board_games/games:__subpackages__",
-    ],
+    visibility = ["//apps/board_games:__subpackages__"],
     deps = [
+        "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
-        "//apps/board_games/engine/db",
+        "//apps/board_games/games/tic_tac_toe/models:models_cc_proto",
         "@spdlog",
         "@tl-expected",
     ],

@@ -27,3 +27,15 @@ namespace data {
         };
     } // namespace _detail
 } // namespace data
+
+template <data::_detail::UUIDType T> struct fmt::formatter<data::_detail::UUID<T>> : fmt::formatter<std::string> {
+    auto format(data::_detail::UUID<T> obj, format_context& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(), "{}", static_cast<std::string_view>(obj));
+    }
+};
+
+template <data::_detail::UUIDType T> struct std::formatter<data::_detail::UUID<T>> : std::formatter<std::string_view> {
+    auto format(const data::_detail::UUID<T>& obj, std::format_context& ctx) const {
+        return std::formatter<std::string_view>::format(static_cast<std::string_view>(obj), ctx);
+    }
+};

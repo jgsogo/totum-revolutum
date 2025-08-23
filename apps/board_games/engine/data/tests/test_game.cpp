@@ -6,7 +6,7 @@
 #include "apps/board_games/engine/data/room.h"
 #include "apps/board_games/engine/db/tests/fixtures.hpp"
 
-TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test game associated methods") {
+TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game associated methods") {
 
     SECTION("Remove game from non-existing room") {
         pool.with_conn<void>([](pqxx::connection& conn) {
@@ -33,12 +33,12 @@ TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test game associated methods") {
     SECTION("Start a game in a room (no previous game)") {
         pool.with_conn<void>([&room_uuid](pqxx::connection& conn) {
             data::GameType game_type{"tic_tac_toe"};
-            auto r = data::start_game(conn, room_uuid, game_type);
+            auto r = data::start_game(conn, room_uuid, game_type, "");
             REQUIRE(r.has_value());
 
             // ...but inserting again fails
             spdlog::utils::with_level<void>(spdlog::level::off, [&conn, &room_uuid, &game_type]() {
-                auto r = data::start_game(conn, room_uuid, game_type);
+                auto r = data::start_game(conn, room_uuid, game_type, "");
                 REQUIRE(!r.has_value());
             });
         });
@@ -48,7 +48,7 @@ TEST_CASE_PERSISTENT_FIXTURE(DBConnectionPool, "Test game associated methods") {
         pool.with_conn<void>([&room_uuid](pqxx::connection& conn) {
             spdlog::utils::with_level<void>(spdlog::level::off, [&conn, &room_uuid]() {
                 data::GameType game_type{"invalid-game"};
-                auto r = data::start_game(conn, room_uuid, game_type);
+                auto r = data::start_game(conn, room_uuid, game_type, "");
                 REQUIRE(!r.has_value());
             });
         });

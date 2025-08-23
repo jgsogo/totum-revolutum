@@ -1,15 +1,19 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
-    name = "data",
+    name = "models",
     srcs = [
-        "game.cpp",
-        "room.cpp",
     ],
     hdrs = [
-        "errors.h",
-        "game.h",
-        "room.h",
+        "game.hpp",
+        "game_action_response.hpp",
+        "game_state.hpp",
+        "game_type.hpp",
+        "participant.hpp",
+        "participant_role.hpp",
+        "uuid.hpp",
+        "uuid_participant.hpp",
+        "uuid_room.hpp",
     ],
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
@@ -19,8 +23,7 @@ cc_library(
         "//apps/board_games/games:__subpackages__",
     ],
     deps = [
-        "//apps/board_games/engine/data/models",
-        "//apps/board_games/engine/db",
+        "@libpqxx",  # FIXME: Move libpqxx stuff to a different library
         "@spdlog",
         "@tl-expected",
     ],

@@ -6,6 +6,7 @@
     event_type: move_made
     payload: !!binary |
       ERITFA==  # Placeholder protobuf bytes
+    action_id: 1
 
 - model: board_games_core.eventlog
   pk: 2
@@ -15,6 +16,7 @@
     event_type: game_over
     payload: !!binary |
       GBkaGxw=  # Placeholder protobuf bytes
+    action_id: 2
 
 - model: board_games_core.eventlog
   pk: 3
@@ -24,3 +26,4 @@
     event_type: move_made
     payload: !!binary |
       HR4fIA==  # Placeholder protobuf bytes
+    action_id: 3
