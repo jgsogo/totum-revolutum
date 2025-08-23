@@ -16,7 +16,7 @@ namespace data {
 
     // Starts a new game in the given room. If there was a game already playing, it will fail
     tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game,
-                                         GameStatePayload&& game_state_data);
+                                         const GameStatePayload& game_state_data);
 
     // Removes a game, if it exists, from the given room
     tl::expected<void, Error> remove_game(pqxx::connection& conn, RoomUUID uuid);
@@ -25,11 +25,11 @@ namespace data {
 
     tl::expected<std::int64_t, Error> store_action(pqxx::connection& conn, std::int32_t game_id,
                                                    ParticipantUUID participant, std::string_view action_type,
-                                                   GameActionPayload&& payload, bool applied);
+                                                   const GameActionPayload& payload, bool applied);
 
     tl::expected<void, Error> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
-                                             EventLogPayload&& payload, std::int64_t action_id);
+                                             const EventLogPayload& payload, std::int64_t action_id);
 
     tl::expected<void, Error> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
-                                                GameStatePayload&& state_data);
+                                                const GameStatePayload& state_data);
 } // namespace data
