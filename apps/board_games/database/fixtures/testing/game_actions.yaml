@@ -3,7 +3,6 @@
   fields:
     game: 1
     participant: 00000000-0000-0000-0000-000000000001
-    action_index: 0
     action_type: move-request
     applied: True
     timestamp: 2024-01-01T10:00:00Z
@@ -15,7 +14,6 @@
   fields:
     game: 1
     participant: 00000000-0000-0000-0000-000000000002
-    action_index: 1
     action_type: move-request
     applied: False
     timestamp: 2024-01-01T10:01:00Z
@@ -27,7 +25,6 @@
   fields:
     game: 2
     participant: 00000000-0000-0000-0000-000000000003
-    action_index: 0
     action_type: move-request
     applied: True
     timestamp: 2024-01-02T11:00:00Z

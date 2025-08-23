@@ -3,10 +3,7 @@ load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test
 
 cc_test(
     name = "_tests",
-    srcs = [
-        "test_game.cpp",
-        "test_room.cpp",
-    ],
+    srcs = glob(["**/test_*"]),
     tags = ["manual"],
     deps = [
         "//apps/board_games/engine/data",

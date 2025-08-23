@@ -96,12 +96,39 @@ namespace data {
     tl::expected<std::int64_t, Error> store_action(pqxx::connection& conn, std::int32_t game_id,
                                                    ParticipantUUID participant, std::string_view action_type,
                                                    std::string_view payload, bool applied) {
-        return tl::unexpected(Error::NotImplemented);
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Insert game_action for game '{}'", game_id);
+            auto r = tx.exec(std::format(
+                                 "INSERT INTO {} (game_id, participant_id, timestamp, action_type, payload, applied) "
+                                 "VALUES ($1, $2, NOW(), $3, $4, $5) RETURNING id;",
+                                 GAME_ACTION_TABLE),
+                             pqxx::params{game_id, participant, action_type, payload, applied})
+                         .one_field();
+            auto game_action_id = r.as<std::int64_t>();
+            tx.commit();
+            return {game_action_id};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to insert game_action: {}", e.what());
+            return tl::unexpected(Error::DBError);
+        }
     }
 
     tl::expected<void, Error> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
                                              std::string_view payload, std::int64_t action_id) {
-        return tl::unexpected(Error::NotImplemented);
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Insert eventlog for game '{}'", game_id);
+            tx.exec(std::format("INSERT INTO {} (game_id, timestamp, event_type, payload, action_id) "
+                                "VALUES ($1, NOW(), $2, $3, $4);",
+                                EVENT_LOG_TABLE),
+                    pqxx::params{game_id, event_type, payload, action_id});
+            tx.commit();
+            return {};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to insert event_log: {}", e.what());
+            return tl::unexpected(Error::DBError);
+        }
     }
 
     tl::expected<void, Error> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,

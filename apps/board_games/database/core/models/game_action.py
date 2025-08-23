@@ -27,10 +27,6 @@ class GameAction(models.Model):
         help_text="The participant who performed this action. Can be null for system actions.",
     )
 
-    action_index = models.PositiveIntegerField(
-        help_text="Sequential index of the action in the game timeline, starting from 0."
-    )
-
     timestamp = models.DateTimeField(default=timezone.now, help_text="When the action was taken.")
 
     action_type = models.CharField(
@@ -45,8 +41,7 @@ class GameAction(models.Model):
     )
 
     class Meta:
-        unique_together = ("game", "action_index")
-        ordering = ["game", "action_index"]
+        ordering = ["game", "timestamp"]
 
     def __str__(self):
         return f"Action #{self.action_index} in game {self.game_id}"
