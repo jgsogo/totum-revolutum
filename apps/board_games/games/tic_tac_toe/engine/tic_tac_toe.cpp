@@ -35,7 +35,9 @@ namespace board_games::tic_tac_toe {
             SPDLOG_ERROR("Error encoding board_game::tic_tac_toe::Board protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
-        return {data::GameStatePayload{std::move(response)}};
+        data::GameStatePayload game_state_payload{std::move(response)};
+        tl::expected<data::GameStatePayload, data::Error> ret{std::move(game_state_payload)};
+        return ret;
     }
 
     tl::expected<data::GameActionResponse, data::Error> run(const data::GameStatePayload& game_state,
@@ -120,6 +122,6 @@ namespace board_games::tic_tac_toe {
         data::GameActionResponse response{"place_mark", "mark_placed",
                                           data::EventLogPayload{std::move(eventlog_payload)},
                                           data::GameStatePayload{std::move(new_game_state_data)}, new_game_state};
-        return {response};
+        return {std::move(response)};
     }
 } // namespace board_games::tic_tac_toe

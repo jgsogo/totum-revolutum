@@ -7,7 +7,11 @@ namespace data {
     namespace _detail {
         template <typename T> class Payload {
           public:
+            Payload() = delete;
+            Payload(const Payload&) = delete;
             explicit Payload(std::string&& payload) : payload{payload} {};
+            explicit Payload(Payload&& payload) = default;
+            explicit Payload(const Payload&& payload) = default;
 
             operator std::string_view() const { return payload; }
 
