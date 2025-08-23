@@ -1,76 +1,59 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { connectToRoom } from '$lib/api/socket';
-  import { page, get } from '$app/stores';
-  import { sendCommand } from '$lib/api/send_command';
+  import { page } from '$app/state';
   import { qr } from '@svelte-put/qr/svg';
-  import { player_id } from '$lib/player_id';
-  import { redirect } from '@sveltejs/kit';
   import { goto } from '$app/navigation';
 
+  const roomId = page.params.roomId!;
 
+  let room_data = $state({});
+  const on_room_update = async (payload: JSON) => {
+    console.log(`[frontend] Get room_update for room ${roomId}`);
+    room_data = payload;
+  };
 
-  const roomId = $page.params.roomId!;
+  const on_game_update = async (payload: { game_type_id: string } | undefined) => {
+    console.log(`[frontend] Get game update for room ${roomId}`);
+    if (payload !== undefined) {
+      goto(`/${payload.game_type_id}/${roomId}/board`);
+    }
+  };
+
   onMount(() => {
-    connectToRoom(roomId);
+    connectToRoom(roomId, on_room_update, async () => {}, on_game_update);
   });
 
-  async function handleClick() {
-    try {
-      let i = Math.floor(Math.random() * 10);
-	  console.log(`[browser] Random int (browser): ${i}`);
-      let myarr = new Uint8Array([i, 2, 3]);
-      let r = await sendCommand(roomId, myarr);
-      console.log('[browser] Command sent!');
-      console.log(`[browser] Response: ${JSON.stringify(r)}`);
-    } catch (err) {
-      console.error('[browser] Failed to send command', err);
-    }
-  }
-
-  async function becomeObserver() {
-    goto($page.url.pathname + "/observe");
-  }
-
-  async function joinGame() {
-    goto($page.url.pathname + "/join");
-  }
-
   const full_domain = 'http://localhost:3000'; // FIXME: Read from envvar
-  const join_url = full_domain + $page.url.pathname + '/join';
+  const admin_url = full_domain + `/room/${roomId}/admin`;
 </script>
 
-<p>Player ID: {JSON.stringify(player_id)}</p>
-
-<h1>Room: {$page.params.roomId}</h1>
-<hr />
-<hr />
-
-<h2>Join the game</h2>
-Join: {join_url}
-<svg
-  use:qr={{
-    data: join_url,
-    logo: 'https://svelte-put.vnphanquang.com/images/svelte-put-logo.svg',
-    shape: 'circle',
-  }}
-  width="200px"
-  height="200px"
-/>
-<hr />
-<hr />
-
-<h2>Game status</h2>
-<h3>Players</h3>
-<h3>Board</h3>
-<p>Waiting for updates...</p>
-<hr />
-<hr />
-
-<h2>Commands</h2>
-<button on:click={handleClick} class="px-4 py-2 bg-blue-600 text-white rounded"> Send Test Command </button>
-<button on:click={becomeObserver} class="px-4 py-2 bg-blue-600 text-white rounded"> Become observer </button>
-<button on:click={joinGame} class="px-4 py-2 bg-blue-600 text-white rounded"> Join the game </button>
+<h3>= Room view =</h3>
 
 <hr />
+<hr />
+<h2>Room data</h2>
+<table>
+  {#each Object.entries(room_data) as [key, value]}
+    <tr>
+      <td>{key}</td>
+      <td>{value}</td>
+    </tr>
+  {/each}
+</table>
+<hr />
+
+<hr />
+<h1>Admin QR</h1>
+<a href={admin_url} target="_blank">
+  <svg
+    use:qr={{
+      data: admin_url,
+      logo: 'https://svelte-put.vnphanquang.com/images/svelte-put-logo.svg',
+      shape: 'circle',
+    }}
+    width="200px"
+    height="200px"
+  />
+</a>
 <hr />

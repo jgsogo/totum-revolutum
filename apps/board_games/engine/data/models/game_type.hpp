@@ -1,16 +1,20 @@
 #pragma once
 
-#include <pqxx/pqxx>
 #include <string>
+
+#include <pqxx/pqxx>
+#include <spdlog/spdlog.h>
 
 namespace data {
 
     namespace _detail {
         template <typename T> class StringType {
           public:
-            explicit StringType(std::string&& value) : value{std::move(value)} {}
+            constexpr explicit StringType(std::string&& value) : value{std::move(value)} {}
 
             operator std::string_view() const { return value; }
+
+            auto operator<=>(const StringType<T>&) const = default;
 
           private:
             std::string value;
@@ -19,6 +23,18 @@ namespace data {
 
     using GameType = _detail::StringType<class GameTypeTag>;
 } // namespace data
+
+template <typename T> struct fmt::formatter<data::_detail::StringType<T>> : fmt::formatter<std::string> {
+    auto format(data::_detail::StringType<T> participant, format_context& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(), "{}", static_cast<std::string_view>(participant));
+    }
+};
+
+template <typename T> struct std::formatter<data::_detail::StringType<T>> : std::formatter<std::string_view> {
+    auto format(const data::_detail::StringType<T>& obj, std::format_context& ctx) const {
+        return std::formatter<std::string_view>::format(static_cast<std::string_view>(obj), ctx);
+    }
+};
 
 // // Custom datatype for libpqxx: https://libpqxx.readthedocs.io/stable/datatypes.html#autotoc_md10,
 // // most of the implementation taken from https://gist.github.com/tomlankhorst/5c41127a3f4fe3e6b1b4cb114ec7e3be

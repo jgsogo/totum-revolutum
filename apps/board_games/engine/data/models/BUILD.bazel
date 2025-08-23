@@ -1,0 +1,31 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "models",
+    srcs = [
+    ],
+    hdrs = [
+        "game.hpp",
+        "game_action_response.hpp",
+        "game_state.hpp",
+        "game_type.hpp",
+        "participant.hpp",
+        "participant_role.hpp",
+        "payload.hpp",
+        "uuid.hpp",
+        "uuid_participant.hpp",
+        "uuid_room.hpp",
+    ],
+    defines = [
+        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
+    ],
+    visibility = [
+        "//apps/board_games/engine:__subpackages__",
+        "//apps/board_games/games:__subpackages__",
+    ],
+    deps = [
+        "@libpqxx",  # FIXME: Move libpqxx stuff to a different library
+        "@spdlog",
+        "@tl-expected",
+    ],
+)

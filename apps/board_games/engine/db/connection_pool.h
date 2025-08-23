@@ -11,7 +11,10 @@ namespace db {
       public:
         ConnectionPool(const std::string& conninfo, std::size_t pool_size);
 
-        static ConnectionPool from_env(const std::string& prefix, std::size_t pool_size);
+        static ConnectionPool from_env(std::string_view prefix, std::size_t pool_size);
+        static ConnectionPool from(std::string_view sql_database, std::string_view sql_user,
+                                   std::string_view sql_password, std::string_view sql_host, std::string_view sql_port,
+                                   std::size_t pool_size);
 
         std::shared_ptr<pqxx::connection> acquire();
         void release(std::shared_ptr<pqxx::connection> conn);
@@ -22,6 +25,8 @@ namespace db {
             this->release(conn);
             return r;
         }
+
+        std::queue<std::shared_ptr<pqxx::connection>> drain();
 
       private:
         std::queue<std::shared_ptr<pqxx::connection>> pool;

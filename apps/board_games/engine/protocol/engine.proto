@@ -7,8 +7,10 @@ import "google/protobuf/empty.proto";
 service EngineService {
   rpc CreateNewRoom (NewRoomRequest) returns (google.protobuf.Empty);
   rpc StartGame (StartGameRequest) returns (google.protobuf.Empty);
-  rpc AddParticipant (AddParticipantRequest) returns (google.protobuf.Empty);
-  rpc SubmitCommand (CommandRequest) returns (CommandResponse);
+  rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (Participant);
+
+  rpc SendGameAction(SendGameActionRequest) returns (google.protobuf.Empty);
+  rpc SubmitCommand (CommandRequest) returns (CommandResponse); // TODO: Remove this
 }
 
 message NewRoomRequest {
@@ -21,10 +23,23 @@ message StartGameRequest {
   string game_type = 2;
 }
 
-message AddParticipantRequest {
+message GetOrCreateParticipantRequest {
   string room_uuid = 1;
   string participant_uuid = 2;
   string participant_role = 3;
+}
+
+message Participant {
+  string room_uuid = 1;
+  string uuid = 2;
+  string role = 3;
+  uint32 player_number = 4;
+}
+
+message SendGameActionRequest {
+  string room_uuid = 1;
+  string participant_uuid = 2;
+  bytes payload = 3;
 }
 
 message CommandRequest {

@@ -7,24 +7,36 @@
 
 let socket: WebSocket;
 
-export function connectToRoom(roomId: string) {
+export function connectToRoom(roomId: string,
+	on_room_update: { (payload: JSON): Promise<void>; (arg0: any): any; },
+	on_participants_update: { (payload: JSON): Promise<void>; (arg0: any): any; },
+	on_game_update: { (payload: JSON): Promise<void>; (arg0: any): any; },
+) {
 	socket = new WebSocket(`ws://localhost:3000/ws/${roomId}`);
 
 	socket.onopen = () => {
-		console.log("WebSocket connected");
+		console.log("[frontend] WebSocket connected");
 	};
 
-	socket.onmessage = (event) => {
+	socket.onmessage = async (event) => {
 		const data = JSON.parse(event.data);
-		// Dispatch to Svelte store or trigger event
-		console.log("Received event:", data);
+		console.log("[frontend] Received event:", data);
+
+		const {type, payload} = data;
+		if (type === 'room_update') {
+			await on_room_update(payload);
+		} else if (type === 'participants_update') {
+			await on_participants_update(payload);
+		} else if (type === 'game_update') {
+			await on_game_update(payload);
+		}
 	};
 
 	socket.onclose = () => {
-		console.warn("WebSocket disconnected");
+		console.warn("[frontend] WebSocket disconnected");
 	};
 
 	socket.onerror = (err) => {
-		console.error("WebSocket error", err);
+		console.error("[frontend] WebSocket error", err);
 	};
 }

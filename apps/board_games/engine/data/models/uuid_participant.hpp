@@ -8,12 +8,6 @@ namespace data {
     using ParticipantUUID = _detail::UUID<_detail::UUIDType::Participant>;
 } // namespace data
 
-template <> struct fmt::formatter<data::ParticipantUUID> : fmt::formatter<std::string> {
-    auto format(data::ParticipantUUID participant, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "{}", static_cast<std::string_view>(participant));
-    }
-};
-
 // Custom datatype for libpqxx: https://libpqxx.readthedocs.io/stable/datatypes.html#autotoc_md10,
 // most of the implementation taken from https://gist.github.com/tomlankhorst/5c41127a3f4fe3e6b1b4cb114ec7e3be
 namespace pqxx {
