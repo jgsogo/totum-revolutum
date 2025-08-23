@@ -133,7 +133,17 @@ namespace data {
 
     tl::expected<void, Error> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
                                                 std::string_view state_data) {
-        return tl::unexpected(Error::NotImplemented);
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Update game state for game '{}'", game_id);
+            tx.exec(std::format("UPDATE {} SET state = $2, state_data = $3 WHERE id = $1;", GAMES_TABLE),
+                    pqxx::params{game_id, state, state_data});
+            tx.commit();
+            return {};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to update game state: {}", e.what());
+            return tl::unexpected(Error::DBError);
+        }
     }
 
 } // namespace data
