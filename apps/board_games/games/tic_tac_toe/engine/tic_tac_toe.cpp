@@ -6,9 +6,15 @@
 #include "apps/board_games/games/tic_tac_toe/models/board.pb.h"
 
 namespace board_games::tic_tac_toe {
+    // static constexpr data::GameType GAME_TYPE{"tic_tac_toe"};
+
     constexpr static char PLAYER1_SYMBOL = 'X';
     constexpr static char PLAYER2_SYMBOL = 'O';
     constexpr static char EMPTY_SYMBOL = ' ';
+
+    static constexpr std::string_view ACTION_PLACE_MARK{"move_action"};
+
+    static constexpr std::string_view EVENT_MARK_PLACED{"move_action"};
 
     namespace {
         static const std::vector<std::array<int, 3>> winners{
@@ -24,6 +30,28 @@ namespace board_games::tic_tac_toe {
         }
 
     } // namespace
+
+    TicTacToePlugin::TicTacToePlugin()
+        : TicTacToePlugin::GamePlugin{std::string{GAME_TYPE}, std::string{"Tic-Tac-Toe"},
+                                      std::string{"Basic Tic-Tac-Toe board game"}} {};
+
+    std::string_view TicTacToePlugin::get_action_type(const board_game::tic_tac_toe::Action& action) const {
+        return ACTION_PLACE_MARK;
+    }
+    std::string_view TicTacToePlugin::get_eventlog_type(const board_game::tic_tac_toe::EventLog& eventlog) const {
+        return EVENT_MARK_PLACED;
+    }
+    data::GameState TicTacToePlugin::get_game_state(const board_game::tic_tac_toe::Board& game_state) const {
+        return data::GameState::PLAYING;
+    }
+    tl::expected<board_game::tic_tac_toe::Board, data::Error> TicTacToePlugin::_new_board() {
+        return tl::unexpected(data::Error::NotImplemented);
+    }
+    tl::expected<std::pair<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::EventLog>, data::Error>
+    TicTacToePlugin::_run(board_game::tic_tac_toe::Board&& game_state, board_game::tic_tac_toe::Action&& action,
+                          uint8_t player_number) {
+        return tl::unexpected(data::Error::NotImplemented);
+    }
 
     tl::expected<data::GameStatePayload, data::Error> new_board() {
         board_game::tic_tac_toe::Board board;

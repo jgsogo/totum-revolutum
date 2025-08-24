@@ -17,6 +17,7 @@ cc_library(
         "//apps/board_games/engine:__pkg__",
     ],
     deps = [
+        "//apps/board_games/engine:plugin",
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/db",
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",

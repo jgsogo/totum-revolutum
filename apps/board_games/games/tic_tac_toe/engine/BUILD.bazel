@@ -13,6 +13,7 @@ cc_library(
     ],
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
+        "//apps/board_games/engine:plugin",
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
         "//apps/board_games/games/tic_tac_toe/models:models_cc_proto",
