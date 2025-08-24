@@ -15,6 +15,7 @@ fn test_app_state() {
         assert!(r.is_ok());
         let app_state: AppState = r.unwrap().try_into_proto().unwrap();
         assert_eq!(app_state.base_ccy().unwrap(), google_type::CurrencyCode::USD);
+        assert!(app_state.db().is_ok());
         assert_eq!(
             app_state.db().unwrap().postgres_url(),
             "postgres://user:password@host:1234/dbname"

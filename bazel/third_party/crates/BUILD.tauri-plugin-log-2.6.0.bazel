@@ -67,10 +67,10 @@ rust_library(
         "@crates__fern-0.7.1//:fern",
         "@crates__log-0.4.27//:log",
         "@crates__serde-1.0.219//:serde",
-        "@crates__serde_json-1.0.142//:serde_json",
-        "@crates__tauri-2.7.0//:tauri",
+        "@crates__serde_json-1.0.143//:serde_json",
+        "@crates__tauri-2.8.2//:tauri",
         "@crates__tauri-plugin-log-2.6.0//:build_script_build",
-        "@crates__thiserror-2.0.14//:thiserror",
+        "@crates__thiserror-2.0.16//:thiserror",
         "@crates__time-0.3.41//:time",
     ],
 )
@@ -110,7 +110,7 @@ cargo_build_script(
     ),
     edition = "2021",
     link_deps = [
-        "@crates__tauri-2.7.0//:tauri",
+        "@crates__tauri-2.8.2//:tauri",
     ],
     links = "tauri-plugin-log",
     pkg_name = "tauri-plugin-log",
@@ -130,7 +130,7 @@ cargo_build_script(
     version = "2.6.0",
     visibility = ["//visibility:private"],
     deps = [
-        "@crates__tauri-plugin-2.3.1//:tauri_plugin",
+        "@crates__tauri-plugin-2.4.0//:tauri_plugin",
     ],
 )
 

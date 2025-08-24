@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.4.44",
     deps = [
-        "@crates__filetime-0.2.25//:filetime",
+        "@crates__filetime-0.2.26//:filetime",
         "@crates__xattr-1.5.1//:xattr",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [

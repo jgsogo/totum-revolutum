@@ -61,8 +61,8 @@ rust_proc_macro(
     deps = [
         "@crates__once_cell-1.21.3//:once_cell",
         "@crates__proc-macro-crate-2.0.2//:proc_macro_crate",
-        "@crates__proc-macro2-1.0.97//:proc_macro2",
+        "@crates__proc-macro2-1.0.101//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
-        "@crates__syn-2.0.104//:syn",
+        "@crates__syn-2.0.106//:syn",
     ],
 )
