@@ -76,7 +76,7 @@ rust_library(
         "@crates__arrayvec-0.7.6//:arrayvec",
         "@crates__av1-grain-0.2.4//:av1_grain",
         "@crates__bitstream-io-2.6.0//:bitstream_io",
-        "@crates__cfg-if-1.0.1//:cfg_if",
+        "@crates__cfg-if-1.0.3//:cfg_if",
         "@crates__itertools-0.12.1//:itertools",
         "@crates__libc-0.2.175//:libc",
         "@crates__log-0.4.27//:log",

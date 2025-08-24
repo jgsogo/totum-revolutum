@@ -58,7 +58,7 @@ rust_library(
     deps = [
         "@crates__cssparser-0.29.6//:cssparser",
         "@crates__html5ever-0.29.1//:html5ever",
-        "@crates__indexmap-2.10.0//:indexmap",
+        "@crates__indexmap-2.11.0//:indexmap",
         "@crates__selectors-0.24.0//:selectors",
     ],
 )

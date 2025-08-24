@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.4.10",
     deps = [
-        "@crates__arbitrary-1.4.1//:arbitrary",
+        "@crates__arbitrary-1.4.2//:arbitrary",
         "@crates__libfuzzer-sys-0.4.10//:build_script_build",
     ],
 )
@@ -116,7 +116,7 @@ cargo_build_script(
     version = "0.4.10",
     visibility = ["//visibility:private"],
     deps = [
-        "@crates__cc-1.2.32//:cc",
+        "@crates__cc-1.2.34//:cc",
     ],
 )
 

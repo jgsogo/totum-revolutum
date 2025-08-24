@@ -56,6 +56,6 @@ rust_library(
     }),
     version = "0.6.1",
     deps = [
-        "@crates__mutate_once-0.1.1//:mutate_once",
+        "@crates__mutate_once-0.1.2//:mutate_once",
     ],
 )

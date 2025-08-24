@@ -58,6 +58,6 @@ rust_library(
     deps = [
         "@crates__getrandom-0.2.16//:getrandom",
         "@crates__libredox-0.1.9//:libredox",
-        "@crates__thiserror-2.0.14//:thiserror",
+        "@crates__thiserror-2.0.16//:thiserror",
     ],
 )

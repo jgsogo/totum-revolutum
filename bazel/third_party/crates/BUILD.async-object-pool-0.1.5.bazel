@@ -56,6 +56,6 @@ rust_library(
     }),
     version = "0.1.5",
     deps = [
-        "@crates__async-std-1.13.1//:async_std",
+        "@crates__async-std-1.13.2//:async_std",
     ],
 )

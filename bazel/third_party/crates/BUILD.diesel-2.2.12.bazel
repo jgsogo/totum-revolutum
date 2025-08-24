@@ -72,7 +72,7 @@ rust_library(
     version = "2.2.12",
     deps = [
         "@crates__bigdecimal-0.4.8//:bigdecimal",
-        "@crates__bitflags-2.9.1//:bitflags",
+        "@crates__bitflags-2.9.3//:bitflags",
         "@crates__byteorder-1.5.0//:byteorder",
         "@crates__chrono-0.4.41//:chrono",
         "@crates__itoa-1.0.15//:itoa",

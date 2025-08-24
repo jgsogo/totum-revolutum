@@ -62,7 +62,7 @@ rust_library(
     }),
     version = "0.7.0",
     deps = [
-        "@crates__bitflags-2.9.1//:bitflags",
+        "@crates__bitflags-2.9.3//:bitflags",
         "@crates__serde-1.0.219//:serde",
         "@crates__unicode-segmentation-1.12.0//:unicode_segmentation",
     ],
