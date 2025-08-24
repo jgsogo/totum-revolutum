@@ -38,19 +38,77 @@ namespace board_games::tic_tac_toe {
     std::string_view TicTacToePlugin::get_action_type(const board_game::tic_tac_toe::Action& action) const {
         return ACTION_PLACE_MARK;
     }
+
     std::string_view TicTacToePlugin::get_eventlog_type(const board_game::tic_tac_toe::EventLog& eventlog) const {
         return EVENT_MARK_PLACED;
     }
+
     data::GameState TicTacToePlugin::get_game_state(const board_game::tic_tac_toe::Board& game_state) const {
+        // TODO: Based on 'draw' or 'current_turn'
         return data::GameState::PLAYING;
     }
+
     tl::expected<board_game::tic_tac_toe::Board, data::Error> TicTacToePlugin::_new_board() {
-        return tl::unexpected(data::Error::NotImplemented);
+        board_game::tic_tac_toe::Board board;
+        board.set_board_status({9, EMPTY_SYMBOL});
+        board.set_current_turn(0);
+        return tl::expected<board_game::tic_tac_toe::Board, data::Error>{std::move(board)};
     }
+
     tl::expected<std::pair<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::EventLog>, data::Error>
     TicTacToePlugin::_run(board_game::tic_tac_toe::Board&& game_state, board_game::tic_tac_toe::Action&& action,
                           uint8_t player_number) {
-        return tl::unexpected(data::Error::NotImplemented);
+        // Preconditions:
+        //  - It's the players turn
+        //  - Game is not finished
+        //  - The cell is empty
+        switch (game_state.turn_state_case()) {
+        case board_game::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
+            if (game_state.current_turn() != player_number) {
+                SPDLOG_ERROR(
+                    "Game state is expecting actions from player {}, however, game action comes from player {}",
+                    game_state.current_turn(), player_number);
+                return tl::unexpected(data::Error::GameEngineError);
+            }
+            break;
+        case board_game::tic_tac_toe::Board::TurnStateCase::kWinner:
+        case board_game::tic_tac_toe::Board::TurnStateCase::kDraw:
+            SPDLOG_ERROR("Game state is finished. No action expected");
+            return tl::unexpected(data::Error::GameEngineError);
+        case board_game::tic_tac_toe::Board::TurnStateCase::TURN_STATE_NOT_SET:
+            SPDLOG_ERROR("Error decoding board_game::tic_tac_toe::Board protobuf: 'turn_state' is not set");
+            return tl::unexpected(data::Error::GameDecodeError);
+        }
+
+        if (game_state.board_status()[action.position()] != EMPTY_SYMBOL) {
+            SPDLOG_ERROR("Cell {} is already set", action.position());
+            return tl::unexpected(data::Error::GameDecodeError);
+        }
+
+        // Effects: compute new 'game_state'
+        //  - Place the mark (X or O)
+        //  - Check for 'win' or 'draw'
+        //  - Switch current player
+        std::string board_status = game_state.board_status();
+        board_status[action.position()] = player_number == 0 ? PLAYER1_SYMBOL : PLAYER2_SYMBOL;
+
+        board_game::tic_tac_toe::Board new_board;
+        new_board.set_board_status(board_status);
+        auto winner = check_winner(board_status);
+        if (winner) {
+            new_board.set_winner(winner == PLAYER1_SYMBOL ? 0 : 1);
+        } else if (is_draw(board_status)) {
+            new_board.set_draw(true);
+        } else {
+            new_board.set_current_turn((player_number + 1) % 2);
+        }
+
+        // Compute return event log[s]
+        board_game::tic_tac_toe::EventLog event_log;
+        event_log.set_mark_placed_at_position(action.position());
+        event_log.set_player(player_number);
+
+        return {std::make_pair(std::move(new_board), std::move(event_log))};
     }
 
     tl::expected<data::GameStatePayload, data::Error> new_board() {
