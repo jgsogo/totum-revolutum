@@ -32,7 +32,7 @@ namespace board_games::tic_tac_toe {
     } // namespace
 
     TicTacToePlugin::TicTacToePlugin()
-        : TicTacToePlugin::GamePlugin{std::string{GAME_TYPE}, std::string{"Tic-Tac-Toe"},
+        : TicTacToePlugin::GamePlugin{GAME_TYPE, std::string{"Tic-Tac-Toe"},
                                       std::string{"Basic Tic-Tac-Toe board game"}} {};
 
     std::string_view TicTacToePlugin::get_action_type(const board_game::tic_tac_toe::Action& action) const {

@@ -11,7 +11,7 @@ cc_library(
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
     ],
-    visibility = ["//apps/board_games:__subpackages__"],
+    visibility = ["//apps/board_games/engine:__pkg__"],
     deps = [
         "//apps/board_games/engine:plugin",
         "//apps/board_games/engine/data",

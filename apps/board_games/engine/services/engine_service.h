@@ -1,13 +1,14 @@
 #pragma once
 
 #include "apps/board_games/engine/db/connection_pool.h"
+#include "apps/board_games/engine/game_plugin.hpp"
 #include "apps/board_games/engine/protocol/engine.grpc.pb.h"
 
 namespace services {
 
     class EngineServiceImpl final : public board_game::EngineService::Service {
       public:
-        EngineServiceImpl(db::ConnectionPool& pool);
+        EngineServiceImpl(db::ConnectionPool& pool, const engine::GamePluginsMap& games);
 
         grpc::Status SubmitCommand(grpc::ServerContext* context, const board_game::CommandRequest* request,
                                    board_game::CommandResponse* response) override;
@@ -27,6 +28,7 @@ namespace services {
 
       private:
         db::ConnectionPool& pool;
+        const engine::GamePluginsMap& _games;
     };
 
 } // namespace services

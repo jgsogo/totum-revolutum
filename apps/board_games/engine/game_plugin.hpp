@@ -3,6 +3,12 @@
 #include <string>
 // #include <google/protobuf/message_lite.h>
 #include <spdlog/spdlog.h>
+#include <tl/expected.hpp>
+
+#include "apps/board_games/engine/data/errors.h"
+#include "apps/board_games/engine/data/models/game_action_response.hpp"
+#include "apps/board_games/engine/data/models/game_type.hpp"
+#include "apps/board_games/engine/data/models/payload.hpp"
 
 namespace engine {
 
@@ -24,10 +30,11 @@ namespace engine {
     class GamePluginBase {
       public:
         GamePluginBase() = delete;
-        explicit GamePluginBase(std::string&& slug, std::string&& name, std::string&& description)
-            : _slug{std::move(slug)}, _name{std::move(name)}, _description{std::move(description)} {};
+        explicit GamePluginBase(const data::GameType& slug, std::string&& name, std::string&& description)
+            : _slug{slug}, _name{std::move(name)}, _description{std::move(description)} {};
+        virtual ~GamePluginBase() {};
 
-        std::string_view slug() const { return _slug; };
+        data::GameType slug() const { return _slug; };
         std::string_view name() const { return _name; };
         std::string_view description() const { return _description; };
 
@@ -37,16 +44,22 @@ namespace engine {
             uint8_t player_number) = 0;
 
       protected:
-        std::string _slug;
+        data::GameType _slug;
         std::string _name;
         std::string _description;
     };
 
+    struct GameTypeHasher {
+        std::size_t operator()(const data::GameType& k) const { return std::hash<std::string_view>()(k); }
+    };
+
+    using GamePluginsMap = std::unordered_map<data::GameType, std::unique_ptr<GamePluginBase>, GameTypeHasher>;
+
     template <typename TGameStateProto, typename TGameActionProto, typename TEventLogProto>
     class GamePlugin : public GamePluginBase {
       public:
-        explicit GamePlugin(std::string&& slug, std::string&& name, std::string&& description)
-            : GamePluginBase{std::move(slug), std::move(name), std::move(description)} {};
+        explicit GamePlugin(const data::GameType& slug, std::string&& name, std::string&& description)
+            : GamePluginBase{slug, std::move(name), std::move(description)} {};
 
         tl::expected<data::GameStatePayload, data::Error> new_board() override {
             return this->_new_board().and_then(
