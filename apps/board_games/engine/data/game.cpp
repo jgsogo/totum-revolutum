@@ -3,16 +3,10 @@
 #include <fmt/ranges.h>
 #include <spdlog/spdlog.h>
 
+#include "constants.hpp"
 #include "room.h"
 
 namespace data {
-
-    // static constexpr std::string_view ROOMS_TABLE = "board_games_core_room";
-    static constexpr std::string_view GAMES_TABLE = "board_games_core_game";
-    static constexpr std::string_view GAME_TYPE_TABLE = "board_games_core_gametype";
-    static constexpr std::string_view EVENT_LOG_TABLE = "board_games_core_eventlog";
-    static constexpr std::string_view GAME_ACTION_TABLE = "board_games_core_gameaction";
-    static constexpr std::string_view PARTICIPANT_TABLE = "board_games_core_participant";
 
     tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game,
                                          const GameStatePayload& game_state_data) {

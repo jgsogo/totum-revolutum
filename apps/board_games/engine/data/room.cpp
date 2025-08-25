@@ -3,15 +3,10 @@
 #include <spdlog/spdlog.h>
 
 #include "apps/board_games/engine/db/notify.h"
+#include "constants.hpp"
 #include "game.h"
 
 namespace data {
-
-    static constexpr std::string_view ROOMS_TABLE = "board_games_core_room";
-    static constexpr std::string_view GAMES_TABLE = "board_games_core_game";
-    static constexpr std::string_view PARTICIPANT_TABLE = "board_games_core_participant";
-
-    static constexpr std::string_view NOTIFICATION_CHANNEL_ROOM = "room_update";
 
     tl::expected<void, Error> insert_new_room(pqxx::connection& conn, RoomUUID uuid, std::string_view name) {
         try {
