@@ -29,5 +29,10 @@ class GameType(models.Model):
         help_text="Optional description of the game type and its rules or characteristics.",
     )
 
+    enabled = models.BooleanField(
+        help_text="If the game_type is enabled or not. It won't be possible to play disabled games",
+        default=False,
+    )
+
     def __str__(self):
         return self.name
