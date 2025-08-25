@@ -14,10 +14,8 @@ export async function connect(connectionString: string): Promise<Client> {
 }
 
 export async function get_game_types(): Promise<{ name: string, slug: string, description: string | undefined }> {
-    console.log("[backend] Get game types")
-    const game_types = await client.query(`SELECT * FROM ${GAME_TYPE_TABLE}`);
-    // Remove disabled games
-    return game_types.filter((gt) => gt.enabled)
+    console.log("[backend] Get game types, only enabled ones")
+    const game_types = await client.query(`SELECT * FROM ${GAME_TYPE_TABLE} WHERE enabled=true`);
     return game_types.rows;
 }
 

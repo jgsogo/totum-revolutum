@@ -154,10 +154,12 @@ namespace services {
                         }
                     })
                     // Switch based on game.game_type and execute the run function
-                    .and_then([&conn, request, this](std::pair<data::Game, data::Participant> game_and_participant)
+                    .and_then([&conn, request,
+                               this](const std::pair<data::Game, data::Participant>&& game_and_participant)
                                   -> tl::expected<void, data::Error> {
-                        auto [game, participant] = std::move(game_and_participant);
+                        const auto&& [game, participant] = std::move(game_and_participant);
 
+                        // We don't care if the game is enabled or not. Maybe it's an ongoing game
                         auto it = this->_games.find(game.type);
                         if (it == this->_games.end()) {
                             SPDLOG_ERROR("Game type {} not known", game.type);
