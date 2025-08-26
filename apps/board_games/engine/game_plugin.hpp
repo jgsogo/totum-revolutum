@@ -12,21 +12,6 @@
 
 namespace engine {
 
-    // template <typename T> requires std::is_base_of_v<google::protobuf::MessageLite, T>
-    // class ProtobufPayload final: public Payload {
-    //     public:
-    //         explicit ProtobufPayload(std::string&& payload) : Payload{std::move(payload)} {}
-
-    //         static tl::expected<ProtobufPayload, T> from(T&& payload) {
-    //             std::string serialized_payload;
-    //             if (!payload.SerializeToString(&serialized_payload)) {
-    //                 SPDLOG_ERROR("Error encoding '{}' protobuf", payload.GetTypeName());
-    //                 return tl::unexpected(payload);
-    //             }
-    //             return {ProtobufPayload{serialized_payload}};
-    //         }
-    // };
-
     class GamePluginBase {
       public:
         GamePluginBase() = delete;
