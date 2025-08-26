@@ -1,16 +1,12 @@
 #include "game.h"
 
+#include <fmt/ranges.h>
 #include <spdlog/spdlog.h>
 
+#include "constants.hpp"
 #include "room.h"
 
 namespace data {
-
-    // static constexpr std::string_view ROOMS_TABLE = "board_games_core_room";
-    static constexpr std::string_view GAMES_TABLE = "board_games_core_game";
-    static constexpr std::string_view EVENT_LOG_TABLE = "board_games_core_eventlog";
-    static constexpr std::string_view GAME_ACTION_TABLE = "board_games_core_gameaction";
-    static constexpr std::string_view PARTICIPANT_TABLE = "board_games_core_participant";
 
     tl::expected<void, Error> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game,
                                          const GameStatePayload& game_state_data) {
@@ -75,38 +71,6 @@ namespace data {
                     return tl::unexpected(Error::DBError);
                 }
             });
-        ;
-        // if (!game_opt_expected.has_value()) {
-        //     return tl::unexpected(Error::DBError);
-        // }
-        // if (!game_opt_expected.value()) {
-        //     SPDLOG_TRACE("There is no game associated to the given room. Nothing to do");
-        //     return {};
-        // }
-        // Game game = std::move(game_opt_expected.value());
-
-        // pqxx::work tx(conn);
-        // //  - remove 'event_log'
-        // SPDLOG_TRACE("Remove event_log entries associated to the game in the room");
-        // tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENT_LOG_TABLE), pqxx::params{game.id})
-        //     .no_rows();
-
-        // //  - remove 'game_action'
-        // SPDLOG_TRACE("Remove game_action entries associated to the game in the room");
-        // tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", GAME_ACTION_TABLE), pqxx::params{game.id})
-        //     .no_rows();
-
-        // //  - remove 'game' from 'participants
-        // SPDLOG_TRACE("Clear the 'game_id' entry from the participants playing the game we are about to remove");
-        // tx.exec(std::format("UPDATE {} SET game_id = NULL WHERE game_id = $1;", PARTICIPANT_TABLE),
-        //         pqxx::params{game.id})
-        //     .no_rows();
-
-        // // And now we can finally remove the row from the games table
-        // SPDLOG_TRACE("Finally remove the game from the table");
-        // tx.exec(std::format("DELETE FROM {} WHERE room_id = $1;", GAMES_TABLE), pqxx::params{room_uuid}).no_rows();
-        // tx.commit();
-        // return {};
     }
 
     tl::expected<std::uint8_t, Error> count_players(pqxx::connection& conn, std::int32_t game_id) {
@@ -175,6 +139,43 @@ namespace data {
             return {};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to update game state: {}", e.what());
+            return tl::unexpected(Error::DBError);
+        }
+    }
+
+    tl::expected<void, Error> set_active_games(pqxx::connection& conn, const std::vector<GameType>& active_games) {
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Set active games: {}", active_games);
+
+            std::string query;
+            pqxx::params values;
+
+            if (!active_games.empty()) {
+                std::ostringstream out;
+                pqxx::placeholders name;
+                for (auto it = active_games.begin(); it != active_games.end() - 1; it++) {
+                    out << name.get() << ", ";
+                    name.next();
+                    values.append(*it);
+                }
+                out << name.get();
+                name.next();
+                values.append(active_games.back());
+
+                query = out.str();
+            }
+
+            tx.exec(std::format("UPDATE {} SET enabled = CASE "
+                                "   WHEN slug IN ({}) THEN true "
+                                "   ELSE false "
+                                "END;",
+                                GAME_TYPE_TABLE, query),
+                    values);
+            tx.commit();
+            return {};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to set enabled games: {}", e.what());
             return tl::unexpected(Error::DBError);
         }
     }

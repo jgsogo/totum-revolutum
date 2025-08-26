@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <google/protobuf/empty.pb.h>
 
 #include "libraries/cpp/spdlog/utils.hpp"
 
@@ -33,12 +34,14 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game associated metho
     SECTION("Start a game in a room (no previous game)") {
         pool.with_conn<void>([&room_uuid](pqxx::connection& conn) {
             data::GameType game_type{"tic_tac_toe"};
-            auto r = data::start_game(conn, room_uuid, game_type, data::GameStatePayload{""});
+            auto game_state_payload = data::GameStatePayload::from_proto(google::protobuf::Empty{});
+            auto r = data::start_game(conn, room_uuid, game_type, game_state_payload.value());
             REQUIRE(r.has_value());
 
             // ...but inserting again fails
             spdlog::utils::with_level<void>(spdlog::level::off, [&conn, &room_uuid, &game_type]() {
-                auto r = data::start_game(conn, room_uuid, game_type, data::GameStatePayload{""});
+                auto game_state_payload = data::GameStatePayload::from_proto(google::protobuf::Empty{});
+                auto r = data::start_game(conn, room_uuid, game_type, game_state_payload.value());
                 REQUIRE(!r.has_value());
             });
         });
@@ -48,7 +51,8 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game associated metho
         pool.with_conn<void>([&room_uuid](pqxx::connection& conn) {
             spdlog::utils::with_level<void>(spdlog::level::off, [&conn, &room_uuid]() {
                 data::GameType game_type{"invalid-game"};
-                auto r = data::start_game(conn, room_uuid, game_type, data::GameStatePayload{""});
+                auto game_state_payload = data::GameStatePayload::from_proto(google::protobuf::Empty{});
+                auto r = data::start_game(conn, room_uuid, game_type, game_state_payload.value());
                 REQUIRE(!r.has_value());
             });
         });

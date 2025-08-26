@@ -3,6 +3,7 @@
   import { connectToRoom } from '$lib/api/socket';
   import { page } from '$app/state';
   import { qr } from '@svelte-put/qr/svg';
+  import { Board } from '../../../../../../games/tic_tac_toe/webapp/src/index';
 
   const roomUUID = page.params.roomUUID!;
 
@@ -19,9 +20,11 @@
   };
 
   let game_data = $state({});
+  let board: Board | undefined = $state();
   const on_game_update = async (payload: JSON) => {
     console.log(`[frontend] Get game update for room ${roomUUID}`);
     game_data = payload;
+    board = Board.create_from_array(game_data.state_data);
   };
 
   onMount(() => {
@@ -70,6 +73,9 @@
     </tr>
   {/each}
 </table>
+{#if board}
+<p>This is the board: '{board.status()}' ({board.status().length})</p>
+{/if}
 <hr />
 
 <hr />

@@ -4,11 +4,12 @@ load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test
 
 cc_library(
     name = "fixtures",
+    testonly = True,
     hdrs = [
         "fixtures.hpp",
     ],
     visibility = [
-        "//apps/board_games/engine:__subpackages__",
+        "//apps/board_games:__subpackages__",
     ],
     deps = [
         "@stduuid",

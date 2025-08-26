@@ -1,0 +1,6 @@
+{
+  "description": "Models used TicTacToe board game",
+  "name": "@totum-revolutum/tic-tac-toe-models",
+  "private": true,
+  "type": "module"
+}

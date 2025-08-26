@@ -5,11 +5,10 @@
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/room.h"
 
-#include "apps/board_games/games/tic_tac_toe/engine/tic_tac_toe.h"
-
 namespace services {
 
-    EngineServiceImpl::EngineServiceImpl(db::ConnectionPool& pool) : pool{pool} {}
+    EngineServiceImpl::EngineServiceImpl(db::ConnectionPool& pool, const engine::GamePluginsMap& games)
+        : pool{pool}, _games(games) {}
 
     grpc::Status EngineServiceImpl::SubmitCommand(grpc::ServerContext* context,
                                                   const board_game::CommandRequest* request,
@@ -40,22 +39,23 @@ namespace services {
     grpc::Status EngineServiceImpl::StartGame(grpc::ServerContext* context, const board_game::StartGameRequest* request,
                                               google::protobuf::Empty* response) {
         SPDLOG_DEBUG("StartGame");
-        return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) {
+        return pool.with_conn<grpc::Status>([request, this](pqxx::connection& conn) {
             data::RoomUUID room{std::string{request->room_uuid()}};
             data::GameType game_type{std::string{request->game_type()}};
 
             // FIXME: remove_game and start_game should go inside the same transaction
             auto r = data::remove_game(conn, room)
-                         .and_then([&conn, &room, &game_type]() -> tl::expected<void, data::Error> {
-                             if (game_type == board_games::tic_tac_toe::GAME_TYPE) {
-                                 return board_games::tic_tac_toe::new_board().and_then(
-                                     [&conn, &room, &game_type](data::GameStatePayload&& initial_board_status) {
-                                         return data::start_game(conn, room, game_type, initial_board_status);
-                                     });
-                             } else {
+                         .and_then([&conn, &room, &game_type, this]() -> tl::expected<void, data::Error> {
+                             auto it = this->_games.find(game_type);
+                             if (it == this->_games.end()) {
                                  SPDLOG_ERROR("Game type {} not known", game_type);
                                  return tl::unexpected{data::Error::NotFound};
                              }
+                             const auto& game = it->second;
+                             return game->new_board().and_then(
+                                 [&conn, &room, &game_type](data::GameStatePayload&& initial_board_status) {
+                                     return data::start_game(conn, room, game_type, initial_board_status);
+                                 });
                          })
                          .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
 
@@ -123,7 +123,7 @@ namespace services {
                                                    const board_game::SendGameActionRequest* request,
                                                    google::protobuf::Empty* response) {
         SPDLOG_DEBUG("GetOrCreateParticipant");
-        return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) {
+        return pool.with_conn<grpc::Status>([request, this](pqxx::connection& conn) {
             data::RoomUUID room{std::string{request->room_uuid()}};
             data::ParticipantUUID participant{std::string{request->participant_uuid()}};
 
@@ -154,43 +154,44 @@ namespace services {
                         }
                     })
                     // Switch based on game.game_type and execute the run function
-                    .and_then([&conn, &request](std::pair<data::Game, data::Participant> game_and_participant)
+                    .and_then([&conn, request,
+                               this](const std::pair<data::Game, data::Participant>&& game_and_participant)
                                   -> tl::expected<void, data::Error> {
-                        auto [game, participant] = std::move(game_and_participant);
+                        const auto&& [game, participant] = std::move(game_and_participant);
 
-                        // TODO: Factory + register different games
-                        if (game.type == board_games::tic_tac_toe::GAME_TYPE) {
-                            data::GameActionPayload action_payload{std::string(request->payload())};
-                            return board_games::tic_tac_toe::run(game.state_data, action_payload,
-                                                                 participant.player_number)
-                                // Store to the database the action + new status + event_log
-                                .and_then(
-                                    [&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
-                                        return data::store_action(conn, game.id, participant.uuid, res.action_type,
-                                                                  action_payload, true)
-                                            .and_then([&conn, &game, &res](const std::int64_t& action_id) {
-                                                return data::store_eventlog(conn, game.id, res.eventlog_type,
-                                                                            res.eventlog_payload, action_id);
-                                            })
-                                            .and_then([&conn, &game, &res]() {
-                                                return data::update_game_state(conn, game.id, res.new_game_state,
-                                                                               res.new_game_state_data);
-                                            });
-                                    })
-                                // On failure: RETURN to the user that the action could not be understood.
-                                .or_else([&conn, &game, &participant,
-                                          &action_payload](const data::Error& e) -> tl::expected<void, data::Error> {
-                                    SPDLOG_ERROR("Failed to apply action to the game");
-                                    std::ignore = data::store_action(conn, game.id, participant.uuid, "unknown",
-                                                                     action_payload, false);
-                                    return tl::unexpected{data::Error::GameActionFailed};
-                                });
-                        } else {
+                        // We don't care if the game is enabled or not. Maybe it's an ongoing game
+                        auto it = this->_games.find(game.type);
+                        if (it == this->_games.end()) {
                             SPDLOG_ERROR("Game type {} not known", game.type);
                             return tl::unexpected{data::Error::NotFound};
                         }
-
-                        return tl::unexpected{data::Error::NotFound};
+                        const auto& game_plugin = it->second;
+                        std::vector<std::byte> payload(request->payload().size());
+                        std::memcpy(payload.data(), request->payload().data(), request->payload().size());
+                        const auto& action_payload = data::GameActionPayload{std::move(payload)};
+                        return game_plugin
+                            ->run(game.state_data, action_payload, participant.player_number)
+                            // Store to the database the action + new status + event_log
+                            .and_then([&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
+                                return data::store_action(conn, game.id, participant.uuid, res.action_type,
+                                                          action_payload, true)
+                                    .and_then([&conn, &game, &res](const std::int64_t& action_id) {
+                                        return data::store_eventlog(conn, game.id, res.eventlog_type,
+                                                                    res.eventlog_payload, action_id);
+                                    })
+                                    .and_then([&conn, &game, &res]() {
+                                        return data::update_game_state(conn, game.id, res.new_game_state,
+                                                                       res.new_game_state_data);
+                                    });
+                            })
+                            // On failure: RETURN to the user that the action could not be understood.
+                            .or_else([&conn, &game, &participant,
+                                      &action_payload](const data::Error& e) -> tl::expected<void, data::Error> {
+                                SPDLOG_ERROR("Failed to apply action to the game");
+                                std::ignore = data::store_action(conn, game.id, participant.uuid, "unknown",
+                                                                 action_payload, false);
+                                return tl::unexpected{data::Error::GameActionFailed};
+                            });
                     })
                     // Send notification to the room
                     .and_then([&conn, &room]() { return data::notify_room_update(conn, room); });

@@ -9,14 +9,31 @@ namespace data {
           public:
             Payload() = delete;
             Payload(const Payload&) = delete;
-            explicit Payload(std::string&& payload) : payload{payload} {};
             explicit Payload(Payload&& payload) = default;
-            explicit Payload(const Payload&& payload) = default;
 
-            operator std::string_view() const { return payload; }
+            explicit Payload(std::vector<std::byte>&& payload) : _payload{std::move(payload)} {};
+
+            operator pqxx::bytes_view() const { return pqxx::bytes_view{_payload.begin(), _payload.end()}; }
+
+            template <typename TProto> tl::expected<TProto, std::string> into_proto() const {
+                TProto proto;
+                if (!proto.ParseFromArray(_payload.data(), _payload.size())) {
+                    return tl::unexpected{"ParseFromArray failed"};
+                }
+                return {proto};
+            }
+
+            template <typename TProto> static tl::expected<Payload, std::string> from_proto(TProto&& proto) {
+                std::vector<std::byte> payload{proto.ByteSizeLong()};
+                if (!proto.SerializeToArray(payload.data(), payload.size())) {
+                    return tl::unexpected{"SerializeToArray failed"};
+                }
+                Payload obj{std::move(payload)};
+                return tl::expected<Payload, std::string>{std::move(obj)};
+            }
 
           protected:
-            std::string payload;
+            std::vector<std::byte> _payload;
         };
     } // namespace _detail
 
@@ -37,27 +54,22 @@ namespace pqxx {
 
     template <typename T> struct string_traits<data::_detail::Payload<T>> {
         static data::_detail::Payload<T> from_string(std::string_view text) {
-            return data::_detail::Payload<T>{std::string{text}};
+            auto bytes = string_traits<pqxx::bytes>::from_string(text);
+            std::vector<std::byte> as_vector{
+                bytes.begin(), bytes.end()}; // FIXME: There is a copy here, use std::basic_string<std::byte> everywhere
+            return data::_detail::Payload<T>{std::move(as_vector)};
         }
 
         static zview to_buf(char* begin, char* end, const data::_detail::Payload<T>& value) {
-            auto string = std::string{value};
-
-            if (std::distance(begin, end) < static_cast<signed long>(string.size() + 1)) {
-                throw pqxx::conversion_overrun{"could not convert data::_detail::Payload<T>"};
-            }
-            std::copy(string.cbegin(), string.cend(), begin);
-            begin[string.size()] = '\0';
-            return zview{begin, string.size()};
+            return string_traits<pqxx::bytes_view>::to_buf(begin, end, value);
         }
 
         static char* into_buf(char* begin, char* end, const data::_detail::Payload<T>& value) {
-            auto v = to_buf(begin, end, value);
-            return begin + v.size() + 2; // past the '\0'
+            return string_traits<pqxx::bytes_view>::into_buf(begin, end, value);
         }
 
         static std::size_t size_buffer(const data::_detail::Payload<T>& value) noexcept {
-            return std::string(value).size() + 1; // include trailing '\0'
+            return string_traits<pqxx::bytes_view>::size_buffer(value);
         }
     };
 } // namespace pqxx

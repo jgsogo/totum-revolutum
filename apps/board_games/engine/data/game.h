@@ -32,4 +32,6 @@ namespace data {
 
     tl::expected<void, Error> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
                                                 const GameStatePayload& state_data);
+
+    tl::expected<void, Error> set_active_games(pqxx::connection& conn, const std::vector<GameType>& active_games);
 } // namespace data
