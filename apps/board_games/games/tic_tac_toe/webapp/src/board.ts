@@ -3,16 +3,6 @@ import { IncomingMessageConstructor, staticImplements } from "./message.js";
 import { Buffer } from 'buffer';
 import { fromBinary } from "@bufbuild/protobuf";
 
-// import { AccountContext as AccountContextProto, AccountContextSchema } from "../protos/account_context_pb.js";
-// import { Snapshot as SnapshotProto } from "../protos/snapshot_pb.js";
-// import { Movement as MovementProto } from "../protos/movement_pb.js";
-// import { Account } from "./account.js";
-// import { Movement } from "./movement.js";
-// import { Snapshot } from "./snapshot.js";
-// import { fromBinary } from "@bufbuild/protobuf";
-// import { Buffer } from 'buffer';
-// import { IncomingMessageConstructor, staticImplements } from "./message.js";
-
 export class Board {
     private readonly board: BoardProto;
 

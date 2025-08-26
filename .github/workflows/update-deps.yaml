@@ -27,7 +27,8 @@ jobs:
           if [ -n "$available" ]; then
             echo "runner-label=self-hosted" >> $GITHUB_OUTPUT
           else
-            echo "runner-label=ubuntu-latest" >> $GITHUB_OUTPUT
+            echo "Self-host is not available, however, we are only running this job locally"
+            echo "runner-label=self-hosted" >> $GITHUB_OUTPUT
           fi
 
   just-update:

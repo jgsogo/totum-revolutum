@@ -13,7 +13,6 @@ cc_library(
     deps = [
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
-        "@protobuf",
         "@spdlog",
         "@tl-expected",
     ],
