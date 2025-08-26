@@ -51,7 +51,7 @@ namespace board_games::tic_tac_toe {
     tl::expected<board_game::tic_tac_toe::Board, data::Error> TicTacToePlugin::_new_board() {
         SPDLOG_DEBUG("[tic_tac_toe] Return new board");
         board_game::tic_tac_toe::Board board;
-        board.set_board_status(std::string{9, EMPTY_SYMBOL});
+        board.set_board_status(std::string(9, EMPTY_SYMBOL));
         board.set_current_turn(0);
         return tl::expected<board_game::tic_tac_toe::Board, data::Error>{std::move(board)};
     }

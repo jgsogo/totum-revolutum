@@ -20,15 +20,11 @@
   };
 
   let game_data = $state({});
-  let board = $state();
+  let board: Board | undefined = $state();
   const on_game_update = async (payload: JSON) => {
     console.log(`[frontend] Get game update for room ${roomUUID}`);
     game_data = payload;
-    console.log(`[frontend]  - game_data: ${JSON.stringify(game_data)}`);
-    console.log(`[frontend]  - game_data.state_data: ${JSON.stringify(game_data.state_data)}`);
-    const data: Uint8Array = game_data.state_data;
-    console.log(`[frontend]  - game_data.state_data as Uint8Array: ${JSON.stringify(data)}`);
-    board = Board.create_from_array(data);
+    board = Board.create_from_array(game_data.state_data);
   };
 
   onMount(() => {
@@ -78,7 +74,7 @@
   {/each}
 </table>
 {#if board}
-<p>This is the board: '{board.status()}'</p>
+<p>This is the board: '{board.status()}' ({board.status().length})</p>
 {/if}
 <hr />
 
