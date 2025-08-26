@@ -64,8 +64,8 @@ namespace engine {
         tl::expected<data::GameStatePayload, data::Error> new_board() override {
             return this->_new_board().and_then(
                 [](auto&& game_state) -> tl::expected<data::GameStatePayload, data::Error> {
-                    std::string serialized;
-                    if (!game_state.SerializeToString(&serialized)) {
+                    std::vector<std::byte> serialized(game_state.ByteSizeLong());
+                    if (!game_state.SerializeToArray(serialized.data(), serialized.size())) {
                         SPDLOG_ERROR("Error encoding '{}' protobuf", game_state.GetTypeName());
                         return tl::unexpected(data::Error::GameEncodeError);
                     }
@@ -79,14 +79,14 @@ namespace engine {
                                                                 uint8_t player_number) override {
             // Decode 'game_state'
             TGameStateProto game_state;
-            if (!game_state.ParseFromString(static_cast<std::string_view>(game_state_payload))) {
+            if (!game_state.ParseFromArray(game_state_payload.data(), game_state_payload.size())) {
                 SPDLOG_ERROR("Error decoding GameStatePayload into {}", game_state.GetTypeName());
                 return tl::unexpected(data::Error::GameDecodeError);
             }
 
             // Decode 'action_payload'
             TGameActionProto action;
-            if (!action.ParseFromString(static_cast<std::string_view>(action_payload))) {
+            if (!action.ParseFromArray(action_payload.data(), action_payload.size())) {
                 SPDLOG_ERROR("Error decoding GameActionPayload into {}", action.GetTypeName());
                 return tl::unexpected(data::Error::GameDecodeError);
             }
@@ -98,12 +98,14 @@ namespace engine {
                     auto eventlog_type = this->get_eventlog_type(eventlog);
                     auto new_game_state = this->get_game_state(new_game_state_data);
 
-                    std::string eventlog_payload, new_game_state_data_payload;
-                    if (!eventlog.SerializeToString(&eventlog_payload)) {
+                    std::vector<std::byte> eventlog_payload(eventlog.ByteSizeLong());
+                    std::vector<std::byte> new_game_state_data_payload(new_game_state_data.ByteSizeLong());
+                    if (!eventlog.SerializeToArray(eventlog_payload.data(), eventlog_payload.size())) {
                         SPDLOG_ERROR("Error serializing {} into protobuf", eventlog.GetTypeName());
                         return tl::unexpected(data::Error::GameDecodeError);
                     }
-                    if (!new_game_state_data.SerializeToString(&new_game_state_data_payload)) {
+                    if (!new_game_state_data.SerializeToArray(new_game_state_data_payload.data(),
+                                                              new_game_state_data_payload.size())) {
                         SPDLOG_ERROR("Error serializing {} into protobuf", new_game_state_data.GetTypeName());
                         return tl::unexpected(data::Error::GameDecodeError);
                     }

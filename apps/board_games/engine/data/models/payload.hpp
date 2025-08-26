@@ -9,14 +9,17 @@ namespace data {
           public:
             Payload() = delete;
             Payload(const Payload&) = delete;
-            explicit Payload(std::string&& payload) : payload{payload} {};
+            explicit Payload(std::vector<std::byte>&& payload) : _payload{std::move(payload)} {};
             explicit Payload(Payload&& payload) = default;
-            explicit Payload(const Payload&& payload) = default;
 
-            operator std::string_view() const { return payload; }
+            operator std::span<const std::byte>() const { return {_payload.cbegin(), _payload.size()}; }
+            const void* data() const { return _payload.data(); }
+            std::size_t size() const { return _payload.size(); }
+            operator pqxx::bytes_view() const { return pqxx::bytes_view{_payload.begin(), _payload.end()}; }
+            pqxx::bytes_view payload() const { return pqxx::bytes_view{_payload.begin(), _payload.end()}; }
 
           protected:
-            std::string payload;
+            std::vector<std::byte> _payload;
         };
     } // namespace _detail
 
@@ -37,18 +40,22 @@ namespace pqxx {
 
     template <typename T> struct string_traits<data::_detail::Payload<T>> {
         static data::_detail::Payload<T> from_string(std::string_view text) {
-            return data::_detail::Payload<T>{std::string{text}};
+            SPDLOG_ERROR("from_string. We retrieve {}: '{}'", text.size(), text);
+            std::vector<std::byte> data(text.size());
+            std::memcpy(data.data(), text.data(), text.size());
+            return data::_detail::Payload<T>{std::move(data)};
         }
 
         static zview to_buf(char* begin, char* end, const data::_detail::Payload<T>& value) {
-            auto string = std::string{value};
-
-            if (std::distance(begin, end) < static_cast<signed long>(string.size() + 1)) {
+            auto data = static_cast<std::span<const std::byte>>(value);
+            if (std::distance(begin, end) < static_cast<signed long>(data.size() + 1)) {
                 throw pqxx::conversion_overrun{"could not convert data::_detail::Payload<T>"};
             }
-            std::copy(string.cbegin(), string.cend(), begin);
-            begin[string.size()] = '\0';
-            return zview{begin, string.size()};
+            std::memcpy(begin, data.data(), data.size());
+            begin[data.size()] = '\0';
+            SPDLOG_ERROR("to_buf. We have {} available. We serialize {}: '{}'", std::distance(begin, end), data.size(),
+                         std::string_view{begin, end});
+            return zview{begin, data.size()};
         }
 
         static char* into_buf(char* begin, char* end, const data::_detail::Payload<T>& value) {
@@ -57,7 +64,7 @@ namespace pqxx {
         }
 
         static std::size_t size_buffer(const data::_detail::Payload<T>& value) noexcept {
-            return std::string(value).size() + 1; // include trailing '\0'
+            return value.size() + 1; // include trailing '\0'
         }
     };
 } // namespace pqxx

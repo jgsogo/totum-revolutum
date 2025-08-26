@@ -8,7 +8,7 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game: update state") 
     SECTION("Update game state") {
         std::int64_t game_id = 1;
         pool.with_conn<void>([&game_id](pqxx::connection& conn) {
-            data::GameStatePayload state_data{"state_data"};
+            data::GameStatePayload state_data{{std::byte{0x36}, std::byte{0xd0}}};
             auto r = data::update_game_state(conn, game_id, data::GameState::PLAYING, state_data);
             REQUIRE(r.has_value());
         });

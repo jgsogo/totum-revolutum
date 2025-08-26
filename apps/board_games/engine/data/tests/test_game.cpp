@@ -33,12 +33,14 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game associated metho
     SECTION("Start a game in a room (no previous game)") {
         pool.with_conn<void>([&room_uuid](pqxx::connection& conn) {
             data::GameType game_type{"tic_tac_toe"};
-            auto r = data::start_game(conn, room_uuid, game_type, data::GameStatePayload{""});
+            auto r = data::start_game(conn, room_uuid, game_type,
+                                      data::GameStatePayload{{std::byte{0x36}, std::byte{0xd0}}});
             REQUIRE(r.has_value());
 
             // ...but inserting again fails
             spdlog::utils::with_level<void>(spdlog::level::off, [&conn, &room_uuid, &game_type]() {
-                auto r = data::start_game(conn, room_uuid, game_type, data::GameStatePayload{""});
+                auto r = data::start_game(conn, room_uuid, game_type,
+                                          data::GameStatePayload{{std::byte{0x36}, std::byte{0xd0}}});
                 REQUIRE(!r.has_value());
             });
         });
@@ -48,7 +50,8 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game associated metho
         pool.with_conn<void>([&room_uuid](pqxx::connection& conn) {
             spdlog::utils::with_level<void>(spdlog::level::off, [&conn, &room_uuid]() {
                 data::GameType game_type{"invalid-game"};
-                auto r = data::start_game(conn, room_uuid, game_type, data::GameStatePayload{""});
+                auto r = data::start_game(conn, room_uuid, game_type,
+                                          data::GameStatePayload{{std::byte{0x36}, std::byte{0xd0}}});
                 REQUIRE(!r.has_value());
             });
         });

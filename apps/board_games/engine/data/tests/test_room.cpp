@@ -55,7 +55,8 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test room associated metho
             r = data::add_participant(conn, room_uuid, spectator, data::ParticipantRole::SPECTATOR);
 
             // After adding a game, I can insert the player
-            REQUIRE(data::start_game(conn, room_uuid, data::GameType{"tic_tac_toe"}, data::GameStatePayload{""})
+            REQUIRE(data::start_game(conn, room_uuid, data::GameType{"tic_tac_toe"},
+                                     data::GameStatePayload{{std::byte{0x36}, std::byte{0xd0}}})
                         .has_value());
             REQUIRE(data::add_participant(conn, room_uuid, player, data::ParticipantRole::PLAYER).has_value());
 

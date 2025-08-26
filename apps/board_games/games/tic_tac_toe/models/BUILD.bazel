@@ -22,5 +22,7 @@ ts_proto_library(
     protoc_gen_options = {
         "import_extension": "js",
     },
-    visibility = ["//apps/board_games/games/tic_tac_toe:__subpackages__"],
+    visibility = [
+        "//apps/board_games/games/tic_tac_toe/webapp:__pkg__",
+    ],
 )

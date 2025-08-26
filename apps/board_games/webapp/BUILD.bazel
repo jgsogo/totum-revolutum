@@ -56,6 +56,8 @@ js_run_binary(
         # Build deps
         "//:node_modules",  # TODO: Consume only the required deps
         "//apps/board_games/engine/protocol:engine_proto/ts",
+        # Games
+        "//apps/board_games/games/tic_tac_toe/webapp:models/ts",
 
         # Sources
         ":configs",

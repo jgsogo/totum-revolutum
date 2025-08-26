@@ -49,8 +49,9 @@ namespace board_games::tic_tac_toe {
     }
 
     tl::expected<board_game::tic_tac_toe::Board, data::Error> TicTacToePlugin::_new_board() {
+        SPDLOG_DEBUG("[tic_tac_toe] Return new board");
         board_game::tic_tac_toe::Board board;
-        board.set_board_status({9, EMPTY_SYMBOL});
+        board.set_board_status(std::string{9, EMPTY_SYMBOL});
         board.set_current_turn(0);
         return tl::expected<board_game::tic_tac_toe::Board, data::Error>{std::move(board)};
     }
@@ -58,6 +59,7 @@ namespace board_games::tic_tac_toe {
     tl::expected<std::pair<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::EventLog>, data::Error>
     TicTacToePlugin::_run(board_game::tic_tac_toe::Board&& game_state, board_game::tic_tac_toe::Action&& action,
                           uint8_t player_number) {
+        SPDLOG_DEBUG("[tic_tac_toe] Play action");
         // Preconditions:
         //  - It's the players turn
         //  - Game is not finished
@@ -116,8 +118,8 @@ namespace board_games::tic_tac_toe {
         board.set_board_status({9, EMPTY_SYMBOL});
         board.set_current_turn(0);
 
-        std::string response;
-        if (!board.SerializeToString(&response)) {
+        std::vector<std::byte> response(board.ByteSizeLong());
+        if (!board.SerializeToArray(response.data(), response.size())) {
             SPDLOG_ERROR("Error encoding board_game::tic_tac_toe::Board protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
@@ -130,14 +132,14 @@ namespace board_games::tic_tac_toe {
                                                             uint8_t player_number) {
         // Decode 'game_state', check if it's possible that 'player_number' plays an action
         board_game::tic_tac_toe::Board board;
-        if (!board.ParseFromString(static_cast<std::string_view>(game_state))) {
+        if (!board.ParseFromArray(game_state.data(), game_state.size())) {
             SPDLOG_ERROR("Error decoding board_game::tic_tac_toe::Board protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
 
         // Decode 'action_payload'
         board_game::tic_tac_toe::Action action;
-        if (!action.ParseFromString(static_cast<std::string_view>(action_payload))) {
+        if (!action.ParseFromArray(action_payload.data(), action_payload.size())) {
             SPDLOG_ERROR("Error decoding board_game::tic_tac_toe::Action protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
@@ -195,12 +197,13 @@ namespace board_games::tic_tac_toe {
         event_log.set_mark_placed_at_position(action.position());
         event_log.set_player(player_number);
 
-        std::string eventlog_payload, new_game_state_data;
-        if (!event_log.SerializeToString(&eventlog_payload)) {
+        std::vector<std::byte> eventlog_payload(event_log.ByteSizeLong());
+        std::vector<std::byte> new_game_state_data(new_board.ByteSizeLong());
+        if (!event_log.SerializeToArray(eventlog_payload.data(), eventlog_payload.size())) {
             SPDLOG_ERROR("Error encoding board_game::tic_tac_toe::EventLog protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
-        if (!new_board.SerializeToString(&new_game_state_data)) {
+        if (!new_board.SerializeToArray(new_game_state_data.data(), new_game_state_data.size())) {
             SPDLOG_ERROR("Error encoding board_game::tic_tac_toe::Board protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }

@@ -1,31 +1,18 @@
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
 
-cc_library(
-    name = "fixtures",
-    testonly = True,
-    hdrs = [
-        "fixtures.hpp",
-    ],
-    visibility = [
-        "//apps/board_games:__subpackages__",
-    ],
-    deps = [
-        "@stduuid",
-    ],
-)
-
 cc_test(
     name = "_tests",
-    srcs = [
-        "test_connection_pool.cpp",
-        "test_notify.cpp",
+    srcs = glob(["**/test_*"]),
+    defines = [
+        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
     ],
     tags = ["manual"],
     deps = [
-        ":fixtures",
-        "//apps/board_games/engine/db",
+        "//apps/board_games/engine/data",
+        "//apps/board_games/engine/db/tests:fixtures",
+        "//apps/board_games/games/tic_tac_toe/engine",
+        "//libraries/cpp/spdlog:utils",
         "@catch2//:catch2_main",
         "@spdlog",
     ],

@@ -166,7 +166,9 @@ namespace services {
                             return tl::unexpected{data::Error::NotFound};
                         }
                         const auto& game_plugin = it->second;
-                        const auto& action_payload = data::GameActionPayload{std::string{request->payload()}};
+                        std::vector<std::byte> payload(request->payload().size());
+                        std::memcpy(payload.data(), request->payload().data(), request->payload().size());
+                        const auto& action_payload = data::GameActionPayload{std::move(payload)};
                         return game_plugin
                             ->run(game.state_data, action_payload, participant.player_number)
                             // Store to the database the action + new status + event_log

@@ -1,0 +1,53 @@
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config", "ts_project")
+load("@npm//:vitest/package_json.bzl", vitest_bin = "bin")
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+)
+
+ts_project(
+    name = "models/ts",
+    srcs = glob(
+        ["src/**/*.ts"],
+        exclude = [
+            "**/*.spec.ts",
+            "**/*.test.ts",
+        ],
+    ) + ["package.json"],
+    declaration = True,
+    source_map = True,
+    tsconfig = ":tsconfig",
+    visibility = ["//apps/board_games/webapp:__subpackages__"],
+    deps = [
+        "//:node_modules/@types/node",
+        "//:node_modules/buffer",
+        "//apps/board_games/games/tic_tac_toe/models:models_ts_proto",
+    ],
+)
+
+ts_project(
+    name = "src_test_ts",
+    srcs = glob([
+        "src/**/*.spec.ts",
+        # "src-js/**/*.test.ts",
+    ]) + ["package.json"],
+    declaration = True,
+    source_map = True,
+    tsconfig = ":tsconfig",
+    deps = [
+        ":models/ts",
+        "//:node_modules/vitest",
+    ],
+)
+
+vitest_bin.vitest_test(
+    name = "test.vitest",
+    args = ["run"],
+    chdir = package_name(),
+    data = [
+        "package.json",
+        ":src_test_ts",
+        "//:node_modules",  # TODO: Consume only the required deps
+    ],
+)
