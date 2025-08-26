@@ -28,7 +28,7 @@ namespace board_games::tic_tac_toe {
         data::GameState get_game_state(const board_game::tic_tac_toe::Board& game_state) const override;
         tl::expected<board_game::tic_tac_toe::Board, data::Error> _new_board() override;
         tl::expected<std::pair<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::EventLog>, data::Error>
-        _run(board_game::tic_tac_toe::Board&& game_state, board_game::tic_tac_toe::Action&& action,
+        _run(const board_game::tic_tac_toe::Board& game_state, const board_game::tic_tac_toe::Action& action,
              uint8_t player_number) override;
     };
 

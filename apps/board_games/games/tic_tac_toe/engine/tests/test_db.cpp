@@ -24,11 +24,10 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test DB interactions") {
             REQUIRE(game_found);
             REQUIRE(game_found.value());
 
-            board_game::tic_tac_toe::Board game_state;
-            REQUIRE(game_state.ParseFromArray(game_found.value().value().state_data.data(),
-                                              game_found.value().value().state_data.size()));
-            REQUIRE(game_state.current_turn() == 0);
-            REQUIRE(game_state.board_status() == std::string{9, ' '});
+            auto game_state = game_found.value()->state_data.into_proto<board_game::tic_tac_toe::Board>();
+            REQUIRE(game_state.has_value());
+            REQUIRE(game_state->current_turn() == 0);
+            REQUIRE(game_state->board_status() == std::string{9, ' '});
         });
     }
 }

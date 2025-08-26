@@ -57,8 +57,8 @@ namespace board_games::tic_tac_toe {
     }
 
     tl::expected<std::pair<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::EventLog>, data::Error>
-    TicTacToePlugin::_run(board_game::tic_tac_toe::Board&& game_state, board_game::tic_tac_toe::Action&& action,
-                          uint8_t player_number) {
+    TicTacToePlugin::_run(const board_game::tic_tac_toe::Board& game_state,
+                          const board_game::tic_tac_toe::Action& action, uint8_t player_number) {
         SPDLOG_DEBUG("[tic_tac_toe] Play action");
         // Preconditions:
         //  - It's the players turn
@@ -131,15 +131,15 @@ namespace board_games::tic_tac_toe {
                                                             const data::GameActionPayload& action_payload,
                                                             uint8_t player_number) {
         // Decode 'game_state', check if it's possible that 'player_number' plays an action
-        board_game::tic_tac_toe::Board board;
-        if (!board.ParseFromArray(game_state.data(), game_state.size())) {
+        auto board = game_state.into_proto<board_game::tic_tac_toe::Board>();
+        if (!board.has_value()) {
             SPDLOG_ERROR("Error decoding board_game::tic_tac_toe::Board protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
 
         // Decode 'action_payload'
-        board_game::tic_tac_toe::Action action;
-        if (!action.ParseFromArray(action_payload.data(), action_payload.size())) {
+        auto action = game_state.into_proto<board_game::tic_tac_toe::Action>();
+        if (!action.has_value()) {
             SPDLOG_ERROR("Error decoding board_game::tic_tac_toe::Action protobuf");
             return tl::unexpected(data::Error::GameDecodeError);
         }
@@ -148,12 +148,12 @@ namespace board_games::tic_tac_toe {
         //  - It's the players turn
         //  - Game is not finished
         //  - The cell is empty
-        switch (board.turn_state_case()) {
+        switch (board.value().turn_state_case()) {
         case board_game::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
-            if (board.current_turn() != player_number) {
+            if (board.value().current_turn() != player_number) {
                 SPDLOG_ERROR(
                     "Game state is expecting actions from player {}, however, game action comes from player {}",
-                    board.current_turn(), player_number);
+                    board.value().current_turn(), player_number);
                 return tl::unexpected(data::Error::GameEngineError);
             }
             break;
@@ -166,8 +166,8 @@ namespace board_games::tic_tac_toe {
             return tl::unexpected(data::Error::GameDecodeError);
         }
 
-        if (board.board_status()[action.position()] != EMPTY_SYMBOL) {
-            SPDLOG_ERROR("Cell {} is already set", action.position());
+        if (board.value().board_status()[action.value().position()] != EMPTY_SYMBOL) {
+            SPDLOG_ERROR("Cell {} is already set", action.value().position());
             return tl::unexpected(data::Error::GameDecodeError);
         }
 
@@ -175,8 +175,8 @@ namespace board_games::tic_tac_toe {
         //  - Place the mark (X or O)
         //  - Check for 'win' or 'draw'
         //  - Switch current player
-        std::string board_status = board.board_status();
-        board_status[action.position()] = player_number == 0 ? PLAYER1_SYMBOL : PLAYER2_SYMBOL;
+        std::string board_status = board->board_status();
+        board_status[action->position()] = player_number == 0 ? PLAYER1_SYMBOL : PLAYER2_SYMBOL;
 
         data::GameState new_game_state;
         board_game::tic_tac_toe::Board new_board;
@@ -194,7 +194,7 @@ namespace board_games::tic_tac_toe {
 
         // Compute return event log[s]
         board_game::tic_tac_toe::EventLog event_log;
-        event_log.set_mark_placed_at_position(action.position());
+        event_log.set_mark_placed_at_position(action->position());
         event_log.set_player(player_number);
 
         std::vector<std::byte> eventlog_payload(event_log.ByteSizeLong());

@@ -78,21 +78,21 @@ namespace engine {
                                                                 const data::GameActionPayload& action_payload,
                                                                 uint8_t player_number) override {
             // Decode 'game_state'
-            TGameStateProto game_state;
-            if (!game_state.ParseFromArray(game_state_payload.data(), game_state_payload.size())) {
-                SPDLOG_ERROR("Error decoding GameStatePayload into {}", game_state.GetTypeName());
+            auto game_state = game_state_payload.into_proto<TGameStateProto>();
+            if (!game_state.has_value()) {
+                SPDLOG_ERROR("Error decoding GameStatePayload: {}", game_state.error());
                 return tl::unexpected(data::Error::GameDecodeError);
             }
 
             // Decode 'action_payload'
-            TGameActionProto action;
-            if (!action.ParseFromArray(action_payload.data(), action_payload.size())) {
-                SPDLOG_ERROR("Error decoding GameActionPayload into {}", action.GetTypeName());
+            auto action = action_payload.into_proto<TGameActionProto>();
+            if (!action.has_value()) {
+                SPDLOG_ERROR("Error decoding GameActionPayload: {}", action.error());
                 return tl::unexpected(data::Error::GameDecodeError);
             }
 
-            auto action_type = this->get_action_type(action);
-            return this->_run(std::move(game_state), std::move(action), player_number)
+            auto action_type = this->get_action_type(action.value());
+            return this->_run(game_state.value(), action.value(), player_number)
                 .and_then([&action_type, this](auto&& t) -> tl::expected<data::GameActionResponse, data::Error> {
                     const auto& [new_game_state_data, eventlog] = t;
                     auto eventlog_type = this->get_eventlog_type(eventlog);
@@ -124,7 +124,7 @@ namespace engine {
         virtual data::GameState get_game_state(const TGameStateProto& game_state) const = 0;
         virtual tl::expected<TGameStateProto, data::Error> _new_board() = 0;
         virtual tl::expected<std::pair<TGameStateProto, TEventLogProto>, data::Error>
-        _run(TGameStateProto&& game_state, TGameActionProto&& action, uint8_t player_number) = 0;
+        _run(const TGameStateProto& game_state, const TGameActionProto& action, uint8_t player_number) = 0;
     };
 
 } // namespace engine

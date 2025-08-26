@@ -16,7 +16,7 @@ namespace data {
             tx.exec(std::format("INSERT INTO {} (room_id, game_type_id, created_at, updated_at, state, state_data) "
                                 "VALUES ($1, $2, NOW(), NOW(), 'waiting', $3);",
                                 GAMES_TABLE),
-                    pqxx::params{uuid, game, game_state_data.payload()})
+                    pqxx::params{uuid, game, game_state_data})
                 .no_rows();
             tx.commit();
             return {};
