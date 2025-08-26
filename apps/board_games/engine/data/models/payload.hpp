@@ -9,7 +9,6 @@ namespace data {
           public:
             Payload() = delete;
             Payload(const Payload&) = delete;
-            explicit Payload(std::vector<std::byte>&& payload) : _payload{std::move(payload)} {};
             explicit Payload(Payload&& payload) = default;
 
             operator pqxx::bytes_view() const { return pqxx::bytes_view{_payload.begin(), _payload.end()}; }
@@ -27,8 +26,14 @@ namespace data {
                 if (!proto.SerializeToArray(payload.data(), payload.size())) {
                     return tl::unexpected{"SerializeToArray failed"};
                 }
-                return {Payload{std::move(payload)}};
+                Payload obj{std::move(payload)};
+                return tl::expected<Payload, std::string>{std::move(obj)};
             }
+
+          protected:
+            explicit Payload(std::vector<std::byte>&& payload) : _payload{std::move(payload)} {};
+
+            friend Payload<T> pqxx::string_traits<Payload<T>>::from_string(std::string_view);
 
           protected:
             std::vector<std::byte> _payload;

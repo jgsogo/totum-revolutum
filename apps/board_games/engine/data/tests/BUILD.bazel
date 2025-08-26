@@ -10,6 +10,7 @@ cc_test(
         "//apps/board_games/engine/db/tests:fixtures",
         "//libraries/cpp/spdlog:utils",
         "@catch2//:catch2_main",
+        "@protobuf//:empty_cc_proto",
         "@spdlog",
     ],
 )

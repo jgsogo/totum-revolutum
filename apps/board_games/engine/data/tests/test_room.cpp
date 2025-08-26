@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <google/protobuf/empty.pb.h>
 #include <spdlog/spdlog.h>
 
 #include "libraries/cpp/spdlog/utils.hpp"
@@ -55,8 +56,8 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test room associated metho
             r = data::add_participant(conn, room_uuid, spectator, data::ParticipantRole::SPECTATOR);
 
             // After adding a game, I can insert the player
-            REQUIRE(data::start_game(conn, room_uuid, data::GameType{"tic_tac_toe"},
-                                     data::GameStatePayload{{std::byte{0x36}, std::byte{0xd0}}})
+            auto game_state_payload = data::GameStatePayload::from_proto(google::protobuf::Empty{});
+            REQUIRE(data::start_game(conn, room_uuid, data::GameType{"tic_tac_toe"}, game_state_payload.value())
                         .has_value());
             REQUIRE(data::add_participant(conn, room_uuid, player, data::ParticipantRole::PLAYER).has_value());
 
