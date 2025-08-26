@@ -11,6 +11,8 @@ namespace data {
             Payload(const Payload&) = delete;
             explicit Payload(Payload&& payload) = default;
 
+            explicit Payload(std::vector<std::byte>&& payload) : _payload{std::move(payload)} {};
+
             operator pqxx::bytes_view() const { return pqxx::bytes_view{_payload.begin(), _payload.end()}; }
 
             template <typename TProto> tl::expected<TProto, std::string> into_proto() const {
@@ -29,11 +31,6 @@ namespace data {
                 Payload obj{std::move(payload)};
                 return tl::expected<Payload, std::string>{std::move(obj)};
             }
-
-          protected:
-            explicit Payload(std::vector<std::byte>&& payload) : _payload{std::move(payload)} {};
-
-            friend Payload<T> pqxx::string_traits<Payload<T>>::from_string(std::string_view);
 
           protected:
             std::vector<std::byte> _payload;

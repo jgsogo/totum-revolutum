@@ -49,13 +49,12 @@ namespace engine {
         tl::expected<data::GameStatePayload, data::Error> new_board() override {
             return this->_new_board().and_then(
                 [](auto&& game_state) -> tl::expected<data::GameStatePayload, data::Error> {
-                    std::vector<std::byte> serialized(game_state.ByteSizeLong());
-                    if (!game_state.SerializeToArray(serialized.data(), serialized.size())) {
+                    auto game_state_payload = data::GameStatePayload::from_proto(game_state);
+                    if (!game_state_payload.has_value()) {
                         SPDLOG_ERROR("Error encoding '{}' protobuf", game_state.GetTypeName());
                         return tl::unexpected(data::Error::GameEncodeError);
                     }
-                    data::GameStatePayload game_state_payload{std::move(serialized)};
-                    return tl::expected<data::GameStatePayload, data::Error>{std::move(game_state_payload)};
+                    return tl::expected<data::GameStatePayload, data::Error>{std::move(game_state_payload).value()};
                 });
         }
 
@@ -83,22 +82,24 @@ namespace engine {
                     auto eventlog_type = this->get_eventlog_type(eventlog);
                     auto new_game_state = this->get_game_state(new_game_state_data);
 
-                    std::vector<std::byte> eventlog_payload(eventlog.ByteSizeLong());
-                    std::vector<std::byte> new_game_state_data_payload(new_game_state_data.ByteSizeLong());
-                    if (!eventlog.SerializeToArray(eventlog_payload.data(), eventlog_payload.size())) {
+                    auto eventlog_payload = data::EventLogPayload::from_proto(eventlog);
+                    if (!eventlog_payload.has_value()) {
                         SPDLOG_ERROR("Error serializing {} into protobuf", eventlog.GetTypeName());
                         return tl::unexpected(data::Error::GameDecodeError);
                     }
-                    if (!new_game_state_data.SerializeToArray(new_game_state_data_payload.data(),
-                                                              new_game_state_data_payload.size())) {
+
+                    auto new_game_state_data_payload = data::GameStatePayload::from_proto(new_game_state_data);
+                    if (!new_game_state_data_payload.has_value()) {
                         SPDLOG_ERROR("Error serializing {} into protobuf", new_game_state_data.GetTypeName());
                         return tl::unexpected(data::Error::GameDecodeError);
                     }
 
-                    data::GameActionResponse game_action_response{
-                        std::string{action_type}, std::string{eventlog_type},
-                        data::EventLogPayload{std::move(eventlog_payload)},
-                        data::GameStatePayload{std::move(new_game_state_data_payload)}, new_game_state};
+                    data::EventLogPayload eventlog_{std::move(eventlog_payload).value()};
+                    data::GameStatePayload new_game_state_data_{std::move(new_game_state_data_payload).value()};
+
+                    data::GameActionResponse game_action_response{std::string{action_type}, std::string{eventlog_type},
+                                                                  std::move(eventlog_), std::move(new_game_state_data_),
+                                                                  new_game_state};
                     return tl::expected<data::GameActionResponse, data::Error>{std::move(game_action_response)};
                 });
         }

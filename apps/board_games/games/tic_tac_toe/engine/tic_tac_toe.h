@@ -11,8 +11,6 @@
 
 namespace board_games::tic_tac_toe {
 
-    static constexpr data::GameType GAME_TYPE{"tic_tac_toe"};
-
     class TicTacToePlugin final
         : public engine::GamePlugin<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::Action,
                                     board_game::tic_tac_toe::EventLog> {
@@ -31,11 +29,5 @@ namespace board_games::tic_tac_toe {
         _run(const board_game::tic_tac_toe::Board& game_state, const board_game::tic_tac_toe::Action& action,
              uint8_t player_number) override;
     };
-
-    tl::expected<data::GameStatePayload, data::Error> new_board();
-
-    tl::expected<data::GameActionResponse, data::Error> run(const data::GameStatePayload& game_state_payload,
-                                                            const data::GameActionPayload& action_payload,
-                                                            uint8_t player_number);
 
 } // namespace board_games::tic_tac_toe
