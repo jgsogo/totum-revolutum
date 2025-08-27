@@ -4,6 +4,7 @@
   import { page } from '$app/state';
   import { qr } from '@svelte-put/qr/svg';
   import { Board } from '../../../../../../games/tic_tac_toe/webapp/src/index';
+  import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
 
   const roomUUID = page.params.roomUUID!;
 
@@ -33,6 +34,8 @@
 
   const full_domain = 'http://localhost:3000'; // FIXME: Read from envvar
   const play_url = full_domain + `/tic_tac_toe/${roomUUID}/play`;
+
+  let refBoard: typeof TicTacToeBoard;
 </script>
 
 <h3>= Board view =</h3>
@@ -74,7 +77,7 @@
   {/each}
 </table>
 {#if board}
-<p>This is the board: '{board.status()}' ({board.status().length})</p>
+  <p>This is the board: '{board.status()}' ({board.status().length})</p>
 {/if}
 <hr />
 
@@ -92,3 +95,5 @@
   />
 </a>
 <hr />
+
+<TicTacToeBoard bind:this={refBoard} size={420} />
