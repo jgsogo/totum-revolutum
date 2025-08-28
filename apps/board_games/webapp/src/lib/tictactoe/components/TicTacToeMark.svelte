@@ -1,20 +1,16 @@
 <script lang="ts">
   import { Spring } from 'svelte/motion';
 
-  let { cell_id, size }: { cell_id: number; size: number } = $props();
+  let { cell_id, margin, cellSize, strokeWidth }: { cell_id: number; margin: number, cellSize: number, strokeWidth: number } = $props();
 
-  const margin = size * 0.02; // small outer padding
-  const innerSize = size - margin * 2;
-  const cellSize = innerSize / 3;
   const xColor: string = '#d9534f';
   const oColor: string = '#2b9df4';
-  const strokeWidth: number = 8;
 
   const scale = new Spring(0, { stiffness: 0.25, damping: 0.7 });
   let mark: string = $state('');
 
   export function updateCell(new_mark: 'X' | 'O' | '') {
-    console.log(`[frontend] updateCell(new_mark='${new_mark}') in cell_id='${cell_id}' (size='${size}')`);
+    console.log(`[frontend] updateCell(new_mark='${new_mark}') in cell_id='${cell_id}'`);
     const prev_mark = mark;
     mark = new_mark;
     if (prev_mark === '' && (new_mark === 'X' || new_mark === 'O')) {
