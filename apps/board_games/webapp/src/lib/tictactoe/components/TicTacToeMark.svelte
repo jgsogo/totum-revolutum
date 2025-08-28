@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Spring } from 'svelte/motion'; // Svelte 5 runes friendly
+  import { Spring } from 'svelte/motion';
 
   let { cell_id, size }: { cell_id: number; size: number } = $props();
 
@@ -11,7 +11,6 @@
   const strokeWidth: number = 8;
 
   const scale = new Spring(0, { stiffness: 0.25, damping: 0.7 });
-  // svelte-ignore non_reactive_update
   let mark: string = $state('');
 
   export function updateCell(new_mark: 'X' | 'O' | '') {
@@ -20,12 +19,11 @@
     mark = new_mark;
     if (prev_mark === '' && (new_mark === 'X' || new_mark === 'O')) {
       // animate: spring from 0 -> 1
-      scale.set(0);
-      // small timeout to allow spring value reset to take effect
-      setTimeout(() => scale.set(1), 10);
+      scale.set(0, {instant: true});
+      scale.set(1)
     } else {
       // changed or removed: just set to final
-      scale.set(new_mark ? 1 : 0);
+      scale.set(new_mark ? 1 : 0, {instant: true});
     }
   }
 
