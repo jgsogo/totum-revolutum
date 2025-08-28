@@ -7,6 +7,7 @@
   import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
 
   const roomUUID = page.params.roomUUID!;
+  let refBoard: typeof TicTacToeBoard;
 
   let room_data = $state({});
   const on_room_update = async (payload: JSON) => {
@@ -35,7 +36,17 @@
   const full_domain = 'http://localhost:3000'; // FIXME: Read from envvar
   const play_url = full_domain + `/tic_tac_toe/${roomUUID}/play`;
 
-  let refBoard: typeof TicTacToeBoard;
+  const randomBoard = async() => {
+    const values = ["X", "O", ""];
+
+    let board: string[] = Array.from({ length: 9 }, () => {
+      const random = Math.floor(Math.random() * values.length);
+      return values[random];
+    });
+
+    console.log(`Random board: ${board}`);
+    refBoard.updateBoard(board);
+  }
 </script>
 
 <h3>= Board view =</h3>
@@ -97,3 +108,5 @@
 <hr />
 
 <TicTacToeBoard bind:this={refBoard} size={420} />
+
+<button onclick={randomBoard} class="px-4 py-2 bg-blue-600 text-white rounded"> Random board </button>
