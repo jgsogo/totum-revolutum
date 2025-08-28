@@ -1,10 +1,20 @@
 <script lang="ts">
   import { Spring } from 'svelte/motion';
 
-  let { cell_id, margin, cellSize, strokeWidth }: { cell_id: number; margin: number, cellSize: number, strokeWidth: number } = $props();
+  type TicTacToeMarkProps = {
+    cell_id: number;
+    margin: number;
+    cellSize: number;
+    strokeWidth: number;
+    cellClick: () => void;
+  };
+
+  let { cell_id, margin, cellSize, strokeWidth, cellClick }: TicTacToeMarkProps = $props();
 
   const xColor: string = '#d9534f';
   const oColor: string = '#2b9df4';
+  const row = Math.floor(cell_id / 3);
+  const column = cell_id % 3;
 
   const scale = new Spring(0, { stiffness: 0.25, damping: 0.7 });
   let mark: string = $state('');
@@ -15,11 +25,11 @@
     mark = new_mark;
     if (prev_mark === '' && (new_mark === 'X' || new_mark === 'O')) {
       // animate: spring from 0 -> 1
-      scale.set(0, {instant: true});
-      scale.set(1)
+      scale.set(0, { instant: true });
+      scale.set(1);
     } else {
       // changed or removed: just set to final
-      scale.set(new_mark ? 1 : 0, {instant: true});
+      scale.set(new_mark ? 1 : 0, { instant: true });
     }
   }
 
@@ -54,6 +64,15 @@
     return { cx, cy, r };
   }
 </script>
+
+<rect
+  x={margin + row * cellSize}
+  y={margin + column * cellSize}
+  width={cellSize}
+  height={cellSize}
+  fill="transparent"
+  onclick={cellClick}
+/>
 
 {#if mark === 'X'}
   <g>

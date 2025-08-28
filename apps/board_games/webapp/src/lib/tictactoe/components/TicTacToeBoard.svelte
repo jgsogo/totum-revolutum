@@ -1,10 +1,14 @@
 <script lang="ts">
   import TicTacToeMark from './TicTacToeMark.svelte';
 
-  // Props
-  export let size: number = 360; // overall px size of the board
-  export let strokeWidth: number = 8;
-  export let gridColor: string = '#222';
+  type TicTacToeBoardProps = {
+    size: number;
+    strokeWidth: number;
+    gridColor: string;
+    onCellClick: (cell_id: number) => void;
+  };
+
+  let { size = 360, strokeWidth = 8, gridColor = '#222', onCellClick = (_: number) => {} }: TicTacToeBoardProps = $props();
 
   const margin = size * 0.02; // small outer padding
   const innerSize = size - margin * 2;
@@ -13,15 +17,18 @@
   const cells = Array.from({ length: 9 }, (_, i: number) => {
     return { cell_id: i, instance: typeof TicTacToeMark, margin, cellSize, strokeWidth };
   });
-  console.log(`[frontend] cells: ${JSON.stringify(cells)}`);
 
   export function updateBoard(nextBoard: string[]) {
     console.log(`[frontend] updateBoard(nextBoard='${nextBoard}')`);
     nextBoard.forEach((nextElem, idx) => {
-        let cell = cells[idx];
-        cell.instance.updateCell(nextElem);
+      let cell = cells[idx];
+      cell.instance.updateCell(nextElem);
     });
   }
+
+  //   const onCellClick = (cellId: number) => {
+  //     console.log(`[frontend] Cell ${cellId} clicked`);
+  //   }
 </script>
 
 <div class="board-wrapper" role="group" aria-label="Tic Tac Toe board">
@@ -57,7 +64,14 @@
 
     <!-- marks -->
     {#each cells as cell}
-      <TicTacToeMark cell_id={cell.cell_id} margin={cell.margin} cellSize={cell.cellSize} strokeWidth={cell.strokeWidth} bind:this={cell.instance}  />
+      <TicTacToeMark
+        cell_id={cell.cell_id}
+        margin={cell.margin}
+        cellSize={cell.cellSize}
+        strokeWidth={cell.strokeWidth}
+        cellClick={() => onCellClick(cell.cell_id)}
+        bind:this={cell.instance}
+      />
     {/each}
   </svg>
 </div>
