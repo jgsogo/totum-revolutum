@@ -27,6 +27,7 @@
     console.log(`[frontend] Get game update for room ${roomUUID}`);
     game_data = payload;
     board = Board.create_from_array(game_data.state_data);
+    refBoard.updateBoard([...board.status()]);
   };
 
   onMount(() => {
