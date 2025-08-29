@@ -122,7 +122,8 @@ namespace services {
     grpc::Status EngineServiceImpl::SendGameAction(grpc::ServerContext* context,
                                                    const board_game::SendGameActionRequest* request,
                                                    google::protobuf::Empty* response) {
-        SPDLOG_DEBUG("GetOrCreateParticipant");
+        SPDLOG_DEBUG("SendGameAction(request.room_uuid={}, request.participant_uuid={})", request->room_uuid(),
+                     request->participant_uuid());
         return pool.with_conn<grpc::Status>([request, this](pqxx::connection& conn) {
             data::RoomUUID room{std::string{request->room_uuid()}};
             data::ParticipantUUID participant{std::string{request->participant_uuid()}};

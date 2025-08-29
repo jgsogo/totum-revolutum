@@ -4,8 +4,10 @@
   import { page } from '$app/state';
   import { qr } from '@svelte-put/qr/svg';
   import { Board } from '../../../../../../games/tic_tac_toe/webapp/src/index';
+  import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
 
   const roomUUID = page.params.roomUUID!;
+  let refBoard: typeof TicTacToeBoard;
 
   let room_data = $state({});
   const on_room_update = async (payload: JSON) => {
@@ -25,6 +27,7 @@
     console.log(`[frontend] Get game update for room ${roomUUID}`);
     game_data = payload;
     board = Board.create_from_array(game_data.state_data);
+    refBoard.updateBoard([...board.status()]);
   };
 
   onMount(() => {
@@ -74,7 +77,7 @@
   {/each}
 </table>
 {#if board}
-<p>This is the board: '{board.status()}' ({board.status().length})</p>
+  <p>This is the board: '{board.status()}' ({board.status().length})</p>
 {/if}
 <hr />
 
@@ -92,3 +95,5 @@
   />
 </a>
 <hr />
+
+<TicTacToeBoard bind:this={refBoard} size={420} />
