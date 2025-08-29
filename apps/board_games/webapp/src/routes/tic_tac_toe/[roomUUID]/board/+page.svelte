@@ -14,6 +14,9 @@
   };
 
   const roomUUID = page.params.roomUUID!;
+  const PORT = process.env.PORT || 3000;
+  const DOMAIN_NAME = process.env.DOMAIN_NAME || "192.168.1.46";  // FIXME: This is my IP!!
+
   let refBoard: typeof TicTacToeBoard;
   let playerX: Participant | undefined = $state(undefined);
   let playerO: Participant | undefined = $state(undefined);
@@ -50,7 +53,7 @@
     connectToRoom(roomUUID, on_room_update, on_participants_update, on_game_update);
   });
 
-  const full_domain = 'http://localhost:3000'; // FIXME: Read from envvar
+  const full_domain = `http://${DOMAIN_NAME}:${PORT}`;
   const playX_url = full_domain + `/tic_tac_toe/${roomUUID}/play/X`;
   const playO_url = full_domain + `/tic_tac_toe/${roomUUID}/play/O`;
 </script>

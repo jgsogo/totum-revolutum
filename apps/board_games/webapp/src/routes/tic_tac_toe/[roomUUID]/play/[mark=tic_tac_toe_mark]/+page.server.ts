@@ -13,7 +13,10 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     if (session_id === undefined) {
         session_id = crypto.randomUUID();
     }
-    cookies.set('session-id', session_id, { path: `/tic_tac_toe/${roomUUID}` });
+    cookies.set('session-id', session_id, {
+        path: `/tic_tac_toe/${roomUUID}`,
+        secure: false , // FIXME: We need this if using HTTP (https://github.com/jshttp/cookie#secure)
+    });
 
     // Add or retrieve me as a participant
     try {

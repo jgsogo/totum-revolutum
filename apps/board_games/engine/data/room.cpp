@@ -74,6 +74,7 @@ namespace data {
                              pqxx::params{participant_uuid, room})
                          .opt_row();
             if (!r) {
+                SPDLOG_DEBUG(" - participant not found");
                 return {std::nullopt};
             }
 
