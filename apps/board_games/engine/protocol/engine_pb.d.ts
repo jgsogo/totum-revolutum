@@ -71,6 +71,11 @@ export declare type GetOrCreateParticipantRequest = Message<"board_game.GetOrCre
    * @generated from field: string participant_role = 3;
    */
   participantRole: string;
+
+  /**
+   * @generated from field: optional uint32 player_number = 4;
+   */
+  playerNumber?: number;
 };
 
 /**
