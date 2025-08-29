@@ -25,7 +25,8 @@ namespace data {
                                                                      ParticipantUUID participant);
 
     tl::expected<Participant, Error> add_participant(pqxx::connection& conn, RoomUUID room, ParticipantUUID participant,
-                                                     ParticipantRole role);
+                                                     ParticipantRole role,
+                                                     std::optional<uint32_t> player_number = std::nullopt);
 
     tl::expected<void, Error> notify_room_update(pqxx::connection& conn, RoomUUID room);
 

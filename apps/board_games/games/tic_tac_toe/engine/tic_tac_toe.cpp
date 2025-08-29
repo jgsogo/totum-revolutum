@@ -8,8 +8,8 @@
 namespace board_games::tic_tac_toe {
     static constexpr data::GameType GAME_TYPE{"tic_tac_toe"};
 
-    constexpr static char PLAYER1_SYMBOL = 'X';
-    constexpr static char PLAYER2_SYMBOL = 'O';
+    constexpr static char PLAYER_X_SYMBOL = 'X';
+    constexpr static char PLAYER_O_SYMBOL = 'O';
     constexpr static char EMPTY_SYMBOL = ' ';
 
     static constexpr std::string_view ACTION_PLACE_MARK{"move_action"};
@@ -23,7 +23,20 @@ namespace board_games::tic_tac_toe {
             {0, 4, 8}, {2, 4, 6}             // diagonals
         };
 
-        std::optional<char> check_winner(std::string_view board_status) { return {PLAYER1_SYMBOL}; }
+        std::optional<std::pair<char, std::array<int, 3>>> check_winner(std::string_view board_status) {
+            auto it = std::find_if(winners.begin(), winners.end(), [&board_status](const auto& winner_line) {
+                auto& [a, b, c] = winner_line;
+                return (board_status[a] != EMPTY_SYMBOL && board_status[a] == board_status[b] &&
+                        board_status[a] == board_status[c]);
+            });
+
+            if (it != winners.end()) {
+                const int& p = (*it)[0];
+                return std::make_pair(board_status.at(p), *it);
+            } else {
+                return std::nullopt;
+            };
+        }
 
         bool is_draw(std::string_view board_status) {
             return std::all_of(board_status.begin(), board_status.end(), [](char c) { return c != EMPTY_SYMBOL; });
@@ -44,8 +57,15 @@ namespace board_games::tic_tac_toe {
     }
 
     data::GameState TicTacToePlugin::get_game_state(const board_game::tic_tac_toe::Board& game_state) const {
-        // TODO: Based on 'draw' or 'current_turn'
-        return data::GameState::PLAYING;
+        switch (game_state.turn_state_case()) {
+        case board_game::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
+            return data::GameState::PLAYING;
+        case board_game::tic_tac_toe::Board::TurnStateCase::kWinner:
+        case board_game::tic_tac_toe::Board::TurnStateCase::kDraw:
+            return data::GameState::FINISHED;
+        case board_game::tic_tac_toe::Board::TurnStateCase::TURN_STATE_NOT_SET:
+            return data::GameState::WAITING;
+        }
     }
 
     tl::expected<board_game::tic_tac_toe::Board, data::Error> TicTacToePlugin::_new_board() {
@@ -92,13 +112,18 @@ namespace board_games::tic_tac_toe {
         //  - Check for 'win' or 'draw'
         //  - Switch current player
         std::string board_status = game_state.board_status();
-        board_status[action.position()] = player_number == 0 ? PLAYER1_SYMBOL : PLAYER2_SYMBOL;
+        board_status[action.position()] = player_number == 0 ? PLAYER_X_SYMBOL : PLAYER_O_SYMBOL;
 
         board_game::tic_tac_toe::Board new_board;
         new_board.set_board_status(board_status);
         auto winner = check_winner(board_status);
         if (winner) {
-            new_board.set_winner(winner == PLAYER1_SYMBOL ? 0 : 1);
+            board_game::tic_tac_toe::Winner* w = new_board.mutable_winner();
+            w->set_player(winner->first == PLAYER_X_SYMBOL ? 0 : 1);
+            {
+                auto* data = w->mutable_line();
+                data->Assign(winner->second.begin(), winner->second.end());
+            }
         } else if (is_draw(board_status)) {
             new_board.set_draw(true);
         } else {

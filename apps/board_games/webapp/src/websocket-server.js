@@ -62,5 +62,5 @@ server.on('upgrade', (req, socket, head) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-	console.log(`[backend] Server running at http://localhost:${PORT}`);
+	console.log(`[backend] Server listening on port ${PORT}`);
 });

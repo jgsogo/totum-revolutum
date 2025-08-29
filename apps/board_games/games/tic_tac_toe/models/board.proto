@@ -10,10 +10,15 @@ message Board {
         uint32 current_turn = 2;
 
         // If there is a winner, the game has finished
-        uint32 winner = 3;
+        Winner winner = 3;
 
         bool draw = 4;
     }
+}
+
+message Winner {
+    uint32 player = 1;
+    repeated uint32 line = 2;
 }
 
 message Action {

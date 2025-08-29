@@ -27,6 +27,7 @@ message GetOrCreateParticipantRequest {
   string room_uuid = 1;
   string participant_uuid = 2;
   string participant_role = 3;
+  optional uint32 player_number = 4;
 }
 
 message Participant {

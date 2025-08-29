@@ -35,10 +35,10 @@ export async function get_game_types(): Promise<{ name: string, slug: string, de
 // }
 
 export async function get_game(room_uuid: string): Promise<{ game_type_id: string } | undefined> {
+    console.log("[backend] Get game in room")
     const games = await client.query(`SELECT * FROM ${GAMES_TABLE} WHERE room_id = $1 LIMIT 1`, [room_uuid]);
     if (games.rows.length != 0) {
         const game = games.rows[0];
-        console.log(`[backend] game: ${JSON.stringify(game)}`);
         return game;
     }
     return undefined;

@@ -6,6 +6,8 @@
   import { goto } from '$app/navigation';
 
   const roomId = page.params.roomId!;
+  const PORT = process.env.PORT || 3000;
+  const DOMAIN_NAME = process.env.DOMAIN_NAME || "192.168.1.46";  // FIXME: This is my IP!!
 
   let room_data = $state({});
   const on_room_update = async (payload: JSON) => {
@@ -24,7 +26,7 @@
     connectToRoom(roomId, on_room_update, async () => {}, on_game_update);
   });
 
-  const full_domain = 'http://localhost:3000'; // FIXME: Read from envvar
+  const full_domain = `http://${DOMAIN_NAME}:${PORT}`;
   const admin_url = full_domain + `/room/${roomId}/admin`;
 </script>
 

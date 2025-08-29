@@ -15,6 +15,8 @@
   const oColor: string = '#2b9df4';
   const row = Math.floor(cell_id / 3);
   const column = cell_id % 3;
+  const cx = margin + column * cellSize + cellSize / 2;
+  const cy = margin + row * cellSize + cellSize / 2;
 
   const scale = new Spring(0, { stiffness: 0.25, damping: 0.7 });
   let mark: string = $state('');
@@ -33,18 +35,8 @@
     }
   }
 
-  // Coordinates for drawing helpers
-  function cellCenter(i: number) {
-    const r = Math.floor(i / 3);
-    const c = i % 3;
-    const cx = margin + c * cellSize + cellSize / 2;
-    const cy = margin + r * cellSize + cellSize / 2;
-    return { cx, cy };
-  }
-
   // draw X as 2 lines
-  function XPaths(i: number, scale: number) {
-    const { cx, cy } = cellCenter(i);
+  function XPaths(scale: number) {
     const pad = cellSize * 0.22;
     const x1 = cx - pad * scale,
       y1 = cy - pad * scale;
@@ -58,16 +50,15 @@
   }
 
   // draw O as circle
-  function OAttrs(i: number, scale: number) {
-    const { cx, cy } = cellCenter(i);
+  function OAttrs(scale: number) {
     const r = cellSize * 0.28 * scale;
     return { cx, cy, r };
   }
 </script>
 
 <rect
-  x={margin + row * cellSize}
-  y={margin + column * cellSize}
+  x={margin + column * cellSize}
+  y={margin + row * cellSize}
   width={cellSize}
   height={cellSize}
   fill="transparent"
@@ -77,10 +68,10 @@
 {#if mark === 'X'}
   <g>
     <line
-      x1={XPaths(cell_id, scale.current).x1}
-      y1={XPaths(cell_id, scale.current).y1}
-      x2={XPaths(cell_id, scale.current).x2}
-      y2={XPaths(cell_id, scale.current).y2}
+      x1={XPaths(scale.current).x1}
+      y1={XPaths(scale.current).y1}
+      x2={XPaths(scale.current).x2}
+      y2={XPaths(scale.current).y2}
       stroke={xColor}
       stroke-width={strokeWidth * 0.9}
       stroke-linecap="round"
@@ -88,10 +79,10 @@
       opacity={0.98}
     />
     <line
-      x1={XPaths(cell_id, scale.current).x3}
-      y1={XPaths(cell_id, scale.current).y3}
-      x2={XPaths(cell_id, scale.current).x4}
-      y2={XPaths(cell_id, scale.current).y4}
+      x1={XPaths(scale.current).x3}
+      y1={XPaths(scale.current).y3}
+      x2={XPaths(scale.current).x4}
+      y2={XPaths(scale.current).y4}
       stroke={xColor}
       stroke-width={strokeWidth * 0.9}
       stroke-linecap="round"
@@ -102,9 +93,9 @@
 {:else if mark === 'O'}
   <g>
     <circle
-      cx={OAttrs(cell_id, scale.current).cx}
-      cy={OAttrs(cell_id, scale.current).cy}
-      r={OAttrs(cell_id, scale.current).r}
+      cx={OAttrs(scale.current).cx}
+      cy={OAttrs(scale.current).cy}
+      r={OAttrs(scale.current).r}
       stroke={oColor}
       stroke-width={strokeWidth * 0.9}
       fill="none"
