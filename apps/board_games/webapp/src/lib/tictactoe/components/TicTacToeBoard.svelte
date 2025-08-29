@@ -2,10 +2,10 @@
   import TicTacToeMark from './TicTacToeMark.svelte';
 
   type TicTacToeBoardProps = {
-    size: number;
-    strokeWidth: number;
-    gridColor: string;
-    onCellClick: (cell_id: number) => void;
+    size?: number;
+    strokeWidth?: number;
+    gridColor?: string;
+    onCellClick?: (cell_id: number) => void;
   };
 
   let { size = 360, strokeWidth = 8, gridColor = '#222', onCellClick = (_: number) => {} }: TicTacToeBoardProps = $props();

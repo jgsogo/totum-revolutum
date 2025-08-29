@@ -23,7 +23,6 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
         const participant: ParticipantProto = await getOrCreateParticipant(roomUUID, session_id, role, player_number);
         console.log(`[backend] Participant '${session_id}' added to the game. Participant is ${JSON.stringify(participant)}`);
         return {
-            session_id,
             participant
         };
     } catch (err) {

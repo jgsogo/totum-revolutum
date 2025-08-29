@@ -5,9 +5,11 @@
   import { Board } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
   import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
   import { placeMark } from '$lib/tictactoe/api/place_mark';
+  import type { Participant as ParticipantProto } from '../../../../../../../engine/protocol/engine_pb';
 
   const roomUUID = page.params.roomUUID!;
   let refBoard: typeof TicTacToeBoard;
+  const participant: ParticipantProto = page.data.participant;
 
   let game_data = $state({});
   let board: Board | undefined = $state();
@@ -28,9 +30,14 @@
   });
 
   const onCellClick = async (cellId: number) => {
-    console.log(`You clicked on cell ${cellId}`);
+    console.log(`[frontend] You clicked on cell ${cellId}`);
+    if (board?.current_turn() !== participant.playerNumber) {
+      alert("It's not your turn. Wait...");
+      return;
+    }
+
     try {
-      let r = await placeMark(roomUUID, page.data.session_id, cellId);
+      let r = await placeMark(roomUUID, participant.uuid, cellId);
       console.log(`[frontend] Response: ${JSON.stringify(r)}`);
     } catch (err) {
       console.error('[frontend] Failed to send place_mark command', err);
@@ -40,10 +47,32 @@
 
 <h3>= Play view =</h3>
 <hr />
-Session-id: {page.data.session_id}
+<p>Session/Participant-id: {participant.uuid}</p>
+<p>Player number: {participant.playerNumber}</p>
 <hr />
 <hr />
 Participant: {JSON.stringify(page.data.participant)}
 <hr />
 
+{#if board?.winner()}
+  Player {board.winner()} won!
+  {#if board.winner() === participant.playerNumber}
+    It's you!
+  {:else}
+    You lost :/
+  {/if}
+{:else if board?.draw()}
+  Draw. Noone won!
+{:else if board?.current_turn() === participant.playerNumber}
+  It's your turn!
+{:else}
+  It's NOT your turn :/
+{/if}
+
 <TicTacToeBoard {onCellClick} bind:this={refBoard} />
+{#if board}
+  <p>Board.status: '{board.status()}' ({board.status().length})</p>
+  <p>Board.current_turn: '{board.current_turn()}'</p>
+  <p>Board.winner: '{board.winner()}'</p>
+  <p>Board.draw: '{board.draw()}'</p>
+{/if}

@@ -23,7 +23,20 @@ namespace board_games::tic_tac_toe {
             {0, 4, 8}, {2, 4, 6}             // diagonals
         };
 
-        std::optional<char> check_winner(std::string_view board_status) { return std::nullopt; }
+        std::optional<char> check_winner(std::string_view board_status) {
+            auto it = std::find_if(winners.begin(), winners.end(), [&board_status](const auto& winner_line) {
+                auto& [a, b, c] = winner_line;
+                return (board_status[a] != EMPTY_SYMBOL && board_status[a] == board_status[b] &&
+                        board_status[a] == board_status[c]);
+            });
+
+            if (it != winners.end()) {
+                const int& p = (*it)[0];
+                return board_status.at(p);
+            } else {
+                return std::nullopt;
+            };
+        }
 
         bool is_draw(std::string_view board_status) {
             return std::all_of(board_status.begin(), board_status.end(), [](char c) { return c != EMPTY_SYMBOL; });
@@ -44,8 +57,15 @@ namespace board_games::tic_tac_toe {
     }
 
     data::GameState TicTacToePlugin::get_game_state(const board_game::tic_tac_toe::Board& game_state) const {
-        // TODO: Based on 'draw' or 'current_turn'
-        return data::GameState::PLAYING;
+        switch (game_state.turn_state_case()) {
+        case board_game::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
+            return data::GameState::PLAYING;
+        case board_game::tic_tac_toe::Board::TurnStateCase::kWinner:
+        case board_game::tic_tac_toe::Board::TurnStateCase::kDraw:
+            return data::GameState::FINISHED;
+        case board_game::tic_tac_toe::Board::TurnStateCase::TURN_STATE_NOT_SET:
+            return data::GameState::WAITING;
+        }
     }
 
     tl::expected<board_game::tic_tac_toe::Board, data::Error> TicTacToePlugin::_new_board() {

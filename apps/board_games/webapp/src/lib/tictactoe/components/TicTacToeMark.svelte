@@ -13,8 +13,8 @@
 
   const xColor: string = '#d9534f';
   const oColor: string = '#2b9df4';
-  const row = cell_id % 3;
-  const column = Math.floor(cell_id / 3);
+  const row = Math.floor(cell_id / 3);
+  const column = cell_id % 3;
   const cx = margin + column * cellSize + cellSize / 2;
   const cy = margin + row * cellSize + cellSize / 2;
 
@@ -57,8 +57,8 @@
 </script>
 
 <rect
-  x={margin + row * cellSize}
-  y={margin + column * cellSize}
+  x={margin + column * cellSize}
+  y={margin + row * cellSize}
   width={cellSize}
   height={cellSize}
   fill="transparent"
