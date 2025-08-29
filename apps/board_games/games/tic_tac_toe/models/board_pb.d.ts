@@ -36,9 +36,9 @@ export declare type Board = Message<"board_game.tic_tac_toe.Board"> & {
     /**
      * If there is a winner, the game has finished
      *
-     * @generated from field: uint32 winner = 3;
+     * @generated from field: board_game.tic_tac_toe.Winner winner = 3;
      */
-    value: number;
+    value: Winner;
     case: "winner";
   } | {
     /**
@@ -54,6 +54,27 @@ export declare type Board = Message<"board_game.tic_tac_toe.Board"> & {
  * Use `create(BoardSchema)` to create a new message.
  */
 export declare const BoardSchema: GenMessage<Board>;
+
+/**
+ * @generated from message board_game.tic_tac_toe.Winner
+ */
+export declare type Winner = Message<"board_game.tic_tac_toe.Winner"> & {
+  /**
+   * @generated from field: uint32 player = 1;
+   */
+  player: number;
+
+  /**
+   * @generated from field: repeated uint32 line = 2;
+   */
+  line: number[];
+};
+
+/**
+ * Describes the message board_game.tic_tac_toe.Winner.
+ * Use `create(WinnerSchema)` to create a new message.
+ */
+export declare const WinnerSchema: GenMessage<Winner>;
 
 /**
  * @generated from message board_game.tic_tac_toe.Action

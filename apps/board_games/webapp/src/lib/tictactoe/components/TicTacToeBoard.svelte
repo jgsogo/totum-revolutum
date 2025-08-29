@@ -26,6 +26,53 @@
     });
   }
 
+  let strike: { x1: number; y1: number; x2: number; y2: number } | undefined = $state();
+  export function winningLine(cellStart: number, cellEnd: number) {
+    console.log(`[frontend] winningLine(cellStart='${cellStart}', cellEnd='${cellEnd}')`);
+    const row_ini = Math.floor(cellStart / 3);
+    const column_ini = cellStart % 3;
+    const cx_ini = margin + column_ini * cellSize + cellSize / 2;
+    const cy_ini = margin + row_ini * cellSize + cellSize / 2;
+
+    const row_end = Math.floor(cellEnd / 3);
+    const column_end = cellEnd % 3;
+    const cx_end = margin + column_end * cellSize + cellSize / 2;
+    const cy_end = margin + row_end * cellSize + cellSize / 2;
+
+    if (row_ini === row_end) {
+      // row
+      strike = {
+        x1: cx_ini - cellSize / 2,
+        y1: cy_ini,
+        x2: cx_end + cellSize / 2,
+        y2: cy_end,
+      };
+    } else if (column_ini === column_end) {
+      // column
+      strike = {
+        x1: cx_ini,
+        y1: cy_ini - cellSize / 2,
+        x2: cx_end,
+        y2: cy_end + cellSize / 2,
+      };
+    } else if (column_ini < column_end) {
+      // diagonal
+      strike = {
+        x1: cx_ini - cellSize / 2,
+        y1: cy_ini - cellSize / 2,
+        x2: cx_end + cellSize / 2,
+        y2: cy_end + cellSize / 2,
+      };
+    } else if (column_ini > column_end) {
+      // diagonal
+      strike = {
+        x1: cx_ini + cellSize / 2,
+        y1: cy_ini - cellSize / 2,
+        x2: cx_end - cellSize / 2,
+        y2: cy_end + cellSize / 2,
+      };
+    }
+  }
 </script>
 
 <div class="board-wrapper" role="group" aria-label="Tic Tac Toe board">
@@ -70,6 +117,11 @@
         bind:this={cell.instance}
       />
     {/each}
+
+    <!-- Strike-through line -->
+    {#if strike}
+      <line x1={strike.x1} y1={strike.y1} x2={strike.x2} y2={strike.y2} stroke="green" stroke-width="6" stroke-linecap="round" />
+    {/if}
   </svg>
 </div>
 

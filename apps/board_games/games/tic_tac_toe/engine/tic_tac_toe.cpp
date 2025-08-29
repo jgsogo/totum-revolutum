@@ -23,7 +23,7 @@ namespace board_games::tic_tac_toe {
             {0, 4, 8}, {2, 4, 6}             // diagonals
         };
 
-        std::optional<char> check_winner(std::string_view board_status) {
+        std::optional<std::pair<char, std::array<int, 3>>> check_winner(std::string_view board_status) {
             auto it = std::find_if(winners.begin(), winners.end(), [&board_status](const auto& winner_line) {
                 auto& [a, b, c] = winner_line;
                 return (board_status[a] != EMPTY_SYMBOL && board_status[a] == board_status[b] &&
@@ -32,7 +32,7 @@ namespace board_games::tic_tac_toe {
 
             if (it != winners.end()) {
                 const int& p = (*it)[0];
-                return board_status.at(p);
+                return std::make_pair(board_status.at(p), *it);
             } else {
                 return std::nullopt;
             };
@@ -118,7 +118,12 @@ namespace board_games::tic_tac_toe {
         new_board.set_board_status(board_status);
         auto winner = check_winner(board_status);
         if (winner) {
-            new_board.set_winner(winner == PLAYER_X_SYMBOL ? 0 : 1);
+            board_game::tic_tac_toe::Winner* w = new_board.mutable_winner();
+            w->set_player(winner->first == PLAYER_X_SYMBOL ? 0 : 1);
+            {
+                auto* data = w->mutable_line();
+                data->Assign(winner->second.begin(), winner->second.end());
+            }
         } else if (is_draw(board_status)) {
             new_board.set_draw(true);
         } else {

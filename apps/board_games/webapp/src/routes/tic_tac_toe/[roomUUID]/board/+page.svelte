@@ -39,6 +39,11 @@
     game_data = payload;
     board = Board.create_from_array(game_data.state_data);
     refBoard.updateBoard([...board.status()]);
+
+    if (board.winner() !== undefined) {
+      const winnning_line = board.winner()!.line();
+      refBoard.winningLine(winnning_line[0], winnning_line[2]);
+    }
   };
 
   onMount(() => {

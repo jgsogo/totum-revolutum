@@ -18,6 +18,11 @@
     game_data = payload;
     board = Board.create_from_array(game_data.state_data);
     refBoard.updateBoard([...board.status()]);
+
+    if (board.winner() !== undefined) {
+      const winnning_line = board.winner()!.line();
+      refBoard.winningLine(winnning_line[0], winnning_line[2]);
+    }
   };
 
   onMount(() => {
@@ -55,8 +60,8 @@ Participant: {JSON.stringify(page.data.participant)}
 <hr />
 
 {#if board?.winner()}
-  Player {board.winner()} won!
-  {#if board.winner() === participant.playerNumber}
+  Player {board.winner()!.player()} won!
+  {#if board.winner()!.player() === participant.playerNumber}
     It's you!
   {:else}
     You lost :/
@@ -73,6 +78,7 @@ Participant: {JSON.stringify(page.data.participant)}
 {#if board}
   <p>Board.status: '{board.status()}' ({board.status().length})</p>
   <p>Board.current_turn: '{board.current_turn()}'</p>
-  <p>Board.winner: '{board.winner()}'</p>
+  <p>Board.winner.player: '{board.winner()?.player()}'</p>
+  <p>Board.winner.line: '{board.winner()?.line()}'</p>
   <p>Board.draw: '{board.draw()}'</p>
 {/if}
