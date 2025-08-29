@@ -1,10 +1,11 @@
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
-import { getOrCreateParticipant } from '../../../../../../engine/protocol/engine_client';
-import { Participant as ParticipantProto } from '../../../../../../engine/protocol/engine_pb';
+import type { PageServerLoad } from '../$types';
+import { getOrCreateParticipant } from '../../../../../../../engine/protocol/engine_client';
+import type { Participant as ParticipantProto } from '../../../../../../../engine/protocol/engine_pb';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
     const roomUUID = params.roomUUID;
+    const mark = params.mark;
 
     // Get/assign a session-id. We assign a different session-id per game/UUID, so the
     // same user can play multiple games at the same time from the same browser.

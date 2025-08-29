@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import { connectToRoom } from '$lib/api/socket';
-  import { Board } from '../../../../../../games/tic_tac_toe/webapp/src/index';
+  import { Board } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
   import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
   import { placeMark } from '$lib/tictactoe/api/place_mark';
 
