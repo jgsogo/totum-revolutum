@@ -41,9 +41,9 @@ export async function startGame(room_uuid: string, game_type: string): Promise<E
   return await client.startGame(request);
 }
 
-export async function getOrCreateParticipant(room_uuid: string, participant_uuid: string, participant_role: string): Promise<ParticipantProto> {
-  console.log(`[backend] getOrCreateParticipant(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, participant_role=${participant_role})`);
-  const request: GetOrCreateParticipantRequestProto = create(GetOrCreateParticipantRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, participantRole: participant_role });
+export async function getOrCreateParticipant(room_uuid: string, participant_uuid: string, participant_role: string, player_number: number | undefined): Promise<ParticipantProto> {
+  console.log(`[backend] getOrCreateParticipant(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, participant_role=${participant_role}, player_number=${player_number})`);
+  const request: GetOrCreateParticipantRequestProto = create(GetOrCreateParticipantRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, participantRole: participant_role, playerNumber: player_number });
   return await client.getOrCreateParticipant(request);
 }
 

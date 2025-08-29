@@ -87,15 +87,15 @@ namespace data {
     }
 
     tl::expected<Participant, Error> add_participant(pqxx::connection& conn, RoomUUID room, ParticipantUUID participant,
-                                                     ParticipantRole role) {
+                                                     ParticipantRole role, std::optional<uint32_t> player_number) {
         try {
-            SPDLOG_DEBUG("Insert participant '{}' into room '{}' with role '{}'", participant, room, role);
+            SPDLOG_DEBUG("Insert participant '{}' into room '{}' with role '{}' and player_number '{}'", participant,
+                         room, role, player_number ? std::to_string(player_number.value()) : "<None>");
 
             // FIXME: We can only add participants if there is already a game associated in the room. All
             //        participants are PLAYERs. We can simplify this a lot.
 
             std::optional<std::int64_t> game_id = std::nullopt;
-            std::optional<std::int32_t> player_number = std::nullopt;
             if (role == ParticipantRole::PLAYER) {
                 // Check (and return) game in the room
                 auto r = find_game(conn, room)
@@ -117,13 +117,15 @@ namespace data {
                 game_id = r.value();
                 SPDLOG_DEBUG(" - There is a game ({}) being played in the room", game_id.value());
 
-                // Count number of player for the game and assign next one
-                auto r_count_players = data::count_players(conn, game_id.value());
-                if (!r_count_players.has_value()) {
-                    return tl::unexpected(Error::DBError);
+                if (!player_number.has_value()) {
+                    // Count number of players for the game and assign next one
+                    auto r_count_players = data::count_players(conn, game_id.value());
+                    if (!r_count_players.has_value()) {
+                        return tl::unexpected(Error::DBError);
+                    }
+                    player_number = r_count_players.value();
+                    SPDLOG_DEBUG(" - New participant will be player number ({})", player_number.value());
                 }
-                player_number = r_count_players.value();
-                SPDLOG_DEBUG(" - New participant will be player number ({})", player_number.value());
             }
 
             pqxx::work tx(conn);

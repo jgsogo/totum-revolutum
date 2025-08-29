@@ -19,7 +19,8 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     try {
         const role = "player";
         console.log(`[backend] GRPC request: getOrCreateParticipant(roomUUID=${roomUUID}, participantUUID=${session_id}, role=${role})`);
-        const participant: ParticipantProto = await getOrCreateParticipant(roomUUID, session_id, role);
+        const player_number = mark === 'X' ? 0 : 1;
+        const participant: ParticipantProto = await getOrCreateParticipant(roomUUID, session_id, role, player_number);
         console.log(`[backend] Participant '${session_id}' added to the game. Participant is ${JSON.stringify(participant)}`);
         return {
             session_id,

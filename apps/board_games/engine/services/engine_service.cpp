@@ -98,7 +98,7 @@ namespace services {
                 }
                 data::ParticipantRole role = role_expected.value();
 
-                auto r = data::add_participant(conn, room, participant, role)
+                auto r = data::add_participant(conn, room, participant, role, request->player_number())
                              .and_then([response](data::Participant p) {
                                  response->set_room_uuid(p.room);
                                  response->set_uuid(p.uuid);
