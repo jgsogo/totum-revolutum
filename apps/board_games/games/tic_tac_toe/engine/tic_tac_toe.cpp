@@ -8,8 +8,8 @@
 namespace board_games::tic_tac_toe {
     static constexpr data::GameType GAME_TYPE{"tic_tac_toe"};
 
-    constexpr static char PLAYER1_SYMBOL = 'X';
-    constexpr static char PLAYER2_SYMBOL = 'O';
+    constexpr static char PLAYER_X_SYMBOL = 'X';
+    constexpr static char PLAYER_O_SYMBOL = 'O';
     constexpr static char EMPTY_SYMBOL = ' ';
 
     static constexpr std::string_view ACTION_PLACE_MARK{"move_action"};
@@ -92,13 +92,13 @@ namespace board_games::tic_tac_toe {
         //  - Check for 'win' or 'draw'
         //  - Switch current player
         std::string board_status = game_state.board_status();
-        board_status[action.position()] = player_number == 0 ? PLAYER1_SYMBOL : PLAYER2_SYMBOL;
+        board_status[action.position()] = player_number == 0 ? PLAYER_X_SYMBOL : PLAYER_O_SYMBOL;
 
         board_game::tic_tac_toe::Board new_board;
         new_board.set_board_status(board_status);
         auto winner = check_winner(board_status);
         if (winner) {
-            new_board.set_winner(winner == PLAYER1_SYMBOL ? 0 : 1);
+            new_board.set_winner(winner == PLAYER_X_SYMBOL ? 0 : 1);
         } else if (is_draw(board_status)) {
             new_board.set_draw(true);
         } else {
