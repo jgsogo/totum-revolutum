@@ -4,6 +4,7 @@ import { Client } from 'pg';
 
 const GAME_TYPE_TABLE = "board_games_core_gametype";
 const GAMES_TABLE = "board_games_core_game";
+const ROOMS_TABLE = "board_games_core_room";
 
 let client: Client = undefined;
 
@@ -41,4 +42,9 @@ export async function get_game(room_uuid: string): Promise<{ game_type_id: strin
         return game;
     }
     return undefined;
+}
+
+export async function room_exists(room_uuid: string): Promise<boolean> {
+    const r = await client.query(`SELECT 1 FROM ${ROOMS_TABLE} WHERE id = $1`, [room_uuid]);
+    return r.rows.length != 0;
 }

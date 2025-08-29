@@ -9,7 +9,13 @@ export const load: LayoutServerLoad = async ({ params }) => {
     // Check if the given roomUUID exists
     const game = await get_game(roomUUID);
     if (game === undefined) {
-        console.log(`[backend] There is no game running in room ${roomUUID}. Redirecting to a new room`);
+        console.log(`[backend] There is no game running in room ${roomUUID}. Redirecting to root`);
+        redirect(307, `/`);
+    }
+
+    // Check if the given room is playing TicTacToe
+    if (game.game_type_id !== 'tic_tac_toe') {
+        console.log(`[backend] Game mismatch in room ${roomUUID}. Expected 'tic_tac_toe', found '${game.game_type_id}'. Redirecting to root`);
         redirect(307, `/`);
     }
 };
