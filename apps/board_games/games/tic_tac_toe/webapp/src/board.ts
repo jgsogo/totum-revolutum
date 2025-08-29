@@ -19,5 +19,16 @@ export class Board {
         return this.board.boardStatus;
     }
 
+    current_turn(): number | undefined {
+        return this.board.turnState.case === 'currentTurn' ? this.board.turnState.value : undefined;
+    }
+
+    winner(): number | undefined {
+        return this.board.turnState.case === 'winner' ? this.board.turnState.value : undefined;
+    }
+
+    draw(): boolean | undefined {
+        return this.board.turnState.case === 'draw' ? this.board.turnState.value : undefined;
+    }
 }
 staticImplements<IncomingMessageConstructor<Board>>(Board);

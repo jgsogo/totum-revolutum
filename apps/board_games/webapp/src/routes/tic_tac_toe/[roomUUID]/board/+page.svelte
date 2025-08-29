@@ -112,6 +112,8 @@
 
 <TicTacToeBoard bind:this={refBoard} size={420} />
 
+<hr />
+<hr />
 <h2>Room data</h2>
 <table>
   {#each Object.entries(room_data) as [key, value]}
@@ -147,6 +149,9 @@
   {/each}
 </table>
 {#if board}
-  <p>This is the board: '{board.status()}' ({board.status().length})</p>
+  <p>Board.status: '{board.status()}' ({board.status().length})</p>
+  <p>Board.current_turn: '{board.current_turn()}'</p>
+  <p>Board.winner: '{board.winner()}'</p>
+  <p>Board.draw: '{board.draw()}'</p>
 {/if}
 <hr />

@@ -23,7 +23,7 @@ namespace board_games::tic_tac_toe {
             {0, 4, 8}, {2, 4, 6}             // diagonals
         };
 
-        std::optional<char> check_winner(std::string_view board_status) { return {PLAYER1_SYMBOL}; }
+        std::optional<char> check_winner(std::string_view board_status) { return std::nullopt; }
 
         bool is_draw(std::string_view board_status) {
             return std::all_of(board_status.begin(), board_status.end(), [](char c) { return c != EMPTY_SYMBOL; });
