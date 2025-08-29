@@ -26,9 +26,6 @@
     });
   }
 
-  //   const onCellClick = (cellId: number) => {
-  //     console.log(`[frontend] Cell ${cellId} clicked`);
-  //   }
 </script>
 
 <div class="board-wrapper" role="group" aria-label="Tic Tac Toe board">
