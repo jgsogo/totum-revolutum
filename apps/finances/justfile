@@ -19,12 +19,12 @@ run:
 
 
 release: latest-tag next-tag utils::_gh_check_local_changes
-    # Build the installable binary
-    bazel build --config=release --config=stamp //apps/finances/installable
-
     # GH: Create a tag (using "<date>[-<num>]"), use the tag to stamp the binaries
     bazel run --config=release --config=stamp //tools/gh -- release create $(cat {{ next_tag }}) --generate-notes --notes-start-tag $(cat {{ latest_tag }})
     git fetch --tags
+
+    # Build the installable binary (after I have the right tag)
+    bazel build --config=release --config=stamp //apps/finances/installable
 
     # GH: Release the installable (to Github)
     bazel run --config=release --config=stamp //apps/finances/installable:release
