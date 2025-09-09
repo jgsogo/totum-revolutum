@@ -20,6 +20,16 @@ filegroup(
     ],
 )
 
+genrule(
+    name = "env",
+    srcs = ["//apps/finances:version"],
+    outs = [".env"],
+    cmd_bash = """
+        echo "PUBLIC_VERSION=v$$(cat $(location //apps/finances:version))" > $@
+    """,
+    tags = ["manual"],
+)
+
 js_run_binary(
     name = "frontend",
     srcs = [
@@ -32,6 +42,7 @@ js_run_binary(
         ":configs",
         ":src",
         ":static",
+        ":env",
     ],
     args = ["build --sourcemap --config vite.config.js"],  # TODO: Source map allow us to go from the error to the source code. Use it in debug builds!
     # args = ["build --config vite.config.js"],

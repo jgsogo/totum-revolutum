@@ -4,7 +4,9 @@ run:
     RUST_LOG=debug bazel run //apps/finances:finances-app
 
 release:
+    # TODO: Create a tag (using "<date>[-<num>]"), use the tag to stamp the binaries
     bazel build --config=release //apps/finances/installable/...
+    # TODO: Push the tag to the repo
     @echo ""
     @echo "🎉 Execute the following to install the package:"
     @echo ""

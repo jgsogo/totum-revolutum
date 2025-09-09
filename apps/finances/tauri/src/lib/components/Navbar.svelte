@@ -7,10 +7,12 @@
     drawerHidden = $bindable(),
     home_href = '/',
     holder,
+    version,
   }: {
     drawerHidden: boolean;
     home_href: string;
     holder?: Holder;
+    version: string;
   } = $props();
 
   let activeUrl = $derived(page.url.pathname);
@@ -20,6 +22,7 @@
   <NavBrand href="/" class="mx-10">
     <img src="/favicon.png" class="me-2.5 h-6 sm:h-8" alt="Flowbite Logo" />
     <span class="ml-px self-center text-xl font-semibold whitespace-nowrap sm:text-2xl dark:text-white"> Finances </span>
+    <span class="ml-px self-center text-xs font-semibold whitespace-nowrap sm:text-xs dark:text-white"> {version}</span>
   </NavBrand>
 
   <div class="hidden lg:block lg:ps-3">

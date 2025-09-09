@@ -8,6 +8,7 @@ import { error } from '@sveltejs/kit';
 import { get_app_state, get_main_context } from '$lib/commands';
 import type { AppState, MainContext } from '../../models/src-js/index.js';
 
+
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ }) {
 	try {
