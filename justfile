@@ -96,17 +96,21 @@ bazel-remote:
     docker-compose --env-file .env -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml up --build -d bazel-remote
 
 # Run bazel-remote (cache) and github runner
+[group('github')]
 gh-runner-linux:
     docker-compose --env-file .env -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml up --build -d
 
+[group('github')]
 gh-runner-linux-logs:
     docker-compose -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml logs -f
 
 # Stops bazel-remote (cache) and github runner
+[group('github')]
 gh-runner-linux-stop:
     docker-compose -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml down
 
 # Run gh self-hosted runner for Macos
+[group('github')]
 [working-directory('actions-runner')]
 gh-runner-macos:
     curl -o actions-runner-osx-x64-2.322.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.322.0/actions-runner-osx-x64-2.322.0.tar.gz
@@ -116,7 +120,9 @@ gh-runner-macos:
     ./../tools/github/self-hosted-runner/runner.sh # Do not detach
 
 # Run self-hosted runners for Linux and Macos
+[group('github')]
 gh-runner: gh-runner-linux gh-runner-macos
 
 # Stop self-hosted runners for Linux
+[group('github')]
 gh-runner-stop: gh-runner-linux-stop

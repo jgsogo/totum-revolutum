@@ -98,23 +98,13 @@ alias(
 )
 
 # Release the docker-compose file matching the released docker contianers (see rules above)
-genrule(
-    name = "gh_tagname",
-    srcs = ["//apps/finances:version"],
-    outs = ["gh_tagname.txt"],
-    cmd_bash = """
-        echo "finances-v$$(cat $(location //apps/finances:version))" > $@
-    """,
-    tags = ["manual"],
-)
-
 gh_release(
     name = "release-docker-compose",
     data = [
         ":app-docker_compose",
     ],
     display_label = "django-docker-compose.tar",
-    tag = ":gh_tagname",
+    tag = "//apps/finances:gh_tag",
     tags = [
         "manual",
         "release",
