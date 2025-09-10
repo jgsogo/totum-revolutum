@@ -11,7 +11,8 @@ next_tag := tmpdir / "next-tag"
 release_file := tmpdir / "finances.pkg"
 
 # Returns the latest tag associated to the finances application
-latest-tag: (utils::_latest-tag prefix latest_tag )
+latest-tag: && (utils::_latest-tag prefix latest_tag )
+    git fetch --tags
 
 # Computes the next tag for the finances application
 next-tag: (utils::_next-tag prefix next_tag )
@@ -47,11 +48,15 @@ release: _release-prereqs latest-tag next-tag
     # GH: Release the installable (to Github)
     bazel run --config=release --config=stamp //apps/finances/installable:release
 
-    # Download the artifact from the release page
-    bazel run //tools/gh -- release download $(cat {{ next_tag }}) --repo jgsogo/totum-revolutum --pattern "release-files.tar" --output "{{ release_file }}"
 
-    @echo ""
-    @echo "🎉 Execute the following to install the package:"
-    @echo ""
-    @echo "{{ cgreen }}sudo installer -pkg {{ release_file }} -target / -verboseR{{ creset }}"
-    @echo ""
+# Install latest released version
+install: latest-tag
+    # Download the artifact from the release page
+    bazel run //tools/gh -- release download $(cat {{ latest_tag }}) --repo jgsogo/totum-revolutum --pattern "release-files.tar" --output "{{ release_file }}.tar"
+    tar -xf "{{ release_file }}.tar" -C {{ tmpdir }}
+
+    # Execute the command to install the package
+    @echo "📦 Installing the package. You can use the following command to see live logs"
+    @echo " tail -f /var/log/finances2_install.log"
+    sudo installer -pkg "{{ tmpdir }}/installable.pkg" -target / -verboseR
+    @echo "{{ cgreen }}🎉 Package successfully installed{{ creset }}"
