@@ -87,12 +87,6 @@ repos:
         entry: bazel run //bazel/tools/format
         files: .*
 
-      #      - id: branch-updated
-      #        name: Branch up-to-date with master
-      #        entry: scripts/branch_updated.sh
-      #        language: script
-      #        always_run: true
-
       # Removed, it takes too long
       # - id: cargo-check
       #   name: Run cargo check (rules_rust managed version)
@@ -103,14 +97,16 @@ repos:
 
       - id: bazel-check
         name: Run all Bazel targets with 'check' tag
-        entry: scripts/bazel_run_targets.sh check
-        language: script
+        entry: just bazel-check
+        language: system
         always_run: true
         require_serial: true
+        pass_filenames: false
 
       - id: bazel-update
         name: Run all Bazel targets with 'update' tag (update workspace files)
-        entry: scripts/bazel_run_targets.sh update
-        language: script
+        entry: just bazel-update
+        language: system
         always_run: true
         require_serial: true
+        pass_filenames: false

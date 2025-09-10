@@ -1,6 +1,7 @@
 set dotenv-load := true
 
 mod apps
+mod utils 'justfiles/utils.just'
 
 _default: _just-check
     @{{ just_executable() }} --choose  # Requires 'fzf' (https://formulae.brew.sh/formula/fzf)
@@ -60,16 +61,16 @@ npm-install:
     bazel run -- @pnpm --dir $(pwd) install --recursive
 
 # Run all the Bazel targets labelled with 'update' tag
-bazel-update:
-    scripts/bazel_run_targets.sh update
+[group('bazel')]
+bazel-update: (utils::_bazel_run_targets 'update')
 
 # Run all the Bazel targets labelled with 'check' tag
-bazel-check:
-    scripts/bazel_run_targets.sh check
+[group('bazel')]
+bazel-check: (utils::_bazel_run_targets 'check')
 
 # Run all the `oci_load` rules: These rules will generate OCI containers and load them into the local registry
-bazel-load-oci:
-    scripts/bazel_run_oci_load_targets.sh
+[group('bazel')]
+bazel-load-oci: utils::_bazel_run_oci_load
 
 # Execute tokei: prints statistics about the repository
 tokei:

@@ -19,3 +19,29 @@ _gh_check_local_changes:
     else
         exit 0
     fi
+
+# Check (and fail) if the working copy is not the HEAD of the default branch
+_gh_check_i_am_head:
+    @{{ justfile_directory() }}/scripts/gh/i_am_default_head.sh
+
+# Run all 'oci_load' targets
+_bazel_run_oci_load bazel_config="":
+    #!/usr/bin/env bash
+    set -euox pipefail
+
+    targets=$(bazel query 'kind("oci_load", //...)')
+
+    while IFS= read -r line; do
+        bazel run {{ bazel_config }} $line
+    done <<< "$targets"
+
+# Run all targets with the given tag
+_bazel_run_targets tag bazel_config="":
+    #!/usr/bin/env bash
+    set -euox pipefail
+
+    targets=$(bazel query "attr('tags', '{{ tag }}', '//...')")
+
+    while IFS= read -r line; do
+        bazel run {{ bazel_config }} $line
+    done <<< "$targets"

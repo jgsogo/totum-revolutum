@@ -11,113 +11,24 @@ on:
         - finances
         - photodb
         - syncronia
-      bump_component:
-        type: choice
-        description: Version component to bump
-        options:
-        - major
-        - minor
-        - patch
-        - prerelease
-      prerelease:
-        type: boolean
-        description: If the new version is a prerelease or not
+        - board_games
 
 jobs:
   release:
-    runs-on: ubuntu-24.04
+    runs-on: "self-hosted"  # Run only locally
     env:
-      BAZEL_CONFIG: "--config=ci --config=stamp"
-      BAZEL_COMPILATION_MODE: "-c opt"
-    timeout-minutes: 30
+      BAZEL_CONFIG: "--config=ci --config=stamp --config=release"
+      BAZEL_REMOTE_CACHE_URL: "grpc://bazel-remote:9092"
+      BAZEL_DISK_CACHE_PATH: "~/.cache/bazel-disk-cache"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install some requirements
-        # Required by Tauri v2: https://v2.tauri.app/start/prerequisites/#linux
+      - name: Configure bazel-remote
+        if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            build-essential \
-            curl \
-            wget \
-            file \
-            libxdo-dev \
-            libssl-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev
+          echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> user.bazelrc
+          echo "build --remote_timeout=10" >> user.bazelrc
+          echo "build --remote_upload_local_results" >> user.bazelrc
 
-      - name: Compute new release
-        id: release-new
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Get latest release for application ${{ inputs.app }}"
-          bazel run $BAZEL_CONFIG //tools/gh -- release list --exclude-drafts --json tagName,name | jq '.[].tagName' | tee  ${{ runner.temp }}/${{ inputs.app }}-releases.json
-          PREV_RELEASE=$(bazel run //tools/semver:bin -- max --filter-prefix=${{ inputs.app }} $(<${{ runner.temp }}/${{ inputs.app }}-releases.json))
-          echo ">>>> PREV_RELEASE=$PREV_RELEASE"
-
-          echo "Compute new release"
-          if [ "${{ inputs.prerelease }}" == "true" ]; then
-            NEW_RELEASE=$(bazel run //tools/semver:bin -- bump --prerelease --component ${{ inputs.bump_component }} $PREV_RELEASE)
-          else
-            NEW_RELEASE=$(bazel run //tools/semver:bin -- bump --component ${{ inputs.bump_component }} $PREV_RELEASE)
-          fi
-          echo ">>>> NEW_RELEASE=$NEW_RELEASE"
-
-          echo "NEW_RELEASE=$NEW_RELEASE" >> $GITHUB_OUTPUT
-          echo "PREV_RELEASE=$PREV_RELEASE" >> $GITHUB_OUTPUT
-
-
-      - name: Create the release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NEW_RELEASE: ${{ steps.release-new.outputs.NEW_RELEASE }}
-          PREV_RELEASE: ${{ steps.release-new.outputs.PREV_RELEASE }}
-        run: |
-          echo "Create new release ($NEW_RELEASE) and generate notes starting on the prev one ($PREV_RELEASE)"
-          if [ "${{ inputs.bump_component }}" == "prerelease" ]; then
-              bazel run $BAZEL_CONFIG //tools/gh -- release create $NEW_RELEASE --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
-          elif [ "${{ inputs.prerelease }}" == "true" ]; then
-              bazel run $BAZEL_CONFIG //tools/gh -- release create $NEW_RELEASE --prerelease --generate-notes --notes-start-tag $PREV_RELEASE
-          else
-              bazel run $BAZEL_CONFIG //tools/gh -- release create $NEW_RELEASE --generate-notes --notes-start-tag $PREV_RELEASE
-          fi
-          git fetch --tags
-          git tag
-          git describe --tags --abbrev=0
-
-      - name: Build and upload the artifacts
-        env:
-          NEW_RELEASE: ${{ steps.release-new.outputs.NEW_RELEASE }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-          bazel query "attr('tags', 'release', '//apps/${{ inputs.app }}/...')" | tee  ${{ runner.temp }}/${{ inputs.app }}-release-targets.txt
-          while IFS="" read -r p || [ -n "$p" ]
-          do
-            bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE "$p"
-          done < ${{ runner.temp }}/${{ inputs.app }}-release-targets.txt
-
-
-      # - name: Upload artifacts
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     echo "${{ inputs.release_tag }}"
-      #     bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE //tools/gh -- release upload ${{ inputs.release_tag }} <path-to-artifact>#<text>
-
-      # # Release containers (stamped + optimized build)
-      # # FIXME: Release only modified images!
-      # # TODO: Filter from the ${{ runner.temp }}/impacted-targets.txt list
-      # # TODO: Stamp the generated images with the image_tag!
-      # - name: Release to GHCR
-      #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-      #   env:
-      #     CR_PAT: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     echo $CR_PAT | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-      #     bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE  //bazel/python/django/containers/nginx:release
-      #     bazel run $BAZEL_CONFIG $BAZEL_COMPILATION_MODE  //apps/finances/django:app-release
+      - name: Release
+        run: just apps finances release
