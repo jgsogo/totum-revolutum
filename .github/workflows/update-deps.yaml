@@ -42,7 +42,7 @@ jobs:
         run: |
           git fetch origin
           git checkout $BRANCH_NAME || git checkout -b "$BRANCH_NAME" --track "origin/$BRANCH_NAME" || git checkout -b "$BRANCH_NAME"
-          git push -u origin "$BRANCH_NAME"
+          git push --set-upstream origin "$BRANCH_NAME"
 
       - name: Install requirements
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
@@ -81,7 +81,7 @@ jobs:
 
       - name: Run just update
         run: |
-          ~/bin/just update || just update
+          ~/bin/just update
           pre-commit run
 
       - name: Create Pull Request
