@@ -23,9 +23,10 @@ if [ -f ${ENV_FILE} ]; then
 fi
 
 # Override environment with created file
-echo "Load environment from '%ENV_FILE%' file"
+ENV_FILE="$(rlocation "_main/%ENV_FILE%")"
+echo "Load environment from '$ENV_FILE' file"
 set -a
-source %ENV_FILE%
+source ${ENV_FILE}
 set +a
 
 $TOOL_PATH %TOOL_ARGS% &  # Start task in the background

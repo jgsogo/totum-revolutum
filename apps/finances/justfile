@@ -1,12 +1,57 @@
 
+mod utils '../../justfiles/utils.just'
+
+cgreen := "\\033[1;32m"
+creset := "\\033[0m"
+
+tmpdir  := `mktemp -d`
+prefix := "finances"
+latest_tag := tmpdir / "latest-tag"
+next_tag := tmpdir / "next-tag"
+release_file := tmpdir / "finances.pkg"
+
+# Returns the latest tag associated to the finances application
+latest-tag: (utils::_latest-tag prefix latest_tag )
+
+# Computes the next tag for the finances application
+next-tag: (utils::_next-tag prefix next_tag )
+
 # Runs finances app (Rust frontend) connecting (read-only) to production database
+[group('dev')]
 run:
     RUST_LOG=debug bazel run //apps/finances:finances-app
 
-release:
-    bazel build --config=release //apps/finances/installable/...
+# Checks release prerequisites:
+_release-prereqs: utils::_gh_check_local_changes utils::_gh_check_i_am_head
+    # - We only create a release if there are no local changes
+    # - Check that current working directory is at HEAD of the default branch. We
+    #   need this check because we are using GH CLI to create the releases and it
+    #   will tag the latest commit in the default branch (see docs for 'gh release create')
+
+    # - Run the tests
+    just utils::_bazel_run_oci_load "--config=release --config=stamp"
+    bazel test --config=release --config=stamp //apps/finances/...
+
+# Creates a new release using GH CLI (it tags the latest HEAD of the default branch).
+release: _release-prereqs latest-tag next-tag
+    # It will create artifacts using the local working copy (see the _release-prereqs), and
+    # upload them to the release it has just created.
+
+    # GH: Create a tag (using "<date>[-<num>]"), use the tag to stamp the binaries
+    bazel run --config=release --config=stamp //tools/gh -- release create $(cat {{ next_tag }}) --generate-notes --notes-start-tag $(cat {{ latest_tag }})
+    git fetch --tags
+
+    # Build the installable binary (after I have the right tag)
+    bazel build --config=release --config=stamp //apps/finances/installable
+
+    # GH: Release the installable (to Github)
+    bazel run --config=release --config=stamp //apps/finances/installable:release
+
+    # Download the artifact from the release page
+    bazel run //tools/gh -- release download $(cat {{ next_tag }}) --repo jgsogo/totum-revolutum --pattern "release-files.tar" --output "{{ release_file }}"
+
     @echo ""
     @echo "🎉 Execute the following to install the package:"
     @echo ""
-    @echo "\033[1;32msudo installer -pkg bazel-bin/apps/finances/installable/installable.pkg -target / -verboseR\033[0m"
+    @echo "{{ cgreen }}sudo installer -pkg {{ release_file }} -target / -verboseR{{ creset }}"
     @echo ""

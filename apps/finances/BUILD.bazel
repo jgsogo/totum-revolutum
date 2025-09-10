@@ -11,6 +11,17 @@ value_from_stable_status(
     visibility = [":__subpackages__"],
 )
 
+genrule(
+    name = "gh_tag",
+    srcs = [":version"],
+    outs = ["gh_tag.txt"],
+    cmd_bash = """
+        echo "finances-v$$(cat $(location :version))" > $@
+    """,
+    tags = ["manual"],
+    visibility = [":__subpackages__"],
+)
+
 # Development environment
 # FIXME: This should probably be part of the actual docker-compose if we create Postgres inside docker
 expand_template(

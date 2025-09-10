@@ -2,7 +2,7 @@ name: Update deps
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 11 * * 2"
+    - cron: "30 11 * * 2"
 
 env:
   BRANCH_NAME: "update-deps"
