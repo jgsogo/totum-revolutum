@@ -8,6 +8,6 @@
     "group:recommended",
     "replacements:all",
     "workarounds:all",
-    "schedule:earlyMondays"
+    "schedule:monthly"
   ]
 }
