@@ -31,4 +31,4 @@ jobs:
           echo "build --remote_upload_local_results" >> user.bazelrc
 
       - name: Release
-        run: just apps finances release
+        run: just apps ${{ inputs.app }} release

@@ -10,14 +10,18 @@ _just-check:
     {{ just_executable() }} --unstable --fmt --check
 
 # Updates all the dependencies (MODULE.bazel and 3rd parties not included)
+[group('update')]
 update: update-deps update-precommit
 
+[group('update')]
 update-precommit:
     max=10; until pre-commit autoupdate || [[ "$max" -le 0 ]]; do sleep 1; ((--max)); done # Run 10 times (it frequently fails with SSL errors)
 
 # Updates only the dependencies
+[group('update')]
 update-deps: update-bazel update-rust update-npm update-python
 
+[group('update')]
 update-rust:
     cargo update
     rm -fr bazel/third_party/crates # Remove everything in the 3rd party directory
@@ -28,6 +32,7 @@ update-rust:
     @echo "🤖🦾 Run buildifier"
     pre-commit run buildifier
 
+[group('update')]
 update-npm:
     bazel run -- @pnpm --dir $(pwd) update --recursive --workspace
     @echo "🤖🦾 NPM - Update some auto generated files"
@@ -35,15 +40,18 @@ update-npm:
     bazel run @@//apps/finances/tauri/models/protos:protos_ts.copy
     bazel run //apps/board_games/engine/protocol:engine_ts_proto.copy
 
+[group('update')]
 update-python:
     bazel run @@//bazel/third_party:python_requirements
 
+[group('update')]
 update-bazel:
     scripts/update_bazel_version.sh
     scripts/update_bazel_modules.sh MODULE.bazel protobuf.MODULE.bazel llvm.MODULE.bazel
     bazel mod tidy
 
 # Run all testing
+[group('dev')]
 test: build bazel-check
     # cargo check
     # cargo clippy
@@ -51,12 +59,15 @@ test: build bazel-check
     bazel test --test_keep_going //...
 
 # Build everything
+[group('dev')]
 build: bazel-update npm-install
     # cargo build
     bazel build --keep_going //...
 
+[group('dev')]
 npm-install:
     # FIXME: Remove. These 'install' rules are just creating the node_modules in the workspace, but Bazel uses the ones in the build directory (created by the 'npm_link_all_packages' rule)
+    #        I wonder, however, if this can be useful to vscode for linting in the IDE
     bazel run -- @pnpm//:pnpm --dir $(pwd) install --lockfile-only # Only this one is needed to update pnpm-lock.yaml
     bazel run -- @pnpm --dir $(pwd) install --recursive
 
@@ -73,26 +84,28 @@ bazel-check: (utils::_bazel_run_targets 'check')
 bazel-load-oci: utils::_bazel_run_oci_load
 
 # Execute tokei: prints statistics about the repository
+[group('repo')]
 tokei:
     tokei --sort lines --compact
 
 # Shows the documentation
+[group('dev')]
 doc:
     cargo doc --open --document-private-items --all-features --workspace
 
 # Removes temporary files (free disk space)
+[group('dev')]
 clean:
     cargo clean
     bazel clean
     docker system prune --volumes --force
 
 # Reset: removes all temporary files and recreates the workspace (Cargo and Bazel). This can take a while
+[group('dev')]
 reset: clean build test
 
-###
-# GH self-hosted runners
-###
-
+# Starts a bazel remote cache service
+[group('dev')]
 bazel-remote:
     docker-compose --env-file .env -f ./tools/github/self-hosted-runner/docker-compose-bazel.yml up --build -d bazel-remote
 
