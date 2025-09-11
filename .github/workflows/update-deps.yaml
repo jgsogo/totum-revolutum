@@ -35,10 +35,14 @@ jobs:
     needs:
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
+    permissions:
+      actions: write
     steps:
       - uses: actions/checkout@v4
 
       - name: Checkout $BRANCH_NAME
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git fetch origin
           git checkout $BRANCH_NAME || git checkout -b "$BRANCH_NAME" --track "origin/$BRANCH_NAME" || git checkout -b "$BRANCH_NAME"
