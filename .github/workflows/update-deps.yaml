@@ -36,7 +36,7 @@ jobs:
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     permissions:
-      contents: read
+      contents: write
       actions: write
     steps:
       - uses: actions/checkout@v4
