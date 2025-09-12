@@ -62,8 +62,8 @@ rust_library(
     deps = [
         "@crates__aho-corasick-1.1.3//:aho_corasick",
         "@crates__bstr-1.12.0//:bstr",
-        "@crates__log-0.4.27//:log",
-        "@crates__regex-automata-0.4.9//:regex_automata",
-        "@crates__regex-syntax-0.8.5//:regex_syntax",
+        "@crates__log-0.4.28//:log",
+        "@crates__regex-automata-0.4.10//:regex_automata",
+        "@crates__regex-syntax-0.8.6//:regex_syntax",
     ],
 )

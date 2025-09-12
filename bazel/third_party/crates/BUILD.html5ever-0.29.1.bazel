@@ -59,7 +59,7 @@ rust_library(
     }),
     version = "0.29.1",
     deps = [
-        "@crates__log-0.4.27//:log",
+        "@crates__log-0.4.28//:log",
         "@crates__mac-0.1.1//:mac",
         "@crates__markup5ever-0.14.1//:markup5ever",
     ],

@@ -63,7 +63,7 @@ rust_library(
         "@crates__futures-lite-2.6.1//:futures_lite",
         "@crates__parking-2.2.1//:parking",
         "@crates__polling-3.10.0//:polling",
-        "@crates__rustix-1.0.8//:rustix",
+        "@crates__rustix-1.1.2//:rustix",
         "@crates__slab-0.4.11//:slab",
     ],
 )

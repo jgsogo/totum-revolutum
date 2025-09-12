@@ -39,6 +39,7 @@ update-npm:
     bazel run @@//libraries/googleapis/protos/google/type:protos_ts.copy
     bazel run @@//apps/finances/tauri/models/protos:protos_ts.copy
     bazel run //apps/board_games/engine/protocol:engine_ts_proto.copy
+    bazel run //apps/board_games/games/tic_tac_toe/models:models_ts_proto.copy
 
 [group('update')]
 update-python:

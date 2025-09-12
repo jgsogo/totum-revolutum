@@ -75,12 +75,12 @@ rust_library(
         "@crates__tauri-utils-2.7.0//:tauri_utils",
         "@crates__thiserror-2.0.16//:thiserror",
         "@crates__url-2.5.7//:url",
-        "@crates__uuid-1.18.0//:uuid",
+        "@crates__uuid-1.18.1//:uuid",
         "@crates__walkdir-2.5.0//:walkdir",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
             "@crates__plist-1.7.4//:plist",  # cfg(target_os = "macos")
-            "@crates__time-0.3.41//:time",  # cfg(target_os = "macos")
+            "@crates__time-0.3.43//:time",  # cfg(target_os = "macos")
         ],
         "//conditions:default": [],
     }),

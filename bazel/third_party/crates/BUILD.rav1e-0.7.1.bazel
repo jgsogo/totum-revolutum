@@ -79,7 +79,7 @@ rust_library(
         "@crates__cfg-if-1.0.3//:cfg_if",
         "@crates__itertools-0.12.1//:itertools",
         "@crates__libc-0.2.175//:libc",
-        "@crates__log-0.4.27//:log",
+        "@crates__log-0.4.28//:log",
         "@crates__maybe-rayon-0.1.1//:maybe_rayon",
         "@crates__new_debug_unreachable-1.0.6//:debug_unreachable",
         "@crates__num-traits-0.2.19//:num_traits",

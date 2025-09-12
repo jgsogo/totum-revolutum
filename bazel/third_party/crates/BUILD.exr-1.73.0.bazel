@@ -56,9 +56,9 @@ rust_library(
     }),
     version = "1.73.0",
     deps = [
-        "@crates__bit_field-0.10.2//:bit_field",
+        "@crates__bit_field-0.10.3//:bit_field",
         "@crates__half-2.6.0//:half",
-        "@crates__lebe-0.5.2//:lebe",
+        "@crates__lebe-0.5.3//:lebe",
         "@crates__miniz_oxide-0.8.9//:miniz_oxide",
         "@crates__rayon-core-1.13.0//:rayon_core",
         "@crates__smallvec-1.15.1//:smallvec",

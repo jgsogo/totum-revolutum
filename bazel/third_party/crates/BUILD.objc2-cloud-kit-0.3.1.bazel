@@ -63,7 +63,7 @@ rust_library(
     }),
     version = "0.3.1",
     deps = [
-        "@crates__bitflags-2.9.3//:bitflags",
+        "@crates__bitflags-2.9.4//:bitflags",
         "@crates__objc2-0.6.2//:objc2",
         "@crates__objc2-foundation-0.3.1//:objc2_foundation",
     ],

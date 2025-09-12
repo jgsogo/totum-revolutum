@@ -76,7 +76,7 @@ rust_library(
     }),
     version = "0.18.5",
     deps = [
-        "@crates__bitflags-2.9.3//:bitflags",
+        "@crates__bitflags-2.9.4//:bitflags",
         "@crates__futures-channel-0.3.31//:futures_channel",
         "@crates__futures-core-0.3.31//:futures_core",
         "@crates__futures-executor-0.3.31//:futures_executor",

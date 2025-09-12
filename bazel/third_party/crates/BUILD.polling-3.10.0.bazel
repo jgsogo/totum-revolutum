@@ -59,10 +59,10 @@ rust_library(
         "@crates__cfg-if-1.0.3//:cfg_if",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__rustix-1.0.8//:rustix",  # cfg(any(unix, target_os = "fuchsia", target_os = "vxworks"))
+            "@crates__rustix-1.1.2//:rustix",  # cfg(any(unix, target_os = "fuchsia", target_os = "vxworks"))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__rustix-1.0.8//:rustix",  # cfg(any(unix, target_os = "fuchsia", target_os = "vxworks"))
+            "@crates__rustix-1.1.2//:rustix",  # cfg(any(unix, target_os = "fuchsia", target_os = "vxworks"))
         ],
         "//conditions:default": [],
     }),

@@ -58,6 +58,6 @@ rust_library(
     deps = [
         "@crates__byteorder-1.5.0//:byteorder",
         "@crates__fnv-1.0.7//:fnv",
-        "@crates__uuid-1.18.0//:uuid",
+        "@crates__uuid-1.18.1//:uuid",
     ],
 )
