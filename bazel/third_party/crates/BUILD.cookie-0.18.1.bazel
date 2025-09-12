@@ -61,7 +61,7 @@ rust_library(
     version = "0.18.1",
     deps = [
         "@crates__cookie-0.18.1//:build_script_build",
-        "@crates__time-0.3.41//:time",
+        "@crates__time-0.3.43//:time",
     ],
 )
 

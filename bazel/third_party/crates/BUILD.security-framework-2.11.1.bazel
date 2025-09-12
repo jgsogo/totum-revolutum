@@ -63,10 +63,10 @@ rust_library(
     }),
     version = "2.11.1",
     deps = [
-        "@crates__bitflags-2.9.3//:bitflags",
+        "@crates__bitflags-2.9.4//:bitflags",
         "@crates__core-foundation-0.9.4//:core_foundation",
         "@crates__core-foundation-sys-0.8.7//:core_foundation_sys",
         "@crates__libc-0.2.175//:libc",
-        "@crates__security-framework-sys-2.14.0//:security_framework_sys",
+        "@crates__security-framework-sys-2.15.0//:security_framework_sys",
     ],
 )

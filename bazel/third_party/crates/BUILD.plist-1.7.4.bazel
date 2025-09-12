@@ -61,9 +61,9 @@ rust_library(
     version = "1.7.4",
     deps = [
         "@crates__base64-0.22.1//:base64",
-        "@crates__indexmap-2.11.0//:indexmap",
-        "@crates__quick-xml-0.38.2//:quick_xml",
+        "@crates__indexmap-2.11.1//:indexmap",
+        "@crates__quick-xml-0.38.3//:quick_xml",
         "@crates__serde-1.0.219//:serde",
-        "@crates__time-0.3.41//:time",
+        "@crates__time-0.3.43//:time",
     ],
 )

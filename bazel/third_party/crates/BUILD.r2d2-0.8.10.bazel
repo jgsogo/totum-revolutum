@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.8.10",
     deps = [
-        "@crates__log-0.4.27//:log",
+        "@crates__log-0.4.28//:log",
         "@crates__parking_lot-0.12.4//:parking_lot",
         "@crates__scheduled-thread-pool-0.2.7//:scheduled_thread_pool",
     ],

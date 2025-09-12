@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.4.6",
     deps = [
-        "@crates__log-0.4.27//:log",
+        "@crates__log-0.4.28//:log",
         "@crates__raw-window-handle-0.6.2//:raw_window_handle",
         "@crates__softbuffer-0.4.6//:build_script_build",
     ] + select({

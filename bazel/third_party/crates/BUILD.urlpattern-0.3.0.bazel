@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.3.0",
     deps = [
-        "@crates__regex-1.11.1//:regex",
+        "@crates__regex-1.11.2//:regex",
         "@crates__serde-1.0.219//:serde",
         "@crates__unic-ucd-ident-0.9.0//:unic_ucd_ident",
         "@crates__url-2.5.7//:url",

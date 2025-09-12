@@ -64,7 +64,7 @@ rust_library(
     }),
     version = "0.18.5",
     deps = [
-        "@crates__bitflags-2.9.3//:bitflags",
+        "@crates__bitflags-2.9.4//:bitflags",
         "@crates__cairo-sys-rs-0.18.2//:cairo_sys",
         "@crates__glib-0.18.5//:glib",
         "@crates__libc-0.2.175//:libc",

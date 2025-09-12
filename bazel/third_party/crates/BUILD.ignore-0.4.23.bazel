@@ -58,9 +58,9 @@ rust_library(
     deps = [
         "@crates__crossbeam-deque-0.8.6//:crossbeam_deque",
         "@crates__globset-0.4.16//:globset",
-        "@crates__log-0.4.27//:log",
+        "@crates__log-0.4.28//:log",
         "@crates__memchr-2.7.5//:memchr",
-        "@crates__regex-automata-0.4.9//:regex_automata",
+        "@crates__regex-automata-0.4.10//:regex_automata",
         "@crates__same-file-1.0.6//:same_file",
         "@crates__walkdir-2.5.0//:walkdir",
     ],

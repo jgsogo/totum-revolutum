@@ -86,12 +86,12 @@ rust_library(
         "@crates__infer-0.19.0//:infer",
         "@crates__json-patch-3.0.1//:json_patch",
         "@crates__kuchikiki-0.8.8-speedreader//:kuchikiki",
-        "@crates__log-0.4.27//:log",
+        "@crates__log-0.4.28//:log",
         "@crates__memchr-2.7.5//:memchr",
         "@crates__phf-0.11.3//:phf",
         "@crates__proc-macro2-1.0.101//:proc_macro2",
         "@crates__quote-1.0.40//:quote",
-        "@crates__regex-1.11.1//:regex",
+        "@crates__regex-1.11.2//:regex",
         "@crates__schemars-0.8.22//:schemars",
         "@crates__semver-1.0.26//:semver",
         "@crates__serde-1.0.219//:serde",
@@ -102,7 +102,7 @@ rust_library(
         "@crates__toml-0.9.5//:toml",
         "@crates__url-2.5.7//:url",
         "@crates__urlpattern-0.3.0//:urlpattern",
-        "@crates__uuid-1.18.0//:uuid",
+        "@crates__uuid-1.18.1//:uuid",
         "@crates__walkdir-2.5.0//:walkdir",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [

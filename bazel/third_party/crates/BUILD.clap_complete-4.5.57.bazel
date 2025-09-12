@@ -59,6 +59,6 @@ rust_library(
     }),
     version = "4.5.57",
     deps = [
-        "@crates__clap-4.5.45//:clap",
+        "@crates__clap-4.5.47//:clap",
     ],
 )
