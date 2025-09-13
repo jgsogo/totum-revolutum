@@ -6,12 +6,10 @@
   let {
     accounts,
     holders,
-    drawerHidden = $bindable(),
     app_state,
   }: {
     accounts: Account[];
     holders: Holder[];
-    drawerHidden: boolean;
     app_state: AppState;
   } = $props();
 

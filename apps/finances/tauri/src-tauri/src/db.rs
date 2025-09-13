@@ -5,7 +5,7 @@ pub fn establish_connection(database_url: &str) -> Pool<ConnectionManager<Connec
     let manager = ConnectionManager::<ConnectionType>::new(database_url);
     Pool::builder()
         .max_size(4)
-        // .test_on_check_out(true)
+        .test_on_check_out(true)
         .build(manager)
         .expect("Failed to create DB pool")
 }

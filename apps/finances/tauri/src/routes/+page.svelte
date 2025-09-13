@@ -1,9 +1,12 @@
 <script lang="ts">
   import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
   import AccountsTable from '$lib/components/AccountsTable.svelte';
+  import { info } from '@tauri-apps/plugin-log';
+
+  info('/page.svelte');
 
   /** @type {{ data: import('./$types').PageData }} */
-  let { data } = $props();
+  let { main_context, app_state } = $props();
 </script>
 
 <main class="p-4">
@@ -20,7 +23,7 @@
       <Heading tag="h1" class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">All accounts</Heading>
     </div>
     <div class="col-span-full space-y-4 xl:col-auto">
-      <AccountsTable accounts={data.main_context.accounts()} app_state={data.app_state} />
+      <AccountsTable accounts={main_context.accounts()} {app_state} />
     </div>
   </div>
 </main>

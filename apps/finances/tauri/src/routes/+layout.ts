@@ -7,13 +7,17 @@ export const ssr = false;
 import { error } from '@sveltejs/kit';
 import { get_app_state, get_main_context } from '$lib/commands';
 import type { AppState, MainContext } from '../../models/src-js/index.js';
+import { info } from '@tauri-apps/plugin-log';
+import type { LayoutLoad } from './$types';
 
 
-/** @type {import('./$types').LayoutLoad} */
-export async function load({ }) {
+export const load: LayoutLoad = async ({ }) => {
+	info("/layout.ts - load function in '/' route");
 	try {
 		let main_context: MainContext = await get_main_context();
+		info(`/layout.ts - main_context ${main_context}`);
 		let app_state: AppState = await get_app_state();
+		info(`/layout.ts - app_state ${app_state}`);
 		return {
 			app_state,
 			main_context,
