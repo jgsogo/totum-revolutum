@@ -21,7 +21,7 @@ jobs:
       BAZEL_REMOTE_CACHE_URL: "grpc://bazel-remote:9092"
       BAZEL_DISK_CACHE_PATH: "~/.cache/bazel-disk-cache"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Configure bazel-remote
         if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
