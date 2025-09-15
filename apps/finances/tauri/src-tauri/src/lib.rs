@@ -58,17 +58,21 @@ pub fn create_app<R: tauri::Runtime>(
     builder
         .plugin(
             tauri_plugin_log::Builder::new()
-                .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout))
+                // .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout))
+                .level(log::LevelFilter::Debug)
+                // different levels for other apps
+                .level_for("tao", log::LevelFilter::Info)
                 .build(),
         )
         .setup(|app| {
+            log::debug!("Setup application");
             app.manage(db_pool);
             app.manage(app_state);
             app.manage(main_context);
             app.manage(Mutex::new(oxr_client));
             Ok(())
         })
-        .plugin(tauri_plugin_shell::init())
+        // .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             commands::get_app_state,
             commands::get_main_context,
