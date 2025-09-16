@@ -11,12 +11,12 @@ def main(ctx: dict, input_path: pathlib.Path, output: pathlib.Path):
     log.info("Work on directory '%s'", input_path)
 
     # Mac
-    frameworks = macos_frameworks(input_path / "lib")
+    frameworks = list(macos_frameworks(input_path / "lib"))
     ctx.update({"frameworks": frameworks})
 
     content = render(ctx)
     with open(output, "w") as f:
-        f.write(content)
+        f.write(content + "\n")
 
 
 if __name__ == "__main__":

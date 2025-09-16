@@ -70,7 +70,9 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
 )
-{% for framework in frameworks %}
+
+{%- for framework in frameworks %}
+
 filegroup(
     name = "{{ framework.name }}/lib_files",
     srcs = [
@@ -105,4 +107,14 @@ cc_library(
     ],
     {%- endif %}
 )
-{% endfor %}
+{%- endfor %}
+
+cc_library(
+    name = "qt",
+    visibility = ["//visibility:public"],
+    deps = [
+        {%- for framework in frameworks|sort(attribute='name') %}
+        ":{{ framework.name }}",
+        {%- endfor %}
+    ],
+)
