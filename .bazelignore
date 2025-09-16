@@ -8,3 +8,4 @@ libraries/googleapis/node_modules/
 node_modules/
 sandbox/svelte-hello-world/node_modules/
 target/
+third_party/@rules_qt

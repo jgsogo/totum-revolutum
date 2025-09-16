@@ -1,0 +1,9 @@
+load("@rules_qt//tools:create_defs_file.bzl", "create_defs_file")
+
+create_defs_file(
+    name = "qt_6_10_0_mac",
+    arch = "clang_64",
+    host = "mac",
+    target_sdk = "desktop",
+    version = "6.10.0",
+)

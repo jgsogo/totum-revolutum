@@ -1,0 +1,27 @@
+module(
+    name = "rules_qt",
+    version = "0.0.0",
+)
+
+bazel_dep(name = "aspect_rules_py", version = "1.6.3", dev_dependency = True)
+bazel_dep(name = "rules_python", version = "1.6.1", dev_dependency = True)
+bazel_dep(name = "rules_uv", version = "0.88.0", dev_dependency = True)
+bazel_dep(name = "aspect_bazel_lib", version = "2.21.1", dev_dependency = True)
+bazel_dep(name = "rules_shell", version = "0.6.0", dev_dependency = True)
+
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
+
+PYTHON_VERSION = "3.13"
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    python_version = PYTHON_VERSION,
+)
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "py_deps",
+    python_version = PYTHON_VERSION,
+    requirements_lock = "//tools:requirements.lock",
+)
+use_repo(pip, "py_deps")
