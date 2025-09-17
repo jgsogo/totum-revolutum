@@ -51,13 +51,17 @@ update-bazel:
     scripts/update_bazel_modules.sh MODULE.bazel protobuf.MODULE.bazel llvm.MODULE.bazel
     bazel mod tidy
 
-# Run all testing
+# Run testing
 [group('dev')]
-test: build bazel-check rules_qt-test
+test: rules_qt-test
+    bazel test --test_keep_going //...
+
+# Run all testing, checks and updates
+[group('dev')]
+full-test: build bazel-check && test
     # cargo check
     # cargo clippy
     bazel run //bazel/tools/format
-    bazel test --test_keep_going //...
 
 # Build everything
 [group('dev')]
@@ -142,7 +146,7 @@ gh-runner: gh-runner-linux gh-runner-macos
 [group('github')]
 gh-runner-stop: gh-runner-linux-stop
 
-# Run all testing
+# Run testing
 [group('@rules_qt')]
 [working-directory('third_party/@rules_qt')]
 rules_qt-test:

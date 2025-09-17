@@ -11,7 +11,7 @@ load("@rules_qt//private:dirname_providing_rule.bzl", "dirname_providing_rule")
 
 # TARGET_SDK = "desktop"
 
-# VERSION = "6.10.0"
+# VERSION = "6.8.3"
 
 # ARCH = "clang_64"
 
@@ -32,7 +32,6 @@ cc_library(
         ":qt_labs_qml_models",
         ":qt_labs_settings",
         ":qt_labs_shared_image",
-        ":qt_labs_synchronizer",
         ":qt_labs_wavefront_mesh",
         ":qt_network",
         ":qt_open_g_l",
@@ -70,12 +69,10 @@ cc_library(
         ":qt_quick_layouts",
         ":qt_quick_particles",
         ":qt_quick_shapes",
-        ":qt_quick_shapes_design_helpers",
         ":qt_quick_templates2",
         ":qt_quick_test",
         ":qt_quick_vector_image",
         ":qt_quick_vector_image_generator",
-        ":qt_quick_vector_image_helpers",
         ":qt_quick_widgets",
         ":qt_sql",
         ":qt_svg",
@@ -89,7 +86,7 @@ cc_library(
 
 dirname_providing_rule(
     name = "repo_location",
-    append = "/6.10.0/macos/lib",
+    append = "/6.8.3/macos/lib",
     data = [":MODULE.bazel"],
     value = "$(location :MODULE.bazel)",
     varname = "REPO_LOCATION",
@@ -97,7 +94,7 @@ dirname_providing_rule(
 
 dirname_providing_rule(
     name = "repo_rootpath",
-    append = "/6.10.0/macos/lib",
+    append = "/6.8.3/macos/lib",
     data = [":MODULE.bazel"],
     value = "$(rootpath :MODULE.bazel)",
     varname = "REPO_ROOTPATH",
@@ -126,37 +123,37 @@ filegroup(
 
 filegroup(
     name = "plugin_files",
-    srcs = glob(["6.10.0/macos/plugins/**/*"]),
+    srcs = glob(["6.8.3/macos/plugins/**/*"]),
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "qml_files",
-    srcs = glob(["6.10.0/macos/qml/**/*"]),
+    srcs = glob(["6.8.3/macos/qml/**/*"]),
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "uic",
-    srcs = ["6.10.0/macos/libexec/uic"],
+    srcs = ["6.8.3/macos/libexec/uic"],
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "moc",
-    srcs = ["6.10.0/macos/libexec/moc"],
+    srcs = ["6.8.3/macos/libexec/moc"],
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "rcc",
-    srcs = ["6.10.0/macos/libexec/rcc"],
+    srcs = ["6.8.3/macos/libexec/rcc"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "qt_hdrs",
-    hdrs = glob(["6.10.0/macos/include/**"]),
+    hdrs = glob(["6.8.3/macos/include/**"]),
     includes = [
         "include",
     ],
@@ -166,26 +163,26 @@ cc_library(
 filegroup(
     name = "qt_labs_platform/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtLabsPlatform.framework/QtLabsPlatform",
-        "6.10.0/macos/lib/QtLabsPlatform.framework/Versions/A/QtLabsPlatform",
-        "6.10.0/macos/lib/QtLabsPlatform.framework/Versions/Current/QtLabsPlatform",
+        "6.8.3/macos/lib/QtLabsPlatform.framework/QtLabsPlatform",
+        "6.8.3/macos/lib/QtLabsPlatform.framework/Versions/A/QtLabsPlatform",
+        "6.8.3/macos/lib/QtLabsPlatform.framework/Versions/Current/QtLabsPlatform",
     ],
 )
 
 cc_library(
     name = "qt_labs_platform",
-    hdrs = glob(["6.10.0/macos/lib/QtLabsPlatform.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtLabsPlatform.framework/Headers/**"]),
     additional_linker_inputs = [":qt_labs_platform/lib_files"],
     data = [":qt_labs_platform/lib_files"],
     include_prefix = "QtLabsPlatform",
     includes = [
-        "6.10.0/macos/lib/QtLabsPlatform.framework/Headers",
+        "6.8.3/macos/lib/QtLabsPlatform.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtLabsPlatform",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtLabsPlatform.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtLabsPlatform.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -196,26 +193,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2.framework/QtQuickControls2",
-        "6.10.0/macos/lib/QtQuickControls2.framework/Versions/A/QtQuickControls2",
-        "6.10.0/macos/lib/QtQuickControls2.framework/Versions/Current/QtQuickControls2",
+        "6.8.3/macos/lib/QtQuickControls2.framework/QtQuickControls2",
+        "6.8.3/macos/lib/QtQuickControls2.framework/Versions/A/QtQuickControls2",
+        "6.8.3/macos/lib/QtQuickControls2.framework/Versions/Current/QtQuickControls2",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2/lib_files"],
     data = [":qt_quick_controls2/lib_files"],
     include_prefix = "QtQuickControls2",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -237,26 +234,26 @@ cc_library(
 filegroup(
     name = "qt_quick_particles/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickParticles.framework/QtQuickParticles",
-        "6.10.0/macos/lib/QtQuickParticles.framework/Versions/A/QtQuickParticles",
-        "6.10.0/macos/lib/QtQuickParticles.framework/Versions/Current/QtQuickParticles",
+        "6.8.3/macos/lib/QtQuickParticles.framework/QtQuickParticles",
+        "6.8.3/macos/lib/QtQuickParticles.framework/Versions/A/QtQuickParticles",
+        "6.8.3/macos/lib/QtQuickParticles.framework/Versions/Current/QtQuickParticles",
     ],
 )
 
 cc_library(
     name = "qt_quick_particles",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickParticles.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickParticles.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_particles/lib_files"],
     data = [":qt_quick_particles/lib_files"],
     include_prefix = "QtQuickParticles",
     includes = [
-        "6.10.0/macos/lib/QtQuickParticles.framework/Headers",
+        "6.8.3/macos/lib/QtQuickParticles.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickParticles",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickParticles.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickParticles.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -278,26 +275,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_imagine_style_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2ImagineStyleImpl.framework/QtQuickControls2ImagineStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Versions/A/QtQuickControls2ImagineStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Versions/Current/QtQuickControls2ImagineStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2ImagineStyleImpl.framework/QtQuickControls2ImagineStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Versions/A/QtQuickControls2ImagineStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Versions/Current/QtQuickControls2ImagineStyleImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_imagine_style_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_imagine_style_impl/lib_files"],
     data = [":qt_quick_controls2_imagine_style_impl/lib_files"],
     include_prefix = "QtQuickControls2ImagineStyleImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2ImagineStyleImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -308,26 +305,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_basic_style_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2BasicStyleImpl.framework/QtQuickControls2BasicStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2BasicStyleImpl.framework/Versions/A/QtQuickControls2BasicStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2BasicStyleImpl.framework/Versions/Current/QtQuickControls2BasicStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2BasicStyleImpl.framework/QtQuickControls2BasicStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2BasicStyleImpl.framework/Versions/A/QtQuickControls2BasicStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2BasicStyleImpl.framework/Versions/Current/QtQuickControls2BasicStyleImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_basic_style_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2BasicStyleImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2BasicStyleImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_basic_style_impl/lib_files"],
     data = [":qt_quick_controls2_basic_style_impl/lib_files"],
     include_prefix = "QtQuickControls2BasicStyleImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2BasicStyleImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2BasicStyleImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2BasicStyleImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2BasicStyleImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2BasicStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -338,56 +335,67 @@ cc_library(
 filegroup(
     name = "qt_labs_shared_image/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtLabsSharedImage.framework/QtLabsSharedImage",
-        "6.10.0/macos/lib/QtLabsSharedImage.framework/Versions/A/QtLabsSharedImage",
-        "6.10.0/macos/lib/QtLabsSharedImage.framework/Versions/Current/QtLabsSharedImage",
+        "6.8.3/macos/lib/QtLabsSharedImage.framework/QtLabsSharedImage",
+        "6.8.3/macos/lib/QtLabsSharedImage.framework/Versions/A/QtLabsSharedImage",
+        "6.8.3/macos/lib/QtLabsSharedImage.framework/Versions/Current/QtLabsSharedImage",
     ],
 )
 
 cc_library(
     name = "qt_labs_shared_image",
-    hdrs = glob(["6.10.0/macos/lib/QtLabsSharedImage.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtLabsSharedImage.framework/Headers/**"]),
     additional_linker_inputs = [":qt_labs_shared_image/lib_files"],
     data = [":qt_labs_shared_image/lib_files"],
     include_prefix = "QtLabsSharedImage",
     includes = [
-        "6.10.0/macos/lib/QtLabsSharedImage.framework/Headers",
+        "6.8.3/macos/lib/QtLabsSharedImage.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtLabsSharedImage",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtLabsSharedImage.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtLabsSharedImage.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_gui",
+        ":qt_network",
+        ":qt_open_g_l",
+        ":qt_qml",
+        ":qt_qml_meta",
+        ":qt_qml_models",
+        ":qt_qml_worker_script",
+        ":qt_quick",
+    ],
 )
 
 filegroup(
     name = "qt_qml_meta/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQmlMeta.framework/QtQmlMeta",
-        "6.10.0/macos/lib/QtQmlMeta.framework/Versions/A/QtQmlMeta",
-        "6.10.0/macos/lib/QtQmlMeta.framework/Versions/Current/QtQmlMeta",
+        "6.8.3/macos/lib/QtQmlMeta.framework/QtQmlMeta",
+        "6.8.3/macos/lib/QtQmlMeta.framework/Versions/A/QtQmlMeta",
+        "6.8.3/macos/lib/QtQmlMeta.framework/Versions/Current/QtQmlMeta",
     ],
 )
 
 cc_library(
     name = "qt_qml_meta",
-    hdrs = glob(["6.10.0/macos/lib/QtQmlMeta.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQmlMeta.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml_meta/lib_files"],
     data = [":qt_qml_meta/lib_files"],
     include_prefix = "QtQmlMeta",
     includes = [
-        "6.10.0/macos/lib/QtQmlMeta.framework/Headers",
+        "6.8.3/macos/lib/QtQmlMeta.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQmlMeta",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQmlMeta.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQmlMeta.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -405,26 +413,26 @@ cc_library(
 filegroup(
     name = "qt_designer/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtDesigner.framework/QtDesigner",
-        "6.10.0/macos/lib/QtDesigner.framework/Versions/A/QtDesigner",
-        "6.10.0/macos/lib/QtDesigner.framework/Versions/Current/QtDesigner",
+        "6.8.3/macos/lib/QtDesigner.framework/QtDesigner",
+        "6.8.3/macos/lib/QtDesigner.framework/Versions/A/QtDesigner",
+        "6.8.3/macos/lib/QtDesigner.framework/Versions/Current/QtDesigner",
     ],
 )
 
 cc_library(
     name = "qt_designer",
-    hdrs = glob(["6.10.0/macos/lib/QtDesigner.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtDesigner.framework/Headers/**"]),
     additional_linker_inputs = [":qt_designer/lib_files"],
     data = [":qt_designer/lib_files"],
     include_prefix = "QtDesigner",
     includes = [
-        "6.10.0/macos/lib/QtDesigner.framework/Headers",
+        "6.8.3/macos/lib/QtDesigner.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtDesigner",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtDesigner.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtDesigner.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -443,98 +451,56 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_fusion_style_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2FusionStyleImpl.framework/QtQuickControls2FusionStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2FusionStyleImpl.framework/Versions/A/QtQuickControls2FusionStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2FusionStyleImpl.framework/Versions/Current/QtQuickControls2FusionStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2FusionStyleImpl.framework/QtQuickControls2FusionStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2FusionStyleImpl.framework/Versions/A/QtQuickControls2FusionStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2FusionStyleImpl.framework/Versions/Current/QtQuickControls2FusionStyleImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_fusion_style_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2FusionStyleImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2FusionStyleImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_fusion_style_impl/lib_files"],
     data = [":qt_quick_controls2_fusion_style_impl/lib_files"],
     include_prefix = "QtQuickControls2FusionStyleImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2FusionStyleImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2FusionStyleImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2FusionStyleImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2FusionStyleImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2FusionStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
-)
-
-filegroup(
-    name = "qt_quick_shapes_design_helpers/lib_files",
-    srcs = [
-        "6.10.0/macos/lib/QtQuickShapesDesignHelpers.framework/QtQuickShapesDesignHelpers",
-        "6.10.0/macos/lib/QtQuickShapesDesignHelpers.framework/Versions/A/QtQuickShapesDesignHelpers",
-        "6.10.0/macos/lib/QtQuickShapesDesignHelpers.framework/Versions/Current/QtQuickShapesDesignHelpers",
-    ],
-)
-
-cc_library(
-    name = "qt_quick_shapes_design_helpers",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickShapesDesignHelpers.framework/Headers/**"]),
-    additional_linker_inputs = [":qt_quick_shapes_design_helpers/lib_files"],
-    data = [":qt_quick_shapes_design_helpers/lib_files"],
-    include_prefix = "QtQuickShapesDesignHelpers",
-    includes = [
-        "6.10.0/macos/lib/QtQuickShapesDesignHelpers.framework/Headers",
-    ],
-    linkopts = [
-        "-F $(REPO_LOCATION)",
-        "-framework QtQuickShapesDesignHelpers",
-    ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickShapesDesignHelpers.framework/Headers",
-    toolchains = [
-        ":repo_location",
-    ],
-    # target_compatible_with = "[]"
-    visibility = ["//visibility:public"],
-    deps = [
-        ":qt_core",
-        ":qt_gui",
-        ":qt_network",
-        ":qt_open_g_l",
-        ":qt_qml",
-        ":qt_qml_meta",
-        ":qt_qml_models",
-        ":qt_qml_worker_script",
-        ":qt_quick",
-        ":qt_quick_shapes",
-    ],
 )
 
 filegroup(
     name = "qt_quick_widgets/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickWidgets.framework/QtQuickWidgets",
-        "6.10.0/macos/lib/QtQuickWidgets.framework/Versions/A/QtQuickWidgets",
-        "6.10.0/macos/lib/QtQuickWidgets.framework/Versions/Current/QtQuickWidgets",
+        "6.8.3/macos/lib/QtQuickWidgets.framework/QtQuickWidgets",
+        "6.8.3/macos/lib/QtQuickWidgets.framework/Versions/A/QtQuickWidgets",
+        "6.8.3/macos/lib/QtQuickWidgets.framework/Versions/Current/QtQuickWidgets",
     ],
 )
 
 cc_library(
     name = "qt_quick_widgets",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickWidgets.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickWidgets.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_widgets/lib_files"],
     data = [":qt_quick_widgets/lib_files"],
     include_prefix = "QtQuickWidgets",
     includes = [
-        "6.10.0/macos/lib/QtQuickWidgets.framework/Headers",
+        "6.8.3/macos/lib/QtQuickWidgets.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickWidgets",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickWidgets.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickWidgets.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -557,26 +523,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_material/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2Material.framework/QtQuickControls2Material",
-        "6.10.0/macos/lib/QtQuickControls2Material.framework/Versions/A/QtQuickControls2Material",
-        "6.10.0/macos/lib/QtQuickControls2Material.framework/Versions/Current/QtQuickControls2Material",
+        "6.8.3/macos/lib/QtQuickControls2Material.framework/QtQuickControls2Material",
+        "6.8.3/macos/lib/QtQuickControls2Material.framework/Versions/A/QtQuickControls2Material",
+        "6.8.3/macos/lib/QtQuickControls2Material.framework/Versions/Current/QtQuickControls2Material",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_material",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2Material.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2Material.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_material/lib_files"],
     data = [":qt_quick_controls2_material/lib_files"],
     include_prefix = "QtQuickControls2Material",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2Material.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2Material.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Material",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Material.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2Material.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -587,26 +553,26 @@ cc_library(
 filegroup(
     name = "qt_qml_xml_list_model/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQmlXmlListModel.framework/QtQmlXmlListModel",
-        "6.10.0/macos/lib/QtQmlXmlListModel.framework/Versions/A/QtQmlXmlListModel",
-        "6.10.0/macos/lib/QtQmlXmlListModel.framework/Versions/Current/QtQmlXmlListModel",
+        "6.8.3/macos/lib/QtQmlXmlListModel.framework/QtQmlXmlListModel",
+        "6.8.3/macos/lib/QtQmlXmlListModel.framework/Versions/A/QtQmlXmlListModel",
+        "6.8.3/macos/lib/QtQmlXmlListModel.framework/Versions/Current/QtQmlXmlListModel",
     ],
 )
 
 cc_library(
     name = "qt_qml_xml_list_model",
-    hdrs = glob(["6.10.0/macos/lib/QtQmlXmlListModel.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQmlXmlListModel.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml_xml_list_model/lib_files"],
     data = [":qt_qml_xml_list_model/lib_files"],
     include_prefix = "QtQmlXmlListModel",
     includes = [
-        "6.10.0/macos/lib/QtQmlXmlListModel.framework/Headers",
+        "6.8.3/macos/lib/QtQmlXmlListModel.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQmlXmlListModel",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQmlXmlListModel.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQmlXmlListModel.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -616,65 +582,32 @@ cc_library(
         ":qt_core",
         ":qt_network",
         ":qt_qml",
-    ],
-)
-
-filegroup(
-    name = "qt_labs_synchronizer/lib_files",
-    srcs = [
-        "6.10.0/macos/lib/QtLabsSynchronizer.framework/QtLabsSynchronizer",
-        "6.10.0/macos/lib/QtLabsSynchronizer.framework/Versions/A/QtLabsSynchronizer",
-        "6.10.0/macos/lib/QtLabsSynchronizer.framework/Versions/Current/QtLabsSynchronizer",
-    ],
-)
-
-cc_library(
-    name = "qt_labs_synchronizer",
-    hdrs = glob(["6.10.0/macos/lib/QtLabsSynchronizer.framework/Headers/**"]),
-    additional_linker_inputs = [":qt_labs_synchronizer/lib_files"],
-    data = [":qt_labs_synchronizer/lib_files"],
-    include_prefix = "QtLabsSynchronizer",
-    includes = [
-        "6.10.0/macos/lib/QtLabsSynchronizer.framework/Headers",
-    ],
-    linkopts = [
-        "-F $(REPO_LOCATION)",
-        "-framework QtLabsSynchronizer",
-    ],
-    strip_include_prefix = "6.10.0/macos/lib/QtLabsSynchronizer.framework/Headers",
-    toolchains = [
-        ":repo_location",
-    ],
-    # target_compatible_with = "[]"
-    visibility = ["//visibility:public"],
-    deps = [
-        ":qt_core",
     ],
 )
 
 filegroup(
     name = "qt_quick_layouts/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickLayouts.framework/QtQuickLayouts",
-        "6.10.0/macos/lib/QtQuickLayouts.framework/Versions/A/QtQuickLayouts",
-        "6.10.0/macos/lib/QtQuickLayouts.framework/Versions/Current/QtQuickLayouts",
+        "6.8.3/macos/lib/QtQuickLayouts.framework/QtQuickLayouts",
+        "6.8.3/macos/lib/QtQuickLayouts.framework/Versions/A/QtQuickLayouts",
+        "6.8.3/macos/lib/QtQuickLayouts.framework/Versions/Current/QtQuickLayouts",
     ],
 )
 
 cc_library(
     name = "qt_quick_layouts",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickLayouts.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickLayouts.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_layouts/lib_files"],
     data = [":qt_quick_layouts/lib_files"],
     include_prefix = "QtQuickLayouts",
     includes = [
-        "6.10.0/macos/lib/QtQuickLayouts.framework/Headers",
+        "6.8.3/macos/lib/QtQuickLayouts.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickLayouts",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickLayouts.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickLayouts.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -682,34 +615,40 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":qt_core",
+        ":qt_gui",
         ":qt_network",
+        ":qt_open_g_l",
         ":qt_qml",
+        ":qt_qml_meta",
+        ":qt_qml_models",
+        ":qt_qml_worker_script",
+        ":qt_quick",
     ],
 )
 
 filegroup(
     name = "qt_quick_controls2_basic/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2Basic.framework/QtQuickControls2Basic",
-        "6.10.0/macos/lib/QtQuickControls2Basic.framework/Versions/A/QtQuickControls2Basic",
-        "6.10.0/macos/lib/QtQuickControls2Basic.framework/Versions/Current/QtQuickControls2Basic",
+        "6.8.3/macos/lib/QtQuickControls2Basic.framework/QtQuickControls2Basic",
+        "6.8.3/macos/lib/QtQuickControls2Basic.framework/Versions/A/QtQuickControls2Basic",
+        "6.8.3/macos/lib/QtQuickControls2Basic.framework/Versions/Current/QtQuickControls2Basic",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_basic",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2Basic.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2Basic.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_basic/lib_files"],
     data = [":qt_quick_controls2_basic/lib_files"],
     include_prefix = "QtQuickControls2Basic",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2Basic.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2Basic.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Basic",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Basic.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2Basic.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -720,26 +659,26 @@ cc_library(
 filegroup(
     name = "qt_help/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtHelp.framework/QtHelp",
-        "6.10.0/macos/lib/QtHelp.framework/Versions/A/QtHelp",
-        "6.10.0/macos/lib/QtHelp.framework/Versions/Current/QtHelp",
+        "6.8.3/macos/lib/QtHelp.framework/QtHelp",
+        "6.8.3/macos/lib/QtHelp.framework/Versions/A/QtHelp",
+        "6.8.3/macos/lib/QtHelp.framework/Versions/Current/QtHelp",
     ],
 )
 
 cc_library(
     name = "qt_help",
-    hdrs = glob(["6.10.0/macos/lib/QtHelp.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtHelp.framework/Headers/**"]),
     additional_linker_inputs = [":qt_help/lib_files"],
     data = [":qt_help/lib_files"],
     include_prefix = "QtHelp",
     includes = [
-        "6.10.0/macos/lib/QtHelp.framework/Headers",
+        "6.8.3/macos/lib/QtHelp.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtHelp",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtHelp.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtHelp.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -756,26 +695,26 @@ cc_library(
 filegroup(
     name = "qt_quick_vector_image/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickVectorImage.framework/QtQuickVectorImage",
-        "6.10.0/macos/lib/QtQuickVectorImage.framework/Versions/A/QtQuickVectorImage",
-        "6.10.0/macos/lib/QtQuickVectorImage.framework/Versions/Current/QtQuickVectorImage",
+        "6.8.3/macos/lib/QtQuickVectorImage.framework/QtQuickVectorImage",
+        "6.8.3/macos/lib/QtQuickVectorImage.framework/Versions/A/QtQuickVectorImage",
+        "6.8.3/macos/lib/QtQuickVectorImage.framework/Versions/Current/QtQuickVectorImage",
     ],
 )
 
 cc_library(
     name = "qt_quick_vector_image",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickVectorImage.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickVectorImage.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_vector_image/lib_files"],
     data = [":qt_quick_vector_image/lib_files"],
     include_prefix = "QtQuickVectorImage",
     includes = [
-        "6.10.0/macos/lib/QtQuickVectorImage.framework/Headers",
+        "6.8.3/macos/lib/QtQuickVectorImage.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickVectorImage",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickVectorImage.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickVectorImage.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -786,26 +725,26 @@ cc_library(
 filegroup(
     name = "qt_print_support/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtPrintSupport.framework/QtPrintSupport",
-        "6.10.0/macos/lib/QtPrintSupport.framework/Versions/A/QtPrintSupport",
-        "6.10.0/macos/lib/QtPrintSupport.framework/Versions/Current/QtPrintSupport",
+        "6.8.3/macos/lib/QtPrintSupport.framework/QtPrintSupport",
+        "6.8.3/macos/lib/QtPrintSupport.framework/Versions/A/QtPrintSupport",
+        "6.8.3/macos/lib/QtPrintSupport.framework/Versions/Current/QtPrintSupport",
     ],
 )
 
 cc_library(
     name = "qt_print_support",
-    hdrs = glob(["6.10.0/macos/lib/QtPrintSupport.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtPrintSupport.framework/Headers/**"]),
     additional_linker_inputs = [":qt_print_support/lib_files"],
     data = [":qt_print_support/lib_files"],
     include_prefix = "QtPrintSupport",
     includes = [
-        "6.10.0/macos/lib/QtPrintSupport.framework/Headers",
+        "6.8.3/macos/lib/QtPrintSupport.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtPrintSupport",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtPrintSupport.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtPrintSupport.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -821,26 +760,26 @@ cc_library(
 filegroup(
     name = "qt_gui/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtGui.framework/QtGui",
-        "6.10.0/macos/lib/QtGui.framework/Versions/A/QtGui",
-        "6.10.0/macos/lib/QtGui.framework/Versions/Current/QtGui",
+        "6.8.3/macos/lib/QtGui.framework/QtGui",
+        "6.8.3/macos/lib/QtGui.framework/Versions/A/QtGui",
+        "6.8.3/macos/lib/QtGui.framework/Versions/Current/QtGui",
     ],
 )
 
 cc_library(
     name = "qt_gui",
-    hdrs = glob(["6.10.0/macos/lib/QtGui.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtGui.framework/Headers/**"]),
     additional_linker_inputs = [":qt_gui/lib_files"],
     data = [":qt_gui/lib_files"],
     include_prefix = "QtGui",
     includes = [
-        "6.10.0/macos/lib/QtGui.framework/Headers",
+        "6.8.3/macos/lib/QtGui.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtGui",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtGui.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtGui.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -854,26 +793,26 @@ cc_library(
 filegroup(
     name = "qt_d_bus/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtDBus.framework/QtDBus",
-        "6.10.0/macos/lib/QtDBus.framework/Versions/A/QtDBus",
-        "6.10.0/macos/lib/QtDBus.framework/Versions/Current/QtDBus",
+        "6.8.3/macos/lib/QtDBus.framework/QtDBus",
+        "6.8.3/macos/lib/QtDBus.framework/Versions/A/QtDBus",
+        "6.8.3/macos/lib/QtDBus.framework/Versions/Current/QtDBus",
     ],
 )
 
 cc_library(
     name = "qt_d_bus",
-    hdrs = glob(["6.10.0/macos/lib/QtDBus.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtDBus.framework/Headers/**"]),
     additional_linker_inputs = [":qt_d_bus/lib_files"],
     data = [":qt_d_bus/lib_files"],
     include_prefix = "QtDBus",
     includes = [
-        "6.10.0/macos/lib/QtDBus.framework/Headers",
+        "6.8.3/macos/lib/QtDBus.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtDBus",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtDBus.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtDBus.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -887,26 +826,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_fusion/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2Fusion.framework/QtQuickControls2Fusion",
-        "6.10.0/macos/lib/QtQuickControls2Fusion.framework/Versions/A/QtQuickControls2Fusion",
-        "6.10.0/macos/lib/QtQuickControls2Fusion.framework/Versions/Current/QtQuickControls2Fusion",
+        "6.8.3/macos/lib/QtQuickControls2Fusion.framework/QtQuickControls2Fusion",
+        "6.8.3/macos/lib/QtQuickControls2Fusion.framework/Versions/A/QtQuickControls2Fusion",
+        "6.8.3/macos/lib/QtQuickControls2Fusion.framework/Versions/Current/QtQuickControls2Fusion",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_fusion",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2Fusion.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2Fusion.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_fusion/lib_files"],
     data = [":qt_quick_controls2_fusion/lib_files"],
     include_prefix = "QtQuickControls2Fusion",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2Fusion.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2Fusion.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Fusion",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Fusion.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2Fusion.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -917,26 +856,26 @@ cc_library(
 filegroup(
     name = "qt_quick_templates2/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickTemplates2.framework/QtQuickTemplates2",
-        "6.10.0/macos/lib/QtQuickTemplates2.framework/Versions/A/QtQuickTemplates2",
-        "6.10.0/macos/lib/QtQuickTemplates2.framework/Versions/Current/QtQuickTemplates2",
+        "6.8.3/macos/lib/QtQuickTemplates2.framework/QtQuickTemplates2",
+        "6.8.3/macos/lib/QtQuickTemplates2.framework/Versions/A/QtQuickTemplates2",
+        "6.8.3/macos/lib/QtQuickTemplates2.framework/Versions/Current/QtQuickTemplates2",
     ],
 )
 
 cc_library(
     name = "qt_quick_templates2",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickTemplates2.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickTemplates2.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_templates2/lib_files"],
     data = [":qt_quick_templates2/lib_files"],
     include_prefix = "QtQuickTemplates2",
     includes = [
-        "6.10.0/macos/lib/QtQuickTemplates2.framework/Headers",
+        "6.8.3/macos/lib/QtQuickTemplates2.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickTemplates2",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickTemplates2.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickTemplates2.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -958,26 +897,26 @@ cc_library(
 filegroup(
     name = "qt_quick_dialogs2_utils/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickDialogs2Utils.framework/QtQuickDialogs2Utils",
-        "6.10.0/macos/lib/QtQuickDialogs2Utils.framework/Versions/A/QtQuickDialogs2Utils",
-        "6.10.0/macos/lib/QtQuickDialogs2Utils.framework/Versions/Current/QtQuickDialogs2Utils",
+        "6.8.3/macos/lib/QtQuickDialogs2Utils.framework/QtQuickDialogs2Utils",
+        "6.8.3/macos/lib/QtQuickDialogs2Utils.framework/Versions/A/QtQuickDialogs2Utils",
+        "6.8.3/macos/lib/QtQuickDialogs2Utils.framework/Versions/Current/QtQuickDialogs2Utils",
     ],
 )
 
 cc_library(
     name = "qt_quick_dialogs2_utils",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickDialogs2Utils.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickDialogs2Utils.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_dialogs2_utils/lib_files"],
     data = [":qt_quick_dialogs2_utils/lib_files"],
     include_prefix = "QtQuickDialogs2Utils",
     includes = [
-        "6.10.0/macos/lib/QtQuickDialogs2Utils.framework/Headers",
+        "6.8.3/macos/lib/QtQuickDialogs2Utils.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickDialogs2Utils",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickDialogs2Utils.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickDialogs2Utils.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -991,26 +930,26 @@ cc_library(
 filegroup(
     name = "qt_xml/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtXml.framework/QtXml",
-        "6.10.0/macos/lib/QtXml.framework/Versions/A/QtXml",
-        "6.10.0/macos/lib/QtXml.framework/Versions/Current/QtXml",
+        "6.8.3/macos/lib/QtXml.framework/QtXml",
+        "6.8.3/macos/lib/QtXml.framework/Versions/A/QtXml",
+        "6.8.3/macos/lib/QtXml.framework/Versions/Current/QtXml",
     ],
 )
 
 cc_library(
     name = "qt_xml",
-    hdrs = glob(["6.10.0/macos/lib/QtXml.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtXml.framework/Headers/**"]),
     additional_linker_inputs = [":qt_xml/lib_files"],
     data = [":qt_xml/lib_files"],
     include_prefix = "QtXml",
     includes = [
-        "6.10.0/macos/lib/QtXml.framework/Headers",
+        "6.8.3/macos/lib/QtXml.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtXml",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtXml.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtXml.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1024,26 +963,26 @@ cc_library(
 filegroup(
     name = "qt_quick/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuick.framework/QtQuick",
-        "6.10.0/macos/lib/QtQuick.framework/Versions/A/QtQuick",
-        "6.10.0/macos/lib/QtQuick.framework/Versions/Current/QtQuick",
+        "6.8.3/macos/lib/QtQuick.framework/QtQuick",
+        "6.8.3/macos/lib/QtQuick.framework/Versions/A/QtQuick",
+        "6.8.3/macos/lib/QtQuick.framework/Versions/Current/QtQuick",
     ],
 )
 
 cc_library(
     name = "qt_quick",
-    hdrs = glob(["6.10.0/macos/lib/QtQuick.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuick.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick/lib_files"],
     data = [":qt_quick/lib_files"],
     include_prefix = "QtQuick",
     includes = [
-        "6.10.0/macos/lib/QtQuick.framework/Headers",
+        "6.8.3/macos/lib/QtQuick.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuick",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuick.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuick.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1064,26 +1003,26 @@ cc_library(
 filegroup(
     name = "qt_quick_effects/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickEffects.framework/QtQuickEffects",
-        "6.10.0/macos/lib/QtQuickEffects.framework/Versions/A/QtQuickEffects",
-        "6.10.0/macos/lib/QtQuickEffects.framework/Versions/Current/QtQuickEffects",
+        "6.8.3/macos/lib/QtQuickEffects.framework/QtQuickEffects",
+        "6.8.3/macos/lib/QtQuickEffects.framework/Versions/A/QtQuickEffects",
+        "6.8.3/macos/lib/QtQuickEffects.framework/Versions/Current/QtQuickEffects",
     ],
 )
 
 cc_library(
     name = "qt_quick_effects",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickEffects.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickEffects.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_effects/lib_files"],
     data = [":qt_quick_effects/lib_files"],
     include_prefix = "QtQuickEffects",
     includes = [
-        "6.10.0/macos/lib/QtQuickEffects.framework/Headers",
+        "6.8.3/macos/lib/QtQuickEffects.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickEffects",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickEffects.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickEffects.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1105,26 +1044,26 @@ cc_library(
 filegroup(
     name = "qt_core/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtCore.framework/QtCore",
-        "6.10.0/macos/lib/QtCore.framework/Versions/A/QtCore",
-        "6.10.0/macos/lib/QtCore.framework/Versions/Current/QtCore",
+        "6.8.3/macos/lib/QtCore.framework/QtCore",
+        "6.8.3/macos/lib/QtCore.framework/Versions/A/QtCore",
+        "6.8.3/macos/lib/QtCore.framework/Versions/Current/QtCore",
     ],
 )
 
 cc_library(
     name = "qt_core",
-    hdrs = glob(["6.10.0/macos/lib/QtCore.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtCore.framework/Headers/**"]),
     additional_linker_inputs = [":qt_core/lib_files"],
     data = [":qt_core/lib_files"],
     include_prefix = "QtCore",
     includes = [
-        "6.10.0/macos/lib/QtCore.framework/Headers",
+        "6.8.3/macos/lib/QtCore.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtCore",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtCore.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtCore.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1135,26 +1074,26 @@ cc_library(
 filegroup(
     name = "qt_quick_dialogs2_quick_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickDialogs2QuickImpl.framework/QtQuickDialogs2QuickImpl",
-        "6.10.0/macos/lib/QtQuickDialogs2QuickImpl.framework/Versions/A/QtQuickDialogs2QuickImpl",
-        "6.10.0/macos/lib/QtQuickDialogs2QuickImpl.framework/Versions/Current/QtQuickDialogs2QuickImpl",
+        "6.8.3/macos/lib/QtQuickDialogs2QuickImpl.framework/QtQuickDialogs2QuickImpl",
+        "6.8.3/macos/lib/QtQuickDialogs2QuickImpl.framework/Versions/A/QtQuickDialogs2QuickImpl",
+        "6.8.3/macos/lib/QtQuickDialogs2QuickImpl.framework/Versions/Current/QtQuickDialogs2QuickImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_dialogs2_quick_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickDialogs2QuickImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickDialogs2QuickImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_dialogs2_quick_impl/lib_files"],
     data = [":qt_quick_dialogs2_quick_impl/lib_files"],
     include_prefix = "QtQuickDialogs2QuickImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickDialogs2QuickImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickDialogs2QuickImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickDialogs2QuickImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickDialogs2QuickImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickDialogs2QuickImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1176,26 +1115,26 @@ cc_library(
 filegroup(
     name = "qt_qml_network/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQmlNetwork.framework/QtQmlNetwork",
-        "6.10.0/macos/lib/QtQmlNetwork.framework/Versions/A/QtQmlNetwork",
-        "6.10.0/macos/lib/QtQmlNetwork.framework/Versions/Current/QtQmlNetwork",
+        "6.8.3/macos/lib/QtQmlNetwork.framework/QtQmlNetwork",
+        "6.8.3/macos/lib/QtQmlNetwork.framework/Versions/A/QtQmlNetwork",
+        "6.8.3/macos/lib/QtQmlNetwork.framework/Versions/Current/QtQmlNetwork",
     ],
 )
 
 cc_library(
     name = "qt_qml_network",
-    hdrs = glob(["6.10.0/macos/lib/QtQmlNetwork.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQmlNetwork.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml_network/lib_files"],
     data = [":qt_qml_network/lib_files"],
     include_prefix = "QtQmlNetwork",
     includes = [
-        "6.10.0/macos/lib/QtQmlNetwork.framework/Headers",
+        "6.8.3/macos/lib/QtQmlNetwork.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQmlNetwork",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQmlNetwork.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQmlNetwork.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1211,26 +1150,26 @@ cc_library(
 filegroup(
     name = "qt_qml/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQml.framework/QtQml",
-        "6.10.0/macos/lib/QtQml.framework/Versions/A/QtQml",
-        "6.10.0/macos/lib/QtQml.framework/Versions/Current/QtQml",
+        "6.8.3/macos/lib/QtQml.framework/QtQml",
+        "6.8.3/macos/lib/QtQml.framework/Versions/A/QtQml",
+        "6.8.3/macos/lib/QtQml.framework/Versions/Current/QtQml",
     ],
 )
 
 cc_library(
     name = "qt_qml",
-    hdrs = glob(["6.10.0/macos/lib/QtQml.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQml.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml/lib_files"],
     data = [":qt_qml/lib_files"],
     include_prefix = "QtQml",
     includes = [
-        "6.10.0/macos/lib/QtQml.framework/Headers",
+        "6.8.3/macos/lib/QtQml.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQml",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQml.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQml.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1245,26 +1184,26 @@ cc_library(
 filegroup(
     name = "qt_quick_vector_image_generator/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickVectorImageGenerator.framework/QtQuickVectorImageGenerator",
-        "6.10.0/macos/lib/QtQuickVectorImageGenerator.framework/Versions/A/QtQuickVectorImageGenerator",
-        "6.10.0/macos/lib/QtQuickVectorImageGenerator.framework/Versions/Current/QtQuickVectorImageGenerator",
+        "6.8.3/macos/lib/QtQuickVectorImageGenerator.framework/QtQuickVectorImageGenerator",
+        "6.8.3/macos/lib/QtQuickVectorImageGenerator.framework/Versions/A/QtQuickVectorImageGenerator",
+        "6.8.3/macos/lib/QtQuickVectorImageGenerator.framework/Versions/Current/QtQuickVectorImageGenerator",
     ],
 )
 
 cc_library(
     name = "qt_quick_vector_image_generator",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickVectorImageGenerator.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickVectorImageGenerator.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_vector_image_generator/lib_files"],
     data = [":qt_quick_vector_image_generator/lib_files"],
     include_prefix = "QtQuickVectorImageGenerator",
     includes = [
-        "6.10.0/macos/lib/QtQuickVectorImageGenerator.framework/Headers",
+        "6.8.3/macos/lib/QtQuickVectorImageGenerator.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickVectorImageGenerator",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickVectorImageGenerator.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickVectorImageGenerator.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1275,26 +1214,26 @@ cc_library(
 filegroup(
     name = "qt_qml_core/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQmlCore.framework/QtQmlCore",
-        "6.10.0/macos/lib/QtQmlCore.framework/Versions/A/QtQmlCore",
-        "6.10.0/macos/lib/QtQmlCore.framework/Versions/Current/QtQmlCore",
+        "6.8.3/macos/lib/QtQmlCore.framework/QtQmlCore",
+        "6.8.3/macos/lib/QtQmlCore.framework/Versions/A/QtQmlCore",
+        "6.8.3/macos/lib/QtQmlCore.framework/Versions/Current/QtQmlCore",
     ],
 )
 
 cc_library(
     name = "qt_qml_core",
-    hdrs = glob(["6.10.0/macos/lib/QtQmlCore.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQmlCore.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml_core/lib_files"],
     data = [":qt_qml_core/lib_files"],
     include_prefix = "QtQmlCore",
     includes = [
-        "6.10.0/macos/lib/QtQmlCore.framework/Headers",
+        "6.8.3/macos/lib/QtQmlCore.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQmlCore",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQmlCore.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQmlCore.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1310,26 +1249,26 @@ cc_library(
 filegroup(
     name = "qt_qml_worker_script/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQmlWorkerScript.framework/QtQmlWorkerScript",
-        "6.10.0/macos/lib/QtQmlWorkerScript.framework/Versions/A/QtQmlWorkerScript",
-        "6.10.0/macos/lib/QtQmlWorkerScript.framework/Versions/Current/QtQmlWorkerScript",
+        "6.8.3/macos/lib/QtQmlWorkerScript.framework/QtQmlWorkerScript",
+        "6.8.3/macos/lib/QtQmlWorkerScript.framework/Versions/A/QtQmlWorkerScript",
+        "6.8.3/macos/lib/QtQmlWorkerScript.framework/Versions/Current/QtQmlWorkerScript",
     ],
 )
 
 cc_library(
     name = "qt_qml_worker_script",
-    hdrs = glob(["6.10.0/macos/lib/QtQmlWorkerScript.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQmlWorkerScript.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml_worker_script/lib_files"],
     data = [":qt_qml_worker_script/lib_files"],
     include_prefix = "QtQmlWorkerScript",
     includes = [
-        "6.10.0/macos/lib/QtQmlWorkerScript.framework/Headers",
+        "6.8.3/macos/lib/QtQmlWorkerScript.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQmlWorkerScript",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQmlWorkerScript.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQmlWorkerScript.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1345,26 +1284,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2Impl.framework/QtQuickControls2Impl",
-        "6.10.0/macos/lib/QtQuickControls2Impl.framework/Versions/A/QtQuickControls2Impl",
-        "6.10.0/macos/lib/QtQuickControls2Impl.framework/Versions/Current/QtQuickControls2Impl",
+        "6.8.3/macos/lib/QtQuickControls2Impl.framework/QtQuickControls2Impl",
+        "6.8.3/macos/lib/QtQuickControls2Impl.framework/Versions/A/QtQuickControls2Impl",
+        "6.8.3/macos/lib/QtQuickControls2Impl.framework/Versions/Current/QtQuickControls2Impl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2Impl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2Impl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_impl/lib_files"],
     data = [":qt_quick_controls2_impl/lib_files"],
     include_prefix = "QtQuickControls2Impl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2Impl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2Impl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Impl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Impl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2Impl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1386,26 +1325,26 @@ cc_library(
 filegroup(
     name = "qt_open_g_l/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtOpenGL.framework/QtOpenGL",
-        "6.10.0/macos/lib/QtOpenGL.framework/Versions/A/QtOpenGL",
-        "6.10.0/macos/lib/QtOpenGL.framework/Versions/Current/QtOpenGL",
+        "6.8.3/macos/lib/QtOpenGL.framework/QtOpenGL",
+        "6.8.3/macos/lib/QtOpenGL.framework/Versions/A/QtOpenGL",
+        "6.8.3/macos/lib/QtOpenGL.framework/Versions/Current/QtOpenGL",
     ],
 )
 
 cc_library(
     name = "qt_open_g_l",
-    hdrs = glob(["6.10.0/macos/lib/QtOpenGL.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtOpenGL.framework/Headers/**"]),
     additional_linker_inputs = [":qt_open_g_l/lib_files"],
     data = [":qt_open_g_l/lib_files"],
     include_prefix = "QtOpenGL",
     includes = [
-        "6.10.0/macos/lib/QtOpenGL.framework/Headers",
+        "6.8.3/macos/lib/QtOpenGL.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtOpenGL",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtOpenGL.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtOpenGL.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1420,56 +1359,62 @@ cc_library(
 filegroup(
     name = "qt_labs_qml_models/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtLabsQmlModels.framework/QtLabsQmlModels",
-        "6.10.0/macos/lib/QtLabsQmlModels.framework/Versions/A/QtLabsQmlModels",
-        "6.10.0/macos/lib/QtLabsQmlModels.framework/Versions/Current/QtLabsQmlModels",
+        "6.8.3/macos/lib/QtLabsQmlModels.framework/QtLabsQmlModels",
+        "6.8.3/macos/lib/QtLabsQmlModels.framework/Versions/A/QtLabsQmlModels",
+        "6.8.3/macos/lib/QtLabsQmlModels.framework/Versions/Current/QtLabsQmlModels",
     ],
 )
 
 cc_library(
     name = "qt_labs_qml_models",
-    hdrs = glob(["6.10.0/macos/lib/QtLabsQmlModels.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtLabsQmlModels.framework/Headers/**"]),
     additional_linker_inputs = [":qt_labs_qml_models/lib_files"],
     data = [":qt_labs_qml_models/lib_files"],
     include_prefix = "QtLabsQmlModels",
     includes = [
-        "6.10.0/macos/lib/QtLabsQmlModels.framework/Headers",
+        "6.8.3/macos/lib/QtLabsQmlModels.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtLabsQmlModels",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtLabsQmlModels.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtLabsQmlModels.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_network",
+        ":qt_qml",
+        ":qt_qml_models",
+    ],
 )
 
 filegroup(
     name = "qt_quick_controls2_universal/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2Universal.framework/QtQuickControls2Universal",
-        "6.10.0/macos/lib/QtQuickControls2Universal.framework/Versions/A/QtQuickControls2Universal",
-        "6.10.0/macos/lib/QtQuickControls2Universal.framework/Versions/Current/QtQuickControls2Universal",
+        "6.8.3/macos/lib/QtQuickControls2Universal.framework/QtQuickControls2Universal",
+        "6.8.3/macos/lib/QtQuickControls2Universal.framework/Versions/A/QtQuickControls2Universal",
+        "6.8.3/macos/lib/QtQuickControls2Universal.framework/Versions/Current/QtQuickControls2Universal",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_universal",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2Universal.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2Universal.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_universal/lib_files"],
     data = [":qt_quick_controls2_universal/lib_files"],
     include_prefix = "QtQuickControls2Universal",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2Universal.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2Universal.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Universal",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Universal.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2Universal.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1480,26 +1425,26 @@ cc_library(
 filegroup(
     name = "qt_qml_local_storage/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQmlLocalStorage.framework/QtQmlLocalStorage",
-        "6.10.0/macos/lib/QtQmlLocalStorage.framework/Versions/A/QtQmlLocalStorage",
-        "6.10.0/macos/lib/QtQmlLocalStorage.framework/Versions/Current/QtQmlLocalStorage",
+        "6.8.3/macos/lib/QtQmlLocalStorage.framework/QtQmlLocalStorage",
+        "6.8.3/macos/lib/QtQmlLocalStorage.framework/Versions/A/QtQmlLocalStorage",
+        "6.8.3/macos/lib/QtQmlLocalStorage.framework/Versions/Current/QtQmlLocalStorage",
     ],
 )
 
 cc_library(
     name = "qt_qml_local_storage",
-    hdrs = glob(["6.10.0/macos/lib/QtQmlLocalStorage.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQmlLocalStorage.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml_local_storage/lib_files"],
     data = [":qt_qml_local_storage/lib_files"],
     include_prefix = "QtQmlLocalStorage",
     includes = [
-        "6.10.0/macos/lib/QtQmlLocalStorage.framework/Headers",
+        "6.8.3/macos/lib/QtQmlLocalStorage.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQmlLocalStorage",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQmlLocalStorage.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQmlLocalStorage.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1507,6 +1452,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":qt_core",
+        ":qt_network",
+        ":qt_qml",
         ":qt_sql",
     ],
 )
@@ -1514,26 +1461,26 @@ cc_library(
 filegroup(
     name = "qt_qml_compiler/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQmlCompiler.framework/QtQmlCompiler",
-        "6.10.0/macos/lib/QtQmlCompiler.framework/Versions/A/QtQmlCompiler",
-        "6.10.0/macos/lib/QtQmlCompiler.framework/Versions/Current/QtQmlCompiler",
+        "6.8.3/macos/lib/QtQmlCompiler.framework/QtQmlCompiler",
+        "6.8.3/macos/lib/QtQmlCompiler.framework/Versions/A/QtQmlCompiler",
+        "6.8.3/macos/lib/QtQmlCompiler.framework/Versions/Current/QtQmlCompiler",
     ],
 )
 
 cc_library(
     name = "qt_qml_compiler",
-    hdrs = glob(["6.10.0/macos/lib/QtQmlCompiler.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQmlCompiler.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml_compiler/lib_files"],
     data = [":qt_qml_compiler/lib_files"],
     include_prefix = "QtQmlCompiler",
     includes = [
-        "6.10.0/macos/lib/QtQmlCompiler.framework/Headers",
+        "6.8.3/macos/lib/QtQmlCompiler.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQmlCompiler",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQmlCompiler.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQmlCompiler.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1549,26 +1496,26 @@ cc_library(
 filegroup(
     name = "qt_open_g_l_widgets/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtOpenGLWidgets.framework/QtOpenGLWidgets",
-        "6.10.0/macos/lib/QtOpenGLWidgets.framework/Versions/A/QtOpenGLWidgets",
-        "6.10.0/macos/lib/QtOpenGLWidgets.framework/Versions/Current/QtOpenGLWidgets",
+        "6.8.3/macos/lib/QtOpenGLWidgets.framework/QtOpenGLWidgets",
+        "6.8.3/macos/lib/QtOpenGLWidgets.framework/Versions/A/QtOpenGLWidgets",
+        "6.8.3/macos/lib/QtOpenGLWidgets.framework/Versions/Current/QtOpenGLWidgets",
     ],
 )
 
 cc_library(
     name = "qt_open_g_l_widgets",
-    hdrs = glob(["6.10.0/macos/lib/QtOpenGLWidgets.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtOpenGLWidgets.framework/Headers/**"]),
     additional_linker_inputs = [":qt_open_g_l_widgets/lib_files"],
     data = [":qt_open_g_l_widgets/lib_files"],
     include_prefix = "QtOpenGLWidgets",
     includes = [
-        "6.10.0/macos/lib/QtOpenGLWidgets.framework/Headers",
+        "6.8.3/macos/lib/QtOpenGLWidgets.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtOpenGLWidgets",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtOpenGLWidgets.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtOpenGLWidgets.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1585,26 +1532,26 @@ cc_library(
 filegroup(
     name = "qt_ui_tools/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtUiTools.framework/QtUiTools",
-        "6.10.0/macos/lib/QtUiTools.framework/Versions/A/QtUiTools",
-        "6.10.0/macos/lib/QtUiTools.framework/Versions/Current/QtUiTools",
+        "6.8.3/macos/lib/QtUiTools.framework/QtUiTools",
+        "6.8.3/macos/lib/QtUiTools.framework/Versions/A/QtUiTools",
+        "6.8.3/macos/lib/QtUiTools.framework/Versions/Current/QtUiTools",
     ],
 )
 
 cc_library(
     name = "qt_ui_tools",
-    hdrs = glob(["6.10.0/macos/lib/QtUiTools.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtUiTools.framework/Headers/**"]),
     additional_linker_inputs = [":qt_ui_tools/lib_files"],
     data = [":qt_ui_tools/lib_files"],
     include_prefix = "QtUiTools",
     includes = [
-        "6.10.0/macos/lib/QtUiTools.framework/Headers",
+        "6.8.3/macos/lib/QtUiTools.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtUiTools",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtUiTools.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtUiTools.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1622,26 +1569,26 @@ cc_library(
 filegroup(
     name = "qt_labs_settings/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtLabsSettings.framework/QtLabsSettings",
-        "6.10.0/macos/lib/QtLabsSettings.framework/Versions/A/QtLabsSettings",
-        "6.10.0/macos/lib/QtLabsSettings.framework/Versions/Current/QtLabsSettings",
+        "6.8.3/macos/lib/QtLabsSettings.framework/QtLabsSettings",
+        "6.8.3/macos/lib/QtLabsSettings.framework/Versions/A/QtLabsSettings",
+        "6.8.3/macos/lib/QtLabsSettings.framework/Versions/Current/QtLabsSettings",
     ],
 )
 
 cc_library(
     name = "qt_labs_settings",
-    hdrs = glob(["6.10.0/macos/lib/QtLabsSettings.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtLabsSettings.framework/Headers/**"]),
     additional_linker_inputs = [":qt_labs_settings/lib_files"],
     data = [":qt_labs_settings/lib_files"],
     include_prefix = "QtLabsSettings",
     includes = [
-        "6.10.0/macos/lib/QtLabsSettings.framework/Headers",
+        "6.8.3/macos/lib/QtLabsSettings.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtLabsSettings",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtLabsSettings.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtLabsSettings.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1657,26 +1604,26 @@ cc_library(
 filegroup(
     name = "qt_svg_widgets/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtSvgWidgets.framework/QtSvgWidgets",
-        "6.10.0/macos/lib/QtSvgWidgets.framework/Versions/A/QtSvgWidgets",
-        "6.10.0/macos/lib/QtSvgWidgets.framework/Versions/Current/QtSvgWidgets",
+        "6.8.3/macos/lib/QtSvgWidgets.framework/QtSvgWidgets",
+        "6.8.3/macos/lib/QtSvgWidgets.framework/Versions/A/QtSvgWidgets",
+        "6.8.3/macos/lib/QtSvgWidgets.framework/Versions/Current/QtSvgWidgets",
     ],
 )
 
 cc_library(
     name = "qt_svg_widgets",
-    hdrs = glob(["6.10.0/macos/lib/QtSvgWidgets.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtSvgWidgets.framework/Headers/**"]),
     additional_linker_inputs = [":qt_svg_widgets/lib_files"],
     data = [":qt_svg_widgets/lib_files"],
     include_prefix = "QtSvgWidgets",
     includes = [
-        "6.10.0/macos/lib/QtSvgWidgets.framework/Headers",
+        "6.8.3/macos/lib/QtSvgWidgets.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtSvgWidgets",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtSvgWidgets.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtSvgWidgets.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1693,26 +1640,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_mac_o_s_style_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2MacOSStyleImpl.framework/QtQuickControls2MacOSStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Versions/A/QtQuickControls2MacOSStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Versions/Current/QtQuickControls2MacOSStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2MacOSStyleImpl.framework/QtQuickControls2MacOSStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Versions/A/QtQuickControls2MacOSStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Versions/Current/QtQuickControls2MacOSStyleImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_mac_o_s_style_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_mac_o_s_style_impl/lib_files"],
     data = [":qt_quick_controls2_mac_o_s_style_impl/lib_files"],
     include_prefix = "QtQuickControls2MacOSStyleImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2MacOSStyleImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1723,26 +1670,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_material_style_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2MaterialStyleImpl.framework/QtQuickControls2MaterialStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Versions/A/QtQuickControls2MaterialStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Versions/Current/QtQuickControls2MaterialStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2MaterialStyleImpl.framework/QtQuickControls2MaterialStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Versions/A/QtQuickControls2MaterialStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Versions/Current/QtQuickControls2MaterialStyleImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_material_style_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_material_style_impl/lib_files"],
     data = [":qt_quick_controls2_material_style_impl/lib_files"],
     include_prefix = "QtQuickControls2MaterialStyleImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2MaterialStyleImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1753,26 +1700,26 @@ cc_library(
 filegroup(
     name = "qt_test/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtTest.framework/QtTest",
-        "6.10.0/macos/lib/QtTest.framework/Versions/A/QtTest",
-        "6.10.0/macos/lib/QtTest.framework/Versions/Current/QtTest",
+        "6.8.3/macos/lib/QtTest.framework/QtTest",
+        "6.8.3/macos/lib/QtTest.framework/Versions/A/QtTest",
+        "6.8.3/macos/lib/QtTest.framework/Versions/Current/QtTest",
     ],
 )
 
 cc_library(
     name = "qt_test",
-    hdrs = glob(["6.10.0/macos/lib/QtTest.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtTest.framework/Headers/**"]),
     additional_linker_inputs = [":qt_test/lib_files"],
     data = [":qt_test/lib_files"],
     include_prefix = "QtTest",
     includes = [
-        "6.10.0/macos/lib/QtTest.framework/Headers",
+        "6.8.3/macos/lib/QtTest.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtTest",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtTest.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtTest.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1786,26 +1733,26 @@ cc_library(
 filegroup(
     name = "qt_widgets/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtWidgets.framework/QtWidgets",
-        "6.10.0/macos/lib/QtWidgets.framework/Versions/A/QtWidgets",
-        "6.10.0/macos/lib/QtWidgets.framework/Versions/Current/QtWidgets",
+        "6.8.3/macos/lib/QtWidgets.framework/QtWidgets",
+        "6.8.3/macos/lib/QtWidgets.framework/Versions/A/QtWidgets",
+        "6.8.3/macos/lib/QtWidgets.framework/Versions/Current/QtWidgets",
     ],
 )
 
 cc_library(
     name = "qt_widgets",
-    hdrs = glob(["6.10.0/macos/lib/QtWidgets.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtWidgets.framework/Headers/**"]),
     additional_linker_inputs = [":qt_widgets/lib_files"],
     data = [":qt_widgets/lib_files"],
     include_prefix = "QtWidgets",
     includes = [
-        "6.10.0/macos/lib/QtWidgets.framework/Headers",
+        "6.8.3/macos/lib/QtWidgets.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtWidgets",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtWidgets.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtWidgets.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1820,26 +1767,26 @@ cc_library(
 filegroup(
     name = "qt_quick_shapes/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickShapes.framework/QtQuickShapes",
-        "6.10.0/macos/lib/QtQuickShapes.framework/Versions/A/QtQuickShapes",
-        "6.10.0/macos/lib/QtQuickShapes.framework/Versions/Current/QtQuickShapes",
+        "6.8.3/macos/lib/QtQuickShapes.framework/QtQuickShapes",
+        "6.8.3/macos/lib/QtQuickShapes.framework/Versions/A/QtQuickShapes",
+        "6.8.3/macos/lib/QtQuickShapes.framework/Versions/Current/QtQuickShapes",
     ],
 )
 
 cc_library(
     name = "qt_quick_shapes",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickShapes.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickShapes.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_shapes/lib_files"],
     data = [":qt_quick_shapes/lib_files"],
     include_prefix = "QtQuickShapes",
     includes = [
-        "6.10.0/macos/lib/QtQuickShapes.framework/Headers",
+        "6.8.3/macos/lib/QtQuickShapes.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickShapes",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickShapes.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickShapes.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1861,26 +1808,26 @@ cc_library(
 filegroup(
     name = "qt_quick_test/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickTest.framework/QtQuickTest",
-        "6.10.0/macos/lib/QtQuickTest.framework/Versions/A/QtQuickTest",
-        "6.10.0/macos/lib/QtQuickTest.framework/Versions/Current/QtQuickTest",
+        "6.8.3/macos/lib/QtQuickTest.framework/QtQuickTest",
+        "6.8.3/macos/lib/QtQuickTest.framework/Versions/A/QtQuickTest",
+        "6.8.3/macos/lib/QtQuickTest.framework/Versions/Current/QtQuickTest",
     ],
 )
 
 cc_library(
     name = "qt_quick_test",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickTest.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickTest.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_test/lib_files"],
     data = [":qt_quick_test/lib_files"],
     include_prefix = "QtQuickTest",
     includes = [
-        "6.10.0/macos/lib/QtQuickTest.framework/Headers",
+        "6.8.3/macos/lib/QtQuickTest.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickTest",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickTest.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickTest.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1895,26 +1842,26 @@ cc_library(
 filegroup(
     name = "qt_network/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtNetwork.framework/QtNetwork",
-        "6.10.0/macos/lib/QtNetwork.framework/Versions/A/QtNetwork",
-        "6.10.0/macos/lib/QtNetwork.framework/Versions/Current/QtNetwork",
+        "6.8.3/macos/lib/QtNetwork.framework/QtNetwork",
+        "6.8.3/macos/lib/QtNetwork.framework/Versions/A/QtNetwork",
+        "6.8.3/macos/lib/QtNetwork.framework/Versions/Current/QtNetwork",
     ],
 )
 
 cc_library(
     name = "qt_network",
-    hdrs = glob(["6.10.0/macos/lib/QtNetwork.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtNetwork.framework/Headers/**"]),
     additional_linker_inputs = [":qt_network/lib_files"],
     data = [":qt_network/lib_files"],
     include_prefix = "QtNetwork",
     includes = [
-        "6.10.0/macos/lib/QtNetwork.framework/Headers",
+        "6.8.3/macos/lib/QtNetwork.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtNetwork",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtNetwork.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtNetwork.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1928,26 +1875,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_universal_style_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2UniversalStyleImpl.framework/QtQuickControls2UniversalStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Versions/A/QtQuickControls2UniversalStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Versions/Current/QtQuickControls2UniversalStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2UniversalStyleImpl.framework/QtQuickControls2UniversalStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Versions/A/QtQuickControls2UniversalStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Versions/Current/QtQuickControls2UniversalStyleImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_universal_style_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_universal_style_impl/lib_files"],
     data = [":qt_quick_controls2_universal_style_impl/lib_files"],
     include_prefix = "QtQuickControls2UniversalStyleImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2UniversalStyleImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1958,26 +1905,26 @@ cc_library(
 filegroup(
     name = "qt_svg/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtSvg.framework/QtSvg",
-        "6.10.0/macos/lib/QtSvg.framework/Versions/A/QtSvg",
-        "6.10.0/macos/lib/QtSvg.framework/Versions/Current/QtSvg",
+        "6.8.3/macos/lib/QtSvg.framework/QtSvg",
+        "6.8.3/macos/lib/QtSvg.framework/Versions/A/QtSvg",
+        "6.8.3/macos/lib/QtSvg.framework/Versions/Current/QtSvg",
     ],
 )
 
 cc_library(
     name = "qt_svg",
-    hdrs = glob(["6.10.0/macos/lib/QtSvg.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtSvg.framework/Headers/**"]),
     additional_linker_inputs = [":qt_svg/lib_files"],
     data = [":qt_svg/lib_files"],
     include_prefix = "QtSvg",
     includes = [
-        "6.10.0/macos/lib/QtSvg.framework/Headers",
+        "6.8.3/macos/lib/QtSvg.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtSvg",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtSvg.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtSvg.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -1992,26 +1939,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_ios_style_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2IOSStyleImpl.framework/QtQuickControls2IOSStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2IOSStyleImpl.framework/Versions/A/QtQuickControls2IOSStyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2IOSStyleImpl.framework/Versions/Current/QtQuickControls2IOSStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2IOSStyleImpl.framework/QtQuickControls2IOSStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2IOSStyleImpl.framework/Versions/A/QtQuickControls2IOSStyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2IOSStyleImpl.framework/Versions/Current/QtQuickControls2IOSStyleImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_ios_style_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2IOSStyleImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2IOSStyleImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_ios_style_impl/lib_files"],
     data = [":qt_quick_controls2_ios_style_impl/lib_files"],
     include_prefix = "QtQuickControls2IOSStyleImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2IOSStyleImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2IOSStyleImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2IOSStyleImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2IOSStyleImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2IOSStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -2022,26 +1969,26 @@ cc_library(
 filegroup(
     name = "qt_designer_components/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtDesignerComponents.framework/QtDesignerComponents",
-        "6.10.0/macos/lib/QtDesignerComponents.framework/Versions/A/QtDesignerComponents",
-        "6.10.0/macos/lib/QtDesignerComponents.framework/Versions/Current/QtDesignerComponents",
+        "6.8.3/macos/lib/QtDesignerComponents.framework/QtDesignerComponents",
+        "6.8.3/macos/lib/QtDesignerComponents.framework/Versions/A/QtDesignerComponents",
+        "6.8.3/macos/lib/QtDesignerComponents.framework/Versions/Current/QtDesignerComponents",
     ],
 )
 
 cc_library(
     name = "qt_designer_components",
-    hdrs = glob(["6.10.0/macos/lib/QtDesignerComponents.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtDesignerComponents.framework/Headers/**"]),
     additional_linker_inputs = [":qt_designer_components/lib_files"],
     data = [":qt_designer_components/lib_files"],
     include_prefix = "QtDesignerComponents",
     includes = [
-        "6.10.0/macos/lib/QtDesignerComponents.framework/Headers",
+        "6.8.3/macos/lib/QtDesignerComponents.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtDesignerComponents",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtDesignerComponents.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtDesignerComponents.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -2061,56 +2008,26 @@ cc_library(
 filegroup(
     name = "qt_quick_controls2_imagine/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2Imagine.framework/QtQuickControls2Imagine",
-        "6.10.0/macos/lib/QtQuickControls2Imagine.framework/Versions/A/QtQuickControls2Imagine",
-        "6.10.0/macos/lib/QtQuickControls2Imagine.framework/Versions/Current/QtQuickControls2Imagine",
+        "6.8.3/macos/lib/QtQuickControls2Imagine.framework/QtQuickControls2Imagine",
+        "6.8.3/macos/lib/QtQuickControls2Imagine.framework/Versions/A/QtQuickControls2Imagine",
+        "6.8.3/macos/lib/QtQuickControls2Imagine.framework/Versions/Current/QtQuickControls2Imagine",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_imagine",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2Imagine.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2Imagine.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_imagine/lib_files"],
     data = [":qt_quick_controls2_imagine/lib_files"],
     include_prefix = "QtQuickControls2Imagine",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2Imagine.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2Imagine.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Imagine",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Imagine.framework/Headers",
-    toolchains = [
-        ":repo_location",
-    ],
-    # target_compatible_with = "[]"
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
-    name = "qt_quick_vector_image_helpers/lib_files",
-    srcs = [
-        "6.10.0/macos/lib/QtQuickVectorImageHelpers.framework/QtQuickVectorImageHelpers",
-        "6.10.0/macos/lib/QtQuickVectorImageHelpers.framework/Versions/A/QtQuickVectorImageHelpers",
-        "6.10.0/macos/lib/QtQuickVectorImageHelpers.framework/Versions/Current/QtQuickVectorImageHelpers",
-    ],
-)
-
-cc_library(
-    name = "qt_quick_vector_image_helpers",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickVectorImageHelpers.framework/Headers/**"]),
-    additional_linker_inputs = [":qt_quick_vector_image_helpers/lib_files"],
-    data = [":qt_quick_vector_image_helpers/lib_files"],
-    include_prefix = "QtQuickVectorImageHelpers",
-    includes = [
-        "6.10.0/macos/lib/QtQuickVectorImageHelpers.framework/Headers",
-    ],
-    linkopts = [
-        "-F $(REPO_LOCATION)",
-        "-framework QtQuickVectorImageHelpers",
-    ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickVectorImageHelpers.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2Imagine.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -2121,26 +2038,26 @@ cc_library(
 filegroup(
     name = "qt_qml_models/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQmlModels.framework/QtQmlModels",
-        "6.10.0/macos/lib/QtQmlModels.framework/Versions/A/QtQmlModels",
-        "6.10.0/macos/lib/QtQmlModels.framework/Versions/Current/QtQmlModels",
+        "6.8.3/macos/lib/QtQmlModels.framework/QtQmlModels",
+        "6.8.3/macos/lib/QtQmlModels.framework/Versions/A/QtQmlModels",
+        "6.8.3/macos/lib/QtQmlModels.framework/Versions/Current/QtQmlModels",
     ],
 )
 
 cc_library(
     name = "qt_qml_models",
-    hdrs = glob(["6.10.0/macos/lib/QtQmlModels.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQmlModels.framework/Headers/**"]),
     additional_linker_inputs = [":qt_qml_models/lib_files"],
     data = [":qt_qml_models/lib_files"],
     include_prefix = "QtQmlModels",
     includes = [
-        "6.10.0/macos/lib/QtQmlModels.framework/Headers",
+        "6.8.3/macos/lib/QtQmlModels.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQmlModels",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQmlModels.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQmlModels.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -2156,86 +2073,103 @@ cc_library(
 filegroup(
     name = "qt_labs_animation/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtLabsAnimation.framework/QtLabsAnimation",
-        "6.10.0/macos/lib/QtLabsAnimation.framework/Versions/A/QtLabsAnimation",
-        "6.10.0/macos/lib/QtLabsAnimation.framework/Versions/Current/QtLabsAnimation",
+        "6.8.3/macos/lib/QtLabsAnimation.framework/QtLabsAnimation",
+        "6.8.3/macos/lib/QtLabsAnimation.framework/Versions/A/QtLabsAnimation",
+        "6.8.3/macos/lib/QtLabsAnimation.framework/Versions/Current/QtLabsAnimation",
     ],
 )
 
 cc_library(
     name = "qt_labs_animation",
-    hdrs = glob(["6.10.0/macos/lib/QtLabsAnimation.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtLabsAnimation.framework/Headers/**"]),
     additional_linker_inputs = [":qt_labs_animation/lib_files"],
     data = [":qt_labs_animation/lib_files"],
     include_prefix = "QtLabsAnimation",
     includes = [
-        "6.10.0/macos/lib/QtLabsAnimation.framework/Headers",
+        "6.8.3/macos/lib/QtLabsAnimation.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtLabsAnimation",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtLabsAnimation.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtLabsAnimation.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_gui",
+        ":qt_network",
+        ":qt_open_g_l",
+        ":qt_qml",
+        ":qt_qml_meta",
+        ":qt_qml_models",
+        ":qt_qml_worker_script",
+        ":qt_quick",
+    ],
 )
 
 filegroup(
     name = "qt_labs_folder_list_model/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtLabsFolderListModel.framework/QtLabsFolderListModel",
-        "6.10.0/macos/lib/QtLabsFolderListModel.framework/Versions/A/QtLabsFolderListModel",
-        "6.10.0/macos/lib/QtLabsFolderListModel.framework/Versions/Current/QtLabsFolderListModel",
+        "6.8.3/macos/lib/QtLabsFolderListModel.framework/QtLabsFolderListModel",
+        "6.8.3/macos/lib/QtLabsFolderListModel.framework/Versions/A/QtLabsFolderListModel",
+        "6.8.3/macos/lib/QtLabsFolderListModel.framework/Versions/Current/QtLabsFolderListModel",
     ],
 )
 
 cc_library(
     name = "qt_labs_folder_list_model",
-    hdrs = glob(["6.10.0/macos/lib/QtLabsFolderListModel.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtLabsFolderListModel.framework/Headers/**"]),
     additional_linker_inputs = [":qt_labs_folder_list_model/lib_files"],
     data = [":qt_labs_folder_list_model/lib_files"],
     include_prefix = "QtLabsFolderListModel",
     includes = [
-        "6.10.0/macos/lib/QtLabsFolderListModel.framework/Headers",
+        "6.8.3/macos/lib/QtLabsFolderListModel.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtLabsFolderListModel",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtLabsFolderListModel.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtLabsFolderListModel.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_network",
+        ":qt_qml",
+        ":qt_qml_models",
+    ],
 )
 
 filegroup(
     name = "qt_quick_controls2_fluent_win_u_i3_style_impl/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/QtQuickControls2FluentWinUI3StyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Versions/A/QtQuickControls2FluentWinUI3StyleImpl",
-        "6.10.0/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Versions/Current/QtQuickControls2FluentWinUI3StyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/QtQuickControls2FluentWinUI3StyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Versions/A/QtQuickControls2FluentWinUI3StyleImpl",
+        "6.8.3/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Versions/Current/QtQuickControls2FluentWinUI3StyleImpl",
     ],
 )
 
 cc_library(
     name = "qt_quick_controls2_fluent_win_u_i3_style_impl",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_controls2_fluent_win_u_i3_style_impl/lib_files"],
     data = [":qt_quick_controls2_fluent_win_u_i3_style_impl/lib_files"],
     include_prefix = "QtQuickControls2FluentWinUI3StyleImpl",
     includes = [
-        "6.10.0/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Headers",
+        "6.8.3/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2FluentWinUI3StyleImpl",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -2246,26 +2180,26 @@ cc_library(
 filegroup(
     name = "qt_quick_dialogs2/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtQuickDialogs2.framework/QtQuickDialogs2",
-        "6.10.0/macos/lib/QtQuickDialogs2.framework/Versions/A/QtQuickDialogs2",
-        "6.10.0/macos/lib/QtQuickDialogs2.framework/Versions/Current/QtQuickDialogs2",
+        "6.8.3/macos/lib/QtQuickDialogs2.framework/QtQuickDialogs2",
+        "6.8.3/macos/lib/QtQuickDialogs2.framework/Versions/A/QtQuickDialogs2",
+        "6.8.3/macos/lib/QtQuickDialogs2.framework/Versions/Current/QtQuickDialogs2",
     ],
 )
 
 cc_library(
     name = "qt_quick_dialogs2",
-    hdrs = glob(["6.10.0/macos/lib/QtQuickDialogs2.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtQuickDialogs2.framework/Headers/**"]),
     additional_linker_inputs = [":qt_quick_dialogs2/lib_files"],
     data = [":qt_quick_dialogs2/lib_files"],
     include_prefix = "QtQuickDialogs2",
     includes = [
-        "6.10.0/macos/lib/QtQuickDialogs2.framework/Headers",
+        "6.8.3/macos/lib/QtQuickDialogs2.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtQuickDialogs2",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtQuickDialogs2.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtQuickDialogs2.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -2287,56 +2221,67 @@ cc_library(
 filegroup(
     name = "qt_labs_wavefront_mesh/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtLabsWavefrontMesh.framework/QtLabsWavefrontMesh",
-        "6.10.0/macos/lib/QtLabsWavefrontMesh.framework/Versions/A/QtLabsWavefrontMesh",
-        "6.10.0/macos/lib/QtLabsWavefrontMesh.framework/Versions/Current/QtLabsWavefrontMesh",
+        "6.8.3/macos/lib/QtLabsWavefrontMesh.framework/QtLabsWavefrontMesh",
+        "6.8.3/macos/lib/QtLabsWavefrontMesh.framework/Versions/A/QtLabsWavefrontMesh",
+        "6.8.3/macos/lib/QtLabsWavefrontMesh.framework/Versions/Current/QtLabsWavefrontMesh",
     ],
 )
 
 cc_library(
     name = "qt_labs_wavefront_mesh",
-    hdrs = glob(["6.10.0/macos/lib/QtLabsWavefrontMesh.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtLabsWavefrontMesh.framework/Headers/**"]),
     additional_linker_inputs = [":qt_labs_wavefront_mesh/lib_files"],
     data = [":qt_labs_wavefront_mesh/lib_files"],
     include_prefix = "QtLabsWavefrontMesh",
     includes = [
-        "6.10.0/macos/lib/QtLabsWavefrontMesh.framework/Headers",
+        "6.8.3/macos/lib/QtLabsWavefrontMesh.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtLabsWavefrontMesh",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtLabsWavefrontMesh.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtLabsWavefrontMesh.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
+    deps = [
+        ":qt_core",
+        ":qt_gui",
+        ":qt_network",
+        ":qt_open_g_l",
+        ":qt_qml",
+        ":qt_qml_meta",
+        ":qt_qml_models",
+        ":qt_qml_worker_script",
+        ":qt_quick",
+    ],
 )
 
 filegroup(
     name = "qt_sql/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtSql.framework/QtSql",
-        "6.10.0/macos/lib/QtSql.framework/Versions/A/QtSql",
-        "6.10.0/macos/lib/QtSql.framework/Versions/Current/QtSql",
+        "6.8.3/macos/lib/QtSql.framework/QtSql",
+        "6.8.3/macos/lib/QtSql.framework/Versions/A/QtSql",
+        "6.8.3/macos/lib/QtSql.framework/Versions/Current/QtSql",
     ],
 )
 
 cc_library(
     name = "qt_sql",
-    hdrs = glob(["6.10.0/macos/lib/QtSql.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtSql.framework/Headers/**"]),
     additional_linker_inputs = [":qt_sql/lib_files"],
     data = [":qt_sql/lib_files"],
     include_prefix = "QtSql",
     includes = [
-        "6.10.0/macos/lib/QtSql.framework/Headers",
+        "6.8.3/macos/lib/QtSql.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtSql",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtSql.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtSql.framework/Headers",
     toolchains = [
         ":repo_location",
     ],
@@ -2350,26 +2295,26 @@ cc_library(
 filegroup(
     name = "qt_concurrent/lib_files",
     srcs = [
-        "6.10.0/macos/lib/QtConcurrent.framework/QtConcurrent",
-        "6.10.0/macos/lib/QtConcurrent.framework/Versions/A/QtConcurrent",
-        "6.10.0/macos/lib/QtConcurrent.framework/Versions/Current/QtConcurrent",
+        "6.8.3/macos/lib/QtConcurrent.framework/QtConcurrent",
+        "6.8.3/macos/lib/QtConcurrent.framework/Versions/A/QtConcurrent",
+        "6.8.3/macos/lib/QtConcurrent.framework/Versions/Current/QtConcurrent",
     ],
 )
 
 cc_library(
     name = "qt_concurrent",
-    hdrs = glob(["6.10.0/macos/lib/QtConcurrent.framework/Headers/**"]),
+    hdrs = glob(["6.8.3/macos/lib/QtConcurrent.framework/Headers/**"]),
     additional_linker_inputs = [":qt_concurrent/lib_files"],
     data = [":qt_concurrent/lib_files"],
     include_prefix = "QtConcurrent",
     includes = [
-        "6.10.0/macos/lib/QtConcurrent.framework/Headers",
+        "6.8.3/macos/lib/QtConcurrent.framework/Headers",
     ],
     linkopts = [
         "-F $(REPO_LOCATION)",
         "-framework QtConcurrent",
     ],
-    strip_include_prefix = "6.10.0/macos/lib/QtConcurrent.framework/Headers",
+    strip_include_prefix = "6.8.3/macos/lib/QtConcurrent.framework/Headers",
     toolchains = [
         ":repo_location",
     ],

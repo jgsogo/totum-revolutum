@@ -15,6 +15,16 @@ load("@rules_qt//private:dirname_providing_rule.bzl", "dirname_providing_rule")
 
 # ARCH = "{{ arch }}"
 
+cc_library(
+    name = "qt",
+    visibility = ["//visibility:public"],
+    deps = [
+        {%- for framework in frameworks|sort(attribute='name') %}
+        ":{{ framework.name }}",
+        {%- endfor %}
+    ],
+)
+
 dirname_providing_rule(
     name = "repo_location",
     append = "/{{ path_prefix }}/lib",
@@ -130,13 +140,3 @@ cc_library(
     {%- endif %}
 )
 {%- endfor %}
-
-cc_library(
-    name = "qt",
-    visibility = ["//visibility:public"],
-    deps = [
-        {%- for framework in frameworks|sort(attribute='name') %}
-        ":{{ framework.name }}",
-        {%- endfor %}
-    ],
-)

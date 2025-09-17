@@ -5,9 +5,9 @@ Some constants we are using across the project
 VERSIONS = [
     "6.10.0",
     "6.9.2",
-    "6.8.4",  # LTS release
+    "6.8.3",  # LTS release
 ]
-DEFAULT_VERSION = "6.8.4"  # Latest LTS
+DEFAULT_VERSION = "6.8.3"  # Latest LTS
 
 HOSTS = ["mac"]
 TARGET_SDKS = ["desktop"]
