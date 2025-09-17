@@ -52,11 +52,6 @@ qt = use_extension("@rules_qt//:extensions.bzl", "qt")
 qt.configure(qt_version = "6.9.2")
 use_repo(qt, "qt_mac_clang_64")
 
-# register_toolchains(
-#     "@rules_qt//tools:all",
-#     dev_dependency = True,
-# )
-
 #####
 # Other extensions
 #####
