@@ -15,6 +15,7 @@ load("@rules_qt//private:dirname_providing_rule.bzl", "dirname_providing_rule")
 
 dirname_providing_rule(
     name = "repo_location",
+    append = "/{{ path_prefix }}/lib",
     data = [":MODULE.bazel"],
     value = "$(location :MODULE.bazel)",
     varname = "REPO_LOCATION",
@@ -22,9 +23,11 @@ dirname_providing_rule(
 
 dirname_providing_rule(
     name = "repo_rootpath",
+    append = "/{{ path_prefix }}/lib",
     data = [":MODULE.bazel"],
     value = "$(rootpath :MODULE.bazel)",
     varname = "REPO_ROOTPATH",
+    visibility = ["//visibility:public"],
 )
 
 genrule(
@@ -107,14 +110,12 @@ cc_library(
         "{{ path_prefix }}/lib/{{ framework.hdrs_dir }}",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/{{ path_prefix }}/lib",
+        "-F $(REPO_LOCATION)",
         "-framework {{ framework.target }}",
-        "-rpath $(REPO_ROOTPATH)/{{ path_prefix }}/lib",
     ],
     strip_include_prefix = "{{ path_prefix }}/lib/{{ framework.hdrs_dir }}",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],

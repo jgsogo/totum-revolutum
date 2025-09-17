@@ -15,6 +15,7 @@ load("@rules_qt//private:dirname_providing_rule.bzl", "dirname_providing_rule")
 
 dirname_providing_rule(
     name = "repo_location",
+    append = "/6.8.4/macos/lib",
     data = [":MODULE.bazel"],
     value = "$(location :MODULE.bazel)",
     varname = "REPO_LOCATION",
@@ -22,9 +23,11 @@ dirname_providing_rule(
 
 dirname_providing_rule(
     name = "repo_rootpath",
+    append = "/6.8.4/macos/lib",
     data = [":MODULE.bazel"],
     value = "$(rootpath :MODULE.bazel)",
     varname = "REPO_ROOTPATH",
+    visibility = ["//visibility:public"],
 )
 
 genrule(

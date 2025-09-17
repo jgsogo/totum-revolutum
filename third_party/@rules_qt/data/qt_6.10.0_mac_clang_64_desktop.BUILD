@@ -15,6 +15,7 @@ load("@rules_qt//private:dirname_providing_rule.bzl", "dirname_providing_rule")
 
 dirname_providing_rule(
     name = "repo_location",
+    append = "/6.10.0/macos/lib",
     data = [":MODULE.bazel"],
     value = "$(location :MODULE.bazel)",
     varname = "REPO_LOCATION",
@@ -22,9 +23,11 @@ dirname_providing_rule(
 
 dirname_providing_rule(
     name = "repo_rootpath",
+    append = "/6.10.0/macos/lib",
     data = [":MODULE.bazel"],
     value = "$(rootpath :MODULE.bazel)",
     varname = "REPO_ROOTPATH",
+    visibility = ["//visibility:public"],
 )
 
 genrule(
@@ -105,14 +108,12 @@ cc_library(
         "6.10.0/macos/lib/QtLabsPlatform.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtLabsPlatform",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtLabsPlatform.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -137,14 +138,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -180,14 +179,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickParticles.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickParticles",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickParticles.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -223,14 +220,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2ImagineStyleImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2ImagineStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -255,14 +250,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2BasicStyleImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2BasicStyleImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2BasicStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -287,14 +280,12 @@ cc_library(
         "6.10.0/macos/lib/QtLabsSharedImage.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtLabsSharedImage",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtLabsSharedImage.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -319,14 +310,12 @@ cc_library(
         "6.10.0/macos/lib/QtQmlMeta.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQmlMeta",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQmlMeta.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -358,14 +347,12 @@ cc_library(
         "6.10.0/macos/lib/QtDesigner.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtDesigner",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtDesigner.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -398,14 +385,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2FusionStyleImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2FusionStyleImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2FusionStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -430,14 +415,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickShapesDesignHelpers.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickShapesDesignHelpers",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickShapesDesignHelpers.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -474,14 +457,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickWidgets.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickWidgets",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickWidgets.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -518,14 +499,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2Material.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Material",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Material.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -550,14 +529,12 @@ cc_library(
         "6.10.0/macos/lib/QtQmlXmlListModel.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQmlXmlListModel",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQmlXmlListModel.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -587,14 +564,12 @@ cc_library(
         "6.10.0/macos/lib/QtLabsSynchronizer.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtLabsSynchronizer",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtLabsSynchronizer.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -622,14 +597,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickLayouts.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickLayouts",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickLayouts.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -659,14 +632,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2Basic.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Basic",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Basic.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -691,14 +662,12 @@ cc_library(
         "6.10.0/macos/lib/QtHelp.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtHelp",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtHelp.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -729,14 +698,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickVectorImage.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickVectorImage",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickVectorImage.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -761,14 +728,12 @@ cc_library(
         "6.10.0/macos/lib/QtPrintSupport.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtPrintSupport",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtPrintSupport.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -798,14 +763,12 @@ cc_library(
         "6.10.0/macos/lib/QtGui.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtGui",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtGui.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -833,14 +796,12 @@ cc_library(
         "6.10.0/macos/lib/QtDBus.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtDBus",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtDBus.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -868,14 +829,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2Fusion.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Fusion",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Fusion.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -900,14 +859,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickTemplates2.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickTemplates2",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickTemplates2.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -943,14 +900,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickDialogs2Utils.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickDialogs2Utils",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickDialogs2Utils.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -978,14 +933,12 @@ cc_library(
         "6.10.0/macos/lib/QtXml.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtXml",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtXml.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1013,14 +966,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuick.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuick",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuick.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1055,14 +1006,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickEffects.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickEffects",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickEffects.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1098,14 +1047,12 @@ cc_library(
         "6.10.0/macos/lib/QtCore.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtCore",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtCore.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1130,14 +1077,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickDialogs2QuickImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickDialogs2QuickImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickDialogs2QuickImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1173,14 +1118,12 @@ cc_library(
         "6.10.0/macos/lib/QtQmlNetwork.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQmlNetwork",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQmlNetwork.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1210,14 +1153,12 @@ cc_library(
         "6.10.0/macos/lib/QtQml.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQml",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQml.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1246,14 +1187,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickVectorImageGenerator.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickVectorImageGenerator",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickVectorImageGenerator.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1278,14 +1217,12 @@ cc_library(
         "6.10.0/macos/lib/QtQmlCore.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQmlCore",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQmlCore.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1315,14 +1252,12 @@ cc_library(
         "6.10.0/macos/lib/QtQmlWorkerScript.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQmlWorkerScript",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQmlWorkerScript.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1352,14 +1287,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2Impl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Impl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Impl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1395,14 +1328,12 @@ cc_library(
         "6.10.0/macos/lib/QtOpenGL.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtOpenGL",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtOpenGL.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1431,14 +1362,12 @@ cc_library(
         "6.10.0/macos/lib/QtLabsQmlModels.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtLabsQmlModels",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtLabsQmlModels.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1463,14 +1392,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2Universal.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Universal",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Universal.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1495,14 +1422,12 @@ cc_library(
         "6.10.0/macos/lib/QtQmlLocalStorage.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQmlLocalStorage",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQmlLocalStorage.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1531,14 +1456,12 @@ cc_library(
         "6.10.0/macos/lib/QtQmlCompiler.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQmlCompiler",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQmlCompiler.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1568,14 +1491,12 @@ cc_library(
         "6.10.0/macos/lib/QtOpenGLWidgets.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtOpenGLWidgets",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtOpenGLWidgets.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1606,14 +1527,12 @@ cc_library(
         "6.10.0/macos/lib/QtUiTools.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtUiTools",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtUiTools.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1645,14 +1564,12 @@ cc_library(
         "6.10.0/macos/lib/QtLabsSettings.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtLabsSettings",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtLabsSettings.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1682,14 +1599,12 @@ cc_library(
         "6.10.0/macos/lib/QtSvgWidgets.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtSvgWidgets",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtSvgWidgets.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1720,14 +1635,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2MacOSStyleImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2MacOSStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1752,14 +1665,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2MaterialStyleImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2MaterialStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1784,14 +1695,12 @@ cc_library(
         "6.10.0/macos/lib/QtTest.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtTest",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtTest.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1819,14 +1728,12 @@ cc_library(
         "6.10.0/macos/lib/QtWidgets.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtWidgets",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtWidgets.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1855,14 +1762,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickShapes.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickShapes",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickShapes.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1898,14 +1803,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickTest.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickTest",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickTest.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1934,14 +1837,12 @@ cc_library(
         "6.10.0/macos/lib/QtNetwork.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtNetwork",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtNetwork.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -1969,14 +1870,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2UniversalStyleImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2UniversalStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2001,14 +1900,12 @@ cc_library(
         "6.10.0/macos/lib/QtSvg.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtSvg",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtSvg.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2037,14 +1934,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2IOSStyleImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2IOSStyleImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2IOSStyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2069,14 +1964,12 @@ cc_library(
         "6.10.0/macos/lib/QtDesignerComponents.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtDesignerComponents",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtDesignerComponents.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2110,14 +2003,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2Imagine.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2Imagine",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2Imagine.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2142,14 +2033,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickVectorImageHelpers.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickVectorImageHelpers",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickVectorImageHelpers.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2174,14 +2063,12 @@ cc_library(
         "6.10.0/macos/lib/QtQmlModels.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQmlModels",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQmlModels.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2211,14 +2098,12 @@ cc_library(
         "6.10.0/macos/lib/QtLabsAnimation.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtLabsAnimation",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtLabsAnimation.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2243,14 +2128,12 @@ cc_library(
         "6.10.0/macos/lib/QtLabsFolderListModel.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtLabsFolderListModel",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtLabsFolderListModel.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2275,14 +2158,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickControls2FluentWinUI3StyleImpl",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickControls2FluentWinUI3StyleImpl.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2307,14 +2188,12 @@ cc_library(
         "6.10.0/macos/lib/QtQuickDialogs2.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtQuickDialogs2",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtQuickDialogs2.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2350,14 +2229,12 @@ cc_library(
         "6.10.0/macos/lib/QtLabsWavefrontMesh.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtLabsWavefrontMesh",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtLabsWavefrontMesh.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2382,14 +2259,12 @@ cc_library(
         "6.10.0/macos/lib/QtSql.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtSql",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtSql.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
@@ -2417,14 +2292,12 @@ cc_library(
         "6.10.0/macos/lib/QtConcurrent.framework/Headers",
     ],
     linkopts = [
-        "-F $(REPO_LOCATION)/6.10.0/macos/lib",
+        "-F $(REPO_LOCATION)",
         "-framework QtConcurrent",
-        "-rpath $(REPO_ROOTPATH)/6.10.0/macos/lib",
     ],
     strip_include_prefix = "6.10.0/macos/lib/QtConcurrent.framework/Headers",
     toolchains = [
         ":repo_location",
-        ":repo_rootpath",
     ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
