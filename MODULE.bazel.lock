@@ -11809,17 +11809,17 @@
     },
     "@@rules_qt+//:extensions.bzl%qt": {
       "general": {
-        "bzlTransitiveDigest": "53WoLtUypGXU6IY4mJRyXtL26PMJlxZji5lMwYsmn2w=",
-        "usagesDigest": "1JwlHpMqSq924kSrIT/r6bSzjzYNGcd8oust3HtRn94=",
+        "bzlTransitiveDigest": "awlgwinS5hixsS/H33NHBoCAfDP6V54vvt6zKr4UbEk=",
+        "usagesDigest": "t1Kd1+G2RTRDHy/M+8s9C3zGRvhwv5ofHuJPlSDFaX4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
         "generatedRepoSpecs": {
-          "qt_6.10.0_mac_x86_64": {
-            "repoRuleId": "@@rules_qt+//tools/aqt:install_qt.bzl%install_qt",
+          "qt_mac_clang_64": {
+            "repoRuleId": "@@rules_qt+//private:install_qt.bzl%install_qt",
             "attributes": {
               "host": "mac",
-              "version": "6.10.0",
+              "version": "6.9.2",
               "arch": "clang_64",
               "target_sdk": "desktop"
             }

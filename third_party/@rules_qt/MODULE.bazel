@@ -29,14 +29,4 @@ pip.parse(
 use_repo(pip, "py_deps_rules_qt")
 
 qt = use_extension("@rules_qt//:extensions.bzl", "qt")
-qt.install(
-    name = "qt_6.10.0_mac_x86_64",
-    arch = "clang_64",
-    host = "mac",
-    target_sdk = "desktop",
-    version = "6.10.0",
-)
-use_repo(
-    qt,
-    "qt_6.10.0_mac_x86_64",
-)
+use_repo(qt, "qt_mac_clang_64")

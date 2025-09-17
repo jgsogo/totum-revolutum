@@ -186,6 +186,33 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "//:extensions.bzl%qt": {
+      "general": {
+        "bzlTransitiveDigest": "h93+weUqjkjCZoWkW1BJxdPJHeyHEiMnvRWcDHguksI=",
+        "usagesDigest": "Lo599PhFCK5llW6RiTBONdN8lFZ76CQkQ4EdwdGspuQ=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "qt_mac_clang_64": {
+            "repoRuleId": "@@//private:install_qt.bzl%install_qt",
+            "attributes": {
+              "host": "mac",
+              "version": "6.9.2",
+              "arch": "clang_64",
+              "target_sdk": "desktop"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "rules_qt",
+            ""
+          ]
+        ]
+      }
+    },
     "@@aspect_rules_py+//py:extensions.bzl%py_tools": {
       "general": {
         "bzlTransitiveDigest": "bO7IB2vWvQpUVmuE3YdX9T/MGZQPC64cqoKqxStqBgA=",

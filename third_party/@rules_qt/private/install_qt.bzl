@@ -2,13 +2,7 @@
 A repository rule to install Qt
 """
 
-def get_base_name(host, version):
-    v = version.replace(".", "_")
-    return "qt_{}_{}".format(v, host)
-
-def get_build_filename(host, version):
-    base_name = get_base_name(host, version)
-    return "{}.BUILD".format(base_name)
+load("@rules_qt//private:utils.bzl", "get_build_filename")
 
 def _install_qt_impl(rctx):
     # See if aqt is installed
@@ -27,9 +21,10 @@ def _install_qt_impl(rctx):
         fail("Failed to install Qt version: \nSTDERR:\n{}\nSTDOUT:\n{}".format(r.stderr, r.stdout))
 
     # TODO: We could remove directories that we won't use
+    build_filename = get_build_filename("qt", version, host, arch, target_sdk)
 
     rctx.file("MODULE.bazel", content = "module(name = {})".format(rctx.attr.name))
-    build_file = Label("@rules_qt//data:{}".format(get_build_filename(host, version)))
+    build_file = Label("@rules_qt//data:{}".format(build_filename))
     rctx.file("BUILD.bazel", content = rctx.read(build_file))
 
 install_qt = repository_rule(

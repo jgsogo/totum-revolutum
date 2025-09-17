@@ -13,7 +13,7 @@ def qt_cc_binary(name, srcs, deps = None, copts = [], data = [], env = {}, **kwa
             "//conditions:default": ["-fPIC"],
         }),
         data = data + select({
-            "@bazel_tools//src/conditions:darwin_x86_64": ["@qt_6.10.0_mac_x86_64//:qt_env"],
+            "@bazel_tools//src/conditions:darwin_x86_64": ["@qt_mac_clang_64//:qt_env"],
         }),
         env = env,
         # env = select({

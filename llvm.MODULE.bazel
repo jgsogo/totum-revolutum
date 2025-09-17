@@ -49,10 +49,8 @@ register_toolchains("@llvm_toolchain//:all")
 # Qt
 #####
 qt = use_extension("@rules_qt//:extensions.bzl", "qt")
-use_repo(
-    qt,
-    "qt_6.10.0_mac_x86_64",
-)
+qt.configure(qt_version = "6.9.2")
+use_repo(qt, "qt_mac_clang_64")
 
 # register_toolchains(
 #     "@rules_qt//tools:all",

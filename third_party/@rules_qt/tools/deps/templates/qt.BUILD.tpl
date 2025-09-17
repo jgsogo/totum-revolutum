@@ -13,7 +13,6 @@ load("@rules_qt//private:dirname_providing_rule.bzl", "dirname_providing_rule")
 
 # ARCH = "{{ arch }}"
 
-
 dirname_providing_rule(
     name = "repo_location",
     data = [":MODULE.bazel"],
@@ -27,7 +26,6 @@ dirname_providing_rule(
     value = "$(rootpath :MODULE.bazel)",
     varname = "REPO_ROOTPATH",
 )
-
 
 genrule(
     name = "_qt_env",
@@ -114,6 +112,10 @@ cc_library(
         "-rpath $(REPO_ROOTPATH)/{{ path_prefix }}/lib",
     ],
     strip_include_prefix = "{{ path_prefix }}/lib/{{ framework.hdrs_dir }}",
+    toolchains = [
+        ":repo_location",
+        ":repo_rootpath",
+    ],
     # target_compatible_with = "[]"
     visibility = ["//visibility:public"],
     {%- if framework.deps %}
@@ -123,10 +125,6 @@ cc_library(
         {%- endfor %}
     ],
     {%- endif %}
-    toolchains = [
-        ":repo_location",
-        ":repo_rootpath",
-    ],
 )
 {%- endfor %}
 

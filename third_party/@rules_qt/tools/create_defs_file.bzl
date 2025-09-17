@@ -2,15 +2,11 @@
 A function to create the BUILD file for a repo
 """
 
-load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
-load("//tools:update_ws_file.bzl", "update_ws_file")
-load("//tools/aqt:install_qt.bzl", "get_build_filename")
+load("@rules_qt//:constants.bzl", "ARCHS", "HOSTS", "OUTPUT_DIR_FOR_HOST", "TARGET_SDKS")
+load("@rules_qt//private:utils.bzl", "get_base_name", "get_build_filename")
+load("@rules_qt//tools:update_ws_file.bzl", "update_ws_file")
 
-HOSTS = ["mac"]
-TARGET_SDKS = ["desktop"]
-ARCHS = ["clang_64"]
-
-def create_defs_file(name, host, target_sdk, version, arch):
+def create_defs_file_and_update_test(name, host, target_sdk, version, arch):
     """
     Generates the BUILD file for a repo
 
@@ -22,54 +18,101 @@ def create_defs_file(name, host, target_sdk, version, arch):
         arch:
     """
 
-    if host not in HOSTS:
-        fail("Invalid host value '{}'. Valid hosts are '{}'".format(host, "', '".join(HOSTS)))
+    base_name = get_base_name(name, version, host, arch, target_sdk)
+    output_filename = get_build_filename(name, version, host, arch, target_sdk)
 
-    if target_sdk not in TARGET_SDKS:
-        fail("Invalid target_sdk value '{}'. Valid target_sdks are '{}'".format(target_sdk, "', '".join(TARGET_SDKS)))
-
-    if arch not in ARCHS:
-        fail("Invalid arch value '{}'. Valid archs are '{}'".format(arch, "', '".join(ARCHS)))
-
-    out_dirs_host = {"mac": "macos"}.get(host)
-
-    base_name = "qt_{}_{}".format(version.replace(".", "_"), host)
-
-    run_binary(
+    create_defs_file(
         name = base_name,
-        tool = "//tools/aqt",
-        args = [
-            "install-qt",
-            host,
-            target_sdk,
-            version,
-            arch,
-            "--outputdir $(RULEDIR)",
-        ],
-        out_dirs = ["{}/{}".format(version, out_dirs_host)],
-        tags = ["manual"],
+        arch = arch,
+        host = host,
+        target_sdk = target_sdk,
+        version = version,
     )
 
-    run_binary(
-        name = "{}/deps".format(base_name),
-        tool = "//tools/deps",
-        args = [
-            "--input_path=$(location :{})".format(base_name),
-            "--base_path=$(RULEDIR)",
-            "--output=$@",
-            "--host={}".format(host),
-            "--target_sdk={}".format(target_sdk),
-            "--version={}".format(version),
-            "--arch={}".format(arch),
-        ],
-        srcs = [":{}".format(base_name)],
-        outs = ["out/{}.bzl".format(base_name)],
-        # tags = ["manual"],
-    )
-
-    filename = get_build_filename(host, version)
     update_ws_file(
         name = base_name,
-        origin = "{}/deps".format(base_name),
-        target = filename,
+        origin = ":{}".format(base_name),
+        target = ":{}".format(output_filename),
     )
+
+def _create_defs_file(ctx):
+    # Execute AQT to install Qt
+    install_folder = ctx.actions.declare_directory(ctx.attr.name + ".install")
+
+    args = ctx.actions.args()
+
+    # args.add(ctx.executable._aqt)
+    args.add("install-qt")
+    args.add(ctx.attr.host)
+    args.add(ctx.attr.target_sdk)
+    args.add(ctx.attr.version)
+    args.add(ctx.attr.arch)
+    args.add("--outputdir")
+    args.add(install_folder.path)
+
+    ctx.actions.run(
+        outputs = [install_folder],
+        arguments = [args],
+        progress_message = "Installing Qt {} for {}".format(ctx.attr.version, ctx.attr.host),
+        executable = ctx.executable._aqt,
+    )
+
+    # Execute our tool to generate the BUILD file
+    output = ctx.actions.declare_file(ctx.attr.name + ".out")
+
+    args = ctx.actions.args()
+    args.add("--input_path")
+    args.add(install_folder.path + "/{}/{}".format(ctx.attr.version, OUTPUT_DIR_FOR_HOST.get(ctx.attr.host, ctx.attr.host)))
+    args.add("--base_path")
+    args.add(install_folder.path)
+    args.add("--output")
+    args.add(output)
+    args.add("--host")
+    args.add(ctx.attr.host)
+    args.add("--target_sdk")
+    args.add(ctx.attr.target_sdk)
+    args.add("--version")
+    args.add(ctx.attr.version)
+    args.add("--arch")
+    args.add(ctx.attr.arch)
+
+    ctx.actions.run(
+        inputs = [install_folder],
+        outputs = [output],
+        arguments = [args],
+        progress_message = "Creating BUILD file",
+        executable = ctx.executable._repo_build_tool,
+    )
+
+    return DefaultInfo(files = depset([output]))
+
+create_defs_file = rule(
+    implementation = _create_defs_file,
+    attrs = {
+        "host": attr.string(
+            mandatory = True,
+            values = HOSTS,
+        ),
+        "target_sdk": attr.string(
+            mandatory = True,
+            values = TARGET_SDKS,
+        ),
+        "arch": attr.string(
+            mandatory = True,
+            values = ARCHS,
+        ),
+        "version": attr.string(
+            mandatory = True,
+        ),
+        "_aqt": attr.label(
+            executable = True,
+            default = Label("@rules_qt//tools/aqt"),
+            cfg = "exec",
+        ),
+        "_repo_build_tool": attr.label(
+            executable = True,
+            default = Label("@rules_qt//tools/deps"),
+            cfg = "exec",
+        ),
+    },
+)
