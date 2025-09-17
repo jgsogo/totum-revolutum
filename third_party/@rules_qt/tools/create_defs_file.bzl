@@ -4,6 +4,7 @@ A function to create the BUILD file for a repo
 
 load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
 load("//tools:update_ws_file.bzl", "update_ws_file")
+load("//tools/aqt:install_qt.bzl", "get_build_filename")
 
 HOSTS = ["mac"]
 TARGET_SDKS = ["desktop"]
@@ -66,8 +67,9 @@ def create_defs_file(name, host, target_sdk, version, arch):
         # tags = ["manual"],
     )
 
+    filename = get_build_filename(host, version)
     update_ws_file(
         name = base_name,
         origin = "{}/deps".format(base_name),
-        target = "{}.BUILD".format(base_name),
+        target = filename,
     )

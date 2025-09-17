@@ -1,5 +1,5 @@
 load("@aspect_rules_py//py:defs.bzl", "py_binary")
-load("@py_deps//:requirements.bzl", "requirement")
+load("@py_deps_rules_qt//:requirements.bzl", "requirement")
 
 py_binary(
     name = "deps",

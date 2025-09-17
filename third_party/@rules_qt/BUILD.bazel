@@ -1,0 +1,7 @@
+alias(
+    name = "qt",
+    actual = select({
+        "@bazel_tools//src/conditions:darwin_x86_64": "@qt_6.10.0_mac_x86_64//:qt",
+    }),
+    visibility = ["//visibility:public"],
+)

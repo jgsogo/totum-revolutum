@@ -11807,6 +11807,33 @@
         ]
       }
     },
+    "@@rules_qt+//:extensions.bzl%qt": {
+      "general": {
+        "bzlTransitiveDigest": "53WoLtUypGXU6IY4mJRyXtL26PMJlxZji5lMwYsmn2w=",
+        "usagesDigest": "1JwlHpMqSq924kSrIT/r6bSzjzYNGcd8oust3HtRn94=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "qt_6.10.0_mac_x86_64": {
+            "repoRuleId": "@@rules_qt+//tools/aqt:install_qt.bzl%install_qt",
+            "attributes": {
+              "host": "mac",
+              "version": "6.10.0",
+              "arch": "clang_64",
+              "target_sdk": "desktop"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "rules_qt+",
+            "rules_qt",
+            "rules_qt+"
+          ]
+        ]
+      }
+    },
     "@@rules_rust+//crate_universe:extensions.bzl%crate": {
       "general": {
         "bzlTransitiveDigest": "KVXr8Qsaq4d6PZ6q9IZN4lmdSbGXxWapUbMDXp04nVk=",

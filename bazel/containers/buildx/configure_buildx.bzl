@@ -20,7 +20,7 @@ def _impl_configure_buildx(rctx):
         if not builder_name in r.stdout:
             r = rctx.execute([buildx, "create", "--name", builder_name, "--driver", "docker-container"])
             if r.return_code != 0:
-                fail("Failed to create buildx driver %s: \nSTDERR:\n%s\nsSTDOUT:\n%s" % (builder_name, r.stderr, r.stdout))
+                fail("Failed to create buildx driver %s: \nSTDERR:\n%s\nSTDOUT:\n%s" % (builder_name, r.stderr, r.stdout))
         else:
             # buildifier: disable=print
             print("WARNING: BuildX driver `%s` already exists." % builder_name)
