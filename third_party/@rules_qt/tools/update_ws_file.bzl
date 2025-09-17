@@ -40,7 +40,7 @@ def update_ws_file(name, origin, target):
             "$(location {})".format(origin),
             "$(location {})".format(target),
         ],
-        tags = ["manual"],
+        tags = ["update"],
     )
 
     command(

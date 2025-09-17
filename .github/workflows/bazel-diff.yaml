@@ -232,6 +232,17 @@ jobs:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/
 
+      - name: Test third parties (all tests)
+        run: |
+          pushd third_party/@rules_qt || exit 1
+
+          # Run all the tests ('manual' ones are only built if required)
+          set +e
+          bazel test $BAZEL_CONFIG --test_tag_filters=-manual --build_tag_filters=-manual //...
+
+          # error_code 4 - Build successful but no tests were found even though testing was requested (https://bazel.build/run/scripts)
+          err=$? ; if (( $err != 4 )) ; then exit $err ; fi
+
       - name: Test impacted targets
         run: |
           # Do not fail for next command

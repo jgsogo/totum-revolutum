@@ -191,8 +191,8 @@
   "moduleExtensions": {
     "//:extensions.bzl%qt": {
       "general": {
-        "bzlTransitiveDigest": "h93+weUqjkjCZoWkW1BJxdPJHeyHEiMnvRWcDHguksI=",
-        "usagesDigest": "Lo599PhFCK5llW6RiTBONdN8lFZ76CQkQ4EdwdGspuQ=",
+        "bzlTransitiveDigest": "4gkfQGbsFPLIcee96wg0YaAAv0SZADeKij9ux/mWKuQ=",
+        "usagesDigest": "XVgwWT5ONw3COaIQMvp2iioVlil7BnmE/qYUj9pHSXY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -201,7 +201,7 @@
             "repoRuleId": "@@//private:install_qt.bzl%install_qt",
             "attributes": {
               "host": "mac",
-              "version": "6.9.2",
+              "version": "6.8.4",
               "arch": "clang_64",
               "target_sdk": "desktop"
             }

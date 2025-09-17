@@ -53,7 +53,7 @@ update-bazel:
 
 # Run all testing
 [group('dev')]
-test: build bazel-check
+test: build bazel-check rules_qt-test
     # cargo check
     # cargo clippy
     bazel run //bazel/tools/format
@@ -74,7 +74,7 @@ npm-install:
 
 # Run all the Bazel targets labelled with 'update' tag
 [group('bazel')]
-bazel-update: (utils::_bazel_run_targets 'update')
+bazel-update: rules_qt-bazel-update (utils::_bazel_run_targets 'update')
 
 # Run all the Bazel targets labelled with 'check' tag
 [group('bazel')]
@@ -141,3 +141,15 @@ gh-runner: gh-runner-linux gh-runner-macos
 # Stop self-hosted runners for Linux
 [group('github')]
 gh-runner-stop: gh-runner-linux-stop
+
+# Run all testing
+[group('@rules_qt')]
+[working-directory('third_party/@rules_qt')]
+rules_qt-test:
+    bazel test --test_keep_going //...
+
+# Run all the Bazel targets labelled with 'update' tag
+[group('@rules_qt')]
+[working-directory('third_party/@rules_qt')]
+rules_qt-bazel-update:
+    just utils::_bazel_run_targets 'update' $(pwd)
