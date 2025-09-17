@@ -40,8 +40,6 @@ def _create_defs_file(ctx):
     install_folder = ctx.actions.declare_directory(ctx.attr.name + ".install")
 
     args = ctx.actions.args()
-
-    # args.add(ctx.executable._aqt)
     args.add("install-qt")
     args.add(ctx.attr.host)
     args.add(ctx.attr.target_sdk)
@@ -83,6 +81,9 @@ def _create_defs_file(ctx):
         progress_message = "Creating BUILD file",
         executable = ctx.executable._repo_build_tool,
     )
+
+    # We could generate a `.tar.gz` too and store it somewhere. This way we will be sure that the
+    # generated BUILD file matches the repo
 
     return DefaultInfo(files = depset([output]))
 

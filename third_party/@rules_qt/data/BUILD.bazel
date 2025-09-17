@@ -1,4 +1,6 @@
+load("@rules_multirun//:defs.bzl", "multirun")
 load("@rules_qt//:constants.bzl", "QT_RELEASES", "VERSIONS")
+load("@rules_qt//private:utils.bzl", "get_base_name")
 load("@rules_qt//tools:create_defs_file.bzl", "create_defs_file_and_update_test")
 
 [
@@ -16,3 +18,12 @@ load("@rules_qt//tools:create_defs_file.bzl", "create_defs_file_and_update_test"
 ]
 
 # Maybe use multirun and update all of them together
+multirun(
+    name = "data",
+    commands = [
+        ":{}.cmd".format(get_base_name("qt", version, host, arch, target_sdk))
+        for version in VERSIONS
+        for host, target_sdk, arch in QT_RELEASES
+    ],
+    jobs = 0,  # Set to 0 to run in parallel, defaults to sequential
+)
