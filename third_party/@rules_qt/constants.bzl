@@ -19,6 +19,25 @@ QT_RELEASES = [
 
 OUTPUT_DIR_FOR_HOST = {"mac": "macos"}
 
+# List of targets that appear on every version/host/target_sdk/arch
+QT_COMMON_LIBRARIES = [
+    "qt",
+    "qt_hdrs",
+    "qt_env",
+    "plugin_files",
+    "qml_files",
+    "uic",
+    "moc",
+    "rcc",
+    "repo_rootpath",
+
+    # Individual libraries
+    "qt_core",
+    "qt_widgets",
+]
+
+# aqt install-qt --help
+#
 #   {linux,linux_arm64,mac,windows,windows_arm64,all_os}
 #                         host os name
 #   {desktop,winrt,android,ios,wasm,qt}

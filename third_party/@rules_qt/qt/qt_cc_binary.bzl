@@ -12,16 +12,12 @@ def qt_cc_binary(name, srcs, deps = None, copts = [], data = [], env = {}, toolc
             "@platforms//os:windows": [],
             "//conditions:default": ["-fPIC"],
         }),
-        data = data + select({
-            "@bazel_tools//src/conditions:darwin_x86_64": ["@qt_mac_clang_64//:qt_env"],
-        }),
+        data = data + ["@rules_qt//:qt_env"],
         env = env,
         linkopts = linkopts + [
             "-rpath $(REPO_ROOTPATH)",
         ],
-        toolchains = toolchains + select({
-            "@bazel_tools//src/conditions:darwin_x86_64": ["@qt_mac_clang_64//:repo_rootpath"],
-        }),
+        toolchains = toolchains + ["@rules_qt//:repo_rootpath"],
         # env = select({
         #     # "@platforms//os:linux": linux_env_data,
         #     "@rules_qt//:osx_x86_64": mac_x64_env_data,
