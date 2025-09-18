@@ -1,7 +1,5 @@
 load("@rules_uv//uv:pip.bzl", "pip_compile")
 
-exports_files(["update_ws_file.sh"])
-
 pip_compile(
     name = "python_requirements",
     python_platform = "x86_64-unknown-linux-gnu",

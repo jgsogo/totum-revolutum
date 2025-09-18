@@ -2,7 +2,7 @@
 A repository rule to install Qt
 """
 
-load("@rules_qt//private:utils.bzl", "get_build_filename")
+load("@rules_qt//private/utils:naming.bzl", "get_build_filename")
 
 def _install_qt_impl(rctx):
     # See if aqt is installed

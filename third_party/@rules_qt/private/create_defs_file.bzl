@@ -3,8 +3,8 @@ A function to create the BUILD file for a repo
 """
 
 load("@rules_qt//:constants.bzl", "ARCHS", "HOSTS", "OUTPUT_DIR_FOR_HOST", "TARGET_SDKS")
-load("@rules_qt//private:utils.bzl", "get_base_name", "get_build_filename")
-load("@rules_qt//tools:update_ws_file.bzl", "update_ws_file")
+load("@rules_qt//private/utils:naming.bzl", "get_base_name", "get_build_filename")
+load("@rules_qt//private/utils:update_ws_file.bzl", "update_ws_file")
 
 def create_defs_file_and_update_test(name, host, target_sdk, version, arch):
     """

@@ -1,7 +1,7 @@
 load("@rules_multirun//:defs.bzl", "multirun")
 load("@rules_qt//:constants.bzl", "QT_RELEASES", "VERSIONS")
-load("@rules_qt//private:utils.bzl", "get_base_name")
-load("@rules_qt//tools:create_defs_file.bzl", "create_defs_file_and_update_test")
+load("@rules_qt//private:create_defs_file.bzl", "create_defs_file_and_update_test")
+load("@rules_qt//private/utils:naming.bzl", "get_base_name")
 
 [
     [
