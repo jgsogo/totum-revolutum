@@ -34,7 +34,7 @@ def update_ws_file(name, origin, target):
 
     sh_binary(
         name = "{}.update".format(name),
-        srcs = ["//tools:update_ws_file.sh"],
+        srcs = ["@rules_qt//private/utils:update_ws_file.sh"],
         data = [origin, target],
         args = [
             "$(location {})".format(origin),

@@ -191,7 +191,7 @@
   "moduleExtensions": {
     "//:extensions.bzl%qt": {
       "general": {
-        "bzlTransitiveDigest": "1Ae5KPUGw4phAiCALD2FMHx19JDCZXAVY6+1iJiEIu8=",
+        "bzlTransitiveDigest": "kBA742Z8eMwbCQavh0XlS4WtL5K3quxF2gFB3MBCFpM=",
         "usagesDigest": "XVgwWT5ONw3COaIQMvp2iioVlil7BnmE/qYUj9pHSXY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
