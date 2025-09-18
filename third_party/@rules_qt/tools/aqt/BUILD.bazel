@@ -1,0 +1,13 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary")
+load("@py_deps_rules_qt//:requirements.bzl", "requirement")
+
+py_binary(
+    name = "aqt",
+    srcs = ["aqt_wrapper.py"],
+    main = "aqt_wrapper.py",
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = [
+        requirement("aqtinstall"),
+    ],
+)

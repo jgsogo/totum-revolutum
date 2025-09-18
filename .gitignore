@@ -1,3 +1,4 @@
+**/bazel-*
 **/src-tauri/gen/
 *.bak
 *.sqlite3

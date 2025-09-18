@@ -6,6 +6,11 @@ bazel_dep(name = "toolchains_llvm", version = "1.5.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
 bazel_dep(name = "spdlog", version = "1.15.3")
 bazel_dep(name = "catch2", version = "3.10.0")
+bazel_dep(name = "rules_qt")
+local_path_override(
+    module_name = "rules_qt",
+    path = "third_party/@rules_qt",
+)
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -39,6 +44,17 @@ use_repo(llvm, "llvm_toolchain")
 use_repo(llvm, "llvm_toolchain_llvm")  # if you depend on specific tools in scripts
 
 register_toolchains("@llvm_toolchain//:all")
+
+#####
+# Qt
+#####
+qt = use_extension("@rules_qt//:extensions.bzl", "qt")
+qt.configure(qt_version = "6.9.2")
+use_repo(qt, "qt_mac_clang_64")
+
+#####
+# Other extensions
+#####
 
 libpqxx_non_module_dependencies = use_extension("//third_party/libpqxx:extensions.bzl", "non_module_dependencies")
 use_repo(libpqxx_non_module_dependencies, "libpqxx")

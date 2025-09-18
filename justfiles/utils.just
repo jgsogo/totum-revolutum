@@ -36,12 +36,16 @@ _bazel_run_oci_load bazel_config="":
     done <<< "$targets"
 
 # Run all targets with the given tag
-_bazel_run_targets tag bazel_config="":
+_bazel_run_targets tag wd="." bazel_config="":
     #!/usr/bin/env bash
     set -euox pipefail
 
+    pwd
+    pushd {{ wd }}
     targets=$(bazel query "attr('tags', '{{ tag }}', '//...')")
 
     while IFS= read -r line; do
         bazel run {{ bazel_config }} $line
     done <<< "$targets"
+
+    popd
