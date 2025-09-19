@@ -9,11 +9,6 @@ django_app(
     ],
 )
 
-# TODO: If we consume the //libraries/finances/investments/fixtures/testing, we
-#       can remove this command to populate the DB with test data.
-#
-#       For these models, the fixtures are not that complex/long so I think we
-#       can use them instead of the Python script to populate test data.
 sh_with_runfiles_binary(
     name = "populate_test_database",
     testonly = True,
