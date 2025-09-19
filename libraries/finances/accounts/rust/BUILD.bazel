@@ -40,6 +40,9 @@ rust_library(
 
 # FIXME: This binary is a bit convoluted: it depends on the 'finances_accounts' library
 # to generate the 'constants.rs' file which is included in the library itself.
+# Now that we have the '//libraries/finances/accounts/fixtures/migration' available, we
+# can use those files to generate these constants. It can be a pre-build step and it will
+# let us remove some of these targets ('update' ones are evil)
 rust_binary(
     name = "gen_constants",
     srcs = glob(["src/gen_constants/bin/**/*.rs"]),
@@ -78,7 +81,7 @@ with_postgres_test(
     # First migrate, then populate the database, then run the tests
     binaries = [
         "//libraries/finances/accounts/django_finances_accounts:migrate",
-        "//libraries/finances/accounts/fixtures/testing:loaddata",
+        "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
         ":_tests",
     ],
     env = {

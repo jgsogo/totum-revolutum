@@ -36,6 +36,7 @@ cc_binary(
 
 with_postgres_run(
     name = "dev",
+    testonly = True,
     binaries = [
         "//apps/board_games/database:app-migrate",
         "//apps/board_games/database:_populate_test_database",

@@ -7,15 +7,9 @@
 # load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
 
 # MODELS_FOR_TESTING = [
-#     "account",
-#     "accountholder",
-#     "accountholderrole",
-#     "custodian",
-#     "fx",
-#     "movement",
-#     "snapshot",
-#     "transaction",
-#     "transactiongroup",
+#     "movementdividend",
+#     "movementnumerable",
+#     "snapshotnumerable",
 # ]
 
 # [
@@ -23,23 +17,26 @@
 #         name = "_gen_fixture_{}".format(it),
 #         args = [
 #             "dumpdata",
-#             "finances_accounts.{}".format(it),
+#             "finances_investments.{}".format(it),
 #             "--format",
 #             "yaml",
 #             "--output",
 #             "$$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/{}.yaml".format(it),
 #         ],
-#         tool = "//libraries/finances/accounts/django_finances_accounts:django-admin",
+#         tool = "//libraries/finances/investments/django_finances_investments:django-admin",
 #     )
 #     for it in MODELS_FOR_TESTING
 # ]
 
 # with_postgres_run(
 #     name = "genfixtures",
-#     # First migrate, then populate the database
 #     binaries = [
-#         "//libraries/finances/accounts/django_finances_accounts:migrate",
-#         "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
+#         # Migrate
+#         "//libraries/finances/investments/django_finances_investments:migrate",
+#         # Populate database
+#         "//libraries/finances/accounts/fixtures/testing:loaddata",
+#         "//libraries/finances/investments/django_finances_investments:populate_test_database",
+#         # Dump fixtures
 #     ] + [":_gen_fixture_{}".format(it) for it in MODELS_FOR_TESTING],
 #     env = {
 #         "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
@@ -54,6 +51,7 @@
 #     tags = [
 #         "update",
 #     ],
+#     testonly = True,
 # )
 
 # filegroup(
@@ -70,7 +68,7 @@
 #     ],
 #     data = [":fixtures"],
 #     tags = ["manual"],
-#     tool = "//libraries/finances/accounts/django_finances_accounts:django-admin",
+#     tool = "//libraries/finances/investments/django_finances_investments:django-admin",
 #     visibility = ["//visibility:public"],
 #     testonly = True,
 # )

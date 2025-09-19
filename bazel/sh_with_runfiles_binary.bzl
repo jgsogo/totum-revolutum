@@ -46,28 +46,37 @@ def _sh_with_runfiles_binary_impl(ctx):
         ),
     ]
 
+ATTRIBS = {
+    # "args": attr.string_list(),
+    "tool": attr.label(
+        # allow_single_file = True,
+        executable = True,
+        cfg = "target",
+        mandatory = True,
+    ),
+    "data": attr.label_list(
+        allow_files = True,
+    ),
+    "env": attr.string_dict(
+        doc = "Environment variables",
+    ),
+    "_run_template": attr.label(
+        default = Label("//bazel:sh_with_runfiles_binary.tpl.sh"),
+        allow_single_file = True,
+    ),
+    "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
+}
+
 sh_with_runfiles_binary = rule(
     implementation = _sh_with_runfiles_binary_impl,
-    attrs = {
-        # "args": attr.string_list(),
-        "tool": attr.label(
-            # allow_single_file = True,
-            executable = True,
-            cfg = "target",
-            mandatory = True,
-        ),
-        "data": attr.label_list(
-            allow_files = True,
-        ),
-        "env": attr.string_dict(
-            doc = "Environment variables",
-        ),
-        "_run_template": attr.label(
-            default = Label("//bazel:sh_with_runfiles_binary.tpl.sh"),
-            allow_single_file = True,
-        ),
-        "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
-    },
+    attrs = ATTRIBS,
     executable = True,
     doc = "Executes a tool using the Bash Runfiles library to locate it",
+)
+
+sh_with_runfiles_test = rule(
+    implementation = _sh_with_runfiles_binary_impl,
+    attrs = ATTRIBS,
+    test = True,
+    doc = "Run some tests using SH script",
 )

@@ -52,7 +52,7 @@ with_postgres_test(
     # First migrate,then run the tests
     binaries = [
         "//libraries/finances/investments/django_finances_investments:migrate",
-        "//libraries/finances/accounts/fixtures/testing:loaddata",
+        "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
         "//libraries/finances/investments/django_finances_investments:populate_test_database",
         ":_tests",
     ],

@@ -27,7 +27,7 @@
 #             "--output",
 #             "$$BUILD_WORKSPACE_DIRECTORY/" + package_name() + "/{}.yaml".format(it),
 #         ],
-#         tool = "//libraries/finances/accounts/django_finances_accounts:django-admin",
+#         tool = "//libraries/finances/investments/django_finances_investments:django-admin",
 #     )
 #     for it in MODELS
 # ]
@@ -36,7 +36,7 @@
 #     name = "genfixtures",
 #     # First migrate, then generate the fixtures
 #     binaries = [
-#         "//libraries/finances/accounts/django_finances_accounts:migrate",
+#         "//libraries/finances/investments/django_finances_investments:migrate",
 #     ] + [":_gen_fixture_{}".format(it) for it in MODELS],
 #     env = {
 #         "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",

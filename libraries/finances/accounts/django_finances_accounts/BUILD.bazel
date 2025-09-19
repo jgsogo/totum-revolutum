@@ -21,10 +21,11 @@ django_app(
 #       can use them instead of the Python script to populate test data.
 sh_with_runfiles_binary(
     name = "populate_test_database",
+    testonly = True,
     args = [
         "finances_accounts_test_data",
     ],
     tags = ["manual"],
     tool = ":django-admin",
-    visibility = ["//libraries/finances/accounts/fixtures/testing:__pkg__"],
+    visibility = ["//visibility:public"],
 )

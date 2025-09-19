@@ -2,9 +2,8 @@
 
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary", "sh_with_runfiles_test")
 load("//bazel/python/django/app:makemigrations.bzl", "django_makemigrations_check", "django_makemigrations_update")
-load("//bazel/python/django/app:migrate.bzl", "django_migrate")
-load("//bazel/python/django/app:test.bzl", "django_test")
 
 def django_app(name, deps = None, visibility = None, app_label = None):
     """
@@ -101,11 +100,14 @@ def django_app(name, deps = None, visibility = None, app_label = None):
         visibility = visibility,
     )
 
-    # The test target for this application
-    django_test(
+    sh_with_runfiles_test(
         name = "unittests",
-        srcs = native.glob(["tests/**/*.py"]),  # Include the test files here
-        django_admin_tool = ":django-admin",
+        data = native.glob(["tests/**/*.py"]),  # Include the test files here
+        args = [
+            "test",
+            "tests",
+        ],
+        tool = ":django-admin",
     )
 
     # makemigrations - Creates pending migrations (it fails if user input is required)
@@ -113,7 +115,6 @@ def django_app(name, deps = None, visibility = None, app_label = None):
         name = "makemigrations.check",
         app_label = app_label,
         django_admin_tool = ":django-admin",
-        deps = ["@bazel_tools//tools/bash/runfiles"],
         tags = ["check"],
         update_rule = ":makemigrations",
     )
@@ -122,13 +123,26 @@ def django_app(name, deps = None, visibility = None, app_label = None):
         name = "makemigrations",
         app_label = app_label,
         django_admin_tool = ":django-admin",
-        deps = ["@bazel_tools//tools/bash/runfiles"],
         tags = ["manual"],
     )
 
-    django_migrate(
-        name = "migrate",
-        django_admin_tool = ":django-admin",
+    # Some more commands
+    sh_with_runfiles_binary(
+        name = "runserver",
+        args = [
+            "runserver",
+        ],
         tags = ["manual"],
+        tool = ":django-admin",
+        visibility = ["//:__subpackages__"],
+    )
+
+    sh_with_runfiles_binary(
+        name = "migrate",
+        args = [
+            "migrate",
+        ],
+        tags = ["manual"],
+        tool = ":django-admin",
         visibility = ["//:__subpackages__"],
     )

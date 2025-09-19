@@ -6,8 +6,8 @@ load("@aspect_rules_py//py:defs.bzl", "py_library")
 load("@py_deps//:requirements.bzl", "requirement")
 load("@rules_oci//oci:defs.bzl", "oci_load")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
-load("//bazel/python/django/app:migrate.bzl", "django_migrate")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
 load("//bazel/python/django/project:django_admin.bzl", "django_admin")
 load("//bazel/python/django/project:django_gunicorn.bzl", "django_gunicorn")
@@ -50,10 +50,13 @@ def django_project(name, deps, srcs, **kwargs):
         **kwargs
     )
 
-    django_migrate(
+    sh_with_runfiles_binary(
         name = "{}-migrate".format(name),
-        django_admin_tool = ":{}-admin".format(name),
+        args = [
+            "migrate",
+        ],
         tags = ["manual"],
+        tool = ":{}-admin".format(name),
         **kwargs
     )
 

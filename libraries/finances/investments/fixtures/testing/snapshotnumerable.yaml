@@ -1,0 +1,25 @@
+- model: finances_investments.snapshotnumerable
+  pk: 4
+  fields:
+    quantity: '2.0000'
+    unit_value: '100.0000'
+- model: finances_investments.snapshotnumerable
+  pk: 6
+  fields:
+    quantity: '2.0000'
+    unit_value: '100.0000'
+- model: finances_investments.snapshotnumerable
+  pk: 3
+  fields:
+    quantity: '1.0000'
+    unit_value: '100.0000'
+- model: finances_investments.snapshotnumerable
+  pk: 5
+  fields:
+    quantity: '1.0000'
+    unit_value: '100.0000'
+- model: finances_investments.snapshotnumerable
+  pk: 7
+  fields:
+    quantity: '1.0000'
+    unit_value: '100.0000'
