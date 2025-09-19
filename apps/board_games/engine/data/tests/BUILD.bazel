@@ -18,7 +18,7 @@ cc_test(
 with_postgres_test(
     name = "tests",
     binaries = [
-        "//apps/board_games/database:_migrate",
+        "//apps/board_games/database:app-migrate",
         "//apps/board_games/database:_populate_test_database",
         ":_tests",
     ],

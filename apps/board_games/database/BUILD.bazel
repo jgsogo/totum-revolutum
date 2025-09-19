@@ -19,17 +19,8 @@ django_project(
 )
 
 sh_with_runfiles_binary(
-    name = "_migrate",
-    args = [
-        "migrate",
-    ],
-    tags = ["manual"],
-    tool = ":app-admin",
-    visibility = ["//apps/board_games:__subpackages__"],
-)
-
-sh_with_runfiles_binary(
     name = "_populate_test_database",
+    testonly = True,
     args = [
         "loaddata",
         "$(location :fixtures/testing/game_types.yaml)",
@@ -84,8 +75,9 @@ sh_with_runfiles_binary(
 
 with_postgres_run(
     name = "dev",
+    testonly = True,
     binaries = [
-        ":_migrate",
+        ":app-migrate",
         ":_populate_test_database",
         ":_create_superuser",
         ":_runserver",

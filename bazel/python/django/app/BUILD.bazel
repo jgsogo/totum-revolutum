@@ -1,4 +1,5 @@
 exports_files([
     "makemigrations.check.tpl.sh",
     "makemigrations.update.tpl.sh",
+    "django_admin_command.tpl.sh",
 ])

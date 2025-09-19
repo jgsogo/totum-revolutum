@@ -1,5 +1,7 @@
 """Rule implementation to run Django makemigrations"""
 
+load("@aspect_bazel_lib//lib:paths.bzl", "BASH_RLOCATION_FUNCTION", "to_rlocation_path")
+
 def _django_makemigrations_impl(ctx):
     executable = ctx.actions.declare_file(ctx.label.name)
 
@@ -12,17 +14,18 @@ def _django_makemigrations_impl(ctx):
         template = ctx.file.run_template,
         output = executable,
         substitutions = {
+            "%BASH_RLOCATION_FUNCTION%": BASH_RLOCATION_FUNCTION,
             "%UPDATE_RULE%": update_rule_str,
-            "%DJANGO_ADMIN%": ctx.executable.django_admin_tool.short_path,
+            "%DJANGO_ADMIN%": to_rlocation_path(ctx, ctx.executable.django_admin_tool),
             "%APP_LABEL%": ctx.attr.app_label,
         },
         is_executable = True,
     )
 
-    runfiles = ctx.runfiles(files = [ctx.executable.django_admin_tool])
-    for dep in ctx.attr.deps:
-        runfiles = runfiles.merge(dep[DefaultInfo].data_runfiles)
-    runfiles = runfiles.merge(ctx.attr.django_admin_tool[DefaultInfo].data_runfiles)
+    runfiles = ctx.runfiles()
+    runfiles = runfiles.merge(ctx.attr.django_admin_tool.default_runfiles)
+    runfiles = runfiles.merge(ctx.attr.django_admin_tool[DefaultInfo].default_runfiles)
+    runfiles = runfiles.merge(ctx.attr._runfiles.default_runfiles)
 
     return [
         DefaultInfo(
@@ -43,11 +46,11 @@ django_makemigrations = rule(
             executable = True,
             cfg = "exec",
         ),
-        "deps": attr.label_list(),
         "run_template": attr.label(
             allow_single_file = True,
         ),
         "update_rule": attr.label(),
+        "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
     },
     doc = "Executes makemigrations Django command",
     executable = True,
