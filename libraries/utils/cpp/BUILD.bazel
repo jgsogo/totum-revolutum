@@ -1,0 +1,10 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+[
+    cc_library(
+        name = "{}".format(it.replace(".hpp", "")),
+        hdrs = [it],
+        visibility = ["//visibility:public"],
+    )
+    for it in glob(["**/*.hpp"])
+]

@@ -1,0 +1,12 @@
+load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
+
+
+qt_cc_library(
+    name = "widgets",
+    srcs = glob(["**/*.cpp"]),
+    hdrs = glob(["**/*.h"]),
+    deps = [
+        "@rules_qt//:qt_widgets",
+    ],
+    visibility = ["//apps/finances/qt:__pkg__"],
+)

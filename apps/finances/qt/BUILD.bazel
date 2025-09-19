@@ -1,9 +1,29 @@
 load("@rules_qt//qt:qt_cc_binary.bzl", "qt_cc_binary")
 
+genrule(
+    name = "version",
+    srcs = ["//apps/finances:version"],
+    outs = ["version.hpp"],
+    cmd_bash = """
+        echo '#pragma once' > $@
+        echo '' >> $@
+        echo '#include <string>' >> $@
+        echo '' >> $@
+        echo "static constexpr std::string_view FINANCES_VERSION = \\"$$(cat $(location //apps/finances:version))\\";" >> $@
+    """,
+    tags = ["manual"],
+    visibility = [":__subpackages__"],
+)
+
 qt_cc_binary(
     name = "qt",
-    srcs = ["main.cpp"],
+    srcs = [
+        "main.cpp",
+        ":version",
+    ],
     deps = [
+        "//apps/finances/qt/widgets",
+        "//apps/finances/qt/models",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_widgets",
     ],
