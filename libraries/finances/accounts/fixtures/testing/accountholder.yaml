@@ -1,0 +1,18 @@
+- model: finances_accounts.accountholder
+  pk: 0
+  fields:
+    name: holder0
+    is_company: false
+    photo: ''
+- model: finances_accounts.accountholder
+  pk: 1
+  fields:
+    name: holder1
+    is_company: false
+    photo: ''
+- model: finances_accounts.accountholder
+  pk: 2
+  fields:
+    name: holder2
+    is_company: true
+    photo: ''

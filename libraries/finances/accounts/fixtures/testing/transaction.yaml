@@ -1,0 +1,18 @@
+- model: finances_accounts.transaction
+  pk: 1
+  fields:
+    name: transaction0
+    description: null
+    group: null
+- model: finances_accounts.transaction
+  pk: 2
+  fields:
+    name: transaction1
+    description: null
+    group: null
+- model: finances_accounts.transaction
+  pk: 3
+  fields:
+    name: transaction2
+    description: null
+    group: null

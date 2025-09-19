@@ -1,0 +1,12 @@
+- model: finances_accounts.snapshot
+  pk: 1
+  fields:
+    amount: '0.0000'
+    account: 0
+    date_value: 2024-09-06
+- model: finances_accounts.snapshot
+  pk: 2
+  fields:
+    amount: '1.0000'
+    account: 0
+    date_value: 2024-09-30

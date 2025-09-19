@@ -1,0 +1,28 @@
+- model: finances_accounts.fx
+  pk: 1
+  fields:
+    foreign: USD
+    local: EUR
+    rate: '1.0000'
+    date_value: 2024-09-06
+- model: finances_accounts.fx
+  pk: 2
+  fields:
+    foreign: USD
+    local: EUR
+    rate: '2.0000'
+    date_value: 2024-09-07
+- model: finances_accounts.fx
+  pk: 3
+  fields:
+    foreign: USD
+    local: EUR
+    rate: '3.0000'
+    date_value: 2024-09-08
+- model: finances_accounts.fx
+  pk: 4
+  fields:
+    foreign: USD
+    local: EUR
+    rate: '4.0000'
+    date_value: 2024-09-09

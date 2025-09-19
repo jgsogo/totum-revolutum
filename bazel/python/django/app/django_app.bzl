@@ -98,6 +98,7 @@ def django_app(name, deps = None, visibility = None, app_label = None):
             ":{}".format(name),
             requirement("psycopg"),  # Required because deployments can use Postgres
         ],
+        visibility = visibility,
     )
 
     # The test target for this application

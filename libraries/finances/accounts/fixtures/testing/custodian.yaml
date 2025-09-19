@@ -1,0 +1,21 @@
+- model: finances_accounts.custodian
+  pk: 0
+  fields:
+    name: custodian0
+    description: null
+    country: ES
+    photo: ''
+- model: finances_accounts.custodian
+  pk: 1
+  fields:
+    name: custodian1
+    description: null
+    country: US
+    photo: ''
+- model: finances_accounts.custodian
+  pk: 2
+  fields:
+    name: custodian2
+    description: null
+    country: NL
+    photo: ''
