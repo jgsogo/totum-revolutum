@@ -15,6 +15,7 @@ django_app(
 
 sh_with_runfiles_binary(
     name = "populate_test_database",
+    testonly = True,
     args = [
         "finances_accounts_test_data",
     ],
