@@ -11809,7 +11809,7 @@
     },
     "@@rules_qt+//:extensions.bzl%qt": {
       "general": {
-        "bzlTransitiveDigest": "1Ae5KPUGw4phAiCALD2FMHx19JDCZXAVY6+1iJiEIu8=",
+        "bzlTransitiveDigest": "kBA742Z8eMwbCQavh0XlS4WtL5K3quxF2gFB3MBCFpM=",
         "usagesDigest": "t1Kd1+G2RTRDHy/M+8s9C3zGRvhwv5ofHuJPlSDFaX4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

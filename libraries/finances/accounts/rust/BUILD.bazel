@@ -78,7 +78,7 @@ with_postgres_test(
     # First migrate, then populate the database, then run the tests
     binaries = [
         "//libraries/finances/accounts/django_finances_accounts:migrate",
-        "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
+        "//libraries/finances/accounts/fixtures/testing:loaddata",
         ":_tests",
     ],
     env = {

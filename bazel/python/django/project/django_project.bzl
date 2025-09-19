@@ -7,6 +7,7 @@ load("@py_deps//:requirements.bzl", "requirement")
 load("@rules_oci//oci:defs.bzl", "oci_load")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 load("//bazel/containers:py_layer.bzl", "py_oci_image")
+load("//bazel/python/django/app:migrate.bzl", "django_migrate")
 load("//bazel/python/django/containers:defs.bzl", "DJANGO_PORT", "USER", "USER_UID")
 load("//bazel/python/django/project:django_admin.bzl", "django_admin")
 load("//bazel/python/django/project:django_gunicorn.bzl", "django_gunicorn")
@@ -45,6 +46,13 @@ def django_project(name, deps, srcs, **kwargs):
         name = "{}-admin".format(name),
         django_project = ":{}-project".format(name),
         settings = settings_module,
+        tags = ["manual"],
+        **kwargs
+    )
+
+    django_migrate(
+        name = "{}-migrate".format(name),
+        django_admin_tool = ":{}-admin".format(name),
         tags = ["manual"],
         **kwargs
     )

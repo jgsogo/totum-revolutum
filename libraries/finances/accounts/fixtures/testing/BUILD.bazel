@@ -61,3 +61,15 @@ filegroup(
     srcs = ["{}.yaml".format(it) for it in MODELS_FOR_TESTING],
     visibility = ["//visibility:public"],
 )
+
+sh_with_runfiles_binary(
+    name = "loaddata",
+    args = [
+        "loaddata",
+        "$(locations :fixtures)",
+    ],
+    data = [":fixtures"],
+    tags = ["manual"],
+    tool = "//libraries/finances/accounts/django_finances_accounts:django-admin",
+    visibility = ["//visibility:public"],
+)
