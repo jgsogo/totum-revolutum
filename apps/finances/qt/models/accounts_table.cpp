@@ -1,9 +1,16 @@
 #include "accounts_table.h"
 
-AccountTableModel::AccountTableModel() {}
+AccountTableModel::AccountTableModel(std::vector<finances::accounts::models::Account>&& accounts, QObject* parent)
+    : QAbstractTableModel(parent), accounts{std::move(accounts)} {}
 
-int AccountTableModel::rowCount(const QModelIndex& parent) const { return 10; }
-int AccountTableModel::columnCount(const QModelIndex& parent) const { return 4; }
+AccountTableModel* AccountTableModel::create_with_all(utils::db::ConnectionPool& pool, QObject* parent) {
+    finances::accounts::models::AccountManager manager{pool};
+    auto all_accounts = manager.all();
+    return new AccountTableModel(std::move(all_accounts.value()), parent);
+}
+
+int AccountTableModel::rowCount(const QModelIndex& parent) const { return accounts.size(); }
+int AccountTableModel::columnCount(const QModelIndex& parent) const { return 3; }
 
 QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     QVariant result = QVariant();
@@ -16,9 +23,18 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     }
 
     switch (role) {
-    case Qt::DisplayRole:
-        result = QString("row-%1, col-%2").arg(row).arg(column);
-        break;
+    case Qt::DisplayRole: {
+        const auto& account = accounts.at(row);
+        if (column == 0) {
+            result = account.name.c_str();
+        } else if (column == 1) {
+            result = account.identifier.value_or("").c_str();
+        } else if (column == 2) {
+            result = QString::fromStdString(static_cast<std::string>(account.ccy));
+        }
+    }
+    // result = QString("row-%1, col-%2").arg(row).arg(column);
+    break;
     // case Qt::FontRole:
     //     if (2 == row) {
     //         QFont font;
@@ -63,31 +79,32 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) { // H
         switch (section) {
         case 0:
-            result = "Hello";
+            result = "name";
             break;
         case 1:
-            result = "World";
+            result = "identifier";
             break;
         case 2:
-            result = ":D";
+            result = "ccy";
             break;
         default:
             break;
         }
     } else if (role == Qt::DisplayRole && orientation == Qt::Vertical) { // V
-        switch (section) {
-        case 0:
-            result = "Welcome";
-            break;
-        case 1:
-            result = "Aboard";
-            break;
-        case 2:
-            result = "Guys";
-            break;
-        default:
-            break;
-        }
+        return QString("%1").arg(accounts[section].id);
+        // switch (section) {
+        // case 0:
+        //     result = "Welcome";
+        //     break;
+        // case 1:
+        //     result = "Aboard";
+        //     break;
+        // case 2:
+        //     result = "Guys";
+        //     break;
+        // default:
+        //     break;
+        // }
     } else {
         // other stuff
     }

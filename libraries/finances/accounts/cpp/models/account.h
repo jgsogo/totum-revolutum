@@ -5,8 +5,10 @@
 
 #include "ccy.h"
 #include "id.h"
+#include "model_manager.hpp"
 
 namespace finances::accounts::models {
+
     struct Account {
         Id id;
         std::string name;
@@ -19,4 +21,9 @@ namespace finances::accounts::models {
         Id custodian_id;
         bool is_numerable;
     };
+
+    using AccountManager = ModelManager<Account>;
+
+    template <> tl::expected<std::vector<Account>, Error> AccountManager::all();
+
 } // namespace finances::accounts::models

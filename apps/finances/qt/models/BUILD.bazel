@@ -1,12 +1,12 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
-
 cc_library(
     name = "models",
     srcs = glob(["**/*.cpp"]),
     hdrs = glob(["**/*.h"]),
+    visibility = ["//apps/finances/qt:__pkg__"],
     deps = [
+        "//libraries/finances/accounts/cpp/models",
         "@rules_qt//:qt_core",
     ],
-    visibility = ["//apps/finances/qt:__pkg__"],
 )

@@ -25,8 +25,10 @@ qt_cc_binary(
     deps = [
         "//apps/finances/qt/models",
         "//apps/finances/qt/widgets",
+        "//libraries/utils/cpp/db",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_widgets",
+        "@spdlog",
     ],
 )
 
@@ -43,18 +45,18 @@ with_postgres_run(
         "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
     },
     env_transpose = {
-        # Envvars for the 'database' component
+        # Envvars for the 'django' component
         "DJANGO_SQL_DATABASE": "POSTGRES_DB",
         "DJANGO_SQL_USER": "POSTGRES_USER",
         "DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
         "DJANGO_SQL_HOST": "POSTGRES_HOST",
         "DJANGO_SQL_PORT": "POSTGRES_PORT",
 
-        # Envvars for the 'engine' component
-        "BOARD_GAMES_ENGINE_SQL_DATABASE": "POSTGRES_DB",
-        "BOARD_GAMES_ENGINE_SQL_USER": "POSTGRES_USER",
-        "BOARD_GAMES_ENGINE_SQL_PASSWORD": "POSTGRES_PASSWORD",
-        "BOARD_GAMES_ENGINE_SQL_HOST": "POSTGRES_HOST",
-        "BOARD_GAMES_ENGINE_SQL_PORT": "POSTGRES_PORT",
+        # Envvars for the Qt application
+        "FINANCES_QT_SQL_DATABASE": "POSTGRES_DB",
+        "FINANCES_QT_SQL_USER": "POSTGRES_USER",
+        "FINANCES_QT_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "FINANCES_QT_SQL_HOST": "POSTGRES_HOST",
+        "FINANCES_QT_SQL_PORT": "POSTGRES_PORT",
     },
 )

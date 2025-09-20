@@ -1,13 +1,18 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
-
 cc_library(
     name = "models",
-    # srcs = glob(["**/*.cpp"]),
-    hdrs = glob(["**/*.h"]),
+    srcs = glob(["**/*.cpp"]),
+    hdrs = glob([
+        "**/*.h",
+        "**/*.hpp",
+    ]),
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
-        "//libraries/utils/cpp:string_type",
         "//libraries/utils/cpp:integral_type",
-    ]
+        "//libraries/utils/cpp:string_type",
+        "//libraries/utils/cpp/db",
+        "@spdlog",
+        "@tl-expected",
+    ],
 )
