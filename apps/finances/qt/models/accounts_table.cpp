@@ -10,7 +10,7 @@ AccountTableModel* AccountTableModel::create_with_all(utils::db::ConnectionPool&
 }
 
 int AccountTableModel::rowCount(const QModelIndex& parent) const { return accounts.size(); }
-int AccountTableModel::columnCount(const QModelIndex& parent) const { return 3; }
+int AccountTableModel::columnCount(const QModelIndex& parent) const { return 5; }
 
 QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     QVariant result = QVariant();
@@ -26,11 +26,15 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     case Qt::DisplayRole: {
         const auto& account = accounts.at(row);
         if (column == 0) {
-            result = account.name.c_str();
+            result = account.custodian.second.c_str();
         } else if (column == 1) {
-            result = account.identifier.value_or("").c_str();
+            result = account.name.c_str();
         } else if (column == 2) {
+            result = account.identifier.value_or("").c_str();
+        } else if (column == 3) {
             result = QString::fromStdString(static_cast<std::string>(account.ccy));
+        } else if (column == 4) {
+            result = account.type.second.c_str();
         }
     }
     // result = QString("row-%1, col-%2").arg(row).arg(column);
@@ -79,32 +83,25 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) { // H
         switch (section) {
         case 0:
-            result = "name";
+            result = "custodian";
             break;
         case 1:
-            result = "identifier";
+            result = "name";
             break;
         case 2:
+            result = "identifier";
+            break;
+        case 3:
             result = "ccy";
+            break;
+        case 4:
+            result = "type";
             break;
         default:
             break;
         }
     } else if (role == Qt::DisplayRole && orientation == Qt::Vertical) { // V
         return QString("%1").arg(accounts[section].id);
-        // switch (section) {
-        // case 0:
-        //     result = "Welcome";
-        //     break;
-        // case 1:
-        //     result = "Aboard";
-        //     break;
-        // case 2:
-        //     result = "Guys";
-        //     break;
-        // default:
-        //     break;
-        // }
     } else {
         // other stuff
     }

@@ -17,7 +17,7 @@
 #include "apps/finances/qt/widgets/sidebar.h"
 
 int main(int argc, char** argv) {
-    spdlog::set_level(spdlog::level::debug); // TODO: Configurable via CLI and/or envvar
+    spdlog::set_level(spdlog::level::trace); // TODO: Configurable via CLI and/or envvar
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%8l%$][engine] %v (%@)");
 
     auto pool = utils::db::ConnectionPool::from_env("FINANCES_QT_", 4);

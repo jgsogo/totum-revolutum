@@ -10,6 +10,8 @@
 namespace finances::accounts::models {
 
     static constexpr std::string_view ACCOUNT_TABLE = "finances_accounts_account";
+    static constexpr std::string_view ACCOUNT_TYPE_TABLE = "finances_accounts_accounttype";
+    static constexpr std::string_view CUSTODIAN_TABLE = "finances_accounts_custodian";
 
     template <typename TModel> class ModelManager {
       public:

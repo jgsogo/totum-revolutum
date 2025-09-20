@@ -3,7 +3,9 @@
 #include <optional>
 #include <string>
 
+#include "account_type.h"
 #include "ccy.h"
+#include "custodian.h"
 #include "id.h"
 #include "model_manager.hpp"
 
@@ -17,13 +19,16 @@ namespace finances::accounts::models {
         Ccy ccy;
         // pub open: chrono::NaiveDate,
         // pub close: Option<chrono::NaiveDate>,
-        Id type_id;
-        Id custodian_id;
+        std::pair<decltype(AccountType::id), decltype(AccountType::name)> type;
+        std::pair<decltype(Custodian::id), decltype(Custodian::name)> custodian;
         bool is_numerable;
     };
 
-    using AccountManager = ModelManager<Account>;
+    class AccountManager : public ModelManager<Account> {
+      public:
+        AccountManager(utils::db::ConnectionPool& pool);
+    };
 
-    template <> tl::expected<std::vector<Account>, Error> AccountManager::all();
+    template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all();
 
 } // namespace finances::accounts::models
