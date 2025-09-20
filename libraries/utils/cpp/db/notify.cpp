@@ -1,7 +1,7 @@
 #include "notify.h"
 #include <spdlog/spdlog.h>
 
-namespace db {
+namespace utils::db {
 
     namespace {
 
@@ -29,4 +29,4 @@ namespace db {
         auto query = std::format("NOTIFY {}", channel);
         return _send_notify(conn, query);
     }
-} // namespace db
+} // namespace utils::db

@@ -8,6 +8,8 @@
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/room.h"
 
+using namespace utils::db::testing;
+
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test room associated methods") {
 
     SECTION("Get playing rooms") {

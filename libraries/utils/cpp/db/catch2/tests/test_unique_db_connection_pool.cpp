@@ -2,6 +2,8 @@
 
 #include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
 
+using namespace utils::db::testing;
+
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test connection pool") {
 
     SECTION("Test pool can provide connections") {

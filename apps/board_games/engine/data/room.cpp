@@ -145,7 +145,7 @@ namespace data {
     }
 
     tl::expected<void, Error> notify_room_update(pqxx::connection& conn, RoomUUID room) {
-        auto r = db::notify(conn, NOTIFICATION_CHANNEL_ROOM, room);
+        auto r = utils::db::notify(conn, NOTIFICATION_CHANNEL_ROOM, room);
         if (r == 0) {
             return {};
         } else {

@@ -5,6 +5,8 @@
 
 #include "apps/board_games/engine/data/game.h"
 
+using namespace utils::db::testing;
+
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game: update state") {
 
     SECTION("Update game state") {

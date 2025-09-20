@@ -6,7 +6,7 @@
 
 namespace services {
 
-    CliServiceImpl::CliServiceImpl(db::ConnectionPool& pool) : pool{pool} {}
+    CliServiceImpl::CliServiceImpl(utils::db::ConnectionPool& pool) : pool{pool} {}
 
     grpc::Status CliServiceImpl::ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
                                                   board_game::RoomList* response) {

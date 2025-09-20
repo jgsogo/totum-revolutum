@@ -3,6 +3,8 @@
 #include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
 #include "libraries/utils/cpp/db/notify.h"
 
+using namespace utils::db::testing;
+
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test notify") {
 
     SECTION("Test notify without payload") {
@@ -15,7 +17,7 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test notify") {
 
             REQUIRE(!notification_arrived);
 
-            db::notify(conn, channel);
+            utils::db::notify(conn, channel);
 
             int received{conn.await_notification(3)};
             REQUIRE(received == 1);
@@ -32,7 +34,7 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test notify") {
             conn.listen(channel, [&recv_payload](pqxx::notification n) { recv_payload = n.payload; });
             conn.get_notifs();
 
-            db::notify(conn, channel, payload);
+            utils::db::notify(conn, channel, payload);
 
             int received{conn.await_notification(3)};
             REQUIRE(received == 1);

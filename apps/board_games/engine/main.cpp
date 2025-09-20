@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     std::unique_ptr<engine::GamePluginBase> tic_tac_toe = std::make_unique<board_games::tic_tac_toe::TicTacToePlugin>();
     games.insert(std::make_pair(tic_tac_toe->slug(), std::move(tic_tac_toe)));
 
-    auto pool = db::ConnectionPool::from_env("BOARD_GAMES_ENGINE_", 4);
+    auto pool = utils::db::ConnectionPool::from_env("BOARD_GAMES_ENGINE_", 4);
 
     // TODO: Based on the registered games, enable/disable them in the DB
     if (!pool.with_conn<bool>([&games](pqxx::connection& conn) {
