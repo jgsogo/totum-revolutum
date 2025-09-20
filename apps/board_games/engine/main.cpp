@@ -2,9 +2,10 @@
 #include <grpcpp/server_builder.h>
 #include <spdlog/spdlog.h>
 
+#include "libraries/utils/cpp/db/connection_pool.h"
+
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/models/game_type.hpp"
-#include "apps/board_games/engine/db/connection_pool.h"
 #include "apps/board_games/engine/game_plugin.hpp"
 #include "apps/board_games/engine/services/cli_service.h"
 #include "apps/board_games/engine/services/engine_service.h"

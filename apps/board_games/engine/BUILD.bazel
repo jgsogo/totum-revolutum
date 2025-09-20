@@ -1,6 +1,6 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run")
 
 cc_library(
     name = "plugin",
@@ -27,9 +27,9 @@ cc_binary(
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
         ":plugin",
-        "//apps/board_games/engine/db",
         "//apps/board_games/engine/services",
         "//apps/board_games/games/tic_tac_toe/engine",
+        "//libraries/utils/cpp/db",
         "@spdlog",
     ],
 )

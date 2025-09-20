@@ -21,7 +21,7 @@ cc_library(
     ],
     deps = [
         "//apps/board_games/engine/data/models",
-        "//apps/board_games/engine/db",
+        "//libraries/utils/cpp/db",
         "@spdlog",
         "@tl-expected",
     ],

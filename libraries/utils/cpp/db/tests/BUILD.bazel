@@ -1,0 +1,24 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_test")
+
+cc_test(
+    name = "_tests",
+    srcs = [
+        "test_connection_pool.cpp",
+        "test_notify.cpp",
+    ],
+    tags = ["manual"],
+    deps = [
+        "//libraries/utils/cpp/db/catch2:unique_db_connection_pool",
+        "@catch2//:catch2_main",
+        "@spdlog",
+    ],
+)
+
+with_postgres_test(
+    name = "tests",
+    binaries = [
+        "//bazel/containers/postgres:example_users_table",
+        ":_tests",
+    ],
+)

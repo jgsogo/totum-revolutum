@@ -9,9 +9,7 @@ cc_library(
     defines = [
         "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
     ],
-    visibility = [
-        "//apps/board_games/engine:__subpackages__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         "@libpqxx",
         "@spdlog",

@@ -1,0 +1,19 @@
+"""
+C++ utilities for to test databases using Catch2
+"""
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "unique_db_connection_pool",
+    testonly = True,
+    hdrs = [
+        "unique_db_connection_pool.hpp",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//libraries/utils/cpp:string_literal",
+        "//libraries/utils/cpp/db",
+        "@stduuid",
+    ],
+)

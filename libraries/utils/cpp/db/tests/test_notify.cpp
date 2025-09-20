@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "apps/board_games/engine/db/notify.h"
-#include "fixtures.hpp"
+#include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
+#include "libraries/utils/cpp/db/notify.h"
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test notify") {
 

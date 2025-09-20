@@ -1,10 +1,23 @@
+"""
+A collection of utilities for C++
+"""
+
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
-[
-    cc_library(
-        name = "{}".format(it.replace(".hpp", "")),
-        hdrs = [it],
-        visibility = ["//visibility:public"],
-    )
-    for it in glob(["**/*.hpp"])
-]
+cc_library(
+    name = "integral_type",
+    hdrs = ["integral_type.hpp"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "string_type",
+    hdrs = ["string_type.hpp"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "string_literal",
+    hdrs = ["string_literal.hpp"],
+    visibility = ["//visibility:public"],
+)

@@ -3,8 +3,8 @@
 #include "apps/board_games/engine/data/constants.hpp"
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/room.h"
-#include "apps/board_games/engine/db/tests/fixtures.hpp"
 #include "apps/board_games/games/tic_tac_toe/engine/tic_tac_toe.h"
+#include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test DB interactions") {
     data::RoomUUID room_uuid{uuids::to_string(uuids::uuid_system_generator{}())};

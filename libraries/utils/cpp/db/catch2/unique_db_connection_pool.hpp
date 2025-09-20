@@ -1,24 +1,23 @@
 #pragma once
 
-#include "apps/board_games/engine/db/connection_pool.h"
 #include <stduuid/uuid.h>
 
-constexpr static std::string_view PREFIX = "BOARD_GAMES_ENGINE_";
+#include "libraries/utils/cpp/db/connection_pool.h"
+#include "libraries/utils/cpp/string_literal.hpp"
 
-// Provides a `db::ConnectionPool` to a temporal database that is a clone of the
-// 'BOARD_GAMES_ENGINE_' one.
-class UniqueDBConnectionPool {
+// Provides a `db::ConnectionPool` to a temporal database that clones the "default" one
+template <utils::StringLiteral PREFIX> class UniqueDBConnectionPoolWithPrefix {
   public:
-    UniqueDBConnectionPool() : pool(cloned_db()) {}
+    UniqueDBConnectionPoolWithPrefix() : pool(cloned_db()) {}
 
-    ~UniqueDBConnectionPool() {
+    ~UniqueDBConnectionPoolWithPrefix() {
         // Get name of the cloned database and close all connections to it
         const std::string cloned_dbname =
             pool.with_conn<std::string>([](pqxx::connection& conn) { return conn.dbname(); });
         std::ignore = pool.drain();
 
         // Remove the cloned DB. I need to use a connection to a different database
-        db::ConnectionPool::from_env(PREFIX, 1).with_conn<void>(
+        db::ConnectionPool::from_env(PREFIX, 1).template with_conn<void>(
             [&cloned_dbname](pqxx::connection& conn) { // FIXME: Use a single connection instead of a pool
                 pqxx::nontransaction tx{conn};
                 tx.exec(std::format("DROP DATABASE {}", cloned_dbname));
@@ -32,13 +31,13 @@ class UniqueDBConnectionPool {
 
         // Clone the original DB and return the new prefix
         auto original_db = db::ConnectionPool::from_env(PREFIX, 1); // FIXME: Use a single connection instead of a pool
-        std::string new_db = original_db.with_conn<std::string>([](pqxx::connection& conn) {
+        std::string new_db = original_db.template with_conn<std::string>([](pqxx::connection& conn) {
             // Use UUID so there are no collisions even across multiple processes, this way it would
             // be possible to use the same PostgreSQL instance for all the tests in the repo.
             std::string id = uuids::to_string(uuids::uuid_system_generator{}());
 
             // Database names need to be lowercase and some chars are forbidden: '-'
-            std::string tmp_database = std::format("{}{}_db", PREFIX, id);
+            std::string tmp_database = std::format("{}p_{}_db", PREFIX, id);
             std::transform(tmp_database.begin(), tmp_database.end(), tmp_database.begin(),
                            [](unsigned char c) { return c == '-' ? '_' : std::tolower(c); });
 
@@ -64,3 +63,5 @@ class UniqueDBConnectionPool {
   public:
     mutable db::ConnectionPool pool;
 };
+
+using UniqueDBConnectionPool = UniqueDBConnectionPoolWithPrefix<"">;

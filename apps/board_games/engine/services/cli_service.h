@@ -1,7 +1,7 @@
 #pragma once
 
-#include "apps/board_games/engine/db/connection_pool.h"
 #include "apps/board_games/engine/protocol/cli_service.grpc.pb.h"
+#include "libraries/utils/cpp/db/connection_pool.h"
 
 namespace services {
 

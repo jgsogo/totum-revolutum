@@ -72,42 +72,44 @@ def _with_docker_run_impl(ctx):
         ),
     ]
 
-with_postgres_run = rule(
-    implementation = _with_docker_run_impl,
-    attrs = {
-        "postgres_image_tag": attr.string(
-            doc = "Docker image to run",
-            default = POSTGRES_IMAGE_TAG,
-        ),
-        "binaries": attr.label_list(
-            doc = "Binaries to execute while the container is running",
-            mandatory = True,
-            cfg = "target",
-        ),
-        "_run_template": attr.label(
-            default = Label("//bazel/containers/with_docker:with_postgres_run.tpl.sh"),
-            allow_single_file = True,
-        ),
-        "env": attr.string_dict(
-            doc = "Environment variables",
-        ),
-        "env_transpose": attr.string_dict(
-            doc = "Environment variables that will be populated with the value of others",
-        ),
-        "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
-        "docker_cli": attr.label(
-            doc = """\
+COMMON_ATTRS = {
+    "postgres_image_tag": attr.string(
+        doc = "Docker image to run",
+        default = POSTGRES_IMAGE_TAG,
+    ),
+    "binaries": attr.label_list(
+        doc = "Binaries to execute while the container is running",
+        mandatory = True,
+        cfg = "target",
+    ),
+    "_run_template": attr.label(
+        default = Label("//bazel/containers/postgres:with_postgres_run.tpl.sh"),
+        allow_single_file = True,
+    ),
+    "env": attr.string_dict(
+        doc = "Environment variables",
+    ),
+    "env_transpose": attr.string_dict(
+        doc = "Environment variables that will be populated with the value of others",
+    ),
+    "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
+    "docker_cli": attr.label(
+        doc = """\
                 Alternative target for a container cli tool that will be
                 used to run docker compose when using `bazel run` on this target.
                 By default, we look for `docker` or `podman` on the PATH.
                 See the _run_template attribute for the script that calls this docker tool.
                 """,
-            allow_single_file = True,
-            mandatory = False,
-            executable = True,
-            cfg = "target",
-        ),
-    },
+        allow_single_file = True,
+        mandatory = False,
+        executable = True,
+        cfg = "target",
+    ),
+}
+
+with_postgres_run = rule(
+    implementation = _with_docker_run_impl,
+    attrs = COMMON_ATTRS,
     executable = True,
     doc = """
     Ensure postgres is running while executing the given 'binaries'.
@@ -124,40 +126,7 @@ with_postgres_run = rule(
 
 with_postgres_test = rule(
     implementation = _with_docker_run_impl,
-    attrs = {
-        "postgres_image_tag": attr.string(
-            doc = "Docker image to run",
-            default = POSTGRES_IMAGE_TAG,
-        ),
-        "binaries": attr.label_list(
-            doc = "Binaries to execute while the container is running",
-            mandatory = True,
-            cfg = "target",
-        ),
-        "_run_template": attr.label(
-            default = Label("//bazel/containers/with_docker:with_postgres_run.tpl.sh"),
-            allow_single_file = True,
-        ),
-        "env": attr.string_dict(
-            doc = "Environment variables",
-        ),
-        "env_transpose": attr.string_dict(
-            doc = "Environment variables that will be populated with the value of others",
-        ),
-        "_runfiles": attr.label(default = "@bazel_tools//tools/bash/runfiles"),
-        "docker_cli": attr.label(
-            doc = """\
-                Alternative target for a container cli tool that will be
-                used to run docker compose when using `bazel run` on this target.
-                By default, we look for `docker` or `podman` on the PATH.
-                See the _run_template attribute for the script that calls this docker tool.
-                """,
-            allow_single_file = True,
-            mandatory = False,
-            executable = True,
-            cfg = "target",
-        ),
-    },
+    attrs = COMMON_ATTRS,
     test = True,
     doc = """
     Ensure postgres is running while executing the given 'binaries'.

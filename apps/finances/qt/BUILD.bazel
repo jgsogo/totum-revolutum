@@ -1,5 +1,5 @@
 load("@rules_qt//qt:qt_cc_binary.bzl", "qt_cc_binary")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run")
 
 genrule(
     name = "version",

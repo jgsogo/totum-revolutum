@@ -2,9 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "apps/board_games/engine/db/notify.h"
 #include "constants.hpp"
 #include "game.h"
+#include "libraries/utils/cpp/db/notify.h"
 
 namespace data {
 

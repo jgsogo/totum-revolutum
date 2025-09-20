@@ -153,7 +153,7 @@ with_docker_compose_test = rule(
             cfg = "target",
         ),
         "_run_template": attr.label(
-            default = Label("//bazel/containers/with_docker:with_docker_compose_run.tpl.sh"),
+            default = Label("//bazel/containers/postgres:with_docker_compose_run.tpl.sh"),
             allow_single_file = True,
         ),
         "env": attr.string_dict(
