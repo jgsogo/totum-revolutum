@@ -1,10 +1,62 @@
 load("@rules_qt//qt:qt_cc_binary.bzl", "qt_cc_binary")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run")
+
+genrule(
+    name = "version",
+    srcs = ["//apps/finances:version"],
+    outs = ["version.hpp"],
+    cmd_bash = """
+        echo '#pragma once' > $@
+        echo '' >> $@
+        echo '#include <string>' >> $@
+        echo '' >> $@
+        echo "static constexpr std::string_view FINANCES_VERSION = \\"$$(cat $(location //apps/finances:version))\\";" >> $@
+    """,
+    tags = ["manual"],
+    visibility = [":__subpackages__"],
+)
 
 qt_cc_binary(
     name = "qt",
-    srcs = ["main.cpp"],
+    srcs = [
+        "main.cpp",
+        ":version",
+    ],
     deps = [
+        "//apps/finances/qt/models",
+        "//apps/finances/qt/widgets",
+        "//libraries/utils/cpp/db",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_widgets",
+        "@spdlog",
     ],
+)
+
+with_postgres_run(
+    name = "dev",
+    testonly = True,
+    binaries = [
+        "//apps/finances/django:app-migrate",
+        "//libraries/finances/accounts/django_finances_accounts:populate_test_database",
+        "//libraries/finances/investments/django_finances_investments:populate_test_database",
+        ":qt",
+    ],
+    env = {
+        "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        # Envvars for the 'django' component
+        "DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "DJANGO_SQL_USER": "POSTGRES_USER",
+        "DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "DJANGO_SQL_PORT": "POSTGRES_PORT",
+
+        # Envvars for the Qt application
+        "FINANCES_QT_SQL_DATABASE": "POSTGRES_DB",
+        "FINANCES_QT_SQL_USER": "POSTGRES_USER",
+        "FINANCES_QT_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "FINANCES_QT_SQL_HOST": "POSTGRES_HOST",
+        "FINANCES_QT_SQL_PORT": "POSTGRES_PORT",
+    },
 )

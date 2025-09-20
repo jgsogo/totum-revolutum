@@ -6,7 +6,8 @@
 #include <pqxx/pqxx>
 #include <queue>
 
-namespace db {
+namespace utils::db {
+
     class ConnectionPool {
       public:
         ConnectionPool(const std::string& conninfo, std::size_t pool_size);
@@ -36,4 +37,4 @@ namespace db {
 
     template <> void ConnectionPool::with_conn<void>(std::function<void(pqxx::connection& conn)> work);
 
-} // namespace db
+} // namespace utils::db

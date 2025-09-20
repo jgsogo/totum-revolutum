@@ -1,6 +1,6 @@
 load("@py_deps//:requirements.bzl", "requirement")
 load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/python/django/project:django_project.bzl", "django_project")
 
 name = "app"

@@ -1,5 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_run_binary")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run")
 load("//bazel/run:defs.bzl", "run_together")
 
 filegroup(

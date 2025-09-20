@@ -1,0 +1,11 @@
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
+
+exports_files([
+    "with_postgres_run.tpl.sh",
+])
+
+sh_binary(
+    name = "example_users_table",
+    srcs = ["example_users_table.sh"],
+    visibility = ["//visibility:public"],
+)

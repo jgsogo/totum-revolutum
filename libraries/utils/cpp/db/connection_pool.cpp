@@ -3,7 +3,7 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-using namespace db;
+using namespace utils::db;
 
 ConnectionPool::ConnectionPool(const std::string& conninfo, std::size_t pool_size) {
     for (std::size_t i = 0; i < pool_size; ++i) {

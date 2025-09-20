@@ -1,6 +1,6 @@
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_run", "with_postgres_test")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run", "with_postgres_test")
 
 exports_files(["Cargo.toml"])
 

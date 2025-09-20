@@ -1,7 +1,7 @@
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rust_test_suite")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_test")
 
 exports_files([
     "Cargo.toml",

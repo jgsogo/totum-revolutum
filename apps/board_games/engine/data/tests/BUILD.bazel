@@ -1,14 +1,15 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
-load("//bazel/containers/with_docker:with_postgres_run.bzl", "with_postgres_test")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_test")
 
 cc_test(
     name = "_tests",
+    testonly = True,
     srcs = glob(["**/test_*"]),
     tags = ["manual"],
     deps = [
         "//apps/board_games/engine/data",
-        "//apps/board_games/engine/db/tests:fixtures",
         "//libraries/cpp/spdlog:utils",
+        "//libraries/utils/cpp/db/catch2:unique_db_connection_pool",
         "@catch2//:catch2_main",
         "@protobuf//:empty_cc_proto",
         "@spdlog",

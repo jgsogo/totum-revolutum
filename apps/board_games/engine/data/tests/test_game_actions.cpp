@@ -1,8 +1,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <google/protobuf/empty.pb.h>
 
+#include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
+
 #include "apps/board_games/engine/data/game.h"
-#include "apps/board_games/engine/db/tests/fixtures.hpp"
+
+using namespace utils::db::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game: game_action / event_log") {
 

@@ -1,6 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "apps/board_games/engine/db/tests/fixtures.hpp"
+#include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
+
+using namespace utils::db::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test connection pool") {
 
@@ -10,7 +12,7 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test connection pool") {
         pool.with_conn<void>([](pqxx::connection& conn) {
             pqxx::work tx(conn);
             std::vector<std::string> ret;
-            for (auto [id] : tx.query<std::string>("SELECT id FROM board_games_core_room;")) {
+            for (auto [id] : tx.query<std::string>("SELECT id FROM users;")) {
                 ret.emplace_back(id);
             }
             REQUIRE(ret.size() == 3);

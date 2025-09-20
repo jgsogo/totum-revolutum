@@ -2,9 +2,10 @@
 #include <grpcpp/server_builder.h>
 #include <spdlog/spdlog.h>
 
+#include "libraries/utils/cpp/db/connection_pool.h"
+
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/models/game_type.hpp"
-#include "apps/board_games/engine/db/connection_pool.h"
 #include "apps/board_games/engine/game_plugin.hpp"
 #include "apps/board_games/engine/services/cli_service.h"
 #include "apps/board_games/engine/services/engine_service.h"
@@ -19,7 +20,7 @@ int main(int argc, char** argv) {
     std::unique_ptr<engine::GamePluginBase> tic_tac_toe = std::make_unique<board_games::tic_tac_toe::TicTacToePlugin>();
     games.insert(std::make_pair(tic_tac_toe->slug(), std::move(tic_tac_toe)));
 
-    auto pool = db::ConnectionPool::from_env("BOARD_GAMES_ENGINE_", 4);
+    auto pool = utils::db::ConnectionPool::from_env("BOARD_GAMES_ENGINE_", 4);
 
     // TODO: Based on the registered games, enable/disable them in the DB
     if (!pool.with_conn<bool>([&games](pqxx::connection& conn) {
