@@ -1,13 +1,6 @@
 #include "accounts_table.h"
 
-AccountTableModel::AccountTableModel(std::vector<finances::accounts::models::Account>&& accounts, QObject* parent)
-    : QAbstractTableModel(parent), accounts{std::move(accounts)} {}
-
-AccountTableModel* AccountTableModel::create_with_all(utils::db::ConnectionPool& pool, QObject* parent) {
-    finances::accounts::models::AccountManager manager{pool};
-    auto all_accounts = manager.all();
-    return new AccountTableModel(std::move(all_accounts.value()), parent);
-}
+AccountTableModel::AccountTableModel(QObject* parent) : QAbstractTableModel(parent) {}
 
 int AccountTableModel::rowCount(const QModelIndex& parent) const { return accounts.size(); }
 int AccountTableModel::columnCount(const QModelIndex& parent) const { return 5; }
@@ -106,4 +99,10 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
         // other stuff
     }
     return result;
+}
+
+void AccountTableModel::set_accounts(std::vector<finances::accounts::models::Account>&& input) {
+    this->beginResetModel();
+    accounts.swap(input);
+    this->endResetModel();
 }

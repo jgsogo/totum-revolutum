@@ -1,12 +1,14 @@
 load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
 
-
 qt_cc_library(
     name = "widgets",
     srcs = glob(["**/*.cpp"]),
     hdrs = glob(["**/*.h"]),
-    deps = [
-        "@rules_qt//:qt_widgets",
-    ],
     visibility = ["//apps/finances/qt:__pkg__"],
+    deps = [
+        "//apps/finances/qt/models",
+        "//libraries/utils/cpp/db",
+        "@rules_qt//:qt_widgets",
+        "@spdlog",
+    ],
 )

@@ -2,6 +2,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QScreen>
+#include <QSortFilterProxyModel>
 #include <QTableView>
 #include <QThread>
 #include <QVBoxLayout>
@@ -14,6 +15,7 @@
 
 #include "apps/finances/qt/models/accounts_table.h"
 #include "apps/finances/qt/version.hpp"
+#include "apps/finances/qt/widgets/accounts_table.h"
 #include "apps/finances/qt/widgets/sidebar.h"
 
 int main(int argc, char** argv) {
@@ -35,11 +37,16 @@ int main(int argc, char** argv) {
     // left_pane->addWidget(createSidebar());
     // QIcon undoicon = QIcon::fromTheme(QIcon::ThemeIcon::EditUndo);
     all->addWidget(new SideBar(), 30);
+    all->addWidget(new AccountsTableWidget(pool), 70);
 
-    QTableView* table = new QTableView();
-    AccountTableModel* table_model = AccountTableModel::create_with_all(pool);
-    table->setModel(table_model);
-    all->addWidget(table, 70);
+    // QTableView* table = new QTableView();
+    // AccountTableModel* table_model = AccountTableModel::create_with_all(pool);
+    // QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel();
+    // proxyModel->setSourceModel(table_model);
+    // table->setModel(proxyModel);
+    // // proxyModel->sort(3, Qt::AscendingOrder); // Default sort
+    // table->setSortingEnabled(true);
+    // all->addWidget(table, 70);
 
     window.setLayout(all);
     // Set up the model and configure the view...

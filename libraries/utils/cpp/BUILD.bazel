@@ -8,6 +8,9 @@ cc_library(
     name = "integral_type",
     hdrs = ["integral_type.hpp"],
     visibility = ["//visibility:public"],
+    deps = [
+        "@spdlog",
+    ],
 )
 
 cc_library(

@@ -25,7 +25,6 @@ qt_cc_binary(
     deps = [
         "//apps/finances/qt/models",
         "//apps/finances/qt/widgets",
-        "//libraries/utils/cpp/db",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_widgets",
         "@spdlog",
