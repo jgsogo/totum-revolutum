@@ -165,6 +165,8 @@
     "https://bcr.bazel.build/modules/jsoncpp/1.9.6/source.json": "a04756d367a2126c3541682864ecec52f92cdee80a35735a3cb249ce015ca000",
     "https://bcr.bazel.build/modules/libpfm/4.11.0/MODULE.bazel": "45061ff025b301940f1e30d2c16bea596c25b176c8b6b3087e92615adbd52902",
     "https://bcr.bazel.build/modules/libpfm/4.11.0/source.json": "caaffb3ac2b59b8aac456917a4ecf3167d40478ee79f15ab7a877ec9273937c9",
+    "https://bcr.bazel.build/modules/magic_enum/0.9.7/MODULE.bazel": "2205d1095eb334c5883ed1f592c7f10b27d5feb7e05f4bd97b43202901c14e0d",
+    "https://bcr.bazel.build/modules/magic_enum/0.9.7/source.json": "456e639a1c2eb13b78c4c799db2b758f5720284f3991d99238848f5cdcf3b554",
     "https://bcr.bazel.build/modules/mbedtls/3.6.0/MODULE.bazel": "8e380e4698107c5f8766264d4df92e36766248447858db28187151d884995a09",
     "https://bcr.bazel.build/modules/mbedtls/3.6.0/source.json": "1dbe7eb5258050afcc3806b9d43050f71c6f539ce0175535c670df606790b30c",
     "https://bcr.bazel.build/modules/nlohmann_json/3.11.3/MODULE.bazel": "87023db2f55fc3a9949c7b08dc711fae4d4be339a80a99d04453c4bb3998eefc",
@@ -10070,6 +10072,32 @@
         ]
       }
     },
+    "//third_party/date:extensions.bzl%non_module_dependencies": {
+      "general": {
+        "bzlTransitiveDigest": "oix4RbFoZC02sRx3lfFgbrwxUrljCPotojzOnyRJ2G0=",
+        "usagesDigest": "qW6RCYoz74ovGH8uGaxpylIe3Q45Gim+mdQBmm8byi0=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "date": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/HowardHinnant/date/archive/refs/tags/v3.0.4.tar.gz",
+              "build_file": "@@//third_party/date:date.BUILD",
+              "strip_prefix": "date-3.0.4"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
     "//third_party/libpqxx:extensions.bzl%non_module_dependencies": {
       "general": {
         "bzlTransitiveDigest": "0+xpesT4lAkjPBozb1yiNCFFtK7inbMF57tPiX8xAX4=",
@@ -11809,7 +11837,7 @@
     },
     "@@rules_qt+//:extensions.bzl%qt": {
       "general": {
-        "bzlTransitiveDigest": "kBA742Z8eMwbCQavh0XlS4WtL5K3quxF2gFB3MBCFpM=",
+        "bzlTransitiveDigest": "qvYPeQUW6p7JImQZ9EFV3xhNe2dX227m8wXq40lRh4I=",
         "usagesDigest": "t1Kd1+G2RTRDHy/M+8s9C3zGRvhwv5ofHuJPlSDFaX4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

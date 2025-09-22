@@ -1,0 +1,16 @@
+"""
+A collection of utilities for libpqxx
+"""
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "date",
+    hdrs = ["date.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@date",
+        "@libpqxx",
+        "@spdlog",
+    ],
+)

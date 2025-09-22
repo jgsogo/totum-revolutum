@@ -12,6 +12,7 @@ cc_library(
         "//libraries/utils/cpp:integral_type",
         "//libraries/utils/cpp:string_type",
         "//libraries/utils/cpp/db",
+        "//libraries/utils/cpp/libpqxx:date",
         "@spdlog",
         "@tl-expected",
     ],

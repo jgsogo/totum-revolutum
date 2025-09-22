@@ -1,45 +1,79 @@
 #include "accounts_table.h"
 
-AccountTableModel::AccountTableModel(QObject* parent) : QAbstractTableModel(parent) {}
+#include <QDate>
+#include <QFont>
+#include <QTimer>
+#include <magic_enum/magic_enum.hpp>
 
-int AccountTableModel::rowCount(const QModelIndex& parent) const { return accounts.size(); }
-int AccountTableModel::columnCount(const QModelIndex& parent) const { return 5; }
+namespace {
+    enum class Column {
+        CUSTODIAN = 0,
+        NAME = 1,
+        IDENTIFIER = 2,
+        SNAPSHOT = 3,
+        TYPE = 4,
+        OPEN = 5,
+        CLOSE = 6,
+    };
+}
+
+AccountTableModel::AccountTableModel(utils::db::ConnectionPool& pool, QObject* parent)
+    : QAbstractTableModel(parent), pool{pool} {}
+
+int AccountTableModel::rowCount(const QModelIndex&) const { return accounts.size(); }
+int AccountTableModel::columnCount(const QModelIndex&) const { return magic_enum::enum_count<Column>(); }
 
 QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     QVariant result = QVariant();
 
     int row = index.row();
-    int column = index.column();
+    int column_idx = index.column();
 
-    if (!index.isValid() || row >= rowCount() || column >= columnCount()) {
+    if (!index.isValid() || row >= rowCount() || column_idx >= columnCount()) {
         return result;
     }
+
+    Column column = magic_enum::enum_value<Column>(column_idx);
 
     switch (role) {
     case Qt::DisplayRole: {
         const auto& account = accounts.at(row);
-        if (column == 0) {
+        switch (column) {
+        case Column::CUSTODIAN:
             result = account.custodian.second.c_str();
-        } else if (column == 1) {
+            break;
+        case Column::NAME:
             result = account.name.c_str();
-        } else if (column == 2) {
+            break;
+        case Column::IDENTIFIER:
             result = account.identifier.value_or("").c_str();
-        } else if (column == 3) {
-            result = QString::fromStdString(static_cast<std::string>(account.ccy));
-        } else if (column == 4) {
+            break;
+        case Column::SNAPSHOT: {
+            const auto& snapshot = snapshots.at(row);
+            if (snapshot) {
+                result = QString("%1 %2").arg(snapshot.value().amount).arg(static_cast<std::string_view>(account.ccy));
+            }
+        } break;
+        case Column::TYPE:
             result = account.type.second.c_str();
+            break;
+        case Column::OPEN:
+            result = QDate{int(account.open.year()), static_cast<int>(unsigned(account.open.month())),
+                           static_cast<int>(unsigned(account.open.day()))}
+                         .toString("yyyy-MM-dd");
+            break;
+        case Column::CLOSE:
+            result = QDate{int(account.close->year()), static_cast<int>(unsigned(account.close->month())),
+                           static_cast<int>(unsigned(account.close->day()))}
+                         .toString("yyyy-MM-dd");
         }
-    }
-    // result = QString("row-%1, col-%2").arg(row).arg(column);
-    break;
-    // case Qt::FontRole:
-    //     if (2 == row) {
-    //         QFont font;
-    //         font.setBold(true);
-    //         result = font;
-    //     }
-    //     break;
-    // //
+    } break;
+    case Qt::FontRole:
+        if (column == Column::SNAPSHOT) {
+            result = QFont{"Andale Mono"};
+        }
+        break;
+    //
     // case Qt::ForegroundRole:
     //     if (1 == column) {
     //         result = QColor(Qt::red);
@@ -52,14 +86,13 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     //     }
     //     break;
     // //
-    // case Qt::TextAlignmentRole:
-    //     result = Qt::AlignCenter;
-    //     break;
-    // //
+    case Qt::TextAlignmentRole:
+        result = Qt::AlignRight;
+        break;
     default:
         break;
     }
-    //
+
     return result;
 }
 
@@ -74,25 +107,8 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
     QVariant result = QVariant();
 
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) { // H
-        switch (section) {
-        case 0:
-            result = "custodian";
-            break;
-        case 1:
-            result = "name";
-            break;
-        case 2:
-            result = "identifier";
-            break;
-        case 3:
-            result = "ccy";
-            break;
-        case 4:
-            result = "type";
-            break;
-        default:
-            break;
-        }
+        Column column = magic_enum::enum_value<Column>(section);
+        result = QString::fromStdString(std::string(magic_enum::enum_name(column)));
     } else if (role == Qt::DisplayRole && orientation == Qt::Vertical) { // V
         return QString("%1").arg(accounts[section].id);
     } else {
@@ -101,8 +117,49 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
     return result;
 }
 
-void AccountTableModel::set_accounts(std::vector<finances::accounts::models::Account>&& input) {
+void AccountTableModel::fetch_all() {
+    SPDLOG_DEBUG("AccountTableModel::fetch_all");
+    finances::accounts::models::AccountManager manager{pool};
+    auto all_accounts = manager.all();
+    if (!all_accounts) {
+        SPDLOG_ERROR("Error refreshing accounts");
+        // TODO: Communicate error to user
+    }
+
+    std::vector<std::optional<finances::accounts::models::Snapshot>> all_snapshots(all_accounts->size(), std::nullopt);
+
     this->beginResetModel();
-    accounts.swap(input);
+    this->accounts = std::move(all_accounts.value());
+    this->snapshots = std::move(all_snapshots);
     this->endResetModel();
+
+    // We have updated all the accounts, so let's fetch all the snapshots together.
+    QTimer::singleShot(0, this, SLOT(fetch_snapshots()));
+}
+
+void AccountTableModel::fetch_snapshots() {
+    SPDLOG_DEBUG("AccountTableModel::fetch_snapshots");
+    finances::accounts::models::AccountManager manager{pool};
+
+    std::vector<finances::accounts::models::Id> account_ids;
+    account_ids.resize(accounts.size());
+    std::transform(accounts.begin(), accounts.end(), account_ids.begin(),
+                   [](const auto& account) { return account.id; });
+    auto last_snapshots = manager.get_last_snapshots(account_ids);
+
+    if (!last_snapshots) {
+        SPDLOG_ERROR("Error refreshing snapshots");
+        // TODO: Communicate error to user
+    }
+
+    this->snapshots = std::move(last_snapshots.value());
+
+    QVector<int> roles = {Qt::DisplayRole};
+    QModelIndex topLeft = this->createIndex(0, magic_enum::enum_integer(Column::SNAPSHOT));
+    QModelIndex bottomRight = this->createIndex(rowCount(), magic_enum::enum_integer(Column::SNAPSHOT));
+    emit dataChanged(topLeft, bottomRight, roles);
+}
+
+void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id) {
+    SPDLOG_DEBUG("AccountTableModel::fetch_snapshot(account_id={})", account_id);
 }

@@ -1,3 +1,4 @@
+#include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -26,6 +27,10 @@ int main(int argc, char** argv) {
 
     QApplication app(argc, argv);
     QWidget window;
+
+    for (auto it : QFontDatabase::families()) {
+        SPDLOG_DEBUG(it.toStdString());
+    }
 
     QHBoxLayout* all = new QHBoxLayout();
     // QVBoxLayout* left_pane = new QVBoxLayout();

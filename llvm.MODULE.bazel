@@ -6,6 +6,7 @@ bazel_dep(name = "toolchains_llvm", version = "1.5.0")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.0")
 bazel_dep(name = "spdlog", version = "1.15.3")
 bazel_dep(name = "catch2", version = "3.10.0")
+bazel_dep(name = "magic_enum", version = "0.9.7")
 bazel_dep(name = "rules_qt")
 local_path_override(
     module_name = "rules_qt",
@@ -61,3 +62,6 @@ use_repo(libpqxx_non_module_dependencies, "libpqxx")
 
 tl_expected_non_module_dependencies = use_extension("//third_party/tl-expected:extensions.bzl", "non_module_dependencies")
 use_repo(tl_expected_non_module_dependencies, "tl-expected")
+
+date_non_module_dependencies = use_extension("//third_party/date:extensions.bzl", "non_module_dependencies")
+use_repo(date_non_module_dependencies, "date")

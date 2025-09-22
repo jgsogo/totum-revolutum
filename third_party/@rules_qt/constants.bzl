@@ -34,6 +34,8 @@ QT_COMMON_LIBRARIES = [
     # Individual libraries
     "qt_core",
     "qt_widgets",
+    "qt_gui",
+    # FIXME: Add more libraries here. For sure, there are others that are provided by all the versions.
 ]
 
 # aqt install-qt --help
