@@ -124,6 +124,7 @@ void AccountTableModel::fetch_all() {
     if (!all_accounts) {
         SPDLOG_ERROR("Error refreshing accounts");
         // TODO: Communicate error to user
+        return;
     }
 
     std::vector<std::optional<finances::accounts::models::Snapshot>> all_snapshots(all_accounts->size(), std::nullopt);
@@ -150,6 +151,7 @@ void AccountTableModel::fetch_snapshots() {
     if (!last_snapshots) {
         SPDLOG_ERROR("Error refreshing snapshots");
         // TODO: Communicate error to user
+        return;
     }
 
     this->snapshots = std::move(last_snapshots.value());
@@ -162,4 +164,29 @@ void AccountTableModel::fetch_snapshots() {
 
 void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id) {
     SPDLOG_DEBUG("AccountTableModel::fetch_snapshot(account_id={})", account_id);
+
+    // Find the row for the fetched snapshot
+    auto it = std::find_if(this->accounts.begin(), this->accounts.end(),
+                           [&account_id](const auto& account) { return account.id == account_id; });
+    if (it == this->accounts.end()) {
+        SPDLOG_ERROR("Account {} is not in the model", account_id);
+        // TODO: Communicate error to user
+        return;
+    }
+
+    finances::accounts::models::AccountManager manager{pool};
+    auto last_snapshot = manager.get_last_snapshot(account_id);
+    if (!last_snapshot) {
+        SPDLOG_ERROR("Error fetching snapshot for account: {}", account_id);
+        // TODO: Communicate error to user
+        return;
+    }
+
+    // Update the corresponding row
+    auto row = std::distance(this->accounts.begin(), it);
+    this->snapshots.at(row) = std::move(last_snapshot.value());
+
+    QVector<int> roles = {Qt::DisplayRole};
+    QModelIndex topLeft = this->createIndex(row, magic_enum::enum_integer(Column::SNAPSHOT));
+    emit dataChanged(topLeft, topLeft, roles);
 }
