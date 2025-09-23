@@ -1,12 +1,9 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
-    name = "utils",
-    srcs = [
-        "utils.cpp",
-    ],
+    name = "with_level",
     hdrs = [
-        "utils.hpp",
+        "with_level.h",
     ],
     visibility = [
         "//visibility:public",

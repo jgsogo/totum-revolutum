@@ -27,7 +27,7 @@ namespace utils::libpqxx {
 template <std::size_t MaxDigits, std::size_t DecimalPlaces>
 struct std::formatter<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>> : std::formatter<std::string> {
     auto format(const utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>& p, std::format_context& ctx) const {
-        return std::formatter<std::string>::format(dec::toString(p.value, ENGLISH_DECIMAL_FORMAT), ctx);
+        return std::formatter<std::string>::format(dec::toString(p.value, utils::libpqxx::ENGLISH_DECIMAL_FORMAT), ctx);
     }
 };
 
@@ -35,7 +35,7 @@ struct std::formatter<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>> : std::
 template <std::size_t MaxDigits, std::size_t DecimalPlaces>
 struct fmt::formatter<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>> : fmt::formatter<std::string> {
     auto format(utils::libpqxx::Numeric<MaxDigits, DecimalPlaces> p, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "{}", dec::toString(p.value, ENGLISH_DECIMAL_FORMAT));
+        return fmt::format_to(ctx.out(), "{}", dec::toString(p.value, utils::libpqxx::ENGLISH_DECIMAL_FORMAT));
     }
 };
 

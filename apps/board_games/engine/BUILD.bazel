@@ -21,15 +21,12 @@ cc_library(
 cc_binary(
     name = "engine",
     srcs = ["main.cpp"],
-    defines = [
-        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
-    ],
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
         ":plugin",
         "//apps/board_games/engine/services",
         "//apps/board_games/games/tic_tac_toe/engine",
-        "//libraries/utils/cpp/db",
+        "//libraries/utils/cpp/db:connection_pool",
         "@spdlog",
     ],
 )

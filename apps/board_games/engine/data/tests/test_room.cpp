@@ -2,8 +2,8 @@
 #include <google/protobuf/empty.pb.h>
 #include <spdlog/spdlog.h>
 
-#include "libraries/cpp/spdlog/utils.hpp"
 #include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
+#include "libraries/utils/cpp/spdlog/with_level.h"
 
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/room.h"

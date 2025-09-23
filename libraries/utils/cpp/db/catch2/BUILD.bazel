@@ -13,7 +13,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//libraries/utils/cpp:string_literal",
-        "//libraries/utils/cpp/db",
+        "//libraries/utils/cpp/db:connection_pool",
         "@stduuid",
     ],
 )
