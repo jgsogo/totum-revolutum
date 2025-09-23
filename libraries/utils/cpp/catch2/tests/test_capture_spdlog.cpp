@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "libraries/utils/cpp/db/catch2/capture_spdlog.hpp"
+#include "libraries/utils/cpp/catch2/capture_spdlog.hpp"
 
 using namespace utils::catch2;
 

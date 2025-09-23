@@ -7,7 +7,7 @@ cc_test(
     ],
     deps = [
         "//libraries/utils/cpp:integral_type",
-        "//libraries/utils/cpp/db/catch2:capture_spdlog",
+        "//libraries/utils/cpp/catch2:capture_spdlog",
         "@catch2//:catch2_main",
     ],
 )
@@ -30,7 +30,7 @@ cc_test(
     ],
     deps = [
         "//libraries/utils/cpp:string_type",
-        "//libraries/utils/cpp/db/catch2:capture_spdlog",
+        "//libraries/utils/cpp/catch2:capture_spdlog",
         "@catch2//:catch2_main",
     ],
 )

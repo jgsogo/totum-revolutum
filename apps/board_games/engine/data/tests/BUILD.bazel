@@ -8,7 +8,7 @@ cc_test(
     tags = ["manual"],
     deps = [
         "//apps/board_games/engine/data",
-        "//libraries/utils/cpp/db/catch2:unique_db_connection_pool",
+        "//libraries/utils/cpp/catch2:unique_db_connection_pool",
         "//libraries/utils/cpp/spdlog:with_level",
         "@catch2//:catch2_main",
         "@protobuf//:empty_cc_proto",
