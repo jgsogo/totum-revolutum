@@ -16,27 +16,37 @@ namespace utils {
         IntegralType& operator=(IntegralType&&) = default;
         ~IntegralType() = default;
 
-        constexpr explicit IntegralType(TInteger&& value) : value{std::move(value)} {}
         constexpr explicit IntegralType(TInteger value) : value{value} {}
+        // Move semantic for integral types doesn't make much sense.
+        // constexpr explicit IntegralType(TInteger&& value) : value{std::move(value)} {}
 
         // template <typename TInteger2> constexpr IntegralType(TInteger2 value) : value{value} {
         //     static_assert(std::is_integral_v<TInteger2>, "Tinteger2 must be an integral type");
         // }
 
-        operator TInteger() const { return value; }
+        constexpr operator TInteger() const { return value; }
 
         auto operator<=>(const IntegralType<T, TInteger>&) const = default;
+
+        template <typename TT, typename TTInteger>
+        friend std::ostream& operator<<(std::ostream&, const IntegralType<TT, TTInteger>&);
 
       private:
         TInteger value;
     };
+
+    template <typename T, typename TInteger>
+    std::ostream& operator<<(std::ostream& os, const IntegralType<T, TInteger>& p) {
+        os << std::to_string(p.value);
+        return os;
+    }
 } // namespace utils
 
 // Required for std::format
 template <typename T, typename TInteger>
 struct std::formatter<utils::IntegralType<T, TInteger>> : std::formatter<TInteger> {
     auto format(const utils::IntegralType<T, TInteger>& p, std::format_context& ctx) const {
-        return std::formatter<TInteger>::format(p.value, ctx);
+        return std::formatter<TInteger>::format(static_cast<TInteger>(p), ctx);
     }
 };
 

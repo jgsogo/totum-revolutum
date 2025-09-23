@@ -17,3 +17,15 @@ cc_library(
         "@stduuid",
     ],
 )
+
+cc_library(
+    name = "capture_spdlog",
+    testonly = True,
+    hdrs = [
+        "capture_spdlog.hpp",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@spdlog",
+    ],
+)

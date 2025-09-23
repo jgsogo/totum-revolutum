@@ -29,3 +29,14 @@ with_postgres_test(
         "RANDOMPREFIX_SQL_PORT": "POSTGRES_PORT",
     },
 )
+
+cc_test(
+    name = "test_capture_spdlog",
+    srcs = [
+        "test_capture_spdlog.cpp",
+    ],
+    deps = [
+        "//libraries/utils/cpp/db/catch2:capture_spdlog",
+        "@catch2//:catch2_main",
+    ],
+)
