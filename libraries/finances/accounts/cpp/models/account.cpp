@@ -5,7 +5,7 @@
 
 using namespace finances::accounts::models;
 
-AccountManager::AccountManager(utils::db::ConnectionPool& pool) : ModelManager<Account>(pool) {}
+AccountManager::AccountManager(utils::libpqxx::ConnectionPool& pool) : ModelManager<Account>(pool) {}
 
 template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all() {
     return pool.with_conn<tl::expected<std::vector<Account>, Error>>(

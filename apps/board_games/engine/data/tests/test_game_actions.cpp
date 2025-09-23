@@ -5,7 +5,7 @@
 
 #include "apps/board_games/engine/data/game.h"
 
-using namespace utils::db::testing;
+using namespace utils::libpqxx::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game: game_action / event_log") {
 

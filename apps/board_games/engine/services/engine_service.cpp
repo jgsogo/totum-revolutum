@@ -7,7 +7,7 @@
 
 namespace services {
 
-    EngineServiceImpl::EngineServiceImpl(utils::db::ConnectionPool& pool, const engine::GamePluginsMap& games)
+    EngineServiceImpl::EngineServiceImpl(utils::libpqxx::ConnectionPool& pool, const engine::GamePluginsMap& games)
         : pool{pool}, _games(games) {}
 
     grpc::Status EngineServiceImpl::SubmitCommand(grpc::ServerContext* context,

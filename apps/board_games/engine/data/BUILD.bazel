@@ -18,8 +18,8 @@ cc_library(
     ],
     deps = [
         "//apps/board_games/engine/data/models",
-        "//libraries/utils/cpp/db:connection_pool",
-        "//libraries/utils/cpp/db:notify",
+        "//libraries/utils/cpp/libpqxx:connection_pool",
+        "//libraries/utils/cpp/libpqxx:notify",
         "@spdlog",
         "@tl-expected",
     ],

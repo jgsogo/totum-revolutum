@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "libraries/utils/cpp/catch2/unique_db_connection_pool.hpp"
-#include "libraries/utils/cpp/db/notify.h"
+#include "libraries/utils/cpp/libpqxx/notify.h"
 
-using namespace utils::db::testing;
+using namespace utils::libpqxx::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test notify") {
 
@@ -17,7 +17,7 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test notify") {
 
             REQUIRE(!notification_arrived);
 
-            utils::db::notify(conn, channel);
+            utils::libpqxx::notify(conn, channel);
 
             int received{conn.await_notification(3)};
             REQUIRE(received == 1);
@@ -34,7 +34,7 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test notify") {
             conn.listen(channel, [&recv_payload](pqxx::notification n) { recv_payload = n.payload; });
             conn.get_notifs();
 
-            utils::db::notify(conn, channel, payload);
+            utils::libpqxx::notify(conn, channel, payload);
 
             int received{conn.await_notification(3)};
             REQUIRE(received == 1);

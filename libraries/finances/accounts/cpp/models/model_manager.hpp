@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "libraries/utils/cpp/db/connection_pool.h"
+#include "libraries/utils/cpp/libpqxx/connection_pool.h"
 #include "tl/expected.hpp"
 
 #include "errors.h"
@@ -16,12 +16,12 @@ namespace finances::accounts::models {
 
     template <typename TModel> class ModelManager {
       public:
-        ModelManager(utils::db::ConnectionPool& pool) : pool{pool} {}
+        ModelManager(utils::libpqxx::ConnectionPool& pool) : pool{pool} {}
 
         tl::expected<std::vector<TModel>, Error> all();
 
       protected:
-        utils::db::ConnectionPool& pool;
+        utils::libpqxx::ConnectionPool& pool;
     };
 
 } // namespace finances::accounts::models

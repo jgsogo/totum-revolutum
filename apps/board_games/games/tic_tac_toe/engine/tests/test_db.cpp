@@ -7,7 +7,7 @@
 #include "apps/board_games/engine/data/room.h"
 #include "apps/board_games/games/tic_tac_toe/engine/tic_tac_toe.h"
 
-using namespace utils::db::testing;
+using namespace utils::libpqxx::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test DB interactions") {
     data::RoomUUID room_uuid{uuids::to_string(uuids::uuid_system_generator{}())};

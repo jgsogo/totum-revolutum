@@ -29,7 +29,7 @@ namespace finances::accounts::models {
 
     class AccountManager : public ModelManager<Account> {
       public:
-        AccountManager(utils::db::ConnectionPool& pool);
+        AccountManager(utils::libpqxx::ConnectionPool& pool);
 
         tl::expected<std::optional<Snapshot>, Error> get_last_snapshot(decltype(Account::id) account_id) const;
 

@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <spdlog/spdlog.h>
 
-AccountsTableWidget::AccountsTableWidget(utils::db::ConnectionPool& pool, QWidget* parent, Qt::WindowFlags f)
+AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent, Qt::WindowFlags f)
     : QWidget(parent, f) {
     model = new AccountTableModel(pool, this);
 

@@ -3,14 +3,14 @@
 #include <QSortFilterProxyModel>
 #include <QWidget>
 
-#include "libraries/utils/cpp/db/connection_pool.h"
+#include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
 #include "apps/finances/qt/models/accounts_table.h"
 
 class AccountsTableWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountsTableWidget(utils::db::ConnectionPool& pool, QWidget* parent = nullptr,
+    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent = nullptr,
                                  Qt::WindowFlags f = Qt::WindowFlags());
 
   private:

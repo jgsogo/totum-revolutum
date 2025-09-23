@@ -11,7 +11,7 @@ cc_library(
     deps = [
         "//libraries/utils/cpp:integral_type",
         "//libraries/utils/cpp:string_type",
-        "//libraries/utils/cpp/db:connection_pool",
+        "//libraries/utils/cpp/libpqxx:connection_pool",
         "//libraries/utils/cpp/libpqxx:date",
         "//libraries/utils/cpp/libpqxx:numeric",
         "@spdlog",

@@ -2,7 +2,7 @@
 
 #include "libraries/utils/cpp/catch2/unique_db_connection_pool.hpp"
 
-using namespace utils::db::testing;
+using namespace utils::libpqxx::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test connection pool") {
 

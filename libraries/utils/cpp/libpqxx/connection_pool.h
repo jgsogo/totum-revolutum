@@ -6,7 +6,7 @@
 #include <pqxx/pqxx>
 #include <queue>
 
-namespace utils::db {
+namespace utils::libpqxx {
 
     class ConnectionPool {
       public:
@@ -37,4 +37,4 @@ namespace utils::db {
 
     template <> void ConnectionPool::with_conn<void>(std::function<void(pqxx::connection& conn)> work);
 
-} // namespace utils::db
+} // namespace utils::libpqxx

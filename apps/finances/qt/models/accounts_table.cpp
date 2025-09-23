@@ -19,7 +19,7 @@ namespace {
     };
 }
 
-AccountTableModel::AccountTableModel(utils::db::ConnectionPool& pool, QObject* parent)
+AccountTableModel::AccountTableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent)
     : QAbstractTableModel(parent), pool{pool} {}
 
 int AccountTableModel::rowCount(const QModelIndex&) const { return accounts.size(); }
