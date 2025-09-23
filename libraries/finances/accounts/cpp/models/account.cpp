@@ -54,7 +54,7 @@ tl::expected<std::optional<Snapshot>, Error> AccountManager::get_last_snapshot(d
                 pqxx::work tx(conn);
                 SPDLOG_DEBUG("Get last snapshot for account_id {}", account_id);
 
-                auto query = std::format("SELECT id, date_value"
+                auto query = std::format("SELECT id, date_value, amount"
                                          " FROM {}"
                                          " ORDER BY date_value DESC"
                                          " WHERE account_id = $1"
@@ -65,8 +65,9 @@ tl::expected<std::optional<Snapshot>, Error> AccountManager::get_last_snapshot(d
                 if (!r) {
                     return {std::nullopt};
                 }
-                auto [id, date_value] = r->as<Id, utils::libpqxx::Date>();
-                return {std::make_optional<Snapshot>({.id = id, .account_id = account_id, .date_value = date_value})};
+                auto [id, date_value, amount] = r->as<Id, utils::libpqxx::Date, Amount>();
+                return {std::make_optional<Snapshot>(
+                    {.id = id, .account_id = account_id, .date_value = date_value, .amount = amount})};
             } catch (const std::exception& e) {
                 SPDLOG_ERROR("Failed to fetch latest snapshot for account {}: {}", account_id, e.what());
                 return tl::unexpected(Error::DBError);
@@ -101,7 +102,7 @@ AccountManager::get_last_snapshots(const std::vector<decltype(Account::id)>& acc
                     subquery = out.str();
                 }
 
-                auto query = std::format("SELECT DISTINCT ON (account_id) id, account_id, date_value"
+                auto query = std::format("SELECT DISTINCT ON (account_id) id, account_id, date_value, amount"
                                          " FROM {}"
                                          " WHERE account_id IN ({})"
                                          " ORDER BY account_id, date_value DESC;",
@@ -109,10 +110,12 @@ AccountManager::get_last_snapshots(const std::vector<decltype(Account::id)>& acc
                 SPDLOG_TRACE(query);
 
                 std::map<Id, Snapshot> snapshots;
-                for (auto [id, account_id, date_value] : tx.query<Id, Id, utils::libpqxx::Date>(query, values)) {
-                    SPDLOG_TRACE("Found snapshot for account {}: date {}, value = ", account_id, date_value);
+                for (auto [id, account_id, date_value, amount] :
+                     tx.query<Id, Id, utils::libpqxx::Date, Amount>(query, values)) {
+                    SPDLOG_TRACE("Found snapshot for account {}: date {}, amount = {}", account_id, date_value, amount);
                     const auto [_it, inserted] = snapshots.insert(
-                        {account_id, Snapshot{.id = id, .account_id = account_id, .date_value = date_value}});
+                        {account_id,
+                         Snapshot{.id = id, .account_id = account_id, .date_value = date_value, .amount = amount}});
                     assert(inserted);
                 }
 

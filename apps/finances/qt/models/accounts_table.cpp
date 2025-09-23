@@ -5,6 +5,8 @@
 #include <QTimer>
 #include <magic_enum/magic_enum.hpp>
 
+#include "libraries/finances/accounts/cpp/models/types/money.h"
+
 namespace {
     enum class Column {
         CUSTODIAN = 0,
@@ -51,7 +53,8 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
         case Column::SNAPSHOT: {
             const auto& snapshot = snapshots.at(row);
             if (snapshot) {
-                result = QString("%1 %2").arg(snapshot.value().amount).arg(static_cast<std::string_view>(account.ccy));
+                auto snapshot_money = finances::accounts::models::Money{snapshot.value().amount, account.ccy};
+                result = QString::fromStdString(static_cast<std::string>(snapshot_money));
             }
         } break;
         case Column::TYPE:

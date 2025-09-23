@@ -6,11 +6,11 @@
 #include "libraries/utils/cpp/libpqxx/date.h"
 
 #include "account_type.h"
-#include "ccy.h"
 #include "custodian.h"
-#include "id.h"
 #include "model_manager.hpp"
 #include "snapshot.h"
+#include "types/ccy.h"
+#include "types/id.h"
 
 namespace finances::accounts::models {
 

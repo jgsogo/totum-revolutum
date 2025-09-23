@@ -13,6 +13,7 @@ cc_library(
         "//libraries/utils/cpp:string_type",
         "//libraries/utils/cpp/db",
         "//libraries/utils/cpp/libpqxx:date",
+        "//libraries/utils/cpp/libpqxx:numeric",
         "@spdlog",
         "@tl-expected",
     ],

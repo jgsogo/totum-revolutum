@@ -14,3 +14,14 @@ cc_library(
         "@spdlog",
     ],
 )
+
+cc_library(
+    name = "numeric",
+    hdrs = ["numeric.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@decimal_for_cpp",
+        "@libpqxx",
+        "@spdlog",
+    ],
+)

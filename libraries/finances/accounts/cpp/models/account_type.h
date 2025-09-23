@@ -3,7 +3,7 @@
 #include <optional>
 #include <string>
 
-#include "id.h"
+#include "types/id.h"
 
 namespace finances::accounts::models {
     struct AccountType {

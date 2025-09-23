@@ -5,7 +5,8 @@
 
 #include "libraries/utils/cpp/libpqxx/date.h"
 
-#include "id.h"
+#include "types/amount.h"
+#include "types/id.h"
 
 namespace finances::accounts::models {
 
@@ -13,6 +14,6 @@ namespace finances::accounts::models {
         Id id;
         decltype(AccountType::id) account_id;
         utils::libpqxx::Date date_value;
-        float amount;
+        Amount amount;
     };
 } // namespace finances::accounts::models

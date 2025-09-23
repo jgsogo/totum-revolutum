@@ -1,0 +1,22 @@
+diff --git a/include/decimal.h b/include/decimal.h
+index b5bc5ef..7853579 100644
+--- a/include/decimal.h
++++ b/include/decimal.h
+@@ -1971,7 +1971,7 @@ bool fromStream(StreamType &input, const basic_decimal_format &format, decimal_t
+ 
+         ostringstream out;
+         toStream(arg, format, out);
+-        output = DEC_MOVE(out.str());
++        output = out.str();
+         return output;
+     }
+ 
+@@ -1982,7 +1982,7 @@ bool fromStream(StreamType &input, const basic_decimal_format &format, decimal_t
+ 
+         ostringstream out;
+         toStream(arg, out);
+-        output = DEC_MOVE(out.str());
++        output = out.str();
+         return output;
+     }
+ 

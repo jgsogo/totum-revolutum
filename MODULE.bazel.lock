@@ -10098,6 +10098,38 @@
         ]
       }
     },
+    "//third_party/decimal_for_cpp:extensions.bzl%non_module_dependencies": {
+      "general": {
+        "bzlTransitiveDigest": "0//hZ+Pab2RSPWwjxgZf2Jure1PzlElvQHB9ReL0+54=",
+        "usagesDigest": "oYs4g7T9bl7BEIO0OlYTkdsIptb9sspap/EJIGscZLI=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "decimal_for_cpp": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/vpiotr/decimal_for_cpp/archive/599372ee214ab37b5c0fc68148352321978f20ed.tar.gz",
+              "build_file": "@@//third_party/decimal_for_cpp:decimal_for_cpp.BUILD",
+              "strip_prefix": "decimal_for_cpp-599372ee214ab37b5c0fc68148352321978f20ed",
+              "patches": [
+                "@@//third_party/decimal_for_cpp:0001-pessimizing-move.patch"
+              ],
+              "patch_args": [
+                "-p1"
+              ]
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
     "//third_party/libpqxx:extensions.bzl%non_module_dependencies": {
       "general": {
         "bzlTransitiveDigest": "0+xpesT4lAkjPBozb1yiNCFFtK7inbMF57tPiX8xAX4=",

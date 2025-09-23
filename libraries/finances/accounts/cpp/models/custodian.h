@@ -3,8 +3,8 @@
 #include <optional>
 #include <string>
 
-#include "country.h"
-#include "id.h"
+#include "types/country.h"
+#include "types/id.h"
 
 namespace finances::accounts::models {
 

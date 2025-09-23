@@ -65,3 +65,6 @@ use_repo(tl_expected_non_module_dependencies, "tl-expected")
 
 date_non_module_dependencies = use_extension("//third_party/date:extensions.bzl", "non_module_dependencies")
 use_repo(date_non_module_dependencies, "date")
+
+decimal_for_cpp_non_module_dependencies = use_extension("//third_party/decimal_for_cpp:extensions.bzl", "non_module_dependencies")
+use_repo(decimal_for_cpp_non_module_dependencies, "decimal_for_cpp")

@@ -3,7 +3,6 @@
 #include <QSortFilterProxyModel>
 #include <QWidget>
 
-#include "libraries/finances/accounts/cpp/models/id.h"
 #include "libraries/utils/cpp/db/connection_pool.h"
 
 #include "apps/finances/qt/models/accounts_table.h"
