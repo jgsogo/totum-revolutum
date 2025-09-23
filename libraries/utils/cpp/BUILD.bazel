@@ -24,4 +24,7 @@ cc_library(
     name = "string_literal",
     hdrs = ["string_literal.hpp"],
     visibility = ["//visibility:public"],
+    deps = [
+        "@spdlog",
+    ],
 )

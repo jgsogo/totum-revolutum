@@ -9,13 +9,16 @@
 #include <spdlog/spdlog.h>
 
 namespace utils::libpqxx {
+    static const dec::decimal_format ENGLISH_DECIMAL_FORMAT{'.'};
+    static const dec::decimal_format SPANISH_DECIMAL_FORMAT{','};
+
     template <std::size_t MaxDigits, std::size_t DecimalPlaces> struct Numeric {
         // dec::decimal maximum number of digits is 18 (uses 64 bit integer under the hood)
         static_assert(MaxDigits <= 18, "MaxDigits cannot excceed 18");
 
-        operator std::string() const { return dec::toString(value, dec::decimal_format(',')); }
+        static const std::size_t max_digits = MaxDigits;
 
-        constexpr static std::size_t max_digits = MaxDigits;
+        operator std::string() const { return dec::toString(value, ENGLISH_DECIMAL_FORMAT); }
         dec::decimal<DecimalPlaces> value;
     };
 } // namespace utils::libpqxx
@@ -24,7 +27,7 @@ namespace utils::libpqxx {
 template <std::size_t MaxDigits, std::size_t DecimalPlaces>
 struct std::formatter<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>> : std::formatter<std::string> {
     auto format(const utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>& p, std::format_context& ctx) const {
-        return std::formatter<std::string>::format(dec::toString(p.value, dec::decimal_format(',')), ctx);
+        return std::formatter<std::string>::format(dec::toString(p.value, ENGLISH_DECIMAL_FORMAT), ctx);
     }
 };
 
@@ -32,13 +35,15 @@ struct std::formatter<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>> : std::
 template <std::size_t MaxDigits, std::size_t DecimalPlaces>
 struct fmt::formatter<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>> : fmt::formatter<std::string> {
     auto format(utils::libpqxx::Numeric<MaxDigits, DecimalPlaces> p, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "{}", dec::toString(p.value, dec::decimal_format(',')));
+        return fmt::format_to(ctx.out(), "{}", dec::toString(p.value, ENGLISH_DECIMAL_FORMAT));
     }
 };
 
-// // Custom datatype for libpqxx: https://libpqxx.readthedocs.io/stable/datatypes.html#autotoc_md10,
-// // most of the implementation taken from https://gist.github.com/tomlankhorst/5c41127a3f4fe3e6b1b4cb114ec7e3be
+// Custom datatype for libpqxx: https://libpqxx.readthedocs.io/stable/datatypes.html#autotoc_md10,
+// most of the implementation taken from https://gist.github.com/tomlankhorst/5c41127a3f4fe3e6b1b4cb114ec7e3be
 namespace pqxx {
+
+    static const dec::decimal_format POSTGRES_DECIMAL_FORMAT{'.'}; // Does this depend on some PostgreSQL locale?
 
     template <std::size_t MaxDigits, std::size_t DecimalPlaces>
     inline std::string const type_name<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>>{
@@ -52,15 +57,14 @@ namespace pqxx {
     struct string_traits<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>> {
         static utils::libpqxx::Numeric<MaxDigits, DecimalPlaces> from_string(std::string_view text) {
             SPDLOG_DEBUG("Trying to parse: {}", text);
-            dec::decimal_format format('.');
             dec::decimal<DecimalPlaces> inner_value =
-                dec::fromString<dec::decimal<DecimalPlaces>>(std::string{text}, format);
+                dec::fromString<dec::decimal<DecimalPlaces>>(std::string{text}, POSTGRES_DECIMAL_FORMAT);
             return utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>{inner_value};
         }
 
         static zview to_buf(char* begin, char* end, const utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>& value) {
             // auto string = date::format(utils::libpqxx::DATE_FORMAT, value);
-            std::string string = dec::toString(value.value, dec::decimal_format('.'));
+            std::string string = dec::toString(value.value, POSTGRES_DECIMAL_FORMAT);
 
             if (std::distance(begin, end) < static_cast<signed long>(string.size() + 1)) {
                 throw pqxx::conversion_overrun{"could not convert utils::libpqxx::Date"};
