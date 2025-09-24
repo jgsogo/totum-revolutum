@@ -26,6 +26,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@spdlog",
+        "//bazel/logging:spdlog",
     ],
 )

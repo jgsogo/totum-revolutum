@@ -21,6 +21,6 @@ cc_library(
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",
         "//apps/board_games/engine/protocol:engine_cpp_grpc",
-        "@spdlog",
+        "//bazel/logging:spdlog",
     ],
 )

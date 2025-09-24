@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "third_party"
+		},
+		{
+			"path": "bazel"
 		}
 	],
 	"settings": {}

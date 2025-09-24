@@ -10,8 +10,8 @@ cc_library(
     hdrs = ["connection_pool.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//bazel/logging:spdlog",
         "@libpqxx",
-        "@spdlog",
     ],
 )
 
@@ -21,7 +21,7 @@ cc_library(
     hdrs = ["notify.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//bazel/logging:spdlog",
         "@libpqxx",
-        "@spdlog",
     ],
 )

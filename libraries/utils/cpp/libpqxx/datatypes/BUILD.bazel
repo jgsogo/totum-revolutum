@@ -5,9 +5,9 @@ cc_library(
     hdrs = ["date.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//bazel/logging:spdlog",
         "@date",
         "@libpqxx",
-        "@spdlog",
     ],
 )
 
@@ -16,8 +16,8 @@ cc_library(
     hdrs = ["numeric.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//bazel/logging:spdlog",
         "@decimal_for_cpp",
         "@libpqxx",
-        "@spdlog",
     ],
 )

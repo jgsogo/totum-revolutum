@@ -9,8 +9,8 @@ cc_library(
     hdrs = ["integral_type.hpp"],
     visibility = ["//visibility:public"],
     deps = [
+        "//bazel/logging:spdlog",
         "@libpqxx",
-        "@spdlog",
     ],
 )
 
@@ -25,6 +25,6 @@ cc_library(
     hdrs = ["string_literal.hpp"],
     visibility = ["//visibility:public"],
     deps = [
-        "@spdlog",
+        "//bazel/logging:spdlog",
     ],
 )

@@ -4,6 +4,10 @@ test --verbose_failures --test_output=errors
 
 build --enable_platform_specific_config
 
+# Logging: Release builds aim for 'INFO'
+common --//bazel/logging:logging=trace
+common:release --//bazel/logging:logging=info
+
 ###################
 # CI Specific flags
 ###################

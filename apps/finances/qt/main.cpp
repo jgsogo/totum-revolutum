@@ -14,6 +14,7 @@
 
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
+#include "apps/finances/qt/db/notificator.h"
 #include "apps/finances/qt/models/accounts_table.h"
 #include "apps/finances/qt/version.hpp"
 #include "apps/finances/qt/widgets/accounts_table.h"
@@ -28,9 +29,13 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
     QWidget window;
 
-    for (auto it : QFontDatabase::families()) {
-        SPDLOG_DEBUG(it.toStdString());
-    }
+    auto conn = pool.acquire();
+    std::chrono::milliseconds ms{1000};
+    Notificator notificator{std::move(*conn), ms};
+
+    // for (auto it : QFontDatabase::families()) {
+    //     SPDLOG_DEBUG(it.toStdString());
+    // }
 
     QHBoxLayout* all = new QHBoxLayout();
     // QVBoxLayout* left_pane = new QVBoxLayout();

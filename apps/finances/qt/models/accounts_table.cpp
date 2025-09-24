@@ -130,6 +130,7 @@ void AccountTableModel::fetch_all() {
         return;
     }
 
+    // Create empty snapshots vector
     std::vector<std::optional<finances::accounts::models::Snapshot>> all_snapshots(all_accounts->size(), std::nullopt);
 
     this->beginResetModel();

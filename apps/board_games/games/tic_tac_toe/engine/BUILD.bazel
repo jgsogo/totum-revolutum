@@ -20,7 +20,7 @@ cc_library(
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
         "//apps/board_games/games/tic_tac_toe/models:models_cc_proto",
-        "@spdlog",
+        "//bazel/logging:spdlog",
         "@tl-expected",
     ],
 )

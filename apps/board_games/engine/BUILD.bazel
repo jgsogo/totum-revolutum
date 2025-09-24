@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
-        "@spdlog",
+        "//bazel/logging:spdlog",
         "@tl-expected",
     ],
 )
@@ -26,8 +26,8 @@ cc_binary(
         ":plugin",
         "//apps/board_games/engine/services",
         "//apps/board_games/games/tic_tac_toe/engine",
+        "//bazel/logging:spdlog",
         "//libraries/utils/cpp/libpqxx:connection_pool",
-        "@spdlog",
     ],
 )
 

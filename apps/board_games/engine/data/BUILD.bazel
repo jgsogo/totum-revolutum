@@ -18,9 +18,9 @@ cc_library(
     ],
     deps = [
         "//apps/board_games/engine/data/models",
+        "//bazel/logging:spdlog",
         "//libraries/utils/cpp/libpqxx:connection_pool",
         "//libraries/utils/cpp/libpqxx:notify",
-        "@spdlog",
         "@tl-expected",
     ],
 )

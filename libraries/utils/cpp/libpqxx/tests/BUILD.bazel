@@ -8,10 +8,10 @@ cc_test(
     ],
     tags = ["manual"],
     deps = [
+        "//bazel/logging:spdlog",
         "//libraries/utils/cpp/catch2:unique_db_connection_pool",
         "//libraries/utils/cpp/libpqxx:notify",
         "@catch2//:catch2_main",
-        "@spdlog",
     ],
 )
 
@@ -22,9 +22,9 @@ cc_test(
     ],
     tags = ["manual"],
     deps = [
+        "//bazel/logging:spdlog",
         "//libraries/utils/cpp/catch2:unique_db_connection_pool",
         "@catch2//:catch2_main",
-        "@spdlog",
     ],
 )
 

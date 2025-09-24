@@ -1,0 +1,45 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+LOG_LEVELS = [
+    "trace",
+    "debug",
+    "info",
+    "warn",
+    "error",
+    "critical",
+    "off",
+]
+
+string_flag(
+    name = "logging",
+    build_setting_default = "debug",
+)
+
+[
+    config_setting(
+        name = level,
+        flag_values = {":logging": level},
+    )
+    for level in LOG_LEVELS
+]
+
+# Spdlog library wrapper that propagates the right level of logging to the
+# dependent targets. Yes, these 'defines' attribute will also apply to the
+# consumers of this target.
+cc_library(
+    name = "spdlog",
+    defines = select({
+        ":trace": ["SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE"],
+        ":debug": ["SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG"],
+        ":info": ["SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO"],
+        ":warn": ["SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_WARN"],
+        ":error": ["SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_ERROR"],
+        ":critical": ["SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_CRITICAL"],
+        ":off": ["SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_OFF"],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@spdlog",
+    ],
+)
