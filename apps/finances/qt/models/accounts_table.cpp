@@ -72,7 +72,7 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
         }
     } break;
     case Qt::FontRole:
-        if (column == Column::SNAPSHOT) {
+        if ((column == Column::SNAPSHOT) || (column == Column::OPEN) || (column == Column::CLOSE)) {
             result = QFont{"Andale Mono"};
         }
         break;

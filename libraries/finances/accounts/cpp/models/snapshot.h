@@ -3,7 +3,7 @@
 #include <optional>
 #include <string>
 
-#include "libraries/utils/cpp/libpqxx/date.h"
+#include "libraries/utils/cpp/libpqxx/datatypes/date.h"
 
 #include "types/amount.h"
 #include "types/id.h"

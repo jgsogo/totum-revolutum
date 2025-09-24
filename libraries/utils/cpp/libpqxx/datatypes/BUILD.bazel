@@ -1,26 +1,22 @@
-"""
-A collection of utilities for libpqxx
-"""
-
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
-    name = "connection_pool",
-    srcs = ["connection_pool.cpp"],
-    hdrs = ["connection_pool.h"],
+    name = "date",
+    hdrs = ["date.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "@date",
         "@libpqxx",
         "@spdlog",
     ],
 )
 
 cc_library(
-    name = "notify",
-    srcs = ["notify.cpp"],
-    hdrs = ["notify.h"],
+    name = "numeric",
+    hdrs = ["numeric.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "@decimal_for_cpp",
         "@libpqxx",
         "@spdlog",
     ],

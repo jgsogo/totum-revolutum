@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "apps/finances/qt"
+		},
+		{
+			"path": "libraries/finances"
+		},
+		{
+			"path": "libraries/utils/cpp"
+		},
+		{
+			"path": "third_party"
+		}
+	],
+	"settings": {}
+}
