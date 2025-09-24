@@ -33,6 +33,7 @@ void Notificator::check_notifications() {
 }
 
 void Notificator::notify_all_accounts() { utils::libpqxx::notify(conn, ACCOUNT_CHANNEL); }
+
 void Notificator::notify_account(finances::accounts::models::Id account_id) {
     utils::libpqxx::notify(conn, ACCOUNT_CHANNEL, std::to_string(account_id));
 }
