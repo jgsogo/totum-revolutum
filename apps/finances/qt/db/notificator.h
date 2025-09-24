@@ -4,12 +4,6 @@
 #include <pqxx/pqxx>
 
 #include "libraries/finances/accounts/cpp/models/types/id.h"
-// #include "libraries/finances/accounts/cpp/models/snapshot.h"
-
-// https://stackoverflow.com/a/6791177
-
-// TableView: https://doc.qt.io/qt-6/qtableview.html
-// QAbstractTableModel: https://doc.qt.io/qt-6/qabstracttablemodel.html
 
 /*
 A class to manage all the DB notifications
