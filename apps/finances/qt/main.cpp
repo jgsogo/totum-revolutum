@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
     QWidget window;
 
+    // Run a notificator that will monitor notifications from the database
     auto conn = pool.acquire();
     std::chrono::milliseconds ms{1000};
     Notificator notificator{std::move(*conn), ms};
