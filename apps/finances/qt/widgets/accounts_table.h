@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QSortFilterProxyModel>
 #include <QWidget>
 
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
 #include "apps/finances/qt/models/accounts_table.h"
+#include "apps/finances/qt/widgets/accounts_table_filter.h"
 
 class AccountsTableWidget : public QWidget {
     Q_OBJECT
@@ -14,6 +14,6 @@ class AccountsTableWidget : public QWidget {
                                  Qt::WindowFlags f = Qt::WindowFlags());
 
   private:
-    QSortFilterProxyModel* sort_filter;
+    AccountsTableFilterProxyModel* sort_filter;
     AccountTableModel* model;
 };

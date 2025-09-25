@@ -13,6 +13,17 @@
 class AccountTableModel : public QAbstractTableModel {
     Q_OBJECT
   public:
+    enum class Column {
+        CUSTODIAN = 0,
+        NAME = 1,
+        IDENTIFIER = 2,
+        SNAPSHOT = 3,
+        TYPE = 4,
+        OPEN = 5,
+        CLOSE = 6,
+    };
+
+  public:
     AccountTableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent = nullptr);
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;

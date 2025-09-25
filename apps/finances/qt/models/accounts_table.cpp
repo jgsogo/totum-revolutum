@@ -7,18 +7,6 @@
 
 #include "libraries/finances/accounts/cpp/models/types/money.h"
 
-namespace {
-    enum class Column {
-        CUSTODIAN = 0,
-        NAME = 1,
-        IDENTIFIER = 2,
-        SNAPSHOT = 3,
-        TYPE = 4,
-        OPEN = 5,
-        CLOSE = 6,
-    };
-}
-
 AccountTableModel::AccountTableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent)
     : QAbstractTableModel(parent), pool{pool} {}
 
@@ -66,9 +54,11 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
                          .toString("yyyy-MM-dd");
             break;
         case Column::CLOSE:
-            result = QDate{int(account.close->year()), static_cast<int>(unsigned(account.close->month())),
-                           static_cast<int>(unsigned(account.close->day()))}
-                         .toString("yyyy-MM-dd");
+            if (account.close) {
+                result = QDate{int(account.close->year()), static_cast<int>(unsigned(account.close->month())),
+                               static_cast<int>(unsigned(account.close->day()))}
+                             .toString("yyyy-MM-dd");
+            }
         }
     } break;
     case Qt::FontRole:
