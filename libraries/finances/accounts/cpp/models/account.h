@@ -5,10 +5,9 @@
 
 #include "libraries/utils/cpp/libpqxx/datatypes/date.h"
 
-#include "account_type.h"
 #include "custodian.h"
+#include "hierarchy_tree.h"
 #include "model_manager.hpp"
-#include "snapshot.h"
 #include "types/ccy.h"
 #include "types/id.h"
 
@@ -27,19 +26,7 @@ namespace finances::accounts::models {
         bool is_numerable;
     };
 
-    class AccountManager : public ModelManager<Account> {
-      public:
-        AccountManager(utils::libpqxx::ConnectionPool& pool);
-
-        tl::expected<std::optional<Snapshot>, Error> get_last_snapshot(decltype(Account::id) account_id) const;
-
-        tl::expected<std::vector<std::optional<Snapshot>>, Error>
-        get_last_snapshots(const std::vector<decltype(Account::id)>& account_ids) const;
-
-        tl::expected<std::vector<Snapshot>, Error> get_snapshots(Id account_id);
-        // tl::expected<std::vector<Movement>, Error> get_movements(Id account_id);
-    };
-
+    using AccountManager = ModelManager<Account>;
     template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all();
 
 } // namespace finances::accounts::models

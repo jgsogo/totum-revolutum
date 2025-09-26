@@ -137,7 +137,7 @@ void AccountTableModel::fetch_all() {
 
 void AccountTableModel::fetch_snapshots() {
     SPDLOG_DEBUG("AccountTableModel::fetch_snapshots");
-    finances::accounts::models::AccountManager manager{pool};
+    finances::accounts::models::SnapshotManager manager{pool};
 
     std::vector<finances::accounts::models::Id> account_ids;
     account_ids.resize(accounts.size());
@@ -171,7 +171,7 @@ void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id
         return;
     }
 
-    finances::accounts::models::AccountManager manager{pool};
+    finances::accounts::models::SnapshotManager manager{pool};
     auto last_snapshot = manager.get_last_snapshot(account_id);
     if (!last_snapshot) {
         SPDLOG_ERROR("Error fetching snapshot for account: {}", account_id);
