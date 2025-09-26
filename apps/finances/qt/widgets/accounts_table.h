@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QTableWidget>
 #include <QWidget>
 
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
@@ -10,8 +11,13 @@
 class AccountsTableWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent = nullptr,
-                                 Qt::WindowFlags f = Qt::WindowFlags());
+    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent = nullptr);
+
+  private slots:
+    void onDoubleClicked(const QModelIndex& index);
+
+  signals:
+    void accountDoubleClicked(finances::accounts::models::Id account_id);
 
   private:
     AccountsTableFilterProxyModel* sort_filter;

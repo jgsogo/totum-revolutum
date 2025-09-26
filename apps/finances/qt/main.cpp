@@ -18,6 +18,7 @@
 #include "apps/finances/qt/models/accounts_table.h"
 #include "apps/finances/qt/version.hpp"
 #include "apps/finances/qt/widgets/accounts_table.h"
+#include "apps/finances/qt/widgets/main_tab.h"
 #include "apps/finances/qt/widgets/sidebar.h"
 
 int main(int argc, char** argv) {
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
     //     SPDLOG_DEBUG(it.toStdString());
     // }
 
-    QHBoxLayout* all = new QHBoxLayout();
+    // QHBoxLayout* all = new QHBoxLayout();
     // QVBoxLayout* left_pane = new QVBoxLayout();
     // QVBoxLayout* main_pane = new QVBoxLayout();
 
@@ -47,8 +48,15 @@ int main(int argc, char** argv) {
 
     // left_pane->addWidget(createSidebar());
     // QIcon undoicon = QIcon::fromTheme(QIcon::ThemeIcon::EditUndo);
-    all->addWidget(new SideBar(), 30);
-    all->addWidget(new AccountsTableWidget(pool), 70);
+    // all->addWidget(new SideBar(), 30);
+    // all->addWidget(new AccountsTableWidget(pool), 70);
+
+    MainTabWidget* tabWidget = new MainTabWidget(pool);
+    // tabWidget->setTabsClosable(true);
+    // int all_accounts_idx = tabWidget->addTab(new AccountsTableWidget(pool), "All");
+
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(tabWidget);
 
     // QTableView* table = new QTableView();
     // AccountTableModel* table_model = AccountTableModel::create_with_all(pool);
@@ -59,7 +67,7 @@ int main(int argc, char** argv) {
     // table->setSortingEnabled(true);
     // all->addWidget(table, 70);
 
-    window.setLayout(all);
+    window.setLayout(layout);
     // Set up the model and configure the view...
     // QApplication::translate("finances", "Finances")
     window.setWindowTitle(QString::fromStdString(std::format("Finances v{}", FINANCES_VERSION)));

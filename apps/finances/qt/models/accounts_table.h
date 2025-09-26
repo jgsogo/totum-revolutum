@@ -5,22 +5,18 @@
 #include "libraries/finances/accounts/cpp/models/account.h"
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 
-// https://stackoverflow.com/a/6791177
-
-// TableView: https://doc.qt.io/qt-6/qtableview.html
-// QAbstractTableModel: https://doc.qt.io/qt-6/qabstracttablemodel.html
-
 class AccountTableModel : public QAbstractTableModel {
     Q_OBJECT
   public:
     enum class Column {
-        CUSTODIAN = 0,
-        NAME = 1,
-        IDENTIFIER = 2,
-        SNAPSHOT = 3,
-        TYPE = 4,
-        OPEN = 5,
-        CLOSE = 6,
+        ID = 0,
+        CUSTODIAN = 1,
+        NAME = 2,
+        IDENTIFIER = 3,
+        SNAPSHOT = 4,
+        TYPE = 5,
+        OPEN = 6,
+        CLOSE = 7,
     };
 
   public:

@@ -29,6 +29,9 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     case Qt::DisplayRole: {
         const auto& account = accounts.at(row);
         switch (column) {
+        case Column::ID:
+            result = (uint64_t)account.id; // FIXME: implement the right conversion
+            break;
         case Column::CUSTODIAN:
             result = account.custodian.second.c_str();
             break;

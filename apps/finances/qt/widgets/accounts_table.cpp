@@ -2,14 +2,16 @@
 
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
 #include <QTableView>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <magic_enum/magic_enum.hpp>
+#include <spdlog/spdlog.h>
 
-AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent, Qt::WindowFlags f)
-    : QWidget(parent, f) {
+AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent) : QWidget(parent) {
     model = new AccountTableModel(pool, this);
 
     // Initial values for these filters
@@ -26,6 +28,9 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, Q
     QTableView* table_view = new QTableView(this);
     table_view->setModel(sort_filter);
     table_view->setSortingEnabled(true);
+    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::ID));
+    table_view->verticalHeader()->hide();
+    connect(table_view, &QTableView::doubleClicked, this, &AccountsTableWidget::onDoubleClicked);
 
     // Filters
     // - filter by term
@@ -60,4 +65,16 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, Q
 
     // We initialize the widget with all the models
     QTimer::singleShot(0, model, SLOT(fetch_all()));
+}
+
+void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {
+    SPDLOG_TRACE("AccountsTableWidget::onDoubleClicked(index.row={})", index.row());
+
+    // Get the account id from the filter/sort view
+    QVariant account_id_variant =
+        sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountTableModel::Column::ID)));
+    SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
+    finances::accounts::models::Id account_id{account_id_variant.toULongLong()};
+
+    emit accountDoubleClicked(account_id);
 }
