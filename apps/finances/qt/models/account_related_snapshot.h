@@ -1,13 +1,8 @@
 #pragma once
 
 #include "account_related.h"
-#include "account_related_movement.h"
 
-enum class SnapshotColumn {
-    ID = 0,
-    DATE_VALUE = 1,
-    AMOUNT = 2,
-};
+#include <QColor>
 
 class AccountRelatedSnapshotsModel : public AccountRelatedModel<finances::accounts::models::Snapshot, SnapshotColumn> {
     Q_OBJECT
@@ -15,7 +10,6 @@ class AccountRelatedSnapshotsModel : public AccountRelatedModel<finances::accoun
   public:
     using AccountRelatedModel::AccountRelatedModel;
 
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   private slots:
     void fetch_all_snapshots();
 };
@@ -27,11 +21,21 @@ class AccountRelatedSnapshotsAsMovementsModel
   public:
     using AccountRelatedModel::AccountRelatedModel;
 
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   private slots:
     void fetch_all_snapshots();
 };
 
+template <typename TColumn> struct DataDispatcher<finances::accounts::models::Snapshot, TColumn, Qt::BackgroundRole> {
+    static QVariant data(const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&,
+                         TColumn column) {
+        return QVariant{QColor(255, 255, 40)};
+    }
+};
+
 template <>
-QVariant AccountRelatedModel<finances::accounts::models::Snapshot, MovementColumn>::data_display_role(
-    MovementColumn column, const finances::accounts::models::Snapshot& item) const;
+QVariant DataDispatcher<finances::accounts::models::Snapshot, SnapshotColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&, SnapshotColumn);
+
+template <>
+QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&, MovementColumn);

@@ -5,8 +5,9 @@
 void AccountRelatedMovementsModel::fetch_all_movements() { this->fetch_all(); }
 
 template <>
-QVariant AccountRelatedModel<finances::accounts::models::Movement, MovementColumn>::data_display_role(
-    MovementColumn column, const finances::accounts::models::Movement& item) const {
+QVariant DataDispatcher<finances::accounts::models::Movement, MovementColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account& account, const finances::accounts::models::Movement& item,
+    MovementColumn column) {
     QVariant result = QVariant();
     switch (column) {
     case MovementColumn::ID:
@@ -32,4 +33,4 @@ QVariant AccountRelatedModel<finances::accounts::models::Movement, MovementColum
         break;
     }
     return result;
-}
+};

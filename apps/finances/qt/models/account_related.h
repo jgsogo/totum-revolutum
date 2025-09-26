@@ -11,10 +11,48 @@
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 #include "libraries/finances/accounts/cpp/models/types/money.h"
 
-// template <typename TModel, typename Column, enum Qt::ItemDataRole>
-// QVariant data(Column column, const TModel& item) {
-//   return QVariant{};
-// };
+enum class SnapshotColumn {
+    ID = 0,
+    DATE_VALUE = 1,
+    AMOUNT = 2,
+};
+
+enum class MovementColumn {
+    ID = 0,
+    DATE_VALUE = 1,
+    MOVE_TYPE = 2,
+    TRANSACTION = 3,
+    DIRECTION = 4,
+    AMOUNT = 5,
+};
+
+template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher {
+    static QVariant data(const finances::accounts::models::Account&, const TModel&, TColumn) { return QVariant{}; }
+};
+
+template <typename TModel, typename TColumn> struct DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole> {
+    static QVariant data(const finances::accounts::models::Account&, const TModel&, TColumn) {
+        return QVariant{Qt::AlignRight};
+    }
+};
+
+template <typename TModel> struct DataDispatcher<TModel, SnapshotColumn, Qt::FontRole> {
+    static QVariant data(const finances::accounts::models::Account&, const TModel&, SnapshotColumn column) {
+        if ((column == SnapshotColumn::DATE_VALUE) || (column == SnapshotColumn::AMOUNT)) {
+            return QVariant{QFont{"Andale Mono"}};
+        }
+        return QVariant{};
+    }
+};
+
+template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::FontRole> {
+    static QVariant data(const finances::accounts::models::Account&, const TModel&, MovementColumn column) {
+        if ((column == MovementColumn::DATE_VALUE) || (column == MovementColumn::AMOUNT)) {
+            return QVariant{QFont{"Andale Mono"}};
+        }
+        return QVariant{};
+    }
+};
 
 template <typename TModel, typename Column> class AccountRelatedModel : public QAbstractTableModel {
 
@@ -60,47 +98,25 @@ template <typename TModel, typename Column> class AccountRelatedModel : public Q
         }
 
         Column column = magic_enum::enum_value<Column>(column_idx);
+        const auto& item = items.at(row);
 
         switch (role) {
-        case Qt::DisplayRole: {
-            const auto& item = items.at(row);
-            result = data_display_role(column, item);
-        } break;
+        case Qt::DisplayRole:
+            return DataDispatcher<TModel, Column, Qt::DisplayRole>::data(account, item, column);
         case Qt::FontRole:
-            if ((column == Column::DATE_VALUE) || (column == Column::AMOUNT)) {
-                result = QFont{"Andale Mono"};
-            }
-            break;
+            return DataDispatcher<TModel, Column, Qt::FontRole>::data(account, item, column);
         case Qt::TextAlignmentRole:
-            result = Qt::AlignRight;
-            break;
-        default:
-            break;
+            return DataDispatcher<TModel, Column, Qt::TextAlignmentRole>::data(account, item, column);
+        case Qt::BackgroundRole:
+            return DataDispatcher<TModel, Column, Qt::BackgroundRole>::data(account, item, column);
+            // default:
+            //     break;
         }
 
         return result;
     }
 
   protected:
-    QVariant data_display_role(Column column, const TModel& item) const {
-        QVariant result = QVariant();
-        switch (column) {
-        case Column::ID:
-            result = (uint64_t)item.id; // FIXME: implement the right conversion
-            break;
-        case Column::DATE_VALUE:
-            result = QDate{int(item.date_value.year()), static_cast<int>(unsigned(item.date_value.month())),
-                           static_cast<int>(unsigned(item.date_value.day()))}
-                         .toString("yyyy-MM-dd");
-            break;
-        case Column::AMOUNT: {
-            auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(amount_money));
-        } break;
-        }
-        return result;
-    };
-
     void fetch_all() {
         SPDLOG_DEBUG("AccountRelatedModel<TModel>::fetch_all");
 
