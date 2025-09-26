@@ -3,7 +3,6 @@
 #include <spdlog/spdlog.h>
 
 #include "apps/finances/qt/models/account_related.h"
-#include "apps/finances/qt/models/account_related_snapshot.h"
 
 #include "account_detail.h"
 #include "accounts_table.h"
@@ -43,9 +42,10 @@ void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
     // Get the data for this account
     try {
         const auto& account = model->get_account(account_id);
-        AccountRelatedSnapshotsAsMovementsModel* snapshots_model =
-            new AccountRelatedSnapshotsAsMovementsModel(pool, account, this);
-        AccountRelatedMovementsModel* movements_model = new AccountRelatedMovementsModel(pool, account, this);
+        AccountRelatedModelBase* snapshots_model =
+            new AccountRelatedModel<finances::accounts::models::Snapshot, MovementColumn>(pool, account, this);
+        AccountRelatedModelBase* movements_model =
+            new AccountRelatedModel<finances::accounts::models::Movement, MovementColumn>(pool, account, this);
 
         AccountDetailWidget* account_widget = new AccountDetailWidget(account, snapshots_model, movements_model, this);
         auto idx = this->addTab(account_widget,

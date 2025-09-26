@@ -4,15 +4,17 @@
 
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
-#include "apps/finances/qt/models/account_related_movement.h"
-#include "apps/finances/qt/models/account_related_snapshot.h"
+#include "account_add_snapshot.h"
+#include "apps/finances/qt/models/account_related.h"
 
 class AccountDetailWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountDetailWidget(const finances::accounts::models::Account&,
-                                 AccountRelatedSnapshotsAsMovementsModel* snapshots_model,
-                                 AccountRelatedMovementsModel* movements_model, QWidget* parent = nullptr);
+    explicit AccountDetailWidget(const finances::accounts::models::Account&, AccountRelatedModelBase* snapshots_model,
+                                 AccountRelatedModelBase* movements_model, QWidget* parent = nullptr);
+
+  public slots:
+    void on_new_snapshot(Snapshot);
 
   private:
     const finances::accounts::models::Account& account;

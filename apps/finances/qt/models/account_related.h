@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractTableModel>
+#include <QColor>
 #include <QDate>
 #include <QFont>
 #include <QTimer>
@@ -30,31 +31,19 @@ template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataD
     static QVariant data(const finances::accounts::models::Account&, const TModel&, TColumn) { return QVariant{}; }
 };
 
-template <typename TModel, typename TColumn> struct DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole> {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, TColumn) {
-        return QVariant{Qt::AlignRight};
-    }
+class AccountRelatedModelBase : public QAbstractTableModel {
+    Q_OBJECT
+  public:
+    using QAbstractTableModel::QAbstractTableModel;
+
+  public slots:
+    void fetch_all() { this->_fetch_all(); };
+
+  protected:
+    virtual void _fetch_all() = 0;
 };
 
-template <typename TModel> struct DataDispatcher<TModel, SnapshotColumn, Qt::FontRole> {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, SnapshotColumn column) {
-        if ((column == SnapshotColumn::DATE_VALUE) || (column == SnapshotColumn::AMOUNT)) {
-            return QVariant{QFont{"Andale Mono"}};
-        }
-        return QVariant{};
-    }
-};
-
-template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::FontRole> {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, MovementColumn column) {
-        if ((column == MovementColumn::DATE_VALUE) || (column == MovementColumn::AMOUNT)) {
-            return QVariant{QFont{"Andale Mono"}};
-        }
-        return QVariant{};
-    }
-};
-
-template <typename TModel, typename Column> class AccountRelatedModel : public QAbstractTableModel {
+template <typename TModel, typename Column> class AccountRelatedModel : public AccountRelatedModelBase {
 
     // Prepared to work with Snapshot and Movement
     static_assert(std::is_same_v<TModel, finances::accounts::models::Snapshot> ||
@@ -63,8 +52,8 @@ template <typename TModel, typename Column> class AccountRelatedModel : public Q
   public:
     AccountRelatedModel(utils::libpqxx::ConnectionPool& pool_, const finances::accounts::models::Account& account_,
                         QObject* parent = nullptr)
-        : QAbstractTableModel(parent), pool{pool_}, account{account_} {
-        QTimer::singleShot(0, this, &AccountRelatedModel::fetch_all);
+        : AccountRelatedModelBase(parent), pool{pool_}, account{account_} {
+        QTimer::singleShot(0, this, &AccountRelatedModelBase::fetch_all);
     };
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override { return items.size(); };
@@ -117,8 +106,8 @@ template <typename TModel, typename Column> class AccountRelatedModel : public Q
     }
 
   protected:
-    void fetch_all() {
-        SPDLOG_DEBUG("AccountRelatedModel<TModel>::fetch_all");
+    void _fetch_all() override final {
+        SPDLOG_DEBUG("AccountRelatedModel<TModel>::_fetch_all");
 
         typename TModel::Manager manager{pool};
         auto all_items = manager.all(account.id);
@@ -138,3 +127,48 @@ template <typename TModel, typename Column> class AccountRelatedModel : public Q
     const finances::accounts::models::Account& account;
     std::vector<TModel> items;
 };
+
+// Overrides for DataDispatcher::data function
+
+template <typename TModel, typename TColumn> struct DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole> {
+    static QVariant data(const finances::accounts::models::Account&, const TModel&, TColumn) {
+        return QVariant{Qt::AlignRight};
+    }
+};
+
+template <typename TModel> struct DataDispatcher<TModel, SnapshotColumn, Qt::FontRole> {
+    static QVariant data(const finances::accounts::models::Account&, const TModel&, SnapshotColumn column) {
+        if ((column == SnapshotColumn::DATE_VALUE) || (column == SnapshotColumn::AMOUNT)) {
+            return QVariant{QFont{"Andale Mono"}};
+        }
+        return QVariant{};
+    }
+};
+
+template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::FontRole> {
+    static QVariant data(const finances::accounts::models::Account&, const TModel&, MovementColumn column) {
+        if ((column == MovementColumn::DATE_VALUE) || (column == MovementColumn::AMOUNT)) {
+            return QVariant{QFont{"Andale Mono"}};
+        }
+        return QVariant{};
+    }
+};
+
+template <typename TColumn> struct DataDispatcher<finances::accounts::models::Snapshot, TColumn, Qt::BackgroundRole> {
+    static QVariant data(const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&,
+                         TColumn column) {
+        return QVariant{QColor(255, 255, 40)};
+    }
+};
+
+template <>
+QVariant DataDispatcher<finances::accounts::models::Snapshot, SnapshotColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&, SnapshotColumn);
+
+template <>
+QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&, MovementColumn);
+
+template <>
+QVariant DataDispatcher<finances::accounts::models::Movement, MovementColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account&, const finances::accounts::models::Movement&, MovementColumn);
