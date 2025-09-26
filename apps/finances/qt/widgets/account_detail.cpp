@@ -8,7 +8,7 @@
 #include <QVBoxLayout>
 
 AccountDetailWidget::AccountDetailWidget(const finances::accounts::models::Account& account_,
-                                         AccountRelatedSnapshotsModel* snapshots_model,
+                                         AccountRelatedSnapshotsAsMovementsModel* snapshots_model,
                                          AccountRelatedMovementsModel* movements_model, QWidget* parent)
     : QWidget(parent), account{account_} {
 
@@ -20,12 +20,12 @@ AccountDetailWidget::AccountDetailWidget(const finances::accounts::models::Accou
     // Components
     QSortFilterProxyModel* sort_filter = new QSortFilterProxyModel(this);
     sort_filter->setSourceModel(model);
-    sort_filter->sort(magic_enum::enum_integer(AccountRelatedMovementsModel::Column::DATE_VALUE), Qt::DescendingOrder);
+    sort_filter->sort(magic_enum::enum_integer(MovementColumn::DATE_VALUE), Qt::DescendingOrder);
 
     QTableView* table_view = new QTableView(this);
     table_view->setModel(sort_filter);
     table_view->setSortingEnabled(false);
-    table_view->hideColumn(magic_enum::enum_integer(AccountRelatedMovementsModel::Column::ID));
+    table_view->hideColumn(magic_enum::enum_integer(MovementColumn::ID));
     table_view->verticalHeader()->hide();
 
     QLabel* name = new QLabel(QString::fromStdString(account.name));

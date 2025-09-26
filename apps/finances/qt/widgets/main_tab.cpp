@@ -43,7 +43,8 @@ void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
     // Get the data for this account
     try {
         const auto& account = model->get_account(account_id);
-        AccountRelatedSnapshotsModel* snapshots_model = new AccountRelatedSnapshotsModel(pool, account, this);
+        AccountRelatedSnapshotsAsMovementsModel* snapshots_model =
+            new AccountRelatedSnapshotsAsMovementsModel(pool, account, this);
         AccountRelatedMovementsModel* movements_model = new AccountRelatedMovementsModel(pool, account, this);
 
         AccountDetailWidget* account_widget = new AccountDetailWidget(account, snapshots_model, movements_model, this);

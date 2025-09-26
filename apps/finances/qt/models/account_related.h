@@ -11,18 +11,16 @@
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 #include "libraries/finances/accounts/cpp/models/types/money.h"
 
-template <typename TModel> class AccountRelatedModel : public QAbstractTableModel {
+// template <typename TModel, typename Column, enum Qt::ItemDataRole>
+// QVariant data(Column column, const TModel& item) {
+//   return QVariant{};
+// };
+
+template <typename TModel, typename Column> class AccountRelatedModel : public QAbstractTableModel {
 
     // Prepared to work with Snapshot and Movement
     static_assert(std::is_same_v<TModel, finances::accounts::models::Snapshot> ||
                   std::is_same_v<TModel, finances::accounts::models::Movement>);
-
-  public:
-    enum Column {
-        ID = 0,
-        DATE_VALUE = 1,
-        AMOUNT = 2,
-    };
 
   public:
     AccountRelatedModel(utils::libpqxx::ConnectionPool& pool_, const finances::accounts::models::Account& account_,
@@ -66,20 +64,7 @@ template <typename TModel> class AccountRelatedModel : public QAbstractTableMode
         switch (role) {
         case Qt::DisplayRole: {
             const auto& item = items.at(row);
-            switch (column) {
-            case Column::ID:
-                result = (uint64_t)item.id; // FIXME: implement the right conversion
-                break;
-            case Column::DATE_VALUE:
-                result = QDate{int(item.date_value.year()), static_cast<int>(unsigned(item.date_value.month())),
-                               static_cast<int>(unsigned(item.date_value.day()))}
-                             .toString("yyyy-MM-dd");
-                break;
-            case Column::AMOUNT:
-                auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
-                result = QString::fromStdString(static_cast<std::string>(amount_money));
-                break;
-            }
+            result = data_display_role(column, item);
         } break;
         case Qt::FontRole:
             if ((column == Column::DATE_VALUE) || (column == Column::AMOUNT)) {
@@ -97,6 +82,25 @@ template <typename TModel> class AccountRelatedModel : public QAbstractTableMode
     }
 
   protected:
+    QVariant data_display_role(Column column, const TModel& item) const {
+        QVariant result = QVariant();
+        switch (column) {
+        case Column::ID:
+            result = (uint64_t)item.id; // FIXME: implement the right conversion
+            break;
+        case Column::DATE_VALUE:
+            result = QDate{int(item.date_value.year()), static_cast<int>(unsigned(item.date_value.month())),
+                           static_cast<int>(unsigned(item.date_value.day()))}
+                         .toString("yyyy-MM-dd");
+            break;
+        case Column::AMOUNT: {
+            auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
+            result = QString::fromStdString(static_cast<std::string>(amount_money));
+        } break;
+        }
+        return result;
+    };
+
     void fetch_all() {
         SPDLOG_DEBUG("AccountRelatedModel<TModel>::fetch_all");
 

@@ -11,7 +11,7 @@ class AccountDetailWidget : public QWidget {
     Q_OBJECT
   public:
     explicit AccountDetailWidget(const finances::accounts::models::Account&,
-                                 AccountRelatedSnapshotsModel* snapshots_model,
+                                 AccountRelatedSnapshotsAsMovementsModel* snapshots_model,
                                  AccountRelatedMovementsModel* movements_model, QWidget* parent = nullptr);
 
   private:
