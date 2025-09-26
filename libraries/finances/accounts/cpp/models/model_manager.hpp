@@ -19,6 +19,7 @@ namespace finances::accounts::models {
         ModelManager(utils::libpqxx::ConnectionPool& pool) : pool{pool} {}
 
         tl::expected<std::vector<TModel>, Error> all();
+        tl::expected<TModel, Error> get(Id id) { return tl::unexpected(Error::NotImplemented); };
 
       protected:
         utils::libpqxx::ConnectionPool& pool;

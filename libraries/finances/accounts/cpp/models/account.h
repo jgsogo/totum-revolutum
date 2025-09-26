@@ -35,6 +35,9 @@ namespace finances::accounts::models {
 
         tl::expected<std::vector<std::optional<Snapshot>>, Error>
         get_last_snapshots(const std::vector<decltype(Account::id)>& account_ids) const;
+
+        tl::expected<std::vector<Snapshot>, Error> get_snapshots(Id account_id);
+        // tl::expected<std::vector<Movement>, Error> get_movements(Id account_id);
     };
 
     template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all();

@@ -56,7 +56,6 @@ namespace pqxx {
     template <std::size_t MaxDigits, std::size_t DecimalPlaces>
     struct string_traits<utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>> {
         static utils::libpqxx::Numeric<MaxDigits, DecimalPlaces> from_string(std::string_view text) {
-            SPDLOG_DEBUG("Trying to parse: {}", text);
             dec::decimal<DecimalPlaces> inner_value =
                 dec::fromString<dec::decimal<DecimalPlaces>>(std::string{text}, POSTGRES_DECIMAL_FORMAT);
             return utils::libpqxx::Numeric<MaxDigits, DecimalPlaces>{inner_value};

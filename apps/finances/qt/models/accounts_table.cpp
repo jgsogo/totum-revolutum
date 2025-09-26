@@ -187,3 +187,20 @@ void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id
     QModelIndex topLeft = this->createIndex(row, magic_enum::enum_integer(Column::SNAPSHOT));
     emit dataChanged(topLeft, topLeft, roles);
 }
+
+const finances::accounts::models::Account&
+AccountTableModel::get_account(finances::accounts::models::Id account_id) const {
+    SPDLOG_TRACE("AccountTableModel::get_account(account_id={})", account_id);
+    auto found =
+        std::find_if(accounts.begin(), accounts.end(), [&account_id](const auto& acc) { return acc.id == account_id; });
+    if (found == accounts.end()) {
+        SPDLOG_ERROR(" - Unexpected: Account not found!");
+        throw std::runtime_error("Details requested for account that doesn't exist!");
+    }
+
+    return *found;
+
+    // auto idx = std::distance(accounts.begin(), found);
+    // SPDLOG_TRACE(" - account is position {} in vectors", idx);
+    // return std::make_pair(accounts.at(idx), snapshots.at(idx));
+}

@@ -27,9 +27,13 @@ class AccountTableModel : public QAbstractTableModel {
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-  public slots:
+    const finances::accounts::models::Account& get_account(finances::accounts::models::Id account_id) const;
+
+  private slots:
     void fetch_all();
     void fetch_snapshots();
+
+  public slots:
     void fetch_snapshot(finances::accounts::models::Id account_id);
 
   private:

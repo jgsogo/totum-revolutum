@@ -30,30 +30,17 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
     QWidget window;
 
+    // Create the main model with the accounts
+    AccountTableModel* model = new AccountTableModel(pool);
+
     // Run a notificator that will monitor notifications from the database
     auto conn = pool.acquire();
     std::chrono::milliseconds ms{1000};
     Notificator notificator{std::move(*conn), ms};
+    QObject::connect(&notificator, &Notificator::account_changed, model, &AccountTableModel::fetch_snapshot);
 
-    // for (auto it : QFontDatabase::families()) {
-    //     SPDLOG_DEBUG(it.toStdString());
-    // }
-
-    // QHBoxLayout* all = new QHBoxLayout();
-    // QVBoxLayout* left_pane = new QVBoxLayout();
-    // QVBoxLayout* main_pane = new QVBoxLayout();
-
-    // all->addLayout(left_pane, 20);
-    // all->addLayout(main_pane);
-
-    // left_pane->addWidget(createSidebar());
-    // QIcon undoicon = QIcon::fromTheme(QIcon::ThemeIcon::EditUndo);
-    // all->addWidget(new SideBar(), 30);
-    // all->addWidget(new AccountsTableWidget(pool), 70);
-
-    MainTabWidget* tabWidget = new MainTabWidget(pool);
-    // tabWidget->setTabsClosable(true);
-    // int all_accounts_idx = tabWidget->addTab(new AccountsTableWidget(pool), "All");
+    // Create the tabs for the accounts
+    MainTabWidget* tabWidget = new MainTabWidget(pool, model);
 
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(tabWidget);

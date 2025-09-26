@@ -16,7 +16,7 @@ Notificator::Notificator(pqxx::connection&& _conn, std::chrono::milliseconds not
             finances::accounts::models::Id account_id{account_id_u};
             emit account_changed(account_id);
         } else {
-            emit all_accounts_changed();
+            SPDLOG_WARN("All accounts changed notification is not implemented!");
         }
     });
 

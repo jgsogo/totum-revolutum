@@ -134,3 +134,7 @@ AccountManager::get_last_snapshots(const std::vector<decltype(Account::id)>& acc
             }
         });
 }
+
+tl::expected<std::vector<Snapshot>, Error> AccountManager::get_snapshots(Id account_id) {
+    return tl::unexpected(Error::NotImplemented);
+}

@@ -11,10 +11,9 @@
 #include <magic_enum/magic_enum.hpp>
 #include <spdlog/spdlog.h>
 
-AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent) : QWidget(parent) {
-    model = new AccountTableModel(pool, this);
+AccountsTableWidget::AccountsTableWidget(AccountTableModel* model, QWidget* parent) : QWidget(parent) {
 
-    // Initial values for these filters
+    // Initial values for the filters
     Qt::CheckState showClosedAccounts = Qt::Unchecked;
     Qt::CheckState showOthersAccounts = Qt::Unchecked;
 

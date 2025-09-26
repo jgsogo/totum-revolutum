@@ -58,6 +58,13 @@ struct fmt::formatter<utils::IntegralType<T, TInteger>> : fmt::formatter<TIntege
     }
 };
 
+// std::hash is required for std containers
+template <typename T, typename TInteger> struct std::hash<utils::IntegralType<T, TInteger>> {
+    std::size_t operator()(const utils::IntegralType<T, TInteger>& s) const noexcept {
+        return std::hash<TInteger>{}(static_cast<TInteger>(s));
+    }
+};
+
 // // Custom datatype for libpqxx: https://libpqxx.readthedocs.io/stable/datatypes.html#autotoc_md10,
 // // most of the implementation taken from https://gist.github.com/tomlankhorst/5c41127a3f4fe3e6b1b4cb114ec7e3be
 namespace pqxx {

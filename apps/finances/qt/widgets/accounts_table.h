@@ -11,7 +11,7 @@
 class AccountsTableWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent = nullptr);
+    explicit AccountsTableWidget(AccountTableModel* model, QWidget* parent = nullptr);
 
   private slots:
     void onDoubleClicked(const QModelIndex& index);
@@ -21,5 +21,4 @@ class AccountsTableWidget : public QWidget {
 
   private:
     AccountsTableFilterProxyModel* sort_filter;
-    AccountTableModel* model;
 };

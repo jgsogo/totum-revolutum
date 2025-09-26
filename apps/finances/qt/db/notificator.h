@@ -22,7 +22,6 @@ class Notificator : public QObject {
     void notify_account(finances::accounts::models::Id account_id);
 
   signals:
-    void all_accounts_changed();
     void account_changed(finances::accounts::models::Id account_id);
 
   private:
