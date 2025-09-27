@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
 
     // Create the tabs for the accounts
     MainTabWidget* tabWidget = new MainTabWidget(pool, model);
+    QObject::connect(tabWidget, &MainTabWidget::account_changed, &notificator, &Notificator::notify_account);
 
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(tabWidget);

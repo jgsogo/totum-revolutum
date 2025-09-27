@@ -9,6 +9,7 @@ qt_cc_library(
         "//apps/finances/qt/models",
         "//bazel/logging:spdlog",
         "//libraries/utils/cpp/libpqxx:connection_pool",
+        "@decimal_for_cpp",
         "@rules_qt//:qt_widgets",
     ],
 )

@@ -28,7 +28,7 @@ Notificator::Notificator(pqxx::connection&& _conn, std::chrono::milliseconds not
 }
 
 void Notificator::check_notifications() {
-    SPDLOG_TRACE("Notificator::check_notifications");
+    // SPDLOG_TRACE("Notificator::check_notifications");
     conn.get_notifs();
 }
 

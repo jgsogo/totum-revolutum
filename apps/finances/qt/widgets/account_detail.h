@@ -10,13 +10,17 @@
 class AccountDetailWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountDetailWidget(const finances::accounts::models::Account&, AccountRelatedModelBase* snapshots_model,
-                                 AccountRelatedModelBase* movements_model, QWidget* parent = nullptr);
+    explicit AccountDetailWidget(utils::libpqxx::ConnectionPool& pool, const finances::accounts::models::Account&,
+                                 QWidget* parent = nullptr);
 
   public slots:
-    void on_new_snapshot(Snapshot);
+    void on_new_snapshot(Snapshot2Decs);
+
+  signals:
+    void snapshot_added(finances::accounts::models::Id account_id);
 
   private:
+    utils::libpqxx::ConnectionPool& pool;
     const finances::accounts::models::Account& account;
     // AccountsTableFilterProxyModel* sort_filter;
     // AccountTableModel* model;

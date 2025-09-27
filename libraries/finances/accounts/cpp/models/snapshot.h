@@ -30,6 +30,8 @@ namespace finances::accounts::models {
         get_last_snapshots(const std::vector<decltype(Account::id)>& account_ids) const;
 
         tl::expected<std::vector<Snapshot>, Error> all(Id account_id);
+
+        tl::expected<void, Error> create(Id account_id, utils::libpqxx::Date&& date_value, Amount&& amount);
     };
 
 } // namespace finances::accounts::models

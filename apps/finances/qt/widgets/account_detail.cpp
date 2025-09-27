@@ -9,11 +9,17 @@
 #include <QVBoxLayout>
 
 #include "account_add_snapshot.h"
+#include "apps/finances/qt/models/account_related.h"
 
-AccountDetailWidget::AccountDetailWidget(const finances::accounts::models::Account& account_,
-                                         AccountRelatedModelBase* snapshots_model,
-                                         AccountRelatedModelBase* movements_model, QWidget* parent)
-    : QWidget(parent), account{account_} {
+AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
+                                         const finances::accounts::models::Account& account_, QWidget* parent)
+    : QWidget(parent), pool{pool_}, account{account_} {
+
+    AccountRelatedModelBase* snapshots_model =
+        new AccountRelatedModel<finances::accounts::models::Snapshot, MovementColumn>(pool, account, this);
+    connect(this, &AccountDetailWidget::snapshot_added, snapshots_model, &AccountRelatedModelBase::fetch_all);
+    AccountRelatedModelBase* movements_model =
+        new AccountRelatedModel<finances::accounts::models::Movement, MovementColumn>(pool, account, this);
 
     // Models
     QConcatenateTablesProxyModel* model = new QConcatenateTablesProxyModel(this);
@@ -52,9 +58,25 @@ AccountDetailWidget::AccountDetailWidget(const finances::accounts::models::Accou
     this->setLayout(mainLayout);
 }
 
-void AccountDetailWidget::on_new_snapshot(Snapshot snapshot) {
-    SPDLOG_DEBUG("AccountDetailWidget::on_new_snapshot(date={}, amount={})");
+void AccountDetailWidget::on_new_snapshot(Snapshot2Decs snapshot) {
+    SPDLOG_DEBUG("AccountDetailWidget::on_new_snapshot(date={}, amount={})", snapshot.date().toString().toStdString(),
+                 dec::toString(snapshot.amount(), dec::decimal_format{','}));
 
-    // TODO: Add to database and notify DB channel!
-    //       The Notifier will do its work updating all the models.
+    auto qt_date = snapshot.date();
+    auto qt_amount = snapshot.amount();
+
+    utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
+                                                   date::month{static_cast<unsigned int>(qt_date.month())},
+                                                   date::day{static_cast<unsigned int>(qt_date.day())}}};
+    finances::accounts::models::Amount amount{qt_amount};
+
+    finances::accounts::models::SnapshotManager manager{pool};
+    auto r = manager.create(account.id, std::move(date), std::move(amount));
+    if (!r) {
+        SPDLOG_ERROR("Error adding snapshot to account");
+        // TODO: Communicate error to user
+        return;
+    }
+
+    emit snapshot_added(account.id);
 }

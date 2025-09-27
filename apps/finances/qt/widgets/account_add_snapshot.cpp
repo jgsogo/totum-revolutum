@@ -8,12 +8,6 @@
 
 #include <spdlog/spdlog.h>
 
-Snapshot::Snapshot(const QDate& date, const QString& amount) : date_{date}, amount_{amount} {}
-
-QDate Snapshot::date() const { return date_; }
-
-QStringView Snapshot::amount() const { return amount_; }
-
 AddSnapshotWidget::AddSnapshotWidget(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f) {
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
@@ -49,7 +43,7 @@ void AddSnapshotWidget::add_snapshot() {
 
     auto date_ = calendar->selectedDate();
     auto amount_ = amount->text();
-    Snapshot snapshot{date_, amount_};
+    Snapshot2Decs snapshot{date_, amount_};
     emit new_snapshot(snapshot);
 
     this->accept();

@@ -17,6 +17,9 @@ class MainTabWidget : public QTabWidget {
     void addTabAccount(finances::accounts::models::Id account_id);
     void closeTab(int index);
 
+  signals:
+    void account_changed(finances::accounts::models::Id account_id);
+
   private:
     int _all_accounts_idx;
     std::unordered_map<finances::accounts::models::Id, int> _accounts_tabs;

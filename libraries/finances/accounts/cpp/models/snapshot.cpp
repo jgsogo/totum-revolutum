@@ -15,8 +15,8 @@ SnapshotManager::get_last_snapshot(decltype(Account::id) account_id) const {
 
                 auto query = std::format("SELECT id, date_value, amount"
                                          " FROM {}"
-                                         " ORDER BY date_value DESC"
                                          " WHERE account_id = $1"
+                                         " ORDER BY date_value DESC"
                                          " LIMIT 1",
                                          SNAPSHOT_TABLE);
                 SPDLOG_TRACE(query);
@@ -120,4 +120,24 @@ tl::expected<std::vector<Snapshot>, Error> SnapshotManager::all(Id account_id) {
                 return tl::unexpected(Error::DBError);
             }
         });
+}
+
+tl::expected<void, Error> SnapshotManager::create(Id account_id, utils::libpqxx::Date&& date_value, Amount&& amount) {
+    return pool.with_conn<tl::expected<void, Error>>([&](pqxx::connection& conn) -> tl::expected<void, Error> {
+        try {
+            pqxx::work tx(conn);
+            SPDLOG_DEBUG("Add snapshot to account_id {}: date_value={}, amount={}", account_id, date_value, amount);
+
+            auto query = std::format("INSERT INTO {} (account_id, date_value, amount)"
+                                     " VALUES ($1, $2, $3)",
+                                     SNAPSHOT_TABLE);
+            SPDLOG_TRACE(query);
+            tx.exec(query, pqxx::params{account_id, date_value, amount}).no_rows();
+            tx.commit();
+            return {};
+        } catch (const std::exception& e) {
+            SPDLOG_ERROR("Failed to insert snapshots for account {}: {}", account_id, e.what());
+            return tl::unexpected(Error::DBError);
+        }
+    });
 }

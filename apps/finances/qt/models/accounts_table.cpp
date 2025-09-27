@@ -181,7 +181,7 @@ void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id
 
     // Update the corresponding row
     auto row = std::distance(this->accounts.begin(), it);
-    this->snapshots.at(row) = std::move(last_snapshot.value());
+    this->snapshots.at(row).swap(last_snapshot.value());
 
     QVector<int> roles = {Qt::DisplayRole};
     QModelIndex topLeft = this->createIndex(row, magic_enum::enum_integer(Column::SNAPSHOT));
