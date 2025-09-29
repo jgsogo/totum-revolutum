@@ -71,7 +71,6 @@ AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::Conne
             &AccountNumerableDetailWidget::on_new_snapshot);
 
     QPushButton* bt_add_snapshot = new QPushButton(tr("Add snapshot"), this);
-    bt_add_snapshot->setDisabled(account.is_numerable);
     connect(bt_add_snapshot, &QPushButton::clicked, popup_add_snapshot, &QDialog::exec);
 
     // Layout
@@ -86,24 +85,154 @@ AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::Conne
 void AccountNumerableDetailWidget::on_new_snapshot(SnapshotNumerable snapshot) {
     SPDLOG_DEBUG("AccountNumerableDetailWidget::on_new_snapshot(numerable)");
 
-    // auto qt_date = snapshot.date();
-    // utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
-    //                                                date::month{static_cast<unsigned int>(qt_date.month())},
-    //                                                date::day{static_cast<unsigned int>(qt_date.day())}}};
+    auto qt_date = snapshot.date();
+    utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
+                                                   date::month{static_cast<unsigned int>(qt_date.month())},
+                                                   date::day{static_cast<unsigned int>(qt_date.day())}}};
 
-    // auto quantity = snapshot.quantity();
-    // auto unit_value = snapshot.unit_value();
+    auto quantity = snapshot.quantity();
+    auto unit_value = snapshot.unit_value();
 
-    // TODO: Not implemented
-    SPDLOG_ERROR("Not implemented!");
-
-    // finances::accounts::models::SnapshotNumerableManager manager{pool};
-    // auto r = manager.create(account.id, std::move(date), std::move(amount));
-    // if (!r) {
-    //     SPDLOG_ERROR("Error adding snapshot to account");
-    //     // TODO: Communicate error to user
-    //     return;
-    // }
+    finances::investments::models::SnapshotNumerableManager manager{pool};
+    auto r = manager.create(account.id, std::move(date), std::move(quantity), std::move(unit_value));
+    if (!r) {
+        SPDLOG_ERROR("Error adding snapshot to account");
+        // TODO: Communicate error to user
+        return;
+    }
 
     emit snapshot_added(account.id);
+}
+
+template <typename TModel> struct DataDispatcher<TModel, MovementNumerableColumn, Qt::FontRole> {
+    static QVariant data(const finances::accounts::models::Account&, const TModel&, MovementNumerableColumn column) {
+        if ((column == MovementNumerableColumn::DATE_VALUE) || (column == MovementNumerableColumn::AMOUNT) ||
+            (column == MovementNumerableColumn::QUANTITY) || (column == MovementNumerableColumn::UNIT_VALUE)) {
+            return QVariant{QFont{"Andale Mono"}};
+        }
+        return QVariant{};
+    }
+};
+
+template <typename TColumn>
+struct DataDispatcher<finances::investments::models::SnapshotNumerable, TColumn, Qt::BackgroundRole> {
+    static QVariant data(const finances::accounts::models::Account&,
+                         const finances::investments::models::SnapshotNumerable&, TColumn column) {
+        return QVariant{QColor(255, 255, 40)};
+    }
+};
+
+template <>
+QVariant
+DataDispatcher<finances::investments::models::SnapshotNumerable, MovementNumerableColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account& account, const finances::investments::models::SnapshotNumerable& item,
+    MovementNumerableColumn column) {
+    QVariant result = QVariant();
+
+    switch (column) {
+    case MovementNumerableColumn::ID:
+        result = (uint64_t)item.id; // FIXME: implement the right conversion
+        break;
+    case MovementNumerableColumn::DATE_VALUE:
+        result = QDate{int(item.date_value.year()), static_cast<int>(unsigned(item.date_value.month())),
+                       static_cast<int>(unsigned(item.date_value.day()))}
+                     .toString("yyyy-MM-dd");
+        break;
+    case MovementNumerableColumn::AMOUNT: {
+        auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
+        result = QString::fromStdString(static_cast<std::string>(amount_money));
+    } break;
+    case MovementNumerableColumn::QUANTITY: {
+        result = QString::fromStdString(static_cast<std::string>(item.quantity));
+    } break;
+    case MovementNumerableColumn::UNIT_VALUE: {
+        auto unit_value_money = finances::accounts::models::Money{item.unit_value, account.ccy};
+        result = QString::fromStdString(static_cast<std::string>(unit_value_money));
+    } break;
+    case MovementNumerableColumn::TRANSACTION:
+    case MovementNumerableColumn::MOVE_TYPE:
+    case MovementNumerableColumn::DIRECTION:
+        break;
+    }
+
+    return result;
+}
+
+template <>
+QVariant
+DataDispatcher<finances::investments::models::MovementNumerable, MovementNumerableColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account& account, const finances::investments::models::MovementNumerable& item,
+    MovementNumerableColumn column) {
+    QVariant result = QVariant();
+    switch (column) {
+    case MovementNumerableColumn::ID:
+        result = (uint64_t)item.id; // FIXME: implement the right conversion
+        break;
+    case MovementNumerableColumn::DATE_VALUE:
+        result = QDate{int(item.date_value.year()), static_cast<int>(unsigned(item.date_value.month())),
+                       static_cast<int>(unsigned(item.date_value.day()))}
+                     .toString("yyyy-MM-dd");
+        break;
+    case MovementNumerableColumn::AMOUNT: {
+        auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
+        result = QString::fromStdString(static_cast<std::string>(amount_money));
+    } break;
+    case MovementNumerableColumn::QUANTITY: {
+        result = QString::fromStdString(static_cast<std::string>(item.quantity));
+    } break;
+    case MovementNumerableColumn::UNIT_VALUE: {
+        auto money = finances::accounts::models::Money{item.unit_value, account.ccy};
+        result = QString::fromStdString(static_cast<std::string>(money));
+    } break;
+    case MovementNumerableColumn::TRANSACTION:
+        result = item.transaction.second.c_str();
+        break;
+    case MovementNumerableColumn::MOVE_TYPE:
+        result = item.type.second.c_str();
+        break;
+    case MovementNumerableColumn::DIRECTION:
+        result = QString::fromStdString(std::string(magic_enum::enum_name(item.direction)));
+        break;
+    }
+    return result;
+}
+
+template <>
+QVariant
+DataDispatcher<finances::investments::models::MovementDividend, MovementNumerableColumn, Qt::DisplayRole>::data(
+    const finances::accounts::models::Account& account, const finances::investments::models::MovementDividend& item,
+    MovementNumerableColumn column) {
+    QVariant result = QVariant();
+    switch (column) {
+    case MovementNumerableColumn::ID:
+        result = (uint64_t)item.id; // FIXME: implement the right conversion
+        break;
+    case MovementNumerableColumn::DATE_VALUE:
+        result = QDate{int(item.date_value.year()), static_cast<int>(unsigned(item.date_value.month())),
+                       static_cast<int>(unsigned(item.date_value.day()))}
+                     .toString("yyyy-MM-dd");
+        break;
+    case MovementNumerableColumn::AMOUNT: {
+        auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
+        result = QString::fromStdString(static_cast<std::string>(amount_money));
+    } break;
+    case MovementNumerableColumn::QUANTITY: {
+        SPDLOG_ERROR("Not implemented yet!!!");
+        // result = QString::fromStdString(static_cast<std::string>(item.quantity));
+    } break;
+    case MovementNumerableColumn::UNIT_VALUE: {
+        auto money = finances::accounts::models::Money{item.unit_value, account.ccy};
+        result = QString::fromStdString(static_cast<std::string>(money));
+    } break;
+    case MovementNumerableColumn::TRANSACTION:
+        result = item.transaction.second.c_str();
+        break;
+    case MovementNumerableColumn::MOVE_TYPE:
+        result = item.type.second.c_str();
+        break;
+    case MovementNumerableColumn::DIRECTION:
+        result = QString::fromStdString(std::string(magic_enum::enum_name(item.direction)));
+        break;
+    }
+    return result;
 }

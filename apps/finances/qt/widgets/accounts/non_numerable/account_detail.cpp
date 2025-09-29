@@ -62,7 +62,6 @@ AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx:
             &AccountNonNumerableDetailWidget::on_new_snapshot);
 
     QPushButton* bt_add_snapshot = new QPushButton(tr("Add snapshot"), this);
-    bt_add_snapshot->setDisabled(account.is_numerable);
     connect(bt_add_snapshot, &QPushButton::clicked, popup_add_snapshot, &QDialog::exec);
 
     // Layout
@@ -94,15 +93,6 @@ void AccountNonNumerableDetailWidget::on_new_snapshot(SnapshotNonNumerable snaps
     emit snapshot_added(account.id);
 }
 
-// template <typename TModel> struct DataDispatcher<TModel, SnapshotColumn, Qt::FontRole> {
-//     static QVariant data(const finances::accounts::models::Account&, const TModel&, SnapshotColumn column) {
-//         if ((column == SnapshotColumn::DATE_VALUE) || (column == SnapshotColumn::AMOUNT)) {
-//             return QVariant{QFont{"Andale Mono"}};
-//         }
-//         return QVariant{};
-//     }
-// };
-
 template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::FontRole> {
     static QVariant data(const finances::accounts::models::Account&, const TModel&, MovementColumn column) {
         if ((column == MovementColumn::DATE_VALUE) || (column == MovementColumn::AMOUNT)) {
@@ -118,10 +108,6 @@ template <typename TColumn> struct DataDispatcher<finances::accounts::models::Sn
         return QVariant{QColor(255, 255, 40)};
     }
 };
-
-// template <>
-// QVariant DataDispatcher<finances::accounts::models::Snapshot, SnapshotColumn, Qt::DisplayRole>::data(
-//     const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&, SnapshotColumn);
 
 template <>
 QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumn, Qt::DisplayRole>::data(

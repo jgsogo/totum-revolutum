@@ -9,6 +9,7 @@ namespace finances::investments::models {
         using Manager = SnapshotNumerableManager;
 
         finances::accounts::models::Id id;
+        // FIXME: Implement NumerableAmount as a type. This pair is very error prone
         finances::accounts::models::Amount quantity;
         finances::accounts::models::Amount unit_value;
     };
