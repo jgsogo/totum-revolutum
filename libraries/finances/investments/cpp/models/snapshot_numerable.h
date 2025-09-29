@@ -5,8 +5,10 @@
 namespace finances::investments::models {
     class SnapshotNumerableManager;
 
-    struct SnapshotNumerable : finances::accounts::models::Snapshot {
+    struct SnapshotNumerable {
         using Manager = SnapshotNumerableManager;
+
+        finances::accounts::models::Snapshot snapshot;
 
         finances::accounts::models::Id id;
         // FIXME: Implement NumerableAmount as a type. This pair is very error prone

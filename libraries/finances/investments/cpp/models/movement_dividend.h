@@ -5,8 +5,10 @@
 namespace finances::investments::models {
     class MovementDividendManager;
 
-    struct MovementDividend : finances::accounts::models::Movement {
+    struct MovementDividend {
         using Manager = MovementDividendManager;
+
+        finances::accounts::models::Movement movement;
 
         finances::accounts::models::Id id;
         utils::libpqxx::Date ex_dividend_date;

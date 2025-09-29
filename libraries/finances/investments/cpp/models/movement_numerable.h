@@ -5,8 +5,10 @@
 namespace finances::investments::models {
     class MovementNumerableManager;
 
-    struct MovementNumerable : finances::accounts::models::Movement {
+    struct MovementNumerable {
         using Manager = MovementNumerableManager;
+
+        finances::accounts::models::Movement movement;
 
         finances::accounts::models::Id id;
         finances::accounts::models::Amount quantity;
