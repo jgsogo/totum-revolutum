@@ -17,9 +17,7 @@
 #include "apps/finances/qt/db/notificator.h"
 #include "apps/finances/qt/models/accounts_table.h"
 #include "apps/finances/qt/version.hpp"
-#include "apps/finances/qt/widgets/accounts_table.h"
-#include "apps/finances/qt/widgets/main_tab.h"
-#include "apps/finances/qt/widgets/sidebar.h"
+#include "apps/finances/qt/widgets/accounts/main_tab.h"
 
 int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::trace); // TODO: Configurable via CLI and/or envvar

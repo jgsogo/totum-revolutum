@@ -23,9 +23,9 @@ qt_cc_binary(
         ":version",
     ],
     deps = [
+        "//apps/finances/qt/accounts:widgets",
         "//apps/finances/qt/db",
         "//apps/finances/qt/models",
-        "//apps/finances/qt/widgets",
         "//bazel/logging:spdlog",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_widgets",

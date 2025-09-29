@@ -2,7 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "account_non_numerable_detail.h"
+#include "non_numerable/account_detail.h"
+#include "numerable/account_detail.h"
+
 #include "accounts_table.h"
 
 MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_, QWidget* parent)
@@ -49,7 +51,7 @@ void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
             idx = this->addTab(account_widget,
                                QString("%1 - %2").arg(account.custodian.second.c_str()).arg(account.name.c_str()));
         } else {
-            SPDLOG_WARN("Detail for numerable accounts not implemented yet");
+            SPDLOG_ERROR("Detail for numerable accounts not implemented yet");
             // - numerable account
             return;
         }

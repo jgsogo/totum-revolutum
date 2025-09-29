@@ -1,4 +1,4 @@
-#include "account_add_snapshot_non_numerable.h"
+#include "add_snapshot.h"
 
 #include <QLabel>
 #include <QPushButton>

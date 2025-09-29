@@ -4,14 +4,12 @@ qt_cc_library(
     name = "widgets",
     srcs = glob(["**/*.cpp"]),
     hdrs = glob(["**/*.h"]),
-    visibility = ["//apps/finances/qt:__pkg__"],
+    visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
         "//apps/finances/qt/metatypes",
         "//apps/finances/qt/models",
         "//bazel/logging:spdlog",
         "//libraries/finances/investments/cpp/models",
-        "//libraries/utils/cpp/libpqxx:connection_pool",
-        "@decimal_for_cpp",
         "@rules_qt//:qt_widgets",
     ],
 )

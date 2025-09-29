@@ -1,4 +1,4 @@
-#include "account_non_numerable_detail.h"
+#include "account_detail.h"
 
 #include <QConcatenateTablesProxyModel>
 #include <QHeaderView>
@@ -8,12 +8,12 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include "apps/finances/qt/models/account_related.h"
 #include "libraries/finances/accounts/cpp/models/movement.h"
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 #include "libraries/finances/accounts/cpp/models/types/money.h"
 
-#include "account_add_snapshot_non_numerable.h"
-#include "apps/finances/qt/models/account_related.h"
+#include "add_snapshot.h"
 
 enum class MovementColumn {
     ID = 0,
