@@ -27,7 +27,7 @@ enum class MovementColumn {
 AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool_,
                                                                  const finances::accounts::models::Account& account_,
                                                                  QWidget* parent)
-    : QWidget(parent), pool{pool_}, account{account_} {
+    : AccountDetailWidget(pool_, account_, parent) {
 
     AccountRelatedModelBase* snapshots_model =
         new AccountRelatedModel<finances::accounts::models::Snapshot, MovementColumn>(pool, account, this);

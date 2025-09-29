@@ -42,22 +42,20 @@ void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
     // Get the data for this account
     try {
         const auto& account = model->get_account(account_id);
-        auto idx = -1;
-        if (!account.is_numerable) {
-            // - non numerable account
-            AccountNonNumerableDetailWidget* account_widget = new AccountNonNumerableDetailWidget(pool, account, this);
-            connect(account_widget, &AccountNonNumerableDetailWidget::snapshot_added,
-                    [this](auto id) { emit account_changed(id); });
-            idx = this->addTab(account_widget,
-                               QString("%1 - %2").arg(account.custodian.second.c_str()).arg(account.name.c_str()));
-        } else {
-            SPDLOG_ERROR("Detail for numerable accounts not implemented yet");
-            // - numerable account
-            return;
-        }
 
-        assert(idx != -1);
+        // create the widget
+        AccountDetailWidget* account_widget = nullptr;
+        if (!account.is_numerable) {
+            account_widget = new AccountNonNumerableDetailWidget(pool, account, this);
+        } else {
+            account_widget = new AccountNumerableDetailWidget(pool, account, this);
+        }
+        connect(account_widget, &AccountDetailWidget::snapshot_added, [this](auto id) { emit account_changed(id); });
+        auto idx = this->addTab(account_widget,
+                                QString("%1 - %2").arg(account.custodian.second.c_str()).arg(account.name.c_str()));
+
         _accounts_tabs.insert(std::make_pair(account_id, idx));
+
         // and make it active
         this->setCurrentIndex(idx);
     } catch (std::runtime_error) {

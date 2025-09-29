@@ -1,9 +1,28 @@
 load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
 
 qt_cc_library(
+    name = "interface",
+    srcs = ["account_detail.cpp"],
+    hdrs = ["account_detail.h"],
+    visibility = ["//apps/finances/qt/widgets/accounts:__subpackages__"],
+    deps = [
+        "//apps/finances/qt/metatypes",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
     name = "widgets",
-    srcs = glob(["**/*.cpp"]),
-    hdrs = glob(["**/*.h"]),
+    srcs = [
+        "accounts_table.cpp",
+        "accounts_table_filter.cpp",
+        "main_tab.cpp",
+    ],
+    hdrs = [
+        "accounts_table.h",
+        "accounts_table_filter.h",
+        "main_tab.h",
+    ],
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
         "//apps/finances/qt/widgets/accounts/non_numerable:widgets",
