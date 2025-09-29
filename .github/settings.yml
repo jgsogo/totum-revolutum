@@ -157,6 +157,10 @@ labels:
     color: "000000"
   - name: cmp:apps/finances
     color: "000000"
+  - name: cmp:apps/finances/qt
+    color: "000000"
+  - name: cmp:apps/finances/tauri
+    color: "000000"
   - name: cmp:apps/task_manager
     color: "000000"
   - name: cmp:bazel
@@ -184,6 +188,8 @@ labels:
   - name: cmp:libraries/rust
     color: "000000"
   - name: cmp:libraries/utils
+    color: "000000"
+  - name: cmp:libraries/utils/cpp
     color: "000000"
   - name: cmp:notes
     color: "000000"
