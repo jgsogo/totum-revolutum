@@ -15,11 +15,12 @@ namespace utils::libpqxx {
     template <std::size_t MaxDigits, std::size_t DecimalPlaces> struct Numeric {
         // dec::decimal maximum number of digits is 18 (uses 64 bit integer under the hood)
         static_assert(MaxDigits <= 18, "MaxDigits cannot excceed 18");
+        using InnerType = dec::decimal<DecimalPlaces>;
 
         static const std::size_t max_digits = MaxDigits;
 
         operator std::string() const { return dec::toString(value, ENGLISH_DECIMAL_FORMAT); }
-        dec::decimal<DecimalPlaces> value;
+        InnerType value;
     };
 } // namespace utils::libpqxx
 

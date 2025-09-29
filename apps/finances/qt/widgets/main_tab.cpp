@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "account_detail.h"
+#include "account_non_numerable_detail.h"
 #include "accounts_table.h"
 
 MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_, QWidget* parent)
@@ -40,12 +40,22 @@ void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
     // Get the data for this account
     try {
         const auto& account = model->get_account(account_id);
-        AccountDetailWidget* account_widget = new AccountDetailWidget(pool, account, this);
-        connect(account_widget, &AccountDetailWidget::snapshot_added, [this](auto id) { emit account_changed(id); });
-        auto idx = this->addTab(account_widget,
-                                QString("%1 - %2").arg(account.custodian.second.c_str()).arg(account.name.c_str()));
-        _accounts_tabs.insert(std::make_pair(account_id, idx));
+        auto idx = -1;
+        if (!account.is_numerable) {
+            // - non numerable account
+            AccountNonNumerableDetailWidget* account_widget = new AccountNonNumerableDetailWidget(pool, account, this);
+            connect(account_widget, &AccountNonNumerableDetailWidget::snapshot_added,
+                    [this](auto id) { emit account_changed(id); });
+            idx = this->addTab(account_widget,
+                               QString("%1 - %2").arg(account.custodian.second.c_str()).arg(account.name.c_str()));
+        } else {
+            SPDLOG_WARN("Detail for numerable accounts not implemented yet");
+            // - numerable account
+            return;
+        }
 
+        assert(idx != -1);
+        _accounts_tabs.insert(std::make_pair(account_id, idx));
         // and make it active
         this->setCurrentIndex(idx);
     } catch (std::runtime_error) {

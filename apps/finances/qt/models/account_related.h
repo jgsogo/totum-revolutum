@@ -8,24 +8,12 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include "libraries/finances/accounts/cpp/models/account.h"
-#include "libraries/finances/accounts/cpp/models/movement.h"
-#include "libraries/finances/accounts/cpp/models/snapshot.h"
-#include "libraries/finances/accounts/cpp/models/types/money.h"
 
-enum class SnapshotColumn {
-    ID = 0,
-    DATE_VALUE = 1,
-    AMOUNT = 2,
-};
-
-enum class MovementColumn {
-    ID = 0,
-    DATE_VALUE = 1,
-    MOVE_TYPE = 2,
-    TRANSACTION = 3,
-    DIRECTION = 4,
-    AMOUNT = 5,
-};
+// enum class SnapshotColumn {
+//     ID = 0,
+//     DATE_VALUE = 1,
+//     AMOUNT = 2,
+// };
 
 template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher {
     static QVariant data(const finances::accounts::models::Account&, const TModel&, TColumn) { return QVariant{}; }
@@ -44,10 +32,6 @@ class AccountRelatedModelBase : public QAbstractTableModel {
 };
 
 template <typename TModel, typename Column> class AccountRelatedModel : public AccountRelatedModelBase {
-
-    // Prepared to work with Snapshot and Movement
-    static_assert(std::is_same_v<TModel, finances::accounts::models::Snapshot> ||
-                  std::is_same_v<TModel, finances::accounts::models::Movement>);
 
   public:
     AccountRelatedModel(utils::libpqxx::ConnectionPool& pool_, const finances::accounts::models::Account& account_,
@@ -135,40 +119,3 @@ template <typename TModel, typename TColumn> struct DataDispatcher<TModel, TColu
         return QVariant{Qt::AlignRight};
     }
 };
-
-template <typename TModel> struct DataDispatcher<TModel, SnapshotColumn, Qt::FontRole> {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, SnapshotColumn column) {
-        if ((column == SnapshotColumn::DATE_VALUE) || (column == SnapshotColumn::AMOUNT)) {
-            return QVariant{QFont{"Andale Mono"}};
-        }
-        return QVariant{};
-    }
-};
-
-template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::FontRole> {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, MovementColumn column) {
-        if ((column == MovementColumn::DATE_VALUE) || (column == MovementColumn::AMOUNT)) {
-            return QVariant{QFont{"Andale Mono"}};
-        }
-        return QVariant{};
-    }
-};
-
-template <typename TColumn> struct DataDispatcher<finances::accounts::models::Snapshot, TColumn, Qt::BackgroundRole> {
-    static QVariant data(const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&,
-                         TColumn column) {
-        return QVariant{QColor(255, 255, 40)};
-    }
-};
-
-template <>
-QVariant DataDispatcher<finances::accounts::models::Snapshot, SnapshotColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&, SnapshotColumn);
-
-template <>
-QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&, MovementColumn);
-
-template <>
-QVariant DataDispatcher<finances::accounts::models::Movement, MovementColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account&, const finances::accounts::models::Movement&, MovementColumn);

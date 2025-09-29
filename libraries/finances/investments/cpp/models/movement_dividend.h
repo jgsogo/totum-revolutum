@@ -1,0 +1,21 @@
+#pragma once
+
+#include "libraries/finances/accounts/cpp/models/movement.h"
+
+namespace finances::investments::models {
+    class MovementDividendManager;
+
+    struct MovementDividend : finances::accounts::models::Movement {
+        using Manager = MovementDividendManager;
+
+        finances::accounts::models::Id id;
+        utils::libpqxx::Date ex_dividend_date;
+        finances::accounts::models::Amount unit_value;
+    };
+
+    class MovementDividendManager : public finances::accounts::models::ModelManager<MovementDividend> {
+      public:
+        tl::expected<std::vector<MovementDividend>, finances::accounts::models::Error>
+        all(finances::accounts::models::Id account_id);
+    };
+} // namespace finances::investments::models
