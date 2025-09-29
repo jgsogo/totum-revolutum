@@ -12,10 +12,11 @@ class MainTabWidget : public QTabWidget {
 
   public:
     MainTabWidget(utils::libpqxx::ConnectionPool& pool, AccountTableModel* model, QWidget* parent = nullptr);
+    void tabRemoved(int index) override;
 
   private slots:
     void addTabAccount(finances::accounts::models::Id account_id);
-    void closeTab(int index);
+    void closeMyTab(int);
 
   signals:
     void account_changed(finances::accounts::models::Id account_id);

@@ -21,7 +21,7 @@
 
 int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::trace); // TODO: Configurable via CLI and/or envvar
-    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%8l%$][engine] %v (%@)");
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%8l%$] %v (%@)");
 
     auto pool = utils::libpqxx::ConnectionPool::from_env("FINANCES_QT_", 4);
 

@@ -13,6 +13,9 @@ namespace finances::investments::models {
         finances::accounts::models::Id id;
         utils::libpqxx::Date ex_dividend_date;
         finances::accounts::models::Amount unit_value;
+
+        std::optional<std::pair<utils::libpqxx::Date, finances::accounts::models::Amount>>
+            snapshot_data; // <date_value, quantity>
     };
 
     class MovementDividendManager : public finances::accounts::models::ModelManager<MovementDividend> {

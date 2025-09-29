@@ -122,6 +122,14 @@ struct DataDispatcher<finances::investments::models::SnapshotNumerable, TColumn,
     }
 };
 
+template <typename TColumn>
+struct DataDispatcher<finances::investments::models::MovementDividend, TColumn, Qt::BackgroundRole> {
+    static QVariant data(const finances::accounts::models::Account&,
+                         const finances::investments::models::MovementDividend&, TColumn column) {
+        return QVariant{QColor(230, 249, 255)};
+    }
+};
+
 template <>
 QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementNumerableColumn, Qt::DisplayRole>::data(
     const finances::accounts::models::Account& account, const finances::accounts::models::Snapshot& item,
@@ -256,8 +264,7 @@ DataDispatcher<finances::investments::models::MovementDividend, MovementNumerabl
     QVariant result = QVariant();
     switch (column) {
     case MovementNumerableColumn::QUANTITY: {
-        SPDLOG_ERROR("Not implemented yet!!!");
-        // result = QString::fromStdString(static_cast<std::string>(item.quantity));
+        result = QString::fromStdString(static_cast<std::string>(item.snapshot_data.value().second));
     } break;
     case MovementNumerableColumn::UNIT_VALUE: {
         auto money = finances::accounts::models::Money{item.unit_value, account.ccy};

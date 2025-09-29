@@ -24,8 +24,7 @@ MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_, AccountTable
     if (rightTabButton)
         rightTabButton->resize(0, 0);
 
-    // connect other signals
-    connect(this, &MainTabWidget::tabCloseRequested, this, &MainTabWidget::closeTab);
+    connect(this, &MainTabWidget::tabCloseRequested, this, &MainTabWidget::closeMyTab);
 }
 
 void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
@@ -64,13 +63,13 @@ void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
     }
 }
 
-void MainTabWidget::closeTab(int index) {
-    SPDLOG_DEBUG("MainTabWidget::closeTab(index={})", index);
+void MainTabWidget::closeMyTab(int index) {
+    SPDLOG_DEBUG("MainTabWidget::closeMyTab(index={})", index);
     assert(index != _all_accounts_idx && "Requested to close ALL tab. Not expected!");
-
-    // Remove from the vector
-    std::erase_if(_accounts_tabs, [index](const auto& item) { return item.second == index; });
-
-    // Remove the tab
     this->removeTab(index);
+}
+
+void MainTabWidget::tabRemoved(int index) {
+    SPDLOG_DEBUG("MainTabWidget::tabRemoved(index={})", index);
+    std::erase_if(_accounts_tabs, [index](const auto& item) { return item.second == index; });
 }

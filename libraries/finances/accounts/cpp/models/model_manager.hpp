@@ -6,6 +6,7 @@
 #include "tl/expected.hpp"
 
 #include "errors.h"
+#include "types/id.h"
 
 namespace finances::accounts::models {
 

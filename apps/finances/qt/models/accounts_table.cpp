@@ -48,9 +48,19 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
                 result = QString::fromStdString(static_cast<std::string>(snapshot_money));
             }
         } break;
-        case Column::TYPE:
-            result = account.type.second.c_str();
-            break;
+        case Column::TYPE: {
+            // FIXME: This is executed too many times. We don't want to call the DB so often. This data is static!
+            finances::accounts::models::AccountType::Manager manager{pool};
+            QString q_breadcrumb(account.type.second.c_str());
+            auto breadcrumb = manager.breadcrumb(account.type.first);
+            if (breadcrumb) {
+                for (auto it : breadcrumb.value()) {
+                    q_breadcrumb.append(" > ");
+                    q_breadcrumb.append(it.c_str());
+                }
+            }
+            result = q_breadcrumb;
+        } break;
         case Column::OPEN:
             result = QDate{int(account.open.year()), static_cast<int>(unsigned(account.open.month())),
                            static_cast<int>(unsigned(account.open.day()))}
@@ -199,8 +209,4 @@ AccountTableModel::get_account(finances::accounts::models::Id account_id) const 
     }
 
     return *found;
-
-    // auto idx = std::distance(accounts.begin(), found);
-    // SPDLOG_TRACE(" - account is position {} in vectors", idx);
-    // return std::make_pair(accounts.at(idx), snapshots.at(idx));
 }
