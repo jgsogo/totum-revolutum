@@ -55,6 +55,7 @@ AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx:
     table_view->setSortingEnabled(false);
     table_view->hideColumn(magic_enum::enum_integer(MovementColumn::ID));
     table_view->verticalHeader()->hide();
+    table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // - popup - add snapshot
     AddSnapshotNonNumerableWidget* popup_add_snapshot = new AddSnapshotNonNumerableWidget(this);

@@ -63,6 +63,7 @@ AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::Conne
     table_view->setSortingEnabled(false);
     table_view->hideColumn(magic_enum::enum_integer(MovementNumerableColumn::ID));
     table_view->verticalHeader()->hide();
+    table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // - popup - add snapshot
     AddSnapshotNumerableWidget* popup_add_snapshot = new AddSnapshotNumerableWidget(this);

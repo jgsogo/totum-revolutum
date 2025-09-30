@@ -29,6 +29,7 @@ AccountsTableWidget::AccountsTableWidget(AccountTableModel* model, QWidget* pare
     table_view->setSortingEnabled(true);
     table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::ID));
     table_view->verticalHeader()->hide();
+    table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     connect(table_view, &QTableView::doubleClicked, this, &AccountsTableWidget::onDoubleClicked);
 
     // Filters
