@@ -11,36 +11,41 @@
 
 #include "movement_type.h"
 
-// enum class SnapshotColumn {
-//     ID = 0,
-//     DATE_VALUE = 1,
-//     AMOUNT = 2,
-// };
+class AccountRelatedModelBase;
 
 template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, TColumn) { return QVariant{}; }
+    static QVariant data(const AccountRelatedModelBase&, const TModel&, TColumn) { return QVariant{}; }
 };
 
 class AccountRelatedModelBase : public QAbstractTableModel {
     Q_OBJECT
   public:
-    using QAbstractTableModel::QAbstractTableModel;
+    AccountRelatedModelBase(utils::libpqxx::ConnectionPool& pool_, const finances::accounts::models::Account& account_,
+                            const MovementTypeTableModel* movtype_model_, QObject* parent = nullptr)
+        : QAbstractTableModel(parent), pool{pool_}, account{account_}, movtype_model{movtype_model_} {
+        QTimer::singleShot(0, this, &AccountRelatedModelBase::fetch_all);
+    };
+
+    template <typename TTModel, typename TTColumn, enum Qt::ItemDataRole> friend struct DataDispatcher;
 
   public slots:
     void fetch_all() { this->_fetch_all(); };
 
   protected:
     virtual void _fetch_all() = 0;
+
+  protected:
+    utils::libpqxx::ConnectionPool& pool;
+    const finances::accounts::models::Account& account;
+    const MovementTypeTableModel* movtype_model;
 };
 
 template <typename TModel, typename Column> class AccountRelatedModel : public AccountRelatedModelBase {
 
   public:
     AccountRelatedModel(utils::libpqxx::ConnectionPool& pool_, const finances::accounts::models::Account& account_,
-                        MovementTypeTableModel* movtype_model_, QObject* parent = nullptr)
-        : AccountRelatedModelBase(parent), pool{pool_}, account{account_}, movtype_model{movtype_model_} {
-        QTimer::singleShot(0, this, &AccountRelatedModelBase::fetch_all);
-    };
+                        const MovementTypeTableModel* movtype_model_, QObject* parent = nullptr)
+        : AccountRelatedModelBase(pool_, account_, movtype_model_, parent) {};
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override { return items.size(); };
 
@@ -77,13 +82,13 @@ template <typename TModel, typename Column> class AccountRelatedModel : public A
 
         switch (role) {
         case Qt::DisplayRole:
-            return DataDispatcher<TModel, Column, Qt::DisplayRole>::data(account, item, column);
+            return DataDispatcher<TModel, Column, Qt::DisplayRole>::data(*this, item, column);
         case Qt::FontRole:
-            return DataDispatcher<TModel, Column, Qt::FontRole>::data(account, item, column);
+            return DataDispatcher<TModel, Column, Qt::FontRole>::data(*this, item, column);
         case Qt::TextAlignmentRole:
-            return DataDispatcher<TModel, Column, Qt::TextAlignmentRole>::data(account, item, column);
+            return DataDispatcher<TModel, Column, Qt::TextAlignmentRole>::data(*this, item, column);
         case Qt::BackgroundRole:
-            return DataDispatcher<TModel, Column, Qt::BackgroundRole>::data(account, item, column);
+            return DataDispatcher<TModel, Column, Qt::BackgroundRole>::data(*this, item, column);
             // default:
             //     break;
         }
@@ -111,16 +116,11 @@ template <typename TModel, typename Column> class AccountRelatedModel : public A
     }
 
   private:
-    utils::libpqxx::ConnectionPool& pool;
-    const finances::accounts::models::Account& account;
-    MovementTypeTableModel* movtype_model;
     std::vector<TModel> items;
 };
 
 // Overrides for DataDispatcher::data function
 
 template <typename TModel, typename TColumn> struct DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole> {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, TColumn) {
-        return QVariant{Qt::AlignRight};
-    }
+    static QVariant data(const AccountRelatedModelBase&, const TModel&, TColumn) { return QVariant{Qt::AlignRight}; }
 };

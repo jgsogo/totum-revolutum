@@ -12,8 +12,8 @@ class MainTabWidget : public QTabWidget {
     Q_OBJECT
 
   public:
-    MainTabWidget(utils::libpqxx::ConnectionPool& pool, AccountTableModel* model, MovementTypeTableModel* movtype_model,
-                  QWidget* parent = nullptr);
+    MainTabWidget(utils::libpqxx::ConnectionPool& pool, AccountTableModel* model,
+                  const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
     void tabRemoved(int index) override;
 
   private slots:
@@ -29,5 +29,5 @@ class MainTabWidget : public QTabWidget {
 
     utils::libpqxx::ConnectionPool& pool;
     AccountTableModel* model;
-    MovementTypeTableModel* movtype_model;
+    const MovementTypeTableModel* movtype_model;
 };

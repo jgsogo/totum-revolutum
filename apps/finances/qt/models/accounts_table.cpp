@@ -8,7 +8,9 @@
 #include "libraries/finances/accounts/cpp/models/types/money.h"
 
 AccountTableModel::AccountTableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent)
-    : QAbstractTableModel(parent), pool{pool} {}
+    : QAbstractTableModel(parent), pool{pool} {
+    QTimer::singleShot(0, this, SLOT(fetch_all()));
+}
 
 int AccountTableModel::rowCount(const QModelIndex&) const { return accounts.size(); }
 int AccountTableModel::columnCount(const QModelIndex&) const { return magic_enum::enum_count<Column>(); }
@@ -136,6 +138,7 @@ void AccountTableModel::fetch_all() {
     auto all_account_type = account_type_manager.all();
     if (all_account_type) {
         for (const auto& acc_type : all_account_type.value()) {
+            // FIXME: We are doing this also for the movement types
             QString q_breadcrumb;
             auto breadcrumb = account_type_manager.breadcrumb(acc_type.id);
             if (breadcrumb) {

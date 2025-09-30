@@ -29,7 +29,8 @@ enum class MovementNumerableColumn {
 
 AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool_,
                                                            const finances::accounts::models::Account& account_,
-                                                           MovementTypeTableModel* movtype_model_, QWidget* parent)
+                                                           const MovementTypeTableModel* movtype_model_,
+                                                           QWidget* parent)
 
     : AccountDetailWidget(pool_, account_, movtype_model_, parent) {
 
@@ -105,7 +106,7 @@ void AccountNumerableDetailWidget::on_new_snapshot(SnapshotNumerable snapshot) {
 }
 
 template <typename TModel> struct DataDispatcher<TModel, MovementNumerableColumn, Qt::FontRole> {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, MovementNumerableColumn column) {
+    static QVariant data(const AccountRelatedModelBase&, const TModel&, MovementNumerableColumn column) {
         if ((column == MovementNumerableColumn::DATE_VALUE) || (column == MovementNumerableColumn::AMOUNT) ||
             (column == MovementNumerableColumn::QUANTITY) || (column == MovementNumerableColumn::UNIT_VALUE)) {
             return QVariant{QFont{"Andale Mono"}};
@@ -116,23 +117,23 @@ template <typename TModel> struct DataDispatcher<TModel, MovementNumerableColumn
 
 template <typename TColumn>
 struct DataDispatcher<finances::investments::models::SnapshotNumerable, TColumn, Qt::BackgroundRole> {
-    static QVariant data(const finances::accounts::models::Account&,
-                         const finances::investments::models::SnapshotNumerable&, TColumn column) {
+    static QVariant data(const AccountRelatedModelBase&, const finances::investments::models::SnapshotNumerable&,
+                         TColumn column) {
         return QVariant{QColor(255, 255, 40)};
     }
 };
 
 template <typename TColumn>
 struct DataDispatcher<finances::investments::models::MovementDividend, TColumn, Qt::BackgroundRole> {
-    static QVariant data(const finances::accounts::models::Account&,
-                         const finances::investments::models::MovementDividend&, TColumn column) {
+    static QVariant data(const AccountRelatedModelBase&, const finances::investments::models::MovementDividend&,
+                         TColumn column) {
         return QVariant{QColor(230, 249, 255)};
     }
 };
 
 template <>
 QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementNumerableColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account& account, const finances::accounts::models::Snapshot& item,
+    const AccountRelatedModelBase& account, const finances::accounts::models::Snapshot& item,
     MovementNumerableColumn column) {
     QVariant result = QVariant();
 
@@ -146,13 +147,14 @@ QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementNumerableC
                      .toString("yyyy-MM-dd");
         break;
     case MovementNumerableColumn::AMOUNT: {
-        auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
+        auto amount_money = finances::accounts::models::Money{item.amount, account.account.ccy};
         result = QString::fromStdString(static_cast<std::string>(amount_money));
     } break;
     case MovementNumerableColumn::QUANTITY:
     case MovementNumerableColumn::UNIT_VALUE: {
         SPDLOG_ERROR("Never get here! It should be already handled by the SnapshotNumerable");
     } break;
+    // Snapshots doesn't have these fields
     case MovementNumerableColumn::TRANSACTION:
     case MovementNumerableColumn::MOVE_TYPE:
     case MovementNumerableColumn::DIRECTION:
@@ -164,7 +166,7 @@ QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementNumerableC
 template <>
 QVariant
 DataDispatcher<finances::investments::models::SnapshotNumerable, MovementNumerableColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account& account, const finances::investments::models::SnapshotNumerable& item,
+    const AccountRelatedModelBase& account, const finances::investments::models::SnapshotNumerable& item,
     MovementNumerableColumn column) {
     QVariant result = QVariant();
 
@@ -173,7 +175,7 @@ DataDispatcher<finances::investments::models::SnapshotNumerable, MovementNumerab
         result = QString::fromStdString(static_cast<std::string>(item.quantity));
     } break;
     case MovementNumerableColumn::UNIT_VALUE: {
-        auto unit_value_money = finances::accounts::models::Money{item.unit_value, account.ccy};
+        auto unit_value_money = finances::accounts::models::Money{item.unit_value, account.account.ccy};
         result = QString::fromStdString(static_cast<std::string>(unit_value_money));
     } break;
     // Forward all the others to the underlying Snapshot type
@@ -193,7 +195,7 @@ DataDispatcher<finances::investments::models::SnapshotNumerable, MovementNumerab
 
 template <>
 QVariant DataDispatcher<finances::accounts::models::Movement, MovementNumerableColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account& account, const finances::accounts::models::Movement& item,
+    const AccountRelatedModelBase& account, const finances::accounts::models::Movement& item,
     MovementNumerableColumn column) {
     QVariant result = QVariant();
     switch (column) {
@@ -206,15 +208,28 @@ QVariant DataDispatcher<finances::accounts::models::Movement, MovementNumerableC
                      .toString("yyyy-MM-dd");
         break;
     case MovementNumerableColumn::AMOUNT: {
-        auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
+        auto amount_money = finances::accounts::models::Money{item.amount, account.account.ccy};
         result = QString::fromStdString(static_cast<std::string>(amount_money));
     } break;
     case MovementNumerableColumn::TRANSACTION:
         result = item.transaction.second.c_str();
         break;
-    case MovementNumerableColumn::MOVE_TYPE:
-        result = item.type.second.c_str();
-        break;
+    case MovementNumerableColumn::MOVE_TYPE: {
+        auto breadcrumb = account.movtype_model->get_breadcrumb(item.type.first);
+        if (breadcrumb) {
+            // FIXME: We are doing this in multiple places
+            QString q_breadcrumb;
+            for (const auto& it : breadcrumb.value().get()) {
+                q_breadcrumb.append(it.c_str());
+                q_breadcrumb.append(" > ");
+            }
+            q_breadcrumb.append(item.type.second.c_str());
+
+            result = q_breadcrumb;
+        } else {
+            result = item.type.second.c_str();
+        }
+    } break;
     case MovementNumerableColumn::DIRECTION:
         result = QString::fromStdString(std::string(magic_enum::enum_name(item.direction)));
         break;
@@ -230,7 +245,7 @@ QVariant DataDispatcher<finances::accounts::models::Movement, MovementNumerableC
 template <>
 QVariant
 DataDispatcher<finances::investments::models::MovementNumerable, MovementNumerableColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account& account, const finances::investments::models::MovementNumerable& item,
+    const AccountRelatedModelBase& account, const finances::investments::models::MovementNumerable& item,
     MovementNumerableColumn column) {
     QVariant result = QVariant();
     switch (column) {
@@ -238,7 +253,7 @@ DataDispatcher<finances::investments::models::MovementNumerable, MovementNumerab
         result = QString::fromStdString(static_cast<std::string>(item.quantity));
     } break;
     case MovementNumerableColumn::UNIT_VALUE: {
-        auto money = finances::accounts::models::Money{item.unit_value, account.ccy};
+        auto money = finances::accounts::models::Money{item.unit_value, account.account.ccy};
         result = QString::fromStdString(static_cast<std::string>(money));
     } break;
         // Forward all the others to the underlying Movement type
@@ -259,7 +274,7 @@ DataDispatcher<finances::investments::models::MovementNumerable, MovementNumerab
 template <>
 QVariant
 DataDispatcher<finances::investments::models::MovementDividend, MovementNumerableColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account& account, const finances::investments::models::MovementDividend& item,
+    const AccountRelatedModelBase& account, const finances::investments::models::MovementDividend& item,
     MovementNumerableColumn column) {
     QVariant result = QVariant();
     switch (column) {
@@ -267,7 +282,7 @@ DataDispatcher<finances::investments::models::MovementDividend, MovementNumerabl
         result = QString::fromStdString(static_cast<std::string>(item.snapshot_data.value().second));
     } break;
     case MovementNumerableColumn::UNIT_VALUE: {
-        auto money = finances::accounts::models::Money{item.unit_value, account.ccy};
+        auto money = finances::accounts::models::Money{item.unit_value, account.account.ccy};
         result = QString::fromStdString(static_cast<std::string>(money));
     } break;
         // Forward all the others to the underlying Movement type

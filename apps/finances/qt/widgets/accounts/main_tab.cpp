@@ -8,7 +8,7 @@
 #include "accounts_table.h"
 
 MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_,
-                             MovementTypeTableModel* movtype_model_, QWidget* parent)
+                             const MovementTypeTableModel* movtype_model_, QWidget* parent)
     : QTabWidget(parent), pool{pool_}, model{model_}, movtype_model{movtype_model_} {
     this->setTabsClosable(true);
 

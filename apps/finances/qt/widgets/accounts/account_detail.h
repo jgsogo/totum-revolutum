@@ -11,7 +11,7 @@ class AccountDetailWidget : public QWidget {
     Q_OBJECT
   public:
     explicit AccountDetailWidget(utils::libpqxx::ConnectionPool& pool, const finances::accounts::models::Account&,
-                                 MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
+                                 const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
   signals:
     void snapshot_added(finances::accounts::models::Id account_id);
@@ -19,5 +19,5 @@ class AccountDetailWidget : public QWidget {
   protected:
     utils::libpqxx::ConnectionPool& pool;
     const finances::accounts::models::Account& account;
-    MovementTypeTableModel* movtype_model;
+    const MovementTypeTableModel* movtype_model;
 };

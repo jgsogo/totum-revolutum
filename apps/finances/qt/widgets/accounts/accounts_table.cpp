@@ -61,9 +61,6 @@ AccountsTableWidget::AccountsTableWidget(AccountTableModel* model, QWidget* pare
     mainLayout->addWidget(table_view);
 
     this->setLayout(mainLayout);
-
-    // We initialize the widget with all the models
-    QTimer::singleShot(0, model, SLOT(fetch_all()));
 }
 
 void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {

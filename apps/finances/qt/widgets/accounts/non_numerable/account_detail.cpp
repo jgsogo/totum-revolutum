@@ -26,7 +26,7 @@ enum class MovementColumn {
 
 AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool_,
                                                                  const finances::accounts::models::Account& account_,
-                                                                 MovementTypeTableModel* movtype_model_,
+                                                                 const MovementTypeTableModel* movtype_model_,
                                                                  QWidget* parent)
     : AccountDetailWidget(pool_, account_, movtype_model_, parent) {
 
@@ -96,7 +96,7 @@ void AccountNonNumerableDetailWidget::on_new_snapshot(SnapshotNonNumerable snaps
 }
 
 template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::FontRole> {
-    static QVariant data(const finances::accounts::models::Account&, const TModel&, MovementColumn column) {
+    static QVariant data(const AccountRelatedModelBase&, const TModel&, MovementColumn column) {
         if ((column == MovementColumn::DATE_VALUE) || (column == MovementColumn::AMOUNT)) {
             return QVariant{QFont{"Andale Mono"}};
         }
@@ -105,16 +105,14 @@ template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::Fon
 };
 
 template <typename TColumn> struct DataDispatcher<finances::accounts::models::Snapshot, TColumn, Qt::BackgroundRole> {
-    static QVariant data(const finances::accounts::models::Account&, const finances::accounts::models::Snapshot&,
-                         TColumn column) {
+    static QVariant data(const AccountRelatedModelBase&, const finances::accounts::models::Snapshot&, TColumn column) {
         return QVariant{QColor(255, 255, 40)};
     }
 };
 
 template <>
 QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account& account, const finances::accounts::models::Snapshot& item,
-    MovementColumn column) {
+    const AccountRelatedModelBase& account, const finances::accounts::models::Snapshot& item, MovementColumn column) {
     QVariant result = QVariant();
 
     switch (column) {
@@ -127,9 +125,10 @@ QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumn, Qt
                      .toString("yyyy-MM-dd");
         break;
     case MovementColumn::AMOUNT: {
-        auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
+        auto amount_money = finances::accounts::models::Money{item.amount, account.account.ccy};
         result = QString::fromStdString(static_cast<std::string>(amount_money));
     } break;
+    // Snashot doesn't have these fields
     case MovementColumn::TRANSACTION:
     case MovementColumn::MOVE_TYPE:
     case MovementColumn::DIRECTION:
@@ -141,8 +140,7 @@ QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumn, Qt
 
 template <>
 QVariant DataDispatcher<finances::accounts::models::Movement, MovementColumn, Qt::DisplayRole>::data(
-    const finances::accounts::models::Account& account, const finances::accounts::models::Movement& item,
-    MovementColumn column) {
+    const AccountRelatedModelBase& account, const finances::accounts::models::Movement& item, MovementColumn column) {
     QVariant result = QVariant();
     switch (column) {
     case MovementColumn::ID:
@@ -154,15 +152,28 @@ QVariant DataDispatcher<finances::accounts::models::Movement, MovementColumn, Qt
                      .toString("yyyy-MM-dd");
         break;
     case MovementColumn::AMOUNT: {
-        auto amount_money = finances::accounts::models::Money{item.amount, account.ccy};
+        auto amount_money = finances::accounts::models::Money{item.amount, account.account.ccy};
         result = QString::fromStdString(static_cast<std::string>(amount_money));
     } break;
     case MovementColumn::TRANSACTION:
         result = item.transaction.second.c_str();
         break;
-    case MovementColumn::MOVE_TYPE:
-        result = item.type.second.c_str();
-        break;
+    case MovementColumn::MOVE_TYPE: {
+        auto breadcrumb = account.movtype_model->get_breadcrumb(item.type.first);
+        if (breadcrumb) {
+            // FIXME: We are doing this in multiple places
+            QString q_breadcrumb;
+            for (const auto& it : breadcrumb.value().get()) {
+                q_breadcrumb.append(it.c_str());
+                q_breadcrumb.append(" > ");
+            }
+            q_breadcrumb.append(item.type.second.c_str());
+
+            result = q_breadcrumb;
+        } else {
+            result = item.type.second.c_str();
+        }
+    } break;
     case MovementColumn::DIRECTION:
         result = QString::fromStdString(std::string(magic_enum::enum_name(item.direction)));
         break;

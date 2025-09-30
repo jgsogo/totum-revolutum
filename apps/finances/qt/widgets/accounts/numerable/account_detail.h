@@ -8,7 +8,7 @@ class AccountNumerableDetailWidget : public AccountDetailWidget {
   public:
     explicit AccountNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool,
                                           const finances::accounts::models::Account&,
-                                          MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
+                                          const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
   public slots:
     void on_new_snapshot(SnapshotNumerable);

@@ -6,7 +6,9 @@
 #include <magic_enum/magic_enum.hpp>
 
 MovementTypeTableModel::MovementTypeTableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent)
-    : QAbstractTableModel(parent), pool{pool} {}
+    : QAbstractTableModel(parent), pool{pool} {
+    QTimer::singleShot(0, this, SLOT(fetch_all()));
+}
 
 int MovementTypeTableModel::rowCount(const QModelIndex&) const { return items.size(); }
 int MovementTypeTableModel::columnCount(const QModelIndex&) const { return magic_enum::enum_count<Column>(); }
@@ -123,9 +125,7 @@ void MovementTypeTableModel::fetch_breadcrumbs() {
     for (const auto& movtype : items) {
         auto breadcrumb = manager.breadcrumb(movtype.id);
         if (breadcrumb) {
-            std::vector<std::string> movtype_breadcrumb = std::move(breadcrumb.value());
-            movtype_breadcrumb.emplace_back(movtype.name);
-            breadcrumbs_[movtype.id] = std::move(movtype_breadcrumb);
+            breadcrumbs_[movtype.id] = std::move(breadcrumb.value());
         }
     }
 
