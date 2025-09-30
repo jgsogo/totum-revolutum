@@ -1,5 +1,7 @@
 #include "add_snapshot.h"
 
+#include <QDialogButtonBox>
+#include <QFormLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QRegularExpression>
@@ -8,7 +10,10 @@
 
 #include <spdlog/spdlog.h>
 
-AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f) {
+AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(const finances::accounts::models::Account& account_,
+                                                             QWidget* parent, Qt::WindowFlags f)
+    : QDialog(parent, f), account{account_} {
+    // Components
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
@@ -18,17 +23,18 @@ AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(QWidget* parent, Qt
     amount->setValidator(ccy_validator);
     amount->setPlaceholderText("120,34");
 
-    QPushButton* add = new QPushButton(tr("Add"), this);
-    connect(add, &QPushButton::clicked, this, &AddSnapshotNonNumerableWidget::add_snapshot_clicked);
+    // Layout
+    QFormLayout* formLayout = new QFormLayout;
+    formLayout->addRow(tr("&Date:"), calendar);
+    formLayout->addRow(tr("&Amount (%1):").arg(static_cast<std::string>(account.ccy)), amount);
 
-    QPushButton* cancel = new QPushButton(tr("Cancel"), this);
-    connect(cancel, &QPushButton::clicked, this, &QDialog::reject);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &AddSnapshotNonNumerableWidget::add_snapshot_clicked);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    QVBoxLayout* mainLayout = new QVBoxLayout();
-    mainLayout->addWidget(calendar);
-    mainLayout->addWidget(amount);
-    mainLayout->addWidget(add);
-    mainLayout->addWidget(cancel);
+    QVBoxLayout* mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(formLayout);
+    mainLayout->addWidget(buttonBox);
 
     this->setLayout(mainLayout);
     this->setWindowTitle(tr("Add snapshot non numerable"));

@@ -1,5 +1,7 @@
 #include "add_snapshot.h"
 
+#include <QDialogButtonBox>
+#include <QFormLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QRegularExpression>
@@ -8,33 +10,37 @@
 
 #include <spdlog/spdlog.h>
 
-AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(QWidget* parent, Qt::WindowFlags f) : QDialog(parent, f) {
+AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(const finances::accounts::models::Account& account_,
+                                                       QWidget* parent, Qt::WindowFlags f)
+    : QDialog(parent, f), account{account_} {
+    // components
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
     QRegularExpression rx(R"(^\d+(,\d{2})?$)");
     QRegularExpressionValidator* amount_validator = new QRegularExpressionValidator(rx, this);
 
-    unit_value = new QLineEdit(this);
-    unit_value->setValidator(amount_validator);
-    unit_value->setPlaceholderText("120,34");
-
     quantity = new QLineEdit(this);
     quantity->setValidator(amount_validator);
     quantity->setPlaceholderText("120,34");
 
-    QPushButton* add = new QPushButton(tr("Add"), this);
-    connect(add, &QPushButton::clicked, this, &AddSnapshotNumerableWidget::add_snapshot_clicked);
+    unit_value = new QLineEdit(this);
+    unit_value->setValidator(amount_validator);
+    unit_value->setPlaceholderText("120,34");
 
-    QPushButton* cancel = new QPushButton(tr("Cancel"), this);
-    connect(cancel, &QPushButton::clicked, this, &QDialog::reject);
+    // Layout
+    QFormLayout* formLayout = new QFormLayout;
+    formLayout->addRow(tr("&Date:"), calendar);
+    formLayout->addRow(tr("&Quantity:"), quantity);
+    formLayout->addRow(tr("&Unit value (%1):").arg(static_cast<std::string>(account.ccy)), unit_value);
 
-    QVBoxLayout* mainLayout = new QVBoxLayout();
-    mainLayout->addWidget(calendar);
-    mainLayout->addWidget(quantity);
-    mainLayout->addWidget(unit_value);
-    mainLayout->addWidget(add);
-    mainLayout->addWidget(cancel);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &AddSnapshotNumerableWidget::add_snapshot_clicked);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(formLayout);
+    mainLayout->addWidget(buttonBox);
 
     this->setLayout(mainLayout);
     this->setWindowTitle(tr("Add snapshot numerable"));

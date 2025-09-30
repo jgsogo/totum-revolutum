@@ -58,7 +58,7 @@ AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx:
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // - popup - add snapshot
-    AddSnapshotNonNumerableWidget* popup_add_snapshot = new AddSnapshotNonNumerableWidget(this);
+    AddSnapshotNonNumerableWidget* popup_add_snapshot = new AddSnapshotNonNumerableWidget(account, this);
     popup_add_snapshot->setModal(true);
     popup_add_snapshot->setSizeGripEnabled(true);
     connect(popup_add_snapshot, &AddSnapshotNonNumerableWidget::new_snapshot, this,
