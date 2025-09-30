@@ -43,7 +43,7 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(const finances::accounts:
     mainLayout->addWidget(buttonBox);
 
     this->setLayout(mainLayout);
-    this->setWindowTitle(tr("Add snapshot numerable"));
+    this->setWindowTitle(tr("%1 - Add snapshot numerable").arg(account.name));
 }
 
 void AddSnapshotNumerableWidget::add_snapshot_clicked() {

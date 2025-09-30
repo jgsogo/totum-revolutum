@@ -37,7 +37,7 @@ AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(const finances::acc
     mainLayout->addWidget(buttonBox);
 
     this->setLayout(mainLayout);
-    this->setWindowTitle(tr("Add snapshot non numerable"));
+    this->setWindowTitle(tr("%1 - Add snapshot non numerable").arg(account.name));
 }
 
 void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {

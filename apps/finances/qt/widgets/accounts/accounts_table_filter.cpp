@@ -31,10 +31,11 @@ void AccountsTableFilterProxyModel::showOthersAccounts(Qt::CheckState state) {
 
 bool AccountsTableFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const {
     if (this->QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent)) {
-        QModelIndex idx_close =
-            sourceModel()->index(sourceRow, magic_enum::enum_integer(AccountTableModel::Column::CLOSE), sourceParent);
         // Filter based on showClosedAccounts
         if (_showClosedAccounts == Qt::Unchecked) {
+            // FIXME: Use some account.isClosed() helper method
+            QModelIndex idx_close = sourceModel()->index(
+                sourceRow, magic_enum::enum_integer(AccountTableModel::Column::CLOSE), sourceParent);
             QVariant close_value = sourceModel()->data(idx_close);
             if (!close_value.isNull()) {
                 if (close_value.toDate() < QDate::currentDate()) {

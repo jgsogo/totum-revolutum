@@ -1,5 +1,7 @@
 #include "accounts_table.h"
 
+#include <QBrush>
+#include <QColor>
 #include <QDate>
 #include <QFont>
 #include <QTimer>
@@ -26,10 +28,10 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     }
 
     Column column = magic_enum::enum_value<Column>(column_idx);
+    const auto& account = accounts.at(row);
 
     switch (role) {
     case Qt::DisplayRole: {
-        const auto& account = accounts.at(row);
         switch (column) {
         case Column::ID:
             result = (uint64_t)account.id; // FIXME: implement the right conversion
@@ -37,17 +39,38 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
         case Column::CUSTODIAN:
             result = account.custodian.second.c_str();
             break;
-        case Column::NAME:
-            result = account.name.c_str();
-            break;
+        case Column::NAME: {
+            // FIXME: use account.isClosed()
+            if (account.close) {
+                auto close_date = QDate{int(account.close->year()), static_cast<int>(unsigned(account.close->month())),
+                                        static_cast<int>(unsigned(account.close->day()))};
+                if (close_date < QDate::currentDate()) {
+                    result = QString("%1 🔒").arg(account.name);
+                } else {
+                    result = account.name.c_str();
+                }
+            } else {
+                result = account.name.c_str();
+            }
+        } break;
         case Column::IDENTIFIER:
             result = account.identifier.value_or("").c_str();
             break;
         case Column::SNAPSHOT: {
             const auto& snapshot = snapshots.at(row);
             if (snapshot) {
+                // FIXME: Implement some convenient functions in Snapshot class
                 auto snapshot_money = finances::accounts::models::Money{snapshot.value().amount, account.ccy};
-                result = QString::fromStdString(static_cast<std::string>(snapshot_money));
+                auto date_value = QDate{int(snapshot.value().date_value.year()),
+                                        static_cast<int>(unsigned(snapshot.value().date_value.month())),
+                                        static_cast<int>(unsigned(snapshot.value().date_value.day()))};
+                if (date_value.daysTo(QDate::currentDate()) > 21) {
+                    result = QString("❗%1").arg(static_cast<std::string>(snapshot_money));
+                } else {
+                    result = QString::fromStdString(static_cast<std::string>(snapshot_money));
+                }
+            } else {
+                result = QString(tr("❗missing"));
             }
         } break;
         case Column::TYPE: {
@@ -74,6 +97,16 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
             result = QFont{"Andale Mono"};
         }
         break;
+    case Qt::ForegroundRole: {
+        // FIXME: use account.isClosed()
+        if (account.close) {
+            auto close_date = QDate{int(account.close->year()), static_cast<int>(unsigned(account.close->month())),
+                                    static_cast<int>(unsigned(account.close->day()))};
+            if (close_date < QDate::currentDate()) {
+                result = QBrush{QColor{Qt::darkGray}};
+            }
+        }
+    } break;
     //
     // case Qt::ForegroundRole:
     //     if (1 == column) {
