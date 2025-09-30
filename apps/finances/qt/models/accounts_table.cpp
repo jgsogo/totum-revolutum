@@ -49,17 +49,10 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
             }
         } break;
         case Column::TYPE: {
-            // FIXME: This is executed too many times. We don't want to call the DB so often. This data is static!
-            finances::accounts::models::AccountType::Manager manager{pool};
-            QString q_breadcrumb(account.type.second.c_str());
-            auto breadcrumb = manager.breadcrumb(account.type.first);
-            if (breadcrumb) {
-                for (auto it : breadcrumb.value()) {
-                    q_breadcrumb.append(" > ");
-                    q_breadcrumb.append(it.c_str());
-                }
+            auto found = _account_type_breadcrumb.find(account.type.first);
+            if (found != _account_type_breadcrumb.end()) {
+                result = found->second;
             }
-            result = q_breadcrumb;
         } break;
         case Column::OPEN:
             result = QDate{int(account.open.year()), static_cast<int>(unsigned(account.open.month())),
@@ -125,6 +118,8 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
 
 void AccountTableModel::fetch_all() {
     SPDLOG_DEBUG("AccountTableModel::fetch_all");
+
+    SPDLOG_TRACE(" - fetch all accounts");
     finances::accounts::models::AccountManager manager{pool};
     auto all_accounts = manager.all();
     if (!all_accounts) {
@@ -133,12 +128,37 @@ void AccountTableModel::fetch_all() {
         return;
     }
 
+    // Fetch the account_type breadcrumbs
+    SPDLOG_TRACE(" - fetch all account_type breadcrumbs");
+    // FIXME: The breadcrumbs could/should be created only once, maybe at the root of the application
+    std::map<finances::accounts::models::Id, QString> account_type_breadcrumb;
+    finances::accounts::models::AccountType::Manager account_type_manager{pool};
+    auto all_account_type = account_type_manager.all();
+    if (all_account_type) {
+        for (const auto& acc_type : all_account_type.value()) {
+            QString q_breadcrumb;
+            auto breadcrumb = account_type_manager.breadcrumb(acc_type.id);
+            if (breadcrumb) {
+                for (auto it : breadcrumb.value()) {
+                    q_breadcrumb.append(it.c_str());
+                    q_breadcrumb.append(" > ");
+                }
+                q_breadcrumb.append(acc_type.name.c_str());
+                account_type_breadcrumb.insert(std::make_pair(acc_type.id, q_breadcrumb));
+            }
+        }
+    } else {
+        SPDLOG_ERROR("Failed to get all the AccountType instances");
+        // TODO: Communicate error to user
+    }
+
     // Create empty snapshots vector
     std::vector<std::optional<finances::accounts::models::Snapshot>> all_snapshots(all_accounts->size(), std::nullopt);
 
     this->beginResetModel();
     this->accounts = std::move(all_accounts.value());
     this->snapshots = std::move(all_snapshots);
+    this->_account_type_breadcrumb = std::move(account_type_breadcrumb);
     this->endResetModel();
 
     // We have updated all the accounts, so let's fetch all the snapshots together.

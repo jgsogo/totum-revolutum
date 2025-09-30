@@ -93,6 +93,7 @@ template <typename TModel, typename Column> class AccountRelatedModel : public A
     void _fetch_all() override final {
         SPDLOG_DEBUG("AccountRelatedModel<TModel>::_fetch_all");
 
+        SPDLOG_TRACE(" - fetch all the items for this model");
         typename TModel::Manager manager{pool};
         auto all_items = manager.all(account.id);
         if (!all_items) {
@@ -101,6 +102,7 @@ template <typename TModel, typename Column> class AccountRelatedModel : public A
             return;
         }
 
+        SPDLOG_TRACE(" - reset the model");
         this->beginResetModel();
         this->items = std::move(all_items.value());
         this->endResetModel();

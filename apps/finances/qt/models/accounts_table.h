@@ -40,4 +40,6 @@ class AccountTableModel : public QAbstractTableModel {
     utils::libpqxx::ConnectionPool& pool;
     std::vector<finances::accounts::models::Account> accounts;
     std::vector<std::optional<finances::accounts::models::Snapshot>> snapshots;
+
+    std::map<finances::accounts::models::Id, QString> _account_type_breadcrumb;
 };

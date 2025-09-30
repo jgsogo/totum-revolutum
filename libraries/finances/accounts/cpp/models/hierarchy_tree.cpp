@@ -5,26 +5,32 @@
 
 using namespace finances::accounts::models;
 
-// impl AccountType {
-//     pub fn get_breadcrumbs(&self, conn: &mut PgConnection) -> Result<Vec<String>, diesel::result::Error> {
-//         let me_pk = vec![self.id];
-//         let all_pks = [self.tn_ancestors_pks.nodes.clone(), me_pk].concat();
-//         let breadcrumbs = Self::all()
-//             .filter(accounttype_by_pks(&all_pks))
-//             .select((
-//                 crate::schema::finances_accounts_accounttype::id,
-//                 crate::schema::finances_accounts_accounttype::name,
-//             ))
-//             .load::<(i64, String)>(conn)?;
-
-//         Ok(reorder_breadcrumbs(breadcrumbs, &all_pks))
-//     }
-// }
-
 namespace {
+    template <typename T> std::vector<T> get_all(pqxx::connection& conn, std::string_view table) {
+        pqxx::work tx(conn);
+        SPDLOG_DEBUG("Get all hierarchy tree elements from table '{}'", table);
+
+        std::vector<T> ret;
+        auto query = std::format("SELECT id, name, description, is_abstract, unique_name"
+                                 " FROM {};",
+                                 table);
+        SPDLOG_TRACE(query);
+        for (auto [id, name, description, is_abstract, unique_name] :
+             tx.query<Id, std::string, std::optional<std::string>, bool, std::optional<std::string>>(query)) {
+            ret.emplace_back(T{
+                .id = id,
+                .name = name,
+                .description = description,
+                .is_abstract = is_abstract,
+                .unique_name = unique_name,
+            });
+        }
+        SPDLOG_TRACE("Found {} items", ret.size());
+        return {ret};
+    }
+
     std::vector<std::string> get_breadcrumb(pqxx::connection& conn, Id id, std::string_view table) {
         pqxx::work tx(conn);
-
         auto query = std::format(""
                                  "SELECT i.id AS source_id, "
                                  "       i.name AS source_name, "
@@ -44,6 +50,18 @@ namespace {
     }
 } // namespace
 
+template <> tl::expected<std::vector<AccountType>, Error> HierarchyTreeManager<AccountType>::all() {
+    return pool.with_conn<tl::expected<std::vector<AccountType>, Error>>(
+        [](pqxx::connection& conn) -> tl::expected<std::vector<AccountType>, Error> {
+            try {
+                return {get_all<AccountType>(conn, ACCOUNT_TYPE_TABLE)};
+            } catch (const std::exception& e) {
+                SPDLOG_ERROR("Failed to fetch all AccountType: {}", e.what());
+                return tl::unexpected(Error::DBError);
+            }
+        });
+}
+
 template <> tl::expected<std::vector<std::string>, Error> HierarchyTreeManager<AccountType>::breadcrumb(Id id) {
     return pool.with_conn<tl::expected<std::vector<std::string>, Error>>(
         [id](pqxx::connection& conn) -> tl::expected<std::vector<std::string>, Error> {
@@ -51,6 +69,18 @@ template <> tl::expected<std::vector<std::string>, Error> HierarchyTreeManager<A
                 return {get_breadcrumb(conn, id, ACCOUNT_TYPE_TABLE)};
             } catch (const std::exception& e) {
                 SPDLOG_ERROR("Failed to fetch breadcrumb for account type {}: {}", id, e.what());
+                return tl::unexpected(Error::DBError);
+            }
+        });
+}
+
+template <> tl::expected<std::vector<MovementType>, Error> HierarchyTreeManager<MovementType>::all() {
+    return pool.with_conn<tl::expected<std::vector<MovementType>, Error>>(
+        [](pqxx::connection& conn) -> tl::expected<std::vector<MovementType>, Error> {
+            try {
+                return {get_all<MovementType>(conn, MOVEMENTTYPE_TABLE)};
+            } catch (const std::exception& e) {
+                SPDLOG_ERROR("Failed to fetch all MovementType: {}", e.what());
                 return tl::unexpected(Error::DBError);
             }
         });
@@ -67,40 +97,3 @@ template <> tl::expected<std::vector<std::string>, Error> HierarchyTreeManager<M
             }
         });
 }
-
-// tl::expected<std::vector<Movement>, Error> MovementManager::all(Id account_id) {
-//     return pool.with_conn<tl::expected<std::vector<Movement>, Error>>(
-//         [account_id](pqxx::connection& conn) -> tl::expected<std::vector<Movement>, Error> {
-//             try {
-//                 pqxx::work tx(conn);
-//                 SPDLOG_DEBUG("Get all movements for account_id {}", account_id);
-
-//                 auto query =
-//                     std::format("SELECT m.id, m.date_value, m.amount, m.direction, t.id, t.name, tr.id, tr.name"
-//                                 " FROM {} AS m"
-//                                 "   LEFT JOIN {} AS t ON m.type_id = t.id"
-//                                 "   LEFT JOIN {} AS tr ON m.transaction_id = tr.id"
-//                                 " WHERE m.account_id = $1"
-//                                 " ORDER BY m.date_value DESC",
-//                                 MOVEMENT_TABLE, MOVEMENTTYPE_TABLE, TRANSACTION_TABLE);
-//                 SPDLOG_TRACE(query);
-//                 std::vector<Movement> ret;
-//                 for (auto [id, date_value, amount, direction, type_id, type_name, transaction_id, transaction_name] :
-//                      tx.query<Id, utils::libpqxx::Date, Amount, MovementDirection, Id, std::string, Id, std::string>(
-//                          query, pqxx::params{account_id})) {
-//                     ret.emplace_back(Movement{.id = id,
-//                                               .transaction = std::make_pair(transaction_id, transaction_name),
-//                                               .type = std::make_pair(type_id, type_name),
-//                                               .direction = direction,
-//                                               .account_id = account_id,
-//                                               .date_value = date_value,
-//                                               .amount = amount});
-//                 }
-//                 SPDLOG_TRACE("Found {} movements for account {}", ret.size(), account_id);
-//                 return {ret};
-//             } catch (const std::exception& e) {
-//                 SPDLOG_ERROR("Failed to fetch all movements for account {}: {}", account_id, e.what());
-//                 return tl::unexpected(Error::DBError);
-//             }
-//         });
-// }
