@@ -7,6 +7,7 @@ qt_cc_library(
     visibility = ["//apps/finances/qt/widgets/accounts:__subpackages__"],
     deps = [
         "//apps/finances/qt/metatypes",
+        "//apps/finances/qt/models",
         "@rules_qt//:qt_widgets",
     ],
 )

@@ -26,15 +26,17 @@ enum class MovementColumn {
 
 AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool_,
                                                                  const finances::accounts::models::Account& account_,
+                                                                 MovementTypeTableModel* movtype_model_,
                                                                  QWidget* parent)
-    : AccountDetailWidget(pool_, account_, parent) {
+    : AccountDetailWidget(pool_, account_, movtype_model_, parent) {
 
     AccountRelatedModelBase* snapshots_model =
-        new AccountRelatedModel<finances::accounts::models::Snapshot, MovementColumn>(pool, account, this);
+        new AccountRelatedModel<finances::accounts::models::Snapshot, MovementColumn>(pool, account, nullptr, this);
     connect(this, &AccountNonNumerableDetailWidget::snapshot_added, snapshots_model,
             &AccountRelatedModelBase::fetch_all);
     AccountRelatedModelBase* movements_model =
-        new AccountRelatedModel<finances::accounts::models::Movement, MovementColumn>(pool, account, this);
+        new AccountRelatedModel<finances::accounts::models::Movement, MovementColumn>(pool, account, movtype_model,
+                                                                                      this);
 
     // Models
     QConcatenateTablesProxyModel* model = new QConcatenateTablesProxyModel(this);

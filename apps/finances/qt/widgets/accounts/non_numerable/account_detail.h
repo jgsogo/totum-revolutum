@@ -7,7 +7,8 @@ class AccountNonNumerableDetailWidget : public AccountDetailWidget {
     Q_OBJECT
   public:
     explicit AccountNonNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool,
-                                             const finances::accounts::models::Account&, QWidget* parent = nullptr);
+                                             const finances::accounts::models::Account&,
+                                             MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
   public slots:
     void on_new_snapshot(SnapshotNonNumerable);

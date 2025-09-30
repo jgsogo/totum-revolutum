@@ -9,6 +9,8 @@
 
 #include "libraries/finances/accounts/cpp/models/account.h"
 
+#include "movement_type.h"
+
 // enum class SnapshotColumn {
 //     ID = 0,
 //     DATE_VALUE = 1,
@@ -35,8 +37,8 @@ template <typename TModel, typename Column> class AccountRelatedModel : public A
 
   public:
     AccountRelatedModel(utils::libpqxx::ConnectionPool& pool_, const finances::accounts::models::Account& account_,
-                        QObject* parent = nullptr)
-        : AccountRelatedModelBase(parent), pool{pool_}, account{account_} {
+                        MovementTypeTableModel* movtype_model_, QObject* parent = nullptr)
+        : AccountRelatedModelBase(parent), pool{pool_}, account{account_}, movtype_model{movtype_model_} {
         QTimer::singleShot(0, this, &AccountRelatedModelBase::fetch_all);
     };
 
@@ -111,6 +113,7 @@ template <typename TModel, typename Column> class AccountRelatedModel : public A
   private:
     utils::libpqxx::ConnectionPool& pool;
     const finances::accounts::models::Account& account;
+    MovementTypeTableModel* movtype_model;
     std::vector<TModel> items;
 };
 

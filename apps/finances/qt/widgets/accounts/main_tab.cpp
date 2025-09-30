@@ -7,8 +7,9 @@
 
 #include "accounts_table.h"
 
-MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_, QWidget* parent)
-    : QTabWidget(parent), pool{pool_}, model{model_} {
+MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_,
+                             MovementTypeTableModel* movtype_model_, QWidget* parent)
+    : QTabWidget(parent), pool{pool_}, model{model_}, movtype_model{movtype_model_} {
     this->setTabsClosable(true);
 
     // Add the tab with the accounts table
@@ -45,9 +46,9 @@ void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
         // create the widget
         AccountDetailWidget* account_widget = nullptr;
         if (!account.is_numerable) {
-            account_widget = new AccountNonNumerableDetailWidget(pool, account, this);
+            account_widget = new AccountNonNumerableDetailWidget(pool, account, movtype_model, this);
         } else {
-            account_widget = new AccountNumerableDetailWidget(pool, account, this);
+            account_widget = new AccountNumerableDetailWidget(pool, account, movtype_model, this);
         }
         connect(account_widget, &AccountDetailWidget::snapshot_added, [this](auto id) { emit account_changed(id); });
         auto idx = this->addTab(account_widget,
