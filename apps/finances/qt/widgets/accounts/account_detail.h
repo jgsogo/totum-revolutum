@@ -2,7 +2,6 @@
 
 #include <QWidget>
 
-#include "apps/finances/qt/metatypes/snapshot_numerable.h"
 #include "apps/finances/qt/models/movement_type.h"
 #include "libraries/finances/accounts/cpp/models/account.h"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"

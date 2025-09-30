@@ -6,8 +6,6 @@
 
 #include "libraries/finances/accounts/cpp/models/account.h"
 
-#include "apps/finances/qt/metatypes/snapshot_non_numerable.h"
-
 class AddSnapshotNonNumerableWidget : public QDialog {
     Q_OBJECT
 
@@ -15,13 +13,15 @@ class AddSnapshotNonNumerableWidget : public QDialog {
     void add_snapshot_clicked();
 
   signals:
-    void new_snapshot(SnapshotNonNumerable);
+    void new_snapshot(finances::accounts::models::Id account_id);
 
   public:
-    AddSnapshotNonNumerableWidget(const finances::accounts::models::Account& account, QWidget* parent = nullptr,
+    AddSnapshotNonNumerableWidget(utils::libpqxx::ConnectionPool& pool,
+                                  const finances::accounts::models::Account& account, QWidget* parent = nullptr,
                                   Qt::WindowFlags f = Qt::WindowFlags());
 
   protected:
+    utils::libpqxx::ConnectionPool& pool;
     const finances::accounts::models::Account& account;
     QCalendarWidget* calendar;
     QLineEdit* amount;

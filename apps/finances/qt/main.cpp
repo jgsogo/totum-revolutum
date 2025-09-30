@@ -29,6 +29,10 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
     QWidget window;
 
+    // FIXME: Make the pool only available to the models. Every DB operation should
+    //        be performed through these classes. This will require some metatypes
+    //        to send the info throught the QT channels.
+
     // Create the main model with the accounts
     AccountTableModel* model = new AccountTableModel(pool);
     MovementTypeTableModel* movtype_model = new MovementTypeTableModel(pool);
@@ -46,18 +50,7 @@ int main(int argc, char** argv) {
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(tabWidget);
 
-    // QTableView* table = new QTableView();
-    // AccountTableModel* table_model = AccountTableModel::create_with_all(pool);
-    // QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel();
-    // proxyModel->setSourceModel(table_model);
-    // table->setModel(proxyModel);
-    // // proxyModel->sort(3, Qt::AscendingOrder); // Default sort
-    // table->setSortingEnabled(true);
-    // all->addWidget(table, 70);
-
     window.setLayout(layout);
-    // Set up the model and configure the view...
-    // QApplication::translate("finances", "Finances")
     window.setWindowTitle(QString::fromStdString(std::format("Finances v{}", FINANCES_VERSION)));
     QSize screen_size = QGuiApplication::primaryScreen()->availableGeometry().size();
     window.resize(screen_size.width() * 0.5, screen_size.height());

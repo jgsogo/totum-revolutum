@@ -13,7 +13,7 @@ MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_, AccountTable
     this->setTabsClosable(true);
 
     // Add the tab with the accounts table
-    AccountsTableWidget* accounts_table_widget = new AccountsTableWidget(model);
+    AccountsTableWidget* accounts_table_widget = new AccountsTableWidget(pool, model);
     _all_accounts_idx = this->addTab(accounts_table_widget, "All");
     connect(accounts_table_widget, &AccountsTableWidget::accountDoubleClicked, this, &MainTabWidget::addTabAccount);
 

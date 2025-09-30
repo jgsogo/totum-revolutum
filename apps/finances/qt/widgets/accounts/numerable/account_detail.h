@@ -1,6 +1,5 @@
 #pragma once
 
-#include "apps/finances/qt/metatypes/snapshot_numerable.h"
 #include "apps/finances/qt/widgets/accounts/account_detail.h"
 
 class AccountNumerableDetailWidget : public AccountDetailWidget {
@@ -10,7 +9,7 @@ class AccountNumerableDetailWidget : public AccountDetailWidget {
                                           const finances::accounts::models::Account&,
                                           const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
-  public slots:
-    void on_new_snapshot(SnapshotNumerable);
+  private slots:
+    void on_new_snapshot(finances::accounts::models::Id account_id);
     // void on_new_snapshot(SnapshotNumerable);
 };

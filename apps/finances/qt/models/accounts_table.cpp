@@ -65,12 +65,12 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
                                         static_cast<int>(unsigned(snapshot.value().date_value.month())),
                                         static_cast<int>(unsigned(snapshot.value().date_value.day()))};
                 if (date_value.daysTo(QDate::currentDate()) > 21) {
-                    result = QString("❗%1").arg(static_cast<std::string>(snapshot_money));
+                    result = QString("🗓️ %1").arg(static_cast<std::string>(snapshot_money));
                 } else {
                     result = QString::fromStdString(static_cast<std::string>(snapshot_money));
                 }
             } else {
-                result = QString(tr("❗missing"));
+                result = QString(tr("❗"));
             }
         } break;
         case Column::TYPE: {

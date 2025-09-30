@@ -11,14 +11,18 @@
 class AccountsTableWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountsTableWidget(AccountTableModel* model, QWidget* parent = nullptr);
+    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, AccountTableModel* model,
+                                 QWidget* parent = nullptr);
 
   private slots:
     void onDoubleClicked(const QModelIndex& index);
+    void onPressed(const QModelIndex& index);
 
   signals:
     void accountDoubleClicked(finances::accounts::models::Id account_id);
 
   private:
+    utils::libpqxx::ConnectionPool& pool;
+    AccountTableModel* model;
     AccountsTableFilterProxyModel* sort_filter;
 };

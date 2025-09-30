@@ -7,12 +7,16 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QVBoxLayout>
-
 #include <spdlog/spdlog.h>
 
-AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(const finances::accounts::models::Account& account_,
+#include "libraries/finances/investments/cpp/models/snapshot_numerable.h"
+
+#include "apps/finances/qt/metatypes/utils.h"
+
+AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::ConnectionPool& pool_,
+                                                       const finances::accounts::models::Account& account_,
                                                        QWidget* parent, Qt::WindowFlags f)
-    : QDialog(parent, f), account{account_} {
+    : QDialog(parent, f), pool{pool_}, account{account_} {
     // components
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
@@ -39,11 +43,13 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(const finances::accounts:
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     QVBoxLayout* mainLayout = new QVBoxLayout;
+    QString title(tr("%1 - Add snapshot numerable").arg(account.name));
+    mainLayout->addWidget(new QLabel(title));
     mainLayout->addLayout(formLayout);
     mainLayout->addWidget(buttonBox);
 
     this->setLayout(mainLayout);
-    this->setWindowTitle(tr("%1 - Add snapshot numerable").arg(account.name));
+    this->setWindowTitle(title);
 }
 
 void AddSnapshotNumerableWidget::add_snapshot_clicked() {
@@ -59,19 +65,33 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
         return;
     }
 
-    auto date_ = calendar->selectedDate();
-    auto unit_value_ = unit_value->text();
-    auto quantity_ = quantity->text();
-    auto snapshot = SnapshotNumerable::from(std::move(date_), std::move(quantity_), std::move(unit_value_));
-    if (!snapshot) {
-        SPDLOG_WARN("Failed to create snapshot from date={}, quantity={} and unit_value={}: {}",
-                    date_.toString().toStdString(), quantity_.toStdString(), unit_value_.toStdString(),
-                    snapshot.error());
+    auto qt_date = calendar->selectedDate();
+    utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
+                                                   date::month{static_cast<unsigned int>(qt_date.month())},
+                                                   date::day{static_cast<unsigned int>(qt_date.day())}}};
+
+    auto quantity_amount = utils::qstring_to_amount(quantity->text());
+    if (!quantity_amount) {
         // TODO: Communicate error to the user
         return;
     }
 
-    emit new_snapshot(snapshot.value());
+    auto unit_value_amount = utils::qstring_to_amount(unit_value->text());
+    if (!unit_value_amount) {
+        // TODO: Communicate error to the user
+        return;
+    }
+
+    finances::investments::models::SnapshotNumerableManager manager{pool};
+    auto r = manager.create(account.id, std::move(date), std::move(quantity_amount.value()),
+                            std::move(unit_value_amount.value()));
+    if (!r) {
+        SPDLOG_ERROR("Error adding snapshot to account");
+        // TODO: Communicate error to user
+        return;
+    }
+
+    emit new_snapshot(account.id);
 
     this->accept();
 }

@@ -66,14 +66,14 @@ AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::Conne
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // - popup - add snapshot
-    AddSnapshotNumerableWidget* popup_add_snapshot = new AddSnapshotNumerableWidget(account, this);
+    AddSnapshotNumerableWidget* popup_add_snapshot = new AddSnapshotNumerableWidget(pool, account, this);
     popup_add_snapshot->setModal(true);
     popup_add_snapshot->setSizeGripEnabled(true);
     connect(popup_add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, this,
             &AccountNumerableDetailWidget::on_new_snapshot);
 
     QPushButton* bt_add_snapshot = new QPushButton(tr("Add snapshot"), this);
-    connect(bt_add_snapshot, &QPushButton::clicked, popup_add_snapshot, &QDialog::exec);
+    connect(bt_add_snapshot, &QPushButton::clicked, popup_add_snapshot, &QDialog::open);
 
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
@@ -84,26 +84,10 @@ AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::Conne
     this->setLayout(mainLayout);
 }
 
-void AccountNumerableDetailWidget::on_new_snapshot(SnapshotNumerable snapshot) {
-    SPDLOG_DEBUG("AccountNumerableDetailWidget::on_new_snapshot(numerable)");
-
-    auto qt_date = snapshot.date();
-    utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
-                                                   date::month{static_cast<unsigned int>(qt_date.month())},
-                                                   date::day{static_cast<unsigned int>(qt_date.day())}}};
-
-    auto quantity = snapshot.quantity();
-    auto unit_value = snapshot.unit_value();
-
-    finances::investments::models::SnapshotNumerableManager manager{pool};
-    auto r = manager.create(account.id, std::move(date), std::move(quantity), std::move(unit_value));
-    if (!r) {
-        SPDLOG_ERROR("Error adding snapshot to account");
-        // TODO: Communicate error to user
-        return;
-    }
-
-    emit snapshot_added(account.id);
+void AccountNumerableDetailWidget::on_new_snapshot(finances::accounts::models::Id account_id) {
+    SPDLOG_DEBUG("AccountNumerableDetailWidget::on_new_snapshot(account_id={})", account_id);
+    assert(account_id == account.id);
+    emit snapshot_added(account_id);
 }
 
 template <typename TModel> struct DataDispatcher<TModel, MovementNumerableColumn, Qt::FontRole> {

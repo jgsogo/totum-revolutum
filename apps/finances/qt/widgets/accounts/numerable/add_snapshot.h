@@ -6,8 +6,6 @@
 
 #include "libraries/finances/accounts/cpp/models/account.h"
 
-#include "apps/finances/qt/metatypes/snapshot_numerable.h"
-
 class AddSnapshotNumerableWidget : public QDialog {
     Q_OBJECT
 
@@ -15,13 +13,14 @@ class AddSnapshotNumerableWidget : public QDialog {
     void add_snapshot_clicked();
 
   signals:
-    void new_snapshot(SnapshotNumerable);
+    void new_snapshot(finances::accounts::models::Id account_id);
 
   public:
-    AddSnapshotNumerableWidget(const finances::accounts::models::Account& account, QWidget* parent = nullptr,
-                               Qt::WindowFlags f = Qt::WindowFlags());
+    AddSnapshotNumerableWidget(utils::libpqxx::ConnectionPool& pool, const finances::accounts::models::Account& account,
+                               QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
   protected:
+    utils::libpqxx::ConnectionPool& pool;
     const finances::accounts::models::Account& account;
     QCalendarWidget* calendar;
     QLineEdit* quantity;

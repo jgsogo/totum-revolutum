@@ -2,10 +2,9 @@ load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
 
 qt_cc_library(
     name = "metatypes",
-    srcs = glob(["**/*.cpp"]) + ["utils.h"],
+    srcs = glob(["**/*.cpp"]),
     hdrs = glob(
         ["**/*.h"],
-        exclude = ["utils.h"],
     ),
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [

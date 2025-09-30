@@ -2,16 +2,23 @@
 
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QGuiApplication>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
 #include <QTableView>
 #include <QTimer>
 #include <QVBoxLayout>
+
 #include <magic_enum/magic_enum.hpp>
 #include <spdlog/spdlog.h>
 
-AccountsTableWidget::AccountsTableWidget(AccountTableModel* model, QWidget* parent) : QWidget(parent) {
+#include "apps/finances/qt/widgets/accounts/non_numerable/add_snapshot.h"
+#include "apps/finances/qt/widgets/accounts/numerable/add_snapshot.h"
+
+AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_,
+                                         QWidget* parent)
+    : QWidget(parent), pool{pool_}, model{model_} {
 
     // Initial values for the filters
     Qt::CheckState showClosedAccounts = Qt::Unchecked;
@@ -34,6 +41,7 @@ AccountsTableWidget::AccountsTableWidget(AccountTableModel* model, QWidget* pare
     table_view->verticalHeader()->hide();
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     connect(table_view, &QTableView::doubleClicked, this, &AccountsTableWidget::onDoubleClicked);
+    connect(table_view, &QTableView::pressed, this, &AccountsTableWidget::onPressed);
 
     // Filters
     // - filter by term
@@ -77,4 +85,44 @@ void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {
     finances::accounts::models::Id account_id{account_id_variant.toULongLong()};
 
     emit accountDoubleClicked(account_id);
+}
+
+void AccountsTableWidget::onPressed(const QModelIndex& index) {
+    SPDLOG_TRACE("AccountsTableWidget::onPressed(index.row={}, index.column={})", index.row(), index.column());
+
+    // Only if the user clicks the snapshot column
+    AccountTableModel::Column column = magic_enum::enum_value<AccountTableModel::Column>(index.column());
+    if (column != AccountTableModel::Column::SNAPSHOT) {
+        return;
+    }
+
+    auto buttons = QGuiApplication::mouseButtons();
+    if (buttons == Qt::RightButton) {
+        // Get the account id from the filter/sort view
+        QVariant account_id_variant =
+            sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountTableModel::Column::ID)));
+        SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
+        finances::accounts::models::Id account_id{account_id_variant.toULongLong()};
+
+        // Get the account itself
+        const auto& account = model->get_account(account_id);
+
+        // Show the AddSnapshot dialog
+        // FIXME: Merge AddSnapshotNumerableWidget and AddSnapshotNonNumerableWidget into a single one AddSnapshot
+        // widget.
+        if (account.is_numerable) {
+            AddSnapshotNumerableWidget* add_snapshot = new AddSnapshotNumerableWidget(pool, account, this);
+            add_snapshot->setModal(true);
+            add_snapshot->setSizeGripEnabled(true);
+            add_snapshot->open();
+            connect(add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, model, &AccountTableModel::fetch_snapshot);
+        } else {
+            AddSnapshotNonNumerableWidget* add_snapshot = new AddSnapshotNonNumerableWidget(pool, account, this);
+            add_snapshot->setModal(true);
+            add_snapshot->setSizeGripEnabled(true);
+            add_snapshot->open();
+            connect(add_snapshot, &AddSnapshotNonNumerableWidget::new_snapshot, model,
+                    &AccountTableModel::fetch_snapshot);
+        }
+    }
 }
