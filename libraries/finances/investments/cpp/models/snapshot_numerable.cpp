@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 
 #include "constants.h"
+#include "types/numerable_amount.h"
 
 using namespace finances::investments::models;
 using namespace finances::accounts::models;
@@ -48,6 +49,32 @@ tl::expected<void, finances::accounts::models::Error>
 SnapshotNumerableManager::create(finances::accounts::models::Id account_id, utils::libpqxx::Date&& date_value,
                                  finances::accounts::models::Amount&& quantity,
                                  finances::accounts::models::Amount&& unit_value) {
-    SPDLOG_ERROR("Not implemented");
-    return tl::unexpected{finances::accounts::models::Error::NotImplemented};
+    return pool.with_conn<tl::expected<void, Error>>(
+        [account_id, &date_value, &quantity, &unit_value](pqxx::connection& conn) -> tl::expected<void, Error> {
+            try {
+                pqxx::work tx(conn);
+                SPDLOG_DEBUG("Insert a new snapshot numerable for account_id {}", account_id);
+
+                NumerableAmount numerable_amount{.quantity = quantity, .unit_value = unit_value};
+
+                auto query = std::format(""
+                                         "WITH new_snapshot AS ("
+                                         "   INSERT INTO {} (account_id, date_value, amount)"
+                                         "   VALUES ($1, $2, $3)"
+                                         "   RETURNING id"
+                                         ") "
+                                         "INSERT INTO {} (snapshot_ptr_id, quantity, unit_value)"
+                                         "   SELECT id, $4, $5"
+                                         "   FROM new_snapshot;",
+                                         SNAPSHOT_TABLE, SNAPSHOT_NUMERABLE_TABLE);
+                SPDLOG_TRACE(query);
+                tx.exec(query, pqxx::params{account_id, date_value, numerable_amount.amount(), quantity, unit_value})
+                    .no_rows();
+                tx.commit();
+                return {};
+            } catch (const std::exception& e) {
+                SPDLOG_ERROR("Failed to insert a numerable snapshots for account {}: {}", account_id, e.what());
+                return tl::unexpected(Error::DBError);
+            }
+        });
 }
