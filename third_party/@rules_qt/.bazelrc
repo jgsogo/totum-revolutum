@@ -1,0 +1,6 @@
+###################
+# CI Specific flags
+###################
+
+build:ci --verbose_failures --show_progress_rate_limit=10
+test:ci --verbose_failures --test_output=all --keep_going
