@@ -118,7 +118,7 @@ tauri-plugin-shell = "2.2.1"
 tauri-plugin-log = "2.4.0"
 tempfile = { version = "3.17.1" }
 testing_logger = "0.1.1"
-thiserror = "2.0.12"
+thiserror = "2.0.17"
 time = { version = "0.3.37" }
 tokio = { version = "1.43" }
 tokio-stream = "0.1.17"

@@ -45,7 +45,7 @@ tauri-plugin-log = "2.4.0"
 tauri-plugin-shell = "2.2.1"
 serde = { version = "1.0.217", features = ["derive"] }
 serde_json = "1.0.138"
-thiserror = "2.0.11"
+thiserror = "2.0.17"
 log = "0.4.25"
 itertools = "0.14.0"
 
