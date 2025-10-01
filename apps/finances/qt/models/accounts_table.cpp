@@ -8,6 +8,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include "libraries/finances/accounts/cpp/models/types/money.h"
+#include "libraries/utils/cpp/enumerate.hpp"
 
 AccountTableModel::AccountTableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent)
     : QAbstractTableModel(parent), pool{pool} {
@@ -90,6 +91,18 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
                                static_cast<int>(unsigned(account.close->day()))}
                              .toString("yyyy-MM-dd");
             }
+            break;
+        case Column::HOLDERS: {
+            const auto& account_holders = holders.at(row);
+
+            // TODO: Implement this implode-transform as a util
+            const char* const delim = ", ";
+            std::ostringstream imploded;
+            std::transform(account_holders.begin(), account_holders.end(),
+                           std::ostream_iterator<std::string>(imploded, delim),
+                           [](const auto& acc_holder) { return acc_holder.first.name; });
+            result = QString::fromStdString(imploded.str());
+        } break;
         }
     } break;
     case Qt::FontRole:
@@ -107,21 +120,12 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
             }
         }
     } break;
-    //
-    // case Qt::ForegroundRole:
-    //     if (1 == column) {
-    //         result = QColor(Qt::red);
-    //     }
-    //     break;
-    // //
-    // case Qt::BackgroundRole:
-    //     if (1 == column) {
-    //         result = QColor(255, 255, 40);
-    //     }
-    //     break;
-    // //
     case Qt::TextAlignmentRole:
-        result = Qt::AlignRight;
+        if ((column == Column::CUSTODIAN) || (column == Column::NAME) || (column == Column::TYPE)) {
+            result = Qt::AlignLeft;
+        } else {
+            result = Qt::AlignRight;
+        }
         break;
     default:
         break;
@@ -191,14 +195,24 @@ void AccountTableModel::fetch_all() {
     // Create empty snapshots vector
     std::vector<std::optional<finances::accounts::models::Snapshot>> all_snapshots(all_accounts->size(), std::nullopt);
 
+    // Create empty account_holders vector
+    std::vector<std::vector<
+        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
+        initial_holders(
+            all_accounts->size(),
+            std::vector<
+                std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>{});
+
     this->beginResetModel();
     this->accounts = std::move(all_accounts.value());
     this->snapshots = std::move(all_snapshots);
+    this->holders = std::move(initial_holders);
     this->_account_type_breadcrumb = std::move(account_type_breadcrumb);
     this->endResetModel();
 
     // We have updated all the accounts, so let's fetch all the snapshots together.
     QTimer::singleShot(0, this, SLOT(fetch_snapshots()));
+    QTimer::singleShot(0, this, SLOT(fetch_account_holders()));
 }
 
 void AccountTableModel::fetch_snapshots() {
@@ -222,6 +236,31 @@ void AccountTableModel::fetch_snapshots() {
     QVector<int> roles = {Qt::DisplayRole};
     QModelIndex topLeft = this->createIndex(0, magic_enum::enum_integer(Column::SNAPSHOT));
     QModelIndex bottomRight = this->createIndex(rowCount(), magic_enum::enum_integer(Column::SNAPSHOT));
+    emit dataChanged(topLeft, bottomRight, roles);
+}
+
+void AccountTableModel::fetch_account_holders() {
+    SPDLOG_DEBUG("AccountTableModel::fetch_account_holders");
+    finances::accounts::models::AccountHolderManager manager{pool};
+
+    std::vector<std::vector<
+        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
+        account_holders;
+    account_holders.resize(accounts.size());
+    for (const auto& [i, account] : utils::enumerate(accounts)) {
+        auto holders_expected = manager.all(account.id);
+        if (!holders_expected) {
+            SPDLOG_WARN("Error retrieving AccountHolders for account {}", account.id);
+            continue;
+        }
+        account_holders[i] = std::move(holders_expected.value());
+    }
+
+    this->holders = std::move(account_holders);
+
+    QVector<int> roles = {Qt::DisplayRole};
+    QModelIndex topLeft = this->createIndex(0, magic_enum::enum_integer(Column::HOLDERS));
+    QModelIndex bottomRight = this->createIndex(rowCount(), magic_enum::enum_integer(Column::HOLDERS));
     emit dataChanged(topLeft, bottomRight, roles);
 }
 

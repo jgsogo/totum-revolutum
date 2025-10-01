@@ -3,6 +3,7 @@
 #include <QAbstractTableModel>
 
 #include "libraries/finances/accounts/cpp/models/account.h"
+#include "libraries/finances/accounts/cpp/models/account_holder.h"
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 
 class AccountTableModel : public QAbstractTableModel {
@@ -13,10 +14,11 @@ class AccountTableModel : public QAbstractTableModel {
         CUSTODIAN = 1,
         NAME = 2,
         IDENTIFIER = 3,
-        SNAPSHOT = 4,
-        TYPE = 5,
+        TYPE = 4,
+        SNAPSHOT = 5,
         OPEN = 6,
         CLOSE = 7,
+        HOLDERS = 8,
     };
 
   public:
@@ -32,6 +34,7 @@ class AccountTableModel : public QAbstractTableModel {
   private slots:
     void fetch_all();
     void fetch_snapshots();
+    void fetch_account_holders();
 
   public slots:
     void fetch_snapshot(finances::accounts::models::Id account_id);
@@ -40,6 +43,9 @@ class AccountTableModel : public QAbstractTableModel {
     utils::libpqxx::ConnectionPool& pool;
     std::vector<finances::accounts::models::Account> accounts;
     std::vector<std::optional<finances::accounts::models::Snapshot>> snapshots;
+    std::vector<std::vector<
+        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
+        holders;
 
     std::map<finances::accounts::models::Id, QString> _account_type_breadcrumb;
 };

@@ -17,6 +17,8 @@ namespace finances::accounts::models {
     static constexpr std::string_view MOVEMENT_TABLE = "finances_accounts_movement";
     static constexpr std::string_view MOVEMENTTYPE_TABLE = "finances_accounts_movementtype";
     static constexpr std::string_view TRANSACTION_TABLE = "finances_accounts_transaction";
+    static constexpr std::string_view ACCOUNT_HOLDER_TABLE = "finances_accounts_accountholder";
+    static constexpr std::string_view ACCOUNT_HOLDER_ROLE_TABLE = "finances_accounts_accountholderrole";
 
     template <typename TModel> class ModelManager {
       public:

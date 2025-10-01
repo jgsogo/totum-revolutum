@@ -28,3 +28,9 @@ cc_library(
         "//bazel/logging:spdlog",
     ],
 )
+
+cc_library(
+    name = "enumerate",
+    hdrs = ["enumerate.hpp"],
+    visibility = ["//visibility:public"],
+)

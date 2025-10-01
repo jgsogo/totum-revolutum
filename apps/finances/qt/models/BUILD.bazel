@@ -7,6 +7,7 @@ qt_cc_library(
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
         "//libraries/finances/accounts/cpp/models",
+        "//libraries/utils/cpp:enumerate",
         "@magic_enum",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_gui",
