@@ -42,11 +42,22 @@ expand_template(
     template = "//apps/finances/tauri/src-tauri:.env.tpl",
 )
 
+expand_template(
+    name = "env-finances-app-qt-file",
+    out = "envfile-finances-app-qt",
+    substitutions = SUBSTITUTIONS,
+    tags = [
+        "manual",
+    ],
+    template = "//apps/finances/qt:.env.tpl",
+)
+
 pkg_files(
     name = "data-files",
     srcs = [
         ":env-file",
         ":env-finances-app-file",
+        ":env-finances-app-qt-file",
         ":nginx_conf-file",
         ":supervisor_ini-file",
     ],

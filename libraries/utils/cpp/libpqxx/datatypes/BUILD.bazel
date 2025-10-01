@@ -1,0 +1,23 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "date",
+    hdrs = ["date.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bazel/logging:spdlog",
+        "@date",
+        "@libpqxx",
+    ],
+)
+
+cc_library(
+    name = "numeric",
+    hdrs = ["numeric.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bazel/logging:spdlog",
+        "@decimal_for_cpp",
+        "@libpqxx",
+    ],
+)

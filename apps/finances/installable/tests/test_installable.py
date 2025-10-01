@@ -77,3 +77,4 @@ def test_postinstall(postinstall):
     assert "Execute Django command 'migrate'" in postinstall
     assert "Change owner of '$ROOT_FOLDER'" in postinstall
     assert "Change owner of '$MACOS_APPLICATION_FOLDER'" in postinstall
+    assert "Change owner of '$MACOS_APPLICATION_QT_FOLDER'" in postinstall

@@ -24,8 +24,8 @@ cc_library(
         "//apps/board_games/games:__subpackages__",
     ],
     deps = [
+        "//bazel/logging:spdlog",
         "@libpqxx",  # FIXME: Move libpqxx stuff to a different library
-        "@spdlog",
         "@tl-expected",
     ],
 )

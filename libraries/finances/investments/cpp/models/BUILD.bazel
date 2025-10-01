@@ -1,0 +1,22 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "models",
+    srcs = [
+        "constants.h",
+        "movement_dividend.cpp",
+        "movement_numerable.cpp",
+        "snapshot_numerable.cpp",
+        "types/numerable_amount.cpp",
+    ],
+    hdrs = [
+        "movement_dividend.h",
+        "movement_numerable.h",
+        "snapshot_numerable.h",
+        "types/numerable_amount.h",
+    ],
+    visibility = ["//apps/finances/qt:__subpackages__"],
+    deps = [
+        "//libraries/finances/accounts/cpp/models",
+    ],
+)

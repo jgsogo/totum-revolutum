@@ -1,13 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
+#include "libraries/utils/cpp/catch2/unique_db_connection_pool.hpp"
 
 #include "apps/board_games/engine/data/constants.hpp"
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/room.h"
 #include "apps/board_games/games/tic_tac_toe/engine/tic_tac_toe.h"
 
-using namespace utils::db::testing;
+using namespace utils::libpqxx::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test DB interactions") {
     data::RoomUUID room_uuid{uuids::to_string(uuids::uuid_system_generator{}())};

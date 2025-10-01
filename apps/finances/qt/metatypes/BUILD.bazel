@@ -1,0 +1,16 @@
+load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
+
+qt_cc_library(
+    name = "metatypes",
+    srcs = glob(["**/*.cpp"]),
+    hdrs = glob(
+        ["**/*.h"],
+    ),
+    visibility = ["//apps/finances/qt:__subpackages__"],
+    deps = [
+        "//bazel/logging:spdlog",
+        "//libraries/finances/accounts/cpp/models",
+        "@rules_qt//:qt_core",
+        "@tl-expected",
+    ],
+)

@@ -1,7 +1,9 @@
+#include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QScreen>
+#include <QSortFilterProxyModel>
 #include <QTableView>
 #include <QThread>
 #include <QVBoxLayout>
@@ -10,40 +12,63 @@
 #include <QtWidgets/QStylePainter>
 #include <spdlog/spdlog.h>
 
-#include "libraries/utils/cpp/db/connection_pool.h"
+#include "libraries/finances/accounts/cpp/models/account_holder.h"
+#include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
+#include "apps/finances/qt/db/notificator.h"
 #include "apps/finances/qt/models/accounts_table.h"
+#include "apps/finances/qt/models/movement_type.h"
 #include "apps/finances/qt/version.hpp"
-#include "apps/finances/qt/widgets/sidebar.h"
+#include "apps/finances/qt/widgets/accounts/main_tab.h"
 
 int main(int argc, char** argv) {
-    spdlog::set_level(spdlog::level::debug); // TODO: Configurable via CLI and/or envvar
-    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%8l%$][engine] %v (%@)");
+    spdlog::set_level(spdlog::level::trace); // TODO: Configurable via CLI and/or envvar
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%8l%$] %v (%@)");
 
-    auto pool = utils::db::ConnectionPool::from_env("FINANCES_QT_", 4);
+    auto pool = utils::libpqxx::ConnectionPool::from_env("FINANCES_QT_", 4);
 
     QApplication app(argc, argv);
     QWidget window;
 
-    QHBoxLayout* all = new QHBoxLayout();
-    // QVBoxLayout* left_pane = new QVBoxLayout();
-    // QVBoxLayout* main_pane = new QVBoxLayout();
+    // FIXME: Make the pool only available to the models. Every DB operation should
+    //        be performed through these classes. This will require some metatypes
+    //        to send the info throught the QT channels.
 
-    // all->addLayout(left_pane, 20);
-    // all->addLayout(main_pane);
+    // Get who I am
+    std::optional<finances::accounts::models::AccountHolder> me = std::nullopt;
+    {
+        const char* initial_holder_pk = std::getenv("FINANCES_QT_INITIAL_HOLDER_PK");
+        if (initial_holder_pk != nullptr) {
+            finances::accounts::models::Id me_id{std::stoull(initial_holder_pk)};
+            finances::accounts::models::AccountHolderManager manager{pool};
+            auto me_expected = manager.get(me_id);
+            if (!me_expected) {
+                SPDLOG_ERROR("Cannot retrieve AccountHolder for pk={}", me_id);
+                return 1;
+            }
+            me = std::move(me_expected.value());
+            SPDLOG_INFO("AccountHolder for ME: pk={}, name={}", me->id, me->name);
+        }
+    }
 
-    // left_pane->addWidget(createSidebar());
-    // QIcon undoicon = QIcon::fromTheme(QIcon::ThemeIcon::EditUndo);
-    all->addWidget(new SideBar(), 30);
+    // Create the main model with the accounts
+    AccountTableModel* model = new AccountTableModel(pool);
+    MovementTypeTableModel* movtype_model = new MovementTypeTableModel(pool);
 
-    QTableView* table = new QTableView();
-    AccountTableModel* table_model = AccountTableModel::create_with_all(pool);
-    table->setModel(table_model);
-    all->addWidget(table, 70);
+    // Run a notificator that will monitor notifications from the database
+    auto conn = pool.acquire();
+    std::chrono::milliseconds ms{1000};
+    Notificator notificator{std::move(*conn), ms};
+    QObject::connect(&notificator, &Notificator::account_changed, model, &AccountTableModel::fetch_snapshot);
 
-    window.setLayout(all);
-    // Set up the model and configure the view...
-    // QApplication::translate("finances", "Finances")
+    // Create the tabs for the accounts
+    MainTabWidget* tabWidget = new MainTabWidget(pool, me, model, movtype_model);
+    QObject::connect(tabWidget, &MainTabWidget::account_changed, &notificator, &Notificator::notify_account);
+
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(tabWidget);
+
+    window.setLayout(layout);
     window.setWindowTitle(QString::fromStdString(std::format("Finances v{}", FINANCES_VERSION)));
     QSize screen_size = QGuiApplication::primaryScreen()->availableGeometry().size();
     window.resize(screen_size.width() * 0.5, screen_size.height());

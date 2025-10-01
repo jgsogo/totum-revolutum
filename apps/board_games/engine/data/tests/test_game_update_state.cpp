@@ -1,11 +1,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <google/protobuf/empty.pb.h>
 
-#include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
+#include "libraries/utils/cpp/catch2/unique_db_connection_pool.hpp"
 
 #include "apps/board_games/engine/data/game.h"
 
-using namespace utils::db::testing;
+using namespace utils::libpqxx::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game: update state") {
 

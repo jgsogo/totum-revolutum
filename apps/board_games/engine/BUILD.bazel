@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
-        "@spdlog",
+        "//bazel/logging:spdlog",
         "@tl-expected",
     ],
 )
@@ -21,16 +21,13 @@ cc_library(
 cc_binary(
     name = "engine",
     srcs = ["main.cpp"],
-    defines = [
-        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
-    ],
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
         ":plugin",
         "//apps/board_games/engine/services",
         "//apps/board_games/games/tic_tac_toe/engine",
-        "//libraries/utils/cpp/db",
-        "@spdlog",
+        "//bazel/logging:spdlog",
+        "//libraries/utils/cpp/libpqxx:connection_pool",
     ],
 )
 

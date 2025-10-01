@@ -12,17 +12,15 @@ cc_library(
         "game.h",
         "room.h",
     ],
-    defines = [
-        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
-    ],
     visibility = [
         "//apps/board_games/engine:__subpackages__",
         "//apps/board_games/games:__subpackages__",
     ],
     deps = [
         "//apps/board_games/engine/data/models",
-        "//libraries/utils/cpp/db",
-        "@spdlog",
+        "//bazel/logging:spdlog",
+        "//libraries/utils/cpp/libpqxx:connection_pool",
+        "//libraries/utils/cpp/libpqxx:notify",
         "@tl-expected",
     ],
 )

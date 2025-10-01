@@ -2,13 +2,13 @@
 #include <google/protobuf/empty.pb.h>
 #include <spdlog/spdlog.h>
 
-#include "libraries/cpp/spdlog/utils.hpp"
-#include "libraries/utils/cpp/db/catch2/unique_db_connection_pool.hpp"
+#include "libraries/utils/cpp/catch2/unique_db_connection_pool.hpp"
+#include "libraries/utils/cpp/spdlog/with_level.h"
 
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/room.h"
 
-using namespace utils::db::testing;
+using namespace utils::libpqxx::testing;
 
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test room associated methods") {
 
@@ -35,7 +35,7 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test room associated metho
     SECTION("it fails to insert a duplicated room") {
         pool.with_conn<void>([](pqxx::connection& conn) {
             data::RoomUUID uuid{"11111111-1111-1111-1111-111111111111"};
-            spdlog::utils::with_level<void>(spdlog::level::off, [&conn, &uuid]() {
+            utils::spdlog::with_level<void>(spdlog::level::off, [&conn, &uuid]() {
                 auto r = data::insert_new_room(conn, uuid, "room_name");
                 REQUIRE(!r.has_value());
             });

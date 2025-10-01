@@ -1,6 +1,10 @@
 load("@rules_qt//qt:qt_cc_binary.bzl", "qt_cc_binary")
 load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run")
 
+exports_files([
+    ".env.tpl",
+])
+
 genrule(
     name = "version",
     srcs = ["//apps/finances:version"],
@@ -22,13 +26,14 @@ qt_cc_binary(
         "main.cpp",
         ":version",
     ],
+    visibility = ["//apps/finances:__pkg__"],
     deps = [
+        "//apps/finances/qt/db",
         "//apps/finances/qt/models",
-        "//apps/finances/qt/widgets",
-        "//libraries/utils/cpp/db",
+        "//apps/finances/qt/widgets/accounts:widgets",
+        "//bazel/logging:spdlog",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_widgets",
-        "@spdlog",
     ],
 )
 
@@ -43,6 +48,7 @@ with_postgres_run(
     ],
     env = {
         "DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
+        "FINANCES_QT_INITIAL_HOLDER_PK": "1",  # The AccountHolder for the test data
     },
     env_transpose = {
         # Envvars for the 'django' component

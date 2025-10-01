@@ -1,0 +1,14 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "with_level",
+    hdrs = [
+        "with_level.h",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//bazel/logging:spdlog",
+    ],
+)

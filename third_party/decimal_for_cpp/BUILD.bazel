@@ -1,0 +1,5 @@
+exports_files(
+    [
+        "decimal_for_cpp.BUILD",
+    ],
+)
