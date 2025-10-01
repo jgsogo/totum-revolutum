@@ -36,16 +36,19 @@ int main(int argc, char** argv) {
 
     // Get who I am
     std::optional<finances::accounts::models::AccountHolder> me = std::nullopt;
-    finances::accounts::models::Id me_id{1}; // FIXME: This should be an input somehow
-    if (true) {
-        finances::accounts::models::AccountHolderManager manager{pool};
-        auto me_expected = manager.get(me_id);
-        if (!me_expected) {
-            SPDLOG_ERROR("Cannot retrieve AccountHolder for pk={}", me_id);
-            return 1;
+    {
+        const char* initial_holder_pk = std::getenv("FINANCES_QT_INITIAL_HOLDER_PK");
+        if (initial_holder_pk != nullptr) {
+            finances::accounts::models::Id me_id{std::stoull(initial_holder_pk)};
+            finances::accounts::models::AccountHolderManager manager{pool};
+            auto me_expected = manager.get(me_id);
+            if (!me_expected) {
+                SPDLOG_ERROR("Cannot retrieve AccountHolder for pk={}", me_id);
+                return 1;
+            }
+            me = std::move(me_expected.value());
+            SPDLOG_INFO("AccountHolder for ME: pk={}, name={}", me->id, me->name);
         }
-        me = std::move(me_expected.value());
-        SPDLOG_INFO("AccountHolder for ME: pk={}, name={}", me->id, me->name);
     }
 
     // Create the main model with the accounts

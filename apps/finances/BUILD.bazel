@@ -85,3 +85,10 @@ sh_with_runfiles_binary(
     tool = "//apps/finances/tauri/src-tauri:app",
     visibility = ["//apps/finances/installable:__subpackages__"],
 )
+
+sh_with_runfiles_binary(
+    name = "finances-qt-app",
+    tags = ["no-remote-cache"],
+    tool = "//apps/finances/qt",
+    visibility = ["//apps/finances/installable:__subpackages__"],
+)
