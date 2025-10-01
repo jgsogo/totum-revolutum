@@ -305,3 +305,14 @@ AccountTableModel::get_account(finances::accounts::models::Id account_id) const 
 
     return *found;
 }
+
+const finances::accounts::models::Account& AccountTableModel::get_account(int row) const {
+    SPDLOG_TRACE("AccountTableModel::get_account(row={})", row);
+    return accounts.at(row);
+}
+
+const std::vector<std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>&
+AccountTableModel::get_holders(int row) const {
+    SPDLOG_TRACE("AccountTableModel::get_holders(row={})", row);
+    return holders.at(row);
+}

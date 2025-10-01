@@ -31,6 +31,11 @@ class AccountTableModel : public QAbstractTableModel {
 
     const finances::accounts::models::Account& get_account(finances::accounts::models::Id account_id) const;
 
+    const finances::accounts::models::Account& get_account(int row) const;
+    const std::vector<
+        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>&
+    get_holders(int row) const;
+
   private slots:
     void fetch_all();
     void fetch_snapshots();

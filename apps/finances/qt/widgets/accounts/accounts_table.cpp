@@ -17,15 +17,15 @@
 #include "apps/finances/qt/widgets/accounts/numerable/add_snapshot.h"
 
 AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_,
-                                         QWidget* parent)
+                                         std::optional<finances::accounts::models::AccountHolder> me, QWidget* parent)
     : QWidget(parent), pool{pool_}, model{model_} {
 
     // Initial values for the filters
     Qt::CheckState showClosedAccounts = Qt::Unchecked;
-    Qt::CheckState showOthersAccounts = Qt::Unchecked;
+    Qt::CheckState showOthersAccounts = me ? Qt::Unchecked : Qt::Checked;
 
     // Components
-    sort_filter = new AccountsTableFilterProxyModel(showClosedAccounts, showOthersAccounts, this);
+    sort_filter = new AccountsTableFilterProxyModel(me, model, showClosedAccounts, showOthersAccounts, this);
     sort_filter->setSourceModel(model);
     sort_filter->setSortCaseSensitivity(Qt::CaseInsensitive);
     sort_filter->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -54,10 +54,6 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_, 
     QCheckBox* showClosed = new QCheckBox(tr("Show closed"));
     showClosed->setCheckState(showClosedAccounts);
     connect(showClosed, &QCheckBox::checkStateChanged, sort_filter, &AccountsTableFilterProxyModel::showClosedAccounts);
-    // - filter mine/other's accounts
-    QCheckBox* showOthers = new QCheckBox(tr("Show others"));
-    showOthers->setCheckState(showOthersAccounts);
-    connect(showOthers, &QCheckBox::checkStateChanged, sort_filter, &AccountsTableFilterProxyModel::showOthersAccounts);
 
     // Layout
     // - line with all the filters
@@ -65,7 +61,15 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_, 
     filtersLine->addWidget(filterLabel);
     filtersLine->addWidget(lineEdit);
     filtersLine->addWidget(showClosed);
-    filtersLine->addWidget(showOthers);
+    if (me) {
+        // - filter mine/other's accounts
+        QCheckBox* showOthers = new QCheckBox(tr("Show others"));
+        showOthers->setCheckState(showOthersAccounts);
+        connect(showOthers, &QCheckBox::checkStateChanged, sort_filter,
+                &AccountsTableFilterProxyModel::showOthersAccounts);
+
+        filtersLine->addWidget(showOthers);
+    }
 
     // - VBox for filters and table
     QVBoxLayout* mainLayout = new QVBoxLayout();

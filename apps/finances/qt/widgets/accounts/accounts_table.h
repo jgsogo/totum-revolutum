@@ -12,6 +12,7 @@ class AccountsTableWidget : public QWidget {
     Q_OBJECT
   public:
     explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, AccountTableModel* model,
+                                 std::optional<finances::accounts::models::AccountHolder> me,
                                  QWidget* parent = nullptr);
 
   private slots:

@@ -10,7 +10,6 @@ tl::expected<std::vector<std::pair<AccountHolder, AccountHolderRole>>, Error> Ac
                 pqxx::work tx(conn);
                 SPDLOG_DEBUG("Get all account holders for account {}", account_id);
 
-                // std::vector<Account> ret;
                 auto query = std::format(""
                                          "SELECT ah.id, ah.name, ah.is_company, ah.photo, ahr.owns_money"
                                          "   FROM {} AS ah"
@@ -32,6 +31,30 @@ tl::expected<std::vector<std::pair<AccountHolder, AccountHolderRole>>, Error> Ac
 
             } catch (const std::exception& e) {
                 SPDLOG_ERROR("Failed to fetch account holders for account {}: {}", account_id, e.what());
+                return tl::unexpected(Error::DBError);
+            }
+        });
+}
+
+template <> tl::expected<AccountHolder, Error> ModelManager<AccountHolder>::get(Id id) {
+    return pool.with_conn<tl::expected<AccountHolder, Error>>(
+        [id](pqxx::connection& conn) -> tl::expected<AccountHolder, Error> {
+            try {
+                pqxx::work tx(conn);
+                SPDLOG_DEBUG("Get all account holder for pk {}", id);
+
+                auto query = std::format(""
+                                         "SELECT ah.id, ah.name, ah.is_company, ah.photo"
+                                         "   FROM {} AS ah"
+                                         "   WHERE ah.id = $1;",
+                                         ACCOUNT_HOLDER_TABLE);
+                SPDLOG_TRACE(query);
+
+                auto r = tx.exec(query, pqxx::params{id}).one_row();
+                auto [id, name, is_company, photo] = r.as<Id, std::string, bool, std::optional<std::string>>();
+                return {AccountHolder({.id = id, .name = name, .is_company = is_company, .photo = photo})};
+            } catch (const std::exception& e) {
+                SPDLOG_ERROR("Failed to fetch account holder pk={}: {}", id, e.what());
                 return tl::unexpected(Error::DBError);
             }
         });

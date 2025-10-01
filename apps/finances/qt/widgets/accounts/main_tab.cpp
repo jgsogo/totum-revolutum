@@ -7,13 +7,14 @@
 
 #include "accounts_table.h"
 
-MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_,
+MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_,
+                             std::optional<finances::accounts::models::AccountHolder> me, AccountTableModel* model_,
                              const MovementTypeTableModel* movtype_model_, QWidget* parent)
     : QTabWidget(parent), pool{pool_}, model{model_}, movtype_model{movtype_model_} {
     this->setTabsClosable(true);
 
     // Add the tab with the accounts table
-    AccountsTableWidget* accounts_table_widget = new AccountsTableWidget(pool, model);
+    AccountsTableWidget* accounts_table_widget = new AccountsTableWidget(pool, model, me);
     _all_accounts_idx = this->addTab(accounts_table_widget, "All");
     connect(accounts_table_widget, &AccountsTableWidget::accountDoubleClicked, this, &MainTabWidget::addTabAccount);
 

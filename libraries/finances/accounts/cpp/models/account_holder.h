@@ -26,4 +26,6 @@ namespace finances::accounts::models {
       public:
         tl::expected<std::vector<std::pair<AccountHolder, AccountHolderRole>>, Error> all(Id account_id);
     };
+
+    template <> tl::expected<AccountHolder, Error> ModelManager<AccountHolder>::get(Id id);
 } // namespace finances::accounts::models
