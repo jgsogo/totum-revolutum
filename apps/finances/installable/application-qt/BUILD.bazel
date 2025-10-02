@@ -1,6 +1,6 @@
 load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("//apps/finances/installable:defs.bzl", "BIN_FOLDER", "MACOS_APPLICATION_QT_CONTENTS", "MACOS_APPLICATION_QT_CONTENTS_MACOS", "NAME_QT")
+load("//apps/finances/installable:defs.bzl", "BIN_FOLDER", "MACOS_APPLICATION_QT_CONTENTS", "MACOS_APPLICATION_QT_CONTENTS_MACOS", "NAME")
 
 # The application itself
 pkg_tar(
@@ -31,7 +31,7 @@ genrule(
     cmd = """
         echo "#!/usr/bin/env bash" > $@
         echo "/usr/local/{}/bin/finances-qt" >> $@
-    """.format(NAME_QT),
+    """.format(NAME),
     executable = True,
 )
 
