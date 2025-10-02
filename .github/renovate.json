@@ -1,13 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    ":dependencyDashboard",
-    ":semanticPrefixFixDepsChoreOthers",
-    "group:allNonMajor",
-    "group:monorepos",
-    "group:recommended",
-    "replacements:all",
-    "workarounds:all",
-    "schedule:monthly"
-  ]
+    ":preserveSemverRanges",
+    "group:all",
+    "schedule:monthly",
+    ":maintainLockFilesMonthly"
+  ],
+  "lockFileMaintenance": {
+    "commitMessageAction": "Update",
+    "extends": [
+      "group:all"
+    ]
+  },
+  "rebaseWhen": "automerging",
+  "separateMajorMinor": false
 }
