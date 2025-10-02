@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pqxx/pqxx>
+#include <string_view>
 
 namespace utils::libpqxx {
 
