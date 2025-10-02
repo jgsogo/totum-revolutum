@@ -1,17 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    ":preserveSemverRanges",
-    "group:all",
-    "schedule:monthly",
-    ":maintainLockFilesMonthly"
+    "config:recommended",
+    "config:semverAllMonthly"
   ],
-  "lockFileMaintenance": {
-    "commitMessageAction": "Update",
-    "extends": [
-      "group:all"
-    ]
-  },
-  "rebaseWhen": "automerging",
-  "separateMajorMinor": false
+  "rebaseWhen": "automerging"
 }
