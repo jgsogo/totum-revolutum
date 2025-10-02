@@ -225,6 +225,7 @@ jobs:
       - head_commit_message
       - check-runner
       - compute-base-hashes
+      - run-third-party-tests
     if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     services:
@@ -308,6 +309,7 @@ jobs:
     needs:
       - head_commit_message
       - check-runner
+      - run-third-party-tests
     if: ${{ contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     services:
