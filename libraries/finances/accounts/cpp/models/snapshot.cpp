@@ -72,10 +72,10 @@ SnapshotManager::get_last_snapshots(const std::vector<decltype(Account::id)>& ac
                 for (auto [id, account_id, date_value, amount] :
                      tx.query<Id, Id, utils::libpqxx::Date, Amount>(query, values)) {
                     SPDLOG_TRACE("Found snapshot for account {}: date {}, amount = {}", account_id, date_value, amount);
-                    const auto it_inserted = snapshots.emplace(std::make_pair(
+                    [[maybe_unused]] const auto [it, inserted] = snapshots.emplace(std::make_pair(
                         account_id,
                         Snapshot{.id = id, .account_id = account_id, .date_value = date_value, .amount = amount}));
-                    assert(it_inserted.second);
+                    assert(inserted);
                 }
 
                 // Now we need to build the return vector with the same size as the input vector
