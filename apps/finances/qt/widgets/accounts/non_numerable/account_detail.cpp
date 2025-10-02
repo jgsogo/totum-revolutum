@@ -79,7 +79,7 @@ AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx:
 void AccountNonNumerableDetailWidget::on_new_snapshot(finances::accounts::models::Id account_id) {
     SPDLOG_DEBUG("AccountNonNumerableDetailWidget::on_new_snapshot(account_id={})", account_id);
     assert(account_id == account.id);
-    emit snapshot_added(account.id);
+    emit snapshot_added(account_id);
 }
 
 template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::FontRole> {
