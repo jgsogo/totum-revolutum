@@ -54,7 +54,7 @@ build --per_file_copt=external/.*@-w,-Wno-all
 build --host_per_file_copt=external/.*@-w,-Wno-all
 
 build:macos --linkopt=-framework --linkopt=CoreFoundation --host_linkopt=-framework --host_linkopt=CoreFoundation
-build:macos --host_macos_minimum_os=15.0
+build:macos --host_macos_minimum_os=15.0 --macos_minimum_os=15.0
 
 ###################
 # Typescript
