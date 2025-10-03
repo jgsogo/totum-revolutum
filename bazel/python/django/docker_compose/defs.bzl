@@ -25,6 +25,6 @@ def docker_compose(name, app_repository, app_image_tag_stamped, **kwargs):
             "%ENV_FILE%": ".env.prod",
             "%ENV_DB_FILE%": ".env.prod.db",
         },
-        template = "//bazel/python/django/docker_compose:docker-compose.yaml.tpl",
+        template = "//bazel/python/django/docker_compose:docker-compose.tpl.yaml",
         **kwargs
     )
