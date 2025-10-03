@@ -6,32 +6,32 @@ services:
     environment:
       # Docs: See interpolation and env-files: https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/#env-file
       # Django
-      - DEBUG=${DEBUG:-true}
-      - SECRET_KEY=${SECRET_KEY}  # Django fails if this is empty, so the user really needs to set it from somewhere else
-      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 0.0.0.0 [::1]  # TODO: Sure I can remove some of them
+      DEBUG: ${DEBUG:-true}
+      SECRET_KEY: ${SECRET_KEY}  # Django fails if this is empty, so the user really needs to set it from somewhere else
+      DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 0.0.0.0 [::1]  # TODO: Sure I can remove some of them
       # Database
-      - DJANGO_SQL_ENGINE=django.db.backends.postgresql
-      - DJANGO_SQL_DATABASE=${SQL_DATABASE:-hello_django_dev}
-      - DJANGO_SQL_USER=${SQL_USER:-hello_django}
-      - DJANGO_SQL_PASSWORD=${SQL_PASSWORD:-hello_django}
-      - DJANGO_SQL_HOST=db
-      - DJANGO_SQL_PORT=5432
+      DJANGO_SQL_ENGINE: django.db.backends.postgresql
+      DJANGO_SQL_DATABASE: ${SQL_DATABASE:-hello_django_dev}
+      DJANGO_SQL_USER: ${SQL_USER:-hello_django}
+      DJANGO_SQL_PASSWORD: ${SQL_PASSWORD:-hello_django}
+      DJANGO_SQL_HOST: db
+      DJANGO_SQL_PORT: 5432
       # Django static and media files
-      - STATIC_ROOT=/home/%USER%/web/staticfiles/
-      - MEDIA_ROOT=/home/%USER%/web/mediafiles/
-      # Django create superuser
-      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
-      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
-      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      STATIC_ROOT: /home/%USER%/web/staticfiles/
+      MEDIA_ROOT: /home/%USER%/web/mediafiles/
+      # Django create superuser (only if provided)
+      DJANGO_SUPERUSER_PASSWORD:
+      DJANGO_SUPERUSER_USERNAME:
+      DJANGO_SUPERUSER_EMAIL:
       # gunicorn
-      - GUNICORN_APP_NAME=${GUNICORN_APP_NAME:-django_app}
-      - GUNICORN_RUN_FOLDER=${GUNICORN_RUN_FOLDER:-/home/%USER%/web/run}
-      - GUNICORN_LOGS_FOLDER=${GUNICORN_LOGS_FOLDER:-/home/%USER%/web/logs}
-      - GUNICORN_USER=%USER%
-      - GUNICORN_GROUP=%GROUP%
-      - GUNICORN_BIND=0.0.0.0:%DJANGO_PORT%
+      GUNICORN_APP_NAME: ${GUNICORN_APP_NAME:-django_app}
+      GUNICORN_RUN_FOLDER: ${GUNICORN_RUN_FOLDER:-/home/%USER%/web/run}
+      GUNICORN_LOGS_FOLDER: ${GUNICORN_LOGS_FOLDER:-/home/%USER%/web/logs}
+      GUNICORN_USER: %USER%
+      GUNICORN_GROUP: %GROUP%
+      GUNICORN_BIND: 0.0.0.0:%DJANGO_PORT%
       # Django - if provided it will copy the contents from this database into the dev one.
-      - PRODUCTION_DATABASE_URL=${PRODUCTION_DATABASE_URL}
+      PRODUCTION_DATABASE_URL:
     depends_on:
       - db
     volumes:

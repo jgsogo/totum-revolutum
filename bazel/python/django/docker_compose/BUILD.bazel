@@ -1,4 +1,4 @@
 exports_files([
-    "docker-compose.yaml.tpl",
+    "docker-compose.tpl.yaml",
     "with_docker_compose_run.tpl.sh",
 ])
