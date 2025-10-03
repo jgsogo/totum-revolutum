@@ -71,7 +71,7 @@ rust_library(
         "@crates__glib-sys-0.18.1//:glib_sys",
         "@crates__gobject-sys-0.18.0//:gobject_sys",
         "@crates__javascriptcore-rs-sys-1.1.1//:build_script_build",
-        "@crates__libc-0.2.175//:libc",
+        "@crates__libc-0.2.176//:libc",
     ],
 )
 

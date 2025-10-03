@@ -172,6 +172,7 @@ jobs:
           path: ${{ runner.temp }}/impacted-targets.txt
 
   # Run third-party tests (different Bazel workspaces)
+  # TODO: Get some info from the bazel-diff job to know if these 3rdparty modules have been modified or not (and which ones)
   run-third-party-tests:
     needs:
       - check-runner
