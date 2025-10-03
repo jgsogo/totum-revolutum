@@ -3,7 +3,7 @@ FROM python:3.13-bookworm
 LABEL org.opencontainers.image.source=https://github.com/jgsogo/totum-revolutum
 
 RUN apt-get update
-RUN apt-get install -y netcat-openbsd
+RUN apt-get install -y netcat-openbsd libpq-dev
 
 # Install postgresql 17 (not yet available in Debian repos)
 RUN apt-get install -y lsb-release && \
