@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "3.1.3",
     deps = [
-        "@crates__anstyle-1.0.11//:anstyle",
+        "@crates__anstyle-1.0.13//:anstyle",
         "@crates__predicates-core-1.0.9//:predicates_core",
     ],
 )

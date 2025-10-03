@@ -77,7 +77,7 @@ rust_library(
     }),
     version = "2.8.5",
     deps = [
-        "@crates__anyhow-1.0.99//:anyhow",
+        "@crates__anyhow-1.0.100//:anyhow",
         "@crates__cookie-0.18.1//:cookie",
         "@crates__dirs-6.0.0//:dirs",
         "@crates__dunce-1.0.5//:dunce",
@@ -89,14 +89,14 @@ rust_library(
         "@crates__mime-0.3.17//:mime",
         "@crates__percent-encoding-2.3.2//:percent_encoding",
         "@crates__raw-window-handle-0.6.2//:raw_window_handle",
-        "@crates__serde-1.0.219//:serde",
-        "@crates__serde_json-1.0.143//:serde_json",
+        "@crates__serde-1.0.228//:serde",
+        "@crates__serde_json-1.0.145//:serde_json",
         "@crates__serialize-to-javascript-0.1.2//:serialize_to_javascript",
         "@crates__tauri-2.8.5//:build_script_build",
         "@crates__tauri-runtime-2.8.0//:tauri_runtime",
         "@crates__tauri-runtime-wry-2.8.1//:tauri_runtime_wry",
         "@crates__tauri-utils-2.7.0//:tauri_utils",
-        "@crates__thiserror-2.0.16//:thiserror",
+        "@crates__thiserror-2.0.17//:thiserror",
         "@crates__tokio-1.47.1//:tokio",
         "@crates__url-2.5.7//:url",
         "@crates__urlpattern-0.3.0//:urlpattern",
@@ -108,7 +108,7 @@ rust_library(
             "@crates__objc2-app-kit-0.3.1//:objc2_app_kit",  # cfg(target_os = "macos")
             "@crates__objc2-foundation-0.3.1//:objc2_foundation",  # cfg(target_os = "macos")
             "@crates__objc2-web-kit-0.3.1//:objc2_web_kit",  # cfg(target_os = "macos")
-            "@crates__plist-1.7.4//:plist",  # cfg(target_os = "macos")
+            "@crates__plist-1.8.0//:plist",  # cfg(target_os = "macos")
             "@crates__window-vibrancy-0.6.0//:window_vibrancy",  # cfg(target_os = "macos")
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [

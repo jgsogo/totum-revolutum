@@ -64,13 +64,13 @@ rust_library(
         "@crates__log-0.4.28//:log",
         "@crates__open-5.3.2//:open",
         "@crates__os_pipe-1.2.2//:os_pipe",
-        "@crates__regex-1.11.2//:regex",
-        "@crates__serde-1.0.219//:serde",
-        "@crates__serde_json-1.0.143//:serde_json",
+        "@crates__regex-1.11.3//:regex",
+        "@crates__serde-1.0.228//:serde",
+        "@crates__serde_json-1.0.145//:serde_json",
         "@crates__shared_child-1.1.1//:shared_child",
         "@crates__tauri-2.8.5//:tauri",
         "@crates__tauri-plugin-shell-2.3.1//:build_script_build",
-        "@crates__thiserror-2.0.16//:thiserror",
+        "@crates__thiserror-2.0.17//:thiserror",
         "@crates__tokio-1.47.1//:tokio",
     ],
 )
@@ -131,7 +131,7 @@ cargo_build_script(
     visibility = ["//visibility:private"],
     deps = [
         "@crates__schemars-0.8.22//:schemars",
-        "@crates__serde-1.0.219//:serde",
+        "@crates__serde-1.0.228//:serde",
         "@crates__tauri-plugin-2.4.0//:tauri_plugin",
     ],
 )

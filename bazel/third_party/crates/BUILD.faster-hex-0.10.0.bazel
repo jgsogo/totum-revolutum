@@ -62,7 +62,7 @@ rust_library(
     }),
     version = "0.10.0",
     deps = [
-        "@crates__serde-1.0.219//:serde",
+        "@crates__serde-1.0.228//:serde",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
             "@crates__heapless-0.8.0//:heapless",  # cfg(not(feature = "alloc"))

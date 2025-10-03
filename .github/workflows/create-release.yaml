@@ -13,13 +13,14 @@ on:
         - syncronia
         - board_games
 
+env:
+  BAZEL_CONFIG: "--config=ci"
+  BAZEL_REMOTE_CACHE_URL: "grpc://bazel-remote:9092"
+  BAZEL_DISK_CACHE_PATH: "~/.cache/bazel-disk-cache"
+
 jobs:
   release:
     runs-on: "self-hosted"  # Run only locally
-    env:
-      BAZEL_CONFIG: "--config=ci --config=stamp --config=release --config=macos"
-      BAZEL_REMOTE_CACHE_URL: "grpc://bazel-remote:9092"
-      BAZEL_DISK_CACHE_PATH: "~/.cache/bazel-disk-cache"
     steps:
       - uses: actions/checkout@v5
 
