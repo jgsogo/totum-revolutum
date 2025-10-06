@@ -6,6 +6,7 @@ load("//bazel/scripts/envfile:envfile_load.bzl", "envfile_load")
 load("//bazel/scripts/envsubst:apply_envsubst.bzl", "apply_envsubst")
 load("//bazel/scripts/filesystem:untar_files.bzl", "untar_files")
 load("//bazel/scripts/hosts:append_hosts.bzl", "append_hosts")
+load("//bazel/scripts/macos/codesign:codesign_ad_hoc.bzl", "codesign_ad_hoc")
 load("//bazel/tools/pkgbuild:scripts.bzl", "postinstall")
 
 apply_envsubst(
@@ -91,6 +92,11 @@ chown_folder(
     folder = "$MACOS_APPLICATION_QT_FOLDER",
 )
 
+codesign_ad_hoc(
+    name = "codesign-macos-app-qt",
+    target_directory = "/usr/local/{}/bin".format(NAME),
+)
+
 postinstall(
     name = "postinstall",
     chunks = [
@@ -103,6 +109,9 @@ postinstall(
         "//bazel/scripts/postgres:pg_create_database.sh",
         ":django-migrate",
         ":django-collectstatic",
+
+        # Macos
+        ":codesign-macos-app-qt",
 
         # TODO: Add django-createsuperuser (use GUI app to collect data)
 
