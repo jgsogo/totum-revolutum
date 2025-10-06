@@ -92,9 +92,10 @@ chown_folder(
     folder = "$MACOS_APPLICATION_QT_FOLDER",
 )
 
+# FIXME: Apply codesign to a certain app, maybe this script should act as a wrapper for the app
 codesign_ad_hoc(
     name = "codesign-macos-app-qt",
-    target_directory = "/usr/local/{}/bin".format(NAME),
+    target_directory = "/usr/local/{}/bin/finances-qt-app.runfiles/rules_qt++qt+qt_mac_clang_64".format(NAME),
 )
 
 postinstall(
