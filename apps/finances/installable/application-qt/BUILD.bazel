@@ -30,8 +30,10 @@ genrule(
     outs = ["finances-app-executable"],
     cmd = """
         echo "#!/usr/bin/env bash" > $@
-        echo "/usr/local/{}/bin/finances-qt" >> $@
-    """.format(NAME),
+        echo "pushd /usr/local/{name}/bin/finances-qt-app.runfiles/_main" >> $@
+        echo "/usr/local/{name}/bin/finances-qt-app" >> $@
+        echo "popd" >> $@
+    """.format(name = NAME),
     executable = True,
 )
 
