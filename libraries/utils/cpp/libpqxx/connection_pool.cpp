@@ -5,26 +5,58 @@
 
 using namespace utils::libpqxx;
 
+namespace {
+    [[nodiscard]]
+    std::string connection_string(std::string_view sql_database, std::string_view sql_user,
+                                  std::string_view sql_password, std::string_view sql_host, std::string_view sql_port) {
+        const std::string connection_str = std::format("dbname={} user={} password={} host={} port={}", sql_database,
+                                                       sql_user, sql_password, sql_host, sql_port);
+        return connection_str;
+    }
+} // namespace
+
 ConnectionPool::ConnectionPool(const std::string& conninfo, std::size_t pool_size) {
     for (std::size_t i = 0; i < pool_size; ++i) {
         pool.emplace(std::make_shared<pqxx::connection>(conninfo));
     }
 }
 
-ConnectionPool ConnectionPool::from_env(std::string_view prefix, std::size_t pool_size) {
-    const char* sql_database = std::getenv(std::format("{}SQL_DATABASE", prefix).c_str());
-    const char* sql_user = std::getenv(std::format("{}SQL_USER", prefix).c_str());
-    const char* sql_password = std::getenv(std::format("{}SQL_PASSWORD", prefix).c_str());
-    const char* sql_host = std::getenv(std::format("{}SQL_HOST", prefix).c_str());
-    const char* sql_port = std::getenv(std::format("{}SQL_PORT", prefix).c_str());
-    return ConnectionPool::from(sql_database, sql_user, sql_password, sql_host, sql_port, pool_size);
+tl::expected<ConnectionPool, std::string> ConnectionPool::from_env(std::string_view prefix, std::size_t pool_size) {
+    // FIXME: Return some kind of error, not just a std::string
+    auto sql_database = std::getenv(std::format("{}SQL_DATABASE", prefix).c_str());
+    if (sql_database == nullptr) {
+        return tl::unexpected{std::format("Envvar '{}SQL_DATABASE' not found", prefix)};
+    }
+
+    auto sql_user = std::getenv(std::format("{}SQL_USER", prefix).c_str());
+    if (sql_user == nullptr) {
+        return tl::unexpected{std::format("Envvar '{}SQL_USER' not found", prefix)};
+    }
+
+    auto sql_password = std::getenv(std::format("{}SQL_PASSWORD", prefix).c_str());
+    if (sql_password == nullptr) {
+        return tl::unexpected{std::format("Envvar '{}SQL_PASSWORD' not found", prefix)};
+    }
+
+    auto sql_host = std::getenv(std::format("{}SQL_HOST", prefix).c_str());
+    if (sql_host == nullptr) {
+        return tl::unexpected{std::format("Envvar '{}SQL_HOST' not found", prefix)};
+    }
+
+    auto sql_port = std::getenv(std::format("{}SQL_PORT", prefix).c_str());
+    if (sql_port == nullptr) {
+        return tl::unexpected{std::format("Envvar '{}SQL_PORT' not found", prefix)};
+    }
+
+    const std::string connstr = connection_string(sql_database, sql_user, sql_password, sql_host, sql_port);
+    SPDLOG_DEBUG("Connection string: {}", connstr);
+    return tl::expected<ConnectionPool, std::string>{tl::in_place, connstr, pool_size};
 }
 
 ConnectionPool ConnectionPool::from(std::string_view sql_database, std::string_view sql_user,
                                     std::string_view sql_password, std::string_view sql_host, std::string_view sql_port,
                                     std::size_t pool_size) {
-    const std::string connection_str = std::format("dbname={} user={} password={} host={} port={}", sql_database,
-                                                   sql_user, sql_password, sql_host, sql_port);
+    const std::string connection_str = connection_string(sql_database, sql_user, sql_password, sql_host, sql_port);
     SPDLOG_DEBUG("Connection string: {}", connection_str);
     return ConnectionPool{connection_str, pool_size};
 }
