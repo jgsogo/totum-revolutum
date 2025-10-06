@@ -18,6 +18,8 @@ cmake(
         "SKIP_BUILD_TEST": "on",
         "CMAKE_C_COMPILER_WORKS": "1",
         "CMAKE_CXX_COMPILER_WORKS": "1",
+        # TODO: Take this from .bazelrc. Apply only to macos
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "15.0",
     },
     # These envs taken from # TODO: https://github.com/bazel-contrib/toolchains_llvm/issues/396
     env = {
