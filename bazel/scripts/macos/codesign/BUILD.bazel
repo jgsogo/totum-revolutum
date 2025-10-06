@@ -1,0 +1,1 @@
+exports_files(["codesign_ad_hoc.tpl.sh"])
