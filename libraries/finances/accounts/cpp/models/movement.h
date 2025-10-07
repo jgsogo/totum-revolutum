@@ -38,6 +38,13 @@ namespace finances::accounts::models {
 
 } // namespace finances::accounts::models
 
+// Required for spdlog
+template <> struct fmt::formatter<finances::accounts::models::MovementDirection> : fmt::formatter<std::string> {
+    auto format(finances::accounts::models::MovementDirection p, format_context& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(), "{}", magic_enum::enum_name(p));
+    }
+};
+
 // // Custom datatype for libpqxx: https://libpqxx.readthedocs.io/stable/datatypes.html#autotoc_md10,
 // // most of the implementation taken from https://gist.github.com/tomlankhorst/5c41127a3f4fe3e6b1b4cb114ec7e3be
 namespace pqxx {
@@ -71,32 +78,3 @@ namespace pqxx {
     };
 
 } // namespace pqxx
-
-/*
-
-
-class Direction(models.IntegerChoices):
-    IN = 0, _("IN")
-    OUT = 1, _("OUT")
-
-
-class Movement(AmountMixin):
-
-    account = models.ForeignKey(Account, on_delete=models.PROTECT)
-    date_value = models.DateField(
-        help_text=_("Date when the movement is annotated in the associated account")
-    )
-
-    fx = models.ForeignKey(
-        Fx,
-        blank=True,
-        null=True,
-        on_delete=models.PROTECT,
-        help_text=_(
-            "This is the FX used for this movement (it doesn't need to be exactly the same"
-            " as the official one for this 'date_value', as FX varies along the day)"
-        ),
-    )
-
-
-*/

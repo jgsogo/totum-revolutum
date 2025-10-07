@@ -1,8 +1,11 @@
 #pragma once
 
 #include <QDialog>
+#include <QVBoxLayout>
 
 #include "libraries/finances/accounts/cpp/models/movement.h"
+
+// class AddMovementWidget;
 
 class AddTransactionWidget : public QDialog {
     Q_OBJECT
@@ -28,4 +31,10 @@ class AddTransactionWidget : public QDialog {
 
   protected:
     utils::libpqxx::ConnectionPool& pool;
+
+    QVBoxLayout* movs_in_layout;
+    QVBoxLayout* movs_out_layout;
+
+    // std::vector<AddMovementWidget*> movs_in;
+    // std::vector<AddMovementWidget*> movs_out;
 };

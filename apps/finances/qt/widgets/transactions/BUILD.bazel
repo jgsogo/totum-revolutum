@@ -4,9 +4,17 @@ qt_cc_library(
     name = "transactions",
     srcs = [
         "add_transaction.cpp",
+        "movements/add_movement.cpp",
+        "movements/add_movement_dividend.cpp",
+        "movements/add_movement_non_numerable.cpp",
+        "movements/add_movement_numerable.cpp",
     ],
     hdrs = [
         "add_transaction.h",
+        "movements/add_movement.h",
+        "movements/add_movement_dividend.h",
+        "movements/add_movement_non_numerable.h",
+        "movements/add_movement_numerable.h",
     ],
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
