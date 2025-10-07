@@ -8,7 +8,4 @@ class AccountNonNumerableDetailWidget : public AccountDetailWidget {
     explicit AccountNonNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool,
                                              const finances::accounts::models::Account&,
                                              const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
-
-  private slots:
-    void on_new_snapshot(finances::accounts::models::Id account_id);
 };

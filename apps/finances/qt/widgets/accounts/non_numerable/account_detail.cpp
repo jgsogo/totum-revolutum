@@ -8,10 +8,12 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
-#include "apps/finances/qt/models/account_related.h"
 #include "libraries/finances/accounts/cpp/models/movement.h"
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 #include "libraries/finances/accounts/cpp/models/types/money.h"
+
+#include "apps/finances/qt/models/account_related.h"
+#include "apps/finances/qt/widgets/transactions/add_transaction.h"
 
 #include "add_snapshot.h"
 
@@ -67,19 +69,24 @@ AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx:
     QPushButton* bt_add_snapshot = new QPushButton(tr("Add snapshot"), this);
     connect(bt_add_snapshot, &QPushButton::clicked, popup_add_snapshot, &QDialog::open);
 
+    // - popup - add transaction
+    AddTransactionWidget* popup_add_transaction = new AddTransactionWidget(pool, this);
+    popup_add_transaction->setModal(true);
+    popup_add_transaction->setSizeGripEnabled(true);
+    // connect(popup_add_transaction, &AddSnapshotNumerableWidget::new_snapshot, this,
+    //         &AccountNumerableDetailWidget::on_new_snapshot);
+
+    QPushButton* bt_add_transaction = new QPushButton(tr("Add transaction"), this);
+    connect(bt_add_transaction, &QPushButton::clicked, popup_add_transaction, &QDialog::open);
+
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->addWidget(name);
     mainLayout->addWidget(bt_add_snapshot);
+    mainLayout->addWidget(bt_add_transaction);
     mainLayout->addWidget(table_view);
 
     this->setLayout(mainLayout);
-}
-
-void AccountNonNumerableDetailWidget::on_new_snapshot(finances::accounts::models::Id account_id) {
-    SPDLOG_DEBUG("AccountNonNumerableDetailWidget::on_new_snapshot(account_id={})", account_id);
-    assert(account_id == account.id);
-    emit snapshot_added(account_id);
 }
 
 template <typename TModel> struct DataDispatcher<TModel, MovementColumn, Qt::FontRole> {

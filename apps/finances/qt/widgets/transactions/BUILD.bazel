@@ -1,0 +1,17 @@
+load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
+
+qt_cc_library(
+    name = "transactions",
+    srcs = [
+        "add_transaction.cpp",
+    ],
+    hdrs = [
+        "add_transaction.h",
+    ],
+    visibility = ["//apps/finances/qt:__subpackages__"],
+    deps = [
+        "//apps/finances/qt/models",
+        "//bazel/logging:spdlog",
+        "@rules_qt//:qt_widgets",
+    ],
+)
