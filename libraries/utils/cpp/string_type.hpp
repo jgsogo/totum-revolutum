@@ -1,5 +1,6 @@
 #pragma once
 
+#include <spdlog/spdlog.h>
 #include <string>
 
 namespace utils {
@@ -11,7 +12,10 @@ namespace utils {
         constexpr operator std::string_view() const { return value; }
 
         auto operator<=>(const StringType<T>&) const = default;
-        bool operator!=(const StringType<T>& other) const { return value != other.value; };
+        // FIXME: Why these operators are not created by the spaceship one above?
+        bool operator==(const StringType<T>& other) const = default;
+        bool operator!=(const StringType<T>& other) const = default;
+
         bool operator==(const std::string& other) const { return value == other; };
 
         template <typename TT> friend std::ostream& operator<<(std::ostream&, const StringType<TT>&);

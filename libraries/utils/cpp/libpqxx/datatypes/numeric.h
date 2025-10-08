@@ -19,6 +19,8 @@ namespace utils::libpqxx {
 
         static const std::size_t max_digits = MaxDigits;
 
+        auto operator<=>(const Numeric<MaxDigits, DecimalPlaces>&) const = default;
+
         operator std::string() const { return dec::toString(value, ENGLISH_DECIMAL_FORMAT); }
         InnerType value;
     };

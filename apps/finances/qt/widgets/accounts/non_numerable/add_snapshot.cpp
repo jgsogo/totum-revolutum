@@ -60,7 +60,7 @@ void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {
                                                    date::month{static_cast<unsigned int>(qt_date.month())},
                                                    date::day{static_cast<unsigned int>(qt_date.day())}}};
 
-    auto amount_amount = utils::qstring_to_amount(amount->text());
+    auto amount_amount = utils::qstring_to_amount(amount->text(), account.ccy);
     if (!amount_amount) {
         // TODO: Communicate error to the user
         return;

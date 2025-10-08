@@ -18,6 +18,9 @@ cc_library(
     name = "string_type",
     hdrs = ["string_type.hpp"],
     visibility = ["//visibility:public"],
+    deps = [
+        "//bazel/logging:spdlog",
+    ],
 )
 
 cc_library(

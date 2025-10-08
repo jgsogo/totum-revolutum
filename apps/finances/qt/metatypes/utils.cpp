@@ -2,7 +2,10 @@
 
 namespace utils {
 
-    tl::expected<finances::accounts::models::Amount, std::string> qstring_to_amount(QString&& input) {
+    tl::expected<finances::accounts::models::Amount, std::string>
+    qstring_to_amount(const QString& input, finances::accounts::models::Ccy ccy) {
+        // TODO: Different Ccy might have different parse formats
+
         static const dec::decimal_format SPANISH_DECIMAL_FORMAT{','}; // FIXME: Get this from Qt locale
         finances::accounts::models::Amount::InnerType output;
 

@@ -1,0 +1,25 @@
+load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
+
+qt_cc_library(
+    name = "amounts",
+    srcs = [
+        "movement_dividend_form.cpp",
+        "movement_non_numerable_form.cpp",
+        "movement_numerable_form.cpp",
+        "movement_stacked_form.cpp",
+    ],
+    hdrs = [
+        "movement_dividend_form.h",
+        "movement_non_numerable_form.h",
+        "movement_numerable_form.h",
+        "movement_stacked_form.h",
+    ],
+    visibility = ["//apps/finances/qt:__subpackages__"],
+    deps = [
+        "//apps/finances/qt/metatypes",
+        "//bazel/logging:spdlog",
+        "//libraries/finances/accounts/cpp/models",
+        "//libraries/finances/investments/cpp/models",
+        "@rules_qt//:qt_widgets",
+    ],
+)

@@ -16,6 +16,7 @@
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
 #include "apps/finances/qt/db/notificator.h"
+#include "apps/finances/qt/metatypes/money.h"
 #include "apps/finances/qt/models/accounts_table.h"
 #include "apps/finances/qt/models/movement_type.h"
 #include "apps/finances/qt/version.hpp"
