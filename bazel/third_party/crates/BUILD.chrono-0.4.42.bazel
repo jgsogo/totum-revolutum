@@ -71,8 +71,8 @@ rust_library(
     }),
     version = "0.4.42",
     deps = [
-        "@crates__iana-time-zone-0.1.63//:iana_time_zone",
+        "@crates__iana-time-zone-0.1.64//:iana_time_zone",
         "@crates__num-traits-0.2.19//:num_traits",
-        "@crates__serde-1.0.219//:serde",
+        "@crates__serde-1.0.228//:serde",
     ],
 )

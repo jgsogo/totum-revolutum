@@ -17,7 +17,7 @@ sleep "${RETRY_INTERVAL}"
 done
 
 # If provided, it will copy the production database
-if [ -n "$PRODUCTION_DATABASE_URL" ]; then
+if [ -n "${PRODUCTION_DATABASE_URL-}" ]; then
     echo "Copying content from production database (only if empty)"
     DEV_DATABASE="postgres://$DJANGO_SQL_USER:$DJANGO_SQL_PASSWORD@$DJANGO_SQL_HOST:$DJANGO_SQL_PORT/$DJANGO_SQL_DATABASE"
 
@@ -41,7 +41,7 @@ fi
 
 /apps/finances/django/app-admin collectstatic --no-input --clear
 
-if [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
+if [ -n "${DJANGO_SUPERUSER_PASSWORD-}" ]; then
     # If the username is already taken, this command will fail, but the script will continue
     echo "Creating superuser '$DJANGO_SUPERUSER_USERNAME'"
     /apps/finances/django/app-admin createsuperuser --noinput

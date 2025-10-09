@@ -19,7 +19,7 @@ namespace utils::libpqxx::testing {
             std::ignore = pool.drain();
 
             // Remove the cloned DB. I need to use a connection to a different database
-            utils::libpqxx::ConnectionPool::from_env(PREFIX, 1).template with_conn<void>(
+            utils::libpqxx::ConnectionPool::from_env(PREFIX, 1).value().template with_conn<void>(
                 [&cloned_dbname](pqxx::connection& conn) { // FIXME: Use a single connection instead of a pool
                     pqxx::nontransaction tx{conn};
                     tx.exec(std::format("DROP DATABASE {}", cloned_dbname));
@@ -34,7 +34,7 @@ namespace utils::libpqxx::testing {
             // Clone the original DB and return the new prefix
             auto original_db =
                 utils::libpqxx::ConnectionPool::from_env(PREFIX, 1); // FIXME: Use a single connection instead of a pool
-            std::string new_db = original_db.template with_conn<std::string>([](pqxx::connection& conn) {
+            std::string new_db = original_db.value().template with_conn<std::string>([](pqxx::connection& conn) {
                 // Use UUID so there are no collisions even across multiple processes, this way it would
                 // be possible to use the same PostgreSQL instance for all the tests in the repo.
                 std::string id = uuids::to_string(uuids::uuid_system_generator{}());

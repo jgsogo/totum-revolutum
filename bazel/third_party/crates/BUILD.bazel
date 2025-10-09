@@ -31,14 +31,14 @@ filegroup(
 
 # Workspace Member Dependencies
 alias(
-    name = "anyhow-1.0.99",
-    actual = "@crates__anyhow-1.0.99//:anyhow",
+    name = "anyhow-1.0.100",
+    actual = "@crates__anyhow-1.0.100//:anyhow",
     tags = ["manual"],
 )
 
 alias(
     name = "anyhow",
-    actual = "@crates__anyhow-1.0.99//:anyhow",
+    actual = "@crates__anyhow-1.0.100//:anyhow",
     tags = ["manual"],
 )
 
@@ -103,14 +103,14 @@ alias(
 )
 
 alias(
-    name = "camino-1.1.12",
-    actual = "@crates__camino-1.1.12//:camino",
+    name = "camino-1.2.1",
+    actual = "@crates__camino-1.2.1//:camino",
     tags = ["manual"],
 )
 
 alias(
     name = "camino",
-    actual = "@crates__camino-1.1.12//:camino",
+    actual = "@crates__camino-1.2.1//:camino",
     tags = ["manual"],
 )
 
@@ -151,14 +151,14 @@ alias(
 )
 
 alias(
-    name = "clap-4.5.47",
-    actual = "@crates__clap-4.5.47//:clap",
+    name = "clap-4.5.48",
+    actual = "@crates__clap-4.5.48//:clap",
     tags = ["manual"],
 )
 
 alias(
     name = "clap",
-    actual = "@crates__clap-4.5.47//:clap",
+    actual = "@crates__clap-4.5.48//:clap",
     tags = ["manual"],
 )
 
@@ -175,14 +175,14 @@ alias(
 )
 
 alias(
-    name = "clap_complete-4.5.57",
-    actual = "@crates__clap_complete-4.5.57//:clap_complete",
+    name = "clap_complete-4.5.58",
+    actual = "@crates__clap_complete-4.5.58//:clap_complete",
     tags = ["manual"],
 )
 
 alias(
     name = "clap_complete",
-    actual = "@crates__clap_complete-4.5.57//:clap_complete",
+    actual = "@crates__clap_complete-4.5.58//:clap_complete",
     tags = ["manual"],
 )
 
@@ -223,14 +223,14 @@ alias(
 )
 
 alias(
-    name = "diesel-2.3.0",
-    actual = "@crates__diesel-2.3.0//:diesel",
+    name = "diesel-2.3.2",
+    actual = "@crates__diesel-2.3.2//:diesel",
     tags = ["manual"],
 )
 
 alias(
     name = "diesel",
-    actual = "@crates__diesel-2.3.0//:diesel",
+    actual = "@crates__diesel-2.3.2//:diesel",
     tags = ["manual"],
 )
 
@@ -475,14 +475,14 @@ alias(
 )
 
 alias(
-    name = "hyper-util-0.1.16",
-    actual = "@crates__hyper-util-0.1.16//:hyper_util",
+    name = "hyper-util-0.1.17",
+    actual = "@crates__hyper-util-0.1.17//:hyper_util",
     tags = ["manual"],
 )
 
 alias(
     name = "hyper-util",
-    actual = "@crates__hyper-util-0.1.16//:hyper_util",
+    actual = "@crates__hyper-util-0.1.17//:hyper_util",
     tags = ["manual"],
 )
 
@@ -631,14 +631,14 @@ alias(
 )
 
 alias(
-    name = "pq-sys-0.7.2",
-    actual = "@crates__pq-sys-0.7.2//:pq_sys",
+    name = "pq-sys-0.7.3",
+    actual = "@crates__pq-sys-0.7.3//:pq_sys",
     tags = ["manual"],
 )
 
 alias(
     name = "pq-sys",
-    actual = "@crates__pq-sys-0.7.2//:pq_sys",
+    actual = "@crates__pq-sys-0.7.3//:pq_sys",
     tags = ["manual"],
 )
 
@@ -679,26 +679,26 @@ alias(
 )
 
 alias(
-    name = "quote-1.0.40",
-    actual = "@crates__quote-1.0.40//:quote",
+    name = "quote-1.0.41",
+    actual = "@crates__quote-1.0.41//:quote",
     tags = ["manual"],
 )
 
 alias(
     name = "quote",
-    actual = "@crates__quote-1.0.40//:quote",
+    actual = "@crates__quote-1.0.41//:quote",
     tags = ["manual"],
 )
 
 alias(
-    name = "regex-1.11.2",
-    actual = "@crates__regex-1.11.2//:regex",
+    name = "regex-1.11.3",
+    actual = "@crates__regex-1.11.3//:regex",
     tags = ["manual"],
 )
 
 alias(
     name = "regex",
-    actual = "@crates__regex-1.11.2//:regex",
+    actual = "@crates__regex-1.11.3//:regex",
     tags = ["manual"],
 )
 
@@ -727,26 +727,26 @@ alias(
 )
 
 alias(
-    name = "serde-1.0.219",
-    actual = "@crates__serde-1.0.219//:serde",
+    name = "serde-1.0.228",
+    actual = "@crates__serde-1.0.228//:serde",
     tags = ["manual"],
 )
 
 alias(
     name = "serde",
-    actual = "@crates__serde-1.0.219//:serde",
+    actual = "@crates__serde-1.0.228//:serde",
     tags = ["manual"],
 )
 
 alias(
-    name = "serde_json-1.0.143",
-    actual = "@crates__serde_json-1.0.143//:serde_json",
+    name = "serde_json-1.0.145",
+    actual = "@crates__serde_json-1.0.145//:serde_json",
     tags = ["manual"],
 )
 
 alias(
     name = "serde_json",
-    actual = "@crates__serde_json-1.0.143//:serde_json",
+    actual = "@crates__serde_json-1.0.145//:serde_json",
     tags = ["manual"],
 )
 
@@ -1003,14 +1003,14 @@ alias(
 )
 
 alias(
-    name = "tempfile-3.22.0",
-    actual = "@crates__tempfile-3.22.0//:tempfile",
+    name = "tempfile-3.23.0",
+    actual = "@crates__tempfile-3.23.0//:tempfile",
     tags = ["manual"],
 )
 
 alias(
     name = "tempfile",
-    actual = "@crates__tempfile-3.22.0//:tempfile",
+    actual = "@crates__tempfile-3.23.0//:tempfile",
     tags = ["manual"],
 )
 
@@ -1027,26 +1027,26 @@ alias(
 )
 
 alias(
-    name = "thiserror-2.0.16",
-    actual = "@crates__thiserror-2.0.16//:thiserror",
+    name = "thiserror-2.0.17",
+    actual = "@crates__thiserror-2.0.17//:thiserror",
     tags = ["manual"],
 )
 
 alias(
     name = "thiserror",
-    actual = "@crates__thiserror-2.0.16//:thiserror",
+    actual = "@crates__thiserror-2.0.17//:thiserror",
     tags = ["manual"],
 )
 
 alias(
-    name = "time-0.3.43",
-    actual = "@crates__time-0.3.43//:time",
+    name = "time-0.3.44",
+    actual = "@crates__time-0.3.44//:time",
     tags = ["manual"],
 )
 
 alias(
     name = "time",
-    actual = "@crates__time-0.3.43//:time",
+    actual = "@crates__time-0.3.44//:time",
     tags = ["manual"],
 )
 
@@ -1075,14 +1075,14 @@ alias(
 )
 
 alias(
-    name = "toml-0.9.5",
-    actual = "@crates__toml-0.9.5//:toml",
+    name = "toml-0.9.7",
+    actual = "@crates__toml-0.9.7//:toml",
     tags = ["manual"],
 )
 
 alias(
     name = "toml",
-    actual = "@crates__toml-0.9.5//:toml",
+    actual = "@crates__toml-0.9.7//:toml",
     tags = ["manual"],
 )
 

@@ -56,6 +56,6 @@ rust_library(
     }),
     version = "0.1.28",
     deps = [
-        "@crates__windows-sys-0.61.0//:windows_sys",
+        "@crates__windows-sys-0.61.1//:windows_sys",
     ],
 )

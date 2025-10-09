@@ -38,8 +38,8 @@ rust_library(
     edition = "2021",
     proc_macro_deps = [
         "@crates__webview2-com-macros-0.8.0//:webview2_com_macros",
-        "@crates__windows-implement-0.60.0//:windows_implement",
-        "@crates__windows-interface-0.59.1//:windows_interface",
+        "@crates__windows-implement-0.60.1//:windows_implement",
+        "@crates__windows-interface-0.59.2//:windows_interface",
     ],
     rustc_env_files = [
         ":cargo_toml_env_vars",

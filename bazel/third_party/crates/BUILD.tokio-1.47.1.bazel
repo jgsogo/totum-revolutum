@@ -83,7 +83,7 @@ rust_library(
     version = "1.47.1",
     deps = [
         "@crates__bytes-1.10.1//:bytes",
-        "@crates__libc-0.2.175//:libc",
+        "@crates__libc-0.2.176//:libc",
         "@crates__mio-1.0.4//:mio",
         "@crates__parking_lot-0.12.4//:parking_lot",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",

@@ -59,13 +59,13 @@ rust_library(
         "@crates__gix-fs-0.15.0//:gix_fs",
         "@crates__once_cell-1.21.3//:once_cell",
         "@crates__parking_lot-0.12.4//:parking_lot",
-        "@crates__tempfile-3.22.0//:tempfile",
+        "@crates__tempfile-3.23.0//:tempfile",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.175//:libc",  # cfg(not(windows))
+            "@crates__libc-0.2.176//:libc",  # cfg(not(windows))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.175//:libc",  # cfg(not(windows))
+            "@crates__libc-0.2.176//:libc",  # cfg(not(windows))
         ],
         "//conditions:default": [],
     }),

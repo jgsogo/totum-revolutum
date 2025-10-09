@@ -39,7 +39,7 @@ http_archive(
 
 # LLVM Versions and platforms
 # https://github.com/bazel-contrib/toolchains_llvm/blob/master/toolchain/internal/llvm_distributions.bzl
-LLVM_VERSION = "19.1.7"
+LLVM_VERSION = "20.1.7"
 
 ###############################################################################
 # L L V M

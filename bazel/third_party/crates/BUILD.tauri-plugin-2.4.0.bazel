@@ -59,17 +59,17 @@ rust_library(
     }),
     version = "2.4.0",
     deps = [
-        "@crates__anyhow-1.0.99//:anyhow",
+        "@crates__anyhow-1.0.100//:anyhow",
         "@crates__glob-0.3.3//:glob",
         "@crates__schemars-0.8.22//:schemars",
-        "@crates__serde-1.0.219//:serde",
-        "@crates__serde_json-1.0.143//:serde_json",
+        "@crates__serde-1.0.228//:serde",
+        "@crates__serde_json-1.0.145//:serde_json",
         "@crates__tauri-utils-2.7.0//:tauri_utils",
-        "@crates__toml-0.9.5//:toml",
+        "@crates__toml-0.9.7//:toml",
         "@crates__walkdir-2.5.0//:walkdir",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__plist-1.7.4//:plist",  # x86_64-apple-darwin
+            "@crates__plist-1.8.0//:plist",  # x86_64-apple-darwin
         ],
         "//conditions:default": [],
     }),

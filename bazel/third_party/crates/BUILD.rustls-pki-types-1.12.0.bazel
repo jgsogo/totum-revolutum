@@ -61,6 +61,6 @@ rust_library(
     }),
     version = "1.12.0",
     deps = [
-        "@crates__zeroize-1.8.1//:zeroize",
+        "@crates__zeroize-1.8.2//:zeroize",
     ],
 )

@@ -60,7 +60,7 @@ rust_library(
         "@crates__gix-trace-0.1.13//:gix_trace",
         "@crates__gix-validate-0.10.0//:gix_validate",
         "@crates__once_cell-1.21.3//:once_cell",
-        "@crates__thiserror-2.0.16//:thiserror",
+        "@crates__thiserror-2.0.17//:thiserror",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
             "@crates__home-0.5.11//:home",  # cfg(not(target_family = "wasm"))

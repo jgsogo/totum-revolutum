@@ -62,7 +62,7 @@ rust_library(
         "@crates__gdk-pixbuf-sys-0.18.0//:gdk_pixbuf_sys",
         "@crates__gio-0.18.4//:gio",
         "@crates__glib-0.18.5//:glib",
-        "@crates__libc-0.2.175//:libc",
+        "@crates__libc-0.2.176//:libc",
         "@crates__once_cell-1.21.3//:once_cell",
     ],
 )

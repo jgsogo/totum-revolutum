@@ -70,7 +70,7 @@ rust_library(
     version = "0.7.3",
     deps = [
         "@crates__getrandom-0.1.16//:getrandom",
-        "@crates__libc-0.2.175//:libc",
+        "@crates__libc-0.2.176//:libc",
         "@crates__rand_core-0.5.1//:rand_core",
         "@crates__rand_pcg-0.2.1//:rand_pcg",
     ] + select({

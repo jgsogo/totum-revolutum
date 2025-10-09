@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.2.4",
     deps = [
-        "@crates__libc-0.2.175//:libc",
+        "@crates__libc-0.2.176//:libc",
         "@crates__os_pipe-1.2.2//:os_pipe",
         "@crates__signal-hook-0.3.18//:signal_hook",
     ],
