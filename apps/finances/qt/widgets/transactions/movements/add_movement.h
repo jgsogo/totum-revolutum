@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include <QWidget>
 
+#include "apps/finances/qt/widgets/forms/amounts/movement_stacked_form.h"
 #include "libraries/finances/accounts/cpp/models/types/amount.h"
 
 class AddMovementWidget : public QWidget {
@@ -38,4 +39,6 @@ class AddMovementWidget : public QWidget {
     QComboBox* account;
     QComboBox* movtype;
     QCalendarWidget* mov_date;
+
+    widgets::forms::MovementStackedForm* mov_amount;
 };

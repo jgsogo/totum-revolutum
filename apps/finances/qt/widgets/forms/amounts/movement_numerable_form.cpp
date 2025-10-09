@@ -24,7 +24,7 @@ namespace widgets::forms {
         quantity->setPlaceholderText("120,34");
 
         // Unit value
-        unit_value = new QLineEdit();
+        unit_value = new QLineEdit("ccy unknown");
         unit_value->setEnabled(false);
         connect(unit_value, &QLineEdit::textChanged, [this]() { this->on_input_data_change(); });
 

@@ -9,9 +9,10 @@
 #include <QStackedLayout>
 #include <QVBoxLayout>
 
-#include "movements/add_movement_dividend.h"
-#include "movements/add_movement_non_numerable.h"
-#include "movements/add_movement_numerable.h"
+#include "movements/add_movement.h"
+// #include "movements/add_movement_dividend.h"
+// #include "movements/add_movement_non_numerable.h"
+// #include "movements/add_movement_numerable.h"
 
 void AddTransactionWidget::add_transaction_clicked() {
     SPDLOG_DEBUG("AddTransactionWidget::add_transaction_clicked()");
@@ -19,22 +20,15 @@ void AddTransactionWidget::add_transaction_clicked() {
 void AddTransactionWidget::add_movement(finances::accounts::models::MovementDirection direction) {
     SPDLOG_DEBUG("AddTransactionWidget::add_movement(direction={})", direction);
 
-    QWidget* numerable = new QWidget;
-    QWidget* non_numerable = new QWidget;
-    QWidget* dividend = new QWidget;
-
-    QStackedLayout* stackedLayout = new QStackedLayout;
-    stackedLayout->addWidget(numerable);
-    stackedLayout->addWidget(non_numerable);
-    stackedLayout->addWidget(dividend);
+    AddMovementWidget* mov = new AddMovementWidget;
 
     switch (direction) {
     case finances::accounts::models::MovementDirection::IN: {
-        movs_in_layout->addLayout(stackedLayout);
+        movs_in_layout->addWidget(mov);
         // movs_in.push_back(stackedLayout);
     } break;
     case finances::accounts::models::MovementDirection::OUT: {
-        movs_out_layout->addLayout(stackedLayout);
+        movs_out_layout->addWidget(mov);
         // movs_out.push_back(stackedLayout);
     } break;
     }

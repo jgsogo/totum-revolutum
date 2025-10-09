@@ -2,7 +2,23 @@
 
 #include <spdlog/spdlog.h>
 
-AddMovementWidget::AddMovementWidget(QWidget* parent) : QWidget(parent) {}
+#include <QVBoxLayout>
+
+AddMovementWidget::AddMovementWidget(QWidget* parent) : QWidget(parent) {
+
+    mov_amount = new widgets::forms::MovementStackedForm;
+    account = new QComboBox;
+    movtype = new QComboBox;
+    mov_date = new QCalendarWidget;
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(account);
+    layout->addWidget(movtype);
+    layout->addWidget(mov_date);
+    layout->addWidget(mov_amount);
+
+    this->setLayout(layout);
+}
 
 void AddMovementWidget::account_changed() { SPDLOG_DEBUG("AddMovementWidget::account_changed()"); }
 

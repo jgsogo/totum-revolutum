@@ -14,7 +14,7 @@ namespace widgets::forms {
 
     MovementNonNumerableFormWidget::MovementNonNumerableFormWidget(QWidget* parent) : QWidget(parent) {
         // We start QLineEdit and disable it, because we don't know the currency!
-        amount = new QLineEdit();
+        amount = new QLineEdit("ccy unknown");
         amount->setEnabled(false);
         connect(amount, &QLineEdit::textChanged, this, [this]() { this->on_input_data_change(); });
 

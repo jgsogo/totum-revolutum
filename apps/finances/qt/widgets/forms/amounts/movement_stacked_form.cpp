@@ -8,24 +8,79 @@
 
 namespace widgets::forms {
 
-    MovementStackedForm::MovementStackedForm(QWidget* parent) : QWidget(parent) {
+    struct MovementStackedForm::Impl {
+        MovementNonNumerableFormWidget* mov_non_numerable;
+        MovementNumerableFormWidget* mov_numerable;
+        MovementDividendFormWidget* mov_dividend;
+        QStackedLayout* stacked_layout;
+    };
 
-        MovementNonNumerableFormWidget* mov_non_numerable = new MovementNonNumerableFormWidget;
-        connect(mov_non_numerable, &MovementNonNumerableFormWidget::amount_changed, this,
-                &MovementStackedForm::amount_changed);
+    MovementStackedForm::MovementStackedForm(QWidget* parent)
+        : QWidget(parent), pImpl{std::make_unique<MovementStackedForm::Impl>()} {
 
-        MovementNumerableFormWidget* mov_numerable = new MovementNumerableFormWidget;
-        connect(mov_numerable, &MovementNumerableFormWidget::amount_changed, this,
-                &MovementStackedForm::amount_changed);
+        pImpl->stacked_layout = new QStackedLayout;
 
-        MovementDividendFormWidget* mov_dividend = new MovementDividendFormWidget;
-        connect(mov_dividend, &MovementDividendFormWidget::amount_changed, this, &MovementStackedForm::amount_changed);
+        {
+            pImpl->mov_non_numerable = new MovementNonNumerableFormWidget;
+            connect(pImpl->mov_non_numerable, &MovementNonNumerableFormWidget::amount_changed, this,
+                    &MovementStackedForm::amount_changed);
+            pImpl->mov_non_numerable->blockSignals(true);
+            pImpl->stacked_layout->addWidget(pImpl->mov_non_numerable);
+        }
+        {
+            pImpl->mov_numerable = new MovementNumerableFormWidget;
+            connect(pImpl->mov_numerable, &MovementNumerableFormWidget::amount_changed, this,
+                    &MovementStackedForm::amount_changed);
+            pImpl->mov_numerable->blockSignals(true);
+            pImpl->stacked_layout->addWidget(pImpl->mov_numerable);
+        }
+        {
+            pImpl->mov_dividend = new MovementDividendFormWidget;
+            connect(pImpl->mov_dividend, &MovementDividendFormWidget::amount_changed, this,
+                    &MovementStackedForm::amount_changed);
+            connect(pImpl->mov_dividend, &MovementDividendFormWidget::ex_dividend_date_changed, this,
+                    &MovementStackedForm::ex_dividend_date_changed);
+            pImpl->mov_dividend->blockSignals(true);
+            pImpl->stacked_layout->addWidget(pImpl->mov_dividend);
+        }
 
-        QStackedLayout* stacked_layout = new QStackedLayout;
-        stacked_layout->addWidget(mov_non_numerable);
-        stacked_layout->addWidget(mov_numerable);
-        stacked_layout->addWidget(mov_dividend);
-
-        this->setLayout(stacked_layout);
+        this->setLayout(pImpl->stacked_layout);
     }
+
+    MovementStackedForm::~MovementStackedForm() = default;
+
+    void MovementStackedForm::set_movement_non_numerable() {
+        pImpl->mov_non_numerable->blockSignals(false);
+        pImpl->mov_numerable->blockSignals(true);
+        pImpl->mov_dividend->blockSignals(true);
+
+        pImpl->stacked_layout->setCurrentWidget(pImpl->mov_numerable);
+    }
+
+    void MovementStackedForm::set_movement_numerable() {
+        pImpl->mov_non_numerable->blockSignals(true);
+        pImpl->mov_numerable->blockSignals(false);
+        pImpl->mov_dividend->blockSignals(true);
+
+        pImpl->stacked_layout->setCurrentWidget(pImpl->mov_numerable);
+    }
+
+    void MovementStackedForm::set_movement_dividend() {
+        pImpl->mov_non_numerable->blockSignals(true);
+        pImpl->mov_numerable->blockSignals(true);
+        pImpl->mov_dividend->blockSignals(false);
+
+        pImpl->stacked_layout->setCurrentWidget(pImpl->mov_numerable);
+    }
+
+    void MovementStackedForm::set_ccy(finances::accounts::models::Ccy ccy) {
+        pImpl->mov_non_numerable->setCcy(ccy);
+        pImpl->mov_numerable->setCcy(ccy);
+        pImpl->mov_dividend->setCcy(ccy);
+    }
+
+    void MovementStackedForm::set_dividend_quantity(finances::accounts::models::Amount quantity) {
+        pImpl->mov_dividend->setQuantity(quantity);
+    }
+
 } // namespace widgets::forms

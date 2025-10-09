@@ -20,7 +20,7 @@ namespace widgets::forms {
                 &MovementDividendFormWidget::ex_dividend_date_changed);
 
         // Unit value
-        unit_value = new QLineEdit();
+        unit_value = new QLineEdit("ccy unknown");
         unit_value->setEnabled(false);
         connect(unit_value, &QLineEdit::textChanged, [this]() { this->on_input_data_change(); });
 

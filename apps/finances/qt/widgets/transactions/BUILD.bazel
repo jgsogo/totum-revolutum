@@ -5,20 +5,15 @@ qt_cc_library(
     srcs = [
         "add_transaction.cpp",
         "movements/add_movement.cpp",
-        "movements/add_movement_dividend.cpp",
-        "movements/add_movement_non_numerable.cpp",
-        "movements/add_movement_numerable.cpp",
     ],
     hdrs = [
         "add_transaction.h",
         "movements/add_movement.h",
-        "movements/add_movement_dividend.h",
-        "movements/add_movement_non_numerable.h",
-        "movements/add_movement_numerable.h",
     ],
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
         "//apps/finances/qt/models",
+        "//apps/finances/qt/widgets/forms/amounts",
         "//bazel/logging:spdlog",
         "@rules_qt//:qt_widgets",
     ],
