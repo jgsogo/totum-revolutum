@@ -4,14 +4,15 @@
 #include <QComboBox>
 #include <QWidget>
 
-#include "apps/finances/qt/widgets/forms/amounts/movement_stacked_form.h"
 #include "libraries/finances/accounts/cpp/models/types/amount.h"
 
+#include "apps/finances/qt/models/accounts_table.h"
+#include "apps/finances/qt/widgets/forms/amounts/movement_stacked_form.h"
 class AddMovementWidget : public QWidget {
     Q_OBJECT
 
   public:
-    explicit AddMovementWidget(QWidget* parent = nullptr);
+    explicit AddMovementWidget(AccountTableModel* accounts, QWidget* parent = nullptr);
     virtual ~AddMovementWidget() = default;
 
   private slots:

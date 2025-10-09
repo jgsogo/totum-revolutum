@@ -4,11 +4,22 @@
 
 #include <QVBoxLayout>
 
-AddMovementWidget::AddMovementWidget(QWidget* parent) : QWidget(parent) {
+AddMovementWidget::AddMovementWidget(AccountTableModel* accounts, QWidget* parent) : QWidget(parent) {
 
     mov_amount = new widgets::forms::MovementStackedForm;
+
     account = new QComboBox;
+    // QCompleter *mycompletear = new QCompleter(this);
+    // mycompletear->setCaseSensitivity(Qt::CaseInsensitive);
+    // mycompletear->setModel(proxyModel);
+    // mycompletear->setCompletionColumn(1);
+    // mycompletear->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    // ui->comp_comb->setCompleter(mycompletear);
+    account->setModel(accounts);
+    account->setModelColumn(1);
+
     movtype = new QComboBox;
+
     mov_date = new QCalendarWidget;
 
     QVBoxLayout* layout = new QVBoxLayout;

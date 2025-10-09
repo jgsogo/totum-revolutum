@@ -5,13 +5,13 @@
 
 #include "libraries/finances/accounts/cpp/models/movement.h"
 
-// class AddMovementWidget;
+#include "apps/finances/qt/models/accounts_table.h"
 
 class AddTransactionWidget : public QDialog {
     Q_OBJECT
 
   public:
-    AddTransactionWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent = nullptr,
+    AddTransactionWidget(utils::libpqxx::ConnectionPool& pool, AccountTableModel* accounts, QWidget* parent = nullptr,
                          Qt::WindowFlags f = Qt::WindowFlags());
 
   private slots:
@@ -31,6 +31,7 @@ class AddTransactionWidget : public QDialog {
 
   protected:
     utils::libpqxx::ConnectionPool& pool;
+    AccountTableModel* accounts;
 
     QVBoxLayout* movs_in_layout;
     QVBoxLayout* movs_out_layout;

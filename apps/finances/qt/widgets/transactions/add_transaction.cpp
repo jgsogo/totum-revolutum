@@ -20,7 +20,7 @@ void AddTransactionWidget::add_transaction_clicked() {
 void AddTransactionWidget::add_movement(finances::accounts::models::MovementDirection direction) {
     SPDLOG_DEBUG("AddTransactionWidget::add_movement(direction={})", direction);
 
-    AddMovementWidget* mov = new AddMovementWidget;
+    AddMovementWidget* mov = new AddMovementWidget{accounts};
 
     switch (direction) {
     case finances::accounts::models::MovementDirection::IN: {
@@ -38,8 +38,9 @@ void AddTransactionWidget::remove_movement(/* we need some kind of ID here */) {
     SPDLOG_DEBUG("AddTransactionWidget::remove_movement()");
 }
 
-AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool_, QWidget* parent, Qt::WindowFlags f)
-    : QDialog(parent, f), pool{pool_} {
+AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* accounts_,
+                                           QWidget* parent, Qt::WindowFlags f)
+    : QDialog(parent, f), pool{pool_}, accounts{accounts_} {
 
     // Transaction details
 
