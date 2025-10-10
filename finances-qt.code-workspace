@@ -19,5 +19,17 @@
 			"path": "apps/finances/installable"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"clangd.checkUpdates": true,
+		"clangd.arguments": [
+			"--header-insertion=never",
+			"--query-driver=/opt/llvm-*/bin/clang*,/**/cc_wrapper.sh",
+			"--compile-commands-dir=/Users/jgsogo/personal/totum-revolutum/"
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"llvm-vs-code-extensions.vscode-clangd"
+		]
+	}
 }

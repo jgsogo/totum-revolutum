@@ -1,15 +1,21 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 filegroup(
     name = "all_srcs",
     srcs = glob(
         include = ["**"],
-        exclude = ["*.bazel"],
+        # exclude = ["*.bazel"],
     ),
 )
 
+filegroup(
+    name = "headers",
+    srcs = glob(["include/pqxx/**/*"]),
+)
+
 cmake(
-    name = "libpqxx",
+    name = "libpqxx_",
     build_args = [
         # "-Wno-error=unused-command-line-argument"
     ],
@@ -37,22 +43,17 @@ cmake(
     out_static_libs = [
         "libpqxx.a",
     ],
-    visibility = ["//visibility:public"],
+    # visibility = ["//visibility:public"],
 )
 
-# configure_make(
-#     name = "libpqxx",
-#     # These envs taken from # TODO: https://github.com/bazel-contrib/toolchains_llvm/issues/396
-#     env = {
-#         "AR": "$$EXT_BUILD_ROOT/external/toolchains_llvm~~llvm~llvm_toolchain/bin/llvm-ar",
-#         "STRIP": "$$EXT_BUILD_ROOT/external/toolchains_llvm~~llvm~llvm_toolchain/bin/llvm-strip",
-#     },
-#     configure_options = [
-#         "--disable-documentation",
-#         "--disable-shared",
-#     ],
-#     lib_source = ":all_srcs",
-#     linkopts = ["-lpq"],
-#     out_static_libs = ["libpqxx.a"],
-#     visibility = ["//visibility:public"],
-# )
+# The only purpose of this "alias" target is to provide a cc_library that the
+# hedron_compile_commands will recognize to populate the compile_commands.json
+cc_library(
+    name = "libpqxx",
+    hdrs = [":headers"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":libpqxx_",
+    ],
+)
