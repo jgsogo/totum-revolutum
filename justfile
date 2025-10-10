@@ -98,6 +98,11 @@ tokei:
 doc:
     cargo doc --open --document-private-items --all-features --workspace
 
+# Generates the compile-commands.json file to be used by Clangd to offer IDE assistance in C++
+[group('dev')]
+cpp-compile-commands:
+    bazel run //:refresh_compile_commands
+
 # Removes temporary files (free disk space)
 [group('dev')]
 clean:
@@ -107,7 +112,7 @@ clean:
 
 # Reset: removes all temporary files and recreates the workspace (Cargo and Bazel). This can take a while
 [group('dev')]
-reset: clean build test
+reset: clean build test cpp-compile-commands
 
 # Starts a bazel remote cache service
 [group('dev')]
