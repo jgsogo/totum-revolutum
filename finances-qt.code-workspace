@@ -23,8 +23,8 @@
 		"clangd.checkUpdates": true,
 		"clangd.arguments": [
 			"--header-insertion=never",
-			"--query-driver=/opt/llvm-*/bin/clang*,/**/cc_wrapper.sh",
-			"--compile-commands-dir=/Users/jgsogo/personal/totum-revolutum/"
+			"--query-driver=**",
+			"--compile-commands-dir=${workspaceFolder}/"
 		]
 	},
 	"extensions": {
