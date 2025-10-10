@@ -18,6 +18,7 @@ cc_library(
         "//libraries/utils/cpp/libpqxx:connection_pool",
         "//libraries/utils/cpp/libpqxx/datatypes:date",
         "//libraries/utils/cpp/libpqxx/datatypes:numeric",
+        "//libraries/utils/cpp/libpqxx/orm",
         "@magic_enum",
         "@tl-expected",
     ],

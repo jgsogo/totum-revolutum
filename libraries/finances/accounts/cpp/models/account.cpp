@@ -5,6 +5,16 @@
 
 using namespace finances::accounts::models;
 
+namespace utils::db {
+
+    template <>
+    Account utils::db::Model<Account>::parse(pqxx::row) {
+        const auto [id, name, description, identifier] = r->as<Id, utils::libpqxx::Date, Amount>();
+    }
+
+}
+
+
 template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all() {
     return pool.with_conn<tl::expected<std::vector<Account>, Error>>(
         [](pqxx::connection& conn) -> tl::expected<std::vector<Account>, Error> {

@@ -4,6 +4,8 @@
 #include <string>
 
 #include "libraries/utils/cpp/libpqxx/datatypes/date.h"
+// #include "libraries/utils/cpp/libpqxx/orm/manager.h"
+#include "libraries/utils/cpp/libpqxx/orm/model.h"
 
 #include "custodian.h"
 #include "hierarchy_tree.h"
@@ -14,6 +16,8 @@
 namespace finances::accounts::models {
 
     struct Account {
+        static constexpr std::string_view table_name = "finances_accounts_account";
+
         Id id;
         std::string name;
         std::optional<std::string> description;
@@ -26,7 +30,17 @@ namespace finances::accounts::models {
         bool is_numerable;
     };
 
+    // using AccountModel = utils::db::Model<Account>;
+    // using AccountModelManager = utils::db::ModelManager<Account>;
+
     using AccountManager = ModelManager<Account>;
     template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all();
 
 } // namespace finances::accounts::models
+
+namespace utils::db {
+
+    template <>
+    finances::accounts::models::Account utils::db::Model<finances::accounts::models::Account>::parse(pqxx::row);
+
+}

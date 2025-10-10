@@ -1,0 +1,118 @@
+#pragma once
+
+#include <magic_enum/magic_enum.hpp>
+#include <spdlog/spdlog.h>
+
+#include <QAbstractTableModel>
+
+#include "libraries/utils/cpp/libpqxx/connection_pool.h"
+#include "libraries/utils/cpp/libpqxx/orm/manager.h"
+
+namespace utils::qt::models {
+
+    namespace _detail {
+
+        class GenericTableModel : public QAbstractTableModel {
+            Q_OBJECT
+          public:
+            explicit GenericTableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent = nullptr);
+
+          public slots:
+            void refresh_all();
+            void refresh_one(int row);
+
+          protected:
+            virtual void _refresh_all() = 0;
+            virtual void _refresh_one(int row) = 0;
+
+          protected:
+            utils::libpqxx::ConnectionPool& pool;
+        };
+
+    } // namespace _detail
+
+    template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher;
+
+    template <class TModel, typename TColumn> class TableModel : public _detail::GenericTableModel {
+      public:
+        explicit TableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent = nullptr)
+            : _detail::GenericTableModel{pool, parent} {};
+
+        int rowCount(const QModelIndex& parent = QModelIndex()) const override { return items.size(); }
+
+        int columnCount(const QModelIndex& parent = QModelIndex()) const override {
+            return magic_enum::enum_count<TColumn>();
+        }
+
+        QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override {
+            QVariant result = QVariant();
+
+            if (role == Qt::DisplayRole && orientation == Qt::Horizontal) { // H
+                TColumn column = magic_enum::enum_value<TColumn>(section);
+                result = QString::fromStdString(std::string(magic_enum::enum_name(column)));
+            } else if (role == Qt::DisplayRole && orientation == Qt::Vertical) { // V
+                return QString("%1").arg(items[section].id);
+            } else {
+                // other stuff
+            }
+            return result;
+        }
+
+        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
+            QVariant result = QVariant();
+
+            int row = index.row();
+            int column_idx = index.column();
+
+            if (!index.isValid() || row >= rowCount() || column_idx >= columnCount()) {
+                return result;
+            }
+
+            TColumn column = magic_enum::enum_value<TColumn>(column_idx);
+            const auto& item = items.at(row);
+
+            switch (role) {
+            case Qt::DisplayRole:
+                return DataDispatcher<TModel, TColumn, Qt::DisplayRole>::data(*this, item, column);
+            case Qt::FontRole:
+                return DataDispatcher<TModel, TColumn, Qt::FontRole>::data(*this, item, column);
+            case Qt::TextAlignmentRole:
+                return DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole>::data(*this, item, column);
+            case Qt::BackgroundRole:
+                return DataDispatcher<TModel, TColumn, Qt::BackgroundRole>::data(*this, item, column);
+                // default:
+                //     break;
+            }
+
+            return result;
+        }
+
+      protected:
+        void _refresh_all() override {
+            SPDLOG_DEBUG("TableModel<TModel, TColumn>::_refresh_all");
+
+            SPDLOG_TRACE(" - fetch all the items for this model");
+            typename utils::db::ModelManager<TModel> manager{pool};
+            auto all_items = manager.all();
+            if (!all_items) {
+                SPDLOG_ERROR("Error refreshing items: {}", all_items.error());
+                // TODO: Communicate error to user
+                return;
+            }
+
+            SPDLOG_TRACE(" - reset the model");
+            this->beginResetModel();
+            this->items = std::move(all_items.value());
+            this->endResetModel();
+        };
+        void _refresh_one(int row) override {};
+
+      protected:
+        std::vector<TModel> items;
+    };
+
+    template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher {
+        static QVariant data(const TableModel<TModel, TColumn>&, const TModel&, TColumn) { return QVariant{}; }
+    };
+
+} // namespace utils::qt::models
