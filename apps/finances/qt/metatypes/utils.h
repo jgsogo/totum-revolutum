@@ -1,7 +1,7 @@
 #pragma once
 
-#include "tl/expected.hpp"
 #include <QString>
+#include <tl/expected.hpp>
 
 #include "libraries/finances/accounts/cpp/models/types/amount.h"
 

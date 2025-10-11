@@ -19,5 +19,17 @@
 			"path": "apps/finances/installable"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"clangd.checkUpdates": true,
+		"clangd.arguments": [
+			"--header-insertion=never",
+			"--query-driver=**",
+			"--compile-commands-dir=${workspaceFolder}/"
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"llvm-vs-code-extensions.vscode-clangd"
+		]
+	}
 }
