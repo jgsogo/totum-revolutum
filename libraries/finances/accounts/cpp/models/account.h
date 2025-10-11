@@ -41,6 +41,7 @@ namespace finances::accounts::models {
 namespace utils::db {
 
     template <>
-    finances::accounts::models::Account utils::db::Model<finances::accounts::models::Account>::parse(pqxx::row);
+    std::vector<finances::accounts::models::Account>
+    utils::db::Model<finances::accounts::models::Account>::get_all(pqxx::work&);
 
 }

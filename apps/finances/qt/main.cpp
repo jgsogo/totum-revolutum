@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
     QObject::connect(tabWidget, &MainTabWidget::account_changed, &notificator, &Notificator::notify_account);
 
     QVBoxLayout* layout = new QVBoxLayout();
-    layout->addWidget(tabWidget);
+    // layout->addWidget(tabWidget);
 
     AccountsTable* accounts = new AccountsTable{pool};
     QTableView* table_view = new QTableView;

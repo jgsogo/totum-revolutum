@@ -8,12 +8,15 @@
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
+#include "errors.h"
+
 namespace utils::qt::models {
 
     namespace _detail {
 
         class GenericTableModel : public QAbstractTableModel {
             Q_OBJECT
+
           public:
             explicit GenericTableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent = nullptr);
 
@@ -34,6 +37,10 @@ namespace utils::qt::models {
     template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher;
 
     template <class TModel, typename TColumn> class TableModel : public _detail::GenericTableModel {
+        using Model = utils::db::Model<TModel>;
+        using ModelManager = utils::db::ModelManager<TModel>;
+        static constexpr std::string_view name = utils::type_name<TableModel<TModel, TColumn>>();
+
       public:
         explicit TableModel(utils::libpqxx::ConnectionPool& pool, QObject* parent = nullptr)
             : _detail::GenericTableModel{pool, parent} {};
@@ -87,25 +94,47 @@ namespace utils::qt::models {
             return result;
         }
 
+        const TModel& get(int row) {
+            SPDLOG_DEBUG("{}::get(row={})", name, row);
+            return items.at(row);
+        };
+
+        Expected<std::reference_wrapper<const TModel>> get(const Model::Id& id) {
+            SPDLOG_DEBUG("{}::get(id={})", name, id);
+
+            auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.item == id; });
+            if (found == items.end()) {
+                SPDLOG_ERROR(" - Unexpected: {} with id {} not found in {}!", Model::name, id, name);
+                return tl::unexpected{ErrorItemNotFound{}};
+            }
+
+            return {*found};
+        };
+
       protected:
         void _refresh_all() override {
-            SPDLOG_DEBUG("TableModel<TModel, TColumn>::_refresh_all");
+            SPDLOG_DEBUG("{}::_refresh_all", name);
 
             SPDLOG_TRACE(" - fetch all the items for this model");
-            typename utils::db::ModelManager<TModel> manager{pool};
+            ModelManager manager{pool};
             auto all_items = manager.all();
             if (!all_items) {
                 SPDLOG_ERROR("Error refreshing items: {}", all_items.error());
                 // TODO: Communicate error to user
                 return;
             }
-
-            SPDLOG_TRACE(" - reset the model");
-            this->beginResetModel();
             this->items = std::move(all_items.value());
-            this->endResetModel();
         };
-        void _refresh_one(int row) override {};
+
+        void _refresh_one(int row) override final {
+            SPDLOG_DEBUG("{}::_refresh_one(row={})", name, row);
+            const typename Model::Id& id = items.at(row).id;
+            this->_refresh_one(id);
+        };
+
+        virtual void _refresh_one(const Model::Id& id) {
+            SPDLOG_WARN("{}::_refresh_one(id={}) - empty implementation!", name, id);
+        };
 
       protected:
         std::vector<TModel> items;

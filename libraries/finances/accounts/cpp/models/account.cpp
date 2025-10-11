@@ -7,13 +7,36 @@ using namespace finances::accounts::models;
 
 namespace utils::db {
 
-    template <>
-    Account utils::db::Model<Account>::parse(pqxx::row) {
-        const auto [id, name, description, identifier] = r->as<Id, utils::libpqxx::Date, Amount>();
+    template <> std::vector<Account> utils::db::Model<Account>::get_all(pqxx::work& tx) {
+        auto query = std::format("SELECT a.id, a.name, a.description, a.identifier, a.ccy, a.open, a.close, "
+                                 "t.id, t.name, c.id, c.name, a.is_numerable"
+                                 " FROM {} a"
+                                 "   LEFT JOIN {} t ON a.type_id = t.id"
+                                 "   LEFT JOIN {} c ON a.custodian_id = c.id;",
+                                 ACCOUNT_TABLE, ACCOUNT_TYPE_TABLE, CUSTODIAN_TABLE);
+        SPDLOG_TRACE(query);
+
+        std::vector<Account> ret;
+        for (auto [id, name, description, identifier, ccy, open, close, type_id, type_name, custodian_id,
+                   custodian_name, is_numerable] :
+             tx.query<Id, std::string, std::optional<std::string>, std::optional<std::string>, std::string,
+                      utils::libpqxx::Date, std::optional<utils::libpqxx::Date>, Id, std::string, Id, std::string,
+                      bool>(query)) {
+            ret.emplace_back(Account{.id = id,
+                                     .name = name,
+                                     .description = description,
+                                     .identifier = identifier,
+                                     .ccy = Ccy{std::move(ccy)},
+                                     .open = open,
+                                     .close = close,
+                                     .type = std::make_pair(type_id, type_name),
+                                     .custodian = std::make_pair(custodian_id, custodian_name),
+                                     .is_numerable = is_numerable});
+        }
+        return {ret};
     }
 
-}
-
+} // namespace utils::db
 
 template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all() {
     return pool.with_conn<tl::expected<std::vector<Account>, Error>>(
