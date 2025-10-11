@@ -45,4 +45,7 @@ cc_library(
     name = "expected_type",
     hdrs = ["expected_type.hpp"],
     visibility = ["//visibility:public"],
+    deps = [
+        "//libraries/utils/cpp/concepts:alternative_c",
+    ],
 )

@@ -4,8 +4,8 @@
 
 namespace utils::db {
 
-    template <> std::vector<AccountModel> utils::db::Model<AccountModel>::get_all(pqxx::work& tx) {
-        auto all_accounts = utils::db::Model<finances::accounts::models::Account>::get_all(tx);
+    template <> std::vector<AccountModel> Model<AccountModel>::get_all(pqxx::work& tx) {
+        auto all_accounts = Model<finances::accounts::models::Account>::get_all(tx);
 
         std::vector<AccountModel> ret;
         std::transform(all_accounts.begin(), all_accounts.end(), std::back_inserter(ret),
@@ -17,6 +17,12 @@ namespace utils::db {
                            };
                        });
         return ret;
+    }
+
+    template <>
+    ExpectedType<AccountModel, ErrorNotFound, ErrorMultipleFound>
+    Model<AccountModel>::get(pqxx::work& tx, const Model<AccountModel>::Id& id) {
+        return tl::make_unexpected(utils::NotImplemented{"TODO"});
     }
 
 } // namespace utils::db
