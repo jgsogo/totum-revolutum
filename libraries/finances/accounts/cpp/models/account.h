@@ -16,8 +16,6 @@
 namespace finances::accounts::models {
 
     struct Account {
-        static constexpr std::string_view table_name = "finances_accounts_account";
-
         Id id;
         std::string name;
         std::optional<std::string> description;
@@ -29,9 +27,6 @@ namespace finances::accounts::models {
         std::pair<decltype(Custodian::id), decltype(Custodian::name)> custodian;
         bool is_numerable;
     };
-
-    // using AccountModel = utils::db::Model<Account>;
-    // using AccountModelManager = utils::db::ModelManager<Account>;
 
     using AccountManager = ModelManager<Account>;
     template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all();
