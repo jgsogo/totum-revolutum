@@ -40,3 +40,9 @@ cc_library(
     hdrs = ["type_name.hpp"],
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "expected_type",
+    hdrs = ["expected_type.hpp"],
+    visibility = ["//visibility:public"],
+)

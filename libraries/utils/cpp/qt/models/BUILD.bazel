@@ -21,6 +21,7 @@ qt_cc_library(
         "@magic_enum",
         "@spdlog",
         # "@rules_qt//:qt_gui",
+        "//libraries/utils/cpp:expected_type",
         "@tl-expected",
     ],
 )

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "libraries/utils/cpp/expected_type.hpp"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 #include <spdlog/spdlog.h>
 #include <vector>
@@ -15,9 +16,9 @@ namespace utils::db {
       public:
         ModelManager(utils::libpqxx::ConnectionPool& pool) : pool{pool} {}
 
-        Expected<std::vector<TModel>, DatabaseError> all() {
-            return pool.with_conn<Expected<std::vector<TModel>, DatabaseError>>(
-                [](pqxx::connection& conn) -> Expected<std::vector<TModel>, DatabaseError> {
+        ExpectedType<std::vector<TModel>, DatabaseError> all() {
+            return pool.with_conn<ExpectedType<std::vector<TModel>, DatabaseError>>(
+                [](pqxx::connection& conn) -> ExpectedType<std::vector<TModel>, DatabaseError> {
                     try {
                         pqxx::work tx(conn);
                         SPDLOG_DEBUG("Get all {}", TModelData::name);
@@ -32,7 +33,7 @@ namespace utils::db {
                 });
         }
 
-        Expected<TModel, DatabaseError, ErrorNotFound, ErrorMultipleFound> get(typename TModelData::Id id);
+        ExpectedType<TModel, DatabaseError> get(typename TModelData::Id id);
 
       protected:
         utils::libpqxx::ConnectionPool& pool;

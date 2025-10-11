@@ -8,6 +8,8 @@
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
+#include "libraries/utils/cpp/expected_type.hpp"
+
 #include "errors.h"
 
 namespace utils::qt::models {
@@ -99,12 +101,12 @@ namespace utils::qt::models {
             return items.at(row);
         };
 
-        Expected<std::reference_wrapper<const TModel>> get(const Model::Id& id) {
+        utils::ExpectedType<std::reference_wrapper<const TModel>, ErrorItemNotFound> get(const Model::Id& id) {
             SPDLOG_DEBUG("{}::get(id={})", name, id);
 
             auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.item == id; });
             if (found == items.end()) {
-                SPDLOG_ERROR(" - Unexpected: {} with id {} not found in {}!", Model::name, id, name);
+                SPDLOG_ERROR(" - Unexpected: {} item with id {} not found in table {}!", Model::name, id, name);
                 return tl::unexpected{ErrorItemNotFound{}};
             }
 

@@ -6,6 +6,7 @@ cc_library(
     hdrs = glob(["**/*.h"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//libraries/utils/cpp:expected_type",
         "//libraries/utils/cpp:integral_type",
         "//libraries/utils/cpp:type_name",
         "//libraries/utils/cpp/libpqxx:connection_pool",
