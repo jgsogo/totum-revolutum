@@ -21,4 +21,16 @@ namespace utils::qt::models {
     DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const TableModel<AccountModel, AccountColumns>&,
                                                                         const AccountModel&, AccountColumns);
 
+    template <>
+    QVariant
+    DataDispatcher<AccountModel, AccountColumns, Qt::FontRole>::data(const TableModel<AccountModel, AccountColumns>&,
+                                                                     const AccountModel&, AccountColumns);
+
+    template <>
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::ForegroundRole>::data(
+        const TableModel<AccountModel, AccountColumns>&, const AccountModel&, AccountColumns);
+
+    template <>
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(
+        const TableModel<AccountModel, AccountColumns>&, const AccountModel&, AccountColumns);
 } // namespace utils::qt::models

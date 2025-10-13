@@ -137,4 +137,42 @@ namespace utils::qt::models {
         return result;
     }
 
+    template <>
+    QVariant
+    DataDispatcher<AccountModel, AccountColumns, Qt::FontRole>::data(const TableModel<AccountModel, AccountColumns>&,
+                                                                     const AccountModel&, AccountColumns column) {
+        QVariant result;
+        if ((column == AccountColumns::SNAPSHOT) || (column == AccountColumns::OPEN) ||
+            (column == AccountColumns::CLOSE)) {
+            result = QFont{"Andale Mono"};
+        }
+        return result;
+    }
+
+    template <>
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::ForegroundRole>::data(
+        const TableModel<AccountModel, AccountColumns>&, const AccountModel& item, AccountColumns) {
+        QVariant result;
+        const auto& account = item.account;
+        if (account.close) {
+            auto close_date = QDate{int(account.close->year()), static_cast<int>(unsigned(account.close->month())),
+                                    static_cast<int>(unsigned(account.close->day()))};
+            if (close_date < QDate::currentDate()) {
+                result = QBrush{QColor{Qt::darkGray}};
+            }
+        }
+        return result;
+    }
+
+    template <>
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(
+        const TableModel<AccountModel, AccountColumns>&, const AccountModel&, AccountColumns column) {
+        if ((column == AccountColumns::CUSTODIAN) || (column == AccountColumns::NAME) ||
+            (column == AccountColumns::TYPE)) {
+            return Qt::AlignLeft;
+        } else {
+            return Qt::AlignRight;
+        }
+    }
+
 } // namespace utils::qt::models
