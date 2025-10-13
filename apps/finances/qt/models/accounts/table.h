@@ -15,9 +15,10 @@ class AccountsTable final : public utils::qt::models::TableModel<AccountModel, A
 
 namespace utils::qt::models {
 
-    template <>
-    QVariant
-    DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const TableModel<AccountModel, AccountColumns>&,
-                                                                        const AccountModel&, AccountColumns);
+    // template <>
+    // QVariant
+    // DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const TableModel<AccountModel,
+    // AccountColumns>&,
+    //                                                                     const AccountModel&, AccountColumns);
 
 } // namespace utils::qt::models

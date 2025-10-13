@@ -17,18 +17,19 @@ void AccountsTable::_refresh_one(const AccountModel::Id& id, int row) {
 
     this->items.at(row).last_snapshot = std::move(last_snapshot.value());
 
-    // Emit a signal for all the row (here we don't know which columns have been modified)
+    // Emit a signal to notify that the snapshot column has been modified
     QVector<int> roles = {Qt::DisplayRole};
     QModelIndex topLeft = this->createIndex(row, magic_enum::enum_integer(AccountColumns::SNAPSHOT));
     emit dataChanged(topLeft, topLeft, roles);
 }
 namespace utils::qt::models {
 
-    template <>
-    QVariant
-    DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const TableModel<AccountModel, AccountColumns>&,
-                                                                        const AccountModel&, AccountColumns) {
-        return QVariant{QString::fromStdString("lol")};
-    }
+    // template <>
+    // QVariant
+    // DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const TableModel<AccountModel,
+    // AccountColumns>&,
+    //                                                                     const AccountModel&, AccountColumns) {
+    //     return QVariant{QString::fromStdString("lol")};
+    // }
 
 } // namespace utils::qt::models

@@ -10,6 +10,7 @@
 
 #include "libraries/utils/cpp/expected_type.hpp"
 
+#include "data_dispatcher.h"
 #include "errors.h"
 
 namespace utils::qt::models {
@@ -37,8 +38,6 @@ namespace utils::qt::models {
         };
 
     } // namespace _detail
-
-    template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher;
 
     template <class TModel, typename TColumn> class TableModel : public _detail::GenericTableModel {
         using ModelData = utils::db::ModelData<TModel>;
@@ -144,10 +143,6 @@ namespace utils::qt::models {
 
       protected:
         std::vector<TModel> items;
-    };
-
-    template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher {
-        static QVariant data(const TableModel<TModel, TColumn>&, const TModel&, TColumn) { return QVariant{}; }
     };
 
 } // namespace utils::qt::models

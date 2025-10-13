@@ -6,10 +6,11 @@ qt_cc_library(
         "generic_table_model.cpp",
     ],
     hdrs = [
-        "errors.h",
         "generic_table_model.h",
     ],
     normal_hdrs = [
+        "errors.h",
+        "data_dispatcher.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
