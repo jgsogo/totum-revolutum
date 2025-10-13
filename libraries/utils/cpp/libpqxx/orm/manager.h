@@ -18,6 +18,7 @@ namespace utils::db {
       public:
         ModelManager(utils::libpqxx::ConnectionPool& pool) : pool{pool} {}
 
+        /// Returns all the rows from the database
         ExpectedType<std::vector<TModel>, DatabaseError> all() {
             return pool.with_conn<ExpectedType<std::vector<TModel>, DatabaseError>>(
                 [](pqxx::connection& conn) -> ExpectedType<std::vector<TModel>, DatabaseError> {
@@ -35,6 +36,7 @@ namespace utils::db {
                 });
         }
 
+        /// Returns the row that matches the given `id`.
         ExpectedType<TModel, DatabaseError, ErrorNotFound, ErrorMultipleFound> get(const typename TModelData::Id& id) {
             return pool.with_conn<ExpectedType<TModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>>(
                 [&id](
@@ -44,7 +46,25 @@ namespace utils::db {
 
                         pqxx::work tx(conn);
                         return ModelManager::_get(tx, id);
-                        // return tl::unexpected(DatabaseError{});
+                    } catch (const std::exception& e) {
+                        SPDLOG_ERROR("Failed to fetch {} model: {}", TModelData::name, e.what());
+                        return tl::unexpected(DatabaseError{});
+                    }
+                });
+        }
+
+        /// Returns all the rows that has a foreign key to the given `TParentModel` `id`
+        template <typename TParentModel>
+        ExpectedType<std::vector<TModel>, DatabaseError> filter_by_fk(const typename ModelData<TParentModel>::Id& id) {
+            return pool.with_conn<ExpectedType<std::vector<TModel>, DatabaseError>>(
+                [&id](pqxx::connection& conn) -> ExpectedType<std::vector<TModel>, DatabaseError> {
+                    try {
+                        SPDLOG_DEBUG("Get all the {} that are related to the {} with id {}", TModelData::name,
+                                     ModelData<TParentModel>::name, id);
+
+                        pqxx::work tx(conn);
+                        std::vector<TModel> all_items = ModelManager::_filter_by_fk<TParentModel>(tx, id);
+                        return {all_items};
                     } catch (const std::exception& e) {
                         SPDLOG_ERROR("Failed to fetch {} model: {}", TModelData::name, e.what());
                         return tl::unexpected(DatabaseError{});
@@ -56,6 +76,9 @@ namespace utils::db {
         static std::vector<TModel> _all(pqxx::work&);
         static ExpectedType<TModel, ErrorNotFound, ErrorMultipleFound> _get(pqxx::work&,
                                                                             const typename TModelData::Id&);
+
+        template <typename TParentModel>
+        static std::vector<TModel> _filter_by_fk(pqxx::work&, const typename ModelData<TParentModel>::Id&);
 
       protected:
         utils::libpqxx::ConnectionPool& pool;

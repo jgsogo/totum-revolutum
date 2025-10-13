@@ -47,4 +47,10 @@ namespace utils::db {
         get_last_snapshot(const decltype(finances::accounts::models::Account::id)& account_id);
     };
 
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Snapshot>
+    utils::db::ModelManager<finances::accounts::models::Snapshot>::_filter_by_fk<finances::accounts::models::Account>(
+        pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
+
 } // namespace utils::db

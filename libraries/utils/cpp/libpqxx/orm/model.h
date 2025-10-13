@@ -17,7 +17,8 @@ namespace utils::db {
         using Model = TModel;
         using Manager = ModelManager<TModel>;
         using Id = decltype(TModel::id);
-        static constexpr std::string_view table_name;
         static constexpr std::string_view name = utils::type_name<TModel>();
+
+        static constexpr std::string_view table_name; // to be provided by each model
     };
 } // namespace utils::db

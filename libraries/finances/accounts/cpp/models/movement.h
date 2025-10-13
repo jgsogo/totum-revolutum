@@ -72,31 +72,12 @@ namespace pqxx {
 
 } // namespace pqxx
 
-/*
+namespace utils::db {
 
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Movement>
+    utils::db::ModelManager<finances::accounts::models::Movement>::_filter_by_fk<finances::accounts::models::Account>(
+        pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
 
-class Direction(models.IntegerChoices):
-    IN = 0, _("IN")
-    OUT = 1, _("OUT")
-
-
-class Movement(AmountMixin):
-
-    account = models.ForeignKey(Account, on_delete=models.PROTECT)
-    date_value = models.DateField(
-        help_text=_("Date when the movement is annotated in the associated account")
-    )
-
-    fx = models.ForeignKey(
-        Fx,
-        blank=True,
-        null=True,
-        on_delete=models.PROTECT,
-        help_text=_(
-            "This is the FX used for this movement (it doesn't need to be exactly the same"
-            " as the official one for this 'date_value', as FX varies along the day)"
-        ),
-    )
-
-
-*/
+} // namespace utils::db

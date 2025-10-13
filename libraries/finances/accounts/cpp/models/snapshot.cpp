@@ -38,6 +38,29 @@ namespace utils::db {
             });
     }
 
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Snapshot>
+    utils::db::ModelManager<finances::accounts::models::Snapshot>::_filter_by_fk<finances::accounts::models::Account>(
+        pqxx::work& tx, const ModelData<finances::accounts::models::Account>::Id& account_id) {
+
+        SPDLOG_DEBUG("Get all snapshots for account_id {}", account_id);
+
+        auto query = std::format("SELECT id, date_value, amount"
+                                 " FROM {}"
+                                 " WHERE account_id = $1"
+                                 " ORDER BY date_value DESC",
+                                 SNAPSHOT_TABLE);
+        SPDLOG_TRACE(query);
+        std::vector<Snapshot> ret;
+        for (auto [id, date_value, amount] :
+             tx.query<Id, utils::libpqxx::Date, Amount>(query, pqxx::params{account_id})) {
+            ret.emplace_back(Snapshot{.id = id, .account_id = account_id, .date_value = date_value, .amount = amount});
+        }
+        SPDLOG_TRACE("Found {} snapshots for account {}", ret.size(), account_id);
+        return {ret};
+    }
+
 } // namespace utils::db
 
 tl::expected<std::optional<Snapshot>, Error>
