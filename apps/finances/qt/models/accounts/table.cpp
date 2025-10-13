@@ -143,7 +143,7 @@ namespace utils::qt::models {
                                                                      const AccountModel&, AccountColumns column) {
         QVariant result;
         if ((column == AccountColumns::SNAPSHOT) || (column == AccountColumns::OPEN) ||
-            (column == AccountColumns::CLOSE)) {
+            (column == AccountColumns::CLOSE) || (column == AccountColumns::IDENTIFIER)) {
             result = QFont{"Andale Mono"};
         }
         return result;
