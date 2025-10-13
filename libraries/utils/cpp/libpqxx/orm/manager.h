@@ -13,7 +13,7 @@
 namespace utils::db {
 
     template <typename TModel> class ModelManager {
-        using TModelData = Model<TModel>;
+        using TModelData = ModelData<TModel>;
 
       public:
         ModelManager(utils::libpqxx::ConnectionPool& pool) : pool{pool} {}
@@ -25,7 +25,7 @@ namespace utils::db {
                         SPDLOG_DEBUG("Get all {}", TModelData::name);
 
                         pqxx::work tx(conn);
-                        std::vector<TModel> ret = TModelData::get_all(tx);
+                        std::vector<TModel> ret = ModelManager::_all(tx);
                         SPDLOG_TRACE("Found {} {}", ret.size(), TModelData::name);
                         return {ret};
                     } catch (const std::exception& e) {
@@ -43,7 +43,7 @@ namespace utils::db {
                         SPDLOG_DEBUG("Get {} with id {}", TModelData::name, id);
 
                         pqxx::work tx(conn);
-                        return TModelData::get(tx, id);
+                        return ModelManager::_get(tx, id);
                         // return tl::unexpected(DatabaseError{});
                     } catch (const std::exception& e) {
                         SPDLOG_ERROR("Failed to fetch {} model: {}", TModelData::name, e.what());
@@ -51,6 +51,11 @@ namespace utils::db {
                     }
                 });
         }
+
+      protected:
+        static std::vector<TModel> _all(pqxx::work&);
+        static ExpectedType<TModel, ErrorNotFound, ErrorMultipleFound> _get(pqxx::work&,
+                                                                            const typename TModelData::Id&);
 
       protected:
         utils::libpqxx::ConnectionPool& pool;

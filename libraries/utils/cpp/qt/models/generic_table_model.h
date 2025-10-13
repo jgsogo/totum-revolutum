@@ -41,7 +41,7 @@ namespace utils::qt::models {
     template <typename TModel, typename TColumn, enum Qt::ItemDataRole> struct DataDispatcher;
 
     template <class TModel, typename TColumn> class TableModel : public _detail::GenericTableModel {
-        using Model = utils::db::Model<TModel>;
+        using ModelData = utils::db::ModelData<TModel>;
         using ModelManager = utils::db::ModelManager<TModel>;
         static constexpr std::string_view name = utils::type_name<TableModel<TModel, TColumn>>();
 
@@ -103,12 +103,12 @@ namespace utils::qt::models {
             return items.at(row);
         };
 
-        utils::ExpectedType<std::reference_wrapper<const TModel>, ErrorItemNotFound> get(const Model::Id& id) {
+        utils::ExpectedType<std::reference_wrapper<const TModel>, ErrorItemNotFound> get(const ModelData::Id& id) {
             SPDLOG_DEBUG("{}::get(id={})", name, id);
 
             auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.item == id; });
             if (found == items.end()) {
-                SPDLOG_ERROR(" - Unexpected: {} item with id {} not found in table {}!", Model::name, id, name);
+                SPDLOG_ERROR(" - Unexpected: {} item with id {} not found in table {}!", ModelData::name, id, name);
                 return tl::unexpected{ErrorItemNotFound{}};
             }
 
@@ -132,13 +132,13 @@ namespace utils::qt::models {
 
         void _refresh_one(int row) override final {
             SPDLOG_DEBUG("{}::_refresh_one(row={})", name, row);
-            const typename Model::Id& id = items.at(row).id;
+            const typename ModelData::Id& id = items.at(row).id;
             this->_refresh_one(id, row);
             // Emitting the data changed is responsibility of the leaf implementation, only them
             // know which columns have been modified and for which Qt::ItemDataRole.
         };
 
-        virtual void _refresh_one(const Model::Id& id, int row) {
+        virtual void _refresh_one(const ModelData::Id& id, int row) {
             SPDLOG_WARN("{}::_refresh_one(id={}, row={}) -- empty implementation", name, id, row);
         };
 

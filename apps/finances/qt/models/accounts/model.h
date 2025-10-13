@@ -19,7 +19,9 @@ struct AccountModel {
 
 namespace utils::db {
 
-    template <> std::vector<AccountModel> Model<AccountModel>::get_all(pqxx::work&);
+    template <> ExpectedType<std::vector<AccountModel>, DatabaseError> ModelManager<AccountModel>::all();
+
+    // template <> std::vector<AccountModel> ModelManager<AccountModel>::get_all(pqxx::work&);
 
     // template <>
     // ExpectedType<AccountModel, ErrorNotFound, ErrorMultipleFound>

@@ -5,7 +5,6 @@
 
 #include "libraries/utils/cpp/libpqxx/datatypes/date.h"
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
-#include "libraries/utils/cpp/libpqxx/orm/model.h"
 
 #include "account.h"
 #include "types/amount.h"

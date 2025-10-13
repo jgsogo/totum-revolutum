@@ -7,7 +7,7 @@ using namespace finances::accounts::models;
 
 namespace utils::db {
 
-    template <> std::vector<Account> utils::db::Model<Account>::get_all(pqxx::work& tx) {
+    template <> std::vector<Account> utils::db::ModelManager<Account>::_all(pqxx::work& tx) {
         auto query = std::format("SELECT a.id, a.name, a.description, a.identifier, a.ccy, a.open, a.close, "
                                  "t.id, t.name, c.id, c.name, a.is_numerable"
                                  " FROM {} a"

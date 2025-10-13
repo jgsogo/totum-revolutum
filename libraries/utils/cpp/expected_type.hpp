@@ -4,6 +4,7 @@
 #include <string>
 #include <variant>
 
+#include <spdlog/spdlog.h>
 #include <tl/expected.hpp>
 
 #include "libraries/utils/cpp/concepts/alternative_c.hpp"

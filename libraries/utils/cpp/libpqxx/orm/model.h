@@ -13,13 +13,11 @@ namespace utils::db {
 
     template <typename TModel> class ModelManager;
 
-    template <typename TModel> struct Model {
-        using Manager = ModelManager<Model<TModel>>;
+    template <typename TModel> struct ModelData {
+        using Model = TModel;
+        using Manager = ModelManager<TModel>;
         using Id = decltype(TModel::id);
         // using TModel::table_name;
         static constexpr std::string_view name = utils::type_name<TModel>();
-
-        static std::vector<TModel> get_all(pqxx::work&);
-        static ExpectedType<TModel, ErrorNotFound, ErrorMultipleFound> get(pqxx::work&, const Id&);
     };
 } // namespace utils::db

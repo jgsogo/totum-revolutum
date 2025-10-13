@@ -46,6 +46,7 @@ cc_library(
     hdrs = ["expected_type.hpp"],
     visibility = ["//visibility:public"],
     deps = [
+        "//bazel/logging:spdlog",
         "//libraries/utils/cpp/concepts:alternative_c",
     ],
 )

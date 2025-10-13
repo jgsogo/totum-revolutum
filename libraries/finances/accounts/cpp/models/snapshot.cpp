@@ -3,13 +3,39 @@
 #include <spdlog/fmt/ranges.h>
 #include <spdlog/spdlog.h>
 
+#include "libraries/utils/cpp/libpqxx/orm/model.h"
+
 using namespace finances::accounts::models;
 
 namespace utils::db {
 
     ExpectedType<std::optional<Snapshot>, DatabaseError>
     SnapshotManager::get_last_snapshot(const decltype(Account::id)& account_id) {
-        return tl::unexpected{NotImplemented{"TODO"}};
+        return pool.with_conn<ExpectedType<std::optional<Snapshot>, DatabaseError>>(
+            [&account_id](pqxx::connection& conn) -> ExpectedType<std::optional<Snapshot>, DatabaseError> {
+                try {
+                    pqxx::work tx(conn);
+                    SPDLOG_DEBUG("Get last snapshot for account_id {}", account_id);
+
+                    auto query = std::format("SELECT id, date_value, amount"
+                                             " FROM {}"
+                                             " WHERE account_id = $1"
+                                             " ORDER BY date_value DESC"
+                                             " LIMIT 1",
+                                             SNAPSHOT_TABLE);
+                    SPDLOG_TRACE(query);
+                    auto r = tx.exec(query, pqxx::params{account_id}).opt_row();
+                    if (!r) {
+                        return {std::nullopt};
+                    }
+                    auto [id, date_value, amount] = r->as<Id, utils::libpqxx::Date, Amount>();
+                    return {std::make_optional<Snapshot>(
+                        {.id = id, .account_id = account_id, .date_value = date_value, .amount = amount})};
+                } catch (const std::exception& e) {
+                    SPDLOG_ERROR("Failed to fetch latest snapshot for account {}: {}", account_id, e.what());
+                    return tl::unexpected(DatabaseError{});
+                }
+            });
     }
 
 } // namespace utils::db

@@ -5,7 +5,7 @@
 
 #include "libraries/utils/cpp/libpqxx/datatypes/date.h"
 // #include "libraries/utils/cpp/libpqxx/orm/manager.h"
-#include "libraries/utils/cpp/libpqxx/orm/model.h"
+#include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
 #include "custodian.h"
 #include "hierarchy_tree.h"
@@ -37,6 +37,6 @@ namespace utils::db {
 
     template <>
     std::vector<finances::accounts::models::Account>
-    utils::db::Model<finances::accounts::models::Account>::get_all(pqxx::work&);
+    utils::db::ModelManager<finances::accounts::models::Account>::_all(pqxx::work&);
 
 }
