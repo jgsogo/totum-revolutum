@@ -5,6 +5,15 @@
 
 using namespace finances::accounts::models;
 
+namespace utils::db {
+
+    ExpectedType<std::optional<Snapshot>, DatabaseError>
+    SnapshotManager::get_last_snapshot(const decltype(Account::id)& account_id) {
+        return tl::unexpected{NotImplemented{"TODO"}};
+    }
+
+} // namespace utils::db
+
 tl::expected<std::optional<Snapshot>, Error>
 SnapshotManager::get_last_snapshot(decltype(Account::id) account_id) const {
     return pool.with_conn<tl::expected<std::optional<Snapshot>, Error>>(

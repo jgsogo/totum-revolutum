@@ -11,7 +11,10 @@
 
 namespace utils::db {
 
-    template <typename TModel> struct Model : TModel {
+    template <typename TModel> class ModelManager;
+
+    template <typename TModel> struct Model {
+        using Manager = ModelManager<Model<TModel>>;
         using Id = decltype(TModel::id);
         // using TModel::table_name;
         static constexpr std::string_view name = utils::type_name<TModel>();

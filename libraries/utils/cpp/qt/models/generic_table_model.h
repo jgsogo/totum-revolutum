@@ -28,6 +28,8 @@ namespace utils::qt::models {
 
           protected:
             virtual void _refresh_all() = 0;
+
+            /// Updates data in row `row`. Return true if the data has been modified or false otherwise.
             virtual void _refresh_one(int row) = 0;
 
           protected:
@@ -131,28 +133,13 @@ namespace utils::qt::models {
         void _refresh_one(int row) override final {
             SPDLOG_DEBUG("{}::_refresh_one(row={})", name, row);
             const typename Model::Id& id = items.at(row).id;
-            this->_refresh_one(id);
-            // TODO: Emit data changed
+            this->_refresh_one(id, row);
+            // Emitting the data changed is responsibility of the leaf implementation, only them
+            // know which columns have been modified and for which Qt::ItemDataRole.
         };
 
-        virtual void _refresh_one(const Model::Id& id) {
-            SPDLOG_WARN("{}::_refresh_one(id={}) - empty implementation!", name, id);
-            SPDLOG_TRACE(" - fetch data for item with id {}", id);
-            ModelManager manager{pool};
-            const auto item = manager.get(id);
-            if (!item) {
-                SPDLOG_ERROR("Error refreshing items: {}", item.error());
-                // TODO: Communicate error to user
-                return;
-            }
-
-            //             // Update the corresponding row
-            // auto row = std::distance(this->accounts.begin(), it);
-            // this->snapshots.at(row).swap(last_snapshot.value());
-
-            // QVector<int> roles = {Qt::DisplayRole};
-            // QModelIndex topLeft = this->createIndex(row, magic_enum::enum_integer(Column::SNAPSHOT));
-            // emit dataChanged(topLeft, topLeft, roles);
+        virtual void _refresh_one(const Model::Id& id, int row) {
+            SPDLOG_WARN("{}::_refresh_one(id={}, row={}) -- empty implementation", name, id, row);
         };
 
       protected:

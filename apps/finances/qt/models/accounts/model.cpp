@@ -19,10 +19,10 @@ namespace utils::db {
         return ret;
     }
 
-    template <>
-    ExpectedType<AccountModel, ErrorNotFound, ErrorMultipleFound>
-    Model<AccountModel>::get(pqxx::work& tx, const Model<AccountModel>::Id& id) {
-        return tl::make_unexpected(utils::NotImplemented{"TODO"});
-    }
+    // template <>
+    // ExpectedType<AccountModel, ErrorNotFound, ErrorMultipleFound>
+    // Model<AccountModel>::get(pqxx::work& tx, const Model<AccountModel>::Id& id) {
+    //     return tl::make_unexpected(utils::NotImplemented{"TODO"});
+    // }
 
 } // namespace utils::db

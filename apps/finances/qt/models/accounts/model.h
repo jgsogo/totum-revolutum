@@ -5,7 +5,11 @@
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 
 struct AccountModel {
-    const decltype(finances::accounts::models::Account::id) id;
+    using Id = decltype(finances::accounts::models::Account::id);
+    // AccountModel(AccountModel&& other) = default;
+    // AccountModel& operator=(AccountModel&& other) = default;
+
+    const Id id;
 
     finances::accounts::models::Account account;
     std::optional<finances::accounts::models::Snapshot> last_snapshot;
@@ -17,8 +21,8 @@ namespace utils::db {
 
     template <> std::vector<AccountModel> Model<AccountModel>::get_all(pqxx::work&);
 
-    template <>
-    ExpectedType<AccountModel, ErrorNotFound, ErrorMultipleFound>
-    Model<AccountModel>::get(pqxx::work&, const Model<AccountModel>::Id&);
+    // template <>
+    // ExpectedType<AccountModel, ErrorNotFound, ErrorMultipleFound>
+    // Model<AccountModel>::get(pqxx::work&, const Model<AccountModel>::Id&);
 
 } // namespace utils::db

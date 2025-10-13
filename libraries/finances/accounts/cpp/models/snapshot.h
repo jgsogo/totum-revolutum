@@ -4,6 +4,8 @@
 #include <string>
 
 #include "libraries/utils/cpp/libpqxx/datatypes/date.h"
+#include "libraries/utils/cpp/libpqxx/orm/manager.h"
+#include "libraries/utils/cpp/libpqxx/orm/model.h"
 
 #include "account.h"
 #include "types/amount.h"
@@ -35,3 +37,15 @@ namespace finances::accounts::models {
     };
 
 } // namespace finances::accounts::models
+
+namespace utils::db {
+
+    class SnapshotManager : public ModelManager<finances::accounts::models::Snapshot> {
+      public:
+        using ModelManager<finances::accounts::models::Snapshot>::ModelManager;
+
+        ExpectedType<std::optional<finances::accounts::models::Snapshot>, DatabaseError>
+        get_last_snapshot(const decltype(finances::accounts::models::Account::id)& account_id);
+    };
+
+} // namespace utils::db
