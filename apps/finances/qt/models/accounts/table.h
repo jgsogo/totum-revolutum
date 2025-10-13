@@ -10,15 +10,15 @@ class AccountsTable final : public utils::qt::models::TableModel<AccountModel, A
     AccountsTable(utils::libpqxx::ConnectionPool& pool, QObject* parent = nullptr);
 
   protected:
+    void _refresh_all() override;
     void _refresh_one(const AccountModel::Id& id, int row) override final;
 };
 
 namespace utils::qt::models {
 
-    // template <>
-    // QVariant
-    // DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const TableModel<AccountModel,
-    // AccountColumns>&,
-    //                                                                     const AccountModel&, AccountColumns);
+    template <>
+    QVariant
+    DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const TableModel<AccountModel, AccountColumns>&,
+                                                                        const AccountModel&, AccountColumns);
 
 } // namespace utils::qt::models

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Qt>
+
 namespace utils::qt::models {
 
     template <class TModel, typename TColumn> class TableModel;

@@ -12,6 +12,7 @@ struct AccountModel {
     std::optional<finances::accounts::models::Snapshot> last_snapshot;
     std::vector<std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>
         holders;
+    std::string account_type_breadcrumb;
 };
 
 namespace utils::db {
