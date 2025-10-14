@@ -7,6 +7,7 @@
 
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
 #include "libraries/utils/cpp/libpqxx/orm/model.h"
+#include "libraries/utils/cpp/string_literal.hpp"
 
 #include "model_manager.hpp"
 #include "types/id.h"
@@ -44,13 +45,14 @@ namespace finances::accounts::models {
 
 namespace utils::db {
 
-    template <>
-    constexpr std::string_view ModelData<finances::accounts::models::AccountType>::table_name =
-        "finances_accounts_accounttype";
+    // template <>
+    // constexpr std::string_view ModelData<finances::accounts::models::AccountType>::table_name =
+    //     "finances_accounts_accounttype";
 
     namespace _impl {
 
-        template <typename THierarchyTree> class HierarchyTreeManager : public ModelManager<THierarchyTree> {
+        template <typename THierarchyTree, utils::StringLiteral TABLE_NAME>
+        class HierarchyTreeManager : public ModelManager<THierarchyTree> {
           public:
             using ModelManager<THierarchyTree>::ModelManager;
             using Id = decltype(THierarchyTree::id);
@@ -60,8 +62,6 @@ namespace utils::db {
                 return pool.template with_conn<ExpectedType<std::vector<std::string>, DatabaseError>>(
                     [id](pqxx::connection& conn) -> ExpectedType<std::vector<std::string>, DatabaseError> {
                         try {
-                            auto table_name = ModelData<THierarchyTree>::table_name;
-
                             pqxx::work tx(conn);
                             auto query = std::format(
                                 ""
@@ -73,7 +73,7 @@ namespace utils::db {
                                 "JOIN LATERAL unnest(string_to_array(i.tn_ancestors_pks, ',')) AS ref_id ON TRUE "
                                 "JOIN {} r ON r.id = ref_id::INT "
                                 "WHERE i.id = $1;",
-                                table_name, table_name);
+                                TABLE_NAME, TABLE_NAME);
                             SPDLOG_TRACE(query);
 
                             std::vector<std::string> ret;
@@ -92,7 +92,9 @@ namespace utils::db {
         };
     } // namespace _impl
 
-    using AccountTypeManager = _impl::HierarchyTreeManager<finances::accounts::models::AccountType>;
-    using MovementTypeManager = _impl::HierarchyTreeManager<finances::accounts::models::MovementType>;
+    using AccountTypeManager =
+        _impl::HierarchyTreeManager<finances::accounts::models::AccountType, "finances_accounts_accounttype">;
+    using MovementTypeManager =
+        _impl::HierarchyTreeManager<finances::accounts::models::MovementType, "finances_accounts_movementtype">;
 
 } // namespace utils::db

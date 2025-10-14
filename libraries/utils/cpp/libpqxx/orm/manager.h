@@ -72,6 +72,12 @@ namespace utils::db {
                 });
         }
 
+        /// Retruns all the rows that has a foreign key to the give `TParentModel`
+        template <typename TParentModel>
+        ExpectedType<std::vector<TModel>, DatabaseError> filter_by_fk(const TParentModel& parent) {
+            return this->filter_by_fk<TParentModel>(parent.id);
+        }
+
       protected:
         static std::vector<TModel> _all(pqxx::work&);
         static ExpectedType<TModel, ErrorNotFound, ErrorMultipleFound> _get(pqxx::work&,

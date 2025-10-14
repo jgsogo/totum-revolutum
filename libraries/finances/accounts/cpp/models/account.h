@@ -39,4 +39,17 @@ namespace utils::db {
     std::vector<finances::accounts::models::Account>
     utils::db::ModelManager<finances::accounts::models::Account>::_all(pqxx::work&);
 
-}
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Account>
+    utils::db::ModelManager<finances::accounts::models::Account>::_filter_by_fk<finances::accounts::models::Custodian>(
+        pqxx::work&, const decltype(finances::accounts::models::Custodian::id)& id);
+
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Account>
+    utils::db::ModelManager<finances::accounts::models::Account>::_filter_by_fk<
+        finances::accounts::models::AccountType>(pqxx::work&,
+                                                 const decltype(finances::accounts::models::AccountType::id)& id);
+
+} // namespace utils::db
