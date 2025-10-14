@@ -25,7 +25,7 @@ void AccountsTable::_refresh_all() {
             breadcrumb_str = item.account.type.second;
         } else {
             for (auto it : breadcrumb.value()) {
-                breadcrumb_str.append(it);
+                breadcrumb_str.append(it.second);
                 breadcrumb_str.append(" > ");
             }
             breadcrumb_str.append(item.account.type.second);

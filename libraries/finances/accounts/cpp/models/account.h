@@ -28,9 +28,6 @@ namespace finances::accounts::models {
         bool is_numerable;
     };
 
-    using AccountManager = ModelManager<Account>;
-    template <> tl::expected<std::vector<Account>, Error> ModelManager<Account>::all();
-
 } // namespace finances::accounts::models
 
 namespace utils::db {

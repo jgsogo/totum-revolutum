@@ -58,9 +58,12 @@ namespace utils::db {
             using Id = decltype(THierarchyTree::id);
             using ModelManager<THierarchyTree>::pool;
 
-            ExpectedType<std::vector<std::string>, DatabaseError> breadcrumb(const Id& id) {
-                return pool.template with_conn<ExpectedType<std::vector<std::string>, DatabaseError>>(
-                    [id](pqxx::connection& conn) -> ExpectedType<std::vector<std::string>, DatabaseError> {
+            /// Returns the breadcrumb for the given `THierarchyTree` model. The breadcrumb doesn't include the element
+            /// itself.
+            ExpectedType<std::vector<std::pair<Id, std::string>>, DatabaseError> breadcrumb(const Id& id) {
+                return pool.template with_conn<ExpectedType<std::vector<std::pair<Id, std::string>>, DatabaseError>>(
+                    [id](pqxx::connection& conn)
+                        -> ExpectedType<std::vector<std::pair<Id, std::string>>, DatabaseError> {
                         try {
                             pqxx::work tx(conn);
                             auto query = std::format(
@@ -76,15 +79,16 @@ namespace utils::db {
                                 TABLE_NAME, TABLE_NAME);
                             SPDLOG_TRACE(query);
 
-                            std::vector<std::string> ret;
-                            for (auto [id, source, ref_id, target] :
+                            std::vector<std::pair<Id, std::string>> ret;
+                            for (auto [source_id, source, target_id, target] :
                                  tx.query<Id, std::string, Id, std::string>(query, pqxx::params{id})) {
-                                ret.emplace_back(std::move(target));
+                                ret.emplace_back(std::make_pair(target_id, std::move(target)));
                             }
                             return ret;
 
                         } catch (const std::exception& e) {
-                            SPDLOG_ERROR("Failed to fetch breadcrumb for account type {}: {}", id, e.what());
+                            SPDLOG_ERROR("Failed to fetch breadcrumb for model {} (pk={}): {}",
+                                         utils::type_name<THierarchyTree>(), id, e.what());
                             return tl::unexpected(DatabaseError{});
                         }
                     });

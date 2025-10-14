@@ -159,7 +159,7 @@ void AccountTableModel::fetch_all() {
     SPDLOG_DEBUG("AccountTableModel::fetch_all");
 
     SPDLOG_TRACE(" - fetch all accounts");
-    finances::accounts::models::AccountManager manager{pool};
+    utils::db::ModelManager<finances::accounts::models::Account> manager{pool};
     auto all_accounts = manager.all();
     if (!all_accounts) {
         SPDLOG_ERROR("Error refreshing accounts");
