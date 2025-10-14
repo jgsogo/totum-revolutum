@@ -48,13 +48,9 @@ bool AccountsTableFilterProxyModel::filterAcceptsRow(int sourceRow, const QModel
         }
         // Filter base on showOthersAccounts
         if (me.has_value() && _showOthersAccounts == Qt::Unchecked) {
-            // SPDLOG_TRACE("1");
-            // SPDLOG_ERROR("mapToSource -- row={}", this->createSourceIndex(sourceRow, 1, nullptr).row());
-            // auto idx_model = this->mapToSource(this->createSourceIndex(sourceRow, 1, nullptr));
-            // SPDLOG_TRACE("2");
             const auto& holders = this->model->get_holders(sourceRow);
             auto it = std::find_if(holders.begin(), holders.end(), [this](const auto& acc_holder) {
-                return acc_holder.second.owns_money && (acc_holder.first.id == me->id);
+                return acc_holder.owns_money && (acc_holder.id == me->id);
             });
             return it != holders.end();
         }

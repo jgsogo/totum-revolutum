@@ -80,6 +80,7 @@ namespace utils::db {
 
       protected:
         static std::vector<TModel> _all(pqxx::work&);
+
         static ExpectedType<TModel, ErrorNotFound, ErrorMultipleFound> _get(pqxx::work&,
                                                                             const typename TModelData::Id&);
 

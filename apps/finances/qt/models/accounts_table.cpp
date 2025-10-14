@@ -100,7 +100,7 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
             std::ostringstream imploded;
             std::transform(account_holders.begin(), account_holders.end(),
                            std::ostream_iterator<std::string>(imploded, delim),
-                           [](const auto& acc_holder) { return acc_holder.first.name; });
+                           [](const auto& acc_holder) { return acc_holder.name; });
             result = QString::fromStdString(imploded.str());
         } break;
         }
@@ -196,12 +196,8 @@ void AccountTableModel::fetch_all() {
     std::vector<std::optional<finances::accounts::models::Snapshot>> all_snapshots(all_accounts->size(), std::nullopt);
 
     // Create empty account_holders vector
-    std::vector<std::vector<
-        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
-        initial_holders(
-            all_accounts->size(),
-            std::vector<
-                std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>{});
+    std::vector<std::vector<finances::accounts::models::AccountHolder>> initial_holders(
+        all_accounts->size(), std::vector<finances::accounts::models::AccountHolder>{});
 
     this->beginResetModel();
     this->accounts = std::move(all_accounts.value());
@@ -241,14 +237,12 @@ void AccountTableModel::fetch_snapshots() {
 
 void AccountTableModel::fetch_account_holders() {
     SPDLOG_DEBUG("AccountTableModel::fetch_account_holders");
-    finances::accounts::models::AccountHolderManager manager{pool};
+    utils::db::ModelManager<finances::accounts::models::AccountHolder> manager{pool};
 
-    std::vector<std::vector<
-        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
-        account_holders;
+    std::vector<std::vector<finances::accounts::models::AccountHolder>> account_holders;
     account_holders.resize(accounts.size());
     for (const auto& [i, account] : utils::enumerate(accounts)) {
-        auto holders_expected = manager.all(account.id);
+        auto holders_expected = manager.filter_by_fk(account);
         if (!holders_expected) {
             SPDLOG_WARN("Error retrieving AccountHolders for account {}", account.id);
             continue;
@@ -311,8 +305,7 @@ const finances::accounts::models::Account& AccountTableModel::get_account(int ro
     return accounts.at(row);
 }
 
-const std::vector<std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>&
-AccountTableModel::get_holders(int row) const {
+const std::vector<finances::accounts::models::AccountHolder>& AccountTableModel::get_holders(int row) const {
     SPDLOG_TRACE("AccountTableModel::get_holders(row={})", row);
     return holders.at(row);
 }

@@ -10,8 +10,7 @@ struct AccountModel {
     const Id id;
     finances::accounts::models::Account account;
     std::optional<finances::accounts::models::Snapshot> last_snapshot;
-    std::vector<std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>
-        holders;
+    std::vector<finances::accounts::models::AccountHolder> holders;
     std::string account_type_breadcrumb;
 };
 

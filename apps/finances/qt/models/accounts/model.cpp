@@ -25,8 +25,8 @@ namespace utils::db {
             }
 
             // Get the holders for this account
-            AccountHolderManager holders_manager{pool};
-            auto holders = holders_manager.all_for_account(acc.id);
+            utils::db::ModelManager<finances::accounts::models::AccountHolder> holders_manager{pool};
+            auto holders = holders_manager.filter_by_fk(acc);
             if (!holders) {
                 return tl::unexpected{holders.error()};
             }

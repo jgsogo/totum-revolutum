@@ -130,7 +130,7 @@ namespace utils::qt::models {
             std::ostringstream imploded;
             std::transform(account_holders.begin(), account_holders.end(),
                            std::ostream_iterator<std::string>(imploded, delim),
-                           [](const auto& acc_holder) { return acc_holder.first.name; });
+                           [](const auto& acc_holder) { return acc_holder.name; });
             result = QString::fromStdString(imploded.str());
         } break;
         }

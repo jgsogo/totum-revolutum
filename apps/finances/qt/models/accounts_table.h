@@ -32,9 +32,7 @@ class AccountTableModel : public QAbstractTableModel {
     const finances::accounts::models::Account& get_account(finances::accounts::models::Id account_id) const;
 
     const finances::accounts::models::Account& get_account(int row) const;
-    const std::vector<
-        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>&
-    get_holders(int row) const;
+    const std::vector<finances::accounts::models::AccountHolder>& get_holders(int row) const;
 
   private slots:
     void fetch_all();
@@ -48,9 +46,7 @@ class AccountTableModel : public QAbstractTableModel {
     utils::libpqxx::ConnectionPool& pool;
     std::vector<finances::accounts::models::Account> accounts;
     std::vector<std::optional<finances::accounts::models::Snapshot>> snapshots;
-    std::vector<std::vector<
-        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
-        holders;
+    std::vector<std::vector<finances::accounts::models::AccountHolder>> holders;
 
     std::map<finances::accounts::models::Id, QString> _account_type_breadcrumb;
 };
