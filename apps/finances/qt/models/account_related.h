@@ -101,8 +101,8 @@ template <typename TModel, typename Column> class AccountRelatedModel : public A
         SPDLOG_DEBUG("AccountRelatedModel<TModel>::_fetch_all");
 
         SPDLOG_TRACE(" - fetch all the items for this model");
-        typename TModel::Manager manager{pool};
-        auto all_items = manager.all(account.id);
+        typename utils::db::ModelData<TModel>::Manager manager{pool};
+        auto all_items = manager.filter_by_fk(account);
         if (!all_items) {
             SPDLOG_ERROR("Error refreshing items");
             // TODO: Communicate error to user

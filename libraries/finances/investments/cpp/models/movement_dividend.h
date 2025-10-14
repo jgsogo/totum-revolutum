@@ -3,10 +3,10 @@
 #include "libraries/finances/accounts/cpp/models/movement.h"
 
 namespace finances::investments::models {
-    class MovementDividendManager;
+    // class MovementDividendManager;
 
     struct MovementDividend {
-        using Manager = MovementDividendManager;
+        // using Manager = MovementDividendManager;
 
         finances::accounts::models::Movement movement;
 
@@ -18,9 +18,4 @@ namespace finances::investments::models {
             snapshot_data; // <date_value, quantity>
     };
 
-    class MovementDividendManager : public finances::accounts::models::ModelManager<MovementDividend> {
-      public:
-        tl::expected<std::vector<MovementDividend>, finances::accounts::models::Error>
-        all(finances::accounts::models::Id account_id);
-    };
 } // namespace finances::investments::models

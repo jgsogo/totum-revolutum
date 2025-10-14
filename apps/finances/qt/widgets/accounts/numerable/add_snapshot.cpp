@@ -82,7 +82,7 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
         return;
     }
 
-    finances::investments::models::SnapshotNumerableManager manager{pool};
+    utils::db::SnapshotNumerableManager manager{pool};
     auto r = manager.create(account.id, std::move(date), std::move(quantity_amount.value()),
                             std::move(unit_value_amount.value()));
     if (!r) {

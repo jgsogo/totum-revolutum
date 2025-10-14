@@ -66,7 +66,7 @@ void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {
         return;
     }
 
-    finances::accounts::models::SnapshotManager manager{pool};
+    utils::db::SnapshotManager manager{pool};
     auto r = manager.create(account.id, std::move(date), std::move(amount_amount.value()));
     if (!r) {
         SPDLOG_ERROR("Error adding snapshot to account");

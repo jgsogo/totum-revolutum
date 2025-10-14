@@ -14,26 +14,17 @@
 
 namespace finances::accounts::models {
 
-    class MovementManager;
-
     enum class MovementDirection : int32_t { IN = 0, OUT = 1 };
 
     struct Movement {
-        using Manager = MovementManager;
-
         Id id;
         std::pair<decltype(Transaction::id), decltype(Transaction::name)> transaction;
         std::pair<decltype(MovementType::id), decltype(MovementType::name)> type;
         MovementDirection direction;
-        decltype(AccountType::id) account_id;
+        std::pair<decltype(Account::id), decltype(Account::name)> account;
         utils::libpqxx::Date date_value;
         // Fx fx;
         Amount amount;
-    };
-
-    class MovementManager : public ModelManager<Movement> {
-      public:
-        tl::expected<std::vector<Movement>, Error> all(Id account_id);
     };
 
 } // namespace finances::accounts::models
@@ -79,5 +70,12 @@ namespace utils::db {
     std::vector<finances::accounts::models::Movement>
     utils::db::ModelManager<finances::accounts::models::Movement>::_filter_by_fk<finances::accounts::models::Account>(
         pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
+
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Movement>
+    utils::db::ModelManager<finances::accounts::models::Movement>::_filter_by_fk<
+        finances::accounts::models::Transaction>(pqxx::work&,
+                                                 const ModelData<finances::accounts::models::Transaction>::Id& id);
 
 } // namespace utils::db
