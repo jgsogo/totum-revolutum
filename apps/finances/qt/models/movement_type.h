@@ -22,7 +22,8 @@ class MovementTypeTableModel : public QAbstractTableModel {
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     const finances::accounts::models::MovementType& get_movement_type(finances::accounts::models::Id) const;
-    std::optional<std::reference_wrapper<const std::vector<std::string>>>
+    std::optional<std::reference_wrapper<
+        const std::vector<std::pair<decltype(finances::accounts::models::MovementType::id), std::string>>>>
         get_breadcrumb(finances::accounts::models::Id) const;
 
   private slots:
@@ -32,5 +33,7 @@ class MovementTypeTableModel : public QAbstractTableModel {
   private:
     utils::libpqxx::ConnectionPool& pool;
     std::vector<finances::accounts::models::MovementType> items;
-    std::map<finances::accounts::models::Id, std::vector<std::string>> breadcrumbs;
+    std::map<finances::accounts::models::Id,
+             std::vector<std::pair<decltype(finances::accounts::models::MovementType::id), std::string>>>
+        breadcrumbs;
 };

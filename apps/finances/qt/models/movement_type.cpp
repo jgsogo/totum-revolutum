@@ -41,8 +41,9 @@ QVariant MovementTypeTableModel::data(const QModelIndex& index, int role) const 
                 // TODO: Implement this implode as a util
                 const char* const delim = " > ";
                 std::ostringstream imploded;
-                std::copy(found->second.begin(), found->second.end(),
-                          std::ostream_iterator<std::string>(imploded, delim));
+                for (const auto& item : found->second) {
+                    imploded << item.second << delim;
+                }
                 result = QString::fromStdString(imploded.str());
             }
         } break;
@@ -101,7 +102,7 @@ void MovementTypeTableModel::fetch_all() {
     SPDLOG_DEBUG("MovementTypeTableModel::fetch_all");
 
     SPDLOG_TRACE(" - fetch all accounts");
-    finances::accounts::models::MovementType::Manager manager{pool};
+    utils::db::ModelManager<finances::accounts::models::MovementType> manager{pool};
     auto all_items = manager.all();
     if (!all_items) {
         SPDLOG_ERROR("Error refreshing accounts");
@@ -120,8 +121,10 @@ void MovementTypeTableModel::fetch_all() {
 void MovementTypeTableModel::fetch_breadcrumbs() {
     SPDLOG_DEBUG("MovementTypeTableModel::fetch_breadcrumbs");
 
-    finances::accounts::models::MovementType::Manager manager{pool};
-    std::map<finances::accounts::models::Id, std::vector<std::string>> breadcrumbs_;
+    utils::db::MovementTypeManager manager{pool};
+    std::map<finances::accounts::models::Id,
+             std::vector<std::pair<decltype(finances::accounts::models::MovementType::id), std::string>>>
+        breadcrumbs_;
     for (const auto& movtype : items) {
         auto breadcrumb = manager.breadcrumb(movtype.id);
         if (breadcrumb) {
@@ -148,7 +151,8 @@ MovementTypeTableModel::get_movement_type(finances::accounts::models::Id id) con
     return *found;
 }
 
-std::optional<std::reference_wrapper<const std::vector<std::string>>>
+std::optional<std::reference_wrapper<
+    const std::vector<std::pair<decltype(finances::accounts::models::MovementType::id), std::string>>>>
 MovementTypeTableModel::get_breadcrumb(finances::accounts::models::Id id) const {
     auto found = this->breadcrumbs.find(id);
     if (found == breadcrumbs.end()) {

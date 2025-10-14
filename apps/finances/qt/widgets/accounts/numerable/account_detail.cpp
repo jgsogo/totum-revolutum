@@ -205,7 +205,7 @@ QVariant DataDispatcher<finances::accounts::models::Movement, MovementNumerableC
             // FIXME: We are doing this in multiple places
             QString q_breadcrumb;
             for (const auto& it : breadcrumb.value().get()) {
-                q_breadcrumb.append(it.c_str());
+                q_breadcrumb.append(it.second.c_str());
                 q_breadcrumb.append(" > ");
             }
             q_breadcrumb.append(item.type.second.c_str());

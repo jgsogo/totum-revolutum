@@ -171,7 +171,7 @@ void AccountTableModel::fetch_all() {
     SPDLOG_TRACE(" - fetch all account_type breadcrumbs");
     // FIXME: The breadcrumbs could/should be created only once, maybe at the root of the application
     std::map<finances::accounts::models::Id, QString> account_type_breadcrumb;
-    finances::accounts::models::AccountType::Manager account_type_manager{pool};
+    utils::db::AccountTypeManager account_type_manager{pool};
     auto all_account_type = account_type_manager.all();
     if (all_account_type) {
         for (const auto& acc_type : all_account_type.value()) {
@@ -180,7 +180,7 @@ void AccountTableModel::fetch_all() {
             auto breadcrumb = account_type_manager.breadcrumb(acc_type.id);
             if (breadcrumb) {
                 for (auto it : breadcrumb.value()) {
-                    q_breadcrumb.append(it.c_str());
+                    q_breadcrumb.append(it.second.c_str());
                     q_breadcrumb.append(" > ");
                 }
                 q_breadcrumb.append(acc_type.name.c_str());

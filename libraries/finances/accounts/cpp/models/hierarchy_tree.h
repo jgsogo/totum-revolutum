@@ -14,11 +14,7 @@
 
 namespace finances::accounts::models {
 
-    template <typename Tag> class HierarchyTreeManager;
-
     template <typename Tag> struct HierarchyTree {
-        using Manager = HierarchyTreeManager<HierarchyTree<Tag>>;
-
         Id id;
         std::string name;
         std::optional<std::string> description;
@@ -29,25 +25,9 @@ namespace finances::accounts::models {
     using AccountType = HierarchyTree<class AccountTypeTag>;
     using MovementType = HierarchyTree<class MovementTypeTag>;
 
-    template <typename THierarchyTree> class HierarchyTreeManager : public ModelManager<THierarchyTree> {
-      public:
-        tl::expected<std::vector<THierarchyTree>, Error> all();
-        tl::expected<std::vector<std::string>, Error> breadcrumb(Id id);
-    };
-
-    template <> tl::expected<std::vector<AccountType>, Error> HierarchyTreeManager<AccountType>::all();
-    template <> tl::expected<std::vector<std::string>, Error> HierarchyTreeManager<AccountType>::breadcrumb(Id id);
-
-    template <> tl::expected<std::vector<MovementType>, Error> HierarchyTreeManager<MovementType>::all();
-    template <> tl::expected<std::vector<std::string>, Error> HierarchyTreeManager<MovementType>::breadcrumb(Id id);
-
 } // namespace finances::accounts::models
 
 namespace utils::db {
-
-    // template <>
-    // constexpr std::string_view ModelData<finances::accounts::models::AccountType>::table_name =
-    //     "finances_accounts_accounttype";
 
     namespace _impl {
 
@@ -94,11 +74,20 @@ namespace utils::db {
                     });
             }
         };
+
     } // namespace _impl
 
-    using AccountTypeManager =
-        _impl::HierarchyTreeManager<finances::accounts::models::AccountType, "finances_accounts_accounttype">;
-    using MovementTypeManager =
-        _impl::HierarchyTreeManager<finances::accounts::models::MovementType, "finances_accounts_movementtype">;
+    using AccountTypeManager = _impl::HierarchyTreeManager<finances::accounts::models::AccountType,
+                                                           finances::accounts::models::ACCOUNT_TYPE_TABLE>;
+    using MovementTypeManager = _impl::HierarchyTreeManager<finances::accounts::models::MovementType,
+                                                            finances::accounts::models::MOVEMENTTYPE_TABLE>;
+
+    template <>
+    std::vector<finances::accounts::models::AccountType>
+    ModelManager<finances::accounts::models::AccountType>::_all(pqxx::work&);
+
+    template <>
+    std::vector<finances::accounts::models::MovementType>
+    ModelManager<finances::accounts::models::MovementType>::_all(pqxx::work&);
 
 } // namespace utils::db
