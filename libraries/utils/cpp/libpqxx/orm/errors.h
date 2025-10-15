@@ -8,6 +8,7 @@ namespace utils::db {
     struct ErrorNotFound {};
     struct DatabaseError {};
     struct ErrorMultipleFound {};
+    struct ErrorInvalidInput {};
 } // namespace utils::db
 
 // Required for spdlog

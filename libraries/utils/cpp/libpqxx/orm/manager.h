@@ -72,11 +72,33 @@ namespace utils::db {
                 });
         }
 
-        /// Retruns all the rows that has a foreign key to the give `TParentModel`
+        /// Returns all the rows that has a foreign key to the give `TParentModel`
         template <typename TParentModel>
         ExpectedType<std::vector<TModel>, DatabaseError> filter_by_fk(const TParentModel& parent) {
             return this->filter_by_fk<TParentModel>(parent.id);
         }
+
+        /// Creates a new TModel, and returns its id
+        ExpectedType<Id, DatabaseError, ErrorInvalidInput> create(TModel&& new_instance) {
+            if (is_null(new_instance.id)) {
+                return tl::unexpected{ErrorInvalidInput{}};
+            }
+
+            return pool.with_conn<ExpectedType<Id, DatabaseError, ErrorInvalidInput>>(
+                [&new_instance](pqxx::connection& conn) -> ExpectedType<Id, DatabaseError, ErrorInvalidInput> {
+                    try {
+                        SPDLOG_DEBUG("Create new instance of model {}", TModelData::name);
+
+                        pqxx::work tx(conn);
+                        utils::db::Id new_id = ModelManager::_create(tx, std::move(new_instance));
+                        tx.commit();
+                        return {new_id};
+                    } catch (const std::exception& e) {
+                        SPDLOG_ERROR("Failed to create new instance of model {}: {}", TModelData::name, e.what());
+                        return tl::unexpected(DatabaseError{});
+                    }
+                });
+        };
 
       protected:
         static std::vector<TModel> _all(pqxx::work&);
@@ -86,6 +108,8 @@ namespace utils::db {
 
         template <typename TParentModel>
         static std::vector<TModel> _filter_by_fk(pqxx::work&, const typename ModelData<TParentModel>::Id&);
+
+        static Id _create(pqxx::work&, TModel&&);
 
       protected:
         utils::libpqxx::ConnectionPool& pool;

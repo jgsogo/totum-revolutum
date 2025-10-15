@@ -31,10 +31,6 @@ namespace utils::db {
 
         ExpectedType<std::vector<std::optional<finances::accounts::models::Snapshot>>, DatabaseError>
         get_last_snapshots(const std::vector<decltype(finances::accounts::models::Account::id)>& account_ids);
-
-        ExpectedType<int, DatabaseError> create(Id, utils::libpqxx::Date, finances::accounts::models::Amount) {
-            return tl::unexpected{NotImplemented{}};
-        };
     };
 
     template <>

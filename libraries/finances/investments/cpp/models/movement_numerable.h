@@ -3,11 +3,7 @@
 #include "libraries/finances/accounts/cpp/models/movement.h"
 
 namespace finances::investments::models {
-    // class MovementNumerableManager;
-
     struct MovementNumerable {
-        // using Manager = MovementNumerableManager;
-
         finances::accounts::models::Movement movement;
 
         utils::db::Id id;
@@ -15,9 +11,4 @@ namespace finances::investments::models {
         finances::accounts::models::Amount unit_value;
     };
 
-    // class MovementNumerableManager : public finances::accounts::models::ModelManager<MovementNumerable> {
-    //   public:
-    //     tl::expected<std::vector<MovementNumerable>, finances::accounts::models::Error>
-    //     all(utils::db::Id account_id);
-    // };
 } // namespace finances::investments::models

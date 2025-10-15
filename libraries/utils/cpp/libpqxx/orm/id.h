@@ -7,6 +7,8 @@
 namespace utils::db {
     using IdType = utils::IntegralType<class DatabaseId, uint64_t>;
     using Id = std::variant<std::monostate, IdType>;
+
+    constexpr bool is_null(const utils::db::Id& value) { return value.index() == 0; }
 } // namespace utils::db
 
 // Required for std::format
@@ -56,10 +58,7 @@ namespace pqxx {
         // Does this C++ type always denote an SQL null, like with nullptr_t?
         static constexpr bool always_null{false};
 
-        static bool is_null(const utils::db::Id& value) {
-            // Return whether "value" is null.
-            return value.index() == 0;
-        }
+        static bool is_null(const utils::db::Id& value) { return utils::db::is_null(value); }
 
         [[nodiscard]] static utils::db::Id null() {
             // Return a null value.
