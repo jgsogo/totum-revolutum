@@ -100,8 +100,6 @@ namespace pqxx {
                     }
                 },
                 value);
-
-            // return string_traits<utils::db::IdType>::into_buf(begin, end, static_cast<utils::db::IdType>(value));
         }
 
         static std::size_t size_buffer(const utils::db::Id& value) noexcept {

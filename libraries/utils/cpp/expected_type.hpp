@@ -19,11 +19,6 @@ namespace utils {
 
     namespace _impl {
 
-        // template <typename... Ts>
-        // struct variant_types {
-        //     using type = std::tuple<Ts...>;
-        // };
-
         template <typename... Ts> struct variant_traits {
             using types = std::tuple<Ts...>;
         };
@@ -55,28 +50,11 @@ namespace utils {
                                                                 std::make_index_sequence<N>{});
         }
 
-        // template <typename... FromArgs, typename... ToArgs>
-        // std::variant<ToArgs...> convert_variant(std::variant<FromArgs...>&& in) {
-        //     return std::visit(
-        //         [](auto&& arg) -> std::variant<ToArgs...>  {
-        //             using T = std::decay_t<decltype(arg)>;
-        //             static_assert(
-        //                             (std::disjunction_v<std::is_same<T, ToArgs>...>),
-        //                             "convert_variant: Target variant must contain all source types"
-        //                         );
-        //             return std::variant<ToArgs...>{std::forward<T>(arg)};
-        //         },
-        //         std::move(in));
-        // }
     } // namespace _impl
 
     template <typename T, typename... Errs>
     struct ExpectedType : tl::expected<T, std::variant<NotImplemented, Errs...>> {
         using tl::expected<T, std::variant<NotImplemented, Errs...>>::expected;
-
-        // /// A constructor for the NotImplemented error type
-        // explicit ExpectedType(NotImplemented&& e) : tl::expected<T, std::variant<NotImplemented,
-        // Errs...>>{tl::make_unexpected(std::move(e))} {}
 
         /// A constructor that can take any of the unexpected types
         template <typename Err>

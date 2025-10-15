@@ -16,8 +16,6 @@ qt_cc_library(
     deps = [
         "//libraries/utils/cpp/libpqxx:connection_pool",
         "//libraries/utils/cpp/libpqxx/orm",
-        # "//libraries/utils/cpp:enumerate",
-        # "@magic_enum",
         "@rules_qt//:qt_core",
         "@magic_enum",
         "@spdlog",
