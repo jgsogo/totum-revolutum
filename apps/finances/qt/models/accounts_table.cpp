@@ -195,9 +195,9 @@ void AccountTableModel::fetch_all() {
     // Create empty snapshots vector
     std::vector<std::optional<finances::accounts::models::Snapshot>> all_snapshots(all_accounts->size(), std::nullopt);
 
-    // Create empty account_holders vector
-    std::vector<std::vector<finances::accounts::models::AccountHolder>> initial_holders(
-        all_accounts->size(), std::vector<finances::accounts::models::AccountHolder>{});
+    // Create empty initial_holders vector
+    std::vector<std::vector<finances::accounts::models::AccountHolderWithRoles>> initial_holders(
+        all_accounts->size(), std::vector<finances::accounts::models::AccountHolderWithRoles>{});
 
     this->beginResetModel();
     this->accounts = std::move(all_accounts.value());
@@ -237,14 +237,14 @@ void AccountTableModel::fetch_snapshots() {
 
 void AccountTableModel::fetch_account_holders() {
     SPDLOG_DEBUG("AccountTableModel::fetch_account_holders");
-    utils::db::ModelManager<finances::accounts::models::AccountHolder> manager{pool};
+    utils::db::ModelManager<finances::accounts::models::AccountHolderWithRoles> manager{pool};
 
-    std::vector<std::vector<finances::accounts::models::AccountHolder>> account_holders;
+    std::vector<std::vector<finances::accounts::models::AccountHolderWithRoles>> account_holders;
     account_holders.resize(accounts.size());
     for (const auto& [i, account] : utils::enumerate(accounts)) {
         auto holders_expected = manager.filter_by_fk(account);
         if (!holders_expected) {
-            SPDLOG_WARN("Error retrieving AccountHolders for account {}", account.id);
+            SPDLOG_WARN("Error retrieving AccountHolderWithRoles for account {}", account.id);
             continue;
         }
         account_holders[i] = std::move(holders_expected.value());
@@ -304,7 +304,7 @@ const finances::accounts::models::Account& AccountTableModel::get_account(int ro
     return accounts.at(row);
 }
 
-const std::vector<finances::accounts::models::AccountHolder>& AccountTableModel::get_holders(int row) const {
+const std::vector<finances::accounts::models::AccountHolderWithRoles>& AccountTableModel::get_holders(int row) const {
     SPDLOG_TRACE("AccountTableModel::get_holders(row={})", row);
     return holders.at(row);
 }

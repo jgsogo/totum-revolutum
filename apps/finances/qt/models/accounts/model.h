@@ -9,7 +9,7 @@ struct AccountModel {
 
     finances::accounts::models::Account account;
     std::optional<finances::accounts::models::Snapshot> last_snapshot;
-    std::vector<finances::accounts::models::AccountHolder> holders;
+    std::vector<finances::accounts::models::AccountHolderWithRoles> holders;
     std::string account_type_breadcrumb;
 };
 

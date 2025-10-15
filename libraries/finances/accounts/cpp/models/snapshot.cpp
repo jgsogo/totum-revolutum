@@ -19,7 +19,7 @@ namespace utils::db {
 
                     auto query = std::format("SELECT s.id, s.date_value, s.amount, acc.id, acc.name"
                                              " FROM {} AS s"
-                                             "   LEFT JOIN {} AS acc ON m.account_id = acc.id"
+                                             "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
                                              " WHERE s.account_id = $1"
                                              " ORDER BY s.date_value DESC"
                                              " LIMIT 1",

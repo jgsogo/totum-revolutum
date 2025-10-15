@@ -15,7 +15,9 @@ namespace finances::accounts::models {
         std::string name;
         bool is_company;
         std::optional<std::string> photo;
+    };
 
+    struct AccountHolderWithRoles : public AccountHolder {
         std::pair<decltype(Account::id), decltype(Account::name)> account;
         bool owns_money;
     };
@@ -35,8 +37,8 @@ namespace utils::db {
 
     template <>
     template <>
-    std::vector<finances::accounts::models::AccountHolder>
-    utils::db::ModelManager<finances::accounts::models::AccountHolder>::_filter_by_fk<
+    std::vector<finances::accounts::models::AccountHolderWithRoles>
+    utils::db::ModelManager<finances::accounts::models::AccountHolderWithRoles>::_filter_by_fk<
         finances::accounts::models::Account>(pqxx::work&, const decltype(finances::accounts::models::Account::id)& id);
 
 } // namespace utils::db
