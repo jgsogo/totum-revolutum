@@ -36,9 +36,10 @@ namespace utils::db {
     template <>
     template <>
     std::vector<finances::accounts::models::Snapshot>
-    utils::db::ModelManager<finances::accounts::models::Snapshot>::_filter_by_fk<finances::accounts::models::Account>(
+    ModelManager<finances::accounts::models::Snapshot>::_filter_by_fk<finances::accounts::models::Account>(
         pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
 
-    // auto r = manager.create(account.id, std::move(date), std::move(amount_amount.value()));
+    template <>
+    Id ModelManager<finances::accounts::models::Snapshot>::_create(pqxx::work&, finances::accounts::models::Snapshot&&);
 
 } // namespace utils::db

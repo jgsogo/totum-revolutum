@@ -73,7 +73,7 @@ namespace utils::db {
                     auto query = std::format(
                         "SELECT DISTINCT ON (s.account_id) s.id, s.account_id, s.date_value, s.amount, acc.id, acc.name"
                         " FROM {} AS s"
-                        "   LEFT JOIN {} AS acc ON m.account_id = acc.id"
+                        "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
                         " WHERE s.account_id IN ({})"
                         " ORDER BY s.account_id, s.date_value DESC;",
                         SNAPSHOT_TABLE, ACCOUNT_TABLE, subquery);
@@ -118,7 +118,7 @@ namespace utils::db {
 
         auto query = std::format("SELECT s.id, s.date_value, s.amount, acc.id, acc.name"
                                  " FROM {} AS s"
-                                 "   LEFT JOIN {} AS acc ON m.account_id = acc.id"
+                                 "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
                                  " WHERE s.account_id = $1"
                                  " ORDER BY s.date_value DESC",
                                  SNAPSHOT_TABLE, ACCOUNT_TABLE);
@@ -131,6 +131,13 @@ namespace utils::db {
         }
         SPDLOG_TRACE("Found {} snapshots for account {}", ret.size(), account_id);
         return {ret};
+    }
+
+    template <>
+    Id ModelManager<finances::accounts::models::Snapshot>::_create(pqxx::work&,
+                                                                   finances::accounts::models::Snapshot&&) {
+        SPDLOG_ERROR("Not implemented");
+        return {std::monostate{}};
     }
 
 } // namespace utils::db

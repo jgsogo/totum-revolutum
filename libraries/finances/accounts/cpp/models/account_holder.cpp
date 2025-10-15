@@ -69,11 +69,6 @@ namespace utils::db {
         for (auto [id, name, is_company, photo, acc_id, acc_owns_money, acc_name] :
              tx.query<Id, std::string, bool, std::optional<std::string>, Id, bool, std::string>(
                  query, pqxx::params{account_id})) {
-            // ret.emplace_back({
-            //     {
-            //         .id = id, .name = name, .is_company = is_company, .photo = photo,
-            //     },
-            //     .owns_money = acc_owns_money, .account = std::make_pair(acc_id, acc_name)});
             ret.emplace_back(AccountHolderWithRoles{
                 {id, name, is_company, photo}, std::make_pair(acc_id, acc_name), acc_owns_money});
         }

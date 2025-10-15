@@ -16,3 +16,13 @@ namespace finances::investments::models {
     };
 
 } // namespace finances::investments::models
+
+namespace utils::db {
+
+    template <>
+    template <>
+    std::vector<finances::investments::models::MovementDividend>
+    utils::db::ModelManager<finances::investments::models::MovementDividend>::_filter_by_fk<
+        finances::accounts::models::Account>(pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
+
+}

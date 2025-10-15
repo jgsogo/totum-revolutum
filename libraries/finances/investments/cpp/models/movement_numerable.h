@@ -12,3 +12,13 @@ namespace finances::investments::models {
     };
 
 } // namespace finances::investments::models
+
+namespace utils::db {
+
+    template <>
+    template <>
+    std::vector<finances::investments::models::MovementNumerable>
+    utils::db::ModelManager<finances::investments::models::MovementNumerable>::_filter_by_fk<
+        finances::accounts::models::Account>(pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
+
+}

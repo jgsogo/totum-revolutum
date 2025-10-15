@@ -16,15 +16,14 @@ namespace finances::investments::models {
 
 namespace utils::db {
 
-    // class SnapshotNumerableManager : public ModelManager<finances::investments::models::SnapshotNumerable> {
-    //   public:
-    //     using ModelManager<finances::investments::models::SnapshotNumerable>::ModelManager;
+    template <>
+    template <>
+    std::vector<finances::investments::models::SnapshotNumerable>
+    utils::db::ModelManager<finances::investments::models::SnapshotNumerable>::_filter_by_fk<
+        finances::accounts::models::Account>(pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
 
-    //     ExpectedType<int, DatabaseError> create(utils::db::Id, utils::libpqxx::Date,
-    //     finances::accounts::models::Amount,
-    //                                             finances::accounts::models::Amount) {
-    //         return tl::unexpected{NotImplemented{}};
-    //     };
-    // };
+    template <>
+    Id ModelManager<finances::investments::models::SnapshotNumerable>::_create(
+        pqxx::work&, finances::investments::models::SnapshotNumerable&&);
 
 } // namespace utils::db
