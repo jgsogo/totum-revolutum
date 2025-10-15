@@ -10,7 +10,7 @@ namespace finances::investments::models {
 
         finances::accounts::models::Movement movement;
 
-        finances::accounts::models::Id id;
+        utils::db::Id id;
         finances::accounts::models::Amount quantity;
         finances::accounts::models::Amount unit_value;
     };
@@ -18,6 +18,6 @@ namespace finances::investments::models {
     // class MovementNumerableManager : public finances::accounts::models::ModelManager<MovementNumerable> {
     //   public:
     //     tl::expected<std::vector<MovementNumerable>, finances::accounts::models::Error>
-    //     all(finances::accounts::models::Id account_id);
+    //     all(utils::db::Id account_id);
     // };
 } // namespace finances::investments::models

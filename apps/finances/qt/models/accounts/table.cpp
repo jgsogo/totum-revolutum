@@ -34,7 +34,7 @@ void AccountsTable::_refresh_all() {
     }
 };
 
-void AccountsTable::_refresh_one(const AccountModel::Id& id, int row) {
+void AccountsTable::_refresh_one(const utils::db::ModelData<AccountModel>::Id& id, int row) {
     SPDLOG_DEBUG("AccountsTable::_refresh_one(id={}, row={})", id, row);
 
     // For a given row, the only thing that can change is the last_snapshot
@@ -64,7 +64,7 @@ namespace utils::qt::models {
 
         switch (column) {
         case AccountColumns::ID:
-            result = (uint64_t)item.id; // FIXME: implement the right conversion
+            result = QString::fromStdString(std::format("{}", item.id)); // FIXME: implement the right conversion
             break;
         case AccountColumns::CUSTODIAN:
             result = account.custodian.second.c_str();

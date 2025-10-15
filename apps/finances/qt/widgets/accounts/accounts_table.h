@@ -20,7 +20,7 @@ class AccountsTableWidget : public QWidget {
     void onPressed(const QModelIndex& index);
 
   signals:
-    void accountDoubleClicked(finances::accounts::models::Id account_id);
+    void accountDoubleClicked(utils::db::Id account_id);
 
   private:
     utils::libpqxx::ConnectionPool& pool;

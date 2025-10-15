@@ -5,8 +5,7 @@
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
 struct MovementModel {
-    using Id = decltype(finances::accounts::models::Movement::id);
-    const Id id;
+    utils::db::Id id;
 
     finances::accounts::models::Movement movement;
     std::string movtype_breadcrumb;

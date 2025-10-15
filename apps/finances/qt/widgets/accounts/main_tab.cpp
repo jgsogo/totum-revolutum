@@ -29,7 +29,7 @@ MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_,
     connect(this, &MainTabWidget::tabCloseRequested, this, &MainTabWidget::closeMyTab);
 }
 
-void MainTabWidget::addTabAccount(finances::accounts::models::Id account_id) {
+void MainTabWidget::addTabAccount(utils::db::Id account_id) {
     SPDLOG_DEBUG("MainTabWidget::addTabAccount(account_id={})", account_id);
 
     // If this tab is already available, show it

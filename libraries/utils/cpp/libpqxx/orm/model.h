@@ -14,11 +14,14 @@ namespace utils::db {
     template <typename TModel> class ModelManager;
 
     template <typename TModel> struct ModelData {
-        using Model = TModel;
-        using Manager = ModelManager<TModel>;
-        using Id = decltype(TModel::id);
         static constexpr std::string_view name = utils::type_name<TModel>();
 
-        // static constexpr std::string_view table_name; // to be provided by each model
+        using Model = TModel;
+        using Manager = ModelManager<TModel>;
+        using Id = utils::db::Id;
+
+        // Check 'TModel::id' field
+        static_assert(std::is_same_v<decltype(TModel::id), utils::db::Id>,
+                      "'TModel::id' must be of type 'utils::db::Id' to use this framework");
     };
 } // namespace utils::db

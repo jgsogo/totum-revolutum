@@ -9,7 +9,7 @@ using namespace finances::investments::models;
 using namespace finances::accounts::models;
 
 // tl::expected<std::vector<MovementNumerable>, finances::accounts::models::Error>
-// MovementNumerableManager::all(finances::accounts::models::Id account_id) {
+// MovementNumerableManager::all(utils::db::Id account_id) {
 //     return pool.with_conn<tl::expected<std::vector<MovementNumerable>, Error>>(
 //         [account_id](pqxx::connection& conn) -> tl::expected<std::vector<MovementNumerable>, Error> {
 //             try {

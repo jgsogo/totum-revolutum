@@ -35,7 +35,7 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     case Qt::DisplayRole: {
         switch (column) {
         case Column::ID:
-            result = (uint64_t)account.id; // FIXME: implement the right conversion
+            result = QString::fromStdString(std::format("{}", account.id)); // FIXME: implement the right conversion
             break;
         case Column::CUSTODIAN:
             result = account.custodian.second.c_str();
@@ -148,7 +148,7 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
         Column column = magic_enum::enum_value<Column>(section);
         result = QString::fromStdString(std::string(magic_enum::enum_name(column)));
     } else if (role == Qt::DisplayRole && orientation == Qt::Vertical) { // V
-        return QString("%1").arg(accounts[section].id);
+        return QString("%1").arg(std::format("{}", accounts[section].id));
     } else {
         // other stuff
     }
@@ -170,7 +170,7 @@ void AccountTableModel::fetch_all() {
     // Fetch the account_type breadcrumbs
     SPDLOG_TRACE(" - fetch all account_type breadcrumbs");
     // FIXME: The breadcrumbs could/should be created only once, maybe at the root of the application
-    std::map<finances::accounts::models::Id, QString> account_type_breadcrumb;
+    std::map<utils::db::Id, QString> account_type_breadcrumb;
     utils::db::AccountTypeManager account_type_manager{pool};
     auto all_account_type = account_type_manager.all();
     if (all_account_type) {
@@ -215,7 +215,7 @@ void AccountTableModel::fetch_snapshots() {
     SPDLOG_DEBUG("AccountTableModel::fetch_snapshots");
     utils::db::SnapshotManager manager{pool};
 
-    std::vector<finances::accounts::models::Id> account_ids;
+    std::vector<utils::db::Id> account_ids;
     account_ids.resize(accounts.size());
     std::transform(accounts.begin(), accounts.end(), account_ids.begin(),
                    [](const auto& account) { return account.id; });
@@ -258,7 +258,7 @@ void AccountTableModel::fetch_account_holders() {
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
-void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id) {
+void AccountTableModel::fetch_snapshot(const utils::db::Id& account_id) {
     SPDLOG_DEBUG("AccountTableModel::fetch_snapshot(account_id={})", account_id);
 
     // Find the row for the fetched snapshot
@@ -287,8 +287,7 @@ void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id
     emit dataChanged(topLeft, topLeft, roles);
 }
 
-const finances::accounts::models::Account&
-AccountTableModel::get_account(finances::accounts::models::Id account_id) const {
+const finances::accounts::models::Account& AccountTableModel::get_account(const utils::db::Id& account_id) const {
     SPDLOG_TRACE("AccountTableModel::get_account(account_id={})", account_id);
     auto found =
         std::find_if(accounts.begin(), accounts.end(), [&account_id](const auto& acc) { return acc.id == account_id; });

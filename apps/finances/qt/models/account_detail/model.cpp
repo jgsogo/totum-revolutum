@@ -9,7 +9,7 @@ namespace utils::db {
     ModelManager<AccountDetail>::get(const ModelData<AccountDetail>::Id& account_id) {
         // Get all movements
         utils::db::ModelManager<Movement> mov_manager{pool};
-        auto all_movs = mov_manager.filter_by_fk<Account>(account_id.id);
+        auto all_movs = mov_manager.filter_by_fk<Account>(account_id);
         if (!all_movs) {
             return ExpectedType<AccountDetail, DatabaseError, ErrorNotFound, ErrorMultipleFound>(
                 std::move(all_movs.error()));
@@ -17,7 +17,7 @@ namespace utils::db {
 
         // Get all snapshots
         SnapshotManager snapshot_manager{pool};
-        auto all_snapshots = snapshot_manager.filter_by_fk<Account>(account_id.id);
+        auto all_snapshots = snapshot_manager.filter_by_fk<Account>(account_id);
         if (!all_snapshots) {
             return ExpectedType<AccountDetail, DatabaseError, ErrorNotFound, ErrorMultipleFound>(
                 std::move(all_snapshots.error()));

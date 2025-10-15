@@ -13,7 +13,7 @@ class AddSnapshotNumerableWidget : public QDialog {
     void add_snapshot_clicked();
 
   signals:
-    void new_snapshot(finances::accounts::models::Id account_id);
+    void new_snapshot(utils::db::Id account_id);
 
   public:
     AddSnapshotNumerableWidget(utils::libpqxx::ConnectionPool& pool, const finances::accounts::models::Account& account,

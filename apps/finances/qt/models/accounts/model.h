@@ -5,9 +5,8 @@
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 
 struct AccountModel {
-    using Id = decltype(finances::accounts::models::Account::id);
+    utils::db::Id id;
 
-    const Id id;
     finances::accounts::models::Account account;
     std::optional<finances::accounts::models::Snapshot> last_snapshot;
     std::vector<finances::accounts::models::AccountHolder> holders;

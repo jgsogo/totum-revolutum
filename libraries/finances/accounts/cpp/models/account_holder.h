@@ -7,12 +7,11 @@
 
 #include "account.h"
 #include "model_manager.hpp"
-#include "types/id.h"
 
 namespace finances::accounts::models {
 
     struct AccountHolder {
-        Id id;
+        utils::db::Id id;
         std::string name;
         bool is_company;
         std::optional<std::string> photo;

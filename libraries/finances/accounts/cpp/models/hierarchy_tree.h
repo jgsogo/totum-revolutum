@@ -10,12 +10,11 @@
 #include "libraries/utils/cpp/string_literal.hpp"
 
 #include "model_manager.hpp"
-#include "types/id.h"
 
 namespace finances::accounts::models {
 
     template <typename Tag> struct HierarchyTree {
-        Id id;
+        utils::db::Id id;
         std::string name;
         std::optional<std::string> description;
         bool is_abstract;

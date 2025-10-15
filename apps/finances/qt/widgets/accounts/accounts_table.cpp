@@ -86,7 +86,8 @@ void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {
     QVariant account_id_variant =
         sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountTableModel::Column::ID)));
     SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
-    finances::accounts::models::Id account_id{account_id_variant.toULongLong()};
+    utils::db::IdType account_id_inner{account_id_variant.toULongLong()};
+    utils::db::Id account_id{account_id_inner};
 
     emit accountDoubleClicked(account_id);
 }
@@ -106,7 +107,7 @@ void AccountsTableWidget::onPressed(const QModelIndex& index) {
         QVariant account_id_variant =
             sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountTableModel::Column::ID)));
         SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
-        finances::accounts::models::Id account_id{account_id_variant.toULongLong()};
+        utils::db::Id account_id{utils::db::IdType{account_id_variant.toULongLong()}};
 
         // Get the account itself
         const auto& account = model->get_account(account_id);

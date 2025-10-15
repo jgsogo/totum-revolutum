@@ -11,12 +11,11 @@
 #include "hierarchy_tree.h"
 #include "model_manager.hpp"
 #include "types/ccy.h"
-#include "types/id.h"
 
 namespace finances::accounts::models {
 
     struct Account {
-        Id id;
+        utils::db::Id id;
         std::string name;
         std::optional<std::string> description;
         std::optional<std::string> identifier;

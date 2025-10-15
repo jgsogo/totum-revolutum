@@ -3,12 +3,12 @@
 #include <optional>
 #include <string>
 
-#include "types/id.h"
+#include "libraries/utils/cpp/libpqxx/orm/id.h"
 
 namespace finances::accounts::models {
 
     struct Transaction {
-        Id id;
+        utils::db::Id id;
         std::string name;
         std::optional<std::string> description;
     };

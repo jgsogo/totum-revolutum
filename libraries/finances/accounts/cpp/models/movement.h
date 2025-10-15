@@ -10,14 +10,13 @@
 #include "hierarchy_tree.h"
 #include "transaction.h"
 #include "types/amount.h"
-#include "types/id.h"
 
 namespace finances::accounts::models {
 
     enum class MovementDirection : int32_t { IN = 0, OUT = 1 };
 
     struct Movement {
-        Id id;
+        utils::db::Id id;
         std::pair<decltype(Transaction::id), decltype(Transaction::name)> transaction;
         std::pair<decltype(MovementType::id), decltype(MovementType::name)> type;
         MovementDirection direction;

@@ -50,3 +50,9 @@ cc_library(
         "//libraries/utils/cpp/concepts:alternative_c",
     ],
 )
+
+cc_library(
+    name = "constexpr",
+    hdrs = ["constexpr.hpp"],
+    visibility = ["//visibility:public"],
+)

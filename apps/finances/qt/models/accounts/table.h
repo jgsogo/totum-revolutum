@@ -11,7 +11,7 @@ class AccountsTable final : public utils::qt::models::TableModel<AccountModel, A
 
   protected:
     void _refresh_all() override;
-    void _refresh_one(const AccountModel::Id& id, int row) override final;
+    void _refresh_one(const utils::db::ModelData<AccountModel>::Id& id, int row) override final;
 };
 
 namespace utils::qt::models {

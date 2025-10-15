@@ -10,7 +10,7 @@ using namespace finances::investments::models;
 using namespace finances::accounts::models;
 
 // tl::expected<std::vector<SnapshotNumerable>, finances::accounts::models::Error>
-// SnapshotNumerableManager::all(finances::accounts::models::Id account_id) {
+// SnapshotNumerableManager::all(utils::db::Id account_id) {
 //     return pool.with_conn<tl::expected<std::vector<SnapshotNumerable>, Error>>(
 //         [account_id](pqxx::connection& conn) -> tl::expected<std::vector<SnapshotNumerable>, Error> {
 //             try {
@@ -47,7 +47,7 @@ using namespace finances::accounts::models;
 // }
 
 // tl::expected<void, finances::accounts::models::Error>
-// SnapshotNumerableManager::create(finances::accounts::models::Id account_id, utils::libpqxx::Date&& date_value,
+// SnapshotNumerableManager::create(utils::db::Id account_id, utils::libpqxx::Date&& date_value,
 //                                  finances::accounts::models::Amount&& quantity,
 //                                  finances::accounts::models::Amount&& unit_value) {
 //     return pool.with_conn<tl::expected<void, Error>>(

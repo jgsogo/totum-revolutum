@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     {
         const char* initial_holder_pk = std::getenv("FINANCES_QT_INITIAL_HOLDER_PK");
         if (initial_holder_pk != nullptr) {
-            finances::accounts::models::Id me_id{std::stoull(initial_holder_pk)};
+            utils::db::Id me_id{utils::db::IdType{std::stoull(initial_holder_pk)}};
             utils::db::ModelManager<finances::accounts::models::AccountHolder> manager{pool};
             auto me_expected = manager.get(me_id);
             if (!me_expected) {

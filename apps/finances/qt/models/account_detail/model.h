@@ -7,11 +7,7 @@
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
 struct AccountDetail {
-    // using Id = decltype(finances::accounts::models::Account::id);
-    // const Id id;
-
-    using Id = finances::accounts::models::Account;
-    const Id id;
+    utils::db::Id id;
 
     std::vector<finances::accounts::models::Movement> movements;
     std::vector<finances::accounts::models::Snapshot> snapshots;

@@ -8,12 +8,11 @@
 
 #include "account.h"
 #include "types/amount.h"
-#include "types/id.h"
 
 namespace finances::accounts::models {
 
     struct Snapshot {
-        Id id;
+        utils::db::Id id;
         std::pair<decltype(Account::id), decltype(Account::name)> account;
         utils::libpqxx::Date date_value;
         Amount amount;
@@ -33,8 +32,7 @@ namespace utils::db {
         ExpectedType<std::vector<std::optional<finances::accounts::models::Snapshot>>, DatabaseError>
         get_last_snapshots(const std::vector<decltype(finances::accounts::models::Account::id)>& account_ids);
 
-        ExpectedType<int, DatabaseError> create(finances::accounts::models::Id, utils::libpqxx::Date,
-                                                finances::accounts::models::Amount) {
+        ExpectedType<int, DatabaseError> create(Id, utils::libpqxx::Date, finances::accounts::models::Amount) {
             return tl::unexpected{NotImplemented{}};
         };
     };

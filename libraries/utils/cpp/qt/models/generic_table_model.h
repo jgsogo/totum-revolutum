@@ -61,7 +61,7 @@ namespace utils::qt::models {
                 TColumn column = magic_enum::enum_value<TColumn>(section);
                 result = QString::fromStdString(std::string(magic_enum::enum_name(column)));
             } else if (role == Qt::DisplayRole && orientation == Qt::Vertical) { // V
-                return QString("%1").arg(items[section].id);
+                return QString::fromStdString(std::format("{}", items[section].id));
             } else {
                 // other stuff
             }
