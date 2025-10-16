@@ -17,20 +17,16 @@ class AccountsTable final : public utils::qt::models::TableModel<AccountModel, A
 namespace utils::qt::models {
 
     template <>
-    QVariant
-    DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const TableModel<AccountModel, AccountColumns>&,
-                                                                        const AccountModel&, AccountColumns);
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const AccountModel&, AccountColumns);
 
     template <>
-    QVariant
-    DataDispatcher<AccountModel, AccountColumns, Qt::FontRole>::data(const TableModel<AccountModel, AccountColumns>&,
-                                                                     const AccountModel&, AccountColumns);
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::FontRole>::data(const AccountModel&, AccountColumns);
 
     template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::ForegroundRole>::data(
-        const TableModel<AccountModel, AccountColumns>&, const AccountModel&, AccountColumns);
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::ForegroundRole>::data(const AccountModel&,
+                                                                                    AccountColumns);
 
     template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(
-        const TableModel<AccountModel, AccountColumns>&, const AccountModel&, AccountColumns);
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(const AccountModel&,
+                                                                                       AccountColumns);
 } // namespace utils::qt::models

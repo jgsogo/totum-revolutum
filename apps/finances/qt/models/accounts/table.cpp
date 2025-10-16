@@ -56,8 +56,8 @@ void AccountsTable::_refresh_one(const utils::db::ModelData<AccountModel>::Id& i
 namespace utils::qt::models {
 
     template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(
-        const TableModel<AccountModel, AccountColumns>&, const AccountModel& item, AccountColumns column) {
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const AccountModel& item,
+                                                                                 AccountColumns column) {
         QVariant result;
 
         const finances::accounts::models::Account& account = item.account;
@@ -138,9 +138,8 @@ namespace utils::qt::models {
     }
 
     template <>
-    QVariant
-    DataDispatcher<AccountModel, AccountColumns, Qt::FontRole>::data(const TableModel<AccountModel, AccountColumns>&,
-                                                                     const AccountModel&, AccountColumns column) {
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::FontRole>::data(const AccountModel&,
+                                                                              AccountColumns column) {
         QVariant result;
         if ((column == AccountColumns::SNAPSHOT) || (column == AccountColumns::OPEN) ||
             (column == AccountColumns::CLOSE) || (column == AccountColumns::IDENTIFIER)) {
@@ -150,8 +149,8 @@ namespace utils::qt::models {
     }
 
     template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::ForegroundRole>::data(
-        const TableModel<AccountModel, AccountColumns>&, const AccountModel& item, AccountColumns) {
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::ForegroundRole>::data(const AccountModel& item,
+                                                                                    AccountColumns) {
         QVariant result;
         const auto& account = item.account;
         if (account.close) {
@@ -165,8 +164,8 @@ namespace utils::qt::models {
     }
 
     template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(
-        const TableModel<AccountModel, AccountColumns>&, const AccountModel&, AccountColumns column) {
+    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(const AccountModel&,
+                                                                                       AccountColumns column) {
         if ((column == AccountColumns::CUSTODIAN) || (column == AccountColumns::NAME) ||
             (column == AccountColumns::TYPE)) {
             return Qt::AlignLeft;

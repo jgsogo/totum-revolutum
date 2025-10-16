@@ -83,13 +83,13 @@ namespace utils::qt::models {
 
             switch (role) {
             case Qt::DisplayRole:
-                return DataDispatcher<TModel, TColumn, Qt::DisplayRole>::data(*this, item, column);
+                return DataDispatcher<TModel, TColumn, Qt::DisplayRole>::data(item, column);
             case Qt::FontRole:
-                return DataDispatcher<TModel, TColumn, Qt::FontRole>::data(*this, item, column);
+                return DataDispatcher<TModel, TColumn, Qt::FontRole>::data(item, column);
             case Qt::TextAlignmentRole:
-                return DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole>::data(*this, item, column);
+                return DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole>::data(item, column);
             case Qt::BackgroundRole:
-                return DataDispatcher<TModel, TColumn, Qt::BackgroundRole>::data(*this, item, column);
+                return DataDispatcher<TModel, TColumn, Qt::BackgroundRole>::data(item, column);
                 // default:
                 //     break;
             }
@@ -97,12 +97,13 @@ namespace utils::qt::models {
             return result;
         }
 
-        const TModel& get(int row) {
+        const TModel& get(int row) const {
             SPDLOG_DEBUG("{}::get(row={})", name, row);
             return items.at(row);
         };
 
-        utils::ExpectedType<std::reference_wrapper<const TModel>, ErrorItemNotFound> get(const ModelData::Id& id) {
+        utils::ExpectedType<std::reference_wrapper<const TModel>, ErrorItemNotFound>
+        get(const ModelData::Id& id) const {
             SPDLOG_DEBUG("{}::get(id={})", name, id);
 
             auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.item == id; });
@@ -155,6 +156,37 @@ namespace utils::qt::models {
         explicit FilteredTableModel(const TParent& parent_, utils::libpqxx::ConnectionPool& pool,
                                     QObject* parent = nullptr)
             : TableModel<TModel, TColumn>{pool, parent}, parent{parent} {};
+
+        const TParent& get_parent() const { return parent; };
+
+        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
+            QVariant result = QVariant();
+
+            int row = index.row();
+            int column_idx = index.column();
+
+            if (!index.isValid() || row >= this->rowCount() || column_idx >= this->columnCount()) {
+                return result;
+            }
+
+            TColumn column = magic_enum::enum_value<TColumn>(column_idx);
+            const auto& item = this->items.at(row);
+
+            switch (role) {
+            case Qt::DisplayRole:
+                return DataDispatcher<TModel, TColumn, Qt::DisplayRole>::data(item, column, parent);
+            case Qt::FontRole:
+                return DataDispatcher<TModel, TColumn, Qt::FontRole>::data(item, column, parent);
+            case Qt::TextAlignmentRole:
+                return DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole>::data(item, column, parent);
+            case Qt::BackgroundRole:
+                return DataDispatcher<TModel, TColumn, Qt::BackgroundRole>::data(item, column, parent);
+                // default:
+                //     break;
+            }
+
+            return result;
+        }
 
       protected:
         void _refresh_all() override {
