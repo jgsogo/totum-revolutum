@@ -3,7 +3,7 @@
 #include <QObject>
 #include <pqxx/pqxx>
 
-#include "libraries/finances/accounts/cpp/models/types/id.h"
+#include "libraries/utils/cpp/libpqxx/orm/id.h"
 
 /*
 A class to manage all the DB notifications
@@ -19,10 +19,10 @@ class Notificator : public QObject {
 
   public slots:
     void notify_all_accounts();
-    void notify_account(finances::accounts::models::Id account_id);
+    void notify_account(utils::db::Id account_id);
 
   signals:
-    void account_changed(finances::accounts::models::Id account_id);
+    void account_changed(utils::db::Id account_id);
 
   private:
     pqxx::connection conn;

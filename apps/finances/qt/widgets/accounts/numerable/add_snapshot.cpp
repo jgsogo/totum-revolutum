@@ -82,9 +82,18 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
         return;
     }
 
-    finances::investments::models::SnapshotNumerableManager manager{pool};
-    auto r = manager.create(account.id, std::move(date), std::move(quantity_amount.value()),
-                            std::move(unit_value_amount.value()));
+    // Create the new snapshot
+    finances::investments::models::SnapshotNumerable new_snapshot_{
+        .snapshot =
+            finances::accounts::models::Snapshot{
+                .date_value = std::move(date),
+            },
+        .quantity = std::move(quantity_amount.value()),
+        .unit_value = std::move(unit_value_amount.value()),
+    };
+
+    utils::db::ModelData<finances::investments::models::SnapshotNumerable>::Manager manager{pool};
+    auto r = manager.create(std::move(new_snapshot_));
     if (!r) {
         SPDLOG_ERROR("Error adding snapshot to account");
         // TODO: Communicate error to user

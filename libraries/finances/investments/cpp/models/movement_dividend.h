@@ -1,26 +1,28 @@
 #pragma once
 
 #include "libraries/finances/accounts/cpp/models/movement.h"
-
+#include "snapshot_numerable.h"
 namespace finances::investments::models {
-    class MovementDividendManager;
-
     struct MovementDividend {
-        using Manager = MovementDividendManager;
-
         finances::accounts::models::Movement movement;
 
-        finances::accounts::models::Id id;
+        utils::db::Id id;
         utils::libpqxx::Date ex_dividend_date;
         finances::accounts::models::Amount unit_value;
 
-        std::optional<std::pair<utils::libpqxx::Date, finances::accounts::models::Amount>>
+        std::optional<std::pair<decltype(decltype(SnapshotNumerable::snapshot)::date_value),
+                                decltype(SnapshotNumerable::quantity)>>
             snapshot_data; // <date_value, quantity>
     };
 
-    class MovementDividendManager : public finances::accounts::models::ModelManager<MovementDividend> {
-      public:
-        tl::expected<std::vector<MovementDividend>, finances::accounts::models::Error>
-        all(finances::accounts::models::Id account_id);
-    };
 } // namespace finances::investments::models
+
+namespace utils::db {
+
+    template <>
+    template <>
+    std::vector<finances::investments::models::MovementDividend>
+    utils::db::ModelManager<finances::investments::models::MovementDividend>::_filter_by_fk<
+        finances::accounts::models::Account>(pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
+
+}

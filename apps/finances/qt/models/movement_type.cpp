@@ -29,9 +29,10 @@ QVariant MovementTypeTableModel::data(const QModelIndex& index, int role) const 
     case Qt::DisplayRole: {
         const auto& movtype = items.at(row);
         switch (column) {
-        case Column::ID:
-            result = (uint64_t)movtype.id; // FIXME: implement the right conversion
-            break;
+        case Column::ID: {
+
+            result = QString::fromStdString(std::format("{}", movtype.id)); // FIXME: implement the right conversion
+        } break;
         case Column::NAME:
             result = movtype.name.c_str();
             break;
@@ -41,8 +42,9 @@ QVariant MovementTypeTableModel::data(const QModelIndex& index, int role) const 
                 // TODO: Implement this implode as a util
                 const char* const delim = " > ";
                 std::ostringstream imploded;
-                std::copy(found->second.begin(), found->second.end(),
-                          std::ostream_iterator<std::string>(imploded, delim));
+                for (const auto& item : found->second) {
+                    imploded << item.second << delim;
+                }
                 result = QString::fromStdString(imploded.str());
             }
         } break;
@@ -90,7 +92,7 @@ QVariant MovementTypeTableModel::headerData(int section, Qt::Orientation orienta
         Column column = magic_enum::enum_value<Column>(section);
         result = QString::fromStdString(std::string(magic_enum::enum_name(column)));
     } else if (role == Qt::DisplayRole && orientation == Qt::Vertical) { // V
-        return QString("%1").arg(items[section].id);
+        return QString("%1").arg(std::format("{}", items[section].id));
     } else {
         // other stuff
     }
@@ -101,7 +103,7 @@ void MovementTypeTableModel::fetch_all() {
     SPDLOG_DEBUG("MovementTypeTableModel::fetch_all");
 
     SPDLOG_TRACE(" - fetch all accounts");
-    finances::accounts::models::MovementType::Manager manager{pool};
+    utils::db::ModelManager<finances::accounts::models::MovementType> manager{pool};
     auto all_items = manager.all();
     if (!all_items) {
         SPDLOG_ERROR("Error refreshing accounts");
@@ -120,8 +122,9 @@ void MovementTypeTableModel::fetch_all() {
 void MovementTypeTableModel::fetch_breadcrumbs() {
     SPDLOG_DEBUG("MovementTypeTableModel::fetch_breadcrumbs");
 
-    finances::accounts::models::MovementType::Manager manager{pool};
-    std::map<finances::accounts::models::Id, std::vector<std::string>> breadcrumbs_;
+    utils::db::MovementTypeManager manager{pool};
+    std::map<utils::db::Id, std::vector<std::pair<decltype(finances::accounts::models::MovementType::id), std::string>>>
+        breadcrumbs_;
     for (const auto& movtype : items) {
         auto breadcrumb = manager.breadcrumb(movtype.id);
         if (breadcrumb) {
@@ -138,7 +141,7 @@ void MovementTypeTableModel::fetch_breadcrumbs() {
 }
 
 const finances::accounts::models::MovementType&
-MovementTypeTableModel::get_movement_type(finances::accounts::models::Id id) const {
+MovementTypeTableModel::get_movement_type(const decltype(finances::accounts::models::MovementType::id)& id) const {
     SPDLOG_TRACE("MovementTypeTableModel::get_movement_type(id={})", id);
     auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.id == id; });
     if (found == items.end()) {
@@ -148,8 +151,9 @@ MovementTypeTableModel::get_movement_type(finances::accounts::models::Id id) con
     return *found;
 }
 
-std::optional<std::reference_wrapper<const std::vector<std::string>>>
-MovementTypeTableModel::get_breadcrumb(finances::accounts::models::Id id) const {
+std::optional<std::reference_wrapper<
+    const std::vector<std::pair<decltype(finances::accounts::models::MovementType::id), std::string>>>>
+MovementTypeTableModel::get_breadcrumb(const decltype(finances::accounts::models::MovementType::id)& id) const {
     auto found = this->breadcrumbs.find(id);
     if (found == breadcrumbs.end()) {
         return {};

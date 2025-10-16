@@ -4,34 +4,42 @@
 #include <string>
 
 #include "libraries/utils/cpp/libpqxx/datatypes/date.h"
+#include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
 #include "account.h"
 #include "types/amount.h"
-#include "types/id.h"
 
 namespace finances::accounts::models {
 
-    class SnapshotManager;
-
     struct Snapshot {
-        using Manager = SnapshotManager;
-
-        Id id;
-        decltype(AccountType::id) account_id;
+        utils::db::Id id;
+        std::pair<decltype(Account::id), decltype(Account::name)> account;
         utils::libpqxx::Date date_value;
         Amount amount;
     };
 
-    class SnapshotManager : public ModelManager<Snapshot> {
+} // namespace finances::accounts::models
+
+namespace utils::db {
+
+    class SnapshotManager : public ModelManager<finances::accounts::models::Snapshot> {
       public:
-        tl::expected<std::optional<Snapshot>, Error> get_last_snapshot(decltype(Account::id) account_id) const;
+        using ModelManager<finances::accounts::models::Snapshot>::ModelManager;
 
-        tl::expected<std::vector<std::optional<Snapshot>>, Error>
-        get_last_snapshots(const std::vector<decltype(Account::id)>& account_ids) const;
+        ExpectedType<std::optional<finances::accounts::models::Snapshot>, DatabaseError>
+        get_last_snapshot(const decltype(finances::accounts::models::Account::id)& account_id);
 
-        tl::expected<std::vector<Snapshot>, Error> all(Id account_id);
-
-        tl::expected<void, Error> create(Id account_id, utils::libpqxx::Date&& date_value, Amount&& amount);
+        ExpectedType<std::vector<std::optional<finances::accounts::models::Snapshot>>, DatabaseError>
+        get_last_snapshots(const std::vector<decltype(finances::accounts::models::Account::id)>& account_ids);
     };
 
-} // namespace finances::accounts::models
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Snapshot>
+    ModelManager<finances::accounts::models::Snapshot>::_filter_by_fk<finances::accounts::models::Account>(
+        pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
+
+    template <>
+    Id ModelManager<finances::accounts::models::Snapshot>::_create(pqxx::work&, finances::accounts::models::Snapshot&&);
+
+} // namespace utils::db

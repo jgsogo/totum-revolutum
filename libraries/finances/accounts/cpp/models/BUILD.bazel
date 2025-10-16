@@ -14,10 +14,12 @@ cc_library(
     deps = [
         "//bazel/logging:spdlog",
         "//libraries/utils/cpp:integral_type",
+        "//libraries/utils/cpp:string_literal",
         "//libraries/utils/cpp:string_type",
         "//libraries/utils/cpp/libpqxx:connection_pool",
         "//libraries/utils/cpp/libpqxx/datatypes:date",
         "//libraries/utils/cpp/libpqxx/datatypes:numeric",
+        "//libraries/utils/cpp/libpqxx/orm",
         "@magic_enum",
         "@tl-expected",
     ],

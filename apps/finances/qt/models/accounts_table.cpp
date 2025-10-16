@@ -35,7 +35,7 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
     case Qt::DisplayRole: {
         switch (column) {
         case Column::ID:
-            result = (uint64_t)account.id; // FIXME: implement the right conversion
+            result = QString::fromStdString(std::format("{}", account.id)); // FIXME: implement the right conversion
             break;
         case Column::CUSTODIAN:
             result = account.custodian.second.c_str();
@@ -100,7 +100,7 @@ QVariant AccountTableModel::data(const QModelIndex& index, int role) const {
             std::ostringstream imploded;
             std::transform(account_holders.begin(), account_holders.end(),
                            std::ostream_iterator<std::string>(imploded, delim),
-                           [](const auto& acc_holder) { return acc_holder.first.name; });
+                           [](const auto& acc_holder) { return acc_holder.name; });
             result = QString::fromStdString(imploded.str());
         } break;
         }
@@ -148,7 +148,7 @@ QVariant AccountTableModel::headerData(int section, Qt::Orientation orientation,
         Column column = magic_enum::enum_value<Column>(section);
         result = QString::fromStdString(std::string(magic_enum::enum_name(column)));
     } else if (role == Qt::DisplayRole && orientation == Qt::Vertical) { // V
-        return QString("%1").arg(accounts[section].id);
+        return QString("%1").arg(std::format("{}", accounts[section].id));
     } else {
         // other stuff
     }
@@ -159,7 +159,7 @@ void AccountTableModel::fetch_all() {
     SPDLOG_DEBUG("AccountTableModel::fetch_all");
 
     SPDLOG_TRACE(" - fetch all accounts");
-    finances::accounts::models::AccountManager manager{pool};
+    utils::db::ModelManager<finances::accounts::models::Account> manager{pool};
     auto all_accounts = manager.all();
     if (!all_accounts) {
         SPDLOG_ERROR("Error refreshing accounts");
@@ -170,8 +170,8 @@ void AccountTableModel::fetch_all() {
     // Fetch the account_type breadcrumbs
     SPDLOG_TRACE(" - fetch all account_type breadcrumbs");
     // FIXME: The breadcrumbs could/should be created only once, maybe at the root of the application
-    std::map<finances::accounts::models::Id, QString> account_type_breadcrumb;
-    finances::accounts::models::AccountType::Manager account_type_manager{pool};
+    std::map<utils::db::Id, QString> account_type_breadcrumb;
+    utils::db::AccountTypeManager account_type_manager{pool};
     auto all_account_type = account_type_manager.all();
     if (all_account_type) {
         for (const auto& acc_type : all_account_type.value()) {
@@ -180,7 +180,7 @@ void AccountTableModel::fetch_all() {
             auto breadcrumb = account_type_manager.breadcrumb(acc_type.id);
             if (breadcrumb) {
                 for (auto it : breadcrumb.value()) {
-                    q_breadcrumb.append(it.c_str());
+                    q_breadcrumb.append(it.second.c_str());
                     q_breadcrumb.append(" > ");
                 }
                 q_breadcrumb.append(acc_type.name.c_str());
@@ -195,13 +195,9 @@ void AccountTableModel::fetch_all() {
     // Create empty snapshots vector
     std::vector<std::optional<finances::accounts::models::Snapshot>> all_snapshots(all_accounts->size(), std::nullopt);
 
-    // Create empty account_holders vector
-    std::vector<std::vector<
-        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
-        initial_holders(
-            all_accounts->size(),
-            std::vector<
-                std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>{});
+    // Create empty initial_holders vector
+    std::vector<std::vector<finances::accounts::models::AccountHolderWithRoles>> initial_holders(
+        all_accounts->size(), std::vector<finances::accounts::models::AccountHolderWithRoles>{});
 
     this->beginResetModel();
     this->accounts = std::move(all_accounts.value());
@@ -217,9 +213,9 @@ void AccountTableModel::fetch_all() {
 
 void AccountTableModel::fetch_snapshots() {
     SPDLOG_DEBUG("AccountTableModel::fetch_snapshots");
-    finances::accounts::models::SnapshotManager manager{pool};
+    utils::db::SnapshotManager manager{pool};
 
-    std::vector<finances::accounts::models::Id> account_ids;
+    std::vector<utils::db::Id> account_ids;
     account_ids.resize(accounts.size());
     std::transform(accounts.begin(), accounts.end(), account_ids.begin(),
                    [](const auto& account) { return account.id; });
@@ -241,16 +237,14 @@ void AccountTableModel::fetch_snapshots() {
 
 void AccountTableModel::fetch_account_holders() {
     SPDLOG_DEBUG("AccountTableModel::fetch_account_holders");
-    finances::accounts::models::AccountHolderManager manager{pool};
+    utils::db::ModelManager<finances::accounts::models::AccountHolderWithRoles> manager{pool};
 
-    std::vector<std::vector<
-        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
-        account_holders;
+    std::vector<std::vector<finances::accounts::models::AccountHolderWithRoles>> account_holders;
     account_holders.resize(accounts.size());
     for (const auto& [i, account] : utils::enumerate(accounts)) {
-        auto holders_expected = manager.all(account.id);
+        auto holders_expected = manager.filter_by_fk(account);
         if (!holders_expected) {
-            SPDLOG_WARN("Error retrieving AccountHolders for account {}", account.id);
+            SPDLOG_WARN("Error retrieving AccountHolderWithRoles for account {}", account.id);
             continue;
         }
         account_holders[i] = std::move(holders_expected.value());
@@ -264,7 +258,7 @@ void AccountTableModel::fetch_account_holders() {
     emit dataChanged(topLeft, bottomRight, roles);
 }
 
-void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id) {
+void AccountTableModel::fetch_snapshot(const utils::db::Id& account_id) {
     SPDLOG_DEBUG("AccountTableModel::fetch_snapshot(account_id={})", account_id);
 
     // Find the row for the fetched snapshot
@@ -276,7 +270,7 @@ void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id
         return;
     }
 
-    finances::accounts::models::SnapshotManager manager{pool};
+    utils::db::SnapshotManager manager{pool};
     auto last_snapshot = manager.get_last_snapshot(account_id);
     if (!last_snapshot) {
         SPDLOG_ERROR("Error fetching snapshot for account: {}", account_id);
@@ -293,8 +287,7 @@ void AccountTableModel::fetch_snapshot(finances::accounts::models::Id account_id
     emit dataChanged(topLeft, topLeft, roles);
 }
 
-const finances::accounts::models::Account&
-AccountTableModel::get_account(finances::accounts::models::Id account_id) const {
+const finances::accounts::models::Account& AccountTableModel::get_account(const utils::db::Id& account_id) const {
     SPDLOG_TRACE("AccountTableModel::get_account(account_id={})", account_id);
     auto found =
         std::find_if(accounts.begin(), accounts.end(), [&account_id](const auto& acc) { return acc.id == account_id; });
@@ -311,8 +304,7 @@ const finances::accounts::models::Account& AccountTableModel::get_account(int ro
     return accounts.at(row);
 }
 
-const std::vector<std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>&
-AccountTableModel::get_holders(int row) const {
+const std::vector<finances::accounts::models::AccountHolderWithRoles>& AccountTableModel::get_holders(int row) const {
     SPDLOG_TRACE("AccountTableModel::get_holders(row={})", row);
     return holders.at(row);
 }

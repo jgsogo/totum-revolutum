@@ -34,3 +34,25 @@ cc_library(
     hdrs = ["enumerate.hpp"],
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "type_name",
+    hdrs = ["type_name.hpp"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "expected_type",
+    hdrs = ["expected_type.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bazel/logging:spdlog",
+        "//libraries/utils/cpp/concepts:alternative_c",
+    ],
+)
+
+cc_library(
+    name = "constexpr",
+    hdrs = ["constexpr.hpp"],
+    visibility = ["//visibility:public"],
+)

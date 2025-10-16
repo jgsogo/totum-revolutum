@@ -10,5 +10,5 @@ class AccountNonNumerableDetailWidget : public AccountDetailWidget {
                                              const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
   private slots:
-    void on_new_snapshot(finances::accounts::models::Id account_id);
+    void on_new_snapshot(utils::db::Id account_id);
 };

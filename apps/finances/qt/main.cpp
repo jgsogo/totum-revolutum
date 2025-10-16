@@ -16,6 +16,7 @@
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
 #include "apps/finances/qt/db/notificator.h"
+#include "apps/finances/qt/models/accounts/table.h"
 #include "apps/finances/qt/models/accounts_table.h"
 #include "apps/finances/qt/models/movement_type.h"
 #include "apps/finances/qt/version.hpp"
@@ -44,8 +45,8 @@ int main(int argc, char** argv) {
     {
         const char* initial_holder_pk = std::getenv("FINANCES_QT_INITIAL_HOLDER_PK");
         if (initial_holder_pk != nullptr) {
-            finances::accounts::models::Id me_id{std::stoull(initial_holder_pk)};
-            finances::accounts::models::AccountHolderManager manager{pool};
+            utils::db::Id me_id{utils::db::IdType{std::stoull(initial_holder_pk)}};
+            utils::db::ModelManager<finances::accounts::models::AccountHolder> manager{pool};
             auto me_expected = manager.get(me_id);
             if (!me_expected) {
                 SPDLOG_ERROR("Cannot retrieve AccountHolder for pk={}", me_id);
@@ -72,6 +73,11 @@ int main(int argc, char** argv) {
 
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(tabWidget);
+
+    // AccountsTable* accounts = new AccountsTable{pool};
+    // QTableView* table_view = new QTableView;
+    // table_view->setModel(accounts);
+    // layout->addWidget(table_view);
 
     window.setLayout(layout);
     window.setWindowTitle(QString::fromStdString(std::format("Finances v{}", FINANCES_VERSION)));

@@ -29,12 +29,10 @@ class AccountTableModel : public QAbstractTableModel {
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-    const finances::accounts::models::Account& get_account(finances::accounts::models::Id account_id) const;
+    const finances::accounts::models::Account& get_account(const utils::db::Id& account_id) const;
 
     const finances::accounts::models::Account& get_account(int row) const;
-    const std::vector<
-        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>&
-    get_holders(int row) const;
+    const std::vector<finances::accounts::models::AccountHolderWithRoles>& get_holders(int row) const;
 
   private slots:
     void fetch_all();
@@ -42,15 +40,13 @@ class AccountTableModel : public QAbstractTableModel {
     void fetch_account_holders();
 
   public slots:
-    void fetch_snapshot(finances::accounts::models::Id account_id);
+    void fetch_snapshot(const utils::db::Id& account_id);
 
   private:
     utils::libpqxx::ConnectionPool& pool;
     std::vector<finances::accounts::models::Account> accounts;
     std::vector<std::optional<finances::accounts::models::Snapshot>> snapshots;
-    std::vector<std::vector<
-        std::pair<finances::accounts::models::AccountHolder, finances::accounts::models::AccountHolderRole>>>
-        holders;
+    std::vector<std::vector<finances::accounts::models::AccountHolderWithRoles>> holders;
 
-    std::map<finances::accounts::models::Id, QString> _account_type_breadcrumb;
+    std::map<utils::db::Id, QString> _account_type_breadcrumb;
 };

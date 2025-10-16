@@ -76,7 +76,7 @@ AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx:
     this->setLayout(mainLayout);
 }
 
-void AccountNonNumerableDetailWidget::on_new_snapshot(finances::accounts::models::Id account_id) {
+void AccountNonNumerableDetailWidget::on_new_snapshot(utils::db::Id account_id) {
     SPDLOG_DEBUG("AccountNonNumerableDetailWidget::on_new_snapshot(account_id={})", account_id);
     assert(account_id == account.id);
     emit snapshot_added(account_id);
@@ -104,7 +104,7 @@ QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumn, Qt
 
     switch (column) {
     case MovementColumn::ID:
-        result = (uint64_t)item.id; // FIXME: implement the right conversion
+        result = QString::fromStdString(std::format("{}", item.id)); // FIXME: implement the right conversion
         break;
     case MovementColumn::DATE_VALUE:
         result = QDate{int(item.date_value.year()), static_cast<int>(unsigned(item.date_value.month())),
@@ -131,7 +131,7 @@ QVariant DataDispatcher<finances::accounts::models::Movement, MovementColumn, Qt
     QVariant result = QVariant();
     switch (column) {
     case MovementColumn::ID:
-        result = (uint64_t)item.id; // FIXME: implement the right conversion
+        result = QString::fromStdString(std::format("{}", item.id)); // FIXME: implement the right conversion
         break;
     case MovementColumn::DATE_VALUE:
         result = QDate{int(item.date_value.year()), static_cast<int>(unsigned(item.date_value.month())),
@@ -151,7 +151,7 @@ QVariant DataDispatcher<finances::accounts::models::Movement, MovementColumn, Qt
             // FIXME: We are doing this in multiple places
             QString q_breadcrumb;
             for (const auto& it : breadcrumb.value().get()) {
-                q_breadcrumb.append(it.c_str());
+                q_breadcrumb.append(it.second.c_str());
                 q_breadcrumb.append(" > ");
             }
             q_breadcrumb.append(item.type.second.c_str());

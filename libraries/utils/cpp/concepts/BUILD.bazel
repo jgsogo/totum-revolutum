@@ -1,0 +1,11 @@
+"""
+A collection of C++ concepts
+"""
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "alternative_c",
+    hdrs = ["alternative_c.hpp"],
+    visibility = ["//visibility:public"],
+)

@@ -13,7 +13,7 @@ class AccountDetailWidget : public QWidget {
                                  const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
   signals:
-    void snapshot_added(finances::accounts::models::Id account_id);
+    void snapshot_added(utils::db::Id account_id);
 
   protected:
     utils::libpqxx::ConnectionPool& pool;

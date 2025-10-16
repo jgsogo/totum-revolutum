@@ -1,0 +1,17 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "orm",
+    # srcs = glob(["**/*.cpp"]),
+    hdrs = glob(["**/*.h"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//libraries/utils/cpp:expected_type",
+        "//libraries/utils/cpp:integral_type",
+        "//libraries/utils/cpp:type_name",
+        "//libraries/utils/cpp/libpqxx:connection_pool",
+        "@libpqxx",
+        "@spdlog",
+        "@tl-expected",
+    ],
+)

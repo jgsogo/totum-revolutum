@@ -13,7 +13,7 @@ Notificator::Notificator(pqxx::connection&& _conn, std::chrono::milliseconds not
         SPDLOG_TRACE("DB notification received on channel '{}' with payload '{}'", ACCOUNT_CHANNEL, n.payload);
         if (!n.payload.empty()) {
             uint64_t account_id_u = std::stoull(std::string(n.payload));
-            finances::accounts::models::Id account_id{account_id_u};
+            utils::db::Id account_id = utils::db::IdType{account_id_u};
             emit account_changed(account_id);
         } else {
             SPDLOG_WARN("All accounts changed notification is not implemented!");
@@ -34,6 +34,6 @@ void Notificator::check_notifications() {
 
 void Notificator::notify_all_accounts() { utils::libpqxx::notify(conn, ACCOUNT_CHANNEL); }
 
-void Notificator::notify_account(finances::accounts::models::Id account_id) {
-    utils::libpqxx::notify(conn, ACCOUNT_CHANNEL, std::to_string(account_id));
+void Notificator::notify_account(utils::db::Id account_id) {
+    utils::libpqxx::notify(conn, ACCOUNT_CHANNEL, std::format("{}", account_id));
 }

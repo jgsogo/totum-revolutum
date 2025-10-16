@@ -10,30 +10,20 @@
 #include "hierarchy_tree.h"
 #include "transaction.h"
 #include "types/amount.h"
-#include "types/id.h"
 
 namespace finances::accounts::models {
-
-    class MovementManager;
 
     enum class MovementDirection : int32_t { IN = 0, OUT = 1 };
 
     struct Movement {
-        using Manager = MovementManager;
-
-        Id id;
+        utils::db::Id id;
         std::pair<decltype(Transaction::id), decltype(Transaction::name)> transaction;
         std::pair<decltype(MovementType::id), decltype(MovementType::name)> type;
         MovementDirection direction;
-        decltype(AccountType::id) account_id;
+        std::pair<decltype(Account::id), decltype(Account::name)> account;
         utils::libpqxx::Date date_value;
         // Fx fx;
         Amount amount;
-    };
-
-    class MovementManager : public ModelManager<Movement> {
-      public:
-        tl::expected<std::vector<Movement>, Error> all(Id account_id);
     };
 
 } // namespace finances::accounts::models
@@ -72,31 +62,19 @@ namespace pqxx {
 
 } // namespace pqxx
 
-/*
+namespace utils::db {
 
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Movement>
+    utils::db::ModelManager<finances::accounts::models::Movement>::_filter_by_fk<finances::accounts::models::Account>(
+        pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
 
-class Direction(models.IntegerChoices):
-    IN = 0, _("IN")
-    OUT = 1, _("OUT")
+    template <>
+    template <>
+    std::vector<finances::accounts::models::Movement>
+    utils::db::ModelManager<finances::accounts::models::Movement>::_filter_by_fk<
+        finances::accounts::models::Transaction>(pqxx::work&,
+                                                 const ModelData<finances::accounts::models::Transaction>::Id& id);
 
-
-class Movement(AmountMixin):
-
-    account = models.ForeignKey(Account, on_delete=models.PROTECT)
-    date_value = models.DateField(
-        help_text=_("Date when the movement is annotated in the associated account")
-    )
-
-    fx = models.ForeignKey(
-        Fx,
-        blank=True,
-        null=True,
-        on_delete=models.PROTECT,
-        help_text=_(
-            "This is the FX used for this movement (it doesn't need to be exactly the same"
-            " as the official one for this 'date_value', as FX varies along the day)"
-        ),
-    )
-
-
-*/
+} // namespace utils::db

@@ -1,0 +1,26 @@
+load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
+
+qt_cc_library(
+    name = "models",
+    srcs = [
+        "generic_table_model.cpp",
+    ],
+    hdrs = [
+        "generic_table_model.h",
+    ],
+    normal_hdrs = [
+        "errors.h",
+        "data_dispatcher.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//libraries/utils/cpp/libpqxx:connection_pool",
+        "//libraries/utils/cpp/libpqxx/orm",
+        "@rules_qt//:qt_core",
+        "@magic_enum",
+        "@spdlog",
+        # "@rules_qt//:qt_gui",
+        "//libraries/utils/cpp:expected_type",
+        "@tl-expected",
+    ],
+)

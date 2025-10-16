@@ -3,29 +3,42 @@
 #include <optional>
 #include <string>
 
+#include "libraries/utils/cpp/libpqxx/orm/manager.h"
+
+#include "account.h"
 #include "model_manager.hpp"
-#include "types/id.h"
 
 namespace finances::accounts::models {
-    class AccountHolderManager;
 
     struct AccountHolder {
-        using Manager = AccountHolderManager;
-
-        Id id;
+        utils::db::Id id;
         std::string name;
         bool is_company;
         std::optional<std::string> photo;
     };
 
-    struct AccountHolderRole {
+    struct AccountHolderWithRoles : public AccountHolder {
+        std::pair<decltype(Account::id), decltype(Account::name)> account;
         bool owns_money;
     };
 
-    class AccountHolderManager : public ModelManager<AccountHolder> {
-      public:
-        tl::expected<std::vector<std::pair<AccountHolder, AccountHolderRole>>, Error> all(Id account_id);
-    };
-
-    template <> tl::expected<AccountHolder, Error> ModelManager<AccountHolder>::get(Id id);
 } // namespace finances::accounts::models
+
+namespace utils::db {
+
+    template <>
+    std::vector<finances::accounts::models::AccountHolder>
+    ModelManager<finances::accounts::models::AccountHolder>::_all(pqxx::work&);
+
+    template <>
+    ExpectedType<finances::accounts::models::AccountHolder, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<finances::accounts::models::AccountHolder>::_get(
+        pqxx::work&, const ModelData<finances::accounts::models::AccountHolder>::Id&);
+
+    template <>
+    template <>
+    std::vector<finances::accounts::models::AccountHolderWithRoles>
+    utils::db::ModelManager<finances::accounts::models::AccountHolderWithRoles>::_filter_by_fk<
+        finances::accounts::models::Account>(pqxx::work&, const decltype(finances::accounts::models::Account::id)& id);
+
+} // namespace utils::db
