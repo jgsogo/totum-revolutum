@@ -135,6 +135,7 @@ namespace utils::qt::models {
             this->_refresh_one(id, row);
             // Emitting the data changed is responsibility of the leaf implementation, only them
             // know which columns have been modified and for which Qt::ItemDataRole.
+            // By default, here I could notify the full row has been updated
         };
 
         virtual void _refresh_one(const ModelData::Id& id, int row) {
@@ -145,4 +146,32 @@ namespace utils::qt::models {
         std::vector<TModel> items;
     };
 
+    template <class TParent, class TModel, typename TColumn>
+    class FilteredTableModel : public TableModel<TModel, TColumn> {
+        using ModelManager = TableModel<TModel, TColumn>::ModelManager;
+        static constexpr std::string_view name = utils::type_name<FilteredTableModel<TParent, TModel, TColumn>>();
+
+      public:
+        explicit FilteredTableModel(const TParent& parent_, utils::libpqxx::ConnectionPool& pool,
+                                    QObject* parent = nullptr)
+            : TableModel<TModel, TColumn>{pool, parent}, parent{parent} {};
+
+      protected:
+        void _refresh_all() override {
+            SPDLOG_DEBUG("{}::_refresh_all", name);
+
+            SPDLOG_TRACE(" - fetch all the items for this model");
+            ModelManager manager{this->pool};
+            auto all_items = manager.filter_by_fk(parent);
+            if (!all_items) {
+                SPDLOG_ERROR("Error refreshing items: {}", all_items.error());
+                // TODO: Communicate error to user
+                return;
+            }
+            this->items = std::move(all_items.value());
+        };
+
+      protected:
+        const TParent& parent;
+    };
 } // namespace utils::qt::models
