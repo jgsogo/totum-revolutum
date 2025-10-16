@@ -13,20 +13,3 @@ class AccountsTable final : public utils::qt::models::TableModel<AccountModel, A
     void _refresh_all() override;
     void _refresh_one(const utils::db::ModelData<AccountModel>::Id& id, int row) override final;
 };
-
-namespace utils::qt::models {
-
-    template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const AccountModel&, AccountColumns);
-
-    template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::FontRole>::data(const AccountModel&, AccountColumns);
-
-    template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::ForegroundRole>::data(const AccountModel&,
-                                                                                    AccountColumns);
-
-    template <>
-    QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(const AccountModel&,
-                                                                                       AccountColumns);
-} // namespace utils::qt::models
