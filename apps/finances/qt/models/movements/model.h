@@ -4,6 +4,7 @@
 
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
+/// A model wrapping finances::accounts::movel::Movement with some additional data
 struct MovementModel {
     utils::db::Id id;
 
@@ -13,6 +14,10 @@ struct MovementModel {
 
 namespace utils::db {
 
-    template <> ExpectedType<std::vector<MovementModel>, DatabaseError> ModelManager<MovementModel>::all();
+    template <>
+    template <>
+    ExpectedType<std::vector<MovementModel>, DatabaseError>
+    ModelManager<MovementModel>::filter_by_fk<finances::accounts::models::Account>(
+        const finances::accounts::models::Account& account);
 
 } // namespace utils::db

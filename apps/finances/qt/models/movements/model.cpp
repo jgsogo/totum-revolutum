@@ -4,10 +4,14 @@ using namespace finances::accounts::models;
 
 namespace utils::db {
 
-    template <> ExpectedType<std::vector<MovementModel>, DatabaseError> ModelManager<MovementModel>::all() {
-        // Get all movements
+    template <>
+    template <>
+    ExpectedType<std::vector<MovementModel>, DatabaseError>
+    ModelManager<MovementModel>::filter_by_fk<finances::accounts::models::Account>(
+        const finances::accounts::models::Account& account) {
+        // Get all movements for the given account
         auto movs_manager = ModelData<Movement>::Manager{pool};
-        auto all = movs_manager.all();
+        auto all = movs_manager.filter_by_fk(account);
         if (!all) {
             return tl::unexpected{all.error()};
         }
