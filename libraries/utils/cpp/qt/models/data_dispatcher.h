@@ -1,6 +1,10 @@
 #pragma once
 
+#include <QVariant>
 #include <Qt>
+
+#include "libraries/utils/cpp/type_name.hpp"
+#include <magic_enum/magic_enum.hpp>
 
 namespace utils::qt::models {
 

@@ -141,6 +141,20 @@ namespace utils::qt::models {
 
         virtual void _refresh_one(const ModelData::Id& id, int row) {
             SPDLOG_WARN("{}::_refresh_one(id={}, row={}) -- empty implementation", name, id, row);
+
+            ModelManager manager{pool};
+            auto new_item = manager.get(id);
+            if (!new_item) {
+                SPDLOG_ERROR("Error refreshing item: {}", new_item.error());
+                // TODO: Communicate error to user
+                return;
+            }
+            this->items.at(row) = std::move(new_item.value());
+
+            // Emit a signal to notify that the row has been modified
+            QModelIndex topLeft = this->createIndex(row, 0);
+            QModelIndex bottomRight = this->createIndex(row, this->columnCount());
+            emit dataChanged(topLeft, bottomRight);
         };
 
       protected:

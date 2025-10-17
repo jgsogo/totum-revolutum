@@ -30,6 +30,8 @@ qt_cc_binary(
     deps = [
         "//apps/finances/qt/db",
         "//apps/finances/qt/models",
+        "//apps/finances/qt/table_models",
+        "//apps/finances/qt/tables",
         "//apps/finances/qt/widgets/accounts:widgets",
         "//bazel/logging:spdlog",
         "@rules_qt//:qt_core",
