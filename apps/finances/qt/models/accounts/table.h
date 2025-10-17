@@ -10,6 +10,5 @@ class AccountsTable final : public utils::qt::models::TableModel<AccountModel, A
     AccountsTable(utils::libpqxx::ConnectionPool& pool, QObject* parent = nullptr);
 
   protected:
-    void _refresh_all() override;
     void _refresh_one(const utils::db::ModelData<AccountModel>::Id& id, int row) override final;
 };
