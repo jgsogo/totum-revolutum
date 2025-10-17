@@ -1,17 +1,13 @@
-load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
 
-qt_cc_library(
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
     name = "accounts",
     srcs = [
         "model.cpp",
-        "table.cpp",
     ],
     hdrs = [
-        "table.h",
-    ],
-    normal_hdrs = [
         "model.h",
-        "columns.h",
     ],
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [

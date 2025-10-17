@@ -18,4 +18,8 @@ namespace utils::db {
 
     template <> ExpectedType<std::vector<AccountModel>, DatabaseError> ModelManager<AccountModel>::all();
 
+    template <>
+    ExpectedType<AccountModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<AccountModel>::get(const ModelData<AccountModel>::Id&);
+
 } // namespace utils::db

@@ -41,4 +41,38 @@ namespace utils::db {
         return ret;
     }
 
+    template <>
+    ExpectedType<AccountModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<AccountModel>::get(const ModelData<AccountModel>::Id& id) {
+        auto accounts_manager = ModelData<Account>::Manager{pool};
+        auto account_expected = accounts_manager.get(id);
+        if (!account_expected) {
+            return tl::unexpected{account_expected.error()};
+        }
+
+        finances::accounts::models::Account account = std::move(account_expected.value());
+
+        // Get the last snapshot for this accounts
+        auto snapshots_manager = SnapshotManager{pool};
+        auto last_snapshot = snapshots_manager.get_last_snapshot(account.id);
+        if (!last_snapshot) {
+            return ExpectedType<AccountModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>{
+                std::move(last_snapshot.error())};
+        }
+
+        // Get the holders for this account
+        utils::db::ModelManager<finances::accounts::models::AccountHolderWithRoles> holders_manager{pool};
+        auto holders = holders_manager.filter_by_fk(account);
+        if (!holders) {
+            return ExpectedType<AccountModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>{
+                std::move(holders.error())};
+        }
+
+        // Create the AccountModel, we have all the information we need
+        return AccountModel{.id = account.id,
+                            .account = std::move(account),
+                            .last_snapshot = std::move(last_snapshot.value()),
+                            .holders = std::move(holders.value())};
+    }
+
 } // namespace utils::db

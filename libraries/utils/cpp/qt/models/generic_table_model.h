@@ -26,12 +26,14 @@ namespace utils::qt::models {
           public slots:
             void refresh_all();
             void refresh_one(int row);
+            void refresh_one(utils::db::Id& id);
 
           protected:
             virtual void _refresh_all() = 0;
 
-            /// Updates data in row `row`. Return true if the data has been modified or false otherwise.
+            /// Updates data in row `row`
             virtual void _refresh_one(int row) = 0;
+            virtual void _refresh_one(utils::db::Id& id) = 0;
 
           protected:
             utils::libpqxx::ConnectionPool& pool;
@@ -138,6 +140,24 @@ namespace utils::qt::models {
             // know which columns have been modified and for which Qt::ItemDataRole.
             // By default, here I could notify the full row has been updated
         };
+
+        void _refresh_one(utils::db::Id& id) override final {
+            SPDLOG_DEBUG("{}::_refresh_one(id={})", name, id);
+            auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item){
+                return item.id == id;
+            });
+            if (found != items.end()) {
+                SPDLOG_WARN("Item with id='{}' not found", id);
+                // TODO: Communicate error to user
+                return;
+            }
+
+            int row = std::distance(items.begin(), found);
+            this->_refresh_one(id, row);
+            // Emitting the data changed is responsibility of the leaf implementation, only them
+            // know which columns have been modified and for which Qt::ItemDataRole.
+            // By default, here I could notify the full row has been updated
+        }
 
         virtual void _refresh_one(const ModelData::Id& id, int row) {
             SPDLOG_WARN("{}::_refresh_one(id={}, row={}) -- empty implementation", name, id, row);
