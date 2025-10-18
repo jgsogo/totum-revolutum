@@ -12,6 +12,12 @@ namespace utils::db {
     ExpectedType<std::vector<MovementModel>, DatabaseError>
     ModelManager<MovementModel>::filter_by_fk<finances::accounts::models::Account>(
         const finances::accounts::models::Account& account) {
+        // FIXME: If we use AccountModel instead, we know if it is numerable or not and we can
+        //        choose which movements to retrieve.
+        //
+        //        But, I'm not sure if that's what we want:
+        //          Q: Are there "numerable" accounts where we have regular movements?
+        //          Q: Are there non-numerable accounts with dividends, or other investment movements?
 
         // All MovementNumerable
         auto movs_numerable_manager = ModelData<MovementNumerable>::Manager{pool};

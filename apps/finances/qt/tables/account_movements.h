@@ -14,6 +14,8 @@ enum class AccountMovementsColumns {
     TRANSACTION = 3,
     DIRECTION = 4,
     AMOUNT = 5,
+    QUANTITY = 6,
+    UNIT_VALUE = 7,
 };
 
 namespace utils::qt::models {
