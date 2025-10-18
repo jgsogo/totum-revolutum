@@ -1,6 +1,9 @@
 #include "movement_model.h"
 
+#include <spdlog/spdlog.h>
+
 using namespace finances::accounts::models;
+using namespace finances::investments::models;
 
 namespace utils::db {
 
@@ -9,18 +12,41 @@ namespace utils::db {
     ExpectedType<std::vector<MovementModel>, DatabaseError>
     ModelManager<MovementModel>::filter_by_fk<finances::accounts::models::Account>(
         const finances::accounts::models::Account& account) {
-        // Get all movements for the given account
-        auto movs_manager = ModelData<Movement>::Manager{pool};
-        auto all = movs_manager.filter_by_fk(account);
-        if (!all) {
-            return tl::unexpected{all.error()};
+
+        // All MovementNumerable
+        auto movs_numerable_manager = ModelData<MovementNumerable>::Manager{pool};
+        auto all_movs_numerable = movs_numerable_manager.filter_by_fk(account);
+        if (!all_movs_numerable) {
+            return tl::unexpected{all_movs_numerable.error()};
         }
 
-        std::vector<MovementModel> ret;
-        for (auto&& item : all.value()) {
+        // All MovementDividend
+        auto movs_dividend_manager = ModelData<MovementDividend>::Manager{pool};
+        auto all_movs_dividend = movs_dividend_manager.filter_by_fk(account);
+        if (!all_movs_dividend) {
+            return tl::unexpected{all_movs_dividend.error()};
+        }
 
-            // Get breadcrumb
-            AccountTypeManager movtype_manager{pool};
+        // All regular Movements
+        auto movs_manager = ModelData<Movement>::Manager{pool};
+        auto all_movs = movs_manager.filter_by_fk(account);
+        if (!all_movs) {
+            return tl::unexpected{all_movs.error()};
+        }
+        // - remove movements that are already dividend or numerable ones
+        std::erase_if(all_movs.value(), [&all_movs_numerable, &all_movs_dividend](const auto& mov) {
+            const auto& mov_id = mov.id;
+            return ((std::find_if(all_movs_numerable->begin(), all_movs_numerable->end(),
+                                  [&mov_id](const auto& item) { return item.movement.id == mov_id; }) !=
+                     all_movs_numerable->end()) ||
+                    (std::find_if(all_movs_dividend->begin(), all_movs_dividend->end(), [&mov_id](const auto& item) {
+                         return item.movement.id == mov_id;
+                     }) != all_movs_dividend->end()));
+        });
+
+        // A function to get the breadcrumb
+        MovementTypeManager movtype_manager{pool};
+        auto get_breadcrumb = [&movtype_manager](const Movement& item) -> std::string {
             auto breadcrumb = movtype_manager.breadcrumb(item.type.first);
 
             std::string breadcrumb_str;
@@ -35,10 +61,27 @@ namespace utils::db {
                 }
                 breadcrumb_str.append(item.type.second);
             }
+            return breadcrumb_str;
+        };
 
-            // Create the MovementModel, we have all the information we need
+        std::vector<MovementModel> ret;
+
+        // Add regular Movement
+        for (auto&& item : all_movs.value()) {
+            ret.emplace_back(
+                MovementModel{.id = item.id, .movement = std::move(item), .movtype_breadcrumb = get_breadcrumb(item)});
+        }
+
+        // Add MovementDividend
+        for (auto&& item : all_movs_dividend.value()) {
             ret.emplace_back(MovementModel{
-                .id = item.id, .movement = std::move(item), .movtype_breadcrumb = std::move(breadcrumb_str)});
+                .id = item.id, .movement = std::move(item), .movtype_breadcrumb = get_breadcrumb(item.movement)});
+        }
+
+        // Add MovementNumerable
+        for (auto&& item : all_movs_numerable.value()) {
+            ret.emplace_back(MovementModel{
+                .id = item.id, .movement = std::move(item), .movtype_breadcrumb = get_breadcrumb(item.movement)});
         }
 
         return ret;
