@@ -6,12 +6,15 @@
 #include "apps/finances/qt/models/accounts_table.h"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
+#include "apps/finances/qt/table_models/accounts.h"
+#include "apps/finances/qt/tables/accounts.h"
+
 #include "accounts_table_filter.h"
 
 class AccountsTableWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, AccountTableModel* model,
+    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>* model,
                                  std::optional<finances::accounts::models::AccountHolder> me,
                                  QWidget* parent = nullptr);
 
@@ -24,6 +27,6 @@ class AccountsTableWidget : public QWidget {
 
   private:
     utils::libpqxx::ConnectionPool& pool;
-    AccountTableModel* model;
+    AccountsTableModel<AccountColumns>* model;
     AccountsTableFilterProxyModel* sort_filter;
 };

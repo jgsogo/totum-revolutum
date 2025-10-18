@@ -2,6 +2,7 @@
 
 #include <QWidget>
 
+#include "apps/finances/qt/models/accounts/model.h"
 #include "apps/finances/qt/models/movement_type.h"
 #include "libraries/finances/accounts/cpp/models/account.h"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
@@ -9,7 +10,7 @@
 class AccountDetailWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountDetailWidget(utils::libpqxx::ConnectionPool& pool, const finances::accounts::models::Account&,
+    explicit AccountDetailWidget(utils::libpqxx::ConnectionPool& pool, const AccountModel&,
                                  const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
   signals:
@@ -17,6 +18,6 @@ class AccountDetailWidget : public QWidget {
 
   protected:
     utils::libpqxx::ConnectionPool& pool;
-    const finances::accounts::models::Account& account;
+    const AccountModel& account;
     const MovementTypeTableModel* movtype_model;
 };

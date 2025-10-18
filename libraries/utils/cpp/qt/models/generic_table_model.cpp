@@ -15,4 +15,6 @@ void _detail::GenericTableModel::refresh_all() {
     this->endResetModel();
 }
 
-void _detail::GenericTableModel::refresh_one(int row) { this->_refresh_one(row); }
+void _detail::GenericTableModel::refresh_row(int row) { this->_refresh_row(row); }
+
+void _detail::GenericTableModel::refresh_item(utils::db::Id id) { this->_refresh_item(id); }

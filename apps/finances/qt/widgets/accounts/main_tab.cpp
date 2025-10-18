@@ -8,8 +8,9 @@
 #include "accounts_table.h"
 
 MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_,
-                             std::optional<finances::accounts::models::AccountHolder> me, AccountTableModel* model_,
-                             const MovementTypeTableModel* movtype_model_, QWidget* parent)
+                             std::optional<finances::accounts::models::AccountHolder> me,
+                             AccountsTableModel<AccountColumns>* model_, const MovementTypeTableModel* movtype_model_,
+                             QWidget* parent)
     : QTabWidget(parent), pool{pool_}, model{model_}, movtype_model{movtype_model_} {
     this->setTabsClosable(true);
 
@@ -42,18 +43,24 @@ void MainTabWidget::addTabAccount(utils::db::Id account_id) {
 
     // Get the data for this account
     try {
-        const auto& account = model->get_account(account_id);
+        const auto& account_expected = model->get(account_id);
+        if (!account_expected) {
+            SPDLOG_ERROR("AccountModel with id {} not found in the MainTab", account_id);
+            return;
+        }
+        const AccountModel& account = account_expected.value();
 
         // create the widget
         AccountDetailWidget* account_widget = nullptr;
-        if (!account.is_numerable) {
+        if (!account.account.is_numerable) {
             account_widget = new AccountNonNumerableDetailWidget(pool, account, movtype_model, this);
         } else {
             account_widget = new AccountNumerableDetailWidget(pool, account, movtype_model, this);
         }
         connect(account_widget, &AccountDetailWidget::snapshot_added, [this](auto id) { emit account_changed(id); });
-        auto idx = this->addTab(account_widget,
-                                QString("%1 - %2").arg(account.custodian.second.c_str()).arg(account.name.c_str()));
+        auto idx = this->addTab(
+            account_widget,
+            QString("%1 - %2").arg(account.account.custodian.second.c_str()).arg(account.account.name.c_str()));
 
         _accounts_tabs.insert(std::make_pair(account_id, idx));
 

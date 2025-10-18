@@ -28,7 +28,7 @@ enum class MovementNumerableColumn {
 };
 
 AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool_,
-                                                           const finances::accounts::models::Account& account_,
+                                                           const AccountModel& account_,
                                                            const MovementTypeTableModel* movtype_model_,
                                                            QWidget* parent)
 
@@ -36,14 +36,14 @@ AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::Conne
 
     AccountRelatedModelBase* snapshots_model =
         new AccountRelatedModel<finances::investments::models::SnapshotNumerable, MovementNumerableColumn>(
-            pool, account, nullptr, this);
+            pool, account.account, nullptr, this);
     connect(this, &AccountNumerableDetailWidget::snapshot_added, snapshots_model, &AccountRelatedModelBase::fetch_all);
     AccountRelatedModelBase* movements_model =
         new AccountRelatedModel<finances::investments::models::MovementNumerable, MovementNumerableColumn>(
-            pool, account, movtype_model, this);
+            pool, account.account, movtype_model, this);
     AccountRelatedModelBase* dividends_model =
         new AccountRelatedModel<finances::investments::models::MovementDividend, MovementNumerableColumn>(
-            pool, account, movtype_model, this);
+            pool, account.account, movtype_model, this);
 
     // Models
     QConcatenateTablesProxyModel* model = new QConcatenateTablesProxyModel(this);
@@ -52,7 +52,7 @@ AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::Conne
     model->addSourceModel(dividends_model);
 
     // Components
-    QLabel* name = new QLabel(QString::fromStdString(account.name));
+    QLabel* name = new QLabel(QString::fromStdString(account.account.name));
 
     QSortFilterProxyModel* sort_filter = new QSortFilterProxyModel(this);
     sort_filter->setSourceModel(model);
@@ -66,7 +66,7 @@ AccountNumerableDetailWidget::AccountNumerableDetailWidget(utils::libpqxx::Conne
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     // - popup - add snapshot
-    AddSnapshotNumerableWidget* popup_add_snapshot = new AddSnapshotNumerableWidget(pool, account, this);
+    AddSnapshotNumerableWidget* popup_add_snapshot = new AddSnapshotNumerableWidget(pool, account.account, this);
     popup_add_snapshot->setModal(true);
     popup_add_snapshot->setSizeGripEnabled(true);
     connect(popup_add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, this,

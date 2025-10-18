@@ -16,7 +16,8 @@
 #include "apps/finances/qt/widgets/accounts/non_numerable/add_snapshot.h"
 #include "apps/finances/qt/widgets/accounts/numerable/add_snapshot.h"
 
-AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_,
+AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
+                                         AccountsTableModel<AccountColumns>* model_,
                                          std::optional<finances::accounts::models::AccountHolder> me, QWidget* parent)
     : QWidget(parent), pool{pool_}, model{model_} {
 
@@ -34,7 +35,7 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_, 
     QTableView* table_view = new QTableView(this);
     table_view->setModel(sort_filter);
     table_view->setSortingEnabled(true);
-    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::ID));
+    // table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::ID));
     table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::IDENTIFIER));
     table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::OPEN));
     table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::CLOSE));
@@ -110,24 +111,26 @@ void AccountsTableWidget::onPressed(const QModelIndex& index) {
         utils::db::Id account_id{utils::db::IdType{account_id_variant.toULongLong()}};
 
         // Get the account itself
-        const auto& account = model->get_account(account_id);
+        const AccountModel& account = model->get(account_id).value();
 
         // Show the AddSnapshot dialog
         // FIXME: Merge AddSnapshotNumerableWidget and AddSnapshotNonNumerableWidget into a single one AddSnapshot
         // widget.
-        if (account.is_numerable) {
-            AddSnapshotNumerableWidget* add_snapshot = new AddSnapshotNumerableWidget(pool, account, this);
+        if (account.account.is_numerable) {
+            AddSnapshotNumerableWidget* add_snapshot = new AddSnapshotNumerableWidget(pool, account.account, this);
             add_snapshot->setModal(true);
             add_snapshot->setSizeGripEnabled(true);
             add_snapshot->open();
-            connect(add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, model, &AccountTableModel::fetch_snapshot);
+            connect(add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, model,
+                    &utils::qt::models::_detail::GenericTableModel::refresh_item);
         } else {
-            AddSnapshotNonNumerableWidget* add_snapshot = new AddSnapshotNonNumerableWidget(pool, account, this);
+            AddSnapshotNonNumerableWidget* add_snapshot =
+                new AddSnapshotNonNumerableWidget(pool, account.account, this);
             add_snapshot->setModal(true);
             add_snapshot->setSizeGripEnabled(true);
             add_snapshot->open();
             connect(add_snapshot, &AddSnapshotNonNumerableWidget::new_snapshot, model,
-                    &AccountTableModel::fetch_snapshot);
+                    &utils::qt::models::_detail::GenericTableModel::refresh_item);
         }
     }
 }

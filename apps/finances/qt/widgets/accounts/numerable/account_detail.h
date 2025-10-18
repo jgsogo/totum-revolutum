@@ -5,8 +5,7 @@
 class AccountNumerableDetailWidget : public AccountDetailWidget {
     Q_OBJECT
   public:
-    explicit AccountNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool,
-                                          const finances::accounts::models::Account&,
+    explicit AccountNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool, const AccountModel&,
                                           const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
   private slots:

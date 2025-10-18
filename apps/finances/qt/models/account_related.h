@@ -98,7 +98,7 @@ template <typename TModel, typename Column> class AccountRelatedModel : public A
 
   protected:
     void _fetch_all() override final {
-        SPDLOG_DEBUG("AccountRelatedModel<TModel>::_fetch_all");
+        SPDLOG_DEBUG("AccountRelatedModel<{}>::_fetch_all", utils::type_name<TModel>());
 
         SPDLOG_TRACE(" - fetch all the items for this model");
         typename utils::db::ModelData<TModel>::Manager manager{pool};

@@ -20,7 +20,7 @@ namespace utils::db {
 
         auto query =
             std::format("SELECT m.id, m.date_value, m.amount, m.direction, t.id, t.name, tr.id, tr.name, "
-                        "mn.movement_ptr_id, mn.quantity, mn.unit_value"
+                        "mn.movement_ptr_id, mn.quantity, mn.unit_value, acc.id, acc.name"
                         " FROM {} AS mn"
                         "   LEFT JOIN {} AS m ON mn.movement_ptr_id = m.id"
                         "   LEFT JOIN {} AS t ON m.type_id = t.id"

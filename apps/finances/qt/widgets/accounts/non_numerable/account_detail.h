@@ -5,8 +5,7 @@
 class AccountNonNumerableDetailWidget : public AccountDetailWidget {
     Q_OBJECT
   public:
-    explicit AccountNonNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool,
-                                             const finances::accounts::models::Account&,
+    explicit AccountNonNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool, const AccountModel&,
                                              const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
 
   private slots:

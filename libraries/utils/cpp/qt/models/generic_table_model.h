@@ -25,15 +25,15 @@ namespace utils::qt::models {
 
           public slots:
             void refresh_all();
-            void refresh_one(int row);
-            void refresh_one(utils::db::Id& id);
+            void refresh_row(int row);
+            void refresh_item(utils::db::Id id);
 
           protected:
             virtual void _refresh_all() = 0;
 
             /// Updates data in row `row`
-            virtual void _refresh_one(int row) = 0;
-            virtual void _refresh_one(utils::db::Id& id) = 0;
+            virtual void _refresh_row(int row) = 0;
+            virtual void _refresh_item(utils::db::Id id) = 0;
 
           protected:
             utils::libpqxx::ConnectionPool& pool;
@@ -108,7 +108,7 @@ namespace utils::qt::models {
         get(const ModelData::Id& id) const {
             SPDLOG_DEBUG("{}::get(id={})", name, id);
 
-            auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.item == id; });
+            auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.id == id; });
             if (found == items.end()) {
                 SPDLOG_ERROR(" - Unexpected: {} item with id {} not found in table {}!", ModelData::name, id, name);
                 return tl::unexpected{ErrorItemNotFound{}};
@@ -132,7 +132,7 @@ namespace utils::qt::models {
             this->items = std::move(all_items.value());
         };
 
-        void _refresh_one(int row) override final {
+        void _refresh_row(int row) override final {
             SPDLOG_DEBUG("{}::_refresh_one(row={})", name, row);
             const typename ModelData::Id& id = items.at(row).id;
             this->_refresh_one(id, row);
@@ -141,13 +141,11 @@ namespace utils::qt::models {
             // By default, here I could notify the full row has been updated
         };
 
-        void _refresh_one(utils::db::Id& id) override final {
+        void _refresh_item(utils::db::Id id) override final {
             SPDLOG_DEBUG("{}::_refresh_one(id={})", name, id);
-            auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item){
-                return item.id == id;
-            });
-            if (found != items.end()) {
-                SPDLOG_WARN("Item with id='{}' not found", id);
+            auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.id == id; });
+            if (found == items.end()) {
+                SPDLOG_WARN("Item with id='{}' not found (total {} items)", id, items.size());
                 // TODO: Communicate error to user
                 return;
             }

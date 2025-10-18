@@ -67,10 +67,11 @@ int main(int argc, char** argv) {
     auto conn = pool.acquire();
     std::chrono::milliseconds ms{1000};
     Notificator notificator{std::move(*conn), ms};
-    QObject::connect(&notificator, &Notificator::account_changed, accounts_tablemodel, &AccountsTableModel<AccountColumns>::refresh_one);
+    QObject::connect(&notificator, &Notificator::account_changed, accounts_tablemodel,
+                     &utils::qt::models::_detail::GenericTableModel::refresh_item);
 
     // Create the tabs for the accounts
-    MainTabWidget* tabWidget = new MainTabWidget(pool, me, model, movtype_model);
+    MainTabWidget* tabWidget = new MainTabWidget(pool, me, accounts_tablemodel, movtype_model);
     QObject::connect(tabWidget, &MainTabWidget::account_changed, &notificator, &Notificator::notify_account);
 
     QVBoxLayout* layout = new QVBoxLayout();
