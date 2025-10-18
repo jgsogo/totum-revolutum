@@ -31,18 +31,4 @@ namespace utils::qt::models {
     DataDispatcher<finances::investments::models::SnapshotNumerable, AccountMovementsColumns, Qt::DisplayRole>::data(
         const finances::investments::models::SnapshotNumerable&, AccountMovementsColumns);
 
-    // template <>
-    // QVariant DataDispatcher<AccountModel, AccountColumns, Qt::DisplayRole>::data(const AccountModel&,
-    // AccountColumns);
-
-    // template <>
-    // QVariant DataDispatcher<AccountModel, AccountColumns, Qt::FontRole>::data(const AccountModel&, AccountColumns);
-
-    // template <>
-    // QVariant DataDispatcher<AccountModel, AccountColumns, Qt::ForegroundRole>::data(const AccountModel&,
-    //                                                                                 AccountColumns);
-
-    // template <>
-    // QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(const AccountModel&,
-    //                                                                                    AccountColumns);
 } // namespace utils::qt::models
