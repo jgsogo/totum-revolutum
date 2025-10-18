@@ -117,20 +117,19 @@ namespace utils::db {
         SPDLOG_TRACE(query);
 
         auto r = tx.exec(query, pqxx::params{account_id}).one_row();
-        auto [id, name, description, identifier, ccy, open, close, type_id, type_name, custodian_id,
-                   custodian_name, is_numerable] = r.as<Id, std::string, std::optional<std::string>, std::optional<std::string>, std::string,
-                      utils::libpqxx::Date, std::optional<utils::libpqxx::Date>, Id, std::string, Id, std::string,
-                      bool>();
+        auto [id, name, description, identifier, ccy, open, close, type_id, type_name, custodian_id, custodian_name,
+              is_numerable] =
+            r.as<Id, std::string, std::optional<std::string>, std::optional<std::string>, std::string,
+                 utils::libpqxx::Date, std::optional<utils::libpqxx::Date>, Id, std::string, Id, std::string, bool>();
         return {Account{.id = id,
-                                     .name = name,
-                                     .description = description,
-                                     .identifier = identifier,
-                                     .ccy = Ccy{std::move(ccy)},
-                                     .open = open,
-                                     .close = close,
-                                     .type = std::make_pair(type_id, type_name),
-                                     .custodian = std::make_pair(custodian_id, custodian_name),
-                                     .is_numerable = is_numerable}};
-
+                        .name = name,
+                        .description = description,
+                        .identifier = identifier,
+                        .ccy = Ccy{std::move(ccy)},
+                        .open = open,
+                        .close = close,
+                        .type = std::make_pair(type_id, type_name),
+                        .custodian = std::make_pair(custodian_id, custodian_name),
+                        .is_numerable = is_numerable}};
     }
 } // namespace utils::db

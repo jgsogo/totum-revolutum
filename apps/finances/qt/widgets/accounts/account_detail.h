@@ -2,7 +2,7 @@
 
 #include <QWidget>
 
-#include "apps/finances/qt/models/accounts/model.h"
+#include "apps/finances/qt/models/account_model.h"
 #include "apps/finances/qt/models/movement_type.h"
 #include "libraries/finances/accounts/cpp/models/account.h"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"

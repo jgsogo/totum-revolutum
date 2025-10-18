@@ -44,13 +44,12 @@ namespace utils::db {
     template <>
     template <>
     std::vector<finances::accounts::models::Account>
-    ModelManager<finances::accounts::models::Account>::_filter_by_fk<
-        finances::accounts::models::AccountType>(pqxx::work&,
-                                                 const decltype(finances::accounts::models::AccountType::id)& id);
+    ModelManager<finances::accounts::models::Account>::_filter_by_fk<finances::accounts::models::AccountType>(
+        pqxx::work&, const decltype(finances::accounts::models::AccountType::id)& id);
 
     template <>
     ExpectedType<finances::accounts::models::Account, ErrorNotFound, ErrorMultipleFound>
-    ModelManager<finances::accounts::models::Account>::_get(pqxx::work&, const decltype(finances::accounts::models::Account::id)&);
-
+    ModelManager<finances::accounts::models::Account>::_get(pqxx::work&,
+                                                            const decltype(finances::accounts::models::Account::id)&);
 
 } // namespace utils::db

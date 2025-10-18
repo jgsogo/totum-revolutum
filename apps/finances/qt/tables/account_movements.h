@@ -5,7 +5,7 @@
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 #include "libraries/finances/investments/cpp/models/snapshot_numerable.h"
 
-#include "apps/finances/qt/models/movements/model.h"
+#include "apps/finances/qt/models/movement_model.h"
 
 enum class AccountMovementsColumns {
     ID = 0,

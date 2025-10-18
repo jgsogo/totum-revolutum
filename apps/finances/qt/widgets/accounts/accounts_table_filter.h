@@ -2,7 +2,6 @@
 
 #include <QSortFilterProxyModel>
 
-#include "apps/finances/qt/models/accounts_table.h"
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/tables/accounts.h"
 #include "libraries/finances/accounts/cpp/models/account_holder.h"

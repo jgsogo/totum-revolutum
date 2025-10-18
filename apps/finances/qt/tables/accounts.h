@@ -2,7 +2,7 @@
 
 #include "libraries/utils/cpp/qt/models/data_dispatcher.h"
 
-#include "apps/finances/qt/models/accounts/model.h"
+#include "apps/finances/qt/models/account_model.h"
 
 enum class AccountColumns {
     ID = 0,

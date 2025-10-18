@@ -12,10 +12,5 @@ qt_cc_library(
         "@magic_enum",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_gui",
-
-        # Models
-        "//apps/finances/qt/models/accounts",
-        "//apps/finances/qt/models/account_detail",
-        "//apps/finances/qt/models/movements",
     ],
 )

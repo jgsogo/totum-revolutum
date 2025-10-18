@@ -1,4 +1,4 @@
-#include "model.h"
+#include "movement_model.h"
 
 using namespace finances::accounts::models;
 

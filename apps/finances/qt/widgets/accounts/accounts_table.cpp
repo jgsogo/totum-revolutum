@@ -35,10 +35,10 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
     QTableView* table_view = new QTableView(this);
     table_view->setModel(sort_filter);
     table_view->setSortingEnabled(true);
-    // table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::ID));
-    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::IDENTIFIER));
-    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::OPEN));
-    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::CLOSE));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::ID));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::IDENTIFIER));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::OPEN));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::CLOSE));
     table_view->verticalHeader()->hide();
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     connect(table_view, &QTableView::doubleClicked, this, &AccountsTableWidget::onDoubleClicked);
@@ -85,7 +85,7 @@ void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {
 
     // Get the account id from the filter/sort view
     QVariant account_id_variant =
-        sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountTableModel::Column::ID)));
+        sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::ID)));
     SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
     utils::db::IdType account_id_inner{account_id_variant.toULongLong()};
     utils::db::Id account_id{account_id_inner};
@@ -97,8 +97,8 @@ void AccountsTableWidget::onPressed(const QModelIndex& index) {
     SPDLOG_TRACE("AccountsTableWidget::onPressed(index.row={}, index.column={})", index.row(), index.column());
 
     // Only if the user clicks the snapshot column
-    AccountTableModel::Column column = magic_enum::enum_value<AccountTableModel::Column>(index.column());
-    if (column != AccountTableModel::Column::SNAPSHOT) {
+    AccountColumns column = magic_enum::enum_value<AccountColumns>(index.column());
+    if (column != AccountColumns::SNAPSHOT) {
         return;
     }
 
@@ -106,7 +106,7 @@ void AccountsTableWidget::onPressed(const QModelIndex& index) {
     if (buttons == Qt::RightButton) {
         // Get the account id from the filter/sort view
         QVariant account_id_variant =
-            sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountTableModel::Column::ID)));
+            sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::ID)));
         SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
         utils::db::Id account_id{utils::db::IdType{account_id_variant.toULongLong()}};
 

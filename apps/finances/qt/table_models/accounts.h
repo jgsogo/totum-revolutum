@@ -2,7 +2,7 @@
 
 #include "libraries/utils/cpp/qt/models/generic_table_model.h"
 
-#include "apps/finances/qt/models/accounts/model.h"
+#include "apps/finances/qt/models/account_model.h"
 
 template <typename Columns>
 class AccountsTableModel final : public utils::qt::models::TableModel<AccountModel, Columns> {

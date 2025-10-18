@@ -3,7 +3,6 @@
 #include <QTableWidget>
 #include <QWidget>
 
-#include "apps/finances/qt/models/accounts_table.h"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
 #include "apps/finances/qt/table_models/accounts.h"
