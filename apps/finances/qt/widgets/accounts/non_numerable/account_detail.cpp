@@ -8,7 +8,6 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
-#include "apps/finances/qt/models/account_related.h"
 #include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/table_models/snapshots.h"
 #include "apps/finances/qt/tables/account_movements.h"
@@ -18,20 +17,11 @@
 
 #include "add_snapshot.h"
 
-// enum class MovementColumn {
-//     ID = 0,
-//     DATE_VALUE = 1,
-//     MOVE_TYPE = 2,
-//     TRANSACTION = 3,
-//     DIRECTION = 4,
-//     AMOUNT = 5,
-// };
-
 AccountNonNumerableDetailWidget::AccountNonNumerableDetailWidget(utils::libpqxx::ConnectionPool& pool_,
                                                                  const AccountModel& account_,
-                                                                 const MovementTypeTableModel* movtype_model_,
+
                                                                  QWidget* parent)
-    : AccountDetailWidget(pool_, account_, movtype_model_, parent) {
+    : AccountDetailWidget(pool_, account_, parent) {
 
     SnapshotsTableModel<AccountMovementsColumns>* snapshots_tablemodel =
         new SnapshotsTableModel<AccountMovementsColumns>(account.account, pool, this);

@@ -8,14 +8,15 @@ cc_library(
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
         "//apps/finances/qt/table_models",
+        "//libraries/utils/cpp/qt/models",
         # "//libraries/finances/accounts/cpp/models",
         # "//libraries/finances/investments/cpp/models",
         # "//libraries/finances/accounts/cpp/models",
         # "//libraries/utils/cpp:enumerate",
         # "//libraries/utils/cpp/qt/models",
         # "@magic_enum",
-        # "@rules_qt//:qt_core",
-        # "@rules_qt//:qt_gui",
+        "@rules_qt//:qt_core",
+        "@rules_qt//:qt_gui",
 
         # # Models
         # "//apps/finances/qt/models/accounts",

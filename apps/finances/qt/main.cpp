@@ -17,7 +17,6 @@
 
 #include "apps/finances/qt/db/notificator.h"
 
-#include "apps/finances/qt/models/movement_type.h"
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/tables/accounts.h"
 #include "apps/finances/qt/version.hpp"
@@ -61,7 +60,6 @@ int main(int argc, char** argv) {
     // Create the main model with the accounts
     AccountsTableModel<AccountColumns>* accounts_tablemodel = new AccountsTableModel<AccountColumns>{pool};
     // AccountTableModel* model = new AccountTableModel(pool);
-    MovementTypeTableModel* movtype_model = new MovementTypeTableModel(pool);
 
     // Run a notificator that will monitor notifications from the database
     auto conn = pool.acquire();
@@ -71,7 +69,7 @@ int main(int argc, char** argv) {
                      &utils::qt::models::_detail::GenericTableModel::refresh_item);
 
     // Create the tabs for the accounts
-    MainTabWidget* tabWidget = new MainTabWidget(pool, me, accounts_tablemodel, movtype_model);
+    MainTabWidget* tabWidget = new MainTabWidget(pool, me, accounts_tablemodel);
     QObject::connect(tabWidget, &MainTabWidget::account_changed, &notificator, &Notificator::notify_account);
 
     QVBoxLayout* layout = new QVBoxLayout();
