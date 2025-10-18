@@ -42,6 +42,7 @@ namespace utils::qt::models {
     } // namespace _detail
 
     template <class TModel, typename TColumn> class TableModel : public _detail::GenericTableModel {
+      protected:
         using ModelData = utils::db::ModelData<TModel>;
         using ModelManager = utils::db::ModelManager<TModel>;
         static constexpr std::string_view name = utils::type_name<TableModel<TModel, TColumn>>();
@@ -186,8 +187,8 @@ namespace utils::qt::models {
 
       public:
         explicit FilteredTableModel(const TParent& parent_, utils::libpqxx::ConnectionPool& pool,
-                                    QObject* parent = nullptr)
-            : TableModel<TModel, TColumn>{pool, parent}, parent{parent} {};
+                                    QObject* parent_object = nullptr)
+            : TableModel<TModel, TColumn>{pool, parent_object}, parent{parent_} {};
 
         const TParent& get_parent() const { return parent; };
 

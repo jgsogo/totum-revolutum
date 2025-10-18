@@ -7,6 +7,8 @@ qt_cc_library(
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
         "//apps/finances/qt/models",
+        "//apps/finances/qt/table_models",
+        "//apps/finances/qt/tables",
         "//apps/finances/qt/widgets/accounts:interface",
         "//bazel/logging:spdlog",
         "//libraries/finances/investments/cpp/models",

@@ -44,4 +44,16 @@ namespace utils::db {
         return ret;
     }
 
+    template <> ExpectedType<std::vector<MovementModel>, DatabaseError> ModelManager<MovementModel>::all() {
+        SPDLOG_ERROR("Not implemented");
+        return {};
+    }
+
+    template <>
+    ExpectedType<MovementModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<MovementModel>::get(const ModelData<MovementModel>::Id&) {
+        SPDLOG_ERROR("Not implemented");
+        return tl::unexpected{NotImplemented{}};
+    }
+
 } // namespace utils::db

@@ -26,4 +26,12 @@ namespace utils::db {
     Id ModelManager<finances::investments::models::SnapshotNumerable>::_create(
         pqxx::work&, finances::investments::models::SnapshotNumerable&&);
 
+    template <>
+    std::vector<finances::investments::models::SnapshotNumerable>
+    ModelManager<finances::investments::models::SnapshotNumerable>::_all(pqxx::work&);
+
+    template <>
+    ExpectedType<finances::investments::models::SnapshotNumerable, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<finances::investments::models::SnapshotNumerable>::_get(
+        pqxx::work&, const decltype(finances::investments::models::SnapshotNumerable::id)&);
 } // namespace utils::db
