@@ -8,10 +8,5 @@ cc_library(
     deps = [
         "//libraries/finances/accounts/cpp/models",
         "//libraries/finances/investments/cpp/models",
-        # "//libraries/utils/cpp:enumerate",
-        # "//libraries/utils/cpp/qt/models",
-        # "@magic_enum",
-        # "@rules_qt//:qt_core",
-        # "@rules_qt//:qt_gui",
     ],
 )
