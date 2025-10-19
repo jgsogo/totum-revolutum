@@ -11,7 +11,7 @@
 
 #include "libraries/finances/investments/cpp/models/snapshot_numerable.h"
 
-#include "apps/finances/qt/metatypes/utils.h"
+#include "apps/finances/qt/utils/utils.h"
 
 AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::ConnectionPool& pool_,
                                                        const finances::accounts::models::Account& account_,

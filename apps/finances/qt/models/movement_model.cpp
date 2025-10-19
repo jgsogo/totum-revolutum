@@ -5,8 +5,24 @@
 using namespace finances::accounts::models;
 using namespace finances::investments::models;
 
-namespace utils::db {
+const utils::libpqxx::Date& MovementModel::date_value() const {
+    return std::visit(
+        [](const auto& arg) -> const utils::libpqxx::Date& {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, finances::accounts::models::Movement>) {
+                return arg.date_value;
+            } else if constexpr (std::is_same_v<T, finances::investments::models::MovementNumerable>) {
+                return arg.movement.date_value;
+            } else if constexpr (std::is_same_v<T, finances::investments::models::MovementDividend>) {
+                return arg.movement.date_value;
+            } else {
+                static_assert(false, "non-exhaustive visitor!");
+            }
+        },
+        movement);
+}
 
+namespace utils::db {
     template <>
     template <>
     ExpectedType<std::vector<MovementModel>, DatabaseError>

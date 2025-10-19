@@ -7,6 +7,8 @@
 
 #include "libraries/finances/accounts/cpp/models/types/money.h"
 
+#include "apps/finances/qt/utils/utils.h"
+
 namespace utils::qt::models {
 
     template <>
@@ -26,8 +28,7 @@ namespace utils::qt::models {
         case AccountColumns::NAME: {
             // FIXME: use account.isClosed()
             if (account.close) {
-                auto close_date = QDate{int(account.close->year()), static_cast<int>(unsigned(account.close->month())),
-                                        static_cast<int>(unsigned(account.close->day()))};
+                auto close_date = utils::date_to_qdate(account.close.value());
                 if (close_date < QDate::currentDate()) {
                     result = QString("%1 🔒").arg(account.name);
                 } else {
@@ -45,9 +46,7 @@ namespace utils::qt::models {
             if (snapshot) {
                 // FIXME: Implement some convenient functions in Snapshot class
                 auto snapshot_money = finances::accounts::models::Money{snapshot.value().amount, account.ccy};
-                auto date_value = QDate{int(snapshot.value().date_value.year()),
-                                        static_cast<int>(unsigned(snapshot.value().date_value.month())),
-                                        static_cast<int>(unsigned(snapshot.value().date_value.day()))};
+                auto date_value = utils::date_to_qdate(snapshot.value().date_value);
                 if (date_value.daysTo(QDate::currentDate()) > 21) {
                     result = QString("🗓️ %1").arg(static_cast<std::string>(snapshot_money));
                 } else {
@@ -65,15 +64,11 @@ namespace utils::qt::models {
             // }
         } break;
         case AccountColumns::OPEN:
-            result = QDate{int(account.open.year()), static_cast<int>(unsigned(account.open.month())),
-                           static_cast<int>(unsigned(account.open.day()))}
-                         .toString("yyyy-MM-dd");
+            result = utils::date_to_qdate(account.open).toString("yyyy-MM-dd");
             break;
         case AccountColumns::CLOSE:
             if (account.close) {
-                result = QDate{int(account.close->year()), static_cast<int>(unsigned(account.close->month())),
-                               static_cast<int>(unsigned(account.close->day()))}
-                             .toString("yyyy-MM-dd");
+                result = utils::date_to_qdate(account.close.value()).toString("yyyy-MM-dd");
             }
             break;
         case AccountColumns::HOLDERS: {

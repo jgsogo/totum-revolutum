@@ -14,6 +14,8 @@ struct MovementModel {
                  finances::investments::models::MovementDividend>
         movement;
     std::string movtype_breadcrumb;
+
+    const utils::libpqxx::Date& date_value() const;
 };
 
 namespace utils::db {

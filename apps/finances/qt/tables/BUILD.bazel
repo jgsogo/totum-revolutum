@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//apps/finances/qt/table_models",
         "//libraries/utils/cpp/qt/models",
+        "//apps/finances/qt/utils",
         # "//libraries/finances/accounts/cpp/models",
         # "//libraries/finances/investments/cpp/models",
         # "//libraries/finances/accounts/cpp/models",
