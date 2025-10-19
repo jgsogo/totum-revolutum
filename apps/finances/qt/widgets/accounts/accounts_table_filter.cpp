@@ -4,10 +4,8 @@
 #include <magic_enum/magic_enum.hpp>
 #include <spdlog/spdlog.h>
 
-#include "apps/finances/qt/models/accounts_table.h"
-
 AccountsTableFilterProxyModel::AccountsTableFilterProxyModel(
-    std::optional<finances::accounts::models::AccountHolder> me_, const AccountTableModel* model_,
+    std::optional<finances::accounts::models::AccountHolder> me_, const AccountsTableModel<AccountColumns>* model_,
     Qt::CheckState showClosedAccounts, Qt::CheckState showOthersAccounts, QObject* parent)
     : QSortFilterProxyModel(parent), model{model_}, me{me_}, _showClosedAccounts{showClosedAccounts},
       _showOthersAccounts{showOthersAccounts} {};
@@ -37,8 +35,8 @@ bool AccountsTableFilterProxyModel::filterAcceptsRow(int sourceRow, const QModel
         // Filter based on showClosedAccounts
         if (_showClosedAccounts == Qt::Unchecked) {
             // FIXME: Use some account.isClosed() helper method
-            QModelIndex idx_close = sourceModel()->index(
-                sourceRow, magic_enum::enum_integer(AccountTableModel::Column::CLOSE), sourceParent);
+            QModelIndex idx_close =
+                sourceModel()->index(sourceRow, magic_enum::enum_integer(AccountColumns::CLOSE), sourceParent);
             QVariant close_value = sourceModel()->data(idx_close);
             if (!close_value.isNull()) {
                 if (close_value.toDate() < QDate::currentDate()) {
@@ -48,7 +46,7 @@ bool AccountsTableFilterProxyModel::filterAcceptsRow(int sourceRow, const QModel
         }
         // Filter base on showOthersAccounts
         if (me.has_value() && _showOthersAccounts == Qt::Unchecked) {
-            const auto& holders = this->model->get_holders(sourceRow);
+            const auto& holders = this->model->get(sourceRow).holders;
             auto it = std::find_if(holders.begin(), holders.end(), [this](const auto& acc_holder) {
                 return acc_holder.owns_money && (acc_holder.id == me->id);
             });

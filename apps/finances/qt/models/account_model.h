@@ -4,6 +4,7 @@
 #include "libraries/finances/accounts/cpp/models/account_holder.h"
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 
+/// A model wrapping finances::accounts::movel::Account with some additional data
 struct AccountModel {
     utils::db::Id id;
 
@@ -16,5 +17,9 @@ struct AccountModel {
 namespace utils::db {
 
     template <> ExpectedType<std::vector<AccountModel>, DatabaseError> ModelManager<AccountModel>::all();
+
+    template <>
+    ExpectedType<AccountModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<AccountModel>::get(const ModelData<AccountModel>::Id&);
 
 } // namespace utils::db

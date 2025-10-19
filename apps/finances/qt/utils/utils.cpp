@@ -14,4 +14,9 @@ namespace utils {
         return {finances::accounts::models::Amount{std::move(output)}};
     }
 
+    QDate date_to_qdate(const utils::libpqxx::Date& date) {
+        return QDate{int(date.year()), static_cast<int>(unsigned(date.month())),
+                     static_cast<int>(unsigned(date.day()))};
+    }
+
 } // namespace utils

@@ -104,4 +104,32 @@ namespace utils::db {
         return {ret};
     }
 
+    template <>
+    ExpectedType<Account, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<Account>::_get(pqxx::work& tx, const decltype(Account::id)& account_id) {
+        auto query = std::format("SELECT a.id, a.name, a.description, a.identifier, a.ccy, a.open, a.close, "
+                                 "t.id, t.name, c.id, c.name, a.is_numerable"
+                                 " FROM {} a"
+                                 "   LEFT JOIN {} t ON a.type_id = t.id"
+                                 "   LEFT JOIN {} c ON a.custodian_id = c.id"
+                                 " WHERE a.id = $1;",
+                                 ACCOUNT_TABLE, ACCOUNT_TYPE_TABLE, CUSTODIAN_TABLE);
+        SPDLOG_TRACE(query);
+
+        auto r = tx.exec(query, pqxx::params{account_id}).one_row();
+        auto [id, name, description, identifier, ccy, open, close, type_id, type_name, custodian_id, custodian_name,
+              is_numerable] =
+            r.as<Id, std::string, std::optional<std::string>, std::optional<std::string>, std::string,
+                 utils::libpqxx::Date, std::optional<utils::libpqxx::Date>, Id, std::string, Id, std::string, bool>();
+        return {Account{.id = id,
+                        .name = name,
+                        .description = description,
+                        .identifier = identifier,
+                        .ccy = Ccy{std::move(ccy)},
+                        .open = open,
+                        .close = close,
+                        .type = std::make_pair(type_id, type_name),
+                        .custodian = std::make_pair(custodian_id, custodian_name),
+                        .is_numerable = is_numerable}};
+    }
 } // namespace utils::db

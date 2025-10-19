@@ -1,7 +1,7 @@
-load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
-qt_cc_library(
-    name = "metatypes",
+cc_library(
+    name = "utils",
     srcs = glob(["**/*.cpp"]),
     hdrs = glob(
         ["**/*.h"],

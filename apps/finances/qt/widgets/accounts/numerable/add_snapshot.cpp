@@ -11,7 +11,7 @@
 
 #include "libraries/finances/investments/cpp/models/snapshot_numerable.h"
 
-#include "apps/finances/qt/metatypes/utils.h"
+#include "apps/finances/qt/utils/utils.h"
 
 AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::ConnectionPool& pool_,
                                                        const finances::accounts::models::Account& account_,
@@ -95,7 +95,7 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
     utils::db::ModelData<finances::investments::models::SnapshotNumerable>::Manager manager{pool};
     auto r = manager.create(std::move(new_snapshot_));
     if (!r) {
-        SPDLOG_ERROR("Error adding snapshot to account");
+        SPDLOG_ERROR("Error adding snapshot to account: {}", r.error());
         // TODO: Communicate error to user
         return;
     }

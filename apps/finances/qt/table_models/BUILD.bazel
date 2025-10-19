@@ -1,11 +1,12 @@
+# load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
-    name = "models",
-    srcs = glob(["**/*.cpp"]),
+    name = "table_models",
     hdrs = glob(["**/*.h"]),
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
+        "//apps/finances/qt/models",
         "//libraries/finances/accounts/cpp/models",
         "//libraries/finances/investments/cpp/models",
     ],

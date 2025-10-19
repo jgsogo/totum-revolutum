@@ -42,4 +42,12 @@ namespace utils::db {
     template <>
     Id ModelManager<finances::accounts::models::Snapshot>::_create(pqxx::work&, finances::accounts::models::Snapshot&&);
 
+    template <>
+    std::vector<finances::accounts::models::Snapshot>
+    ModelManager<finances::accounts::models::Snapshot>::_all(pqxx::work&);
+
+    template <>
+    ExpectedType<finances::accounts::models::Snapshot, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<finances::accounts::models::Snapshot>::_get(pqxx::work&,
+                                                             const decltype(finances::accounts::models::Snapshot::id)&);
 } // namespace utils::db

@@ -52,4 +52,19 @@ namespace utils::db {
         SPDLOG_ERROR("Not implemented");
         return {std::monostate{}};
     }
+
+    template <>
+    std::vector<finances::investments::models::SnapshotNumerable>
+    ModelManager<finances::investments::models::SnapshotNumerable>::_all(pqxx::work&) {
+        SPDLOG_ERROR("Not implemented");
+        return {};
+    }
+
+    template <>
+    ExpectedType<finances::investments::models::SnapshotNumerable, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<finances::investments::models::SnapshotNumerable>::_get(
+        pqxx::work&, const decltype(finances::investments::models::SnapshotNumerable::id)&) {
+        SPDLOG_ERROR("Not implemented");
+        return tl::unexpected{NotImplemented{}};
+    }
 } // namespace utils::db

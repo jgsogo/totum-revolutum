@@ -6,12 +6,12 @@ cc_library(
     hdrs = glob(["**/*.h"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//bazel/logging:spdlog",
         "//libraries/utils/cpp:expected_type",
         "//libraries/utils/cpp:integral_type",
         "//libraries/utils/cpp:type_name",
         "//libraries/utils/cpp/libpqxx:connection_pool",
         "@libpqxx",
-        "@spdlog",
         "@tl-expected",
     ],
 )

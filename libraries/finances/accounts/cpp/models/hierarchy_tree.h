@@ -40,6 +40,7 @@ namespace utils::db {
             /// Returns the breadcrumb for the given `THierarchyTree` model. The breadcrumb doesn't include the element
             /// itself.
             ExpectedType<std::vector<std::pair<Id, std::string>>, DatabaseError> breadcrumb(const Id& id) {
+                // TODO: Implement LRU cache
                 return pool.template with_conn<ExpectedType<std::vector<std::pair<Id, std::string>>, DatabaseError>>(
                     [id](pqxx::connection& conn)
                         -> ExpectedType<std::vector<std::pair<Id, std::string>>, DatabaseError> {

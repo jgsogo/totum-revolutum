@@ -80,7 +80,8 @@ namespace utils::db {
 
         /// Creates a new TModel, and returns its id
         ExpectedType<Id, DatabaseError, ErrorInvalidInput> create(TModel&& new_instance) {
-            if (is_null(new_instance.id)) {
+            if (!is_null(new_instance.id)) {
+                SPDLOG_WARN("Cannot create an instance if the 'id' is already given");
                 return tl::unexpected{ErrorInvalidInput{}};
             }
 

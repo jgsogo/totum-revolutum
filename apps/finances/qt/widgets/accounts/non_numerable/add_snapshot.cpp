@@ -12,7 +12,7 @@
 
 #include "libraries/finances/accounts/cpp/models/snapshot.h"
 
-#include "apps/finances/qt/metatypes/utils.h"
+#include "apps/finances/qt/utils/utils.h"
 
 AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(utils::libpqxx::ConnectionPool& pool_,
                                                              const finances::accounts::models::Account& account_,

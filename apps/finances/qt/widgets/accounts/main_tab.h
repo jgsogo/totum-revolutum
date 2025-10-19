@@ -4,15 +4,15 @@
 
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
-#include "apps/finances/qt/models/accounts_table.h"
-#include "apps/finances/qt/models/movement_type.h"
+#include "apps/finances/qt/table_models/accounts.h"
+#include "apps/finances/qt/tables/accounts.h"
 
 class MainTabWidget : public QTabWidget {
     Q_OBJECT
 
   public:
     MainTabWidget(utils::libpqxx::ConnectionPool& pool, std::optional<finances::accounts::models::AccountHolder> me,
-                  AccountTableModel* model, const MovementTypeTableModel* movtype_model, QWidget* parent = nullptr);
+                  AccountsTableModel<AccountColumns>* model, QWidget* parent = nullptr);
     void tabRemoved(int index) override;
 
   private slots:
@@ -27,6 +27,5 @@ class MainTabWidget : public QTabWidget {
     std::unordered_map<utils::db::Id, int> _accounts_tabs;
 
     utils::libpqxx::ConnectionPool& pool;
-    AccountTableModel* model;
-    const MovementTypeTableModel* movtype_model;
+    AccountsTableModel<AccountColumns>* model;
 };

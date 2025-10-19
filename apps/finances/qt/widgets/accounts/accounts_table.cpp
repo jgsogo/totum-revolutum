@@ -16,7 +16,8 @@
 #include "apps/finances/qt/widgets/accounts/non_numerable/add_snapshot.h"
 #include "apps/finances/qt/widgets/accounts/numerable/add_snapshot.h"
 
-AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_, AccountTableModel* model_,
+AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
+                                         AccountsTableModel<AccountColumns>* model_,
                                          std::optional<finances::accounts::models::AccountHolder> me, QWidget* parent)
     : QWidget(parent), pool{pool_}, model{model_} {
 
@@ -34,10 +35,10 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_, 
     QTableView* table_view = new QTableView(this);
     table_view->setModel(sort_filter);
     table_view->setSortingEnabled(true);
-    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::ID));
-    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::IDENTIFIER));
-    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::OPEN));
-    table_view->hideColumn(magic_enum::enum_integer(AccountTableModel::Column::CLOSE));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::ID));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::IDENTIFIER));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::OPEN));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::CLOSE));
     table_view->verticalHeader()->hide();
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     connect(table_view, &QTableView::doubleClicked, this, &AccountsTableWidget::onDoubleClicked);
@@ -84,7 +85,7 @@ void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {
 
     // Get the account id from the filter/sort view
     QVariant account_id_variant =
-        sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountTableModel::Column::ID)));
+        sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::ID)));
     SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
     utils::db::IdType account_id_inner{account_id_variant.toULongLong()};
     utils::db::Id account_id{account_id_inner};
@@ -96,8 +97,8 @@ void AccountsTableWidget::onPressed(const QModelIndex& index) {
     SPDLOG_TRACE("AccountsTableWidget::onPressed(index.row={}, index.column={})", index.row(), index.column());
 
     // Only if the user clicks the snapshot column
-    AccountTableModel::Column column = magic_enum::enum_value<AccountTableModel::Column>(index.column());
-    if (column != AccountTableModel::Column::SNAPSHOT) {
+    AccountColumns column = magic_enum::enum_value<AccountColumns>(index.column());
+    if (column != AccountColumns::SNAPSHOT) {
         return;
     }
 
@@ -105,29 +106,31 @@ void AccountsTableWidget::onPressed(const QModelIndex& index) {
     if (buttons == Qt::RightButton) {
         // Get the account id from the filter/sort view
         QVariant account_id_variant =
-            sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountTableModel::Column::ID)));
+            sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::ID)));
         SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
         utils::db::Id account_id{utils::db::IdType{account_id_variant.toULongLong()}};
 
         // Get the account itself
-        const auto& account = model->get_account(account_id);
+        const AccountModel& account = model->get(account_id).value();
 
         // Show the AddSnapshot dialog
         // FIXME: Merge AddSnapshotNumerableWidget and AddSnapshotNonNumerableWidget into a single one AddSnapshot
         // widget.
-        if (account.is_numerable) {
-            AddSnapshotNumerableWidget* add_snapshot = new AddSnapshotNumerableWidget(pool, account, this);
+        if (account.account.is_numerable) {
+            AddSnapshotNumerableWidget* add_snapshot = new AddSnapshotNumerableWidget(pool, account.account, this);
             add_snapshot->setModal(true);
             add_snapshot->setSizeGripEnabled(true);
             add_snapshot->open();
-            connect(add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, model, &AccountTableModel::fetch_snapshot);
+            connect(add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, model,
+                    &utils::qt::models::_detail::GenericTableModel::refresh_item);
         } else {
-            AddSnapshotNonNumerableWidget* add_snapshot = new AddSnapshotNonNumerableWidget(pool, account, this);
+            AddSnapshotNonNumerableWidget* add_snapshot =
+                new AddSnapshotNonNumerableWidget(pool, account.account, this);
             add_snapshot->setModal(true);
             add_snapshot->setSizeGripEnabled(true);
             add_snapshot->open();
             connect(add_snapshot, &AddSnapshotNonNumerableWidget::new_snapshot, model,
-                    &AccountTableModel::fetch_snapshot);
+                    &utils::qt::models::_detail::GenericTableModel::refresh_item);
         }
     }
 }

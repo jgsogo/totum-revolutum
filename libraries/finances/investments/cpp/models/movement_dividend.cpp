@@ -52,7 +52,7 @@ namespace utils::db {
                 snapshot_data =
                     std::make_pair(std::move(snapshot_date_value.value()), std::move(snapshot_quantity.value()));
             } else {
-                SPDLOG_WARN("Snapshot data missing for dividend! This is a database error!");
+                SPDLOG_ERROR("Snapshot data missing for dividend! This is a database error!");
             }
 
             ret.emplace_back(MovementDividend{

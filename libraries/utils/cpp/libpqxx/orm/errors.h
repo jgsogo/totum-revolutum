@@ -29,3 +29,9 @@ template <> struct fmt::formatter<utils::db::ErrorMultipleFound> : fmt::formatte
         return fmt::format_to(ctx.out(), "ErrorMultipleFound");
     }
 };
+
+template <> struct fmt::formatter<utils::db::ErrorInvalidInput> : fmt::formatter<std::string> {
+    auto format(utils::db::ErrorInvalidInput p, format_context& ctx) const -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(), "ErrorInvalidInput");
+    }
+};
