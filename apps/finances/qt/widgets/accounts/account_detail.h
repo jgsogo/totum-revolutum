@@ -12,6 +12,9 @@ class AccountDetailWidget : public QWidget {
   public:
     explicit AccountDetailWidget(utils::libpqxx::ConnectionPool& pool, const AccountModel&, QWidget* parent = nullptr);
 
+  private slots:
+    void on_new_snapshot(utils::db::Id account_id);
+
   signals:
     void snapshot_added(utils::db::Id account_id);
 

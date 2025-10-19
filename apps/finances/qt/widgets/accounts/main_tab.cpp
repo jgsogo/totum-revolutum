@@ -2,9 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "non_numerable/account_detail.h"
-#include "numerable/account_detail.h"
-
+#include "account_detail.h"
 #include "accounts_table.h"
 
 MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_,
@@ -50,12 +48,7 @@ void MainTabWidget::addTabAccount(utils::db::Id account_id) {
         const AccountModel& account = account_expected.value();
 
         // create the widget
-        AccountDetailWidget* account_widget = nullptr;
-        if (!account.account.is_numerable) {
-            account_widget = new AccountNonNumerableDetailWidget(pool, account, this);
-        } else {
-            account_widget = new AccountNumerableDetailWidget(pool, account, this);
-        }
+        AccountDetailWidget* account_widget = new AccountDetailWidget{pool, account, this};
         connect(account_widget, &AccountDetailWidget::snapshot_added, [this](auto id) { emit account_changed(id); });
         auto idx = this->addTab(
             account_widget,
