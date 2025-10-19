@@ -5,16 +5,16 @@
 using namespace finances::accounts::models;
 using namespace finances::investments::models;
 
-const utils::libpqxx::Date& MovementModel::date_value() const {
+const Movement& MovementModel::as_movement() const {
     return std::visit(
-        [](const auto& arg) -> const utils::libpqxx::Date& {
+        [](const auto& arg) -> const Movement& {
             using T = std::decay_t<decltype(arg)>;
-            if constexpr (std::is_same_v<T, finances::accounts::models::Movement>) {
-                return arg.date_value;
-            } else if constexpr (std::is_same_v<T, finances::investments::models::MovementNumerable>) {
-                return arg.movement.date_value;
-            } else if constexpr (std::is_same_v<T, finances::investments::models::MovementDividend>) {
-                return arg.movement.date_value;
+            if constexpr (std::is_same_v<T, Movement>) {
+                return arg;
+            } else if constexpr (std::is_same_v<T, MovementNumerable>) {
+                return arg.movement;
+            } else if constexpr (std::is_same_v<T, MovementDividend>) {
+                return arg.movement;
             } else {
                 static_assert(false, "non-exhaustive visitor!");
             }

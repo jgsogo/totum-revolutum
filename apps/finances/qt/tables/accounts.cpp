@@ -56,13 +56,9 @@ namespace utils::qt::models {
                 result = QString("❗");
             }
         } break;
-        case AccountColumns::TYPE: {
+        case AccountColumns::TYPE:
             result = QString::fromStdString(item.account_type_breadcrumb);
-            // auto found = _account_type_breadcrumb.find(account.type.first);
-            // if (found != _account_type_breadcrumb.end()) {
-            //     result = found->second;
-            // }
-        } break;
+            break;
         case AccountColumns::OPEN:
             result = utils::date_to_qdate(account.open).toString("yyyy-MM-dd");
             break;

@@ -15,7 +15,7 @@ struct MovementModel {
         movement;
     std::string movtype_breadcrumb;
 
-    const utils::libpqxx::Date& date_value() const;
+    const finances::accounts::models::Movement& as_movement() const;
 };
 
 namespace utils::db {
