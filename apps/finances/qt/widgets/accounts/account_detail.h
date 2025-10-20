@@ -2,10 +2,9 @@
 
 #include <QWidget>
 
-#include "apps/finances/qt/models/account_model.h"
-
-#include "libraries/finances/accounts/cpp/models/account.h"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
+
+#include "apps/finances/qt/models/account_model.h"
 
 class AccountDetailWidget : public QWidget {
     Q_OBJECT

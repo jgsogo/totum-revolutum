@@ -225,7 +225,7 @@ namespace utils::qt::models {
         void _refresh_all() override {
             SPDLOG_DEBUG("{}::_refresh_all", name);
 
-            SPDLOG_TRACE(" - fetch all the items for this model");
+            SPDLOG_TRACE(" - fetch all the items for this model (parent.id={})", parent.id);
             ModelManager manager{this->pool};
             auto all_items = manager.filter_by_fk(parent);
             if (!all_items) {

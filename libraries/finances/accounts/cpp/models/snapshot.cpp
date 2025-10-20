@@ -110,9 +110,9 @@ namespace utils::db {
 
     template <>
     template <>
-    std::vector<finances::accounts::models::Snapshot>
-    utils::db::ModelManager<finances::accounts::models::Snapshot>::_filter_by_fk<finances::accounts::models::Account>(
-        pqxx::work& tx, const ModelData<finances::accounts::models::Account>::Id& account_id) {
+    std::vector<Snapshot>
+    utils::db::ModelManager<Snapshot>::_filter_by_fk<Account>(pqxx::work& tx,
+                                                              const ModelData<Account>::Id& account_id) {
 
         SPDLOG_DEBUG("Get all snapshots for account_id {}", account_id);
 
@@ -133,24 +133,19 @@ namespace utils::db {
         return {ret};
     }
 
-    template <>
-    Id ModelManager<finances::accounts::models::Snapshot>::_create(pqxx::work&,
-                                                                   finances::accounts::models::Snapshot&&) {
+    template <> Id ModelManager<Snapshot>::_create(pqxx::work&, Snapshot&&) {
         SPDLOG_ERROR("Not implemented");
         return {std::monostate{}};
     }
 
-    template <>
-    std::vector<finances::accounts::models::Snapshot>
-    ModelManager<finances::accounts::models::Snapshot>::_all(pqxx::work&) {
+    template <> std::vector<Snapshot> ModelManager<Snapshot>::_all(pqxx::work&) {
         SPDLOG_ERROR("Not implemented");
         return {};
     }
 
     template <>
-    ExpectedType<finances::accounts::models::Snapshot, ErrorNotFound, ErrorMultipleFound>
-    ModelManager<finances::accounts::models::Snapshot>::_get(
-        pqxx::work&, const decltype(finances::accounts::models::Snapshot::id)&) {
+    ExpectedType<Snapshot, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<Snapshot>::_get(pqxx::work&, const decltype(Snapshot::id)&) {
         SPDLOG_ERROR("Not implemented");
         return tl::unexpected{NotImplemented{}};
     }

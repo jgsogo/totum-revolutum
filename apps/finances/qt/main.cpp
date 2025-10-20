@@ -17,6 +17,7 @@
 
 #include "apps/finances/qt/db/notificator.h"
 
+#include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/tables/accounts.h"
 #include "apps/finances/qt/version.hpp"
@@ -35,6 +36,8 @@ int main(int argc, char** argv) {
 
     QApplication app(argc, argv);
     QWidget window;
+
+    register_metatypes();
 
     // FIXME: Make the pool only available to the models. Every DB operation should
     //        be performed through these classes. This will require some metatypes
@@ -57,9 +60,8 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Create the main model with the accounts
+    // Create the long-living models
     AccountsTableModel<AccountColumns>* accounts_tablemodel = new AccountsTableModel<AccountColumns>{pool};
-    // AccountTableModel* model = new AccountTableModel(pool);
 
     // Run a notificator that will monitor notifications from the database
     auto conn = pool.acquire();

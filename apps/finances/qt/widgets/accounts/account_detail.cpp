@@ -8,9 +8,12 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/table_models/snapshots.h"
-#include "apps/finances/qt/tables/account_movements.h"
+#include "apps/finances/qt/tables/movement_columns.h"
+#include "apps/finances/qt/widgets/transactions/transaction_detail.h"
+
 #include "non_numerable/add_snapshot.h"
 #include "numerable/add_snapshot.h"
 
@@ -23,23 +26,23 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
 
     // - movements
     {
-        MovementsTableModel<AccountMovementsColumns>* movements_tablemodel =
-            new MovementsTableModel<AccountMovementsColumns>(account.account, pool, this);
+        MovementsForAccountTableModel<MovementColumns>* movements_tablemodel =
+            new MovementsForAccountTableModel<MovementColumns>(account.account, pool, this);
         model->addSourceModel(movements_tablemodel);
     }
 
     // - snapshots
     {
         if (account.account.is_numerable) {
-            NumerableSnapshotsTableModel<AccountMovementsColumns>* snapshots_tablemodel =
-                new NumerableSnapshotsTableModel<AccountMovementsColumns>(account.account, pool, this);
+            NumerableSnapshotsTableModel<MovementColumns>* snapshots_tablemodel =
+                new NumerableSnapshotsTableModel<MovementColumns>(account.account, pool, this);
             connect(this, &AccountDetailWidget::snapshot_added, snapshots_tablemodel,
                     &utils::qt::models::_detail::GenericTableModel::refresh_all);
 
             model->addSourceModel(snapshots_tablemodel);
         } else {
-            SnapshotsTableModel<AccountMovementsColumns>* snapshots_tablemodel =
-                new SnapshotsTableModel<AccountMovementsColumns>(account.account, pool, this);
+            SnapshotsTableModel<MovementColumns>* snapshots_tablemodel =
+                new SnapshotsTableModel<MovementColumns>(account.account, pool, this);
             connect(this, &AccountDetailWidget::snapshot_added, snapshots_tablemodel,
                     &utils::qt::models::_detail::GenericTableModel::refresh_all);
 
@@ -52,13 +55,45 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
     {
         QSortFilterProxyModel* sort_filter = new QSortFilterProxyModel(this);
         sort_filter->setSourceModel(model);
-        sort_filter->sort(magic_enum::enum_integer(AccountMovementsColumns::DATE_VALUE), Qt::DescendingOrder);
+        sort_filter->sort(magic_enum::enum_integer(MovementColumns::DATE_VALUE), Qt::DescendingOrder);
 
         table_view->setModel(sort_filter);
         table_view->setSortingEnabled(false);
-        table_view->hideColumn(magic_enum::enum_integer(AccountMovementsColumns::ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ID));
         table_view->verticalHeader()->hide();
         table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+        // When the user double-click in a row, if it is a movement, we want to open the corresponding transaction
+        // window
+        connect(table_view, &QTableView::doubleClicked, [sort_filter, this](const QModelIndex& index) {
+            SPDLOG_DEBUG("User clicked on row={}", index.row());
+            auto transaction_column = index.siblingAtColumn(magic_enum::enum_integer(MovementColumns::TRANSACTION_ID));
+            QVariant transaction_id_variant = sort_filter->data(transaction_column);
+            utils::db::Id transaction_id = transaction_id_variant.value<utils::db::Id>();
+            if (utils::db::is_null(transaction_id)) {
+                SPDLOG_DEBUG("No transaction id associated to row {}, or value cannot be converted into utils::db::Id",
+                             index.row());
+                return;
+            }
+
+            SPDLOG_TRACE(" - this is transaction_id {}", transaction_id);
+            utils::db::ModelData<finances::accounts::models::Transaction>::Manager transactions_manager{pool};
+            auto transaction_expected = transactions_manager.get(transaction_id);
+            if (!transaction_expected) {
+                SPDLOG_ERROR("Failed to get transaction with id {} (corresponding to row {}): {}", transaction_id,
+                             index.row(), transaction_expected.error());
+                return;
+            }
+
+            // FIXME: Here I'm using a temporal Transaction and passing a reference!!!!
+            SPDLOG_WARN("STOP! We cannot create a TransactionDetailWidget using a reference!");
+            // const finances::accounts::models::Transaction& transaction = transaction_expected.value();
+            // TransactionDetailWidget* transaction_detail =
+            // new TransactionDetailWidget(pool, transaction, this);
+            // transaction_detail->setModal(true);
+            // transaction_detail->setSizeGripEnabled(true);
+            // transaction_detail->open();
+        });
     }
 
     // - popup - add snapshot

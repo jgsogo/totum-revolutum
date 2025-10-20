@@ -21,4 +21,11 @@ namespace utils::db {
     utils::db::ModelManager<finances::investments::models::MovementNumerable>::_filter_by_fk<
         finances::accounts::models::Account>(pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
 
-}
+    template <>
+    template <>
+    std::vector<finances::investments::models::MovementNumerable>
+    utils::db::ModelManager<finances::investments::models::MovementNumerable>::_filter_by_fk<
+        finances::accounts::models::Transaction>(pqxx::work&,
+                                                 const ModelData<finances::accounts::models::Transaction>::Id& id);
+
+} // namespace utils::db

@@ -1,16 +1,12 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
-    name = "tables",
+    name = "metatypes",
     srcs = glob(["**/*.cpp"]),
     hdrs = glob(["**/*.h"]),
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
-        "//apps/finances/qt/metatypes",
-        "//apps/finances/qt/table_models",
-        "//apps/finances/qt/utils",
-        "//libraries/utils/cpp/qt/models",
+        "//libraries/utils/cpp/libpqxx/orm",
         "@rules_qt//:qt_core",
-        "@rules_qt//:qt_gui",
     ],
 )
