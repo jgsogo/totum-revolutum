@@ -10,46 +10,59 @@ using namespace finances::accounts::models;
 
 namespace utils::db {
 
-    template <>
-    template <>
-    std::vector<finances::investments::models::MovementNumerable>
-    utils::db::ModelManager<finances::investments::models::MovementNumerable>::_filter_by_fk<
-        finances::accounts::models::Account>(pqxx::work& tx,
-                                             const ModelData<finances::accounts::models::Account>::Id& account_id) {
-        SPDLOG_DEBUG("Get all movements for account_id {}", account_id);
+    namespace {
+        std::vector<MovementNumerable> filter_by_fk_id(pqxx::work& tx, const std::string& fk_key,
+                                                       const utils::db::Id& id) {
+            auto query = std::format("SELECT m.id, m.date_value, m.amount, m.direction, t.id, t.name, tr.id, tr.name, "
+                                     "mn.movement_ptr_id, mn.quantity, mn.unit_value, acc.id, acc.name"
+                                     " FROM {} AS mn"
+                                     "   LEFT JOIN {} AS m ON mn.movement_ptr_id = m.id"
+                                     "   LEFT JOIN {} AS t ON m.type_id = t.id"
+                                     "   LEFT JOIN {} AS tr ON m.transaction_id = tr.id"
+                                     "   LEFT JOIN {} AS acc ON m.account_id = acc.id"
+                                     " WHERE m.{} = $1"
+                                     " ORDER BY m.date_value DESC",
+                                     MOVEMENT_NUMERABLE_TABLE, MOVEMENT_TABLE, MOVEMENTTYPE_TABLE, TRANSACTION_TABLE,
+                                     ACCOUNT_TABLE, fk_key);
+            SPDLOG_TRACE(query);
 
-        auto query =
-            std::format("SELECT m.id, m.date_value, m.amount, m.direction, t.id, t.name, tr.id, tr.name, "
-                        "mn.movement_ptr_id, mn.quantity, mn.unit_value, acc.id, acc.name"
-                        " FROM {} AS mn"
-                        "   LEFT JOIN {} AS m ON mn.movement_ptr_id = m.id"
-                        "   LEFT JOIN {} AS t ON m.type_id = t.id"
-                        "   LEFT JOIN {} AS tr ON m.transaction_id = tr.id"
-                        "   LEFT JOIN {} AS acc ON m.account_id = acc.id"
-                        " WHERE m.account_id = $1"
-                        " ORDER BY m.date_value DESC",
-                        MOVEMENT_NUMERABLE_TABLE, MOVEMENT_TABLE, MOVEMENTTYPE_TABLE, TRANSACTION_TABLE, ACCOUNT_TABLE);
-        SPDLOG_TRACE(query);
-        std::vector<MovementNumerable> ret;
-        for (auto [id, date_value, amount, direction, type_id, type_name, transaction_id, transaction_name, mn_id,
-                   quantity, unit_value, acc_id, acc_name] :
-             tx.query<Id, utils::libpqxx::Date, Amount, MovementDirection, Id, std::string, Id, std::string, Id, Amount,
-                      Amount, Id, std::string>(query, pqxx::params{account_id})) {
-            ret.emplace_back(MovementNumerable{
-                .movement = Movement{.id = id,
-                                     .transaction = std::make_pair(transaction_id, transaction_name),
-                                     .type = std::make_pair(type_id, type_name),
-                                     .direction = direction,
-                                     .account = std::make_pair(acc_id, acc_name),
-                                     .date_value = date_value,
-                                     .amount = amount},
-                .id = mn_id,
-                .quantity = quantity,
-                .unit_value = unit_value,
-            });
+            std::vector<MovementNumerable> ret;
+            for (auto [id, date_value, amount, direction, type_id, type_name, transaction_id, transaction_name, mn_id,
+                       quantity, unit_value, acc_id, acc_name] :
+                 tx.query<Id, utils::libpqxx::Date, Amount, MovementDirection, Id, std::string, Id, std::string, Id,
+                          Amount, Amount, Id, std::string>(query, pqxx::params{id})) {
+                ret.emplace_back(MovementNumerable{
+                    .movement = Movement{.id = id,
+                                         .transaction = std::make_pair(transaction_id, transaction_name),
+                                         .type = std::make_pair(type_id, type_name),
+                                         .direction = direction,
+                                         .account = std::make_pair(acc_id, acc_name),
+                                         .date_value = date_value,
+                                         .amount = amount},
+                    .id = mn_id,
+                    .quantity = quantity,
+                    .unit_value = unit_value,
+                });
+            }
+            SPDLOG_TRACE("Found {} numerable movements", ret.size());
+            return {ret};
         }
-        SPDLOG_TRACE("Found {} movements for account {}", ret.size(), account_id);
-        return {ret};
+    } // namespace
+
+    template <>
+    template <>
+    std::vector<MovementNumerable>
+    utils::db::ModelManager<MovementNumerable>::_filter_by_fk<Account>(pqxx::work& tx,
+                                                                       const ModelData<Account>::Id& account_id) {
+        SPDLOG_DEBUG("Get all numerable movements for account_id {}", account_id);
+        return filter_by_fk_id(tx, "account_id", account_id);
     }
 
+    template <>
+    template <>
+    std::vector<MovementNumerable> utils::db::ModelManager<MovementNumerable>::_filter_by_fk<Transaction>(
+        pqxx::work& tx, const ModelData<Transaction>::Id& transaction_id) {
+        SPDLOG_DEBUG("Get all numerable movements for transaction_id {}", transaction_id);
+        return filter_by_fk_id(tx, "transaction_id", transaction_id);
+    }
 } // namespace utils::db

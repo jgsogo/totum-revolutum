@@ -25,4 +25,10 @@ namespace utils::db {
     utils::db::ModelManager<finances::investments::models::MovementDividend>::_filter_by_fk<
         finances::accounts::models::Account>(pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
 
-}
+    template <>
+    template <>
+    std::vector<finances::investments::models::MovementDividend>
+    utils::db::ModelManager<finances::investments::models::MovementDividend>::_filter_by_fk<
+        finances::accounts::models::Transaction>(pqxx::work&,
+                                                 const ModelData<finances::accounts::models::Transaction>::Id& id);
+} // namespace utils::db

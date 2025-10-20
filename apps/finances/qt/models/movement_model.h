@@ -26,6 +26,12 @@ namespace utils::db {
     ModelManager<MovementModel>::filter_by_fk<finances::accounts::models::Account>(
         const finances::accounts::models::Account& account);
 
+    template <>
+    template <>
+    ExpectedType<std::vector<MovementModel>, DatabaseError>
+    ModelManager<MovementModel>::filter_by_fk<finances::accounts::models::Transaction>(
+        const finances::accounts::models::Transaction&);
+
     template <> ExpectedType<std::vector<MovementModel>, DatabaseError> ModelManager<MovementModel>::all();
 
     template <>
