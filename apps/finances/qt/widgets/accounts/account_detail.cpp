@@ -85,11 +85,14 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
                 return;
             }
 
-            TransactionDetailWidget* transaction_detail =
-                new TransactionDetailWidget(pool, transaction_expected.value(), this);
-            transaction_detail->setModal(true);
-            transaction_detail->setSizeGripEnabled(true);
-            transaction_detail->open();
+            // FIXME: Here I'm using a temporal Transaction and passing a reference!!!!
+            SPDLOG_WARN("STOP! We cannot create a TransactionDetailWidget using a reference!");
+            // const finances::accounts::models::Transaction& transaction = transaction_expected.value();
+            // TransactionDetailWidget* transaction_detail =
+            // new TransactionDetailWidget(pool, transaction, this);
+            // transaction_detail->setModal(true);
+            // transaction_detail->setSizeGripEnabled(true);
+            // transaction_detail->open();
         });
     }
 

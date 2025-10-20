@@ -60,9 +60,8 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Create the main model with the accounts
+    // Create the long-living models
     AccountsTableModel<AccountColumns>* accounts_tablemodel = new AccountsTableModel<AccountColumns>{pool};
-    // AccountTableModel* model = new AccountTableModel(pool);
 
     // Run a notificator that will monitor notifications from the database
     auto conn = pool.acquire();
