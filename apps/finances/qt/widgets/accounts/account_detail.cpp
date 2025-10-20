@@ -8,9 +8,12 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/table_models/snapshots.h"
 #include "apps/finances/qt/tables/movement_columns.h"
+#include "apps/finances/qt/widgets/transactions/transaction_detail.h"
+
 #include "non_numerable/add_snapshot.h"
 #include "numerable/add_snapshot.h"
 
@@ -59,6 +62,35 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
         table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ID));
         table_view->verticalHeader()->hide();
         table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+        // When the user double-click in a row, if it is a movement, we want to open the corresponding transaction
+        // window
+        connect(table_view, &QTableView::doubleClicked, [sort_filter, this](const QModelIndex& index) {
+            SPDLOG_DEBUG("User clicked on row={}", index.row());
+            auto transaction_column = index.siblingAtColumn(magic_enum::enum_integer(MovementColumns::TRANSACTION_ID));
+            QVariant transaction_id_variant = sort_filter->data(transaction_column);
+            utils::db::Id transaction_id = transaction_id_variant.value<utils::db::Id>();
+            if (utils::db::is_null(transaction_id)) {
+                SPDLOG_DEBUG("No transaction id associated to row {}, or value cannot be converted into utils::db::Id",
+                             index.row());
+                return;
+            }
+
+            SPDLOG_TRACE(" - this is transaction_id {}", transaction_id);
+            utils::db::ModelData<finances::accounts::models::Transaction>::Manager transactions_manager{pool};
+            auto transaction_expected = transactions_manager.get(transaction_id);
+            if (!transaction_expected) {
+                SPDLOG_ERROR("Failed to get transaction with id {} (corresponding to row {}): {}", transaction_id,
+                             index.row(), transaction_expected.error());
+                return;
+            }
+
+            TransactionDetailWidget* transaction_detail =
+                new TransactionDetailWidget(pool, transaction_expected.value(), this);
+            transaction_detail->setModal(true);
+            transaction_detail->setSizeGripEnabled(true);
+            transaction_detail->open();
+        });
     }
 
     // - popup - add snapshot

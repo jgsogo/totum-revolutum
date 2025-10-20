@@ -19,6 +19,8 @@ enum class MovementColumns {
     QUANTITY = 6,
     UNIT_VALUE = 7,
     ACCOUNT = 8,
+    TRANSACTION_ID = 9,
+    ACCOUNT_ID = 10,
 };
 
 namespace utils::qt::models {

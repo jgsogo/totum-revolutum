@@ -7,6 +7,7 @@
 
 #include "libraries/finances/accounts/cpp/models/types/money.h"
 
+#include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/utils/utils.h"
 
 namespace utils::qt::models {
@@ -20,7 +21,7 @@ namespace utils::qt::models {
 
         switch (column) {
         case AccountColumns::ID:
-            result = QString::fromStdString(std::format("{}", item.id)); // FIXME: implement the right conversion
+            result.setValue(item.id);
             break;
         case AccountColumns::CUSTODIAN:
             result = account.custodian.second.c_str();

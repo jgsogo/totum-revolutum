@@ -29,10 +29,11 @@ qt_cc_binary(
     visibility = ["//apps/finances:__pkg__"],
     deps = [
         "//apps/finances/qt/db",
+        "//apps/finances/qt/metatypes",
         "//apps/finances/qt/models",
         "//apps/finances/qt/table_models",
         "//apps/finances/qt/tables",
-        "//apps/finances/qt/widgets/accounts:widgets",
+        "//apps/finances/qt/widgets/accounts",
         "//bazel/logging:spdlog",
         "@rules_qt//:qt_core",
         "@rules_qt//:qt_widgets",

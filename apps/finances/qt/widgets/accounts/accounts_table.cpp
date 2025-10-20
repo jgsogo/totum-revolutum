@@ -13,6 +13,7 @@
 #include <magic_enum/magic_enum.hpp>
 #include <spdlog/spdlog.h>
 
+#include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/widgets/accounts/non_numerable/add_snapshot.h"
 #include "apps/finances/qt/widgets/accounts/numerable/add_snapshot.h"
 
@@ -86,9 +87,8 @@ void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {
     // Get the account id from the filter/sort view
     QVariant account_id_variant =
         sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::ID)));
-    SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
-    utils::db::IdType account_id_inner{account_id_variant.toULongLong()};
-    utils::db::Id account_id{account_id_inner};
+    utils::db::Id account_id = account_id_variant.value<utils::db::Id>();
+    SPDLOG_TRACE(" - account_id: {}", account_id);
 
     emit accountDoubleClicked(account_id);
 }

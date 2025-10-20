@@ -6,6 +6,7 @@
 
 #include "libraries/finances/accounts/cpp/models/types/money.h"
 
+#include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/utils/utils.h"
 
 namespace utils::qt::models {
@@ -17,7 +18,7 @@ namespace utils::qt::models {
         QVariant result = QVariant();
         switch (column) {
         case MovementColumns::ID:
-            result = QString::fromStdString(std::format("{}", movement.id)); // FIXME: implement the right conversion
+            result.setValue(movement.id);
             break;
         case MovementColumns::DATE_VALUE:
             result = utils::date_to_qdate(movement.as_movement().date_value).toString("yyyy-MM-dd");
@@ -76,6 +77,13 @@ namespace utils::qt::models {
         case MovementColumns::ACCOUNT:
             result = movement.as_movement().account.second.c_str();
             break;
+        case MovementColumns::ACCOUNT_ID:
+            result.setValue(movement.as_movement().account.first);
+            // result = QString::fromStdString("%1 -").arg(std::format("{}", movement.as_movement().account.first));
+            break;
+        case MovementColumns::TRANSACTION_ID:
+            result.setValue(movement.as_movement().transaction.first);
+            break;
         }
         return result;
     }
@@ -102,12 +110,16 @@ namespace utils::qt::models {
         case MovementColumns::ACCOUNT:
             result = snapshot.account.second.c_str();
             break;
+        case MovementColumns::ACCOUNT_ID:
+            result.setValue(snapshot.account.first);
+            break;
         // Snapshot doesn't have these fields
         case MovementColumns::TRANSACTION:
         case MovementColumns::MOVE_TYPE:
         case MovementColumns::DIRECTION:
         case MovementColumns::QUANTITY:
         case MovementColumns::UNIT_VALUE:
+        case MovementColumns::TRANSACTION_ID:
             break;
         }
 
@@ -142,10 +154,14 @@ namespace utils::qt::models {
         case MovementColumns::ACCOUNT:
             result = snapshot.snapshot.account.second.c_str();
             break;
+        case MovementColumns::ACCOUNT_ID:
+            result.setValue(snapshot.snapshot.account.first);
+            break;
         // SnapshotNumerable doesn't have these fields
         case MovementColumns::TRANSACTION:
         case MovementColumns::MOVE_TYPE:
         case MovementColumns::DIRECTION:
+        case MovementColumns::TRANSACTION_ID:
             break;
         }
         return result;
