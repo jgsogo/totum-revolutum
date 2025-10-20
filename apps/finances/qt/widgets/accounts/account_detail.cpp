@@ -10,7 +10,7 @@
 
 #include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/table_models/snapshots.h"
-#include "apps/finances/qt/tables/account_movements.h"
+#include "apps/finances/qt/tables/movement_columns.h"
 #include "non_numerable/add_snapshot.h"
 #include "numerable/add_snapshot.h"
 
@@ -23,23 +23,23 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
 
     // - movements
     {
-        MovementsTableModel<AccountMovementsColumns>* movements_tablemodel =
-            new MovementsTableModel<AccountMovementsColumns>(account.account, pool, this);
+        MovementsForAccountTableModel<MovementColumns>* movements_tablemodel =
+            new MovementsForAccountTableModel<MovementColumns>(account.account, pool, this);
         model->addSourceModel(movements_tablemodel);
     }
 
     // - snapshots
     {
         if (account.account.is_numerable) {
-            NumerableSnapshotsTableModel<AccountMovementsColumns>* snapshots_tablemodel =
-                new NumerableSnapshotsTableModel<AccountMovementsColumns>(account.account, pool, this);
+            NumerableSnapshotsTableModel<MovementColumns>* snapshots_tablemodel =
+                new NumerableSnapshotsTableModel<MovementColumns>(account.account, pool, this);
             connect(this, &AccountDetailWidget::snapshot_added, snapshots_tablemodel,
                     &utils::qt::models::_detail::GenericTableModel::refresh_all);
 
             model->addSourceModel(snapshots_tablemodel);
         } else {
-            SnapshotsTableModel<AccountMovementsColumns>* snapshots_tablemodel =
-                new SnapshotsTableModel<AccountMovementsColumns>(account.account, pool, this);
+            SnapshotsTableModel<MovementColumns>* snapshots_tablemodel =
+                new SnapshotsTableModel<MovementColumns>(account.account, pool, this);
             connect(this, &AccountDetailWidget::snapshot_added, snapshots_tablemodel,
                     &utils::qt::models::_detail::GenericTableModel::refresh_all);
 
@@ -52,11 +52,11 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
     {
         QSortFilterProxyModel* sort_filter = new QSortFilterProxyModel(this);
         sort_filter->setSourceModel(model);
-        sort_filter->sort(magic_enum::enum_integer(AccountMovementsColumns::DATE_VALUE), Qt::DescendingOrder);
+        sort_filter->sort(magic_enum::enum_integer(MovementColumns::DATE_VALUE), Qt::DescendingOrder);
 
         table_view->setModel(sort_filter);
         table_view->setSortingEnabled(false);
-        table_view->hideColumn(magic_enum::enum_integer(AccountMovementsColumns::ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ID));
         table_view->verticalHeader()->hide();
         table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     }

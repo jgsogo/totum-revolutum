@@ -28,6 +28,7 @@ namespace utils::db {
     ExpectedType<std::vector<MovementModel>, DatabaseError>
     ModelManager<MovementModel>::filter_by_fk<finances::accounts::models::Account>(
         const finances::accounts::models::Account& account) {
+        SPDLOG_DEBUG("ModelManager<MovementModel>::filter_by_fk<Account>(account.pk={})", account.id);
         // FIXME: If we use AccountModel instead, we know if it is numerable or not and we can
         //        choose which movements to retrieve.
         //
@@ -36,6 +37,7 @@ namespace utils::db {
         //          Q: Are there non-numerable accounts with dividends, or other investment movements?
 
         // All MovementNumerable
+        SPDLOG_TRACE(" - get all numerable movements");
         auto movs_numerable_manager = ModelData<MovementNumerable>::Manager{pool};
         auto all_movs_numerable = movs_numerable_manager.filter_by_fk(account);
         if (!all_movs_numerable) {
@@ -43,6 +45,7 @@ namespace utils::db {
         }
 
         // All MovementDividend
+        SPDLOG_TRACE(" - get all dividend movements");
         auto movs_dividend_manager = ModelData<MovementDividend>::Manager{pool};
         auto all_movs_dividend = movs_dividend_manager.filter_by_fk(account);
         if (!all_movs_dividend) {
@@ -50,6 +53,7 @@ namespace utils::db {
         }
 
         // All regular Movements
+        SPDLOG_TRACE(" - get all regular movements (filter those that are already other kind of movements)");
         auto movs_manager = ModelData<Movement>::Manager{pool};
         auto all_movs = movs_manager.filter_by_fk(account);
         if (!all_movs) {
@@ -69,6 +73,7 @@ namespace utils::db {
         // A function to get the breadcrumb
         MovementTypeManager movtype_manager{pool};
         auto get_breadcrumb = [&movtype_manager](const Movement& item) -> std::string {
+            // TODO: Implement LRU cache
             auto breadcrumb = movtype_manager.breadcrumb(item.type.first);
 
             std::string breadcrumb_str;
@@ -106,6 +111,7 @@ namespace utils::db {
                 .id = item.id, .movement = std::move(item), .movtype_breadcrumb = get_breadcrumb(item.movement)});
         }
 
+        SPDLOG_TRACE(" - Found a total of {} movements", ret.size());
         return ret;
     }
 
