@@ -10,6 +10,8 @@
 #include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/utils/utils.h"
 
+using namespace finances::accounts::models;
+
 namespace utils::qt::models {
 
     template <>
@@ -17,7 +19,7 @@ namespace utils::qt::models {
                                                                                  AccountColumns column) {
         QVariant result;
 
-        const finances::accounts::models::Account& account = item.account;
+        const Account& account = item.account;
 
         switch (column) {
         case AccountColumns::ID:
@@ -46,7 +48,7 @@ namespace utils::qt::models {
             const auto& snapshot = item.last_snapshot;
             if (snapshot) {
                 // FIXME: Implement some convenient functions in Snapshot class
-                auto snapshot_money = finances::accounts::models::Money{snapshot.value().amount, account.ccy};
+                auto snapshot_money = Money{snapshot.value().amount, account.ccy};
                 auto date_value = utils::date_to_qdate(snapshot.value().date_value);
                 if (date_value.daysTo(QDate::currentDate()) > 21) { // FIXME: Hardcoded number
                     result = QString("🗓️ %1").arg(static_cast<std::string>(snapshot_money));

@@ -23,6 +23,7 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
 
     // Models
     QConcatenateTablesProxyModel* model = new QConcatenateTablesProxyModel(this);
+    transactions_tablemodel = new TransactionsForAccountTableModel<TransactionColumns>(account.account, pool, this);
 
     // - movements
     {
@@ -75,24 +76,7 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
                              index.row());
                 return;
             }
-
-            SPDLOG_TRACE(" - this is transaction_id {}", transaction_id);
-            utils::db::ModelData<finances::accounts::models::Transaction>::Manager transactions_manager{pool};
-            auto transaction_expected = transactions_manager.get(transaction_id);
-            if (!transaction_expected) {
-                SPDLOG_ERROR("Failed to get transaction with id {} (corresponding to row {}): {}", transaction_id,
-                             index.row(), transaction_expected.error());
-                return;
-            }
-
-            // FIXME: Here I'm using a temporal Transaction and passing a reference!!!!
-            SPDLOG_WARN("STOP! We cannot create a TransactionDetailWidget using a reference!");
-            // const finances::accounts::models::Transaction& transaction = transaction_expected.value();
-            // TransactionDetailWidget* transaction_detail =
-            // new TransactionDetailWidget(pool, transaction, this);
-            // transaction_detail->setModal(true);
-            // transaction_detail->setSizeGripEnabled(true);
-            // transaction_detail->open();
+            this->showTransaction(transaction_id);
         });
     }
 
@@ -130,4 +114,39 @@ void AccountDetailWidget::on_new_snapshot(utils::db::Id account_id) {
     SPDLOG_DEBUG("AccountDetailWidget::on_new_snapshot(account_id={})", account_id);
     assert(account_id == account.id);
     emit snapshot_added(account_id);
+}
+
+void AccountDetailWidget::showTransaction(const decltype(finances::accounts::models::Transaction::id)& transaction_id) {
+    SPDLOG_DEBUG("AccountDetailWidget::showTransaction(transaction_id={})", transaction_id);
+
+    auto transaction_expected = transactions_tablemodel->get(transaction_id);
+    if (!transaction_expected) {
+        SPDLOG_ERROR("Transaction with id '{}' not found in this account", transaction_id);
+        // TODO: Notify error to user
+        return;
+    }
+
+    const finances::accounts::models::Transaction& transaction = transaction_expected.value();
+    TransactionDetailWidget* transaction_detail = new TransactionDetailWidget(pool, transaction, this);
+    transaction_detail->setModal(true);
+    transaction_detail->setSizeGripEnabled(true);
+    transaction_detail->open();
+
+    // SPDLOG_TRACE(" - this is transaction_id {}", transaction_id);
+    //         utils::db::ModelData<finances::accounts::models::Transaction>::Manager transactions_manager{pool};
+    //         auto transaction_expected = transactions_manager.get(transaction_id);
+    //         if (!transaction_expected) {
+    //             SPDLOG_ERROR("Failed to get transaction with id {} (corresponding to row {}): {}", transaction_id,
+    //                          index.row(), transaction_expected.error());
+    //             return;
+    //         }
+
+    //         // FIXME: Here I'm using a temporal Transaction and passing a reference!!!!
+    //         SPDLOG_WARN("STOP! We cannot create a TransactionDetailWidget using a reference!");
+    //         // const finances::accounts::models::Transaction& transaction = transaction_expected.value();
+    //         // TransactionDetailWidget* transaction_detail =
+    //         // new TransactionDetailWidget(pool, transaction, this);
+    //         // transaction_detail->setModal(true);
+    //         // transaction_detail->setSizeGripEnabled(true);
+    //         // transaction_detail->open();
 }
