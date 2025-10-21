@@ -48,12 +48,11 @@ namespace utils::qt::models {
             const auto& snapshot = item.last_snapshot;
             if (snapshot) {
                 // FIXME: Implement some convenient functions in Snapshot class
-                auto snapshot_money = Money{snapshot.value().amount, account.ccy};
                 auto date_value = utils::date_to_qdate(snapshot.value().date_value);
                 if (date_value.daysTo(QDate::currentDate()) > 21) { // FIXME: Hardcoded number
-                    result = QString("🗓️ %1").arg(static_cast<std::string>(snapshot_money));
+                    result = QString("🗓️ %1").arg(static_cast<std::string>(snapshot.value().amount));
                 } else {
-                    result = QString::fromStdString(static_cast<std::string>(snapshot_money));
+                    result = QString::fromStdString(static_cast<std::string>(snapshot.value().amount));
                 }
             } else {
                 result = QString("❗");

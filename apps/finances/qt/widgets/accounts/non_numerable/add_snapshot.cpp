@@ -69,7 +69,7 @@ void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {
     // Create the new snapshot
     finances::accounts::models::Snapshot new_snapshot_{
         .date_value = std::move(date),
-        .amount = std::move(amount_amount.value()),
+        .amount = finances::accounts::models::Money{std::move(amount_amount.value()), account.ccy},
     };
 
     utils::db::SnapshotManager manager{pool};

@@ -7,13 +7,19 @@ namespace finances::accounts::models {
 
     class Money {
       public:
-        explicit Money(const Amount& amount, const Ccy& ccy);
+        explicit Money(Amount amount, Ccy ccy);
+
+        Money(Money&&) noexcept = default;
+        Money& operator=(Money&&) noexcept = default;
+
+        // Money(const Money&) = delete;
+        // Money& operator=(const Money&) = delete;
 
         operator std::string() const;
 
       private:
-        const Amount& amount;
-        const Ccy& ccy;
+        Amount amount;
+        Ccy ccy;
     };
 
 } // namespace finances::accounts::models

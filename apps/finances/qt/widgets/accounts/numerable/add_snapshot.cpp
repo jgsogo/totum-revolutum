@@ -83,11 +83,11 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
     }
 
     // Create the new snapshot
+    finances::accounts::models::Amount amount = quantity_amount.value() * unit_value_amount.value();
     finances::investments::models::SnapshotNumerable new_snapshot_{
-        .snapshot =
-            finances::accounts::models::Snapshot{
-                .date_value = std::move(date),
-            },
+        .snapshot = finances::accounts::models::Snapshot{.date_value = std::move(date),
+                                                         .amount = finances::accounts::models::Money{std::move(amount),
+                                                                                                     account.ccy}},
         .quantity = std::move(quantity_amount.value()),
         .unit_value = std::move(unit_value_amount.value()),
     };

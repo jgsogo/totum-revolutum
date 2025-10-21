@@ -2,7 +2,7 @@
 
 using namespace finances::accounts::models;
 
-Money::Money(const Amount& amount, const Ccy& ccy) : amount{amount}, ccy{ccy} {}
+Money::Money(Amount amount, Ccy ccy) : amount{std::move(amount)}, ccy{std::move(ccy)} {}
 
 Money::operator std::string() const {
     // We want to decimals for all (?) the currencies

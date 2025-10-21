@@ -104,10 +104,9 @@ namespace utils::qt::models {
         case MovementColumns::DATE_VALUE:
             result = utils::date_to_qdate(snapshot.date_value).toString("yyyy-MM-dd");
             break;
-        case MovementColumns::AMOUNT: {
-            auto amount_money = Money{snapshot.amount, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(amount_money));
-        } break;
+        case MovementColumns::AMOUNT:
+            result = QString::fromStdString(static_cast<std::string>(snapshot.amount));
+            break;
         case MovementColumns::ACCOUNT:
             result = snapshot.account.second.c_str();
             break;
@@ -139,10 +138,9 @@ namespace utils::qt::models {
         case MovementColumns::DATE_VALUE:
             result = utils::date_to_qdate(snapshot.snapshot.date_value).toString("yyyy-MM-dd");
             break;
-        case MovementColumns::AMOUNT: {
-            auto amount_money = Money{snapshot.snapshot.amount, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(amount_money));
-        } break;
+        case MovementColumns::AMOUNT:
+            result = QString::fromStdString(static_cast<std::string>(snapshot.snapshot.amount));
+            break;
         case MovementColumns::QUANTITY:
             result = QString::fromStdString(static_cast<std::string>(snapshot.quantity));
             break;
