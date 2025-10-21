@@ -26,10 +26,9 @@ namespace utils::qt::models {
         case MovementColumns::DATE_VALUE:
             result = utils::date_to_qdate(movement.as_movement().date_value).toString("yyyy-MM-dd");
             break;
-        case MovementColumns::AMOUNT: {
-            auto amount_money = Money{movement.as_movement().amount, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(amount_money));
-        } break;
+        case MovementColumns::AMOUNT:
+            result = QString::fromStdString(static_cast<std::string>(movement.as_movement().amount));
+            break;
         case MovementColumns::MOVE_TYPE:
             result = QString::fromStdString(movement.movtype_breadcrumb);
             break;

@@ -9,7 +9,7 @@
 #include "account.h"
 #include "hierarchy_tree.h"
 #include "transaction.h"
-#include "types/amount.h"
+#include "types/money.h"
 
 namespace finances::accounts::models {
 
@@ -23,7 +23,7 @@ namespace finances::accounts::models {
         std::pair<decltype(Account::id), decltype(Account::name)> account;
         utils::libpqxx::Date date_value;
         // Fx fx;
-        Amount amount;
+        Money amount;
     };
 
 } // namespace finances::accounts::models
