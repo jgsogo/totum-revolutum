@@ -13,8 +13,10 @@
 
 #include "apps/finances/qt/utils/utils.h"
 
-AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::ConnectionPool& pool_,
-                                                       const finances::accounts::models::Account& account_,
+using namespace finances::accounts::models;
+using namespace finances::investments::models;
+
+AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::ConnectionPool& pool_, const Account& account_,
                                                        QWidget* parent, Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool_}, account{account_} {
     // components
@@ -83,16 +85,16 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
     }
 
     // Create the new snapshot
-    finances::accounts::models::Amount amount = quantity_amount.value() * unit_value_amount.value();
-    finances::investments::models::SnapshotNumerable new_snapshot_{
-        .snapshot = finances::accounts::models::Snapshot{.date_value = std::move(date),
-                                                         .amount = finances::accounts::models::Money{std::move(amount),
-                                                                                                     account.ccy}},
+    Money unit_value{std::move(unit_value_amount.value()), account.ccy};
+    Money amount = unit_value * quantity_amount.value();
+
+    SnapshotNumerable new_snapshot_{
+        .snapshot = Snapshot{.date_value = std::move(date), .amount = std::move(amount)},
         .quantity = std::move(quantity_amount.value()),
-        .unit_value = std::move(unit_value_amount.value()),
+        .unit_value = std::move(unit_value),
     };
 
-    utils::db::ModelData<finances::investments::models::SnapshotNumerable>::Manager manager{pool};
+    utils::db::ModelData<SnapshotNumerable>::Manager manager{pool};
     auto r = manager.create(std::move(new_snapshot_));
     if (!r) {
         SPDLOG_ERROR("Error adding snapshot to account: {}", r.error());

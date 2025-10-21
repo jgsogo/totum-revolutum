@@ -39,7 +39,7 @@ namespace utils::db {
                                      .amount = Money{amount, Ccy{acc_ccy}}},
                 .id = numerable_id,
                 .quantity = quantity,
-                .unit_value = unit_value,
+                .unit_value = Money{unit_value, Ccy{acc_ccy}},
             });
         }
         SPDLOG_TRACE("Found {} snapshots for account {}", ret.size(), account_id);

@@ -12,14 +12,18 @@ namespace finances::accounts::models {
         Money(Money&&) noexcept = default;
         Money& operator=(Money&&) noexcept = default;
 
-        // Money(const Money&) = delete;
-        // Money& operator=(const Money&) = delete;
-
         operator std::string() const;
+
+        friend Money operator*(const Money& lhs, const Amount& rhs);
 
       private:
         Amount amount;
         Ccy ccy;
     };
+
+    inline Money operator*(const Money& lhs, const Amount& rhs) {
+        auto new_amount = lhs.amount * rhs;
+        return Money{std::move(new_amount), lhs.ccy};
+    }
 
 } // namespace finances::accounts::models

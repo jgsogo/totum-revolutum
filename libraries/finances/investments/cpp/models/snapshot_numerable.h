@@ -9,7 +9,7 @@ namespace finances::investments::models {
         utils::db::Id id;
         // FIXME: Implement NumerableAmount as a type. This pair is very error prone
         finances::accounts::models::Amount quantity;
-        finances::accounts::models::Amount unit_value;
+        finances::accounts::models::Money unit_value;
     };
 
 } // namespace finances::investments::models

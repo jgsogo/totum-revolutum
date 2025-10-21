@@ -143,10 +143,9 @@ namespace utils::qt::models {
         case MovementColumns::QUANTITY:
             result = QString::fromStdString(static_cast<std::string>(snapshot.quantity));
             break;
-        case MovementColumns::UNIT_VALUE: {
-            auto unit_value_money = Money{snapshot.unit_value, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(unit_value_money));
-        } break;
+        case MovementColumns::UNIT_VALUE:
+            result = QString::fromStdString(static_cast<std::string>(snapshot.unit_value));
+            break;
         case MovementColumns::ACCOUNT:
             result = snapshot.snapshot.account.second.c_str();
             break;
