@@ -15,9 +15,8 @@ using namespace finances::investments::models;
 namespace utils::qt::models {
 
     template <>
-    template <>
-    QVariant DataDispatcher<MovementModel, MovementColumns, Qt::DisplayRole>::data<Account>(
-        const MovementModel& movement, MovementColumns column, const Account& account) {
+    QVariant DataDispatcher<MovementModel, MovementColumns, Qt::DisplayRole>::data(const MovementModel& movement,
+                                                                                   MovementColumns column) {
         QVariant result = QVariant();
         switch (column) {
         case MovementColumns::ID:
@@ -88,10 +87,8 @@ namespace utils::qt::models {
     }
 
     template <>
-    template <>
-    QVariant DataDispatcher<Snapshot, MovementColumns, Qt::DisplayRole>::data<Account>(const Snapshot& snapshot,
-                                                                                       MovementColumns column,
-                                                                                       const Account& account) {
+    QVariant DataDispatcher<Snapshot, MovementColumns, Qt::DisplayRole>::data(const Snapshot& snapshot,
+                                                                              MovementColumns column) {
         QVariant result = QVariant();
 
         switch (column) {
@@ -124,9 +121,9 @@ namespace utils::qt::models {
     }
 
     template <>
-    template <>
-    QVariant DataDispatcher<SnapshotNumerable, MovementColumns, Qt::DisplayRole>::data<Account>(
-        const SnapshotNumerable& snapshot, MovementColumns column, const Account& account) {
+    QVariant
+    DataDispatcher<SnapshotNumerable, MovementColumns, Qt::DisplayRole>::data(const SnapshotNumerable& snapshot,
+                                                                              MovementColumns column) {
         QVariant result = QVariant();
         switch (column) {
         case MovementColumns::ID:
@@ -161,17 +158,13 @@ namespace utils::qt::models {
     }
 
     template <>
-    template <>
-    QVariant DataDispatcher<SnapshotNumerable, MovementColumns, Qt::BackgroundRole>::data<Account>(
-        const SnapshotNumerable&, MovementColumns, const Account&) {
+    QVariant DataDispatcher<SnapshotNumerable, MovementColumns, Qt::BackgroundRole>::data(const SnapshotNumerable&,
+                                                                                          MovementColumns) {
         return QVariant{QColor(255, 255, 40)};
     }
 
     template <>
-    template <>
-    QVariant DataDispatcher<Snapshot, MovementColumns, Qt::BackgroundRole>::data<Account>(const Snapshot&,
-                                                                                          MovementColumns,
-                                                                                          const Account&) {
+    QVariant DataDispatcher<Snapshot, MovementColumns, Qt::BackgroundRole>::data(const Snapshot&, MovementColumns) {
         return QVariant{QColor(255, 255, 40)};
     }
 } // namespace utils::qt::models

@@ -27,21 +27,16 @@ namespace utils::qt::models {
 
     // Qt::DisplayRole
     template <>
-    template <>
-    QVariant DataDispatcher<MovementModel, MovementColumns, Qt::DisplayRole>::data<finances::accounts::models::Account>(
-        const MovementModel&, MovementColumns, const finances::accounts::models::Account&);
+    QVariant DataDispatcher<MovementModel, MovementColumns, Qt::DisplayRole>::data(const MovementModel&,
+                                                                                   MovementColumns);
 
     template <>
-    template <>
-    QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumns, Qt::DisplayRole>::data<
-        finances::accounts::models::Account>(const finances::accounts::models::Snapshot&, MovementColumns,
-                                             const finances::accounts::models::Account&);
+    QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumns, Qt::DisplayRole>::data(
+        const finances::accounts::models::Snapshot&, MovementColumns);
 
     template <>
-    template <>
-    QVariant DataDispatcher<finances::investments::models::SnapshotNumerable, MovementColumns, Qt::DisplayRole>::data<
-        finances::accounts::models::Account>(const finances::investments::models::SnapshotNumerable&, MovementColumns,
-                                             const finances::accounts::models::Account&);
+    QVariant DataDispatcher<finances::investments::models::SnapshotNumerable, MovementColumns, Qt::DisplayRole>::data(
+        const finances::investments::models::SnapshotNumerable&, MovementColumns);
 
     // Qt::FontRole
     template <typename TModel> struct DataDispatcher<TModel, MovementColumns, Qt::FontRole> {
@@ -52,28 +47,16 @@ namespace utils::qt::models {
             }
             return QVariant{};
         }
-
-        template <typename TParent> static QVariant data(const TModel&, MovementColumns column, const TParent&) {
-            if ((column == MovementColumns::DATE_VALUE) || (column == MovementColumns::AMOUNT) ||
-                (column == MovementColumns::QUANTITY) || (column == MovementColumns::UNIT_VALUE)) {
-                return QVariant{QFont{"Andale Mono"}};
-            }
-            return QVariant{};
-        }
     };
 
     // Qt::BackgroundRole
     template <>
-    template <>
     QVariant
-    DataDispatcher<finances::investments::models::SnapshotNumerable, MovementColumns, Qt::BackgroundRole>::data<
-        finances::accounts::models::Account>(const finances::investments::models::SnapshotNumerable&, MovementColumns,
-                                             const finances::accounts::models::Account&);
+    DataDispatcher<finances::investments::models::SnapshotNumerable, MovementColumns, Qt::BackgroundRole>::data(
+        const finances::investments::models::SnapshotNumerable&, MovementColumns);
 
     template <>
-    template <>
-    QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumns, Qt::BackgroundRole>::data<
-        finances::accounts::models::Account>(const finances::accounts::models::Snapshot&, MovementColumns,
-                                             const finances::accounts::models::Account&);
+    QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumns, Qt::BackgroundRole>::data(
+        const finances::accounts::models::Snapshot&, MovementColumns);
 
 } // namespace utils::qt::models
