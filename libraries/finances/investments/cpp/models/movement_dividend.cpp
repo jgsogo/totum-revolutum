@@ -62,7 +62,7 @@ namespace utils::db {
                                          .amount = Money{amount, Ccy{acc_ccy}}},
                     .id = mn_id,
                     .ex_dividend_date = ex_dividend_date,
-                    .unit_value = unit_value,
+                    .unit_value = Money{unit_value, Ccy{acc_ccy}},
                     .snapshot_data = snapshot_data,
                 });
             }

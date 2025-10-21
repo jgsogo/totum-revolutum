@@ -60,16 +60,14 @@ namespace utils::qt::models {
             break;
         case MovementColumns::UNIT_VALUE:
             result = std::visit(
-                [&account](const auto& arg) -> QVariant {
+                [](const auto& arg) -> QVariant {
                     using T = std::decay_t<decltype(arg)>;
                     if constexpr (std::is_same_v<T, Movement>) {
                         return QVariant{};
                     } else if constexpr (std::is_same_v<T, MovementNumerable>) {
-                        auto amount_money = Money{arg.unit_value, account.ccy};
-                        return QString::fromStdString(static_cast<std::string>(amount_money));
+                        return QString::fromStdString(static_cast<std::string>(arg.unit_value));
                     } else if constexpr (std::is_same_v<T, MovementDividend>) {
-                        auto amount_money = Money{arg.unit_value, account.ccy};
-                        return QString::fromStdString(static_cast<std::string>(amount_money));
+                        return QString::fromStdString(static_cast<std::string>(arg.unit_value));
                     } else {
                         static_assert(false, "non-exhaustive visitor!");
                     }

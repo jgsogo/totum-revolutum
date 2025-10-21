@@ -8,7 +8,7 @@ namespace finances::investments::models {
 
         utils::db::Id id;
         finances::accounts::models::Amount quantity;
-        finances::accounts::models::Amount unit_value;
+        finances::accounts::models::Money unit_value;
     };
 
 } // namespace finances::investments::models

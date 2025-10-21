@@ -41,7 +41,7 @@ namespace utils::db {
                                          .amount = Money{amount, Ccy{acc_ccy}}},
                     .id = mn_id,
                     .quantity = quantity,
-                    .unit_value = unit_value,
+                    .unit_value = Money{unit_value, Ccy{acc_ccy}},
                 });
             }
             SPDLOG_TRACE("Found {} numerable movements", ret.size());

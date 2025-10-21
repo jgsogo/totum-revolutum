@@ -8,7 +8,7 @@ namespace finances::investments::models {
 
         utils::db::Id id;
         utils::libpqxx::Date ex_dividend_date;
-        finances::accounts::models::Amount unit_value;
+        finances::accounts::models::Money unit_value;
 
         std::optional<std::pair<decltype(decltype(SnapshotNumerable::snapshot)::date_value),
                                 decltype(SnapshotNumerable::quantity)>>
