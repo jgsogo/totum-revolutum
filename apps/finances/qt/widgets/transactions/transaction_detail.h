@@ -13,12 +13,6 @@ class TransactionDetailWidget : public QDialog {
                                      const finances::accounts::models::Transaction&, QWidget* parent = nullptr,
                                      Qt::WindowFlags f = Qt::WindowFlags());
 
-    //   private slots:
-    //     void on_new_snapshot(utils::db::Id account_id);
-
-    //   signals:
-    //     void snapshot_added(utils::db::Id account_id);
-
   protected:
     utils::libpqxx::ConnectionPool& pool;
     const finances::accounts::models::Transaction& transaction;
