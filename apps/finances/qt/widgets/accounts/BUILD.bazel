@@ -9,6 +9,7 @@ qt_cc_library(
         "//apps/finances/qt/models",
         "//apps/finances/qt/table_models",
         "//apps/finances/qt/tables",
+        "//apps/finances/qt/widgets/forms",
         "//apps/finances/qt/widgets/transactions",
         "@rules_qt//:qt_widgets",
     ],

@@ -1,13 +1,15 @@
 load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
 
 qt_cc_library(
-    name = "transactions",
+    name = "forms",
     srcs = glob(["**/*.cpp"]),
     hdrs = glob(["**/*.h"]),
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
+        "//apps/finances/qt/models",
         "//apps/finances/qt/table_models",
         "//apps/finances/qt/tables",
+        "//apps/finances/qt/widgets/forms/amounts",
         "@rules_qt//:qt_widgets",
     ],
 )

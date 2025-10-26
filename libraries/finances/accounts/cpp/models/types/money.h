@@ -10,6 +10,8 @@ namespace finances::accounts::models {
         explicit Money(Amount amount, Ccy ccy);
 
         Money(Money&&) noexcept = default;
+        Money(const Money&) noexcept = default;
+
         Money& operator=(Money&&) noexcept = default;
 
         operator std::string() const;

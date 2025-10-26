@@ -26,6 +26,8 @@ namespace utils::libpqxx {
         Numeric(const Numeric&) = default;
         Numeric& operator=(Numeric&&) noexcept = default;
 
+        auto operator<=>(const Numeric<MaxDigits, DecimalPlaces>&) const = default;
+
         operator std::string() const { return dec::toString(value, ENGLISH_DECIMAL_FORMAT); }
         InnerType value;
     };

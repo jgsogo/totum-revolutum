@@ -1,4 +1,4 @@
-#include "transaction_detail.h"
+#include "add_transaction.h"
 
 #include <QDialogButtonBox>
 #include <QHeaderView>
@@ -10,10 +10,8 @@
 #include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/tables/movement_columns.h"
 
-TransactionDetailWidget::TransactionDetailWidget(utils::libpqxx::ConnectionPool& pool_,
-                                                 const finances::accounts::models::Transaction& transaction_,
-                                                 QWidget* parent, Qt::WindowFlags f)
-    : QDialog(parent, f), pool{pool_}, transaction{transaction_} {
+AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent, Qt::WindowFlags f)
+    : QDialog(parent, f), pool{pool} {
 
     // Models
     MovementsForTransactionTableModel<MovementColumns>* model =
@@ -35,17 +33,15 @@ TransactionDetailWidget::TransactionDetailWidget(utils::libpqxx::ConnectionPool&
         table_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         table_view->resizeColumnsToContents();
         table_view->resizeRowsToContents();
-
-        // TODO: When the user double-click in a row (movement), we want to open the corresponding
-        //       account detail tab (and highlight this transaction in that tab).
     }
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
-    mainLayout->addWidget(new QLabel(QString::fromStdString(transaction.name)));
+    mainLayout->addWidget(new QLabel(tr("Add new transaction")));
     mainLayout->addWidget(table_view);
     mainLayout->addWidget(buttonBox);
 

@@ -72,13 +72,13 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
                                                    date::month{static_cast<unsigned int>(qt_date.month())},
                                                    date::day{static_cast<unsigned int>(qt_date.day())}}};
 
-    auto quantity_amount = utils::qstring_to_amount(quantity->text());
+    auto quantity_amount = utils::qstring_to_amount(quantity->text(), account.ccy);
     if (!quantity_amount) {
         // TODO: Communicate error to the user
         return;
     }
 
-    auto unit_value_amount = utils::qstring_to_amount(unit_value->text());
+    auto unit_value_amount = utils::qstring_to_amount(unit_value->text(), account.ccy);
     if (!unit_value_amount) {
         // TODO: Communicate error to the user
         return;

@@ -6,6 +6,7 @@ cc_library(
     hdrs = glob(["**/*.h"]),
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
+        "//libraries/finances/accounts/cpp/models",
         "//libraries/utils/cpp/libpqxx/orm",
         "@rules_qt//:qt_core",
     ],
