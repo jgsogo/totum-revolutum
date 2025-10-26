@@ -2,9 +2,11 @@
 
 #include <spdlog/spdlog.h>
 
+#include <QDialogButtonBox>
 #include <QVBoxLayout>
 
-AddMovementWidget::AddMovementWidget(/*AccountTableModel* accounts,*/ QWidget* parent) : QWidget(parent) {
+AddMovementWidget::AddMovementWidget(/*AccountTableModel* accounts,*/ QWidget* parent, Qt::WindowFlags f)
+    : QDialog(parent, f) {
 
     mov_amount = new widgets::forms::MovementStackedForm;
 
@@ -22,11 +24,16 @@ AddMovementWidget::AddMovementWidget(/*AccountTableModel* accounts,*/ QWidget* p
 
     mov_date = new QCalendarWidget;
 
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(account);
     layout->addWidget(movtype);
     layout->addWidget(mov_date);
     layout->addWidget(mov_amount);
+    layout->addWidget(buttonBox);
 
     this->setLayout(layout);
 }

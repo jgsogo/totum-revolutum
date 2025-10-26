@@ -2,18 +2,19 @@
 
 #include <QCalendarWidget>
 #include <QComboBox>
-#include <QWidget>
+#include <QDialog>
 
 // #include "libraries/finances/accounts/cpp/models/types/amount.h"
 
 // #include "apps/finances/qt/models/accounts_table.h"
 #include "apps/finances/qt/widgets/forms/amounts/movement_stacked_form.h"
 
-class AddMovementWidget : public QWidget {
+class AddMovementWidget : public QDialog {
     Q_OBJECT
 
   public:
-    explicit AddMovementWidget(/*AccountTableModel* accounts,*/ QWidget* parent = nullptr);
+    explicit AddMovementWidget(/*AccountTableModel* accounts,*/ QWidget* parent = nullptr,
+                               Qt::WindowFlags f = Qt::WindowFlags());
     virtual ~AddMovementWidget() = default;
 
   private slots:

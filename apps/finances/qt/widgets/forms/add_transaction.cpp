@@ -3,6 +3,7 @@
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QLabel>
+#include <QPushButton>
 #include <QSortFilterProxyModel>
 #include <QTableView>
 #include <QVBoxLayout>
@@ -10,12 +11,25 @@
 #include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/tables/movement_columns.h"
 
+#include "add_movement.h"
+
 AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent, Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool} {
 
     // Models
     MovementsForTransactionTableModel<MovementColumns>* model =
         new MovementsForTransactionTableModel<MovementColumns>(transaction, pool, this);
+
+    QPushButton* add_movement = new QPushButton(tr("Add movement"), this);
+    {
+        AddMovementWidget* popup_add_movement = new AddMovementWidget(this);
+        popup_add_movement->setModal(true);
+        popup_add_movement->setSizeGripEnabled(true);
+        // connect(popup_add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, this,
+        //         &AccountDetailWidget::on_new_snapshot);
+
+        connect(add_movement, &QPushButton::clicked, popup_add_movement, &QDialog::open);
+    }
 
     // Components
     QTableView* table_view = new QTableView(this);
@@ -42,6 +56,7 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->addWidget(new QLabel(tr("Add new transaction")));
+    mainLayout->addWidget(add_movement);
     mainLayout->addWidget(table_view);
     mainLayout->addWidget(buttonBox);
 
