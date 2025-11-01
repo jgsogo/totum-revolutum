@@ -38,7 +38,7 @@ camino = "1.1.9"
 camino-tempfile = "1.1.1"
 chrono = { version = "0.4.39" }
 chrono-tz = { version = "0.10.1" }
-clap = { version = "4.5.31", features = ["cargo", "string"] }
+clap = { version = "4.5.51", features = ["cargo", "string"] }
 clap_complete = "4.5.46"
 clap-verbosity-flag = { version = "3.0.2" }
 confy = { version = "1.0.0", default-features = false, features = [
