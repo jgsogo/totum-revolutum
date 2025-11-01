@@ -98,7 +98,7 @@ prost-types = "0.14.1"
 prost-build = "0.14.1"
 # protoc-gen-prost = "0.4.0"
 # protoc-gen-tonic = "0.4.1"
-regex = "1.11.1"
+regex = "1.12.2"
 reqwest = { version = "0.12.12" }
 ring = "0.17.13"
 serde = { version = "1.0.218" }
