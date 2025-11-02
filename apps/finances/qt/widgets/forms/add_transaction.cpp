@@ -13,16 +13,19 @@
 
 #include "add_movement.h"
 
-AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent, Qt::WindowFlags f)
+AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
+                                           AccountsTableModel<AccountColumns>& accounts_, QWidget* parent,
+                                           Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool} {
 
     // Models
+    // - the list of movements associated to this account
     MovementsForTransactionTableModel<MovementColumns>* model =
         new MovementsForTransactionTableModel<MovementColumns>(transaction, pool, this);
 
     QPushButton* add_movement = new QPushButton(tr("Add movement"), this);
     {
-        AddMovementWidget* popup_add_movement = new AddMovementWidget(this);
+        AddMovementWidget* popup_add_movement = new AddMovementWidget(pool, accounts_, this);
         popup_add_movement->setModal(true);
         popup_add_movement->setSizeGripEnabled(true);
         // connect(popup_add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, this,

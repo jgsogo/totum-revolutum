@@ -13,7 +13,7 @@
 class AccountsTableWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>* model,
+    explicit AccountsTableWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>& accounts,
                                  std::optional<finances::accounts::models::AccountHolder> me,
                                  QWidget* parent = nullptr);
 
@@ -26,6 +26,6 @@ class AccountsTableWidget : public QWidget {
 
   private:
     utils::libpqxx::ConnectionPool& pool;
-    AccountsTableModel<AccountColumns>* model;
+    const AccountsTableModel<AccountColumns>& accounts;
     AccountsTableFilterProxyModel* sort_filter;
 };

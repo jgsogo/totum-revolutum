@@ -1,19 +1,18 @@
 #pragma once
 
 #include <QDialog>
-// #include <QVBoxLayout>
 
-// #include "libraries/finances/accounts/cpp/models/movement.h"
-
-// #include "apps/finances/qt/models/accounts_table.h"
 #include "libraries/finances/accounts/cpp/models/transaction.h"
+
+#include "apps/finances/qt/table_models/accounts.h"
+#include "apps/finances/qt/tables/accounts.h"
 
 class AddTransactionWidget : public QDialog {
     Q_OBJECT
 
   public:
-    AddTransactionWidget(utils::libpqxx::ConnectionPool& pool, QWidget* parent = nullptr,
-                         Qt::WindowFlags f = Qt::WindowFlags());
+    AddTransactionWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>& accounts,
+                         QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
   protected:
     utils::libpqxx::ConnectionPool& pool;

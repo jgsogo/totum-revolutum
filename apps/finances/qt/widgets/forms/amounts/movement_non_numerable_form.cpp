@@ -18,7 +18,7 @@ namespace widgets::forms {
         amount->setEnabled(false);
         connect(amount, &QLineEdit::textChanged, this, [this]() { this->on_input_data_change(); });
 
-        amount_label = new QLabel(tr("&Amount"));
+        amount_label = new QLabel(tr("Amount"));
 
         QFormLayout* formLayout = new QFormLayout;
         formLayout->addRow(amount_label, amount);

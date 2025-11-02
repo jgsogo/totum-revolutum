@@ -12,7 +12,7 @@ class MainTabWidget : public QTabWidget {
 
   public:
     MainTabWidget(utils::libpqxx::ConnectionPool& pool, std::optional<finances::accounts::models::AccountHolder> me,
-                  AccountsTableModel<AccountColumns>* model, QWidget* parent = nullptr);
+                  AccountsTableModel<AccountColumns>& accounts, QWidget* parent = nullptr);
     void tabRemoved(int index) override;
 
   private slots:
@@ -27,5 +27,5 @@ class MainTabWidget : public QTabWidget {
     std::unordered_map<utils::db::Id, int> _accounts_tabs;
 
     utils::libpqxx::ConnectionPool& pool;
-    AccountsTableModel<AccountColumns>* model;
+    AccountsTableModel<AccountColumns>& accounts;
 };

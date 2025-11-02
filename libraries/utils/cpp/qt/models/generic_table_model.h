@@ -159,7 +159,7 @@ namespace utils::qt::models {
         }
 
         virtual void _refresh_one(const ModelData::Id& id, int row) {
-            SPDLOG_WARN("{}::_refresh_one(id={}, row={}) -- empty implementation", name, id, row);
+            SPDLOG_DEBUG("{}::_refresh_one(id={}, row={})", name, id, row);
 
             ModelManager manager{pool};
             auto new_item = manager.get(id);

@@ -6,13 +6,16 @@
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
 #include "apps/finances/qt/models/account_model.h"
+#include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/table_models/transactions.h"
+#include "apps/finances/qt/tables/accounts.h"
 #include "apps/finances/qt/tables/transaction_columns.h"
 
 class AccountDetailWidget : public QWidget {
     Q_OBJECT
   public:
-    explicit AccountDetailWidget(utils::libpqxx::ConnectionPool& pool, const AccountModel&, QWidget* parent = nullptr);
+    explicit AccountDetailWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>& accounts,
+                                 const AccountModel&, QWidget* parent = nullptr);
 
   private slots:
     void on_new_snapshot(utils::db::Id account_id);

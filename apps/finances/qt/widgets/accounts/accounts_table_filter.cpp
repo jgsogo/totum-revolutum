@@ -5,9 +5,9 @@
 #include <spdlog/spdlog.h>
 
 AccountsTableFilterProxyModel::AccountsTableFilterProxyModel(
-    std::optional<finances::accounts::models::AccountHolder> me_, const AccountsTableModel<AccountColumns>* model_,
+    std::optional<finances::accounts::models::AccountHolder> me_, const AccountsTableModel<AccountColumns>& accounts_,
     Qt::CheckState showClosedAccounts, Qt::CheckState showOthersAccounts, QObject* parent)
-    : QSortFilterProxyModel(parent), model{model_}, me{me_}, _showClosedAccounts{showClosedAccounts},
+    : QSortFilterProxyModel(parent), accounts{accounts_}, me{me_}, _showClosedAccounts{showClosedAccounts},
       _showOthersAccounts{showOthersAccounts} {};
 
 void AccountsTableFilterProxyModel::showClosedAccounts(Qt::CheckState state) {
@@ -46,7 +46,7 @@ bool AccountsTableFilterProxyModel::filterAcceptsRow(int sourceRow, const QModel
         }
         // Filter base on showOthersAccounts
         if (me.has_value() && _showOthersAccounts == Qt::Unchecked) {
-            const auto& holders = this->model->get(sourceRow).holders;
+            const auto& holders = this->accounts.get(sourceRow).holders;
             auto it = std::find_if(holders.begin(), holders.end(), [this](const auto& acc_holder) {
                 return acc_holder.owns_money && (acc_holder.id == me->id);
             });

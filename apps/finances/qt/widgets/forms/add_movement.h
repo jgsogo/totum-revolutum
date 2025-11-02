@@ -3,18 +3,23 @@
 #include <QCalendarWidget>
 #include <QComboBox>
 #include <QDialog>
+#include <QLineEdit>
 
-// #include "libraries/finances/accounts/cpp/models/types/amount.h"
+#include <QDir>
+#include <QStringListModel>
 
-// #include "apps/finances/qt/models/accounts_table.h"
+#include "libraries/utils/cpp/libpqxx/connection_pool.h"
+
 #include "apps/finances/qt/widgets/forms/amounts/movement_stacked_form.h"
 
+#include "apps/finances/qt/table_models/accounts.h"
+#include "apps/finances/qt/tables/accounts.h"
 class AddMovementWidget : public QDialog {
     Q_OBJECT
 
   public:
-    explicit AddMovementWidget(/*AccountTableModel* accounts,*/ QWidget* parent = nullptr,
-                               Qt::WindowFlags f = Qt::WindowFlags());
+    explicit AddMovementWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>& accounts,
+                               QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     virtual ~AddMovementWidget() = default;
 
   private slots:
@@ -39,7 +44,12 @@ class AddMovementWidget : public QDialog {
     void amount_changed(finances::accounts::models::Amount);
 
   protected:
-    QComboBox* account;
+    utils::libpqxx::ConnectionPool& pool;
+
+    QComboBox* account_combo;
+    AccountsTableModel<AccountColumns>& accounts;
+    QStringListModel* mdl;
+
     QComboBox* movtype;
     QCalendarWidget* mov_date;
 
