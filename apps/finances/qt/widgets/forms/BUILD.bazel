@@ -10,6 +10,7 @@ qt_cc_library(
         "//apps/finances/qt/table_models",
         "//apps/finances/qt/tables",
         "//apps/finances/qt/widgets/forms/amounts",
+        "//libraries/utils/cpp/qt/widgets:combobox_with_search",
         "@rules_qt//:qt_widgets",
     ],
 )

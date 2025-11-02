@@ -14,6 +14,9 @@
 
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/tables/accounts.h"
+
+#include "libraries/utils/cpp/qt/widgets/combobox_with_search.h"
+
 class AddMovementWidget : public QDialog {
     Q_OBJECT
 
@@ -46,9 +49,8 @@ class AddMovementWidget : public QDialog {
   protected:
     utils::libpqxx::ConnectionPool& pool;
 
-    QComboBox* account_combo;
+    utils::qt::widgets::ComboBoxWithSearch* account_combo;
     AccountsTableModel<AccountColumns>& accounts;
-    QStringListModel* mdl;
 
     QComboBox* movtype;
     QCalendarWidget* mov_date;
