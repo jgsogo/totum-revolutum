@@ -52,6 +52,7 @@ class AddMovementWidget : public QDialog {
     utils::libpqxx::ConnectionPool& pool;
 
     utils::qt::widgets::ComboBoxWithSearch<AccountModel, AccountColumns>* account_combo;
+    QComboBox* direction_combo;
     // AccountsTableModel<AccountColumns>& accounts;
 
     QComboBox* movtype_combo;

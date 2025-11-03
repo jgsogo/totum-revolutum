@@ -24,9 +24,10 @@ namespace widgets::forms {
         unit_value->setEnabled(false);
         connect(unit_value, &QLineEdit::textEdited, [this]() { this->on_input_data_change(); });
 
-        unit_value_label = new QLabel(tr("&Unit value"));
+        unit_value_label = new QLabel(tr("Unit value"));
 
         QFormLayout* formLayout = new QFormLayout;
+        formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
         formLayout->addRow(tr("Ex dividend &date"), ex_dividend_date);
         formLayout->addRow(unit_value_label, unit_value);
 

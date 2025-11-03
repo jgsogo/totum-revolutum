@@ -31,6 +31,7 @@ namespace widgets::forms {
         unit_value_label = new QLabel(tr("&Unit value"));
 
         QFormLayout* formLayout = new QFormLayout;
+        formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
         formLayout->addRow(tr("&Quantity"), quantity);
         formLayout->addRow(unit_value_label, unit_value);
 

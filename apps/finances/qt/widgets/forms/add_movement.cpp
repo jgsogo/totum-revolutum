@@ -6,12 +6,21 @@
 #include <QFormLayout>
 #include <QGridLayout>
 
+#include "libraries/finances/accounts/cpp/models/movement.h"
+
 AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
                                      AccountsTableModel<AccountColumns>& accounts_, QWidget* parent, Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool} {
 
     account_combo =
         new utils::qt::widgets::ComboBoxWithSearch{accounts_, AccountColumns::ID, AccountColumns::NAME, parent};
+
+    {
+        direction_combo = new QComboBox;
+        for (auto dirname : magic_enum::enum_names<finances::accounts::models::MovementDirection>()) {
+            direction_combo->addItem(QString::fromStdString(std::string(dirname)));
+        }
+    }
 
     movtype_combo = new QComboBox;
 
@@ -26,7 +35,7 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
     QFormLayout* formLayout = new QFormLayout;
     formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     formLayout->addRow(tr("&Account:"), account_combo);
-
+    formLayout->addRow(tr("&Direction:"), direction_combo);
     formLayout->addRow(tr("Movement &type:"), movtype_combo);
     formLayout->addRow(tr("Movement &date:"), mov_date);
     // formLayout->addRow(tr("&Amount:"), mov_amount);

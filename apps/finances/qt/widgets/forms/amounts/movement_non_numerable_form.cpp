@@ -21,6 +21,7 @@ namespace widgets::forms {
         amount_label = new QLabel(tr("Amount"));
 
         QFormLayout* formLayout = new QFormLayout;
+        formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
         formLayout->addRow(amount_label, amount);
 
         this->setLayout(formLayout);
