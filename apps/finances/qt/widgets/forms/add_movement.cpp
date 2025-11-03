@@ -41,22 +41,27 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
     {
         QCompleter* completer = new QCompleter(this);
         completer->setMaxVisibleItems(4);
+        QStandardItemModel* model = new QStandardItemModel(accounts.rowCount(), 3, completer);
         {
             // Get a simplified model from the accounts, just the name and the custodian
-            QStandardItemModel* model = new QStandardItemModel(accounts.rowCount(), 2, completer);
             for (int i = 0; i < accounts.rowCount(); ++i) {
                 const auto& item = accounts.get(i);
 
                 QModelIndex nameIdx = model->index(i, 0);
                 QModelIndex custodianIdx = model->index(i, 1);
+                QModelIndex idIdx = model->index(i, 2);
 
                 model->setData(nameIdx, QString::fromStdString(item.account.name));
                 model->setData(custodianIdx, QString::fromStdString(item.account.custodian.second));
+                model->setData(idIdx, QVariant::fromValue(item.id));
             }
+            model->sort(0);
+
             completer->setModel(model);
 
             QTreeView* treeView = new QTreeView;
             completer->setPopup(treeView);
+            treeView->hideColumn(2);
             treeView->setRootIsDecorated(false);
             treeView->header()->hide();
             treeView->header()->setStretchLastSection(false);
@@ -86,25 +91,13 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
         // // Live filter as the user types
         // connect(account_combo, &QLineEdit::textEdited, proxy, &QSortFilterProxyModel::setFilterFixedString);
 
-        // // Update current index in proxy when completer activates
-        // connect(completer, qOverload<const QModelIndex&>(&QCompleter::activated),
-        //         [this, completer](const QModelIndex& index) {
-        //             SPDLOG_TRACE("Row {} selected", index.row());
-        //             auto complete_model = completer->completionModel();
-        //             QVariant account_name =
-        //                 complete_model->data(index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::NAME)));
-
-        //             // auto path = completer->pathFromIndex(index);
-        //             SPDLOG_TRACE(" - account_name: {}", account_name.toString().toStdString());
-        //             this->account_combo->clear();
-        //             this->account_combo->setText(account_name.toString());
-        //             // account_combo->setText("lolololo");
-
-        //             // auto model_index = proxy->mapToSource(index);
-
-        //             // QVariant account_name =
-        //             //     proxy->data(model_index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::NAME)));
-        //         });
+        // Update current index in proxy when completer activates
+        connect(completer, qOverload<const QModelIndex&>(&QCompleter::activated),
+                [completer](const QModelIndex& index) {
+                    SPDLOG_TRACE("Row {} selected", index.row());
+                    QVariant item_id = completer->completionModel()->data(index.siblingAtColumn(2));
+                    SPDLOG_TRACE(" - id {}", item_id.toString().toStdString());
+                });
     }
     // account_combo->setModelColumn(magic_enum::enum_integer(AccountColumns::NAME));
     {
