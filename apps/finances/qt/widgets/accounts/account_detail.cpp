@@ -145,22 +145,4 @@ void AccountDetailWidget::showTransaction(const decltype(finances::accounts::mod
     transaction_detail->setModal(true);
     transaction_detail->setSizeGripEnabled(true);
     transaction_detail->open();
-
-    // SPDLOG_TRACE(" - this is transaction_id {}", transaction_id);
-    //         utils::db::ModelData<finances::accounts::models::Transaction>::Manager transactions_manager{pool};
-    //         auto transaction_expected = transactions_manager.get(transaction_id);
-    //         if (!transaction_expected) {
-    //             SPDLOG_ERROR("Failed to get transaction with id {} (corresponding to row {}): {}", transaction_id,
-    //                          index.row(), transaction_expected.error());
-    //             return;
-    //         }
-
-    //         // FIXME: Here I'm using a temporal Transaction and passing a reference!!!!
-    //         SPDLOG_WARN("STOP! We cannot create a TransactionDetailWidget using a reference!");
-    //         // const finances::accounts::models::Transaction& transaction = transaction_expected.value();
-    //         // TransactionDetailWidget* transaction_detail =
-    //         // new TransactionDetailWidget(pool, transaction, this);
-    //         // transaction_detail->setModal(true);
-    //         // transaction_detail->setSizeGripEnabled(true);
-    //         // transaction_detail->open();
 }
