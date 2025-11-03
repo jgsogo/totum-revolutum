@@ -49,7 +49,7 @@ class AddMovementWidget : public QDialog {
   protected:
     utils::libpqxx::ConnectionPool& pool;
 
-    QLineEdit* account_combo;
+    QComboBox* account_combo;
     AccountsTableModel<AccountColumns>& accounts;
 
     QComboBox* movtype;

@@ -37,10 +37,13 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
                                      AccountsTableModel<AccountColumns>& accounts_, QWidget* parent, Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool}, accounts{accounts_} {
 
-    account_combo = new QLineEdit;
+    account_combo = new QComboBox;
+    account_combo->setEditable(true);
+    account_combo->setFocusPolicy(Qt::StrongFocus);
     {
         QCompleter* completer = new QCompleter(this);
-        completer->setMaxVisibleItems(4);
+        completer->setCaseSensitivity(Qt::CaseInsensitive);
+        // completer->setMaxVisibleItems(4);
         QStandardItemModel* model = new QStandardItemModel(accounts.rowCount(), 3, completer);
         {
             // Get a simplified model from the accounts, just the name and the custodian
@@ -70,6 +73,7 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
         }
 
         account_combo->setCompleter(completer);
+        account_combo->setModel(model);
 
         // auto* proxy = new QSortFilterProxyModel;
         // proxy->setSourceModel(&accounts);
@@ -94,10 +98,18 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
         // Update current index in proxy when completer activates
         connect(completer, qOverload<const QModelIndex&>(&QCompleter::activated),
                 [completer](const QModelIndex& index) {
-                    SPDLOG_TRACE("Row {} selected", index.row());
+                    SPDLOG_TRACE("(Completer) Row {} selected", index.row());
                     QVariant item_id = completer->completionModel()->data(index.siblingAtColumn(2));
                     SPDLOG_TRACE(" - id {}", item_id.toString().toStdString());
                 });
+
+        // Update current index in proxy when completer activates
+        connect(account_combo, &QComboBox::activated, [this](int index) {
+            SPDLOG_TRACE("(QCombobox) Row {} selected", index);
+            QModelIndex idIdx = this->account_combo->model()->index(index, 2);
+            QVariant item_id = this->account_combo->model()->data(idIdx);
+            SPDLOG_TRACE(" - id {}", item_id.toString().toStdString());
+        });
     }
     // account_combo->setModelColumn(magic_enum::enum_integer(AccountColumns::NAME));
     {
