@@ -45,55 +45,35 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
         completer->setCaseSensitivity(Qt::CaseInsensitive);
         // completer->setMaxVisibleItems(4);
         QStandardItemModel* model = new QStandardItemModel(accounts.rowCount(), 3, completer);
-        {
-            // Get a simplified model from the accounts, just the name and the custodian
-            for (int i = 0; i < accounts.rowCount(); ++i) {
-                const auto& item = accounts.get(i);
 
-                QModelIndex nameIdx = model->index(i, 0);
-                QModelIndex custodianIdx = model->index(i, 1);
-                QModelIndex idIdx = model->index(i, 2);
+        // Get a simplified model from the accounts, just the name and the custodian
+        for (int i = 0; i < accounts.rowCount(); ++i) {
+            const auto& item = accounts.get(i);
 
-                model->setData(nameIdx, QString::fromStdString(item.account.name));
-                model->setData(custodianIdx, QString::fromStdString(item.account.custodian.second));
-                model->setData(idIdx, QVariant::fromValue(item.id));
-            }
-            model->sort(0);
+            QModelIndex nameIdx = model->index(i, 0);
+            QModelIndex custodianIdx = model->index(i, 1);
+            QModelIndex idIdx = model->index(i, 2);
 
-            completer->setModel(model);
-
-            QTreeView* treeView = new QTreeView;
-            completer->setPopup(treeView);
-            treeView->hideColumn(2);
-            treeView->setRootIsDecorated(false);
-            treeView->header()->hide();
-            treeView->header()->setStretchLastSection(false);
-            treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-            treeView->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+            model->setData(nameIdx, QString::fromStdString(item.account.name));
+            model->setData(custodianIdx, QString::fromStdString(item.account.custodian.second));
+            model->setData(idIdx, QVariant::fromValue(item.id));
         }
+        model->sort(0);
+
+        completer->setModel(model);
+
+        QTreeView* treeView = new QTreeView;
+        completer->setPopup(treeView);
+        treeView->hideColumn(2);
+        treeView->setRootIsDecorated(false);
+        treeView->header()->hide();
+        treeView->header()->setStretchLastSection(false);
+        treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+        treeView->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 
         account_combo->setCompleter(completer);
         account_combo->setModel(model);
-
-        // auto* proxy = new QSortFilterProxyModel;
-        // proxy->setSourceModel(&accounts);
-        // proxy->setSortCaseSensitivity(Qt::CaseInsensitive);
-        // proxy->sort(magic_enum::enum_integer(AccountColumns::NAME));
-        // proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-        // // proxy->setFilterKeyColumn(magic_enum::enum_integer(AccountColumns::NAME));
-        // proxy->setFilterKeyColumn(-1);
-
-        // QCompleter* completer = new QCompleter(proxy, account_combo);
-        // completer->setCompletionColumn(magic_enum::enum_integer(AccountColumns::NAME));
-        // // completer->setCompletionMode(QCompleter::PopupCompletion);  // Auto-shows popup on typing
-        // completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-        // completer->setCaseSensitivity(Qt::CaseInsensitive);
-        // completer->setFilterMode(Qt::MatchContains); // Optional: Match anywhere
-        // completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-        // account_combo->setCompleter(completer);
-
-        // // Live filter as the user types
-        // connect(account_combo, &QLineEdit::textEdited, proxy, &QSortFilterProxyModel::setFilterFixedString);
+        // account_combo->setView(treeView);
 
         // Update current index in proxy when completer activates
         connect(completer, qOverload<const QModelIndex&>(&QCompleter::activated),
@@ -110,61 +90,6 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
             QVariant item_id = this->account_combo->model()->data(idIdx);
             SPDLOG_TRACE(" - id {}", item_id.toString().toStdString());
         });
-    }
-    // account_combo->setModelColumn(magic_enum::enum_integer(AccountColumns::NAME));
-    {
-        // auto* proxy = new QSortFilterProxyModel;
-        // proxy->setSourceModel(&accounts);
-        // proxy->setSortCaseSensitivity(Qt::CaseInsensitive);
-        // proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-        // proxy->setFilterKeyColumn(magic_enum::enum_integer(AccountColumns::NAME));
-
-        // account_combo->setEditable(true);
-        // account_combo->setModel(proxy);
-        // account_combo->setModelColumn(magic_enum::enum_integer(AccountColumns::NAME));
-
-        // QCompleter* completer = new QCompleter(proxy, account_combo);
-        // completer->setCompletionColumn(magic_enum::enum_integer(AccountColumns::NAME));
-        // completer->setCaseSensitivity(Qt::CaseInsensitive);
-        // completer->setFilterMode(Qt::MatchContains);
-        // completer->setCompletionMode(QCompleter::PopupCompletion);
-
-        // // Keep focus on line edit while popup is shown
-        // completer->popup()->setFocusPolicy(Qt::NoFocus);
-        // completer->setWidget(account_combo->lineEdit());
-        // account_combo->setCompleter(completer);
-
-        // // Ensure focus is enabled
-        // account_combo->setFocusPolicy(Qt::StrongFocus);
-        // account_combo->lineEdit()->setFocusPolicy(Qt::StrongFocus);
-
-        // // Live filter as the user types
-        // connect(account_combo->lineEdit(), &QLineEdit::textEdited, proxy,
-        // &QSortFilterProxyModel::setFilterFixedString);
-
-        // // Auto-show popup when typing (no focus loss)
-        // connect(account_combo->lineEdit(), &QLineEdit::textEdited, account_combo,
-        //         [combo = account_combo]() { QTimer::singleShot(0, combo, [combo]() { combo->showPopup(); }); });
-
-        // // Update current index in proxy when completer activates
-        // connect(completer, QOverload<const QModelIndex&>::of(&QCompleter::activated),
-        //         [combo = account_combo](const QModelIndex& index) {
-        //             SPDLOG_TRACE("Row {} selected", index.row());
-        //             combo->setCurrentIndex(index.row());
-        //         });
-
-        // // Nice layout
-        // // 🔧 Fixed size line edit
-        // auto* line_edit = account_combo->lineEdit();
-        // line_edit->setFixedWidth(300); // adjust as you like
-        // line_edit->setMinimumWidth(300);
-        // line_edit->setAlignment(Qt::AlignLeft);
-        // // line_edit->setFocusPolicy(Qt::StrongFocus);
-
-        // account_combo->view()->setMinimumWidth(300);
-        // account_combo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-        // account_combo->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-        // // account_combo->lineEdit()->setFocusPolicy(Qt::StrongFocus);
     }
 
     movtype = new QComboBox;
