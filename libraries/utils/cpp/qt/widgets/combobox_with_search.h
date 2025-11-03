@@ -1,7 +1,5 @@
 #pragma once
 
-#include <spdlog/spdlog.h>
-
 #include <QComboBox>
 #include <QCompleter>
 #include <QSortFilterProxyModel>
@@ -15,6 +13,8 @@ namespace utils::qt::widgets {
         ComboBoxWithSearch(QAbstractItemModel* model, QWidget* parent = nullptr);
 
         void setModelColumn(int column);
+        // void focusInEvent(QFocusEvent *event);
+        // void focusOutEvent(QFocusEvent *event);
 
         QSortFilterProxyModel* sortFilterProxyModel();
         QCompleter* completer();

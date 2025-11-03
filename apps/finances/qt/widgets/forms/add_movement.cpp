@@ -6,12 +6,14 @@
 #include <QCompleter>
 #include <QDialogButtonBox>
 #include <QFormLayout>
-#include <QVBoxLayout>
+#include <QGridLayout>
 
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 #include <QTableView>
 #include <QTimer>
+#include <QTreeView>
 
 // namespace {
 //     class NameFilterProxy : public QSortFilterProxyModel {
@@ -35,8 +37,76 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
                                      AccountsTableModel<AccountColumns>& accounts_, QWidget* parent, Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool}, accounts{accounts_} {
 
-    account_combo = new utils::qt::widgets::ComboBoxWithSearch{&accounts, this};
-    account_combo->setModelColumn(magic_enum::enum_integer(AccountColumns::NAME));
+    account_combo = new QLineEdit;
+    {
+        QCompleter* completer = new QCompleter(this);
+        completer->setMaxVisibleItems(4);
+        {
+            // Get a simplified model from the accounts, just the name and the custodian
+            QStandardItemModel* model = new QStandardItemModel(accounts.rowCount(), 2, completer);
+            for (int i = 0; i < accounts.rowCount(); ++i) {
+                const auto& item = accounts.get(i);
+
+                QModelIndex nameIdx = model->index(i, 0);
+                QModelIndex custodianIdx = model->index(i, 1);
+
+                model->setData(nameIdx, QString::fromStdString(item.account.name));
+                model->setData(custodianIdx, QString::fromStdString(item.account.custodian.second));
+            }
+            completer->setModel(model);
+
+            QTreeView* treeView = new QTreeView;
+            completer->setPopup(treeView);
+            treeView->setRootIsDecorated(false);
+            treeView->header()->hide();
+            treeView->header()->setStretchLastSection(false);
+            treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+            treeView->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+        }
+
+        account_combo->setCompleter(completer);
+
+        // auto* proxy = new QSortFilterProxyModel;
+        // proxy->setSourceModel(&accounts);
+        // proxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+        // proxy->sort(magic_enum::enum_integer(AccountColumns::NAME));
+        // proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+        // // proxy->setFilterKeyColumn(magic_enum::enum_integer(AccountColumns::NAME));
+        // proxy->setFilterKeyColumn(-1);
+
+        // QCompleter* completer = new QCompleter(proxy, account_combo);
+        // completer->setCompletionColumn(magic_enum::enum_integer(AccountColumns::NAME));
+        // // completer->setCompletionMode(QCompleter::PopupCompletion);  // Auto-shows popup on typing
+        // completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+        // completer->setCaseSensitivity(Qt::CaseInsensitive);
+        // completer->setFilterMode(Qt::MatchContains); // Optional: Match anywhere
+        // completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+        // account_combo->setCompleter(completer);
+
+        // // Live filter as the user types
+        // connect(account_combo, &QLineEdit::textEdited, proxy, &QSortFilterProxyModel::setFilterFixedString);
+
+        // // Update current index in proxy when completer activates
+        // connect(completer, qOverload<const QModelIndex&>(&QCompleter::activated),
+        //         [this, completer](const QModelIndex& index) {
+        //             SPDLOG_TRACE("Row {} selected", index.row());
+        //             auto complete_model = completer->completionModel();
+        //             QVariant account_name =
+        //                 complete_model->data(index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::NAME)));
+
+        //             // auto path = completer->pathFromIndex(index);
+        //             SPDLOG_TRACE(" - account_name: {}", account_name.toString().toStdString());
+        //             this->account_combo->clear();
+        //             this->account_combo->setText(account_name.toString());
+        //             // account_combo->setText("lolololo");
+
+        //             // auto model_index = proxy->mapToSource(index);
+
+        //             // QVariant account_name =
+        //             //     proxy->data(model_index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::NAME)));
+        //         });
+    }
+    // account_combo->setModelColumn(magic_enum::enum_integer(AccountColumns::NAME));
     {
         // auto* proxy = new QSortFilterProxyModel;
         // proxy->setSourceModel(&accounts);
@@ -102,16 +172,19 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-    QFormLayout* formLayout = new QFormLayout;
-    formLayout->addRow(tr("&Account"), account_combo);
-    formLayout->addRow(tr("Movement type"), movtype);
-    formLayout->addRow(tr("Movement date"), mov_date);
-    formLayout->addRow(tr("Amount"), mov_amount);
+    QFormLayout* formLayout = new QFormLayout(this);
+    formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+    formLayout->addRow(tr("&Account:"), account_combo);
+    formLayout->addRow(tr("Movement &type:"), movtype);
+    formLayout->addRow(tr("Movement &date:"), mov_date);
+    formLayout->addRow(tr("&Amount:"), mov_amount);
 
-    QVBoxLayout* layout = new QVBoxLayout;
-    layout->addLayout(formLayout);
-    layout->addWidget(buttonBox);
+    QGridLayout* layout = new QGridLayout;
+    layout->addLayout(formLayout, 0, 0);
+    layout->addWidget(buttonBox, 1, 0);
     this->setLayout(layout);
+
+    account_combo->setFocus();
 }
 
 void AddMovementWidget::account_changed() { SPDLOG_DEBUG("AddMovementWidget::account_changed()"); }
