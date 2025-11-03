@@ -17,6 +17,8 @@ namespace widgets::forms {
         explicit MovementNonNumerableFormWidget(QWidget* parent = nullptr);
 
       public slots:
+        void clear();
+
         void setCcy(finances::accounts::models::Ccy);
 
       private slots:

@@ -15,7 +15,7 @@
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/tables/accounts.h"
 
-#include "libraries/utils/cpp/qt/widgets/combobox_with_search.hpp"
+#include "libraries/utils/cpp/qt/widgets/combobox_with_search.h"
 
 class AddMovementWidget : public QDialog {
     Q_OBJECT
@@ -27,12 +27,14 @@ class AddMovementWidget : public QDialog {
 
   private slots:
     // The selected account has changed. The fields in the widget might change.
-    void account_changed();
+    void account_changed(const AccountModel& account);
 
     // The selected movement type has changed. Fields in the widget might change.
     void movtype_changed();
 
   public slots:
+    void clear(bool keep_date = true);
+
     // Show the calendar to choose the date
     void show_mov_date();
 
@@ -52,7 +54,7 @@ class AddMovementWidget : public QDialog {
     utils::qt::widgets::ComboBoxWithSearch<AccountModel, AccountColumns>* account_combo;
     // AccountsTableModel<AccountColumns>& accounts;
 
-    QComboBox* movtype;
+    QComboBox* movtype_combo;
     QCalendarWidget* mov_date;
 
     widgets::forms::MovementStackedForm* mov_amount;

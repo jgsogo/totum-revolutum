@@ -18,6 +18,8 @@ namespace widgets::forms {
         explicit MovementDividendFormWidget(QWidget* parent = nullptr);
 
       public slots:
+        void clear();
+
         void setCcy(finances::accounts::models::Ccy);
         void setQuantity(finances::accounts::models::Amount);
 

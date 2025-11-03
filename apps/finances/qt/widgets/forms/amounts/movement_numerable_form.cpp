@@ -16,7 +16,7 @@ namespace widgets::forms {
     MovementNumerableFormWidget::MovementNumerableFormWidget(QWidget* parent) : QWidget(parent) {
         // Quantity
         quantity = new QLineEdit();
-        connect(quantity, &QLineEdit::textChanged, [this]() { this->on_input_data_change(); });
+        connect(quantity, &QLineEdit::textEdited, [this]() { this->on_input_data_change(); });
 
         QRegularExpression rx(R"(^\d+(,\d{2})?$)");
         QRegularExpressionValidator* ccy_validator = new QRegularExpressionValidator(rx, this);
@@ -26,7 +26,7 @@ namespace widgets::forms {
         // Unit value
         unit_value = new QLineEdit("ccy unknown");
         unit_value->setEnabled(false);
-        connect(unit_value, &QLineEdit::textChanged, [this]() { this->on_input_data_change(); });
+        connect(unit_value, &QLineEdit::textEdited, [this]() { this->on_input_data_change(); });
 
         unit_value_label = new QLabel(tr("&Unit value"));
 
@@ -35,6 +35,14 @@ namespace widgets::forms {
         formLayout->addRow(unit_value_label, unit_value);
 
         this->setLayout(formLayout);
+    }
+
+    void MovementNumerableFormWidget::clear() {
+        ccy = std::nullopt;
+        unit_value->setEnabled(false);
+
+        this->quantity->clear();
+        this->unit_value->clear();
     }
 
     void MovementNumerableFormWidget::setCcy(finances::accounts::models::Ccy ccy_) {
@@ -51,10 +59,10 @@ namespace widgets::forms {
         unit_value->setPlaceholderText("120,34");
 
         // Update label and enable the inputs
-        unit_value_label->setText(tr("&Unit value (%1)").arg(static_cast<std::string>(ccy.value())));
+        unit_value_label->setText(tr("Unit value (%1)").arg(static_cast<std::string>(ccy.value())));
 
         unit_value->setEnabled(true);
-        // amount->clear();
+        unit_value->clear();
 
         this->on_input_data_change();
     }

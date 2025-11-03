@@ -22,7 +22,7 @@ namespace widgets::forms {
         // Unit value
         unit_value = new QLineEdit("ccy unknown");
         unit_value->setEnabled(false);
-        connect(unit_value, &QLineEdit::textChanged, [this]() { this->on_input_data_change(); });
+        connect(unit_value, &QLineEdit::textEdited, [this]() { this->on_input_data_change(); });
 
         unit_value_label = new QLabel(tr("&Unit value"));
 
@@ -31,6 +31,14 @@ namespace widgets::forms {
         formLayout->addRow(unit_value_label, unit_value);
 
         this->setLayout(formLayout);
+    }
+
+    void MovementDividendFormWidget::clear() {
+        ccy = std::nullopt;
+        quantity = std::nullopt;
+        unit_value->setEnabled(false);
+        this->unit_value->clear();
+        this->ex_dividend_date->setSelectedDate(QDate::currentDate());
     }
 
     void MovementDividendFormWidget::setCcy(finances::accounts::models::Ccy ccy_) {
@@ -49,6 +57,7 @@ namespace widgets::forms {
         // Update label and enable the inputs
         unit_value_label->setText(tr("&Unit value (%1)").arg(static_cast<std::string>(ccy.value())));
         unit_value->setEnabled(true);
+        unit_value->clear();
 
         this->on_input_data_change();
     }

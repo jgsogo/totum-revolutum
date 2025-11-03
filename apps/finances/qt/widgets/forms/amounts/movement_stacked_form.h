@@ -15,6 +15,8 @@ namespace widgets::forms {
         ~MovementStackedForm();
 
       public slots:
+        void clear();
+
         void set_movement_non_numerable();
         void set_movement_numerable();
         void set_movement_dividend();

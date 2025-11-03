@@ -11,14 +11,24 @@
 
 namespace utils::qt::widgets {
 
-    template <class TModel, typename TColumn> class ComboBoxWithSearch : public QComboBox {
+    class _ComboBoxWithSearch : public QComboBox {
+        Q_OBJECT
+
+      public:
+        using QComboBox::QComboBox;
+
+      signals:
+        void activated(utils::db::Id);
+    };
+
+    template <class TModel, typename TColumn> class ComboBoxWithSearch : public _ComboBoxWithSearch {
         const static int ID_COLUMN = 1;
         const static int DISPLAY_COLUMN = 0;
 
       public:
         ComboBoxWithSearch(utils::qt::models::TableModel<TModel, TColumn>& model, TColumn col_id, TColumn col_display,
                            QWidget* parent = nullptr)
-            : QComboBox{parent}, _model{model} {
+            : _ComboBoxWithSearch{parent}, _model{model} {
             this->setEditable(true);
             this->setFocusPolicy(Qt::StrongFocus);
 
@@ -56,6 +66,17 @@ namespace utils::qt::widgets {
             }
 
             this->setCompleter(completer);
+
+            connect(this, &QComboBox::activated, [this](const int index) {
+                SPDLOG_DEBUG("ComboBoxWithSearch::activated(index={})", index);
+
+                QModelIndex idIdx = this->model()->index(index, ID_COLUMN);
+                QVariant item_id = this->model()->data(idIdx);
+
+                auto id = item_id.value<utils::db::Id>();
+
+                emit this->activated(id);
+            });
         };
 
         ~ComboBoxWithSearch() = default;

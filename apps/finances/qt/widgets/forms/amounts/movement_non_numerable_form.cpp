@@ -16,7 +16,7 @@ namespace widgets::forms {
         // We start QLineEdit and disable it, because we don't know the currency!
         amount = new QLineEdit("ccy unknown");
         amount->setEnabled(false);
-        connect(amount, &QLineEdit::textChanged, this, [this]() { this->on_input_data_change(); });
+        connect(amount, &QLineEdit::textEdited, this, [this]() { this->on_input_data_change(); });
 
         amount_label = new QLabel(tr("Amount"));
 
@@ -24,6 +24,12 @@ namespace widgets::forms {
         formLayout->addRow(amount_label, amount);
 
         this->setLayout(formLayout);
+    }
+
+    void MovementNonNumerableFormWidget::clear() {
+        ccy = std::nullopt;
+        amount->setEnabled(false);
+        amount->clear();
     }
 
     void MovementNonNumerableFormWidget::setCcy(finances::accounts::models::Ccy ccy_) {
@@ -40,9 +46,9 @@ namespace widgets::forms {
         amount->setPlaceholderText("120,34");
 
         // Update label and enable the amount if it was not
-        amount_label->setText(tr("&Amount (%1)").arg(static_cast<std::string>(ccy.value())));
+        amount_label->setText(tr("Amount (%1)").arg(static_cast<std::string>(ccy.value())));
         amount->setEnabled(true);
-        // amount->clear();
+        amount->clear();
 
         this->on_input_data_change();
     }

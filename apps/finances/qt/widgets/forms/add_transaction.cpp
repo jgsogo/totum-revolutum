@@ -31,7 +31,10 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
         // connect(popup_add_snapshot, &AddSnapshotNumerableWidget::new_snapshot, this,
         //         &AccountDetailWidget::on_new_snapshot);
 
-        connect(add_movement, &QPushButton::clicked, popup_add_movement, &QDialog::open);
+        connect(add_movement, &QPushButton::clicked, [popup_add_movement]() {
+            popup_add_movement->clear();
+            popup_add_movement->open();
+        });
     }
 
     // Components

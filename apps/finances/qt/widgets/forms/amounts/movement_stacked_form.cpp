@@ -49,6 +49,14 @@ namespace widgets::forms {
 
     MovementStackedForm::~MovementStackedForm() = default;
 
+    void MovementStackedForm::clear() {
+        pImpl->mov_non_numerable->clear();
+        pImpl->mov_numerable->clear();
+        pImpl->mov_dividend->clear();
+
+        this->set_movement_non_numerable();
+    }
+
     void MovementStackedForm::set_movement_non_numerable() {
         pImpl->mov_non_numerable->blockSignals(false);
         pImpl->mov_numerable->blockSignals(true);
