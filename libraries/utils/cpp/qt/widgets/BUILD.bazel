@@ -1,0 +1,19 @@
+load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
+
+qt_cc_library(
+    name = "combobox_with_search",
+    srcs = [
+        "combobox_with_search.cpp",
+    ],
+    hdrs = [
+        "combobox_with_search.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bazel/logging:spdlog",
+        "//libraries/utils/cpp:expected_type",
+        "//libraries/utils/cpp/qt/models",
+        "@magic_enum",
+        "@rules_qt//:qt_widgets",
+    ],
+)

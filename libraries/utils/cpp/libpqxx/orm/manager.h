@@ -28,7 +28,7 @@ namespace utils::db {
                         pqxx::work tx(conn);
                         std::vector<TModel> ret = ModelManager::_all(tx);
                         SPDLOG_TRACE("Found {} {}", ret.size(), TModelData::name);
-                        return {ret};
+                        return ExpectedType<std::vector<TModel>, DatabaseError>{std::move(ret)};
                     } catch (const std::exception& e) {
                         SPDLOG_ERROR("Failed to fetch all the {}: {}", TModelData::name, e.what());
                         return tl::unexpected(DatabaseError{});
@@ -64,7 +64,7 @@ namespace utils::db {
 
                         pqxx::work tx(conn);
                         std::vector<TModel> all_items = ModelManager::_filter_by_fk<TParentModel>(tx, id);
-                        return {all_items};
+                        return ExpectedType<std::vector<TModel>, DatabaseError>{std::move(all_items)};
                     } catch (const std::exception& e) {
                         SPDLOG_ERROR("Failed to fetch {} model: {}", TModelData::name, e.what());
                         return tl::unexpected(DatabaseError{});
@@ -93,7 +93,7 @@ namespace utils::db {
                         pqxx::work tx(conn);
                         utils::db::Id new_id = ModelManager::_create(tx, std::move(new_instance));
                         tx.commit();
-                        return {new_id};
+                        return ExpectedType<Id, DatabaseError, ErrorInvalidInput>{std::move(new_id)};
                     } catch (const std::exception& e) {
                         SPDLOG_ERROR("Failed to create new instance of model {}: {}", TModelData::name, e.what());
                         return tl::unexpected(DatabaseError{});

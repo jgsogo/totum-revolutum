@@ -1,0 +1,16 @@
+load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
+
+qt_cc_library(
+    name = "forms",
+    srcs = glob(["**/*.cpp"]),
+    hdrs = glob(["**/*.h"]),
+    visibility = ["//apps/finances/qt:__subpackages__"],
+    deps = [
+        "//apps/finances/qt/models",
+        "//apps/finances/qt/table_models",
+        "//apps/finances/qt/tables",
+        "//apps/finances/qt/widgets/forms/amounts",
+        "//libraries/utils/cpp/qt/widgets:combobox_with_search",
+        "@rules_qt//:qt_widgets",
+    ],
+)

@@ -9,12 +9,14 @@
 #include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/utils/utils.h"
 
+using namespace finances::accounts::models;
+using namespace finances::investments::models;
+
 namespace utils::qt::models {
 
     template <>
-    template <>
-    QVariant DataDispatcher<MovementModel, MovementColumns, Qt::DisplayRole>::data<finances::accounts::models::Account>(
-        const MovementModel& movement, MovementColumns column, const finances::accounts::models::Account& account) {
+    QVariant DataDispatcher<MovementModel, MovementColumns, Qt::DisplayRole>::data(const MovementModel& movement,
+                                                                                   MovementColumns column) {
         QVariant result = QVariant();
         switch (column) {
         case MovementColumns::ID:
@@ -23,10 +25,9 @@ namespace utils::qt::models {
         case MovementColumns::DATE_VALUE:
             result = utils::date_to_qdate(movement.as_movement().date_value).toString("yyyy-MM-dd");
             break;
-        case MovementColumns::AMOUNT: {
-            auto amount_money = finances::accounts::models::Money{movement.as_movement().amount, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(amount_money));
-        } break;
+        case MovementColumns::AMOUNT:
+            result = QString::fromStdString(static_cast<std::string>(movement.as_movement().amount));
+            break;
         case MovementColumns::MOVE_TYPE:
             result = QString::fromStdString(movement.movtype_breadcrumb);
             break;
@@ -40,11 +41,11 @@ namespace utils::qt::models {
             result = std::visit(
                 [](const auto& arg) -> QVariant {
                     using T = std::decay_t<decltype(arg)>;
-                    if constexpr (std::is_same_v<T, finances::accounts::models::Movement>) {
+                    if constexpr (std::is_same_v<T, Movement>) {
                         return QVariant{};
-                    } else if constexpr (std::is_same_v<T, finances::investments::models::MovementNumerable>) {
+                    } else if constexpr (std::is_same_v<T, MovementNumerable>) {
                         return QString::fromStdString(static_cast<std::string>(arg.quantity));
-                    } else if constexpr (std::is_same_v<T, finances::investments::models::MovementDividend>) {
+                    } else if constexpr (std::is_same_v<T, MovementDividend>) {
                         if (!arg.snapshot_data) {
                             SPDLOG_ERROR("Missing required data! Snapshot is mandatory for a MovementDividend!");
                             return QVariant{};
@@ -58,16 +59,14 @@ namespace utils::qt::models {
             break;
         case MovementColumns::UNIT_VALUE:
             result = std::visit(
-                [&account](const auto& arg) -> QVariant {
+                [](const auto& arg) -> QVariant {
                     using T = std::decay_t<decltype(arg)>;
-                    if constexpr (std::is_same_v<T, finances::accounts::models::Movement>) {
+                    if constexpr (std::is_same_v<T, Movement>) {
                         return QVariant{};
-                    } else if constexpr (std::is_same_v<T, finances::investments::models::MovementNumerable>) {
-                        auto amount_money = finances::accounts::models::Money{arg.unit_value, account.ccy};
-                        return QString::fromStdString(static_cast<std::string>(amount_money));
-                    } else if constexpr (std::is_same_v<T, finances::investments::models::MovementDividend>) {
-                        auto amount_money = finances::accounts::models::Money{arg.unit_value, account.ccy};
-                        return QString::fromStdString(static_cast<std::string>(amount_money));
+                    } else if constexpr (std::is_same_v<T, MovementNumerable>) {
+                        return QString::fromStdString(static_cast<std::string>(arg.unit_value));
+                    } else if constexpr (std::is_same_v<T, MovementDividend>) {
+                        return QString::fromStdString(static_cast<std::string>(arg.unit_value));
                     } else {
                         static_assert(false, "non-exhaustive visitor!");
                     }
@@ -79,7 +78,6 @@ namespace utils::qt::models {
             break;
         case MovementColumns::ACCOUNT_ID:
             result.setValue(movement.as_movement().account.first);
-            // result = QString::fromStdString("%1 -").arg(std::format("{}", movement.as_movement().account.first));
             break;
         case MovementColumns::TRANSACTION_ID:
             result.setValue(movement.as_movement().transaction.first);
@@ -89,24 +87,20 @@ namespace utils::qt::models {
     }
 
     template <>
-    template <>
-    QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumns, Qt::DisplayRole>::data<
-        finances::accounts::models::Account>(const finances::accounts::models::Snapshot& snapshot,
-                                             MovementColumns column,
-                                             const finances::accounts::models::Account& account) {
+    QVariant DataDispatcher<Snapshot, MovementColumns, Qt::DisplayRole>::data(const Snapshot& snapshot,
+                                                                              MovementColumns column) {
         QVariant result = QVariant();
 
         switch (column) {
         case MovementColumns::ID:
-            result = QString::fromStdString(std::format("{}", snapshot.id)); // FIXME: implement the right conversion
+            result.setValue(snapshot.id);
             break;
         case MovementColumns::DATE_VALUE:
             result = utils::date_to_qdate(snapshot.date_value).toString("yyyy-MM-dd");
             break;
-        case MovementColumns::AMOUNT: {
-            auto amount_money = finances::accounts::models::Money{snapshot.amount, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(amount_money));
-        } break;
+        case MovementColumns::AMOUNT:
+            result = QString::fromStdString(static_cast<std::string>(snapshot.amount));
+            break;
         case MovementColumns::ACCOUNT:
             result = snapshot.account.second.c_str();
             break;
@@ -127,11 +121,9 @@ namespace utils::qt::models {
     }
 
     template <>
-    template <>
-    QVariant DataDispatcher<finances::investments::models::SnapshotNumerable, MovementColumns, Qt::DisplayRole>::data<
-        finances::accounts::models::Account>(const finances::investments::models::SnapshotNumerable& snapshot,
-                                             MovementColumns column,
-                                             const finances::accounts::models::Account& account) {
+    QVariant
+    DataDispatcher<SnapshotNumerable, MovementColumns, Qt::DisplayRole>::data(const SnapshotNumerable& snapshot,
+                                                                              MovementColumns column) {
         QVariant result = QVariant();
         switch (column) {
         case MovementColumns::ID:
@@ -140,17 +132,15 @@ namespace utils::qt::models {
         case MovementColumns::DATE_VALUE:
             result = utils::date_to_qdate(snapshot.snapshot.date_value).toString("yyyy-MM-dd");
             break;
-        case MovementColumns::AMOUNT: {
-            auto amount_money = finances::accounts::models::Money{snapshot.snapshot.amount, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(amount_money));
-        } break;
+        case MovementColumns::AMOUNT:
+            result = QString::fromStdString(static_cast<std::string>(snapshot.snapshot.amount));
+            break;
         case MovementColumns::QUANTITY:
             result = QString::fromStdString(static_cast<std::string>(snapshot.quantity));
             break;
-        case MovementColumns::UNIT_VALUE: {
-            auto unit_value_money = finances::accounts::models::Money{snapshot.unit_value, account.ccy};
-            result = QString::fromStdString(static_cast<std::string>(unit_value_money));
-        } break;
+        case MovementColumns::UNIT_VALUE:
+            result = QString::fromStdString(static_cast<std::string>(snapshot.unit_value));
+            break;
         case MovementColumns::ACCOUNT:
             result = snapshot.snapshot.account.second.c_str();
             break;
@@ -168,19 +158,13 @@ namespace utils::qt::models {
     }
 
     template <>
-    template <>
-    QVariant
-    DataDispatcher<finances::investments::models::SnapshotNumerable, MovementColumns, Qt::BackgroundRole>::data<
-        finances::accounts::models::Account>(const finances::investments::models::SnapshotNumerable&, MovementColumns,
-                                             const finances::accounts::models::Account&) {
+    QVariant DataDispatcher<SnapshotNumerable, MovementColumns, Qt::BackgroundRole>::data(const SnapshotNumerable&,
+                                                                                          MovementColumns) {
         return QVariant{QColor(255, 255, 40)};
     }
 
     template <>
-    template <>
-    QVariant DataDispatcher<finances::accounts::models::Snapshot, MovementColumns, Qt::BackgroundRole>::data<
-        finances::accounts::models::Account>(const finances::accounts::models::Snapshot&, MovementColumns,
-                                             const finances::accounts::models::Account&) {
+    QVariant DataDispatcher<Snapshot, MovementColumns, Qt::BackgroundRole>::data(const Snapshot&, MovementColumns) {
         return QVariant{QColor(255, 255, 40)};
     }
 } // namespace utils::qt::models

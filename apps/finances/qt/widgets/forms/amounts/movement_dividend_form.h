@@ -1,0 +1,42 @@
+#pragma once
+
+#include <QCalendarWidget>
+#include <QLabel>
+#include <QLineEdit>
+#include <QWidget>
+
+#include "libraries/finances/accounts/cpp/models/types/ccy.h"
+
+#include "apps/finances/qt/metatypes/types.h"
+
+namespace widgets::forms {
+
+    class MovementDividendFormWidget : public QWidget {
+        Q_OBJECT
+
+      public:
+        explicit MovementDividendFormWidget(QWidget* parent = nullptr);
+
+      public slots:
+        void clear();
+
+        void setCcy(finances::accounts::models::Ccy);
+        void setQuantity(finances::accounts::models::Amount);
+
+      private slots:
+        void on_input_data_change();
+
+      signals:
+        void ex_dividend_date_changed(QDate date);
+        void amount_changed(finances::accounts::models::Money money);
+
+      protected:
+        std::optional<finances::accounts::models::Ccy> ccy;
+        std::optional<finances::accounts::models::Amount> quantity;
+
+        QCalendarWidget* ex_dividend_date;
+        QLineEdit* unit_value;
+        QLabel* unit_value_label;
+    };
+
+} // namespace widgets::forms

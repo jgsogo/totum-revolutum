@@ -14,7 +14,7 @@ namespace utils::db {
         std::vector<MovementNumerable> filter_by_fk_id(pqxx::work& tx, const std::string& fk_key,
                                                        const utils::db::Id& id) {
             auto query = std::format("SELECT m.id, m.date_value, m.amount, m.direction, t.id, t.name, tr.id, tr.name, "
-                                     "mn.movement_ptr_id, mn.quantity, mn.unit_value, acc.id, acc.name"
+                                     "mn.movement_ptr_id, mn.quantity, mn.unit_value, acc.id, acc.name, acc.ccy"
                                      " FROM {} AS mn"
                                      "   LEFT JOIN {} AS m ON mn.movement_ptr_id = m.id"
                                      "   LEFT JOIN {} AS t ON m.type_id = t.id"
@@ -28,9 +28,9 @@ namespace utils::db {
 
             std::vector<MovementNumerable> ret;
             for (auto [id, date_value, amount, direction, type_id, type_name, transaction_id, transaction_name, mn_id,
-                       quantity, unit_value, acc_id, acc_name] :
+                       quantity, unit_value, acc_id, acc_name, acc_ccy] :
                  tx.query<Id, utils::libpqxx::Date, Amount, MovementDirection, Id, std::string, Id, std::string, Id,
-                          Amount, Amount, Id, std::string>(query, pqxx::params{id})) {
+                          Amount, Amount, Id, std::string, std::string>(query, pqxx::params{id})) {
                 ret.emplace_back(MovementNumerable{
                     .movement = Movement{.id = id,
                                          .transaction = std::make_pair(transaction_id, transaction_name),
@@ -38,14 +38,14 @@ namespace utils::db {
                                          .direction = direction,
                                          .account = std::make_pair(acc_id, acc_name),
                                          .date_value = date_value,
-                                         .amount = amount},
+                                         .amount = Money{amount, Ccy{acc_ccy}}},
                     .id = mn_id,
                     .quantity = quantity,
-                    .unit_value = unit_value,
+                    .unit_value = Money{unit_value, Ccy{acc_ccy}},
                 });
             }
             SPDLOG_TRACE("Found {} numerable movements", ret.size());
-            return {ret};
+            return ret;
         }
     } // namespace
 

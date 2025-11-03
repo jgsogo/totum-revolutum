@@ -6,7 +6,6 @@ qt_cc_library(
     hdrs = glob(["**/*.h"]),
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
-        # "//apps/finances/qt/models",
         "//apps/finances/qt/table_models",
         "//apps/finances/qt/tables",
         "@rules_qt//:qt_widgets",

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "libraries/utils/cpp/string_type.hpp"
+#include <string_view>
 
 namespace finances::accounts::models {
     using Country = utils::StringType<class CountryTag>;

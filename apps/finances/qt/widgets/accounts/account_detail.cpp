@@ -12,17 +12,20 @@
 #include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/table_models/snapshots.h"
 #include "apps/finances/qt/tables/movement_columns.h"
+#include "apps/finances/qt/widgets/forms/add_transaction.h"
 #include "apps/finances/qt/widgets/transactions/transaction_detail.h"
 
 #include "non_numerable/add_snapshot.h"
 #include "numerable/add_snapshot.h"
 
-AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, const AccountModel& account_,
+AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
+                                         AccountsTableModel<AccountColumns>& accounts_, const AccountModel& account_,
                                          QWidget* parent)
     : QWidget(parent), pool{pool_}, account{account_} {
 
     // Models
     QConcatenateTablesProxyModel* model = new QConcatenateTablesProxyModel(this);
+    transactions_tablemodel = new TransactionsForAccountTableModel<TransactionColumns>(account.account, pool, this);
 
     // - movements
     {
@@ -75,24 +78,7 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
                              index.row());
                 return;
             }
-
-            SPDLOG_TRACE(" - this is transaction_id {}", transaction_id);
-            utils::db::ModelData<finances::accounts::models::Transaction>::Manager transactions_manager{pool};
-            auto transaction_expected = transactions_manager.get(transaction_id);
-            if (!transaction_expected) {
-                SPDLOG_ERROR("Failed to get transaction with id {} (corresponding to row {}): {}", transaction_id,
-                             index.row(), transaction_expected.error());
-                return;
-            }
-
-            // FIXME: Here I'm using a temporal Transaction and passing a reference!!!!
-            SPDLOG_WARN("STOP! We cannot create a TransactionDetailWidget using a reference!");
-            // const finances::accounts::models::Transaction& transaction = transaction_expected.value();
-            // TransactionDetailWidget* transaction_detail =
-            // new TransactionDetailWidget(pool, transaction, this);
-            // transaction_detail->setModal(true);
-            // transaction_detail->setSizeGripEnabled(true);
-            // transaction_detail->open();
+            this->showTransaction(transaction_id);
         });
     }
 
@@ -117,10 +103,22 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_, 
         connect(bt_add_snapshot, &QPushButton::clicked, popup_add_snapshot, &QDialog::open);
     }
 
+    // - popup - add transaction
+    QPushButton* bt_add_transaction = new QPushButton(tr("Add transaction"), this);
+    {
+        AddTransactionWidget* popup_add_transaction = new AddTransactionWidget(pool, accounts_, this);
+        popup_add_transaction->setModal(true);
+        popup_add_transaction->setSizeGripEnabled(true);
+        // connect(popup_add_transaction, &AddSnapshotNumerableWidget::new_snapshot, this,
+        //         &AccountDetailWidget::on_new_snapshot);
+        connect(bt_add_transaction, &QPushButton::clicked, popup_add_transaction, &QDialog::open);
+    }
+
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->addWidget(new QLabel(QString::fromStdString(account.account.name)));
     mainLayout->addWidget(bt_add_snapshot);
+    mainLayout->addWidget(bt_add_transaction);
     mainLayout->addWidget(table_view);
 
     this->setLayout(mainLayout);
@@ -130,4 +128,21 @@ void AccountDetailWidget::on_new_snapshot(utils::db::Id account_id) {
     SPDLOG_DEBUG("AccountDetailWidget::on_new_snapshot(account_id={})", account_id);
     assert(account_id == account.id);
     emit snapshot_added(account_id);
+}
+
+void AccountDetailWidget::showTransaction(const decltype(finances::accounts::models::Transaction::id)& transaction_id) {
+    SPDLOG_DEBUG("AccountDetailWidget::showTransaction(transaction_id={})", transaction_id);
+
+    auto transaction_expected = transactions_tablemodel->get(transaction_id);
+    if (!transaction_expected) {
+        SPDLOG_ERROR("Transaction with id '{}' not found in this account", transaction_id);
+        // TODO: Notify error to user
+        return;
+    }
+
+    const finances::accounts::models::Transaction& transaction = transaction_expected.value();
+    TransactionDetailWidget* transaction_detail = new TransactionDetailWidget(pool, transaction, this);
+    transaction_detail->setModal(true);
+    transaction_detail->setSizeGripEnabled(true);
+    transaction_detail->open();
 }

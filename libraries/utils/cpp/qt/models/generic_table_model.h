@@ -71,7 +71,7 @@ namespace utils::qt::models {
             return result;
         }
 
-        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
+        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override final {
             QVariant result = QVariant();
 
             int row = index.row();
@@ -159,7 +159,7 @@ namespace utils::qt::models {
         }
 
         virtual void _refresh_one(const ModelData::Id& id, int row) {
-            SPDLOG_WARN("{}::_refresh_one(id={}, row={}) -- empty implementation", name, id, row);
+            SPDLOG_DEBUG("{}::_refresh_one(id={}, row={})", name, id, row);
 
             ModelManager manager{pool};
             auto new_item = manager.get(id);
@@ -191,35 +191,6 @@ namespace utils::qt::models {
             : TableModel<TModel, TColumn>{pool, parent_object}, parent{parent_} {};
 
         const TParent& get_parent() const { return parent; };
-
-        QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override {
-            QVariant result = QVariant();
-
-            int row = index.row();
-            int column_idx = index.column();
-
-            if (!index.isValid() || row >= this->rowCount() || column_idx >= this->columnCount()) {
-                return result;
-            }
-
-            TColumn column = magic_enum::enum_value<TColumn>(column_idx);
-            const auto& item = this->items.at(row);
-
-            switch (role) {
-            case Qt::DisplayRole:
-                return DataDispatcher<TModel, TColumn, Qt::DisplayRole>::data(item, column, parent);
-            case Qt::FontRole:
-                return DataDispatcher<TModel, TColumn, Qt::FontRole>::data(item, column, parent);
-            case Qt::TextAlignmentRole:
-                return DataDispatcher<TModel, TColumn, Qt::TextAlignmentRole>::data(item, column, parent);
-            case Qt::BackgroundRole:
-                return DataDispatcher<TModel, TColumn, Qt::BackgroundRole>::data(item, column, parent);
-                // default:
-                //     break;
-            }
-
-            return result;
-        }
 
       protected:
         void _refresh_all() override {

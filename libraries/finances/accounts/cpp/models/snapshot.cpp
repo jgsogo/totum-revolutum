@@ -17,7 +17,7 @@ namespace utils::db {
                     pqxx::work tx(conn);
                     SPDLOG_DEBUG("Get last snapshot for account_id {}", account_id);
 
-                    auto query = std::format("SELECT s.id, s.date_value, s.amount, acc.id, acc.name"
+                    auto query = std::format("SELECT s.id, s.date_value, s.amount, acc.id, acc.name, acc.ccy"
                                              " FROM {} AS s"
                                              "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
                                              " WHERE s.account_id = $1"
@@ -29,12 +29,12 @@ namespace utils::db {
                     if (!r) {
                         return {std::nullopt};
                     }
-                    auto [id, date_value, amount, acc_id, acc_name] =
-                        r->as<Id, utils::libpqxx::Date, Amount, Id, std::string>();
+                    auto [id, date_value, amount, acc_id, acc_name, acc_ccy] =
+                        r->as<Id, utils::libpqxx::Date, Amount, Id, std::string, std::string>();
                     return {std::make_optional<Snapshot>({.id = id,
                                                           .account = std::make_pair(acc_id, acc_name),
                                                           .date_value = date_value,
-                                                          .amount = amount})};
+                                                          .amount = Money{amount, Ccy{acc_ccy}}})};
                 } catch (const std::exception& e) {
                     SPDLOG_ERROR("Failed to fetch latest snapshot for account {}: {}", account_id, e.what());
                     return tl::unexpected(DatabaseError{});
@@ -70,25 +70,25 @@ namespace utils::db {
                         subquery = out.str();
                     }
 
-                    auto query = std::format(
-                        "SELECT DISTINCT ON (s.account_id) s.id, s.account_id, s.date_value, s.amount, acc.id, acc.name"
-                        " FROM {} AS s"
-                        "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
-                        " WHERE s.account_id IN ({})"
-                        " ORDER BY s.account_id, s.date_value DESC;",
-                        SNAPSHOT_TABLE, ACCOUNT_TABLE, subquery);
+                    auto query = std::format("SELECT DISTINCT ON (s.account_id) s.id, s.account_id, s.date_value, "
+                                             "s.amount, acc.id, acc.name, acc.ccy"
+                                             " FROM {} AS s"
+                                             "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
+                                             " WHERE s.account_id IN ({})"
+                                             " ORDER BY s.account_id, s.date_value DESC;",
+                                             SNAPSHOT_TABLE, ACCOUNT_TABLE, subquery);
                     SPDLOG_TRACE(query);
 
                     std::map<Id, Snapshot> snapshots;
-                    for (auto [id, account_id, date_value, amount, acc_id, acc_name] :
-                         tx.query<Id, Id, utils::libpqxx::Date, Amount, Id, std::string>(query, values)) {
+                    for (auto [id, account_id, date_value, amount, acc_id, acc_name, acc_ccy] :
+                         tx.query<Id, Id, utils::libpqxx::Date, Amount, Id, std::string, std::string>(query, values)) {
                         SPDLOG_TRACE("Found snapshot for account {}: date {}, amount = {}", account_id, date_value,
                                      amount);
                         [[maybe_unused]] const auto [it, inserted] = snapshots.emplace(
                             std::make_pair(account_id, Snapshot{.id = id,
                                                                 .account = std::make_pair(acc_id, acc_name),
                                                                 .date_value = date_value,
-                                                                .amount = amount}));
+                                                                .amount = Money{amount, Ccy{acc_ccy}}}));
                         assert(inserted);
                     }
 
@@ -98,9 +98,10 @@ namespace utils::db {
                     std::transform(account_ids.begin(), account_ids.end(), ret.begin(),
                                    [&snapshots](const Id& account_id) -> std::optional<Snapshot> {
                                        auto it = snapshots.find(account_id);
-                                       return it == snapshots.end() ? std::nullopt : std::make_optional(it->second);
+                                       return it == snapshots.end() ? std::nullopt
+                                                                    : std::make_optional(std::move(it->second));
                                    });
-                    return {ret};
+                    return ExpectedType<std::vector<std::optional<Snapshot>>, DatabaseError>{std::move(ret)};
                 } catch (const std::exception& e) {
                     SPDLOG_ERROR("Failed to fetch latest snapshots for accounts {}: {}", account_ids, e.what());
                     return tl::unexpected(DatabaseError{});
@@ -116,7 +117,7 @@ namespace utils::db {
 
         SPDLOG_DEBUG("Get all snapshots for account_id {}", account_id);
 
-        auto query = std::format("SELECT s.id, s.date_value, s.amount, acc.id, acc.name"
+        auto query = std::format("SELECT s.id, s.date_value, s.amount, acc.id, acc.name, acc.ccy"
                                  " FROM {} AS s"
                                  "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
                                  " WHERE s.account_id = $1"
@@ -124,13 +125,16 @@ namespace utils::db {
                                  SNAPSHOT_TABLE, ACCOUNT_TABLE);
         SPDLOG_TRACE(query);
         std::vector<Snapshot> ret;
-        for (auto [id, date_value, amount, acc_id, acc_name] :
-             tx.query<Id, utils::libpqxx::Date, Amount, Id, std::string>(query, pqxx::params{account_id})) {
-            ret.emplace_back(Snapshot{
-                .id = id, .account = std::make_pair(acc_id, acc_name), .date_value = date_value, .amount = amount});
+        for (auto [id, date_value, amount, acc_id, acc_name, acc_ccy] :
+             tx.query<Id, utils::libpqxx::Date, Amount, Id, std::string, std::string>(query,
+                                                                                      pqxx::params{account_id})) {
+            ret.emplace_back(Snapshot{.id = id,
+                                      .account = std::make_pair(acc_id, acc_name),
+                                      .date_value = date_value,
+                                      .amount = Money{amount, Ccy{acc_ccy}}});
         }
         SPDLOG_TRACE("Found {} snapshots for account {}", ret.size(), account_id);
-        return {ret};
+        return ret;
     }
 
     template <> Id ModelManager<Snapshot>::_create(pqxx::work&, Snapshot&&) {

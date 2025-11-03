@@ -7,12 +7,12 @@
 
 MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_,
                              std::optional<finances::accounts::models::AccountHolder> me,
-                             AccountsTableModel<AccountColumns>* model_, QWidget* parent)
-    : QTabWidget(parent), pool{pool_}, model{model_} {
+                             AccountsTableModel<AccountColumns>& accounts_, QWidget* parent)
+    : QTabWidget(parent), pool{pool_}, accounts{accounts_} {
     this->setTabsClosable(true);
 
     // Add the tab with the accounts table
-    AccountsTableWidget* accounts_table_widget = new AccountsTableWidget(pool, model, me);
+    AccountsTableWidget* accounts_table_widget = new AccountsTableWidget(pool, accounts_, me);
     _all_accounts_idx = this->addTab(accounts_table_widget, "All");
     connect(accounts_table_widget, &AccountsTableWidget::accountDoubleClicked, this, &MainTabWidget::addTabAccount);
 
@@ -40,7 +40,7 @@ void MainTabWidget::addTabAccount(utils::db::Id account_id) {
 
     // Get the data for this account
     try {
-        const auto& account_expected = model->get(account_id);
+        const auto& account_expected = accounts.get(account_id);
         if (!account_expected) {
             SPDLOG_ERROR("AccountModel with id {} not found in the MainTab", account_id);
             return;
@@ -48,7 +48,7 @@ void MainTabWidget::addTabAccount(utils::db::Id account_id) {
         const AccountModel& account = account_expected.value();
 
         // create the widget
-        AccountDetailWidget* account_widget = new AccountDetailWidget{pool, account, this};
+        AccountDetailWidget* account_widget = new AccountDetailWidget{pool, accounts, account, this};
         connect(account_widget, &AccountDetailWidget::snapshot_added, [this](auto id) { emit account_changed(id); });
         auto idx = this->addTab(
             account_widget,

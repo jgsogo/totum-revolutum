@@ -7,7 +7,7 @@
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
 #include "account.h"
-#include "types/amount.h"
+#include "types/money.h"
 
 namespace finances::accounts::models {
 
@@ -15,7 +15,7 @@ namespace finances::accounts::models {
         utils::db::Id id;
         std::pair<decltype(Account::id), decltype(Account::name)> account;
         utils::libpqxx::Date date_value;
-        Amount amount;
+        Money amount;
     };
 
 } // namespace finances::accounts::models

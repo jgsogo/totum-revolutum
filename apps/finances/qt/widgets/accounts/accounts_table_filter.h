@@ -11,7 +11,7 @@ class AccountsTableFilterProxyModel : public QSortFilterProxyModel {
 
   public:
     AccountsTableFilterProxyModel(std::optional<finances::accounts::models::AccountHolder> me,
-                                  const AccountsTableModel<AccountColumns>* model, Qt::CheckState showClosedAccounts,
+                                  const AccountsTableModel<AccountColumns>& accounts, Qt::CheckState showClosedAccounts,
                                   Qt::CheckState showOthersAccounts, QObject* parent = nullptr);
 
   public slots:
@@ -22,7 +22,7 @@ class AccountsTableFilterProxyModel : public QSortFilterProxyModel {
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
   private:
-    const AccountsTableModel<AccountColumns>* model;
+    const AccountsTableModel<AccountColumns>& accounts;
     std::optional<finances::accounts::models::AccountHolder> me;
     Qt::CheckState _showClosedAccounts;
     Qt::CheckState _showOthersAccounts;

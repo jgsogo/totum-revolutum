@@ -19,9 +19,26 @@ namespace utils::libpqxx {
 
         static const std::size_t max_digits = MaxDigits;
 
+        Numeric() = default;
+        explicit Numeric(InnerType&& inner) : value{std::move(inner)} {}
+        explicit Numeric(const InnerType& inner) : value{inner} {}
+        Numeric(Numeric&&) noexcept = default;
+        Numeric(const Numeric&) = default;
+        Numeric& operator=(Numeric&&) noexcept = default;
+
+        auto operator<=>(const Numeric<MaxDigits, DecimalPlaces>&) const = default;
+
         operator std::string() const { return dec::toString(value, ENGLISH_DECIMAL_FORMAT); }
         InnerType value;
     };
+
+    template <std::size_t MaxDigits, std::size_t DecimalPlaces>
+    inline Numeric<MaxDigits, DecimalPlaces> operator*(const Numeric<MaxDigits, DecimalPlaces>& lhs,
+                                                       const Numeric<MaxDigits, DecimalPlaces>& rhs) {
+        // TODO: Add testing. Are we loosing precision here? Is overflow possible?
+        return Numeric<MaxDigits, DecimalPlaces>{lhs.value * rhs.value};
+    }
+
 } // namespace utils::libpqxx
 
 // Required for std::format

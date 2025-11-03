@@ -61,13 +61,13 @@ int main(int argc, char** argv) {
     }
 
     // Create the long-living models
-    AccountsTableModel<AccountColumns>* accounts_tablemodel = new AccountsTableModel<AccountColumns>{pool};
+    AccountsTableModel<AccountColumns> accounts_tablemodel{pool};
 
     // Run a notificator that will monitor notifications from the database
     auto conn = pool.acquire();
     std::chrono::milliseconds ms{1000};
     Notificator notificator{std::move(*conn), ms};
-    QObject::connect(&notificator, &Notificator::account_changed, accounts_tablemodel,
+    QObject::connect(&notificator, &Notificator::account_changed, &accounts_tablemodel,
                      &utils::qt::models::_detail::GenericTableModel::refresh_item);
 
     // Create the tabs for the accounts

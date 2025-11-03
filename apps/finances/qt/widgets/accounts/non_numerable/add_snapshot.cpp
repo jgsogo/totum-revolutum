@@ -60,7 +60,7 @@ void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {
                                                    date::month{static_cast<unsigned int>(qt_date.month())},
                                                    date::day{static_cast<unsigned int>(qt_date.day())}}};
 
-    auto amount_amount = utils::qstring_to_amount(amount->text());
+    auto amount_amount = utils::qstring_to_amount(amount->text(), account.ccy);
     if (!amount_amount) {
         // TODO: Communicate error to the user
         return;
@@ -69,7 +69,7 @@ void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {
     // Create the new snapshot
     finances::accounts::models::Snapshot new_snapshot_{
         .date_value = std::move(date),
-        .amount = std::move(amount_amount.value()),
+        .amount = finances::accounts::models::Money{std::move(amount_amount.value()), account.ccy},
     };
 
     utils::db::SnapshotManager manager{pool};
