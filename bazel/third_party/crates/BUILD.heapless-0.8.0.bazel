@@ -62,7 +62,7 @@ rust_library(
     deps = [
         "@crates__hash32-0.3.1//:hash32",
         "@crates__heapless-0.8.0//:build_script_build",
-        "@crates__stable_deref_trait-1.2.0//:stable_deref_trait",
+        "@crates__stable_deref_trait-1.2.1//:stable_deref_trait",
     ],
 )
 

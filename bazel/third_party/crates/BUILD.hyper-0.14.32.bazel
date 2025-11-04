@@ -74,7 +74,7 @@ rust_library(
         "@crates__itoa-1.0.15//:itoa",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
         "@crates__socket2-0.5.10//:socket2",
-        "@crates__tokio-1.47.1//:tokio",
+        "@crates__tokio-1.48.0//:tokio",
         "@crates__tower-service-0.3.3//:tower_service",
         "@crates__tracing-0.1.41//:tracing",
         "@crates__want-0.3.1//:want",

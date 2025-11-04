@@ -74,9 +74,9 @@ rust_library(
     version = "0.3.20",
     deps = [
         "@crates__matchers-0.2.0//:matchers",
-        "@crates__nu-ansi-term-0.50.1//:nu_ansi_term",
+        "@crates__nu-ansi-term-0.50.3//:nu_ansi_term",
         "@crates__once_cell-1.21.3//:once_cell",
-        "@crates__regex-automata-0.4.11//:regex_automata",
+        "@crates__regex-automata-0.4.13//:regex_automata",
         "@crates__sharded-slab-0.1.7//:sharded_slab",
         "@crates__smallvec-1.15.1//:smallvec",
         "@crates__thread_local-1.1.9//:thread_local",

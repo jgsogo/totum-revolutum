@@ -57,7 +57,7 @@ rust_library(
     version = "0.21.1",
     deps = [
         "@crates__cesu8-1.1.0//:cesu8",
-        "@crates__cfg-if-1.0.3//:cfg_if",
+        "@crates__cfg-if-1.0.4//:cfg_if",
         "@crates__combine-4.6.7//:combine",
         "@crates__jni-sys-0.3.0//:jni_sys",
         "@crates__log-0.4.28//:log",

@@ -56,6 +56,6 @@ rust_library(
     }),
     version = "0.4.2",
     deps = [
-        "@crates__nu-ansi-term-0.50.1//:nu_ansi_term",
+        "@crates__nu-ansi-term-0.50.3//:nu_ansi_term",
     ],
 )

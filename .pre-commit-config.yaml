@@ -43,7 +43,7 @@ repos:
 
   # Enforce that commit messages allow for later changelog generation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.9.0
+    rev: v4.9.1
     hooks:
       # Requires that commitizen is already installed
       - id: commitizen
@@ -51,14 +51,14 @@ repos:
 
   # Lint and format SQL files
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.4.2
+    rev: 4.0.0a1
     hooks:
       - id: sqlfluff-lint
       - id: sqlfluff-fix
 
   # Python
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 25.9.0
     hooks:
       - id: black
         args:
@@ -73,7 +73,7 @@ repos:
           - "--max-line-length=100"
 
   - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
+    rev: 7.0.0
     hooks:
       - id: isort
         args: ["--profile", "black"]

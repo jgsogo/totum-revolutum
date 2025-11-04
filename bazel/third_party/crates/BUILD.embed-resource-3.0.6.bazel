@@ -57,14 +57,14 @@ rust_library(
     version = "3.0.6",
     deps = [
         "@crates__rustc_version-0.4.1//:rustc_version",
-        "@crates__toml-0.9.7//:toml",
+        "@crates__toml-0.9.8//:toml",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__cc-1.2.40//:cc",  # cfg(not(target_os = "windows"))
+            "@crates__cc-1.2.44//:cc",  # cfg(not(target_os = "windows"))
             "@crates__memchr-2.7.6//:memchr",  # cfg(not(target_os = "windows"))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__cc-1.2.40//:cc",  # cfg(not(target_os = "windows"))
+            "@crates__cc-1.2.44//:cc",  # cfg(not(target_os = "windows"))
             "@crates__memchr-2.7.6//:memchr",  # cfg(not(target_os = "windows"))
         ],
         "//conditions:default": [],

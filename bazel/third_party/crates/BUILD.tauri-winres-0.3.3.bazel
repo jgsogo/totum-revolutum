@@ -57,6 +57,6 @@ rust_library(
     version = "0.3.3",
     deps = [
         "@crates__embed-resource-3.0.6//:embed_resource",
-        "@crates__toml-0.9.7//:toml",
+        "@crates__toml-0.9.8//:toml",
     ],
 )

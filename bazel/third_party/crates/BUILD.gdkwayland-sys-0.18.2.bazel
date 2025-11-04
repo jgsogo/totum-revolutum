@@ -64,6 +64,6 @@ rust_library(
         "@crates__gdk-sys-0.18.2//:gdk_sys",
         "@crates__glib-sys-0.18.1//:glib_sys",
         "@crates__gobject-sys-0.18.0//:gobject_sys",
-        "@crates__libc-0.2.176//:libc",
+        "@crates__libc-0.2.177//:libc",
     ],
 )
