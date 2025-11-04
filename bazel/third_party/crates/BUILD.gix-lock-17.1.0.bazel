@@ -57,7 +57,7 @@ rust_library(
     version = "17.1.0",
     deps = [
         "@crates__gix-tempfile-17.1.0//:gix_tempfile",
-        "@crates__gix-utils-0.3.0//:gix_utils",
+        "@crates__gix-utils-0.3.1//:gix_utils",
         "@crates__thiserror-2.0.17//:thiserror",
     ],
 )

@@ -57,7 +57,7 @@ rust_library(
     version = "2.5.0",
     deps = [
         "@crates__async-io-2.6.0//:async_io",
-        "@crates__cfg-if-1.0.3//:cfg_if",
+        "@crates__cfg-if-1.0.4//:cfg_if",
         "@crates__event-listener-5.4.1//:event_listener",
         "@crates__futures-lite-2.6.1//:futures_lite",
     ] + select({

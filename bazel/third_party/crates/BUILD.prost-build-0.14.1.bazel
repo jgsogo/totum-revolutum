@@ -69,8 +69,8 @@ rust_library(
         "@crates__prettyplease-0.2.37//:prettyplease",
         "@crates__prost-0.14.1//:prost",
         "@crates__prost-types-0.14.1//:prost_types",
-        "@crates__regex-1.11.3//:regex",
-        "@crates__syn-2.0.106//:syn",
+        "@crates__regex-1.12.2//:regex",
+        "@crates__syn-2.0.108//:syn",
         "@crates__tempfile-3.23.0//:tempfile",
     ],
 )

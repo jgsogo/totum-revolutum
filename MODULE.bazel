@@ -4,22 +4,22 @@ module(
     compatibility_level = 1,
 )
 
-bazel_dep(name = "bazel_skylib", version = "1.8.1")
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
 bazel_dep(name = "platforms", version = "1.0.0")
-bazel_dep(name = "aspect_rules_py", version = "1.6.3")
-bazel_dep(name = "rules_rust", version = "0.65.0")
-bazel_dep(name = "rules_nodejs", version = "6.5.0")
+bazel_dep(name = "aspect_rules_py", version = "1.6.6")
+bazel_dep(name = "rules_rust", version = "0.67.0")
+bazel_dep(name = "rules_nodejs", version = "6.6.0")
 bazel_dep(name = "rules_oci", version = "2.2.6")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
-bazel_dep(name = "rules_cc", version = "0.2.8")
+bazel_dep(name = "rules_cc", version = "0.2.13")
 bazel_dep(name = "rules_shell", version = "0.6.1")
-bazel_dep(name = "aspect_rules_js", version = "2.5.0")
+bazel_dep(name = "aspect_rules_js", version = "2.7.0")
 bazel_dep(name = "aspect_rules_ts", version = "3.7.0")
-bazel_dep(name = "aspect_rules_lint", version = "1.7.0")
+bazel_dep(name = "aspect_rules_lint", version = "1.10.2")
 
-bazel_dep(name = "rules_python", version = "1.6.1", dev_dependency = True)
-bazel_dep(name = "rules_java", version = "8.15.2", dev_dependency = True)
-bazel_dep(name = "aspect_bazel_lib", version = "2.21.1", dev_dependency = True)
+bazel_dep(name = "rules_python", version = "1.6.3", dev_dependency = True)
+bazel_dep(name = "rules_java", version = "8.16.1", dev_dependency = True)
+bazel_dep(name = "aspect_bazel_lib", version = "2.21.2", dev_dependency = True)
 bazel_dep(name = "rules_uv", version = "0.88.0", dev_dependency = True)
 
 RUST_VERSION = "1.90.0"
@@ -91,20 +91,20 @@ use_repo(
     "crates__anyhow-1.0.100",
     "crates__async-std-1.13.2",
     "crates__async-trait-0.1.89",
-    "crates__bigdecimal-0.4.8",
-    "crates__bitflags-2.9.4",
+    "crates__bigdecimal-0.4.9",
+    "crates__bitflags-2.10.0",
     "crates__bytes-1.10.1",
     "crates__camino-1.2.1",
     "crates__camino-tempfile-1.4.1",
     "crates__chrono-0.4.42",
     "crates__chrono-tz-0.10.4",
-    "crates__clap-4.5.48",
+    "crates__clap-4.5.51",
     "crates__clap-verbosity-flag-3.0.4",
-    "crates__clap_complete-4.5.58",
+    "crates__clap_complete-4.5.60",
     "crates__confy-1.0.0",
     "crates__cron-parser-0.10.0",
     "crates__data-encoding-2.9.0",
-    "crates__diesel-2.3.2",
+    "crates__diesel-2.3.3",
     "crates__diesel_migrations-2.3.0",
     "crates__diesel_table_macro_syntax-0.2.0",
     "crates__diffy-0.4.2",
@@ -112,24 +112,24 @@ use_repo(
     "crates__dotenvy-0.15.7",
     "crates__env_logger-0.11.8",
     "crates__fd-lock-4.0.4",
-    "crates__flate2-1.1.2",
+    "crates__flate2-1.1.5",
     "crates__flume-0.11.1",
     "crates__fs4-0.13.1",
     "crates__futures-0.3.31",
     "crates__futures-util-0.3.31",
     "crates__headers-0.4.1",
     "crates__heck-0.5.0",
-    "crates__home-0.5.11",
+    "crates__home-0.5.12",
     "crates__http-1.3.1",
     "crates__http-body-1.0.1",
     "crates__http-body-util-0.1.3",
     "crates__httpmock-0.7.0",
     "crates__hyper-1.7.0",
     "crates__hyper-util-0.1.17",
-    "crates__ignore-0.4.23",
+    "crates__ignore-0.4.25",
     "crates__ignore-files-3.0.4",
     "crates__image-0.25.8",
-    "crates__indicatif-0.18.0",
+    "crates__indicatif-0.18.2",
     "crates__itertools-0.14.0",
     "crates__kamadak-exif-0.6.1",
     "crates__lazy_static-1.5.0",
@@ -138,13 +138,13 @@ use_repo(
     "crates__mockall-0.13.1",
     "crates__num-bigint-0.4.6",
     "crates__oxipng-9.1.5",
-    "crates__pq-sys-0.7.3",
+    "crates__pq-sys-0.7.5",
     "crates__prost-0.14.1",
     "crates__prost-build-0.14.1",
     "crates__prost-types-0.14.1",
     "crates__quote-1.0.41",
-    "crates__regex-1.11.3",
-    "crates__reqwest-0.12.23",
+    "crates__regex-1.12.2",
+    "crates__reqwest-0.12.24",
     "crates__ring-0.17.14",
     "crates__serde-1.0.228",
     "crates__serde_json-1.0.145",
@@ -155,19 +155,19 @@ use_repo(
     "crates__similar-asserts-1.7.0",
     "crates__strum-0.27.2",
     "crates__strum_macros-0.27.2",
-    "crates__syn-2.0.106",
+    "crates__syn-2.0.108",
     "crates__tar-0.4.44",
-    "crates__tauri-2.8.5",
-    "crates__tauri-build-2.4.1",
-    "crates__tauri-plugin-log-2.7.0",
-    "crates__tauri-plugin-shell-2.3.1",
+    "crates__tauri-2.9.2",
+    "crates__tauri-build-2.5.1",
+    "crates__tauri-plugin-log-2.7.1",
+    "crates__tauri-plugin-shell-2.3.3",
     "crates__tempfile-3.23.0",
     "crates__testing_logger-0.1.1",
     "crates__thiserror-2.0.17",
     "crates__time-0.3.44",
-    "crates__tokio-1.47.1",
+    "crates__tokio-1.48.0",
     "crates__tokio-stream-0.1.17",
-    "crates__toml-0.9.7",
+    "crates__toml-0.9.8",
     "crates__tracing-0.1.41",
     "crates__tracing-subscriber-0.3.20",
     "crates__tryhard-0.5.2",

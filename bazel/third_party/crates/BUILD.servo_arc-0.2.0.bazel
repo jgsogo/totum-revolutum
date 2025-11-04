@@ -57,6 +57,6 @@ rust_library(
     version = "0.2.0",
     deps = [
         "@crates__nodrop-0.1.14//:nodrop",
-        "@crates__stable_deref_trait-1.2.0//:stable_deref_trait",
+        "@crates__stable_deref_trait-1.2.1//:stable_deref_trait",
     ],
 )

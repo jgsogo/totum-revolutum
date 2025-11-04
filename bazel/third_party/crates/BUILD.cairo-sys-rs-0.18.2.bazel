@@ -69,7 +69,7 @@ rust_library(
     deps = [
         "@crates__cairo-sys-rs-0.18.2//:build_script_build",
         "@crates__glib-sys-0.18.1//:glib_sys",
-        "@crates__libc-0.2.176//:libc",
+        "@crates__libc-0.2.177//:libc",
     ],
 )
 

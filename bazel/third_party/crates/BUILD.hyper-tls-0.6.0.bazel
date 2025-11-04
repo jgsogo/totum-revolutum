@@ -61,7 +61,7 @@ rust_library(
         "@crates__hyper-1.7.0//:hyper",
         "@crates__hyper-util-0.1.17//:hyper_util",
         "@crates__native-tls-0.2.14//:native_tls",
-        "@crates__tokio-1.47.1//:tokio",
+        "@crates__tokio-1.48.0//:tokio",
         "@crates__tokio-native-tls-0.3.1//:tokio_native_tls",
         "@crates__tower-service-0.3.3//:tower_service",
     ],

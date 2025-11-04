@@ -63,7 +63,7 @@ rust_library(
     }),
     version = "1.18.1",
     deps = [
-        "@crates__getrandom-0.3.3//:getrandom",
+        "@crates__getrandom-0.3.4//:getrandom",
         "@crates__serde-1.0.228//:serde",
     ],
 )

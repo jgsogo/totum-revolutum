@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.3.0",
     deps = [
-        "@crates__js-sys-0.3.81//:js_sys",
-        "@crates__wasm-bindgen-0.2.104//:wasm_bindgen",
+        "@crates__js-sys-0.3.82//:js_sys",
+        "@crates__wasm-bindgen-0.2.105//:wasm_bindgen",
     ],
 )

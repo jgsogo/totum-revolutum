@@ -23,7 +23,7 @@ rust_library(
         allow_empty = True,
     ),
     aliases = {
-        "@crates__lock_api-0.4.13//:lock_api": "lock_api_crate",
+        "@crates__lock_api-0.4.14//:lock_api": "lock_api_crate",
     },
     compile_data = glob(
         include = ["**"],
@@ -70,6 +70,6 @@ rust_library(
     }),
     version = "0.9.8",
     deps = [
-        "@crates__lock_api-0.4.13//:lock_api",
+        "@crates__lock_api-0.4.14//:lock_api",
     ],
 )

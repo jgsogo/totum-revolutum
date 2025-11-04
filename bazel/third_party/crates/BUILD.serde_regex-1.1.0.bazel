@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "1.1.0",
     deps = [
-        "@crates__regex-1.11.3//:regex",
+        "@crates__regex-1.12.2//:regex",
         "@crates__serde-1.0.228//:serde",
     ],
 )
