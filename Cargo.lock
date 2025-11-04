@@ -1252,7 +1252,7 @@ version = "2.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9daac6489a36e42570da165a10c424f3edcefdff70c5fd55e1847c23f3dd7562"
 dependencies = [
- "diesel_table_macro_syntax 0.3.0",
+ "diesel_table_macro_syntax",
  "dsl_auto_type",
  "proc-macro2",
  "quote",
@@ -1268,15 +1268,6 @@ dependencies = [
  "diesel",
  "migrations_internals",
  "migrations_macros",
-]
-
-[[package]]
-name = "diesel_table_macro_syntax"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "209c735641a413bc68c4923a9d6ad4bcb3ca306b794edaa7eb0b3228a99ffb25"
-dependencies = [
- "syn 2.0.108",
 ]
 
 [[package]]
@@ -1660,7 +1651,7 @@ name = "external_crates"
 version = "0.1.0"
 dependencies = [
  "clap_complete",
- "diesel_table_macro_syntax 0.2.0",
+ "diesel_table_macro_syntax",
  "diffy",
  "fd-lock",
  "heck 0.5.0",
