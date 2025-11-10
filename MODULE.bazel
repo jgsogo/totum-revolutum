@@ -26,7 +26,7 @@ RUST_VERSION = "1.90.0"
 
 RUST_EDITION = "2021"
 
-PYTHON_VERSION = "3.13"
+PYTHON_VERSION = "3.14"
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
