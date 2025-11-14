@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
                      &utils::qt::models::_detail::GenericTableModel::refresh_item);
 
     // Create the tabs for the accounts
-    MainTabWidget* tabWidget = new MainTabWidget(pool, me, accounts_tablemodel);
+    MainTabWidget* tabWidget = new MainTabWidget(pool, me, accounts_tablemodel, movement_types_tablemodel);
     QObject::connect(tabWidget, &MainTabWidget::account_changed, &notificator, &Notificator::notify_account);
 
     QVBoxLayout* layout = new QVBoxLayout();

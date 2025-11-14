@@ -19,8 +19,9 @@
 #include "numerable/add_snapshot.h"
 
 AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
-                                         AccountsTableModel<AccountColumns>& accounts_, const AccountModel& account_,
-                                         QWidget* parent)
+                                         AccountsTableModel<AccountColumns>& accounts_,
+                                         MovementTypesTableModel<HierarchyTreeColumns>& movtypes_,
+                                         const AccountModel& account_, QWidget* parent)
     : QWidget(parent), pool{pool_}, account{account_} {
 
     // Models
@@ -106,7 +107,7 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
     // - popup - add transaction
     QPushButton* bt_add_transaction = new QPushButton(tr("Add transaction"), this);
     {
-        AddTransactionWidget* popup_add_transaction = new AddTransactionWidget(pool, accounts_, this);
+        AddTransactionWidget* popup_add_transaction = new AddTransactionWidget(pool, accounts_, movtypes_, this);
         popup_add_transaction->setModal(true);
         popup_add_transaction->setSizeGripEnabled(true);
         // connect(popup_add_transaction, &AddSnapshotNumerableWidget::new_snapshot, this,
