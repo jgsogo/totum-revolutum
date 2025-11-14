@@ -90,4 +90,9 @@ namespace utils::db {
     std::vector<finances::accounts::models::MovementType>
     ModelManager<finances::accounts::models::MovementType>::_all(pqxx::work&);
 
+    template <>
+    ExpectedType<finances::accounts::models::MovementType, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<finances::accounts::models::MovementType>::_get(
+        pqxx::work&, const decltype(finances::accounts::models::MovementType::id)&);
+
 } // namespace utils::db

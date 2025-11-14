@@ -17,6 +17,7 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
 
     {
         direction_combo = new QComboBox;
+        direction_combo->setFocusPolicy(Qt::StrongFocus);
         for (auto dirname : magic_enum::enum_names<finances::accounts::models::MovementDirection>()) {
             direction_combo->addItem(QString::fromStdString(std::string(dirname)));
         }
