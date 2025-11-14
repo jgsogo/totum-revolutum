@@ -34,6 +34,7 @@ namespace utils::qt::widgets {
 
             QCompleter* completer = new QCompleter(this);
             completer->setCaseSensitivity(Qt::CaseInsensitive);
+            completer->setFilterMode(Qt::MatchContains);
 
             {
                 // Create a model with all rows but only the selected columns

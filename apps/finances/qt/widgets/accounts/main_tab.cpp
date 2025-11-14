@@ -7,8 +7,9 @@
 
 MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_,
                              std::optional<finances::accounts::models::AccountHolder> me,
-                             AccountsTableModel<AccountColumns>& accounts_, QWidget* parent)
-    : QTabWidget(parent), pool{pool_}, accounts{accounts_} {
+                             AccountsTableModel<AccountColumns>& accounts_,
+                             MovementTypesTableModel<HierarchyTreeColumns>& movtypes_, QWidget* parent)
+    : QTabWidget(parent), pool{pool_}, accounts{accounts_}, movtypes{movtypes_} {
     this->setTabsClosable(true);
 
     // Add the tab with the accounts table
@@ -48,7 +49,7 @@ void MainTabWidget::addTabAccount(utils::db::Id account_id) {
         const AccountModel& account = account_expected.value();
 
         // create the widget
-        AccountDetailWidget* account_widget = new AccountDetailWidget{pool, accounts, account, this};
+        AccountDetailWidget* account_widget = new AccountDetailWidget{pool, accounts, movtypes, account, this};
         connect(account_widget, &AccountDetailWidget::snapshot_added, [this](auto id) { emit account_changed(id); });
         auto idx = this->addTab(
             account_widget,

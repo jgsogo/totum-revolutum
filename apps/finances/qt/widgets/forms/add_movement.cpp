@@ -8,21 +8,22 @@
 
 #include "libraries/finances/accounts/cpp/models/movement.h"
 
-AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
-                                     AccountsTableModel<AccountColumns>& accounts_, QWidget* parent, Qt::WindowFlags f)
+AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>& accounts,
+                                     MovementTypesTableModel<HierarchyTreeColumns>& movtypes, QWidget* parent,
+                                     Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool} {
 
     account_combo =
-        new utils::qt::widgets::ComboBoxWithSearch{accounts_, AccountColumns::ID, AccountColumns::NAME, parent};
+        new utils::qt::widgets::ComboBoxWithSearch{accounts, AccountColumns::ID, AccountColumns::NAME, parent};
 
-    {
-        direction_combo = new QComboBox;
-        for (auto dirname : magic_enum::enum_names<finances::accounts::models::MovementDirection>()) {
-            direction_combo->addItem(QString::fromStdString(std::string(dirname)));
-        }
+    direction_combo = new QComboBox;
+    direction_combo->setFocusPolicy(Qt::StrongFocus);
+    for (auto dirname : magic_enum::enum_names<finances::accounts::models::MovementDirection>()) {
+        direction_combo->addItem(QString::fromStdString(std::string(dirname)));
     }
 
-    movtype_combo = new QComboBox;
+    movtype_combo = new utils::qt::widgets::ComboBoxWithSearch{movtypes, HierarchyTreeColumns::ID,
+                                                               HierarchyTreeColumns::BREADCRUMB, parent};
 
     mov_date = new QCalendarWidget;
 
@@ -46,14 +47,24 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool,
     layout->addWidget(buttonBox, 2, 0);
     this->setLayout(layout);
 
-    connect(account_combo, &utils::qt::widgets::_ComboBoxWithSearch::activated, [this, &accounts_](utils::db::Id id) {
-        auto account_expected = accounts_.get(id);
+    connect(account_combo, &utils::qt::widgets::_ComboBoxWithSearch::activated, [this, &accounts](utils::db::Id id) {
+        auto account_expected = accounts.get(id);
         if (!account_expected) {
             SPDLOG_ERROR("Cannot get an account with id '{}'", id);
             // TODO: Communicate error to the user
             return;
         }
         this->account_changed(account_expected.value());
+    });
+
+    connect(movtype_combo, &utils::qt::widgets::_ComboBoxWithSearch::activated, [this, &movtypes](utils::db::Id id) {
+        auto movtypes_expected = movtypes.get(id);
+        if (!movtypes_expected) {
+            SPDLOG_ERROR("Cannot get a movtype with id '{}'", id);
+            // TODO: Communicate error to the user
+            return;
+        }
+        this->movtype_changed(movtypes_expected.value());
     });
 
     account_combo->setFocus();
@@ -78,7 +89,9 @@ void AddMovementWidget::account_changed(const AccountModel& account) {
     }
 }
 
-void AddMovementWidget::movtype_changed() { SPDLOG_DEBUG("AddMovementWidget::movtype_changed()"); }
+void AddMovementWidget::movtype_changed(const MovementTypeModel&) {
+    SPDLOG_DEBUG("AddMovementWidget::movtype_changed()");
+}
 
 void AddMovementWidget::show_mov_date() { SPDLOG_DEBUG("AddMovementWidget::show_mov_date()"); }
 
