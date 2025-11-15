@@ -126,8 +126,13 @@ void AddMovementWidget::add_movement_clicked() {
                                                    date::day{static_cast<unsigned int>(qt_date.day())}}};
 
     // - direction
-    auto direction =
-        magic_enum::enum_value<finances::accounts::models::MovementDirection>(direction_combo->currentIndex());
+    // FIXME: Take this value!
+    auto direction_expected =
+        magic_enum::enum_cast<finances::accounts::models::MovementDirection>(direction_combo->currentIndex());
+    if (!direction_expected) {
+        // TODO: Tell the user about the error
+        return;
+    }
 
     // - amount
     auto amount_expected = mov_amount->getMoneyAmount();
@@ -141,7 +146,7 @@ void AddMovementWidget::add_movement_clicked() {
         .id = {std::monostate{}}, // No id, it's not in the database yet!
         .transaction = std::make_pair(utils::db::Id{std::monostate{}}, std::string{""}),
         .type = std::make_pair(movtype.id, movtype.movtype.name),
-        .direction = direction,
+        .direction = direction_expected.value(),
         .account = std::make_pair(account.id, account.account.name),
         .date_value = date,
         // .fx =

@@ -36,6 +36,9 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
             popup_add_movement->clear();
             popup_add_movement->open();
         });
+
+        connect(popup_add_movement, &AddMovementWidget::new_movement,
+                [model](MovementModel movement) { model->insert(std::move(movement)); });
     }
 
     // Components
