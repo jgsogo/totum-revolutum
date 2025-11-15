@@ -8,13 +8,22 @@
 
 #include "apps/finances/qt/metatypes/types.h"
 
+#include "base_movement_form.h"
+
 namespace widgets::forms {
 
-    class MovementNumerableFormWidget : public QWidget {
+    class MovementNumerableFormWidget : public BaseMovementFormWidget {
         Q_OBJECT
 
       public:
         explicit MovementNumerableFormWidget(QWidget* parent = nullptr);
+
+        ExpectedType<finances::accounts::models::Money> getMoneyAmount() const override;
+
+        ExpectedType<
+            std::variant<finances::accounts::models::Movement, finances::investments::models::MovementNumerable,
+                         finances::investments::models::MovementDividend>>
+        populateAdditionalData(finances::accounts::models::Movement&& movement) const override;
 
       public slots:
         void clear();

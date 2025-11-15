@@ -118,6 +118,13 @@ namespace utils::qt::models {
             return {*found};
         };
 
+        void insert(TModel&& model) {
+            SPDLOG_DEBUG("{}::insert(model)", name);
+            this->beginInsertRows(QModelIndex(), this->rowCount(), this->rowCount());
+            items.emplace_back(std::move(model));
+            this->endInsertRows();
+        }
+
       protected:
         void _refresh_all() override {
             SPDLOG_DEBUG("{}::_refresh_all", name);

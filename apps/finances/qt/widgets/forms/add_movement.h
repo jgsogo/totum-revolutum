@@ -11,6 +11,8 @@
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 #include "libraries/utils/cpp/qt/widgets/combobox_with_search.h"
 
+#include "apps/finances/qt/models/movement_model.h"
+
 #include "apps/finances/qt/tables/accounts.h"
 #include "apps/finances/qt/tables/hierarchy_tree_columns.h"
 
@@ -35,6 +37,9 @@ class AddMovementWidget : public QDialog {
     // The selected movtype has changed. The fields in the widget might change.
     void movtype_changed(const MovementTypeModel&);
 
+    // User wants to add a movement to the transaction
+    void add_movement_clicked();
+
   public slots:
     void clear(bool keep_date = true);
 
@@ -50,6 +55,9 @@ class AddMovementWidget : public QDialog {
   signals:
     // When the amount changes, someone outside might be interested on knowing it
     void amount_changed(finances::accounts::models::Amount);
+
+    // Interaction is finished, the dialog is being closed. This is the MovementModel to be created
+    void new_movement(MovementModel movement);
 
   protected:
     utils::libpqxx::ConnectionPool& pool;

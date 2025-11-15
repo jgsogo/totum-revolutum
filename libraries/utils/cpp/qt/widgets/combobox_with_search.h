@@ -82,7 +82,8 @@ namespace utils::qt::widgets {
 
         ~ComboBoxWithSearch() = default;
 
-        utils::ExpectedType<std::optional<std::reference_wrapper<const TModel>>> selected() const {
+        utils::ExpectedType<std::optional<std::reference_wrapper<const TModel>>, utils::qt::models::ErrorItemNotFound>
+        selected() const {
             auto current_index = this->currentIndex();
             if (current_index == -1) {
                 return {std::nullopt};
@@ -92,7 +93,12 @@ namespace utils::qt::widgets {
             QVariant item_id = this->model()->data(idIdx);
 
             auto id = item_id.value<utils::db::Id>();
-            return _model.get(id);
+            auto item_expected = _model.get(id);
+            if (!item_expected) {
+                return tl::unexpected{item_expected.error()};
+            } else {
+                return std::make_optional(std::move(item_expected.value()));
+            }
         }
 
       private:

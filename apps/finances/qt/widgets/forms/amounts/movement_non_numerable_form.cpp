@@ -12,7 +12,7 @@
 
 namespace widgets::forms {
 
-    MovementNonNumerableFormWidget::MovementNonNumerableFormWidget(QWidget* parent) : QWidget(parent) {
+    MovementNonNumerableFormWidget::MovementNonNumerableFormWidget(QWidget* parent) : BaseMovementFormWidget(parent) {
         // We start QLineEdit and disable it, because we don't know the currency!
         amount = new QLineEdit("ccy unknown");
         amount->setEnabled(false);
@@ -25,6 +25,20 @@ namespace widgets::forms {
         formLayout->addRow(amount_label, amount);
 
         this->setLayout(formLayout);
+    }
+
+    ExpectedType<finances::accounts::models::Money> MovementNonNumerableFormWidget::getMoneyAmount() const {
+        if (!ccy) {
+            return tl::unexpected{error::InputFieldNotSet{"ccy"}};
+        }
+
+        auto amount_expected = utils::qstring_to_amount(amount->text(), ccy.value());
+        if (!amount_expected) {
+            return tl::unexpected{amount_expected.error()};
+        }
+
+        finances::accounts::models::Money money{std::move(amount_expected.value()), std::move(ccy.value())};
+        return {std::move(money)};
     }
 
     void MovementNonNumerableFormWidget::clear() {
@@ -57,22 +71,13 @@ namespace widgets::forms {
     void MovementNonNumerableFormWidget::on_input_data_change() {
         SPDLOG_DEBUG("MovementNonNumerableFormWidget::on_input_data_change()");
 
-        if (!ccy) {
-            SPDLOG_WARN("There is no currency assigned to this MovementNonNumerableFormWidget! We are skipping this "
-                        "notification.");
+        auto money_amount_expected = this->getMoneyAmount();
+        if (!money_amount_expected) {
+            SPDLOG_WARN("We are skipping this signal: {}", money_amount_expected.error());
             return;
         }
 
-        auto amount_expected = utils::qstring_to_amount(amount->text(), ccy.value());
-        if (!amount_expected) {
-            SPDLOG_ERROR("Invalid amount in QLineEdit field '{}' for ccy {}", amount->text().toStdString(),
-                         ccy.value());
-            // TODO: Communicate error to the user
-            return;
-        }
-
-        finances::accounts::models::Money money{std::move(amount_expected.value()), std::move(ccy.value())};
-        emit amount_changed(std::move(money));
+        emit amount_changed(std::move(money_amount_expected.value()));
     }
 
 } // namespace widgets::forms
