@@ -56,7 +56,7 @@ namespace widgets::forms {
         unit_value->setPlaceholderText("120,34");
 
         // Update label and enable the inputs
-        unit_value_label->setText(tr("&Unit value (%1)").arg(static_cast<std::string>(ccy.value())));
+        unit_value_label->setText(tr("Unit value (%1)").arg(static_cast<std::string>(ccy.value())));
         unit_value->setEnabled(true);
         unit_value->clear();
 

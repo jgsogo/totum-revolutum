@@ -1,6 +1,9 @@
 #include "movement_stacked_form.h"
 
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QStackedLayout>
+#include <QVBoxLayout>
 
 #include "movement_dividend_form.h"
 #include "movement_non_numerable_form.h"
@@ -13,6 +16,10 @@ namespace widgets::forms {
         MovementNumerableFormWidget* mov_numerable;
         MovementDividendFormWidget* mov_dividend;
         QStackedLayout* stacked_layout;
+
+        QPushButton* non_numerable;
+        QPushButton* numerable;
+        QPushButton* dividend;
     };
 
     MovementStackedForm::MovementStackedForm(QWidget* parent)
@@ -44,7 +51,29 @@ namespace widgets::forms {
             pImpl->stacked_layout->addWidget(pImpl->mov_dividend);
         }
 
-        this->setLayout(pImpl->stacked_layout);
+        // Buttons
+        QHBoxLayout* buttons = new QHBoxLayout();
+        {
+            pImpl->non_numerable = new QPushButton(tr("Non numerable"), this);
+            pImpl->numerable = new QPushButton(tr("Numerable"), this);
+            pImpl->dividend = new QPushButton(tr("Dividend"), this);
+
+            connect(pImpl->non_numerable, &QPushButton::clicked, this,
+                    &MovementStackedForm::set_movement_non_numerable);
+            connect(pImpl->numerable, &QPushButton::clicked, this, &MovementStackedForm::set_movement_numerable);
+            connect(pImpl->dividend, &QPushButton::clicked, this, &MovementStackedForm::set_movement_dividend);
+
+            buttons->addWidget(pImpl->non_numerable);
+            buttons->addWidget(pImpl->numerable);
+            buttons->addWidget(pImpl->dividend);
+        }
+
+        // Layout
+        QVBoxLayout* mainLayout = new QVBoxLayout();
+        mainLayout->addLayout(buttons);
+        mainLayout->addLayout(pImpl->stacked_layout);
+
+        this->setLayout(mainLayout);
     }
 
     MovementStackedForm::~MovementStackedForm() = default;
@@ -55,6 +84,18 @@ namespace widgets::forms {
         pImpl->mov_dividend->clear();
 
         this->set_movement_non_numerable();
+    }
+
+    void MovementStackedForm::show_buttons() {
+        pImpl->non_numerable->setVisible(true);
+        pImpl->numerable->setVisible(true);
+        pImpl->dividend->setVisible(true);
+    }
+
+    void MovementStackedForm::hide_buttons() {
+        pImpl->non_numerable->setVisible(false);
+        pImpl->numerable->setVisible(false);
+        pImpl->dividend->setVisible(false);
     }
 
     void MovementStackedForm::set_movement_non_numerable() {

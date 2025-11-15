@@ -17,6 +17,9 @@ namespace widgets::forms {
       public slots:
         void clear();
 
+        void show_buttons();
+        void hide_buttons();
+
         void set_movement_non_numerable();
         void set_movement_numerable();
         void set_movement_dividend();
