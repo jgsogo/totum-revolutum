@@ -13,7 +13,7 @@
 
 namespace widgets::forms {
 
-    MovementNumerableFormWidget::MovementNumerableFormWidget(QWidget* parent) : QWidget(parent) {
+    MovementNumerableFormWidget::MovementNumerableFormWidget(QWidget* parent) : BaseMovementFormWidget(parent) {
         // Quantity
         quantity = new QLineEdit();
         connect(quantity, &QLineEdit::textEdited, [this]() { this->on_input_data_change(); });
@@ -36,6 +36,55 @@ namespace widgets::forms {
         formLayout->addRow(unit_value_label, unit_value);
 
         this->setLayout(formLayout);
+    }
+
+    ExpectedType<finances::accounts::models::Money> MovementNumerableFormWidget::getMoneyAmount() const {
+        if (!ccy) {
+            return tl::unexpected{error::InputFieldNotSet{"ccy"}};
+        }
+
+        // FIXME: For quantities, it doesn't make sense the `ccy`!
+        auto quantity_expected = utils::qstring_to_amount(quantity->text(), ccy.value());
+        if (!quantity_expected) {
+            return tl::unexpected{quantity_expected.error()};
+        }
+
+        auto unit_value_expected = utils::qstring_to_amount(unit_value->text(), ccy.value());
+        if (!unit_value_expected) {
+            return tl::unexpected{unit_value_expected.error()};
+        }
+
+        finances::investments::models::NumerableAmount amount{.quantity = std::move(quantity_expected.value()),
+                                                              .unit_value = std::move(unit_value_expected.value())};
+        finances::accounts::models::Money money{amount.amount(), std::move(ccy.value())};
+
+        return {std::move(money)};
+    }
+
+    ExpectedType<std::variant<finances::accounts::models::Movement, finances::investments::models::MovementNumerable,
+                              finances::investments::models::MovementDividend>>
+    MovementNumerableFormWidget::populateAdditionalData(finances::accounts::models::Movement&& movement) const {
+        if (!ccy) {
+            return tl::unexpected{error::InputFieldNotSet{"ccy"}};
+        }
+
+        auto quantity_expected = utils::qstring_to_amount(quantity->text(), ccy.value());
+        if (!quantity_expected) {
+            return tl::unexpected{quantity_expected.error()};
+        }
+
+        auto unit_value_expected = utils::qstring_to_amount(unit_value->text(), ccy.value());
+        if (!unit_value_expected) {
+            return tl::unexpected{unit_value_expected.error()};
+        }
+
+        return finances::investments::models::MovementNumerable{
+            .movement = std::move(movement),
+            .id = {std::monostate{}},
+            .quantity = std::move(quantity_expected.value()),
+            .unit_value =
+                finances::accounts::models::Money{std::move(unit_value_expected.value()), std::move(ccy.value())},
+        };
     }
 
     void MovementNumerableFormWidget::clear() {
@@ -71,31 +120,13 @@ namespace widgets::forms {
     void MovementNumerableFormWidget::on_input_data_change() {
         SPDLOG_DEBUG("MovementNumerableFormWidget::on_input_data_change()");
 
-        if (!ccy) {
-            SPDLOG_WARN("There is no currency assigned to this MovementNumerableFormWidget! We are skipping this "
-                        "notification.");
+        auto money_amount_expected = this->getMoneyAmount();
+        if (!money_amount_expected) {
+            SPDLOG_WARN("We are skipping this signal: {}", money_amount_expected.error());
             return;
         }
 
-        // FIXME: For quantities, it doesn't make sense the `ccy`!
-        auto quantity_expected = utils::qstring_to_amount(quantity->text(), ccy.value());
-        if (!quantity_expected) {
-            SPDLOG_ERROR("Invalid quantity in QLineEdit field '{}'", quantity->text().toStdString());
-            // TODO: Communicate error to the user
-            return;
-        }
-
-        auto unit_value_expected = utils::qstring_to_amount(unit_value->text(), ccy.value());
-        if (!unit_value_expected) {
-            SPDLOG_ERROR("Invalid unit_value in QLineEdit field '{}'", unit_value->text().toStdString());
-            // TODO: Communicate error to the user
-            return;
-        }
-
-        finances::investments::models::NumerableAmount amount{.quantity = std::move(quantity_expected.value()),
-                                                              .unit_value = std::move(unit_value_expected.value())};
-        finances::accounts::models::Money money{amount.amount(), std::move(ccy.value())};
-        emit amount_changed(std::move(money));
+        emit amount_changed(std::move(money_amount_expected.value()));
     }
 
 } // namespace widgets::forms

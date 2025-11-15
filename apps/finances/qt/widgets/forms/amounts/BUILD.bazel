@@ -14,8 +14,12 @@ qt_cc_library(
         "movement_numerable_form.h",
         "movement_stacked_form.h",
     ],
+    normal_hdrs = [
+        "base_movement_form.h",
+    ],
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
+        "//apps/finances/qt/errors",
         "//apps/finances/qt/metatypes",
         "//apps/finances/qt/utils",
         "//bazel/logging:spdlog",

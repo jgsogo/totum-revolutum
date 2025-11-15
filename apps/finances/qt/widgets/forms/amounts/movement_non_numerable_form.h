@@ -8,13 +8,17 @@
 
 #include "apps/finances/qt/metatypes/types.h"
 
+#include "base_movement_form.h"
+
 namespace widgets::forms {
 
-    class MovementNonNumerableFormWidget : public QWidget {
+    class MovementNonNumerableFormWidget : public BaseMovementFormWidget {
         Q_OBJECT
 
       public:
         explicit MovementNonNumerableFormWidget(QWidget* parent = nullptr);
+
+        ExpectedType<finances::accounts::models::Money> getMoneyAmount() const override;
 
       public slots:
         void clear();

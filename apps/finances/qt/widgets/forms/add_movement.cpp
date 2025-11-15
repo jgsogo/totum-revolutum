@@ -30,7 +30,7 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
     mov_amount = new widgets::forms::MovementStackedForm;
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &AddMovementWidget::add_movement_clicked);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     QFormLayout* formLayout = new QFormLayout;
@@ -39,7 +39,6 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
     formLayout->addRow(tr("&Direction:"), direction_combo);
     formLayout->addRow(tr("Movement &type:"), movtype_combo);
     formLayout->addRow(tr("Movement &date:"), mov_date);
-    // formLayout->addRow(tr("&Amount:"), mov_amount);
 
     QGridLayout* layout = new QGridLayout;
     layout->addLayout(formLayout, 0, 0);
@@ -91,6 +90,77 @@ void AddMovementWidget::account_changed(const AccountModel& account) {
 
 void AddMovementWidget::movtype_changed(const MovementTypeModel&) {
     SPDLOG_DEBUG("AddMovementWidget::movtype_changed()");
+}
+
+void AddMovementWidget::add_movement_clicked() {
+    SPDLOG_DEBUG("AddMovementWidget::add_movement_clicked()");
+
+    // - movement type
+    auto movtype_expected = movtype_combo->selected();
+    if (!movtype_expected) {
+        // TODO: Tell the user about the error
+        return;
+    }
+    if (!movtype_expected.value()) {
+        // TODO: Tell the user about the error
+        return;
+    }
+    MovementTypeModel movtype = std::move(movtype_expected.value().value());
+
+    // - account
+    auto account_expected = account_combo->selected();
+    if (!account_expected) {
+        // TODO: Tell the user about the error
+        return;
+    }
+    if (!account_expected.value()) {
+        // TODO: Tell the user about the error
+        return;
+    }
+    AccountModel account = std::move(account_expected.value().value());
+
+    // - date
+    auto qt_date = mov_date->selectedDate();
+    utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
+                                                   date::month{static_cast<unsigned int>(qt_date.month())},
+                                                   date::day{static_cast<unsigned int>(qt_date.day())}}};
+
+    // - direction
+    auto direction =
+        magic_enum::enum_value<finances::accounts::models::MovementDirection>(direction_combo->currentIndex());
+
+    // - amount
+    auto amount_expected = mov_amount->getMoneyAmount();
+    if (!amount_expected) {
+        // TODO: Tell the user about the error
+        return;
+    }
+
+    // Create the base movement with the data in this form
+    finances::accounts::models::Movement movement{
+        .id = {std::monostate{}}, // No id, it's not in the database yet!
+        .transaction = std::make_pair(utils::db::Id{std::monostate{}}, std::string{""}),
+        .type = std::make_pair(movtype.id, movtype.movtype.name),
+        .direction = direction,
+        .account = std::make_pair(account.id, account.account.name),
+        .date_value = date,
+        // .fx =
+        .amount = std::move(amount_expected.value()),
+    };
+
+    // Now, we need to get additional data from the amounts, in case they were other type of movements
+    auto final_movement_expected = mov_amount->populateAdditionalData(std::move(movement));
+    if (!final_movement_expected) {
+        // TODO: Tell the user about the error
+        return;
+    }
+
+    MovementModel movement_model{.id = movement.id,
+                                 .movement = std::move(final_movement_expected.value()),
+                                 .movtype_breadcrumb = movtype.breadcrumb};
+
+    emit new_movement(movement_model);
+    this->accept();
 }
 
 void AddMovementWidget::show_mov_date() { SPDLOG_DEBUG("AddMovementWidget::show_mov_date()"); }

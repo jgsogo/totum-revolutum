@@ -78,6 +78,20 @@ namespace widgets::forms {
 
     MovementStackedForm::~MovementStackedForm() = default;
 
+    ExpectedType<finances::accounts::models::Money> MovementStackedForm::getMoneyAmount() const {
+        BaseMovementFormWidget* cur_widget =
+            static_cast<BaseMovementFormWidget*>(pImpl->stacked_layout->currentWidget());
+        return cur_widget->getMoneyAmount();
+    }
+
+    ExpectedType<std::variant<finances::accounts::models::Movement, finances::investments::models::MovementNumerable,
+                              finances::investments::models::MovementDividend>>
+    MovementStackedForm::populateAdditionalData(finances::accounts::models::Movement&& movement) const {
+        BaseMovementFormWidget* cur_widget =
+            static_cast<BaseMovementFormWidget*>(pImpl->stacked_layout->currentWidget());
+        return cur_widget->populateAdditionalData(std::move(movement));
+    }
+
     void MovementStackedForm::clear() {
         pImpl->mov_non_numerable->clear();
         pImpl->mov_numerable->clear();
