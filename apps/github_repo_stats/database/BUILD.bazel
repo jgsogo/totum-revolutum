@@ -14,6 +14,7 @@ django_project(
     deps = [
         "//apps/github_repo_stats/database/github_repo_stats",
         requirement("pyyaml"),
+        requirement("requests"),
     ],
 )
 
