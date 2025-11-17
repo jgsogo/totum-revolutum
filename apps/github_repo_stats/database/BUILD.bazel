@@ -1,0 +1,95 @@
+load("@py_deps//:requirements.bzl", "requirement")
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
+load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run")
+load("//bazel/python/django/project:django_project.bzl", "django_project")
+
+name = "app"
+
+django_project(
+    name = name,
+    srcs = [
+        "settings.py",
+        "urls.py",
+    ],
+    visibility = ["//apps/github_repo_stats:__subpackages__"],
+    deps = [
+        "//apps/github_repo_stats/database/core:github_repo_stats",
+        requirement("pyyaml"),
+    ],
+)
+
+# sh_with_runfiles_binary(
+#     name = "_populate_test_database",
+#     testonly = True,
+#     args = [
+#         "loaddata",
+#         "$(location :fixtures/testing/game_types.yaml)",
+#         "$(location :fixtures/testing/games.yaml)",
+#         "$(location :fixtures/testing/participants.yaml)",
+#         "$(location :fixtures/testing/rooms.yaml)",
+#         "$(location :fixtures/testing/game_actions.yaml)",
+#         "$(location :fixtures/testing/event_logs.yaml)",
+#     ],
+#     data = [
+#         "fixtures/testing/event_logs.yaml",
+#         "fixtures/testing/game_actions.yaml",
+#         "fixtures/testing/game_types.yaml",
+#         "fixtures/testing/games.yaml",
+#         "fixtures/testing/participants.yaml",
+#         "fixtures/testing/rooms.yaml",
+#     ],
+#     tags = ["manual"],
+#     tool = ":app-admin",
+#     visibility = ["//apps/board_games:__subpackages__"],
+# )
+
+sh_with_runfiles_binary(
+    name = "_create_superuser",
+    args = [
+        "createsuperuser",
+        "--noinput",
+        # "--username=jgsogo",
+        # "--email=jgsogo@jgsogo.es",
+    ],
+    env = {
+        "DJANGO_SUPERUSER_PASSWORD": "jgsogo",
+        "DJANGO_SUPERUSER_USERNAME": "jgsogo",
+        "DJANGO_SUPERUSER_EMAIL": "jgsogo@jgsogo.es",
+    },
+    tags = ["manual"],
+    tool = ":app-admin",
+)
+
+sh_with_runfiles_binary(
+    name = "_runserver",
+    args = [
+        "runserver",
+    ],
+    env = {
+        "DEBUG": "True",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SECRET_KEY": "whatever",
+    },
+    tags = ["manual"],
+    tool = ":app-admin",
+)
+
+with_postgres_run(
+    name = "dev",
+    testonly = True,
+    binaries = [
+        ":app-migrate",
+        # ":_populate_test_database",
+        ":_create_superuser",
+        ":_runserver",
+    ],
+    env = {
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_ENGINE": "django.db.backends.postgresql",
+    },
+    env_transpose = {
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_DATABASE": "POSTGRES_DB",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_USER": "POSTGRES_USER",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_PASSWORD": "POSTGRES_PASSWORD",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_HOST": "POSTGRES_HOST",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_PORT": "POSTGRES_PORT",
+    },
+)
