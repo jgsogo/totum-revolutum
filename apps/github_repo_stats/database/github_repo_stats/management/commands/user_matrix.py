@@ -15,7 +15,7 @@ class Command(BaseCommand):
         parser.add_argument("out_data", choices=["interactions", "changes"], type=str)
 
     def handle(self, *args, **options):
-        self.stdout.write("Running 'scan_repo' command")
+        self.stdout.write("Running 'user_matrix' command")
         self.stdout.write(f" - server: {options['server']}")
         self.stdout.write(f" - org: {options['org']}")
         self.stdout.write(f" - name: {options['name']}")

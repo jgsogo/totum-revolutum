@@ -18,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument("local_path", type=pathlib.Path)
 
     def handle(self, *args, **options):
-        self.stdout.write("Running 'scan_repo' command")
+        self.stdout.write("Running 'scan_local_repo' command")
         self.stdout.write(f" - server: {options['server']}")
         self.stdout.write(f" - org: {options['org']}")
         self.stdout.write(f" - name: {options['name']}")

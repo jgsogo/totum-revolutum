@@ -14,7 +14,7 @@ class Command(BaseCommand):
         parser.add_argument("name", type=str)
 
     def handle(self, *args, **options):
-        self.stdout.write("Running 'scan_repo' command")
+        self.stdout.write("Running 'collect_pr_reviewer' command")
         server = options["server"]
         org = options["org"]
         name = options["name"]
@@ -32,6 +32,7 @@ class Command(BaseCommand):
         all_commits = Commit.objects.filter(pull_request__isnull=False)
         for commit in all_commits:
             url = URL_PATTERN.format(pr_number=commit.pull_request)
+            self.stdout.write(url)  # FIXME: do not print
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             self.stdout.write(response.text)  # FIXME: do not print
