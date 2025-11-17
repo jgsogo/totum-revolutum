@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # My apps
-    "core.apps.GithubRepoStatsConfig",
+    "github_repo_stats.apps.GithubRepoStatsConfig",
 ]
 
 MIDDLEWARE = [

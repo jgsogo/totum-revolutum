@@ -7,7 +7,7 @@ from django.core.management import execute_from_command_line
 
 def setup_application():
     INSTALLED_APPS = [
-        "core.apps.GithubRepoStatsConfig",
+        "github_repo_stats.apps.GithubRepoStatsConfig",
     ]
 
     settings.configure(
