@@ -31,12 +31,10 @@ class Command(BaseCommand):
 
         all_commits = Commit.objects.filter(pull_request__isnull=False)
         for commit in all_commits:
-            # self.stdout.write(f"commit: {commit.sha}")
-
             url = URL_PATTERN.format(pr_number=commit.pull_request)
             response = requests.get(url, headers=headers)
             response.raise_for_status()
-            self.stdout.write(response.text)
+            self.stdout.write(response.text)  # FIXME: do not print
             reviews = response.json()
 
             reviewers = set()
