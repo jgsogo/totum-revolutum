@@ -26,6 +26,8 @@ namespace utils::libpqxx {
         Numeric(const Numeric&) = default;
         Numeric& operator=(Numeric&&) noexcept = default;
 
+        Numeric& operator+=(const Numeric& other);
+        friend Numeric operator+(const Numeric& lhs, const Numeric& rhs);
         auto operator<=>(const Numeric<MaxDigits, DecimalPlaces>&) const = default;
 
         operator std::string() const { return dec::toString(value, ENGLISH_DECIMAL_FORMAT); }
@@ -37,6 +39,19 @@ namespace utils::libpqxx {
                                                        const Numeric<MaxDigits, DecimalPlaces>& rhs) {
         // TODO: Add testing. Are we loosing precision here? Is overflow possible?
         return Numeric<MaxDigits, DecimalPlaces>{lhs.value * rhs.value};
+    }
+
+    template <std::size_t MaxDigits, std::size_t DecimalPlaces>
+    inline Numeric<MaxDigits, DecimalPlaces>&
+    Numeric<MaxDigits, DecimalPlaces>::operator+=(const Numeric<MaxDigits, DecimalPlaces>& other) {
+        value += other.value;
+        return *this;
+    }
+
+    template <std::size_t MaxDigits, std::size_t DecimalPlaces>
+    Numeric<MaxDigits, DecimalPlaces> operator+(const Numeric<MaxDigits, DecimalPlaces>& lhs,
+                                                const Numeric<MaxDigits, DecimalPlaces>& rhs) {
+        return Numeric<MaxDigits, DecimalPlaces>{lhs.value + rhs.value};
     }
 
 } // namespace utils::libpqxx
