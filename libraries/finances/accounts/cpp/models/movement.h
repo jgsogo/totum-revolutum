@@ -7,6 +7,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include "account.h"
+#include "fx.h"
 #include "hierarchy_tree.h"
 #include "transaction.h"
 #include "types/money.h"
@@ -22,8 +23,10 @@ namespace finances::accounts::models {
         MovementDirection direction;
         std::pair<decltype(Account::id), decltype(Account::name)> account;
         utils::libpqxx::Date date_value;
-        // Fx fx;
+        std::optional<std::pair<decltype(Fx::rate), decltype(Fx::local)>> fx;
         Money amount;
+
+        Money amount_in_local_ccy() const;
     };
 
 } // namespace finances::accounts::models

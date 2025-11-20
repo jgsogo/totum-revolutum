@@ -3,10 +3,8 @@
 #include <QCalendarWidget>
 #include <QComboBox>
 #include <QDialog>
+#include <QLabel>
 #include <QLineEdit>
-
-#include <QDir>
-#include <QStringListModel>
 
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 #include "libraries/utils/cpp/qt/widgets/combobox_with_search.h"
@@ -40,6 +38,8 @@ class AddMovementWidget : public QDialog {
     // User wants to add a movement to the transaction
     void add_movement_clicked();
 
+    void on_amount_changed(const finances::accounts::models::Money&);
+
   public slots:
     void clear(bool keep_date = true);
 
@@ -69,4 +69,10 @@ class AddMovementWidget : public QDialog {
     QCalendarWidget* mov_date;
 
     widgets::forms::MovementStackedForm* mov_amount;
+
+    QLineEdit* fx_rate_value;
+    QLabel* fx_rate_label;
+
+    QLabel* amount;
+    QLabel* amount_local;
 };

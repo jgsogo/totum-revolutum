@@ -35,6 +35,13 @@ namespace utils::libpqxx {
     };
 
     template <std::size_t MaxDigits, std::size_t DecimalPlaces>
+    inline Numeric<MaxDigits, DecimalPlaces>&
+    Numeric<MaxDigits, DecimalPlaces>::operator+=(const Numeric<MaxDigits, DecimalPlaces>& other) {
+        value += other.value;
+        return *this;
+    }
+
+    template <std::size_t MaxDigits, std::size_t DecimalPlaces>
     inline Numeric<MaxDigits, DecimalPlaces> operator*(const Numeric<MaxDigits, DecimalPlaces>& lhs,
                                                        const Numeric<MaxDigits, DecimalPlaces>& rhs) {
         // TODO: Add testing. Are we loosing precision here? Is overflow possible?
@@ -42,10 +49,10 @@ namespace utils::libpqxx {
     }
 
     template <std::size_t MaxDigits, std::size_t DecimalPlaces>
-    inline Numeric<MaxDigits, DecimalPlaces>&
-    Numeric<MaxDigits, DecimalPlaces>::operator+=(const Numeric<MaxDigits, DecimalPlaces>& other) {
-        value += other.value;
-        return *this;
+    inline Numeric<MaxDigits, DecimalPlaces> operator/(const Numeric<MaxDigits, DecimalPlaces>& lhs,
+                                                       const Numeric<MaxDigits, DecimalPlaces>& rhs) {
+        // TODO: Add testing. Are we loosing precision here? Is overflow possible?
+        return Numeric<MaxDigits, DecimalPlaces>{lhs.value / rhs.value};
     }
 
     template <std::size_t MaxDigits, std::size_t DecimalPlaces>

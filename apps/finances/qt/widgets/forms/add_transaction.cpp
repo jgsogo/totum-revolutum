@@ -53,31 +53,44 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
         table_view->resizeRowsToContents();
     }
 
+    money_in_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
+    money_out_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
+
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    QHBoxLayout* bottom_line = new QHBoxLayout;
+    bottom_line->addWidget(money_in_label);
+    bottom_line->addWidget(money_out_label);
+    bottom_line->addWidget(buttonBox);
 
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->addWidget(new QLabel(tr("Add new transaction")));
     mainLayout->addWidget(add_movement);
     mainLayout->addWidget(table_view);
-    mainLayout->addWidget(buttonBox);
+    mainLayout->addLayout(bottom_line);
 
     this->setLayout(mainLayout);
 }
 
 void AddTransactionWidget::on_new_movement(MovementModel movement) {
+    SPDLOG_DEBUG("AddTransactionWidget::on_new_movement(movement)");
+
     const auto& plain_movement = movement.as_movement();
 
     switch (plain_movement.direction) {
     case finances::accounts::models::MovementDirection::IN:
-        money_in += plain_movement.amount;
+        money_in += plain_movement.amount_in_local_ccy();
         break;
     case finances::accounts::models::MovementDirection::OUT:
-        money_out += plain_movement.amount;
+        money_out += plain_movement.amount_in_local_ccy();
         break;
     }
+
+    money_in_label->setText(tr("IN: %1").arg(static_cast<std::string>(money_in)));
+    money_out_label->setText(tr("OUT: %1").arg(static_cast<std::string>(money_out)));
 
     QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Ok);
     if (money_in == money_out) {

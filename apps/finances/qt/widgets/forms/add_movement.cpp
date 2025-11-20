@@ -8,6 +8,8 @@
 
 #include "libraries/finances/accounts/cpp/models/movement.h"
 
+#include "apps/finances/qt/utils/utils.h"
+
 AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>& accounts,
                                      MovementTypesTableModel<HierarchyTreeColumns>& movtypes, QWidget* parent,
                                      Qt::WindowFlags f)
@@ -28,10 +30,24 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
     mov_date = new QCalendarWidget;
 
     mov_amount = new widgets::forms::MovementStackedForm;
+    connect(mov_amount, &widgets::forms::MovementStackedForm::amount_changed, this,
+            &AddMovementWidget::on_amount_changed);
+
+    fx_rate_value = new QLineEdit;
+    fx_rate_label = new QLabel(tr("FX rate"));
+    fx_rate_value->setEnabled(false);
+
+    amount = new QLabel(tr("Amount: "));
+    amount_local = new QLabel(tr("Amount (EUR): "));
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddMovementWidget::add_movement_clicked);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    QHBoxLayout* bottom_line = new QHBoxLayout;
+    bottom_line->addWidget(amount_local);
+    bottom_line->addWidget(amount);
+    bottom_line->addWidget(buttonBox);
 
     QFormLayout* formLayout = new QFormLayout;
     formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
@@ -39,11 +55,12 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
     formLayout->addRow(tr("&Direction:"), direction_combo);
     formLayout->addRow(tr("Movement &type:"), movtype_combo);
     formLayout->addRow(tr("Movement &date:"), mov_date);
+    formLayout->addRow(fx_rate_label, fx_rate_value);
 
     QGridLayout* layout = new QGridLayout;
     layout->addLayout(formLayout, 0, 0);
     layout->addWidget(mov_amount, 1, 0);
-    layout->addWidget(buttonBox, 2, 0);
+    layout->addLayout(bottom_line, 2, 0);
     this->setLayout(layout);
 
     connect(account_combo, &utils::qt::widgets::_ComboBoxWithSearch::activated, [this, &accounts](utils::db::Id id) {
@@ -85,6 +102,15 @@ void AddMovementWidget::account_changed(const AccountModel& account) {
         mov_amount->set_movement_numerable();
     } else {
         mov_amount->set_movement_non_numerable();
+    }
+
+    if (account.account.ccy != finances::accounts::models::EUR) {
+        fx_rate_label->setText(tr("FX rate (%1/%2)")
+                                   .arg(static_cast<std::string>(finances::accounts::models::EUR),
+                                        static_cast<std::string>(account.account.ccy)));
+        fx_rate_value->setEnabled(true);
+    } else {
+        fx_rate_value->setEnabled(false);
     }
 }
 
@@ -149,9 +175,18 @@ void AddMovementWidget::add_movement_clicked() {
         .direction = direction_expected.value(),
         .account = std::make_pair(account.id, account.account.name),
         .date_value = date,
-        // .fx =
         .amount = std::move(amount_expected.value()),
     };
+
+    // - fx
+    if (account.account.ccy != finances::accounts::models::EUR) {
+        auto fx_rate_expected = utils::qstring_to_amount(fx_rate_value->text(), finances::accounts::models::EUR);
+        if (!fx_rate_expected) {
+            // TODO: Tell the user about the error
+            return;
+        }
+        movement.fx = std::make_pair(std::move(fx_rate_expected.value()), finances::accounts::models::EUR);
+    }
 
     // Now, we need to get additional data from the amounts, in case they were other type of movements
     auto final_movement_expected = mov_amount->populateAdditionalData(std::move(movement));
@@ -166,6 +201,40 @@ void AddMovementWidget::add_movement_clicked() {
 
     emit new_movement(movement_model);
     this->accept();
+}
+
+void AddMovementWidget::on_amount_changed(const finances::accounts::models::Money& money) {
+    SPDLOG_DEBUG("AddMovementWidget::on_amount_changed(money='{}')", static_cast<std::string>(money));
+
+    amount->setText(
+        tr("Amount (%1): %2").arg(static_cast<std::string>(money.ccy)).arg(static_cast<std::string>(money)));
+
+    if (fx_rate_value->isEnabled()) {
+
+        // - account
+        auto account_expected = account_combo->selected();
+        if (!account_expected) {
+            return;
+        }
+        if (!account_expected.value()) {
+            return;
+        }
+        AccountModel account = std::move(account_expected.value().value());
+
+        auto fx_rate_expected = utils::qstring_to_amount(fx_rate_value->text(), finances::accounts::models::EUR);
+        if (!fx_rate_expected) {
+            return;
+        }
+        finances::accounts::models::Fx fx{.foreign = money.ccy,
+                                          .local = finances::accounts::models::EUR,
+                                          .rate = std::move(fx_rate_expected.value())};
+
+        auto amount_in_local = finances::accounts::models::apply_fx(money, fx);
+
+        amount_local->setText(tr("Amount (%1): %2")
+                                  .arg(static_cast<std::string>(amount_in_local.ccy))
+                                  .arg(static_cast<std::string>(amount_in_local)));
+    }
 }
 
 void AddMovementWidget::show_mov_date() { SPDLOG_DEBUG("AddMovementWidget::show_mov_date()"); }

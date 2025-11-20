@@ -2,6 +2,7 @@
 
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QLabel>
 
 #include "libraries/finances/accounts/cpp/models/transaction.h"
 
@@ -31,6 +32,9 @@ class AddTransactionWidget : public QDialog {
 
     finances::accounts::models::Money money_in;
     finances::accounts::models::Money money_out;
+
+    QLabel* money_in_label;
+    QLabel* money_out_label;
 
     QDialogButtonBox* buttonBox;
 };

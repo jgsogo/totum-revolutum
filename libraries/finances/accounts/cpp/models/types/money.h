@@ -25,7 +25,7 @@ namespace finances::accounts::models {
         friend Money operator+(const Money& lhs, const Money& rhs);
         friend bool operator==(const Money& lhs, const Money& rhs);
 
-      private:
+      public:
         Amount amount;
         Ccy ccy;
     };
