@@ -15,5 +15,6 @@ namespace finances::accounts::models {
     static constexpr std::string_view TRANSACTION_GROUP_TABLE = "finances_accounts_transactiongroup";
     static constexpr std::string_view ACCOUNT_HOLDER_TABLE = "finances_accounts_accountholder";
     static constexpr std::string_view ACCOUNT_HOLDER_ROLE_TABLE = "finances_accounts_accountholderrole";
+    static constexpr std::string_view FX_TABLE = "finances_accounts_fx";
 
 } // namespace finances::accounts::models

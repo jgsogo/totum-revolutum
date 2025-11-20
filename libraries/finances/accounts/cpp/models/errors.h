@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 namespace finances::accounts::models {
 
     // FIXME: Use strong types instead, see https://www.reddit.com/r/cpp/comments/19eqc9p/comment/kjhxti2/,
@@ -20,3 +22,11 @@ namespace finances::accounts::models {
     };
 
 } // namespace finances::accounts::models
+
+namespace finances::accounts::models::error {
+
+    struct CcyMismatch : public std::runtime_error {
+        CcyMismatch() : std::runtime_error("Cannot operate on Money instances with different currencies") {};
+    };
+
+} // namespace finances::accounts::models::error

@@ -64,6 +64,7 @@ namespace widgets::forms {
     ExpectedType<std::variant<finances::accounts::models::Movement, finances::investments::models::MovementNumerable,
                               finances::investments::models::MovementDividend>>
     MovementNumerableFormWidget::populateAdditionalData(finances::accounts::models::Movement&& movement) const {
+        SPDLOG_DEBUG("MovementNumerableFormWidget::populateAdditionalData(movement)");
         if (!ccy) {
             return tl::unexpected{error::InputFieldNotSet{"ccy"}};
         }

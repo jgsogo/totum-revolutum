@@ -58,6 +58,8 @@ namespace widgets::forms {
     ExpectedType<std::variant<finances::accounts::models::Movement, finances::investments::models::MovementNumerable,
                               finances::investments::models::MovementDividend>>
     MovementDividendFormWidget::populateAdditionalData(finances::accounts::models::Movement&& movement) const {
+        SPDLOG_DEBUG("MovementDividendFormWidget::populateAdditionalData(movement)");
+
         // - ex_dividend_date
         auto qt_date = ex_dividend_date->selectedDate();
         utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},

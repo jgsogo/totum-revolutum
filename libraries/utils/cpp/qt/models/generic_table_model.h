@@ -105,6 +105,8 @@ namespace utils::qt::models {
             return items.at(row);
         };
 
+        const std::vector<TModel>& all() const { return items; }
+
         utils::ExpectedType<std::reference_wrapper<const TModel>, ErrorItemNotFound>
         get(const ModelData::Id& id) const {
             SPDLOG_DEBUG("{}::get(id={})", name, id);
