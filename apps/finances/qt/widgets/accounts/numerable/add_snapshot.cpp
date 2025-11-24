@@ -40,7 +40,7 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     formLayout->addRow(tr("&Quantity:"), quantity);
     formLayout->addRow(tr("&Unit value (%1):").arg(static_cast<std::string>(account.ccy)), unit_value);
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddSnapshotNumerableWidget::add_snapshot_clicked);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
