@@ -10,11 +10,11 @@
 
 struct MoneyAmountEdit::Impl {
     QLabel* label;
-    QString label_template;
+    const char* label_template;
     std::optional<finances::accounts::models::Ccy> ccy;
 };
 
-MoneyAmountEdit::MoneyAmountEdit(QString label_template_, QWidget* parent)
+MoneyAmountEdit::MoneyAmountEdit(const char* label_template_, QWidget* parent)
     : QLineEdit{parent}, pImpl{std::make_unique<MoneyAmountEdit::Impl>()} {
     pImpl->label_template = label_template_;
     pImpl->label = new QLabel(pImpl->label_template);
@@ -26,10 +26,11 @@ MoneyAmountEdit::MoneyAmountEdit(QString label_template_, QWidget* parent)
 
 MoneyAmountEdit::~MoneyAmountEdit() = default;
 
-const QLabel& MoneyAmountEdit::get_label() const { return *(pImpl->label); }
+QLabel* MoneyAmountEdit::get_label() const { return pImpl->label; }
 
 void MoneyAmountEdit::setCcy(finances::accounts::models::Ccy ccy) {
     SPDLOG_DEBUG("MoneyAmountEdit::setCcy(ccy={})", ccy);
+    pImpl->ccy = ccy;
 
     // Depending on the CCY, we might have different formats here
     QRegularExpression rx(R"(^\d+(,\d{2})?$)");
@@ -38,12 +39,14 @@ void MoneyAmountEdit::setCcy(finances::accounts::models::Ccy ccy) {
     this->setPlaceholderText("120,34");
     this->setEnabled(true);
 
-    pImpl->label->setText(pImpl->label_template.arg(static_cast<std::string>(ccy)));
+    pImpl->label->setText(tr(pImpl->label_template).arg(static_cast<std::string>(ccy)));
 }
 
 void MoneyAmountEdit::noCcy() {
+    SPDLOG_DEBUG("MoneyAmountEdit::noCcy()");
+    pImpl->ccy = std::nullopt;
     this->setEnabled(false);
-    pImpl->label->setText(pImpl->label_template.arg("<unknown>"));
+    pImpl->label->setText(tr(pImpl->label_template).arg("<unknown>"));
 }
 
 ExpectedType<finances::accounts::models::Money> MoneyAmountEdit::getMoneyAmount() const {

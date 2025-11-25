@@ -20,6 +20,9 @@ namespace widgets::forms {
                 &MovementDividendFormWidget::ex_dividend_date_changed);
 
         // Unit value
+        unit_value_edit = new MoneyAmountEdit("Unit value (%1)", this);
+        connect(unit_value_edit, &MoneyAmountEdit::money_changed, [this]() { this->on_input_data_change(); });
+
         unit_value = new QLineEdit("ccy unknown");
         unit_value->setEnabled(false);
         connect(unit_value, &QLineEdit::textEdited, [this]() { this->on_input_data_change(); });
@@ -30,6 +33,7 @@ namespace widgets::forms {
         formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
         formLayout->addRow(tr("Ex dividend &date"), ex_dividend_date);
         formLayout->addRow(unit_value_label, unit_value);
+        formLayout->addRow(unit_value_edit->get_label(), unit_value_edit);
 
         this->setLayout(formLayout);
     }
@@ -41,6 +45,11 @@ namespace widgets::forms {
 
         if (!quantity) {
             return tl::unexpected{error::InputFieldNotSet{"quantity"}};
+        }
+
+        auto unit_value_money_expected = unit_value_edit->getMoneyAmount();
+        if (!unit_value_money_expected) {
+            return tl::unexpected{error::InputFieldNotSet{"unit_value_edit"}};
         }
 
         // FIXME: For quantities, it doesn't make sense the `ccy`!
@@ -91,6 +100,7 @@ namespace widgets::forms {
         unit_value->setEnabled(false);
         this->unit_value->clear();
         this->ex_dividend_date->setSelectedDate(QDate::currentDate());
+        unit_value_edit->noCcy();
     }
 
     void MovementDividendFormWidget::setCcy(finances::accounts::models::Ccy ccy_) {
@@ -110,6 +120,9 @@ namespace widgets::forms {
         unit_value_label->setText(tr("Unit value (%1)").arg(static_cast<std::string>(ccy.value())));
         unit_value->setEnabled(true);
         unit_value->clear();
+
+        //
+        unit_value_edit->setCcy(ccy_);
 
         this->on_input_data_change();
     }

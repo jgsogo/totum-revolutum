@@ -3,12 +3,14 @@ load("@rules_qt//qt:qt_cc_library.bzl", "qt_cc_library")
 qt_cc_library(
     name = "amounts",
     srcs = [
+        "money_amount.cpp",
         "movement_dividend_form.cpp",
         "movement_non_numerable_form.cpp",
         "movement_numerable_form.cpp",
         "movement_stacked_form.cpp",
     ],
     hdrs = [
+        "money_amount.h",
         "movement_dividend_form.h",
         "movement_non_numerable_form.h",
         "movement_numerable_form.h",

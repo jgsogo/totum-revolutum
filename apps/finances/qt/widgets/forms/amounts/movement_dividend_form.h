@@ -9,7 +9,7 @@
 #include "apps/finances/qt/metatypes/types.h"
 
 #include "base_movement_form.h"
-
+#include "money_amount.h"
 namespace widgets::forms {
 
     class MovementDividendFormWidget : public BaseMovementFormWidget {
@@ -45,6 +45,8 @@ namespace widgets::forms {
         QCalendarWidget* ex_dividend_date;
         QLineEdit* unit_value;
         QLabel* unit_value_label;
+
+        MoneyAmountEdit* unit_value_edit;
     };
 
 } // namespace widgets::forms

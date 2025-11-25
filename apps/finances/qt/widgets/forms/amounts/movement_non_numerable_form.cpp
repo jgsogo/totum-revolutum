@@ -13,57 +13,29 @@
 namespace widgets::forms {
 
     MovementNonNumerableFormWidget::MovementNonNumerableFormWidget(QWidget* parent) : BaseMovementFormWidget(parent) {
-        // We start QLineEdit and disable it, because we don't know the currency!
-        amount = new QLineEdit("ccy unknown");
-        amount->setEnabled(false);
-        connect(amount, &QLineEdit::textEdited, this, [this]() { this->on_input_data_change(); });
-
-        amount_label = new QLabel(tr("Amount"));
+        // Unit value
+        unit_value_edit = new MoneyAmountEdit("Amount (%1)", this);
+        connect(unit_value_edit, &MoneyAmountEdit::money_changed, [this]() { this->on_input_data_change(); });
+        connect(unit_value_edit, &MoneyAmountEdit::money_changed, this,
+                &MovementNonNumerableFormWidget::amount_changed);
 
         QFormLayout* formLayout = new QFormLayout;
         formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
-        formLayout->addRow(amount_label, amount);
+        formLayout->addRow(unit_value_edit->get_label(), unit_value_edit);
 
         this->setLayout(formLayout);
     }
 
     ExpectedType<finances::accounts::models::Money> MovementNonNumerableFormWidget::getMoneyAmount() const {
-        if (!ccy) {
-            return tl::unexpected{error::InputFieldNotSet{"ccy"}};
-        }
-
-        auto amount_expected = utils::qstring_to_amount(amount->text(), ccy.value());
-        if (!amount_expected) {
-            return tl::unexpected{amount_expected.error()};
-        }
-
-        finances::accounts::models::Money money{std::move(amount_expected.value()), std::move(ccy.value())};
-        return {std::move(money)};
+        return unit_value_edit->getMoneyAmount();
     }
 
-    void MovementNonNumerableFormWidget::clear() {
-        ccy = std::nullopt;
-        amount->setEnabled(false);
-        amount->clear();
-    }
+    void MovementNonNumerableFormWidget::clear() { unit_value_edit->noCcy(); }
 
     void MovementNonNumerableFormWidget::setCcy(finances::accounts::models::Ccy ccy_) {
         SPDLOG_DEBUG("MovementNonNumerableFormWidget::setCcy(ccy={})", ccy_);
-        if (ccy && (ccy.value() == ccy_)) {
-            return;
-        }
-        ccy = ccy_;
 
-        // Create the validator for this currency (different ccys might have different validators)
-        QRegularExpression rx(R"(^\d+(,\d{2})?$)");
-        QRegularExpressionValidator* ccy_validator = new QRegularExpressionValidator(rx, this);
-        amount->setValidator(ccy_validator);
-        amount->setPlaceholderText("120,34");
-
-        // Update label and enable the amount if it was not
-        amount_label->setText(tr("Amount (%1)").arg(static_cast<std::string>(ccy.value())));
-        amount->setEnabled(true);
-        amount->clear();
+        unit_value_edit->setCcy(ccy_);
 
         this->on_input_data_change();
     }

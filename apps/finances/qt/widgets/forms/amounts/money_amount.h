@@ -11,10 +11,10 @@
 class MoneyAmountEdit : public QLineEdit {
     Q_OBJECT
   public:
-    explicit MoneyAmountEdit(QString label_template, QWidget* parent = nullptr);
+    explicit MoneyAmountEdit(const char* label_template, QWidget* parent = nullptr);
     ~MoneyAmountEdit();
 
-    const QLabel& get_label() const;
+    QLabel* get_label() const;
     ExpectedType<finances::accounts::models::Money> getMoneyAmount() const;
 
   public slots:

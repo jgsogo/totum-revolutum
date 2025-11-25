@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QLabel>
-#include <QLineEdit>
 #include <QWidget>
 
 #include "libraries/finances/accounts/cpp/models/types/ccy.h"
@@ -9,7 +7,7 @@
 #include "apps/finances/qt/metatypes/types.h"
 
 #include "base_movement_form.h"
-
+#include "money_amount.h"
 namespace widgets::forms {
 
     class MovementNonNumerableFormWidget : public BaseMovementFormWidget {
@@ -32,9 +30,7 @@ namespace widgets::forms {
         void amount_changed(finances::accounts::models::Money money);
 
       protected:
-        std::optional<finances::accounts::models::Ccy> ccy;
-        QLineEdit* amount;
-        QLabel* amount_label;
+        MoneyAmountEdit* unit_value_edit;
     };
 
 } // namespace widgets::forms
