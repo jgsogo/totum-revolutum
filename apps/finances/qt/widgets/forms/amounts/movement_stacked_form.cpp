@@ -119,6 +119,10 @@ namespace widgets::forms {
         pImpl->mov_numerable->blockSignals(true);
         pImpl->mov_dividend->blockSignals(true);
 
+        pImpl->non_numerable->setDown(true);
+        pImpl->numerable->setDown(false);
+        pImpl->dividend->setDown(false);
+
         pImpl->stacked_layout->setCurrentWidget(pImpl->mov_non_numerable);
     }
 
@@ -127,6 +131,10 @@ namespace widgets::forms {
         pImpl->mov_numerable->blockSignals(false);
         pImpl->mov_dividend->blockSignals(true);
 
+        pImpl->non_numerable->setDown(false);
+        pImpl->numerable->setDown(true);
+        pImpl->dividend->setDown(false);
+
         pImpl->stacked_layout->setCurrentWidget(pImpl->mov_numerable);
     }
 
@@ -134,6 +142,10 @@ namespace widgets::forms {
         pImpl->mov_non_numerable->blockSignals(true);
         pImpl->mov_numerable->blockSignals(true);
         pImpl->mov_dividend->blockSignals(false);
+
+        pImpl->non_numerable->setDown(false);
+        pImpl->numerable->setDown(false);
+        pImpl->dividend->setDown(true);
 
         pImpl->stacked_layout->setCurrentWidget(pImpl->mov_dividend);
     }

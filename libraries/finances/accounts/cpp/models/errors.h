@@ -29,4 +29,8 @@ namespace finances::accounts::models::error {
         CcyMismatch() : std::runtime_error("Cannot operate on Money instances with different currencies") {};
     };
 
+    struct FXRateInvalid : public std::runtime_error {
+        FXRateInvalid(const std::string& fx) : std::runtime_error(std::format("Invalid FX: {}", fx)) {};
+    };
+
 } // namespace finances::accounts::models::error

@@ -15,7 +15,7 @@ namespace widgets::forms {
 
     MovementNumerableFormWidget::MovementNumerableFormWidget(QWidget* parent) : BaseMovementFormWidget(parent) {
         // Quantity
-        quantity = new QLineEdit();
+        quantity = new QLineEdit(this);
         connect(quantity, &QLineEdit::textEdited, [this]() { this->on_input_data_change(); });
         quantity->setFocusPolicy(Qt::StrongFocus);
 

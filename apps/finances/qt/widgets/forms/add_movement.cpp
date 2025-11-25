@@ -2,9 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QGridLayout>
+#include <QPushButton>
 
 #include "libraries/finances/accounts/cpp/models/movement.h"
 
@@ -38,15 +38,35 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
 
     fx_rate_value = new QLineEdit;
     fx_rate_label = new QLabel(tr("FX rate"));
-    fx_rate_value->setEnabled(false);
-    fx_rate_value->setFocusPolicy(Qt::StrongFocus);
+    {
+        QRegularExpression rx(R"(^\d+(,\d{4})?$)");
+        QRegularExpressionValidator* fx_validator = new QRegularExpressionValidator(rx, this);
+        fx_rate_value->setValidator(fx_validator);
+        fx_rate_value->setPlaceholderText("0,8923");
+
+        fx_rate_value->setEnabled(false);
+        fx_rate_value->setFocusPolicy(Qt::StrongFocus);
+
+        connect(fx_rate_value, &QLineEdit::textEdited, [this](const QString& text) {
+            auto mov_amount_expected = mov_amount->getMoneyAmount();
+            if (!mov_amount_expected) {
+                return;
+            }
+            this->on_amount_changed({mov_amount_expected.value()});
+        });
+    }
 
     amount = new QLabel(tr("Amount: "));
     amount_local = new QLabel(tr("Amount (EUR): "));
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &AddMovementWidget::add_movement_clicked);
-    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+    {
+        connect(buttonBox, &QDialogButtonBox::accepted, this, &AddMovementWidget::add_movement_clicked);
+        connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+        QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Save);
+        accept_button->setEnabled(false);
+    }
 
     QHBoxLayout* bottom_line = new QHBoxLayout;
     bottom_line->addWidget(amount_local);
@@ -189,6 +209,10 @@ void AddMovementWidget::add_movement_clicked() {
             // TODO: Tell the user about the error
             return;
         }
+        if (fx_rate_expected.value().value == 0) {
+            // TODO: Tell the user about the error
+            return;
+        }
         movement.fx = std::make_pair(std::move(fx_rate_expected.value()), finances::accounts::models::EUR);
     }
 
@@ -209,6 +233,8 @@ void AddMovementWidget::add_movement_clicked() {
 
 void AddMovementWidget::on_amount_changed(std::optional<finances::accounts::models::Money> money) {
     SPDLOG_DEBUG("AddMovementWidget::on_amount_changed(money)");
+    QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Save);
+    accept_button->setEnabled(false);
 
     if (money) {
 
@@ -236,11 +262,19 @@ void AddMovementWidget::on_amount_changed(std::optional<finances::accounts::mode
                                               .local = finances::accounts::models::EUR,
                                               .rate = std::move(fx_rate_expected.value())};
 
-            auto amount_in_local = finances::accounts::models::apply_fx(money.value(), fx);
+            try {
+                auto amount_in_local = finances::accounts::models::apply_fx(money.value(), fx);
 
-            amount_local->setText(tr("Amount (%1): %2")
-                                      .arg(static_cast<std::string>(amount_in_local.ccy))
-                                      .arg(static_cast<std::string>(amount_in_local)));
+                amount_local->setText(tr("Amount (%1): %2")
+                                          .arg(static_cast<std::string>(amount_in_local.ccy))
+                                          .arg(static_cast<std::string>(amount_in_local)));
+                accept_button->setEnabled(true);
+            } catch (const std::runtime_error& e) {
+                SPDLOG_WARN("Error applying FX: {}", e.what());
+                amount_local->setText("Amount:");
+            }
+        } else {
+            accept_button->setEnabled(true);
         }
     } else {
         amount->setText("Amount:");
