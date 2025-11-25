@@ -2,9 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QGridLayout>
+#include <QPushButton>
 
 #include "libraries/finances/accounts/cpp/models/movement.h"
 
@@ -17,6 +17,7 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
 
     account_combo =
         new utils::qt::widgets::ComboBoxWithSearch{accounts, AccountColumns::ID, AccountColumns::NAME, parent};
+    account_combo->setFocusPolicy(Qt::StrongFocus);
 
     direction_combo = new QComboBox;
     direction_combo->setFocusPolicy(Qt::StrongFocus);
@@ -26,8 +27,10 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
 
     movtype_combo = new utils::qt::widgets::ComboBoxWithSearch{movtypes, HierarchyTreeColumns::ID,
                                                                HierarchyTreeColumns::BREADCRUMB, parent};
+    movtype_combo->setFocusPolicy(Qt::StrongFocus);
 
     mov_date = new QCalendarWidget;
+    mov_date->setFocusPolicy(Qt::StrongFocus);
 
     mov_amount = new widgets::forms::MovementStackedForm;
     connect(mov_amount, &widgets::forms::MovementStackedForm::amount_changed, this,
@@ -35,14 +38,35 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
 
     fx_rate_value = new QLineEdit;
     fx_rate_label = new QLabel(tr("FX rate"));
-    fx_rate_value->setEnabled(false);
+    {
+        QRegularExpression rx(R"(^\d+(,\d{4})?$)");
+        QRegularExpressionValidator* fx_validator = new QRegularExpressionValidator(rx, this);
+        fx_rate_value->setValidator(fx_validator);
+        fx_rate_value->setPlaceholderText("0,8923");
+
+        fx_rate_value->setEnabled(false);
+        fx_rate_value->setFocusPolicy(Qt::StrongFocus);
+
+        connect(fx_rate_value, &QLineEdit::textEdited, [this](const QString& text) {
+            auto mov_amount_expected = mov_amount->getMoneyAmount();
+            if (!mov_amount_expected) {
+                return;
+            }
+            this->on_amount_changed({mov_amount_expected.value()});
+        });
+    }
 
     amount = new QLabel(tr("Amount: "));
     amount_local = new QLabel(tr("Amount (EUR): "));
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &AddMovementWidget::add_movement_clicked);
-    connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+    {
+        connect(buttonBox, &QDialogButtonBox::accepted, this, &AddMovementWidget::add_movement_clicked);
+        connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+        QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Save);
+        accept_button->setEnabled(false);
+    }
 
     QHBoxLayout* bottom_line = new QHBoxLayout;
     bottom_line->addWidget(amount_local);
@@ -185,6 +209,10 @@ void AddMovementWidget::add_movement_clicked() {
             // TODO: Tell the user about the error
             return;
         }
+        if (fx_rate_expected.value().value == 0) {
+            // TODO: Tell the user about the error
+            return;
+        }
         movement.fx = std::make_pair(std::move(fx_rate_expected.value()), finances::accounts::models::EUR);
     }
 
@@ -203,37 +231,54 @@ void AddMovementWidget::add_movement_clicked() {
     this->accept();
 }
 
-void AddMovementWidget::on_amount_changed(const finances::accounts::models::Money& money) {
-    SPDLOG_DEBUG("AddMovementWidget::on_amount_changed(money='{}')", static_cast<std::string>(money));
+void AddMovementWidget::on_amount_changed(std::optional<finances::accounts::models::Money> money) {
+    SPDLOG_DEBUG("AddMovementWidget::on_amount_changed(money)");
+    QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Save);
+    accept_button->setEnabled(false);
 
-    amount->setText(
-        tr("Amount (%1): %2").arg(static_cast<std::string>(money.ccy)).arg(static_cast<std::string>(money)));
+    if (money) {
 
-    if (fx_rate_value->isEnabled()) {
+        amount->setText(tr("Amount (%1): %2")
+                            .arg(static_cast<std::string>(money.value().ccy))
+                            .arg(static_cast<std::string>(money.value())));
 
-        // - account
-        auto account_expected = account_combo->selected();
-        if (!account_expected) {
-            return;
+        if (fx_rate_value->isEnabled()) {
+
+            // - account
+            auto account_expected = account_combo->selected();
+            if (!account_expected) {
+                return;
+            }
+            if (!account_expected.value()) {
+                return;
+            }
+            AccountModel account = std::move(account_expected.value().value());
+
+            auto fx_rate_expected = utils::qstring_to_amount(fx_rate_value->text(), finances::accounts::models::EUR);
+            if (!fx_rate_expected) {
+                return;
+            }
+            finances::accounts::models::Fx fx{.foreign = money.value().ccy,
+                                              .local = finances::accounts::models::EUR,
+                                              .rate = std::move(fx_rate_expected.value())};
+
+            try {
+                auto amount_in_local = finances::accounts::models::apply_fx(money.value(), fx);
+
+                amount_local->setText(tr("Amount (%1): %2")
+                                          .arg(static_cast<std::string>(amount_in_local.ccy))
+                                          .arg(static_cast<std::string>(amount_in_local)));
+                accept_button->setEnabled(true);
+            } catch (const std::runtime_error& e) {
+                SPDLOG_WARN("Error applying FX: {}", e.what());
+                amount_local->setText("Amount:");
+            }
+        } else {
+            accept_button->setEnabled(true);
         }
-        if (!account_expected.value()) {
-            return;
-        }
-        AccountModel account = std::move(account_expected.value().value());
-
-        auto fx_rate_expected = utils::qstring_to_amount(fx_rate_value->text(), finances::accounts::models::EUR);
-        if (!fx_rate_expected) {
-            return;
-        }
-        finances::accounts::models::Fx fx{.foreign = money.ccy,
-                                          .local = finances::accounts::models::EUR,
-                                          .rate = std::move(fx_rate_expected.value())};
-
-        auto amount_in_local = finances::accounts::models::apply_fx(money, fx);
-
-        amount_local->setText(tr("Amount (%1): %2")
-                                  .arg(static_cast<std::string>(amount_in_local.ccy))
-                                  .arg(static_cast<std::string>(amount_in_local)));
+    } else {
+        amount->setText("Amount:");
+        amount_local->setText("Amount:");
     }
 }
 

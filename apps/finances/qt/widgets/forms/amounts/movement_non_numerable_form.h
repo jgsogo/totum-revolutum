@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QLabel>
-#include <QLineEdit>
 #include <QWidget>
 
 #include "libraries/finances/accounts/cpp/models/types/ccy.h"
@@ -9,6 +7,7 @@
 #include "apps/finances/qt/metatypes/types.h"
 
 #include "base_movement_form.h"
+#include "money_amount.h"
 
 namespace widgets::forms {
 
@@ -29,12 +28,10 @@ namespace widgets::forms {
         void on_input_data_change();
 
       signals:
-        void amount_changed(finances::accounts::models::Money money);
+        void amount_changed(std::optional<finances::accounts::models::Money>);
 
       protected:
-        std::optional<finances::accounts::models::Ccy> ccy;
-        QLineEdit* amount;
-        QLabel* amount_label;
+        MoneyAmountEdit* unit_value_edit;
     };
 
 } // namespace widgets::forms

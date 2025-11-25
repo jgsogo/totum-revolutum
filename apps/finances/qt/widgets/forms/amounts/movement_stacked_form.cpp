@@ -74,6 +74,8 @@ namespace widgets::forms {
         mainLayout->addLayout(pImpl->stacked_layout);
 
         this->setLayout(mainLayout);
+
+        connect(pImpl->stacked_layout, &QStackedLayout::currentChanged, this, &MovementStackedForm::on_current_changed);
     }
 
     MovementStackedForm::~MovementStackedForm() = default;
@@ -117,6 +119,10 @@ namespace widgets::forms {
         pImpl->mov_numerable->blockSignals(true);
         pImpl->mov_dividend->blockSignals(true);
 
+        pImpl->non_numerable->setDown(true);
+        pImpl->numerable->setDown(false);
+        pImpl->dividend->setDown(false);
+
         pImpl->stacked_layout->setCurrentWidget(pImpl->mov_non_numerable);
     }
 
@@ -125,6 +131,10 @@ namespace widgets::forms {
         pImpl->mov_numerable->blockSignals(false);
         pImpl->mov_dividend->blockSignals(true);
 
+        pImpl->non_numerable->setDown(false);
+        pImpl->numerable->setDown(true);
+        pImpl->dividend->setDown(false);
+
         pImpl->stacked_layout->setCurrentWidget(pImpl->mov_numerable);
     }
 
@@ -132,6 +142,10 @@ namespace widgets::forms {
         pImpl->mov_non_numerable->blockSignals(true);
         pImpl->mov_numerable->blockSignals(true);
         pImpl->mov_dividend->blockSignals(false);
+
+        pImpl->non_numerable->setDown(false);
+        pImpl->numerable->setDown(false);
+        pImpl->dividend->setDown(true);
 
         pImpl->stacked_layout->setCurrentWidget(pImpl->mov_dividend);
     }
@@ -144,6 +158,14 @@ namespace widgets::forms {
 
     void MovementStackedForm::set_dividend_quantity(finances::accounts::models::Amount quantity) {
         pImpl->mov_dividend->setQuantity(quantity);
+    }
+
+    void MovementStackedForm::on_current_changed(int index) {
+        auto money_expected = this->getMoneyAmount();
+        auto money = money_expected.has_value()
+                         ? std::optional<finances::accounts::models::Money>{std::move(money_expected.value())}
+                         : std::nullopt;
+        emit amount_changed(std::move(money));
     }
 
 } // namespace widgets::forms

@@ -56,7 +56,7 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     money_in_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
     money_out_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
@@ -92,7 +92,7 @@ void AddTransactionWidget::on_new_movement(MovementModel movement) {
     money_in_label->setText(tr("IN: %1").arg(static_cast<std::string>(money_in)));
     money_out_label->setText(tr("OUT: %1").arg(static_cast<std::string>(money_out)));
 
-    QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Ok);
+    QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Save);
     if (money_in == money_out) {
         accept_button->setEnabled(true);
     } else {

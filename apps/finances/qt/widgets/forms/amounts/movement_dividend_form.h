@@ -9,7 +9,7 @@
 #include "apps/finances/qt/metatypes/types.h"
 
 #include "base_movement_form.h"
-
+#include "money_amount.h"
 namespace widgets::forms {
 
     class MovementDividendFormWidget : public BaseMovementFormWidget {
@@ -36,15 +36,13 @@ namespace widgets::forms {
 
       signals:
         void ex_dividend_date_changed(QDate date);
-        void amount_changed(finances::accounts::models::Money money);
+        void amount_changed(std::optional<finances::accounts::models::Money>);
 
       protected:
-        std::optional<finances::accounts::models::Ccy> ccy;
         std::optional<finances::accounts::models::Amount> quantity;
 
         QCalendarWidget* ex_dividend_date;
-        QLineEdit* unit_value;
-        QLabel* unit_value_label;
+        MoneyAmountEdit* unit_value_edit;
     };
 
 } // namespace widgets::forms

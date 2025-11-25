@@ -17,6 +17,9 @@ namespace finances::accounts::models {
 
         utils::libpqxx::Date date_value;
         Amount rate;
+
+        operator std::string() const;
+        bool is_valid() const;
     };
 
     Money apply_fx(const Money&, const Fx&);

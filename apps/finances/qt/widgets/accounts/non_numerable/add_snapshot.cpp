@@ -33,7 +33,7 @@ AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(utils::libpqxx::Con
     formLayout->addRow(tr("&Date:"), calendar);
     formLayout->addRow(tr("&Amount (%1):").arg(static_cast<std::string>(account.ccy)), amount);
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddSnapshotNonNumerableWidget::add_snapshot_clicked);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 

@@ -3,6 +3,7 @@
 #include <QCalendarWidget>
 #include <QComboBox>
 #include <QDialog>
+#include <QDialogButtonBox>
 #include <QLabel>
 #include <QLineEdit>
 
@@ -38,7 +39,7 @@ class AddMovementWidget : public QDialog {
     // User wants to add a movement to the transaction
     void add_movement_clicked();
 
-    void on_amount_changed(const finances::accounts::models::Money&);
+    void on_amount_changed(std::optional<finances::accounts::models::Money>);
 
   public slots:
     void clear(bool keep_date = true);
@@ -53,9 +54,6 @@ class AddMovementWidget : public QDialog {
     void mov_date_changed(QDate date);
 
   signals:
-    // When the amount changes, someone outside might be interested on knowing it
-    void amount_changed(finances::accounts::models::Amount);
-
     // Interaction is finished, the dialog is being closed. This is the MovementModel to be created
     void new_movement(MovementModel movement);
 
@@ -75,4 +73,6 @@ class AddMovementWidget : public QDialog {
 
     QLabel* amount;
     QLabel* amount_local;
+
+    QDialogButtonBox* buttonBox;
 };
