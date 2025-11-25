@@ -14,8 +14,8 @@
 #include <spdlog/spdlog.h>
 
 #include "apps/finances/qt/metatypes/types.h"
-#include "apps/finances/qt/widgets/accounts/non_numerable/add_snapshot.h"
-#include "apps/finances/qt/widgets/accounts/numerable/add_snapshot.h"
+#include "apps/finances/qt/widgets/forms/add_snapshot_non_numerable.h"
+#include "apps/finances/qt/widgets/forms/add_snapshot_numerable.h"
 
 AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
                                          AccountsTableModel<AccountColumns>& accounts_,

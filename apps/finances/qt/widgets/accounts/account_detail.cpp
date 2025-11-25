@@ -15,8 +15,8 @@
 #include "apps/finances/qt/widgets/forms/add_transaction.h"
 #include "apps/finances/qt/widgets/transactions/transaction_detail.h"
 
-#include "non_numerable/add_snapshot.h"
-#include "numerable/add_snapshot.h"
+#include "apps/finances/qt/widgets/forms/add_snapshot_non_numerable.h"
+#include "apps/finances/qt/widgets/forms/add_snapshot_numerable.h"
 
 AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
                                          AccountsTableModel<AccountColumns>& accounts_,

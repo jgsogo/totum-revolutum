@@ -1,4 +1,4 @@
-#include "add_snapshot.h"
+#include "add_snapshot_non_numerable.h"
 
 #include <QDialogButtonBox>
 #include <QFormLayout>
