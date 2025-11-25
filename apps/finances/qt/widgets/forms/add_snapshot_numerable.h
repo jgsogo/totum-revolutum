@@ -2,9 +2,10 @@
 
 #include <QCalendarWidget>
 #include <QDialog>
-#include <QLineEdit>
 
 #include "libraries/finances/accounts/cpp/models/account.h"
+
+#include "apps/finances/qt/widgets/forms/amounts/money_amount.h"
 
 class AddSnapshotNumerableWidget : public QDialog {
     Q_OBJECT
@@ -24,5 +25,5 @@ class AddSnapshotNumerableWidget : public QDialog {
     const finances::accounts::models::Account& account;
     QCalendarWidget* calendar;
     QLineEdit* quantity;
-    QLineEdit* unit_value;
+    MoneyAmountEdit* unit_value;
 };
