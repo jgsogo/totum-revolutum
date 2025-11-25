@@ -1,4 +1,4 @@
-#include "add_snapshot.h"
+#include "add_snapshot_numerable.h"
 
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -22,6 +22,7 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     // components
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+    calendar->setFocusPolicy(Qt::StrongFocus);
 
     QRegularExpression rx(R"(^\d+(,\d{2})?$)");
     QRegularExpressionValidator* amount_validator = new QRegularExpressionValidator(rx, this);
@@ -29,16 +30,17 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     quantity = new QLineEdit(this);
     quantity->setValidator(amount_validator);
     quantity->setPlaceholderText("120,34");
+    quantity->setFocusPolicy(Qt::StrongFocus);
 
-    unit_value = new QLineEdit(this);
-    unit_value->setValidator(amount_validator);
-    unit_value->setPlaceholderText("120,34");
+    unit_value = new MoneyAmountEdit("Unit value (%1)", this);
+    unit_value->setCcy(account.ccy);
+    unit_value->setFocusPolicy(Qt::StrongFocus);
 
     // Layout
     QFormLayout* formLayout = new QFormLayout;
     formLayout->addRow(tr("&Date:"), calendar);
     formLayout->addRow(tr("&Quantity:"), quantity);
-    formLayout->addRow(tr("&Unit value (%1):").arg(static_cast<std::string>(account.ccy)), unit_value);
+    formLayout->addRow(unit_value->get_label(), unit_value);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddSnapshotNumerableWidget::add_snapshot_clicked);
@@ -57,7 +59,8 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
 void AddSnapshotNumerableWidget::add_snapshot_clicked() {
     SPDLOG_DEBUG("AddSnapshotNumerableWidget::add_snapshot_clicked");
 
-    if (!unit_value->hasAcceptableInput()) {
+    auto unit_value_money_expected = unit_value->getMoneyAmount();
+    if (!unit_value_money_expected) {
         // TODO: Communicate error to the user
         return;
     }
@@ -78,20 +81,13 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
         return;
     }
 
-    auto unit_value_amount = utils::qstring_to_amount(unit_value->text(), account.ccy);
-    if (!unit_value_amount) {
-        // TODO: Communicate error to the user
-        return;
-    }
-
     // Create the new snapshot
-    Money unit_value{std::move(unit_value_amount.value()), account.ccy};
-    Money amount = unit_value * quantity_amount.value();
+    Money amount = unit_value_money_expected.value() * quantity_amount.value();
 
     SnapshotNumerable new_snapshot_{
         .snapshot = Snapshot{.date_value = std::move(date), .amount = std::move(amount)},
         .quantity = std::move(quantity_amount.value()),
-        .unit_value = std::move(unit_value),
+        .unit_value = std::move(unit_value_money_expected.value()),
     };
 
     utils::db::ModelData<SnapshotNumerable>::Manager manager{pool};

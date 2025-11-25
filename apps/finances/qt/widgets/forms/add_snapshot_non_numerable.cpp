@@ -1,4 +1,4 @@
-#include "add_snapshot.h"
+#include "add_snapshot_non_numerable.h"
 
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -21,17 +21,16 @@ AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(utils::libpqxx::Con
     // Components
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+    calendar->setFocusPolicy(Qt::StrongFocus);
 
-    amount = new QLineEdit(this);
-    QRegularExpression rx(R"(^\d+(,\d{2})?$)");
-    QRegularExpressionValidator* ccy_validator = new QRegularExpressionValidator(rx, this);
-    amount->setValidator(ccy_validator);
-    amount->setPlaceholderText("120,34");
+    amount = new MoneyAmountEdit("Amount (%1)", this);
+    amount->setCcy(account.ccy);
+    amount->setFocusPolicy(Qt::StrongFocus);
 
     // Layout
     QFormLayout* formLayout = new QFormLayout;
     formLayout->addRow(tr("&Date:"), calendar);
-    formLayout->addRow(tr("&Amount (%1):").arg(static_cast<std::string>(account.ccy)), amount);
+    formLayout->addRow(amount->get_label(), amount);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddSnapshotNonNumerableWidget::add_snapshot_clicked);
@@ -50,7 +49,8 @@ AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(utils::libpqxx::Con
 void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {
     SPDLOG_DEBUG("AddSnapshotNonNumerableWidget::add_snapshot_clicked");
 
-    if (!amount->hasAcceptableInput()) {
+    auto money_expected = amount->getMoneyAmount();
+    if (!money_expected) {
         // TODO: Communicate error to the user
         return;
     }
@@ -60,16 +60,10 @@ void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {
                                                    date::month{static_cast<unsigned int>(qt_date.month())},
                                                    date::day{static_cast<unsigned int>(qt_date.day())}}};
 
-    auto amount_amount = utils::qstring_to_amount(amount->text(), account.ccy);
-    if (!amount_amount) {
-        // TODO: Communicate error to the user
-        return;
-    }
-
     // Create the new snapshot
     finances::accounts::models::Snapshot new_snapshot_{
         .date_value = std::move(date),
-        .amount = finances::accounts::models::Money{std::move(amount_amount.value()), account.ccy},
+        .amount = std::move(money_expected.value()),
     };
 
     utils::db::SnapshotManager manager{pool};
