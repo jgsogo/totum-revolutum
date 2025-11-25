@@ -39,8 +39,11 @@ namespace widgets::forms {
         void set_ccy(finances::accounts::models::Ccy ccy);
         void set_dividend_quantity(finances::accounts::models::Amount quantity);
 
+      private slots:
+        void on_current_changed(int index);
+
       signals:
-        void amount_changed(finances::accounts::models::Money money);
+        void amount_changed(std::optional<finances::accounts::models::Money> money);
         void ex_dividend_date_changed(QDate date);
 
       private:

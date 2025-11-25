@@ -8,6 +8,7 @@
 
 #include "base_movement_form.h"
 #include "money_amount.h"
+
 namespace widgets::forms {
 
     class MovementNonNumerableFormWidget : public BaseMovementFormWidget {
@@ -27,7 +28,7 @@ namespace widgets::forms {
         void on_input_data_change();
 
       signals:
-        void amount_changed(finances::accounts::models::Money money);
+        void amount_changed(std::optional<finances::accounts::models::Money>);
 
       protected:
         MoneyAmountEdit* unit_value_edit;

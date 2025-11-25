@@ -16,8 +16,7 @@ namespace widgets::forms {
         // Unit value
         unit_value_edit = new MoneyAmountEdit("Amount (%1)", this);
         connect(unit_value_edit, &MoneyAmountEdit::money_changed, [this]() { this->on_input_data_change(); });
-        connect(unit_value_edit, &MoneyAmountEdit::money_changed, this,
-                &MovementNonNumerableFormWidget::amount_changed);
+        unit_value_edit->setFocusPolicy(Qt::StrongFocus);
 
         QFormLayout* formLayout = new QFormLayout;
         formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
@@ -30,26 +29,25 @@ namespace widgets::forms {
         return unit_value_edit->getMoneyAmount();
     }
 
-    void MovementNonNumerableFormWidget::clear() { unit_value_edit->noCcy(); }
+    void MovementNonNumerableFormWidget::clear() {
+        SPDLOG_DEBUG("MovementNonNumerableFormWidget::clear()");
+        unit_value_edit->noCcy();
+    }
 
     void MovementNonNumerableFormWidget::setCcy(finances::accounts::models::Ccy ccy_) {
         SPDLOG_DEBUG("MovementNonNumerableFormWidget::setCcy(ccy={})", ccy_);
-
         unit_value_edit->setCcy(ccy_);
-
-        this->on_input_data_change();
     }
 
     void MovementNonNumerableFormWidget::on_input_data_change() {
         SPDLOG_DEBUG("MovementNonNumerableFormWidget::on_input_data_change()");
 
         auto money_amount_expected = this->getMoneyAmount();
-        if (!money_amount_expected) {
-            SPDLOG_WARN("We are skipping this signal: {}", money_amount_expected.error());
-            return;
-        }
-
-        emit amount_changed(std::move(money_amount_expected.value()));
+        auto money_opt =
+            money_amount_expected.has_value()
+                ? std::optional<finances::accounts::models::Money>{std::move(money_amount_expected.value())}
+                : std::nullopt;
+        emit amount_changed(std::move(money_opt));
     }
 
 } // namespace widgets::forms

@@ -36,16 +36,12 @@ namespace widgets::forms {
 
       signals:
         void ex_dividend_date_changed(QDate date);
-        void amount_changed(finances::accounts::models::Money money);
+        void amount_changed(std::optional<finances::accounts::models::Money>);
 
       protected:
-        std::optional<finances::accounts::models::Ccy> ccy;
         std::optional<finances::accounts::models::Amount> quantity;
 
         QCalendarWidget* ex_dividend_date;
-        QLineEdit* unit_value;
-        QLabel* unit_value_label;
-
         MoneyAmountEdit* unit_value_edit;
     };
 

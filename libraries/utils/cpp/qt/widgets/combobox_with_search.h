@@ -30,7 +30,6 @@ namespace utils::qt::widgets {
                            QWidget* parent = nullptr)
             : _ComboBoxWithSearch{parent}, _model{model} {
             this->setEditable(true);
-            this->setFocusPolicy(Qt::StrongFocus);
 
             QCompleter* completer = new QCompleter(this);
             completer->setCaseSensitivity(Qt::CaseInsensitive);

@@ -17,6 +17,7 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
 
     account_combo =
         new utils::qt::widgets::ComboBoxWithSearch{accounts, AccountColumns::ID, AccountColumns::NAME, parent};
+    account_combo->setFocusPolicy(Qt::StrongFocus);
 
     direction_combo = new QComboBox;
     direction_combo->setFocusPolicy(Qt::StrongFocus);
@@ -26,8 +27,10 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
 
     movtype_combo = new utils::qt::widgets::ComboBoxWithSearch{movtypes, HierarchyTreeColumns::ID,
                                                                HierarchyTreeColumns::BREADCRUMB, parent};
+    movtype_combo->setFocusPolicy(Qt::StrongFocus);
 
     mov_date = new QCalendarWidget;
+    mov_date->setFocusPolicy(Qt::StrongFocus);
 
     mov_amount = new widgets::forms::MovementStackedForm;
     connect(mov_amount, &widgets::forms::MovementStackedForm::amount_changed, this,
@@ -36,6 +39,7 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
     fx_rate_value = new QLineEdit;
     fx_rate_label = new QLabel(tr("FX rate"));
     fx_rate_value->setEnabled(false);
+    fx_rate_value->setFocusPolicy(Qt::StrongFocus);
 
     amount = new QLabel(tr("Amount: "));
     amount_local = new QLabel(tr("Amount (EUR): "));
@@ -203,37 +207,44 @@ void AddMovementWidget::add_movement_clicked() {
     this->accept();
 }
 
-void AddMovementWidget::on_amount_changed(const finances::accounts::models::Money& money) {
-    SPDLOG_DEBUG("AddMovementWidget::on_amount_changed(money='{}')", static_cast<std::string>(money));
+void AddMovementWidget::on_amount_changed(std::optional<finances::accounts::models::Money> money) {
+    SPDLOG_DEBUG("AddMovementWidget::on_amount_changed(money)");
 
-    amount->setText(
-        tr("Amount (%1): %2").arg(static_cast<std::string>(money.ccy)).arg(static_cast<std::string>(money)));
+    if (money) {
 
-    if (fx_rate_value->isEnabled()) {
+        amount->setText(tr("Amount (%1): %2")
+                            .arg(static_cast<std::string>(money.value().ccy))
+                            .arg(static_cast<std::string>(money.value())));
 
-        // - account
-        auto account_expected = account_combo->selected();
-        if (!account_expected) {
-            return;
+        if (fx_rate_value->isEnabled()) {
+
+            // - account
+            auto account_expected = account_combo->selected();
+            if (!account_expected) {
+                return;
+            }
+            if (!account_expected.value()) {
+                return;
+            }
+            AccountModel account = std::move(account_expected.value().value());
+
+            auto fx_rate_expected = utils::qstring_to_amount(fx_rate_value->text(), finances::accounts::models::EUR);
+            if (!fx_rate_expected) {
+                return;
+            }
+            finances::accounts::models::Fx fx{.foreign = money.value().ccy,
+                                              .local = finances::accounts::models::EUR,
+                                              .rate = std::move(fx_rate_expected.value())};
+
+            auto amount_in_local = finances::accounts::models::apply_fx(money.value(), fx);
+
+            amount_local->setText(tr("Amount (%1): %2")
+                                      .arg(static_cast<std::string>(amount_in_local.ccy))
+                                      .arg(static_cast<std::string>(amount_in_local)));
         }
-        if (!account_expected.value()) {
-            return;
-        }
-        AccountModel account = std::move(account_expected.value().value());
-
-        auto fx_rate_expected = utils::qstring_to_amount(fx_rate_value->text(), finances::accounts::models::EUR);
-        if (!fx_rate_expected) {
-            return;
-        }
-        finances::accounts::models::Fx fx{.foreign = money.ccy,
-                                          .local = finances::accounts::models::EUR,
-                                          .rate = std::move(fx_rate_expected.value())};
-
-        auto amount_in_local = finances::accounts::models::apply_fx(money, fx);
-
-        amount_local->setText(tr("Amount (%1): %2")
-                                  .arg(static_cast<std::string>(amount_in_local.ccy))
-                                  .arg(static_cast<std::string>(amount_in_local)));
+    } else {
+        amount->setText("Amount:");
+        amount_local->setText("Amount:");
     }
 }
 

@@ -74,6 +74,8 @@ namespace widgets::forms {
         mainLayout->addLayout(pImpl->stacked_layout);
 
         this->setLayout(mainLayout);
+
+        connect(pImpl->stacked_layout, &QStackedLayout::currentChanged, this, &MovementStackedForm::on_current_changed);
     }
 
     MovementStackedForm::~MovementStackedForm() = default;
@@ -144,6 +146,14 @@ namespace widgets::forms {
 
     void MovementStackedForm::set_dividend_quantity(finances::accounts::models::Amount quantity) {
         pImpl->mov_dividend->setQuantity(quantity);
+    }
+
+    void MovementStackedForm::on_current_changed(int index) {
+        auto money_expected = this->getMoneyAmount();
+        auto money = money_expected.has_value()
+                         ? std::optional<finances::accounts::models::Money>{std::move(money_expected.value())}
+                         : std::nullopt;
+        emit amount_changed(std::move(money));
     }
 
 } // namespace widgets::forms
