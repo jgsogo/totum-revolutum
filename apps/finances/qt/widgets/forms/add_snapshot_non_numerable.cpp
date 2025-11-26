@@ -62,6 +62,7 @@ void AddSnapshotNonNumerableWidget::add_snapshot_clicked() {
 
     // Create the new snapshot
     finances::accounts::models::Snapshot new_snapshot_{
+        .account = std::make_pair(account.id, account.name),
         .date_value = std::move(date),
         .amount = std::move(money_expected.value()),
     };

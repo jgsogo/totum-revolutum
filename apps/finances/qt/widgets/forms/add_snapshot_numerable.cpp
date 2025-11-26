@@ -85,7 +85,9 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
     Money amount = unit_value_money_expected.value() * quantity_amount.value();
 
     SnapshotNumerable new_snapshot_{
-        .snapshot = Snapshot{.date_value = std::move(date), .amount = std::move(amount)},
+        .snapshot = Snapshot{.account = std::make_pair(account.id, account.name),
+                             .date_value = std::move(date),
+                             .amount = std::move(amount)},
         .quantity = std::move(quantity_amount.value()),
         .unit_value = std::move(unit_value_money_expected.value()),
     };

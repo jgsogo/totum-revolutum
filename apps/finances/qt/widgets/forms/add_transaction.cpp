@@ -146,14 +146,18 @@ void AddTransactionWidget::add_transaction_clicked() {
         [&new_transaction, &all_movements, &transaction_manager, &movement_manager](pqxx::connection& conn) {
             SPDLOG_DEBUG("Insert the new transaction and all the movements using the same DB transaction");
             pqxx::work tx(conn);
-
-            transaction_manager._create(tx, std::move(new_transaction));
-            for (auto& mov : all_movements) {
-                movement_manager._create(tx, mov);
+            try {
+                transaction_manager._create(tx, std::move(new_transaction));
+                for (auto& mov : all_movements) {
+                    movement_manager._create(tx, mov);
+                }
+                tx.commit();
+            } catch (const std::exception& e) {
+                SPDLOG_ERROR("Failed to create new transaction: {}", e.what());
             }
         });
 
-    // Notify to all the accounts involved, that there are new movements and they need to update their data.
+    // TODO: Notify to all the accounts involved, that there are new movements and they need to update their data.
 
     // emit new_movement(movement_model);
     this->accept();
