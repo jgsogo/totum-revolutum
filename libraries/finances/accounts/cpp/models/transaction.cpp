@@ -85,4 +85,9 @@ namespace utils::db {
         return {ret};
     }
 
+    template <> Id ModelManager<Transaction>::_create(pqxx::work&, Transaction&&) {
+        SPDLOG_ERROR("Not implemented");
+        return {std::monostate{}};
+    }
+
 } // namespace utils::db

@@ -136,9 +136,22 @@ void AddTransactionWidget::add_transaction_clicked() {
     };
 
     // Movements
-    // const auto& all_movements = movements->all();
+    const auto& all_movements = movements->all();
 
     // Now I need to insert all the movements and the transaction using a single DB transaction, or rollback everything.
+    utils::db::ModelManager<finances::accounts::models::Transaction> transaction_manager{pool};
+    utils::db::ModelManager<MovementModel> movement_manager{pool};
+
+    pool.with_conn<void>(
+        [&new_transaction, &all_movements, &transaction_manager, &movement_manager](pqxx::connection& conn) {
+            SPDLOG_DEBUG("Insert the new transaction and all the movements using the same DB transaction");
+            pqxx::work tx(conn);
+
+            transaction_manager._create(tx, std::move(new_transaction));
+            for (auto& mov : all_movements) {
+                movement_manager._create(tx, mov);
+            }
+        });
 
     // Notify to all the accounts involved, that there are new movements and they need to update their data.
 

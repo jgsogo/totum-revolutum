@@ -38,4 +38,6 @@ namespace utils::db {
     ExpectedType<MovementModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>
     ModelManager<MovementModel>::get(const ModelData<MovementModel>::Id&);
 
+    template <> Id ModelManager<MovementModel>::_create(pqxx::work&, const MovementModel&);
+
 } // namespace utils::db

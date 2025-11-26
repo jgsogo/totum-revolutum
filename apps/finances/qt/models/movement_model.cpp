@@ -143,4 +143,9 @@ namespace utils::db {
         return tl::unexpected{NotImplemented{}};
     }
 
+    template <> Id ModelManager<MovementModel>::_create(pqxx::work&, const MovementModel&) {
+        SPDLOG_ERROR("Not implemented");
+        return {std::monostate{}};
+    }
+
 } // namespace utils::db

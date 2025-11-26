@@ -101,6 +101,9 @@ namespace utils::db {
                 });
         };
 
+        static Id _create(pqxx::work&, TModel&&);
+        static Id _create(pqxx::work&, const TModel&);
+
       protected:
         static std::vector<TModel> _all(pqxx::work&);
 
@@ -109,8 +112,6 @@ namespace utils::db {
 
         template <typename TParentModel>
         static std::vector<TModel> _filter_by_fk(pqxx::work&, const typename ModelData<TParentModel>::Id&);
-
-        static Id _create(pqxx::work&, TModel&&);
 
       protected:
         utils::libpqxx::ConnectionPool& pool;
