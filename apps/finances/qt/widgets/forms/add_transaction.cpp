@@ -1,6 +1,7 @@
 #include "add_transaction.h"
 
 #include <QDialogButtonBox>
+#include <QFormLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QPushButton>
@@ -16,6 +17,10 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
                                            Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool}, money_in{finances::accounts::models::EUR},
       money_out{finances::accounts::models::EUR} {
+
+    transaction_title = new QLineEdit(this);
+    transaction_description = new QTextEdit(this);
+    transaction_description->setAcceptRichText(false);
 
     // Models
     // - the list of movements associated to this account
@@ -57,7 +62,7 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     money_out_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &AddTransactionWidget::add_transaction_clicked);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     QHBoxLayout* bottom_line = new QHBoxLayout;
@@ -65,9 +70,15 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     bottom_line->addWidget(money_out_label);
     bottom_line->addWidget(buttonBox);
 
+    QFormLayout* formLayout = new QFormLayout;
+    formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+    formLayout->addRow(tr("&Title:"), transaction_title);
+    formLayout->addRow(tr("&Description:"), transaction_description);
+
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->addWidget(new QLabel(tr("Add new transaction")));
+    mainLayout->addLayout(formLayout);
     mainLayout->addWidget(add_movement);
     mainLayout->addWidget(table_view);
     mainLayout->addLayout(bottom_line);
@@ -93,11 +104,44 @@ void AddTransactionWidget::on_new_movement(MovementModel movement) {
     money_out_label->setText(tr("OUT: %1").arg(static_cast<std::string>(money_out)));
 
     QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Save);
-    if (money_in == money_out) {
+    if (this->is_valid()) {
         accept_button->setEnabled(true);
     } else {
         accept_button->setEnabled(false);
     }
 
     movements->insert(std::move(movement));
+}
+
+bool AddTransactionWidget::is_valid() const {
+    // Transaction needs a title
+    return ((transaction_title->hasAcceptableInput()) && (money_in == money_out) && (movements->rowCount() != 0));
+}
+
+void AddTransactionWidget::add_transaction_clicked() {
+    SPDLOG_DEBUG("AddTransactionWidget::add_transaction_clicked()");
+
+    if (!this->is_valid()) {
+        SPDLOG_WARN("User was able to click the 'Save' button, but the transaction is invalid. We cannot add it.");
+        return;
+    }
+
+    // Transaction
+    QString description = transaction_description->toPlainText();
+    finances::accounts::models::Transaction new_transaction{
+        .id = {std::monostate{}}, // No id, it's not in the database yet!
+        .name = this->transaction_title->text().toStdString(),
+        .description = description.isEmpty() ? std::nullopt : std::optional<std::string>{description.toStdString()},
+        .group = std::nullopt,
+    };
+
+    // Movements
+    // const auto& all_movements = movements->all();
+
+    // Now I need to insert all the movements and the transaction using a single DB transaction, or rollback everything.
+
+    // Notify to all the accounts involved, that there are new movements and they need to update their data.
+
+    // emit new_movement(movement_model);
+    this->accept();
 }
