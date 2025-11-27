@@ -153,9 +153,10 @@ void AddTransactionWidget::add_transaction_clicked() {
         }
     });
 
-    // TODO: Notify to all the accounts involved, that there are new movements and they need to update their data.
-    SPDLOG_ERROR("Not implemented: we need to notify all accounts that now they have new movements");
+    // Notify to all the accounts involved, that there are new movements and they need to update their data.
+    for (const auto& movement : all_movements) {
+        emit new_movement(movement.as_movement().account.first);
+    }
 
-    // emit new_movement(movement_model);
     this->accept();
 }

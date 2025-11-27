@@ -12,7 +12,6 @@
 #include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/table_models/snapshots.h"
 #include "apps/finances/qt/tables/movement_columns.h"
-#include "apps/finances/qt/widgets/forms/add_transaction.h"
 #include "apps/finances/qt/widgets/transactions/transaction_detail.h"
 
 #include "apps/finances/qt/widgets/forms/add_snapshot_non_numerable.h"
@@ -104,22 +103,10 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
         connect(bt_add_snapshot, &QPushButton::clicked, popup_add_snapshot, &QDialog::open);
     }
 
-    // - popup - add transaction
-    QPushButton* bt_add_transaction = new QPushButton(tr("Add transaction"), this);
-    {
-        AddTransactionWidget* popup_add_transaction = new AddTransactionWidget(pool, accounts_, movtypes_, this);
-        popup_add_transaction->setModal(true);
-        popup_add_transaction->setSizeGripEnabled(true);
-        // connect(popup_add_transaction, &AddSnapshotNumerableWidget::new_snapshot, this,
-        //         &AccountDetailWidget::on_new_snapshot);
-        connect(bt_add_transaction, &QPushButton::clicked, popup_add_transaction, &QDialog::open);
-    }
-
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->addWidget(new QLabel(QString::fromStdString(account.account.name)));
     mainLayout->addWidget(bt_add_snapshot);
-    mainLayout->addWidget(bt_add_transaction);
     mainLayout->addWidget(table_view);
 
     this->setLayout(mainLayout);
