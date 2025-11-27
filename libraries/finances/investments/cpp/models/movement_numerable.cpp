@@ -65,4 +65,23 @@ namespace utils::db {
         SPDLOG_DEBUG("Get all numerable movements for transaction_id {}", transaction_id);
         return filter_by_fk_id(tx, "transaction_id", transaction_id);
     }
+
+    template <>
+    Id ModelManager<MovementNumerable>::_create(pqxx::work& tx, const MovementNumerable& movement_numerable) {
+        SPDLOG_DEBUG("Create a new MovementNumerable");
+
+        auto movement_id = ModelManager<Movement>::_create(tx, movement_numerable.movement);
+        auto query = std::format("INSERT INTO {}"
+                                 " (movement_ptr_id, quantity, unit_value)"
+                                 " VALUES ($1, $2, $3)"
+                                 " RETURNING movement_ptr_id;",
+                                 MOVEMENT_NUMERABLE_TABLE);
+
+        SPDLOG_TRACE(query);
+        auto r =
+            tx.exec(query, pqxx::params{movement_id, movement_numerable.quantity, movement_numerable.unit_value.amount})
+                .one_field();
+        auto inserted_id = r.as<Id>();
+        return inserted_id;
+    }
 } // namespace utils::db

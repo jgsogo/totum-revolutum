@@ -31,4 +31,8 @@ namespace utils::db {
     utils::db::ModelManager<finances::investments::models::MovementDividend>::_filter_by_fk<
         finances::accounts::models::Transaction>(pqxx::work&,
                                                  const ModelData<finances::accounts::models::Transaction>::Id& id);
+
+    template <>
+    Id ModelManager<finances::investments::models::MovementDividend>::_create(
+        pqxx::work&, const finances::investments::models::MovementDividend&);
 } // namespace utils::db

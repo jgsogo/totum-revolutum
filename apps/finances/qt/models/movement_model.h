@@ -15,6 +15,8 @@ struct MovementModel {
         movement;
     std::string movtype_breadcrumb;
 
+    finances::accounts::models::Movement& as_mut_movement();
+
     const finances::accounts::models::Movement& as_movement() const;
 };
 
@@ -37,5 +39,7 @@ namespace utils::db {
     template <>
     ExpectedType<MovementModel, DatabaseError, ErrorNotFound, ErrorMultipleFound>
     ModelManager<MovementModel>::get(const ModelData<MovementModel>::Id&);
+
+    template <> Id ModelManager<MovementModel>::_create(pqxx::work&, const MovementModel&);
 
 } // namespace utils::db

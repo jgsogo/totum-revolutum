@@ -107,11 +107,12 @@ void AccountsTableWidget::onPressed(const QModelIndex& index) {
         // Get the account id from the filter/sort view
         QVariant account_id_variant =
             sort_filter->data(index.siblingAtColumn(magic_enum::enum_integer(AccountColumns::ID)));
-        SPDLOG_TRACE(" - account_id: {}", account_id_variant.toString().toStdString());
-        utils::db::Id account_id{utils::db::IdType{account_id_variant.toULongLong()}};
+        SPDLOG_TRACE(" - account.id: {}", account_id_variant.toString().toStdString());
+        utils::db::Id account_id = account_id_variant.value<utils::db::Id>();
 
         // Get the account itself
         const AccountModel& account = accounts.get(account_id).value();
+        SPDLOG_TRACE(" - account.name: {}", account.account.name);
 
         // Show the AddSnapshot dialog
         // FIXME: Merge AddSnapshotNumerableWidget and AddSnapshotNonNumerableWidget into a single one AddSnapshot

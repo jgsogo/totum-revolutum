@@ -137,9 +137,20 @@ namespace utils::db {
         return ret;
     }
 
-    template <> Id ModelManager<Snapshot>::_create(pqxx::work&, Snapshot&&) {
-        SPDLOG_ERROR("Not implemented");
-        return {std::monostate{}};
+    template <> Id ModelManager<Snapshot>::_create(pqxx::work& tx, Snapshot&& snapshot) {
+        SPDLOG_DEBUG("Create a new snapshot");
+
+        auto query = std::format("INSERT INTO {}"
+                                 " (amount, account_id, date_value)"
+                                 " VALUES ($1, $2, $3)"
+                                 " RETURNING id;",
+                                 SNAPSHOT_TABLE);
+
+        SPDLOG_TRACE(query);
+        auto r = tx.exec(query, pqxx::params{snapshot.amount.amount, snapshot.account.first, snapshot.date_value})
+                     .one_field();
+        auto snapshot_id = r.as<Id>();
+        return snapshot_id;
     }
 
     template <> std::vector<Snapshot> ModelManager<Snapshot>::_all(pqxx::work&) {

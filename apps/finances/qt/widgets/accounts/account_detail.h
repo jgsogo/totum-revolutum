@@ -9,10 +9,12 @@
 
 #include "apps/finances/qt/tables/accounts.h"
 #include "apps/finances/qt/tables/hierarchy_tree_columns.h"
+#include "apps/finances/qt/tables/movement_columns.h"
 #include "apps/finances/qt/tables/transaction_columns.h"
 
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/table_models/movement_type.h"
+#include "apps/finances/qt/table_models/movements.h"
 #include "apps/finances/qt/table_models/transactions.h"
 
 class AccountDetailWidget : public QWidget {
@@ -21,6 +23,10 @@ class AccountDetailWidget : public QWidget {
     explicit AccountDetailWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>& accounts,
                                  MovementTypesTableModel<HierarchyTreeColumns>& movtypes, const AccountModel&,
                                  QWidget* parent = nullptr);
+
+    const AccountModel& get_account() const;
+  public slots:
+    void refresh(utils::db::Id account_id);
 
   private slots:
     void on_new_snapshot(utils::db::Id account_id);
@@ -35,4 +41,5 @@ class AccountDetailWidget : public QWidget {
     utils::libpqxx::ConnectionPool& pool;
     const AccountModel& account;
     TransactionsForAccountTableModel<TransactionColumns>* transactions_tablemodel;
+    MovementsForAccountTableModel<MovementColumns>* movements_tablemodel;
 };

@@ -70,14 +70,17 @@ namespace utils::db {
     template <>
     template <>
     std::vector<finances::accounts::models::Movement>
-    utils::db::ModelManager<finances::accounts::models::Movement>::_filter_by_fk<finances::accounts::models::Account>(
+    ModelManager<finances::accounts::models::Movement>::_filter_by_fk<finances::accounts::models::Account>(
         pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
 
     template <>
     template <>
     std::vector<finances::accounts::models::Movement>
-    utils::db::ModelManager<finances::accounts::models::Movement>::_filter_by_fk<
-        finances::accounts::models::Transaction>(pqxx::work&,
-                                                 const ModelData<finances::accounts::models::Transaction>::Id& id);
+    ModelManager<finances::accounts::models::Movement>::_filter_by_fk<finances::accounts::models::Transaction>(
+        pqxx::work&, const ModelData<finances::accounts::models::Transaction>::Id& id);
+
+    template <>
+    Id ModelManager<finances::accounts::models::Movement>::_create(pqxx::work&,
+                                                                   const finances::accounts::models::Movement&);
 
 } // namespace utils::db

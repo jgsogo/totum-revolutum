@@ -47,4 +47,9 @@ namespace utils::db {
     std::vector<finances::accounts::models::Transaction>
     utils::db::ModelManager<finances::accounts::models::Transaction>::_filter_by_fk<
         finances::accounts::models::Account>(pqxx::work&, const ModelData<finances::accounts::models::Account>::Id& id);
+
+    template <>
+    Id ModelManager<finances::accounts::models::Transaction>::_create(pqxx::work&,
+                                                                      finances::accounts::models::Transaction&&);
+
 } // namespace utils::db

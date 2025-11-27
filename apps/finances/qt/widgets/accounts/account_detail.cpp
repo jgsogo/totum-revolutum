@@ -9,14 +9,12 @@
 #include <QVBoxLayout>
 
 #include "apps/finances/qt/metatypes/types.h"
-#include "apps/finances/qt/table_models/movements.h"
+
 #include "apps/finances/qt/table_models/snapshots.h"
-#include "apps/finances/qt/tables/movement_columns.h"
-#include "apps/finances/qt/widgets/forms/add_transaction.h"
-#include "apps/finances/qt/widgets/transactions/transaction_detail.h"
 
 #include "apps/finances/qt/widgets/forms/add_snapshot_non_numerable.h"
 #include "apps/finances/qt/widgets/forms/add_snapshot_numerable.h"
+#include "apps/finances/qt/widgets/transactions/transaction_detail.h"
 
 AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
                                          AccountsTableModel<AccountColumns>& accounts_,
@@ -30,8 +28,7 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
 
     // - movements
     {
-        MovementsForAccountTableModel<MovementColumns>* movements_tablemodel =
-            new MovementsForAccountTableModel<MovementColumns>(account.account, pool, this);
+        movements_tablemodel = new MovementsForAccountTableModel<MovementColumns>(account.account, pool, this);
         model->addSourceModel(movements_tablemodel);
     }
 
@@ -104,31 +101,28 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
         connect(bt_add_snapshot, &QPushButton::clicked, popup_add_snapshot, &QDialog::open);
     }
 
-    // - popup - add transaction
-    QPushButton* bt_add_transaction = new QPushButton(tr("Add transaction"), this);
-    {
-        AddTransactionWidget* popup_add_transaction = new AddTransactionWidget(pool, accounts_, movtypes_, this);
-        popup_add_transaction->setModal(true);
-        popup_add_transaction->setSizeGripEnabled(true);
-        // connect(popup_add_transaction, &AddSnapshotNumerableWidget::new_snapshot, this,
-        //         &AccountDetailWidget::on_new_snapshot);
-        connect(bt_add_transaction, &QPushButton::clicked, popup_add_transaction, &QDialog::open);
-    }
-
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->addWidget(new QLabel(QString::fromStdString(account.account.name)));
     mainLayout->addWidget(bt_add_snapshot);
-    mainLayout->addWidget(bt_add_transaction);
     mainLayout->addWidget(table_view);
 
     this->setLayout(mainLayout);
 }
 
+const AccountModel& AccountDetailWidget::get_account() const { return account; }
+
 void AccountDetailWidget::on_new_snapshot(utils::db::Id account_id) {
     SPDLOG_DEBUG("AccountDetailWidget::on_new_snapshot(account_id={})", account_id);
     assert(account_id == account.id);
     emit snapshot_added(account_id);
+}
+
+void AccountDetailWidget::refresh(utils::db::Id account_id) {
+    SPDLOG_DEBUG("AccountDetailWidget::refresh(account_id={})", account_id);
+    assert(account_id == account.id);
+    transactions_tablemodel->refresh_all();
+    movements_tablemodel->refresh_all();
 }
 
 void AccountDetailWidget::showTransaction(const decltype(finances::accounts::models::Transaction::id)& transaction_id) {

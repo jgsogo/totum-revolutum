@@ -48,9 +48,28 @@ namespace utils::db {
 
     template <>
     Id ModelManager<finances::investments::models::SnapshotNumerable>::_create(
-        pqxx::work&, finances::investments::models::SnapshotNumerable&&) {
-        SPDLOG_ERROR("Not implemented");
-        return {std::monostate{}};
+        pqxx::work& tx, finances::investments::models::SnapshotNumerable&& snapshot_numerable) {
+        SPDLOG_DEBUG("Create a new snapshot numerable");
+        auto query = std::format("WITH inserted_parent AS ("
+                                 "    INSERT INTO {} (amount, account_id, date_value)"
+                                 "    VALUES ($1, $2, $3)"
+                                 "    RETURNING id"
+                                 ") "
+                                 "INSERT INTO {}"
+                                 " (snapshot_ptr_id, quantity, unit_value)"
+                                 " SELECT id, $4, $5"
+                                 "   FROM inserted_parent"
+                                 " RETURNING snapshot_ptr_id;",
+                                 SNAPSHOT_TABLE, SNAPSHOT_NUMERABLE_TABLE);
+
+        SPDLOG_TRACE(query);
+        auto r = tx.exec(query,
+                         pqxx::params{snapshot_numerable.snapshot.amount.amount,
+                                      snapshot_numerable.snapshot.account.first, snapshot_numerable.snapshot.date_value,
+                                      snapshot_numerable.quantity, snapshot_numerable.unit_value.amount})
+                     .one_field();
+        auto snapshot_id = r.as<Id>();
+        return snapshot_id;
     }
 
     template <>

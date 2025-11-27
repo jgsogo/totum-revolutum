@@ -24,6 +24,7 @@
 #include "apps/finances/qt/tables/hierarchy_tree_columns.h"
 #include "apps/finances/qt/version.hpp"
 #include "apps/finances/qt/widgets/accounts/main_tab.h"
+#include "apps/finances/qt/widgets/forms/add_transaction.h"
 
 int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::trace); // TODO: Configurable via CLI and/or envvar
@@ -76,8 +77,26 @@ int main(int argc, char** argv) {
     // Create the tabs for the accounts
     MainTabWidget* tabWidget = new MainTabWidget(pool, me, accounts_tablemodel, movement_types_tablemodel);
     QObject::connect(tabWidget, &MainTabWidget::account_changed, &notificator, &Notificator::notify_account);
+    QObject::connect(&notificator, &Notificator::account_changed, tabWidget, &MainTabWidget::on_account_changed);
+
+    // - popup - add transaction
+    QPushButton* bt_add_transaction = new QPushButton(QObject::tr("Add transaction"));
+    {
+        // QObject::connect(bt_add_transaction, &QPushButton::clicked, popup_add_transaction, &QDialog::open);
+        QObject::connect(bt_add_transaction, &QPushButton::clicked,
+                         [&pool, &accounts_tablemodel, &movement_types_tablemodel, &notificator]() {
+                             AddTransactionWidget* popup_add_transaction =
+                                 new AddTransactionWidget(pool, accounts_tablemodel, movement_types_tablemodel);
+                             popup_add_transaction->setModal(true);
+                             popup_add_transaction->setSizeGripEnabled(true);
+                             QObject::connect(popup_add_transaction, &AddTransactionWidget::new_movement, &notificator,
+                                              &Notificator::notify_account);
+                             popup_add_transaction->open();
+                         });
+    }
 
     QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(bt_add_transaction);
     layout->addWidget(tabWidget);
 
     window.setLayout(layout);

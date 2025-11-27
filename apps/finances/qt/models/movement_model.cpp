@@ -5,6 +5,23 @@
 using namespace finances::accounts::models;
 using namespace finances::investments::models;
 
+Movement& MovementModel::as_mut_movement() {
+    return std::visit(
+        [](auto& arg) -> Movement& {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, Movement>) {
+                return arg;
+            } else if constexpr (std::is_same_v<T, MovementNumerable>) {
+                return arg.movement;
+            } else if constexpr (std::is_same_v<T, MovementDividend>) {
+                return arg.movement;
+            } else {
+                static_assert(false, "non-exhaustive visitor!");
+            }
+        },
+        movement);
+}
+
 const Movement& MovementModel::as_movement() const {
     return std::visit(
         [](const auto& arg) -> const Movement& {
@@ -141,6 +158,23 @@ namespace utils::db {
     ModelManager<MovementModel>::get(const ModelData<MovementModel>::Id&) {
         SPDLOG_ERROR("Not implemented");
         return tl::unexpected{NotImplemented{}};
+    }
+
+    template <> Id ModelManager<MovementModel>::_create(pqxx::work& tx, const MovementModel& movement) {
+        return std::visit(
+            [&tx](const auto& arg) -> Id {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, Movement>) {
+                    return ModelManager<Movement>::_create(tx, arg);
+                } else if constexpr (std::is_same_v<T, MovementNumerable>) {
+                    return ModelManager<MovementNumerable>::_create(tx, arg);
+                } else if constexpr (std::is_same_v<T, MovementDividend>) {
+                    return ModelManager<MovementDividend>::_create(tx, arg);
+                } else {
+                    static_assert(false, "non-exhaustive visitor!");
+                }
+            },
+            movement.movement);
     }
 
 } // namespace utils::db
