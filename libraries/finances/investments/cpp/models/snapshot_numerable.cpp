@@ -50,8 +50,7 @@ namespace utils::db {
     Id ModelManager<finances::investments::models::SnapshotNumerable>::_create(
         pqxx::work& tx, finances::investments::models::SnapshotNumerable&& snapshot_numerable) {
         SPDLOG_DEBUG("Create a new snapshot numerable");
-        auto query = std::format(""
-                                 "WITH inserted_parent AS ("
+        auto query = std::format("WITH inserted_parent AS ("
                                  "    INSERT INTO {} (amount, account_id, date_value)"
                                  "    VALUES ($1, $2, $3)"
                                  "    RETURNING id"

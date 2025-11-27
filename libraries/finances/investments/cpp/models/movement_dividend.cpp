@@ -88,4 +88,21 @@ namespace utils::db {
         return filter_by_fk_id(tx, "transaction_id", transaction_id);
     }
 
+    template <> Id ModelManager<MovementDividend>::_create(pqxx::work& tx, const MovementDividend& movement_dividend) {
+        SPDLOG_DEBUG("Create a new MovementDividend");
+
+        auto movement_id = ModelManager<Movement>::_create(tx, movement_dividend.movement);
+        auto query = std::format("INSERT INTO {}"
+                                 " (movement_ptr_id, ex_dividend_date, unit_value)"
+                                 " VALUES ($1, $2, $3)"
+                                 " RETURNING movement_ptr_id;",
+                                 MOVEMENT_DIVIDEND_TABLE);
+
+        SPDLOG_TRACE(query);
+        auto r = tx.exec(query, pqxx::params{movement_id, movement_dividend.ex_dividend_date,
+                                             movement_dividend.unit_value.amount})
+                     .one_field();
+        auto inserted_id = r.as<Id>();
+        return inserted_id;
+    }
 } // namespace utils::db

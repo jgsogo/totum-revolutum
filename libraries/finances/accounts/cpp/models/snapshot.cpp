@@ -140,8 +140,7 @@ namespace utils::db {
     template <> Id ModelManager<Snapshot>::_create(pqxx::work& tx, Snapshot&& snapshot) {
         SPDLOG_DEBUG("Create a new snapshot");
 
-        auto query = std::format(""
-                                 "INSERT INTO {}"
+        auto query = std::format("INSERT INTO {}"
                                  " (amount, account_id, date_value)"
                                  " VALUES ($1, $2, $3)"
                                  " RETURNING id;",

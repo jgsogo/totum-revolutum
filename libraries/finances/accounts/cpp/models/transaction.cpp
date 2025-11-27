@@ -85,9 +85,22 @@ namespace utils::db {
         return {ret};
     }
 
-    template <> Id ModelManager<Transaction>::_create(pqxx::work&, Transaction&&) {
-        SPDLOG_ERROR("Not implemented");
-        return {std::monostate{}};
+    template <> Id ModelManager<Transaction>::_create(pqxx::work& tx, Transaction&& transaction) {
+        SPDLOG_DEBUG("Create a new transaction");
+
+        auto query = std::format("INSERT INTO {}"
+                                 " (name, description, group)"
+                                 " VALUES ($1, $2, $3)"
+                                 " RETURNING id;",
+                                 TRANSACTION_TABLE);
+
+        SPDLOG_TRACE(query);
+        auto transaction_group_id =
+            transaction.group.has_value() ? std::optional<Id>{transaction.group->first} : std::nullopt;
+        auto r =
+            tx.exec(query, pqxx::params{transaction.name, transaction.description, transaction_group_id}).one_field();
+        auto inserted_id = r.as<Id>();
+        return inserted_id;
     }
 
 } // namespace utils::db

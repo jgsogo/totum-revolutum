@@ -74,4 +74,34 @@ namespace utils::db {
         return filter_by_fk_id(tx, "transaction_id", transaction_id);
     }
 
+    template <> Id ModelManager<Movement>::_create(pqxx::work& tx, const Movement& movement) {
+        SPDLOG_DEBUG("Create a new Movement");
+
+        std::optional<Id> fx_id = std::nullopt;
+        if (movement.fx) {
+            Fx fx{
+                .id = {std::monostate{}},
+                .foreign = movement.amount.ccy,
+                .local = movement.fx->second,
+                .date_value = movement.date_value,
+                .rate = movement.fx->first,
+            };
+
+            fx_id = ModelManager<Fx>::_create(tx, fx);
+        }
+
+        auto query = std::format("INSERT INTO {}"
+                                 " (amount, transaction_id, type_id, direction, account_id, date_value, fx_id)"
+                                 " VALUES ($1, $2, $3, $4, $5, $6, $7)"
+                                 " RETURNING id;",
+                                 MOVEMENT_TABLE);
+
+        SPDLOG_TRACE(query);
+        auto r = tx.exec(query, pqxx::params{movement.amount.amount, movement.transaction.first, movement.type.first,
+                                             movement.direction, movement.account.first, movement.date_value, fx_id})
+                     .one_field();
+        auto inserted_id = r.as<Id>();
+        return inserted_id;
+    }
+
 } // namespace utils::db

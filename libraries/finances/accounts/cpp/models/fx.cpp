@@ -3,6 +3,9 @@
 #include <spdlog/spdlog.h>
 
 #include "errors.h"
+#include "model_manager.hpp"
+
+using namespace finances::accounts::models;
 
 namespace finances::accounts::models {
 
@@ -23,12 +26,32 @@ namespace finances::accounts::models {
             throw error::CcyMismatch{};
         }
     }
+} // namespace finances::accounts::models
 
-    Fx::operator std::string() const {
-        auto rate_str = dec::toString(dec::decimal_cast<4>(rate.value), dec::decimal_format(','));
-        return std::format("{} {}/{}", rate_str, local, foreign);
+Fx::operator std::string() const {
+    auto rate_str = dec::toString(dec::decimal_cast<4>(rate.value), dec::decimal_format(','));
+    return std::format("{} {}/{}", rate_str, local, foreign);
+}
+
+bool Fx::is_valid() const { return rate.value != 0; }
+
+namespace utils::db {
+
+    template <> Id ModelManager<Fx>::_create(pqxx::work& tx, const Fx& fx) {
+        SPDLOG_DEBUG("Create a new FX");
+
+        auto query = std::format("INSERT INTO {}"
+                                 " (foreign, local, rate, date_value)"
+                                 " VALUES ($1, $2, $3, $4)"
+                                 " RETURNING id;",
+                                 FX_TABLE);
+
+        SPDLOG_TRACE(query);
+        auto r = tx.exec(query, pqxx::params{static_cast<std::string_view>(fx.foreign),
+                                             static_cast<std::string_view>(fx.local), fx.rate, fx.date_value})
+                     .one_field();
+        auto inserted_id = r.as<Id>();
+        return inserted_id;
     }
 
-    bool Fx::is_valid() const { return rate.value != 0; }
-
-} // namespace finances::accounts::models
+} // namespace utils::db

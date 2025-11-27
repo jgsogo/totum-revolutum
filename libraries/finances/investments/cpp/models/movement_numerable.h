@@ -28,4 +28,7 @@ namespace utils::db {
         finances::accounts::models::Transaction>(pqxx::work&,
                                                  const ModelData<finances::accounts::models::Transaction>::Id& id);
 
+    template <>
+    Id ModelManager<finances::investments::models::MovementNumerable>::_create(
+        pqxx::work&, const finances::investments::models::MovementNumerable&);
 } // namespace utils::db

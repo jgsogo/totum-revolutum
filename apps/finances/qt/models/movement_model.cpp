@@ -143,9 +143,21 @@ namespace utils::db {
         return tl::unexpected{NotImplemented{}};
     }
 
-    template <> Id ModelManager<MovementModel>::_create(pqxx::work&, const MovementModel&) {
-        SPDLOG_ERROR("Not implemented");
-        return {std::monostate{}};
+    template <> Id ModelManager<MovementModel>::_create(pqxx::work& tx, const MovementModel& movement) {
+        return std::visit(
+            [&tx](const auto& arg) -> Id {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, Movement>) {
+                    return ModelManager<Movement>::_create(tx, arg);
+                } else if constexpr (std::is_same_v<T, MovementNumerable>) {
+                    return ModelManager<MovementNumerable>::_create(tx, arg);
+                } else if constexpr (std::is_same_v<T, MovementDividend>) {
+                    return ModelManager<MovementDividend>::_create(tx, arg);
+                } else {
+                    static_assert(false, "non-exhaustive visitor!");
+                }
+            },
+            movement.movement);
     }
 
 } // namespace utils::db
