@@ -118,6 +118,12 @@ void AccountDetailWidget::on_new_snapshot(utils::db::Id account_id) {
     emit snapshot_added(account_id);
 }
 
+void AccountDetailWidget::refresh(utils::db::Id account_id) {
+    SPDLOG_DEBUG("AccountDetailWidget::refresh(account_id={})", account_id);
+    assert(account_id == account.id);
+    transactions_tablemodel->refresh_all();
+}
+
 void AccountDetailWidget::showTransaction(const decltype(finances::accounts::models::Transaction::id)& transaction_id) {
     SPDLOG_DEBUG("AccountDetailWidget::showTransaction(transaction_id={})", transaction_id);
 

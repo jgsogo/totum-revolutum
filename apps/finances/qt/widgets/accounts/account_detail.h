@@ -22,6 +22,9 @@ class AccountDetailWidget : public QWidget {
                                  MovementTypesTableModel<HierarchyTreeColumns>& movtypes, const AccountModel&,
                                  QWidget* parent = nullptr);
 
+  public slots:
+    void refresh(utils::db::Id account_id);
+
   private slots:
     void on_new_snapshot(utils::db::Id account_id);
 

@@ -15,6 +15,8 @@ struct MovementModel {
         movement;
     std::string movtype_breadcrumb;
 
+    finances::accounts::models::Movement& as_mut_movement();
+
     const finances::accounts::models::Movement& as_movement() const;
 };
 

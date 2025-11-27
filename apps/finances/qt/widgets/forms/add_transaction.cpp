@@ -139,24 +139,31 @@ void AddTransactionWidget::add_transaction_clicked() {
     const auto& all_movements = movements->all();
 
     // Now I need to insert all the movements and the transaction using a single DB transaction, or rollback everything.
-    pool.with_conn<void>([&new_transaction, &all_movements](pqxx::connection& conn) {
+    bool success = pool.with_conn<bool>([&new_transaction, &all_movements](pqxx::connection& conn) {
         SPDLOG_DEBUG("Insert the new transaction and all the movements using the same DB transaction");
         pqxx::work tx(conn);
         try {
-            utils::db::ModelManager<finances::accounts::models::Transaction>::_create(tx, std::move(new_transaction));
-            for (auto& mov : all_movements) {
+            auto transaction_id = utils::db::ModelManager<finances::accounts::models::Transaction>::_create(
+                tx, std::move(new_transaction));
+            for (auto mov : all_movements) {
+                mov.as_mut_movement().transaction.first = transaction_id;
                 utils::db::ModelManager<MovementModel>::_create(tx, mov);
             }
             tx.commit();
+            return true;
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to create new transaction: {}", e.what());
+            return false;
         }
     });
 
     // Notify to all the accounts involved, that there are new movements and they need to update their data.
-    for (const auto& movement : all_movements) {
-        emit new_movement(movement.as_movement().account.first);
+    if (success) {
+        for (const auto& movement : all_movements) {
+            emit new_movement(movement.as_movement().account.first);
+        }
+        this->accept();
+    } else {
+        // TODO: Notify the user about the error
     }
-
-    this->accept();
 }

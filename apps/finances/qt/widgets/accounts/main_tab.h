@@ -19,6 +19,9 @@ class MainTabWidget : public QTabWidget {
                   QWidget* parent = nullptr);
     void tabRemoved(int index) override;
 
+  public slots:
+    void on_account_changed(utils::db::Id account_id);
+
   private slots:
     void addTabAccount(utils::db::Id account_id);
     void closeMyTab(int);

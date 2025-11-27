@@ -89,7 +89,7 @@ namespace utils::db {
         SPDLOG_DEBUG("Create a new transaction");
 
         auto query = std::format("INSERT INTO {}"
-                                 " (name, description, group)"
+                                 " (name, description, group_id)"
                                  " VALUES ($1, $2, $3)"
                                  " RETURNING id;",
                                  TRANSACTION_TABLE);

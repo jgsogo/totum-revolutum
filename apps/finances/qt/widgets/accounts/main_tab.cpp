@@ -75,3 +75,13 @@ void MainTabWidget::tabRemoved(int index) {
     SPDLOG_DEBUG("MainTabWidget::tabRemoved(index={})", index);
     std::erase_if(_accounts_tabs, [index](const auto& item) { return item.second == index; });
 }
+
+void MainTabWidget::on_account_changed(utils::db::Id account_id) {
+    SPDLOG_DEBUG("MainTabWidget::on_account_changed(account_id={})", account_id);
+
+    auto account_tab_idx = _accounts_tabs.find(account_id);
+    if (account_tab_idx != _accounts_tabs.end()) {
+        AccountDetailWidget* account_widget = static_cast<AccountDetailWidget*>(this->widget(account_tab_idx->second));
+        account_widget->refresh(account_id);
+    }
+}
