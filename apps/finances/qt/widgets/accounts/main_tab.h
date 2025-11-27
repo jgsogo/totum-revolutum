@@ -10,6 +10,8 @@
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/table_models/movement_type.h"
 
+#include "account_detail.h"
+
 class MainTabWidget : public QTabWidget {
     Q_OBJECT
 
@@ -31,7 +33,7 @@ class MainTabWidget : public QTabWidget {
 
   private:
     int _all_accounts_idx;
-    std::unordered_map<utils::db::Id, int> _accounts_tabs;
+    std::vector<AccountDetailWidget*> _accounts_tabs;
 
     utils::libpqxx::ConnectionPool& pool;
     AccountsTableModel<AccountColumns>& accounts;
