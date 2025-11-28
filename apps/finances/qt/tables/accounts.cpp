@@ -80,6 +80,9 @@ namespace utils::qt::models {
                            [](const auto& acc_holder) { return acc_holder.name; });
             result = QString::fromStdString(imploded.str());
         } break;
+        case AccountColumns::CUSTODIAN_AND_NAME: {
+            result = QString("%1 | %2").arg(account.custodian.second, account.name);
+        } break;
         }
         return result;
     }
@@ -114,7 +117,7 @@ namespace utils::qt::models {
     QVariant DataDispatcher<AccountModel, AccountColumns, Qt::TextAlignmentRole>::data(const AccountModel&,
                                                                                        AccountColumns column) {
         if ((column == AccountColumns::CUSTODIAN) || (column == AccountColumns::NAME) ||
-            (column == AccountColumns::TYPE)) {
+            (column == AccountColumns::TYPE) || column == AccountColumns::CUSTODIAN_AND_NAME) {
             return Qt::AlignLeft;
         } else {
             return Qt::AlignRight;

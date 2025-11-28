@@ -50,6 +50,9 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
         table_view->setModel(sort_filter);
         table_view->setSortingEnabled(false);
         table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::TRANSACTION_ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ACCOUNT_ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::TRANSACTION));
         table_view->verticalHeader()->hide();
         table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
@@ -59,7 +62,7 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     }
 
     money_in_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
-    money_out_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
+    money_out_label = new QLabel(tr("OUT: %1").arg(static_cast<std::string>(money_out)));
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddTransactionWidget::add_transaction_clicked);
