@@ -33,7 +33,7 @@ void MoneyAmountEdit::setCcy(finances::accounts::models::Ccy ccy) {
     pImpl->ccy = ccy;
 
     // Depending on the CCY, we might have different formats here
-    QRegularExpression rx(R"(^\d+(,\d{2})?$)");
+    QRegularExpression rx(R"(^\d+(,\d{4})?$)");
     QRegularExpressionValidator* amount_validator = new QRegularExpressionValidator(rx, this);
     this->setValidator(amount_validator);
     this->setPlaceholderText("120,34");

@@ -12,6 +12,7 @@ class AddSnapshotNumerableWidget : public QDialog {
 
   private slots:
     void add_snapshot_clicked();
+    void on_inputs_changed();
 
   signals:
     void new_snapshot(utils::db::Id account_id);
@@ -20,10 +21,14 @@ class AddSnapshotNumerableWidget : public QDialog {
     AddSnapshotNumerableWidget(utils::libpqxx::ConnectionPool& pool, const finances::accounts::models::Account& account,
                                QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
+    ExpectedType<finances::accounts::models::Money> getMoneyAmount() const;
+
   protected:
     utils::libpqxx::ConnectionPool& pool;
     const finances::accounts::models::Account& account;
     QCalendarWidget* calendar;
     QLineEdit* quantity;
     MoneyAmountEdit* unit_value;
+
+    QLabel* amount_label;
 };

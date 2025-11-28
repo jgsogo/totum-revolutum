@@ -22,19 +22,20 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     // components
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
-    calendar->setFocusPolicy(Qt::StrongFocus);
 
-    QRegularExpression rx(R"(^\d+(,\d{2})?$)");
-    QRegularExpressionValidator* amount_validator = new QRegularExpressionValidator(rx, this);
+    QRegularExpression rx(R"(^\d+(,\d{4})?$)");
+    QRegularExpressionValidator* quantity_validator = new QRegularExpressionValidator(rx, this);
 
     quantity = new QLineEdit(this);
-    quantity->setValidator(amount_validator);
+    quantity->setValidator(quantity_validator);
     quantity->setPlaceholderText("120,34");
-    quantity->setFocusPolicy(Qt::StrongFocus);
+    connect(quantity, &QLineEdit::textEdited, this, &AddSnapshotNumerableWidget::on_inputs_changed);
 
     unit_value = new MoneyAmountEdit("Unit value (%1)", this);
     unit_value->setCcy(account.ccy);
-    unit_value->setFocusPolicy(Qt::StrongFocus);
+    connect(unit_value, &QLineEdit::textEdited, this, &AddSnapshotNumerableWidget::on_inputs_changed);
+
+    amount_label = new QLabel(tr("Amount (%1):").arg(static_cast<std::string>(account.ccy)));
 
     // Layout
     QFormLayout* formLayout = new QFormLayout;
@@ -50,14 +51,53 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     QString title(tr("%1 - Add snapshot numerable").arg(account.name));
     mainLayout->addWidget(new QLabel(title));
     mainLayout->addLayout(formLayout);
+    mainLayout->addWidget(amount_label);
     mainLayout->addWidget(buttonBox);
 
     this->setLayout(mainLayout);
     this->setWindowTitle(title);
 }
 
+void AddSnapshotNumerableWidget::on_inputs_changed() {
+    auto amount_expected = this->getMoneyAmount();
+    if (amount_expected) {
+        this->amount_label->setText(
+            QString("Amount (%1): %2")
+                .arg(static_cast<std::string>(account.ccy), static_cast<std::string>(amount_expected.value())));
+    }
+}
+
+ExpectedType<Money> AddSnapshotNumerableWidget::getMoneyAmount() const {
+    SPDLOG_DEBUG("AddSnapshotNumerableWidget::getMoneyAmount");
+
+    auto unit_value_money_expected = unit_value->getMoneyAmount();
+    if (!unit_value_money_expected) {
+        return tl::unexpected{unit_value_money_expected.error()};
+    }
+
+    if (!quantity->hasAcceptableInput()) {
+        return tl::unexpected{::error::InputFieldNotSet{"quantity"}};
+    }
+
+    auto quantity_amount = utils::qstring_to_amount(quantity->text(), account.ccy);
+    if (!quantity_amount) {
+        return tl::unexpected{quantity_amount.error()};
+    }
+
+    // Create the new snapshot
+    Money amount = unit_value_money_expected.value() * quantity_amount.value();
+    return {std::move(amount)};
+}
+
 void AddSnapshotNumerableWidget::add_snapshot_clicked() {
     SPDLOG_DEBUG("AddSnapshotNumerableWidget::add_snapshot_clicked");
+
+    // Create the new snapshot
+    auto amount_expected = this->getMoneyAmount();
+    if (!amount_expected) {
+        // TODO: Communicate error to the user
+        return;
+    }
 
     auto unit_value_money_expected = unit_value->getMoneyAmount();
     if (!unit_value_money_expected) {
@@ -70,24 +110,21 @@ void AddSnapshotNumerableWidget::add_snapshot_clicked() {
         return;
     }
 
-    auto qt_date = calendar->selectedDate();
-    utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
-                                                   date::month{static_cast<unsigned int>(qt_date.month())},
-                                                   date::day{static_cast<unsigned int>(qt_date.day())}}};
-
     auto quantity_amount = utils::qstring_to_amount(quantity->text(), account.ccy);
     if (!quantity_amount) {
         // TODO: Communicate error to the user
         return;
     }
 
-    // Create the new snapshot
-    Money amount = unit_value_money_expected.value() * quantity_amount.value();
+    auto qt_date = calendar->selectedDate();
+    utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
+                                                   date::month{static_cast<unsigned int>(qt_date.month())},
+                                                   date::day{static_cast<unsigned int>(qt_date.day())}}};
 
     SnapshotNumerable new_snapshot_{
         .snapshot = Snapshot{.account = std::make_pair(account.id, account.name),
                              .date_value = std::move(date),
-                             .amount = std::move(amount)},
+                             .amount = std::move(amount_expected.value())},
         .quantity = std::move(quantity_amount.value()),
         .unit_value = std::move(unit_value_money_expected.value()),
     };
