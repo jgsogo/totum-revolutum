@@ -62,7 +62,7 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     }
 
     money_in_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
-    money_out_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
+    money_out_label = new QLabel(tr("OUT: %1").arg(static_cast<std::string>(money_out)));
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddTransactionWidget::add_transaction_clicked);
