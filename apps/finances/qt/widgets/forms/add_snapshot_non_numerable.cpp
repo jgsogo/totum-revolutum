@@ -21,11 +21,9 @@ AddSnapshotNonNumerableWidget::AddSnapshotNonNumerableWidget(utils::libpqxx::Con
     // Components
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
-    calendar->setFocusPolicy(Qt::StrongFocus);
 
     amount = new MoneyAmountEdit("Amount (%1)", this);
     amount->setCcy(account.ccy);
-    amount->setFocusPolicy(Qt::StrongFocus);
 
     // Layout
     QFormLayout* formLayout = new QFormLayout;
