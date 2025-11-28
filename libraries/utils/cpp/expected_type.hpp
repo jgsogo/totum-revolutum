@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <format>
 #include <string>
 #include <variant>
 
@@ -103,5 +104,23 @@ template <typename... Args> struct fmt::formatter<std::variant<Args...>> : fmt::
 template <> struct fmt::formatter<utils::NotImplemented> : fmt::formatter<std::string> {
     auto format(utils::NotImplemented p, format_context& ctx) const -> decltype(ctx.out()) {
         return fmt::format_to(ctx.out(), "NotImplemented: {}", p.msg);
+    }
+};
+
+// Required for std::format
+template <typename... Args> struct std::formatter<std::variant<Args...>> : std::formatter<std::string> {
+    auto format(const std::variant<Args...>& p, std::format_context& ctx) const {
+        return std::visit(
+            [&ctx, this](auto&& arg) {
+                // using T = std::decay_t<decltype(arg)>;
+                return this->formatter<std::string>::format(std::format("{}", arg), ctx);
+            },
+            p);
+    }
+};
+
+template <> struct std::formatter<utils::NotImplemented> : std::formatter<std::string> {
+    auto format(const utils::NotImplemented& p, std::format_context& ctx) const {
+        return std::formatter<std::string>::format(std::format("NotImplemented: {}", p.msg), ctx);
     }
 };
