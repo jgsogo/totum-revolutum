@@ -40,6 +40,7 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
     table_view->hideColumn(magic_enum::enum_integer(AccountColumns::IDENTIFIER));
     table_view->hideColumn(magic_enum::enum_integer(AccountColumns::OPEN));
     table_view->hideColumn(magic_enum::enum_integer(AccountColumns::CLOSE));
+    table_view->hideColumn(magic_enum::enum_integer(AccountColumns::CUSTODIAN_AND_NAME));
     table_view->verticalHeader()->hide();
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     connect(table_view, &QTableView::doubleClicked, this, &AccountsTableWidget::onDoubleClicked);

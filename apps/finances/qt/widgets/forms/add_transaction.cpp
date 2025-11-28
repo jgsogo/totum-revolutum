@@ -50,6 +50,9 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
         table_view->setModel(sort_filter);
         table_view->setSortingEnabled(false);
         table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::TRANSACTION_ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ACCOUNT_ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::TRANSACTION));
         table_view->verticalHeader()->hide();
         table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 

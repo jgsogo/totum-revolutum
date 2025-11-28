@@ -14,6 +14,7 @@ enum class AccountColumns {
     OPEN = 6,
     CLOSE = 7,
     HOLDERS = 8,
+    CUSTODIAN_AND_NAME = 9,
 };
 
 namespace utils::qt::models {

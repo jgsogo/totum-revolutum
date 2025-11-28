@@ -15,8 +15,8 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
                                      Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool} {
 
-    account_combo =
-        new utils::qt::widgets::ComboBoxWithSearch{accounts, AccountColumns::ID, AccountColumns::NAME, parent};
+    account_combo = new utils::qt::widgets::ComboBoxWithSearch{accounts, AccountColumns::ID,
+                                                               AccountColumns::CUSTODIAN_AND_NAME, parent};
     account_combo->setFocusPolicy(Qt::StrongFocus);
 
     direction_combo = new QComboBox;
