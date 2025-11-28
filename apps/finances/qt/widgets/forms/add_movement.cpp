@@ -39,7 +39,7 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
     fx_rate_value = new QLineEdit;
     fx_rate_label = new QLabel(tr("FX rate"));
     {
-        QRegularExpression rx(R"(^\d+(,\d{4})?$)");
+        QRegularExpression rx(R"(^\d+(,\d+)?$)");
         QRegularExpressionValidator* fx_validator = new QRegularExpressionValidator(rx, this);
         fx_rate_value->setValidator(fx_validator);
         fx_rate_value->setPlaceholderText("0,8923");

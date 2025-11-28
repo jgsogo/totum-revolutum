@@ -2,6 +2,7 @@
 
 #include <QCalendarWidget>
 #include <QDialog>
+#include <QDialogButtonBox>
 
 #include "libraries/finances/accounts/cpp/models/account.h"
 
@@ -31,4 +32,7 @@ class AddSnapshotNumerableWidget : public QDialog {
     MoneyAmountEdit* unit_value;
 
     QLabel* amount_label;
+    QLabel* error_label;
+
+    QDialogButtonBox* buttonBox;
 };

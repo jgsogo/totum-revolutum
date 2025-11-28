@@ -1,6 +1,5 @@
 #include "add_snapshot_numerable.h"
 
-#include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -23,7 +22,7 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     calendar = new QCalendarWidget(this);
     calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
-    QRegularExpression rx(R"(^\d+(,\d{4})?$)");
+    QRegularExpression rx(R"(^\d+(,\d+)?$)");
     QRegularExpressionValidator* quantity_validator = new QRegularExpressionValidator(rx, this);
 
     quantity = new QLineEdit(this);
@@ -35,7 +34,9 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     unit_value->setCcy(account.ccy);
     connect(unit_value, &QLineEdit::textEdited, this, &AddSnapshotNumerableWidget::on_inputs_changed);
 
-    amount_label = new QLabel(tr("Amount (%1):").arg(static_cast<std::string>(account.ccy)));
+    amount_label = new QLabel(tr("Amount (%1): <unknown>").arg(static_cast<std::string>(account.ccy)));
+
+    error_label = new QLabel();
 
     // Layout
     QFormLayout* formLayout = new QFormLayout;
@@ -43,7 +44,7 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     formLayout->addRow(tr("&Quantity:"), quantity);
     formLayout->addRow(unit_value->get_label(), unit_value);
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddSnapshotNumerableWidget::add_snapshot_clicked);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
@@ -52,6 +53,7 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
     mainLayout->addWidget(new QLabel(title));
     mainLayout->addLayout(formLayout);
     mainLayout->addWidget(amount_label);
+    mainLayout->addWidget(error_label);
     mainLayout->addWidget(buttonBox);
 
     this->setLayout(mainLayout);
@@ -59,11 +61,18 @@ AddSnapshotNumerableWidget::AddSnapshotNumerableWidget(utils::libpqxx::Connectio
 }
 
 void AddSnapshotNumerableWidget::on_inputs_changed() {
+    QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Save);
     auto amount_expected = this->getMoneyAmount();
     if (amount_expected) {
         this->amount_label->setText(
             QString("Amount (%1): %2")
                 .arg(static_cast<std::string>(account.ccy), static_cast<std::string>(amount_expected.value())));
+        error_label->setText(QString(""));
+        accept_button->setEnabled(true);
+    } else {
+        this->amount_label->setText(QString("Amount (%1): <err>").arg(static_cast<std::string>(account.ccy)));
+        error_label->setText(QString::fromStdString(std::format("{}", amount_expected.error())));
+        accept_button->setEnabled(false);
     }
 }
 
