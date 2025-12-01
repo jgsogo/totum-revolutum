@@ -33,6 +33,8 @@ class AddTransactionWidget : public QDialog {
     // User wants to add a transaction to the DB
     void add_transaction_clicked();
 
+    void onKeyPressed(const QModelIndex& index, Qt::Key);
+
   signals:
     // After creating a transaction, we notify which accounts have now new movements
     void new_movement(utils::db::Id account_id);

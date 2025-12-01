@@ -99,7 +99,7 @@ void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {
 }
 
 void AccountsTableWidget::onKeyPressed(const QModelIndex& index, Qt::Key key) {
-    SPDLOG_TRACE("AccountsTableWidget::keyPressEvent(index.row={}, index.column={}, key={})", index.row(),
+    SPDLOG_TRACE("AccountsTableWidget::onKeyPressed(index.row={}, index.column={}, key={})", index.row(),
                  index.column(), int(key));
     if (key == Qt::Key_Return || key == Qt::Key_Enter) {
         this->onDoubleClicked(index);

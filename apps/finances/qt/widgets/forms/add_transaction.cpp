@@ -6,10 +6,10 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QSortFilterProxyModel>
-#include <QTableView>
 #include <QVBoxLayout>
 
 #include "add_movement.h"
+#include "apps/finances/qt/widgets/misc/qtableview_with_key_pressed.h"
 
 AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
                                            AccountsTableModel<AccountColumns>& accounts_,
@@ -41,12 +41,13 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     }
 
     // Components
-    QTableView* table_view = new QTableView(this);
+    QTableViewWithKeyPressed* table_view = new QTableViewWithKeyPressed(this);
     {
         QSortFilterProxyModel* sort_filter = new QSortFilterProxyModel(this);
         sort_filter->setSourceModel(movements);
         sort_filter->sort(magic_enum::enum_integer(MovementColumns::DATE_VALUE), Qt::DescendingOrder);
 
+        table_view->setSelectionMode(QAbstractItemView::SingleSelection); // Only one cell selected at a time
         table_view->setModel(sort_filter);
         table_view->setSortingEnabled(false);
         table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ID));
@@ -59,6 +60,8 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
         table_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         table_view->resizeColumnsToContents();
         table_view->resizeRowsToContents();
+
+        connect(table_view, &QTableViewWithKeyPressed::key_press_event, this, &AddTransactionWidget::onKeyPressed);
     }
 
     money_in_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
@@ -119,6 +122,14 @@ void AddTransactionWidget::on_new_movement(MovementModel movement) {
 bool AddTransactionWidget::is_valid() const {
     // Transaction needs a title
     return ((transaction_title->hasAcceptableInput()) && (money_in == money_out) && (movements->rowCount() != 0));
+}
+
+void AddTransactionWidget::onKeyPressed(const QModelIndex& index, Qt::Key key) {
+    SPDLOG_TRACE("AddTransactionWidget::onKeyPressed(index.row={}, index.column={}, key={})", index.row(),
+                 index.column(), int(key));
+    if (key == Qt::Key_Delete) {
+        SPDLOG_ERROR("Qt::Key_Delete not implemented!");
+    }
 }
 
 void AddTransactionWidget::add_transaction_clicked() {
