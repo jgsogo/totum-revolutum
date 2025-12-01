@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QTableWidget>
 #include <QWidget>
 
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
@@ -20,6 +19,7 @@ class AccountsTableWidget : public QWidget {
   private slots:
     void onDoubleClicked(const QModelIndex& index);
     void onPressed(const QModelIndex& index);
+    void onKeyPressed(const QModelIndex& index, Qt::Key);
 
   signals:
     void accountDoubleClicked(utils::db::Id account_id);

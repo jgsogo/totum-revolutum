@@ -4,9 +4,9 @@
 #include <QGroupBox>
 #include <QGuiApplication>
 #include <QHeaderView>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
-#include <QTableView>
 #include <QTimer>
 #include <QVBoxLayout>
 
@@ -16,6 +16,7 @@
 #include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/widgets/forms/add_snapshot_non_numerable.h"
 #include "apps/finances/qt/widgets/forms/add_snapshot_numerable.h"
+#include "apps/finances/qt/widgets/misc/qtableview_with_key_pressed.h"
 
 AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
                                          AccountsTableModel<AccountColumns>& accounts_,
@@ -33,7 +34,8 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
     sort_filter->setFilterCaseSensitivity(Qt::CaseInsensitive);
     sort_filter->setFilterKeyColumn(-1); // Use all columns
 
-    QTableView* table_view = new QTableView(this);
+    QTableViewWithKeyPressed* table_view = new QTableViewWithKeyPressed();
+    table_view->setSelectionMode(QAbstractItemView::SingleSelection); // Only one cell selected at a time
     table_view->setModel(sort_filter);
     table_view->setSortingEnabled(true);
     table_view->hideColumn(magic_enum::enum_integer(AccountColumns::ID));
@@ -43,8 +45,10 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
     table_view->hideColumn(magic_enum::enum_integer(AccountColumns::CUSTODIAN_AND_NAME));
     table_view->verticalHeader()->hide();
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    table_view->setEditTriggers(QAbstractItemView::AllEditTriggers);
     connect(table_view, &QTableView::doubleClicked, this, &AccountsTableWidget::onDoubleClicked);
     connect(table_view, &QTableView::pressed, this, &AccountsTableWidget::onPressed);
+    connect(table_view, &QTableViewWithKeyPressed::key_press_event, this, &AccountsTableWidget::onKeyPressed);
 
     // Filters
     // - filter by term
@@ -92,6 +96,14 @@ void AccountsTableWidget::onDoubleClicked(const QModelIndex& index) {
     SPDLOG_TRACE(" - account_id: {}", account_id);
 
     emit accountDoubleClicked(account_id);
+}
+
+void AccountsTableWidget::onKeyPressed(const QModelIndex& index, Qt::Key key) {
+    SPDLOG_TRACE("AccountsTableWidget::keyPressEvent(index.row={}, index.column={}, key={})", index.row(),
+                 index.column(), int(key));
+    if (key == Qt::Key_Return || key == Qt::Key_Enter) {
+        this->onDoubleClicked(index);
+    }
 }
 
 void AccountsTableWidget::onPressed(const QModelIndex& index) {
