@@ -103,4 +103,36 @@ namespace utils::db {
         return inserted_id;
     }
 
+    template <> std::vector<TransactionGroup> ModelManager<TransactionGroup>::_all(pqxx::work& tx) {
+        auto query = std::format("SELECT DISTINCT tg.id, tg.name, tg.description, tg.start, tg.end"
+                                 " FROM {} AS tg;",
+                                 TRANSACTION_GROUP_TABLE);
+        SPDLOG_TRACE(query);
+
+        std::vector<TransactionGroup> ret;
+        for (auto [id, name, description, start, end] :
+             tx.query<Id, std::string, std::optional<std::string>, utils::libpqxx::Date,
+                      std::optional<utils::libpqxx::Date>>(query)) {
+
+            ret.emplace_back(
+                TransactionGroup{.id = id, .name = name, .description = description, .start = start, .end = end});
+        }
+        return {ret};
+    }
+
+    template <>
+    ExpectedType<TransactionGroup, ErrorNotFound, ErrorMultipleFound>
+    ModelManager<TransactionGroup>::_get(pqxx::work& tx, const decltype(TransactionGroup::id)& transaction_group_id) {
+        auto query = std::format("SELECT tg.id, tg.name, tg.description, tg.start, tg.end"
+                                 " FROM {} AS tg"
+                                 " WHERE tg.id = $1;",
+                                 TRANSACTION_GROUP_TABLE);
+        SPDLOG_TRACE(query);
+
+        auto r = tx.exec(query, pqxx::params{transaction_group_id}).one_row();
+        auto [id, name, description, start, end] = r.as<Id, std::string, std::optional<std::string>,
+                                                        utils::libpqxx::Date, std::optional<utils::libpqxx::Date>>();
+
+        return {TransactionGroup{.id = id, .name = name, .description = description, .start = start, .end = end}};
+    }
 } // namespace utils::db
