@@ -13,8 +13,9 @@
 
 AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
                                            AccountsTableModel<AccountColumns>& accounts_,
-                                           MovementTypesTableModel<HierarchyTreeColumns>& movtypes_, QWidget* parent,
-                                           Qt::WindowFlags f)
+                                           MovementTypesTableModel<HierarchyTreeColumns>& movtypes_,
+                                           TransactionGroupTableModel<TransactionGroupColumns>& transaction_groups_,
+                                           QWidget* parent, Qt::WindowFlags f)
     : QDialog(parent, f), pool{pool} {
 
     transaction_title = new QLineEdit(this);
@@ -40,6 +41,11 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     }
 
     // Components
+    transaction_groups_combo = new utils::qt::widgets::ComboBoxWithSearch{
+        transaction_groups_, TransactionGroupColumns::ID, TransactionGroupColumns::NAME, this};
+    transaction_groups_combo->setFocusPolicy(Qt::StrongFocus);
+    transaction_groups_combo->setCurrentIndex(-1);
+
     QTableViewWithKeyPressed* table_view = new QTableViewWithKeyPressed(this);
     {
         QSortFilterProxyModel* sort_filter = new QSortFilterProxyModel(this);
@@ -82,6 +88,7 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
     formLayout->addRow(tr("&Title:"), transaction_title);
     formLayout->addRow(tr("&Description:"), transaction_description);
+    formLayout->addRow(tr("&Group:"), transaction_groups_combo);
 
     // Layout
     QVBoxLayout* mainLayout = new QVBoxLayout();
@@ -147,17 +154,34 @@ void AddTransactionWidget::add_transaction_clicked() {
         return;
     }
 
+    // Movements
+    const auto& all_movements = movements->all();
+    if (all_movements.empty()) {
+        // TODO: Notify user
+        SPDLOG_WARN("Empty transaction. Add action is not executed");
+        return;
+    }
+
+    // Transaction group
+    auto transaction_group_expected = transaction_groups_combo->selected();
+    if (!transaction_group_expected) {
+        // TODO: Notify error to user
+        return;
+    }
+    decltype(finances::accounts::models::Transaction::group) group = std::nullopt;
+    if (transaction_group_expected.value().has_value()) {
+        const finances::accounts::models::TransactionGroup& tg = transaction_group_expected.value().value();
+        group = {std::make_pair(tg.id, tg.name)};
+    }
+
     // Transaction
     QString description = transaction_description->toPlainText();
     finances::accounts::models::Transaction new_transaction{
         .id = {std::monostate{}}, // No id, it's not in the database yet!
         .name = this->transaction_title->text().toStdString(),
         .description = description.isEmpty() ? std::nullopt : std::optional<std::string>{description.toStdString()},
-        .group = std::nullopt,
+        .group = group,
     };
-
-    // Movements
-    const auto& all_movements = movements->all();
 
     // Now I need to insert all the movements and the transaction using a single DB transaction, or rollback everything.
     bool success = pool.with_conn<bool>([&new_transaction, &all_movements](pqxx::connection& conn) {

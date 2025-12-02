@@ -8,21 +8,26 @@
 
 #include "libraries/finances/accounts/cpp/models/transaction.h"
 
+#include "libraries/utils/cpp/qt/widgets/combobox_with_search.h"
+
 #include "apps/finances/qt/tables/accounts.h"
 #include "apps/finances/qt/tables/hierarchy_tree_columns.h"
 #include "apps/finances/qt/tables/movement_columns.h"
+#include "apps/finances/qt/tables/transaction_group_columns.h"
 
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/table_models/movement_type.h"
 #include "apps/finances/qt/table_models/movements.h"
+#include "apps/finances/qt/table_models/transaction_groups.h"
 
 class AddTransactionWidget : public QDialog {
     Q_OBJECT
 
   public:
     AddTransactionWidget(utils::libpqxx::ConnectionPool& pool, AccountsTableModel<AccountColumns>& accounts,
-                         MovementTypesTableModel<HierarchyTreeColumns>& movtypes, QWidget* parent = nullptr,
-                         Qt::WindowFlags f = Qt::WindowFlags());
+                         MovementTypesTableModel<HierarchyTreeColumns>& movtypes,
+                         TransactionGroupTableModel<TransactionGroupColumns>& transaction_groups,
+                         QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
   public slots:
     void on_new_movement(MovementModel movement);
@@ -45,6 +50,8 @@ class AddTransactionWidget : public QDialog {
 
     QLineEdit* transaction_title;
     QTextEdit* transaction_description;
+    utils::qt::widgets::ComboBoxWithSearch<finances::accounts::models::TransactionGroup, TransactionGroupColumns>*
+        transaction_groups_combo;
 
     QLabel* money_in_label;
     QLabel* money_out_label;

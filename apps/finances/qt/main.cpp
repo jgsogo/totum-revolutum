@@ -20,8 +20,10 @@
 #include "apps/finances/qt/metatypes/types.h"
 #include "apps/finances/qt/table_models/accounts.h"
 #include "apps/finances/qt/table_models/movement_type.h"
+#include "apps/finances/qt/table_models/transaction_groups.h"
 #include "apps/finances/qt/tables/accounts.h"
 #include "apps/finances/qt/tables/hierarchy_tree_columns.h"
+#include "apps/finances/qt/tables/transaction_group_columns.h"
 #include "apps/finances/qt/version.hpp"
 #include "apps/finances/qt/widgets/accounts/main_tab.h"
 #include "apps/finances/qt/widgets/forms/add_transaction.h"
@@ -66,6 +68,7 @@ int main(int argc, char** argv) {
     // Create the long-living models
     AccountsTableModel<AccountColumns> accounts_tablemodel{pool};
     MovementTypesTableModel<HierarchyTreeColumns> movement_types_tablemodel{pool};
+    TransactionGroupTableModel<TransactionGroupColumns> transaction_groups_tablemodel{pool};
 
     // Run a notificator that will monitor notifications from the database
     auto conn = pool.acquire();
@@ -83,16 +86,17 @@ int main(int argc, char** argv) {
     QPushButton* bt_add_transaction = new QPushButton(QObject::tr("Add transaction"));
     {
         // QObject::connect(bt_add_transaction, &QPushButton::clicked, popup_add_transaction, &QDialog::open);
-        QObject::connect(bt_add_transaction, &QPushButton::clicked,
-                         [&pool, &accounts_tablemodel, &movement_types_tablemodel, &notificator]() {
-                             AddTransactionWidget* popup_add_transaction =
-                                 new AddTransactionWidget(pool, accounts_tablemodel, movement_types_tablemodel);
-                             popup_add_transaction->setModal(true);
-                             popup_add_transaction->setSizeGripEnabled(true);
-                             QObject::connect(popup_add_transaction, &AddTransactionWidget::new_movement, &notificator,
-                                              &Notificator::notify_account);
-                             popup_add_transaction->open();
-                         });
+        QObject::connect(
+            bt_add_transaction, &QPushButton::clicked,
+            [&pool, &accounts_tablemodel, &movement_types_tablemodel, &notificator, &transaction_groups_tablemodel]() {
+                AddTransactionWidget* popup_add_transaction = new AddTransactionWidget(
+                    pool, accounts_tablemodel, movement_types_tablemodel, transaction_groups_tablemodel);
+                popup_add_transaction->setModal(true);
+                popup_add_transaction->setSizeGripEnabled(true);
+                QObject::connect(popup_add_transaction, &AddTransactionWidget::new_movement, &notificator,
+                                 &Notificator::notify_account);
+                popup_add_transaction->open();
+            });
     }
 
     QVBoxLayout* layout = new QVBoxLayout();
