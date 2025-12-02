@@ -62,6 +62,8 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
 
         connect(movements, &QAbstractItemModel::rowsRemoved, this, &AddTransactionWidget::on_movements_changed);
         connect(movements, &QAbstractItemModel::rowsInserted, this, &AddTransactionWidget::on_movements_changed);
+
+        connect(table_view, &QTableViewWithKeyPressed::key_press_event, this, &AddTransactionWidget::onKeyPressed);
     }
 
     money_in_label = new QLabel(tr("IN: 0"));
