@@ -6,17 +6,16 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QSortFilterProxyModel>
-#include <QTableView>
 #include <QVBoxLayout>
 
 #include "add_movement.h"
+#include "apps/finances/qt/widgets/misc/qtableview_with_key_pressed.h"
 
 AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
                                            AccountsTableModel<AccountColumns>& accounts_,
                                            MovementTypesTableModel<HierarchyTreeColumns>& movtypes_, QWidget* parent,
                                            Qt::WindowFlags f)
-    : QDialog(parent, f), pool{pool}, money_in{finances::accounts::models::EUR},
-      money_out{finances::accounts::models::EUR} {
+    : QDialog(parent, f), pool{pool} {
 
     transaction_title = new QLineEdit(this);
     transaction_description = new QTextEdit(this);
@@ -41,12 +40,13 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
     }
 
     // Components
-    QTableView* table_view = new QTableView(this);
+    QTableViewWithKeyPressed* table_view = new QTableViewWithKeyPressed(this);
     {
         QSortFilterProxyModel* sort_filter = new QSortFilterProxyModel(this);
         sort_filter->setSourceModel(movements);
         sort_filter->sort(magic_enum::enum_integer(MovementColumns::DATE_VALUE), Qt::DescendingOrder);
 
+        table_view->setSelectionMode(QAbstractItemView::SingleSelection); // Only one cell selected at a time
         table_view->setModel(sort_filter);
         table_view->setSortingEnabled(false);
         table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ID));
@@ -59,10 +59,15 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
         table_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         table_view->resizeColumnsToContents();
         table_view->resizeRowsToContents();
+
+        connect(movements, &QAbstractItemModel::rowsRemoved, this, &AddTransactionWidget::on_movements_changed);
+        connect(movements, &QAbstractItemModel::rowsInserted, this, &AddTransactionWidget::on_movements_changed);
+
+        connect(table_view, &QTableViewWithKeyPressed::key_press_event, this, &AddTransactionWidget::onKeyPressed);
     }
 
-    money_in_label = new QLabel(tr("IN: %1").arg(static_cast<std::string>(money_in)));
-    money_out_label = new QLabel(tr("OUT: %1").arg(static_cast<std::string>(money_out)));
+    money_in_label = new QLabel(tr("IN: 0"));
+    money_out_label = new QLabel(tr("OUT: 0"));
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AddTransactionWidget::add_transaction_clicked);
@@ -92,39 +97,52 @@ AddTransactionWidget::AddTransactionWidget(utils::libpqxx::ConnectionPool& pool,
 void AddTransactionWidget::on_new_movement(MovementModel movement) {
     SPDLOG_DEBUG("AddTransactionWidget::on_new_movement(movement)");
 
-    const auto& plain_movement = movement.as_movement();
+    movements->insert(std::move(movement));
+}
 
-    switch (plain_movement.direction) {
-    case finances::accounts::models::MovementDirection::IN:
-        money_in += plain_movement.amount_in_local_ccy();
-        break;
-    case finances::accounts::models::MovementDirection::OUT:
-        money_out += plain_movement.amount_in_local_ccy();
-        break;
+void AddTransactionWidget::on_movements_changed() {
+    SPDLOG_DEBUG("AddTransactionWidget::on_movements_changed()");
+
+    finances::accounts::models::Money money_in{finances::accounts::models::EUR};
+    finances::accounts::models::Money money_out{finances::accounts::models::EUR};
+
+    const auto& all_movements = movements->all();
+    for (const auto& mov : all_movements) {
+        const auto& plain_movement = mov.as_movement();
+
+        switch (plain_movement.direction) {
+        case finances::accounts::models::MovementDirection::IN:
+            money_in += plain_movement.amount_in_local_ccy();
+            break;
+        case finances::accounts::models::MovementDirection::OUT:
+            money_out += plain_movement.amount_in_local_ccy();
+            break;
+        }
     }
 
     money_in_label->setText(tr("IN: %1").arg(static_cast<std::string>(money_in)));
     money_out_label->setText(tr("OUT: %1").arg(static_cast<std::string>(money_out)));
 
     QPushButton* accept_button = buttonBox->button(QDialogButtonBox::Save);
-    if (this->is_valid()) {
+    if (!all_movements.empty() && (money_in == money_out)) {
         accept_button->setEnabled(true);
     } else {
         accept_button->setEnabled(false);
     }
-
-    movements->insert(std::move(movement));
 }
 
-bool AddTransactionWidget::is_valid() const {
-    // Transaction needs a title
-    return ((transaction_title->hasAcceptableInput()) && (money_in == money_out) && (movements->rowCount() != 0));
+void AddTransactionWidget::onKeyPressed(const QModelIndex& index, Qt::Key key) {
+    SPDLOG_TRACE("AddTransactionWidget::onKeyPressed(index.row={}, index.column={}, key={})", index.row(),
+                 index.column(), int(key));
+    if (key == Qt::Key_Delete) {
+        movements->remove(index.row());
+    }
 }
 
 void AddTransactionWidget::add_transaction_clicked() {
     SPDLOG_DEBUG("AddTransactionWidget::add_transaction_clicked()");
 
-    if (!this->is_valid()) {
+    if (!(transaction_title->hasAcceptableInput())) {
         SPDLOG_WARN("User was able to click the 'Save' button, but the transaction is invalid. We cannot add it.");
         return;
     }

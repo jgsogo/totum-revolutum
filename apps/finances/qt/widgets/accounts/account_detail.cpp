@@ -63,6 +63,7 @@ AccountDetailWidget::AccountDetailWidget(utils::libpqxx::ConnectionPool& pool_,
         table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ID));
         table_view->hideColumn(magic_enum::enum_integer(MovementColumns::TRANSACTION_ID));
         table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ACCOUNT_ID));
+        table_view->hideColumn(magic_enum::enum_integer(MovementColumns::ACCOUNT));
         table_view->verticalHeader()->hide();
         table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 

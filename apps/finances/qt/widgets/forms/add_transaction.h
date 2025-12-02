@@ -24,8 +24,6 @@ class AddTransactionWidget : public QDialog {
                          MovementTypesTableModel<HierarchyTreeColumns>& movtypes, QWidget* parent = nullptr,
                          Qt::WindowFlags f = Qt::WindowFlags());
 
-    bool is_valid() const;
-
   public slots:
     void on_new_movement(MovementModel movement);
 
@@ -33,6 +31,9 @@ class AddTransactionWidget : public QDialog {
     // User wants to add a transaction to the DB
     void add_transaction_clicked();
 
+    void onKeyPressed(const QModelIndex& index, Qt::Key);
+
+    void on_movements_changed();
   signals:
     // After creating a transaction, we notify which accounts have now new movements
     void new_movement(utils::db::Id account_id);
@@ -44,9 +45,6 @@ class AddTransactionWidget : public QDialog {
 
     QLineEdit* transaction_title;
     QTextEdit* transaction_description;
-
-    finances::accounts::models::Money money_in;
-    finances::accounts::models::Money money_out;
 
     QLabel* money_in_label;
     QLabel* money_out_label;

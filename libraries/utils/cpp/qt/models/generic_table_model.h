@@ -127,6 +127,17 @@ namespace utils::qt::models {
             this->endInsertRows();
         }
 
+        void remove(int row) {
+            SPDLOG_DEBUG("{}::remove(row={})", name, row);
+            if (items.size() > row) {
+                this->beginRemoveRows(QModelIndex(), row, row);
+                items.erase(items.begin() + row);
+                this->endRemoveRows();
+            } else {
+                SPDLOG_WARN("Trying to remove row {}, but there are only {} items", row, items.size());
+            }
+        }
+
       protected:
         void _refresh_all() override {
             SPDLOG_DEBUG("{}::_refresh_all", name);

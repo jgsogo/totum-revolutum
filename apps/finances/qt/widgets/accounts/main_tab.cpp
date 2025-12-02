@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <QTabBar>
+
 #include "accounts_table.h"
 
 MainTabWidget::MainTabWidget(utils::libpqxx::ConnectionPool& pool_,
