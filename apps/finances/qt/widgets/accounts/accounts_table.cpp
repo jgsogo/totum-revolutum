@@ -45,7 +45,6 @@ AccountsTableWidget::AccountsTableWidget(utils::libpqxx::ConnectionPool& pool_,
     table_view->hideColumn(magic_enum::enum_integer(AccountColumns::CUSTODIAN_AND_NAME));
     table_view->verticalHeader()->hide();
     table_view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    table_view->setEditTriggers(QAbstractItemView::AllEditTriggers);
     connect(table_view, &QTableView::doubleClicked, this, &AccountsTableWidget::onDoubleClicked);
     connect(table_view, &QTableView::pressed, this, &AccountsTableWidget::onPressed);
     connect(table_view, &QTableViewWithKeyPressed::key_press_event, this, &AccountsTableWidget::onKeyPressed);
