@@ -4,6 +4,9 @@ test --verbose_failures --test_output=errors
 
 build --enable_platform_specific_config
 
+# Prevents Bazel from invalidating the cache when switching from one terminal to another (PATH envvar might be different)
+build --incompatible_strict_action_env
+
 # Logging: Release builds aim for 'INFO'
 common --//bazel/logging:logging=trace
 common:release --//bazel/logging:logging=info
