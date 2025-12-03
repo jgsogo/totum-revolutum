@@ -8,14 +8,16 @@
 let socket: WebSocket;
 
 const PORT = process.env.PORT || 3000;
-const DOMAIN_NAME = process.env.DOMAIN_NAME || "192.168.1.46";  // FIXME: This is my IP!!
+const DOMAIN_NAME = process.env.DOMAIN_NAME || "192.168.1.38";  // FIXME: This is my IP!!
 
 export function connectToRoom(roomId: string,
 	on_room_update: { (payload: JSON): Promise<void>; (arg0: any): any; },
 	on_participants_update: { (payload: JSON): Promise<void>; (arg0: any): any; },
 	on_game_update: { (payload: JSON): Promise<void>; (arg0: any): any; },
 ) {
-	socket = new WebSocket(`ws://${DOMAIN_NAME}:${PORT}/ws/${roomId}`);
+	const ws_address = `ws://${DOMAIN_NAME}:${PORT}/ws/${roomId}`
+	console.log(`[frontend] Connect to ws '${ws_address}'`);
+	socket = new WebSocket(ws_address);
 
 	socket.onopen = () => {
 		console.log("[frontend] WebSocket connected");
