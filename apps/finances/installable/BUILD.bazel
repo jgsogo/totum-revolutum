@@ -135,7 +135,6 @@ pytest_test(
     data = [
         "//apps/finances:version",
         "//apps/finances/installable",
-        "//bazel/tools/pkgutil",
     ],
 )
 

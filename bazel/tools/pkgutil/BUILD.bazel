@@ -1,8 +1,0 @@
-load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
-
-sh_binary(
-    name = "pkgutil",
-    srcs = ["pkgutil.sh"],
-    target_compatible_with = ["@platforms//os:macos"],
-    visibility = ["//visibility:public"],
-)

@@ -23,9 +23,8 @@ def pkg_expanded_dir():
         temp_dir = Path(tmpdirname) / "pkg"
 
         try:
-            pkgutil_exec = os.getenv("TEST_SRCDIR") + "/_main/bazel/tools/pkgutil/pkgutil"
             subprocess.check_output(
-                [pkgutil_exec, "--expand", PKG_FILE, temp_dir],
+                ["pkgutil", "--expand", PKG_FILE, temp_dir],
                 stderr=subprocess.STDOUT,
             )
         except subprocess.CalledProcessError as e:
