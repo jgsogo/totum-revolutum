@@ -80,7 +80,7 @@ rust_library_tests_and_docs(
         "//libraries/diesel_utils",
         "//libraries/filesystem",
         "//libraries/pcloud_sdk",
-        "//libraries/utils",
+        "//libraries/utils/rust/utils",
     ],
 )
 
@@ -101,6 +101,6 @@ rust_binary(
         "//bazel/third_party/crates:tracing-subscriber",
         "//libraries/filesystem",
         "//libraries/pcloud_sdk",
-        "//libraries/utils",
+        "//libraries/utils/rust/utils",
     ],
 )

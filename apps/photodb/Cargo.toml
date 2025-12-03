@@ -9,7 +9,7 @@ edition = "2021"
 filesystem = { path = "../../libraries/filesystem", features = ["local_temp", "pcloud", "diesel_indexed_impl"] } # pcloud only required for the binary?
 pcloud_sdk = { path = "../../libraries/pcloud_sdk" }
 diesel_utils = { path = "../../libraries/diesel_utils" }
-utils = { path = "../../libraries/utils", features = ["dates"] }
+utils = { path = "../../libraries/utils/rust/utils", features = ["dates"] }
 
 anyhow = { workspace = true }
 async-trait = { workspace = true }

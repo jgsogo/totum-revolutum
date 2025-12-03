@@ -43,7 +43,7 @@ rust_library_tests_and_docs(
         "//bazel/third_party/crates:uuid",
         "//libraries/diesel_utils",
         "//libraries/pcloud_sdk",
-        "//libraries/utils",
+        "//libraries/utils/rust/utils",
     ],
 )
 

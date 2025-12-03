@@ -136,8 +136,6 @@ pytest_test(
         "//apps/finances:version",
         "//apps/finances/installable",
     ],
-    deps = [
-    ],
 )
 
 # Release the installable package

@@ -63,7 +63,7 @@ rust_library(
     deps = [
         "@crates__anstyle-1.0.13//:anstyle",
         "@crates__anstyle-parse-0.2.7//:anstyle_parse",
-        "@crates__anstyle-query-1.1.4//:anstyle_query",
+        "@crates__anstyle-query-1.1.5//:anstyle_query",
         "@crates__colorchoice-1.0.4//:colorchoice",
         "@crates__is_terminal_polyfill-1.70.2//:is_terminal_polyfill",
         "@crates__utf8parse-0.2.2//:utf8parse",

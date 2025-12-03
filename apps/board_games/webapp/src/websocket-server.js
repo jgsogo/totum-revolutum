@@ -11,9 +11,11 @@ import { addToRoom , removeFromRoom} from './websocket_rooms.js';
 import {get_game, get_participants, get_room_data, listen_pg_notifications} from './websocket_pg_notifications.js';
 import process from 'process';
 
+console.log("[backend] Create server");
 const server = createServer(handler);
 
 // Create WebSocketServer using the same HTTP server
+console.log("[backend] Create websocket server");
 const wss = new WebSocketServer({ noServer: true });
 
 const connectionString = `postgresql://${process.env.BOARD_GAMES_WEBAPP_SQL_USER}:${process.env.BOARD_GAMES_WEBAPP_SQL_PASSWORD}@${process.env.BOARD_GAMES_WEBAPP_SQL_HOST}:${process.env.BOARD_GAMES_WEBAPP_SQL_PORT}/${process.env.BOARD_GAMES_WEBAPP_SQL_DATABASE}`
@@ -50,6 +52,7 @@ wss.on('connection', async (ws, request, client) => {
 
 server.on('upgrade', (req, socket, head) => {
 	const { pathname } = parse(req.url, true);
+	console.log(`[backend] Server connection upgrade request for pathname '${pathname}'`);
 
 	if (pathname?.startsWith('/ws/')) {
 		wss.handleUpgrade(req, socket, head, (ws) => {

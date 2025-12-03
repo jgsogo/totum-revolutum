@@ -69,6 +69,6 @@ rust_library(
         "@crates__radix_trie-0.2.1//:radix_trie",
         "@crates__thiserror-2.0.17//:thiserror",
         "@crates__tokio-1.48.0//:tokio",
-        "@crates__tracing-0.1.41//:tracing",
+        "@crates__tracing-0.1.43//:tracing",
     ],
 )

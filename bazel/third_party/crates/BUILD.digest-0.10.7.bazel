@@ -64,6 +64,6 @@ rust_library(
     version = "0.10.7",
     deps = [
         "@crates__block-buffer-0.10.4//:block_buffer",
-        "@crates__crypto-common-0.1.6//:crypto_common",
+        "@crates__crypto-common-0.1.7//:crypto_common",
     ],
 )

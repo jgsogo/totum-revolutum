@@ -9,8 +9,8 @@ Totum revolutum
 > ed., [versión 23.7 en línea]. <https://dle.rae.es> 2024-04-17.</small>
 
 
-I find myself reinventing the wheel from time to time, I find myself loving it! But many times
-I find myself reinventing the wheel so I can reinvent the wheel again. There are a lot of tooling
+I find myself reinventing the wheel from time to time. Although I love it, from time to time
+I just want to build on top of something. There are a lot of tooling
 and basic functionalities that every project needs before starting to write actual application
 code: setting up the repo, basic CI, issues, testing, build-system, docs,... The purpose of
 this repository is to gather together many (all?) my projects so they share common
@@ -18,7 +18,7 @@ foundations and I can focus and enjoy the development work itself.
 
 Here you will find a little bit of everything. I'll try to do my best to keep it organized and
 in well shape. Maybe, in the future, if something is worth it I'll extract it to a dedicated
-repository. But right now, this mono repository looks like the best approach for myself.
+repository. But right now, this monorepo looks like the best approach for myself.
 
 Enjoy the visit!
 
@@ -26,6 +26,7 @@ Enjoy the visit!
 
 Applications in this repository:
 
+* [board_games](app/board_games/): a local-first distributed board games framework
 * [finances](app/finances/): application to track personal finances
 * [photodb](app/photodb/): application to backup photos in pCloud storage and access them
 * [syncronia](apps/syncronia/): a tool to run sync operations between different
@@ -45,6 +46,8 @@ You can find the following libraries in this repository:
 * [diesel_utils](libraries/diesel_utils/): utilities for diesel Rust library
 * [filesystem](libraries/filesystem/): abstraction of filesystem and files. Implementation for many different storages.
 * [finances](libraries/finances/): reusable modules for the finances application
+* [googleapis](libraries/googleapis/): Javascript and Rust adapters for the protobufs defined by googleapis
+* [openexchangerates](libraries/openexchangerates/): libraries to consume information from [Open Exchange Rates](https://openexchangerates.org/)
 * [pcloud_sdk](libraries/pcloud_sdk/): pCloud SDK.
 * [rebrickable](libraries/rebrickable/): API for https://rebrickable.com/
 * [utils](libraries/utils/): generic utilities used by several libraries
@@ -53,6 +56,9 @@ You can find the following libraries in this repository:
 
 Shell scripts with some handy functionality (check [justfile](justfile) too).
 
+## Third party
+
+Bazel rules to build third_party code and to consume external packages.
 
 ## Tools
 

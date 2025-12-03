@@ -61,6 +61,6 @@ rust_library(
     }),
     version = "1.0.4",
     deps = [
-        "@crates__winnow-0.7.13//:winnow",
+        "@crates__winnow-0.7.14//:winnow",
     ],
 )

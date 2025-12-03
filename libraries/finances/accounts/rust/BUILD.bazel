@@ -10,6 +10,7 @@ rust_library(
     crate_features = ["postgres"],
     visibility = [
         "//apps/finances:__subpackages__",
+        "//libraries:__pkg__",
         "//libraries/finances:__subpackages__",
     ],
     deps = [
@@ -29,6 +30,7 @@ rust_library(
     crate_name = "finances_accounts",
     visibility = [
         "//apps/finances:__subpackages__",
+        "//libraries:__pkg__",
         "//libraries/finances:__subpackages__",
     ],
     deps = [

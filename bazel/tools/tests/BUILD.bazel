@@ -1,0 +1,13 @@
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+sh_test(
+    name = "pkgutil_test",
+    size = "small",
+    srcs = ["test_pkgutil.sh"],
+)
+
+sh_test(
+    name = "docker_test",
+    size = "small",
+    srcs = ["test_docker.sh"],
+)

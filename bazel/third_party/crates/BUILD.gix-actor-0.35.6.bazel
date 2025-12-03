@@ -61,6 +61,6 @@ rust_library(
         "@crates__gix-utils-0.3.1//:gix_utils",
         "@crates__itoa-1.0.15//:itoa",
         "@crates__thiserror-2.0.17//:thiserror",
-        "@crates__winnow-0.7.13//:winnow",
+        "@crates__winnow-0.7.14//:winnow",
     ],
 )

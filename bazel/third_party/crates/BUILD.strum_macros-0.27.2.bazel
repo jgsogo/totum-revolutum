@@ -58,7 +58,7 @@ rust_proc_macro(
     deps = [
         "@crates__heck-0.5.0//:heck",
         "@crates__proc-macro2-1.0.103//:proc_macro2",
-        "@crates__quote-1.0.41//:quote",
-        "@crates__syn-2.0.108//:syn",
+        "@crates__quote-1.0.42//:quote",
+        "@crates__syn-2.0.111//:syn",
     ],
 )

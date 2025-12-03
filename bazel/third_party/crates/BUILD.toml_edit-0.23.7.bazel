@@ -59,9 +59,9 @@ rust_library(
     }),
     version = "0.23.7",
     deps = [
-        "@crates__indexmap-2.12.0//:indexmap",
+        "@crates__indexmap-2.12.1//:indexmap",
         "@crates__toml_datetime-0.7.3//:toml_datetime",
         "@crates__toml_parser-1.0.4//:toml_parser",
-        "@crates__winnow-0.7.13//:winnow",
+        "@crates__winnow-0.7.14//:winnow",
     ],
 )

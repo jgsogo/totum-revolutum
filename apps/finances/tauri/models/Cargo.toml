@@ -28,6 +28,6 @@ diesel = { workspace = true }
 thiserror = { workspace = true }
 camino = { workspace = true }
 
-proto_wrapper = { path = "../../../../libraries/rust/proto_wrapper" }
+proto_wrapper = { path = "../../../../libraries/utils/rust/proto_wrapper" }
 googleapis = { path = "../../../../libraries/googleapis" }
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust" }

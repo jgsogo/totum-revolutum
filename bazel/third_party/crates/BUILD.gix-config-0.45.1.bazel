@@ -60,7 +60,7 @@ rust_library(
         "@crates__gix-config-value-0.15.3//:gix_config_value",
         "@crates__gix-features-0.42.1//:gix_features",
         "@crates__gix-glob-0.20.1//:gix_glob",
-        "@crates__gix-path-0.10.21//:gix_path",
+        "@crates__gix-path-0.10.22//:gix_path",
         "@crates__gix-ref-0.52.1//:gix_ref",
         "@crates__gix-sec-0.11.0//:gix_sec",
         "@crates__memchr-2.7.6//:memchr",
@@ -68,6 +68,6 @@ rust_library(
         "@crates__smallvec-1.15.1//:smallvec",
         "@crates__thiserror-2.0.17//:thiserror",
         "@crates__unicode-bom-2.0.3//:unicode_bom",
-        "@crates__winnow-0.7.13//:winnow",
+        "@crates__winnow-0.7.14//:winnow",
     ],
 )

@@ -11,7 +11,7 @@ test_utils = []
 diesel_indexed_impl = ["dep:diesel", "dep:diesel_utils", "dep:diesel_migrations"]
 
 [dependencies]
-utils = { path = "../utils", features = ["filesystem"] }
+utils = { path = "../utils/rust/utils", features = ["filesystem"] }
 
 async-trait = { workspace = true }
 camino = { workspace = true }

@@ -25,7 +25,7 @@ rust_library_tests_and_docs(
         "//bazel/third_party/crates:serde_json",
         "//bazel/third_party/crates:thiserror",
         "//bazel/third_party/crates:time",
-        "//libraries/utils",
+        "//libraries/utils/rust/utils",
     ],
 )
 

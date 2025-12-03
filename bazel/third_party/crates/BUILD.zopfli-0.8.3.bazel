@@ -61,7 +61,7 @@ rust_library(
     version = "0.8.3",
     deps = [
         "@crates__bumpalo-3.19.0//:bumpalo",
-        "@crates__log-0.4.28//:log",
+        "@crates__log-0.4.29//:log",
         "@crates__simd-adler32-0.3.7//:simd_adler32",
     ],
 )

@@ -15,7 +15,7 @@
 
   const roomUUID = page.params.roomUUID!;
   const PORT = process.env.PORT || 3000;
-  const DOMAIN_NAME = process.env.DOMAIN_NAME || "192.168.1.46";  // FIXME: This is my IP!!
+  const DOMAIN_NAME = process.env.DOMAIN_NAME || "192.168.1.38";  // FIXME: This is my IP!!
 
   let refBoard: typeof TicTacToeBoard;
   let playerX: Participant | undefined = $state(undefined);
