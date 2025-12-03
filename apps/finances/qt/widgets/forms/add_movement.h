@@ -41,6 +41,8 @@ class AddMovementWidget : public QDialog {
 
     void on_amount_changed(std::optional<finances::accounts::models::Money>);
 
+    void on_ex_dividend_date_changed(QDate date);
+
   public slots:
     void clear(bool keep_date = true);
 

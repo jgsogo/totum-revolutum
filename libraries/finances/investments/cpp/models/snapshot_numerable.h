@@ -16,6 +16,18 @@ namespace finances::investments::models {
 
 namespace utils::db {
 
+    class SnapshotNumerableManager : public ModelManager<finances::investments::models::SnapshotNumerable> {
+      public:
+        using ModelManager<finances::investments::models::SnapshotNumerable>::ModelManager;
+
+        ExpectedType<std::optional<finances::investments::models::SnapshotNumerable>, DatabaseError>
+        get_last_snapshot(const decltype(finances::accounts::models::Account::id)& account_id);
+
+        ExpectedType<std::optional<finances::investments::models::SnapshotNumerable>, DatabaseError>
+        get_prev_snapshot(const decltype(finances::accounts::models::Account::id)& account_id,
+                          const utils::libpqxx::Date& date);
+    };
+
     template <>
     template <>
     std::vector<finances::investments::models::SnapshotNumerable>

@@ -29,7 +29,7 @@ namespace widgets::forms {
         void clear();
 
         void setCcy(finances::accounts::models::Ccy);
-        void setQuantity(finances::accounts::models::Amount);
+        void setClosestSnapshot(std::optional<finances::investments::models::SnapshotNumerable>);
 
       private slots:
         void on_input_data_change();
@@ -39,10 +39,11 @@ namespace widgets::forms {
         void amount_changed(std::optional<finances::accounts::models::Money>);
 
       protected:
-        std::optional<finances::accounts::models::Amount> quantity;
+        std::optional<finances::investments::models::SnapshotNumerable> closest_snapshot;
 
         QCalendarWidget* ex_dividend_date;
         MoneyAmountEdit* unit_value_edit;
+        QLabel* quantity_label;
     };
 
 } // namespace widgets::forms

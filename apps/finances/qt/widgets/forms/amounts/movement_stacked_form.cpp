@@ -156,8 +156,9 @@ namespace widgets::forms {
         pImpl->mov_dividend->setCcy(ccy);
     }
 
-    void MovementStackedForm::set_dividend_quantity(finances::accounts::models::Amount quantity) {
-        pImpl->mov_dividend->setQuantity(quantity);
+    void
+    MovementStackedForm::setClosestSnapshot(std::optional<finances::investments::models::SnapshotNumerable> snapshot) {
+        pImpl->mov_dividend->setClosestSnapshot(snapshot);
     }
 
     void MovementStackedForm::on_current_changed(int index) {

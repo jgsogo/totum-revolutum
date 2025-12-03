@@ -20,7 +20,7 @@ namespace widgets::forms {
         quantity->setFocusPolicy(Qt::StrongFocus);
 
         // Unit value
-        unit_value_edit = new MoneyAmountEdit("Amount (%1)", this);
+        unit_value_edit = new MoneyAmountEdit("Unit value (%1)", this);
         connect(unit_value_edit, &MoneyAmountEdit::money_changed,
                 [this](finances::accounts::models::Money) { this->on_input_data_change(); });
         unit_value_edit->setFocusPolicy(Qt::StrongFocus);
