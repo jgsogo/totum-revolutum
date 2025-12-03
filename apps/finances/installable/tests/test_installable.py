@@ -21,12 +21,15 @@ def pkg_expanded_dir():
 
     with TemporaryDirectory() as tmpdirname:
         temp_dir = Path(tmpdirname) / "pkg"
-        proc = subprocess.Popen(
-            ["pkgutil", "--expand", PKG_FILE, temp_dir],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        stdout, stderr = proc.communicate()
+
+        try:
+            pkgutil_exec = os.getenv("TEST_SRCDIR") + "/_main/bazel/tools/pkgutil/pkgutil"
+            subprocess.check_output(
+                [pkgutil_exec, "--expand", PKG_FILE, temp_dir],
+                stderr=subprocess.STDOUT,
+            )
+        except subprocess.CalledProcessError as e:
+            pytest.fail(e.output.decode())
 
         yield temp_dir
 
@@ -34,7 +37,7 @@ def pkg_expanded_dir():
 @pytest.fixture(scope="session")
 def pkg_info(pkg_expanded_dir):
     pkg_info = pkg_expanded_dir / "PackageInfo"
-    assert os.path.isfile(pkg_info)
+    assert os.path.isfile(pkg_info), f"'{pkg_info}' is not a file"
 
     tree = ET.parse(pkg_info)
     root = tree.getroot()
