@@ -3,13 +3,20 @@
 load("//bazel/rust/docs:defs.bzl", "rust_docs")
 
 ALL_LIBRARIES = [
+    "conductus",
     "constants",
     "cron",
     "diesel_utils",
     "filesystem",
+    # "finances/accounts/rust:finances_accounts",
+    # "finances/investments/rust:finances_investments",
+    # "googleapis:googleapis/rust",
+    "openexchangerates",
     "pcloud_sdk",
     "rebrickable",
-    "utils",
+    "utils/rust/proto_wrapper",
+    "utils/rust/proto_wrapper_derive",
+    "utils/rust/utils",
 ]
 
 rust_docs(

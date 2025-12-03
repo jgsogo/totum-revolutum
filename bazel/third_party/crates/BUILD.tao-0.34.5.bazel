@@ -67,8 +67,8 @@ rust_library(
         "@crates__crossbeam-channel-0.5.15//:crossbeam_channel",
         "@crates__dpi-0.1.2//:dpi",
         "@crates__lazy_static-1.5.0//:lazy_static",
-        "@crates__libc-0.2.177//:libc",
-        "@crates__log-0.4.28//:log",
+        "@crates__libc-0.2.178//:libc",
+        "@crates__log-0.4.29//:log",
         "@crates__raw-window-handle-0.6.2//:raw_window_handle",
         "@crates__url-2.5.7//:url",
     ] + select({
@@ -83,7 +83,7 @@ rust_library(
             "@crates__scopeguard-1.2.0//:scopeguard",  # cfg(target_os = "macos")
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__dlopen2-0.8.0//:dlopen2",  # cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))
+            "@crates__dlopen2-0.8.1//:dlopen2",  # cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))
             "@crates__gdkwayland-sys-0.18.2//:gdk_wayland_sys",  # cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))
             "@crates__gdkx11-sys-0.18.2//:gdk_x11_sys",  # cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))
             "@crates__gtk-0.18.2//:gtk",  # cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))

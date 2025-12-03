@@ -61,7 +61,7 @@ rust_library(
     }),
     version = "0.7.17",
     deps = [
-        "@crates__bytes-1.10.1//:bytes",
+        "@crates__bytes-1.11.0//:bytes",
         "@crates__futures-core-0.3.31//:futures_core",
         "@crates__futures-sink-0.3.31//:futures_sink",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",

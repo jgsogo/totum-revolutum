@@ -91,14 +91,14 @@ alias(
 )
 
 alias(
-    name = "bytes-1.10.1",
-    actual = "@crates__bytes-1.10.1//:bytes",
+    name = "bytes-1.11.0",
+    actual = "@crates__bytes-1.11.0//:bytes",
     tags = ["manual"],
 )
 
 alias(
     name = "bytes",
-    actual = "@crates__bytes-1.10.1//:bytes",
+    actual = "@crates__bytes-1.11.0//:bytes",
     tags = ["manual"],
 )
 
@@ -151,14 +151,14 @@ alias(
 )
 
 alias(
-    name = "clap-4.5.51",
-    actual = "@crates__clap-4.5.51//:clap",
+    name = "clap-4.5.53",
+    actual = "@crates__clap-4.5.53//:clap",
     tags = ["manual"],
 )
 
 alias(
     name = "clap",
-    actual = "@crates__clap-4.5.51//:clap",
+    actual = "@crates__clap-4.5.53//:clap",
     tags = ["manual"],
 )
 
@@ -175,38 +175,38 @@ alias(
 )
 
 alias(
-    name = "clap_complete-4.5.60",
-    actual = "@crates__clap_complete-4.5.60//:clap_complete",
+    name = "clap_complete-4.5.61",
+    actual = "@crates__clap_complete-4.5.61//:clap_complete",
     tags = ["manual"],
 )
 
 alias(
     name = "clap_complete",
-    actual = "@crates__clap_complete-4.5.60//:clap_complete",
+    actual = "@crates__clap_complete-4.5.61//:clap_complete",
     tags = ["manual"],
 )
 
 alias(
-    name = "confy-1.0.0",
-    actual = "@crates__confy-1.0.0//:confy",
+    name = "confy-2.0.0",
+    actual = "@crates__confy-2.0.0//:confy",
     tags = ["manual"],
 )
 
 alias(
     name = "confy",
-    actual = "@crates__confy-1.0.0//:confy",
+    actual = "@crates__confy-2.0.0//:confy",
     tags = ["manual"],
 )
 
 alias(
-    name = "cron-parser-0.10.0",
-    actual = "@crates__cron-parser-0.10.0//:cron_parser",
+    name = "cron-parser-0.11.0",
+    actual = "@crates__cron-parser-0.11.0//:cron_parser",
     tags = ["manual"],
 )
 
 alias(
     name = "cron-parser",
-    actual = "@crates__cron-parser-0.10.0//:cron_parser",
+    actual = "@crates__cron-parser-0.11.0//:cron_parser",
     tags = ["manual"],
 )
 
@@ -223,38 +223,38 @@ alias(
 )
 
 alias(
-    name = "diesel-2.3.3",
-    actual = "@crates__diesel-2.3.3//:diesel",
+    name = "diesel-2.3.4",
+    actual = "@crates__diesel-2.3.4//:diesel",
     tags = ["manual"],
 )
 
 alias(
     name = "diesel",
-    actual = "@crates__diesel-2.3.3//:diesel",
+    actual = "@crates__diesel-2.3.4//:diesel",
     tags = ["manual"],
 )
 
 alias(
-    name = "diesel_migrations-2.3.0",
-    actual = "@crates__diesel_migrations-2.3.0//:diesel_migrations",
+    name = "diesel_migrations-2.3.1",
+    actual = "@crates__diesel_migrations-2.3.1//:diesel_migrations",
     tags = ["manual"],
 )
 
 alias(
     name = "diesel_migrations",
-    actual = "@crates__diesel_migrations-2.3.0//:diesel_migrations",
+    actual = "@crates__diesel_migrations-2.3.1//:diesel_migrations",
     tags = ["manual"],
 )
 
 alias(
-    name = "diesel_table_macro_syntax-0.2.0",
-    actual = "@crates__diesel_table_macro_syntax-0.2.0//:diesel_table_macro_syntax",
+    name = "diesel_table_macro_syntax-0.3.0",
+    actual = "@crates__diesel_table_macro_syntax-0.3.0//:diesel_table_macro_syntax",
     tags = ["manual"],
 )
 
 alias(
     name = "diesel_table_macro_syntax",
-    actual = "@crates__diesel_table_macro_syntax-0.2.0//:diesel_table_macro_syntax",
+    actual = "@crates__diesel_table_macro_syntax-0.3.0//:diesel_table_macro_syntax",
     tags = ["manual"],
 )
 
@@ -415,14 +415,14 @@ alias(
 )
 
 alias(
-    name = "http-1.3.1",
-    actual = "@crates__http-1.3.1//:http",
+    name = "http-1.4.0",
+    actual = "@crates__http-1.4.0//:http",
     tags = ["manual"],
 )
 
 alias(
     name = "http",
-    actual = "@crates__http-1.3.1//:http",
+    actual = "@crates__http-1.4.0//:http",
     tags = ["manual"],
 )
 
@@ -451,38 +451,38 @@ alias(
 )
 
 alias(
-    name = "httpmock-0.7.0",
-    actual = "@crates__httpmock-0.7.0//:httpmock",
+    name = "httpmock-0.8.2",
+    actual = "@crates__httpmock-0.8.2//:httpmock",
     tags = ["manual"],
 )
 
 alias(
     name = "httpmock",
-    actual = "@crates__httpmock-0.7.0//:httpmock",
+    actual = "@crates__httpmock-0.8.2//:httpmock",
     tags = ["manual"],
 )
 
 alias(
-    name = "hyper-1.7.0",
-    actual = "@crates__hyper-1.7.0//:hyper",
+    name = "hyper-1.8.1",
+    actual = "@crates__hyper-1.8.1//:hyper",
     tags = ["manual"],
 )
 
 alias(
     name = "hyper",
-    actual = "@crates__hyper-1.7.0//:hyper",
+    actual = "@crates__hyper-1.8.1//:hyper",
     tags = ["manual"],
 )
 
 alias(
-    name = "hyper-util-0.1.17",
-    actual = "@crates__hyper-util-0.1.17//:hyper_util",
+    name = "hyper-util-0.1.19",
+    actual = "@crates__hyper-util-0.1.19//:hyper_util",
     tags = ["manual"],
 )
 
 alias(
     name = "hyper-util",
-    actual = "@crates__hyper-util-0.1.17//:hyper_util",
+    actual = "@crates__hyper-util-0.1.19//:hyper_util",
     tags = ["manual"],
 )
 
@@ -511,26 +511,26 @@ alias(
 )
 
 alias(
-    name = "image-0.25.8",
-    actual = "@crates__image-0.25.8//:image",
+    name = "image-0.25.9",
+    actual = "@crates__image-0.25.9//:image",
     tags = ["manual"],
 )
 
 alias(
     name = "image",
-    actual = "@crates__image-0.25.8//:image",
+    actual = "@crates__image-0.25.9//:image",
     tags = ["manual"],
 )
 
 alias(
-    name = "indicatif-0.18.2",
-    actual = "@crates__indicatif-0.18.2//:indicatif",
+    name = "indicatif-0.18.3",
+    actual = "@crates__indicatif-0.18.3//:indicatif",
     tags = ["manual"],
 )
 
 alias(
     name = "indicatif",
-    actual = "@crates__indicatif-0.18.2//:indicatif",
+    actual = "@crates__indicatif-0.18.3//:indicatif",
     tags = ["manual"],
 )
 
@@ -571,14 +571,14 @@ alias(
 )
 
 alias(
-    name = "log-0.4.28",
-    actual = "@crates__log-0.4.28//:log",
+    name = "log-0.4.29",
+    actual = "@crates__log-0.4.29//:log",
     tags = ["manual"],
 )
 
 alias(
     name = "log",
-    actual = "@crates__log-0.4.28//:log",
+    actual = "@crates__log-0.4.29//:log",
     tags = ["manual"],
 )
 
@@ -595,14 +595,14 @@ alias(
 )
 
 alias(
-    name = "mockall-0.13.1",
-    actual = "@crates__mockall-0.13.1//:mockall",
+    name = "mockall-0.14.0",
+    actual = "@crates__mockall-0.14.0//:mockall",
     tags = ["manual"],
 )
 
 alias(
     name = "mockall",
-    actual = "@crates__mockall-0.13.1//:mockall",
+    actual = "@crates__mockall-0.14.0//:mockall",
     tags = ["manual"],
 )
 
@@ -679,14 +679,14 @@ alias(
 )
 
 alias(
-    name = "quote-1.0.41",
-    actual = "@crates__quote-1.0.41//:quote",
+    name = "quote-1.0.42",
+    actual = "@crates__quote-1.0.42//:quote",
     tags = ["manual"],
 )
 
 alias(
     name = "quote",
-    actual = "@crates__quote-1.0.41//:quote",
+    actual = "@crates__quote-1.0.42//:quote",
     tags = ["manual"],
 )
 
@@ -835,14 +835,14 @@ alias(
 )
 
 alias(
-    name = "syn-2.0.108",
-    actual = "@crates__syn-2.0.108//:syn",
+    name = "syn-2.0.111",
+    actual = "@crates__syn-2.0.111//:syn",
     tags = ["manual"],
 )
 
 alias(
     name = "syn",
-    actual = "@crates__syn-2.0.108//:syn",
+    actual = "@crates__syn-2.0.111//:syn",
     tags = ["manual"],
 )
 
@@ -859,92 +859,92 @@ alias(
 )
 
 alias(
-    name = "tauri-2.9.2",
-    actual = "@crates__tauri-2.9.2//:tauri",
+    name = "tauri-2.9.4",
+    actual = "@crates__tauri-2.9.4//:tauri",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri",
-    actual = "@crates__tauri-2.9.2//:tauri",
+    actual = "@crates__tauri-2.9.4//:tauri",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-app-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-app-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-app-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-event-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-event-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-event-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-image-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-image-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-image-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-menu-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-menu-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-menu-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-path-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-path-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-path-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-resources-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-resources-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-resources-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-tray-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-tray-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-tray-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-webview-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-webview-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-webview-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-core-window-permission-files",
-    actual = "@crates__tauri-2.9.2//:tauri-core-window-permission-files",
+    actual = "@crates__tauri-2.9.4//:tauri-core-window-permission-files",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-global-api-script",
-    actual = "@crates__tauri-2.9.2//:global-api-script",
+    actual = "@crates__tauri-2.9.4//:global-api-script",
     tags = ["manual"],
 )
 
 alias(
-    name = "tauri-build-2.5.1",
-    actual = "@crates__tauri-build-2.5.1//:tauri_build",
+    name = "tauri-build-2.5.3",
+    actual = "@crates__tauri-build-2.5.3//:tauri_build",
     tags = ["manual"],
 )
 
 alias(
     name = "tauri-build",
-    actual = "@crates__tauri-build-2.5.1//:tauri_build",
+    actual = "@crates__tauri-build-2.5.3//:tauri_build",
     tags = ["manual"],
 )
 
@@ -1087,26 +1087,26 @@ alias(
 )
 
 alias(
-    name = "tracing-0.1.41",
-    actual = "@crates__tracing-0.1.41//:tracing",
+    name = "tracing-0.1.43",
+    actual = "@crates__tracing-0.1.43//:tracing",
     tags = ["manual"],
 )
 
 alias(
     name = "tracing",
-    actual = "@crates__tracing-0.1.41//:tracing",
+    actual = "@crates__tracing-0.1.43//:tracing",
     tags = ["manual"],
 )
 
 alias(
-    name = "tracing-subscriber-0.3.20",
-    actual = "@crates__tracing-subscriber-0.3.20//:tracing_subscriber",
+    name = "tracing-subscriber-0.3.22",
+    actual = "@crates__tracing-subscriber-0.3.22//:tracing_subscriber",
     tags = ["manual"],
 )
 
 alias(
     name = "tracing-subscriber",
-    actual = "@crates__tracing-subscriber-0.3.20//:tracing_subscriber",
+    actual = "@crates__tracing-subscriber-0.3.22//:tracing_subscriber",
     tags = ["manual"],
 )
 
@@ -1135,13 +1135,13 @@ alias(
 )
 
 alias(
-    name = "uuid-1.18.1",
-    actual = "@crates__uuid-1.18.1//:uuid",
+    name = "uuid-1.19.0",
+    actual = "@crates__uuid-1.19.0//:uuid",
     tags = ["manual"],
 )
 
 alias(
     name = "uuid",
-    actual = "@crates__uuid-1.18.1//:uuid",
+    actual = "@crates__uuid-1.19.0//:uuid",
     tags = ["manual"],
 )

@@ -70,7 +70,7 @@ rust_library(
     deps = [
         "@crates__proc-macro-error-1.0.4//:build_script_build",
         "@crates__proc-macro2-1.0.103//:proc_macro2",
-        "@crates__quote-1.0.41//:quote",
+        "@crates__quote-1.0.42//:quote",
         "@crates__syn-1.0.109//:syn",
     ],
 )

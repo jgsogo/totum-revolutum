@@ -61,14 +61,14 @@ rust_library(
     version = "2.3.3",
     deps = [
         "@crates__encoding_rs-0.8.35//:encoding_rs",
-        "@crates__log-0.4.28//:log",
-        "@crates__open-5.3.2//:open",
+        "@crates__log-0.4.29//:log",
+        "@crates__open-5.3.3//:open",
         "@crates__os_pipe-1.2.3//:os_pipe",
         "@crates__regex-1.12.2//:regex",
         "@crates__serde-1.0.228//:serde",
         "@crates__serde_json-1.0.145//:serde_json",
         "@crates__shared_child-1.1.1//:shared_child",
-        "@crates__tauri-2.9.2//:tauri",
+        "@crates__tauri-2.9.4//:tauri",
         "@crates__tauri-plugin-shell-2.3.3//:build_script_build",
         "@crates__thiserror-2.0.17//:thiserror",
         "@crates__tokio-1.48.0//:tokio",
@@ -110,7 +110,7 @@ cargo_build_script(
     ),
     edition = "2021",
     link_deps = [
-        "@crates__tauri-2.9.2//:tauri",
+        "@crates__tauri-2.9.4//:tauri",
     ],
     links = "tauri-plugin-shell",
     pkg_name = "tauri-plugin-shell",
@@ -132,7 +132,7 @@ cargo_build_script(
     deps = [
         "@crates__schemars-0.8.22//:schemars",
         "@crates__serde-1.0.228//:serde",
-        "@crates__tauri-plugin-2.5.1//:tauri_plugin",
+        "@crates__tauri-plugin-2.5.2//:tauri_plugin",
     ],
 )
 

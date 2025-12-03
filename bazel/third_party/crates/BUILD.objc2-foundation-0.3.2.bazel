@@ -237,7 +237,7 @@ rust_library(
     deps = [
         "@crates__bitflags-2.10.0//:bitflags",
         "@crates__block2-0.6.2//:block2",
-        "@crates__libc-0.2.177//:libc",
+        "@crates__libc-0.2.178//:libc",
         "@crates__objc2-0.6.3//:objc2",
         "@crates__objc2-core-foundation-0.3.2//:objc2_core_foundation",
     ],

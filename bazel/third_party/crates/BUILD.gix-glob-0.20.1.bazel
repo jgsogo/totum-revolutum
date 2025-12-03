@@ -59,6 +59,6 @@ rust_library(
         "@crates__bitflags-2.10.0//:bitflags",
         "@crates__bstr-1.12.1//:bstr",
         "@crates__gix-features-0.42.1//:gix_features",
-        "@crates__gix-path-0.10.21//:gix_path",
+        "@crates__gix-path-0.10.22//:gix_path",
     ],
 )

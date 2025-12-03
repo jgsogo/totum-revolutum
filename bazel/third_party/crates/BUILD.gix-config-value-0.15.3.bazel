@@ -58,14 +58,14 @@ rust_library(
     deps = [
         "@crates__bitflags-2.10.0//:bitflags",
         "@crates__bstr-1.12.1//:bstr",
-        "@crates__gix-path-0.10.21//:gix_path",
+        "@crates__gix-path-0.10.22//:gix_path",
         "@crates__thiserror-2.0.17//:thiserror",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.177//:libc",  # cfg(not(windows))
+            "@crates__libc-0.2.178//:libc",  # cfg(not(windows))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.177//:libc",  # cfg(not(windows))
+            "@crates__libc-0.2.178//:libc",  # cfg(not(windows))
         ],
         "//conditions:default": [],
     }),

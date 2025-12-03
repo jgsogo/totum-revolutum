@@ -62,7 +62,7 @@ rust_library(
     deps = [
         "@crates__prettyplease-0.2.37//:build_script_build",
         "@crates__proc-macro2-1.0.103//:proc_macro2",
-        "@crates__syn-2.0.108//:syn",
+        "@crates__syn-2.0.111//:syn",
     ],
 )
 

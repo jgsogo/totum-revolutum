@@ -8,7 +8,10 @@ rust_library(
     name = "finances_investments",
     srcs = glob(["src/**/*.rs"]),
     crate_features = ["postgres"],
-    visibility = ["//apps/finances:__subpackages__"],
+    visibility = [
+        "//apps/finances:__subpackages__",
+        "//libraries:__pkg__",
+    ],
     deps = [
         "//bazel/third_party/crates:chrono",
         "//bazel/third_party/crates:diesel",
@@ -24,7 +27,10 @@ rust_library(
         "test_utils",
     ],
     crate_name = "finances_investments",
-    visibility = ["//apps/finances:__subpackages__"],
+    visibility = [
+        "//apps/finances:__subpackages__",
+        "//libraries:__pkg__",
+    ],
     deps = [
         "//bazel/third_party/crates:chrono",
         "//bazel/third_party/crates:diesel",

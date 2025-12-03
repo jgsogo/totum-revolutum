@@ -185,9 +185,7 @@ labels:
     color: "000000"
   - name: cmp:libraries/rebrickable
     color: "000000"
-  - name: cmp:libraries/rust
-    color: "000000"
-  - name: cmp:libraries/utils
+  - name: cmp:libraries/utils/rust
     color: "000000"
   - name: cmp:libraries/utils/cpp
     color: "000000"

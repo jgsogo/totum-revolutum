@@ -57,9 +57,9 @@ rust_library(
     version = "0.4.2",
     deps = [
         "@crates__futures-util-0.3.31//:futures_util",
-        "@crates__js-sys-0.3.82//:js_sys",
-        "@crates__wasm-bindgen-0.2.105//:wasm_bindgen",
-        "@crates__wasm-bindgen-futures-0.4.55//:wasm_bindgen_futures",
-        "@crates__web-sys-0.3.82//:web_sys",
+        "@crates__js-sys-0.3.83//:js_sys",
+        "@crates__wasm-bindgen-0.2.106//:wasm_bindgen",
+        "@crates__wasm-bindgen-futures-0.4.56//:wasm_bindgen_futures",
+        "@crates__web-sys-0.3.83//:web_sys",
     ],
 )

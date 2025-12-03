@@ -20,7 +20,7 @@ rust_library(
         "//bazel/third_party/crates:num-bigint",
         "//bazel/third_party/crates:prost",
         "//apps/finances/tauri/models/protos:protos_rs",
-        "//libraries/rust/proto_wrapper",
+        "//libraries/utils/rust/proto_wrapper",
         "//libraries/finances/accounts/rust:finances_accounts",
         # "//libraries/googleapis:googleapis/rust", # FIXME: Rust regenerates the googleapis/protos so we can't reuse here
         "//bazel/third_party/crates:bigdecimal",

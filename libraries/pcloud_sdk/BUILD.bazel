@@ -57,7 +57,7 @@ rust_library_tests_and_docs(
         "//bazel/third_party/crates:tracing",
         "//bazel/third_party/crates:tryhard",
         "//bazel/third_party/crates:url",
-        "//libraries/utils",
+        "//libraries/utils/rust/utils",
     ],
 )
 
@@ -81,6 +81,6 @@ rust_binary(
         "//bazel/third_party/crates:tokio",
         "//bazel/third_party/crates:tracing",
         "//bazel/third_party/crates:tracing-subscriber",
-        "//libraries/utils",
+        "//libraries/utils/rust/utils",
     ],
 )
