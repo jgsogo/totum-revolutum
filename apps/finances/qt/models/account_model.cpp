@@ -3,6 +3,47 @@
 #include <spdlog/spdlog.h>
 
 using namespace finances::accounts::models;
+using namespace finances::investments::models;
+
+std::optional<std::reference_wrapper<const utils::libpqxx::Date>> AccountModel::last_snapshot_date() const {
+    if (last_snapshot) {
+        const utils::libpqxx::Date& date = std::visit(
+            [](const auto& arg) -> const utils::libpqxx::Date& {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, Snapshot>) {
+                    return arg.date_value;
+                } else if constexpr (std::is_same_v<T, SnapshotNumerable>) {
+                    return arg.snapshot.date_value;
+                } else {
+                    static_assert(false, "non-exhaustive visitor!");
+                }
+            },
+            last_snapshot.value());
+        return {date};
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::optional<std::reference_wrapper<const Money>> AccountModel::last_snapshot_amount() const {
+    if (last_snapshot) {
+        const Money& money_amount = std::visit(
+            [](const auto& arg) -> const Money& {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, Snapshot>) {
+                    return arg.amount;
+                } else if constexpr (std::is_same_v<T, SnapshotNumerable>) {
+                    return arg.snapshot.amount;
+                } else {
+                    static_assert(false, "non-exhaustive visitor!");
+                }
+            },
+            last_snapshot.value());
+        return {money_amount};
+    } else {
+        return std::nullopt;
+    }
+}
 
 namespace utils::db {
 
@@ -10,15 +51,27 @@ namespace utils::db {
 
         ExpectedType<AccountModel, DatabaseError> get_account_model(utils::libpqxx::ConnectionPool& pool,
                                                                     Account&& account) {
-            // Get the last snapshot for this accounts
-            auto snapshots_manager = SnapshotManager{pool};
-            auto last_snapshot = snapshots_manager.get_last_snapshot(account.id);
-            if (!last_snapshot) {
-                return tl::unexpected{last_snapshot.error()};
+            decltype(AccountModel::last_snapshot) last_snapshot = std::nullopt;
+
+            // Get the last snapshot for this account
+            if (account.is_numerable) {
+                auto snapshot_numerable_manager = SnapshotNumerableManager{pool};
+                auto last_snapshot_expected = snapshot_numerable_manager.get_last_snapshot(account.id);
+                if (!last_snapshot_expected) {
+                    return tl::unexpected{last_snapshot_expected.error()};
+                }
+                last_snapshot = std::move(last_snapshot_expected.value());
+            } else {
+                auto snapshots_manager = SnapshotManager{pool};
+                auto last_snapshot_expected = snapshots_manager.get_last_snapshot(account.id);
+                if (!last_snapshot_expected) {
+                    return tl::unexpected{last_snapshot_expected.error()};
+                }
+                last_snapshot = std::move(last_snapshot_expected.value());
             }
 
             // Get the holders for this account
-            utils::db::ModelManager<finances::accounts::models::AccountHolderWithRoles> holders_manager{pool};
+            utils::db::ModelManager<AccountHolderWithRoles> holders_manager{pool};
             auto holders = holders_manager.filter_by_fk(account);
             if (!holders) {
                 return tl::unexpected{holders.error()};
@@ -44,7 +97,7 @@ namespace utils::db {
             // Create the AccountModel, we have all the information we need
             return AccountModel{.id = account.id,
                                 .account = std::move(account),
-                                .last_snapshot = std::move(last_snapshot.value()),
+                                .last_snapshot = std::move(last_snapshot),
                                 .holders = std::move(holders.value()),
                                 .account_type_breadcrumb = breadcrumb_str};
         }

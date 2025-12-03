@@ -45,14 +45,15 @@ namespace utils::qt::models {
             result = account.identifier.value_or("").c_str();
             break;
         case AccountColumns::SNAPSHOT: {
-            const auto& snapshot = item.last_snapshot;
-            if (snapshot) {
-                // FIXME: Implement some convenient functions in Snapshot class
-                auto date_value = utils::date_to_qdate(snapshot.value().date_value);
-                if (date_value.daysTo(QDate::currentDate()) > 21) { // FIXME: Hardcoded number
-                    result = QString("🗓️ %1").arg(static_cast<std::string>(snapshot.value().amount));
+            if (item.last_snapshot) {
+                auto date_value = item.last_snapshot_date().value();
+                auto amount = item.last_snapshot_amount().value();
+
+                auto qdate_value = utils::date_to_qdate(date_value);
+                if (qdate_value.daysTo(QDate::currentDate()) > 21) { // FIXME: Hardcoded number
+                    result = QString("🗓️ %1").arg(static_cast<std::string>(amount.get()));
                 } else {
-                    result = QString::fromStdString(static_cast<std::string>(snapshot.value().amount));
+                    result = QString::fromStdString(static_cast<std::string>(amount.get()));
                 }
             } else {
                 result = QString("❗");
