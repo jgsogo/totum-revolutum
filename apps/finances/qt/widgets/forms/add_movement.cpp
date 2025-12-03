@@ -33,8 +33,13 @@ AddMovementWidget::AddMovementWidget(utils::libpqxx::ConnectionPool& pool, Accou
     mov_date->setFocusPolicy(Qt::StrongFocus);
 
     mov_amount = new widgets::forms::MovementStackedForm;
-    connect(mov_amount, &widgets::forms::MovementStackedForm::amount_changed, this,
-            &AddMovementWidget::on_amount_changed);
+    {
+
+        connect(mov_amount, &widgets::forms::MovementStackedForm::amount_changed, this,
+                &AddMovementWidget::on_amount_changed);
+        connect(mov_amount, &widgets::forms::MovementStackedForm::ex_dividend_date_changed, this,
+                &AddMovementWidget::on_ex_dividend_date_changed);
+    }
 
     fx_rate_value = new QLineEdit;
     fx_rate_label = new QLabel(tr("FX rate"));
@@ -121,11 +126,25 @@ void AddMovementWidget::clear(bool keep_date) {
 
 void AddMovementWidget::account_changed(const AccountModel& account) {
     SPDLOG_DEBUG("AddMovementWidget::account_changed(account.name={})", account.account.name);
+    mov_amount->clear();
+
+    // Set the currency
     mov_amount->set_ccy(account.account.ccy);
+
+    // Set the (preferred) movement type
     if (account.account.is_numerable) {
         mov_amount->set_movement_numerable();
     } else {
         mov_amount->set_movement_non_numerable();
+    }
+
+    // Set the latest snapshot (only if numerable)
+    if (account.account.is_numerable && account.last_snapshot) {
+        assert(
+            std::holds_alternative<finances::investments::models::SnapshotNumerable>(account.last_snapshot.value()) &&
+            "Last snapshot for numerable account doesn't hold SnapshotNumerable");
+        mov_amount->setClosestSnapshot(
+            std::get<finances::investments::models::SnapshotNumerable>(account.last_snapshot.value()));
     }
 
     if (account.account.ccy != finances::accounts::models::EUR) {
@@ -229,6 +248,41 @@ void AddMovementWidget::add_movement_clicked() {
 
     emit new_movement(movement_model);
     this->accept();
+}
+
+void AddMovementWidget::on_ex_dividend_date_changed(QDate qt_date) {
+    SPDLOG_DEBUG("AddMovementWidget::on_ex_dividend_date_changed(date={})", qt_date.toString().toStdString());
+
+    auto account_expected = account_combo->selected();
+    if (!account_expected) {
+        SPDLOG_WARN(" - if we are modifying the ex-dividend-date we should have an account already. Got error: {}",
+                    account_expected.error());
+        return;
+    }
+    if (!account_expected.value()) {
+        SPDLOG_WARN(" - if we are modifying the ex-dividend-date we should have an account already");
+        return;
+    }
+
+    AccountModel account = std::move(account_expected.value().value());
+    if (!account.account.is_numerable) {
+        SPDLOG_WARN(" - if we are modifying the ex-dividend-date we should have a numerable account");
+        return;
+    }
+
+    // Get snapshot numerable for this account, before the given date
+    auto snapshot_numerable_manager = utils::db::SnapshotNumerableManager{pool};
+
+    utils::libpqxx::Date date{date::year_month_day{date::year{qt_date.year()},
+                                                   date::month{static_cast<unsigned int>(qt_date.month())},
+                                                   date::day{static_cast<unsigned int>(qt_date.day())}}};
+    auto last_snapshot_expected = snapshot_numerable_manager.get_prev_snapshot(account.id, date);
+    if (!last_snapshot_expected) {
+        SPDLOG_WARN("Error returning the latest snapshot (before '{}') for account.id = '{}'", date, account.id);
+        // TODO: Notify the user
+        return;
+    }
+    mov_amount->setClosestSnapshot(last_snapshot_expected.value());
 }
 
 void AddMovementWidget::on_amount_changed(std::optional<finances::accounts::models::Money> money) {

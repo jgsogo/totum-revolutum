@@ -11,6 +11,91 @@ using namespace finances::accounts::models;
 
 namespace utils::db {
 
+    ExpectedType<std::optional<SnapshotNumerable>, DatabaseError>
+    SnapshotNumerableManager::get_last_snapshot(const decltype(Account::id)& account_id) {
+        return pool.with_conn<ExpectedType<std::optional<SnapshotNumerable>, DatabaseError>>(
+            [&account_id](pqxx::connection& conn) -> ExpectedType<std::optional<SnapshotNumerable>, DatabaseError> {
+                try {
+                    pqxx::work tx(conn);
+                    SPDLOG_DEBUG("Get last snapshot numerable for account_id {}", account_id);
+
+                    auto query =
+                        std::format("SELECT s.id, s.date_value, s.amount, n.snapshot_ptr_id, n.quantity, n.unit_value, "
+                                    "       acc.id, acc.name, acc.ccy"
+                                    " FROM {} AS s"
+                                    "   LEFT JOIN {} AS n ON n.snapshot_ptr_id = s.id"
+                                    "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
+                                    " WHERE s.account_id = $1"
+                                    " ORDER BY s.date_value DESC"
+                                    " LIMIT 1",
+                                    SNAPSHOT_TABLE, SNAPSHOT_NUMERABLE_TABLE, ACCOUNT_TABLE);
+                    SPDLOG_TRACE(query);
+                    auto r = tx.exec(query, pqxx::params{account_id}).opt_row();
+                    if (!r) {
+                        return {std::nullopt};
+                    }
+                    auto [id, date_value, amount, numerable_id, quantity, unit_value, acc_id, acc_name, acc_ccy] =
+                        r->as<Id, utils::libpqxx::Date, Amount, Id, Amount, Amount, Id, std::string, std::string>();
+                    return {std::make_optional<SnapshotNumerable>({
+                        .snapshot = Snapshot{.id = id,
+                                             .account = std::make_pair(acc_id, acc_name),
+                                             .date_value = date_value,
+                                             .amount = Money{amount, Ccy{acc_ccy}}},
+                        .id = numerable_id,
+                        .quantity = quantity,
+                        .unit_value = Money{unit_value, Ccy{acc_ccy}},
+                    })};
+                } catch (const std::exception& e) {
+                    SPDLOG_ERROR("Failed to fetch latest snapshot numerable for account {}: {}", account_id, e.what());
+                    return tl::unexpected(DatabaseError{});
+                }
+            });
+    }
+
+    ExpectedType<std::optional<SnapshotNumerable>, DatabaseError>
+    SnapshotNumerableManager::get_prev_snapshot(const decltype(Account::id)& account_id,
+                                                const utils::libpqxx::Date& date) {
+        return pool.with_conn<ExpectedType<std::optional<SnapshotNumerable>, DatabaseError>>(
+            [&account_id,
+             &date](pqxx::connection& conn) -> ExpectedType<std::optional<SnapshotNumerable>, DatabaseError> {
+                try {
+                    pqxx::work tx(conn);
+                    SPDLOG_DEBUG("Get last snapshot numerable for account_id {}", account_id);
+
+                    auto query =
+                        std::format("SELECT s.id, s.date_value, s.amount, n.snapshot_ptr_id, n.quantity, n.unit_value, "
+                                    "       acc.id, acc.name, acc.ccy"
+                                    " FROM {} AS s"
+                                    "   LEFT JOIN {} AS n ON n.snapshot_ptr_id = s.id"
+                                    "   LEFT JOIN {} AS acc ON s.account_id = acc.id"
+                                    " WHERE s.account_id = $1"
+                                    "       AND s.date_value <= $2"
+                                    " ORDER BY s.date_value DESC"
+                                    " LIMIT 1",
+                                    SNAPSHOT_TABLE, SNAPSHOT_NUMERABLE_TABLE, ACCOUNT_TABLE);
+                    SPDLOG_TRACE(query);
+                    auto r = tx.exec(query, pqxx::params{account_id, date}).opt_row();
+                    if (!r) {
+                        return {std::nullopt};
+                    }
+                    auto [id, date_value, amount, numerable_id, quantity, unit_value, acc_id, acc_name, acc_ccy] =
+                        r->as<Id, utils::libpqxx::Date, Amount, Id, Amount, Amount, Id, std::string, std::string>();
+                    return {std::make_optional<SnapshotNumerable>({
+                        .snapshot = Snapshot{.id = id,
+                                             .account = std::make_pair(acc_id, acc_name),
+                                             .date_value = date_value,
+                                             .amount = Money{amount, Ccy{acc_ccy}}},
+                        .id = numerable_id,
+                        .quantity = quantity,
+                        .unit_value = Money{unit_value, Ccy{acc_ccy}},
+                    })};
+                } catch (const std::exception& e) {
+                    SPDLOG_ERROR("Failed to fetch latest snapshot numerable for account {}: {}", account_id, e.what());
+                    return tl::unexpected(DatabaseError{});
+                }
+            });
+    }
+
     template <>
     template <>
     std::vector<finances::investments::models::SnapshotNumerable>
@@ -20,7 +105,7 @@ namespace utils::db {
         SPDLOG_DEBUG("Get all snapshots for account_id {}", account_id);
 
         auto query = std::format("SELECT s.id, s.date_value, s.amount, n.snapshot_ptr_id, n.quantity, n.unit_value, "
-                                 "acc.id, acc.name, acc.ccy"
+                                 "       acc.id, acc.name, acc.ccy"
                                  " FROM {} AS s"
                                  "   LEFT JOIN {} AS n ON n.snapshot_ptr_id = s.id"
                                  "   LEFT JOIN {} AS acc ON s.account_id = acc.id"

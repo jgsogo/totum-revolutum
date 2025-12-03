@@ -37,7 +37,7 @@ namespace widgets::forms {
         void set_movement_dividend();
 
         void set_ccy(finances::accounts::models::Ccy ccy);
-        void set_dividend_quantity(finances::accounts::models::Amount quantity);
+        void setClosestSnapshot(std::optional<finances::investments::models::SnapshotNumerable>);
 
       private slots:
         void on_current_changed(int index);
