@@ -6,6 +6,13 @@
     enabled: True
 
 - model: board_games_core.gametype
+  pk: ticket_to_ride
+  fields:
+    name: "Ticket to Ride"
+    description: "Build your train empire."
+    enabled: True
+
+- model: board_games_core.gametype
   pk: chess
   fields:
     name: "Chess"

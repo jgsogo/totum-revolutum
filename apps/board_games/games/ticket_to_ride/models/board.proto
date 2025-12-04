@@ -1,0 +1,32 @@
+syntax = "proto3";
+package board_games.ticket_to_ride;
+
+
+message Board {
+    // Linearized 3x3 board. Values: 'X', 'O', or ' ' (empty).
+    string board_status = 1;
+
+    oneof turn_state { // FIXME: Every game will have this?
+        uint32 current_turn = 2;
+
+        // If there is a winner, the game has finished
+        Winner winner = 3;
+
+        bool draw = 4;
+    }
+}
+
+message Winner {
+    uint32 player = 1;
+    repeated uint32 line = 2;
+}
+
+message Action {
+    // Position 0–8, mapped left-to-right, top-to-bottom.
+    uint32 position =1;
+}
+
+message EventLog {
+    uint32 mark_placed_at_position = 1;
+    uint32 player = 2;
+}
