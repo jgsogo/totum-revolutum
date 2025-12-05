@@ -1,12 +1,12 @@
 
 #pragma once
 
+#include <expected>
 #include <format>
 #include <string>
 #include <variant>
 
 #include <spdlog/spdlog.h>
-#include <tl/expected.hpp>
 
 #include "libraries/utils/cpp/concepts/alternative_c.hpp"
 
@@ -54,45 +54,44 @@ namespace utils {
     } // namespace _impl
 
     template <typename T, typename... Errs>
-    struct ExpectedType : tl::expected<T, std::variant<NotImplemented, Errs...>> {
-        using tl::expected<T, std::variant<NotImplemented, Errs...>>::expected;
+    using ExpectedType = std::expected<T, std::variant<NotImplemented, Errs...>>;
 
-        /// A constructor that can take any of the unexpected types
-        template <typename Err>
-            requires utils::concepts::alternative_in_pack<Err, NotImplemented, Errs...>
-        explicit ExpectedType(Err&& e)
-            : tl::expected<T, std::variant<NotImplemented, Errs...>>{tl::make_unexpected(std::move(e))} {}
+    // template <typename T, typename... Errs>
+    // struct ExpectedType : std::expected<T, std::variant<NotImplemented, Errs...>> {
+    //     using std::expected<T, std::variant<NotImplemented, Errs...>>::expected;
 
-        // A constructor from a subset of errors
-        template <class... FromArgs>
-        explicit ExpectedType(std::variant<NotImplemented, FromArgs...>&& e)
-            : tl::expected<T, std::variant<NotImplemented, Errs...>>(
-                  tl::unexpect, _impl::convert_variant<std::variant<NotImplemented, FromArgs...>,
-                                                       std::variant<NotImplemented, Errs...>>(std::move(e))) {}
+    //     /// A constructor that can take any of the unexpected types
+    //     template <typename Err>
+    //         requires utils::concepts::alternative_in_pack<Err, NotImplemented, Errs...>
+    //     explicit ExpectedType(Err&& e)
+    //         : std::expected<T, std::variant<NotImplemented, Errs...>>{std::unexpected(std::move(e))} {}
 
-        /// Cast-move operator to convert to an `ExpectedType` with a superset of error types (note that the result type
-        /// has to be the same)
-        template <class... ToArgs> operator ExpectedType<T, ToArgs...>() && {
-            if (this->has_value()) {
-                return {std::move(*this)};
-            } else {
-                // std::variant<NotImplemented, Errs...> err = std::move(this->error());
-                return std::visit(
-                    [](auto&& arg) {
-                        // using TErr = std::decay_t<decltype(arg)>;
-                        return ExpectedType<T, ToArgs...>(std::move(arg));
-                    },
-                    std::move(this->error()));
-            }
-        }
-    };
+    //     // A constructor from a subset of errors
+    //     template <class... FromArgs>
+    //     explicit ExpectedType(std::variant<NotImplemented, FromArgs...>&& e)
+    //         : std::expected<T, std::variant<NotImplemented, Errs...>>(
+    //               std::unexpect, _impl::convert_variant<std::variant<NotImplemented, FromArgs...>,
+    //                                                    std::variant<NotImplemented, Errs...>>(std::move(e))) {}
+
+    //     /// Cast-move operator to convert to an `ExpectedType` with a superset of error types (note that the result
+    //     type
+    //     /// has to be the same)
+    //     template <class... ToArgs> operator ExpectedType<T, ToArgs...>() && {
+    //         if (this->has_value()) {
+    //             return {std::move(*this)};
+    //         } else {
+    //             // std::variant<NotImplemented, Errs...> err = std::move(this->error());
+    //             return std::visit(
+    //                 [](auto&& arg) {
+    //                     // using TErr = std::decay_t<decltype(arg)>;
+    //                     return ExpectedType<T, ToArgs...>(std::move(arg));
+    //                 },
+    //                 std::move(this->error()));
+    //         }
+    //     }
+    // };
 
 } // namespace utils
-
-namespace tl::detail {
-    template <typename T, typename... Errs>
-    struct is_expected_impl<utils::ExpectedType<T, Errs...>> : std::true_type {};
-} // namespace tl::detail
 
 // Required for spdlog
 template <typename... Args> struct fmt::formatter<std::variant<Args...>> : fmt::formatter<std::string> {
