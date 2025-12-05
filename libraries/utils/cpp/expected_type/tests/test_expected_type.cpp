@@ -74,3 +74,46 @@ TEST_CASE("Test ExpectedType") {
         REQUIRE(r2.error() == std::string{"other error"});
     }
 }
+
+TEST_CASE("Test utils::expected") {
+    using ExpectedType = utils::ExpectedType<std::string, int, std::string>;
+
+    ExpectedType success{"success"};
+    ExpectedType error_int{tl::unexpected(42)};
+    ExpectedType error_str{tl::unexpected("error")};
+    ExpectedType error_not_implemented{tl::unexpected(utils::NotImplemented{"todo"})};
+
+    SECTION("ok") {
+        auto r1 = utils::expected::ok(std::move(success));
+        REQUIRE(r1.has_value());
+        REQUIRE(r1 == std::string{"success"});
+
+        auto r2 = utils::expected::ok(std::move(error_int));
+        REQUIRE(!r2.has_value());
+    }
+
+    SECTION("err") {
+        auto r1 = utils::expected::err<std::string>(std::move(success));
+        REQUIRE(!r1.has_value());
+
+        auto r2 = utils::expected::err<int>(std::move(error_int));
+        REQUIRE(r2.has_value());
+        REQUIRE(r2 == 42);
+
+        // if we try to get the wrong error type, it returns and empty optional
+        auto r3 = utils::expected::err<int>(std::move(error_str));
+        REQUIRE(!r3.has_value());
+    }
+
+    SECTION("ok_or") {
+        std::optional<std::string> v1{"value"};
+        auto r1 = utils::expected::ok_or(std::move(v1), int(42));
+        REQUIRE(r1.has_value());
+        REQUIRE(r1.value() == std::string{"value"});
+
+        std::optional<std::string> v2 = std::nullopt;
+        auto r2 = utils::expected::ok_or(std::move(v2), int(42));
+        REQUIRE(!r2.has_value());
+        REQUIRE(r2.error() == int(42));
+    }
+}
