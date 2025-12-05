@@ -45,6 +45,7 @@ cc_library(
     deps = [
         "//bazel/logging:spdlog",
         "//libraries/utils/cpp/concepts:alternative_c",
+        "@tl-expected",
     ],
 )
 
