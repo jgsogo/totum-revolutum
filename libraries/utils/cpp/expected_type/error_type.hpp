@@ -6,8 +6,56 @@
 
 namespace utils {
 
+    namespace _impl {
+
+        template <typename... Ts> struct variant_traits {
+            using types = std::tuple<Ts...>;
+        };
+
+        template <typename... Ts> struct variant_traits<std::variant<Ts...>> {
+            using types = std::tuple<Ts...>;
+        };
+
+        template <typename FromVariant, typename ToVariant, std::size_t... I>
+        ToVariant convert_variant_impl(FromVariant&& in, std::index_sequence<I...>) {
+            using ToTypes = typename variant_traits<std::decay_t<ToVariant>>::types;
+
+            return std::visit(
+                [](auto&& arg) -> ToVariant {
+                    using T = std::decay_t<decltype(arg)>;
+
+                    static_assert(((std::is_same_v<T, std::tuple_element_t<I, ToTypes>> || ...)),
+                                  "convert_variant: target variant must contain all source types");
+
+                    return ToVariant{std::forward<T>(arg)};
+                },
+                std::forward<FromVariant>(in));
+        }
+
+        template <typename FromVariant, typename ToVariant> ToVariant convert_variant(FromVariant&& in) {
+            using ToTypes = typename variant_traits<std::decay_t<ToVariant>>::types;
+            constexpr std::size_t N = std::tuple_size_v<ToTypes>;
+            return convert_variant_impl<FromVariant, ToVariant>(std::forward<FromVariant>(in),
+                                                                std::make_index_sequence<N>{});
+        }
+
+    } // namespace _impl
+
     template <typename... Errs> struct ErrorType : std::variant<NotImplemented, Errs...> {
         using std::variant<NotImplemented, Errs...>::variant;
+
+        // A constructor from a subset of types
+        template <class... FromArgs>
+        explicit ErrorType(ErrorType<FromArgs...>&& other)
+            : std::variant<NotImplemented, Errs...>(
+                  _impl::convert_variant<std::variant<NotImplemented, FromArgs...>,
+                                         std::variant<NotImplemented, Errs...>>(std::move(other))) {}
+
+        // Implicit cast operator to a superset of types
+        template <class... ToArgs> operator ErrorType<ToArgs...>() && {
+            return _impl::convert_variant<std::variant<NotImplemented, Errs...>,
+                                          std::variant<NotImplemented, ToArgs...>>(std::move(*this));
+        }
     };
 
 } // namespace utils

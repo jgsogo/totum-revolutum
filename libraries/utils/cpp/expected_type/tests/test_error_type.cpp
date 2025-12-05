@@ -16,6 +16,12 @@ TEST_CASE("Test ErrorType") {
         CHECK_THAT(std::format("{}", error_not_implemented), Catch::Matchers::Equals("NotImplemented: sorry"));
         CHECK_THAT(std::format("{}", error_str), Catch::Matchers::Equals("str error"));
     }
+
+    SECTION("construct from subset") {
+        utils::ErrorType<int> subset{42};
+        ErrorType e1{std::move(subset)};
+        ErrorType e2 = static_cast<ErrorType>(std::move(subset));
+    }
 }
 
 TEST_CASE_METHOD(utils::catch2::CaptureSpdlogFixture, "Test ErrorType - spdlog") {

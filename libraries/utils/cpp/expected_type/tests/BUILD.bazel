@@ -5,6 +5,7 @@ cc_test(
     srcs = [
         "test_error_type.cpp",
         "test_errors.cpp",
+        "test_expected_type.cpp",
     ],
     deps = [
         "//libraries/utils/cpp/catch2:capture_spdlog",
