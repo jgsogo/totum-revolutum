@@ -107,14 +107,13 @@ namespace utils::qt::models {
 
         const std::vector<TModel>& all() const { return items; }
 
-        utils::ExpectedType<std::reference_wrapper<const TModel>, ErrorItemNotFound>
-        get(const ModelData::Id& id) const {
+        ExpectedType<std::reference_wrapper<const TModel>, ErrorItemNotFound> get(const ModelData::Id& id) const {
             SPDLOG_DEBUG("{}::get(id={})", name, id);
 
             auto found = std::find_if(items.begin(), items.end(), [&id](const auto& item) { return item.id == id; });
             if (found == items.end()) {
-                SPDLOG_ERROR(" - Unexpected: {} item with id {} not found in table {}!", ModelData::name, id, name);
-                return tl::unexpected{ErrorItemNotFound{}};
+                return tl::unexpected{ErrorItemNotFound{
+                    std::format("'{}' item with id {} not found in table {}!", ModelData::name, id, name)}};
             }
 
             return {*found};
