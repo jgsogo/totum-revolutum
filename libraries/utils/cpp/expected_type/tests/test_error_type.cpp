@@ -22,6 +22,20 @@ TEST_CASE("Test ErrorType") {
         ErrorType e1{std::move(subset)};
         ErrorType e2 = static_cast<ErrorType>(std::move(subset));
     }
+
+    SECTION("check equal with operator==") {
+        // We can compare if the underlying types provides a implementation for ==
+        REQUIRE(error_int == 42);
+        REQUIRE(error_str == std::string{"str error"});
+        // ...otherwise we cannot compare
+        // REQUIRE(error_not_implemented == utils::NotImplemented{"sorry"});
+
+        // If the value contained is different, they are not equal
+        REQUIRE(error_int != 23);
+
+        // They are not equal for different types
+        REQUIRE(error_int != std::string{"str error"});
+    }
 }
 
 TEST_CASE_METHOD(utils::catch2::CaptureSpdlogFixture, "Test ErrorType - spdlog") {

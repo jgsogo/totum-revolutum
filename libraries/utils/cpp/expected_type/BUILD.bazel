@@ -10,7 +10,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/logging:spdlog",
-        # "//libraries/utils/cpp/concepts:alternative_c",
         "//libraries/utils/cpp:string_literal",
+        "//libraries/utils/cpp/concepts:alternative_c",
+        "@tl-expected",
     ],
 )

@@ -2,6 +2,8 @@
 
 #include <variant>
 
+#include "libraries/utils/cpp/concepts/alternative_c.hpp"
+
 #include "./errors.hpp"
 
 namespace utils {
@@ -55,6 +57,17 @@ namespace utils {
         template <class... ToArgs> operator ErrorType<ToArgs...>() && {
             return _impl::convert_variant<std::variant<NotImplemented, Errs...>,
                                           std::variant<NotImplemented, ToArgs...>>(std::move(*this));
+        }
+
+        // Check if the contained error matches the one in the input argument
+        template <typename Err>
+            requires utils::concepts::alternative_in_pack<Err, NotImplemented, Errs...>
+        bool operator==(const Err& e) const {
+            if (const Err* c = std::get_if<Err>(this)) {
+                return *c == e;
+            } else {
+                return false;
+            }
         }
     };
 
