@@ -36,6 +36,12 @@ TEST_CASE("Test ErrorType") {
         // They are not equal for different types
         REQUIRE(error_int != std::string{"str error"});
     }
+
+    SECTION("throw") {
+        REQUIRE_THROWS_AS(error_int.throw_exception(), int);
+        REQUIRE_THROWS_AS(error_str.throw_exception(), std::string);
+        REQUIRE_THROWS_AS(error_not_implemented.throw_exception(), utils::NotImplemented);
+    }
 }
 
 TEST_CASE_METHOD(utils::catch2::CaptureSpdlogFixture, "Test ErrorType - spdlog") {

@@ -69,6 +69,11 @@ namespace utils {
                 return false;
             }
         }
+
+        // Throw an exception using the underlying type
+        void throw_exception() noexcept(false) {
+            return std::visit([](auto&& arg) { throw arg; }, std::move(*this));
+        }
     };
 
 } // namespace utils
