@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 // #include <spdlog/fmt/ostr.h>
 
+#include "apps/board_games/engine/errors/errors.hpp"
+
 namespace data {
 
     static constexpr std::string_view ParticipantRolePlayer = "player";
@@ -13,13 +15,13 @@ namespace data {
         SPECTATOR,
     };
 
-    inline tl::expected<ParticipantRole, std::string> participant_role_from_string(std::string_view role) {
+    inline Expected<ParticipantRole> participant_role_from_string(std::string_view role) {
         if (role == ParticipantRolePlayer)
             return {data::ParticipantRole::PLAYER};
         else if (role == ParticipantRoleSpectator)
             return {data::ParticipantRole::SPECTATOR};
         else
-            return tl::unexpected{std::string{role}};
+            return tl::unexpected{errors::StringToTypeError<ParticipantRole>{role}};
     }
 
     inline std::string_view participant_role_to_string(const ParticipantRole& role) {
@@ -39,6 +41,17 @@ template <> struct fmt::formatter<data::ParticipantRole> : fmt::formatter<std::s
             return fmt::format_to(ctx.out(), data::ParticipantRolePlayer);
         case data::ParticipantRole::SPECTATOR:
             return fmt::format_to(ctx.out(), data::ParticipantRoleSpectator);
+        }
+    }
+};
+
+template <> struct std::formatter<data::ParticipantRole> : std::formatter<std::string> {
+    auto format(const data::ParticipantRole& role, std::format_context& ctx) const {
+        switch (role) {
+        case data::ParticipantRole::PLAYER:
+            return std::formatter<std::string>::format(std::string{data::ParticipantRolePlayer}, ctx);
+        case data::ParticipantRole::SPECTATOR:
+            return std::formatter<std::string>::format(std::string{data::ParticipantRoleSpectator}, ctx);
         }
     }
 };

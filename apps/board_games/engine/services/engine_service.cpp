@@ -27,10 +27,11 @@ namespace services {
             auto r = data::insert_new_room(conn, room, request->name())
                          .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
 
-                         .and_then([]() { return tl::expected<grpc::Status, data::Error>{grpc::Status::OK}; })
-                         .or_else([](const data::Error& e) {
-                             auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to insert new room"};
-                             return tl::expected<grpc::Status, data::Error>{status};
+                         .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
+                         .or_else([](const auto& e) {
+                             auto status = grpc::Status{grpc::StatusCode::INTERNAL,
+                                                        std::format("Failed to insert new room: {}", e)};
+                             return Expected<grpc::Status>{status};
                          });
             return r.value();
         });
@@ -45,11 +46,12 @@ namespace services {
 
             // FIXME: remove_game and start_game should go inside the same transaction
             auto r = data::remove_game(conn, room)
-                         .and_then([&conn, &room, &game_type, this]() -> tl::expected<void, data::Error> {
+                         .and_then([&conn, &room, &game_type, this]() -> Expected<void> {
                              auto it = this->_games.find(game_type);
                              if (it == this->_games.end()) {
                                  SPDLOG_ERROR("Game type {} not known", game_type);
-                                 return tl::unexpected{data::Error::NotFound};
+                                 return tl::unexpected{
+                                     errors::InvalidData{std::format("Game type {} not known", game_type)}};
                              }
                              const auto& game = it->second;
                              return game->new_board().and_then(
@@ -59,10 +61,11 @@ namespace services {
                          })
                          .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
 
-                         .and_then([]() { return tl::expected<grpc::Status, data::Error>{grpc::Status::OK}; })
-                         .or_else([](const data::Error& e) {
-                             auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to start game"};
-                             return tl::expected<grpc::Status, data::Error>{status};
+                         .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
+                         .or_else([](const auto& e) {
+                             auto status =
+                                 grpc::Status{grpc::StatusCode::INTERNAL, std::format("Failed to start game: {}", e)};
+                             return Expected<grpc::Status>{status};
                          });
             return r.value();
         });
@@ -104,15 +107,15 @@ namespace services {
                                  response->set_uuid(p.uuid);
                                  response->set_role(data::participant_role_to_string(p.role));
                                  response->set_player_number(p.player_number);
-                                 return tl::expected<void, data::Error>{};
+                                 return Expected<void>{};
                              })
                              .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
 
-                             .and_then([]() { return tl::expected<grpc::Status, data::Error>{grpc::Status::OK}; })
-                             .or_else([](const data::Error& e) {
-                                 auto status =
-                                     grpc::Status{grpc::StatusCode::INTERNAL, "Failed to add participant to room"};
-                                 return tl::expected<grpc::Status, data::Error>{status};
+                             .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
+                             .or_else([](const auto& e) {
+                                 auto status = grpc::Status{grpc::StatusCode::INTERNAL,
+                                                            std::format("Failed to add participant to room: {}", e)};
+                                 return Expected<grpc::Status>{status};
                              });
                 return r.value();
             }
@@ -132,68 +135,73 @@ namespace services {
             auto res =
                 data::find_game(conn, room)
                     .and_then([&conn, &room, &participant](std::optional<data::Game> game)
-                                  -> tl::expected<std::pair<data::Game, data::Participant>, data::Error> {
+                                  -> Expected<std::pair<data::Game, data::Participant>> {
                         if (game) {
                             // TODO: We can check game.state. If it is FINISHED or WAITING, no actions are expected
                             return data::find_participant(conn, room, participant)
                                 .and_then([&game, &room, &participant](std::optional<data::Participant> participant_opt)
-                                              -> tl::expected<std::pair<data::Game, data::Participant>, data::Error> {
+                                              -> Expected<std::pair<data::Game, data::Participant>> {
                                     if (participant_opt) {
                                         std::pair<data::Game, data::Participant> data{std::move(*game),
                                                                                       participant_opt.value()};
-                                        tl::expected<std::pair<data::Game, data::Participant>, data::Error> ret{
-                                            std::move(data)};
+                                        Expected<std::pair<data::Game, data::Participant>> ret{std::move(data)};
                                         return ret;
                                     } else {
                                         SPDLOG_ERROR("No participant found in room {} with uuid {}", room, participant);
-                                        return tl::unexpected{data::Error::NotFound};
+                                        return tl::unexpected{errors::InvalidData{std::format(
+                                            "No participant found in room {} with uuid {}", room, participant)}};
                                     }
                                 });
                         } else {
                             SPDLOG_ERROR("No game found in room {}", room);
-                            return tl::unexpected{data::Error::NotFound};
+                            return tl::unexpected{errors::InvalidData{std::format("No game found in room {}", room)}};
                         }
                     })
                     // Switch based on game.game_type and execute the run function
-                    .and_then([&conn, request,
-                               this](const std::pair<data::Game, data::Participant>&& game_and_participant)
-                                  -> tl::expected<void, data::Error> {
-                        const auto&& [game, participant] = std::move(game_and_participant);
+                    .and_then(
+                        [&conn, request, this](
+                            const std::pair<data::Game, data::Participant>&& game_and_participant) -> Expected<void> {
+                            const auto&& [game, participant] = std::move(game_and_participant);
 
-                        // We don't care if the game is enabled or not. Maybe it's an ongoing game
-                        auto it = this->_games.find(game.type);
-                        if (it == this->_games.end()) {
-                            SPDLOG_ERROR("Game type {} not known", game.type);
-                            return tl::unexpected{data::Error::NotFound};
-                        }
-                        const auto& game_plugin = it->second;
-                        std::vector<std::byte> payload(request->payload().size());
-                        std::memcpy(payload.data(), request->payload().data(), request->payload().size());
-                        const auto& action_payload = data::GameActionPayload{std::move(payload)};
-                        return game_plugin
-                            ->run(game.state_data, action_payload, participant.player_number)
-                            // Store to the database the action + new status + event_log
-                            .and_then([&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
-                                return data::store_action(conn, game.id, participant.uuid, res.action_type,
-                                                          action_payload, true)
-                                    .and_then([&conn, &game, &res](const std::int64_t& action_id) {
-                                        return data::store_eventlog(conn, game.id, res.eventlog_type,
-                                                                    res.eventlog_payload, action_id);
-                                    })
-                                    .and_then([&conn, &game, &res]() {
-                                        return data::update_game_state(conn, game.id, res.new_game_state,
-                                                                       res.new_game_state_data);
-                                    });
-                            })
-                            // On failure: RETURN to the user that the action could not be understood.
-                            .or_else([&conn, &game, &participant,
-                                      &action_payload](const data::Error& e) -> tl::expected<void, data::Error> {
-                                SPDLOG_ERROR("Failed to apply action to the game");
-                                std::ignore = data::store_action(conn, game.id, participant.uuid, "unknown",
-                                                                 action_payload, false);
-                                return tl::unexpected{data::Error::GameActionFailed};
-                            });
-                    })
+                            // We don't care if the game is enabled or not. Maybe it's an ongoing game
+                            auto it = this->_games.find(game.type);
+                            if (it == this->_games.end()) {
+                                SPDLOG_ERROR("Game type {} not known", game.type);
+                                return tl::unexpected{
+                                    errors::InvalidData{std::format("Game type {} not known", game.type)}};
+                            }
+                            const auto& game_plugin = it->second;
+                            std::vector<std::byte> payload(request->payload().size());
+                            std::memcpy(payload.data(), request->payload().data(), request->payload().size());
+                            const auto& action_payload = data::GameActionPayload{std::move(payload)};
+                            Expected<void> r =
+                                game_plugin
+                                    ->run(game.state_data, action_payload, participant.player_number)
+                                    // Store to the database the action + new status + event_log
+                                    .and_then(
+                                        [&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
+                                            return data::store_action(conn, game.id, participant.uuid, res.action_type,
+                                                                      action_payload, true)
+                                                .and_then([&conn, &game, &res](const std::int64_t& action_id) {
+                                                    return data::store_eventlog(conn, game.id, res.eventlog_type,
+                                                                                res.eventlog_payload, action_id);
+                                                })
+                                                .and_then([&conn, &game, &res]() {
+                                                    return data::update_game_state(conn, game.id, res.new_game_state,
+                                                                                   res.new_game_state_data);
+                                                });
+                                        })
+                                    // On failure: RETURN to the user that the action could not be understood.
+                                    .or_else(
+                                        [&conn, &game, &participant, &action_payload](const auto& e) -> Expected<void> {
+                                            SPDLOG_ERROR("Failed to apply action to the game");
+                                            std::ignore = data::store_action(conn, game.id, participant.uuid, "unknown",
+                                                                             action_payload, false);
+                                            return tl::unexpected{errors::InvalidAction{
+                                                std::format("Failed to apply action to the game: {}", e)}};
+                                        });
+                            return r;
+                        })
                     // Send notification to the room
                     .and_then([&conn, &room]() { return data::notify_room_update(conn, room); });
 

@@ -1,0 +1,17 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "errors",
+    hdrs = [
+        "database_errors.hpp",
+        "errors.hpp",
+        "logical_errors.hpp",
+        "runtime_errors.hpp",
+    ],
+    visibility = ["//apps/board_games:__subpackages__"],
+    deps = [
+        "//bazel/logging:spdlog",
+        "//libraries/utils/cpp:expected_type",
+        "//libraries/utils/cpp:type_name",
+    ],
+)

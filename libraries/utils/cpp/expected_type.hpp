@@ -14,9 +14,13 @@
 
 namespace utils {
 
-    struct NotImplemented {
-        std::string msg;
-    };
+    namespace errors {
+        template <typename T> struct BaseError {
+            std::string msg;
+        };
+    } // namespace errors
+
+    using NotImplemented = errors::BaseError<class NotImplementedTag>;
 
     namespace _impl {
 
@@ -88,6 +92,11 @@ namespace utils {
     };
 
 } // namespace utils
+
+namespace tl::detail {
+    template <typename T, typename... Errs>
+    struct is_expected_impl<utils::ExpectedType<T, Errs...>> : std::true_type {};
+} // namespace tl::detail
 
 // Required for spdlog
 template <typename... Args> struct fmt::formatter<std::variant<Args...>> : fmt::formatter<std::string> {
