@@ -4,7 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "libraries/utils/cpp/expected_type.hpp"
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
 #include "errors.h"

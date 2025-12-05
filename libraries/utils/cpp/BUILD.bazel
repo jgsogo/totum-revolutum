@@ -39,16 +39,6 @@ cc_library(
 )
 
 cc_library(
-    name = "expected_type",
-    hdrs = ["expected_type.hpp"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//bazel/logging:spdlog",
-        "//libraries/utils/cpp/concepts:alternative_c",
-    ],
-)
-
-cc_library(
     name = "constexpr",
     hdrs = ["constexpr.hpp"],
     visibility = ["//visibility:public"],

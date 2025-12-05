@@ -3,7 +3,7 @@
 #include <pqxx/pqxx>
 #include <vector>
 
-#include "libraries/utils/cpp/expected_type.hpp"
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 #include "libraries/utils/cpp/type_name.hpp"
 
 #include "errors.h"

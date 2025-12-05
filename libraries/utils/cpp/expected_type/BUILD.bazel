@@ -1,0 +1,18 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "expected_type",
+    hdrs = [
+        "error_type.hpp",
+        "errors.hpp",
+        "expect.hpp",
+        "expected_type.hpp",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bazel/logging:spdlog",
+        "//libraries/utils/cpp:string_literal",
+        "//libraries/utils/cpp/concepts:alternative_c",
+        "@tl-expected",
+    ],
+)
