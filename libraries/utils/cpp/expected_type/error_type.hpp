@@ -80,9 +80,9 @@ namespace utils {
 
 // Required for spdlog
 template <typename... Args> struct fmt::formatter<utils::ErrorType<Args...>> : fmt::formatter<std::string> {
-    auto format(utils::ErrorType<Args...> p, format_context& ctx) const -> decltype(ctx.out()) {
+    auto format(const utils::ErrorType<Args...>& p, format_context& ctx) const -> decltype(ctx.out()) {
         return std::visit(
-            [&ctx](auto&& arg) {
+            [&ctx](const auto& arg) {
                 // using T = std::decay_t<decltype(arg)>;
                 return fmt::format_to(ctx.out(), "{}", arg);
             },
@@ -94,7 +94,7 @@ template <typename... Args> struct fmt::formatter<utils::ErrorType<Args...>> : f
 template <typename... Args> struct std::formatter<utils::ErrorType<Args...>> : std::formatter<std::string> {
     auto format(const utils::ErrorType<Args...>& p, std::format_context& ctx) const {
         return std::visit(
-            [&ctx, this](auto&& arg) {
+            [&ctx, this](const auto& arg) {
                 // using T = std::decay_t<decltype(arg)>;
                 return this->formatter<std::string>::format(std::format("{}", arg), ctx);
             },

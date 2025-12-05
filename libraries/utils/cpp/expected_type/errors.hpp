@@ -22,7 +22,7 @@ namespace utils {
 
 // Required for spdlog
 template <utils::StringLiteral T> struct fmt::formatter<utils::errors::BaseError<T>> : fmt::formatter<std::string> {
-    auto format(utils::errors::BaseError<T> p, format_context& ctx) const -> decltype(ctx.out()) {
+    auto format(const utils::errors::BaseError<T>& p, format_context& ctx) const -> decltype(ctx.out()) {
         return fmt::format_to(ctx.out(), "{}: {}", p.error_identifier, p.msg);
     }
 };
