@@ -21,6 +21,5 @@ qt_cc_library(
         "//libraries/utils/cpp/libpqxx/orm",
         "@magic_enum",
         "@rules_qt//:qt_core",
-        "@tl-expected",
     ],
 )

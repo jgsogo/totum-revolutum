@@ -12,6 +12,5 @@ cc_library(
         "//libraries/utils/cpp/expected_type",
         "//libraries/utils/cpp/libpqxx:connection_pool",
         "@libpqxx",
-        "@tl-expected",
     ],
 )
