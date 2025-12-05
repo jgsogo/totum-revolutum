@@ -74,7 +74,7 @@ namespace utils {
         /// has to be the same)
         template <class... ToArgs> operator ExpectedType<T, ToArgs...>() && {
             if (this->has_value()) {
-                return {std::move(this->value())};
+                return {std::move(*this)};
             } else {
                 // std::variant<NotImplemented, Errs...> err = std::move(this->error());
                 return std::visit(
@@ -88,6 +88,11 @@ namespace utils {
     };
 
 } // namespace utils
+
+namespace tl::detail {
+    template <typename T, typename... Errs>
+    struct is_expected_impl<utils::ExpectedType<T, Errs...>> : std::true_type {};
+} // namespace tl::detail
 
 // Required for spdlog
 template <typename... Args> struct fmt::formatter<std::variant<Args...>> : fmt::formatter<std::string> {
