@@ -49,4 +49,28 @@ TEST_CASE("Test ExpectedType") {
         // .... but we cannot return from a different set of errors
         // error_int.or_else([](auto& e) { return utils::ExpectedType<std::string, float>{tl::unexpected(1.2f)}; });
     }
+
+    SECTION("transform") {
+        // We can return the same success type
+        ExpectedType r = success.transform([](const std::string& str) { return std::string{"other success"}; });
+        REQUIRE(r.has_value());
+        REQUIRE(r.value() == "other success");
+
+        // We can also change the success type
+        auto r2 = success.transform([](const std::string& str) { return 0; });
+        REQUIRE(r2.has_value());
+        REQUIRE(r2.value() == 0);
+    }
+
+    SECTION("transform_error") {
+        // We can return the same error type (with different value)
+        ExpectedType r = error_int.transform_error([](auto& e) { return -1; });
+        REQUIRE(!r.has_value());
+        REQUIRE(r.error() == -1);
+
+        // We can also change the error type
+        auto r2 = error_int.transform_error([](auto& e) { return "other error"; });
+        REQUIRE(!r2.has_value());
+        REQUIRE(r2.error() == std::string{"other error"});
+    }
 }
