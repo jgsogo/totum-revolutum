@@ -21,36 +21,37 @@ ConnectionPool::ConnectionPool(const std::string& conninfo, std::size_t pool_siz
     }
 }
 
-tl::expected<ConnectionPool, std::string> ConnectionPool::from_env(std::string_view prefix, std::size_t pool_size) {
+utils::ExpectedType<ConnectionPool, MissingEnvvar> ConnectionPool::from_env(std::string_view prefix,
+                                                                            std::size_t pool_size) {
     // FIXME: Return some kind of error, not just a std::string
     auto sql_database = std::getenv(std::format("{}SQL_DATABASE", prefix).c_str());
     if (sql_database == nullptr) {
-        return tl::unexpected{std::format("Envvar '{}SQL_DATABASE' not found", prefix)};
+        return tl::unexpected{MissingEnvvar{std::format("{}SQL_DATABASE", prefix)}};
     }
 
     auto sql_user = std::getenv(std::format("{}SQL_USER", prefix).c_str());
     if (sql_user == nullptr) {
-        return tl::unexpected{std::format("Envvar '{}SQL_USER' not found", prefix)};
+        return tl::unexpected{MissingEnvvar{std::format("{}SQL_USER", prefix)}};
     }
 
     auto sql_password = std::getenv(std::format("{}SQL_PASSWORD", prefix).c_str());
     if (sql_password == nullptr) {
-        return tl::unexpected{std::format("Envvar '{}SQL_PASSWORD' not found", prefix)};
+        return tl::unexpected{MissingEnvvar{std::format("{}SQL_PASSWORD", prefix)}};
     }
 
     auto sql_host = std::getenv(std::format("{}SQL_HOST", prefix).c_str());
     if (sql_host == nullptr) {
-        return tl::unexpected{std::format("Envvar '{}SQL_HOST' not found", prefix)};
+        return tl::unexpected{MissingEnvvar{std::format("{}SQL_HOST", prefix)}};
     }
 
     auto sql_port = std::getenv(std::format("{}SQL_PORT", prefix).c_str());
     if (sql_port == nullptr) {
-        return tl::unexpected{std::format("Envvar '{}SQL_PORT' not found", prefix)};
+        return tl::unexpected{MissingEnvvar{std::format("{}SQL_PORT", prefix)}};
     }
 
     const std::string connstr = connection_string(sql_database, sql_user, sql_password, sql_host, sql_port);
     SPDLOG_DEBUG("Connection string: {}", connstr);
-    return tl::expected<ConnectionPool, std::string>{tl::in_place, connstr, pool_size};
+    return utils::ExpectedType<ConnectionPool, MissingEnvvar>{tl::in_place, connstr, pool_size};
 }
 
 ConnectionPool ConnectionPool::from(std::string_view sql_database, std::string_view sql_user,

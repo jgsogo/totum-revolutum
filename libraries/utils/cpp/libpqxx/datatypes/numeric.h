@@ -8,9 +8,13 @@
 #include <pqxx/pqxx>
 #include <spdlog/spdlog.h>
 
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
+
 namespace utils::libpqxx {
     static const dec::decimal_format ENGLISH_DECIMAL_FORMAT{'.'};
     static const dec::decimal_format SPANISH_DECIMAL_FORMAT{','};
+
+    using ParseNumericError = utils::errors::BaseError<"ParseNumericError">;
 
     template <std::size_t MaxDigits, std::size_t DecimalPlaces> struct Numeric {
         // dec::decimal maximum number of digits is 18 (uses 64 bit integer under the hood)
@@ -31,6 +35,19 @@ namespace utils::libpqxx {
         auto operator<=>(const Numeric<MaxDigits, DecimalPlaces>&) const = default;
 
         operator std::string() const { return dec::toString(value, ENGLISH_DECIMAL_FORMAT); }
+
+        static ExpectedType<Numeric<MaxDigits, DecimalPlaces>, ParseNumericError>
+        parse(const std::string& input, const dec::decimal_format& fmt) {
+            InnerType output;
+
+            std::istringstream is(input);
+            bool success = dec::fromStream(is, fmt, output);
+            if (!success) {
+                return tl::unexpected{ParseNumericError{std::string{input}}};
+            }
+            return {Numeric<MaxDigits, DecimalPlaces>{std::move(output)}};
+        };
+
         InnerType value;
     };
 
