@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "libraries/utils/cpp/expected_type.hpp"
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 
 namespace error {
 

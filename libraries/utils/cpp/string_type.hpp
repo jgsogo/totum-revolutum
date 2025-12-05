@@ -6,6 +6,7 @@
 namespace utils {
     template <typename T> class StringType {
       public:
+        constexpr StringType() noexcept : value() {}
         constexpr explicit StringType(std::string&& value) : value{std::move(value)} {}
         constexpr explicit StringType(std::string_view value) : value{std::string(value)} {}
 

@@ -6,6 +6,6 @@ cc_library(
     visibility = ["//apps/finances/qt:__subpackages__"],
     deps = [
         "//bazel/logging:spdlog",
-        "//libraries/utils/cpp:expected_type",
+        "//libraries/utils/cpp/expected_type",
     ],
 )

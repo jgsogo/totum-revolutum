@@ -5,6 +5,7 @@ cc_library(
     hdrs = [
         "error_type.hpp",
         "errors.hpp",
+        "expect.hpp",
         "expected_type.hpp",
     ],
     visibility = ["//visibility:public"],

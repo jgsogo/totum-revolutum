@@ -8,7 +8,7 @@
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 #include "libraries/utils/cpp/libpqxx/orm/manager.h"
 
-#include "libraries/utils/cpp/expected_type.hpp"
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 
 #include "data_dispatcher.h"
 #include "errors.h"

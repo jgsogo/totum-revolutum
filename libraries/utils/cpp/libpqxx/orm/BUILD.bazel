@@ -7,9 +7,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/logging:spdlog",
-        "//libraries/utils/cpp:expected_type",
         "//libraries/utils/cpp:integral_type",
         "//libraries/utils/cpp:type_name",
+        "//libraries/utils/cpp/expected_type",
         "//libraries/utils/cpp/libpqxx:connection_pool",
         "@libpqxx",
         "@tl-expected",

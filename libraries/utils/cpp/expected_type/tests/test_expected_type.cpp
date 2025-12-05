@@ -2,6 +2,7 @@
 #include <catch2/matchers/catch_matchers_string.hpp>
 
 #include "libraries/utils/cpp/catch2/capture_spdlog.hpp"
+#include "libraries/utils/cpp/expected_type/expect.hpp"
 #include "libraries/utils/cpp/expected_type/expected_type.hpp"
 
 TEST_CASE("Test ExpectedType") {
@@ -115,5 +116,31 @@ TEST_CASE("Test utils::expected") {
         auto r2 = utils::expected::ok_or(std::move(v2), int(42));
         REQUIRE(!r2.has_value());
         REQUIRE(r2.error() == int(42));
+    }
+}
+
+TEST_CASE("Test expect macro") {
+    using UndecidedError = utils::errors::BaseError<"Undecided">;
+
+    auto get_integer = []() -> utils::ExpectedType<int> { return {42}; };
+
+    auto integer_is_positive = [](int v) -> utils::ExpectedType<bool, UndecidedError> {
+        if (v == 0) {
+            return tl::unexpected{UndecidedError{"i cannot say"}};
+        } else {
+            return v > 0;
+        }
+    };
+
+    SECTION("EXPECT") {
+        auto test_case = [&]() -> utils::ExpectedType<bool, UndecidedError> {
+            auto v = EXPECT(get_integer());
+            REQUIRE(v == 42);
+            auto is_positive = EXPECT(integer_is_positive(v));
+            REQUIRE(is_positive);
+            return {true};
+        };
+
+        REQUIRE(std::invoke(test_case));
     }
 }

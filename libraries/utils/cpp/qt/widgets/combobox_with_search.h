@@ -6,7 +6,7 @@
 #include <QStandardItemModel>
 #include <QTreeView>
 
-#include "libraries/utils/cpp/expected_type.hpp"
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 #include "libraries/utils/cpp/qt/models/generic_table_model.h"
 
 namespace utils::qt::widgets {

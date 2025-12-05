@@ -9,6 +9,7 @@ namespace finances::accounts::models {
 
     class Money {
       public:
+        constexpr Money() noexcept : amount{}, ccy{} {};
         explicit Money(Amount amount, Ccy ccy);
         explicit Money(Ccy ccy);
 
