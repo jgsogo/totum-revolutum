@@ -90,7 +90,7 @@ ExpectedType<Money> AddSnapshotNumerableWidget::getMoneyAmount() const {
 
     auto quantity_amount = utils::qstring_to_amount(quantity->text(), account.ccy);
     if (!quantity_amount) {
-        return tl::unexpected{quantity_amount.error()};
+        return tl::unexpected{std::format("{}", quantity_amount.error())};
     }
 
     // Create the new snapshot
