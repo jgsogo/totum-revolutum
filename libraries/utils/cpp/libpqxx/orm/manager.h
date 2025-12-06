@@ -4,7 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "libraries/utils/cpp/expected_type.hpp"
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
 #include "errors.h"
@@ -30,8 +30,8 @@ namespace utils::db {
                         SPDLOG_TRACE("Found {} {}", ret.size(), TModelData::name);
                         return ExpectedType<std::vector<TModel>, DatabaseError>{std::move(ret)};
                     } catch (const std::exception& e) {
-                        SPDLOG_ERROR("Failed to fetch all the {}: {}", TModelData::name, e.what());
-                        return tl::unexpected(DatabaseError{});
+                        return tl::unexpected(DatabaseError{
+                            std::format("Failed to fetch all '{}' items: {}", TModelData::name, e.what())});
                     }
                 });
         }
@@ -47,8 +47,8 @@ namespace utils::db {
                         pqxx::work tx(conn);
                         return ModelManager::_get(tx, id);
                     } catch (const std::exception& e) {
-                        SPDLOG_ERROR("Failed to fetch {} model: {}", TModelData::name, e.what());
-                        return tl::unexpected(DatabaseError{});
+                        return tl::unexpected(
+                            DatabaseError{std::format("Failed to fetch '{}' item: {}", TModelData::name, e.what())});
                     }
                 });
         }
@@ -64,10 +64,10 @@ namespace utils::db {
 
                         pqxx::work tx(conn);
                         std::vector<TModel> all_items = ModelManager::_filter_by_fk<TParentModel>(tx, id);
-                        return ExpectedType<std::vector<TModel>, DatabaseError>{std::move(all_items)};
+                        return {std::move(all_items)};
                     } catch (const std::exception& e) {
-                        SPDLOG_ERROR("Failed to fetch {} model: {}", TModelData::name, e.what());
-                        return tl::unexpected(DatabaseError{});
+                        return tl::unexpected(
+                            DatabaseError{std::format("Failed to fetch '{}' items: {}", TModelData::name, e.what())});
                     }
                 });
         }
@@ -81,8 +81,7 @@ namespace utils::db {
         /// Creates a new TModel, and returns its id
         ExpectedType<Id, DatabaseError, ErrorInvalidInput> create(TModel&& new_instance) {
             if (!is_null(new_instance.id)) {
-                SPDLOG_WARN("Cannot create an instance if the 'id' is already given");
-                return tl::unexpected{ErrorInvalidInput{}};
+                return tl::unexpected{ErrorInvalidInput{"Cannot create an instance if the 'id' is already given"}};
             }
 
             return pool.with_conn<ExpectedType<Id, DatabaseError, ErrorInvalidInput>>(
@@ -93,10 +92,10 @@ namespace utils::db {
                         pqxx::work tx(conn);
                         utils::db::Id new_id = ModelManager::_create(tx, std::move(new_instance));
                         tx.commit();
-                        return ExpectedType<Id, DatabaseError, ErrorInvalidInput>{std::move(new_id)};
+                        return {std::move(new_id)};
                     } catch (const std::exception& e) {
-                        SPDLOG_ERROR("Failed to create new instance of model {}: {}", TModelData::name, e.what());
-                        return tl::unexpected(DatabaseError{});
+                        return tl::unexpected(DatabaseError{std::format(
+                            "Failed to create new instance of model '{}': {}", TModelData::name, e.what())});
                     }
                 });
         };

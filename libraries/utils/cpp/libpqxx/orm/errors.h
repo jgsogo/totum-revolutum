@@ -1,37 +1,12 @@
 
 #pragma once
 
-#include <spdlog/spdlog.h>
+#include "libraries/utils/cpp/expected_type/errors.hpp"
 
 namespace utils::db {
 
-    struct ErrorNotFound {};
-    struct DatabaseError {};
-    struct ErrorMultipleFound {};
-    struct ErrorInvalidInput {};
+    using DatabaseError = errors::BaseError<"DatabaseError">;
+    using ErrorNotFound = errors::BaseError<"NotFoundError">;
+    using ErrorMultipleFound = errors::BaseError<"ErrorMultipleFound">;
+    using ErrorInvalidInput = errors::BaseError<"ErrorInvalidInput">;
 } // namespace utils::db
-
-// Required for spdlog
-template <> struct fmt::formatter<utils::db::ErrorNotFound> : fmt::formatter<std::string> {
-    auto format(utils::db::ErrorNotFound p, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "ErrorNotFound");
-    }
-};
-
-template <> struct fmt::formatter<utils::db::DatabaseError> : fmt::formatter<std::string> {
-    auto format(utils::db::DatabaseError p, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "DatabaseError");
-    }
-};
-
-template <> struct fmt::formatter<utils::db::ErrorMultipleFound> : fmt::formatter<std::string> {
-    auto format(utils::db::ErrorMultipleFound p, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "ErrorMultipleFound");
-    }
-};
-
-template <> struct fmt::formatter<utils::db::ErrorInvalidInput> : fmt::formatter<std::string> {
-    auto format(utils::db::ErrorInvalidInput p, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "ErrorInvalidInput");
-    }
-};

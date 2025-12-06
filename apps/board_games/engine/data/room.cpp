@@ -8,48 +8,49 @@
 
 namespace data {
 
-    tl::expected<void, Error> insert_new_room(pqxx::connection& conn, RoomUUID uuid, std::string_view name) {
+    Expected<void> insert_new_room(pqxx::connection& conn, RoomUUID uuid, std::string_view name) {
+        SPDLOG_DEBUG("Insert new room with uuid '{}'", uuid);
+        const std::string query =
+            std::format("INSERT INTO {} (id, name, created_at, updated_at, is_public, is_open) VALUES ($1, $2, "
+                        "NOW(), NOW(), True, True);",
+                        ROOMS_TABLE);
+
         try {
             pqxx::work tx(conn);
-            SPDLOG_DEBUG("Insert new room with uuid '{}'", uuid);
-            tx.exec(std::format("INSERT INTO {} (id, name, created_at, updated_at, is_public, is_open) VALUES ($1, $2, "
-                                "NOW(), NOW(), True, True);",
-                                ROOMS_TABLE),
-                    pqxx::params{uuid, name})
-                .no_rows();
+            tx.exec(query, pqxx::params{uuid, name}).no_rows();
             tx.commit();
             return {};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to insert new room: {}", e.what());
-            return tl::unexpected(Error::InsertError);
+            return tl::unexpected(errors::InsertError{ROOMS_TABLE, query, e.what()});
         }
     }
 
-    tl::expected<std::vector<RoomUUID>, Error> get_playing_rooms(pqxx::connection& conn) {
+    Expected<std::vector<RoomUUID>> get_playing_rooms(pqxx::connection& conn) {
+        SPDLOG_DEBUG("Get list of playing rooms");
+        const std::string query = std::format("SELECT id FROM {};", ROOMS_TABLE);
+
         try {
             pqxx::work tx(conn);
             std::vector<RoomUUID> ret;
-            SPDLOG_DEBUG("Get list of playing room");
-            for (auto [id] : tx.query<RoomUUID>(std::format("SELECT id FROM {};", ROOMS_TABLE))) {
+            for (auto [id] : tx.query<RoomUUID>(query)) {
                 ret.emplace_back(id);
             }
             return ret;
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to retrieve list of rooms: {}", e.what());
-            return tl::unexpected(Error::SelectError);
+            return tl::unexpected(errors::SelectError{ROOMS_TABLE, query, e.what()});
         }
     }
 
-    tl::expected<std::optional<Game>, Error> find_game(pqxx::connection& conn, RoomUUID room_uuid) {
+    Expected<std::optional<Game>> find_game(pqxx::connection& conn, RoomUUID room_uuid) {
+        SPDLOG_DEBUG("Return the game being played in room '{}'", room_uuid);
+        const std::string query =
+            std::format("SELECT id, game_type_id, state, state_data FROM {} WHERE room_id = $1 LIMIT 1;", GAMES_TABLE);
+
         try {
             pqxx::work tx(conn);
-            SPDLOG_DEBUG("Return the game being played in room '{}'", room_uuid);
-
-            auto r =
-                tx.exec(std::format("SELECT id, game_type_id, state, state_data FROM {} WHERE room_id = $1 LIMIT 1;",
-                                    GAMES_TABLE),
-                        pqxx::params{room_uuid})
-                    .opt_row();
+            auto r = tx.exec(query, pqxx::params{room_uuid}).opt_row();
             if (!r) {
                 return {std::nullopt};
             }
@@ -59,22 +60,22 @@ namespace data {
             return {std::make_optional<Game>(id, room_uuid, game_type, state, std::move(state_data))};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get game for the given room: {}", e.what());
-            return tl::unexpected(Error::DBError);
+            return tl::unexpected(errors::SelectError{GAMES_TABLE, query, e.what()});
         }
     }
 
-    tl::expected<std::optional<Participant>, Error> find_participant(pqxx::connection& conn, RoomUUID room,
-                                                                     ParticipantUUID participant_uuid) {
+    Expected<std::optional<Participant>> find_participant(pqxx::connection& conn, RoomUUID room,
+                                                          ParticipantUUID participant_uuid) {
+        SPDLOG_DEBUG("Return participant '{}' in room '{}'", participant_uuid, room);
+        const std::string query = std::format(
+            "SELECT role, player_number FROM {} WHERE id = $1 AND room_id = $2 LIMIT 1;", PARTICIPANT_TABLE);
+
         try {
             pqxx::work tx(conn);
-            SPDLOG_DEBUG("Return participant '{}' in room '{}'", participant_uuid, room);
 
-            auto r = tx.exec(std::format("SELECT role, player_number FROM {} WHERE id = $1 AND room_id = $2 LIMIT 1;",
-                                         PARTICIPANT_TABLE),
-                             pqxx::params{participant_uuid, room})
-                         .opt_row();
+            auto r = tx.exec(query, pqxx::params{participant_uuid, room}).opt_row();
             if (!r) {
-                SPDLOG_DEBUG(" - participant not found");
+                SPDLOG_TRACE(" - participant not found");
                 return {std::nullopt};
             }
 
@@ -83,73 +84,77 @@ namespace data {
             return {{participant}};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get participant: {}", e.what());
-            return tl::unexpected(Error::DBError);
+            return tl::unexpected(errors::SelectError{PARTICIPANT_TABLE, query, e.what()});
         }
     }
 
-    tl::expected<Participant, Error> add_participant(pqxx::connection& conn, RoomUUID room, ParticipantUUID participant,
-                                                     ParticipantRole role, std::optional<uint32_t> player_number) {
-        try {
-            SPDLOG_DEBUG("Insert participant '{}' into room '{}' with role '{}' and player_number '{}'", participant,
-                         room, role, player_number ? std::to_string(player_number.value()) : "<None>");
+    Expected<Participant> add_participant(pqxx::connection& conn, RoomUUID room, ParticipantUUID participant,
+                                          ParticipantRole role, std::optional<uint32_t> player_number) {
+        SPDLOG_DEBUG("Insert participant '{}' into room '{}' with role '{}' and player_number '{}'", participant, room,
+                     role, player_number ? std::to_string(player_number.value()) : "<None>");
 
-            // FIXME: We can only add participants if there is already a game associated in the room. All
-            //        participants are PLAYERs. We can simplify this a lot.
+        // FIXME: We can only add participants if there is already a game associated in the room. All
+        //        participants are PLAYERs. We can simplify this a lot.
 
-            std::optional<std::int64_t> game_id = std::nullopt;
-            if (role == ParticipantRole::PLAYER) {
-                // Check (and return) game in the room
-                auto r = find_game(conn, room)
-                             .and_then([&role](std::optional<Game>&& game) -> tl::expected<std::int64_t, Error> {
-                                 if (!game) {
-                                     SPDLOG_ERROR("There is no game associated to that room. Participant cannot be yet "
-                                                  "assigned the role '{}'",
-                                                  role);
-                                     return tl::unexpected(Error::DBError);
-                                 } else {
-                                     return {game->id};
-                                 }
-                             });
-
-                if (!r.has_value()) {
-                    return tl::unexpected(Error::DBError);
+        std::optional<std::int64_t> game_id = std::nullopt;
+        if (role == ParticipantRole::PLAYER) {
+            // Check (and return) game in the room
+            auto r = find_game(conn, room).and_then([&role](std::optional<Game>&& game) -> Expected<std::int64_t> {
+                if (!game) {
+                    SPDLOG_ERROR("There is no game associated to that room. Participant cannot be yet "
+                                 "assigned the role '{}'",
+                                 role);
+                    return tl::unexpected(errors::LogicalError{
+                        std::format("There is no game associated to that room. Participant cannot be yet "
+                                    "assigned the role '{}'",
+                                    role)});
+                } else {
+                    return {game->id};
                 }
+            });
 
-                game_id = r.value();
-                SPDLOG_DEBUG(" - There is a game ({}) being played in the room", game_id.value());
-
-                if (!player_number.has_value()) {
-                    // Count number of players for the game and assign next one
-                    auto r_count_players = data::count_players(conn, game_id.value());
-                    if (!r_count_players.has_value()) {
-                        return tl::unexpected(Error::DBError);
-                    }
-                    player_number = r_count_players.value();
-                    SPDLOG_DEBUG(" - New participant will be player number ({})", player_number.value());
-                }
+            if (!r) {
+                return tl::unexpected(r.error());
             }
 
-            pqxx::work tx(conn);
-            tx.exec(std::format(
-                        "INSERT INTO {} (id, room_id, role, joined_at, game_id, player_number) VALUES ($1, $2, $3, "
+            game_id = r.value();
+            SPDLOG_TRACE(" - There is a game ({}) being played in the room", game_id.value());
+
+            if (!player_number.has_value()) {
+                // Count number of players for the game and assign next one
+                auto r_count_players = data::count_players(conn, game_id.value());
+                if (!r_count_players) {
+                    return tl::unexpected(r_count_players.error());
+                }
+                player_number = r_count_players.value();
+                SPDLOG_TRACE(" - New participant will be player number ({})", player_number.value());
+            }
+        }
+
+        const std::string query =
+            std::format("INSERT INTO {} (id, room_id, role, joined_at, game_id, player_number) VALUES ($1, $2, $3, "
                         "NOW(), $4, $5);",
-                        PARTICIPANT_TABLE),
-                    pqxx::params{participant, room, role, game_id, player_number})
-                .no_rows();
+                        PARTICIPANT_TABLE);
+
+        try {
+            pqxx::work tx(conn);
+            tx.exec(query, pqxx::params{participant, room, role, game_id, player_number}).no_rows();
             tx.commit();
             return {Participant{room, participant, role, static_cast<uint32_t>(player_number.value())}};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to insert participant: {}", e.what());
-            return tl::unexpected(Error::DBError);
+            return tl::unexpected(errors::InsertError{PARTICIPANT_TABLE, query, e.what()});
         }
     }
 
-    tl::expected<void, Error> notify_room_update(pqxx::connection& conn, RoomUUID room) {
+    Expected<void> notify_room_update(pqxx::connection& conn, RoomUUID room) {
         auto r = utils::libpqxx::notify(conn, NOTIFICATION_CHANNEL_ROOM, room);
         if (r == 0) {
             return {};
         } else {
-            return tl::unexpected(Error::NotifcationFailed);
+            return tl::unexpected(errors::DBNotificationError{
+                std::format("Notification to channel '{}' with payload '{}' failed with error '{}'",
+                            NOTIFICATION_CHANNEL_ROOM, room, r)});
         }
     }
 } // namespace data

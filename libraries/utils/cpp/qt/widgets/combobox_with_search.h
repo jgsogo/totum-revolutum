@@ -6,7 +6,7 @@
 #include <QStandardItemModel>
 #include <QTreeView>
 
-#include "libraries/utils/cpp/expected_type.hpp"
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 #include "libraries/utils/cpp/qt/models/generic_table_model.h"
 
 namespace utils::qt::widgets {
@@ -18,7 +18,7 @@ namespace utils::qt::widgets {
         using QComboBox::QComboBox;
 
       signals:
-        void activated(utils::db::Id);
+        void activated(db::Id);
     };
 
     template <class TModel, typename TColumn> class ComboBoxWithSearch : public _ComboBoxWithSearch {
@@ -26,7 +26,7 @@ namespace utils::qt::widgets {
         const static int DISPLAY_COLUMN = 0;
 
       public:
-        ComboBoxWithSearch(utils::qt::models::TableModel<TModel, TColumn>& model, TColumn col_id, TColumn col_display,
+        ComboBoxWithSearch(models::TableModel<TModel, TColumn>& model, TColumn col_id, TColumn col_display,
                            QWidget* parent = nullptr)
             : _ComboBoxWithSearch{parent}, _model{model} {
             this->setEditable(true);
@@ -73,7 +73,7 @@ namespace utils::qt::widgets {
                 QModelIndex idIdx = this->model()->index(index, ID_COLUMN);
                 QVariant item_id = this->model()->data(idIdx);
 
-                auto id = item_id.value<utils::db::Id>();
+                auto id = item_id.value<db::Id>();
 
                 emit this->activated(id);
             });
@@ -81,8 +81,7 @@ namespace utils::qt::widgets {
 
         ~ComboBoxWithSearch() = default;
 
-        utils::ExpectedType<std::optional<std::reference_wrapper<const TModel>>, utils::qt::models::ErrorItemNotFound>
-        selected() const {
+        ExpectedType<std::optional<std::reference_wrapper<const TModel>>, models::ErrorItemNotFound> selected() const {
             auto current_index = this->currentIndex();
             if (current_index == -1) {
                 return {std::nullopt};
@@ -91,17 +90,12 @@ namespace utils::qt::widgets {
             QModelIndex idIdx = this->model()->index(current_index, ID_COLUMN);
             QVariant item_id = this->model()->data(idIdx);
 
-            auto id = item_id.value<utils::db::Id>();
-            auto item_expected = _model.get(id);
-            if (!item_expected) {
-                return tl::unexpected{item_expected.error()};
-            } else {
-                return std::make_optional(std::move(item_expected.value()));
-            }
+            auto id = item_id.value<db::Id>();
+            return _model.get(id).transform([](auto&& item) { return std::make_optional(std::move(item)); });
         }
 
       private:
-        const utils::qt::models::TableModel<TModel, TColumn>& _model;
+        const models::TableModel<TModel, TColumn>& _model;
     };
 
 } // namespace utils::qt::widgets

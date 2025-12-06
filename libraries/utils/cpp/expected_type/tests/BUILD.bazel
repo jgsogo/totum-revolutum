@@ -1,0 +1,15 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_test(
+    name = "tests",
+    srcs = [
+        "test_error_type.cpp",
+        "test_errors.cpp",
+        "test_expected_type.cpp",
+    ],
+    deps = [
+        "//libraries/utils/cpp/catch2:capture_spdlog",
+        "//libraries/utils/cpp/expected_type",
+        "@catch2//:catch2_main",
+    ],
+)

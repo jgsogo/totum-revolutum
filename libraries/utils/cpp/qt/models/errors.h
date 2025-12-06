@@ -1,16 +1,9 @@
 
 #pragma once
 
-#include <spdlog/spdlog.h>
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 
 namespace utils::qt::models {
 
-    struct ErrorItemNotFound {};
+    using ErrorItemNotFound = errors::BaseError<"ErrorItemNotFound">;
 } // namespace utils::qt::models
-
-// // Required for spdlog
-template <> struct fmt::formatter<utils::qt::models::ErrorItemNotFound> : fmt::formatter<std::string> {
-    auto format(utils::qt::models::ErrorItemNotFound p, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "ErrorItemNotFound");
-    }
-};

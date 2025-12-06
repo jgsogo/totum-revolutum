@@ -3,6 +3,8 @@
 #include <pqxx/pqxx>
 #include <spdlog/spdlog.h>
 
+#include "apps/board_games/engine/errors/errors.hpp"
+
 namespace data {
 
     static constexpr std::string_view GameStatePlaying = "playing";
@@ -15,7 +17,7 @@ namespace data {
         FINISHED,
     };
 
-    inline tl::expected<GameState, std::string> game_state_from_string(std::string_view state) {
+    inline Expected<GameState> game_state_from_string(std::string_view state) {
         if (state == GameStatePlaying)
             return {data::GameState::PLAYING};
         else if (state == GameStateWaiting)
@@ -23,7 +25,7 @@ namespace data {
         else if (state == GameStateFinished)
             return {data::GameState::FINISHED};
         else
-            return tl::unexpected{std::string{state}};
+            return tl::unexpected{errors::StringToTypeError<GameState>{state}};
     }
 
     inline std::string_view game_state_to_string(const GameState& state) {

@@ -17,11 +17,12 @@ namespace services {
                              for (const auto& room_id : playing_rooms) {
                                  response->add_room_ids(room_id);
                              }
-                             return tl::expected<grpc::Status, data::Error>{grpc::Status::OK};
+                             return Expected<grpc::Status>{grpc::Status::OK};
                          })
-                         .or_else([](data::Error _e) {
-                             auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to retrieve playing rooms"};
-                             return tl::expected<grpc::Status, data::Error>{status};
+                         .or_else([](const auto& e) {
+                             auto status = grpc::Status{grpc::StatusCode::INTERNAL,
+                                                        std::format("Failed to retrieve playing rooms", e)};
+                             return Expected<grpc::Status>{status};
                          });
             return r.value();
         });

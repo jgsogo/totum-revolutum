@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "apps/board_games/engine/errors/errors.hpp"
 
 namespace data {
 
@@ -15,21 +15,21 @@ namespace data {
 
             operator pqxx::bytes_view() const { return pqxx::bytes_view{_payload.begin(), _payload.end()}; }
 
-            template <typename TProto> tl::expected<TProto, std::string> into_proto() const {
+            template <typename TProto> Expected<TProto> into_proto() const {
                 TProto proto;
                 if (!proto.ParseFromArray(_payload.data(), _payload.size())) {
-                    return tl::unexpected{"ParseFromArray failed"};
+                    return tl::unexpected{errors::ConvertToProtoError<T, TProto>{"ParseFromArray failed"}};
                 }
                 return {proto};
             }
 
-            template <typename TProto> static tl::expected<Payload, std::string> from_proto(TProto&& proto) {
+            template <typename TProto> static Expected<Payload> from_proto(TProto&& proto) {
                 std::vector<std::byte> payload{proto.ByteSizeLong()};
                 if (!proto.SerializeToArray(payload.data(), payload.size())) {
-                    return tl::unexpected{"SerializeToArray failed"};
+                    return tl::unexpected{errors::ConvertFromProtoError<T, TProto>{"SerializeToArray failed"}};
                 }
                 Payload obj{std::move(payload)};
-                return tl::expected<Payload, std::string>{std::move(obj)};
+                return Expected<Payload>{std::move(obj)};
             }
 
           protected:
