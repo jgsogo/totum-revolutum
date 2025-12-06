@@ -1,0 +1,21 @@
+syntax = "proto3";
+package board_games.ticket_to_ride;
+
+import "apps/board_games/games/ticket_to_ride/models/colors.proto";
+
+
+
+// This is a single train card (color or loco).
+message TrainCard {
+    oneof card_color {
+        Color color = 1;
+        bool locomotive = 2;
+    }
+}
+
+message DestinationTicket {
+  uint32 id = 1;       // unique per ticket deck
+  uint32 city_a = 2;   // city indices referring to MapDefinition.cities
+  uint32 city_b = 3;
+  uint32 points = 4;   // positive or negative at end
+}

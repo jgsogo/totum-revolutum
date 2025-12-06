@@ -1,0 +1,19 @@
+syntax = "proto3";
+package board_games.ticket_to_ride;
+
+import "apps/board_games/games/ticket_to_ride/models/cards.proto";
+
+message TrainDeck {
+  // Cards remaining in draw deck (top is last).
+  repeated TrainCard draw_pile = 1;
+
+  repeated TrainCard face_up = 2; // exactly 5 in standard rules
+
+  // For reshuffling or late-game empty-deck situations.
+  repeated TrainCard discard_pile = 3;
+}
+
+message DestinationDeck {
+  repeated DestinationTicket draw_pile = 1;
+  repeated DestinationTicket discard_pile = 2;
+}
