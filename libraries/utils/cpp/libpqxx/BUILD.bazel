@@ -11,8 +11,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/logging:spdlog",
+        "//libraries/utils/cpp/expected_type",
         "@libpqxx",
-        "@tl-expected",
     ],
 )
 

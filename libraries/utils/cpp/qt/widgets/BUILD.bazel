@@ -11,7 +11,7 @@ qt_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/logging:spdlog",
-        "//libraries/utils/cpp:expected_type",
+        "//libraries/utils/cpp/expected_type",
         "//libraries/utils/cpp/qt/models",
         "@magic_enum",
         "@rules_qt//:qt_widgets",

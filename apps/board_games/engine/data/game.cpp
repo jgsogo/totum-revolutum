@@ -34,43 +34,42 @@ namespace data {
         SPDLOG_DEBUG("Remove the game associated with the given room");
         return find_game(conn, room_uuid)
             .and_then([&conn, &room_uuid](std::optional<Game>&& game_opt) -> Expected<void> {
-                // TODO: Use and_then and or_else for the std::optional once in C++23
-                if (!game_opt) {
-                    SPDLOG_TRACE("There is no game associated to the given room. Nothing to do");
-                    return {};
-                }
+                return game_opt
+                    .transform([&conn, &room_uuid](Game& game) -> Expected<void> {
+                        try {
+                            pqxx::work tx(conn);
+                            //  - remove 'event_log'
+                            SPDLOG_TRACE("Remove event_log entries associated to the game in the room");
+                            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENT_LOG_TABLE),
+                                    pqxx::params{game.id})
+                                .no_rows();
 
-                try {
-                    pqxx::work tx(conn);
-                    //  - remove 'event_log'
-                    SPDLOG_TRACE("Remove event_log entries associated to the game in the room");
-                    tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENT_LOG_TABLE),
-                            pqxx::params{game_opt->id})
-                        .no_rows();
+                            //  - remove 'game_action'
+                            SPDLOG_TRACE("Remove game_action entries associated to the game in the room");
+                            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", GAME_ACTION_TABLE),
+                                    pqxx::params{game.id})
+                                .no_rows();
 
-                    //  - remove 'game_action'
-                    SPDLOG_TRACE("Remove game_action entries associated to the game in the room");
-                    tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", GAME_ACTION_TABLE),
-                            pqxx::params{game_opt->id})
-                        .no_rows();
+                            //  - remove 'game' from 'participants
+                            SPDLOG_TRACE("Clear the 'game_id' entry from the participants playing the game we are "
+                                         "about to remove");
+                            tx.exec(std::format("UPDATE {} SET game_id = NULL WHERE game_id = $1;", PARTICIPANT_TABLE),
+                                    pqxx::params{game.id})
+                                .no_rows();
 
-                    //  - remove 'game' from 'participants
-                    SPDLOG_TRACE(
-                        "Clear the 'game_id' entry from the participants playing the game we are about to remove");
-                    tx.exec(std::format("UPDATE {} SET game_id = NULL WHERE game_id = $1;", PARTICIPANT_TABLE),
-                            pqxx::params{game_opt->id})
-                        .no_rows();
-
-                    // And now we can finally remove the row from the games table
-                    SPDLOG_TRACE("Finally remove the game from the table");
-                    tx.exec(std::format("DELETE FROM {} WHERE room_id = $1;", GAMES_TABLE), pqxx::params{room_uuid})
-                        .no_rows();
-                    tx.commit();
-                    return {};
-                } catch (const std::exception& e) {
-                    SPDLOG_ERROR("Failed to remove game: {}", e.what());
-                    return tl::unexpected(errors::DatabaseError{std::format("Failed to remove game: {}", e.what())});
-                }
+                            // And now we can finally remove the row from the games table
+                            SPDLOG_TRACE("Finally remove the game from the table");
+                            tx.exec(std::format("DELETE FROM {} WHERE room_id = $1;", GAMES_TABLE),
+                                    pqxx::params{room_uuid})
+                                .no_rows();
+                            tx.commit();
+                            return {};
+                        } catch (const std::exception& e) {
+                            return tl::unexpected(
+                                errors::DatabaseError{std::format("Failed to remove game: {}", e.what())});
+                        }
+                    })
+                    .value_or(Expected<void>{});
             });
     }
 

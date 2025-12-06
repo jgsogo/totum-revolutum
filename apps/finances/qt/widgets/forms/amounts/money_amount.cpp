@@ -58,7 +58,7 @@ ExpectedType<finances::accounts::models::Money> MoneyAmountEdit::getMoneyAmount(
 
     auto amount_expected = utils::qstring_to_amount(this->text(), pImpl->ccy.value());
     if (!amount_expected) {
-        return tl::unexpected{amount_expected.error()};
+        return tl::unexpected{std::format("{}", amount_expected.error())};
     }
 
     finances::accounts::models::Money money{std::move(amount_expected.value()), pImpl->ccy.value()};

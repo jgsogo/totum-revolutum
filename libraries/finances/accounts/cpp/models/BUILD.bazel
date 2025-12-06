@@ -21,6 +21,5 @@ cc_library(
         "//libraries/utils/cpp/libpqxx/datatypes:numeric",
         "//libraries/utils/cpp/libpqxx/orm",
         "@magic_enum",
-        "@tl-expected",
     ],
 )

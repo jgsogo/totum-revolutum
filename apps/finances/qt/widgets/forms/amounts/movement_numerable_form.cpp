@@ -42,7 +42,7 @@ namespace widgets::forms {
         // FIXME: For quantities, it doesn't make sense the `ccy`!
         auto quantity_expected = utils::qstring_to_amount(quantity->text(), unit_value_edit_expected.value().ccy);
         if (!quantity_expected) {
-            return tl::unexpected{quantity_expected.error()};
+            return tl::unexpected{std::format("{}", quantity_expected.error())};
         }
 
         finances::investments::models::NumerableAmount amount{.quantity = std::move(quantity_expected.value()),
@@ -64,7 +64,7 @@ namespace widgets::forms {
 
         auto quantity_expected = utils::qstring_to_amount(quantity->text(), unit_value_edit_expected.value().ccy);
         if (!quantity_expected) {
-            return tl::unexpected{quantity_expected.error()};
+            return tl::unexpected{std::format("{}", quantity_expected.error())};
         }
 
         return finances::investments::models::MovementNumerable{

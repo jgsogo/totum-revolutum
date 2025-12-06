@@ -1,12 +1,12 @@
 #pragma once
 
-#include "libraries/utils/cpp/expected_type.hpp"
+#include "libraries/utils/cpp/expected_type/expected_type.hpp"
 #include "libraries/utils/cpp/type_name.hpp"
 
 namespace errors {
 
     //! Errors raised because some input data is invalid.
-    using RuntimeError = utils::errors::BaseError<class RuntimeErrorTag>;
+    using RuntimeError = utils::errors::BaseError<"RuntimeError">;
 
     template <typename T> struct StringToTypeError : public RuntimeError {
         StringToTypeError(std::string_view input)
@@ -38,15 +38,3 @@ namespace errors {
     };
 
 } // namespace errors
-
-template <> struct fmt::formatter<errors::RuntimeError> : fmt::formatter<std::string> {
-    auto format(errors::RuntimeError p, format_context& ctx) const -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "RuntimeError: {}", p.msg);
-    }
-};
-
-template <> struct std::formatter<errors::RuntimeError> : std::formatter<std::string> {
-    auto format(const errors::RuntimeError& p, std::format_context& ctx) const {
-        return std::formatter<std::string>::format(std::format("RuntimeError: {}", p.msg), ctx);
-    }
-};
