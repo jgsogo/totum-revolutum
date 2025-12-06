@@ -9,6 +9,7 @@ proto_library(
         "cards.proto",
         "colors.proto",
         "decks.proto",
+        "game.proto",
         "map.proto",
         "player.proto",
     ],
@@ -32,6 +33,7 @@ ts_proto_library(
         "map.proto",
         "decks.proto",
         "player.proto",
+        "game.proto",
     ],
     protoc_gen_options = {
         "import_extension": "js",

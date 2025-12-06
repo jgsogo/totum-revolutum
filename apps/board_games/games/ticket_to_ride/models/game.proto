@@ -1,18 +1,9 @@
 syntax = "proto3";
 package board_games.ticket_to_ride;
 
-import "apps/board_games/games/ticket_to_ride/models/decks.proto";
+import "apps/board_games/games/ticket_to_ride/models/board.proto";
 import "apps/board_games/games/ticket_to_ride/models/player.proto";
 
-message BoardState {
-  // Train & destination decks
-  TrainDeck train_deck = 1;
-  DestinationDeck destination_deck = 2;
-
-  // Which routes have been claimed by which player.
-  // Index = route_id from MapDefinition.
-  map<uint32, uint32> route_owner = 3;  // route_id → player_id
-}
 
 message GameState {
   string map_name = 1; // reference to MapDefinition ("USA", etc.)
