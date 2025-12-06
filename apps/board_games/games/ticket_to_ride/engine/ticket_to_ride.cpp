@@ -28,14 +28,14 @@ namespace board_games::ticket_to_ride {
         return data::GameState::WAITING;
     }
 
-    tl::expected<Board, data::Error> TicketToRidePlugin::_new_board() {
+    Expected<Board> TicketToRidePlugin::_new_board() {
         SPDLOG_ERROR("[ticket_to_ride] Not implemented");
-        return tl::unexpected(data::Error::GameEngineError);
+        return tl::unexpected(utils::NotImplemented{"WIP"});
     }
 
-    tl::expected<std::pair<Board, EventLog>, data::Error>
-    TicketToRidePlugin::_run(const Board& game_state, const Action& action, uint8_t player_number) {
+    Expected<std::pair<Board, EventLog>> TicketToRidePlugin::_run(const Board& game_state, const Action& action,
+                                                                  uint8_t player_number) {
         SPDLOG_ERROR("[ticket_to_ride] Not implemented");
-        return tl::unexpected(data::Error::GameEngineError);
+        return tl::unexpected(utils::NotImplemented{"WIP"});
     }
 } // namespace board_games::ticket_to_ride
