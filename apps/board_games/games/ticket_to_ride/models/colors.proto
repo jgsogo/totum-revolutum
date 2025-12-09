@@ -2,6 +2,7 @@ syntax = "proto3";
 package board_games.ticket_to_ride;
 
 enum Color {
+    option allow_alias = true;
   UNKNOWN = 0;
   BLUE = 1;
   RED = 2;
@@ -11,4 +12,5 @@ enum Color {
   WHITE = 6;
   ORANGE = 7;
   PURPLE = 8;
+  PINK = 8;
 }

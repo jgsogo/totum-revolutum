@@ -57,6 +57,11 @@ export enum Color {
    * @generated from enum value: PURPLE = 8;
    */
   PURPLE = 8,
+
+  /**
+   * @generated from enum value: PINK = 8;
+   */
+  PINK = 8,
 }
 
 /**
