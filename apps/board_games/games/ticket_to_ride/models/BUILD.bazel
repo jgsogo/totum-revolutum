@@ -5,10 +5,12 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 proto_library(
     name = "models_proto",
     srcs = [
+        "actions.proto",
         "board.proto",
         "cards.proto",
         "colors.proto",
         "decks.proto",
+        "event_log.proto",
         "game.proto",
         "map.proto",
         "player.proto",
@@ -34,6 +36,8 @@ ts_proto_library(
         "decks.proto",
         "player.proto",
         "game.proto",
+        "actions.proto",
+        "event_log.proto",
     ],
     protoc_gen_options = {
         "import_extension": "js",

@@ -13,19 +13,3 @@ message BoardState {
   // Index = route_id from MapDefinition.
   map<uint32, uint32> route_owner = 3;  // route_id → player_id
 }
-
-message GameState {
-  string map_name = 1; // reference to MapDefinition ("USA", etc.)
-
-  // Indexed or mapped by Participant.id
-  map<uint32, PlayerState> players = 2;
-
-  BoardState board = 3;
-
-  // Turn manager
-  uint32 current_player_id = 4;
-  uint32 turn_number = 5;
-
-  bool final_turn_triggered = 6; // last turn begins
-  bool game_over = 7;
-}
