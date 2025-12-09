@@ -1,0 +1,28 @@
+load("@aspect_rules_ts//ts:proto.bzl", "ts_proto_library")
+load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+proto_library(
+    name = "models_proto",
+    srcs = ["board.proto"],
+)
+
+cc_proto_library(
+    name = "models_cc_proto",
+    visibility = ["//apps/board_games/games/ticket_to_ride:__subpackages__"],
+    deps = [":models_proto"],
+)
+
+ts_proto_library(
+    name = "models_ts_proto",
+    copy_files = True,
+    node_modules = "//:node_modules",
+    proto = ":models_proto",
+    proto_srcs = ["board.proto"],
+    protoc_gen_options = {
+        "import_extension": "js",
+    },
+    visibility = [
+        "//apps/board_games/games/ticket_to_ride/webapp:__pkg__",
+    ],
+)

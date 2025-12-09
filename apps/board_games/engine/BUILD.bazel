@@ -26,6 +26,7 @@ cc_binary(
         ":plugin",
         "//apps/board_games/engine/services",
         "//apps/board_games/games/tic_tac_toe/engine",
+        "//apps/board_games/games/ticket_to_ride/engine",
         "//bazel/logging:spdlog",
         "//libraries/utils/cpp/libpqxx:connection_pool",
     ],

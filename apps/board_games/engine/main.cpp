@@ -10,15 +10,19 @@
 #include "apps/board_games/engine/services/cli_service.h"
 #include "apps/board_games/engine/services/engine_service.h"
 #include "apps/board_games/games/tic_tac_toe/engine/tic_tac_toe.h"
+#include "apps/board_games/games/ticket_to_ride/engine/ticket_to_ride.h"
 
 int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::debug); // TODO: Configurable via CLI and/or envvar
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e][%^%8l%$][engine] %v (%@)");
 
-    // Collect the games
+    // Collect the games (// TODO: Make this a factory)
     engine::GamePluginsMap games;
     std::unique_ptr<engine::GamePluginBase> tic_tac_toe = std::make_unique<board_games::tic_tac_toe::TicTacToePlugin>();
     games.insert(std::make_pair(tic_tac_toe->slug(), std::move(tic_tac_toe)));
+    std::unique_ptr<engine::GamePluginBase> ticket_to_ride =
+        std::make_unique<board_games::ticket_to_ride::TicketToRidePlugin>();
+    games.insert(std::make_pair(ticket_to_ride->slug(), std::move(ticket_to_ride)));
 
     auto pool_expected = utils::libpqxx::ConnectionPool::from_env("BOARD_GAMES_ENGINE_", 4);
     if (!pool_expected) {
