@@ -33,3 +33,9 @@ template <utils::StringLiteral T> struct std::formatter<utils::errors::BaseError
         return std::formatter<std::string>::format(std::format("{}: {}", p.error_identifier, p.msg), ctx);
     }
 };
+
+// Required for operator<<
+template <utils::StringLiteral T> std::ostream& operator<<(std::ostream& os, const utils::errors::BaseError<T>& obj) {
+    os << obj.error_identifier << ": " << obj.msg;
+    return os;
+}

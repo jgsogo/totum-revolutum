@@ -1,0 +1,22 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_test(
+    name = "test_map",
+    srcs = [
+        "main.cpp",
+        "test_cities.cpp",
+        "test_config.hpp",
+        "test_routes.cpp",
+    ],
+    args = [
+        "--textproto",
+        "$(location //apps/board_games/games/ticket_to_ride/maps:usa)",
+    ],
+    data = [
+        "//apps/board_games/games/ticket_to_ride/maps:usa",
+    ],
+    deps = [
+        "//apps/board_games/games/ticket_to_ride/maps/cpp:maps",
+        "@catch2",
+    ],
+)
