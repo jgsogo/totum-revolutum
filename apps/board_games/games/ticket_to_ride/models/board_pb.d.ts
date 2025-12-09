@@ -4,6 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
+import type { DestinationDeck, TrainDeck } from "./decks_pb.js";
 
 /**
  * Describes the file apps/board_games/games/ticket_to_ride/models/board.proto.
@@ -11,107 +12,35 @@ import type { Message } from "@bufbuild/protobuf";
 export declare const file_apps_board_games_games_ticket_to_ride_models_board: GenFile;
 
 /**
- * @generated from message board_games.ticket_to_ride.Board
+ * @generated from message board_games.ticket_to_ride.BoardState
  */
-export declare type Board = Message<"board_games.ticket_to_ride.Board"> & {
+export declare type BoardState = Message<"board_games.ticket_to_ride.BoardState"> & {
   /**
-   * Linearized 3x3 board. Values: 'X', 'O', or ' ' (empty).
+   * Train & destination decks
    *
-   * @generated from field: string board_status = 1;
+   * @generated from field: board_games.ticket_to_ride.TrainDeck train_deck = 1;
    */
-  boardStatus: string;
+  trainDeck?: TrainDeck;
 
   /**
-   * FIXME: Every game will have this?
+   * @generated from field: board_games.ticket_to_ride.DestinationDeck destination_deck = 2;
+   */
+  destinationDeck?: DestinationDeck;
+
+  /**
+   * Which routes have been claimed by which player.
+   * Index = route_id from MapDefinition.
    *
-   * @generated from oneof board_games.ticket_to_ride.Board.turn_state
-   */
-  turnState: {
-    /**
-     * @generated from field: uint32 current_turn = 2;
-     */
-    value: number;
-    case: "currentTurn";
-  } | {
-    /**
-     * If there is a winner, the game has finished
-     *
-     * @generated from field: board_games.ticket_to_ride.Winner winner = 3;
-     */
-    value: Winner;
-    case: "winner";
-  } | {
-    /**
-     * @generated from field: bool draw = 4;
-     */
-    value: boolean;
-    case: "draw";
-  } | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message board_games.ticket_to_ride.Board.
- * Use `create(BoardSchema)` to create a new message.
- */
-export declare const BoardSchema: GenMessage<Board>;
-
-/**
- * @generated from message board_games.ticket_to_ride.Winner
- */
-export declare type Winner = Message<"board_games.ticket_to_ride.Winner"> & {
-  /**
-   * @generated from field: uint32 player = 1;
-   */
-  player: number;
-
-  /**
-   * @generated from field: repeated uint32 line = 2;
-   */
-  line: number[];
-};
-
-/**
- * Describes the message board_games.ticket_to_ride.Winner.
- * Use `create(WinnerSchema)` to create a new message.
- */
-export declare const WinnerSchema: GenMessage<Winner>;
-
-/**
- * @generated from message board_games.ticket_to_ride.Action
- */
-export declare type Action = Message<"board_games.ticket_to_ride.Action"> & {
-  /**
-   * Position 0–8, mapped left-to-right, top-to-bottom.
+   * route_id → player_id
    *
-   * @generated from field: uint32 position = 1;
+   * @generated from field: map<uint32, uint32> route_owner = 3;
    */
-  position: number;
+  routeOwner: { [key: number]: number };
 };
 
 /**
- * Describes the message board_games.ticket_to_ride.Action.
- * Use `create(ActionSchema)` to create a new message.
+ * Describes the message board_games.ticket_to_ride.BoardState.
+ * Use `create(BoardStateSchema)` to create a new message.
  */
-export declare const ActionSchema: GenMessage<Action>;
-
-/**
- * @generated from message board_games.ticket_to_ride.EventLog
- */
-export declare type EventLog = Message<"board_games.ticket_to_ride.EventLog"> & {
-  /**
-   * @generated from field: uint32 mark_placed_at_position = 1;
-   */
-  markPlacedAtPosition: number;
-
-  /**
-   * @generated from field: uint32 player = 2;
-   */
-  player: number;
-};
-
-/**
- * Describes the message board_games.ticket_to_ride.EventLog.
- * Use `create(EventLogSchema)` to create a new message.
- */
-export declare const EventLogSchema: GenMessage<EventLog>;
+export declare const BoardStateSchema: GenMessage<BoardState>;
 

@@ -19,8 +19,9 @@ cc_library(
         "//apps/board_games/engine:plugin",
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
+        "//apps/board_games/games/ticket_to_ride/engine/decks",
+        "//apps/board_games/games/ticket_to_ride/engine/maps/usa",
         "//apps/board_games/games/ticket_to_ride/models:models_cc_proto",
         "//bazel/logging:spdlog",
-        "@tl-expected",
     ],
 )

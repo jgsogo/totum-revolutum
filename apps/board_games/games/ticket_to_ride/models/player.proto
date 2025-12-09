@@ -1,0 +1,18 @@
+syntax = "proto3";
+package board_games.ticket_to_ride;
+
+import "apps/board_games/games/ticket_to_ride/models/cards.proto";
+
+
+message PlayerState {
+  uint32 player_id = 1;            // maps to Participant.pk
+
+  uint32 trains_remaining = 2;     // starts at 45 (USA)
+
+  repeated TrainCard hand = 3;     // hidden from others
+  repeated DestinationTicket tickets = 4; // hidden, includes uncompleted ones
+
+  repeated uint32 claimed_route_ids = 5;  // references RouteDef.id
+
+  uint32 score = 6; // optional; can be computed by engine
+}

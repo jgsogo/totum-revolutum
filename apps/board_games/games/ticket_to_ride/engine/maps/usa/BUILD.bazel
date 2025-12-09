@@ -1,0 +1,18 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "usa",
+    srcs = [
+        "usa.cpp",
+    ],
+    hdrs = [
+        "usa.h",
+    ],
+    visibility = [
+        "//apps/board_games/games/ticket_to_ride/engine:__pkg__",
+    ],
+    deps = [
+        "//apps/board_games/games/ticket_to_ride/models:models_cc_proto",
+        "//bazel/logging:spdlog",
+    ],
+)

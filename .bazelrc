@@ -59,6 +59,9 @@ build --host_per_file_copt=external/.*@-w,-Wno-all
 build:macos --linkopt=-framework --linkopt=CoreFoundation --host_linkopt=-framework --host_linkopt=CoreFoundation
 build:macos --host_macos_minimum_os=15.0 --macos_minimum_os=15.0
 
+# FIXME: After upgrading to protobuf >33.1, some deprecations should be gone. Remove this.
+build --cxxopt=-Wno-deprecated-declarations --host_cxxopt=-Wno-deprecated-declarations
+
 ###################
 # Typescript
 ###################
