@@ -9,33 +9,32 @@ cities: { id: 6  name: "Helena" }
 cities: { id: 7  name: "Salt Lake City" }
 cities: { id: 8  name: "Las Vegas" }
 cities: { id: 9  name: "Phoenix" }
-cities: { id: 10 name: "Edmonton" }
-cities: { id: 11 name: "Winnipeg" }
-cities: { id: 12 name: "Denver" }
-cities: { id: 13 name: "Santa Fe" }
-cities: { id: 14 name: "El Paso" }
-cities: { id: 15 name: "Oklahoma City" }
-cities: { id: 16 name: "Dallas" }
-cities: { id: 17 name: "Houston" }
-cities: { id: 18 name: "Kansas City" }
-cities: { id: 19 name: "Omaha" }
-cities: { id: 20 name: "Duluth" }
-cities: { id: 21 name: "Sault Ste Marie" }
-cities: { id: 22 name: "Chicago" }
-cities: { id: 23 name: "Saint Louis" }
-cities: { id: 24 name: "Little Rock" }
-cities: { id: 25 name: "New Orleans" }
-cities: { id: 26 name: "Nashville" }
-cities: { id: 27 name: "Atlanta" }
-cities: { id: 28 name: "Montreal" }
-cities: { id: 29 name: "Boston" }
-cities: { id: 30 name: "New York" }
-cities: { id: 31 name: "Pittsburgh" }
+cities: { id: 10 name: "Winnipeg" }
+cities: { id: 11 name: "Denver" }
+cities: { id: 12 name: "Santa Fe" }
+cities: { id: 13 name: "El Paso" }
+cities: { id: 14 name: "Duluth" }
+cities: { id: 15 name: "Omaha" }
+cities: { id: 16 name: "Kansas City" }
+cities: { id: 17 name: "Oklahoma City" }
+cities: { id: 18 name: "Dallas" }
+cities: { id: 19 name: "Houston" }
+cities: { id: 20 name: "Sault Ste Marie" }
+cities: { id: 21 name: "Chicago" }
+cities: { id: 22 name: "Saint Louis" }
+cities: { id: 23 name: "Little Rock" }
+cities: { id: 24 name: "New Orleans" }
+cities: { id: 25 name: "Nashville" }
+cities: { id: 26 name: "Atlanta" }
+cities: { id: 27 name: "Toronto" }
+cities: { id: 28 name: "Pittsburgh" }
+cities: { id: 29 name: "Montreal" }
+cities: { id: 30 name: "Boston" }
+cities: { id: 31 name: "New York" }
 cities: { id: 32 name: "Washington" }
 cities: { id: 33 name: "Raleigh" }
 cities: { id: 34 name: "Charleston" }
 cities: { id: 35 name: "Miami" }
-cities: { id: 36 name: "Toronto" }
 
 
 # --- Routes ---
@@ -45,64 +44,257 @@ cities: { id: 36 name: "Toronto" }
 # - city2: target
 # - color: route color, use COLOR_UNKNOWN for "grey" ones
 # - lenght: number of carriages for the route
-# - double_route: true for the duplicated one in double routes.
+# - double_route: true for double routes.
 
+# Vancouver - Seattle
 routes: { city1: 0  city2: 1  color: COLOR_UNKNOWN length: 1 double_route: true }
+routes: { city1: 0  city2: 1  color: COLOR_UNKNOWN length: 1 double_route: true }
+
+# Seattle - Portland
 routes: { city1: 1  city2: 2  color: COLOR_UNKNOWN length: 1 double_route: true }
-routes: { city1: 2  city2: 3  color: COLOR_GREEN  length: 5 double_route: false }
-routes: { city1: 3  city2: 4  color: COLOR_PURPLE length: 3 double_route: true }
-routes: { city1: 0  city2: 5  color: COLOR_UNKNOWN length: 4 double_route: false }
+routes: { city1: 1  city2: 2  color: COLOR_UNKNOWN length: 1 double_route: true }
+
+# Portland - San Francisco
+routes: { city1: 2  city2: 3  color: COLOR_GREEN length: 5 double_route: true }
+routes: { city1: 2  city2: 3  color: COLOR_PINK length: 5 double_route: true }
+
+# San Francisco - Los Angeles
+routes: { city1: 3  city2: 4  color: COLOR_YELLOW length: 5 double_route: true }
+routes: { city1: 3  city2: 4  color: COLOR_PINK length: 5 double_route: true }
+
+# Calgary - Vancouver
+routes: { city1: 5  city2: 0  color: COLOR_UNKNOWN length: 3 double_route: false }
+
+# Calgary - Seattle
+routes: { city1: 5  city2: 1  color: COLOR_UNKNOWN length: 4 double_route: false }
+
+# Calgary - Helena
 routes: { city1: 5  city2: 6  color: COLOR_UNKNOWN length: 4 double_route: false }
-routes: { city1: 1  city2: 6  color: COLOR_UNKNOWN length: 6 double_route: false }
-routes: { city1: 2  city2: 7  color: COLOR_BLUE   length: 6 double_route: false }
-routes: { city1: 7  city2: 3  color: COLOR_ORANGE length: 5 double_route: false }
-routes: { city1: 7  city2: 8  color: COLOR_UNKNOWN length: 3 double_route: false }
+
+# Helena - Seattle
+routes: { city1: 6  city2: 1  color: COLOR_YELLOW length: 6 double_route: false }
+
+# Helena - Salt Lake City
+routes: { city1: 6  city2: 7  color: COLOR_PINK length: 3 double_route: false }
+
+# Salt Lake City - Portland
+routes: { city1: 7  city2: 2  color: COLOR_BLUE length: 6 double_route: false }
+
+# Salt Lake City - San Francisco
+routes: { city1: 7  city2: 3  color: COLOR_ORANGE length: 5 double_route: true }
+routes: { city1: 7  city2: 3  color: COLOR_WHITE length: 5 double_route: true }
+
+# Salt Lake City - Las Vegas
+routes: { city1: 7  city2: 8  color: COLOR_ORANGE length: 3 double_route: false }
+
+# Las Vegas - Los Angeles
 routes: { city1: 8  city2: 4  color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 4  city2: 9  color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 9  city2: 14 color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 3  city2: 12 color: COLOR_UNKNOWN length: 4 double_route: false }
-routes: { city1: 12 city2: 7  color: COLOR_UNKNOWN length: 3 double_route: true }
-routes: { city1: 12 city2: 13 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 13 city2: 14 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 12 city2: 18 color: COLOR_UNKNOWN length: 4 double_route: true }
-routes: { city1: 18 city2: 22 color: COLOR_BLUE   length: 4 double_route: true }
-routes: { city1: 18 city2: 23 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 23 city2: 24 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 24 city2: 16 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 16 city2: 17 color: COLOR_UNKNOWN length: 1 double_route: true }
-routes: { city1: 17 city2: 25 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 25 city2: 35 color: COLOR_RED    length: 6 double_route: false }
-routes: { city1: 25 city2: 34 color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 34 city2: 27 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 27 city2: 26 color: COLOR_UNKNOWN length: 1 double_route: false }
-routes: { city1: 26 city2: 22 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 22 city2: 31 color: COLOR_UNKNOWN length: 3 double_route: true }
-routes: { city1: 31 city2: 30 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 30 city2: 29 color: COLOR_YELLOW length: 2 double_route: true }
-routes: { city1: 30 city2: 28 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 28 city2: 36 color: COLOR_UNKNOWN length: 3 double_route: true }
-routes: { city1: 36 city2: 22 color: COLOR_UNKNOWN length: 4 double_route: false }
-routes: { city1: 36 city2: 21 color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 21 city2: 20 color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 20 city2: 19 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 19 city2: 18 color: COLOR_UNKNOWN length: 1 double_route: true }
-routes: { city1: 20 city2: 11 color: COLOR_UNKNOWN length: 4 double_route: false }
-routes: { city1: 11 city2: 10 color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 10 city2: 5  color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 11 city2: 21 color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 28 city2: 29 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 32 city2: 30 color: COLOR_ORANGE length: 2 double_route: false }
-routes: { city1: 32 city2: 33 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 33 city2: 27 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 33 city2: 35 color: COLOR_UNKNOWN length: 4 double_route: false }
-routes: { city1: 31 city2: 27 color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 31 city2: 26 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 26 city2: 24 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 15 city2: 23 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 15 city2: 16 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 15 city2: 24 color: COLOR_UNKNOWN length: 2 double_route: false }
-routes: { city1: 12 city2: 11 color: COLOR_UNKNOWN length: 4 double_route: false }
-routes: { city1: 12 city2: 20 color: COLOR_UNKNOWN length: 4 double_route: false }
-routes: { city1: 14 city2: 16 color: COLOR_UNKNOWN length: 4 double_route: false }
-routes: { city1: 9  city2: 16 color: COLOR_UNKNOWN length: 3 double_route: false }
-routes: { city1: 8  city2: 9  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Phoenix - Los Angeles
+routes: { city1: 9  city2: 4  color: COLOR_UNKNOWN length: 3 double_route: false }
+
+# Winnipeg - Calgary
+routes: { city1: 10  city2: 5  color: COLOR_WHITE length: 6 double_route: false }
+
+# Winnipeg - Helena
+routes: { city1: 10  city2: 6  color: COLOR_BLUE length: 4 double_route: false }
+
+# Denver - Helena
+routes: { city1: 11  city2: 6  color: COLOR_GREEN length: 4 double_route: false }
+
+# Denver - Salt Lake City
+routes: { city1: 11  city2: 7  color: COLOR_RED length: 3 double_route: true }
+routes: { city1: 11  city2: 7  color: COLOR_YELLOW length: 3 double_route: true }
+
+# Denver - Phoenix
+routes: { city1: 11  city2: 9  color: COLOR_WHITE length: 5 double_route: false }
+
+# Denver - Santa Fe
+routes: { city1: 11  city2: 12  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Santa Fe - Phoenix
+routes: { city1: 12  city2: 9  color: COLOR_UNKNOWN length: 3 double_route: false }
+
+# Santa Fe - El Paso
+routes: { city1: 12  city2: 13  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# El Paso - Los Angeles
+routes: { city1: 13  city2: 4  color: COLOR_BLACK length: 6 double_route: false }
+
+# Duluth - Winnipeg
+routes: { city1: 14  city2: 10  color: COLOR_BLACK length: 4 double_route: false }
+
+# Duluth - Helena
+routes: { city1: 14  city2: 6  color: COLOR_ORANGE length: 6 double_route: false }
+
+# Duluth - Omaha
+routes: { city1: 14  city2: 15  color: COLOR_UNKNOWN length: 2 double_route: true }
+routes: { city1: 14  city2: 15  color: COLOR_UNKNOWN length: 2 double_route: true }
+
+# Omaha - Helena
+routes: { city1: 15  city2: 6  color: COLOR_RED length: 5 double_route: false }
+
+# Omaha - Denver
+routes: { city1: 15  city2: 11  color: COLOR_PINK length: 4 double_route: false }
+
+# Omaha - Kansas City
+routes: { city1: 15  city2: 16  color: COLOR_UNKNOWN length: 1 double_route: true }
+routes: { city1: 15  city2: 16  color: COLOR_UNKNOWN length: 1 double_route: true }
+
+# Kansas City - Denver
+routes: { city1: 16  city2: 11  color: COLOR_BLACK length: 4 double_route: true }
+routes: { city1: 16  city2: 11  color: COLOR_ORANGE length: 4 double_route: true }
+
+# Kansas City - Oklahoma City
+routes: { city1: 16  city2: 17  color: COLOR_UNKNOWN length: 2 double_route: true }
+routes: { city1: 16  city2: 17  color: COLOR_UNKNOWN length: 2 double_route: true }
+
+# Oklahoma City - Denver
+routes: { city1: 17  city2: 11  color: COLOR_RED length: 4 double_route: false }
+
+# Oklahoma City - Santa Fe
+routes: { city1: 17  city2: 12  color: COLOR_BLUE length: 3 double_route: false }
+
+# Oklahoma City - El Paso
+routes: { city1: 17  city2: 13  color: COLOR_YELLOW length: 5 double_route: false }
+
+# Oklahoma City - Dallas
+routes: { city1: 17  city2: 18  color: COLOR_UNKNOWN length: 1 double_route: true }
+routes: { city1: 17  city2: 18  color: COLOR_UNKNOWN length: 1 double_route: true }
+
+# Dallas - El Paso
+routes: { city1: 18  city2: 13  color: COLOR_RED length: 4 double_route: false }
+
+# Dallas - Houston
+routes: { city1: 18  city2: 19  color: COLOR_UNKNOWN length: 1 double_route: true }
+routes: { city1: 18  city2: 19  color: COLOR_UNKNOWN length: 1 double_route: true }
+
+# Houston - El Paso
+routes: { city1: 19  city2: 13  color: COLOR_GREEN length: 6 double_route: false }
+
+# Sault Ste Marie - Winnipeg
+routes: { city1: 20  city2: 10  color: COLOR_UNKNOWN length: 6 double_route: false }
+
+# Sault Ste Marie - Duluth
+routes: { city1: 20  city2: 14  color: COLOR_UNKNOWN length: 3 double_route: false }
+
+# Chicago - Duluth
+routes: { city1: 21  city2: 14  color: COLOR_RED length: 3 double_route: false }
+
+# Chicago - Omaha
+routes: { city1: 21  city2: 15  color: COLOR_BLUE length: 4 double_route: false }
+
+# Chicago - Saint Louis
+routes: { city1: 21  city2: 22  color: COLOR_GREEN length: 2 double_route: true }
+routes: { city1: 21  city2: 22  color: COLOR_WHITE length: 2 double_route: true }
+
+# Saint Louis - Kansas
+routes: { city1: 22  city2: 16  color: COLOR_BLUE length: 2 double_route: true }
+routes: { city1: 22  city2: 16  color: COLOR_PINK length: 2 double_route: true }
+
+# Saint Louis - Little Rock
+routes: { city1: 22  city2: 23  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Little Rock - Oklahoma City
+routes: { city1: 23  city2: 17  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Little Rock - Dallas
+routes: { city1: 23  city2: 18  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Little Rock - New Orleans
+routes: { city1: 23  city2: 24  color: COLOR_GREEN length: 3 double_route: false }
+
+# New Orleans - Houston
+routes: { city1: 24  city2: 19  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Nashville - Saint Louis
+routes: { city1: 25  city2: 22  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Nashville - Little Rock
+routes: { city1: 25  city2: 23  color: COLOR_WHITE length: 3 double_route: false }
+
+# Nashville - Atlanta
+routes: { city1: 25  city2: 26  color: COLOR_UNKNOWN length: 1 double_route: false }
+
+# Atlanta - New Orleans
+routes: { city1: 26  city2: 24  color: COLOR_YELLOW length: 4 double_route: true }
+routes: { city1: 26  city2: 24  color: COLOR_ORANGE length: 4 double_route: true }
+
+# Toronto - Sault Ste Marie
+routes: { city1: 27  city2: 20  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Toronto - Duluth
+routes: { city1: 27  city2: 14  color: COLOR_PINK length: 6 double_route: false }
+
+# Toronto - Chicago
+routes: { city1: 27  city2: 21  color: COLOR_WHITE length: 4 double_route: false }
+
+# Toronto - Pittsburgh
+routes: { city1: 27  city2: 28  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Pittsburgh - Chicago
+routes: { city1: 28  city2: 21  color: COLOR_ORANGE length: 3 double_route: true }
+routes: { city1: 28  city2: 21  color: COLOR_BLACK length: 3 double_route: true }
+
+# Pittsburgh - Saint Louis
+routes: { city1: 28  city2: 22  color: COLOR_GREEN length: 5 double_route: false }
+
+# Pittsburgh - Nashville
+routes: { city1: 28  city2: 25  color: COLOR_YELLOW length: 4 double_route: false }
+
+# Montreal - Sault Ste Marie
+routes: { city1: 29  city2: 20  color: COLOR_BLACK length: 5 double_route: false }
+
+# Montreal - Toronto
+routes: { city1: 29  city2: 27  color: COLOR_UNKNOWN length: 3 double_route: false }
+
+# Montreal - New York
+routes: { city1: 29  city2: 31  color: COLOR_BLUE length: 3 double_route: false }
+
+# Montreal - Boston
+routes: { city1: 29  city2: 30  color: COLOR_UNKNOWN length: 2 double_route: true }
+routes: { city1: 29  city2: 30  color: COLOR_UNKNOWN length: 2 double_route: true }
+
+# Boston - New York
+routes: { city1: 30  city2: 31  color: COLOR_YELLOW length: 2 double_route: true }
+routes: { city1: 30  city2: 31  color: COLOR_RED length: 2 double_route: true }
+
+# New York - Pittsburgh
+routes: { city1: 31  city2: 28  color: COLOR_WHITE length: 2 double_route: true }
+routes: { city1: 31  city2: 28  color: COLOR_GREEN length: 2 double_route: true }
+
+# New York - Washington
+routes: { city1: 31  city2: 32  color: COLOR_ORANGE length: 2 double_route: true }
+routes: { city1: 31  city2: 32  color: COLOR_BLACK length: 2 double_route: true }
+
+# Washington - Pittsburgh
+routes: { city1: 32  city2: 28  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Washington - Raleigh
+routes: { city1: 32  city2: 33  color: COLOR_UNKNOWN length: 2 double_route: true }
+routes: { city1: 32  city2: 33  color: COLOR_UNKNOWN length: 2 double_route: true }
+
+# Raleigh - Pittsburgh
+routes: { city1: 33  city2: 28  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Raleigh - Nashville
+routes: { city1: 33  city2: 25  color: COLOR_BLACK length: 3 double_route: false }
+
+# Raleigh - Atlanta
+routes: { city1: 33  city2: 26  color: COLOR_UNKNOWN length: 2 double_route: true }
+routes: { city1: 33  city2: 26  color: COLOR_UNKNOWN length: 2 double_route: true }
+
+# Raleigh - Charleston
+routes: { city1: 33  city2: 34  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Charleston - Atlanta
+routes: { city1: 34  city2: 26  color: COLOR_UNKNOWN length: 2 double_route: false }
+
+# Charleston - Miami
+routes: { city1: 34  city2: 35  color: COLOR_PINK length: 4 double_route: false }
+
+# Miami - Atlanta
+routes: { city1: 35  city2: 26  color: COLOR_BLUE length: 5 double_route: false }
+
+# Miami - New Orleans
+routes: { city1: 35  city2: 24  color: COLOR_RED length: 6 double_route: false }
