@@ -10,7 +10,7 @@
 
 constexpr static int32_t carriage_length = 30;
 constexpr static int32_t carriage_width = 10;
-constexpr static int32_t gap = 2;
+constexpr static int32_t gap = 4;
 constexpr static int32_t double_offset = 8;
 constexpr static int32_t city_radius = 8;
 constexpr static int32_t city_gap = city_radius + 8;
@@ -44,7 +44,7 @@ static double normalize_ang(double a) {
 }
 
 std::string draw_arc(const Vec2& center, const double& radius, const std::string& color, const double& ang_start,
-                     const double& ang_end, double sgn, int segments = 10, int stroke_width = 1) {
+                     const double& ang_end, int segments = 10, int stroke_width = 1) {
     std::ostringstream os;
     os << "<path stroke='" << color << "' stroke-width='" << stroke_width << "' fill='transparent' d='M";
     for (int i = 0; i < (segments + 1); i++) {
@@ -110,54 +110,51 @@ std::string make_route_svg(const RouteData& route) {
     //    << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
 
     // - draw city gap (start and end)
-    os << draw_arc(center, radius, "green", ang_start, ang_start + sgn * (city_gap / radius), sgn, 6, 1);
+    os << draw_arc(center, radius, "green", ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
     os << draw_arc(center, radius, "red", ang_start + sgn * theta - sgn * (city_gap / radius), ang_start + sgn * theta,
-                   sgn, 6, 1);
+                   6, 1);
 
-    // - draw circle for carriages
+    // CARRIAGES
+    auto draw_carriages = [&os](Vec2 _center, double _radius, double _ang_start, double _ang_end, double _sgn,
+                                int n_carriages, std::string color) {
+        // - draw circle for carriages
+        os << draw_arc(_center, _radius, color, _ang_start, _ang_end, 10, 2);
+
+        // - draw carriages
+        double total_length = (_ang_end - _ang_start) * _radius;
+        double _carriage_length = (total_length - (n_carriages - 1) * gap) / n_carriages;
+        double _carriage_ang = _carriage_length / _radius;
+        double _gap_ang = gap / _radius;
+
+        for (int i = 0; i < n_carriages; i++) {
+            double ang = _ang_start + (_carriage_ang / 2.0) + (i * _carriage_ang) + (i * _gap_ang);
+            double x = _center.x + _radius * std::cos(ang);
+            double y = _center.y + _radius * std::sin(ang);
+
+            double angdeg = ang * 180.0 / M_PI; // degrees for SVG
+
+            os << "<circle r='5' fill='red' cx='" << x << "' cy='" << y << "' />\n";
+
+            // Transform order: translate to pos, rotate(angle), then translate by -w/2,-h/2 to place centered
+            os << "<rect width='" << carriage_width << "' height='" << _carriage_length << "' ";
+            os << " fill='rgba(50,120,200,0.8)' stroke='black' stroke-width='0.4'";
+            os << " transform='";
+            os << "translate(" << x << "," << y << ") ";
+            os << "rotate(" << angdeg << ") ";
+            os << "translate(" << -carriage_width / 2.0 << "," << -_carriage_length / 2.0 << ")'";
+            os << "/>\n";
+        }
+    };
+
     if (route.colors.size() == 1) {
-        os << draw_arc(center, radius, "black", ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, 10, 2);
+        draw_carriages(center, radius, ang_start + sgn * (city_gap / radius),
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, "black");
     } else if (route.colors.size() == 2) {
-        os << draw_arc(center, radius + double_offset, "black", ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, 10, 2);
-        os << draw_arc(center, radius - double_offset, "grey", ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, 10, 2);
+        draw_carriages(center, radius + double_offset, ang_start + sgn * (city_gap / radius),
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, "black");
+        draw_carriages(center, radius - double_offset, ang_start + sgn * (city_gap / radius),
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, "grey");
     }
-
-    // Starting angle is ang_start, sweep is sgn*theta to reach the other endpoint.
-    // Now sample positions t in [0,1] along the param angle = ang_start + sgn * t * theta
-    std::vector<std::pair<Vec2, double>> samples;
-    samples.reserve(route.n_carriages);
-
-    // Corrections:
-    //  - starting angle is 'ang_start' (minus the city offset)
-    ang_start = ang_start + sgn * (city_gap / radius);
-    theta = theta - 2 * sgn * (city_gap / radius);
-
-    for (int i = 0; i < route.n_carriages; ++i) {
-        double t = (route.n_carriages == 1)
-                       ? 0.5
-                       : double(i) / (route.n_carriages - 1); // equally distributed including endpoints
-        double ang = ang_start + sgn * t * theta;
-        double x = center.x + radius * std::cos(ang);
-        double y = center.y + radius * std::sin(ang);
-        // Tangent direction: perpendicular to radius. Tangent angle (radians) = ang + sgn*(+pi/2)
-        double tangent_ang = ang + sgn * (M_PI_2); // M_PI_2 is pi/2
-        samples.push_back({{x, y}, tangent_ang});
-    }
-
-    // for (size_t i = 0; i < samples.size(); ++i) {
-    //     const auto& pos = samples[i].first;
-    //     double angdeg = samples[i].second * 180.0 / M_PI; // degrees for SVG
-
-    //     // Transform order: translate to pos, rotate(angle), then translate by -w/2,-h/2 to place centered
-    //     os << "  <rect width='" << carriage_length << "' height='" << carriage_width << "' ";
-    //     os << "transform='translate(" << pos.x << "," << pos.y << ") ";
-    //     os << "rotate(" << angdeg << ") ";
-    //     os << "translate(" << -carriage_length / 2.0 << "," << -carriage_width / 2.0 << ")' ";
-    //     os << "fill='rgba(50,120,200,0.8)' stroke='black' stroke-width='0.4'/>\n";
-    // }
 
     os << "</g>\n";
 
