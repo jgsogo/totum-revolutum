@@ -11,32 +11,32 @@ cities: { id: 4  name: "Los Angeles" pos_x: 142 pos_y: 600 }
 cities: { id: 5  name: "Calgary" pos_x: 262 pos_y: 70 }
 cities: { id: 6  name: "Helena" pos_x: 385 pos_y: 233 }
 cities: { id: 7  name: "Salt Lake City" pos_x: 298 pos_y: 388 }
-cities: { id: 8  name: "Las Vegas" pos_x: 0 pos_y: 0 }
-cities: { id: 9  name: "Phoenix" pos_x: 0 pos_y: 0 }
-cities: { id: 10 name: "Winnipeg" pos_x: 0 pos_y: 0 }
-cities: { id: 11 name: "Denver" pos_x: 0 pos_y: 0 }
-cities: { id: 12 name: "Santa Fe" pos_x: 0 pos_y: 0 }
-cities: { id: 13 name: "El Paso" pos_x: 0 pos_y: 0 }
-cities: { id: 14 name: "Duluth" pos_x: 0 pos_y: 0 }
-cities: { id: 15 name: "Omaha" pos_x: 0 pos_y: 0 }
-cities: { id: 16 name: "Kansas City" pos_x: 0 pos_y: 0 }
-cities: { id: 17 name: "Oklahoma City" pos_x: 0 pos_y: 0 }
-cities: { id: 18 name: "Dallas" pos_x: 0 pos_y: 0 }
-cities: { id: 19 name: "Houston" pos_x: 0 pos_y: 0 }
-cities: { id: 20 name: "Sault Ste Marie" pos_x: 0 pos_y: 0 }
-cities: { id: 21 name: "Chicago" pos_x: 0 pos_y: 0 }
-cities: { id: 22 name: "Saint Louis" pos_x: 0 pos_y: 0 }
-cities: { id: 23 name: "Little Rock" pos_x: 0 pos_y: 0 }
-cities: { id: 24 name: "New Orleans" pos_x: 0 pos_y: 0 }
-cities: { id: 25 name: "Nashville" pos_x: 0 pos_y: 0 }
-cities: { id: 26 name: "Atlanta" pos_x: 0 pos_y: 0 }
-cities: { id: 27 name: "Toronto" pos_x: 0 pos_y: 0 }
-cities: { id: 28 name: "Pittsburgh" pos_x: 0 pos_y: 0 }
-cities: { id: 29 name: "Montreal" pos_x: 0 pos_y: 0 }
-cities: { id: 30 name: "Boston" pos_x: 0 pos_y: 0 }
-cities: { id: 31 name: "New York" pos_x: 0 pos_y: 0 }
-cities: { id: 32 name: "Washington" pos_x: 0 pos_y: 0 }
-cities: { id: 33 name: "Raleigh" pos_x: 0 pos_y: 0 }
+cities: { id: 8  name: "Las Vegas" pos_x: 228 pos_y: 526 }
+cities: { id: 9  name: "Phoenix" pos_x: 296 pos_y: 608 }
+cities: { id: 10 name: "Winnipeg" pos_x: 540 pos_y: 80 }
+cities: { id: 11 name: "Denver" pos_x: 460 pos_y: 430 }
+cities: { id: 12 name: "Santa Fe" pos_x: 450 pos_y: 540 }
+cities: { id: 13 name: "El Paso" pos_x: 443 pos_y: 653 }
+cities: { id: 14 name: "Duluth" pos_x: 682 pos_y: 227 }
+cities: { id: 15 name: "Omaha" pos_x: 646 pos_y: 342 }
+cities: { id: 16 name: "Kansas City" pos_x: 669 pos_y: 405 }
+cities: { id: 17 name: "Oklahoma City" pos_x: 644 pos_y: 514 }
+cities: { id: 18 name: "Dallas" pos_x: 669 pos_y: 624 }
+cities: { id: 19 name: "Houston" pos_x: 721 pos_y: 674 }
+cities: { id: 20 name: "Sault Ste Marie" pos_x: 840 pos_y: 142 }
+cities: { id: 21 name: "Chicago" pos_x: 835 pos_y: 304 }
+cities: { id: 22 name: "Saint Louis" pos_x: 780 pos_y: 408 }
+cities: { id: 23 name: "Little Rock" pos_x: 757 pos_y: 518 }
+cities: { id: 24 name: "New Orleans" pos_x: 840 pos_y: 665 }
+cities: { id: 25 name: "Nashville" pos_x: 897 pos_y: 457 }
+cities: { id: 26 name: "Atlanta" pos_x: 958 pos_y: 499 }
+cities: { id: 27 name: "Toronto" pos_x: 980 pos_y: 170 }
+cities: { id: 28 name: "Pittsburgh" pos_x: 998 pos_y: 285 }
+cities: { id: 29 name: "Montreal" pos_x: 1080 pos_y: 60 }
+cities: { id: 30 name: "Boston" pos_x: 1168 pos_y: 136 }
+cities: { id: 31 name: "New York" pos_x: 1103 pos_y: 229 }
+cities: { id: 32 name: "Washington" pos_x: 1114 pos_y: 342 }
+cities: { id: 33 name: "Raleigh" pos_x: 1040 pos_y: 425 }
 cities: { id: 34 name: "Charleston" pos_x: 0 pos_y: 0 }
 cities: { id: 35 name: "Miami" pos_x: 0 pos_y: 0 }
 
