@@ -11,7 +11,7 @@
 constexpr static int32_t carriage_length = 30;
 constexpr static int32_t carriage_width = 10;
 constexpr static int32_t gap = 2;
-constexpr static int32_t double_offset = 12;
+constexpr static int32_t double_offset = 8;
 constexpr static int32_t city_radius = 8;
 constexpr static int32_t city_gap = city_radius + 8;
 
@@ -115,8 +115,15 @@ std::string make_route_svg(const RouteData& route) {
                    sgn, 6, 1);
 
     // - draw circle for carriages
-    os << draw_arc(center, radius, "black", ang_start + sgn * (city_gap / radius),
-                   ang_start + sgn * theta - sgn * (city_gap / radius), sgn, 10, 2);
+    if (route.colors.size() == 1) {
+        os << draw_arc(center, radius, "black", ang_start + sgn * (city_gap / radius),
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, 10, 2);
+    } else if (route.colors.size() == 2) {
+        os << draw_arc(center, radius + double_offset, "black", ang_start + sgn * (city_gap / radius),
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, 10, 2);
+        os << draw_arc(center, radius - double_offset, "grey", ang_start + sgn * (city_gap / radius),
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, 10, 2);
+    }
 
     // Starting angle is ang_start, sweep is sgn*theta to reach the other endpoint.
     // Now sample positions t in [0,1] along the param angle = ang_start + sgn * t * theta
