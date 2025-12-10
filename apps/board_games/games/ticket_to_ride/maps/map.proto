@@ -36,4 +36,5 @@ message Route {
   Color color = 3;
   int32 length = 4;
   bool double_route = 5;
+  bool draw_ccw = 6;
 }

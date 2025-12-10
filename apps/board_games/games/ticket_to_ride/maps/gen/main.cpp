@@ -20,6 +20,7 @@ struct RouteData {
     board_games::ticket_to_ride::City end;
     int32_t n_carriages;
     std::vector<board_games::ticket_to_ride::Color> colors;
+    bool draw_ccw;
 };
 
 std::string city_name(const board_games::ticket_to_ride::City& city) {
@@ -43,7 +44,7 @@ static double normalize_ang(double a) {
 }
 
 std::string draw_arc(const Vec2& center, const double& radius, const std::string& color, const double& ang_start,
-                     const double& ang_end, int segments = 10, int stroke_width = 1) {
+                     const double& ang_end, double sgn, int segments = 10, int stroke_width = 1) {
     std::ostringstream os;
     os << "<path stroke='" << color << "' stroke-width='" << stroke_width << "' fill='transparent' d='M";
     for (int i = 0; i < (segments + 1); i++) {
@@ -52,7 +53,7 @@ std::string draw_arc(const Vec2& center, const double& radius, const std::string
         double y = center.y + radius * std::sin(ang);
         os << x << " " << y << " ";
     }
-    os << "'/>";
+    os << "'/>\n";
     return os.str();
 }
 
@@ -61,10 +62,10 @@ std::string make_route_svg(const RouteData& route) {
     double arc_length =
         static_cast<double>((route.n_carriages * carriage_length) + ((route.n_carriages - 1) * gap) + (2 * city_gap));
     double hypot = std::hypot(route.end.pos_x() - route.start.pos_x(), route.end.pos_y() - route.start.pos_y());
-    auto solution =
-        arc_circle(Vec2{.x = static_cast<double>(route.start.pos_x()), .y = static_cast<double>(route.start.pos_y())},
-                   Vec2{.x = static_cast<double>(route.end.pos_x()), .y = static_cast<double>(route.end.pos_y())},
-                   std::max(arc_length, hypot));
+    arc_length = std::max(arc_length, hypot);
+    auto solution = arc_circle(
+        Vec2{.x = static_cast<double>(route.start.pos_x()), .y = static_cast<double>(route.start.pos_y())},
+        Vec2{.x = static_cast<double>(route.end.pos_x()), .y = static_cast<double>(route.end.pos_y())}, arc_length);
     if (!solution) {
         std::cerr << "There is no solution for the route from " << route.start.name() << " to " << route.end.name()
                   << std::endl;
@@ -78,7 +79,7 @@ std::string make_route_svg(const RouteData& route) {
     }
 
     // TODO: Agree on some logic to choose one solution over the other.
-    auto center = solution->centers[0];
+    auto center = route.draw_ccw ? solution->centers[1] : solution->centers[0];
     double radius = solution->radius;
 
     // Angles of points A and B relative to center
@@ -109,12 +110,13 @@ std::string make_route_svg(const RouteData& route) {
     //    << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
 
     // - draw city gap (start and end)
-    os << draw_arc(center, radius, "green", ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
-    os << draw_arc(center, radius, "red", ang_end - sgn * (city_gap / radius), ang_end, 6, 1);
+    os << draw_arc(center, radius, "green", ang_start, ang_start + sgn * (city_gap / radius), sgn, 6, 1);
+    os << draw_arc(center, radius, "red", ang_start + sgn * theta - sgn * (city_gap / radius), ang_start + sgn * theta,
+                   sgn, 6, 1);
 
     // - draw circle for carriages
-    os << draw_arc(center, radius, "black", ang_start + sgn * (city_gap / radius), ang_end - sgn * (city_gap / radius),
-                   10, 2);
+    os << draw_arc(center, radius, "black", ang_start + sgn * (city_gap / radius),
+                   ang_start + sgn * theta - sgn * (city_gap / radius), sgn, 10, 2);
 
     // Starting angle is ang_start, sweep is sgn*theta to reach the other endpoint.
     // Now sample positions t in [0,1] along the param angle = ang_start + sgn * t * theta
@@ -211,14 +213,17 @@ int main(int argc, char** argv) {
     std::map<std::pair<int32_t, int32_t>, RouteData> routes;
     {
         for (const auto& route : map_data.routes()) {
+            // 'key' is independent on the order of the cities
             auto city1 = std::min(route.city1(), route.city2());
             auto city2 = std::max(route.city1(), route.city2());
             std::pair<int32_t, int32_t> key = std::make_pair(city1, city2);
 
-            routes[key].start = cities_pos[city1];
-            routes[key].end = cities_pos[city2];
+            // ...but the route has a direction
+            routes[key].start = cities_pos[route.city1()];
+            routes[key].end = cities_pos[route.city2()];
             routes[key].n_carriages = route.length();
             routes[key].colors.push_back(route.color());
+            routes[key].draw_ccw = route.draw_ccw();
         }
     }
     os << "<!--Routes-->\n";
