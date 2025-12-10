@@ -33,20 +33,4 @@ ts_proto_library(
 )
 
 # MAPS
-
 generate_map_targets(name = "usa")
-# filegroup(
-#     name = "usa",
-#     srcs = ["usa.textproto"],
-#     visibility = ["//apps/board_games/games/ticket_to_ride:__subpackages__"],
-# )
-
-# genrule(
-#     name = "usa-svg",
-#     srcs = [":usa"],
-#     outs = ["usa.svg"],
-#     cmd = "$(location //apps/board_games/games/ticket_to_ride/maps/gen) --textproto=$(location :usa) --output=$@",
-#     tools = [
-#         "//apps/board_games/games/ticket_to_ride/maps/gen",
-#     ],
-# )

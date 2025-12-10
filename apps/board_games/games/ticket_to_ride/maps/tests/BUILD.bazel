@@ -8,13 +8,8 @@ cc_test(
         "test_config.hpp",
         "test_routes.cpp",
     ],
-    args = [
-        "--textproto",
-        "$(location //apps/board_games/games/ticket_to_ride/maps:usa-input)",
-    ],
-    data = [
-        "//apps/board_games/games/ticket_to_ride/maps:usa-input",
-    ],
+    tags = ["manual"],
+    visibility = ["//apps/board_games/games/ticket_to_ride/maps:__pkg__"],
     deps = [
         "//apps/board_games/games/ticket_to_ride/maps/cpp:maps",
         "@catch2",

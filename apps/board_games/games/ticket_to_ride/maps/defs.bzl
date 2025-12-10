@@ -2,9 +2,16 @@
 """
 
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//bazel:run_copy_to_workspace.bzl", "run_copy_to_workspace")
 
 def generate_map_targets(name):
+    """Creates all the targets for a given TextProto file
+
+    Args:
+        name: the name of the map. It has to match an input `<name>.textproto` file
+    """
+
     native.filegroup(
         name = "{}-input".format(name),
         srcs = ["{}.textproto".format(name)],
@@ -34,4 +41,29 @@ def generate_map_targets(name):
         file2 = "{}.svg".format(name),
         tags = ["check"],
         failure_message = "\n\nRun `bazel run {}:{}.update` to update the schema file".format(native.package_name(), name),
+    )
+
+    native.genrule(
+        name = "{}.test.map.build".format(name),
+        outs = ["{}.test.map.build.sh".format(name)],
+        cmd = """
+            echo '#!/bin/bash' > $@
+            echo '$(rootpath //apps/board_games/games/ticket_to_ride/maps/tests:test_map) \\' >> $@
+            echo '  --textproto=$(location :{name}-input) \' >> $@
+        """.format(name = name),
+        tools = [
+            "//apps/board_games/games/ticket_to_ride/maps/tests:test_map",
+        ],
+        srcs = [
+            ":{}-input".format(name),
+        ],
+        visibility = ["//visibility:private"],
+        testonly = True,
+        executable = True,
+    )
+
+    sh_test(
+        name = "{}.test.map".format(name),
+        data = [":{}-input".format(name), "//apps/board_games/games/ticket_to_ride/maps/tests:test_map"],
+        srcs = [":{}.test.map.build".format(name)],
     )
