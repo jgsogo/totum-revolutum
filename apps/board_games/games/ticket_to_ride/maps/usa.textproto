@@ -37,8 +37,8 @@ cities: { id: 30 name: "Boston" pos_x: 1168 pos_y: 136 }
 cities: { id: 31 name: "New York" pos_x: 1103 pos_y: 229 }
 cities: { id: 32 name: "Washington" pos_x: 1114 pos_y: 342 }
 cities: { id: 33 name: "Raleigh" pos_x: 1040 pos_y: 425 }
-cities: { id: 34 name: "Charleston" pos_x: 0 pos_y: 0 }
-cities: { id: 35 name: "Miami" pos_x: 0 pos_y: 0 }
+cities: { id: 34 name: "Charleston" pos_x: 1077 pos_y: 508 }
+cities: { id: 35 name: "Miami" pos_x: 1115 pos_y: 705 }
 
 
 # --- Routes ---

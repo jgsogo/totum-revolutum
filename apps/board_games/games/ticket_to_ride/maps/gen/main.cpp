@@ -11,8 +11,9 @@
 constexpr static int32_t carriage_length = 30;
 constexpr static int32_t carriage_width = 10;
 constexpr static int32_t gap = 2;
-constexpr static int32_t city_gap = 40;
 constexpr static int32_t double_offset = 12;
+constexpr static int32_t city_radius = 8;
+constexpr static int32_t city_gap = city_radius + 8;
 
 struct RouteData {
     board_games::ticket_to_ride::City start;
@@ -41,6 +42,20 @@ static double normalize_ang(double a) {
     return a;
 }
 
+std::string draw_arc(const Vec2& center, const double& radius, const std::string& color, const double& ang_start,
+                     const double& ang_end, int segments = 10, int stroke_width = 1) {
+    std::ostringstream os;
+    os << "<path stroke='" << color << "' stroke-width='" << stroke_width << "' fill='transparent' d='M";
+    for (int i = 0; i < (segments + 1); i++) {
+        double ang = ang_start + i * (ang_end - ang_start) / segments;
+        double x = center.x + radius * std::cos(ang);
+        double y = center.y + radius * std::sin(ang);
+        os << x << " " << y << " ";
+    }
+    os << "'/>";
+    return os.str();
+}
+
 std::string make_route_svg(const RouteData& route) {
     // We need to compute the arc with a given length between two points
     double arc_length =
@@ -62,84 +77,82 @@ std::string make_route_svg(const RouteData& route) {
         return "";
     }
 
-    {
-        auto center = solution->centers[0];
-        double radius = solution->radius;
+    // TODO: Agree on some logic to choose one solution over the other.
+    auto center = solution->centers[0];
+    double radius = solution->radius;
 
-        // Angles of points A and B relative to center
-        double ang_start = std::atan2(route.start.pos_y() - center.y, route.start.pos_x() - center.x);
-        double ang_end = std::atan2(route.end.pos_y() - center.y, route.end.pos_x() - center.x);
+    // Angles of points A and B relative to center
+    double ang_start = std::atan2(route.start.pos_y() - center.y, route.start.pos_x() - center.x);
+    double ang_end = std::atan2(route.end.pos_y() - center.y, route.end.pos_x() - center.x);
 
-        // We need to pick the sign (direction) so that swept absolute angle equals theta = s/R
-        double theta = arc_length / radius; // positive
-        // Compute normalized difference from A to B going CCW
-        double diff = normalize_ang(ang_end - ang_start);
+    // We need to pick the sign (direction) so that swept absolute angle equals theta = s/R
+    double theta = arc_length / radius; // positive
+    // Compute normalized difference from A to B going CCW
+    double diff = normalize_ang(ang_end - ang_start);
 
-        // Prefer direction (sign) such that abs(swept) == theta (or as close as possible)
-        // Two possibilities: sweep = +theta or sweep = -theta. We'll choose sign sgn such that
-        // the wrapped delta is closest to sgn*theta.
-        double sgn = (std::abs(normalize_ang(diff - theta)) < std::abs(normalize_ang(diff + theta))) ? +1.0 : -1.0;
+    // Prefer direction (sign) such that abs(swept) == theta (or as close as possible)
+    // Two possibilities: sweep = +theta or sweep = -theta. We'll choose sign sgn such that
+    // the wrapped delta is closest to sgn*theta.
+    double sgn = (std::abs(normalize_ang(diff - theta)) < std::abs(normalize_ang(diff + theta))) ? +1.0 : -1.0;
 
-        // Starting angle is ang_start, sweep is sgn*theta to reach the other endpoint.
-        // Now sample positions t in [0,1] along the param angle = ang_start + sgn * t * theta
-        std::vector<std::pair<Vec2, double>> samples;
-        samples.reserve(route.n_carriages);
+    std::ostringstream os;
+    os << "\n";
+    os << "<g id=\"r-" << city_name(route.start) << "-" << city_name(route.end) << "\">\n";
 
-        // Corrections:
-        //  - starting angle is 'ang_start' (minus the city offset)
-        ang_start = ang_start + sgn * (city_gap / radius);
-        theta = theta - 2 * sgn * (city_gap / radius);
+    // HELPERS
 
-        for (int i = 0; i < route.n_carriages; ++i) {
-            double t = (route.n_carriages == 1)
-                           ? 0.5
-                           : double(i) / (route.n_carriages - 1); // equally distributed including endpoints
-            double ang = ang_start + sgn * t * theta;
-            double x = center.x + radius * std::cos(ang);
-            double y = center.y + radius * std::sin(ang);
-            // Tangent direction: perpendicular to radius. Tangent angle (radians) = ang + sgn*(+pi/2)
-            double tangent_ang = ang + sgn * (M_PI_2); // M_PI_2 is pi/2
-            samples.push_back({{x, y}, tangent_ang});
-        }
+    // - draw circle for reference
+    // os << "  <circle cx='" << center.x << "' cy='" << center.y << "' r='" << radius
+    //    << "' fill='none' stroke='red'/>\n";
+    // - draw chord for reference
+    // os << "  <line x1='" << route.start.pos_x() << "' y1='" << route.start.pos_y() << "' x2='" << route.end.pos_x()
+    //    << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
 
-        std::ostringstream os;
+    // - draw city gap (start and end)
+    os << draw_arc(center, radius, "green", ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
+    os << draw_arc(center, radius, "red", ang_end - sgn * (city_gap / radius), ang_end, 6, 1);
 
-        os << "\n";
-        os << "<g id=\"r-" << city_name(route.start) << "-" << city_name(route.end) << "\">\n";
+    // - draw circle for carriages
+    os << draw_arc(center, radius, "black", ang_start + sgn * (city_gap / radius), ang_end - sgn * (city_gap / radius),
+                   10, 2);
 
-        // draw circle and chord for reference
-        os << "  <circle cx='" << center.x << "' cy='" << center.y << "' r='" << radius
-           << "' fill='none' stroke='red'/>\n";
-        os << "  <line x1='" << route.start.pos_x() << "' y1='" << route.start.pos_y() << "' x2='" << route.end.pos_x()
-           << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
+    // Starting angle is ang_start, sweep is sgn*theta to reach the other endpoint.
+    // Now sample positions t in [0,1] along the param angle = ang_start + sgn * t * theta
+    std::vector<std::pair<Vec2, double>> samples;
+    samples.reserve(route.n_carriages);
 
-        for (size_t i = 0; i < samples.size(); ++i) {
-            const auto& pos = samples[i].first;
-            double angdeg = samples[i].second * 180.0 / M_PI; // degrees for SVG
+    // Corrections:
+    //  - starting angle is 'ang_start' (minus the city offset)
+    ang_start = ang_start + sgn * (city_gap / radius);
+    theta = theta - 2 * sgn * (city_gap / radius);
 
-            // Transform order: translate to pos, rotate(angle), then translate by -w/2,-h/2 to place centered
-            os << "  <rect width='" << carriage_length << "' height='" << carriage_width << "' ";
-            os << "transform='translate(" << pos.x << "," << pos.y << ") ";
-            os << "rotate(" << angdeg << ") ";
-            os << "translate(" << -carriage_length / 2.0 << "," << -carriage_width / 2.0 << ")' ";
-            os << "fill='rgba(50,120,200,0.8)' stroke='black' stroke-width='0.4'/>\n";
-        }
-
-        // out << "  <path d=\"M" << route.start.pos_x() << " " << route.start.pos_y() << " " << route.end.pos_x() << "
-        // "
-        //     << route.end.pos_y() << "\" stroke-width=\"1\" stroke=\"black\"/>\n";
-        os << "</g>\n";
-
-        return os.str();
+    for (int i = 0; i < route.n_carriages; ++i) {
+        double t = (route.n_carriages == 1)
+                       ? 0.5
+                       : double(i) / (route.n_carriages - 1); // equally distributed including endpoints
+        double ang = ang_start + sgn * t * theta;
+        double x = center.x + radius * std::cos(ang);
+        double y = center.y + radius * std::sin(ang);
+        // Tangent direction: perpendicular to radius. Tangent angle (radians) = ang + sgn*(+pi/2)
+        double tangent_ang = ang + sgn * (M_PI_2); // M_PI_2 is pi/2
+        samples.push_back({{x, y}, tangent_ang});
     }
 
-    // std::ostringstream out;
-    // out << "\n";
-    // out << "<g id=\"r-" << city_name(route.start) << "-" << city_name(route.end) << "\">\n";
-    // out << "  <path d=\"M" << route.start.pos_x() << " " << route.start.pos_y() << " " << route.end.pos_x() << " "
-    //     << route.end.pos_y() << "\" stroke-width=\"1\" stroke=\"black\"/>\n";
-    // out << "</g>\n";
-    // return out.str();
+    // for (size_t i = 0; i < samples.size(); ++i) {
+    //     const auto& pos = samples[i].first;
+    //     double angdeg = samples[i].second * 180.0 / M_PI; // degrees for SVG
+
+    //     // Transform order: translate to pos, rotate(angle), then translate by -w/2,-h/2 to place centered
+    //     os << "  <rect width='" << carriage_length << "' height='" << carriage_width << "' ";
+    //     os << "transform='translate(" << pos.x << "," << pos.y << ") ";
+    //     os << "rotate(" << angdeg << ") ";
+    //     os << "translate(" << -carriage_length / 2.0 << "," << -carriage_width / 2.0 << ")' ";
+    //     os << "fill='rgba(50,120,200,0.8)' stroke='black' stroke-width='0.4'/>\n";
+    // }
+
+    os << "</g>\n";
+
+    return os.str();
 }
 
 int main(int argc, char** argv) {
@@ -174,7 +187,7 @@ int main(int argc, char** argv) {
     // Reusable elements
     os << "  <defs>\n";
     //  - city-point
-    os << "    <circle r=\"8\" fill=\"none\" stroke-width=\"5\" stroke=\"black\" id=\"city-point\"/>\n";
+    os << "    <circle r='" << city_radius << "' fill='black' stroke-width='1' stroke='black' id='city-point'/>\n";
     //  - carriage
     os << "    <g id=\"carriage\">\n";
     os << "      <rect x=\"0\" y=\"0\" width=\"" << carriage_length << "\" height=\"" << carriage_width << "\"/>\n";
