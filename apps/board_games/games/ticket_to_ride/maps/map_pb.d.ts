@@ -15,22 +15,27 @@ export declare const file_apps_board_games_games_ticket_to_ride_maps_map: GenFil
  */
 export declare type MapData = Message<"board_games.ticket_to_ride.MapData"> & {
   /**
-   * @generated from field: repeated board_games.ticket_to_ride.City cities = 1;
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: repeated board_games.ticket_to_ride.City cities = 2;
    */
   cities: City[];
 
   /**
-   * @generated from field: repeated board_games.ticket_to_ride.Route routes = 2;
+   * @generated from field: repeated board_games.ticket_to_ride.Route routes = 3;
    */
   routes: Route[];
 
   /**
-   * @generated from field: int32 size_x = 3;
+   * @generated from field: int32 size_x = 4;
    */
   sizeX: number;
 
   /**
-   * @generated from field: int32 size_y = 4;
+   * @generated from field: int32 size_y = 5;
    */
   sizeY: number;
 };

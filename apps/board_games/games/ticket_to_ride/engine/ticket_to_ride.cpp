@@ -37,7 +37,7 @@ namespace board_games::ticket_to_ride {
         SPDLOG_DEBUG("[ticket_to_ride] Return new board");
         GameState game;
 
-        MapDefinition* map = game.mutable_map();
+        MapData* map = game.mutable_map();
         populate_usa_map(*map);
 
         BoardState* board = game.mutable_board();

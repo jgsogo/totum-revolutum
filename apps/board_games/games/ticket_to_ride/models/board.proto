@@ -2,7 +2,7 @@ syntax = "proto3";
 package board_games.ticket_to_ride;
 
 import "apps/board_games/games/ticket_to_ride/models/decks.proto";
-import "apps/board_games/games/ticket_to_ride/models/player.proto";
+
 
 message BoardState {
   // Train & destination decks

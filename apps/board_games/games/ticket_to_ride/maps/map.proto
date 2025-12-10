@@ -2,11 +2,13 @@ syntax = "proto3";
 package board_games.ticket_to_ride;
 
 message MapData {
-  repeated City cities = 1;
-  repeated Route routes = 2;
+  string name = 1;
 
-  int32 size_x = 3;
-  int32 size_y = 4;
+  repeated City cities = 2;
+  repeated Route routes = 3;
+
+  int32 size_x = 4;
+  int32 size_y = 5;
 }
 
 message City {

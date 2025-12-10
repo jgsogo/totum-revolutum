@@ -4,7 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
-import type { MapDefinition } from "./map_pb.js";
+import type { MapData } from "../maps/map_pb.js";
 import type { PlayerState } from "./player_pb.js";
 import type { BoardState } from "./board_pb.js";
 
@@ -18,9 +18,9 @@ export declare const file_apps_board_games_games_ticket_to_ride_models_game: Gen
  */
 export declare type GameState = Message<"board_games.ticket_to_ride.GameState"> & {
   /**
-   * @generated from field: board_games.ticket_to_ride.MapDefinition map = 1;
+   * @generated from field: board_games.ticket_to_ride.MapData map = 1;
    */
-  map?: MapDefinition;
+  map?: MapData;
 
   /**
    * Indexed or mapped by Participant.id

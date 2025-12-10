@@ -4,7 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
-import type { Color } from "./colors_pb.js";
+import type { Color } from "../maps/map_pb.js";
 
 /**
  * Describes the file apps/board_games/games/ticket_to_ride/models/cards.proto.
