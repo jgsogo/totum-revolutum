@@ -2,6 +2,7 @@ USA
 ===
 
 ![image](https://i.imgur.com/3USktsR.jpeg)
+![image](./usa.svg)
 
 
 Europe

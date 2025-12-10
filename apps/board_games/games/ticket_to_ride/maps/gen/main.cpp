@@ -57,6 +57,33 @@ std::string draw_arc(const Vec2& center, const double& radius, const std::string
     return os.str();
 }
 
+std::string color(const board_games::ticket_to_ride::Color color) {
+    switch (color) {
+    case board_games::ticket_to_ride::COLOR_UNKNOWN:
+        return "grey";
+    case board_games::ticket_to_ride::COLOR_BLUE:
+        return "blue";
+    case board_games::ticket_to_ride::COLOR_RED:
+        return "red";
+    case board_games::ticket_to_ride::COLOR_GREEN:
+        return "green";
+    case board_games::ticket_to_ride::COLOR_YELLOW:
+        return "yellow";
+    case board_games::ticket_to_ride::COLOR_BLACK:
+        return "black";
+    case board_games::ticket_to_ride::COLOR_WHITE:
+        return "white";
+    case board_games::ticket_to_ride::COLOR_ORANGE:
+        return "orange";
+    // case board_games::ticket_to_ride::COLOR_PURPLE:
+    case board_games::ticket_to_ride::COLOR_PINK:
+        return "pink";
+    case board_games::ticket_to_ride::Color_INT_MIN_SENTINEL_DO_NOT_USE_:
+    case board_games::ticket_to_ride::Color_INT_MAX_SENTINEL_DO_NOT_USE_:
+        return "grey";
+    }
+}
+
 std::string make_route_svg(const RouteData& route) {
     // We need to compute the arc with a given length between two points
     double arc_length =
@@ -118,16 +145,16 @@ std::string make_route_svg(const RouteData& route) {
     auto draw_carriages = [&os](Vec2 _center, double _radius, double _ang_start, double _ang_end, double _sgn,
                                 int n_carriages, std::string color) {
         // - draw circle for carriages
-        os << draw_arc(_center, _radius, color, _ang_start, _ang_end, 10, 2);
+        os << draw_arc(_center, _radius, "black", _ang_start, _ang_end, 10, 2);
 
         // - draw carriages
-        double total_length = (_ang_end - _ang_start) * _radius;
+        double total_length = std::abs(_ang_end - _ang_start) * _radius;
         double _carriage_length = (total_length - (n_carriages - 1) * gap) / n_carriages;
         double _carriage_ang = _carriage_length / _radius;
         double _gap_ang = gap / _radius;
 
         for (int i = 0; i < n_carriages; i++) {
-            double ang = _ang_start + (_carriage_ang / 2.0) + (i * _carriage_ang) + (i * _gap_ang);
+            double ang = _ang_start + _sgn * ((_carriage_ang / 2.0) + (i * _carriage_ang) + (i * _gap_ang));
             double x = _center.x + _radius * std::cos(ang);
             double y = _center.y + _radius * std::sin(ang);
 
@@ -137,7 +164,7 @@ std::string make_route_svg(const RouteData& route) {
 
             // Transform order: translate to pos, rotate(angle), then translate by -w/2,-h/2 to place centered
             os << "<rect width='" << carriage_width << "' height='" << _carriage_length << "' ";
-            os << " fill='rgba(50,120,200,0.8)' stroke='black' stroke-width='0.4'";
+            os << " fill='" << color << "' stroke='black' stroke-width='0.4'";
             os << " transform='";
             os << "translate(" << x << "," << y << ") ";
             os << "rotate(" << angdeg << ") ";
@@ -148,12 +175,15 @@ std::string make_route_svg(const RouteData& route) {
 
     if (route.colors.size() == 1) {
         draw_carriages(center, radius, ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, "black");
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
+                       color(route.colors[0]));
     } else if (route.colors.size() == 2) {
         draw_carriages(center, radius + double_offset, ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, "black");
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
+                       color(route.colors[0]));
         draw_carriages(center, radius - double_offset, ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, "grey");
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
+                       color(route.colors[1]));
     }
 
     os << "</g>\n";
