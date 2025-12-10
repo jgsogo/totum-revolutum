@@ -23,6 +23,16 @@ export declare type MapData = Message<"board_games.ticket_to_ride.MapData"> & {
    * @generated from field: repeated board_games.ticket_to_ride.Route routes = 2;
    */
   routes: Route[];
+
+  /**
+   * @generated from field: int32 size_x = 3;
+   */
+  sizeX: number;
+
+  /**
+   * @generated from field: int32 size_y = 4;
+   */
+  sizeY: number;
 };
 
 /**
@@ -44,6 +54,16 @@ export declare type City = Message<"board_games.ticket_to_ride.City"> & {
    * @generated from field: string name = 2;
    */
   name: string;
+
+  /**
+   * @generated from field: int32 pos_x = 3;
+   */
+  posX: number;
+
+  /**
+   * @generated from field: int32 pos_y = 4;
+   */
+  posY: number;
 };
 
 /**
@@ -80,6 +100,11 @@ export declare type Route = Message<"board_games.ticket_to_ride.Route"> & {
    * @generated from field: bool double_route = 5;
    */
   doubleRoute: boolean;
+
+  /**
+   * @generated from field: bool draw_ccw = 6;
+   */
+  drawCcw: boolean;
 };
 
 /**

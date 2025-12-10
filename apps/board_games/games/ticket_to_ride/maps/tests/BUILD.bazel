@@ -10,10 +10,10 @@ cc_test(
     ],
     args = [
         "--textproto",
-        "$(location //apps/board_games/games/ticket_to_ride/maps:usa)",
+        "$(location //apps/board_games/games/ticket_to_ride/maps:usa-input)",
     ],
     data = [
-        "//apps/board_games/games/ticket_to_ride/maps:usa",
+        "//apps/board_games/games/ticket_to_ride/maps:usa-input",
     ],
     deps = [
         "//apps/board_games/games/ticket_to_ride/maps/cpp:maps",

@@ -1,7 +1,8 @@
 USA
 ===
 
-![image](https://i.imgur.com/3USktsR.jpeg)
+Reference image: https://i.imgur.com/3USktsR.jpeg
+
 ![image](./usa.svg)
 
 

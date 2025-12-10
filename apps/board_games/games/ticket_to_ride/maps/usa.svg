@@ -1,7 +1,10 @@
-<svg width="1200" height="773" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="773" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <image href="https://i.imgur.com/3USktsR.jpeg" width="1200" height="773"/>
   <defs>
-    <circle r="8" fill="none" stroke-width="5" stroke="black" id="city-point"/>
+    <circle r='8' fill='black' stroke-width='1' stroke='black' id='city-point'/>
+    <g id="carriage">
+      <rect x="0" y="0" width="30" height="10"/>
+    </g>
   </defs>
 <!--Cities-->
   <use id="vancouver" href="#city-point" x="97" y="90"/>
@@ -12,4 +15,1137 @@
   <use id="calgary" href="#city-point" x="262" y="70"/>
   <use id="helena" href="#city-point" x="385" y="233"/>
   <use id="salt-lake-city" href="#city-point" x="298" y="388"/>
+  <use id="las-vegas" href="#city-point" x="228" y="526"/>
+  <use id="phoenix" href="#city-point" x="296" y="608"/>
+  <use id="winnipeg" href="#city-point" x="540" y="80"/>
+  <use id="denver" href="#city-point" x="460" y="430"/>
+  <use id="santa-fe" href="#city-point" x="450" y="540"/>
+  <use id="el-paso" href="#city-point" x="443" y="653"/>
+  <use id="duluth" href="#city-point" x="682" y="227"/>
+  <use id="omaha" href="#city-point" x="646" y="342"/>
+  <use id="kansas-city" href="#city-point" x="669" y="405"/>
+  <use id="oklahoma-city" href="#city-point" x="644" y="514"/>
+  <use id="dallas" href="#city-point" x="669" y="624"/>
+  <use id="houston" href="#city-point" x="721" y="674"/>
+  <use id="sault-ste-marie" href="#city-point" x="840" y="142"/>
+  <use id="chicago" href="#city-point" x="835" y="304"/>
+  <use id="saint-louis" href="#city-point" x="780" y="408"/>
+  <use id="little-rock" href="#city-point" x="757" y="518"/>
+  <use id="new-orleans" href="#city-point" x="840" y="665"/>
+  <use id="nashville" href="#city-point" x="897" y="457"/>
+  <use id="atlanta" href="#city-point" x="958" y="499"/>
+  <use id="toronto" href="#city-point" x="980" y="170"/>
+  <use id="pittsburgh" href="#city-point" x="998" y="285"/>
+  <use id="montreal" href="#city-point" x="1080" y="60"/>
+  <use id="boston" href="#city-point" x="1168" y="136"/>
+  <use id="new-york" href="#city-point" x="1103" y="229"/>
+  <use id="washington" href="#city-point" x="1114" y="342"/>
+  <use id="raleigh" href="#city-point" x="1040" y="425"/>
+  <use id="charleston" href="#city-point" x="1077" y="508"/>
+  <use id="miami" href="#city-point" x="1115" y="705"/>
+<!--Routes-->
+
+<g id="r-vancouver-seattle">
+<path stroke='green' stroke-width='1' fill='transparent' d='M97 90 97.5376 92.6119 98.0261 95.2334 98.4652 97.8636 98.855 100.502 99.1951 103.146 99.4856 105.797 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M98.5136 141.717 98.0802 144.348 97.5975 146.971 97.0656 149.584 96.4849 152.186 95.8553 154.778 95.1773 157.357 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M107.446 105.001 107.777 108.792 108.011 112.59 108.15 116.394 108.192 120.199 108.137 124.004 107.986 127.807 107.738 131.605 107.394 135.395 106.955 139.175 106.419 142.943 '/>
+<circle r='5' fill='red' cx='108.137' cy='124.004' />
+<rect width='10' height='38.0583'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(108.137,124.004) rotate(1.55011) translate(-5,-19.0292)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M91.5254 106.594 91.821 109.981 92.0307 113.374 92.1543 116.772 92.1916 120.172 92.1427 123.572 92.0077 126.969 91.7865 130.362 91.4794 133.748 91.0865 137.125 90.6081 140.491 '/>
+<circle r='5' fill='red' cx='92.1427' cy='123.572' />
+<rect width='10' height='34.0005'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(92.1427,123.572) rotate(1.55011) translate(-5,-17.0003)'/>
+</g>
+
+<g id="r-calgary-vancouver">
+<path stroke='green' stroke-width='1' fill='transparent' d='M262 70 259.503 70.9358 256.999 71.8524 254.488 72.7497 251.97 73.6277 249.445 74.4864 246.914 75.3256 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M114.548 91.6855 111.888 91.4878 109.231 91.2697 106.575 91.0312 103.921 90.7722 101.269 90.4929 98.619 90.1933 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M246.914 75.3256 234.081 79.2526 221.107 82.6806 208.009 85.6045 194.808 88.0199 181.524 89.9232 168.176 91.3116 154.784 92.1829 141.369 92.5359 127.95 92.37 114.548 91.6855 '/>
+<circle r='5' fill='red' cx='226.737' cy='81.259' />
+<rect width='10' height='42.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(226.737,81.259) rotate(75.3493) translate(-5,-21.0346)'/>
+<circle r='5' fill='red' cx='181.524' cy='89.9232' />
+<rect width='10' height='42.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(181.524,89.9232) rotate(82.9542) translate(-5,-21.0346)'/>
+<circle r='5' fill='red' cx='135.562' cy='92.5278' />
+<rect width='10' height='42.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(135.562,92.5278) rotate(90.5591) translate(-5,-21.0346)'/>
+</g>
+
+<g id="r-seattle-portland">
+<path stroke='green' stroke-width='1' fill='transparent' d='M95 158 94.5726 160.632 94.0974 163.256 93.5748 165.871 93.0048 168.476 92.3876 171.07 91.7235 173.653 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M77.1237 209.035 75.7734 211.334 74.3815 213.609 72.9486 215.858 71.4752 218.08 69.9616 220.276 68.4085 222.443 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M99.453 175.715 98.3585 179.612 97.1627 183.479 95.8663 187.313 94.4702 191.111 92.9754 194.873 91.3829 198.593 89.6938 202.271 87.9092 205.904 86.0304 209.489 84.0586 213.023 '/>
+<circle r='5' fill='red' cx='92.9754' cy='194.873' />
+<rect width='10' height='40.4739'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(92.9754,194.873) rotate(22.4227) translate(-5,-20.2369)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M83.9939 171.59 83.0124 175.084 81.9401 178.552 80.7775 181.99 79.5255 185.397 78.1851 188.77 76.757 192.106 75.2422 195.404 73.6419 198.662 71.9571 201.877 70.1888 205.046 '/>
+<circle r='5' fill='red' cx='78.1851' cy='188.77' />
+<rect width='10' height='36.2955'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(78.1851,188.77) rotate(22.4227) translate(-5,-18.1477)'/>
+</g>
+
+<g id="r-calgary-seattle">
+<path stroke='green' stroke-width='1' fill='transparent' d='M262 70 260.001 71.7651 257.99 73.5166 255.968 75.2545 253.933 76.9787 251.888 78.6891 249.83 80.3856 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M112.223 153.31 109.664 154.06 107.1 154.793 104.531 155.508 101.958 156.206 99.3791 156.887 96.7962 157.55 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M249.83 80.3856 237.507 90.0741 224.809 99.2651 211.755 107.944 198.366 116.097 184.664 123.711 170.67 130.775 156.406 137.276 141.895 143.205 127.16 148.553 112.223 153.31 '/>
+<circle r='5' fill='red' cx='235.572' cy='91.5253' />
+<rect width='10' height='36.1918'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(235.572,91.5253) rotate(53.316) translate(-5,-18.0959)'/>
+<circle r='5' fill='red' cx='202.173' cy='113.853' />
+<rect width='10' height='36.1918'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(202.173,113.853) rotate(59.1577) translate(-5,-18.0959)'/>
+<circle r='5' fill='red' cx='166.675' cy='132.665' />
+<rect width='10' height='36.1918'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(166.675,132.665) rotate(64.9995) translate(-5,-18.0959)'/>
+<circle r='5' fill='red' cx='129.447' cy='147.766' />
+<rect width='10' height='36.1918'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(129.447,147.766) rotate(70.8413) translate(-5,-18.0959)'/>
+</g>
+
+<g id="r-helena-seattle">
+<path stroke='green' stroke-width='1' fill='transparent' d='M385 233 382.334 232.964 379.667 232.917 377.001 232.858 374.336 232.789 371.67 232.707 369.005 232.615 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M111.8 166.74 109.419 165.54 107.042 164.33 104.671 163.11 102.305 161.88 99.9446 160.64 97.5892 159.389 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M369.005 232.615 342.298 231.057 315.683 228.359 289.207 224.525 262.919 219.563 236.867 213.481 211.1 206.291 185.663 198.006 160.603 188.641 135.968 178.212 111.8 166.74 '/>
+<circle r='5' fill='red' cx='348.407' cy='231.514' />
+<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(348.407,231.514) rotate(94.0022) translate(-5,-20.6284)'/>
+<circle r='5' fill='red' cx='303.414' cy='226.726' />
+<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(303.414,226.726) rotate(98.1476) translate(-5,-20.6284)'/>
+<circle r='5' fill='red' cx='258.885' cy='218.698' />
+<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(258.885,218.698) rotate(102.293) translate(-5,-20.6284)'/>
+<circle r='5' fill='red' cx='215.053' cy='207.472' />
+<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(215.053,207.472) rotate(106.438) translate(-5,-20.6284)'/>
+<circle r='5' fill='red' cx='172.147' cy='193.106' />
+<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(172.147,193.106) rotate(110.584) translate(-5,-20.6284)'/>
+<circle r='5' fill='red' cx='130.391' cy='175.677' />
+<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(130.391,175.677) rotate(114.729) translate(-5,-20.6284)'/>
+</g>
+
+<g id="r-portland-san-francisco">
+<path stroke='green' stroke-width='1' fill='transparent' d='M68 223 67.1904 225.541 66.3941 228.086 65.611 230.635 64.8411 233.188 64.0846 235.745 63.3413 238.306 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M48.1662 449.811 48.5362 452.452 48.92 455.091 49.3175 457.728 49.7286 460.363 50.1535 462.995 50.592 465.626 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M55.6526 236.096 50.0966 257.063 45.4184 278.243 41.626 299.6 38.7261 321.095 36.7237 342.693 35.6223 364.356 35.4237 386.045 36.1283 407.724 37.7349 429.355 40.2408 450.901 '/>
+<circle r='5' fill='red' cx='50.4765' cy='255.509' />
+<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(50.4765,255.509) rotate(-166.175) translate(-5,-20.0921)'/>
+<circle r='5' fill='red' cx='41.7501' cy='298.809' />
+<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(41.7501,298.809) rotate(-171.036) translate(-5,-20.0921)'/>
+<circle r='5' fill='red' cx='36.7237' cy='342.693' />
+<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(36.7237,342.693) rotate(-175.896) translate(-5,-20.0921)'/>
+<circle r='5' fill='red' cx='35.4336' cy='386.845' />
+<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(35.4336,386.845) rotate(-180.757) translate(-5,-20.0921)'/>
+<circle r='5' fill='red' cx='37.8891' cy='430.948' />
+<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(37.8891,430.948) rotate(-185.617) translate(-5,-20.0921)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M71.0301 240.516 65.6448 260.839 61.1103 281.368 57.4344 302.068 54.6236 322.904 52.6827 343.838 51.6151 364.835 51.4226 385.859 52.1056 406.872 53.6629 427.838 56.0917 448.722 '/>
+<circle r='5' fill='red' cx='66.0248' cy='259.284' />
+<rect width='10' height='38.8515'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(66.0248,259.284) rotate(-166.17) translate(-5,-19.4257)'/>
+<circle r='5' fill='red' cx='57.5585' cy='301.278' />
+<rect width='10' height='38.8515'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(57.5585,301.278) rotate(-171.033) translate(-5,-19.4257)'/>
+<circle r='5' fill='red' cx='52.6827' cy='343.838' />
+<rect width='10' height='38.8515'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(52.6827,343.838) rotate(-175.896) translate(-5,-19.4257)'/>
+<circle r='5' fill='red' cx='51.4326' cy='386.659' />
+<rect width='10' height='38.8515'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(51.4326,386.659) rotate(-180.759) translate(-5,-19.4257)'/>
+<circle r='5' fill='red' cx='53.8171' cy='429.431' />
+<rect width='10' height='38.8515'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(53.8171,429.431) rotate(-185.622) translate(-5,-19.4257)'/>
+</g>
+
+<g id="r-salt-lake-city-portland">
+<path stroke='green' stroke-width='1' fill='transparent' d='M298 388 296.264 385.976 294.519 383.96 292.764 381.951 291.001 379.951 289.229 377.959 287.447 375.974 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M85.32 230.25 82.8744 229.186 80.424 228.134 77.9689 227.094 75.5091 226.064 73.0447 225.045 70.5757 224.037 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M287.447 375.974 270.243 357.692 252.278 340.156 233.585 323.399 214.197 307.451 194.149 292.34 173.478 278.094 152.221 264.739 130.416 252.299 108.102 240.795 85.32 230.25 '/>
+<circle r='5' fill='red' cx='274.322' cy='361.887' />
+<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(274.322,361.887) rotate(-43.9089) translate(-5,-19.2553)'/>
+<circle r='5' fill='red' cx='243.765' cy='332.346' />
+<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(243.765,332.346) rotate(-48.0294) translate(-5,-19.2553)'/>
+<circle r='5' fill='red' cx='211.164' cy='305.078' />
+<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(211.164,305.078) rotate(-52.1499) translate(-5,-19.2553)'/>
+<circle r='5' fill='red' cx='176.688' cy='280.222' />
+<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(176.688,280.222) rotate(-56.2703) translate(-5,-19.2553)'/>
+<circle r='5' fill='red' cx='140.516' cy='257.908' />
+<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(140.516,257.908) rotate(-60.3908) translate(-5,-19.2553)'/>
+<circle r='5' fill='red' cx='102.833' cy='238.251' />
+<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(102.833,238.251) rotate(-64.5113) translate(-5,-19.2553)'/>
+</g>
+
+<g id="r-san-francisco-los-angeles">
+<path stroke='green' stroke-width='1' fill='transparent' d='M51 468 51.9538 470.49 52.9274 472.973 53.9207 475.448 54.9337 477.914 55.9664 480.373 57.0186 482.823 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M129.164 588.001 131.071 589.865 132.993 591.714 134.929 593.547 136.88 595.365 138.846 597.167 140.826 598.954 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M49.6803 486.009 55.1424 497.958 61.0583 509.69 67.4195 521.186 74.2165 532.43 81.4394 543.405 89.0776 554.095 97.1197 564.485 105.554 574.559 114.368 584.302 123.549 593.7 '/>
+<circle r='5' fill='red' cx='58.4308' cy='504.617' />
+<rect width='10' height='41.1314'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(58.4308,504.617) rotate(153.095) translate(-5,-20.5657)'/>
+<circle r='5' fill='red' cx='81.4394' cy='543.405' />
+<rect width='10' height='41.1314'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(81.4394,543.405) rotate(145.552) translate(-5,-20.5657)'/>
+<circle r='5' fill='red' cx='109.341' cy='578.837' />
+<rect width='10' height='41.1314'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(109.341,578.837) rotate(138.009) translate(-5,-20.5657)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M64.3569 479.637 69.564 491.029 75.2039 502.213 81.2682 513.172 87.748 523.891 94.6337 534.354 101.915 544.546 109.582 554.45 117.623 564.054 126.026 573.343 134.778 582.302 '/>
+<circle r='5' fill='red' cx='72.6708' cy='497.321' />
+<rect width='10' height='39.0872'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(72.6708,497.321) rotate(153.106) translate(-5,-19.5436)'/>
+<circle r='5' fill='red' cx='94.6337' cy='534.354' />
+<rect width='10' height='39.0872'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(94.6337,534.354) rotate(145.552) translate(-5,-19.5436)'/>
+<circle r='5' fill='red' cx='121.274' cy='568.179' />
+<rect width='10' height='39.0872'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(121.274,568.179) rotate(137.998) translate(-5,-19.5436)'/>
+</g>
+
+<g id="r-salt-lake-city-san-francisco">
+<path stroke='green' stroke-width='1' fill='transparent' d='M298 388 295.73 389.4 293.453 390.788 291.17 392.165 288.88 393.531 286.583 394.886 284.279 396.229 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M69.4734 466.36 66.8209 466.635 64.1671 466.896 61.512 467.145 58.8558 467.38 56.1984 467.603 53.54 467.812 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M288.292 403.15 268.073 414.315 247.402 424.621 226.317 434.05 204.855 442.586 183.053 450.214 160.951 456.92 138.586 462.693 115.999 467.522 93.2295 471.398 70.317 474.315 '/>
+<circle r='5' fill='red' cx='269.488' cy='413.569' />
+<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(269.488,413.569) rotate(62.1303) translate(-5,-21.4991)'/>
+<circle r='5' fill='red' cx='227.054' cy='433.738' />
+<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(227.054,433.738) rotate(67.0246) translate(-5,-21.4991)'/>
+<circle r='5' fill='red' cx='183.053' cy='450.214' />
+<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(183.053,450.214) rotate(71.919) translate(-5,-21.4991)'/>
+<circle r='5' fill='red' cx='137.808' cy='462.876' />
+<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(137.808,462.876) rotate(76.8133) translate(-5,-21.4991)'/>
+<circle r='5' fill='red' cx='91.6465' cy='471.631' />
+<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(91.6465,471.631) rotate(81.7077) translate(-5,-21.4991)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M280.266 389.309 260.634 400.149 240.565 410.155 220.093 419.31 199.255 427.598 178.087 435.004 156.628 441.515 134.914 447.12 112.983 451.808 90.8758 455.572 68.6297 458.405 '/>
+<circle r='5' fill='red' cx='262.05' cy='399.403' />
+<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(262.05,399.403) rotate(62.1253) translate(-5,-20.8274)'/>
+<circle r='5' fill='red' cx='220.83' cy='418.999' />
+<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(220.83,418.999) rotate(67.0221) translate(-5,-20.8274)'/>
+<circle r='5' fill='red' cx='178.087' cy='435.004' />
+<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(178.087,435.004) rotate(71.919) translate(-5,-20.8274)'/>
+<circle r='5' fill='red' cx='134.135' cy='447.303' />
+<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(134.135,447.303) rotate(76.8158) translate(-5,-20.8274)'/>
+<circle r='5' fill='red' cx='89.2929' cy='455.805' />
+<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(89.2929,455.805) rotate(81.7127) translate(-5,-20.8274)'/>
+</g>
+
+<g id="r-las-vegas-los-angeles">
+<path stroke='green' stroke-width='1' fill='transparent' d='M228 526 225.628 527.218 223.269 528.463 220.925 529.734 218.596 531.032 216.281 532.355 213.981 533.705 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M152.417 586.427 150.729 588.492 149.066 590.576 147.425 592.679 145.809 594.799 144.216 596.938 142.647 599.095 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M213.981 533.705 207.052 537.986 200.274 542.503 193.655 547.251 187.204 552.223 180.927 557.414 174.833 562.817 168.928 568.427 163.219 574.237 157.713 580.239 152.417 586.427 '/>
+<circle r='5' fill='red' cx='197.758' cy='544.267' />
+<rect width='10' height='38.7274'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(197.758,544.267) rotate(-125.41) translate(-5,-19.3637)'/>
+<circle r='5' fill='red' cx='165.349' cy='572.022' />
+<rect width='10' height='38.7274'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(165.349,572.022) rotate(-135.743) translate(-5,-19.3637)'/>
+</g>
+
+<g id="r-phoenix-los-angeles">
+<path stroke='green' stroke-width='1' fill='transparent' d='M296 608 293.444 607.239 290.882 606.498 288.315 605.78 285.741 605.082 283.161 604.406 280.576 603.751 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M159.279 597.164 156.639 597.535 154.001 597.928 151.367 598.343 148.736 598.779 146.109 599.238 143.486 599.718 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M280.576 603.751 268.664 601.024 256.658 598.751 244.573 596.936 232.429 595.58 220.241 594.686 208.029 594.255 195.809 594.288 183.599 594.784 171.417 595.743 159.279 597.164 '/>
+<circle r='5' fill='red' cx='261.98' cy='599.701' />
+<rect width='10' height='38.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(261.98,599.701) rotate(-79.4067) translate(-5,-19.0346)'/>
+<circle r='5' fill='red' cx='220.241' cy='594.686' />
+<rect width='10' height='38.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(220.241,594.686) rotate(-86.8917) translate(-5,-19.0346)'/>
+<circle r='5' fill='red' cx='178.205' cy='595.151' />
+<rect width='10' height='38.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(178.205,595.151) rotate(-94.3767) translate(-5,-19.0346)'/>
+</g>
+
+<g id="r-el-paso-los-angeles">
+<path stroke='green' stroke-width='1' fill='transparent' d='M443 653 440.339 653.174 437.677 653.337 435.015 653.489 432.352 653.63 429.689 653.76 427.025 653.879 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M159.489 607.419 157.021 606.409 154.557 605.389 152.098 604.358 149.642 603.318 147.192 602.267 144.745 601.205 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M427.025 653.879 399.67 654.453 372.315 653.854 345.012 652.083 317.809 649.144 290.757 645.041 263.906 639.783 237.306 633.379 211.004 625.841 185.049 617.182 159.489 607.419 '/>
+<circle r='5' fill='red' cx='405.897' cy='654.425' />
+<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(405.897,654.425) rotate(89.467) translate(-5,-21.1359)'/>
+<circle r='5' fill='red' cx='359.652' cy='653.179' />
+<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(359.652,653.179) rotate(93.6209) translate(-5,-21.1359)'/>
+<circle r='5' fill='red' cx='313.619' cy='648.586' />
+<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(313.619,648.586) rotate(97.7748) translate(-5,-21.1359)'/>
+<circle r='5' fill='red' cx='268.039' cy='640.671' />
+<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(268.039,640.671) rotate(101.929) translate(-5,-21.1359)'/>
+<circle r='5' fill='red' cx='223.153' cy='629.475' />
+<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(223.153,629.475) rotate(106.082) translate(-5,-21.1359)'/>
+<circle r='5' fill='red' cx='179.196' cy='615.057' />
+<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(179.196,615.057) rotate(110.236) translate(-5,-21.1359)'/>
+</g>
+
+<g id="r-calgary-helena">
+<path stroke='green' stroke-width='1' fill='transparent' d='M262 70 264.064 71.6886 266.117 73.39 268.16 75.1043 270.192 76.8313 272.213 78.571 274.223 80.3232 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M377.565 216.605 378.71 219.014 379.84 221.429 380.954 223.852 382.054 226.281 383.138 228.717 384.207 231.16 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M274.223 80.3232 286.935 91.9374 299.168 104.055 310.902 116.657 322.118 129.723 332.797 143.23 342.921 157.158 352.476 171.483 361.444 186.182 369.812 201.231 377.565 216.605 '/>
+<circle r='5' fill='red' cx='288.961' cy='93.8775' />
+<rect width='10' height='40.0502'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(288.961,93.8775) rotate(-46.0508) translate(-5,-20.0251)'/>
+<circle r='5' fill='red' cx='319.041' cy='126.031' />
+<rect width='10' height='40.0502'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(319.041,126.031) rotate(-40.1322) translate(-5,-20.0251)'/>
+<circle r='5' fill='red' cx='345.646' cy='161.116' />
+<rect width='10' height='40.0502'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(345.646,161.116) rotate(-34.2135) translate(-5,-20.0251)'/>
+<circle r='5' fill='red' cx='368.49' cy='198.756' />
+<rect width='10' height='40.0502'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(368.49,198.756) rotate(-28.2948) translate(-5,-20.0251)'/>
+</g>
+
+<g id="r-winnipeg-calgary">
+<path stroke='green' stroke-width='1' fill='transparent' d='M540 80 537.434 79.2747 534.864 78.5613 532.292 77.8596 529.716 77.1698 527.137 76.4917 524.555 75.8256 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M280.392 66.4685 277.767 66.9351 275.143 67.4137 272.522 67.9044 269.903 68.4071 267.287 68.9218 264.673 69.4486 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M524.555 75.8256 500.581 70.2375 476.392 65.6701 452.032 62.1316 427.543 59.6282 402.971 58.1646 378.358 57.7433 353.75 58.3651 329.19 60.0289 304.723 62.7316 280.392 66.4685 '/>
+<circle r='5' fill='red' cx='506.221' cy='71.456' />
+<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(506.221,71.456) rotate(-77.524) translate(-5,-18.8483)'/>
+<circle r='5' fill='red' cx='465.22' cy='63.9164' />
+<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(465.22,63.9164) rotate(-81.6365) translate(-5,-18.8483)'/>
+<circle r='5' fill='red' cx='423.785' cy='59.3366' />
+<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(423.785,59.3366) rotate(-85.7491) translate(-5,-18.8483)'/>
+<circle r='5' fill='red' cx='382.128' cy='57.7402' />
+<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(382.128,57.7402) rotate(-89.8616) translate(-5,-18.8483)'/>
+<circle r='5' fill='red' cx='340.464' cy='59.1353' />
+<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(340.464,59.1353) rotate(-93.9741) translate(-5,-18.8483)'/>
+<circle r='5' fill='red' cx='299.007' cy='63.5148' />
+<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(299.007,63.5148) rotate(-98.0866) translate(-5,-18.8483)'/>
+</g>
+
+<g id="r-helena-salt-lake-city">
+<path stroke='green' stroke-width='1' fill='transparent' d='M385 233 384.28 235.568 383.542 238.13 382.786 240.687 382.011 243.239 381.218 245.785 380.406 248.325 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M309.823 374.771 308.087 376.795 306.336 378.807 304.571 380.806 302.791 382.792 300.998 384.765 299.19 386.725 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M380.406 248.325 375.65 262.101 370.357 275.679 364.535 289.04 358.193 302.161 351.341 315.024 343.989 327.607 336.149 339.892 327.832 351.86 319.053 363.493 309.823 374.771 '/>
+<circle r='5' fill='red' cx='372.671' cy='269.937' />
+<rect width='10' height='45.9157'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(372.671,269.937) rotate(21.4656) translate(-5,-22.9578)'/>
+<circle r='5' fill='red' cx='351.341' cy='315.024' />
+<rect width='10' height='45.9157'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(351.341,315.024) rotate(29.1705) translate(-5,-22.9578)'/>
+<circle r='5' fill='red' cx='324.158' cy='356.844' />
+<rect width='10' height='45.9157'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(324.158,356.844) rotate(36.8754) translate(-5,-22.9578)'/>
+</g>
+
+<g id="r-winnipeg-helena">
+<path stroke='green' stroke-width='1' fill='transparent' d='M540 80 538.599 82.2691 537.185 84.53 535.758 86.7826 534.318 89.0268 532.864 91.2624 531.397 93.4895 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M400.393 223.412 398.154 224.86 395.907 226.295 393.651 227.717 391.386 229.125 389.114 230.521 386.833 231.903 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M531.397 93.4895 520.82 108.762 509.628 123.591 497.839 137.949 485.474 151.815 472.553 165.164 459.097 177.974 445.13 190.223 430.674 201.892 415.754 212.961 400.393 223.412 '/>
+<circle r='5' fill='red' cx='518.968' cy='111.304' />
+<rect width='10' height='43.4484'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(518.968,111.304) rotate(36.2714) translate(-5,-21.7242)'/>
+<circle r='5' fill='red' cx='488.954' cy='148.026' />
+<rect width='10' height='43.4484'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(488.954,148.026) rotate(42.2488) translate(-5,-21.7242)'/>
+<circle r='5' fill='red' cx='455.28' cy='181.423' />
+<rect width='10' height='43.4484'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(455.28,181.423) rotate(48.2262) translate(-5,-21.7242)'/>
+<circle r='5' fill='red' cx='418.311' cy='211.131' />
+<rect width='10' height='43.4484'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(418.311,211.131) rotate(54.2035) translate(-5,-21.7242)'/>
+</g>
+
+<g id="r-denver-helena">
+<path stroke='green' stroke-width='1' fill='transparent' d='M460 430 458.489 427.803 456.991 425.597 455.506 423.381 454.035 421.157 452.578 418.924 451.134 416.682 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M387.566 250.883 387.141 248.251 386.732 245.616 386.339 242.978 385.962 240.338 385.601 237.696 385.256 235.052 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M451.134 416.682 441.806 401.43 433.105 385.812 425.046 369.854 417.641 353.581 410.903 337.021 404.843 320.202 399.471 303.15 394.796 285.894 390.825 268.462 387.566 250.883 '/>
+<circle r='5' fill='red' cx='440.317' cy='398.861' />
+<rect width='10' height='41.6984'  fill='green' stroke='black' stroke-width='0.4' transform='translate(440.317,398.861) rotate(150.101) translate(-5,-20.8492)'/>
+<circle r='5' fill='red' cx='419.633' cy='358.134' />
+<rect width='10' height='41.6984'  fill='green' stroke='black' stroke-width='0.4' transform='translate(419.633,358.134) rotate(156.049) translate(-5,-20.8492)'/>
+<circle r='5' fill='red' cx='403.28' cy='315.484' />
+<rect width='10' height='41.6984'  fill='green' stroke='black' stroke-width='0.4' transform='translate(403.28,315.484) rotate(161.997) translate(-5,-20.8492)'/>
+<circle r='5' fill='red' cx='391.436' cy='271.368' />
+<rect width='10' height='41.6984'  fill='green' stroke='black' stroke-width='0.4' transform='translate(391.436,271.368) rotate(167.945) translate(-5,-20.8492)'/>
+</g>
+
+<g id="r-duluth-helena">
+<path stroke='green' stroke-width='1' fill='transparent' d='M682 227 679.423 227.685 676.843 228.359 674.26 229.022 671.674 229.674 669.085 230.315 666.494 230.944 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M403.512 236.875 400.895 236.363 398.28 235.839 395.668 235.305 393.058 234.759 390.45 234.202 387.844 233.634 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M666.494 230.944 640.599 236.594 614.487 241.133 588.204 244.552 561.8 246.846 535.321 248.009 508.817 248.04 482.336 246.94 455.926 244.709 429.635 241.352 403.512 236.875 '/>
+<circle r='5' fill='red' cx='646.564' cy='235.395' />
+<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(646.564,235.395) rotate(78.3536) translate(-5,-20.4217)'/>
+<circle r='5' fill='red' cx='602.355' cy='242.853' />
+<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(602.355,242.853) rotate(82.4954) translate(-5,-20.4217)'/>
+<circle r='5' fill='red' cx='557.723' cy='247.099' />
+<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(557.723,247.099) rotate(86.6372) translate(-5,-20.4217)'/>
+<circle r='5' fill='red' cx='512.901' cy='248.109' />
+<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(512.901,248.109) rotate(90.779) translate(-5,-20.4217)'/>
+<circle r='5' fill='red' cx='468.123' cy='245.88' />
+<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(468.123,245.88) rotate(94.9208) translate(-5,-20.4217)'/>
+<circle r='5' fill='red' cx='423.622' cy='240.423' />
+<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(423.622,240.423) rotate(99.0625) translate(-5,-20.4217)'/>
+</g>
+
+<g id="r-omaha-helena">
+<path stroke='green' stroke-width='1' fill='transparent' d='M646 342 643.366 341.585 640.733 341.159 638.103 340.721 635.475 340.271 632.848 339.809 630.224 339.335 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M400.263 243.931 398.074 242.408 395.892 240.875 393.717 239.333 391.549 237.78 389.388 236.218 387.234 234.646 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M630.224 339.335 605.652 334.299 581.316 328.224 557.26 321.122 533.527 313.004 510.16 303.887 487.201 293.785 464.692 282.718 442.673 270.705 421.184 257.769 400.263 243.931 '/>
+<circle r='5' fill='red' cx='607.213' cy='334.651' />
+<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(607.213,334.651) rotate(102.644) translate(-5,-23.4846)'/>
+<circle r='5' fill='red' cx='558.022' cy='321.364' />
+<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(558.022,321.364) rotate(107.588) translate(-5,-23.4846)'/>
+<circle r='5' fill='red' cx='510.16' cy='303.887' />
+<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(510.16,303.887) rotate(112.532) translate(-5,-23.4846)'/>
+<circle r='5' fill='red' cx='463.982' cy='282.349' />
+<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(463.982,282.349) rotate(117.476) translate(-5,-23.4846)'/>
+<circle r='5' fill='red' cx='419.832' cy='256.913' />
+<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(419.832,256.913) rotate(122.42) translate(-5,-23.4846)'/>
+</g>
+
+<g id="r-salt-lake-city-las-vegas">
+<path stroke='green' stroke-width='1' fill='transparent' d='M298 388 297.387 390.595 296.754 393.186 296.098 395.77 295.422 398.35 294.724 400.924 294.005 403.491 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M239.07 512.425 237.432 514.53 235.778 516.622 234.106 518.699 232.417 520.763 230.711 522.812 228.988 524.848 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M294.005 403.491 290.423 415.23 286.398 426.825 281.935 438.258 277.042 449.513 271.725 460.575 265.991 471.426 259.85 482.052 253.309 492.437 246.379 502.567 239.07 512.425 '/>
+<circle r='5' fill='red' cx='288.231' cy='421.719' />
+<rect width='10' height='38.2462'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(288.231,421.719) rotate(19.271) translate(-5,-19.1231)'/>
+<circle r='5' fill='red' cx='271.725' cy='460.575' />
+<rect width='10' height='38.2462'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(271.725,460.575) rotate(26.7617) translate(-5,-19.1231)'/>
+<circle r='5' fill='red' cx='250.294' cy='496.947' />
+<rect width='10' height='38.2462'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(250.294,496.947) rotate(34.2524) translate(-5,-19.1231)'/>
+</g>
+
+<g id="r-denver-salt-lake-city">
+<path stroke='green' stroke-width='1' fill='transparent' d='M460 430 457.334 429.958 454.668 429.896 452.002 429.813 449.338 429.71 446.674 429.587 444.011 429.444 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M313.725 395.992 311.323 394.835 308.929 393.66 306.544 392.466 304.169 391.255 301.803 390.025 299.446 388.777 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M443.55 437.43 429.746 436.365 415.995 434.766 402.315 432.635 388.728 429.976 375.254 426.794 361.914 423.092 348.727 418.876 335.713 414.153 322.891 408.929 310.282 403.213 '/>
+<circle r='5' fill='red' cx='421.895' cy='435.518' />
+<rect width='10' height='43.4848'  fill='red' stroke='black' stroke-width='0.4' transform='translate(421.895,435.518) rotate(96.7893) translate(-5,-21.7424)'/>
+<circle r='5' fill='red' cx='375.254' cy='426.794' />
+<rect width='10' height='43.4848'  fill='red' stroke='black' stroke-width='0.4' transform='translate(375.254,426.794) rotate(104.4) translate(-5,-21.7424)'/>
+<circle r='5' fill='red' cx='330.179' cy='411.969' />
+<rect width='10' height='43.4848'  fill='red' stroke='black' stroke-width='0.4' transform='translate(330.179,411.969) rotate(112.01) translate(-5,-21.7424)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M444.472 421.457 431.287 420.439 418.15 418.911 405.083 416.876 392.104 414.337 379.233 411.296 366.49 407.76 353.893 403.733 341.461 399.221 329.214 394.232 317.169 388.771 '/>
+<circle r='5' fill='red' cx='423.846' cy='419.637' />
+<rect width='10' height='41.4192'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(423.846,419.637) rotate(96.7793) translate(-5,-20.7096)'/>
+<circle r='5' fill='red' cx='379.233' cy='411.296' />
+<rect width='10' height='41.4192'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(379.233,411.296) rotate(104.4) translate(-5,-20.7096)'/>
+<circle r='5' fill='red' cx='336.121' cy='397.113' />
+<rect width='10' height='41.4192'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(336.121,397.113) rotate(112.02) translate(-5,-20.7096)'/>
+</g>
+
+<g id="r-denver-phoenix">
+<path stroke='green' stroke-width='1' fill='transparent' d='M460 430 457.78 431.477 455.568 432.966 453.363 434.467 451.167 435.979 448.979 437.503 446.798 439.039 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M305.143 592.063 303.781 594.355 302.43 596.655 301.091 598.961 299.765 601.275 298.451 603.595 297.149 605.922 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M446.798 439.039 429.915 451.53 413.565 464.711 397.777 478.561 382.578 493.054 367.994 508.166 354.05 523.871 340.771 540.142 328.179 556.951 316.296 574.268 305.143 592.063 '/>
+<circle r='5' fill='red' cx='431.183' cy='450.554' />
+<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(431.183,450.554) rotate(-127.504) translate(-5,-19.4033)'/>
+<circle r='5' fill='red' cx='398.368' cy='478.021' />
+<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(398.368,478.021) rotate(-132.357) translate(-5,-19.4033)'/>
+<circle r='5' fill='red' cx='367.994' cy='508.166' />
+<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(367.994,508.166) rotate(-137.21) translate(-5,-19.4033)'/>
+<circle r='5' fill='red' cx='340.278' cy='540.773' />
+<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(340.278,540.773) rotate(-142.062) translate(-5,-19.4033)'/>
+<circle r='5' fill='red' cx='315.421' cy='575.607' />
+<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(315.421,575.607) rotate(-146.915) translate(-5,-19.4033)'/>
+</g>
+
+<g id="r-santa-fe-phoenix">
+<path stroke='green' stroke-width='1' fill='transparent' d='M450 540 447.883 541.622 445.754 543.228 443.613 544.817 441.46 546.391 439.295 547.947 437.118 549.488 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M313.301 604.509 310.699 605.092 308.092 605.655 305.482 606.199 302.867 606.722 300.248 607.226 297.626 607.71 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M437.118 549.488 425.81 557.104 414.215 564.275 402.351 570.991 390.235 577.243 377.885 583.02 365.321 588.313 352.562 593.116 339.625 597.42 326.532 601.22 313.301 604.509 '/>
+<circle r='5' fill='red' cx='419.248' cy='561.238' />
+<rect width='10' height='42.7816'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(419.248,561.238) rotate(58.4167) translate(-5,-21.3908)'/>
+<circle r='5' fill='red' cx='377.885' cy='583.02' />
+<rect width='10' height='42.7816'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(377.885,583.02) rotate(66.0412) translate(-5,-21.3908)'/>
+<circle r='5' fill='red' cx='333.998' cy='599.121' />
+<rect width='10' height='42.7816'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(333.998,599.121) rotate(73.6656) translate(-5,-21.3908)'/>
+</g>
+
+<g id="r-phoenix-el-paso">
+<path stroke='green' stroke-width='1' fill='transparent' d='M296 608 298.294 609.359 300.6 610.699 302.917 612.019 305.244 613.32 307.583 614.602 309.932 615.865 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M425.554 651.556 428.205 651.838 430.86 652.097 433.516 652.334 436.174 652.549 438.833 652.742 441.494 652.913 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M309.932 615.865 320.784 621.378 331.838 626.476 343.077 631.151 354.485 635.397 366.046 639.207 377.743 642.577 389.559 645.5 401.478 647.973 413.482 649.993 425.554 651.556 '/>
+<circle r='5' fill='red' cx='326.919' cy='624.27' />
+<rect width='10' height='37.9112'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(326.919,624.27) rotate(114.635) translate(-5,-18.9556)'/>
+<circle r='5' fill='red' cx='366.046' cy='639.207' />
+<rect width='10' height='37.9112'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(366.046,639.207) rotate(107.155) translate(-5,-18.9556)'/>
+<circle r='5' fill='red' cx='406.785' cy='648.924' />
+<rect width='10' height='37.9112'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(406.785,648.924) rotate(99.6752) translate(-5,-18.9556)'/>
+</g>
+
+<g id="r-duluth-winnipeg">
+<path stroke='green' stroke-width='1' fill='transparent' d='M682 227 679.746 225.574 677.502 224.135 675.266 222.681 673.04 221.213 670.822 219.732 668.614 218.237 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M549.371 95.3728 547.942 93.1212 546.527 90.8606 545.127 88.5912 543.741 86.3131 542.369 84.0265 541.011 81.7312 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M668.614 218.237 654.571 208.241 640.943 197.686 627.753 186.59 615.021 174.97 602.768 162.845 591.016 150.236 579.782 137.162 569.085 123.646 558.942 109.708 549.371 95.3728 '/>
+<circle r='5' fill='red' cx='652.321' cy='206.558' />
+<rect width='10' height='40.0961'  fill='black' stroke='black' stroke-width='0.4' transform='translate(652.321,206.558) rotate(126.977) translate(-5,-20.0481)'/>
+<circle r='5' fill='red' cx='618.526' cy='178.264' />
+<rect width='10' height='40.0961'  fill='black' stroke='black' stroke-width='0.4' transform='translate(618.526,178.264) rotate(132.897) translate(-5,-20.0481)'/>
+<circle r='5' fill='red' cx='587.828' cy='146.634' />
+<rect width='10' height='40.0961'  fill='black' stroke='black' stroke-width='0.4' transform='translate(587.828,146.634) rotate(138.816) translate(-5,-20.0481)'/>
+<circle r='5' fill='red' cx='560.557' cy='112.008' />
+<rect width='10' height='40.0961'  fill='black' stroke='black' stroke-width='0.4' transform='translate(560.557,112.008) rotate(144.736) translate(-5,-20.0481)'/>
+</g>
+
+<g id="r-sault-ste-marie-winnipeg">
+<path stroke='green' stroke-width='1' fill='transparent' d='M840 142 837.335 142.096 834.67 142.18 832.004 142.254 829.338 142.316 826.672 142.367 824.006 142.408 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M557.269 87.9349 554.832 86.8525 552.399 85.76 549.971 84.6573 547.548 83.5446 545.129 82.4217 542.715 81.2888 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M824.006 142.408 796.575 142.175 769.179 140.767 741.869 138.186 714.695 134.436 687.706 129.525 660.953 123.461 634.484 116.256 608.348 107.922 582.594 98.4764 557.269 87.9349 '/>
+<circle r='5' fill='red' cx='802.812' cy='142.331' />
+<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(802.812,142.331) rotate(91.1551) translate(-5,-21.195)'/>
+<circle r='5' fill='red' cx='756.506' cy='139.716' />
+<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(756.506,139.716) rotate(95.3099) translate(-5,-21.195)'/>
+<circle r='5' fill='red' cx='710.511' cy='133.753' />
+<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(710.511,133.753) rotate(99.4647) translate(-5,-21.195)'/>
+<circle r='5' fill='red' cx='665.069' cy='124.473' />
+<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(665.069,124.473) rotate(103.62) translate(-5,-21.195)'/>
+<circle r='5' fill='red' cx='620.419' cy='111.925' />
+<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(620.419,111.925) rotate(107.774) translate(-5,-21.195)'/>
+<circle r='5' fill='red' cx='576.795' cy='96.1746' />
+<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(576.795,96.1746) rotate(111.929) translate(-5,-21.195)'/>
+</g>
+
+<g id="r-denver-santa-fe">
+<path stroke='green' stroke-width='1' fill='transparent' d='M460 430 460.386 432.639 460.742 435.281 461.067 437.928 461.361 440.578 461.625 443.232 461.858 445.888 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M454.972 523.66 454.276 526.234 453.55 528.8 452.795 531.358 452.01 533.906 451.195 536.445 450.351 538.975 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M461.858 445.888 462.366 453.717 462.607 461.558 462.581 469.403 462.289 477.243 461.73 485.068 460.905 492.869 459.816 500.638 458.463 508.366 456.848 516.043 454.972 523.66 '/>
+<circle r='5' fill='red' cx='462.629' cy='464.481' />
+<rect width='10' height='37.2268'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(462.629,464.481) rotate(-0.060533) translate(-5,-18.6134)'/>
+<circle r='5' fill='red' cx='458.997' cy='505.492' />
+<rect width='10' height='37.2268'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(458.997,505.492) rotate(10.1802) translate(-5,-18.6134)'/>
+</g>
+
+<g id="r-omaha-denver">
+<path stroke='green' stroke-width='1' fill='transparent' d='M646 342 643.388 342.538 640.78 343.093 638.175 343.663 635.574 344.25 632.976 344.853 630.382 345.472 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M474.203 418.915 472.072 420.517 469.951 422.134 467.84 423.763 465.739 425.405 463.648 427.06 461.568 428.729 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M630.382 345.472 613.58 349.898 596.97 355 580.581 360.77 564.438 367.197 548.568 374.272 532.997 381.982 517.75 390.316 502.853 399.259 488.329 408.797 474.203 418.915 '/>
+<circle r='5' fill='red' cx='610.847' cy='350.687' />
+<rect width='10' height='40.4417'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(610.847,350.687) rotate(-106.296) translate(-5,-20.2209)'/>
+<circle r='5' fill='red' cx='568.912' cy='365.34' />
+<rect width='10' height='40.4417'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(568.912,365.34) rotate(-112.222) translate(-5,-20.2209)'/>
+<circle r='5' fill='red' cx='528.713' cy='384.243' />
+<rect width='10' height='40.4417'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(528.713,384.243) rotate(-118.148) translate(-5,-20.2209)'/>
+<circle r='5' fill='red' cx='490.68' cy='407.196' />
+<rect width='10' height='40.4417'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(490.68,407.196) rotate(-124.074) translate(-5,-20.2209)'/>
+</g>
+
+<g id="r-kansas-city-denver">
+<path stroke='green' stroke-width='1' fill='transparent' d='M669 405 666.502 405.934 663.999 406.853 661.49 407.756 658.976 408.644 656.456 409.517 653.931 410.375 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M477.969 431.843 475.312 431.617 472.657 431.375 470.002 431.118 467.35 430.844 464.699 430.554 462.05 430.248 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M656.481 417.958 639.142 423.4 621.597 428.133 603.874 432.151 586.003 435.446 568.012 438.012 549.933 439.846 531.793 440.945 513.624 441.306 495.455 440.93 477.317 439.816 '/>
+<circle r='5' fill='red' cx='636.218' cy='424.242' />
+<rect width='10' height='42.4346'  fill='black' stroke='black' stroke-width='0.4' transform='translate(636.218,424.242) rotate(74.1276) translate(-5,-21.2173)'/>
+<circle r='5' fill='red' cx='590.975' cy='434.604' />
+<rect width='10' height='42.4346'  fill='black' stroke='black' stroke-width='0.4' transform='translate(590.975,434.604) rotate(80.0721) translate(-5,-21.2173)'/>
+<circle r='5' fill='red' cx='544.903' cy='440.225' />
+<rect width='10' height='42.4346'  fill='black' stroke='black' stroke-width='0.4' transform='translate(544.903,440.225) rotate(86.0165) translate(-5,-21.2173)'/>
+<circle r='5' fill='red' cx='498.497' cy='441.044' />
+<rect width='10' height='42.4346'  fill='black' stroke='black' stroke-width='0.4' transform='translate(498.497,441.044) rotate(91.9609) translate(-5,-21.2173)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M651.381 402.793 634.662 408.04 617.744 412.604 600.655 416.478 583.422 419.655 566.075 422.13 548.641 423.898 531.15 424.958 513.631 425.306 496.112 424.943 478.622 423.869 '/>
+<circle r='5' fill='red' cx='631.893' cy='408.838' />
+<rect width='10' height='40.8104'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(631.893,408.838) rotate(74.1205) translate(-5,-20.4052)'/>
+<circle r='5' fill='red' cx='588.235' cy='418.841' />
+<rect width='10' height='40.8104'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(588.235,418.841) rotate(80.0697) translate(-5,-20.4052)'/>
+<circle r='5' fill='red' cx='543.774' cy='424.265' />
+<rect width='10' height='40.8104'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(543.774,424.265) rotate(86.0189) translate(-5,-20.4052)'/>
+<circle r='5' fill='red' cx='498.991' cy='425.052' />
+<rect width='10' height='40.8104'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(498.991,425.052) rotate(91.968) translate(-5,-20.4052)'/>
+</g>
+
+<g id="r-oklahoma-city-denver">
+<path stroke='green' stroke-width='1' fill='transparent' d='M644 514 641.381 513.497 638.766 512.978 636.153 512.442 633.544 511.89 630.939 511.322 628.337 510.736 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M474.329 440.865 472.176 439.293 470.032 437.707 467.898 436.107 465.775 434.494 463.661 432.868 461.558 431.229 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M628.337 510.736 611.818 506.615 595.479 501.831 579.345 496.392 563.444 490.308 547.801 483.587 532.441 476.242 517.39 468.284 502.672 459.725 488.311 450.581 474.329 440.865 '/>
+<circle r='5' fill='red' cx='609.16' cy='505.885' />
+<rect width='10' height='39.5668'  fill='red' stroke='black' stroke-width='0.4' transform='translate(609.16,505.885) rotate(105.539) translate(-5,-19.7834)'/>
+<circle r='5' fill='red' cx='567.861' cy='492.072' />
+<rect width='10' height='39.5668'  fill='red' stroke='black' stroke-width='0.4' transform='translate(567.861,492.072) rotate(111.448) translate(-5,-19.7834)'/>
+<circle r='5' fill='red' cx='528.204' cy='474.08' />
+<rect width='10' height='39.5668'  fill='red' stroke='black' stroke-width='0.4' transform='translate(528.204,474.08) rotate(117.358) translate(-5,-19.7834)'/>
+<circle r='5' fill='red' cx='490.61' cy='452.101' />
+<rect width='10' height='39.5668'  fill='red' stroke='black' stroke-width='0.4' transform='translate(490.61,452.101) rotate(123.268) translate(-5,-19.7834)'/>
+</g>
+
+<g id="r-santa-fe-el-paso">
+<path stroke='green' stroke-width='1' fill='transparent' d='M450 540 450.462 542.626 450.895 545.258 451.298 547.894 451.671 550.534 452.015 553.178 452.328 555.827 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M447.521 636.501 446.895 639.094 446.24 641.678 445.556 644.256 444.843 646.825 444.101 649.387 443.33 651.939 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M452.328 555.827 453.099 563.911 453.592 572.017 453.806 580.136 453.741 588.257 453.397 596.371 452.775 604.468 451.875 612.54 450.699 620.575 449.247 628.566 447.521 636.501 '/>
+<circle r='5' fill='red' cx='453.705' cy='575.076' />
+<rect width='10' height='38.6083'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(453.705,575.076) rotate(-1.75263) translate(-5,-19.3042)'/>
+<circle r='5' fill='red' cx='451.174' cy='617.552' />
+<rect width='10' height='38.6083'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(451.174,617.552) rotate(8.57301) translate(-5,-19.3042)'/>
+</g>
+
+<g id="r-oklahoma-city-santa-fe">
+<path stroke='green' stroke-width='1' fill='transparent' d='M644 514 641.515 514.969 639.025 515.921 636.528 516.857 634.025 517.777 631.516 518.681 629.001 519.568 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M467.851 541.55 465.191 541.369 462.532 541.171 459.874 540.955 457.217 540.722 454.562 540.471 451.909 540.204 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M629.001 519.568 613.438 524.653 597.685 529.111 581.765 532.935 565.705 536.118 549.531 538.655 533.267 540.543 516.942 541.777 500.58 542.357 484.207 542.282 467.851 541.55 '/>
+<circle r='5' fill='red' cx='604.24' cy='527.339' />
+<rect width='10' height='51.9115'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(604.24,527.339) rotate(74.3948) translate(-5,-25.9558)'/>
+<circle r='5' fill='red' cx='549.531' cy='538.655' />
+<rect width='10' height='51.9115'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(549.531,538.655) rotate(82.2321) translate(-5,-25.9558)'/>
+<circle r='5' fill='red' cx='493.789' cy='542.406' />
+<rect width='10' height='51.9115'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(493.789,542.406) rotate(90.0694) translate(-5,-25.9558)'/>
+</g>
+
+<g id="r-oklahoma-city-el-paso">
+<path stroke='green' stroke-width='1' fill='transparent' d='M644 514 642.228 515.993 640.446 517.977 638.654 519.952 636.852 521.917 635.039 523.872 633.216 525.819 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M460.075 646.155 457.616 647.185 455.151 648.202 452.681 649.207 450.205 650.199 447.725 651.177 445.239 652.143 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M633.216 525.819 618.339 540.973 602.844 555.496 586.759 569.362 570.111 582.546 552.928 595.026 535.241 606.781 517.081 617.789 498.478 628.033 479.465 637.493 460.075 646.155 '/>
+<circle r='5' fill='red' cx='619.481' cy='539.853' />
+<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(619.481,539.853) rotate(45.4826) translate(-5,-19.6381)'/>
+<circle r='5' fill='red' cx='587.375' cy='568.851' />
+<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(587.375,568.851) rotate(50.3413) translate(-5,-19.6381)'/>
+<circle r='5' fill='red' cx='552.928' cy='595.026' />
+<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(552.928,595.026) rotate(55.1999) translate(-5,-19.6381)'/>
+<circle r='5' fill='red' cx='516.388' cy='618.189' />
+<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(516.388,618.189) rotate(60.0586) translate(-5,-19.6381)'/>
+<circle r='5' fill='red' cx='478.017' cy='638.174' />
+<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(478.017,638.174) rotate(64.9172) translate(-5,-19.6381)'/>
+</g>
+
+<g id="r-dallas-el-paso">
+<path stroke='green' stroke-width='1' fill='transparent' d='M669 624 666.511 624.956 664.016 625.898 661.516 626.826 659.011 627.739 656.5 628.639 653.985 629.525 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M461.152 654.73 458.493 654.52 455.836 654.296 453.18 654.056 450.526 653.802 447.873 653.533 445.221 653.249 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M653.985 629.525 635.366 635.596 616.513 640.896 597.457 645.415 578.232 649.147 558.87 652.084 539.403 654.222 519.865 655.557 500.288 656.087 480.706 655.811 461.152 654.73 '/>
+<circle r='5' fill='red' cx='632.112' cy='636.571' />
+<rect width='10' height='45.9633'  fill='red' stroke='black' stroke-width='0.4' transform='translate(632.112,636.571) rotate(73.5288) translate(-5,-22.9816)'/>
+<circle r='5' fill='red' cx='583.544' cy='648.198' />
+<rect width='10' height='45.9633'  fill='red' stroke='black' stroke-width='0.4' transform='translate(583.544,648.198) rotate(79.5451) translate(-5,-22.9816)'/>
+<circle r='5' fill='red' cx='534.025' cy='654.67' />
+<rect width='10' height='45.9633'  fill='red' stroke='black' stroke-width='0.4' transform='translate(534.025,654.67) rotate(85.5614) translate(-5,-22.9816)'/>
+<circle r='5' fill='red' cx='484.101' cy='655.917' />
+<rect width='10' height='45.9633'  fill='red' stroke='black' stroke-width='0.4' transform='translate(484.101,655.917) rotate(91.5777) translate(-5,-22.9816)'/>
+</g>
+
+<g id="r-houston-el-paso">
+<path stroke='green' stroke-width='1' fill='transparent' d='M721 674 718.369 674.436 715.736 674.859 713.102 675.271 710.465 675.67 707.827 676.057 705.187 676.433 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M460.891 658.556 458.334 657.8 455.78 657.033 453.23 656.254 450.683 655.463 448.14 654.661 445.6 653.847 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M705.187 676.433 680.68 679.331 656.073 681.188 631.409 682 606.732 681.766 582.088 680.487 557.52 678.165 533.073 674.804 508.79 670.41 484.715 664.99 460.891 658.556 '/>
+<circle r='5' fill='red' cx='686.43' cy='678.745' />
+<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(686.43,678.745) rotate(83.9015) translate(-5,-18.8993)'/>
+<circle r='5' fill='red' cx='644.744' cy='681.691' />
+<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(644.744,681.691) rotate(88.015) translate(-5,-18.8993)'/>
+<circle r='5' fill='red' cx='602.955' cy='681.638' />
+<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(602.955,681.638) rotate(92.1286) translate(-5,-18.8993)'/>
+<circle r='5' fill='red' cx='561.276' cy='678.588' />
+<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(561.276,678.588) rotate(96.2421) translate(-5,-18.8993)'/>
+<circle r='5' fill='red' cx='519.924' cy='672.557' />
+<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(519.924,672.557) rotate(100.356) translate(-5,-18.8993)'/>
+<circle r='5' fill='red' cx='479.111' cy='663.574' />
+<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(479.111,663.574) rotate(104.469) translate(-5,-18.8993)'/>
+</g>
+
+<g id="r-duluth-omaha">
+<path stroke='green' stroke-width='1' fill='transparent' d='M682 227 681.822 229.661 681.615 232.319 681.381 234.976 681.118 237.629 680.827 240.28 680.508 242.928 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M654.402 327.016 653.165 329.379 651.903 331.728 650.617 334.064 649.306 336.386 647.971 338.694 646.611 340.988 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M688.446 243.926 687.146 252.965 685.53 261.952 683.599 270.876 681.355 279.728 678.801 288.494 675.941 297.166 672.778 305.732 669.315 314.181 665.557 322.503 661.509 330.688 '/>
+<circle r='5' fill='red' cx='684.813' cy='265.445' />
+<rect width='10' height='43.6584'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(684.813,265.445) rotate(11.9894) translate(-5,-21.8292)'/>
+<circle r='5' fill='red' cx='670.702' cy='310.896' />
+<rect width='10' height='43.6584'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(670.702,310.896) rotate(22.5062) translate(-5,-21.8292)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M672.571 241.929 671.352 250.41 669.835 258.843 668.023 267.218 665.917 275.524 663.521 283.75 660.837 291.888 657.868 299.925 654.619 307.854 651.093 315.663 647.294 323.344 '/>
+<circle r='5' fill='red' cx='669.175' cy='262.061' />
+<rect width='10' height='40.8448'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(669.175,262.061) rotate(11.9749) translate(-5,-20.4224)'/>
+<circle r='5' fill='red' cx='655.897' cy='304.829' />
+<rect width='10' height='40.8448'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(655.897,304.829) rotate(22.5207) translate(-5,-20.4224)'/>
+</g>
+
+<g id="r-sault-ste-marie-duluth">
+<path stroke='green' stroke-width='1' fill='transparent' d='M840 142 838.016 143.782 836.019 145.55 834.01 147.303 831.989 149.042 829.955 150.767 827.909 152.477 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M699.089 222.169 696.538 222.946 693.981 223.705 691.42 224.446 688.853 225.168 686.28 225.872 683.703 226.558 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M827.909 152.477 816.382 161.665 804.503 170.392 792.29 178.645 779.762 186.412 766.937 193.679 753.837 200.437 740.482 206.674 726.891 212.381 713.086 217.549 699.089 222.169 '/>
+<circle r='5' fill='red' cx='809.579' cy='166.751' />
+<rect width='10' height='46.471'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(809.579,166.751) rotate(53.868) translate(-5,-23.2355)'/>
+<circle r='5' fill='red' cx='766.937' cy='193.679' />
+<rect width='10' height='46.471'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(766.937,193.679) rotate(61.5863) translate(-5,-23.2355)'/>
+<circle r='5' fill='red' cx='721.065' cy='214.637' />
+<rect width='10' height='46.471'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(721.065,214.637) rotate(69.3046) translate(-5,-23.2355)'/>
+</g>
+
+<g id="r-chicago-duluth">
+<path stroke='green' stroke-width='1' fill='transparent' d='M835 304 832.402 303.397 829.81 302.774 827.221 302.132 824.638 301.471 822.06 300.79 819.486 300.091 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M695.709 238.162 693.606 236.522 691.516 234.866 689.438 233.195 687.372 231.509 685.319 229.807 683.279 228.09 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M819.486 300.091 806.135 296.126 792.948 291.644 779.946 286.652 767.148 281.158 754.574 275.17 742.242 268.697 730.172 261.749 718.381 254.336 706.888 246.47 695.709 238.162 '/>
+<circle r='5' fill='red' cx='798.585' cy='293.63' />
+<rect width='10' height='43.7611'  fill='red' stroke='black' stroke-width='0.4' transform='translate(798.585,293.63) rotate(108.93) translate(-5,-21.8806)'/>
+<circle r='5' fill='red' cx='754.574' cy='275.17' />
+<rect width='10' height='43.7611'  fill='red' stroke='black' stroke-width='0.4' transform='translate(754.574,275.17) rotate(116.58) translate(-5,-21.8806)'/>
+<circle r='5' fill='red' cx='713.412' cy='251.016' />
+<rect width='10' height='43.7611'  fill='red' stroke='black' stroke-width='0.4' transform='translate(713.412,251.016) rotate(124.231) translate(-5,-21.8806)'/>
+</g>
+
+<g id="r-toronto-duluth">
+<path stroke='green' stroke-width='1' fill='transparent' d='M980 170 977.575 171.108 975.145 172.207 972.71 173.295 970.271 174.372 967.827 175.44 965.379 176.497 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M700.962 227.717 698.296 227.651 695.631 227.573 692.965 227.484 690.301 227.384 687.636 227.273 684.973 227.15 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M965.379 176.497 940.218 186.666 914.645 195.749 888.706 203.728 862.45 210.589 835.924 216.32 809.176 220.909 782.257 224.348 755.215 226.632 728.1 227.756 700.962 227.717 '/>
+<circle r='5' fill='red' cx='945.995' cy='184.442' />
+<rect width='10' height='41.9004'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(945.995,184.442) rotate(68.66) translate(-5,-20.9502)'/>
+<circle r='5' fill='red' cx='902.674' cy='199.583' />
+<rect width='10' height='41.9004'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(902.674,199.583) rotate(72.8108) translate(-5,-20.9502)'/>
+<circle r='5' fill='red' cx='858.371' cy='211.548' />
+<rect width='10' height='41.9004'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(858.371,211.548) rotate(76.9616) translate(-5,-20.9502)'/>
+<circle r='5' fill='red' cx='813.318' cy='220.275' />
+<rect width='10' height='41.9004'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(813.318,220.275) rotate(81.1124) translate(-5,-20.9502)'/>
+<circle r='5' fill='red' cx='767.752' cy='225.719' />
+<rect width='10' height='41.9004'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(767.752,225.719) rotate(85.2631) translate(-5,-20.9502)'/>
+<circle r='5' fill='red' cx='721.911' cy='227.849' />
+<rect width='10' height='41.9004'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(721.911,227.849) rotate(89.4139) translate(-5,-20.9502)'/>
+</g>
+
+<g id="r-omaha-kansas-city">
+<path stroke='green' stroke-width='1' fill='transparent' d='M646 342 647.467 344.227 648.89 346.482 650.271 348.763 651.608 351.07 652.901 353.403 654.149 355.759 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M666.221 388.586 666.797 391.189 667.323 393.803 667.799 396.427 668.225 399.059 668.602 401.699 668.927 404.346 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M661.254 352.082 662.916 355.395 664.495 358.749 665.99 362.141 667.399 365.57 668.722 369.033 669.958 372.528 671.106 376.053 672.165 379.605 673.135 383.183 674.015 386.784 '/>
+<circle r='5' fill='red' cx='668.722' cy='369.033' />
+<rect width='10' height='37.0702'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(668.722,369.033) rotate(-20.1907) translate(-5,-18.5351)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M647.044 359.436 648.527 362.391 649.935 365.383 651.268 368.409 652.525 371.467 653.705 374.555 654.807 377.672 655.831 380.816 656.776 383.985 657.641 387.176 658.426 390.388 '/>
+<circle r='5' fill='red' cx='653.705' cy='374.555' />
+<rect width='10' height='33.0641'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(653.705,374.555) rotate(-20.1907) translate(-5,-16.532)'/>
+</g>
+
+<g id="r-chicago-omaha">
+<path stroke='green' stroke-width='1' fill='transparent' d='M835 304 832.335 303.893 829.67 303.804 827.005 303.733 824.338 303.679 821.672 303.643 819.005 303.624 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M662.35 334.738 659.892 335.775 657.442 336.827 654.999 337.896 652.563 338.98 650.134 340.081 647.713 341.198 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M819.005 303.624 802.93 303.887 786.879 304.791 770.876 306.336 754.948 308.518 739.119 311.335 723.416 314.781 707.862 318.851 692.484 323.54 677.305 328.838 662.35 334.738 '/>
+<circle r='5' fill='red' cx='800.413' cy='303.986' />
+<rect width='10' height='37.1956'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(800.413,303.986) rotate(-92.4392) translate(-5,-18.5978)'/>
+<circle r='5' fill='red' cx='759.416' cy='307.84' />
+<rect width='10' height='37.1956'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(759.416,307.84) rotate(-98.3022) translate(-5,-18.5978)'/>
+<circle r='5' fill='red' cx='719.027' cy='315.862' />
+<rect width='10' height='37.1956'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(719.027,315.862) rotate(-104.165) translate(-5,-18.5978)'/>
+<circle r='5' fill='red' cx='679.669' cy='327.968' />
+<rect width='10' height='37.1956'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(679.669,327.968) rotate(-110.028) translate(-5,-18.5978)'/>
+</g>
+
+<g id="r-kansas-city-oklahoma-city">
+<path stroke='green' stroke-width='1' fill='transparent' d='M669 405 669.028 407.667 669.026 410.333 668.994 413 668.931 415.666 668.837 418.331 668.713 420.994 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M651.135 498.467 650.098 500.924 649.032 503.368 647.938 505.8 646.817 508.22 645.668 510.626 644.492 513.019 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M676.702 421.412 676.131 429.648 675.278 437.86 674.145 446.038 672.733 454.172 671.044 462.254 669.08 470.273 666.843 478.22 664.336 486.086 661.561 493.862 658.522 501.539 '/>
+<circle r='5' fill='red' cx='674.882' cy='440.963' />
+<rect width='10' height='39.2825'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(674.882,440.963) rotate(7.64957) translate(-5,-19.6412)'/>
+<circle r='5' fill='red' cx='665.318' cy='483.116' />
+<rect width='10' height='39.2825'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(665.318,483.116) rotate(17.9169) translate(-5,-19.6412)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M660.724 420.577 660.19 428.268 659.394 435.936 658.336 443.572 657.018 451.167 655.441 458.714 653.607 466.201 651.518 473.622 649.177 480.967 646.586 488.228 643.749 495.396 '/>
+<circle r='5' fill='red' cx='659.033' cy='438.767' />
+<rect width='10' height='36.5478'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(659.033,438.767) rotate(7.63274) translate(-5,-18.2739)'/>
+<circle r='5' fill='red' cx='650.073' cy='478.257' />
+<rect width='10' height='36.5478'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(650.073,478.257) rotate(17.9337) translate(-5,-18.2739)'/>
+</g>
+
+<g id="r-saint-louis-kansas-city">
+<path stroke='green' stroke-width='1' fill='transparent' d='M780 408 777.391 408.553 774.777 409.077 772.156 409.57 769.53 410.033 766.898 410.466 764.262 410.868 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M685.628 408.928 683.015 408.396 680.408 407.834 677.808 407.242 675.215 406.62 672.629 405.968 670.051 405.287 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M765.424 418.783 757.316 419.833 749.176 420.605 741.014 421.1 732.841 421.316 724.665 421.254 716.496 420.913 708.343 420.294 700.216 419.397 692.124 418.224 684.077 416.776 '/>
+<circle r='5' fill='red' cx='746.095' cy='420.825' />
+<rect width='10' height='38.8837'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(746.095,420.825) rotate(86.2922) translate(-5,-19.4419)'/>
+<circle r='5' fill='red' cx='703.282' cy='419.768' />
+<rect width='10' height='38.8837'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(703.282,419.768) rotate(96.5349) translate(-5,-19.4419)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M763.1 402.953 755.533 403.932 747.936 404.653 740.319 405.115 732.69 405.317 725.06 405.259 717.435 404.941 709.826 404.363 702.241 403.526 694.689 402.431 687.179 401.079 '/>
+<circle r='5' fill='red' cx='745.127' cy='404.854' />
+<rect width='10' height='36.1568'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(745.127,404.854) rotate(86.2752) translate(-5,-18.0784)'/>
+<circle r='5' fill='red' cx='705.036' cy='403.865' />
+<rect width='10' height='36.1568'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(705.036,403.865) rotate(96.552) translate(-5,-18.0784)'/>
+</g>
+
+<g id="r-oklahoma-city-dallas">
+<path stroke='green' stroke-width='1' fill='transparent' d='M644 514 645.183 516.39 646.339 518.793 647.467 521.209 648.568 523.638 649.642 526.079 650.687 528.532 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M668.692 606.9 668.822 609.563 668.921 612.228 668.991 614.894 669.03 617.56 669.039 620.227 669.018 622.894 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M658.064 525.436 661.165 533.194 663.997 541.054 666.558 549.006 668.845 557.042 670.855 565.151 672.586 573.324 674.035 581.552 675.202 589.825 676.084 598.132 676.68 606.466 '/>
+<circle r='5' fill='red' cx='670.855' cy='565.151' />
+<rect width='10' height='83.5493'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(670.855,565.151) rotate(-12.9388) translate(-5,-41.7747)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M643.311 531.628 646.207 538.876 648.854 546.219 651.247 553.649 653.383 561.157 655.261 568.733 656.878 576.37 658.233 584.057 659.322 591.786 660.146 599.548 660.704 607.334 '/>
+<circle r='5' fill='red' cx='655.261' cy='568.733' />
+<rect width='10' height='78.061'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(655.261,568.733) rotate(-12.9388) translate(-5,-39.0305)'/>
+</g>
+
+<g id="r-little-rock-oklahoma-city">
+<path stroke='green' stroke-width='1' fill='transparent' d='M757 518 754.387 518.532 751.768 519.034 749.144 519.507 746.514 519.949 743.879 520.363 741.241 520.746 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M660.611 518.082 658.004 517.525 655.402 516.938 652.807 516.323 650.22 515.678 647.64 515.004 645.068 514.301 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M741.241 520.746 733.194 521.728 725.118 522.434 717.022 522.862 708.917 523.011 700.811 522.883 692.715 522.476 684.637 521.791 676.588 520.83 668.576 519.593 660.611 518.082 '/>
+<circle r='5' fill='red' cx='722.07' cy='522.628' />
+<rect width='10' height='38.5354'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(722.07,522.628) rotate(86.7321) translate(-5,-19.2677)'/>
+<circle r='5' fill='red' cx='679.616' cy='521.225' />
+<rect width='10' height='38.5354'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(679.616,521.225) rotate(97.0534) translate(-5,-19.2677)'/>
+</g>
+
+<g id="r-dallas-houston">
+<path stroke='green' stroke-width='1' fill='transparent' d='M669 624 671.297 625.355 673.569 626.75 675.817 628.185 678.039 629.66 680.234 631.173 682.402 632.726 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M711.315 660.396 712.961 662.494 714.57 664.621 716.141 666.776 717.673 668.958 719.167 671.167 720.621 673.403 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M687.117 626.262 690.498 628.799 693.811 631.424 697.052 634.137 700.221 636.935 703.313 639.817 706.328 642.78 709.262 645.822 712.115 648.941 714.883 652.136 717.565 655.402 '/>
+<circle r='5' fill='red' cx='703.313' cy='639.817' />
+<rect width='10' height='42.2703'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(703.313,639.817) rotate(-46.2579) translate(-5,-21.1352)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M677.688 639.189 680.728 641.469 683.707 643.83 686.621 646.269 689.47 648.785 692.25 651.376 694.961 654.04 697.6 656.776 700.164 659.58 702.653 662.453 705.065 665.39 '/>
+<circle r='5' fill='red' cx='692.25' cy='651.376' />
+<rect width='10' height='38.0072'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(692.25,651.376) rotate(-46.2579) translate(-5,-19.0036)'/>
+</g>
+
+<g id="r-little-rock-dallas">
+<path stroke='green' stroke-width='1' fill='transparent' d='M757 518 755.826 520.394 754.631 522.778 753.413 525.15 752.173 527.511 750.911 529.861 749.628 532.198 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M682.638 613.277 680.585 614.978 678.515 616.66 676.431 618.323 674.331 619.966 672.215 621.59 670.085 623.195 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M749.628 532.198 744.326 541.349 738.692 550.3 732.732 559.037 726.455 567.549 719.87 575.825 712.984 583.853 705.809 591.622 698.352 599.123 690.625 606.345 682.638 613.277 '/>
+<circle r='5' fill='red' cx='736.314' cy='553.869' />
+<rect width='10' height='50.884'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(736.314,553.869) rotate(34.0994) translate(-5,-25.442)'/>
+<circle r='5' fill='red' cx='701.409' cy='596.115' />
+<rect width='10' height='50.884'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(701.409,596.115) rotate(45.0296) translate(-5,-25.442)'/>
+</g>
+
+<g id="r-new-orleans-houston">
+<path stroke='green' stroke-width='1' fill='transparent' d='M840 665 837.462 665.818 834.915 666.609 832.361 667.373 829.798 668.11 827.227 668.819 824.649 669.5 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M738.018 676.257 735.366 675.983 732.716 675.681 730.07 675.351 727.428 674.993 724.789 674.606 722.155 674.191 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M824.649 669.5 816.156 671.538 807.598 673.278 798.984 674.716 790.324 675.852 781.63 676.683 772.913 677.21 764.182 677.43 755.449 677.345 746.724 676.954 738.018 676.257 '/>
+<circle r='5' fill='red' cx='804.283' cy='673.868' />
+<rect width='10' height='41.6699'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(804.283,673.868) rotate(80.2905) translate(-5,-20.835)'/>
+<circle r='5' fill='red' cx='758.815' cy='677.414' />
+<rect width='10' height='41.6699'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(758.815,677.414) rotate(90.7902) translate(-5,-20.835)'/>
+</g>
+
+<g id="r-toronto-sault-ste-marie">
+<path stroke='green' stroke-width='1' fill='transparent' d='M980 170 977.335 170.106 974.67 170.189 972.004 170.248 969.338 170.283 966.671 170.294 964.004 170.281 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M855.956 148.935 853.485 147.933 851.023 146.909 848.57 145.862 846.127 144.794 843.693 143.704 841.269 142.593 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M964.004 170.281 952.932 169.972 941.879 169.253 930.86 168.123 919.891 166.585 908.986 164.64 898.161 162.292 887.431 159.543 876.81 156.398 866.314 152.86 855.956 148.935 '/>
+<circle r='5' fill='red' cx='937.359' cy='168.839' />
+<rect width='10' height='53.3863'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(937.359,168.839) rotate(95.6614) translate(-5,-26.6931)'/>
+<circle r='5' fill='red' cx='881.148' cy='157.734' />
+<rect width='10' height='53.3863'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(881.148,157.734) rotate(106.689) translate(-5,-26.6931)'/>
+</g>
+
+<g id="r-montreal-sault-ste-marie">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1080 60 1077.34 60.2396 1074.69 60.4926 1072.04 60.7589 1069.38 61.0386 1066.73 61.3316 1064.08 61.638 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M855.726 132.281 853.437 133.649 851.155 135.028 848.88 136.419 846.611 137.821 844.35 139.235 842.096 140.66 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1064.08 61.638 1042.14 64.6992 1020.34 68.676 998.72 73.5612 977.328 79.3463 956.197 86.0213 935.363 93.5744 914.864 101.992 894.734 111.261 875.01 121.363 855.726 132.281 '/>
+<circle r='5' fill='red' cx='1043.72' cy='64.4475' />
+<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1043.72,64.4475) rotate(-98.9659) translate(-5,-20.5622)'/>
+<circle r='5' fill='red' cx='999.497' cy='73.3691' />
+<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(999.497,73.3691) rotate(-103.847) translate(-5,-20.5622)'/>
+<circle r='5' fill='red' cx='956.197' cy='86.0213' />
+<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(956.197,86.0213) rotate(-108.729) translate(-5,-20.5622)'/>
+<circle r='5' fill='red' cx='914.13' cy='102.312' />
+<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(914.13,102.312) rotate(-113.611) translate(-5,-20.5622)'/>
+<circle r='5' fill='red' cx='873.603' cy='122.124' />
+<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(873.603,122.124) rotate(-118.492) translate(-5,-20.5622)'/>
+</g>
+
+<g id="r-chicago-saint-louis">
+<path stroke='green' stroke-width='1' fill='transparent' d='M835 304 834.34 306.584 833.652 309.16 832.936 311.729 832.192 314.29 831.421 316.842 830.622 319.386 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M790.961 394.809 789.318 396.909 787.652 398.992 785.964 401.056 784.253 403.102 782.521 405.129 780.766 407.137 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M838.241 321.825 835.398 330.199 832.266 338.469 828.847 346.625 825.146 354.656 821.167 362.554 816.915 370.308 812.396 377.909 807.615 385.348 802.577 392.616 797.289 399.704 '/>
+<circle r='5' fill='red' cx='830.977' cy='341.639' />
+<rect width='10' height='42.2183'  fill='green' stroke='black' stroke-width='0.4' transform='translate(830.977,341.639) rotate(22.518) translate(-5,-21.1092)'/>
+<circle r='5' fill='red' cx='809.495' cy='382.49' />
+<rect width='10' height='42.2183'  fill='green' stroke='black' stroke-width='0.4' transform='translate(809.495,382.49) rotate(32.9567) translate(-5,-21.1092)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M823.002 316.947 820.339 324.793 817.404 332.541 814.201 340.183 810.733 347.707 807.006 355.107 803.022 362.372 798.788 369.494 794.308 376.464 789.588 383.273 784.633 389.914 '/>
+<circle r='5' fill='red' cx='816.221' cy='335.453' />
+<rect width='10' height='39.4294'  fill='white' stroke='black' stroke-width='0.4' transform='translate(816.221,335.453) rotate(22.5028) translate(-5,-19.7147)'/>
+<circle r='5' fill='red' cx='796.036' cy='373.838' />
+<rect width='10' height='39.4294'  fill='white' stroke='black' stroke-width='0.4' transform='translate(796.036,373.838) rotate(32.9719) translate(-5,-19.7147)'/>
+</g>
+
+<g id="r-toronto-chicago">
+<path stroke='green' stroke-width='1' fill='transparent' d='M980 170 978.525 172.221 977.035 174.433 975.531 176.635 974.013 178.828 972.481 181.01 970.934 183.183 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M850.511 294.996 848.23 296.377 845.94 297.743 843.642 299.095 841.334 300.432 839.018 301.754 836.694 303.06 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M970.934 183.183 961.03 196.433 950.602 209.274 939.668 221.688 928.244 233.653 916.35 245.149 904.004 256.16 891.226 266.666 878.037 276.651 864.458 286.1 850.511 294.996 '/>
+<circle r='5' fill='red' cx='959.403' cy='198.506' />
+<rect width='10' height='38.359'  fill='white' stroke='black' stroke-width='0.4' transform='translate(959.403,198.506) rotate(38.2936) translate(-5,-19.1795)'/>
+<circle r='5' fill='red' cx='931.494' cy='230.346' />
+<rect width='10' height='38.359'  fill='white' stroke='black' stroke-width='0.4' transform='translate(931.494,230.346) rotate(44.18) translate(-5,-19.1795)'/>
+<circle r='5' fill='red' cx='900.466' cy='259.156' />
+<rect width='10' height='38.359'  fill='white' stroke='black' stroke-width='0.4' transform='translate(900.466,259.156) rotate(50.0664) translate(-5,-19.1795)'/>
+<circle r='5' fill='red' cx='866.647' cy='284.631' />
+<rect width='10' height='38.359'  fill='white' stroke='black' stroke-width='0.4' transform='translate(866.647,284.631) rotate(55.9529) translate(-5,-19.1795)'/>
+</g>
+
+<g id="r-pittsburgh-chicago">
+<path stroke='green' stroke-width='1' fill='transparent' d='M998 285 995.353 284.676 992.704 284.372 990.052 284.089 987.398 283.827 984.743 283.586 982.085 283.365 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M851.646 298.259 849.106 299.073 846.573 299.907 844.047 300.761 841.528 301.634 839.015 302.527 836.509 303.44 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M982.717 275.39 969.223 274.582 955.708 274.295 942.192 274.529 928.696 275.284 915.238 276.559 901.839 278.351 888.52 280.658 875.299 283.477 862.197 286.803 849.232 290.632 '/>
+<circle r='5' fill='red' cx='961.548' cy='274.355' />
+<rect width='10' height='42.3958'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(961.548,274.355) rotate(-88.934) translate(-5,-21.1979)'/>
+<circle r='5' fill='red' cx='915.238' cy='276.559' />
+<rect width='10' height='42.3958'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(915.238,276.559) rotate(-96.5141) translate(-5,-21.1979)'/>
+<circle r='5' fill='red' cx='869.624' cy='284.851' />
+<rect width='10' height='42.3958'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(869.624,284.851) rotate(-104.094) translate(-5,-21.1979)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M981.454 291.34 968.575 290.569 955.677 290.295 942.778 290.519 929.897 291.239 917.053 292.455 904.266 294.166 891.554 296.368 878.936 299.058 866.432 302.232 854.059 305.886 '/>
+<circle r='5' fill='red' cx='961.311' cy='290.354' />
+<rect width='10' height='40.3399'  fill='black' stroke='black' stroke-width='0.4' transform='translate(961.311,290.354) rotate(-88.9236) translate(-5,-20.17)'/>
+<circle r='5' fill='red' cx='917.053' cy='292.455' />
+<rect width='10' height='40.3399'  fill='black' stroke='black' stroke-width='0.4' transform='translate(917.053,292.455) rotate(-96.5141) translate(-5,-20.17)'/>
+<circle r='5' fill='red' cx='873.461' cy='300.385' />
+<rect width='10' height='40.3399'  fill='black' stroke='black' stroke-width='0.4' transform='translate(873.461,300.385) rotate(-104.105) translate(-5,-20.17)'/>
+</g>
+
+<g id="r-saint-louis-little-rock">
+<path stroke='green' stroke-width='1' fill='transparent' d='M780 408 780.08 410.665 780.13 413.332 780.149 415.998 780.138 418.665 780.097 421.331 780.025 423.997 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M763.839 502.328 762.848 504.804 761.829 507.269 760.782 509.721 759.707 512.162 758.605 514.59 757.475 517.005 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M780.025 423.997 779.626 432.024 778.953 440.034 778.005 448.015 776.785 455.959 775.294 463.857 773.533 471.7 771.504 479.477 769.21 487.18 766.654 494.8 763.839 502.328 '/>
+<circle r='5' fill='red' cx='778.629' cy='443.035' />
+<rect width='10' height='38.1894'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(778.629,443.035) rotate(6.52513) translate(-5,-19.0947)'/>
+<circle r='5' fill='red' cx='770.103' cy='484.296' />
+<rect width='10' height='38.1894'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(770.103,484.296) rotate(16.8255) translate(-5,-19.0947)'/>
+</g>
+
+<g id="r-nashville-saint-louis">
+<path stroke='green' stroke-width='1' fill='transparent' d='M897 457 894.367 456.576 891.739 456.125 889.116 455.647 886.497 455.143 883.883 454.613 881.276 454.057 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M794.173 417.818 791.94 416.36 789.722 414.88 787.518 413.378 785.33 411.854 783.158 410.307 781.001 408.739 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M881.276 454.057 872.048 451.866 862.905 449.346 853.858 446.5 844.918 443.332 836.098 439.846 827.408 436.047 818.86 431.939 810.464 427.528 802.231 422.819 794.173 417.818 '/>
+<circle r='5' fill='red' cx='859.323' cy='448.262' />
+<rect width='10' height='45.4232'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(859.323,448.262) rotate(107.244) translate(-5,-22.7116)'/>
+<circle r='5' fill='red' cx='813.758' cy='429.304' />
+<rect width='10' height='45.4232'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(813.758,429.304) rotate(117.935) translate(-5,-22.7116)'/>
+</g>
+
+<g id="r-pittsburgh-saint-louis">
+<path stroke='green' stroke-width='1' fill='transparent' d='M998 285 996.054 286.823 994.099 288.637 992.135 290.44 990.161 292.234 988.179 294.017 986.187 295.79 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M797.686 402.731 795.142 403.53 792.594 404.317 790.043 405.091 787.487 405.852 784.927 406.6 782.364 407.335 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M986.187 295.79 969.547 309.919 952.332 323.341 934.572 336.033 916.297 347.972 897.54 359.137 878.333 369.51 858.709 379.071 838.703 387.805 818.351 395.696 797.686 402.731 '/>
+<circle r='5' fill='red' cx='970.787' cy='308.907' />
+<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(970.787,308.907) rotate(50.6858) translate(-5,-20.2306)'/>
+<circle r='5' fill='red' cx='935.232' cy='335.581' />
+<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(935.232,335.581) rotate(55.5593) translate(-5,-20.2306)'/>
+<circle r='5' fill='red' cx='897.54' cy='359.137' />
+<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(897.54,359.137) rotate(60.4329) translate(-5,-20.2306)'/>
+<circle r='5' fill='red' cx='857.982' cy='379.406' />
+<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(857.982,379.406) rotate(65.3064) translate(-5,-20.2306)'/>
+<circle r='5' fill='red' cx='816.846' cy='396.241' />
+<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(816.846,396.241) rotate(70.1799) translate(-5,-20.2306)'/>
+</g>
+
+<g id="r-little-rock-new-orleans">
+<path stroke='green' stroke-width='1' fill='transparent' d='M757 518 758.822 519.948 760.628 521.909 762.42 523.884 764.197 525.872 765.959 527.874 767.706 529.889 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M834.829 648.12 835.664 650.653 836.48 653.191 837.277 655.736 838.054 658.287 838.812 660.844 839.551 663.406 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M767.706 529.889 776.424 540.431 784.727 551.304 792.602 562.491 800.037 573.974 807.021 585.738 813.543 597.764 819.594 610.033 825.164 622.529 830.245 635.231 834.829 648.12 '/>
+<circle r='5' fill='red' cx='781.202' cy='546.581' />
+<rect width='10' height='42.9378'  fill='green' stroke='black' stroke-width='0.4' transform='translate(781.202,546.581) rotate(-37.2134) translate(-5,-21.4689)'/>
+<circle r='5' fill='red' cx='807.021' cy='585.738' />
+<rect width='10' height='42.9378'  fill='green' stroke='black' stroke-width='0.4' transform='translate(807.021,585.738) rotate(-29.5848) translate(-5,-21.4689)'/>
+<circle r='5' fill='red' cx='827.413' cy='627.976' />
+<rect width='10' height='42.9378'  fill='green' stroke='black' stroke-width='0.4' transform='translate(827.413,627.976) rotate(-21.9561) translate(-5,-21.4689)'/>
+</g>
+
+<g id="r-nashville-little-rock">
+<path stroke='green' stroke-width='1' fill='transparent' d='M897 457 894.875 458.611 892.736 460.203 890.584 461.778 888.419 463.335 886.241 464.874 884.05 466.394 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M774.159 514.583 771.556 515.164 768.949 515.724 766.337 516.262 763.721 516.778 761.101 517.272 758.476 517.744 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M884.05 466.394 873.978 473.045 863.661 479.311 853.114 485.181 842.352 490.648 831.392 495.704 820.247 500.341 808.936 504.554 797.473 508.335 785.875 511.68 774.159 514.583 '/>
+<circle r='5' fill='red' cx='868.268' cy='476.578' />
+<rect width='10' height='37.5707'  fill='white' stroke='black' stroke-width='0.4' transform='translate(868.268,476.578) rotate(58.8532) translate(-5,-18.7854)'/>
+<circle r='5' fill='red' cx='831.392' cy='495.704' />
+<rect width='10' height='37.5707'  fill='white' stroke='black' stroke-width='0.4' transform='translate(831.392,495.704) rotate(66.322) translate(-5,-18.7854)'/>
+<circle r='5' fill='red' cx='792.342' cy='509.873' />
+<rect width='10' height='37.5707'  fill='white' stroke='black' stroke-width='0.4' transform='translate(792.342,509.873) rotate(73.7907) translate(-5,-18.7854)'/>
+</g>
+
+<g id="r-atlanta-new-orleans">
+<path stroke='green' stroke-width='1' fill='transparent' d='M958 499 955.985 500.747 953.981 502.506 951.988 504.278 950.006 506.062 948.036 507.859 946.076 509.668 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M846.964 648.406 845.888 650.845 844.827 653.292 843.782 655.745 842.752 658.205 841.737 660.671 840.738 663.144 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M940.631 503.807 928.062 515.967 915.994 528.624 904.446 541.758 893.438 555.347 882.987 569.369 873.111 583.801 863.824 598.62 855.144 613.802 847.083 629.322 839.655 645.154 '/>
+<circle r='5' fill='red' cx='926.045' cy='518.012' />
+<rect width='10' height='40.7238'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(926.045,518.012) rotate(-135.588) translate(-5,-20.3619)'/>
+<circle r='5' fill='red' cx='896.45' cy='551.516' />
+<rect width='10' height='40.7238'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(896.45,551.516) rotate(-141.502) translate(-5,-20.3619)'/>
+<circle r='5' fill='red' cx='870.464' cy='587.892' />
+<rect width='10' height='40.7238'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(870.464,587.892) rotate(-147.415) translate(-5,-20.3619)'/>
+<circle r='5' fill='red' cx='848.364' cy='626.751' />
+<rect width='10' height='40.7238'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(848.364,626.751) rotate(-153.329) translate(-5,-20.3619)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M951.522 515.528 939.417 527.239 927.794 539.429 916.673 552.078 906.071 565.165 896.006 578.669 886.494 592.569 877.551 606.841 869.191 621.462 861.428 636.409 854.274 651.657 '/>
+<circle r='5' fill='red' cx='937.513' cy='529.169' />
+<rect width='10' height='39.1094'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(937.513,529.169) rotate(-135.58) translate(-5,-19.5547)'/>
+<circle r='5' fill='red' cx='908.983' cy='561.462' />
+<rect width='10' height='39.1094'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(908.983,561.462) rotate(-141.499) translate(-5,-19.5547)'/>
+<circle r='5' fill='red' cx='883.935' cy='596.524' />
+<rect width='10' height='39.1094'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(883.935,596.524) rotate(-147.418) translate(-5,-19.5547)'/>
+<circle r='5' fill='red' cx='862.636' cy='633.982' />
+<rect width='10' height='39.1094'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(862.636,633.982) rotate(-153.337) translate(-5,-19.5547)'/>
+</g>
+
+<g id="r-miami-new-orleans">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1115 705 1112.53 704.001 1110.05 703.014 1107.57 702.038 1105.08 701.073 1102.59 700.12 1100.1 699.178 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M858.664 663.481 856.003 663.661 853.343 663.852 850.684 664.056 848.026 664.272 845.37 664.501 842.714 664.741 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1100.1 699.178 1076.9 691.037 1053.37 683.886 1029.57 677.739 1005.52 672.605 981.278 668.494 956.884 665.414 932.382 663.37 907.815 662.365 883.227 662.402 858.664 663.481 '/>
+<circle r='5' fill='red' cx='1082.37' cy='692.857' />
+<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1082.37,692.857) rotate(-71.3094) translate(-5,-18.8245)'/>
+<circle r='5' fill='red' cx='1042.47' cy='680.937' />
+<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1042.47,680.937) rotate(-75.4215) translate(-5,-18.8245)'/>
+<circle r='5' fill='red' cx='1001.82' cy='671.909' />
+<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1001.82,671.909) rotate(-79.5335) translate(-5,-18.8245)'/>
+<circle r='5' fill='red' cx='960.628' cy='665.818' />
+<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(960.628,665.818) rotate(-83.6456) translate(-5,-18.8245)'/>
+<circle r='5' fill='red' cx='919.105' cy='662.697' />
+<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(919.105,662.697) rotate(-87.7576) translate(-5,-18.8245)'/>
+<circle r='5' fill='red' cx='877.465' cy='662.562' />
+<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(877.465,662.562) rotate(-91.8697) translate(-5,-18.8245)'/>
+</g>
+
+<g id="r-nashville-atlanta">
+<path stroke='green' stroke-width='1' fill='transparent' d='M897 457 899.486 457.964 901.956 458.97 904.407 460.019 906.841 461.111 909.255 462.243 911.649 463.418 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M946.241 487.116 948.201 488.924 950.129 490.766 952.025 492.641 953.889 494.548 955.72 496.487 957.516 498.458 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M911.649 463.418 915.383 465.354 919.063 467.39 922.686 469.526 926.25 471.759 929.752 474.089 933.189 476.513 936.559 479.03 939.859 481.637 943.087 484.333 946.241 487.116 '/>
+<circle r='5' fill='red' cx='929.752' cy='474.089' />
+<rect width='10' height='42.0608'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(929.752,474.089) rotate(-55.5862) translate(-5,-21.0304)'/>
+</g>
+
+<g id="r-pittsburgh-nashville">
+<path stroke='green' stroke-width='1' fill='transparent' d='M998 285 997.231 287.553 996.446 290.102 995.645 292.645 994.828 295.184 993.994 297.717 993.144 300.244 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M909.255 443.877 907.471 445.859 905.674 447.83 903.865 449.789 902.043 451.736 900.209 453.672 898.363 455.596 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M993.144 300.244 987.438 315.987 981.105 331.488 974.153 346.722 966.595 361.664 958.442 376.291 949.708 390.577 940.407 404.502 930.553 418.041 920.164 431.173 909.255 443.877 '/>
+<circle r='5' fill='red' cx='986.464' cy='318.491' />
+<rect width='10' height='38.8654'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(986.464,318.491) rotate(21.4428) translate(-5,-19.4327)'/>
+<circle r='5' fill='red' cx='968.77' cy='357.513' />
+<rect width='10' height='38.8654'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(968.77,357.513) rotate(27.3391) translate(-5,-19.4327)'/>
+<circle r='5' fill='red' cx='947.161' cy='394.512' />
+<rect width='10' height='38.8654'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(947.161,394.512) rotate(33.2354) translate(-5,-19.4327)'/>
+<circle r='5' fill='red' cx='921.866' cy='429.094' />
+<rect width='10' height='38.8654'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(921.866,429.094) rotate(39.1318) translate(-5,-19.4327)'/>
+</g>
+
+<g id="r-raleigh-nashville">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1040 425 1037.33 424.954 1034.67 424.931 1032 424.932 1029.33 424.955 1026.67 425.002 1024 425.072 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M912.823 449.677 910.376 450.739 907.939 451.821 905.512 452.925 903.094 454.05 900.686 455.196 898.288 456.362 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1024 425.072 1012.56 425.637 1001.15 426.63 989.788 428.049 978.485 429.893 967.258 432.158 956.124 434.842 945.098 437.94 934.196 441.449 923.432 445.363 912.823 449.677 '/>
+<circle r='5' fill='red' cx='1006.28' cy='426.131' />
+<rect width='10' height='35.5122'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1006.28,426.131) rotate(-95.081) translate(-5,-17.7561)'/>
+<circle r='5' fill='red' cx='967.258' cy='432.158' />
+<rect width='10' height='35.5122'  fill='black' stroke='black' stroke-width='0.4' transform='translate(967.258,432.158) rotate(-102.479) translate(-5,-17.7561)'/>
+<circle r='5' fill='red' cx='929.337' cy='443.159' />
+<rect width='10' height='35.5122'  fill='black' stroke='black' stroke-width='0.4' transform='translate(929.337,443.159) rotate(-109.877) translate(-5,-17.7561)'/>
+</g>
+
+<g id="r-raleigh-atlanta">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1040 425 1038.49 427.2 1036.96 429.382 1035.4 431.547 1033.82 433.693 1032.21 435.821 1030.58 437.93 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M972.741 490.374 970.483 491.792 968.208 493.184 965.918 494.55 963.612 495.888 961.29 497.2 958.954 498.486 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1036.88 442.862 1031.77 449.167 1026.45 455.295 1020.92 461.238 1015.19 466.99 1009.27 472.544 1003.17 477.893 996.882 483.032 990.427 487.954 983.809 492.653 977.035 497.125 '/>
+<circle r='5' fill='red' cx='1024.39' cy='457.557' />
+<rect width='10' height='38.5873'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1024.39,457.557) rotate(42.689) translate(-5,-19.2937)'/>
+<circle r='5' fill='red' cx='992.879' cy='486.125' />
+<rect width='10' height='38.5873'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(992.879,486.125) rotate(52.9132) translate(-5,-19.2937)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1024.28 432.999 1019.51 438.881 1014.55 444.598 1009.39 450.143 1004.05 455.509 998.523 460.691 992.827 465.681 986.965 470.475 980.943 475.067 974.768 479.452 968.448 483.624 '/>
+<circle r='5' fill='red' cx='1012.67' cy='446.659' />
+<rect width='10' height='35.8663'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1012.67,446.659) rotate(42.6718) translate(-5,-17.9331)'/>
+<circle r='5' fill='red' cx='983.177' cy='473.402' />
+<rect width='10' height='35.8663'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(983.177,473.402) rotate(52.9304) translate(-5,-17.9331)'/>
+</g>
+
+<g id="r-charleston-atlanta">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1077 508 1074.37 508.427 1071.73 508.826 1069.09 509.197 1066.45 509.54 1063.8 509.854 1061.15 510.14 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M974.485 503.791 971.904 503.121 969.33 502.424 966.764 501.7 964.205 500.948 961.655 500.169 959.113 499.363 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1061.15 510.14 1052.44 510.878 1043.72 511.31 1034.99 511.437 1026.26 511.257 1017.54 510.772 1008.84 509.981 1000.17 508.886 991.554 507.488 982.987 505.789 974.485 503.791 '/>
+<circle r='5' fill='red' cx='1040.36' cy='511.395' />
+<rect width='10' height='41.6699'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1040.36,511.395) rotate(88.9406) translate(-5,-20.835)'/>
+<circle r='5' fill='red' cx='994.871' cy='508.063' />
+<rect width='10' height='41.6699'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(994.871,508.063) rotate(99.4403) translate(-5,-20.835)'/>
+</g>
+
+<g id="r-miami-atlanta">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1115 705 1112.93 703.323 1110.86 701.635 1108.81 699.937 1106.76 698.23 1104.72 696.512 1102.69 694.784 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M965.671 515.878 964.532 513.467 963.405 511.05 962.29 508.628 961.187 506.2 960.096 503.767 959.017 501.328 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1102.69 694.784 1085.75 679.674 1069.46 663.867 1053.84 647.391 1038.94 630.273 1024.76 612.546 1011.34 594.239 998.698 575.385 986.859 556.018 975.844 536.17 965.671 515.878 '/>
+<circle r='5' fill='red' cx='1086.92' cy='680.762' />
+<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1086.92,680.762) rotate(132.765) translate(-5,-21.1008)'/>
+<circle r='5' fill='red' cx='1054.38' cy='647.982' />
+<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1054.38,647.982) rotate(137.659) translate(-5,-21.1008)'/>
+<circle r='5' fill='red' cx='1024.76' cy='612.546' />
+<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1024.76,612.546) rotate(142.553) translate(-5,-21.1008)'/>
+<circle r='5' fill='red' cx='998.267' cy='574.711' />
+<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(998.267,574.711) rotate(147.447) translate(-5,-21.1008)'/>
+<circle r='5' fill='red' cx='975.099' cy='534.754' />
+<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(975.099,534.754) rotate(152.341) translate(-5,-21.1008)'/>
+</g>
+
+<g id="r-toronto-pittsburgh">
+<path stroke='green' stroke-width='1' fill='transparent' d='M980 170 981.018 172.465 982.008 174.941 982.972 177.427 983.908 179.924 984.816 182.431 985.697 184.948 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M998.878 267.884 998.821 270.55 998.734 273.215 998.619 275.88 998.474 278.542 998.299 281.203 998.096 283.862 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M985.697 184.948 988.303 192.976 990.628 201.088 992.67 209.277 994.427 217.532 995.896 225.843 997.076 234.199 997.965 242.592 998.562 251.011 998.867 259.445 998.878 267.884 '/>
+<circle r='5' fill='red' cx='991.441' cy='204.204' />
+<rect width='10' height='40.2001'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(991.441,204.204) rotate(-14.2396) translate(-5,-20.1)'/>
+<circle r='5' fill='red' cx='998.369' cy='247.796' />
+<rect width='10' height='40.2001'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(998.369,247.796) rotate(-3.82121) translate(-5,-20.1)'/>
+</g>
+
+<g id="r-montreal-toronto">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1080 60 1077.79 61.4958 1075.6 63.0105 1073.42 64.544 1071.25 66.0961 1069.09 67.6669 1066.95 69.256 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M988.736 154.887 987.347 157.164 985.978 159.452 984.628 161.751 983.298 164.063 981.987 166.385 980.697 168.719 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1066.95 69.256 1057.75 76.4224 1048.82 83.9295 1040.18 91.7667 1031.84 99.923 1023.81 108.387 1016.11 117.146 1008.74 126.189 1001.71 135.502 995.042 145.073 988.736 154.887 '/>
+<circle r='5' fill='red' cx='1052.78' cy='80.5276' />
+<rect width='10' height='36.2202'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1052.78,80.5276) rotate(-130.169) translate(-5,-18.1101)'/>
+<circle r='5' fill='red' cx='1023.81' cy='108.387' />
+<rect width='10' height='36.2202'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1023.81,108.387) rotate(-137.592) translate(-5,-18.1101)'/>
+<circle r='5' fill='red' cx='998.682' cy='139.755' />
+<rect width='10' height='36.2202'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(998.682,139.755) rotate(-145.015) translate(-5,-18.1101)'/>
+</g>
+
+<g id="r-new-york-pittsburgh">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1103 229 1101.01 230.771 1098.99 232.521 1096.96 234.249 1094.91 235.955 1092.85 237.639 1090.76 239.3 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1014.48 280.212 1011.94 281.03 1009.4 281.821 1006.84 282.585 1004.28 283.321 1001.71 284.03 999.131 284.711 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1095.71 245.584 1088.56 251.017 1081.23 256.197 1073.71 261.117 1066.04 265.77 1058.2 270.153 1050.21 274.258 1042.09 278.081 1033.83 281.617 1025.46 284.862 1016.98 287.813 '/>
+<circle r='5' fill='red' cx='1078.33' cy='258.14' />
+<rect width='10' height='42.9004'  fill='white' stroke='black' stroke-width='0.4' transform='translate(1078.33,258.14) rotate(56.5549) translate(-5,-21.4502)'/>
+<circle r='5' fill='red' cx='1037.05' cy='280.277' />
+<rect width='10' height='42.9004'  fill='white' stroke='black' stroke-width='0.4' transform='translate(1037.05,280.277) rotate(67.031) translate(-5,-21.4502)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1085.81 233.016 1079.11 238.111 1072.23 242.967 1065.18 247.58 1057.98 251.944 1050.63 256.053 1043.15 259.902 1035.53 263.486 1027.79 266.802 1019.94 269.845 1011.99 272.611 '/>
+<circle r='5' fill='red' cx='1069.56' cy='244.755' />
+<rect width='10' height='40.0996'  fill='green' stroke='black' stroke-width='0.4' transform='translate(1069.56,244.755) rotate(56.54) translate(-5,-20.0498)'/>
+<circle r='5' fill='red' cx='1030.75' cy='265.57' />
+<rect width='10' height='40.0996'  fill='green' stroke='black' stroke-width='0.4' transform='translate(1030.75,265.57) rotate(67.0459) translate(-5,-20.0498)'/>
+</g>
+
+<g id="r-washington-pittsburgh">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1114 342 1111.4 341.418 1108.8 340.811 1106.21 340.178 1103.63 339.52 1101.05 338.836 1098.48 338.126 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1011.57 295.674 1009.43 294.083 1007.31 292.47 1005.2 290.837 1003.11 289.183 1001.03 287.508 998.973 285.813 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1098.48 338.126 1089.17 335.325 1079.96 332.189 1070.88 328.725 1061.92 324.935 1053.11 320.825 1044.45 316.4 1035.95 311.666 1027.64 306.63 1019.5 301.297 1011.57 295.674 '/>
+<circle r='5' fill='red' cx='1076.34' cy='330.852' />
+<rect width='10' height='46.6239'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1076.34,330.852) rotate(110.661) translate(-5,-23.312)'/>
+<circle r='5' fill='red' cx='1030.92' cy='308.666' />
+<rect width='10' height='46.6239'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1030.92,308.666) rotate(121.407) translate(-5,-23.312)'/>
+</g>
+
+<g id="r-raleigh-pittsburgh">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1040 425 1038.65 422.698 1037.33 420.384 1036.02 418.058 1034.74 415.721 1033.48 413.373 1032.23 411.015 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M999.362 302.378 999.09 299.725 998.84 297.071 998.614 294.413 998.411 291.755 998.231 289.094 998.075 286.432 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1032.23 411.015 1027.14 400.796 1022.44 390.395 1018.13 379.824 1014.21 369.1 1010.7 358.238 1007.6 347.251 1004.91 336.156 1002.64 324.969 1000.79 313.704 999.362 302.378 '/>
+<circle r='5' fill='red' cx='1020.61' cy='386.055' />
+<rect width='10' height='55.0821'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1020.61,386.055) rotate(157.621) translate(-5,-27.5411)'/>
+<circle r='5' fill='red' cx='1003.53' cy='329.593' />
+<rect width='10' height='55.0821'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1003.53,329.593) rotate(168.711) translate(-5,-27.5411)'/>
+</g>
+
+<g id="r-montreal-boston">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1080 60 1082.37 61.2221 1084.73 62.4701 1087.07 63.744 1089.4 65.0435 1091.71 66.3685 1094.01 67.7189 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1157.6 122.378 1159.28 124.448 1160.94 126.537 1162.57 128.644 1164.19 130.769 1165.77 132.911 1167.34 135.071 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1098.1 60.8427 1105.5 65.4209 1112.74 70.2533 1119.81 75.334 1126.7 80.6569 1133.4 86.2157 1139.9 92.0035 1146.2 98.0134 1152.28 104.238 1158.15 110.671 1163.79 117.302 '/>
+<circle r='5' fill='red' cx='1115.49' cy='72.181' />
+<rect width='10' height='41.5261'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1115.49,72.181) rotate(-54.5194) translate(-5,-20.763)'/>
+<circle r='5' fill='red' cx='1149.96' cy='101.816' />
+<rect width='10' height='41.5261'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1149.96,101.816) rotate(-44.1196) translate(-5,-20.763)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1089.92 74.595 1096.85 78.8812 1103.63 83.4053 1110.25 88.1619 1116.7 93.1452 1122.97 98.3494 1129.06 103.768 1134.95 109.395 1140.65 115.222 1146.14 121.244 1151.42 127.453 '/>
+<circle r='5' fill='red' cx='1106.15' cy='85.1729' />
+<rect width='10' height='38.7495'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1106.15,85.1729) rotate(-54.535) translate(-5,-19.3747)'/>
+<circle r='5' fill='red' cx='1138.52' cy='113' />
+<rect width='10' height='38.7495'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1138.52,113) rotate(-44.104) translate(-5,-19.3747)'/>
+</g>
+
+<g id="r-montreal-new-york">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1080 60 1080.97 62.483 1081.93 64.9732 1082.86 67.4705 1083.78 69.9747 1084.68 72.4857 1085.55 75.0034 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1104.44 211.388 1104.28 214.049 1104.1 216.71 1103.9 219.369 1103.68 222.026 1103.44 224.682 1103.17 227.336 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1085.55 75.0034 1089.82 88.1866 1093.56 101.526 1096.79 115 1099.48 128.59 1101.65 142.274 1103.28 156.032 1104.38 169.844 1104.94 183.688 1104.96 197.542 1104.44 211.388 '/>
+<circle r='5' fill='red' cx='1092.02' cy='95.7778' />
+<rect width='10' height='43.5193'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1092.02,95.7778) rotate(-15.5288) translate(-5,-21.7597)'/>
+<circle r='5' fill='red' cx='1101.65' cy='142.274' />
+<rect width='10' height='43.5193'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1101.65,142.274) rotate(-7.88461) translate(-5,-21.7597)'/>
+<circle r='5' fill='red' cx='1105.02' cy='189.639' />
+<rect width='10' height='43.5193'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1105.02,189.639) rotate(-0.240424) translate(-5,-21.7597)'/>
+</g>
+
+<g id="r-boston-new-york">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1168 136 1167.03 138.482 1166.02 140.954 1164.99 143.414 1163.94 145.862 1162.85 148.298 1161.74 150.722 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1115.46 217.274 1113.57 219.16 1111.67 221.024 1109.74 222.867 1107.79 224.689 1105.82 226.488 1103.84 228.265 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1168.99 154.098 1165.31 161.67 1161.37 169.111 1157.17 176.412 1152.72 183.564 1148.04 190.559 1143.11 197.389 1137.95 204.046 1132.57 210.521 1126.96 216.807 1121.15 222.897 '/>
+<circle r='5' fill='red' cx='1159.79' cy='171.911' />
+<rect width='10' height='40.1071'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(1159.79,171.911) rotate(29.6575) translate(-5,-20.0535)'/>
+<circle r='5' fill='red' cx='1134.65' cy='208.074' />
+<rect width='10' height='40.1071'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(1134.65,208.074) rotate(39.9747) translate(-5,-20.0535)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1154.49 147.345 1151.04 154.422 1147.36 161.377 1143.44 168.201 1139.28 174.886 1134.9 181.424 1130.3 187.808 1125.47 194.03 1120.44 200.082 1115.2 205.958 1109.77 211.65 '/>
+<circle r='5' fill='red' cx='1145.92' cy='163.938' />
+<rect width='10' height='37.3566'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1145.92,163.938) rotate(29.6411) translate(-5,-18.6783)'/>
+<circle r='5' fill='red' cx='1122.34' cy='197.845' />
+<rect width='10' height='37.3566'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1122.34,197.845) rotate(39.991) translate(-5,-18.6783)'/>
+</g>
+
+<g id="r-new-york-washington">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1103 229 1103.87 231.52 1104.72 234.05 1105.53 236.589 1106.32 239.137 1107.08 241.693 1107.8 244.258 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1115.86 324.991 1115.65 327.649 1115.41 330.305 1115.14 332.959 1114.84 335.608 1114.52 338.255 1114.16 340.898 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1115.51 242.114 1117.63 250.272 1119.47 258.497 1121.02 266.781 1122.29 275.113 1123.27 283.484 1123.96 291.884 1124.36 300.302 1124.48 308.729 1124.3 317.156 1123.83 325.571 '/>
+<circle r='5' fill='red' cx='1120.09' cy='261.65' />
+<rect width='10' height='40.1426'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(1120.09,261.65) rotate(-10.8542) translate(-5,-20.0713)'/>
+<circle r='5' fill='red' cx='1124.47' cy='305.515' />
+<rect width='10' height='40.1426'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(1124.47,305.515) rotate(-0.534843) translate(-5,-20.0713)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1100.1 246.402 1102.08 254.027 1103.8 261.716 1105.25 269.459 1106.43 277.247 1107.35 285.071 1108 292.923 1108.37 300.792 1108.48 308.669 1108.31 316.545 1107.88 324.411 '/>
+<circle r='5' fill='red' cx='1104.37' cy='264.599' />
+<rect width='10' height='37.3915'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1104.37,264.599) rotate(-10.8705) translate(-5,-18.6957)'/>
+<circle r='5' fill='red' cx='1108.47' cy='305.73' />
+<rect width='10' height='37.3915'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1108.47,305.73) rotate(-0.518516) translate(-5,-18.6957)'/>
+</g>
+
+<g id="r-washington-raleigh">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1114 342 1112.74 344.35 1111.45 346.686 1110.14 349.007 1108.8 351.312 1107.43 353.602 1106.04 355.876 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1053.73 414.828 1051.64 416.481 1049.53 418.11 1047.4 419.715 1045.25 421.295 1043.08 422.851 1040.9 424.381 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1112.84 360.093 1108.4 366.98 1103.73 373.712 1098.84 380.28 1093.72 386.678 1088.39 392.897 1082.85 398.931 1077.1 404.773 1071.16 410.415 1065.04 415.851 1058.72 421.076 '/>
+<circle r='5' fill='red' cx='1101.91' cy='376.214' />
+<rect width='10' height='38.9632'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1101.91,376.214) rotate(36.4607) translate(-5,-19.4816)'/>
+<circle r='5' fill='red' cx='1073.43' cy='408.306' />
+<rect width='10' height='38.9632'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1073.43,408.306) rotate(46.7084) translate(-5,-19.4816)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1099.24 351.659 1095.1 358.087 1090.74 364.37 1086.17 370.501 1081.4 376.472 1076.42 382.278 1071.25 387.91 1065.89 393.362 1060.34 398.629 1054.62 403.703 1048.73 408.579 '/>
+<circle r='5' fill='red' cx='1089.08' cy='366.652' />
+<rect width='10' height='36.2348'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1089.08,366.652) rotate(36.4437) translate(-5,-18.1174)'/>
+<circle r='5' fill='red' cx='1062.41' cy='396.706' />
+<rect width='10' height='36.2348'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1062.41,396.706) rotate(46.7254) translate(-5,-18.1174)'/>
+</g>
+
+<g id="r-raleigh-charleston">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1040 425 1042.2 426.501 1044.36 428.071 1046.46 429.708 1048.52 431.412 1050.51 433.179 1052.45 435.008 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1077.88 492.072 1077.94 494.738 1077.92 497.405 1077.82 500.069 1077.63 502.729 1077.35 505.381 1077 508.024 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1052.45 435.008 1056.86 439.642 1060.91 444.597 1064.57 449.845 1067.82 455.356 1070.65 461.097 1073.03 467.036 1074.95 473.139 1076.41 479.37 1077.39 485.693 1077.88 492.072 '/>
+<circle r='5' fill='red' cx='1062.22' cy='446.37' />
+<rect width='10' height='30'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1062.22,446.37) rotate(-35.5751) translate(-5,-15)'/>
+<circle r='5' fill='red' cx='1075.96' cy='477.216' />
+<rect width='10' height='30'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1075.96,477.216) rotate(-12.4615) translate(-5,-15)'/>
+</g>
+
+<g id="r-charleston-miami">
+<path stroke='green' stroke-width='1' fill='transparent' d='M1077 508 1076.87 510.664 1076.76 513.328 1076.67 515.993 1076.59 518.658 1076.53 521.324 1076.49 523.991 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1107.82 688.529 1108.84 690.992 1109.88 693.45 1110.93 695.9 1112 698.344 1113.08 700.781 1114.18 703.211 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1076.49 523.991 1076.61 540.852 1077.4 557.695 1078.88 574.493 1081.03 591.217 1083.85 607.842 1087.34 624.339 1091.48 640.683 1096.29 656.846 1101.74 672.804 1107.82 688.529 '/>
+<circle r='5' fill='red' cx='1076.69' cy='543.567' />
+<rect width='10' height='39.1579'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(1076.69,543.567) rotate(-181.93) translate(-5,-19.5789)'/>
+<circle r='5' fill='red' cx='1080.36' cy='586.549' />
+<rect width='10' height='39.1579'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(1080.36,586.549) rotate(-187.832) translate(-5,-19.5789)'/>
+<circle r='5' fill='red' cx='1088.43' cy='628.926' />
+<rect width='10' height='39.1579'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(1088.43,628.926) rotate(-193.734) translate(-5,-19.5789)'/>
+<circle r='5' fill='red' cx='1100.82' cy='670.249' />
+<rect width='10' height='39.1579'  fill='pink' stroke='black' stroke-width='0.4' transform='translate(1100.82,670.249) rotate(-199.636) translate(-5,-19.5789)'/>
+</g>
 </svg>
