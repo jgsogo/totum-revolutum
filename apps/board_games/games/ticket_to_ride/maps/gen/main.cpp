@@ -77,14 +77,14 @@ std::string color(const board_games::ticket_to_ride::Color color) {
         return "orange";
     // case board_games::ticket_to_ride::COLOR_PURPLE:
     case board_games::ticket_to_ride::COLOR_PINK:
-        return "pink";
+        return "hotpink";
     case board_games::ticket_to_ride::Color_INT_MIN_SENTINEL_DO_NOT_USE_:
     case board_games::ticket_to_ride::Color_INT_MAX_SENTINEL_DO_NOT_USE_:
         return "grey";
     }
 }
 
-std::string make_route_svg(const RouteData& route) {
+std::string make_route_svg(const RouteData& route, bool draw_helpers) {
     // We need to compute the arc with a given length between two points
     double arc_length =
         static_cast<double>((route.n_carriages * carriage_length) + ((route.n_carriages - 1) * gap) + (2 * city_gap));
@@ -128,24 +128,27 @@ std::string make_route_svg(const RouteData& route) {
     os << "<g id=\"r-" << city_name(route.start) << "-" << city_name(route.end) << "\">\n";
 
     // HELPERS
+    if (draw_helpers) {
+        // - draw circle for reference
+        os << "  <circle cx='" << center.x << "' cy='" << center.y << "' r='" << radius
+           << "' fill='none' stroke='red'/>\n";
+        // - draw chord for reference
+        os << "  <line x1='" << route.start.pos_x() << "' y1='" << route.start.pos_y() << "' x2='" << route.end.pos_x()
+           << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
 
-    // - draw circle for reference
-    // os << "  <circle cx='" << center.x << "' cy='" << center.y << "' r='" << radius
-    //    << "' fill='none' stroke='red'/>\n";
-    // - draw chord for reference
-    // os << "  <line x1='" << route.start.pos_x() << "' y1='" << route.start.pos_y() << "' x2='" << route.end.pos_x()
-    //    << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
-
-    // - draw city gap (start and end)
-    os << draw_arc(center, radius, "green", ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
-    os << draw_arc(center, radius, "red", ang_start + sgn * theta - sgn * (city_gap / radius), ang_start + sgn * theta,
-                   6, 1);
+        // - draw city gap (start and end)
+        os << draw_arc(center, radius, "green", ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
+        os << draw_arc(center, radius, "red", ang_start + sgn * theta - sgn * (city_gap / radius),
+                       ang_start + sgn * theta, 6, 1);
+    }
 
     // CARRIAGES
-    auto draw_carriages = [&os](Vec2 _center, double _radius, double _ang_start, double _ang_end, double _sgn,
-                                int n_carriages, std::string color) {
-        // - draw circle for carriages
-        os << draw_arc(_center, _radius, "black", _ang_start, _ang_end, 10, 2);
+    auto draw_carriages = [&os, &draw_helpers](Vec2 _center, double _radius, double _ang_start, double _ang_end,
+                                               double _sgn, int n_carriages, std::string color) {
+        if (draw_helpers) {
+            // - draw circle for carriages
+            os << draw_arc(_center, _radius, "black", _ang_start, _ang_end, 10, 2);
+        }
 
         // - draw carriages
         double total_length = std::abs(_ang_end - _ang_start) * _radius;
@@ -196,8 +199,10 @@ int main(int argc, char** argv) {
     argv = app.ensure_utf8(argv);
 
     std::filesystem::path input_textproto, output;
+    bool draw_helpers = false;
     app.add_option("--textproto", input_textproto, "Input textproto file")->required();
     app.add_option("--output", output, "Output file")->required();
+    app.add_option("--draw_helpers", draw_helpers, "Add helpers to the SVG output");
 
     CLI11_PARSE(app, argc, argv);
 
@@ -216,9 +221,11 @@ int main(int argc, char** argv) {
     os << "<svg width=\"" << map_data.size_x() << "\" height=\"" << map_data.size_y()
        << "\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n";
 
-    // Background image
-    os << "  <image href=\"https://i.imgur.com/3USktsR.jpeg\" width=\"" << map_data.size_x() << "\" height=\""
-       << map_data.size_y() << "\"/>\n";
+    if (draw_helpers) {
+        // Background image
+        os << "  <image href=\"https://i.imgur.com/3USktsR.jpeg\" width=\"" << map_data.size_x() << "\" height=\""
+           << map_data.size_y() << "\"/>\n";
+    }
 
     // Reusable elements
     os << "  <defs>\n";
@@ -262,7 +269,7 @@ int main(int argc, char** argv) {
     }
     os << "<!--Routes-->\n";
     for (const auto& [_, route] : routes) {
-        std::string svg = make_route_svg(route);
+        std::string svg = make_route_svg(route, draw_helpers);
         os << svg;
     }
 
