@@ -10,6 +10,7 @@ cc_library(
     ],
     visibility = [
         "//apps/board_games/games/ticket_to_ride/engine:__subpackages__",
+        "//apps/board_games/games/ticket_to_ride/maps/gen:__pkg__",
         "//apps/board_games/games/ticket_to_ride/maps/tests:__pkg__",
     ],
     deps = [

@@ -4,11 +4,16 @@ package board_games.ticket_to_ride;
 message MapData {
   repeated City cities = 1;
   repeated Route routes = 2;
+
+  int32 size_x = 3;
+  int32 size_y = 4;
 }
 
 message City {
   int32 id = 1;
   string name = 2;
+  int32 pos_x =3;
+  int32 pos_y =4;
 }
 
 enum Color {

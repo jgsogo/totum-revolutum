@@ -1,0 +1,16 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+cc_binary(
+    name = "gen",
+    srcs = [
+        "arc_circle.cpp",
+        "arc_circle.h",
+        "main.cpp",
+    ],
+    visibility = ["//apps/board_games/games/ticket_to_ride/maps:__pkg__"],
+    deps = [
+        "//apps/board_games/games/ticket_to_ride/maps/cpp:maps",
+        "//bazel/logging:spdlog",
+        "@cli11",
+    ],
+)

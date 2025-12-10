@@ -1,40 +1,44 @@
+# --- Map dimensions --
+size_x: 1200
+size_y: 773
+
 # --- Cities ---
-cities: { id: 0  name: "Vancouver" }
-cities: { id: 1  name: "Seattle" }
-cities: { id: 2  name: "Portland" }
-cities: { id: 3  name: "San Francisco" }
-cities: { id: 4  name: "Los Angeles" }
-cities: { id: 5  name: "Calgary" }
-cities: { id: 6  name: "Helena" }
-cities: { id: 7  name: "Salt Lake City" }
-cities: { id: 8  name: "Las Vegas" }
-cities: { id: 9  name: "Phoenix" }
-cities: { id: 10 name: "Winnipeg" }
-cities: { id: 11 name: "Denver" }
-cities: { id: 12 name: "Santa Fe" }
-cities: { id: 13 name: "El Paso" }
-cities: { id: 14 name: "Duluth" }
-cities: { id: 15 name: "Omaha" }
-cities: { id: 16 name: "Kansas City" }
-cities: { id: 17 name: "Oklahoma City" }
-cities: { id: 18 name: "Dallas" }
-cities: { id: 19 name: "Houston" }
-cities: { id: 20 name: "Sault Ste Marie" }
-cities: { id: 21 name: "Chicago" }
-cities: { id: 22 name: "Saint Louis" }
-cities: { id: 23 name: "Little Rock" }
-cities: { id: 24 name: "New Orleans" }
-cities: { id: 25 name: "Nashville" }
-cities: { id: 26 name: "Atlanta" }
-cities: { id: 27 name: "Toronto" }
-cities: { id: 28 name: "Pittsburgh" }
-cities: { id: 29 name: "Montreal" }
-cities: { id: 30 name: "Boston" }
-cities: { id: 31 name: "New York" }
-cities: { id: 32 name: "Washington" }
-cities: { id: 33 name: "Raleigh" }
-cities: { id: 34 name: "Charleston" }
-cities: { id: 35 name: "Miami" }
+cities: { id: 0  name: "Vancouver" pos_x: 97 pos_y: 90 }
+cities: { id: 1  name: "Seattle" pos_x: 95 pos_y: 158 }
+cities: { id: 2  name: "Portland" pos_x: 68 pos_y: 223 }
+cities: { id: 3  name: "San Francisco" pos_x: 51 pos_y: 468 }
+cities: { id: 4  name: "Los Angeles" pos_x: 142 pos_y: 600 }
+cities: { id: 5  name: "Calgary" pos_x: 262 pos_y: 70 }
+cities: { id: 6  name: "Helena" pos_x: 385 pos_y: 233 }
+cities: { id: 7  name: "Salt Lake City" pos_x: 298 pos_y: 388 }
+cities: { id: 8  name: "Las Vegas" pos_x: 0 pos_y: 0 }
+cities: { id: 9  name: "Phoenix" pos_x: 0 pos_y: 0 }
+cities: { id: 10 name: "Winnipeg" pos_x: 0 pos_y: 0 }
+cities: { id: 11 name: "Denver" pos_x: 0 pos_y: 0 }
+cities: { id: 12 name: "Santa Fe" pos_x: 0 pos_y: 0 }
+cities: { id: 13 name: "El Paso" pos_x: 0 pos_y: 0 }
+cities: { id: 14 name: "Duluth" pos_x: 0 pos_y: 0 }
+cities: { id: 15 name: "Omaha" pos_x: 0 pos_y: 0 }
+cities: { id: 16 name: "Kansas City" pos_x: 0 pos_y: 0 }
+cities: { id: 17 name: "Oklahoma City" pos_x: 0 pos_y: 0 }
+cities: { id: 18 name: "Dallas" pos_x: 0 pos_y: 0 }
+cities: { id: 19 name: "Houston" pos_x: 0 pos_y: 0 }
+cities: { id: 20 name: "Sault Ste Marie" pos_x: 0 pos_y: 0 }
+cities: { id: 21 name: "Chicago" pos_x: 0 pos_y: 0 }
+cities: { id: 22 name: "Saint Louis" pos_x: 0 pos_y: 0 }
+cities: { id: 23 name: "Little Rock" pos_x: 0 pos_y: 0 }
+cities: { id: 24 name: "New Orleans" pos_x: 0 pos_y: 0 }
+cities: { id: 25 name: "Nashville" pos_x: 0 pos_y: 0 }
+cities: { id: 26 name: "Atlanta" pos_x: 0 pos_y: 0 }
+cities: { id: 27 name: "Toronto" pos_x: 0 pos_y: 0 }
+cities: { id: 28 name: "Pittsburgh" pos_x: 0 pos_y: 0 }
+cities: { id: 29 name: "Montreal" pos_x: 0 pos_y: 0 }
+cities: { id: 30 name: "Boston" pos_x: 0 pos_y: 0 }
+cities: { id: 31 name: "New York" pos_x: 0 pos_y: 0 }
+cities: { id: 32 name: "Washington" pos_x: 0 pos_y: 0 }
+cities: { id: 33 name: "Raleigh" pos_x: 0 pos_y: 0 }
+cities: { id: 34 name: "Charleston" pos_x: 0 pos_y: 0 }
+cities: { id: 35 name: "Miami" pos_x: 0 pos_y: 0 }
 
 
 # --- Routes ---
@@ -59,8 +63,8 @@ routes: { city1: 2  city2: 3  color: COLOR_GREEN length: 5 double_route: true }
 routes: { city1: 2  city2: 3  color: COLOR_PINK length: 5 double_route: true }
 
 # San Francisco - Los Angeles
-routes: { city1: 3  city2: 4  color: COLOR_YELLOW length: 5 double_route: true }
-routes: { city1: 3  city2: 4  color: COLOR_PINK length: 5 double_route: true }
+routes: { city1: 3  city2: 4  color: COLOR_YELLOW length: 3 double_route: true }
+routes: { city1: 3  city2: 4  color: COLOR_PINK length: 3 double_route: true }
 
 # Calgary - Vancouver
 routes: { city1: 5  city2: 0  color: COLOR_UNKNOWN length: 3 double_route: false }

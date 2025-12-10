@@ -1,0 +1,15 @@
+<svg width="1200" height="773" xmlns="http://www.w3.org/2000/svg">
+  <image href="https://i.imgur.com/3USktsR.jpeg" width="1200" height="773"/>
+  <defs>
+    <circle r="8" fill="none" stroke-width="5" stroke="black" id="city-point"/>
+  </defs>
+<!--Cities-->
+  <use id="vancouver" href="#city-point" x="97" y="90"/>
+  <use id="seattle" href="#city-point" x="95" y="158"/>
+  <use id="portland" href="#city-point" x="68" y="223"/>
+  <use id="san-francisco" href="#city-point" x="51" y="468"/>
+  <use id="los-angeles" href="#city-point" x="142" y="600"/>
+  <use id="calgary" href="#city-point" x="262" y="70"/>
+  <use id="helena" href="#city-point" x="385" y="233"/>
+  <use id="salt-lake-city" href="#city-point" x="298" y="388"/>
+</svg>
