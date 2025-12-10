@@ -163,8 +163,8 @@ routes: { city1: 17  city2: 12  color: COLOR_BLUE length: 3 double_route: false 
 routes: { city1: 17  city2: 13  color: COLOR_YELLOW length: 5 double_route: false }
 
 # Oklahoma City - Dallas
-routes: { city1: 17  city2: 18  color: COLOR_UNKNOWN length: 1 double_route: true }
-routes: { city1: 17  city2: 18  color: COLOR_UNKNOWN length: 1 double_route: true }
+routes: { city1: 17  city2: 18  color: COLOR_UNKNOWN length: 2 double_route: true }
+routes: { city1: 17  city2: 18  color: COLOR_UNKNOWN length: 2 double_route: true }
 
 # Dallas - El Paso
 routes: { city1: 18  city2: 13  color: COLOR_RED length: 4 double_route: false }

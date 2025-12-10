@@ -200,9 +200,11 @@ int main(int argc, char** argv) {
 
     std::filesystem::path input_textproto, output;
     bool draw_helpers = false;
+    bool add_background = true;
     app.add_option("--textproto", input_textproto, "Input textproto file")->required();
     app.add_option("--output", output, "Output file")->required();
     app.add_option("--draw_helpers", draw_helpers, "Add helpers to the SVG output");
+    app.add_option("--add_background", add_background, "Add background image");
 
     CLI11_PARSE(app, argc, argv);
 
@@ -221,7 +223,7 @@ int main(int argc, char** argv) {
     os << "<svg width=\"" << map_data.size_x() << "\" height=\"" << map_data.size_y()
        << "\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n";
 
-    if (draw_helpers) {
+    if (add_background) {
         // Background image
         os << "  <image href=\"https://i.imgur.com/3USktsR.jpeg\" width=\"" << map_data.size_x() << "\" height=\""
            << map_data.size_y() << "\"/>\n";

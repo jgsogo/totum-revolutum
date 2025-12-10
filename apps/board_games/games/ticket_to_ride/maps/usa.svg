@@ -1,4 +1,5 @@
 <svg width="1200" height="773" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <image href="https://i.imgur.com/3USktsR.jpeg" width="1200" height="773"/>
   <defs>
     <circle r='8' fill='black' stroke-width='1' stroke='black' id='city-point'/>
     <g id="carriage">
@@ -554,10 +555,14 @@
 </g>
 
 <g id="r-oklahoma-city-dallas">
-<circle r='5' fill='red' cx='670.855' cy='565.151' />
-<rect width='10' height='83.5493'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(670.855,565.151) rotate(-12.9388) translate(-5,-41.7747)'/>
-<circle r='5' fill='red' cx='655.261' cy='568.733' />
-<rect width='10' height='78.061'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(655.261,568.733) rotate(-12.9388) translate(-5,-39.0305)'/>
+<circle r='5' fill='red' cx='665.003' cy='544.068' />
+<rect width='10' height='39.7747'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(665.003,544.068) rotate(-18.0875) translate(-5,-19.8873)'/>
+<circle r='5' fill='red' cx='674.792' cy='586.674' />
+<rect width='10' height='39.7747'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(674.792,586.674) rotate(-7.79019) translate(-5,-19.8873)'/>
+<circle r='5' fill='red' cx='649.773' cy='548.973' />
+<rect width='10' height='37.0305'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(649.773,548.973) rotate(-18.104) translate(-5,-18.5152)'/>
+<circle r='5' fill='red' cx='658.948' cy='588.908' />
+<rect width='10' height='37.0305'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(658.948,588.908) rotate(-7.77366) translate(-5,-18.5152)'/>
 </g>
 
 <g id="r-little-rock-oklahoma-city">
