@@ -25,6 +25,12 @@ TEST_CASE("Validate cities") {
 
             REQUIRE(!c.name().empty());
             REQUIRE(name_seen.insert(c.name()).second);
+
+            REQUIRE(c.pos_x() >= 0);
+            REQUIRE(c.pos_x() < cfg.map_data.size_x());
+
+            REQUIRE(c.pos_y() >= 0);
+            REQUIRE(c.pos_y() < cfg.map_data.size_y());
         }
     }
 }
