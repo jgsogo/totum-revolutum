@@ -4,6 +4,6 @@
 
 namespace board_games::ticket_to_ride {
 
-    void populate_usa_map(MapDefinition& map);
+    void populate_usa_map(MapData& map);
 
 }

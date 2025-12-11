@@ -1,0 +1,42 @@
+syntax = "proto3";
+package board_games.ticket_to_ride;
+
+message MapData {
+  string name = 1;
+
+  repeated City cities = 2;
+  repeated Route routes = 3;
+
+  int32 size_x = 4;
+  int32 size_y = 5;
+}
+
+message City {
+  int32 id = 1;
+  string name = 2;
+  int32 pos_x =3;
+  int32 pos_y =4;
+}
+
+enum Color {
+    option allow_alias = true;
+  COLOR_UNKNOWN = 0;
+  COLOR_BLUE = 1;
+  COLOR_RED = 2;
+  COLOR_GREEN = 3;
+  COLOR_YELLOW = 4;
+  COLOR_BLACK = 5;
+  COLOR_WHITE = 6;
+  COLOR_ORANGE = 7;
+  COLOR_PURPLE = 8;
+  COLOR_PINK = 8;
+ }
+
+message Route {
+  int32 city1 = 1;
+  int32 city2 = 2;
+  Color color = 3;
+  int32 length = 4;
+  bool double_route = 5;
+  bool draw_ccw = 6;
+}

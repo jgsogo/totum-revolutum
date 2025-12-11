@@ -1,0 +1,509 @@
+<svg width='1200' height='773' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
+  <defs>
+  <circle id='city-point' stroke='black' stroke-width='1' fill='black' cx='0' cy='0' r='8'/>
+  <g id='carriage'>
+  <rect width='40' height='10'/>
+</g>
+</defs>
+  <use id='vancouver' href='#city-point' x='97' y='90'/>
+  <use id='seattle' href='#city-point' x='95' y='158'/>
+  <use id='portland' href='#city-point' x='68' y='223'/>
+  <use id='san-francisco' href='#city-point' x='51' y='468'/>
+  <use id='los-angeles' href='#city-point' x='142' y='600'/>
+  <use id='calgary' href='#city-point' x='262' y='70'/>
+  <use id='helena' href='#city-point' x='385' y='233'/>
+  <use id='salt-lake-city' href='#city-point' x='298' y='388'/>
+  <use id='las-vegas' href='#city-point' x='228' y='526'/>
+  <use id='phoenix' href='#city-point' x='296' y='608'/>
+  <use id='winnipeg' href='#city-point' x='540' y='80'/>
+  <use id='denver' href='#city-point' x='460' y='430'/>
+  <use id='santa-fe' href='#city-point' x='450' y='540'/>
+  <use id='el-paso' href='#city-point' x='443' y='653'/>
+  <use id='duluth' href='#city-point' x='682' y='227'/>
+  <use id='omaha' href='#city-point' x='646' y='342'/>
+  <use id='kansas-city' href='#city-point' x='669' y='405'/>
+  <use id='oklahoma-city' href='#city-point' x='644' y='514'/>
+  <use id='dallas' href='#city-point' x='669' y='624'/>
+  <use id='houston' href='#city-point' x='721' y='674'/>
+  <use id='sault-ste-marie' href='#city-point' x='840' y='142'/>
+  <use id='chicago' href='#city-point' x='835' y='304'/>
+  <use id='saint-louis' href='#city-point' x='780' y='408'/>
+  <use id='little-rock' href='#city-point' x='757' y='518'/>
+  <use id='new-orleans' href='#city-point' x='840' y='665'/>
+  <use id='nashville' href='#city-point' x='897' y='457'/>
+  <use id='atlanta' href='#city-point' x='958' y='499'/>
+  <use id='toronto' href='#city-point' x='980' y='170'/>
+  <use id='pittsburgh' href='#city-point' x='998' y='285'/>
+  <use id='montreal' href='#city-point' x='1080' y='60'/>
+  <use id='boston' href='#city-point' x='1168' y='136'/>
+  <use id='new-york' href='#city-point' x='1103' y='229'/>
+  <use id='washington' href='#city-point' x='1114' y='342'/>
+  <use id='raleigh' href='#city-point' x='1040' y='425'/>
+  <use id='charleston' href='#city-point' x='1077' y='508'/>
+  <use id='miami' href='#city-point' x='1115' y='705'/>
+  <g id='r-vancouver-seattle'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(114, 121) rotate(-0.407207) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(97, 126) rotate(4.41403) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-calgary-vancouver'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(227, 80) rotate(75.1785) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(181, 89) rotate(82.9542) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(134, 92) rotate(90.7299) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-seattle-portland'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(95, 194) rotate(21.5584) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(79, 191) rotate(23.6477) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-calgary-seattle'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(243, 101) rotate(37.1422) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(212, 131) rotate(53.8608) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(173, 152) rotate(70.5793) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(130, 160) rotate(87.2978) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-helena-seattle'>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(349, 231) rotate(93.9447) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(303, 226) rotate(98.113) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(259, 218) rotate(102.281) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(214, 207) rotate(106.45) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(171, 192) rotate(110.618) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(129, 175) rotate(114.787) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-portland-san-francisco'>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(48, 254) rotate(-163.681) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(38, 298) rotate(-169.809) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(32, 342) rotate(-175.937) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(32, 387) rotate(-182.065) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(36, 432) rotate(-188.193) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(63, 259) rotate(-163.788) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(54, 301) rotate(-169.862) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(48, 344) rotate(-175.937) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(48, 387) rotate(-182.011) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(51, 429) rotate(-188.085) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-salt-lake-city-portland'>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(278, 357) rotate(-35.5323) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(250, 323) rotate(-43.0497) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(218, 293) rotate(-50.5671) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(183, 267) rotate(-58.0845) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(144, 247) rotate(-65.6018) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(103, 231) rotate(-73.1192) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-san-francisco-los-angeles'>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(58, 504) rotate(153.19) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(81, 543) rotate(145.552) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(109, 579) rotate(137.915) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(72, 497) rotate(153.026) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(94, 534) rotate(145.552) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(120, 567) rotate(138.078) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-salt-lake-city-san-francisco'>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(270, 412) rotate(61.9742) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(227, 433) rotate(66.9466) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(183, 450) rotate(71.919) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(137, 463) rotate(76.8914) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(90, 471) rotate(81.8638) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(262, 399) rotate(62.0366) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(221, 418) rotate(66.9778) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(178, 435) rotate(71.919) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(133, 447) rotate(76.8602) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(88, 455) rotate(81.8014) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-las-vegas-los-angeles'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(195, 541) rotate(-122.414) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(162, 570) rotate(-138.918) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-phoenix-los-angeles'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(263, 593) rotate(-72.2021) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(219, 585) rotate(-87.0191) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(176, 588) rotate(-101.836) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-el-paso-los-angeles'>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(407, 654) rotate(89.3651) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(360, 653) rotate(93.5597) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(313, 648) rotate(97.7544) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(267, 640) rotate(101.949) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(222, 629) rotate(106.144) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(178, 614) rotate(110.338) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-calgary-helena'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(288, 93) rotate(-46.0542) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(319, 126) rotate(-40.1333) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(345, 161) rotate(-34.2124) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(368, 198) rotate(-28.2915) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-winnipeg-calgary'>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(508, 62) rotate(-64.814) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(467, 47) rotate(-74.0666) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(424, 38) rotate(-83.3192) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(380, 36) rotate(-92.5718) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(336, 42) rotate(-101.824) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(294, 54) rotate(-111.077) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-helena-salt-lake-city'>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(373, 267) rotate(21.009) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(351, 315) rotate(29.1705) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(322, 359) rotate(37.332) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-winnipeg-helena'>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(519, 109) rotate(36.0542) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(489, 147) rotate(42.1764) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(454, 181) rotate(48.2986) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(416, 212) rotate(54.4207) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-denver-helena'>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(440, 399) rotate(149.99) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(419, 358) rotate(156.012) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(403, 315) rotate(162.034) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(391, 270) rotate(168.056) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-duluth-helena'>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(646, 235) rotate(78.3147) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(602, 242) rotate(82.4721) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(557, 247) rotate(86.6294) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(512, 248) rotate(90.7868) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(467, 245) rotate(94.9441) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(423, 240) rotate(99.1015) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-omaha-helena'>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(610, 335) rotate(102.306) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(559, 321) rotate(107.419) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(510, 303) rotate(112.532) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(462, 281) rotate(117.645) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(416, 255) rotate(122.758) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-salt-lake-city-las-vegas'>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(293, 423) rotate(12.7121) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(278, 464) rotate(26.8826) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(254, 501) rotate(41.053) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-denver-salt-lake-city'>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(423, 435) rotate(96.5101) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(375, 426) rotate(104.4) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(328, 411) rotate(112.29) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(424, 419) rotate(96.6602) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(379, 411) rotate(104.4) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(335, 396) rotate(112.14) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-denver-phoenix'>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(428, 446) rotate(-121.308) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(392, 472) rotate(-129.307) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(360, 502) rotate(-137.307) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(332, 536) rotate(-145.306) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(310, 574) rotate(-153.305) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-santa-fe-phoenix'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(420, 560) rotate(58.19) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(377, 583) rotate(66.0412) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(332, 599) rotate(73.8923) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-phoenix-el-paso'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(324, 630) rotate(122.406) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(363, 648) rotate(107.023) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(407, 655) rotate(91.6398) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-duluth-winnipeg'>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(652, 206) rotate(126.971) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(618, 178) rotate(132.895) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(587, 146) rotate(138.819) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(560, 111) rotate(144.742) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-sault-ste-marie-winnipeg'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(804, 142) rotate(91.048) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(757, 139) rotate(95.2457) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(710, 133) rotate(99.4433) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(664, 124) rotate(103.641) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(619, 111) rotate(107.839) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(575, 95) rotate(112.036) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-denver-santa-fe'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(469, 464) rotate(-6.50478) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(465, 507) rotate(16.9054) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-omaha-denver'>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(611, 350) rotate(-106.267) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(568, 365) rotate(-112.212) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(528, 384) rotate(-118.158) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(490, 407) rotate(-124.103) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-kansas-city-denver'>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(637, 423) rotate(73.9718) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(591, 434) rotate(80.0201) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(544, 440) rotate(86.0684) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(497, 441) rotate(92.1168) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(632, 408) rotate(74.0667) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(588, 418) rotate(80.0518) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(543, 424) rotate(86.0368) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(498, 425) rotate(92.0218) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-oklahoma-city-denver'>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(608, 507) rotate(103.604) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(566, 494) rotate(110.827) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(526, 476) rotate(118.05) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(489, 453) rotate(125.273) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-santa-fe-el-paso'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(457, 575) rotate(-5.03462) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(454, 618) rotate(12.0485) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-oklahoma-city-santa-fe'>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(609, 525) rotate(73.56) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(549, 538) rotate(82.2321) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(487, 542) rotate(90.9042) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-oklahoma-city-el-paso'>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(621, 541) rotate(41.7735) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(590, 572) rotate(48.5174) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(555, 600) rotate(55.2612) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(518, 623) rotate(62.0051) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(478, 641) rotate(68.749) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-dallas-el-paso'>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(634, 635) rotate(73.1698) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(584, 648) rotate(79.4254) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(533, 654) rotate(85.6811) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(481, 655) rotate(91.9367) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-houston-el-paso'>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(687, 687) rotate(71.7098) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(644, 697) rotate(80.7554) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(601, 701) rotate(89.8011) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(557, 698) rotate(98.8468) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(514, 688) rotate(107.892) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(473, 671) rotate(116.938) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-duluth-omaha'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(685, 263) rotate(11.5858) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(669, 312) rotate(22.9098) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(669, 261) rotate(11.8756) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(655, 305) rotate(22.62) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-sault-ste-marie-duluth'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(812, 164) rotate(53.3732) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(766, 193) rotate(61.5863) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(718, 215) rotate(69.7994) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-chicago-duluth'>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(800, 294) rotate(108.628) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(754, 275) rotate(116.58) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(711, 249) rotate(124.532) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-toronto-duluth'>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(946, 184) rotate(68.5741) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(903, 199) rotate(72.7592) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(858, 211) rotate(76.9444) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(813, 220) rotate(81.1295) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(767, 225) rotate(85.3147) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(720, 227) rotate(89.4999) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-omaha-kansas-city'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(674, 364) rotate(-22.6375) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(661, 375) rotate(-16.5888) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-chicago-omaha'>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(800, 294) rotate(-79.9453) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(756, 291) rotate(-94.233) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(713, 300) rotate(-108.521) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(674, 319) rotate(-122.808) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-kansas-city-oklahoma-city'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(680, 439) rotate(2.16355) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(669, 487) rotate(23.6567) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(664, 441) rotate(3.36547) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(655, 479) rotate(22.4548) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-saint-louis-kansas-city'>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(748, 427) rotate(79.817) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(699, 425) rotate(103.283) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(743, 411) rotate(81.2386) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(705, 410) rotate(101.861) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-oklahoma-city-dallas'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(668, 541) rotate(-22.3152) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(679, 588) rotate(-3.34726) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(654, 549) rotate(-21.3695) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(663, 587) rotate(-4.29302) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-little-rock-oklahoma-city'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(722, 526) rotate(83.2753) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(678, 525) rotate(100.712) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-dallas-houston'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(702, 639) rotate(-46.6678) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(692, 652) rotate(-45.8577) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-little-rock-dallas'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(739, 549) rotate(33.0156) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(697, 599) rotate(46.1134) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-new-orleans-houston'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(805, 673) rotate(80.0985) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(757, 677) rotate(90.9822) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-toronto-sault-ste-marie'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(944, 169) rotate(94.3751) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(874, 155) rotate(107.976) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-montreal-sault-ste-marie'>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(1044, 64) rotate(-98.9051) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(999, 73) rotate(-103.817) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(956, 86) rotate(-108.729) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(913, 102) rotate(-113.641) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(873, 122) rotate(-118.553) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-chicago-saint-louis'>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(831, 340) rotate(22.2675) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(808, 383) rotate(33.2073) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(816, 335) rotate(22.5716) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(796, 373) rotate(32.9032) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-toronto-chicago'>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(964, 202) rotate(30.7357) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(938, 237) rotate(41.7403) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(905, 267) rotate(52.7449) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(868, 290) rotate(63.7495) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-pittsburgh-chicago'>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(962, 274) rotate(-88.7383) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(915, 276) rotate(-96.5141) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(868, 285) rotate(-104.29) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(961, 290) rotate(-88.8945) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(917, 292) rotate(-96.5141) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(873, 300) rotate(-104.134) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-saint-louis-little-rock'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(783, 443) rotate(2.24693) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(774, 486) rotate(21.338) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-nashville-saint-louis'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(861, 449) rotate(106.658) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(811, 428) rotate(118.521) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-pittsburgh-saint-louis'>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(970, 308) rotate(50.6605) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(935, 335) rotate(55.5467) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(897, 359) rotate(60.4329) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(857, 379) rotate(65.319) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(816, 396) rotate(70.2052) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-little-rock-new-orleans'>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(780, 545) rotate(-37.4522) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(807, 585) rotate(-29.5848) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(827, 629) rotate(-21.7174) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-nashville-little-rock'>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(872, 483) rotate(49.8952) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(835, 506) rotate(66.4609) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(792, 517) rotate(83.0266) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-atlanta-new-orleans'>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(926, 517) rotate(-135.168) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(896, 551) rotate(-141.366) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(869, 587) rotate(-147.564) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(847, 627) rotate(-153.762) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(936, 529) rotate(-135.278) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(908, 561) rotate(-141.402) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(883, 596) rotate(-147.527) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(862, 633) rotate(-153.652) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-miami-new-orleans'>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(1085, 684) rotate(-58.3599) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(1046, 664) rotate(-67.7081) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(1004, 650) rotate(-77.0562) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(961, 644) rotate(-86.4044) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(917, 645) rotate(-95.7525) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(873, 653) rotate(-105.101) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-nashville-atlanta'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(928, 473) rotate(-55.9679) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-pittsburgh-nashville'>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(990, 320) rotate(16.2281) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(974, 361) rotate(25.6614) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(952, 399) rotate(35.0948) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(924, 432) rotate(44.5281) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-raleigh-nashville'>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(1006, 413) rotate(-79.9474) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(962, 414) rotate(-102.618) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(922, 431) rotate(-125.29) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-raleigh-atlanta'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1031, 460) rotate(35.5006) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(994, 493) rotate(60.3825) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1016, 453) rotate(37.0904) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(988, 478) rotate(58.7927) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-charleston-atlanta'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1041, 511) rotate(88.7487) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(994, 507) rotate(99.6323) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-miami-atlanta'>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(1087, 681) rotate(132.648) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(1054, 648) rotate(137.601) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(1024, 612) rotate(142.553) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(997, 574) rotate(147.506) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(974, 533) rotate(152.458) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-toronto-pittsburgh'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(991, 204) rotate(-14.2632) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(998, 247) rotate(-3.79763) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-montreal-toronto'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1045, 71) rotate(-116.984) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1011, 97) rotate(-137.734) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(988, 135) rotate(-158.484) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-new-york-pittsburgh'>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(1079, 257) rotate(56.2309) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='white' transform=' translate(1035, 280) rotate(67.3549) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(1069, 244) rotate(56.5281) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='green' transform=' translate(1030, 265) rotate(67.0577) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-washington-pittsburgh'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1079, 332) rotate(109.958) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1028, 306) rotate(122.11) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-raleigh-pittsburgh'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1023, 392) rotate(156.205) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1002, 322) rotate(170.127) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-montreal-boston'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1114, 71) rotate(-54.6937) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1150, 102) rotate(-43.9453) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1106, 85) rotate(-54.3824) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1138, 112) rotate(-44.2566) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-montreal-new-york'>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(1091, 94) rotate(-15.8119) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(1101, 142) rotate(-7.88461) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='blue' transform=' translate(1105, 191) rotate(0.0426418) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-boston-new-york'>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(1163, 172) rotate(26.2923) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='yellow' transform=' translate(1135, 211) rotate(43.5188) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(1148, 167) rotate(27.0781) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='red' transform=' translate(1125, 199) rotate(42.733) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-new-york-washington'>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(1123, 259) rotate(-14.1269) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='orange' transform=' translate(1127, 307) rotate(2.91249) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(1108, 265) rotate(-13.3574) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='black' transform=' translate(1111, 304) rotate(2.14304) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-washington-raleigh'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1108, 378) rotate(30.1802) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1075, 415) rotate(53.2587) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1093, 372) rotate(31.5573) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1067, 400) rotate(51.8815) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-raleigh-charleston'>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1073, 436) rotate(-49.6823) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='grey' transform=' translate(1090, 475) rotate(1.62924) translate(-5, -20)' width='10' height='40'/>
+</g>
+  <g id='r-charleston-miami'>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(1073, 543) rotate(-178.09) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(1075, 587) rotate(-186.598) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(1083, 630) rotate(-195.107) translate(-5, -20)' width='10' height='40'/>
+  <rect stroke='black' stroke-width='0.4' fill='hotpink' transform=' translate(1098, 672) rotate(-203.615) translate(-5, -20)' width='10' height='40'/>
+</g>
+</svg>

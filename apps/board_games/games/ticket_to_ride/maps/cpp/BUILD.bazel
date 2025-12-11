@@ -1,0 +1,21 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "maps",
+    srcs = [
+        "map_loader.cpp",
+    ],
+    hdrs = [
+        "map_loader.h",
+    ],
+    visibility = [
+        "//apps/board_games/games/ticket_to_ride/engine:__subpackages__",
+        "//apps/board_games/games/ticket_to_ride/maps/gen:__pkg__",
+        "//apps/board_games/games/ticket_to_ride/maps/tests:__pkg__",
+    ],
+    deps = [
+        "//apps/board_games/games/ticket_to_ride/maps:map_cc_proto",
+        "//bazel/logging:spdlog",
+        "//libraries/utils/cpp/expected_type",
+    ],
+)

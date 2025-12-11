@@ -3,11 +3,11 @@ package board_games.ticket_to_ride;
 
 import "apps/board_games/games/ticket_to_ride/models/board.proto";
 import "apps/board_games/games/ticket_to_ride/models/player.proto";
-import "apps/board_games/games/ticket_to_ride/models/map.proto";
+import "apps/board_games/games/ticket_to_ride/maps/map.proto";
 
 
 message GameState {
-  MapDefinition map = 1;
+  MapData map = 1;
 
   // Indexed or mapped by Participant.id
   map<uint32, PlayerState> players = 2;

@@ -101,3 +101,14 @@ template <typename... Args> struct std::formatter<utils::ErrorType<Args...>> : s
             p);
     }
 };
+
+// Required for operator<<
+template <typename... Args> std::ostream& operator<<(std::ostream& os, const utils::ErrorType<Args...>& obj) {
+    std::visit(
+        [&os](const auto& arg) {
+            // using T = std::decay_t<decltype(arg)>;
+            os << arg;
+        },
+        obj);
+    return os;
+}
