@@ -6,12 +6,14 @@
 
 #include "libraries/utils/cpp/math/geometry/2d/point.hpp"
 
+#include "colors.h"
+
 namespace svg {
 
     struct Path {
-        std::optional<std::string> stroke;
+        std::optional<Color> stroke;
         std::optional<int> stroke_width;
-        std::optional<std::string> fill;
+        std::optional<Color> fill;
 
         std::vector<utils::math::g2d::Point<int>> segments;
     };

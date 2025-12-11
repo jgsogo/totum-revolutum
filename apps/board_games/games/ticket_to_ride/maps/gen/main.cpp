@@ -24,7 +24,7 @@ struct RouteData {
     board_games::ticket_to_ride::City start;
     board_games::ticket_to_ride::City end;
     int32_t n_carriages;
-    std::vector<board_games::ticket_to_ride::Color> colors;
+    std::vector<svg::Color> colors;
     bool draw_ccw;
 };
 
@@ -39,9 +39,9 @@ std::string city_name(const board_games::ticket_to_ride::City& city) {
     return name;
 }
 
-std::string draw_arc(const Circunference<double>& circ, const std::string& color, const double& ang_start,
+std::string draw_arc(const Circunference<double>& circ, svg::Color color, const double& ang_start,
                      const double& ang_end, int segments = 10, int stroke_width = 1) {
-    svg::Path arc{.stroke = color, .stroke_width = stroke_width, .fill = "transparent"};
+    svg::Path arc{.stroke = color, .stroke_width = stroke_width, .fill = svg::Color::TRANSPARENT};
     for (int i = 0; i < (segments + 1); i++) {
         double ang = ang_start + i * (ang_end - ang_start) / segments;
         int x = static_cast<int>(circ.center.x + circ.radius * std::cos(ang));
@@ -54,30 +54,30 @@ std::string draw_arc(const Circunference<double>& circ, const std::string& color
     return os.str();
 }
 
-std::string color(const board_games::ticket_to_ride::Color color) {
+svg::Color color(const board_games::ticket_to_ride::Color color) {
     switch (color) {
     case board_games::ticket_to_ride::COLOR_UNKNOWN:
-        return "grey";
+        return svg::Color::GREY;
     case board_games::ticket_to_ride::COLOR_BLUE:
-        return "blue";
+        return svg::Color::BLUE;
     case board_games::ticket_to_ride::COLOR_RED:
-        return "red";
+        return svg::Color::RED;
     case board_games::ticket_to_ride::COLOR_GREEN:
-        return "green";
+        return svg::Color::GREEN;
     case board_games::ticket_to_ride::COLOR_YELLOW:
-        return "yellow";
+        return svg::Color::YELLOW;
     case board_games::ticket_to_ride::COLOR_BLACK:
-        return "black";
+        return svg::Color::BLACK;
     case board_games::ticket_to_ride::COLOR_WHITE:
-        return "white";
+        return svg::Color::WHITE;
     case board_games::ticket_to_ride::COLOR_ORANGE:
-        return "orange";
+        return svg::Color::ORANGE;
     // case board_games::ticket_to_ride::COLOR_PURPLE:
     case board_games::ticket_to_ride::COLOR_PINK:
-        return "hotpink";
+        return svg::Color::HOTPINK;
     case board_games::ticket_to_ride::Color_INT_MIN_SENTINEL_DO_NOT_USE_:
     case board_games::ticket_to_ride::Color_INT_MAX_SENTINEL_DO_NOT_USE_:
-        return "grey";
+        return svg::Color::GREY;
     }
 }
 
@@ -136,17 +136,17 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
            << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
 
         // - draw city gap (start and end)
-        os << draw_arc(solution, "green", ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
-        os << draw_arc(solution, "red", ang_start + sgn * theta - sgn * (city_gap / radius), ang_start + sgn * theta, 6,
-                       1);
+        os << draw_arc(solution, svg::Color::GREEN, ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
+        os << draw_arc(solution, svg::Color::RED, ang_start + sgn * theta - sgn * (city_gap / radius),
+                       ang_start + sgn * theta, 6, 1);
     }
 
     // CARRIAGES
     auto draw_carriages = [&os, &draw_helpers](const Circunference<double>& _circunference, double _ang_start,
-                                               double _ang_end, double _sgn, int n_carriages, std::string color) {
+                                               double _ang_end, double _sgn, int n_carriages, svg::Color color) {
         if (draw_helpers) {
             // - draw circle for carriages
-            os << draw_arc(_circunference, "black", _ang_start, _ang_end, 10, 2);
+            os << draw_arc(_circunference, svg::Color::BLACK, _ang_start, _ang_end, 10, 2);
         }
 
         // - draw carriages
@@ -180,18 +180,15 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
 
     if (route.colors.size() == 1) {
         draw_carriages(solution, ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
-                       color(route.colors[0]));
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, route.colors[0]);
     } else if (route.colors.size() == 2) {
         auto circ_external = Circunference{.center = solution.center, .radius = solution.radius + double_offset};
         draw_carriages(circ_external, ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
-                       color(route.colors[0]));
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, route.colors[0]);
 
         auto circ_internal = Circunference{.center = solution.center, .radius = solution.radius - double_offset};
         draw_carriages(circ_internal, ang_start + sgn * (city_gap / radius),
-                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
-                       color(route.colors[1]));
+                       ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, route.colors[1]);
     }
 
     os << "</g>\n";
@@ -270,7 +267,7 @@ int main(int argc, char** argv) {
             routes[key].start = cities_pos[route.city1()];
             routes[key].end = cities_pos[route.city2()];
             routes[key].n_carriages = route.length();
-            routes[key].colors.push_back(route.color());
+            routes[key].colors.push_back(color(route.color()));
             routes[key].draw_ccw = route.draw_ccw();
         }
     }

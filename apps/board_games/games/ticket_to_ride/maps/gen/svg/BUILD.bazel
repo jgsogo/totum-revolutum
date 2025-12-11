@@ -3,9 +3,11 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "svg",
     srcs = [
+        "colors.cpp",
         "path.cpp",
     ],
     hdrs = [
+        "colors.h",
         "path.h",
     ],
     visibility = ["//visibility:public"],
