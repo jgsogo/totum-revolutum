@@ -14,6 +14,8 @@
 
 #include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
 
+#include "route_data.h"
+
 constexpr static int32_t carriage_length = 40;
 constexpr static int32_t carriage_width = 10;
 constexpr static int32_t gap = 4;
@@ -22,25 +24,6 @@ constexpr static int32_t city_radius = 8;
 constexpr static int32_t city_gap = city_radius + 8;
 
 using namespace utils::math::g2d;
-
-struct RouteData {
-    board_games::ticket_to_ride::City start;
-    board_games::ticket_to_ride::City end;
-    int32_t n_carriages;
-    std::vector<svg::Color> colors;
-    bool draw_ccw;
-};
-
-std::string city_name(const board_games::ticket_to_ride::City& city) {
-    std::string name = city.name();
-    std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) -> unsigned char {
-        if (c == ' ')
-            return '-';
-        else
-            return std::tolower(c);
-    });
-    return name;
-}
 
 svg::Color color(const board_games::ticket_to_ride::Color color) {
     switch (color) {
@@ -73,19 +56,19 @@ void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool dra
     // We need to compute the arc with a given length between two points
     double arc_length =
         static_cast<double>((route.n_carriages * carriage_length) + ((route.n_carriages - 1) * gap) + (2 * city_gap));
-    double hypot = std::hypot(route.end.pos_x() - route.start.pos_x(), route.end.pos_y() - route.start.pos_y());
+    double hypot = std::hypot(route.end.pos.x - route.start.pos.x, route.end.pos.y - route.start.pos.y);
     arc_length = std::max(arc_length, hypot);
     auto solution_opt = circle_for_arc(
-        Point<double>{.x = static_cast<double>(route.start.pos_x()), .y = static_cast<double>(route.start.pos_y())},
-        Point<double>{.x = static_cast<double>(route.end.pos_x()), .y = static_cast<double>(route.end.pos_y())},
+        Point<double>{.x = static_cast<double>(route.start.pos.x), .y = static_cast<double>(route.start.pos.y)},
+        Point<double>{.x = static_cast<double>(route.end.pos.x), .y = static_cast<double>(route.end.pos.y)},
         arc_length);
     if (!solution_opt) {
-        std::cerr << "There is no solution for the route from " << route.start.name() << " to " << route.end.name()
+        std::cerr << "There is no solution for the route from " << route.start.name << " to " << route.end.name
                   << std::endl;
         std::cerr << " arc lenght: " << arc_length << std::endl;
 
-        int32_t dx = route.end.pos_x() - route.start.pos_x();
-        int32_t dy = route.end.pos_y() - route.start.pos_y();
+        int32_t dx = route.end.pos.x - route.start.pos.x;
+        int32_t dy = route.end.pos.y - route.start.pos.y;
         double c = std::hypot(dx, dy);
         std::cerr << " chord lenght: " << c << std::endl;
         return;
@@ -97,8 +80,8 @@ void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool dra
     double radius = solution.radius;
 
     // Angles of points A and B relative to center
-    double ang_start = std::atan2(route.start.pos_y() - center.y, route.start.pos_x() - center.x);
-    double ang_end = std::atan2(route.end.pos_y() - center.y, route.end.pos_x() - center.x);
+    double ang_start = std::atan2(route.start.pos.y - center.y, route.start.pos.x - center.x);
+    double ang_end = std::atan2(route.end.pos.y - center.y, route.end.pos.x - center.x);
 
     // We need to pick the sign (direction) so that swept absolute angle equals theta = s/R
     double theta = arc_length / radius; // positive
@@ -120,8 +103,8 @@ void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool dra
         // - draw chord for reference
         svg::Line& chord_ref = route_group.add<svg::Line>();
         chord_ref.stroke = svg::Color::BLACK;
-        chord_ref.start = Point<int>{.x = route.start.pos_x(), .y = route.start.pos_y()};
-        chord_ref.end = Point<int>{.x = route.end.pos_x(), .y = route.end.pos_y()};
+        chord_ref.start = Point<int>{.x = route.start.pos.x, .y = route.start.pos.y};
+        chord_ref.end = Point<int>{.x = route.end.pos.x, .y = route.end.pos.y};
 
         // - draw city gap (start and end)
         svg::Path& city_gap_start =
@@ -248,37 +231,37 @@ int main(int argc, char** argv) {
     }
 
     // Cities
-    std::map<int32_t, board_games::ticket_to_ride::City> cities_pos;
-    for (const auto& city : map_data.cities()) {
-        auto& svg_city = doc.add<svg::SVGUse>("#city-point");
-        svg_city.id = city_name(city);
-        svg_city.pos = utils::math::g2d::Point<int>{.x = city.pos_x(), .y = city.pos_y()};
+    std::map<int32_t, City> cities;
+    for (const auto& proto_city : map_data.cities()) {
+        auto city = City::from(proto_city);
+        cities[city.idx] = city; // No duplicated, there are tests!
 
-        // We have tests to validate the input data
-        cities_pos[city.id()] = city;
+        auto& svg_city = doc.add<svg::SVGUse>("#city-point");
+        svg_city.id = city.id;
+        svg_city.pos = city.pos;
     }
 
     // Routes
     // - collect RouteData (// FIXME: We can improve this)
     std::map<std::pair<int32_t, int32_t>, RouteData> routes;
     {
-        for (const auto& route : map_data.routes()) {
+        for (const auto& proto_route : map_data.routes()) {
             // 'key' is independent on the order of the cities
-            auto city1 = std::min(route.city1(), route.city2());
-            auto city2 = std::max(route.city1(), route.city2());
+            auto city1 = std::min(proto_route.city1(), proto_route.city2());
+            auto city2 = std::max(proto_route.city1(), proto_route.city2());
             std::pair<int32_t, int32_t> key = std::make_pair(city1, city2);
 
             // ...but the route has a direction
-            routes[key].start = cities_pos[route.city1()];
-            routes[key].end = cities_pos[route.city2()];
-            routes[key].n_carriages = route.length();
-            routes[key].colors.push_back(color(route.color()));
-            routes[key].draw_ccw = route.draw_ccw();
+            routes[key].start = cities[proto_route.city1()];
+            routes[key].end = cities[proto_route.city2()];
+            routes[key].n_carriages = proto_route.length();
+            routes[key].colors.push_back(color(proto_route.color()));
+            routes[key].draw_ccw = proto_route.draw_ccw();
         }
     }
     for (const auto& [_, route] : routes) {
         svg::SVGGroup& route_group = doc.add<svg::SVGGroup>();
-        route_group.id = std::format("r-{}-{}", city_name(route.start), city_name(route.end));
+        route_group.id = std::format("r-{}-{}", route.start.id, route.end.id);
 
         make_route_svg(route_group, route, draw_helpers);
     }
