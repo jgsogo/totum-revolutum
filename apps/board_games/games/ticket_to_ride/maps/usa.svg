@@ -3,7 +3,7 @@
   <defs>
     <circle r='8' fill='black' stroke-width='1' stroke='black' id='city-point'/>
     <g id="carriage">
-      <rect x="0" y="0" width="30" height="10"/>
+      <rect width="40" height="10"/>
     </g>
   </defs>
 <!--Cities-->
@@ -46,854 +46,545 @@
 <!--Routes-->
 
 <g id="r-vancouver-seattle">
-<circle r='5' fill='red' cx='108.137' cy='124.004' />
-<rect width='10' height='38.0583'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(108.137,124.004) rotate(1.55011) translate(-5,-19.0292)'/>
-<circle r='5' fill='red' cx='92.1427' cy='123.572' />
-<rect width='10' height='34.0005'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(92.1427,123.572) rotate(1.55011) translate(-5,-17.0003)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(114.148,121.971) rotate(-0.407207) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(97.9895,126.64) rotate(4.41403) translate(-5,-20)'/>
 </g>
 
 <g id="r-calgary-vancouver">
-<circle r='5' fill='red' cx='226.737' cy='81.259' />
-<rect width='10' height='42.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(226.737,81.259) rotate(75.3493) translate(-5,-21.0346)'/>
-<circle r='5' fill='red' cx='181.524' cy='89.9232' />
-<rect width='10' height='42.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(181.524,89.9232) rotate(82.9542) translate(-5,-21.0346)'/>
-<circle r='5' fill='red' cx='135.562' cy='92.5278' />
-<rect width='10' height='42.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(135.562,92.5278) rotate(90.5591) translate(-5,-21.0346)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(227.737,80.9958) rotate(75.1785) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(181.524,89.9232) rotate(82.9542) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(134.528,92.5161) rotate(90.7299) translate(-5,-20)'/>
 </g>
 
 <g id="r-seattle-portland">
-<circle r='5' fill='red' cx='92.9754' cy='194.873' />
-<rect width='10' height='40.4739'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(92.9754,194.873) rotate(22.4227) translate(-5,-20.2369)'/>
-<circle r='5' fill='red' cx='78.1851' cy='188.77' />
-<rect width='10' height='36.2955'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(78.1851,188.77) rotate(22.4227) translate(-5,-18.1477)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(95.8678,194.542) rotate(21.5584) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(79.7817,191.559) rotate(23.6477) translate(-5,-20)'/>
 </g>
 
 <g id="r-calgary-seattle">
-<circle r='5' fill='red' cx='235.572' cy='91.5253' />
-<rect width='10' height='36.1918'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(235.572,91.5253) rotate(53.316) translate(-5,-18.0959)'/>
-<circle r='5' fill='red' cx='202.173' cy='113.853' />
-<rect width='10' height='36.1918'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(202.173,113.853) rotate(59.1577) translate(-5,-18.0959)'/>
-<circle r='5' fill='red' cx='166.675' cy='132.665' />
-<rect width='10' height='36.1918'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(166.675,132.665) rotate(64.9995) translate(-5,-18.0959)'/>
-<circle r='5' fill='red' cx='129.447' cy='147.766' />
-<rect width='10' height='36.1918'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(129.447,147.766) rotate(70.8413) translate(-5,-18.0959)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(243.879,101.008) rotate(37.1422) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(212.606,131.737) rotate(53.8608) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(173.815,152.172) rotate(70.5793) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(130.786,160.584) rotate(87.2978) translate(-5,-20)'/>
 </g>
 
 <g id="r-helena-seattle">
-<circle r='5' fill='red' cx='348.407' cy='231.514' />
-<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(348.407,231.514) rotate(94.0022) translate(-5,-20.6284)'/>
-<circle r='5' fill='red' cx='303.414' cy='226.726' />
-<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(303.414,226.726) rotate(98.1476) translate(-5,-20.6284)'/>
-<circle r='5' fill='red' cx='258.885' cy='218.698' />
-<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(258.885,218.698) rotate(102.293) translate(-5,-20.6284)'/>
-<circle r='5' fill='red' cx='215.053' cy='207.472' />
-<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(215.053,207.472) rotate(106.438) translate(-5,-20.6284)'/>
-<circle r='5' fill='red' cx='172.147' cy='193.106' />
-<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(172.147,193.106) rotate(110.584) translate(-5,-20.6284)'/>
-<circle r='5' fill='red' cx='130.391' cy='175.677' />
-<rect width='10' height='41.2569'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(130.391,175.677) rotate(114.729) translate(-5,-20.6284)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(349.034,231.558) rotate(93.9447) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(303.787,226.779) rotate(98.113) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(259.008,218.724) rotate(102.281) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(214.932,207.436) rotate(106.45) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(171.794,192.974) rotate(110.618) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(129.821,175.414) rotate(114.787) translate(-5,-20)'/>
 </g>
 
 <g id="r-portland-san-francisco">
-<circle r='5' fill='red' cx='50.4765' cy='255.509' />
-<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(50.4765,255.509) rotate(-166.175) translate(-5,-20.0921)'/>
-<circle r='5' fill='red' cx='41.7501' cy='298.809' />
-<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(41.7501,298.809) rotate(-171.036) translate(-5,-20.0921)'/>
-<circle r='5' fill='red' cx='36.7237' cy='342.693' />
-<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(36.7237,342.693) rotate(-175.896) translate(-5,-20.0921)'/>
-<circle r='5' fill='red' cx='35.4336' cy='386.845' />
-<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(35.4336,386.845) rotate(-180.757) translate(-5,-20.0921)'/>
-<circle r='5' fill='red' cx='37.8891' cy='430.948' />
-<rect width='10' height='40.1842'  fill='green' stroke='black' stroke-width='0.4' transform='translate(37.8891,430.948) rotate(-185.617) translate(-5,-20.0921)'/>
-<circle r='5' fill='red' cx='66.0248' cy='259.284' />
-<rect width='10' height='38.8515'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(66.0248,259.284) rotate(-166.17) translate(-5,-19.4257)'/>
-<circle r='5' fill='red' cx='57.5585' cy='301.278' />
-<rect width='10' height='38.8515'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(57.5585,301.278) rotate(-171.033) translate(-5,-19.4257)'/>
-<circle r='5' fill='red' cx='52.6827' cy='343.838' />
-<rect width='10' height='38.8515'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(52.6827,343.838) rotate(-175.896) translate(-5,-19.4257)'/>
-<circle r='5' fill='red' cx='51.4326' cy='386.659' />
-<rect width='10' height='38.8515'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(51.4326,386.659) rotate(-180.759) translate(-5,-19.4257)'/>
-<circle r='5' fill='red' cx='53.8171' cy='429.431' />
-<rect width='10' height='38.8515'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(53.8171,429.431) rotate(-185.622) translate(-5,-19.4257)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(48.8531,254.464) rotate(-163.681) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(38.5294,298.288) rotate(-169.809) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(32.9431,342.964) rotate(-175.937) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(32.1579,387.982) rotate(-182.065) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(36.1827,432.825) rotate(-188.193) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(63.9956,259.689) rotate(-163.788) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(54.2099,301.493) rotate(-169.862) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(48.9029,344.098) rotate(-175.937) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(48.134,387.025) rotate(-182.011) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(51.9119,429.793) rotate(-188.085) translate(-5,-20)'/>
 </g>
 
 <g id="r-salt-lake-city-portland">
-<circle r='5' fill='red' cx='274.322' cy='361.887' />
-<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(274.322,361.887) rotate(-43.9089) translate(-5,-19.2553)'/>
-<circle r='5' fill='red' cx='243.765' cy='332.346' />
-<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(243.765,332.346) rotate(-48.0294) translate(-5,-19.2553)'/>
-<circle r='5' fill='red' cx='211.164' cy='305.078' />
-<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(211.164,305.078) rotate(-52.1499) translate(-5,-19.2553)'/>
-<circle r='5' fill='red' cx='176.688' cy='280.222' />
-<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(176.688,280.222) rotate(-56.2703) translate(-5,-19.2553)'/>
-<circle r='5' fill='red' cx='140.516' cy='257.908' />
-<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(140.516,257.908) rotate(-60.3908) translate(-5,-19.2553)'/>
-<circle r='5' fill='red' cx='102.833' cy='238.251' />
-<rect width='10' height='38.5106'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(102.833,238.251) rotate(-64.5113) translate(-5,-19.2553)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(278.689,357.638) rotate(-35.5323) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(250.846,323.609) rotate(-43.0497) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(218.79,293.515) rotate(-50.5671) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(183.072,267.874) rotate(-58.0845) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(144.307,247.126) rotate(-65.6018) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(103.161,231.628) rotate(-73.1192) translate(-5,-20)'/>
 </g>
 
 <g id="r-san-francisco-los-angeles">
-<circle r='5' fill='red' cx='58.4308' cy='504.617' />
-<rect width='10' height='41.1314'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(58.4308,504.617) rotate(153.095) translate(-5,-20.5657)'/>
-<circle r='5' fill='red' cx='81.4394' cy='543.405' />
-<rect width='10' height='41.1314'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(81.4394,543.405) rotate(145.552) translate(-5,-20.5657)'/>
-<circle r='5' fill='red' cx='109.341' cy='578.837' />
-<rect width='10' height='41.1314'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(109.341,578.837) rotate(138.009) translate(-5,-20.5657)'/>
-<circle r='5' fill='red' cx='72.6708' cy='497.321' />
-<rect width='10' height='39.0872'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(72.6708,497.321) rotate(153.106) translate(-5,-19.5436)'/>
-<circle r='5' fill='red' cx='94.6337' cy='534.354' />
-<rect width='10' height='39.0872'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(94.6337,534.354) rotate(145.552) translate(-5,-19.5436)'/>
-<circle r='5' fill='red' cx='121.274' cy='568.179' />
-<rect width='10' height='39.0872'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(121.274,568.179) rotate(137.998) translate(-5,-19.5436)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(58.1752,504.112) rotate(153.19) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(81.4394,543.405) rotate(145.552) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(109.719,579.257) rotate(137.915) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(72.8776,497.728) rotate(153.026) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(94.6337,534.354) rotate(145.552) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(120.969,567.839) rotate(138.078) translate(-5,-20)'/>
 </g>
 
 <g id="r-salt-lake-city-san-francisco">
-<circle r='5' fill='red' cx='269.488' cy='413.569' />
-<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(269.488,413.569) rotate(62.1303) translate(-5,-21.4991)'/>
-<circle r='5' fill='red' cx='227.054' cy='433.738' />
-<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(227.054,433.738) rotate(67.0246) translate(-5,-21.4991)'/>
-<circle r='5' fill='red' cx='183.053' cy='450.214' />
-<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(183.053,450.214) rotate(71.919) translate(-5,-21.4991)'/>
-<circle r='5' fill='red' cx='137.808' cy='462.876' />
-<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(137.808,462.876) rotate(76.8133) translate(-5,-21.4991)'/>
-<circle r='5' fill='red' cx='91.6465' cy='471.631' />
-<rect width='10' height='42.9982'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(91.6465,471.631) rotate(81.7077) translate(-5,-21.4991)'/>
-<circle r='5' fill='red' cx='262.05' cy='399.403' />
-<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(262.05,399.403) rotate(62.1253) translate(-5,-20.8274)'/>
-<circle r='5' fill='red' cx='220.83' cy='418.999' />
-<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(220.83,418.999) rotate(67.0221) translate(-5,-20.8274)'/>
-<circle r='5' fill='red' cx='178.087' cy='435.004' />
-<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(178.087,435.004) rotate(71.919) translate(-5,-20.8274)'/>
-<circle r='5' fill='red' cx='134.135' cy='447.303' />
-<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(134.135,447.303) rotate(76.8158) translate(-5,-20.8274)'/>
-<circle r='5' fill='red' cx='89.2929' cy='455.805' />
-<rect width='10' height='41.6547'  fill='white' stroke='black' stroke-width='0.4' transform='translate(89.2929,455.805) rotate(81.7127) translate(-5,-20.8274)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(270.812,412.866) rotate(61.9742) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(227.744,433.445) rotate(66.9466) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(183.053,450.214) rotate(71.919) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(137.078,463.046) rotate(76.8914) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(90.1628,471.845) rotate(81.8638) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(262.781,399.015) rotate(62.0366) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(221.211,418.837) rotate(66.9778) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(178.087,435.004) rotate(71.919) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(133.732,447.397) rotate(76.8602) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(88.4741,455.924) rotate(81.8014) translate(-5,-20)'/>
 </g>
 
 <g id="r-las-vegas-los-angeles">
-<circle r='5' fill='red' cx='197.758' cy='544.267' />
-<rect width='10' height='38.7274'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(197.758,544.267) rotate(-125.41) translate(-5,-19.3637)'/>
-<circle r='5' fill='red' cx='165.349' cy='572.022' />
-<rect width='10' height='38.7274'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(165.349,572.022) rotate(-135.743) translate(-5,-19.3637)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(195.626,541.555) rotate(-122.414) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(162.367,570.128) rotate(-138.918) translate(-5,-20)'/>
 </g>
 
 <g id="r-phoenix-los-angeles">
-<circle r='5' fill='red' cx='261.98' cy='599.701' />
-<rect width='10' height='38.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(261.98,599.701) rotate(-79.4067) translate(-5,-19.0346)'/>
-<circle r='5' fill='red' cx='220.241' cy='594.686' />
-<rect width='10' height='38.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(220.241,594.686) rotate(-86.8917) translate(-5,-19.0346)'/>
-<circle r='5' fill='red' cx='178.205' cy='595.151' />
-<rect width='10' height='38.0692'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(178.205,595.151) rotate(-94.3767) translate(-5,-19.0346)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(263.138,593.465) rotate(-72.2021) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(219.98,585.553) rotate(-87.019) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(176.233,588.94) rotate(-101.836) translate(-5,-20)'/>
 </g>
 
 <g id="r-el-paso-los-angeles">
-<circle r='5' fill='red' cx='405.897' cy='654.425' />
-<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(405.897,654.425) rotate(89.467) translate(-5,-21.1359)'/>
-<circle r='5' fill='red' cx='359.652' cy='653.179' />
-<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(359.652,653.179) rotate(93.6209) translate(-5,-21.1359)'/>
-<circle r='5' fill='red' cx='313.619' cy='648.586' />
-<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(313.619,648.586) rotate(97.7748) translate(-5,-21.1359)'/>
-<circle r='5' fill='red' cx='268.039' cy='640.671' />
-<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(268.039,640.671) rotate(101.929) translate(-5,-21.1359)'/>
-<circle r='5' fill='red' cx='223.153' cy='629.475' />
-<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(223.153,629.475) rotate(106.082) translate(-5,-21.1359)'/>
-<circle r='5' fill='red' cx='179.196' cy='615.057' />
-<rect width='10' height='42.2717'  fill='black' stroke='black' stroke-width='0.4' transform='translate(179.196,615.057) rotate(110.236) translate(-5,-21.1359)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(407.033,654.414) rotate(89.3651) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(360.332,653.221) rotate(93.5597) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(313.844,648.617) rotate(97.7544) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(267.817,640.624) rotate(101.949) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(222.498,629.285) rotate(106.144) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(178.13,614.663) rotate(110.338) translate(-5,-20)'/>
 </g>
 
 <g id="r-calgary-helena">
-<circle r='5' fill='red' cx='288.961' cy='93.8775' />
-<rect width='10' height='40.0502'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(288.961,93.8775) rotate(-46.0508) translate(-5,-20.0251)'/>
-<circle r='5' fill='red' cx='319.041' cy='126.031' />
-<rect width='10' height='40.0502'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(319.041,126.031) rotate(-40.1322) translate(-5,-20.0251)'/>
-<circle r='5' fill='red' cx='345.646' cy='161.116' />
-<rect width='10' height='40.0502'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(345.646,161.116) rotate(-34.2135) translate(-5,-20.0251)'/>
-<circle r='5' fill='red' cx='368.49' cy='198.756' />
-<rect width='10' height='40.0502'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(368.49,198.756) rotate(-28.2948) translate(-5,-20.0251)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(288.943,93.8601) rotate(-46.0542) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(319.036,126.025) rotate(-40.1333) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(345.65,161.123) rotate(-34.2124) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(368.502,198.779) rotate(-28.2915) translate(-5,-20)'/>
 </g>
 
 <g id="r-winnipeg-calgary">
-<circle r='5' fill='red' cx='506.221' cy='71.456' />
-<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(506.221,71.456) rotate(-77.524) translate(-5,-18.8483)'/>
-<circle r='5' fill='red' cx='465.22' cy='63.9164' />
-<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(465.22,63.9164) rotate(-81.6365) translate(-5,-18.8483)'/>
-<circle r='5' fill='red' cx='423.785' cy='59.3366' />
-<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(423.785,59.3366) rotate(-85.7491) translate(-5,-18.8483)'/>
-<circle r='5' fill='red' cx='382.128' cy='57.7402' />
-<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(382.128,57.7402) rotate(-89.8616) translate(-5,-18.8483)'/>
-<circle r='5' fill='red' cx='340.464' cy='59.1353' />
-<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(340.464,59.1353) rotate(-93.9741) translate(-5,-18.8483)'/>
-<circle r='5' fill='red' cx='299.007' cy='63.5148' />
-<rect width='10' height='37.6966'  fill='white' stroke='black' stroke-width='0.4' transform='translate(299.007,63.5148) rotate(-98.0866) translate(-5,-18.8483)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(508.528,62.5754) rotate(-64.814) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(467.375,47.1401) rotate(-74.0666) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(424.276,38.5225) rotate(-83.3192) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(380.352,36.9468) rotate(-92.5718) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(336.746,42.454) rotate(-101.824) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(294.593,54.9008) rotate(-111.077) translate(-5,-20)'/>
 </g>
 
 <g id="r-helena-salt-lake-city">
-<circle r='5' fill='red' cx='372.671' cy='269.937' />
-<rect width='10' height='45.9157'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(372.671,269.937) rotate(21.4656) translate(-5,-22.9578)'/>
-<circle r='5' fill='red' cx='351.341' cy='315.024' />
-<rect width='10' height='45.9157'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(351.341,315.024) rotate(29.1705) translate(-5,-22.9578)'/>
-<circle r='5' fill='red' cx='324.158' cy='356.844' />
-<rect width='10' height='45.9157'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(324.158,356.844) rotate(36.8754) translate(-5,-22.9578)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(373.742,267.18) rotate(21.009) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(351.341,315.024) rotate(29.1705) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(322.374,359.203) rotate(37.332) translate(-5,-20)'/>
 </g>
 
 <g id="r-winnipeg-helena">
-<circle r='5' fill='red' cx='518.968' cy='111.304' />
-<rect width='10' height='43.4484'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(518.968,111.304) rotate(36.2714) translate(-5,-21.7242)'/>
-<circle r='5' fill='red' cx='488.954' cy='148.026' />
-<rect width='10' height='43.4484'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(488.954,148.026) rotate(42.2488) translate(-5,-21.7242)'/>
-<circle r='5' fill='red' cx='455.28' cy='181.423' />
-<rect width='10' height='43.4484'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(455.28,181.423) rotate(48.2262) translate(-5,-21.7242)'/>
-<circle r='5' fill='red' cx='418.311' cy='211.131' />
-<rect width='10' height='43.4484'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(418.311,211.131) rotate(54.2035) translate(-5,-21.7242)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(519.986,109.912) rotate(36.0542) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(489.341,147.6) rotate(42.1764) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(454.851,181.805) rotate(48.2986) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(416.91,212.137) rotate(54.4207) translate(-5,-20)'/>
 </g>
 
 <g id="r-denver-helena">
-<circle r='5' fill='red' cx='440.317' cy='398.861' />
-<rect width='10' height='41.6984'  fill='green' stroke='black' stroke-width='0.4' transform='translate(440.317,398.861) rotate(150.101) translate(-5,-20.8492)'/>
-<circle r='5' fill='red' cx='419.633' cy='358.134' />
-<rect width='10' height='41.6984'  fill='green' stroke='black' stroke-width='0.4' transform='translate(419.633,358.134) rotate(156.049) translate(-5,-20.8492)'/>
-<circle r='5' fill='red' cx='403.28' cy='315.484' />
-<rect width='10' height='41.6984'  fill='green' stroke='black' stroke-width='0.4' transform='translate(403.28,315.484) rotate(161.997) translate(-5,-20.8492)'/>
-<circle r='5' fill='red' cx='391.436' cy='271.368' />
-<rect width='10' height='41.6984'  fill='green' stroke='black' stroke-width='0.4' transform='translate(391.436,271.368) rotate(167.945) translate(-5,-20.8492)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(440.741,399.597) rotate(149.99) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(419.748,358.393) rotate(156.012) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(403.193,315.215) rotate(162.034) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(391.259,270.538) rotate(168.056) translate(-5,-20)'/>
 </g>
 
 <g id="r-duluth-helena">
-<circle r='5' fill='red' cx='646.564' cy='235.395' />
-<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(646.564,235.395) rotate(78.3536) translate(-5,-20.4217)'/>
-<circle r='5' fill='red' cx='602.355' cy='242.853' />
-<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(602.355,242.853) rotate(82.4954) translate(-5,-20.4217)'/>
-<circle r='5' fill='red' cx='557.723' cy='247.099' />
-<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(557.723,247.099) rotate(86.6372) translate(-5,-20.4217)'/>
-<circle r='5' fill='red' cx='512.901' cy='248.109' />
-<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(512.901,248.109) rotate(90.779) translate(-5,-20.4217)'/>
-<circle r='5' fill='red' cx='468.123' cy='245.88' />
-<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(468.123,245.88) rotate(94.9208) translate(-5,-20.4217)'/>
-<circle r='5' fill='red' cx='423.622' cy='240.423' />
-<rect width='10' height='40.8434'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(423.622,240.423) rotate(99.0625) translate(-5,-20.4217)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(646.977,235.31) rotate(78.3147) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(602.606,242.82) rotate(82.4721) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(557.807,247.094) rotate(86.6294) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(512.817,248.108) rotate(90.7868) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(467.871,245.858) rotate(94.9441) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(423.206,240.356) rotate(99.1015) translate(-5,-20)'/>
 </g>
 
 <g id="r-omaha-helena">
-<circle r='5' fill='red' cx='607.213' cy='334.651' />
-<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(607.213,334.651) rotate(102.644) translate(-5,-23.4846)'/>
-<circle r='5' fill='red' cx='558.022' cy='321.364' />
-<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(558.022,321.364) rotate(107.588) translate(-5,-23.4846)'/>
-<circle r='5' fill='red' cx='510.16' cy='303.887' />
-<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(510.16,303.887) rotate(112.532) translate(-5,-23.4846)'/>
-<circle r='5' fill='red' cx='463.982' cy='282.349' />
-<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(463.982,282.349) rotate(117.476) translate(-5,-23.4846)'/>
-<circle r='5' fill='red' cx='419.832' cy='256.913' />
-<rect width='10' height='46.9692'  fill='red' stroke='black' stroke-width='0.4' transform='translate(419.832,256.913) rotate(122.42) translate(-5,-23.4846)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(610.615,335.404) rotate(102.306) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(559.684,321.888) rotate(107.419) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(510.16,303.887) rotate(112.532) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(462.437,281.543) rotate(117.645) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(416.896,255.036) rotate(122.758) translate(-5,-20)'/>
 </g>
 
 <g id="r-salt-lake-city-las-vegas">
-<circle r='5' fill='red' cx='288.231' cy='421.719' />
-<rect width='10' height='38.2462'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(288.231,421.719) rotate(19.271) translate(-5,-19.1231)'/>
-<circle r='5' fill='red' cx='271.725' cy='460.575' />
-<rect width='10' height='38.2462'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(271.725,460.575) rotate(26.7617) translate(-5,-19.1231)'/>
-<circle r='5' fill='red' cx='250.294' cy='496.947' />
-<rect width='10' height='38.2462'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(250.294,496.947) rotate(34.2524) translate(-5,-19.1231)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(293.673,423.677) rotate(12.7121) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(278.808,464.971) rotate(26.8826) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(254.287,501.37) rotate(41.053) translate(-5,-20)'/>
 </g>
 
 <g id="r-denver-salt-lake-city">
-<circle r='5' fill='red' cx='421.895' cy='435.518' />
-<rect width='10' height='43.4848'  fill='red' stroke='black' stroke-width='0.4' transform='translate(421.895,435.518) rotate(96.7893) translate(-5,-21.7424)'/>
-<circle r='5' fill='red' cx='375.254' cy='426.794' />
-<rect width='10' height='43.4848'  fill='red' stroke='black' stroke-width='0.4' transform='translate(375.254,426.794) rotate(104.4) translate(-5,-21.7424)'/>
-<circle r='5' fill='red' cx='330.179' cy='411.969' />
-<rect width='10' height='43.4848'  fill='red' stroke='black' stroke-width='0.4' transform='translate(330.179,411.969) rotate(112.01) translate(-5,-21.7424)'/>
-<circle r='5' fill='red' cx='423.846' cy='419.637' />
-<rect width='10' height='41.4192'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(423.846,419.637) rotate(96.7793) translate(-5,-20.7096)'/>
-<circle r='5' fill='red' cx='379.233' cy='411.296' />
-<rect width='10' height='41.4192'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(379.233,411.296) rotate(104.4) translate(-5,-20.7096)'/>
-<circle r='5' fill='red' cx='336.121' cy='397.113' />
-<rect width='10' height='41.4192'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(336.121,397.113) rotate(112.02) translate(-5,-20.7096)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(423.626,435.72) rotate(96.5101) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(375.254,426.794) rotate(104.4) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(328.566,411.313) rotate(112.29) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(424.551,419.72) rotate(96.6602) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(379.233,411.296) rotate(104.4) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(335.463,396.847) rotate(112.14) translate(-5,-20)'/>
 </g>
 
 <g id="r-denver-phoenix">
-<circle r='5' fill='red' cx='431.183' cy='450.554' />
-<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(431.183,450.554) rotate(-127.504) translate(-5,-19.4033)'/>
-<circle r='5' fill='red' cx='398.368' cy='478.021' />
-<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(398.368,478.021) rotate(-132.357) translate(-5,-19.4033)'/>
-<circle r='5' fill='red' cx='367.994' cy='508.166' />
-<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(367.994,508.166) rotate(-137.21) translate(-5,-19.4033)'/>
-<circle r='5' fill='red' cx='340.278' cy='540.773' />
-<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(340.278,540.773) rotate(-142.062) translate(-5,-19.4033)'/>
-<circle r='5' fill='red' cx='315.421' cy='575.607' />
-<rect width='10' height='38.8066'  fill='white' stroke='black' stroke-width='0.4' transform='translate(315.421,575.607) rotate(-146.915) translate(-5,-19.4033)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(428.242,446.912) rotate(-121.308) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(392.364,472.322) rotate(-129.307) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(360.372,502.477) rotate(-137.307) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(332.887,536.791) rotate(-145.306) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(310.445,574.596) rotate(-153.305) translate(-5,-20)'/>
 </g>
 
 <g id="r-santa-fe-phoenix">
-<circle r='5' fill='red' cx='419.248' cy='561.238' />
-<rect width='10' height='42.7816'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(419.248,561.238) rotate(58.4167) translate(-5,-21.3908)'/>
-<circle r='5' fill='red' cx='377.885' cy='583.02' />
-<rect width='10' height='42.7816'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(377.885,583.02) rotate(66.0412) translate(-5,-21.3908)'/>
-<circle r='5' fill='red' cx='333.998' cy='599.121' />
-<rect width='10' height='42.7816'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(333.998,599.121) rotate(73.6656) translate(-5,-21.3908)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(420.431,560.508) rotate(58.19) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(377.885,583.02) rotate(66.0412) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(332.663,599.509) rotate(73.8923) translate(-5,-20)'/>
 </g>
 
 <g id="r-phoenix-el-paso">
-<circle r='5' fill='red' cx='326.919' cy='624.27' />
-<rect width='10' height='37.9112'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(326.919,624.27) rotate(114.635) translate(-5,-18.9556)'/>
-<circle r='5' fill='red' cx='366.046' cy='639.207' />
-<rect width='10' height='37.9112'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(366.046,639.207) rotate(107.155) translate(-5,-18.9556)'/>
-<circle r='5' fill='red' cx='406.785' cy='648.924' />
-<rect width='10' height='37.9112'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(406.785,648.924) rotate(99.6752) translate(-5,-18.9556)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(324.039,630.463) rotate(122.406) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(363.889,648.805) rotate(107.023) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(407.176,655.918) rotate(91.6398) translate(-5,-20)'/>
 </g>
 
 <g id="r-duluth-winnipeg">
-<circle r='5' fill='red' cx='652.321' cy='206.558' />
-<rect width='10' height='40.0961'  fill='black' stroke='black' stroke-width='0.4' transform='translate(652.321,206.558) rotate(126.977) translate(-5,-20.0481)'/>
-<circle r='5' fill='red' cx='618.526' cy='178.264' />
-<rect width='10' height='40.0961'  fill='black' stroke='black' stroke-width='0.4' transform='translate(618.526,178.264) rotate(132.897) translate(-5,-20.0481)'/>
-<circle r='5' fill='red' cx='587.828' cy='146.634' />
-<rect width='10' height='40.0961'  fill='black' stroke='black' stroke-width='0.4' transform='translate(587.828,146.634) rotate(138.816) translate(-5,-20.0481)'/>
-<circle r='5' fill='red' cx='560.557' cy='112.008' />
-<rect width='10' height='40.0961'  fill='black' stroke='black' stroke-width='0.4' transform='translate(560.557,112.008) rotate(144.736) translate(-5,-20.0481)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(652.36,206.587) rotate(126.971) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(618.537,178.274) rotate(132.895) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(587.818,146.622) rotate(138.819) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(560.529,111.969) rotate(144.742) translate(-5,-20)'/>
 </g>
 
 <g id="r-sault-ste-marie-winnipeg">
-<circle r='5' fill='red' cx='802.812' cy='142.331' />
-<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(802.812,142.331) rotate(91.1551) translate(-5,-21.195)'/>
-<circle r='5' fill='red' cx='756.506' cy='139.716' />
-<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(756.506,139.716) rotate(95.3099) translate(-5,-21.195)'/>
-<circle r='5' fill='red' cx='710.511' cy='133.753' />
-<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(710.511,133.753) rotate(99.4647) translate(-5,-21.195)'/>
-<circle r='5' fill='red' cx='665.069' cy='124.473' />
-<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(665.069,124.473) rotate(103.62) translate(-5,-21.195)'/>
-<circle r='5' fill='red' cx='620.419' cy='111.925' />
-<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(620.419,111.925) rotate(107.774) translate(-5,-21.195)'/>
-<circle r='5' fill='red' cx='576.795' cy='96.1746' />
-<rect width='10' height='42.3899'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(576.795,96.1746) rotate(111.929) translate(-5,-21.195)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(804.006,142.354) rotate(91.0481) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(757.22,139.782) rotate(95.2457) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(710.747,133.792) rotate(99.4433) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(664.837,124.416) rotate(103.641) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(619.736,111.705) rotate(107.839) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(575.687,95.7273) rotate(112.036) translate(-5,-20)'/>
 </g>
 
 <g id="r-denver-santa-fe">
-<circle r='5' fill='red' cx='462.629' cy='464.481' />
-<rect width='10' height='37.2268'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(462.629,464.481) rotate(-0.060533) translate(-5,-18.6134)'/>
-<circle r='5' fill='red' cx='458.997' cy='505.492' />
-<rect width='10' height='37.2268'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(458.997,505.492) rotate(10.1802) translate(-5,-18.6134)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(469.926,464.43) rotate(-6.50478) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(465.965,507.945) rotate(16.9054) translate(-5,-20)'/>
 </g>
 
 <g id="r-omaha-denver">
-<circle r='5' fill='red' cx='610.847' cy='350.687' />
-<rect width='10' height='40.4417'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(610.847,350.687) rotate(-106.296) translate(-5,-20.2209)'/>
-<circle r='5' fill='red' cx='568.912' cy='365.34' />
-<rect width='10' height='40.4417'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(568.912,365.34) rotate(-112.222) translate(-5,-20.2209)'/>
-<circle r='5' fill='red' cx='528.713' cy='384.243' />
-<rect width='10' height='40.4417'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(528.713,384.243) rotate(-118.148) translate(-5,-20.2209)'/>
-<circle r='5' fill='red' cx='490.68' cy='407.196' />
-<rect width='10' height='40.4417'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(490.68,407.196) rotate(-124.074) translate(-5,-20.2209)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(611.059,350.625) rotate(-106.267) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(568.98,365.312) rotate(-112.212) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(528.648,384.278) rotate(-118.158) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(490.497,407.32) rotate(-124.103) translate(-5,-20)'/>
 </g>
 
 <g id="r-kansas-city-denver">
-<circle r='5' fill='red' cx='636.218' cy='424.242' />
-<rect width='10' height='42.4346'  fill='black' stroke='black' stroke-width='0.4' transform='translate(636.218,424.242) rotate(74.1276) translate(-5,-21.2173)'/>
-<circle r='5' fill='red' cx='590.975' cy='434.604' />
-<rect width='10' height='42.4346'  fill='black' stroke='black' stroke-width='0.4' transform='translate(590.975,434.604) rotate(80.0721) translate(-5,-21.2173)'/>
-<circle r='5' fill='red' cx='544.903' cy='440.225' />
-<rect width='10' height='42.4346'  fill='black' stroke='black' stroke-width='0.4' transform='translate(544.903,440.225) rotate(86.0165) translate(-5,-21.2173)'/>
-<circle r='5' fill='red' cx='498.497' cy='441.044' />
-<rect width='10' height='42.4346'  fill='black' stroke='black' stroke-width='0.4' transform='translate(498.497,441.044) rotate(91.9609) translate(-5,-21.2173)'/>
-<circle r='5' fill='red' cx='631.893' cy='408.838' />
-<rect width='10' height='40.8104'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(631.893,408.838) rotate(74.1205) translate(-5,-20.4052)'/>
-<circle r='5' fill='red' cx='588.235' cy='418.841' />
-<rect width='10' height='40.8104'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(588.235,418.841) rotate(80.0697) translate(-5,-20.4052)'/>
-<circle r='5' fill='red' cx='543.774' cy='424.265' />
-<rect width='10' height='40.8104'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(543.774,424.265) rotate(86.0189) translate(-5,-20.4052)'/>
-<circle r='5' fill='red' cx='498.991' cy='425.052' />
-<rect width='10' height='40.8104'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(498.991,425.052) rotate(91.968) translate(-5,-20.4052)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(637.388,423.908) rotate(73.9718) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(591.375,434.534) rotate(80.0201) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(544.499,440.253) rotate(86.0684) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(497.28,441.001) rotate(92.1168) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(632.283,408.726) rotate(74.0667) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(588.368,418.817) rotate(80.0518) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(543.639,424.274) rotate(86.0368) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(498.586,425.038) rotate(92.0218) translate(-5,-20)'/>
 </g>
 
 <g id="r-oklahoma-city-denver">
-<circle r='5' fill='red' cx='609.16' cy='505.885' />
-<rect width='10' height='39.5668'  fill='red' stroke='black' stroke-width='0.4' transform='translate(609.16,505.885) rotate(105.539) translate(-5,-19.7834)'/>
-<circle r='5' fill='red' cx='567.861' cy='492.072' />
-<rect width='10' height='39.5668'  fill='red' stroke='black' stroke-width='0.4' transform='translate(567.861,492.072) rotate(111.448) translate(-5,-19.7834)'/>
-<circle r='5' fill='red' cx='528.204' cy='474.08' />
-<rect width='10' height='39.5668'  fill='red' stroke='black' stroke-width='0.4' transform='translate(528.204,474.08) rotate(117.358) translate(-5,-19.7834)'/>
-<circle r='5' fill='red' cx='490.61' cy='452.101' />
-<rect width='10' height='39.5668'  fill='red' stroke='black' stroke-width='0.4' transform='translate(490.61,452.101) rotate(123.268) translate(-5,-19.7834)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(608.636,507.351) rotate(103.604) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(566.635,494.337) rotate(110.827) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(526.603,476.146) rotate(118.05) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(489.177,453.065) rotate(125.273) translate(-5,-20)'/>
 </g>
 
 <g id="r-santa-fe-el-paso">
-<circle r='5' fill='red' cx='453.705' cy='575.076' />
-<rect width='10' height='38.6083'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(453.705,575.076) rotate(-1.75263) translate(-5,-19.3042)'/>
-<circle r='5' fill='red' cx='451.174' cy='617.552' />
-<rect width='10' height='38.6083'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(451.174,617.552) rotate(8.57301) translate(-5,-19.3042)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(457.48,575.123) rotate(-5.03462) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(454.799,618.878) rotate(12.0485) translate(-5,-20)'/>
 </g>
 
 <g id="r-oklahoma-city-santa-fe">
-<circle r='5' fill='red' cx='604.24' cy='527.339' />
-<rect width='10' height='51.9115'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(604.24,527.339) rotate(74.3948) translate(-5,-25.9558)'/>
-<circle r='5' fill='red' cx='549.531' cy='538.655' />
-<rect width='10' height='51.9115'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(549.531,538.655) rotate(82.2321) translate(-5,-25.9558)'/>
-<circle r='5' fill='red' cx='493.789' cy='542.406' />
-<rect width='10' height='51.9115'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(493.789,542.406) rotate(90.0694) translate(-5,-25.9558)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(609.965,525.695) rotate(73.56) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(549.531,538.655) rotate(82.2321) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(487.833,542.355) rotate(90.9042) translate(-5,-20)'/>
 </g>
 
 <g id="r-oklahoma-city-el-paso">
-<circle r='5' fill='red' cx='619.481' cy='539.853' />
-<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(619.481,539.853) rotate(45.4826) translate(-5,-19.6381)'/>
-<circle r='5' fill='red' cx='587.375' cy='568.851' />
-<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(587.375,568.851) rotate(50.3413) translate(-5,-19.6381)'/>
-<circle r='5' fill='red' cx='552.928' cy='595.026' />
-<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(552.928,595.026) rotate(55.1999) translate(-5,-19.6381)'/>
-<circle r='5' fill='red' cx='516.388' cy='618.189' />
-<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(516.388,618.189) rotate(60.0586) translate(-5,-19.6381)'/>
-<circle r='5' fill='red' cx='478.017' cy='638.174' />
-<rect width='10' height='39.2762'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(478.017,638.174) rotate(64.9172) translate(-5,-19.6381)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(621.346,541.961) rotate(41.7735) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(590.173,572.976) rotate(48.5174) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(555.572,600.117) rotate(55.2612) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(518.025,623.006) rotate(62.0051) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(478.049,641.328) rotate(68.749) translate(-5,-20)'/>
 </g>
 
 <g id="r-dallas-el-paso">
-<circle r='5' fill='red' cx='632.112' cy='636.571' />
-<rect width='10' height='45.9633'  fill='red' stroke='black' stroke-width='0.4' transform='translate(632.112,636.571) rotate(73.5288) translate(-5,-22.9816)'/>
-<circle r='5' fill='red' cx='583.544' cy='648.198' />
-<rect width='10' height='45.9633'  fill='red' stroke='black' stroke-width='0.4' transform='translate(583.544,648.198) rotate(79.5451) translate(-5,-22.9816)'/>
-<circle r='5' fill='red' cx='534.025' cy='654.67' />
-<rect width='10' height='45.9633'  fill='red' stroke='black' stroke-width='0.4' transform='translate(534.025,654.67) rotate(85.5614) translate(-5,-22.9816)'/>
-<circle r='5' fill='red' cx='484.101' cy='655.917' />
-<rect width='10' height='45.9633'  fill='red' stroke='black' stroke-width='0.4' transform='translate(484.101,655.917) rotate(91.5777) translate(-5,-22.9816)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(634.969,635.716) rotate(73.1698) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(584.522,648.016) rotate(79.4254) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(533.034,654.746) rotate(85.6811) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(481.12,655.825) rotate(91.9367) translate(-5,-20)'/>
 </g>
 
 <g id="r-houston-el-paso">
-<circle r='5' fill='red' cx='686.43' cy='678.745' />
-<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(686.43,678.745) rotate(83.9015) translate(-5,-18.8993)'/>
-<circle r='5' fill='red' cx='644.744' cy='681.691' />
-<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(644.744,681.691) rotate(88.015) translate(-5,-18.8993)'/>
-<circle r='5' fill='red' cx='602.955' cy='681.638' />
-<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(602.955,681.638) rotate(92.1286) translate(-5,-18.8993)'/>
-<circle r='5' fill='red' cx='561.276' cy='678.588' />
-<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(561.276,678.588) rotate(96.2421) translate(-5,-18.8993)'/>
-<circle r='5' fill='red' cx='519.924' cy='672.557' />
-<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(519.924,672.557) rotate(100.356) translate(-5,-18.8993)'/>
-<circle r='5' fill='red' cx='479.111' cy='663.574' />
-<rect width='10' height='37.7987'  fill='green' stroke='black' stroke-width='0.4' transform='translate(479.111,663.574) rotate(104.469) translate(-5,-18.8993)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(687.642,687.471) rotate(71.7098) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(644.951,697.931) rotate(80.7554) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(601.146,701.55) rotate(89.8011) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(557.317,698.236) rotate(98.8468) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(514.553,688.072) rotate(107.892) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(473.92,671.311) rotate(116.938) translate(-5,-20)'/>
 </g>
 
 <g id="r-duluth-omaha">
-<circle r='5' fill='red' cx='684.813' cy='265.445' />
-<rect width='10' height='43.6584'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(684.813,265.445) rotate(11.9894) translate(-5,-21.8292)'/>
-<circle r='5' fill='red' cx='670.702' cy='310.896' />
-<rect width='10' height='43.6584'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(670.702,310.896) rotate(22.5062) translate(-5,-21.8292)'/>
-<circle r='5' fill='red' cx='669.175' cy='262.061' />
-<rect width='10' height='40.8448'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(669.175,262.061) rotate(11.9749) translate(-5,-20.4224)'/>
-<circle r='5' fill='red' cx='655.897' cy='304.829' />
-<rect width='10' height='40.8448'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(655.897,304.829) rotate(22.5207) translate(-5,-20.4224)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(685.187,263.654) rotate(11.5858) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(669.996,312.584) rotate(22.9098) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(669.262,261.648) rotate(11.8756) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(655.735,305.219) rotate(22.62) translate(-5,-20)'/>
 </g>
 
 <g id="r-sault-ste-marie-duluth">
-<circle r='5' fill='red' cx='809.579' cy='166.751' />
-<rect width='10' height='46.471'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(809.579,166.751) rotate(53.868) translate(-5,-23.2355)'/>
-<circle r='5' fill='red' cx='766.937' cy='193.679' />
-<rect width='10' height='46.471'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(766.937,193.679) rotate(61.5863) translate(-5,-23.2355)'/>
-<circle r='5' fill='red' cx='721.065' cy='214.637' />
-<rect width='10' height='46.471'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(721.065,214.637) rotate(69.3046) translate(-5,-23.2355)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(812.184,164.832) rotate(53.3732) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(766.937,193.679) rotate(61.5863) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(718.034,215.767) rotate(69.7994) translate(-5,-20)'/>
 </g>
 
 <g id="r-chicago-duluth">
-<circle r='5' fill='red' cx='798.585' cy='293.63' />
-<rect width='10' height='43.7611'  fill='red' stroke='black' stroke-width='0.4' transform='translate(798.585,293.63) rotate(108.93) translate(-5,-21.8806)'/>
-<circle r='5' fill='red' cx='754.574' cy='275.17' />
-<rect width='10' height='43.7611'  fill='red' stroke='black' stroke-width='0.4' transform='translate(754.574,275.17) rotate(116.58) translate(-5,-21.8806)'/>
-<circle r='5' fill='red' cx='713.412' cy='251.016' />
-<rect width='10' height='43.7611'  fill='red' stroke='black' stroke-width='0.4' transform='translate(713.412,251.016) rotate(124.231) translate(-5,-21.8806)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(800.365,294.235) rotate(108.628) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(754.574,275.17) rotate(116.58) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(711.86,249.954) rotate(124.532) translate(-5,-20)'/>
 </g>
 
 <g id="r-toronto-duluth">
-<circle r='5' fill='red' cx='945.995' cy='184.442' />
-<rect width='10' height='41.9004'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(945.995,184.442) rotate(68.66) translate(-5,-20.9502)'/>
-<circle r='5' fill='red' cx='902.674' cy='199.583' />
-<rect width='10' height='41.9004'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(902.674,199.583) rotate(72.8108) translate(-5,-20.9502)'/>
-<circle r='5' fill='red' cx='858.371' cy='211.548' />
-<rect width='10' height='41.9004'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(858.371,211.548) rotate(76.9616) translate(-5,-20.9502)'/>
-<circle r='5' fill='red' cx='813.318' cy='220.275' />
-<rect width='10' height='41.9004'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(813.318,220.275) rotate(81.1124) translate(-5,-20.9502)'/>
-<circle r='5' fill='red' cx='767.752' cy='225.719' />
-<rect width='10' height='41.9004'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(767.752,225.719) rotate(85.2631) translate(-5,-20.9502)'/>
-<circle r='5' fill='red' cx='721.911' cy='227.849' />
-<rect width='10' height='41.9004'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(721.911,227.849) rotate(89.4139) translate(-5,-20.9502)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(946.879,184.095) rotate(68.5741) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(903.219,199.414) rotate(72.7592) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(858.556,211.505) rotate(76.9444) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(813.13,220.304) rotate(81.1295) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(767.184,225.765) rotate(85.3147) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(720.961,227.858) rotate(89.4999) translate(-5,-20)'/>
 </g>
 
 <g id="r-omaha-kansas-city">
-<circle r='5' fill='red' cx='668.722' cy='369.033' />
-<rect width='10' height='37.0702'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(668.722,369.033) rotate(-20.1907) translate(-5,-18.5351)'/>
-<circle r='5' fill='red' cx='653.705' cy='374.555' />
-<rect width='10' height='33.0641'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(653.705,374.555) rotate(-20.1907) translate(-5,-16.532)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(674.532,364.231) rotate(-22.6375) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(661.451,375.124) rotate(-16.5888) translate(-5,-20)'/>
 </g>
 
 <g id="r-chicago-omaha">
-<circle r='5' fill='red' cx='800.413' cy='303.986' />
-<rect width='10' height='37.1956'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(800.413,303.986) rotate(-92.4392) translate(-5,-18.5978)'/>
-<circle r='5' fill='red' cx='759.416' cy='307.84' />
-<rect width='10' height='37.1956'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(759.416,307.84) rotate(-98.3022) translate(-5,-18.5978)'/>
-<circle r='5' fill='red' cx='719.027' cy='315.862' />
-<rect width='10' height='37.1956'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(719.027,315.862) rotate(-104.165) translate(-5,-18.5978)'/>
-<circle r='5' fill='red' cx='679.669' cy='327.968' />
-<rect width='10' height='37.1956'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(679.669,327.968) rotate(-110.028) translate(-5,-18.5978)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(800.437,294.155) rotate(-79.9453) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(756.608,291.926) rotate(-94.233) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(713.584,300.583) rotate(-108.521) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(674.027,319.59) rotate(-122.808) translate(-5,-20)'/>
 </g>
 
 <g id="r-kansas-city-oklahoma-city">
-<circle r='5' fill='red' cx='674.882' cy='440.963' />
-<rect width='10' height='39.2825'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(674.882,440.963) rotate(7.64957) translate(-5,-19.6412)'/>
-<circle r='5' fill='red' cx='665.318' cy='483.116' />
-<rect width='10' height='39.2825'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(665.318,483.116) rotate(17.9169) translate(-5,-19.6412)'/>
-<circle r='5' fill='red' cx='659.033' cy='438.767' />
-<rect width='10' height='36.5478'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(659.033,438.767) rotate(7.63274) translate(-5,-18.2739)'/>
-<circle r='5' fill='red' cx='650.073' cy='478.257' />
-<rect width='10' height='36.5478'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(650.073,478.257) rotate(17.9337) translate(-5,-18.2739)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(680.551,439.79) rotate(2.16355) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(669.572,487.688) rotate(23.6567) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(664.445,441.612) rotate(3.36547) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(655.868,479.034) rotate(22.4548) translate(-5,-20)'/>
 </g>
 
 <g id="r-saint-louis-kansas-city">
-<circle r='5' fill='red' cx='746.095' cy='420.825' />
-<rect width='10' height='38.8837'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(746.095,420.825) rotate(86.2922) translate(-5,-19.4419)'/>
-<circle r='5' fill='red' cx='703.282' cy='419.768' />
-<rect width='10' height='38.8837'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(703.282,419.768) rotate(96.5349) translate(-5,-19.4419)'/>
-<circle r='5' fill='red' cx='745.127' cy='404.854' />
-<rect width='10' height='36.1568'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(745.127,404.854) rotate(86.2752) translate(-5,-18.0784)'/>
-<circle r='5' fill='red' cx='705.036' cy='403.865' />
-<rect width='10' height='36.1568'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(705.036,403.865) rotate(96.552) translate(-5,-18.0784)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(748.727,427.073) rotate(79.817) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(699.19,425.732) rotate(103.283) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(743.308,411.757) rotate(81.2386) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(705.429,410.732) rotate(101.861) translate(-5,-20)'/>
 </g>
 
 <g id="r-oklahoma-city-dallas">
-<circle r='5' fill='red' cx='665.003' cy='544.068' />
-<rect width='10' height='39.7747'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(665.003,544.068) rotate(-18.0875) translate(-5,-19.8873)'/>
-<circle r='5' fill='red' cx='674.792' cy='586.674' />
-<rect width='10' height='39.7747'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(674.792,586.674) rotate(-7.79019) translate(-5,-19.8873)'/>
-<circle r='5' fill='red' cx='649.773' cy='548.973' />
-<rect width='10' height='37.0305'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(649.773,548.973) rotate(-18.104) translate(-5,-18.5152)'/>
-<circle r='5' fill='red' cx='658.948' cy='588.908' />
-<rect width='10' height='37.0305'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(658.948,588.908) rotate(-7.77366) translate(-5,-18.5152)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(668.542,541.275) rotate(-22.3152) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(679.334,588.658) rotate(-3.34726) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(654.548,549.365) rotate(-21.3695) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(663.217,587.427) rotate(-4.29302) translate(-5,-20)'/>
 </g>
 
 <g id="r-little-rock-oklahoma-city">
-<circle r='5' fill='red' cx='722.07' cy='522.628' />
-<rect width='10' height='38.5354'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(722.07,522.628) rotate(86.7321) translate(-5,-19.2677)'/>
-<circle r='5' fill='red' cx='679.616' cy='521.225' />
-<rect width='10' height='38.5354'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(679.616,521.225) rotate(97.0534) translate(-5,-19.2677)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(722.138,526.6) rotate(83.2753) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(678.334,525.076) rotate(100.712) translate(-5,-20)'/>
 </g>
 
 <g id="r-dallas-houston">
-<circle r='5' fill='red' cx='703.313' cy='639.817' />
-<rect width='10' height='42.2703'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(703.313,639.817) rotate(-46.2579) translate(-5,-21.1352)'/>
-<circle r='5' fill='red' cx='692.25' cy='651.376' />
-<rect width='10' height='38.0072'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(692.25,651.376) rotate(-46.2579) translate(-5,-19.0036)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(702.49,639.035) rotate(-46.6678) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(692.968,652.068) rotate(-45.8577) translate(-5,-20)'/>
 </g>
 
 <g id="r-little-rock-dallas">
-<circle r='5' fill='red' cx='736.314' cy='553.869' />
-<rect width='10' height='50.884'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(736.314,553.869) rotate(34.0994) translate(-5,-25.442)'/>
-<circle r='5' fill='red' cx='701.409' cy='596.115' />
-<rect width='10' height='50.884'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(701.409,596.115) rotate(45.0296) translate(-5,-25.442)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(739.322,549.334) rotate(33.0156) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(697.523,599.924) rotate(46.1134) translate(-5,-20)'/>
 </g>
 
 <g id="r-new-orleans-houston">
-<circle r='5' fill='red' cx='804.283' cy='673.868' />
-<rect width='10' height='41.6699'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(804.283,673.868) rotate(80.2905) translate(-5,-20.835)'/>
-<circle r='5' fill='red' cx='758.815' cy='677.414' />
-<rect width='10' height='41.6699'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(758.815,677.414) rotate(90.7902) translate(-5,-20.835)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(805.106,673.726) rotate(80.0985) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(757.98,677.401) rotate(90.9822) translate(-5,-20)'/>
 </g>
 
 <g id="r-toronto-sault-ste-marie">
-<circle r='5' fill='red' cx='937.359' cy='168.839' />
-<rect width='10' height='53.3863'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(937.359,168.839) rotate(95.6614) translate(-5,-26.6931)'/>
-<circle r='5' fill='red' cx='881.148' cy='157.734' />
-<rect width='10' height='53.3863'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(881.148,157.734) rotate(106.689) translate(-5,-26.6931)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(944.026,169.425) rotate(94.3751) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(874.759,155.74) rotate(107.976) translate(-5,-20)'/>
 </g>
 
 <g id="r-montreal-sault-ste-marie">
-<circle r='5' fill='red' cx='1043.72' cy='64.4475' />
-<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1043.72,64.4475) rotate(-98.9659) translate(-5,-20.5622)'/>
-<circle r='5' fill='red' cx='999.497' cy='73.3691' />
-<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(999.497,73.3691) rotate(-103.847) translate(-5,-20.5622)'/>
-<circle r='5' fill='red' cx='956.197' cy='86.0213' />
-<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(956.197,86.0213) rotate(-108.729) translate(-5,-20.5622)'/>
-<circle r='5' fill='red' cx='914.13' cy='102.312' />
-<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(914.13,102.312) rotate(-113.611) translate(-5,-20.5622)'/>
-<circle r='5' fill='red' cx='873.603' cy='122.124' />
-<rect width='10' height='41.1244'  fill='black' stroke='black' stroke-width='0.4' transform='translate(873.603,122.124) rotate(-118.492) translate(-5,-20.5622)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1044.27,64.3602) rotate(-98.9051) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(999.77,73.3019) rotate(-103.817) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(956.197,86.0213) rotate(-108.729) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(913.873,102.425) rotate(-113.641) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(873.109,122.392) rotate(-118.553) translate(-5,-20)'/>
 </g>
 
 <g id="r-chicago-saint-louis">
-<circle r='5' fill='red' cx='830.977' cy='341.639' />
-<rect width='10' height='42.2183'  fill='green' stroke='black' stroke-width='0.4' transform='translate(830.977,341.639) rotate(22.518) translate(-5,-21.1092)'/>
-<circle r='5' fill='red' cx='809.495' cy='382.49' />
-<rect width='10' height='42.2183'  fill='green' stroke='black' stroke-width='0.4' transform='translate(809.495,382.49) rotate(32.9567) translate(-5,-21.1092)'/>
-<circle r='5' fill='red' cx='816.221' cy='335.453' />
-<rect width='10' height='39.4294'  fill='white' stroke='black' stroke-width='0.4' transform='translate(816.221,335.453) rotate(22.5028) translate(-5,-19.7147)'/>
-<circle r='5' fill='red' cx='796.036' cy='373.838' />
-<rect width='10' height='39.4294'  fill='white' stroke='black' stroke-width='0.4' transform='translate(796.036,373.838) rotate(32.9719) translate(-5,-19.7147)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(831.399,340.613) rotate(22.2675) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(808.89,383.419) rotate(33.2073) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(816.111,335.716) rotate(22.5716) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(796.191,373.599) rotate(32.9032) translate(-5,-20)'/>
 </g>
 
 <g id="r-toronto-chicago">
-<circle r='5' fill='red' cx='959.403' cy='198.506' />
-<rect width='10' height='38.359'  fill='white' stroke='black' stroke-width='0.4' transform='translate(959.403,198.506) rotate(38.2936) translate(-5,-19.1795)'/>
-<circle r='5' fill='red' cx='931.494' cy='230.346' />
-<rect width='10' height='38.359'  fill='white' stroke='black' stroke-width='0.4' transform='translate(931.494,230.346) rotate(44.18) translate(-5,-19.1795)'/>
-<circle r='5' fill='red' cx='900.466' cy='259.156' />
-<rect width='10' height='38.359'  fill='white' stroke='black' stroke-width='0.4' transform='translate(900.466,259.156) rotate(50.0664) translate(-5,-19.1795)'/>
-<circle r='5' fill='red' cx='866.647' cy='284.631' />
-<rect width='10' height='38.359'  fill='white' stroke='black' stroke-width='0.4' transform='translate(866.647,284.631) rotate(55.9529) translate(-5,-19.1795)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(964.103,202.259) rotate(30.7357) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(938.133,237.693) rotate(41.7403) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(905.876,267.519) rotate(52.7449) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(868.519,290.638) rotate(63.7495) translate(-5,-20)'/>
 </g>
 
 <g id="r-pittsburgh-chicago">
-<circle r='5' fill='red' cx='961.548' cy='274.355' />
-<rect width='10' height='42.3958'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(961.548,274.355) rotate(-88.934) translate(-5,-21.1979)'/>
-<circle r='5' fill='red' cx='915.238' cy='276.559' />
-<rect width='10' height='42.3958'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(915.238,276.559) rotate(-96.5141) translate(-5,-21.1979)'/>
-<circle r='5' fill='red' cx='869.624' cy='284.851' />
-<rect width='10' height='42.3958'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(869.624,284.851) rotate(-104.094) translate(-5,-21.1979)'/>
-<circle r='5' fill='red' cx='961.311' cy='290.354' />
-<rect width='10' height='40.3399'  fill='black' stroke='black' stroke-width='0.4' transform='translate(961.311,290.354) rotate(-88.9236) translate(-5,-20.17)'/>
-<circle r='5' fill='red' cx='917.053' cy='292.455' />
-<rect width='10' height='40.3399'  fill='black' stroke='black' stroke-width='0.4' transform='translate(917.053,292.455) rotate(-96.5141) translate(-5,-20.17)'/>
-<circle r='5' fill='red' cx='873.461' cy='300.385' />
-<rect width='10' height='40.3399'  fill='black' stroke='black' stroke-width='0.4' transform='translate(873.461,300.385) rotate(-104.105) translate(-5,-20.17)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(962.745,274.38) rotate(-88.7383) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(915.238,276.559) rotate(-96.5141) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(868.462,285.145) rotate(-104.29) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(961.481,290.357) rotate(-88.8945) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(917.053,292.455) rotate(-96.5141) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(873.296,300.426) rotate(-104.134) translate(-5,-20)'/>
 </g>
 
 <g id="r-saint-louis-little-rock">
-<circle r='5' fill='red' cx='778.629' cy='443.035' />
-<rect width='10' height='38.1894'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(778.629,443.035) rotate(6.52513) translate(-5,-19.0947)'/>
-<circle r='5' fill='red' cx='770.103' cy='484.296' />
-<rect width='10' height='38.1894'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(770.103,484.296) rotate(16.8255) translate(-5,-19.0947)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(783.479,443.72) rotate(2.24693) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(774.528,486.592) rotate(21.338) translate(-5,-20)'/>
 </g>
 
 <g id="r-nashville-saint-louis">
-<circle r='5' fill='red' cx='859.323' cy='448.262' />
-<rect width='10' height='45.4232'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(859.323,448.262) rotate(107.244) translate(-5,-22.7116)'/>
-<circle r='5' fill='red' cx='813.758' cy='429.304' />
-<rect width='10' height='45.4232'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(813.758,429.304) rotate(117.935) translate(-5,-22.7116)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(861.917,449.052) rotate(106.658) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(811.369,428.022) rotate(118.521) translate(-5,-20)'/>
 </g>
 
 <g id="r-pittsburgh-saint-louis">
-<circle r='5' fill='red' cx='970.787' cy='308.907' />
-<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(970.787,308.907) rotate(50.6858) translate(-5,-20.2306)'/>
-<circle r='5' fill='red' cx='935.232' cy='335.581' />
-<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(935.232,335.581) rotate(55.5593) translate(-5,-20.2306)'/>
-<circle r='5' fill='red' cx='897.54' cy='359.137' />
-<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(897.54,359.137) rotate(60.4329) translate(-5,-20.2306)'/>
-<circle r='5' fill='red' cx='857.982' cy='379.406' />
-<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(857.982,379.406) rotate(65.3064) translate(-5,-20.2306)'/>
-<circle r='5' fill='red' cx='816.846' cy='396.241' />
-<rect width='10' height='40.4612'  fill='green' stroke='black' stroke-width='0.4' transform='translate(816.846,396.241) rotate(70.1799) translate(-5,-20.2306)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(970.965,308.761) rotate(50.6605) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(935.327,335.516) rotate(55.5467) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(897.54,359.137) rotate(60.4329) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(857.878,379.454) rotate(65.319) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(816.629,396.319) rotate(70.2052) translate(-5,-20)'/>
 </g>
 
 <g id="r-little-rock-new-orleans">
-<circle r='5' fill='red' cx='781.202' cy='546.581' />
-<rect width='10' height='42.9378'  fill='green' stroke='black' stroke-width='0.4' transform='translate(781.202,546.581) rotate(-37.2134) translate(-5,-21.4689)'/>
-<circle r='5' fill='red' cx='807.021' cy='585.738' />
-<rect width='10' height='42.9378'  fill='green' stroke='black' stroke-width='0.4' transform='translate(807.021,585.738) rotate(-29.5848) translate(-5,-21.4689)'/>
-<circle r='5' fill='red' cx='827.413' cy='627.976' />
-<rect width='10' height='42.9378'  fill='green' stroke='black' stroke-width='0.4' transform='translate(827.413,627.976) rotate(-21.9561) translate(-5,-21.4689)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(780.311,545.413) rotate(-37.4522) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(807.021,585.738) rotate(-29.5848) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(827.959,629.34) rotate(-21.7174) translate(-5,-20)'/>
 </g>
 
 <g id="r-nashville-little-rock">
-<circle r='5' fill='red' cx='868.268' cy='476.578' />
-<rect width='10' height='37.5707'  fill='white' stroke='black' stroke-width='0.4' transform='translate(868.268,476.578) rotate(58.8532) translate(-5,-18.7854)'/>
-<circle r='5' fill='red' cx='831.392' cy='495.704' />
-<rect width='10' height='37.5707'  fill='white' stroke='black' stroke-width='0.4' transform='translate(831.392,495.704) rotate(66.322) translate(-5,-18.7854)'/>
-<circle r='5' fill='red' cx='792.342' cy='509.873' />
-<rect width='10' height='37.5707'  fill='white' stroke='black' stroke-width='0.4' transform='translate(792.342,509.873) rotate(73.7907) translate(-5,-18.7854)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(872.451,483.217) rotate(49.8952) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(835.195,506.336) rotate(66.4609) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(792.893,517.874) rotate(83.0266) translate(-5,-20)'/>
 </g>
 
 <g id="r-atlanta-new-orleans">
-<circle r='5' fill='red' cx='926.045' cy='518.012' />
-<rect width='10' height='40.7238'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(926.045,518.012) rotate(-135.588) translate(-5,-20.3619)'/>
-<circle r='5' fill='red' cx='896.45' cy='551.516' />
-<rect width='10' height='40.7238'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(896.45,551.516) rotate(-141.502) translate(-5,-20.3619)'/>
-<circle r='5' fill='red' cx='870.464' cy='587.892' />
-<rect width='10' height='40.7238'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(870.464,587.892) rotate(-147.415) translate(-5,-20.3619)'/>
-<circle r='5' fill='red' cx='848.364' cy='626.751' />
-<rect width='10' height='40.7238'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(848.364,626.751) rotate(-153.329) translate(-5,-20.3619)'/>
-<circle r='5' fill='red' cx='937.513' cy='529.169' />
-<rect width='10' height='39.1094'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(937.513,529.169) rotate(-135.58) translate(-5,-19.5547)'/>
-<circle r='5' fill='red' cx='908.983' cy='561.462' />
-<rect width='10' height='39.1094'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(908.983,561.462) rotate(-141.499) translate(-5,-19.5547)'/>
-<circle r='5' fill='red' cx='883.935' cy='596.524' />
-<rect width='10' height='39.1094'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(883.935,596.524) rotate(-147.418) translate(-5,-19.5547)'/>
-<circle r='5' fill='red' cx='862.636' cy='633.982' />
-<rect width='10' height='39.1094'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(862.636,633.982) rotate(-153.337) translate(-5,-19.5547)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(926.149,517.494) rotate(-135.168) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(896.128,551.149) rotate(-141.366) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(869.916,587.849) rotate(-147.564) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(847.82,627.164) rotate(-153.762) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(936.955,529.319) rotate(-135.278) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(908.467,561.339) rotate(-141.402) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(883.558,596.215) rotate(-147.527) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(862.512,633.55) rotate(-153.652) translate(-5,-20)'/>
 </g>
 
 <g id="r-miami-new-orleans">
-<circle r='5' fill='red' cx='1082.37' cy='692.857' />
-<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1082.37,692.857) rotate(-71.3094) translate(-5,-18.8245)'/>
-<circle r='5' fill='red' cx='1042.47' cy='680.937' />
-<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1042.47,680.937) rotate(-75.4215) translate(-5,-18.8245)'/>
-<circle r='5' fill='red' cx='1001.82' cy='671.909' />
-<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1001.82,671.909) rotate(-79.5335) translate(-5,-18.8245)'/>
-<circle r='5' fill='red' cx='960.628' cy='665.818' />
-<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(960.628,665.818) rotate(-83.6456) translate(-5,-18.8245)'/>
-<circle r='5' fill='red' cx='919.105' cy='662.697' />
-<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(919.105,662.697) rotate(-87.7576) translate(-5,-18.8245)'/>
-<circle r='5' fill='red' cx='877.465' cy='662.562' />
-<rect width='10' height='37.649'  fill='red' stroke='black' stroke-width='0.4' transform='translate(877.465,662.562) rotate(-91.8697) translate(-5,-18.8245)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1085.7,684.128) rotate(-58.3599) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1046.53,664.198) rotate(-67.7081) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1004.64,650.896) rotate(-77.0562) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(961.144,644.574) rotate(-86.4044) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(917.201,645.401) rotate(-95.7525) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(873.975,653.355) rotate(-105.101) translate(-5,-20)'/>
 </g>
 
 <g id="r-nashville-atlanta">
-<circle r='5' fill='red' cx='929.752' cy='474.089' />
-<rect width='10' height='42.0608'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(929.752,474.089) rotate(-55.5862) translate(-5,-21.0304)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(928.9,473.51) rotate(-55.9679) translate(-5,-20)'/>
 </g>
 
 <g id="r-pittsburgh-nashville">
-<circle r='5' fill='red' cx='986.464' cy='318.491' />
-<rect width='10' height='38.8654'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(986.464,318.491) rotate(21.4428) translate(-5,-19.4327)'/>
-<circle r='5' fill='red' cx='968.77' cy='357.513' />
-<rect width='10' height='38.8654'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(968.77,357.513) rotate(27.3391) translate(-5,-19.4327)'/>
-<circle r='5' fill='red' cx='947.161' cy='394.512' />
-<rect width='10' height='38.8654'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(947.161,394.512) rotate(33.2354) translate(-5,-19.4327)'/>
-<circle r='5' fill='red' cx='921.866' cy='429.094' />
-<rect width='10' height='38.8654'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(921.866,429.094) rotate(39.1318) translate(-5,-19.4327)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(990.294,320.138) rotate(16.2281) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(974.583,361.184) rotate(25.6615) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(952.358,399.1) rotate(35.0948) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(924.218,432.861) rotate(44.5281) translate(-5,-20)'/>
 </g>
 
 <g id="r-raleigh-nashville">
-<circle r='5' fill='red' cx='1006.28' cy='426.131' />
-<rect width='10' height='35.5122'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1006.28,426.131) rotate(-95.081) translate(-5,-17.7561)'/>
-<circle r='5' fill='red' cx='967.258' cy='432.158' />
-<rect width='10' height='35.5122'  fill='black' stroke='black' stroke-width='0.4' transform='translate(967.258,432.158) rotate(-102.479) translate(-5,-17.7561)'/>
-<circle r='5' fill='red' cx='929.337' cy='443.159' />
-<rect width='10' height='35.5122'  fill='black' stroke='black' stroke-width='0.4' transform='translate(929.337,443.159) rotate(-109.877) translate(-5,-17.7561)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1006.18,413.137) rotate(-79.9474) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(962.474,414.116) rotate(-102.618) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(922.526,431.864) rotate(-125.29) translate(-5,-20)'/>
 </g>
 
 <g id="r-raleigh-atlanta">
-<circle r='5' fill='red' cx='1024.39' cy='457.557' />
-<rect width='10' height='38.5873'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1024.39,457.557) rotate(42.689) translate(-5,-19.2937)'/>
-<circle r='5' fill='red' cx='992.879' cy='486.125' />
-<rect width='10' height='38.5873'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(992.879,486.125) rotate(52.9132) translate(-5,-19.2937)'/>
-<circle r='5' fill='red' cx='1012.67' cy='446.659' />
-<rect width='10' height='35.8663'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1012.67,446.659) rotate(42.6718) translate(-5,-17.9331)'/>
-<circle r='5' fill='red' cx='983.177' cy='473.402' />
-<rect width='10' height='35.8663'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(983.177,473.402) rotate(52.9304) translate(-5,-17.9331)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1031.25,460.548) rotate(35.5006) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(994.237,493.94) rotate(60.3825) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1016.58,453.486) rotate(37.0904) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(988.715,478.63) rotate(58.7927) translate(-5,-20)'/>
 </g>
 
 <g id="r-charleston-atlanta">
-<circle r='5' fill='red' cx='1040.36' cy='511.395' />
-<rect width='10' height='41.6699'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1040.36,511.395) rotate(88.9406) translate(-5,-20.835)'/>
-<circle r='5' fill='red' cx='994.871' cy='508.063' />
-<rect width='10' height='41.6699'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(994.871,508.063) rotate(99.4403) translate(-5,-20.835)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1041.19,511.378) rotate(88.7487) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(994.048,507.924) rotate(99.6323) translate(-5,-20)'/>
 </g>
 
 <g id="r-miami-atlanta">
-<circle r='5' fill='red' cx='1086.92' cy='680.762' />
-<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1086.92,680.762) rotate(132.765) translate(-5,-21.1008)'/>
-<circle r='5' fill='red' cx='1054.38' cy='647.982' />
-<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1054.38,647.982) rotate(137.659) translate(-5,-21.1008)'/>
-<circle r='5' fill='red' cx='1024.76' cy='612.546' />
-<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1024.76,612.546) rotate(142.553) translate(-5,-21.1008)'/>
-<circle r='5' fill='red' cx='998.267' cy='574.711' />
-<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(998.267,574.711) rotate(147.447) translate(-5,-21.1008)'/>
-<circle r='5' fill='red' cx='975.099' cy='534.754' />
-<rect width='10' height='42.2015'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(975.099,534.754) rotate(152.341) translate(-5,-21.1008)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1087.73,681.509) rotate(132.648) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1054.75,648.389) rotate(137.601) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1024.76,612.546) rotate(142.553) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(997.971,574.247) rotate(147.506) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(974.589,533.779) rotate(152.458) translate(-5,-20)'/>
 </g>
 
 <g id="r-toronto-pittsburgh">
-<circle r='5' fill='red' cx='991.441' cy='204.204' />
-<rect width='10' height='40.2001'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(991.441,204.204) rotate(-14.2396) translate(-5,-20.1)'/>
-<circle r='5' fill='red' cx='998.369' cy='247.796' />
-<rect width='10' height='40.2001'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(998.369,247.796) rotate(-3.82121) translate(-5,-20.1)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(991.416,204.107) rotate(-14.2632) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(998.375,247.896) rotate(-3.79763) translate(-5,-20)'/>
 </g>
 
 <g id="r-montreal-toronto">
-<circle r='5' fill='red' cx='1052.78' cy='80.5276' />
-<rect width='10' height='36.2202'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1052.78,80.5276) rotate(-130.169) translate(-5,-18.1101)'/>
-<circle r='5' fill='red' cx='1023.81' cy='108.387' />
-<rect width='10' height='36.2202'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1023.81,108.387) rotate(-137.592) translate(-5,-18.1101)'/>
-<circle r='5' fill='red' cx='998.682' cy='139.755' />
-<rect width='10' height='36.2202'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(998.682,139.755) rotate(-145.015) translate(-5,-18.1101)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1045.98,71.3786) rotate(-116.984) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1011.2,97.9324) rotate(-137.734) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(988.083,135.087) rotate(-158.484) translate(-5,-20)'/>
 </g>
 
 <g id="r-new-york-pittsburgh">
-<circle r='5' fill='red' cx='1078.33' cy='258.14' />
-<rect width='10' height='42.9004'  fill='white' stroke='black' stroke-width='0.4' transform='translate(1078.33,258.14) rotate(56.5549) translate(-5,-21.4502)'/>
-<circle r='5' fill='red' cx='1037.05' cy='280.277' />
-<rect width='10' height='42.9004'  fill='white' stroke='black' stroke-width='0.4' transform='translate(1037.05,280.277) rotate(67.031) translate(-5,-21.4502)'/>
-<circle r='5' fill='red' cx='1069.56' cy='244.755' />
-<rect width='10' height='40.0996'  fill='green' stroke='black' stroke-width='0.4' transform='translate(1069.56,244.755) rotate(56.54) translate(-5,-20.0498)'/>
-<circle r='5' fill='red' cx='1030.75' cy='265.57' />
-<rect width='10' height='40.0996'  fill='green' stroke='black' stroke-width='0.4' transform='translate(1030.75,265.57) rotate(67.0459) translate(-5,-20.0498)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(1079.54,257.337) rotate(56.2309) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(1035.72,280.839) rotate(67.3549) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(1069.6,244.728) rotate(56.5281) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(1030.71,265.589) rotate(67.0577) translate(-5,-20)'/>
 </g>
 
 <g id="r-washington-pittsburgh">
-<circle r='5' fill='red' cx='1076.34' cy='330.852' />
-<rect width='10' height='46.6239'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1076.34,330.852) rotate(110.661) translate(-5,-23.312)'/>
-<circle r='5' fill='red' cx='1030.92' cy='308.666' />
-<rect width='10' height='46.6239'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1030.92,308.666) rotate(121.407) translate(-5,-23.312)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1079.44,332.002) rotate(109.958) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1028.1,306.923) rotate(122.11) translate(-5,-20)'/>
 </g>
 
 <g id="r-raleigh-pittsburgh">
-<circle r='5' fill='red' cx='1020.61' cy='386.055' />
-<rect width='10' height='55.0821'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1020.61,386.055) rotate(157.621) translate(-5,-27.5411)'/>
-<circle r='5' fill='red' cx='1003.53' cy='329.593' />
-<rect width='10' height='55.0821'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1003.53,329.593) rotate(168.711) translate(-5,-27.5411)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1023.57,392.992) rotate(156.205) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1002.14,322.18) rotate(170.127) translate(-5,-20)'/>
 </g>
 
 <g id="r-montreal-boston">
-<circle r='5' fill='red' cx='1115.49' cy='72.181' />
-<rect width='10' height='41.5261'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1115.49,72.181) rotate(-54.5194) translate(-5,-20.763)'/>
-<circle r='5' fill='red' cx='1149.96' cy='101.816' />
-<rect width='10' height='41.5261'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1149.96,101.816) rotate(-44.1196) translate(-5,-20.763)'/>
-<circle r='5' fill='red' cx='1106.15' cy='85.1729' />
-<rect width='10' height='38.7495'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1106.15,85.1729) rotate(-54.535) translate(-5,-19.3747)'/>
-<circle r='5' fill='red' cx='1138.52' cy='113' />
-<rect width='10' height='38.7495'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1138.52,113) rotate(-44.104) translate(-5,-19.3747)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1114.87,71.739) rotate(-54.6937) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1150.5,102.365) rotate(-43.9453) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1106.66,85.5364) rotate(-54.3824) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1138.09,112.552) rotate(-44.2566) translate(-5,-20)'/>
 </g>
 
 <g id="r-montreal-new-york">
-<circle r='5' fill='red' cx='1092.02' cy='95.7778' />
-<rect width='10' height='43.5193'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1092.02,95.7778) rotate(-15.5288) translate(-5,-21.7597)'/>
-<circle r='5' fill='red' cx='1101.65' cy='142.274' />
-<rect width='10' height='43.5193'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1101.65,142.274) rotate(-7.88461) translate(-5,-21.7597)'/>
-<circle r='5' fill='red' cx='1105.02' cy='189.639' />
-<rect width='10' height='43.5193'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1105.02,189.639) rotate(-0.240424) translate(-5,-21.7597)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1091.54,94.0836) rotate(-15.8119) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1101.65,142.274) rotate(-7.88461) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1105.02,191.399) rotate(0.0426418) translate(-5,-20)'/>
 </g>
 
 <g id="r-boston-new-york">
-<circle r='5' fill='red' cx='1159.79' cy='171.911' />
-<rect width='10' height='40.1071'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(1159.79,171.911) rotate(29.6575) translate(-5,-20.0535)'/>
-<circle r='5' fill='red' cx='1134.65' cy='208.074' />
-<rect width='10' height='40.1071'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(1134.65,208.074) rotate(39.9747) translate(-5,-20.0535)'/>
-<circle r='5' fill='red' cx='1145.92' cy='163.938' />
-<rect width='10' height='37.3566'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1145.92,163.938) rotate(29.6411) translate(-5,-18.6783)'/>
-<circle r='5' fill='red' cx='1122.34' cy='197.845' />
-<rect width='10' height='37.3566'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1122.34,197.845) rotate(39.991) translate(-5,-18.6783)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(1163.38,172.421) rotate(26.2923) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(1135.79,211.959) rotate(43.5188) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1148.14,167.111) rotate(27.0781) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1125.55,199.491) rotate(42.733) translate(-5,-20)'/>
 </g>
 
 <g id="r-new-york-washington">
-<circle r='5' fill='red' cx='1120.09' cy='261.65' />
-<rect width='10' height='40.1426'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(1120.09,261.65) rotate(-10.8542) translate(-5,-20.0713)'/>
-<circle r='5' fill='red' cx='1124.47' cy='305.515' />
-<rect width='10' height='40.1426'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(1124.47,305.515) rotate(-0.534843) translate(-5,-20.0713)'/>
-<circle r='5' fill='red' cx='1104.37' cy='264.599' />
-<rect width='10' height='37.3915'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1104.37,264.599) rotate(-10.8705) translate(-5,-18.6957)'/>
-<circle r='5' fill='red' cx='1108.47' cy='305.73' />
-<rect width='10' height='37.3915'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1108.47,305.73) rotate(-0.518516) translate(-5,-18.6957)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(1123.06,259.751) rotate(-14.1269) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(1127.77,307.69) rotate(2.91249) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1108.01,265.568) rotate(-13.3574) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1111.88,304.91) rotate(2.14304) translate(-5,-20)'/>
 </g>
 
 <g id="r-washington-raleigh">
-<circle r='5' fill='red' cx='1101.91' cy='376.214' />
-<rect width='10' height='38.9632'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1101.91,376.214) rotate(36.4607) translate(-5,-19.4816)'/>
-<circle r='5' fill='red' cx='1073.43' cy='408.306' />
-<rect width='10' height='38.9632'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1073.43,408.306) rotate(46.7084) translate(-5,-19.4816)'/>
-<circle r='5' fill='red' cx='1089.08' cy='366.652' />
-<rect width='10' height='36.2348'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1089.08,366.652) rotate(36.4437) translate(-5,-18.1174)'/>
-<circle r='5' fill='red' cx='1062.41' cy='396.706' />
-<rect width='10' height='36.2348'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1062.41,396.706) rotate(46.7254) translate(-5,-18.1174)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1108.2,378.173) rotate(30.1802) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1075.27,415.101) rotate(53.2587) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1093.04,372.351) rotate(31.5573) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1067.76,400.707) rotate(51.8815) translate(-5,-20)'/>
 </g>
 
 <g id="r-raleigh-charleston">
-<circle r='5' fill='red' cx='1062.22' cy='446.37' />
-<rect width='10' height='30'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1062.22,446.37) rotate(-35.5751) translate(-5,-15)'/>
-<circle r='5' fill='red' cx='1075.96' cy='477.216' />
-<rect width='10' height='30'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1075.96,477.216) rotate(-12.4615) translate(-5,-15)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1073.22,436.65) rotate(-49.6823) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1090.54,475.508) rotate(1.62924) translate(-5,-20)'/>
 </g>
 
 <g id="r-charleston-miami">
-<circle r='5' fill='red' cx='1076.69' cy='543.567' />
-<rect width='10' height='39.1579'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1076.69,543.567) rotate(-181.93) translate(-5,-19.5789)'/>
-<circle r='5' fill='red' cx='1080.36' cy='586.549' />
-<rect width='10' height='39.1579'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1080.36,586.549) rotate(-187.832) translate(-5,-19.5789)'/>
-<circle r='5' fill='red' cx='1088.43' cy='628.926' />
-<rect width='10' height='39.1579'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1088.43,628.926) rotate(-193.734) translate(-5,-19.5789)'/>
-<circle r='5' fill='red' cx='1100.82' cy='670.249' />
-<rect width='10' height='39.1579'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1100.82,670.249) rotate(-199.636) translate(-5,-19.5789)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1073.62,543.819) rotate(-178.09) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1075.42,587.742) rotate(-186.598) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1083.7,630.915) rotate(-195.107) translate(-5,-20)'/>
+<rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1098.27,672.389) rotate(-203.615) translate(-5,-20)'/>
 </g>
 </svg>

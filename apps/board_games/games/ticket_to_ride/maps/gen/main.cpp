@@ -8,7 +8,7 @@
 
 #include "arc_circle.h"
 
-constexpr static int32_t carriage_length = 30;
+constexpr static int32_t carriage_length = 40;
 constexpr static int32_t carriage_width = 10;
 constexpr static int32_t gap = 4;
 constexpr static int32_t double_offset = 8;
@@ -152,9 +152,10 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
 
         // - draw carriages
         double total_length = std::abs(_ang_end - _ang_start) * _radius;
-        double _carriage_length = (total_length - (n_carriages - 1) * gap) / n_carriages;
-        double _carriage_ang = _carriage_length / _radius;
-        double _gap_ang = gap / _radius;
+        double _gap = n_carriages > 1 ? (total_length - (n_carriages * carriage_length)) / (n_carriages - 1) : 0;
+        // double _carriage_length = (total_length - (n_carriages - 1) * gap) / n_carriages;
+        double _carriage_ang = carriage_length / _radius;
+        double _gap_ang = _gap / _radius;
 
         for (int i = 0; i < n_carriages; i++) {
             double ang = _ang_start + _sgn * ((_carriage_ang / 2.0) + (i * _carriage_ang) + (i * _gap_ang));
@@ -163,15 +164,17 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
 
             double angdeg = ang * 180.0 / M_PI; // degrees for SVG
 
-            os << "<circle r='5' fill='red' cx='" << x << "' cy='" << y << "' />\n";
+            if (draw_helpers) {
+                os << "<circle r='5' fill='red' cx='" << x << "' cy='" << y << "' />\n";
+            }
 
             // Transform order: translate to pos, rotate(angle), then translate by -w/2,-h/2 to place centered
-            os << "<rect width='" << carriage_width << "' height='" << _carriage_length << "' ";
+            os << "<rect width='" << carriage_width << "' height='" << carriage_length << "' ";
             os << " fill='" << color << "' stroke='black' stroke-width='0.4'";
             os << " transform='";
             os << "translate(" << x << "," << y << ") ";
             os << "rotate(" << angdeg << ") ";
-            os << "translate(" << -carriage_width / 2.0 << "," << -_carriage_length / 2.0 << ")'";
+            os << "translate(" << -carriage_width / 2.0 << "," << -carriage_length / 2.0 << ")'";
             os << "/>\n";
         }
     };
@@ -235,7 +238,7 @@ int main(int argc, char** argv) {
     os << "    <circle r='" << city_radius << "' fill='black' stroke-width='1' stroke='black' id='city-point'/>\n";
     //  - carriage
     os << "    <g id=\"carriage\">\n";
-    os << "      <rect x=\"0\" y=\"0\" width=\"" << carriage_length << "\" height=\"" << carriage_width << "\"/>\n";
+    os << "      <rect width=\"" << carriage_length << "\" height=\"" << carriage_width << "\"/>\n";
     os << "    </g>\n";
 
     os << "  </defs>\n";
