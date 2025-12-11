@@ -1,6 +1,7 @@
 #pragma once
 
 #include "point.hpp"
+#include <format>
 
 namespace utils::math::g2d {
 

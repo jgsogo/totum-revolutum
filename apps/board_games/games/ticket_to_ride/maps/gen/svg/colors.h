@@ -17,6 +17,7 @@ namespace svg {
 
         // special colors
         TRANSPARENT,
+        NONE,
     };
 
 }

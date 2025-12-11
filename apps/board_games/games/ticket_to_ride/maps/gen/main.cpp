@@ -9,7 +9,11 @@
 
 #include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
 
+#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/circle.h"
+#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/image.h"
+#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/line.h"
 #include "apps/board_games/games/ticket_to_ride/maps/gen/svg/path.h"
+#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/rect.h"
 
 constexpr static int32_t carriage_length = 40;
 constexpr static int32_t carriage_width = 10;
@@ -107,44 +111,46 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
     // the wrapped delta is closest to sgn*theta.
     double sgn = (std::abs(normalize_ang(diff - theta)) < std::abs(normalize_ang(diff + theta))) ? +1.0 : -1.0;
 
-    std::ostringstream os;
-    os << "\n";
-    os << "<g id=\"r-" << city_name(route.start) << "-" << city_name(route.end) << "\">\n";
+    svg::SVGGroup route_group;
+    route_group.id = std::format("r-{}-{}", city_name(route.start), city_name(route.end));
 
     // HELPERS
     if (draw_helpers) {
         // - draw circle for reference
-        os << "  <circle cx='" << center.x << "' cy='" << center.y << "' r='" << radius
-           << "' fill='none' stroke='red'/>\n";
+        svg::Circle& circle_ref = route_group.add_from<svg::Circle>(solution);
+        circle_ref.fill = svg::Color::NONE;
+        circle_ref.stroke = svg::Color::RED;
+
         // - draw chord for reference
-        os << "  <line x1='" << route.start.pos_x() << "' y1='" << route.start.pos_y() << "' x2='" << route.end.pos_x()
-           << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
+        svg::Line& chord_ref = route_group.add<svg::Line>();
+        chord_ref.stroke = svg::Color::BLACK;
+        chord_ref.start = Point<int>{.x = route.start.pos_x(), .y = route.start.pos_y()};
+        chord_ref.end = Point<int>{.x = route.end.pos_x(), .y = route.end.pos_y()};
 
         // - draw city gap (start and end)
-        svg::Path city_gap_start = svg::Path::from(solution, ang_start, ang_start + sgn * (city_gap / radius), 6);
+        svg::Path& city_gap_start =
+            route_group.add_from<svg::Path>(solution, ang_start, ang_start + sgn * (city_gap / radius), 6);
         city_gap_start.stroke = svg::Color::GREEN;
         city_gap_start.stroke_width = 1;
         city_gap_start.fill = svg::Color::TRANSPARENT;
-        os << city_gap_start;
 
-        svg::Path city_gap_end =
-            svg::Path::from(solution, ang_start + sgn * theta - sgn * (city_gap / radius), ang_start + sgn * theta, 6);
+        svg::Path& city_gap_end = route_group.add_from<svg::Path>(
+            solution, ang_start + sgn * theta - sgn * (city_gap / radius), ang_start + sgn * theta, 6);
         city_gap_end.stroke = svg::Color::RED;
         city_gap_end.stroke_width = 1;
         city_gap_end.fill = svg::Color::TRANSPARENT;
-        os << city_gap_end;
     }
 
     // CARRIAGES
-    auto draw_carriages = [&os, &draw_helpers](const Circunference<double>& _circunference, double _ang_start,
-                                               double _ang_end, double _sgn, int n_carriages, svg::Color color) {
+    auto draw_carriages = [&route_group, &draw_helpers](const Circunference<double>& _circunference, double _ang_start,
+                                                        double _ang_end, double _sgn, int n_carriages,
+                                                        svg::Color color) {
         if (draw_helpers) {
             // - draw circle for carriages
-            svg::Path circle_carriages = svg::Path::from(_circunference, _ang_start, _ang_end, 10);
+            svg::Path& circle_carriages = route_group.add_from<svg::Path>(_circunference, _ang_start, _ang_end, 10);
             circle_carriages.stroke = svg::Color::BLACK;
             circle_carriages.stroke_width = 2;
             circle_carriages.fill = svg::Color::TRANSPARENT;
-            os << circle_carriages;
         }
 
         // - draw carriages
@@ -162,17 +168,23 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
             double angdeg = ang * 180.0 / M_PI; // degrees for SVG
 
             if (draw_helpers) {
-                os << "<circle r='5' fill='red' cx='" << x << "' cy='" << y << "' />\n";
+                svg::Circle& carriage_circle = route_group.add<svg::Circle>();
+                carriage_circle.fill = svg::Color::RED;
+                carriage_circle.center = Point<int>{.x = static_cast<int>(x), .y = static_cast<int>(y)};
+                carriage_circle.radius = 5;
             }
 
             // Transform order: translate to pos, rotate(angle), then translate by -w/2,-h/2 to place centered
-            os << "<rect width='" << carriage_width << "' height='" << carriage_length << "' ";
-            os << " fill='" << color << "' stroke='black' stroke-width='0.4'";
-            os << " transform='";
-            os << "translate(" << x << "," << y << ") ";
-            os << "rotate(" << angdeg << ") ";
-            os << "translate(" << -carriage_width / 2.0 << "," << -carriage_length / 2.0 << ")'";
-            os << "/>\n";
+            svg::Rect& rect = route_group.add<svg::Rect>();
+            rect.size = Point<int>{.x = carriage_width, .y = carriage_length};
+            rect.fill = color;
+            rect.stroke = svg::Color::BLACK;
+            rect.stroke_width = 0.4;
+            rect.transformation.emplace_back(std::make_unique<svg::Translate>(
+                svg::Translate{Point<int>{.x = static_cast<int>(x), .y = static_cast<int>(y)}}));
+            rect.transformation.emplace_back(std::make_unique<svg::Rotate>(svg::Rotate{static_cast<float>(angdeg)}));
+            rect.transformation.emplace_back(std::make_unique<svg::Translate>(svg::Translate{Point<int>{
+                .x = static_cast<int>(-carriage_width / 2.0), .y = static_cast<int>(-carriage_length / 2.0)}}));
         }
     };
 
@@ -189,8 +201,8 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
                        ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, route.colors[1]);
     }
 
-    os << "</g>\n";
-
+    std::ostringstream os;
+    os << route_group;
     return os.str();
 }
 
@@ -225,8 +237,10 @@ int main(int argc, char** argv) {
 
     if (add_background) {
         // Background image
-        os << "  <image href=\"https://i.imgur.com/3USktsR.jpeg\" width=\"" << map_data.size_x() << "\" height=\""
-           << map_data.size_y() << "\"/>\n";
+        svg::Image background;
+        background.href = "https://i.imgur.com/3USktsR.jpeg";
+        background.size = Point<int>{.x = map_data.size_x(), .y = map_data.size_y()};
+        os << background;
     }
 
     // Reusable elements

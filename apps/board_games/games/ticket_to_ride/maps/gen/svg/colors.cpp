@@ -32,6 +32,9 @@ std::ostream& operator<<(std::ostream& os, const svg::Color& color) {
     case svg::Color::TRANSPARENT:
         os << "transparent";
         break;
+    case svg::Color::NONE:
+        os << "none";
+        break;
     }
     return os;
 }
