@@ -14,6 +14,7 @@
 
 #include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
 
+#include "colors.h"
 #include "route_data.h"
 
 constexpr static int32_t carriage_length = 40;
@@ -24,33 +25,6 @@ constexpr static int32_t city_radius = 8;
 constexpr static int32_t city_gap = city_radius + 8;
 
 using namespace utils::math::g2d;
-
-svg::Color color(const board_games::ticket_to_ride::Color color) {
-    switch (color) {
-    case board_games::ticket_to_ride::COLOR_UNKNOWN:
-        return svg::Color::GREY;
-    case board_games::ticket_to_ride::COLOR_BLUE:
-        return svg::Color::BLUE;
-    case board_games::ticket_to_ride::COLOR_RED:
-        return svg::Color::RED;
-    case board_games::ticket_to_ride::COLOR_GREEN:
-        return svg::Color::GREEN;
-    case board_games::ticket_to_ride::COLOR_YELLOW:
-        return svg::Color::YELLOW;
-    case board_games::ticket_to_ride::COLOR_BLACK:
-        return svg::Color::BLACK;
-    case board_games::ticket_to_ride::COLOR_WHITE:
-        return svg::Color::WHITE;
-    case board_games::ticket_to_ride::COLOR_ORANGE:
-        return svg::Color::ORANGE;
-    // case board_games::ticket_to_ride::COLOR_PURPLE:
-    case board_games::ticket_to_ride::COLOR_PINK:
-        return svg::Color::HOTPINK;
-    case board_games::ticket_to_ride::Color_INT_MIN_SENTINEL_DO_NOT_USE_:
-    case board_games::ticket_to_ride::Color_INT_MAX_SENTINEL_DO_NOT_USE_:
-        return svg::Color::GREY;
-    }
-}
 
 void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool draw_helpers) {
     // We need to compute the arc with a given length between two points
