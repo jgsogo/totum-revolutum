@@ -2,6 +2,8 @@
 
 #include <optional>
 
+#include "libraries/utils/cpp/math/newton_method.hpp"
+
 #include "circunference.hpp"
 #include "point.hpp"
 
@@ -27,28 +29,26 @@ namespace utils::math::g2d {
 
         // Solve chord = 2 * (s/theta) * sin(theta/2)
         // Newton iteration for theta
-        ////////////// const double s = arc_length;
-        double theta = 2 * std::asin(chord / (2 * arc_length)); // reasonable initial guess
+        T theta = 2 * std::asin(chord / (2 * arc_length)); // reasonable initial guess
+        {
+            std::function<T(const T&)> f = [&arc_length, &chord](const T& theta) {
+                return 2 * (arc_length / theta) * std::sin(theta / 2) - chord;
+            };
+            std::function<T(const T&)> f_prime = [&arc_length](const T& theta) {
+                return -2 * arc_length * std::sin(theta / 2) / (theta * theta) +
+                       (arc_length / theta) * std::cos(theta / 2) / 2;
+            };
 
-        for (int i = 0; i < 20; ++i) {
-            double f = 2 * (arc_length / theta) * std::sin(theta / 2) - chord;
-            double df = -2 * arc_length * std::sin(theta / 2) / (theta * theta) +
-                        (arc_length / theta) * std::cos(theta / 2) / 2;
-
-            double new_theta = theta - f / df;
-            if (std::abs(new_theta - theta) < 1e-12)
-                theta = new_theta;
-            else
-                theta = new_theta;
+            theta = utils::math::newton_method<T, T>(theta, f, f_prime, 20);
         }
 
-        double R = arc_length / theta;
-        double half_c = chord / 2.0;
+        T radius = arc_length / theta;
+        T half_chord = chord / 2.0;
 
-        if (R < half_c)
+        if (radius < half_chord)
             return std::nullopt; // numeric safety
 
-        double h = std::sqrt(R * R - half_c * half_c);
+        T h = std::sqrt(radius * radius - half_chord * half_chord);
 
         // Midpoint
         Point<T> M{.x = (p1.x + p2.x) * 0.5, .y = (p1.y + p2.y) * 0.5};
@@ -60,6 +60,7 @@ namespace utils::math::g2d {
         Point<T> C1{.x = M.x + h * n.x, .y = M.y + h * n.y};
         Point<T> C2{.x = M.x - h * n.x, .y = M.y - h * n.y};
 
-        return std::make_pair(Circunference<T>{.center = C1, .radius = R}, Circunference<T>{.center = C2, .radius = R});
+        return std::make_pair(Circunference<T>{.center = C1, .radius = radius},
+                              Circunference<T>{.center = C2, .radius = radius});
     }
 } // namespace utils::math::g2d

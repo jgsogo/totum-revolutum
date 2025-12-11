@@ -4,7 +4,7 @@
 
 #include <CLI/CLI.hpp>
 
-#include "libraries/utils/cpp/math/geometry/2d/arc_circle.hpp"
+#include "libraries/utils/cpp/math/geometry/2d/circle_for_arc.hpp"
 
 #include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
 

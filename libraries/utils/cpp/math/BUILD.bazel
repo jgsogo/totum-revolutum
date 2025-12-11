@@ -1,0 +1,9 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "newton_method",
+    hdrs = [
+        "newton_method.hpp",
+    ],
+    visibility = ["//visibility:public"],
+)
