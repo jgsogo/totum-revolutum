@@ -39,25 +39,6 @@ std::string city_name(const board_games::ticket_to_ride::City& city) {
     return name;
 }
 
-std::string draw_arc(const Circunference<double>& circ, svg::Color color, const double& ang_start,
-                     const double& ang_end, int segments = 10, int stroke_width = 1) {
-    svg::Path arc;
-    arc.stroke = color;
-    arc.stroke_width = stroke_width;
-    arc.fill = svg::Color::TRANSPARENT;
-
-    for (int i = 0; i < (segments + 1); i++) {
-        double ang = ang_start + i * (ang_end - ang_start) / segments;
-        int x = static_cast<int>(circ.center.x + circ.radius * std::cos(ang));
-        int y = static_cast<int>(circ.center.y + circ.radius * std::sin(ang));
-        arc.segments.emplace_back(Point<int>{.x = x, .y = y});
-    }
-
-    std::ostringstream os;
-    os << arc;
-    return os.str();
-}
-
 svg::Color color(const board_games::ticket_to_ride::Color color) {
     switch (color) {
     case board_games::ticket_to_ride::COLOR_UNKNOWN:
@@ -140,9 +121,18 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
            << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
 
         // - draw city gap (start and end)
-        os << draw_arc(solution, svg::Color::GREEN, ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
-        os << draw_arc(solution, svg::Color::RED, ang_start + sgn * theta - sgn * (city_gap / radius),
-                       ang_start + sgn * theta, 6, 1);
+        svg::Path city_gap_start = svg::Path::from(solution, ang_start, ang_start + sgn * (city_gap / radius), 6);
+        city_gap_start.stroke = svg::Color::GREEN;
+        city_gap_start.stroke_width = 1;
+        city_gap_start.fill = svg::Color::TRANSPARENT;
+        os << city_gap_start;
+
+        svg::Path city_gap_end =
+            svg::Path::from(solution, ang_start + sgn * theta - sgn * (city_gap / radius), ang_start + sgn * theta, 6);
+        city_gap_end.stroke = svg::Color::RED;
+        city_gap_end.stroke_width = 1;
+        city_gap_end.fill = svg::Color::TRANSPARENT;
+        os << city_gap_end;
     }
 
     // CARRIAGES
@@ -150,7 +140,11 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
                                                double _ang_end, double _sgn, int n_carriages, svg::Color color) {
         if (draw_helpers) {
             // - draw circle for carriages
-            os << draw_arc(_circunference, svg::Color::BLACK, _ang_start, _ang_end, 10, 2);
+            svg::Path circle_carriages = svg::Path::from(_circunference, _ang_start, _ang_end, 10);
+            circle_carriages.stroke = svg::Color::BLACK;
+            circle_carriages.stroke_width = 2;
+            circle_carriages.fill = svg::Color::TRANSPARENT;
+            os << circle_carriages;
         }
 
         // - draw carriages
