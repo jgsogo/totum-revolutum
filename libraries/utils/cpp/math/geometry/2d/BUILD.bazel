@@ -3,6 +3,7 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "geometry_2d",
     hdrs = [
+        "angle.hpp",
         "circle_for_arc.hpp",
         "circunference.hpp",
         "point.hpp",

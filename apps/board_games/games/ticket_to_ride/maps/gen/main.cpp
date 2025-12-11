@@ -4,6 +4,7 @@
 
 #include <CLI/CLI.hpp>
 
+#include "libraries/utils/cpp/math/geometry/2d/angle.hpp"
 #include "libraries/utils/cpp/math/geometry/2d/circle_for_arc.hpp"
 
 #include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
@@ -34,15 +35,6 @@ std::string city_name(const board_games::ticket_to_ride::City& city) {
             return std::tolower(c);
     });
     return name;
-}
-
-// Normalize angle to [-pi, pi)
-static double normalize_ang(double a) {
-    while (a <= -M_PI)
-        a += 2 * M_PI;
-    while (a > M_PI)
-        a -= 2 * M_PI;
-    return a;
 }
 
 std::string draw_arc(const Point<double>& center, const double& radius, const std::string& color,
