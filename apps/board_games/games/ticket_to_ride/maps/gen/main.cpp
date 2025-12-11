@@ -225,24 +225,18 @@ int main(int argc, char** argv) {
     }
     board_games::ticket_to_ride::MapData map_data = std::move(map_data_expected.value());
 
-    std::ofstream os(output, std::ios::out | std::ios::binary);
-    if (!os) {
-        throw std::runtime_error("Cannot open file: " + output.string());
-    }
-
-    os << "<svg width=\"" << map_data.size_x() << "\" height=\"" << map_data.size_y()
-       << "\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n";
+    svg::SVGDoc doc;
+    doc.size = Point<int>{.x = map_data.size_x(), .y = map_data.size_y()};
 
     if (add_background) {
         // Background image
-        svg::Image background;
+        svg::Image& background = doc.add<svg::Image>();
         background.href = "https://i.imgur.com/3USktsR.jpeg";
         background.size = Point<int>{.x = map_data.size_x(), .y = map_data.size_y()};
-        os << background;
     }
 
     // Reusable elements
-    svg::SVGDefs svg_defs;
+    svg::SVGDefs& svg_defs = doc.add<svg::SVGDefs>();
     {
         //  - city-point
         auto& city_point = svg_defs.add<svg::Circle>();
@@ -258,14 +252,13 @@ int main(int argc, char** argv) {
         auto& carriage_rect = carriage_group.add<svg::Rect>();
         carriage_rect.size = Point<int>{.x = carriage_length, .y = carriage_width};
     }
-    os << svg_defs;
 
     // Cities
     std::map<int32_t, board_games::ticket_to_ride::City> cities_pos;
-    os << "<!--Cities-->\n";
     for (const auto& city : map_data.cities()) {
-        os << "  <use id=\"" << city_name(city) << "\" href=\"#city-point\" x=\"" << city.pos_x() << "\" y=\""
-           << city.pos_y() << "\"/>\n";
+        auto& svg_city = doc.add<svg::SVGUse>("#city-point");
+        svg_city.id = city_name(city);
+        svg_city.pos = utils::math::g2d::Point<int>{.x = city.pos_x(), .y = city.pos_y()};
 
         // We have tests to validate the input data
         cities_pos[city.id()] = city;
@@ -289,13 +282,16 @@ int main(int argc, char** argv) {
             routes[key].draw_ccw = route.draw_ccw();
         }
     }
-    os << "<!--Routes-->\n";
     for (const auto& [_, route] : routes) {
-        os << make_route_svg(route, draw_helpers);
+        auto svg_route = make_route_svg(route, draw_helpers);
+        doc.elements.push_back(std::make_unique<svg::SVGGroup>(std::move(svg_route)));
     }
 
-    // Close tag
-    os << "</svg>\n";
+    std::ofstream os(output, std::ios::out | std::ios::binary);
+    if (!os) {
+        throw std::runtime_error("Cannot open file: " + output.string());
+    }
+    os << doc;
 
     return 0;
 }

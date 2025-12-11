@@ -30,6 +30,14 @@ namespace svg {
         virtual std::ostream& write(std::ostream& os) const = 0;
     };
 
+    struct SVGUse : SVGElement {
+        SVGUse(std::string href);
+        std::ostream& write(std::ostream& os) const override;
+
+        std::string href;
+        utils::math::g2d::Point<int> pos;
+    };
+
     // FIXME: Do not inherit from SVGElement, as a group won't have stroke, stroke-width, fill, transformation (?),...
     struct SVGVector : SVGElement {
         SVGVector() = default;
@@ -56,7 +64,6 @@ namespace svg {
 
     struct SVGGroup : SVGVector {
         SVGGroup() = default;
-
         std::ostream& write(std::ostream& os) const override final;
     };
 
@@ -65,6 +72,12 @@ namespace svg {
         std::ostream& write(std::ostream& os) const override final;
     };
 
+    struct SVGDoc : SVGVector {
+        SVGDoc() = default;
+        std::ostream& write(std::ostream& os) const override final;
+
+        utils::math::g2d::Point<int> size;
+    };
 } // namespace svg
 
 inline std::ostream& operator<<(std::ostream& os, const svg::SVGElement& elem) { return elem.write(os); }

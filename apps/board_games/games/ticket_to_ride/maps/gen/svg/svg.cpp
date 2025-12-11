@@ -26,6 +26,16 @@ namespace svg {
         return os;
     }
 
+    SVGUse::SVGUse(std::string href) : href{href} {}
+
+    std::ostream& SVGUse::write(std::ostream& os) const {
+        os << "<use";
+        this->_write(os);
+        os << " href='" << href << "' x='" << pos.x << "' y='" << pos.y << "'";
+        os << "/>\n";
+        return os;
+    }
+
     std::ostream& SVGVector::write(std::ostream& os) const {
         for (const auto& elem : elements) {
             os << "  ";
@@ -55,4 +65,17 @@ namespace svg {
         os << "</defs>\n";
         return os;
     }
+
+    std::ostream& SVGDoc::write(std::ostream& os) const {
+        os << "<svg";
+        os << " width='" << size.x << "' height='" << size.y << "'";
+        os << " xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'";
+        os << ">\n";
+
+        this->SVGVector::write(os);
+
+        os << "</svg>\n";
+        return os;
+    }
+
 } // namespace svg
