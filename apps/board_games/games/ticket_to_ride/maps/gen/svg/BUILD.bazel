@@ -9,6 +9,7 @@ cc_library(
     hdrs = [
         "colors.h",
         "path.h",
+        "svg.h",
     ],
     visibility = ["//visibility:public"],
     deps = [

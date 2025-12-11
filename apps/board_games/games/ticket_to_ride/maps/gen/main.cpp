@@ -41,7 +41,11 @@ std::string city_name(const board_games::ticket_to_ride::City& city) {
 
 std::string draw_arc(const Circunference<double>& circ, svg::Color color, const double& ang_start,
                      const double& ang_end, int segments = 10, int stroke_width = 1) {
-    svg::Path arc{.stroke = color, .stroke_width = stroke_width, .fill = svg::Color::TRANSPARENT};
+    svg::Path arc;
+    arc.stroke = color;
+    arc.stroke_width = stroke_width;
+    arc.fill = svg::Color::TRANSPARENT;
+
     for (int i = 0; i < (segments + 1); i++) {
         double ang = ang_start + i * (ang_end - ang_start) / segments;
         int x = static_cast<int>(circ.center.x + circ.radius * std::cos(ang));
