@@ -69,7 +69,7 @@ svg::Color color(const board_games::ticket_to_ride::Color color) {
     }
 }
 
-svg::SVGGroup make_route_svg(const RouteData& route, bool draw_helpers) {
+void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool draw_helpers) {
     // We need to compute the arc with a given length between two points
     double arc_length =
         static_cast<double>((route.n_carriages * carriage_length) + ((route.n_carriages - 1) * gap) + (2 * city_gap));
@@ -88,7 +88,7 @@ svg::SVGGroup make_route_svg(const RouteData& route, bool draw_helpers) {
         int32_t dy = route.end.pos_y() - route.start.pos_y();
         double c = std::hypot(dx, dy);
         std::cerr << " chord lenght: " << c << std::endl;
-        return svg::SVGGroup();
+        return;
     }
 
     // TODO: Agree on some logic to choose one solution over the other.
@@ -109,9 +109,6 @@ svg::SVGGroup make_route_svg(const RouteData& route, bool draw_helpers) {
     // Two possibilities: sweep = +theta or sweep = -theta. We'll choose sign sgn such that
     // the wrapped delta is closest to sgn*theta.
     double sgn = (std::abs(normalize_ang(diff - theta)) < std::abs(normalize_ang(diff + theta))) ? +1.0 : -1.0;
-
-    svg::SVGGroup route_group;
-    route_group.id = std::format("r-{}-{}", city_name(route.start), city_name(route.end));
 
     // HELPERS
     if (draw_helpers) {
@@ -199,8 +196,6 @@ svg::SVGGroup make_route_svg(const RouteData& route, bool draw_helpers) {
         draw_carriages(circ_internal, ang_start + sgn * (city_gap / radius),
                        ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, route.colors[1]);
     }
-
-    return route_group;
 }
 
 int main(int argc, char** argv) {
@@ -282,8 +277,10 @@ int main(int argc, char** argv) {
         }
     }
     for (const auto& [_, route] : routes) {
-        auto svg_route = make_route_svg(route, draw_helpers);
-        doc.elements.push_back(std::make_unique<svg::SVGGroup>(std::move(svg_route)));
+        svg::SVGGroup& route_group = doc.add<svg::SVGGroup>();
+        route_group.id = std::format("r-{}-{}", city_name(route.start), city_name(route.end));
+
+        make_route_svg(route_group, route, draw_helpers);
     }
 
     std::ofstream os(output, std::ios::out | std::ios::binary);
