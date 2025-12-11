@@ -1,0 +1,11 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "geometry_2d",
+    hdrs = [
+        "arc_circle.hpp",
+        "circunference.hpp",
+        "point.hpp",
+    ],
+    visibility = ["//visibility:public"],
+)

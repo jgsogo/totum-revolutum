@@ -4,9 +4,9 @@
 
 #include <CLI/CLI.hpp>
 
-#include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
+#include "libraries/utils/cpp/math/geometry/2d/arc_circle.hpp"
 
-#include "arc_circle.h"
+#include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
 
 constexpr static int32_t carriage_length = 40;
 constexpr static int32_t carriage_width = 10;
@@ -14,6 +14,8 @@ constexpr static int32_t gap = 4;
 constexpr static int32_t double_offset = 8;
 constexpr static int32_t city_radius = 8;
 constexpr static int32_t city_gap = city_radius + 8;
+
+using namespace utils::math::g2d;
 
 struct RouteData {
     board_games::ticket_to_ride::City start;
@@ -43,8 +45,8 @@ static double normalize_ang(double a) {
     return a;
 }
 
-std::string draw_arc(const Vec2& center, const double& radius, const std::string& color, const double& ang_start,
-                     const double& ang_end, int segments = 10, int stroke_width = 1) {
+std::string draw_arc(const Point<double>& center, const double& radius, const std::string& color,
+                     const double& ang_start, const double& ang_end, int segments = 10, int stroke_width = 1) {
     std::ostringstream os;
     os << "<path stroke='" << color << "' stroke-width='" << stroke_width << "' fill='transparent' d='M";
     for (int i = 0; i < (segments + 1); i++) {
@@ -90,10 +92,11 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
         static_cast<double>((route.n_carriages * carriage_length) + ((route.n_carriages - 1) * gap) + (2 * city_gap));
     double hypot = std::hypot(route.end.pos_x() - route.start.pos_x(), route.end.pos_y() - route.start.pos_y());
     arc_length = std::max(arc_length, hypot);
-    auto solution = arc_circle(
-        Vec2{.x = static_cast<double>(route.start.pos_x()), .y = static_cast<double>(route.start.pos_y())},
-        Vec2{.x = static_cast<double>(route.end.pos_x()), .y = static_cast<double>(route.end.pos_y())}, arc_length);
-    if (!solution) {
+    auto solution_opt = circle_for_arc(
+        Point<double>{.x = static_cast<double>(route.start.pos_x()), .y = static_cast<double>(route.start.pos_y())},
+        Point<double>{.x = static_cast<double>(route.end.pos_x()), .y = static_cast<double>(route.end.pos_y())},
+        arc_length);
+    if (!solution_opt) {
         std::cerr << "There is no solution for the route from " << route.start.name() << " to " << route.end.name()
                   << std::endl;
         std::cerr << " arc lenght: " << arc_length << std::endl;
@@ -106,8 +109,9 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
     }
 
     // TODO: Agree on some logic to choose one solution over the other.
-    auto center = route.draw_ccw ? solution->centers[1] : solution->centers[0];
-    double radius = solution->radius;
+    auto solution = route.draw_ccw ? solution_opt->second : solution_opt->first;
+    auto center = solution.center;
+    double radius = solution.radius;
 
     // Angles of points A and B relative to center
     double ang_start = std::atan2(route.start.pos_y() - center.y, route.start.pos_x() - center.x);
@@ -143,8 +147,8 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
     }
 
     // CARRIAGES
-    auto draw_carriages = [&os, &draw_helpers](Vec2 _center, double _radius, double _ang_start, double _ang_end,
-                                               double _sgn, int n_carriages, std::string color) {
+    auto draw_carriages = [&os, &draw_helpers](Point<double> _center, double _radius, double _ang_start,
+                                               double _ang_end, double _sgn, int n_carriages, std::string color) {
         if (draw_helpers) {
             // - draw circle for carriages
             os << draw_arc(_center, _radius, "black", _ang_start, _ang_end, 10, 2);
