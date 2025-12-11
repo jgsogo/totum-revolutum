@@ -157,7 +157,7 @@ int main(int argc, char** argv) {
 
     std::filesystem::path input_textproto, output;
     bool draw_helpers = false;
-    bool add_background = true;
+    bool add_background = false;
     app.add_option("--textproto", input_textproto, "Input textproto file")->required();
     app.add_option("--output", output, "Output file")->required();
     app.add_option("--draw_helpers", draw_helpers, "Add helpers to the SVG output");
