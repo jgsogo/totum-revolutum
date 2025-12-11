@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
     argv = app.ensure_utf8(argv);
 
     std::filesystem::path input_textproto, output;
-    bool draw_helpers = true;
+    bool draw_helpers = false;
     bool add_background = true;
     app.add_option("--textproto", input_textproto, "Input textproto file")->required();
     app.add_option("--output", output, "Output file")->required();
