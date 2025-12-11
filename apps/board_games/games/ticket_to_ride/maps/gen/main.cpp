@@ -70,7 +70,7 @@ svg::Color color(const board_games::ticket_to_ride::Color color) {
     }
 }
 
-std::string make_route_svg(const RouteData& route, bool draw_helpers) {
+svg::SVGGroup make_route_svg(const RouteData& route, bool draw_helpers) {
     // We need to compute the arc with a given length between two points
     double arc_length =
         static_cast<double>((route.n_carriages * carriage_length) + ((route.n_carriages - 1) * gap) + (2 * city_gap));
@@ -89,7 +89,7 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
         int32_t dy = route.end.pos_y() - route.start.pos_y();
         double c = std::hypot(dx, dy);
         std::cerr << " chord lenght: " << c << std::endl;
-        return "";
+        return svg::SVGGroup();
     }
 
     // TODO: Agree on some logic to choose one solution over the other.
@@ -201,9 +201,7 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
                        ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages, route.colors[1]);
     }
 
-    std::ostringstream os;
-    os << route_group;
-    return os.str();
+    return route_group;
 }
 
 int main(int argc, char** argv) {
@@ -244,15 +242,23 @@ int main(int argc, char** argv) {
     }
 
     // Reusable elements
-    os << "  <defs>\n";
-    //  - city-point
-    os << "    <circle r='" << city_radius << "' fill='black' stroke-width='1' stroke='black' id='city-point'/>\n";
-    //  - carriage
-    os << "    <g id=\"carriage\">\n";
-    os << "      <rect width=\"" << carriage_length << "\" height=\"" << carriage_width << "\"/>\n";
-    os << "    </g>\n";
+    svg::SVGDefs svg_defs;
+    {
+        //  - city-point
+        auto& city_point = svg_defs.add<svg::Circle>();
+        city_point.radius = city_radius;
+        city_point.fill = svg::Color::BLACK;
+        city_point.stroke_width = 1;
+        city_point.stroke = svg::Color::BLACK;
+        city_point.id = "city-point";
 
-    os << "  </defs>\n";
+        //  - carriage
+        auto& carriage_group = svg_defs.add<svg::SVGGroup>();
+        carriage_group.id = "carriage";
+        auto& carriage_rect = carriage_group.add<svg::Rect>();
+        carriage_rect.size = Point<int>{.x = carriage_length, .y = carriage_width};
+    }
+    os << svg_defs;
 
     // Cities
     std::map<int32_t, board_games::ticket_to_ride::City> cities_pos;
@@ -285,8 +291,7 @@ int main(int argc, char** argv) {
     }
     os << "<!--Routes-->\n";
     for (const auto& [_, route] : routes) {
-        std::string svg = make_route_svg(route, draw_helpers);
-        os << svg;
+        os << make_route_svg(route, draw_helpers);
     }
 
     // Close tag

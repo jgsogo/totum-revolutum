@@ -20,6 +20,7 @@ namespace svg {
         SVGElement(SVGElement&&) noexcept = default;
         SVGElement& operator=(SVGElement&&) noexcept = default;
 
+        std::optional<std::string> id;
         std::optional<Color> stroke;
         std::optional<float> stroke_width;
         std::optional<Color> fill;
@@ -29,10 +30,11 @@ namespace svg {
         virtual std::ostream& write(std::ostream& os) const = 0;
     };
 
-    struct SVGGroup : SVGElement {
-        SVGGroup() = default;
+    // FIXME: Do not inherit from SVGElement, as a group won't have stroke, stroke-width, fill, transformation (?),...
+    struct SVGVector : SVGElement {
+        SVGVector() = default;
 
-        std::ostream& write(std::ostream& os) const;
+        std::ostream& write(std::ostream& os) const override;
 
         template <typename T, typename... Args> T& add(Args&&... args) {
             auto ptr = std::make_unique<T>(std::forward<Args>(args)...);
@@ -49,8 +51,18 @@ namespace svg {
             return ref;
         }
 
-        std::optional<std::string> id;
         std::vector<std::unique_ptr<SVGElement>> elements;
+    };
+
+    struct SVGGroup : SVGVector {
+        SVGGroup() = default;
+
+        std::ostream& write(std::ostream& os) const override final;
+    };
+
+    struct SVGDefs : SVGVector {
+        SVGDefs() = default;
+        std::ostream& write(std::ostream& os) const override final;
     };
 
 } // namespace svg
