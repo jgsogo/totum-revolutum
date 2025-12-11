@@ -1,0 +1,15 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "svg",
+    srcs = [
+        "path.cpp",
+    ],
+    hdrs = [
+        "path.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//libraries/utils/cpp/math/geometry/2d:geometry_2d",
+    ],
+)

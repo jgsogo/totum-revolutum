@@ -9,6 +9,8 @@
 
 #include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
 
+#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/path.h"
+
 constexpr static int32_t carriage_length = 40;
 constexpr static int32_t carriage_width = 10;
 constexpr static int32_t gap = 4;
@@ -37,17 +39,18 @@ std::string city_name(const board_games::ticket_to_ride::City& city) {
     return name;
 }
 
-std::string draw_arc(const Point<double>& center, const double& radius, const std::string& color,
-                     const double& ang_start, const double& ang_end, int segments = 10, int stroke_width = 1) {
-    std::ostringstream os;
-    os << "<path stroke='" << color << "' stroke-width='" << stroke_width << "' fill='transparent' d='M";
+std::string draw_arc(const Circunference<double>& circ, const std::string& color, const double& ang_start,
+                     const double& ang_end, int segments = 10, int stroke_width = 1) {
+    svg::Path arc{.stroke = color, .stroke_width = stroke_width, .fill = "transparent"};
     for (int i = 0; i < (segments + 1); i++) {
         double ang = ang_start + i * (ang_end - ang_start) / segments;
-        double x = center.x + radius * std::cos(ang);
-        double y = center.y + radius * std::sin(ang);
-        os << x << " " << y << " ";
+        int x = static_cast<int>(circ.center.x + circ.radius * std::cos(ang));
+        int y = static_cast<int>(circ.center.y + circ.radius * std::sin(ang));
+        arc.segments.emplace_back(Point<int>{.x = x, .y = y});
     }
-    os << "'/>\n";
+
+    std::ostringstream os;
+    os << arc;
     return os.str();
 }
 
@@ -133,30 +136,30 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
            << "' y2='" << route.end.pos_y() << "' stroke='black'/>\n";
 
         // - draw city gap (start and end)
-        os << draw_arc(center, radius, "green", ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
-        os << draw_arc(center, radius, "red", ang_start + sgn * theta - sgn * (city_gap / radius),
-                       ang_start + sgn * theta, 6, 1);
+        os << draw_arc(solution, "green", ang_start, ang_start + sgn * (city_gap / radius), 6, 1);
+        os << draw_arc(solution, "red", ang_start + sgn * theta - sgn * (city_gap / radius), ang_start + sgn * theta, 6,
+                       1);
     }
 
     // CARRIAGES
-    auto draw_carriages = [&os, &draw_helpers](Point<double> _center, double _radius, double _ang_start,
+    auto draw_carriages = [&os, &draw_helpers](const Circunference<double>& _circunference, double _ang_start,
                                                double _ang_end, double _sgn, int n_carriages, std::string color) {
         if (draw_helpers) {
             // - draw circle for carriages
-            os << draw_arc(_center, _radius, "black", _ang_start, _ang_end, 10, 2);
+            os << draw_arc(_circunference, "black", _ang_start, _ang_end, 10, 2);
         }
 
         // - draw carriages
-        double total_length = std::abs(_ang_end - _ang_start) * _radius;
+        double total_length = std::abs(_ang_end - _ang_start) * _circunference.radius;
         double _gap = n_carriages > 1 ? (total_length - (n_carriages * carriage_length)) / (n_carriages - 1) : 0;
         // double _carriage_length = (total_length - (n_carriages - 1) * gap) / n_carriages;
-        double _carriage_ang = carriage_length / _radius;
-        double _gap_ang = _gap / _radius;
+        double _carriage_ang = carriage_length / _circunference.radius;
+        double _gap_ang = _gap / _circunference.radius;
 
         for (int i = 0; i < n_carriages; i++) {
             double ang = _ang_start + _sgn * ((_carriage_ang / 2.0) + (i * _carriage_ang) + (i * _gap_ang));
-            double x = _center.x + _radius * std::cos(ang);
-            double y = _center.y + _radius * std::sin(ang);
+            double x = _circunference.center.x + _circunference.radius * std::cos(ang);
+            double y = _circunference.center.y + _circunference.radius * std::sin(ang);
 
             double angdeg = ang * 180.0 / M_PI; // degrees for SVG
 
@@ -176,14 +179,17 @@ std::string make_route_svg(const RouteData& route, bool draw_helpers) {
     };
 
     if (route.colors.size() == 1) {
-        draw_carriages(center, radius, ang_start + sgn * (city_gap / radius),
+        draw_carriages(solution, ang_start + sgn * (city_gap / radius),
                        ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
                        color(route.colors[0]));
     } else if (route.colors.size() == 2) {
-        draw_carriages(center, radius + double_offset, ang_start + sgn * (city_gap / radius),
+        auto circ_external = Circunference{.center = solution.center, .radius = solution.radius + double_offset};
+        draw_carriages(circ_external, ang_start + sgn * (city_gap / radius),
                        ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
                        color(route.colors[0]));
-        draw_carriages(center, radius - double_offset, ang_start + sgn * (city_gap / radius),
+
+        auto circ_internal = Circunference{.center = solution.center, .radius = solution.radius - double_offset};
+        draw_carriages(circ_internal, ang_start + sgn * (city_gap / radius),
                        ang_start + sgn * theta - sgn * (city_gap / radius), sgn, route.n_carriages,
                        color(route.colors[1]));
     }
@@ -198,7 +204,7 @@ int main(int argc, char** argv) {
     argv = app.ensure_utf8(argv);
 
     std::filesystem::path input_textproto, output;
-    bool draw_helpers = false;
+    bool draw_helpers = true;
     bool add_background = true;
     app.add_option("--textproto", input_textproto, "Input textproto file")->required();
     app.add_option("--output", output, "Output file")->required();

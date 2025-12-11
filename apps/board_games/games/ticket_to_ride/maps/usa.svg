@@ -46,545 +46,1266 @@
 <!--Routes-->
 
 <g id="r-vancouver-seattle">
+  <circle cx='43.9658' cy='122.47' r='62.1844' fill='none' stroke='red'/>
+  <line x1='97' y1='90' x2='95' y2='158' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M97 90 98 92 99 94 100 97 101 99 102 102 103 104 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M102 143 101 146 100 148 99 151 97 153 96 155 94 158 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M111 102 112 106 113 111 113 115 114 120 114 124 113 129 113 133 112 137 111 142 109 146 '/>
+<circle r='5' fill='red' cx='114.148' cy='121.971' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(114.148,121.971) rotate(-0.407207) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M95 106 96 110 97 113 97 117 98 120 98 124 97 127 97 131 96 134 95 137 94 141 '/>
+<circle r='5' fill='red' cx='97.9895' cy='126.64' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(97.9895,126.64) rotate(4.41403) translate(-5,-20)'/>
 </g>
 
 <g id="r-calgary-vancouver">
+  <circle cx='138.949' cy='-254.545' r='347.089' fill='none' stroke='red'/>
+  <line x1='262' y1='70' x2='97' y2='90' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M262 70 259 70 256 71 254 72 251 73 249 74 246 75 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M114 91 111 91 109 91 106 91 103 90 101 90 98 90 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M246 75 234 79 221 82 208 85 194 88 181 89 168 91 154 92 141 92 127 92 114 91 '/>
+<circle r='5' fill='red' cx='227.737' cy='80.9958' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(227.737,80.9958) rotate(75.1785) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='181.524' cy='89.9232' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(181.524,89.9232) rotate(82.9542) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='134.528' cy='92.5161' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(134.528,92.5161) rotate(90.7299) translate(-5,-20)'/>
 </g>
 
 <g id="r-seattle-portland">
+  <circle cx='0.985624' cy='157.056' r='94.0191' fill='none' stroke='red'/>
+  <line x1='95' y1='158' x2='68' y2='223' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M95 158 94 160 94 163 94 165 94 168 93 171 93 173 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M78 210 76 212 75 214 73 216 71 218 69 220 68 222 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M101 175 100 179 99 183 98 187 96 192 95 196 93 200 91 203 89 207 87 211 84 215 '/>
+<circle r='5' fill='red' cx='95.8678' cy='194.542' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(95.8678,194.542) rotate(21.5584) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M85 172 84 176 83 179 82 183 81 186 80 189 78 193 77 196 75 199 73 202 71 206 '/>
+<circle r='5' fill='red' cx='79.7817' cy='191.559' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(79.7817,191.559) rotate(23.6477) translate(-5,-20)'/>
 </g>
 
 <g id="r-calgary-seattle">
+  <circle cx='123.677' cy='9.96025' r='150.792' fill='none' stroke='red'/>
+  <line x1='262' y1='70' x2='95' y2='158' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M262 70 260 72 259 74 258 77 257 79 256 81 254 84 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M110 160 108 159 105 159 102 159 100 158 97 158 94 157 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M254 84 245 98 234 112 222 124 208 134 193 143 178 150 161 155 145 159 127 160 110 160 '/>
+<circle r='5' fill='red' cx='243.879' cy='101.008' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(243.879,101.008) rotate(37.1422) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='212.606' cy='131.737' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(212.606,131.737) rotate(53.8608) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='173.815' cy='152.172' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(173.815,152.172) rotate(70.5793) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='130.786' cy='160.584' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(130.786,160.584) rotate(87.2978) translate(-5,-20)'/>
 </g>
 
 <g id="r-helena-seattle">
+  <circle cx='392.066' cy='-392.487' r='625.527' fill='none' stroke='red'/>
+  <line x1='385' y1='233' x2='95' y2='158' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M385 233 382 232 379 232 377 232 374 232 371 232 369 232 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M111 166 109 165 107 164 104 163 102 161 99 160 97 159 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M369 232 342 231 315 228 289 224 262 219 236 213 211 206 185 198 160 188 135 178 111 166 '/>
+<circle r='5' fill='red' cx='349.034' cy='231.558' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(349.034,231.558) rotate(93.9447) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='303.787' cy='226.779' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(303.787,226.779) rotate(98.113) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='259.008' cy='218.724' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(259.008,218.724) rotate(102.281) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='214.932' cy='207.436' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(214.932,207.436) rotate(106.45) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='171.794' cy='192.974' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(171.794,192.974) rotate(110.618) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='129.821' cy='175.414' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(129.821,175.414) rotate(114.787) translate(-5,-20)'/>
 </g>
 
 <g id="r-portland-san-francisco">
+  <circle cx='453.05' cy='372.808' r='413.166' fill='none' stroke='red'/>
+  <line x1='68' y1='223' x2='51' y2='468' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M68 223 67 225 66 227 65 230 64 232 63 235 62 238 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M47 451 47 453 48 456 48 458 49 461 50 464 50 466 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M54 235 48 256 42 277 38 299 35 321 32 342 31 364 32 386 33 408 35 430 39 452 '/>
+<circle r='5' fill='red' cx='48.8531' cy='254.464' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(48.8531,254.464) rotate(-163.681) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='38.5294' cy='298.288' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(38.5294,298.288) rotate(-169.809) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='32.9431' cy='342.964' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(32.9431,342.964) rotate(-175.937) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='32.1579' cy='387.982' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(32.1579,387.982) rotate(-182.065) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='36.1827' cy='432.825' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(36.1827,432.825) rotate(-188.193) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M70 240 63 260 58 281 54 302 50 323 48 344 47 365 48 386 49 407 51 428 55 449 '/>
+<circle r='5' fill='red' cx='63.9956' cy='259.689' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(63.9956,259.689) rotate(-163.788) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='54.2099' cy='301.493' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(54.2099,301.493) rotate(-169.862) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='48.9029' cy='344.098' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(48.9029,344.098) rotate(-175.937) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='48.134' cy='387.025' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(48.134,387.025) rotate(-182.011) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='51.9119' cy='429.793' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(51.9119,429.793) rotate(-188.085) translate(-5,-20)'/>
 </g>
 
 <g id="r-salt-lake-city-portland">
+  <circle cx='5.77871' cy='552.536' r='335.358' fill='none' stroke='red'/>
+  <line x1='298' y1='388' x2='68' y2='223' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M298 388 296 385 295 383 293 381 292 378 291 376 289 374 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M83 226 81 225 78 225 76 224 73 224 70 223 68 223 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M289 374 275 352 258 332 241 313 221 296 201 280 179 265 156 253 133 242 108 233 83 226 '/>
+<circle r='5' fill='red' cx='278.689' cy='357.638' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(278.689,357.638) rotate(-35.5323) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='250.846' cy='323.609' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(250.846,323.609) rotate(-43.0497) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='218.79' cy='293.515' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(218.79,293.515) rotate(-50.5671) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='183.072' cy='267.874' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(183.072,267.874) rotate(-58.0845) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='144.307' cy='247.126' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(144.307,247.126) rotate(-65.6018) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='103.161' cy='231.628' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(103.161,231.628) rotate(-73.1192) translate(-5,-20)'/>
 </g>
 
 <g id="r-san-francisco-los-angeles">
+  <circle cx='364.136' cy='349.494' r='334.81' fill='none' stroke='red'/>
+  <line x1='51' y1='468' x2='142' y2='600' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M51 467 51 470 52 472 53 475 54 477 55 480 57 482 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M129 588 131 589 132 591 134 593 136 595 138 597 140 598 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M49 486 55 497 61 509 67 521 74 532 81 543 89 554 97 564 105 574 114 584 123 593 '/>
+<circle r='5' fill='red' cx='58.1752' cy='504.112' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(58.1752,504.112) rotate(153.19) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='81.4394' cy='543.405' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(81.4394,543.405) rotate(145.552) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='109.719' cy='579.257' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(109.719,579.257) rotate(137.915) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M64 479 69 491 75 502 81 513 87 523 94 534 101 544 109 554 117 564 126 573 134 582 '/>
+<circle r='5' fill='red' cx='72.8776' cy='497.728' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(72.8776,497.728) rotate(153.026) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='94.6337' cy='534.354' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(94.6337,534.354) rotate(145.552) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='120.969' cy='567.839' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(120.969,567.839) rotate(138.078) translate(-5,-20)'/>
 </g>
 
 <g id="r-salt-lake-city-san-francisco">
+  <circle cx='12.2966' cy='-72.8031' r='542.186' fill='none' stroke='red'/>
+  <line x1='298' y1='388' x2='51' y2='468' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M298 388 295 389 293 390 291 392 288 393 286 394 284 396 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M69 466 66 466 64 466 61 467 58 467 56 467 53 467 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M288 403 268 414 247 424 226 434 204 442 183 450 160 456 138 462 115 467 93 471 70 474 '/>
+<circle r='5' fill='red' cx='270.812' cy='412.866' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(270.812,412.866) rotate(61.9742) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='227.744' cy='433.445' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(227.744,433.445) rotate(66.9466) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='183.053' cy='450.214' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(183.053,450.214) rotate(71.919) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='137.078' cy='463.046' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(137.078,463.046) rotate(76.8914) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='90.1628' cy='471.845' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(90.1628,471.845) rotate(81.8638) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M280 389 260 400 240 410 220 419 199 427 178 435 156 441 134 447 112 451 90 455 68 458 '/>
+<circle r='5' fill='red' cx='262.781' cy='399.015' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(262.781,399.015) rotate(62.0366) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='221.211' cy='418.837' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(221.211,418.837) rotate(66.9778) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='178.087' cy='435.004' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(178.087,435.004) rotate(71.919) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='133.732' cy='447.397' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(133.732,447.397) rotate(76.8602) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='88.4741' cy='455.924' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(88.4741,455.924) rotate(81.8014) translate(-5,-20)'/>
 </g>
 
 <g id="r-las-vegas-los-angeles">
+  <circle cx='277.511' cy='670.512' r='152.758' fill='none' stroke='red'/>
+  <line x1='228' y1='526' x2='142' y2='600' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M228 526 225 526 222 527 220 528 218 529 215 530 213 531 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M150 586 148 588 147 590 145 592 144 595 143 597 142 599 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M213 531 205 535 198 539 191 544 184 549 177 554 171 560 165 566 160 572 155 579 150 586 '/>
+<circle r='5' fill='red' cx='195.626' cy='541.555' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(195.626,541.555) rotate(-122.414) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='162.367' cy='570.128' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(162.367,570.128) rotate(-138.918) translate(-5,-20)'/>
 </g>
 
 <g id="r-phoenix-los-angeles">
+  <circle cx='211.132' cy='755.467' r='170.145' fill='none' stroke='red'/>
+  <line x1='296' y1='608' x2='142' y2='600' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M296 608 293 606 291 605 288 604 286 602 284 601 281 600 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M156 594 154 595 151 595 149 596 146 597 144 598 142 599 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M281 600 269 595 257 591 245 588 232 586 219 585 207 585 194 586 181 587 169 590 156 594 '/>
+<circle r='5' fill='red' cx='263.138' cy='593.465' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(263.138,593.465) rotate(-72.2021) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='219.98' cy='585.553' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(219.98,585.553) rotate(-87.019) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='176.233' cy='588.94' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(176.233,588.94) rotate(-101.836) translate(-5,-20)'/>
 </g>
 
 <g id="r-el-paso-los-angeles">
+  <circle cx='399.96' cy='16.2096' r='638.243' fill='none' stroke='red'/>
+  <line x1='443' y1='653' x2='142' y2='600' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M442 653 440 653 437 653 435 653 432 653 429 653 427 653 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M159 607 157 606 154 605 152 604 149 603 147 602 144 601 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M427 653 399 654 372 653 345 652 317 649 290 645 263 639 237 633 211 625 185 617 159 607 '/>
+<circle r='5' fill='red' cx='407.033' cy='654.414' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(407.033,654.414) rotate(89.3651) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='360.332' cy='653.221' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(360.332,653.221) rotate(93.5597) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='313.844' cy='648.617' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(313.844,648.617) rotate(97.7544) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='267.817' cy='640.624' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(267.817,640.624) rotate(101.949) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='222.498' cy='629.285' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(222.498,629.285) rotate(106.144) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='178.13' cy='614.663' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(178.13,614.663) rotate(110.338) translate(-5,-20)'/>
 </g>
 
 <g id="r-calgary-helena">
+  <circle cx='-6.98949' cy='400.888' r='426.429' fill='none' stroke='red'/>
+  <line x1='262' y1='70' x2='385' y2='233' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M262 70 264 71 266 73 268 75 270 76 272 78 274 80 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M377 216 378 219 379 221 380 223 382 226 383 228 384 231 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M274 80 286 91 299 104 310 116 322 129 332 143 342 157 352 171 361 186 369 201 377 216 '/>
+<circle r='5' fill='red' cx='288.943' cy='93.8601' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(288.943,93.8601) rotate(-46.0542) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='319.036' cy='126.025' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(319.036,126.025) rotate(-40.1333) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='345.65' cy='161.123' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(345.65,161.123) rotate(-34.2124) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='368.502' cy='198.779' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(368.502,198.779) rotate(-28.2915) translate(-5,-20)'/>
 </g>
 
 <g id="r-winnipeg-calgary">
+  <circle cx='392.578' cy='309.138' r='272.466' fill='none' stroke='red'/>
+  <line x1='540' y1='80' x2='262' y2='70' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M540 80 537 78 535 77 533 75 530 74 528 73 526 71 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M276 62 273 63 271 65 269 66 266 67 264 68 261 70 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M526 71 503 60 478 50 453 43 428 39 402 36 376 37 350 39 325 45 300 52 276 62 '/>
+<circle r='5' fill='red' cx='508.528' cy='62.5754' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(508.528,62.5754) rotate(-64.814) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='467.375' cy='47.1401' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(467.375,47.1401) rotate(-74.0666) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='424.276' cy='38.5225' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(424.276,38.5225) rotate(-83.3192) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='380.352' cy='36.9468' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(380.352,36.9468) rotate(-92.5718) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='336.746' cy='42.454' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(336.746,42.454) rotate(-101.824) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='294.593' cy='54.9008' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(294.593,54.9008) rotate(-111.077) translate(-5,-20)'/>
 </g>
 
 <g id="r-helena-salt-lake-city">
+  <circle cx='27.2309' cy='134.104' r='371.186' fill='none' stroke='red'/>
+  <line x1='385' y1='233' x2='298' y2='388' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M385 233 384 235 383 238 382 240 382 243 381 245 380 248 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M309 374 308 376 306 378 304 380 302 382 300 384 299 386 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M380 248 375 262 370 275 364 289 358 302 351 315 343 327 336 339 327 351 319 363 309 374 '/>
+<circle r='5' fill='red' cx='373.742' cy='267.18' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(373.742,267.18) rotate(21.009) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='351.341' cy='315.024' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(351.341,315.024) rotate(29.1705) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='322.374' cy='359.203' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(322.374,359.203) rotate(37.332) translate(-5,-20)'/>
 </g>
 
 <g id="r-winnipeg-helena">
+  <circle cx='152.286' cy='-157.769' r='454.815' fill='none' stroke='red'/>
+  <line x1='540' y1='80' x2='385' y2='233' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M540 80 538 82 537 84 535 86 534 89 532 91 531 93 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M400 223 398 224 395 226 393 227 391 229 389 230 386 231 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M531 93 520 108 509 123 497 137 485 151 472 165 459 177 445 190 430 201 415 212 400 223 '/>
+<circle r='5' fill='red' cx='519.986' cy='109.912' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(519.986,109.912) rotate(36.0542) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='489.341' cy='147.6' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(489.341,147.6) rotate(42.1764) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='454.851' cy='181.805' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(454.851,181.805) rotate(48.2986) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='416.91' cy='212.137' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(416.91,212.137) rotate(54.4207) translate(-5,-20)'/>
 </g>
 
 <g id="r-denver-helena">
+  <circle cx='821.926' cy='179.434' r='440.197' fill='none' stroke='red'/>
+  <line x1='460' y1='430' x2='385' y2='233' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M459 430 458 427 456 425 455 423 454 421 452 418 451 416 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M387 250 387 248 386 245 386 242 385 240 385 237 385 235 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M451 416 441 401 433 385 425 369 417 353 410 337 404 320 399 303 394 285 390 268 387 250 '/>
+<circle r='5' fill='red' cx='440.741' cy='399.597' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(440.741,399.597) rotate(149.99) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='419.748' cy='358.393' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(419.748,358.393) rotate(156.012) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='403.193' cy='315.215' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(403.193,315.215) rotate(162.034) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='391.259' cy='270.538' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(391.259,270.538) rotate(168.056) translate(-5,-20)'/>
 </g>
 
 <g id="r-duluth-helena">
+  <circle cx='521.335' cy='-372.18' r='620.347' fill='none' stroke='red'/>
+  <line x1='682' y1='227' x2='385' y2='233' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M682 227 679 227 676 228 674 229 671 229 669 230 666 230 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M403 236 400 236 398 235 395 235 393 234 390 234 387 233 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M666 230 640 236 614 241 588 244 561 246 535 248 508 248 482 246 455 244 429 241 403 236 '/>
+<circle r='5' fill='red' cx='646.977' cy='235.31' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(646.977,235.31) rotate(78.3147) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='602.606' cy='242.82' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(602.606,242.82) rotate(82.4721) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='557.807' cy='247.094' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(557.807,247.094) rotate(86.6294) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='512.817' cy='248.108' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(512.817,248.108) rotate(90.7868) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='467.871' cy='245.858' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(467.871,245.858) rotate(94.9441) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='423.206' cy='240.356' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(423.206,240.356) rotate(99.1015) translate(-5,-20)'/>
 </g>
 
 <g id="r-omaha-helena">
+  <circle cx='736.502' cy='-241.689' r='590.663' fill='none' stroke='red'/>
+  <line x1='646' y1='342' x2='385' y2='233' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M646 342 643 341 640 341 638 340 635 340 632 339 630 339 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M400 243 398 242 395 240 393 239 391 237 389 236 387 234 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M630 339 605 334 581 328 557 321 533 313 510 303 487 293 464 282 442 270 421 257 400 243 '/>
+<circle r='5' fill='red' cx='610.615' cy='335.404' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(610.615,335.404) rotate(102.306) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='559.684' cy='321.888' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(559.684,321.888) rotate(107.419) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='510.16' cy='303.887' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(510.16,303.887) rotate(112.532) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='462.437' cy='281.543' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(462.437,281.543) rotate(117.645) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='416.896' cy='255.036' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(416.896,255.036) rotate(122.758) translate(-5,-20)'/>
 </g>
 
 <g id="r-salt-lake-city-las-vegas">
+  <circle cx='120.127' cy='384.528' r='177.907' fill='none' stroke='red'/>
+  <line x1='298' y1='388' x2='228' y2='526' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M298 388 297 390 297 393 297 395 297 398 297 401 296 403 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M240 515 238 517 236 519 234 520 232 522 230 524 228 525 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M296 403 295 416 292 429 288 441 284 453 278 464 272 476 265 486 257 497 249 506 240 515 '/>
+<circle r='5' fill='red' cx='293.673' cy='423.677' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(293.673,423.677) rotate(12.7121) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='278.808' cy='464.971' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(278.808,464.971) rotate(26.8826) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='254.287' cy='501.37' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(254.287,501.37) rotate(41.053) translate(-5,-20)'/>
 </g>
 
 <g id="r-denver-salt-lake-city">
+  <circle cx='464.157' cy='80.5381' r='349.487' fill='none' stroke='red'/>
+  <line x1='460' y1='430' x2='298' y2='388' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M460 430 457 429 454 429 452 429 449 429 446 429 444 429 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M313 395 311 394 308 393 306 392 304 391 301 390 299 388 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M443 437 429 436 415 434 402 432 388 429 375 426 361 423 348 418 335 414 322 408 310 403 '/>
+<circle r='5' fill='red' cx='423.626' cy='435.72' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(423.626,435.72) rotate(96.5101) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='375.254' cy='426.794' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(375.254,426.794) rotate(104.4) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='328.566' cy='411.313' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(328.566,411.313) rotate(112.29) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M444 421 431 420 418 418 405 416 392 414 379 411 366 407 353 403 341 399 329 394 317 388 '/>
+<circle r='5' fill='red' cx='424.551' cy='419.72' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(424.551,419.72) rotate(96.6602) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='379.233' cy='411.296' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(379.233,411.296) rotate(104.4) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='335.463' cy='396.847' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(335.463,396.847) rotate(112.14) translate(-5,-20)'/>
 </g>
 
 <g id="r-denver-phoenix">
+  <circle cx='592.013' cy='716.181' r='315.162' fill='none' stroke='red'/>
+  <line x1='460' y1='430' x2='296' y2='608' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M460 429 457 431 455 432 452 433 450 434 448 435 445 437 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M302 592 300 595 299 597 298 600 298 602 297 605 296 607 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M445 437 426 447 408 459 391 472 375 487 360 502 346 518 333 536 321 554 311 573 302 592 '/>
+<circle r='5' fill='red' cx='428.242' cy='446.912' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(428.242,446.912) rotate(-121.308) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='392.364' cy='472.322' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(392.364,472.322) rotate(-129.307) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='360.372' cy='502.477' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(360.372,502.477) rotate(-137.307) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='332.887' cy='536.791' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(332.887,536.791) rotate(-145.306) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='310.445' cy='574.596' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(310.445,574.596) rotate(-153.305) translate(-5,-20)'/>
 </g>
 
 <g id="r-santa-fe-phoenix">
+  <circle cx='235.127' cy='261.758' r='351.552' fill='none' stroke='red'/>
+  <line x1='450' y1='540' x2='296' y2='608' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M450 540 447 541 445 543 443 544 441 546 439 547 437 549 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M313 604 310 605 308 605 305 606 302 606 300 607 297 607 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M437 549 425 557 414 564 402 570 390 577 377 583 365 588 352 593 339 597 326 601 313 604 '/>
+<circle r='5' fill='red' cx='420.431' cy='560.508' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(420.431,560.508) rotate(58.19) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='377.885' cy='583.02' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(377.885,583.02) rotate(66.0412) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='332.663' cy='599.509' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(332.663,599.509) rotate(73.8923) translate(-5,-20)'/>
 </g>
 
 <g id="r-phoenix-el-paso">
+  <circle cx='411.866' cy='492.105' r='163.88' fill='none' stroke='red'/>
+  <line x1='296' y1='608' x2='443' y2='653' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M296 608 297 609 299 611 301 613 303 615 305 617 307 618 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M427 655 429 654 432 654 435 654 437 653 440 653 442 653 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M307 618 318 626 328 633 340 639 351 644 363 648 376 652 388 654 401 655 414 655 427 655 '/>
+<circle r='5' fill='red' cx='324.039' cy='630.463' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(324.039,630.463) rotate(122.406) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='363.889' cy='648.805' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(363.889,648.805) rotate(107.023) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='407.176' cy='655.918' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(407.176,655.918) rotate(91.6398) translate(-5,-20)'/>
 </g>
 
 <g id="r-duluth-winnipeg">
+  <circle cx='909.049' cy='-134.411' r='426.813' fill='none' stroke='red'/>
+  <line x1='682' y1='227' x2='540' y2='80' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M682 227 679 225 677 224 675 222 673 221 670 219 668 218 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M549 95 547 93 546 90 545 88 543 86 542 84 541 81 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M668 218 654 208 640 197 627 186 615 174 602 162 591 150 579 137 569 123 558 109 549 95 '/>
+<circle r='5' fill='red' cx='652.36' cy='206.587' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(652.36,206.587) rotate(126.971) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='618.537' cy='178.274' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(618.537,178.274) rotate(132.895) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='587.818' cy='146.622' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(587.818,146.622) rotate(138.819) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='560.529' cy='111.969' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(560.529,111.969) rotate(144.742) translate(-5,-20)'/>
 </g>
 
 <g id="r-sault-ste-marie-winnipeg">
+  <circle cx='815.708' cy='-497.263' r='639.724' fill='none' stroke='red'/>
+  <line x1='840' y1='142' x2='540' y2='80' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M840 141 837 142 834 142 832 142 829 142 826 142 824 142 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M557 87 554 86 552 85 549 84 547 83 545 82 542 81 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M824 142 796 142 769 140 741 138 714 134 687 129 660 123 634 116 608 107 582 98 557 87 '/>
+<circle r='5' fill='red' cx='804.006' cy='142.354' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(804.006,142.354) rotate(91.0481) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='757.22' cy='139.782' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(757.22,139.782) rotate(95.2457) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='710.747' cy='133.792' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(710.747,133.792) rotate(99.4433) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='664.837' cy='124.416' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(664.837,124.416) rotate(103.641) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='619.736' cy='111.705' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(619.736,111.705) rotate(107.839) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='575.687' cy='95.7273' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(575.687,95.7273) rotate(112.036) translate(-5,-20)'/>
 </g>
 
 <g id="r-denver-santa-fe">
+  <circle cx='362.93' cy='476.63' r='107.689' fill='none' stroke='red'/>
+  <line x1='460' y1='430' x2='450' y2='540' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M460 430 461 432 462 434 463 437 464 439 465 442 465 444 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M458 526 457 528 455 531 454 533 453 535 451 537 449 540 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M465 444 467 452 469 461 470 469 470 478 470 486 469 494 467 502 464 510 462 518 458 526 '/>
+<circle r='5' fill='red' cx='469.926' cy='464.43' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(469.926,464.43) rotate(-6.50478) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='465.965' cy='507.945' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(465.965,507.945) rotate(16.9054) translate(-5,-20)'/>
 </g>
 
 <g id="r-omaha-denver">
+  <circle cx='731.424' cy='763.123' r='429.7' fill='none' stroke='red'/>
+  <line x1='646' y1='342' x2='460' y2='430' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M646 342 643 342 640 343 638 343 635 344 632 344 630 345 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M474 418 472 420 469 422 467 423 465 425 463 427 461 428 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M630 345 613 349 596 355 580 360 564 367 548 374 532 381 517 390 502 399 488 408 474 418 '/>
+<circle r='5' fill='red' cx='611.059' cy='350.625' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(611.059,350.625) rotate(-106.267) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='568.98' cy='365.312' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(568.98,365.312) rotate(-112.212) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='528.648' cy='384.278' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(528.648,384.278) rotate(-118.158) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='490.497' cy='407.32' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(490.497,407.32) rotate(-124.103) translate(-5,-20)'/>
 </g>
 
 <g id="r-kansas-city-denver">
+  <circle cx='513.811' cy='-6.25646' r='439.563' fill='none' stroke='red'/>
+  <line x1='669' y1='405' x2='460' y2='430' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M669 405 666 405 663 406 661 407 658 408 656 409 653 410 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M477 431 475 431 472 431 470 431 467 430 464 430 462 430 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M656 417 639 423 621 428 603 432 586 435 568 438 549 439 531 440 513 441 495 440 477 439 '/>
+<circle r='5' fill='red' cx='637.388' cy='423.908' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(637.388,423.908) rotate(73.9718) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='591.375' cy='434.534' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(591.375,434.534) rotate(80.0201) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='544.499' cy='440.253' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(544.499,440.253) rotate(86.0684) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='497.28' cy='441.001' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(497.28,441.001) rotate(92.1168) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M651 402 634 408 617 412 600 416 583 419 566 422 548 423 531 424 513 425 496 424 478 423 '/>
+<circle r='5' fill='red' cx='632.283' cy='408.726' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(632.283,408.726) rotate(74.0667) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='588.368' cy='418.817' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(588.368,418.817) rotate(80.0518) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='543.639' cy='424.274' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(543.639,424.274) rotate(86.0368) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='498.586' cy='425.038' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(498.586,425.038) rotate(92.0218) translate(-5,-20)'/>
 </g>
 
 <g id="r-oklahoma-city-denver">
+  <circle cx='690.724' cy='168.128' r='349.014' fill='none' stroke='red'/>
+  <line x1='644' y1='514' x2='460' y2='430' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M644 514 641 513 638 513 636 512 633 512 630 511 628 511 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M473 441 471 439 469 437 466 435 464 434 462 432 460 430 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M628 511 611 507 594 503 578 498 562 492 546 485 530 478 515 470 501 461 486 451 473 441 '/>
+<circle r='5' fill='red' cx='608.636' cy='507.351' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(608.636,507.351) rotate(103.604) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='566.635' cy='494.337' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(566.635,494.337) rotate(110.827) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='526.603' cy='476.146' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(526.603,476.146) rotate(118.05) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='489.177' cy='453.065' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(489.177,453.065) rotate(125.273) translate(-5,-20)'/>
 </g>
 
 <g id="r-santa-fe-el-paso">
+  <circle cx='310.476' cy='588.074' r='147.574' fill='none' stroke='red'/>
+  <line x1='450' y1='540' x2='443' y2='653' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M450 540 450 542 451 545 452 547 453 550 453 552 454 555 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M449 638 448 640 447 643 446 645 445 647 444 650 443 652 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M454 555 456 563 457 571 457 580 458 588 457 597 457 605 455 613 454 622 451 630 449 638 '/>
+<circle r='5' fill='red' cx='457.48' cy='575.123' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(457.48,575.123) rotate(-5.03462) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='454.799' cy='618.878' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(454.799,618.878) rotate(12.0485) translate(-5,-20)'/>
 </g>
 
 <g id="r-oklahoma-city-santa-fe">
+  <circle cx='494.284' cy='133.657' r='408.749' fill='none' stroke='red'/>
+  <line x1='644' y1='514' x2='450' y2='540' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M644 514 641 514 639 515 636 516 634 517 631 518 629 519 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M467 541 465 541 462 541 459 540 457 540 454 540 451 540 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M629 519 613 524 597 529 581 532 565 536 549 538 533 540 516 541 500 542 484 542 467 541 '/>
+<circle r='5' fill='red' cx='609.965' cy='525.695' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(609.965,525.695) rotate(73.56) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='549.531' cy='538.655' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(549.531,538.655) rotate(82.2321) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='487.833' cy='542.355' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(487.833,542.355) rotate(90.9042) translate(-5,-20)'/>
 </g>
 
 <g id="r-oklahoma-city-el-paso">
+  <circle cx='342.555' cy='292.925' r='373.823' fill='none' stroke='red'/>
+  <line x1='644' y1='514' x2='443' y2='653' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M644 514 642 516 640 518 639 520 637 522 635 524 634 526 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M459 648 456 648 454 649 451 650 449 651 446 652 443 652 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M634 526 620 543 605 558 589 573 572 587 555 600 537 611 518 622 499 632 479 640 459 648 '/>
+<circle r='5' fill='red' cx='621.346' cy='541.961' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(621.346,541.961) rotate(41.7735) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='590.173' cy='572.976' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(590.173,572.976) rotate(48.5174) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='555.572' cy='600.117' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(555.572,600.117) rotate(55.2612) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='518.025' cy='623.006' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(518.025,623.006) rotate(62.0051) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='478.049' cy='641.328' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(478.049,641.328) rotate(68.749) translate(-5,-20)'/>
 </g>
 
 <g id="r-dallas-el-paso">
+  <circle cx='497.201' cy='180.275' r='475.822' fill='none' stroke='red'/>
+  <line x1='669' y1='624' x2='443' y2='653' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M669 624 666 624 664 625 661 626 659 627 656 628 653 629 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M461 654 458 654 455 654 453 654 450 653 447 653 445 653 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M653 629 635 635 616 640 597 645 578 649 558 652 539 654 519 655 500 656 480 655 461 654 '/>
+<circle r='5' fill='red' cx='634.969' cy='635.716' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(634.969,635.716) rotate(73.1698) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='584.522' cy='648.016' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(584.522,648.016) rotate(79.4254) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='533.034' cy='654.746' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(533.034,654.746) rotate(85.6811) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='481.12' cy='655.825' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(481.12,655.825) rotate(91.9367) translate(-5,-20)'/>
 </g>
 
 <g id="r-houston-el-paso">
+  <circle cx='600.178' cy='422.853' r='278.698' fill='none' stroke='red'/>
+  <line x1='721' y1='674' x2='443' y2='653' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M721 674 718 675 716 676 713 677 711 678 708 679 706 680 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M456 661 454 660 451 658 449 657 447 655 445 654 442 652 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M706 680 681 689 656 695 631 699 605 701 579 700 553 697 527 692 503 684 479 673 456 661 '/>
+<circle r='5' fill='red' cx='687.642' cy='687.471' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(687.642,687.471) rotate(71.7098) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='644.951' cy='697.931' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(644.951,697.931) rotate(80.7554) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='601.146' cy='701.55' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(601.146,701.55) rotate(89.8011) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='557.317' cy='698.236' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(557.317,698.236) rotate(98.8468) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='514.553' cy='688.072' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(514.553,688.072) rotate(107.892) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='473.92' cy='671.311' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(473.92,671.311) rotate(116.938) translate(-5,-20)'/>
 </g>
 
 <g id="r-duluth-omaha">
+  <circle cx='430.833' cy='211.508' r='251.645' fill='none' stroke='red'/>
+  <line x1='682' y1='227' x2='646' y2='342' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M682 227 681 229 681 232 681 234 681 237 680 240 680 242 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M654 327 653 329 651 331 650 334 649 336 647 338 646 340 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M688 243 687 252 685 261 683 270 681 279 678 288 675 297 672 305 669 314 665 322 661 330 '/>
+<circle r='5' fill='red' cx='685.187' cy='263.654' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(685.187,263.654) rotate(11.5858) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='669.996' cy='312.584' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(669.996,312.584) rotate(22.9098) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M672 241 671 250 669 258 668 267 665 275 663 283 660 291 657 299 654 307 651 315 647 323 '/>
+<circle r='5' fill='red' cx='669.262' cy='261.648' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(669.262,261.648) rotate(11.8756) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='655.735' cy='305.219' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(655.735,305.219) rotate(22.62) translate(-5,-20)'/>
 </g>
 
 <g id="r-sault-ste-marie-duluth">
+  <circle cx='588.659' cy='-135.852' r='374.665' fill='none' stroke='red'/>
+  <line x1='840' y1='142' x2='682' y2='227' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M840 142 838 143 836 145 834 147 831 149 829 150 827 152 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M699 222 696 222 693 223 691 224 688 225 686 225 683 226 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M827 152 816 161 804 170 792 178 779 186 766 193 753 200 740 206 726 212 713 217 699 222 '/>
+<circle r='5' fill='red' cx='812.184' cy='164.832' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(812.184,164.832) rotate(53.3732) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='766.937' cy='193.679' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(766.937,193.679) rotate(61.5863) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='718.034' cy='215.767' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(718.034,215.767) rotate(69.7994) translate(-5,-20)'/>
 </g>
 
 <g id="r-chicago-duluth">
+  <circle cx='914.621' cy='-44.7141' r='357.688' fill='none' stroke='red'/>
+  <line x1='835' y1='304' x2='682' y2='227' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M835 304 832 303 829 302 827 302 824 301 822 300 819 300 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M695 238 693 236 691 234 689 233 687 231 685 229 683 228 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M819 300 806 296 792 291 779 286 767 281 754 275 742 268 730 261 718 254 706 246 695 238 '/>
+<circle r='5' fill='red' cx='800.365' cy='294.235' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(800.365,294.235) rotate(108.628) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='754.574' cy='275.17' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(754.574,275.17) rotate(116.58) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='711.86' cy='249.954' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(711.86,249.954) rotate(124.532) translate(-5,-20)'/>
 </g>
 
 <g id="r-toronto-duluth">
+  <circle cx='715.43' cy='-405.708' r='633.59' fill='none' stroke='red'/>
+  <line x1='980' y1='170' x2='682' y2='227' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M980 170 977 171 975 172 972 173 970 174 967 175 965 176 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M700 227 698 227 695 227 692 227 690 227 687 227 684 227 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M965 176 940 186 914 195 888 203 862 210 835 216 809 220 782 224 755 226 728 227 700 227 '/>
+<circle r='5' fill='red' cx='946.879' cy='184.095' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(946.879,184.095) rotate(68.5741) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='903.219' cy='199.414' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(903.219,199.414) rotate(72.7592) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='858.556' cy='211.505' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(858.556,211.505) rotate(76.9444) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='813.13' cy='220.304' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(813.13,220.304) rotate(81.1295) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='767.184' cy='225.765' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(767.184,225.765) rotate(85.3147) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='720.961' cy='227.858' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(720.961,227.858) rotate(89.4999) translate(-5,-20)'/>
 </g>
 
 <g id="r-omaha-kansas-city">
+  <circle cx='615.799' cy='388.724' r='55.6346' fill='none' stroke='red'/>
+  <line x1='646' y1='342' x2='669' y2='405' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M646 342 648 343 650 345 652 346 654 348 656 350 658 352 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M671 389 671 391 671 394 670 397 670 399 669 402 668 405 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M664 347 666 350 669 354 671 358 673 362 675 366 676 371 678 375 678 380 679 384 679 389 '/>
+<circle r='5' fill='red' cx='674.532' cy='364.231' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(674.532,364.231) rotate(-22.6375) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M651 357 654 360 656 363 657 366 659 369 660 372 661 375 662 378 663 382 663 385 663 389 '/>
+<circle r='5' fill='red' cx='661.451' cy='375.124' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(661.451,375.124) rotate(-16.5888) translate(-5,-20)'/>
 </g>
 
 <g id="r-chicago-omaha">
+  <circle cx='769.632' cy='467.892' r='176.447' fill='none' stroke='red'/>
+  <line x1='835' y1='304' x2='646' y2='342' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M835 304 832 303 830 302 827 301 824 300 822 299 819 298 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M657 331 655 333 653 334 651 336 649 338 647 340 645 342 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M819 298 803 294 786 292 768 291 751 292 734 294 718 299 701 304 686 312 671 321 657 331 '/>
+<circle r='5' fill='red' cx='800.437' cy='294.155' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(800.437,294.155) rotate(-79.9453) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='756.608' cy='291.926' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(756.608,291.926) rotate(-94.233) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='713.584' cy='300.583' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(713.584,300.583) rotate(-108.521) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='674.027' cy='319.59' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(674.027,319.59) rotate(-122.808) translate(-5,-20)'/>
 </g>
 
 <g id="r-kansas-city-oklahoma-city">
+  <circle cx='548.878' cy='434.816' r='123.767' fill='none' stroke='red'/>
+  <line x1='669' y1='405' x2='644' y2='514' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M669 405 669 407 670 410 670 412 671 415 671 418 671 420 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M653 501 651 503 650 505 648 507 647 509 645 511 644 513 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M679 419 680 428 680 437 680 446 679 455 677 464 675 472 672 481 668 489 664 497 660 505 '/>
+<circle r='5' fill='red' cx='680.551' cy='439.79' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(680.551,439.79) rotate(2.16355) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='669.572' cy='487.688' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(669.572,487.688) rotate(23.6567) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M663 421 664 429 664 437 664 445 663 452 661 460 659 468 657 475 654 482 650 489 646 496 '/>
+<circle r='5' fill='red' cx='664.445' cy='441.612' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(664.445,441.612) rotate(3.36547) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='655.868' cy='479.034' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(655.868,479.034) rotate(22.4548) translate(-5,-20)'/>
 </g>
 
 <g id="r-saint-louis-kansas-city">
+  <circle cx='727.185' cy='307.147' r='113.846' fill='none' stroke='red'/>
+  <line x1='780' y1='408' x2='669' y2='405' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M780 408 777 409 775 410 772 411 770 412 767 413 765 414 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M683 412 680 411 678 410 676 408 673 407 671 406 668 404 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M768 421 759 424 750 426 741 428 732 428 723 428 714 428 706 427 697 425 688 422 680 419 '/>
+<circle r='5' fill='red' cx='748.727' cy='427.073' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(748.727,427.073) rotate(79.817) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='699.19' cy='425.732' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(699.19,425.732) rotate(103.283) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M762 406 755 409 747 411 739 412 732 412 724 412 716 412 708 411 701 409 693 407 686 404 '/>
+<circle r='5' fill='red' cx='743.308' cy='411.757' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(743.308,411.757) rotate(81.2386) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='705.429' cy='410.732' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(705.429,410.732) rotate(101.861) translate(-5,-20)'/>
 </g>
 
 <g id="r-oklahoma-city-dallas">
+  <circle cx='532.122' cy='597.268' r='139.464' fill='none' stroke='red'/>
+  <line x1='644' y1='514' x2='669' y2='624' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M644 514 645 516 647 518 648 520 650 522 651 525 652 527 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M671 608 670 610 670 613 670 615 669 618 669 621 669 623 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M659 523 663 531 667 539 670 547 673 555 675 564 677 573 678 582 679 590 679 599 679 608 '/>
+<circle r='5' fill='red' cx='668.542' cy='541.275' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(668.542,541.275) rotate(-22.3152) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='679.334' cy='588.658' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(679.334,588.658) rotate(-3.34726) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M645 531 649 538 652 545 655 552 658 560 660 568 661 575 662 583 663 591 663 599 663 607 '/>
+<circle r='5' fill='red' cx='654.548' cy='549.365' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(654.548,549.365) rotate(-21.3695) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='663.217' cy='587.427' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(663.217,587.427) rotate(-4.29302) translate(-5,-20)'/>
 </g>
 
 <g id="r-little-rock-oklahoma-city">
+  <circle cx='705.208' cy='383.012' r='144.583' fill='none' stroke='red'/>
+  <line x1='757' y1='518' x2='644' y2='514' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M757 518 754 518 751 519 749 520 746 521 744 522 741 522 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M659 520 656 519 653 518 651 517 649 516 646 515 644 514 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M741 522 733 524 725 526 716 527 708 527 700 527 691 526 683 525 675 524 667 522 659 520 '/>
+<circle r='5' fill='red' cx='722.138' cy='526.6' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(722.138,526.6) rotate(83.2753) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='678.334' cy='525.076' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(678.334,525.076) rotate(100.712) translate(-5,-20)'/>
 </g>
 
 <g id="r-dallas-houston">
+  <circle cx='593.623' cy='754.432' r='150.646' fill='none' stroke='red'/>
+  <line x1='669' y1='624' x2='721' y2='674' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M669 624 671 625 673 626 675 628 678 629 680 631 682 632 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M711 660 712 662 714 664 716 666 717 668 719 671 720 673 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M687 626 690 628 693 631 697 634 700 636 703 639 706 642 709 645 712 648 714 652 717 655 '/>
+<circle r='5' fill='red' cx='702.49' cy='639.035' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(702.49,639.035) rotate(-46.6678) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M677 639 680 641 683 643 686 646 689 648 692 651 694 654 697 656 700 659 702 662 705 665 '/>
+<circle r='5' fill='red' cx='692.968' cy='652.068' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(692.968,652.068) rotate(-45.8577) translate(-5,-20)'/>
 </g>
 
 <g id="r-little-rock-dallas">
+  <circle cx='498.08' cy='392.576' r='287.699' fill='none' stroke='red'/>
+  <line x1='757' y1='518' x2='669' y2='624' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M757 518 755 520 754 522 753 525 752 527 750 529 749 532 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M682 613 680 614 678 616 676 618 674 619 672 621 670 623 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M749 532 744 541 738 550 732 559 726 567 719 575 712 583 705 591 698 599 690 606 682 613 '/>
+<circle r='5' fill='red' cx='739.322' cy='549.334' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(739.322,549.334) rotate(33.0156) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='697.523' cy='599.924' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(697.523,599.924) rotate(46.1134) translate(-5,-20)'/>
 </g>
 
 <g id="r-new-orleans-houston">
+  <circle cx='762.252' cy='428.222' r='249.216' fill='none' stroke='red'/>
+  <line x1='840' y1='665' x2='721' y2='674' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M840 665 837 665 834 666 832 667 829 668 827 668 824 669 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M738 676 735 675 732 675 730 675 727 674 724 674 722 674 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M824 669 816 671 807 673 798 674 790 675 781 676 772 677 764 677 755 677 746 676 738 676 '/>
+<circle r='5' fill='red' cx='805.106' cy='673.726' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(805.106,673.726) rotate(80.0985) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='757.98' cy='677.401' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(757.98,677.401) rotate(90.9822) translate(-5,-20)'/>
 </g>
 
 <g id="r-toronto-sault-ste-marie">
+  <circle cx='966.771' cy='-127.856' r='298.15' fill='none' stroke='red'/>
+  <line x1='980' y1='170' x2='840' y2='142' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M980 170 977 170 974 170 972 170 969 170 966 170 964 170 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M855 148 853 147 851 146 848 145 846 144 843 143 841 142 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M964 170 952 169 941 169 930 168 919 166 908 164 898 162 887 159 876 156 866 152 855 148 '/>
+<circle r='5' fill='red' cx='944.026' cy='169.425' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(944.026,169.425) rotate(94.3751) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='874.759' cy='155.74' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(874.759,155.74) rotate(107.976) translate(-5,-20)'/>
 </g>
 
 <g id="r-montreal-sault-ste-marie">
+  <circle cx='1126.26' cy='587.61' r='529.634' fill='none' stroke='red'/>
+  <line x1='1080' y1='60' x2='840' y2='142' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1080 60 1077 60 1074 60 1072 60 1069 61 1066 61 1064 61 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M855 132 853 133 851 135 848 136 846 137 844 139 842 140 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1064 61 1042 64 1020 68 998 73 977 79 956 86 935 93 914 101 894 111 875 121 855 132 '/>
+<circle r='5' fill='red' cx='1044.27' cy='64.3602' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1044.27,64.3602) rotate(-98.9051) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='999.77' cy='73.3019' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(999.77,73.3019) rotate(-103.817) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='956.197' cy='86.0213' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(956.197,86.0213) rotate(-108.729) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='913.873' cy='102.425' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(913.873,102.425) rotate(-113.641) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='873.109' cy='122.392' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(873.109,122.392) rotate(-118.553) translate(-5,-20)'/>
 </g>
 
 <g id="r-chicago-saint-louis">
+  <circle cx='596.636' cy='244.485' r='245.682' fill='none' stroke='red'/>
+  <line x1='835' y1='304' x2='780' y2='408' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M835 304 834 306 833 309 832 311 832 314 831 316 830 319 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M790 394 789 396 787 398 785 401 784 403 782 405 780 407 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M838 321 835 330 832 338 828 346 825 354 821 362 816 370 812 377 807 385 802 392 797 399 '/>
+<circle r='5' fill='red' cx='831.399' cy='340.613' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(831.399,340.613) rotate(22.2675) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='808.89' cy='383.419' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(808.89,383.419) rotate(33.2073) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M823 316 820 324 817 332 814 340 810 347 807 355 803 362 798 369 794 376 789 383 784 389 '/>
+<circle r='5' fill='red' cx='816.111' cy='335.716' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(816.111,335.716) rotate(22.5716) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='796.191' cy='373.599' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(796.191,373.599) rotate(32.9032) translate(-5,-20)'/>
 </g>
 
 <g id="r-toronto-chicago">
+  <circle cx='767.195' cy='85.177' r='229.087' fill='none' stroke='red'/>
+  <line x1='980' y1='170' x2='835' y2='304' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M980 169 978 172 977 174 976 177 975 179 974 182 973 184 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M850 298 847 299 845 300 842 301 840 302 837 303 835 303 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M973 184 965 199 956 214 946 228 934 241 922 253 909 264 895 274 881 283 866 291 850 298 '/>
+<circle r='5' fill='red' cx='964.103' cy='202.259' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(964.103,202.259) rotate(30.7357) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='938.133' cy='237.693' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(938.133,237.693) rotate(41.7403) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='905.876' cy='267.519' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(905.876,267.519) rotate(52.7449) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='868.519' cy='290.638' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(868.519,290.638) rotate(63.7495) translate(-5,-20)'/>
 </g>
 
 <g id="r-pittsburgh-chicago">
+  <circle cx='955.023' cy='624.989' r='342.695' fill='none' stroke='red'/>
+  <line x1='998' y1='285' x2='835' y2='304' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M998 285 995 284 992 284 990 284 987 283 984 283 982 283 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M851 298 849 299 846 299 844 300 841 301 839 302 836 303 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M982 275 969 274 955 274 942 274 928 275 915 276 901 278 888 280 875 283 862 286 849 290 '/>
+<circle r='5' fill='red' cx='962.745' cy='274.38' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(962.745,274.38) rotate(-88.7383) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='915.238' cy='276.559' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(915.238,276.559) rotate(-96.5141) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='868.462' cy='285.145' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(868.462,285.145) rotate(-104.29) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M981 291 968 290 955 290 942 290 929 291 917 292 904 294 891 296 878 299 866 302 854 305 '/>
+<circle r='5' fill='red' cx='961.481' cy='290.357' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(961.481,290.357) rotate(-88.8945) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='917.053' cy='292.455' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(917.053,292.455) rotate(-96.5141) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='873.296' cy='300.426' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(873.296,300.426) rotate(-104.134) translate(-5,-20)'/>
 </g>
 
 <g id="r-saint-louis-little-rock">
+  <circle cx='651.528' cy='438.542' r='132.052' fill='none' stroke='red'/>
+  <line x1='780' y1='408' x2='757' y2='518' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M780 408 780 410 781 413 781 415 782 418 782 421 782 423 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M765 504 764 506 763 509 761 511 760 513 758 515 757 517 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M782 423 783 432 783 440 783 448 782 457 780 465 778 473 776 481 773 489 769 497 765 504 '/>
+<circle r='5' fill='red' cx='783.479' cy='443.72' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(783.479,443.72) rotate(2.24693) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='774.528' cy='486.592' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(774.528,486.592) rotate(21.338) translate(-5,-20)'/>
 </g>
 
 <g id="r-nashville-saint-louis">
+  <circle cx='937.85' cy='195.277' r='264.891' fill='none' stroke='red'/>
+  <line x1='897' y1='457' x2='780' y2='408' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M897 456 894 456 891 456 889 455 886 455 883 454 881 454 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M794 417 791 416 789 414 787 413 785 411 783 410 781 408 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M881 454 872 451 862 449 853 446 844 443 836 439 827 436 818 431 810 427 802 422 794 417 '/>
+<circle r='5' fill='red' cx='861.917' cy='449.052' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(861.917,449.052) rotate(106.658) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='811.369' cy='428.022' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(811.369,428.022) rotate(118.521) translate(-5,-20)'/>
 </g>
 
 <g id="r-pittsburgh-saint-louis">
+  <circle cx='639.612' cy='-95.5043' r='522.71' fill='none' stroke='red'/>
+  <line x1='998' y1='285' x2='780' y2='408' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M998 285 996 286 994 288 992 290 990 292 988 294 986 295 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M797 402 795 403 792 404 790 405 787 405 784 406 782 407 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M986 295 969 309 952 323 934 336 916 347 897 359 878 369 858 379 838 387 818 395 797 402 '/>
+<circle r='5' fill='red' cx='970.965' cy='308.761' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(970.965,308.761) rotate(50.6605) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='935.327' cy='335.516' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(935.327,335.516) rotate(55.5467) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='897.54' cy='359.137' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(897.54,359.137) rotate(60.4329) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='857.878' cy='379.454' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(857.878,379.454) rotate(65.319) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='816.629' cy='396.319' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(816.629,396.319) rotate(70.2052) translate(-5,-20)'/>
 </g>
 
 <g id="r-little-rock-new-orleans">
+  <circle cx='500.451' cy='759.786' r='352.531' fill='none' stroke='red'/>
+  <line x1='757' y1='518' x2='840' y2='665' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M757 518 758 519 760 521 762 523 764 525 765 527 767 529 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M834 648 835 650 836 653 837 655 838 658 838 660 839 663 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M767 529 776 540 784 551 792 562 800 573 807 585 813 597 819 610 825 622 830 635 834 648 '/>
+<circle r='5' fill='red' cx='780.311' cy='545.413' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(780.311,545.413) rotate(-37.4522) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='807.021' cy='585.738' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(807.021,585.738) rotate(-29.5848) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='827.959' cy='629.34' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(827.959,629.34) rotate(-21.7174) translate(-5,-20)'/>
 </g>
 
 <g id="r-nashville-little-rock">
+  <circle cx='774.417' cy='366.817' r='152.183' fill='none' stroke='red'/>
+  <line x1='897' y1='457' x2='757' y2='518' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M897 457 895 459 893 461 892 463 890 465 888 467 886 469 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M772 518 770 518 767 518 764 518 762 518 759 518 756 517 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M886 469 877 478 868 486 857 494 846 500 835 506 823 510 810 514 798 517 785 518 772 518 '/>
+<circle r='5' fill='red' cx='872.451' cy='483.217' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(872.451,483.217) rotate(49.8952) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='835.195' cy='506.336' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(835.195,506.336) rotate(66.4609) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='792.893' cy='517.874' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(792.893,517.874) rotate(83.0266) translate(-5,-20)'/>
 </g>
 
 <g id="r-atlanta-new-orleans">
+  <circle cx='1221.95' cy='811.569' r='409.11' fill='none' stroke='red'/>
+  <line x1='958' y1='499' x2='840' y2='665' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M958 498 955 500 953 502 951 504 949 505 947 507 945 509 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M846 648 845 650 844 653 843 655 842 658 841 660 840 663 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M940 503 927 515 915 528 904 541 893 555 882 569 872 583 863 598 854 613 846 629 839 645 '/>
+<circle r='5' fill='red' cx='926.149' cy='517.494' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(926.149,517.494) rotate(-135.168) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='896.128' cy='551.149' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(896.128,551.149) rotate(-141.366) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='869.916' cy='587.849' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(869.916,587.849) rotate(-147.564) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='847.82' cy='627.164' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(847.82,627.164) rotate(-153.762) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M951 515 939 527 927 539 916 551 905 564 895 578 886 592 877 606 868 621 861 636 854 651 '/>
+<circle r='5' fill='red' cx='936.955' cy='529.319' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(936.955,529.319) rotate(-135.278) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='908.467' cy='561.339' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(908.467,561.339) rotate(-141.402) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='883.558' cy='596.215' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(883.558,596.215) rotate(-147.527) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='862.512' cy='633.55' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(862.512,633.55) rotate(-153.652) translate(-5,-20)'/>
 </g>
 
 <g id="r-miami-new-orleans">
+  <circle cx='944.231' cy='913.724' r='269.681' fill='none' stroke='red'/>
+  <line x1='1115' y1='705' x2='840' y2='665' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1115 705 1112 703 1110 701 1108 700 1106 698 1104 696 1102 695 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M854 659 852 660 849 661 847 662 844 663 842 664 839 665 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1102 695 1080 681 1057 668 1033 659 1008 651 983 646 957 644 931 644 905 646 879 651 854 659 '/>
+<circle r='5' fill='red' cx='1085.7' cy='684.128' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1085.7,684.128) rotate(-58.3599) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1046.53' cy='664.198' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1046.53,664.198) rotate(-67.7081) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1004.64' cy='650.896' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1004.64,650.896) rotate(-77.0562) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='961.144' cy='644.574' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(961.144,644.574) rotate(-86.4044) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='917.201' cy='645.401' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(917.201,645.401) rotate(-95.7525) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='873.975' cy='653.355' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(873.975,653.355) rotate(-105.101) translate(-5,-20)'/>
 </g>
 
 <g id="r-nashville-atlanta">
+  <circle cx='842.343' cy='601.68' r='154.66' fill='none' stroke='red'/>
+  <line x1='897' y1='457' x2='958' y2='499' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M897 457 899 457 901 458 904 460 906 461 909 462 911 463 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M946 487 948 488 950 490 952 492 953 494 955 496 957 498 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M911 463 915 465 919 467 922 469 926 471 929 474 933 476 936 479 939 481 943 484 946 487 '/>
+<circle r='5' fill='red' cx='928.9' cy='473.51' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(928.9,473.51) rotate(-55.9679) translate(-5,-20)'/>
 </g>
 
 <g id="r-pittsburgh-nashville">
+  <circle cx='733.696' cy='245.452' r='267.246' fill='none' stroke='red'/>
+  <line x1='998' y1='285' x2='897' y2='457' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M998 285 997 287 997 290 996 292 996 295 995 298 995 300 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M909 446 907 448 905 450 903 451 901 453 899 455 897 456 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M995 300 991 317 985 333 979 349 972 365 964 380 955 395 944 409 934 422 922 434 909 446 '/>
+<circle r='5' fill='red' cx='990.294' cy='320.138' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(990.294,320.138) rotate(16.2281) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='974.583' cy='361.184' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(974.583,361.184) rotate(25.6615) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='952.358' cy='399.1' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(952.358,399.1) rotate(35.0948) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='924.218' cy='432.861' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(924.218,432.861) rotate(44.5281) translate(-5,-20)'/>
 </g>
 
 <g id="r-raleigh-nashville">
+  <circle cx='986.767' cy='522.63' r='111.2' fill='none' stroke='red'/>
+  <line x1='1040' y1='425' x2='897' y2='457' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1040 425 1037 423 1035 422 1032 421 1030 420 1027 419 1025 418 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M907 444 905 446 903 448 901 450 900 452 898 454 896 457 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1025 418 1013 414 1000 412 987 411 975 412 962 414 950 417 938 422 927 428 916 436 907 444 '/>
+<circle r='5' fill='red' cx='1006.18' cy='413.137' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1006.18,413.137) rotate(-79.9474) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='962.474' cy='414.116' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(962.474,414.116) rotate(-102.618) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='922.526' cy='431.864' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(922.526,431.864) rotate(-125.29) translate(-5,-20)'/>
 </g>
 
 <g id="r-raleigh-atlanta">
+  <circle cx='937.062' cy='393.366' r='107.689' fill='none' stroke='red'/>
+  <line x1='1040' y1='425' x2='958' y2='499' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1040 425 1039 427 1038 430 1037 432 1036 435 1035 437 1034 439 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M973 494 970 495 968 496 965 497 963 497 960 498 957 499 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1041 443 1037 451 1032 458 1026 466 1021 472 1014 479 1007 485 1000 490 992 494 984 498 976 502 '/>
+<circle r='5' fill='red' cx='1031.25' cy='460.548' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1031.25,460.548) rotate(35.5006) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='994.237' cy='493.94' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(994.237,493.94) rotate(60.3825) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1026 436 1023 443 1019 449 1014 456 1009 461 1003 467 997 472 991 476 984 480 977 484 970 487 '/>
+<circle r='5' fill='red' cx='1016.58' cy='453.486' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1016.58,453.486) rotate(37.0904) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='988.715' cy='478.63' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(988.715,478.63) rotate(58.7927) translate(-5,-20)'/>
 </g>
 
 <g id="r-charleston-atlanta">
+  <circle cx='1035.75' cy='262.222' r='249.216' fill='none' stroke='red'/>
+  <line x1='1077' y1='508' x2='958' y2='499' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1077 508 1074 508 1071 508 1069 509 1066 509 1063 509 1061 510 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M974 503 971 503 969 502 966 501 964 500 961 500 959 499 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1061 510 1052 510 1043 511 1034 511 1026 511 1017 510 1008 509 1000 508 991 507 982 505 974 503 '/>
+<circle r='5' fill='red' cx='1041.19' cy='511.378' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1041.19,511.378) rotate(88.7487) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='994.048' cy='507.924' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(994.048,507.924) rotate(99.6323) translate(-5,-20)'/>
 </g>
 
 <g id="r-miami-atlanta">
+  <circle cx='1454.17' cy='283.676' r='540.882' fill='none' stroke='red'/>
+  <line x1='1115' y1='705' x2='958' y2='499' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1115 705 1112 703 1110 701 1108 699 1106 698 1104 696 1102 694 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M965 515 964 513 963 511 962 508 961 506 960 503 959 501 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1102 694 1085 679 1069 663 1053 647 1038 630 1024 612 1011 594 998 575 986 556 975 536 965 515 '/>
+<circle r='5' fill='red' cx='1087.73' cy='681.509' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1087.73,681.509) rotate(132.648) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1054.75' cy='648.389' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1054.75,648.389) rotate(137.601) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1024.76' cy='612.546' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1024.76,612.546) rotate(142.553) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='997.971' cy='574.247' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(997.971,574.247) rotate(147.506) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='974.589' cy='533.779' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(974.589,533.779) rotate(152.458) translate(-5,-20)'/>
 </g>
 
 <g id="r-toronto-pittsburgh">
+  <circle cx='755.833' cy='263.996' r='243.077' fill='none' stroke='red'/>
+  <line x1='980' y1='170' x2='998' y2='285' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M980 170 981 172 982 174 982 177 983 179 984 182 985 184 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M998 267 998 270 998 273 998 275 998 278 998 281 998 283 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M985 184 988 192 990 201 992 209 994 217 995 225 997 234 997 242 998 251 998 259 998 267 '/>
+<circle r='5' fill='red' cx='991.416' cy='204.107' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(991.416,204.107) rotate(-14.2632) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='998.375' cy='247.896' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(998.375,247.896) rotate(-3.79763) translate(-5,-20)'/>
 </g>
 
 <g id="r-montreal-toronto">
+  <circle cx='1101.11' cy='179.647' r='121.496' fill='none' stroke='red'/>
+  <line x1='1080' y1='60' x2='980' y2='170' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1080 60 1077 60 1074 61 1072 61 1069 62 1067 63 1064 63 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M982 154 981 156 981 159 980 162 980 164 980 167 979 170 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1064 63 1052 68 1041 74 1030 80 1020 88 1011 97 1003 107 996 118 990 129 985 141 982 154 '/>
+<circle r='5' fill='red' cx='1045.98' cy='71.3786' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1045.98,71.3786) rotate(-116.984) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1011.2' cy='97.9324' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1011.2,97.9324) rotate(-137.734) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='988.083' cy='135.087' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(988.083,135.087) rotate(-158.484) translate(-5,-20)'/>
 </g>
 
 <g id="r-new-york-pittsburgh">
+  <circle cx='936.958' cy='44.108' r='248.506' fill='none' stroke='red'/>
+  <line x1='1103' y1='229' x2='998' y2='285' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1103 229 1101 230 1098 232 1096 234 1094 235 1092 237 1090 239 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1014 280 1011 281 1009 281 1006 282 1004 283 1001 284 999 284 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1095 245 1088 251 1081 256 1073 261 1066 265 1058 270 1050 274 1042 278 1033 281 1025 284 1016 287 '/>
+<circle r='5' fill='red' cx='1079.54' cy='257.337' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(1079.54,257.337) rotate(56.2309) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1035.72' cy='280.839' />
 <rect width='10' height='40'  fill='white' stroke='black' stroke-width='0.4' transform='translate(1035.72,280.839) rotate(67.3549) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1085 233 1079 238 1072 242 1065 247 1057 251 1050 256 1043 259 1035 263 1027 266 1019 269 1011 272 '/>
+<circle r='5' fill='red' cx='1069.6' cy='244.728' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(1069.6,244.728) rotate(56.5281) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1030.71' cy='265.589' />
 <rect width='10' height='40'  fill='green' stroke='black' stroke-width='0.4' transform='translate(1030.71,265.589) rotate(67.0577) translate(-5,-20)'/>
 </g>
 
 <g id="r-washington-pittsburgh">
+  <circle cx='1171.57' cy='78.305' r='269.906' fill='none' stroke='red'/>
+  <line x1='1114' y1='342' x2='998' y2='285' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1114 341 1111 341 1108 340 1106 340 1103 339 1101 338 1098 338 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1011 295 1009 294 1007 292 1005 290 1003 289 1001 287 998 285 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1098 338 1089 335 1079 332 1070 328 1061 324 1053 320 1044 316 1035 311 1027 306 1019 301 1011 295 '/>
+<circle r='5' fill='red' cx='1079.44' cy='332.002' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1079.44,332.002) rotate(109.958) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1028.1' cy='306.923' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1028.1,306.923) rotate(122.11) translate(-5,-20)'/>
 </g>
 
 <g id="r-raleigh-pittsburgh">
+  <circle cx='1302.86' cy='269.843' r='305.233' fill='none' stroke='red'/>
+  <line x1='1040' y1='425' x2='998' y2='285' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1040 425 1038 422 1037 420 1036 418 1034 415 1033 413 1032 411 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M999 302 999 299 998 297 998 294 998 291 998 289 998 286 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1032 411 1027 400 1022 390 1018 379 1014 369 1010 358 1007 347 1004 336 1002 324 1000 313 999 302 '/>
+<circle r='5' fill='red' cx='1023.57' cy='392.992' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1023.57,392.992) rotate(156.205) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1002.14' cy='322.18' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1002.14,322.18) rotate(170.127) translate(-5,-20)'/>
 </g>
 
 <g id="r-montreal-boston">
+  <circle cx='969.907' cy='276.424' r='242.816' fill='none' stroke='red'/>
+  <line x1='1080' y1='60' x2='1168' y2='136' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1080 60 1082 61 1084 62 1087 63 1089 65 1091 66 1094 67 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1157 122 1159 124 1160 126 1162 128 1164 130 1165 132 1167 135 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1098 60 1105 65 1112 70 1119 75 1126 80 1133 86 1139 92 1146 98 1152 104 1158 110 1163 117 '/>
+<circle r='5' fill='red' cx='1114.87' cy='71.739' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1114.87,71.739) rotate(-54.6937) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1150.5' cy='102.365' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1150.5,102.365) rotate(-43.9453) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1089 74 1096 78 1103 83 1110 88 1116 93 1122 98 1129 103 1134 109 1140 115 1146 121 1151 127 '/>
+<circle r='5' fill='red' cx='1106.66' cy='85.5364' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1106.66,85.5364) rotate(-54.3824) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1138.09' cy='112.552' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1138.09,112.552) rotate(-44.2566) translate(-5,-20)'/>
 </g>
 
 <g id="r-montreal-new-york">
+  <circle cx='748.845' cy='191.133' r='356.173' fill='none' stroke='red'/>
+  <line x1='1080' y1='60' x2='1103' y2='229' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1080 60 1080 62 1081 64 1082 67 1083 69 1084 72 1085 75 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1104 211 1104 214 1104 216 1103 219 1103 222 1103 224 1103 227 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1085 75 1089 88 1093 101 1096 115 1099 128 1101 142 1103 156 1104 169 1104 183 1104 197 1104 211 '/>
+<circle r='5' fill='red' cx='1091.54' cy='94.0836' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1091.54,94.0836) rotate(-15.8119) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1101.65' cy='142.274' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1101.65,142.274) rotate(-7.88461) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1105.02' cy='191.399' />
 <rect width='10' height='40'  fill='blue' stroke='black' stroke-width='0.4' transform='translate(1105.02,191.399) rotate(0.0426418) translate(-5,-20)'/>
 </g>
 
 <g id="r-boston-new-york">
+  <circle cx='1019.07' cy='101.125' r='152.958' fill='none' stroke='red'/>
+  <line x1='1168' y1='136' x2='1103' y2='229' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1168 136 1167 138 1166 141 1165 143 1165 146 1164 148 1163 151 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1116 219 1114 221 1111 222 1109 224 1107 225 1105 227 1103 228 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1171 153 1167 162 1164 170 1160 178 1155 185 1151 193 1145 200 1140 207 1134 213 1127 219 1121 225 '/>
+<circle r='5' fill='red' cx='1163.38' cy='172.421' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(1163.38,172.421) rotate(26.2923) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1135.79' cy='211.959' />
 <rect width='10' height='40'  fill='yellow' stroke='black' stroke-width='0.4' transform='translate(1135.79,211.959) rotate(43.5188) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1155 148 1153 156 1149 163 1146 170 1142 177 1137 184 1133 190 1128 196 1122 202 1117 207 1111 213 '/>
+<circle r='5' fill='red' cx='1148.14' cy='167.111' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1148.14,167.111) rotate(27.0781) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1125.55' cy='199.491' />
 <rect width='10' height='40'  fill='red' stroke='black' stroke-width='0.4' transform='translate(1125.55,199.491) rotate(42.733) translate(-5,-20)'/>
 </g>
 
 <g id="r-new-york-washington">
+  <circle cx='965.407' cy='299.429' r='154.571' fill='none' stroke='red'/>
+  <line x1='1103' y1='229' x2='1114' y2='342' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1103 228 1104 231 1105 233 1106 236 1107 238 1108 241 1109 243 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1117 326 1117 328 1116 331 1116 334 1115 336 1114 339 1114 341 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1117 240 1119 249 1122 257 1124 266 1126 274 1127 283 1127 292 1127 301 1127 310 1126 318 1125 327 '/>
+<circle r='5' fill='red' cx='1123.06' cy='259.751' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(1123.06,259.751) rotate(-14.1269) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1127.77' cy='307.69' />
 <rect width='10' height='40'  fill='orange' stroke='black' stroke-width='0.4' transform='translate(1127.77,307.69) rotate(2.91249) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1102 246 1104 253 1107 261 1108 269 1110 277 1111 285 1111 293 1111 301 1111 308 1110 316 1109 324 '/>
+<circle r='5' fill='red' cx='1108.01' cy='265.568' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1108.01,265.568) rotate(-13.3574) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1111.88' cy='304.91' />
 <rect width='10' height='40'  fill='black' stroke='black' stroke-width='0.4' transform='translate(1111.88,304.91) rotate(2.14304) translate(-5,-20)'/>
 </g>
 
 <g id="r-washington-raleigh">
+  <circle cx='1001.3' cy='316.006' r='115.661' fill='none' stroke='red'/>
+  <line x1='1114' y1='342' x2='1040' y2='425' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1114 342 1113 344 1112 347 1111 349 1111 352 1110 354 1109 357 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1054 418 1052 419 1049 420 1047 422 1044 423 1042 424 1039 425 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1116 360 1113 368 1109 376 1104 384 1099 391 1093 398 1087 404 1080 410 1073 416 1066 421 1058 425 '/>
+<circle r='5' fill='red' cx='1108.2' cy='378.173' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1108.2,378.173) rotate(30.1802) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1075.27' cy='415.101' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1075.27,415.101) rotate(53.2587) translate(-5,-20)'/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1101 354 1098 361 1095 368 1091 375 1086 381 1081 387 1076 393 1070 398 1064 403 1057 407 1050 411 '/>
+<circle r='5' fill='red' cx='1093.04' cy='372.351' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1093.04,372.351) rotate(31.5573) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1067.76' cy='400.707' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1067.76,400.707) rotate(51.8815) translate(-5,-20)'/>
 </g>
 
 <g id="r-raleigh-charleston">
+  <circle cx='1041.43' cy='474.111' r='49.1316' fill='none' stroke='red'/>
+  <line x1='1040' y1='425' x2='1077' y2='508' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1040 425 1042 424 1045 425 1047 425 1050 425 1053 426 1055 427 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1085 494 1084 497 1083 499 1082 501 1080 503 1078 506 1076 508 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1055 427 1063 430 1070 434 1076 440 1082 446 1086 454 1089 462 1090 470 1090 478 1088 486 1085 494 '/>
+<circle r='5' fill='red' cx='1073.22' cy='436.65' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1073.22,436.65) rotate(-49.6823) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1090.54' cy='475.508' />
 <rect width='10' height='40'  fill='grey' stroke='black' stroke-width='0.4' transform='translate(1090.54,475.508) rotate(1.62924) translate(-5,-20)'/>
 </g>
 
 <g id="r-charleston-miami">
+  <circle cx='1369.76' cy='553.693' r='296.308' fill='none' stroke='red'/>
+  <line x1='1077' y1='508' x2='1115' y2='705' stroke='black'/>
+<path stroke='green' stroke-width='1' fill='transparent' d='M1077 508 1076 510 1076 513 1075 515 1075 518 1075 521 1074 523 '/>
+<path stroke='red' stroke-width='1' fill='transparent' d='M1106 690 1108 692 1109 695 1110 697 1111 699 1113 702 1114 704 '/>
+<path stroke='black' stroke-width='2' fill='transparent' d='M1074 523 1073 541 1073 558 1074 575 1076 592 1078 609 1082 626 1087 642 1092 659 1099 674 1106 690 '/>
+<circle r='5' fill='red' cx='1073.62' cy='543.819' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1073.62,543.819) rotate(-178.09) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1075.42' cy='587.742' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1075.42,587.742) rotate(-186.598) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1083.7' cy='630.915' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1083.7,630.915) rotate(-195.107) translate(-5,-20)'/>
+<circle r='5' fill='red' cx='1098.27' cy='672.389' />
 <rect width='10' height='40'  fill='hotpink' stroke='black' stroke-width='0.4' transform='translate(1098.27,672.389) rotate(-203.615) translate(-5,-20)'/>
 </g>
 </svg>
