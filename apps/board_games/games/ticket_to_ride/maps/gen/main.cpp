@@ -27,24 +27,20 @@ constexpr static int32_t city_gap = city_radius + 8;
 using namespace utils::math::g2d;
 
 void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool draw_helpers) {
+    Point<double> route_start = static_cast<Point<double>>(route.start.pos);
+    Point<double> route_end = static_cast<Point<double>>(route.end.pos);
+
     // We need to compute the arc with a given length between two points
     double arc_length =
         static_cast<double>((route.n_carriages * carriage_length) + ((route.n_carriages - 1) * gap) + (2 * city_gap));
-    double hypot = std::hypot(route.end.pos.x - route.start.pos.x, route.end.pos.y - route.start.pos.y);
-    arc_length = std::max(arc_length, hypot);
-    auto solution_opt = circle_for_arc(
-        Point<double>{.x = static_cast<double>(route.start.pos.x), .y = static_cast<double>(route.start.pos.y)},
-        Point<double>{.x = static_cast<double>(route.end.pos.x), .y = static_cast<double>(route.end.pos.y)},
-        arc_length);
+    double chord_length = (route_start - route_end).hypot();
+    arc_length = std::max(arc_length, chord_length);
+    auto solution_opt = circle_for_arc(route_start, route_end, arc_length);
     if (!solution_opt) {
         std::cerr << "There is no solution for the route from " << route.start.name << " to " << route.end.name
                   << std::endl;
         std::cerr << " arc lenght: " << arc_length << std::endl;
-
-        int32_t dx = route.end.pos.x - route.start.pos.x;
-        int32_t dy = route.end.pos.y - route.start.pos.y;
-        double c = std::hypot(dx, dy);
-        std::cerr << " chord lenght: " << c << std::endl;
+        std::cerr << " chord lenght: " << chord_length << std::endl;
         return;
     }
 
@@ -54,8 +50,8 @@ void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool dra
     double radius = solution.radius;
 
     // Angles of points A and B relative to center
-    double ang_start = std::atan2(route.start.pos.y - center.y, route.start.pos.x - center.x);
-    double ang_end = std::atan2(route.end.pos.y - center.y, route.end.pos.x - center.x);
+    double ang_start = atan2(route_start - center);
+    double ang_end = atan2(route_end - center);
 
     // We need to pick the sign (direction) so that swept absolute angle equals theta = s/R
     double theta = arc_length / radius; // positive
@@ -77,8 +73,8 @@ void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool dra
         // - draw chord for reference
         svg::Line& chord_ref = route_group.add<svg::Line>();
         chord_ref.stroke = svg::Color::BLACK;
-        chord_ref.start = Point<int>{.x = route.start.pos.x, .y = route.start.pos.y};
-        chord_ref.end = Point<int>{.x = route.end.pos.x, .y = route.end.pos.y};
+        chord_ref.start = route.start.pos;
+        chord_ref.end = route.end.pos;
 
         // - draw city gap (start and end)
         svg::Path& city_gap_start =
@@ -95,9 +91,10 @@ void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool dra
     }
 
     // CARRIAGES
-    auto draw_carriages = [&route_group, &draw_helpers](const Circunference<double>& _circunference, double _ang_start,
-                                                        double _ang_end, double _sgn, int n_carriages,
-                                                        svg::Color color) {
+    Point<double> carriage_size{.x = carriage_width, .y = carriage_length};
+    auto draw_carriages = [&route_group, &draw_helpers, &carriage_size](const Circunference<double>& _circunference,
+                                                                        double _ang_start, double _ang_end, double _sgn,
+                                                                        int n_carriages, svg::Color color) {
         if (draw_helpers) {
             // - draw circle for carriages
             svg::Path& circle_carriages = route_group.add_from<svg::Path>(_circunference, _ang_start, _ang_end, 10);
@@ -109,35 +106,34 @@ void make_route_svg(svg::SVGGroup& route_group, const RouteData& route, bool dra
         // - draw carriages
         double total_length = std::abs(_ang_end - _ang_start) * _circunference.radius;
         double _gap = n_carriages > 1 ? (total_length - (n_carriages * carriage_length)) / (n_carriages - 1) : 0;
-        // double _carriage_length = (total_length - (n_carriages - 1) * gap) / n_carriages;
         double _carriage_ang = carriage_length / _circunference.radius;
         double _gap_ang = _gap / _circunference.radius;
 
         for (int i = 0; i < n_carriages; i++) {
             double ang = _ang_start + _sgn * ((_carriage_ang / 2.0) + (i * _carriage_ang) + (i * _gap_ang));
-            double x = _circunference.center.x + _circunference.radius * std::cos(ang);
-            double y = _circunference.center.y + _circunference.radius * std::sin(ang);
+            Point<double> circunference_radius{.x = _circunference.radius * std::cos(ang),
+                                               .y = _circunference.radius * std::sin(ang)};
+            Point<double> xy = _circunference.center + circunference_radius;
 
             double angdeg = ang * 180.0 / M_PI; // degrees for SVG
 
             if (draw_helpers) {
                 svg::Circle& carriage_circle = route_group.add<svg::Circle>();
                 carriage_circle.fill = svg::Color::RED;
-                carriage_circle.center = Point<int>{.x = static_cast<int>(x), .y = static_cast<int>(y)};
+                carriage_circle.center = static_cast<Point<int>>(xy);
                 carriage_circle.radius = 5;
             }
 
             // Transform order: translate to pos, rotate(angle), then translate by -w/2,-h/2 to place centered
             svg::Rect& rect = route_group.add<svg::Rect>();
-            rect.size = Point<int>{.x = carriage_width, .y = carriage_length};
+            rect.size = static_cast<Point<int>>(carriage_size);
             rect.fill = color;
             rect.stroke = svg::Color::BLACK;
             rect.stroke_width = 0.4;
-            rect.transformation.emplace_back(std::make_unique<svg::Translate>(
-                svg::Translate{Point<int>{.x = static_cast<int>(x), .y = static_cast<int>(y)}}));
+            rect.transformation.emplace_back(
+                std::make_unique<svg::Translate>(svg::Translate{static_cast<Point<int>>(xy)}));
             rect.transformation.emplace_back(std::make_unique<svg::Rotate>(svg::Rotate{static_cast<float>(angdeg)}));
-            rect.transformation.emplace_back(std::make_unique<svg::Translate>(svg::Translate{Point<int>{
-                .x = static_cast<int>(-carriage_width / 2.0), .y = static_cast<int>(-carriage_length / 2.0)}}));
+            rect.transformation.emplace_back(std::make_unique<svg::Translate>(svg::Translate{-carriage_size / 2.0}));
         }
     };
 

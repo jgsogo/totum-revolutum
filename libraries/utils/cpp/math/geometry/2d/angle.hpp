@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "point.hpp"
+
 namespace utils::math::g2d {
 
     // Normalize angle to (-pi, pi]
@@ -12,5 +14,7 @@ namespace utils::math::g2d {
         // 2. Shift the range back to (-PI, PI] by subtracting PI
         return normalized - M_PI;
     }
+
+    template <typename T> T atan2(const Point<T>& p) { return std::atan2(p.y, p.x); }
 
 } // namespace utils::math::g2d
