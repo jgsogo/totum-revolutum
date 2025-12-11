@@ -6,9 +6,9 @@ cc_binary(
     visibility = ["//apps/board_games/games/ticket_to_ride/maps:__pkg__"],
     deps = [
         "//apps/board_games/games/ticket_to_ride/maps/cpp:maps",
-        "//apps/board_games/games/ticket_to_ride/maps/gen/svg",
         "//bazel/logging:spdlog",
         "//libraries/utils/cpp/math/geometry/2d:geometry_2d",
+        "//libraries/utils/cpp/svg",
         "@cli11",
     ],
 )

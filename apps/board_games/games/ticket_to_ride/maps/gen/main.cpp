@@ -6,14 +6,13 @@
 
 #include "libraries/utils/cpp/math/geometry/2d/angle.hpp"
 #include "libraries/utils/cpp/math/geometry/2d/circle_for_arc.hpp"
+#include "libraries/utils/cpp/svg/circle.h"
+#include "libraries/utils/cpp/svg/image.h"
+#include "libraries/utils/cpp/svg/line.h"
+#include "libraries/utils/cpp/svg/path.h"
+#include "libraries/utils/cpp/svg/rect.h"
 
 #include "apps/board_games/games/ticket_to_ride/maps/cpp/map_loader.h"
-
-#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/circle.h"
-#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/image.h"
-#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/line.h"
-#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/path.h"
-#include "apps/board_games/games/ticket_to_ride/maps/gen/svg/rect.h"
 
 constexpr static int32_t carriage_length = 40;
 constexpr static int32_t carriage_width = 10;
