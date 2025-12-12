@@ -32,4 +32,13 @@ namespace svg {
         float degrees;
     };
 
+    struct Scale : Transformation {
+        explicit Scale(float scale) : scale{scale} {};
+        ~Scale() = default;
+
+        std::ostream& write(std::ostream& os) const;
+
+        float scale;
+    };
+
 } // namespace svg

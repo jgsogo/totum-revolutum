@@ -8,9 +8,25 @@ load("//bazel:run_copy_to_workspace.bzl", "run_copy_to_workspace")
 def generate_map_targets(name):
     """Creates all the targets for a given TextProto file
 
+    The main target that it generates is a filegroup with all the resources needed to operate
+    with this map:
+     * the `<name>.textproto` file, with the data
+     * the `<name>.svg` file, with the main SVG
+     * the `<name>-background.svg` file, with the background image used by the main SVG
+
     Args:
         name: the name of the map. It has to match an input `<name>.textproto` file
     """
+
+    native.filegroup(
+        name = name,
+        srcs = [
+            "{}.textproto".format(name),
+            "{}.svg".format(name),
+            "{}-background.svg".format(name),
+        ],
+        visibility = ["//apps/board_games/games/ticket_to_ride:__subpackages__"],
+    )
 
     native.filegroup(
         name = "{}-input".format(name),

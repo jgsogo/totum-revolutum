@@ -12,4 +12,9 @@ namespace svg {
         return os;
     }
 
+    std::ostream& Scale::write(std::ostream& os) const {
+        os << " scale(" << scale << ")";
+        return os;
+    }
+
 } // namespace svg

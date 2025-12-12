@@ -10,7 +10,7 @@ namespace svg {
         Image() = default;
 
         std::string href;
-        utils::math::g2d::Point<int> size;
+        std::optional<utils::math::g2d::Point<int>> size;
 
         std::ostream& write(std::ostream& os) const override final;
     };
