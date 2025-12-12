@@ -10,13 +10,13 @@ namespace data {
         Game() = delete;
         Game(const Game&) = delete;
         explicit Game(Game&&) = default;
-        explicit Game(std::int64_t id, RoomUUID room, GameType type, GameState state, GameStatePayload&& payload)
-            : id{id}, room{room}, type{type}, state{state}, state_data{std::move(payload)} {}
+        explicit Game(std::int64_t id, RoomUUID room, GameType type, GameState state, GamePayload&& payload)
+            : id{id}, room{room}, type{type}, state{state}, payload{std::move(payload)} {}
 
         std::int64_t id;
         RoomUUID room;
         GameType type;
         GameState state;
-        GameStatePayload state_data;
+        GamePayload payload;
     };
 } // namespace data

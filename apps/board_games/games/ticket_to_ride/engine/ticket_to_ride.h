@@ -11,19 +11,19 @@
 
 namespace board_games::ticket_to_ride {
 
-    class TicketToRidePlugin final : public engine::GamePlugin<GameState, Action, EventLog> {
-        using GamePlugin = engine::GamePlugin<GameState, Action, EventLog>;
+    class TicketToRidePlugin final : public engine::GamePlugin<GameState, Action, event> {
+        using GamePlugin = engine::GamePlugin<GameState, Action, event>;
 
       public:
         TicketToRidePlugin();
 
       protected:
         std::string_view get_action_type(const Action& action) const override;
-        std::string_view get_eventlog_type(const EventLog& eventlog) const override;
+        std::string_view get_event_type(const event& event) const override;
         data::GameState get_game_state(const GameState& game_state) const override;
         Expected<GameState> _new_board() override;
-        Expected<std::pair<GameState, EventLog>> _run(const GameState& game_state, const Action& action,
-                                                      uint8_t player_number) override;
+        Expected<std::pair<GameState, event>> _run(const GameState& game_state, const Action& action,
+                                                   uint8_t player_number) override;
     };
 
 } // namespace board_games::ticket_to_ride

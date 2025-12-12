@@ -27,7 +27,7 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test DB interactions") {
             REQUIRE(game_found);
             REQUIRE(game_found.value());
 
-            auto game_state = game_found.value()->state_data.into_proto<board_game::tic_tac_toe::Board>();
+            auto game_state = game_found.value()->payload.into_proto<board_games::tic_tac_toe::Board>();
             REQUIRE(game_state.has_value());
             REQUIRE(game_state->current_turn() == 0);
             REQUIRE(game_state->board_status() == "         ");

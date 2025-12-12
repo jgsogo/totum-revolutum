@@ -46,7 +46,7 @@ namespace data {
     Expected<std::optional<Game>> find_game(pqxx::connection& conn, RoomUUID room_uuid) {
         SPDLOG_DEBUG("Return the game being played in room '{}'", room_uuid);
         const std::string query =
-            std::format("SELECT id, game_type_id, state, state_data FROM {} WHERE room_id = $1 LIMIT 1;", GAMES_TABLE);
+            std::format("SELECT id, game_type_id, state, payload FROM {} WHERE room_id = $1 LIMIT 1;", GAMES_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -56,8 +56,8 @@ namespace data {
             }
 
             // game_type_id is already the game_type.slug
-            auto [id, game_type, state, state_data] = r->as<std::int64_t, GameType, GameState, GameStatePayload>();
-            return {std::make_optional<Game>(id, room_uuid, game_type, state, std::move(state_data))};
+            auto [id, game_type, state, payload] = r->as<std::int64_t, GameType, GameState, GamePayload>();
+            return {std::make_optional<Game>(id, room_uuid, game_type, state, std::move(payload))};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get game for the given room: {}", e.what());
             return tl::unexpected(errors::SelectError{GAMES_TABLE, query, e.what()});
@@ -68,7 +68,7 @@ namespace data {
                                                           ParticipantUUID participant_uuid) {
         SPDLOG_DEBUG("Return participant '{}' in room '{}'", participant_uuid, room);
         const std::string query = std::format(
-            "SELECT role, player_number FROM {} WHERE id = $1 AND room_id = $2 LIMIT 1;", PARTICIPANT_TABLE);
+            "SELECT role, player_number FROM {} WHERE id = $1 AND room_id = $2 LIMIT 1;", PARTICIPANTS_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -84,7 +84,7 @@ namespace data {
             return {{participant}};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get participant: {}", e.what());
-            return tl::unexpected(errors::SelectError{PARTICIPANT_TABLE, query, e.what()});
+            return tl::unexpected(errors::SelectError{PARTICIPANTS_TABLE, query, e.what()});
         }
     }
 
@@ -134,7 +134,7 @@ namespace data {
         const std::string query =
             std::format("INSERT INTO {} (id, room_id, role, joined_at, game_id, player_number) VALUES ($1, $2, $3, "
                         "NOW(), $4, $5);",
-                        PARTICIPANT_TABLE);
+                        PARTICIPANTS_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -143,7 +143,7 @@ namespace data {
             return {Participant{room, participant, role, static_cast<uint32_t>(player_number.value())}};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to insert participant: {}", e.what());
-            return tl::unexpected(errors::InsertError{PARTICIPANT_TABLE, query, e.what()});
+            return tl::unexpected(errors::InsertError{PARTICIPANTS_TABLE, query, e.what()});
         }
     }
 

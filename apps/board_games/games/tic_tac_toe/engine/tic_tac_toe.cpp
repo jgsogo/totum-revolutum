@@ -48,44 +48,44 @@ namespace board_games::tic_tac_toe {
         : TicTacToePlugin::GamePlugin{GAME_TYPE, std::string{"Tic-Tac-Toe"},
                                       std::string{"Basic Tic-Tac-Toe board game"}} {};
 
-    std::string_view TicTacToePlugin::get_action_type(const board_game::tic_tac_toe::Action& action) const {
+    std::string_view TicTacToePlugin::get_action_type(const board_games::tic_tac_toe::Action& action) const {
         return ACTION_PLACE_MARK;
     }
 
-    std::string_view TicTacToePlugin::get_eventlog_type(const board_game::tic_tac_toe::EventLog& eventlog) const {
+    std::string_view TicTacToePlugin::get_event_type(const board_games::tic_tac_toe::event& event) const {
         return EVENT_MARK_PLACED;
     }
 
-    data::GameState TicTacToePlugin::get_game_state(const board_game::tic_tac_toe::Board& game_state) const {
+    data::GameState TicTacToePlugin::get_game_state(const board_games::tic_tac_toe::Board& game_state) const {
         switch (game_state.turn_state_case()) {
-        case board_game::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
+        case board_games::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
             return data::GameState::PLAYING;
-        case board_game::tic_tac_toe::Board::TurnStateCase::kWinner:
-        case board_game::tic_tac_toe::Board::TurnStateCase::kDraw:
+        case board_games::tic_tac_toe::Board::TurnStateCase::kWinner:
+        case board_games::tic_tac_toe::Board::TurnStateCase::kDraw:
             return data::GameState::FINISHED;
-        case board_game::tic_tac_toe::Board::TurnStateCase::TURN_STATE_NOT_SET:
+        case board_games::tic_tac_toe::Board::TurnStateCase::TURN_STATE_NOT_SET:
             return data::GameState::WAITING;
         }
     }
 
-    Expected<board_game::tic_tac_toe::Board> TicTacToePlugin::_new_board() {
+    Expected<board_games::tic_tac_toe::Board> TicTacToePlugin::_new_board() {
         SPDLOG_DEBUG("[tic_tac_toe] Return new board");
-        board_game::tic_tac_toe::Board board;
+        board_games::tic_tac_toe::Board board;
         board.set_board_status(std::string(9, EMPTY_SYMBOL));
         board.set_current_turn(0);
         return {std::move(board)};
     }
 
-    Expected<std::pair<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::EventLog>>
-    TicTacToePlugin::_run(const board_game::tic_tac_toe::Board& game_state,
-                          const board_game::tic_tac_toe::Action& action, uint8_t player_number) {
+    Expected<std::pair<board_games::tic_tac_toe::Board, board_games::tic_tac_toe::event>>
+    TicTacToePlugin::_run(const board_games::tic_tac_toe::Board& game_state,
+                          const board_games::tic_tac_toe::Action& action, uint8_t player_number) {
         SPDLOG_DEBUG("[tic_tac_toe] Play action");
         // Preconditions:
         //  - It's the players turn
         //  - Game is not finished
         //  - The cell is empty
         switch (game_state.turn_state_case()) {
-        case board_game::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
+        case board_games::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
             if (game_state.current_turn() != player_number) {
                 SPDLOG_ERROR(
                     "Game state is expecting actions from player {}, however, game action comes from player {}",
@@ -95,14 +95,14 @@ namespace board_games::tic_tac_toe {
                     game_state.current_turn(), player_number)});
             }
             break;
-        case board_game::tic_tac_toe::Board::TurnStateCase::kWinner:
-        case board_game::tic_tac_toe::Board::TurnStateCase::kDraw:
+        case board_games::tic_tac_toe::Board::TurnStateCase::kWinner:
+        case board_games::tic_tac_toe::Board::TurnStateCase::kDraw:
             SPDLOG_ERROR("Game state is finished. No action expected");
             return tl::unexpected(errors::GameEngineError{"Game state is finished. No action expected"});
-        case board_game::tic_tac_toe::Board::TurnStateCase::TURN_STATE_NOT_SET:
-            SPDLOG_ERROR("Error decoding board_game::tic_tac_toe::Board protobuf: 'turn_state' is not set");
-            return tl::unexpected(
-                errors::InvalidData{"Error decoding board_game::tic_tac_toe::Board protobuf: 'turn_state' is not set"});
+        case board_games::tic_tac_toe::Board::TurnStateCase::TURN_STATE_NOT_SET:
+            SPDLOG_ERROR("Error decoding board_games::tic_tac_toe::Board protobuf: 'turn_state' is not set");
+            return tl::unexpected(errors::InvalidData{
+                "Error decoding board_games::tic_tac_toe::Board protobuf: 'turn_state' is not set"});
         }
 
         if (game_state.board_status()[action.position()] != EMPTY_SYMBOL) {
@@ -117,11 +117,11 @@ namespace board_games::tic_tac_toe {
         std::string board_status = game_state.board_status();
         board_status[action.position()] = player_number == 0 ? PLAYER_X_SYMBOL : PLAYER_O_SYMBOL;
 
-        board_game::tic_tac_toe::Board new_board;
+        board_games::tic_tac_toe::Board new_board;
         new_board.set_board_status(board_status);
         auto winner = check_winner(board_status);
         if (winner) {
-            board_game::tic_tac_toe::Winner* w = new_board.mutable_winner();
+            board_games::tic_tac_toe::Winner* w = new_board.mutable_winner();
             w->set_player(winner->first == PLAYER_X_SYMBOL ? 0 : 1);
             {
                 auto* data = w->mutable_line();
@@ -134,10 +134,10 @@ namespace board_games::tic_tac_toe {
         }
 
         // Compute return event log[s]
-        board_game::tic_tac_toe::EventLog event_log;
-        event_log.set_mark_placed_at_position(action.position());
-        event_log.set_player(player_number);
+        board_games::tic_tac_toe::event event;
+        event.set_mark_placed_at_position(action.position());
+        event.set_player(player_number);
 
-        return {std::make_pair(std::move(new_board), std::move(event_log))};
+        return {std::make_pair(std::move(new_board), std::move(event))};
     }
 } // namespace board_games::tic_tac_toe

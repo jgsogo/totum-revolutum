@@ -11,7 +11,7 @@ namespace services {
         : pool{pool}, _games(games) {}
 
     grpc::Status EngineServiceImpl::CreateNewRoom(grpc::ServerContext* context,
-                                                  const board_game::NewRoomRequest* request,
+                                                  const board_games::NewRoomRequest* request,
                                                   google::protobuf::Empty* response) {
         SPDLOG_DEBUG("CreateNewRoom");
         return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) -> grpc::Status {
@@ -29,7 +29,8 @@ namespace services {
         });
     }
 
-    grpc::Status EngineServiceImpl::StartGame(grpc::ServerContext* context, const board_game::StartGameRequest* request,
+    grpc::Status EngineServiceImpl::StartGame(grpc::ServerContext* context,
+                                              const board_games::StartGameRequest* request,
                                               google::protobuf::Empty* response) {
         SPDLOG_DEBUG("StartGame");
         return pool.with_conn<grpc::Status>([request, this](pqxx::connection& conn) {
@@ -47,7 +48,7 @@ namespace services {
                              }
                              const auto& game = it->second;
                              return game->new_board().and_then(
-                                 [&conn, &room, &game_type](data::GameStatePayload&& initial_board_status) {
+                                 [&conn, &room, &game_type](data::GamePayload&& initial_board_status) {
                                      return data::start_game(conn, room, game_type, initial_board_status);
                                  });
                          })
@@ -64,8 +65,8 @@ namespace services {
     }
 
     grpc::Status EngineServiceImpl::GetOrCreateParticipant(grpc::ServerContext* context,
-                                                           const board_game::GetOrCreateParticipantRequest* request,
-                                                           board_game::Participant* response) {
+                                                           const board_games::GetOrCreateParticipantRequest* request,
+                                                           board_games::Participant* response) {
         SPDLOG_DEBUG("GetOrCreateParticipant");
         return pool.with_conn<grpc::Status>([request, response](pqxx::connection& conn) {
             data::RoomUUID room{std::string{request->room_uuid()}};
@@ -114,10 +115,10 @@ namespace services {
         });
     }
 
-    grpc::Status EngineServiceImpl::SendGameAction(grpc::ServerContext* context,
-                                                   const board_game::SendGameActionRequest* request,
-                                                   google::protobuf::Empty* response) {
-        SPDLOG_DEBUG("SendGameAction(request.room_uuid={}, request.participant_uuid={})", request->room_uuid(),
+    grpc::Status EngineServiceImpl::SendAction(grpc::ServerContext* context,
+                                               const board_games::SendActionRequest* request,
+                                               google::protobuf::Empty* response) {
+        SPDLOG_DEBUG("SendAction(request.room_uuid={}, request.participant_uuid={})", request->room_uuid(),
                      request->participant_uuid());
         return pool.with_conn<grpc::Status>([request, this](pqxx::connection& conn) {
             data::RoomUUID room{std::string{request->room_uuid()}};
@@ -165,22 +166,22 @@ namespace services {
                             const auto& game_plugin = it->second;
                             std::vector<std::byte> payload(request->payload().size());
                             std::memcpy(payload.data(), request->payload().data(), request->payload().size());
-                            const auto& action_payload = data::GameActionPayload{std::move(payload)};
+                            const auto& action_payload = data::ActionPayload{std::move(payload)};
                             Expected<void> r =
                                 game_plugin
-                                    ->run(game.state_data, action_payload, participant.player_number)
-                                    // Store to the database the action + new status + event_log
+                                    ->run(game.payload, action_payload, participant.player_number)
+                                    // Store to the database the action + new status + event
                                     .and_then(
                                         [&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
                                             return data::store_action(conn, game.id, participant.uuid, res.action_type,
                                                                       action_payload, true)
                                                 .and_then([&conn, &game, &res](const std::int64_t& action_id) {
-                                                    return data::store_eventlog(conn, game.id, res.eventlog_type,
-                                                                                res.eventlog_payload, action_id);
+                                                    return data::store_event(conn, game.id, res.event_type,
+                                                                             res.event_payload, action_id);
                                                 })
                                                 .and_then([&conn, &game, &res]() {
                                                     return data::update_game_state(conn, game.id, res.new_game_state,
-                                                                                   res.new_game_state_data);
+                                                                                   res.new_game_payload);
                                                 });
                                         })
                                     // On failure: RETURN to the user that the action could not be understood.

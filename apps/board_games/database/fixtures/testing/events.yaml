@@ -1,4 +1,4 @@
-- model: board_games_core.eventlog
+- model: board_games_core.event
   pk: 1
   fields:
     game: 1
@@ -7,8 +7,9 @@
     payload: !!binary |
       ERITFA==  # Placeholder protobuf bytes
     action_id: 1
+    applied: True
 
-- model: board_games_core.eventlog
+- model: board_games_core.event
   pk: 2
   fields:
     game: 1
@@ -17,8 +18,9 @@
     payload: !!binary |
       GBkaGxw=  # Placeholder protobuf bytes
     action_id: 2
+    applied: True
 
-- model: board_games_core.eventlog
+- model: board_games_core.event
   pk: 3
   fields:
     game: 2
@@ -27,3 +29,4 @@
     payload: !!binary |
       HR4fIA==  # Placeholder protobuf bytes
     action_id: 3
+    applied: True

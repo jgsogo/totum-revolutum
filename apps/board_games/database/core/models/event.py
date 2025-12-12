@@ -1,11 +1,11 @@
 from django.db import models
 from django.utils import timezone
 
+from .action import Action
 from .game import Game
-from .game_action import GameAction
 
 
-class EventLog(models.Model):
+class Event(models.Model):
     """
     Logs notable events, such as game state transitions or system actions.
 
@@ -16,7 +16,6 @@ class EventLog(models.Model):
     game = models.ForeignKey(
         Game,
         on_delete=models.CASCADE,
-        related_name="event_logs",
         help_text="Game in which this event occurred.",
     )
     timestamp = models.DateTimeField(
@@ -27,10 +26,14 @@ class EventLog(models.Model):
     )
     payload = models.BinaryField(help_text="Serialized payload of the event (e.g., protobuf).")
 
-    action = models.OneToOneField(
-        GameAction,
+    action = models.ForeignKey(
+        Action,
         on_delete=models.CASCADE,
-        help_text="Associated action that generated this EventLog.",
+        help_text="Associated action that generated this event",
+    )
+
+    applied = models.BooleanField(
+        help_text="If the event has been applied or not",
     )
 
     def __str__(self):

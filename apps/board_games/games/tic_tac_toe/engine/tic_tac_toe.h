@@ -9,21 +9,21 @@
 namespace board_games::tic_tac_toe {
 
     class TicTacToePlugin final
-        : public engine::GamePlugin<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::Action,
-                                    board_game::tic_tac_toe::EventLog> {
-        using GamePlugin = engine::GamePlugin<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::Action,
-                                              board_game::tic_tac_toe::EventLog>;
+        : public engine::GamePlugin<board_games::tic_tac_toe::Board, board_games::tic_tac_toe::Action,
+                                    board_games::tic_tac_toe::event> {
+        using GamePlugin = engine::GamePlugin<board_games::tic_tac_toe::Board, board_games::tic_tac_toe::Action,
+                                              board_games::tic_tac_toe::event>;
 
       public:
         TicTacToePlugin();
 
       protected:
-        std::string_view get_action_type(const board_game::tic_tac_toe::Action& action) const override;
-        std::string_view get_eventlog_type(const board_game::tic_tac_toe::EventLog& eventlog) const override;
-        data::GameState get_game_state(const board_game::tic_tac_toe::Board& game_state) const override;
-        Expected<board_game::tic_tac_toe::Board> _new_board() override;
-        Expected<std::pair<board_game::tic_tac_toe::Board, board_game::tic_tac_toe::EventLog>>
-        _run(const board_game::tic_tac_toe::Board& game_state, const board_game::tic_tac_toe::Action& action,
+        std::string_view get_action_type(const board_games::tic_tac_toe::Action& action) const override;
+        std::string_view get_event_type(const board_games::tic_tac_toe::event& event) const override;
+        data::GameState get_game_state(const board_games::tic_tac_toe::Board& game_state) const override;
+        Expected<board_games::tic_tac_toe::Board> _new_board() override;
+        Expected<std::pair<board_games::tic_tac_toe::Board, board_games::tic_tac_toe::event>>
+        _run(const board_games::tic_tac_toe::Board& game_state, const board_games::tic_tac_toe::Action& action,
              uint8_t player_number) override;
     };
 
