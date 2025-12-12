@@ -1,7 +1,4 @@
 import {
-  CommandRequest as CommandRequestProto,
-  CommandRequestSchema,
-  CommandResponse as CommandResponseProto,
   EngineService,
   NewRoomRequest as NewRoomRequestProto,
   NewRoomRequestSchema,
@@ -21,7 +18,6 @@ import { createConnectRpcClient } from 'grpc-es-bridge/connectrpc';
 const address = 'localhost:50051';
 const credentials = grpc.credentials.createInsecure();
 const client = createConnectRpcClient(EngineService, address, credentials)
-
 
 
 export async function createNewRoom(uuid: string, name: string): Promise<Empty> {
