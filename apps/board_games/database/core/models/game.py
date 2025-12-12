@@ -45,8 +45,8 @@ class Game(models.Model):
         help_text="State of the game: waiting, playing, or finished.",
     )
 
-    state_data = models.BinaryField(
-        help_text="Raw binary data of the action, typically a serialized protobuf."
+    payload = models.BinaryField(
+        help_text="Raw binary data of the game state, typically a serialized protobuf."
     )
 
     def __str__(self):

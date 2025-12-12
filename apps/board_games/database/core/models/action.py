@@ -5,7 +5,7 @@ from .game import Game
 from .participant import Participant
 
 
-class GameAction(models.Model):
+class Action(models.Model):
     """
     Stores the history of moves performed by players in a game.
 
@@ -36,12 +36,12 @@ class GameAction(models.Model):
         help_text="Raw binary data of the action, typically a serialized protobuf."
     )
 
-    applied = models.BooleanField(
-        help_text="If the action was successfully applied or not",
+    rejected = models.BooleanField(
+        help_text="If the action was rejected or not",
     )
 
     class Meta:
         ordering = ["game", "timestamp"]
 
     def __str__(self):
-        return f"Action #{self.action_index} in game {self.game_id}"
+        return f"Action #{self.action_type} in game {self.game}"
