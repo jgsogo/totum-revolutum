@@ -168,8 +168,8 @@ namespace services {
                             const auto& action_payload = data::ActionPayload{std::move(payload)};
                             Expected<void> r =
                                 game_plugin
-                                    ->run(game.state_data, action_payload, participant.player_number)
-                                    // Store to the database the action + new status + event_log
+                                    ->run(game.payload, action_payload, participant.player_number)
+                                    // Store to the database the action + new status + event
                                     .and_then(
                                         [&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
                                             return data::store_action(conn, game.id, participant.uuid, res.action_type,
@@ -180,7 +180,7 @@ namespace services {
                                                 })
                                                 .and_then([&conn, &game, &res]() {
                                                     return data::update_game_state(conn, game.id, res.new_game_state,
-                                                                                   res.new_game_state_data);
+                                                                                   res.new_game_payload);
                                                 });
                                         })
                                     // On failure: RETURN to the user that the action could not be understood.

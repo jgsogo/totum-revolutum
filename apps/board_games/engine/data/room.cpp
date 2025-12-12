@@ -56,8 +56,8 @@ namespace data {
             }
 
             // game_type_id is already the game_type.slug
-            auto [id, game_type, state, state_data] = r->as<std::int64_t, GameType, GameState, GamePayload>();
-            return {std::make_optional<Game>(id, room_uuid, game_type, state, std::move(state_data))};
+            auto [id, game_type, state, payload] = r->as<std::int64_t, GameType, GameState, GamePayload>();
+            return {std::make_optional<Game>(id, room_uuid, game_type, state, std::move(payload))};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get game for the given room: {}", e.what());
             return tl::unexpected(errors::SelectError{GAMES_TABLE, query, e.what()});

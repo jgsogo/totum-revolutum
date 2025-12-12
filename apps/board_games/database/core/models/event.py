@@ -16,7 +16,6 @@ class Event(models.Model):
     game = models.ForeignKey(
         Game,
         on_delete=models.CASCADE,
-        related_name="event_logs",
         help_text="Game in which this event occurred.",
     )
     timestamp = models.DateTimeField(

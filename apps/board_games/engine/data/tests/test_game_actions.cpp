@@ -7,7 +7,7 @@
 
 using namespace utils::libpqxx::testing;
 
-TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game: game_action / event_log") {
+TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test game: action / event") {
 
     SECTION("Store game action and associated event") {
         std::int64_t game_id = 1;

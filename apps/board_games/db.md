@@ -87,7 +87,7 @@ Each move is stored in protobuf format and can be replayed for auditing or visua
 
 ---
 
-### 6. `event_log`
+### 6. `event`
 Logs notable events, such as game state transitions or system actions.
 
 | Column        | Type        | Description                            |

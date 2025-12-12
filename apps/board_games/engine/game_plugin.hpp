@@ -77,9 +77,9 @@ namespace engine {
             auto action_type = this->get_action_type(action.value());
             return this->_run(game_state.value(), action.value(), player_number)
                 .and_then([&action_type, this](auto&& t) -> Expected<data::GameActionResponse> {
-                    const auto& [new_game_state_data, event] = t;
+                    const auto& [new_game_payload, event] = t;
                     auto event_type = this->get_event_type(event);
-                    auto new_game_state = this->get_game_state(new_game_state_data);
+                    auto new_game_state = this->get_game_state(new_game_payload);
 
                     auto event_payload = data::EventPayload::from_proto(event);
                     if (!event_payload) {
@@ -87,17 +87,17 @@ namespace engine {
                         return tl::unexpected(event_payload.error());
                     }
 
-                    auto new_game_state_data_payload = data::GamePayload::from_proto(new_game_state_data);
-                    if (!new_game_state_data_payload) {
-                        SPDLOG_ERROR("Error serializing {} into protobuf", new_game_state_data.GetTypeName());
-                        return tl::unexpected(new_game_state_data_payload.error());
+                    auto new_game_payload_expected = data::GamePayload::from_proto(new_game_payload);
+                    if (!new_game_payload_expected) {
+                        SPDLOG_ERROR("Error serializing {} into protobuf", new_game_payload.GetTypeName());
+                        return tl::unexpected(new_game_payload_expected.error());
                     }
 
                     data::EventPayload event_{std::move(event_payload).value()};
-                    data::GamePayload new_game_state_data_{std::move(new_game_state_data_payload).value()};
+                    data::GamePayload new_game_payload_{std::move(new_game_payload_expected).value()};
 
                     data::GameActionResponse game_action_response{std::string{action_type}, std::string{event_type},
-                                                                  std::move(event_), std::move(new_game_state_data_),
+                                                                  std::move(event_), std::move(new_game_payload_),
                                                                   new_game_state};
                     return {std::move(game_action_response)};
                 });

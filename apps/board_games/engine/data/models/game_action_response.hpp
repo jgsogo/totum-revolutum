@@ -9,14 +9,14 @@ namespace data {
 
     struct GameActionResponse {
         GameActionResponse(std::string_view action_type, std::string_view event_type, EventPayload&& event_payload,
-                           GamePayload&& new_game_state_data, GameState new_game_state)
+                           GamePayload&& new_game_payload, GameState new_game_state)
             : action_type{action_type}, event_type{event_type}, event_payload{std::move(event_payload)},
-              new_game_state_data{std::move(new_game_state_data)}, new_game_state{new_game_state} {}
+              new_game_payload{std::move(new_game_payload)}, new_game_state{new_game_state} {}
 
         std::string action_type;
         std::string event_type;
         EventPayload event_payload;
-        GamePayload new_game_state_data;
+        GamePayload new_game_payload;
         GameState new_game_state;
     };
 

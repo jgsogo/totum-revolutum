@@ -8,7 +8,7 @@
 
 namespace data {
 
-    Expected<void> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game, const GamePayload& game_payload) {
+    Expected<void> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game, const GamePayload& payload) {
         SPDLOG_DEBUG("Insert game into room '{}'", uuid);
         const std::string query =
             std::format("INSERT INTO {} (room_id, game_type_id, created_at, updated_at, state, payload) "
@@ -17,7 +17,7 @@ namespace data {
 
         try {
             pqxx::work tx(conn);
-            tx.exec(query, pqxx::params{uuid, game, game_payload}).no_rows();
+            tx.exec(query, pqxx::params{uuid, game, payload}).no_rows();
             tx.commit();
             return {};
         } catch (const std::exception& e) {
@@ -37,8 +37,8 @@ namespace data {
                     .transform([&conn, &room_uuid](Game& game) -> Expected<void> {
                         try {
                             pqxx::work tx(conn);
-                            //  - remove 'event_log'
-                            SPDLOG_TRACE("Remove event_log entries associated to the game in the room");
+                            //  - remove 'event'
+                            SPDLOG_TRACE("Remove event entries associated to the game in the room");
                             tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENTS_TABLE),
                                     pqxx::params{game.id})
                                 .no_rows();
@@ -123,7 +123,7 @@ namespace data {
             tx.commit();
             return {};
         } catch (const std::exception& e) {
-            SPDLOG_ERROR("Failed to insert event_log: {}", e.what());
+            SPDLOG_ERROR("Failed to insert event: {}", e.what());
             return tl::unexpected(errors::InsertError{EVENTS_TABLE, query, e.what()});
         }
     }

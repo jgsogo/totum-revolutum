@@ -16,7 +16,7 @@
   const on_game_update = async (payload: JSON) => {
     console.log(`[frontend] Get game update for room ${roomUUID}`);
     game_data = payload;
-    board = Board.create_from_array(game_data.state_data);
+    board = Board.create_from_array(game_data.payload);
     refBoard.updateBoard([...board.status()]);
 
     if (board.winner() !== undefined) {

@@ -134,10 +134,10 @@ namespace board_games::tic_tac_toe {
         }
 
         // Compute return event log[s]
-        board_game::tic_tac_toe::event event_log;
-        event_log.set_mark_placed_at_position(action.position());
-        event_log.set_player(player_number);
+        board_game::tic_tac_toe::event event;
+        event.set_mark_placed_at_position(action.position());
+        event.set_player(player_number);
 
-        return {std::make_pair(std::move(new_board), std::move(event_log))};
+        return {std::make_pair(std::move(new_board), std::move(event))};
     }
 } // namespace board_games::tic_tac_toe

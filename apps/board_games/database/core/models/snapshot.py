@@ -13,7 +13,6 @@ class Snapshot(models.Model):
     game = models.ForeignKey(
         Game,
         on_delete=models.CASCADE,
-        related_name="snapshots",
         help_text="Game for this snapshot.",
     )
 
