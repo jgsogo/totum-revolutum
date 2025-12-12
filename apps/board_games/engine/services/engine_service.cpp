@@ -47,7 +47,7 @@ namespace services {
                              }
                              const auto& game = it->second;
                              return game->new_board().and_then(
-                                 [&conn, &room, &game_type](data::GameStatePayload&& initial_board_status) {
+                                 [&conn, &room, &game_type](data::GamePayload&& initial_board_status) {
                                      return data::start_game(conn, room, game_type, initial_board_status);
                                  });
                          })
@@ -165,7 +165,7 @@ namespace services {
                             const auto& game_plugin = it->second;
                             std::vector<std::byte> payload(request->payload().size());
                             std::memcpy(payload.data(), request->payload().data(), request->payload().size());
-                            const auto& action_payload = data::GameActionPayload{std::move(payload)};
+                            const auto& action_payload = data::ActionPayload{std::move(payload)};
                             Expected<void> r =
                                 game_plugin
                                     ->run(game.state_data, action_payload, participant.player_number)

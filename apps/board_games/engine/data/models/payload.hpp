@@ -37,18 +37,18 @@ namespace data {
         };
     } // namespace _detail
 
-    using GameStatePayload = _detail::Payload<class GameStatePayloadTypeTag>;
-    using GameActionPayload = _detail::Payload<class GameActionPayloadTypeTag>;
-    using EventLogPayload = _detail::Payload<class EventLogPayloadTypeTag>;
+    using GamePayload = _detail::Payload<class GamePayloadTypeTag>;
+    using ActionPayload = _detail::Payload<class ActionPayloadTypeTag>;
+    using EventPayload = _detail::Payload<class EventPayloadTypeTag>;
 
 } // namespace data
 
 // // Custom datatype for libpqxx: https://libpqxx.readthedocs.io/stable/datatypes.html#autotoc_md10,
 // // most of the implementation taken from https://gist.github.com/tomlankhorst/5c41127a3f4fe3e6b1b4cb114ec7e3be
 namespace pqxx {
-    template <> inline std::string const type_name<data::GameStatePayload>{"GameStatePayload"};
-    template <> inline std::string const type_name<data::GameActionPayload>{"GameActionPayload"};
-    template <> inline std::string const type_name<data::EventLogPayload>{"EventLogPayload"};
+    template <> inline std::string const type_name<data::GamePayload>{"GamePayload"};
+    template <> inline std::string const type_name<data::ActionPayload>{"ActionPayload"};
+    template <> inline std::string const type_name<data::EventPayload>{"EventPayload"};
 
     template <typename T> struct nullness<data::_detail::Payload<T>> : no_null<data::_detail::Payload<T>> {};
 

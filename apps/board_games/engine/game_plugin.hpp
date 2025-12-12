@@ -23,9 +23,9 @@ namespace engine {
         std::string_view name() const { return _name; };
         std::string_view description() const { return _description; };
 
-        virtual Expected<data::GameStatePayload> new_board() = 0;
-        virtual Expected<data::GameActionResponse> run(const data::GameStatePayload& game_state_payload,
-                                                       const data::GameActionPayload& action_payload,
+        virtual Expected<data::GamePayload> new_board() = 0;
+        virtual Expected<data::GameActionResponse> run(const data::GamePayload& game_state_payload,
+                                                       const data::ActionPayload& action_payload,
                                                        uint8_t player_number) = 0;
 
       protected:
@@ -46,31 +46,31 @@ namespace engine {
         explicit GamePlugin(const data::GameType& slug, std::string&& name, std::string&& description)
             : GamePluginBase{slug, std::move(name), std::move(description)} {};
 
-        Expected<data::GameStatePayload> new_board() override {
-            return this->_new_board().and_then([](auto&& game_state) -> Expected<data::GameStatePayload> {
-                auto game_state_payload = data::GameStatePayload::from_proto(game_state);
+        Expected<data::GamePayload> new_board() override {
+            return this->_new_board().and_then([](auto&& game_state) -> Expected<data::GamePayload> {
+                auto game_state_payload = data::GamePayload::from_proto(game_state);
                 if (!game_state_payload) {
                     SPDLOG_ERROR("Error encoding '{}' protobuf", game_state.GetTypeName());
                     return tl::unexpected(game_state_payload.error());
                 }
-                return Expected<data::GameStatePayload>{std::move(game_state_payload.value())};
+                return Expected<data::GamePayload>{std::move(game_state_payload.value())};
             });
         }
 
-        Expected<data::GameActionResponse> run(const data::GameStatePayload& game_state_payload,
-                                               const data::GameActionPayload& action_payload,
+        Expected<data::GameActionResponse> run(const data::GamePayload& game_state_payload,
+                                               const data::ActionPayload& action_payload,
                                                uint8_t player_number) override {
             // Decode 'game_state'
             auto game_state = game_state_payload.into_proto<TGameStateProto>();
             if (!game_state) {
-                SPDLOG_ERROR("Error decoding GameStatePayload: {}", game_state.error());
+                SPDLOG_ERROR("Error decoding GamePayload: {}", game_state.error());
                 return tl::unexpected(game_state.error());
             }
 
             // Decode 'action_payload'
             auto action = action_payload.into_proto<TGameActionProto>();
             if (!action) {
-                SPDLOG_ERROR("Error decoding GameActionPayload: {}", action.error());
+                SPDLOG_ERROR("Error decoding ActionPayload: {}", action.error());
                 return tl::unexpected(action.error());
             }
 
@@ -81,20 +81,20 @@ namespace engine {
                     auto eventlog_type = this->get_eventlog_type(eventlog);
                     auto new_game_state = this->get_game_state(new_game_state_data);
 
-                    auto eventlog_payload = data::EventLogPayload::from_proto(eventlog);
+                    auto eventlog_payload = data::EventPayload::from_proto(eventlog);
                     if (!eventlog_payload) {
                         SPDLOG_ERROR("Error serializing {} into protobuf", eventlog.GetTypeName());
                         return tl::unexpected(eventlog_payload.error());
                     }
 
-                    auto new_game_state_data_payload = data::GameStatePayload::from_proto(new_game_state_data);
+                    auto new_game_state_data_payload = data::GamePayload::from_proto(new_game_state_data);
                     if (!new_game_state_data_payload) {
                         SPDLOG_ERROR("Error serializing {} into protobuf", new_game_state_data.GetTypeName());
                         return tl::unexpected(new_game_state_data_payload.error());
                     }
 
-                    data::EventLogPayload eventlog_{std::move(eventlog_payload).value()};
-                    data::GameStatePayload new_game_state_data_{std::move(new_game_state_data_payload).value()};
+                    data::EventPayload eventlog_{std::move(eventlog_payload).value()};
+                    data::GamePayload new_game_state_data_{std::move(new_game_state_data_payload).value()};
 
                     data::GameActionResponse game_action_response{std::string{action_type}, std::string{eventlog_type},
                                                                   std::move(eventlog_), std::move(new_game_state_data_),

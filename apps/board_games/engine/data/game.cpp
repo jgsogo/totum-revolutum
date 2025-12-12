@@ -8,8 +8,7 @@
 
 namespace data {
 
-    Expected<void> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game,
-                              const GameStatePayload& game_payload) {
+    Expected<void> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game, const GamePayload& game_payload) {
         SPDLOG_DEBUG("Insert game into room '{}'", uuid);
         const std::string query =
             std::format("INSERT INTO {} (room_id, game_type_id, created_at, updated_at, state, payload) "
@@ -91,7 +90,7 @@ namespace data {
     }
 
     Expected<std::int64_t> store_action(pqxx::connection& conn, std::int32_t game_id, ParticipantUUID participant,
-                                        std::string_view action_type, const GameActionPayload& payload, bool applied) {
+                                        std::string_view action_type, const ActionPayload& payload, bool applied) {
         SPDLOG_DEBUG("Insert game_action for game '{}'", game_id);
         const std::string query =
             std::format("INSERT INTO {} (game_id, participant_id, timestamp, action_type, payload, rejected) "
@@ -111,7 +110,7 @@ namespace data {
     }
 
     Expected<void> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
-                                  const EventLogPayload& payload, std::int64_t action_id) {
+                                  const EventPayload& payload, std::int64_t action_id) {
         SPDLOG_DEBUG("Insert eventlog for game '{}'", game_id);
         const std::string query =
             std::format("INSERT INTO {} (game_id, timestamp, event_type, payload, action_id, applied) "
@@ -130,7 +129,7 @@ namespace data {
     }
 
     Expected<void> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
-                                     const GameStatePayload& payload) {
+                                     const GamePayload& payload) {
         SPDLOG_DEBUG("Update game state for game '{}'", game_id);
         const std::string query = std::format("UPDATE {} SET state = $2, payload = $3 WHERE id = $1;", GAMES_TABLE);
 
