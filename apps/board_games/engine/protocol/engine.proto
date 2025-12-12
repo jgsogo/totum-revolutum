@@ -9,7 +9,7 @@ service EngineService {
   rpc StartGame (StartGameRequest) returns (google.protobuf.Empty);
   rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (Participant);
 
-  rpc SendGameAction(SendGameActionRequest) returns (google.protobuf.Empty);
+  rpc SendAction(SendActionRequest) returns (google.protobuf.Empty);
 }
 
 message NewRoomRequest {
@@ -36,7 +36,7 @@ message Participant {
   uint32 player_number = 4;
 }
 
-message SendGameActionRequest {
+message SendActionRequest {
   string room_uuid = 1;
   string participant_uuid = 2;
   bytes payload = 3;

@@ -114,10 +114,10 @@ namespace services {
         });
     }
 
-    grpc::Status EngineServiceImpl::SendGameAction(grpc::ServerContext* context,
-                                                   const board_game::SendGameActionRequest* request,
-                                                   google::protobuf::Empty* response) {
-        SPDLOG_DEBUG("SendGameAction(request.room_uuid={}, request.participant_uuid={})", request->room_uuid(),
+    grpc::Status EngineServiceImpl::SendAction(grpc::ServerContext* context,
+                                               const board_game::SendActionRequest* request,
+                                               google::protobuf::Empty* response) {
+        SPDLOG_DEBUG("SendAction(request.room_uuid={}, request.participant_uuid={})", request->room_uuid(),
                      request->participant_uuid());
         return pool.with_conn<grpc::Status>([request, this](pqxx::connection& conn) {
             data::RoomUUID room{std::string{request->room_uuid()}};

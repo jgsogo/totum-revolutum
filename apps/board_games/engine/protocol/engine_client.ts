@@ -7,8 +7,8 @@ import {
   GetOrCreateParticipantRequest as GetOrCreateParticipantRequestProto,
   GetOrCreateParticipantRequestSchema,
   Participant as ParticipantProto,
-  SendGameActionRequest as SendGameActionRequestProto,
-  SendGameActionRequestSchema,
+  SendActionRequest as SendActionRequestProto,
+  SendActionRequestSchema,
 } from './engine_pb.js';
 import { Empty } from "@bufbuild/protobuf/wkt";
 import grpc from '@grpc/grpc-js';
@@ -38,8 +38,8 @@ export async function getOrCreateParticipant(room_uuid: string, participant_uuid
   return await client.getOrCreateParticipant(request);
 }
 
-export async function sendGameAction(room_uuid: string, participant_uuid: string, payload: Uint8Array): Promise<Empty> {
-  console.log(`[backend] sendGameAction(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, payload)`);
-  const request: SendGameActionRequestProto = create(SendGameActionRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, payload });
-  return await client.sendGameAction(request);
+export async function sendAction(room_uuid: string, participant_uuid: string, payload: Uint8Array): Promise<Empty> {
+  console.log(`[backend] sendAction(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, payload)`);
+  const request: SendActionRequestProto = create(SendActionRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, payload });
+  return await client.sendAction(request);
 }

@@ -20,8 +20,8 @@ namespace services {
                                             const board_game::GetOrCreateParticipantRequest* request,
                                             board_game::Participant* response) override;
 
-        grpc::Status SendGameAction(grpc::ServerContext* context, const board_game::SendGameActionRequest* request,
-                                    google::protobuf::Empty* response) override;
+        grpc::Status SendAction(grpc::ServerContext* context, const board_game::SendActionRequest* request,
+                                google::protobuf::Empty* response) override;
 
       private:
         utils::libpqxx::ConnectionPool& pool;

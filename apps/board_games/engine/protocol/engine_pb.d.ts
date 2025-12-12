@@ -116,9 +116,9 @@ export declare type Participant = Message<"board_game.Participant"> & {
 export declare const ParticipantSchema: GenMessage<Participant>;
 
 /**
- * @generated from message board_game.SendGameActionRequest
+ * @generated from message board_game.SendActionRequest
  */
-export declare type SendGameActionRequest = Message<"board_game.SendGameActionRequest"> & {
+export declare type SendActionRequest = Message<"board_game.SendActionRequest"> & {
   /**
    * @generated from field: string room_uuid = 1;
    */
@@ -136,10 +136,10 @@ export declare type SendGameActionRequest = Message<"board_game.SendGameActionRe
 };
 
 /**
- * Describes the message board_game.SendGameActionRequest.
- * Use `create(SendGameActionRequestSchema)` to create a new message.
+ * Describes the message board_game.SendActionRequest.
+ * Use `create(SendActionRequestSchema)` to create a new message.
  */
-export declare const SendGameActionRequestSchema: GenMessage<SendGameActionRequest>;
+export declare const SendActionRequestSchema: GenMessage<SendActionRequest>;
 
 /**
  * @generated from service board_game.EngineService
@@ -170,11 +170,11 @@ export declare const EngineService: GenService<{
     output: typeof ParticipantSchema;
   },
   /**
-   * @generated from rpc board_game.EngineService.SendGameAction
+   * @generated from rpc board_game.EngineService.SendAction
    */
-  sendGameAction: {
+  sendAction: {
     methodKind: "unary";
-    input: typeof SendGameActionRequestSchema;
+    input: typeof SendActionRequestSchema;
     output: typeof EmptySchema;
   },
 }>;
