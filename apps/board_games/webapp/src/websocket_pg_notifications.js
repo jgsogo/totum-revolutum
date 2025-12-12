@@ -6,7 +6,7 @@ const ROOM_UPDATE_CHANNEL = 'room_update';
 
 const ROOMS_TABLE = "board_games_core_room";
 const GAMES_TABLE = "board_games_core_game";
-const PARTICIPANT_TABLE = "board_games_core_participant";
+const PARTICIPANTS_TABLE = "board_games_core_participant";
 
 export async function listen_pg_notifications(connectionString) {
     const client = new Client({
@@ -59,7 +59,7 @@ export async function get_room_data(client, room_uuid) {
 }
 
 export async function get_participants(client, room_uuid) {
-    const participants = await client.query(`SELECT * FROM ${PARTICIPANT_TABLE} WHERE room_id = $1`, [room_uuid]);
+    const participants = await client.query(`SELECT * FROM ${PARTICIPANTS_TABLE} WHERE room_id = $1`, [room_uuid]);
     // console.log(`[backend] participants: ${JSON.stringify(participants.rows)}`);
     return participants.rows;
 }

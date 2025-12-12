@@ -40,20 +40,20 @@ namespace data {
                             pqxx::work tx(conn);
                             //  - remove 'event_log'
                             SPDLOG_TRACE("Remove event_log entries associated to the game in the room");
-                            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENT_LOG_TABLE),
+                            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", EVENTS_TABLE),
                                     pqxx::params{game.id})
                                 .no_rows();
 
                             //  - remove 'game_action'
                             SPDLOG_TRACE("Remove game_action entries associated to the game in the room");
-                            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", GAME_ACTION_TABLE),
+                            tx.exec(std::format("DELETE FROM {} WHERE game_id = $1;", ACTIONS_TABLE),
                                     pqxx::params{game.id})
                                 .no_rows();
 
                             //  - remove 'game' from 'participants
                             SPDLOG_TRACE("Clear the 'game_id' entry from the participants playing the game we are "
                                          "about to remove");
-                            tx.exec(std::format("UPDATE {} SET game_id = NULL WHERE game_id = $1;", PARTICIPANT_TABLE),
+                            tx.exec(std::format("UPDATE {} SET game_id = NULL WHERE game_id = $1;", PARTICIPANTS_TABLE),
                                     pqxx::params{game.id})
                                 .no_rows();
 
@@ -76,7 +76,7 @@ namespace data {
     Expected<std::uint8_t> count_players(pqxx::connection& conn, std::int32_t game_id) {
         SPDLOG_DEBUG("Count players for game '{}'", game_id);
         const std::string query =
-            std::format("SELECT count(*)::int AS count FROM {} WHERE game_id = $1;", PARTICIPANT_TABLE);
+            std::format("SELECT count(*)::int AS count FROM {} WHERE game_id = $1;", PARTICIPANTS_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -86,7 +86,7 @@ namespace data {
             return {num_players};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to count players for game: {}", e.what());
-            return tl::unexpected(errors::SelectError{PARTICIPANT_TABLE, query, e.what()});
+            return tl::unexpected(errors::SelectError{PARTICIPANTS_TABLE, query, e.what()});
         }
     }
 
@@ -96,7 +96,7 @@ namespace data {
         const std::string query =
             std::format("INSERT INTO {} (game_id, participant_id, timestamp, action_type, payload, rejected) "
                         "VALUES ($1, $2, NOW(), $3, $4, $5) RETURNING id;",
-                        GAME_ACTION_TABLE);
+                        ACTIONS_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -106,7 +106,7 @@ namespace data {
             return {game_action_id};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to insert game_action: {}", e.what());
-            return tl::unexpected(errors::InsertError{GAME_ACTION_TABLE, query, e.what()});
+            return tl::unexpected(errors::InsertError{ACTIONS_TABLE, query, e.what()});
         }
     }
 
@@ -116,7 +116,7 @@ namespace data {
         const std::string query =
             std::format("INSERT INTO {} (game_id, timestamp, event_type, payload, action_id, applied) "
                         "VALUES ($1, NOW(), $2, $3, $4, true);",
-                        EVENT_LOG_TABLE);
+                        EVENTS_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -125,7 +125,7 @@ namespace data {
             return {};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to insert event_log: {}", e.what());
-            return tl::unexpected(errors::InsertError{EVENT_LOG_TABLE, query, e.what()});
+            return tl::unexpected(errors::InsertError{EVENTS_TABLE, query, e.what()});
         }
     }
 

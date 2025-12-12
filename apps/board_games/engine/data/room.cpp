@@ -68,7 +68,7 @@ namespace data {
                                                           ParticipantUUID participant_uuid) {
         SPDLOG_DEBUG("Return participant '{}' in room '{}'", participant_uuid, room);
         const std::string query = std::format(
-            "SELECT role, player_number FROM {} WHERE id = $1 AND room_id = $2 LIMIT 1;", PARTICIPANT_TABLE);
+            "SELECT role, player_number FROM {} WHERE id = $1 AND room_id = $2 LIMIT 1;", PARTICIPANTS_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -84,7 +84,7 @@ namespace data {
             return {{participant}};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to get participant: {}", e.what());
-            return tl::unexpected(errors::SelectError{PARTICIPANT_TABLE, query, e.what()});
+            return tl::unexpected(errors::SelectError{PARTICIPANTS_TABLE, query, e.what()});
         }
     }
 
@@ -134,7 +134,7 @@ namespace data {
         const std::string query =
             std::format("INSERT INTO {} (id, room_id, role, joined_at, game_id, player_number) VALUES ($1, $2, $3, "
                         "NOW(), $4, $5);",
-                        PARTICIPANT_TABLE);
+                        PARTICIPANTS_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -143,7 +143,7 @@ namespace data {
             return {Participant{room, participant, role, static_cast<uint32_t>(player_number.value())}};
         } catch (const std::exception& e) {
             SPDLOG_ERROR("Failed to insert participant: {}", e.what());
-            return tl::unexpected(errors::InsertError{PARTICIPANT_TABLE, query, e.what()});
+            return tl::unexpected(errors::InsertError{PARTICIPANTS_TABLE, query, e.what()});
         }
     }
 

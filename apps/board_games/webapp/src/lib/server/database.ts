@@ -29,7 +29,7 @@ export async function get_game_types(): Promise<{ name: string, slug: string, de
 // }
 
 // export async function get_participants(room_uuid: string) {
-//     const participants = await client.query(`SELECT * FROM ${PARTICIPANT_TABLE} WHERE room_id = $1`, [room_uuid]);
+//     const participants = await client.query(`SELECT * FROM ${PARTICIPANTS_TABLE} WHERE room_id = $1`, [room_uuid]);
 //     console.log(`[backend] participants: ${JSON.stringify(participants.rows)}`);
 //     return participants.rows;
 // }
