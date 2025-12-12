@@ -10,7 +10,6 @@ service EngineService {
   rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (Participant);
 
   rpc SendGameAction(SendGameActionRequest) returns (google.protobuf.Empty);
-  rpc SubmitCommand (CommandRequest) returns (CommandResponse); // TODO: Remove this
 }
 
 message NewRoomRequest {
