@@ -6,21 +6,21 @@
 
 namespace services {
 
-    class EngineServiceImpl final : public board_game::EngineService::Service {
+    class EngineServiceImpl final : public board_games::EngineService::Service {
       public:
         EngineServiceImpl(utils::libpqxx::ConnectionPool& pool, const engine::GamePluginsMap& games);
 
-        grpc::Status CreateNewRoom(grpc::ServerContext* context, const board_game::NewRoomRequest* request,
+        grpc::Status CreateNewRoom(grpc::ServerContext* context, const board_games::NewRoomRequest* request,
                                    google::protobuf::Empty* response) override;
 
-        grpc::Status StartGame(grpc::ServerContext* context, const board_game::StartGameRequest* request,
+        grpc::Status StartGame(grpc::ServerContext* context, const board_games::StartGameRequest* request,
                                google::protobuf::Empty* response) override;
 
         grpc::Status GetOrCreateParticipant(grpc::ServerContext* context,
-                                            const board_game::GetOrCreateParticipantRequest* request,
-                                            board_game::Participant* response) override;
+                                            const board_games::GetOrCreateParticipantRequest* request,
+                                            board_games::Participant* response) override;
 
-        grpc::Status SendAction(grpc::ServerContext* context, const board_game::SendActionRequest* request,
+        grpc::Status SendAction(grpc::ServerContext* context, const board_games::SendActionRequest* request,
                                 google::protobuf::Empty* response) override;
 
       private:

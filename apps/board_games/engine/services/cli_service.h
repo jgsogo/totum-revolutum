@@ -5,12 +5,12 @@
 
 namespace services {
 
-    class CliServiceImpl final : public board_game::Cli::Service {
+    class CliServiceImpl final : public board_games::Cli::Service {
       public:
         CliServiceImpl(utils::libpqxx::ConnectionPool& pool);
 
         grpc::Status ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
-                                      board_game::RoomList* response) override;
+                                      board_games::RoomList* response) override;
 
       private:
         utils::libpqxx::ConnectionPool& pool;

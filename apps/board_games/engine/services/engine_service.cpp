@@ -11,7 +11,7 @@ namespace services {
         : pool{pool}, _games(games) {}
 
     grpc::Status EngineServiceImpl::CreateNewRoom(grpc::ServerContext* context,
-                                                  const board_game::NewRoomRequest* request,
+                                                  const board_games::NewRoomRequest* request,
                                                   google::protobuf::Empty* response) {
         SPDLOG_DEBUG("CreateNewRoom");
         return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) -> grpc::Status {
@@ -29,7 +29,8 @@ namespace services {
         });
     }
 
-    grpc::Status EngineServiceImpl::StartGame(grpc::ServerContext* context, const board_game::StartGameRequest* request,
+    grpc::Status EngineServiceImpl::StartGame(grpc::ServerContext* context,
+                                              const board_games::StartGameRequest* request,
                                               google::protobuf::Empty* response) {
         SPDLOG_DEBUG("StartGame");
         return pool.with_conn<grpc::Status>([request, this](pqxx::connection& conn) {
@@ -64,8 +65,8 @@ namespace services {
     }
 
     grpc::Status EngineServiceImpl::GetOrCreateParticipant(grpc::ServerContext* context,
-                                                           const board_game::GetOrCreateParticipantRequest* request,
-                                                           board_game::Participant* response) {
+                                                           const board_games::GetOrCreateParticipantRequest* request,
+                                                           board_games::Participant* response) {
         SPDLOG_DEBUG("GetOrCreateParticipant");
         return pool.with_conn<grpc::Status>([request, response](pqxx::connection& conn) {
             data::RoomUUID room{std::string{request->room_uuid()}};
@@ -115,7 +116,7 @@ namespace services {
     }
 
     grpc::Status EngineServiceImpl::SendAction(grpc::ServerContext* context,
-                                               const board_game::SendActionRequest* request,
+                                               const board_games::SendActionRequest* request,
                                                google::protobuf::Empty* response) {
         SPDLOG_DEBUG("SendAction(request.room_uuid={}, request.participant_uuid={})", request->room_uuid(),
                      request->participant_uuid());

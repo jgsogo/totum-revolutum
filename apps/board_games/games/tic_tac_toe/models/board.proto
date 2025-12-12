@@ -1,5 +1,5 @@
 syntax = "proto3";
-package board_game.tic_tac_toe;
+package board_games.tic_tac_toe;
 
 
 message Board {

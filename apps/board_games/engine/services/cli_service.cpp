@@ -9,7 +9,7 @@ namespace services {
     CliServiceImpl::CliServiceImpl(utils::libpqxx::ConnectionPool& pool) : pool{pool} {}
 
     grpc::Status CliServiceImpl::ListPlayingRooms(grpc::ServerContext* context, const google::protobuf::Empty* request,
-                                                  board_game::RoomList* response) {
+                                                  board_games::RoomList* response) {
         SPDLOG_DEBUG("ListPlayingRooms");
         return pool.with_conn<grpc::Status>([response](pqxx::connection& conn) {
             auto r = data::get_playing_rooms(conn)

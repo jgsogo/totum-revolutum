@@ -1,5 +1,5 @@
 syntax = "proto3";
-package board_game;
+package board_games;
 
 import "google/protobuf/empty.proto";
 

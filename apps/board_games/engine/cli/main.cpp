@@ -11,12 +11,12 @@ int main(int argc, char** argv) {
     std::cout << "Server Address: " << server_address << std::endl;
 
     std::shared_ptr<grpc::Channel> channel = grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials());
-    std::unique_ptr<board_game::Cli::Stub> stub_{board_game::Cli::NewStub(channel)};
+    std::unique_ptr<board_games::Cli::Stub> stub_{board_games::Cli::NewStub(channel)};
 
     std::cout << "Server started." << std::endl;
 
     grpc::ClientContext context;
-    board_game::RoomList room_list;
+    board_games::RoomList room_list;
     grpc::Status r = stub_->ListPlayingRooms(&context, google::protobuf::Empty{}, &room_list);
 
     if (!r.ok()) {
