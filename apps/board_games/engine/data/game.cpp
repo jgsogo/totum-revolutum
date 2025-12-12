@@ -9,16 +9,16 @@
 namespace data {
 
     Expected<void> start_game(pqxx::connection& conn, RoomUUID uuid, GameType game,
-                              const GameStatePayload& game_state_data) {
+                              const GameStatePayload& game_payload) {
         SPDLOG_DEBUG("Insert game into room '{}'", uuid);
         const std::string query =
-            std::format("INSERT INTO {} (room_id, game_type_id, created_at, updated_at, state, state_data) "
+            std::format("INSERT INTO {} (room_id, game_type_id, created_at, updated_at, state, payload) "
                         "VALUES ($1, $2, NOW(), NOW(), 'waiting', $3);",
                         GAMES_TABLE);
 
         try {
             pqxx::work tx(conn);
-            tx.exec(query, pqxx::params{uuid, game, game_state_data}).no_rows();
+            tx.exec(query, pqxx::params{uuid, game, game_payload}).no_rows();
             tx.commit();
             return {};
         } catch (const std::exception& e) {
@@ -94,13 +94,13 @@ namespace data {
                                         std::string_view action_type, const GameActionPayload& payload, bool applied) {
         SPDLOG_DEBUG("Insert game_action for game '{}'", game_id);
         const std::string query =
-            std::format("INSERT INTO {} (game_id, participant_id, timestamp, action_type, payload, applied) "
+            std::format("INSERT INTO {} (game_id, participant_id, timestamp, action_type, payload, rejected) "
                         "VALUES ($1, $2, NOW(), $3, $4, $5) RETURNING id;",
                         GAME_ACTION_TABLE);
 
         try {
             pqxx::work tx(conn);
-            auto r = tx.exec(query, pqxx::params{game_id, participant, action_type, payload, applied}).one_field();
+            auto r = tx.exec(query, pqxx::params{game_id, participant, action_type, payload, !applied}).one_field();
             auto game_action_id = r.as<std::int64_t>();
             tx.commit();
             return {game_action_id};
@@ -113,9 +113,10 @@ namespace data {
     Expected<void> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
                                   const EventLogPayload& payload, std::int64_t action_id) {
         SPDLOG_DEBUG("Insert eventlog for game '{}'", game_id);
-        const std::string query = std::format("INSERT INTO {} (game_id, timestamp, event_type, payload, action_id) "
-                                              "VALUES ($1, NOW(), $2, $3, $4);",
-                                              EVENT_LOG_TABLE);
+        const std::string query =
+            std::format("INSERT INTO {} (game_id, timestamp, event_type, payload, action_id, applied) "
+                        "VALUES ($1, NOW(), $2, $3, $4, true);",
+                        EVENT_LOG_TABLE);
 
         try {
             pqxx::work tx(conn);
@@ -129,13 +130,13 @@ namespace data {
     }
 
     Expected<void> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
-                                     const GameStatePayload& state_data) {
+                                     const GameStatePayload& payload) {
         SPDLOG_DEBUG("Update game state for game '{}'", game_id);
-        const std::string query = std::format("UPDATE {} SET state = $2, state_data = $3 WHERE id = $1;", GAMES_TABLE);
+        const std::string query = std::format("UPDATE {} SET state = $2, payload = $3 WHERE id = $1;", GAMES_TABLE);
 
         try {
             pqxx::work tx(conn);
-            tx.exec(query, pqxx::params{game_id, state, state_data});
+            tx.exec(query, pqxx::params{game_id, state, payload});
             tx.commit();
             return {};
         } catch (const std::exception& e) {

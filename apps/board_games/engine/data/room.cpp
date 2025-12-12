@@ -46,7 +46,7 @@ namespace data {
     Expected<std::optional<Game>> find_game(pqxx::connection& conn, RoomUUID room_uuid) {
         SPDLOG_DEBUG("Return the game being played in room '{}'", room_uuid);
         const std::string query =
-            std::format("SELECT id, game_type_id, state, state_data FROM {} WHERE room_id = $1 LIMIT 1;", GAMES_TABLE);
+            std::format("SELECT id, game_type_id, state, payload FROM {} WHERE room_id = $1 LIMIT 1;", GAMES_TABLE);
 
         try {
             pqxx::work tx(conn);

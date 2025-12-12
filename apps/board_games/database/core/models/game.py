@@ -12,7 +12,7 @@ class Game(models.Model):
     **Notes:**
     - Each game is associated with a `room` and a `game_type`.
     - Games transition through states as players take actions.
-    - Game state is serialized in `state_data`.
+    - Game state is serialized in `payload`.
     """
 
     class State(models.TextChoices):
