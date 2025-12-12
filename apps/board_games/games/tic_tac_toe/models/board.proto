@@ -26,7 +26,7 @@ message Action {
     uint32 position =1;
 }
 
-message EventLog {
+message event {
     uint32 mark_placed_at_position = 1;
     uint32 player = 2;
 }

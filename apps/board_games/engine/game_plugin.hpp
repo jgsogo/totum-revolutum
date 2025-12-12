@@ -40,7 +40,7 @@ namespace engine {
 
     using GamePluginsMap = std::unordered_map<data::GameType, std::unique_ptr<GamePluginBase>, GameTypeHasher>;
 
-    template <typename TGameStateProto, typename TGameActionProto, typename TEventLogProto>
+    template <typename TGameStateProto, typename TGameActionProto, typename TeventProto>
     class GamePlugin : public GamePluginBase {
       public:
         explicit GamePlugin(const data::GameType& slug, std::string&& name, std::string&& description)
@@ -77,14 +77,14 @@ namespace engine {
             auto action_type = this->get_action_type(action.value());
             return this->_run(game_state.value(), action.value(), player_number)
                 .and_then([&action_type, this](auto&& t) -> Expected<data::GameActionResponse> {
-                    const auto& [new_game_state_data, eventlog] = t;
-                    auto eventlog_type = this->get_eventlog_type(eventlog);
+                    const auto& [new_game_state_data, event] = t;
+                    auto event_type = this->get_event_type(event);
                     auto new_game_state = this->get_game_state(new_game_state_data);
 
-                    auto eventlog_payload = data::EventPayload::from_proto(eventlog);
-                    if (!eventlog_payload) {
-                        SPDLOG_ERROR("Error serializing {} into protobuf", eventlog.GetTypeName());
-                        return tl::unexpected(eventlog_payload.error());
+                    auto event_payload = data::EventPayload::from_proto(event);
+                    if (!event_payload) {
+                        SPDLOG_ERROR("Error serializing {} into protobuf", event.GetTypeName());
+                        return tl::unexpected(event_payload.error());
                     }
 
                     auto new_game_state_data_payload = data::GamePayload::from_proto(new_game_state_data);
@@ -93,11 +93,11 @@ namespace engine {
                         return tl::unexpected(new_game_state_data_payload.error());
                     }
 
-                    data::EventPayload eventlog_{std::move(eventlog_payload).value()};
+                    data::EventPayload event_{std::move(event_payload).value()};
                     data::GamePayload new_game_state_data_{std::move(new_game_state_data_payload).value()};
 
-                    data::GameActionResponse game_action_response{std::string{action_type}, std::string{eventlog_type},
-                                                                  std::move(eventlog_), std::move(new_game_state_data_),
+                    data::GameActionResponse game_action_response{std::string{action_type}, std::string{event_type},
+                                                                  std::move(event_), std::move(new_game_state_data_),
                                                                   new_game_state};
                     return {std::move(game_action_response)};
                 });
@@ -105,10 +105,10 @@ namespace engine {
 
       protected:
         virtual std::string_view get_action_type(const TGameActionProto& action) const = 0;
-        virtual std::string_view get_eventlog_type(const TEventLogProto& eventlog) const = 0;
+        virtual std::string_view get_event_type(const TeventProto& event) const = 0;
         virtual data::GameState get_game_state(const TGameStateProto& game_state) const = 0;
         virtual Expected<TGameStateProto> _new_board() = 0;
-        virtual Expected<std::pair<TGameStateProto, TEventLogProto>>
+        virtual Expected<std::pair<TGameStateProto, TeventProto>>
         _run(const TGameStateProto& game_state, const TGameActionProto& action, uint8_t player_number) = 0;
     };
 

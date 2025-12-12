@@ -95,9 +95,9 @@ export declare type Action = Message<"board_game.tic_tac_toe.Action"> & {
 export declare const ActionSchema: GenMessage<Action>;
 
 /**
- * @generated from message board_game.tic_tac_toe.EventLog
+ * @generated from message board_game.tic_tac_toe.event
  */
-export declare type EventLog = Message<"board_game.tic_tac_toe.EventLog"> & {
+export declare type event = Message<"board_game.tic_tac_toe.event"> & {
   /**
    * @generated from field: uint32 mark_placed_at_position = 1;
    */
@@ -110,8 +110,8 @@ export declare type EventLog = Message<"board_game.tic_tac_toe.EventLog"> & {
 };
 
 /**
- * Describes the message board_game.tic_tac_toe.EventLog.
- * Use `create(EventLogSchema)` to create a new message.
+ * Describes the message board_game.tic_tac_toe.event.
+ * Use `create(eventSchema)` to create a new message.
  */
-export declare const EventLogSchema: GenMessage<EventLog>;
+export declare const eventSchema: GenMessage<event>;
 

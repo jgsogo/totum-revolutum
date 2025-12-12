@@ -175,8 +175,8 @@ namespace services {
                                             return data::store_action(conn, game.id, participant.uuid, res.action_type,
                                                                       action_payload, true)
                                                 .and_then([&conn, &game, &res](const std::int64_t& action_id) {
-                                                    return data::store_eventlog(conn, game.id, res.eventlog_type,
-                                                                                res.eventlog_payload, action_id);
+                                                    return data::store_event(conn, game.id, res.event_type,
+                                                                             res.event_payload, action_id);
                                                 })
                                                 .and_then([&conn, &game, &res]() {
                                                     return data::update_game_state(conn, game.id, res.new_game_state,

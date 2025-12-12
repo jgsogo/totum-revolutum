@@ -24,8 +24,8 @@ namespace data {
     Expected<std::int64_t> store_action(pqxx::connection& conn, std::int32_t game_id, ParticipantUUID participant,
                                         std::string_view action_type, const ActionPayload& payload, bool applied);
 
-    Expected<void> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
-                                  const EventPayload& payload, std::int64_t action_id);
+    Expected<void> store_event(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
+                               const EventPayload& payload, std::int64_t action_id);
 
     Expected<void> update_game_state(pqxx::connection& conn, std::int32_t game_id, GameState state,
                                      const GamePayload& state_data);

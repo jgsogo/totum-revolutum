@@ -109,9 +109,9 @@ namespace data {
         }
     }
 
-    Expected<void> store_eventlog(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
-                                  const EventPayload& payload, std::int64_t action_id) {
-        SPDLOG_DEBUG("Insert eventlog for game '{}'", game_id);
+    Expected<void> store_event(pqxx::connection& conn, std::int32_t game_id, std::string_view event_type,
+                               const EventPayload& payload, std::int64_t action_id) {
+        SPDLOG_DEBUG("Insert event for game '{}'", game_id);
         const std::string query =
             std::format("INSERT INTO {} (game_id, timestamp, event_type, payload, action_id, applied) "
                         "VALUES ($1, NOW(), $2, $3, $4, true);",

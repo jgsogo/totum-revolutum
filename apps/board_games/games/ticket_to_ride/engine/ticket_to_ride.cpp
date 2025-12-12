@@ -23,7 +23,7 @@ namespace board_games::ticket_to_ride {
         return ACTION_PLACE_MARK;
     }
 
-    std::string_view TicketToRidePlugin::get_eventlog_type(const EventLog& eventlog) const {
+    std::string_view TicketToRidePlugin::get_event_type(const event& event) const {
         SPDLOG_ERROR("[ticket_to_ride] Not implemented");
         return EVENT_MARK_PLACED;
     }
@@ -49,8 +49,8 @@ namespace board_games::ticket_to_ride {
         return game;
     }
 
-    Expected<std::pair<GameState, EventLog>> TicketToRidePlugin::_run(const GameState& game_state, const Action& action,
-                                                                      uint8_t player_number) {
+    Expected<std::pair<GameState, event>> TicketToRidePlugin::_run(const GameState& game_state, const Action& action,
+                                                                   uint8_t player_number) {
         SPDLOG_ERROR("[ticket_to_ride] Not implemented");
         return tl::unexpected(utils::NotImplemented{"WIP"});
     }
