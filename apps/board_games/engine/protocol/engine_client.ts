@@ -1,7 +1,4 @@
 import {
-  CommandRequest as CommandRequestProto,
-  CommandRequestSchema,
-  CommandResponse as CommandResponseProto,
   EngineService,
   NewRoomRequest as NewRoomRequestProto,
   NewRoomRequestSchema,
@@ -22,12 +19,6 @@ const address = 'localhost:50051';
 const credentials = grpc.credentials.createInsecure();
 const client = createConnectRpcClient(EngineService, address, credentials)
 
-
-export async function sendCommandToEngine(game_id: string, player_id: string, payload: Uint8Array): Promise<CommandResponseProto> {
-  console.log(`[backend] Submit request using gRPC client`);
-  const request: CommandRequestProto = create(CommandRequestSchema, { gameId: game_id, playerId: player_id, payload });
-  return await client.submitCommand(request);
-}
 
 export async function createNewRoom(uuid: string, name: string): Promise<Empty> {
   console.log(`[backend] createNewRoom(uuid=${uuid}, name=${name})`);

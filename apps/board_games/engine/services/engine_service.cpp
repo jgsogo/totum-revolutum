@@ -10,14 +10,6 @@ namespace services {
     EngineServiceImpl::EngineServiceImpl(utils::libpqxx::ConnectionPool& pool, const engine::GamePluginsMap& games)
         : pool{pool}, _games(games) {}
 
-    grpc::Status EngineServiceImpl::SubmitCommand(grpc::ServerContext* context,
-                                                  const board_game::CommandRequest* request,
-                                                  board_game::CommandResponse* response) {
-        SPDLOG_DEBUG("SubmitCommand");
-        pool.with_conn<void>([response](pqxx::connection& conn) { response->set_success(true); });
-        return grpc::Status::OK;
-    }
-
     grpc::Status EngineServiceImpl::CreateNewRoom(grpc::ServerContext* context,
                                                   const board_game::NewRoomRequest* request,
                                                   google::protobuf::Empty* response) {

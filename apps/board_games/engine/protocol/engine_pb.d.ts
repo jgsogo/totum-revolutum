@@ -142,55 +142,6 @@ export declare type SendGameActionRequest = Message<"board_game.SendGameActionRe
 export declare const SendGameActionRequestSchema: GenMessage<SendGameActionRequest>;
 
 /**
- * @generated from message board_game.CommandRequest
- */
-export declare type CommandRequest = Message<"board_game.CommandRequest"> & {
-  /**
-   * @generated from field: string game_id = 1;
-   */
-  gameId: string;
-
-  /**
-   * @generated from field: string player_id = 2;
-   */
-  playerId: string;
-
-  /**
-   * Serialized game-specific command
-   *
-   * @generated from field: bytes payload = 3;
-   */
-  payload: Uint8Array;
-};
-
-/**
- * Describes the message board_game.CommandRequest.
- * Use `create(CommandRequestSchema)` to create a new message.
- */
-export declare const CommandRequestSchema: GenMessage<CommandRequest>;
-
-/**
- * @generated from message board_game.CommandResponse
- */
-export declare type CommandResponse = Message<"board_game.CommandResponse"> & {
-  /**
-   * @generated from field: bool success = 1;
-   */
-  success: boolean;
-
-  /**
-   * @generated from field: string message = 2;
-   */
-  message: string;
-};
-
-/**
- * Describes the message board_game.CommandResponse.
- * Use `create(CommandResponseSchema)` to create a new message.
- */
-export declare const CommandResponseSchema: GenMessage<CommandResponse>;
-
-/**
  * @generated from service board_game.EngineService
  */
 export declare const EngineService: GenService<{
@@ -225,16 +176,6 @@ export declare const EngineService: GenService<{
     methodKind: "unary";
     input: typeof SendGameActionRequestSchema;
     output: typeof EmptySchema;
-  },
-  /**
-   * TODO: Remove this
-   *
-   * @generated from rpc board_game.EngineService.SubmitCommand
-   */
-  submitCommand: {
-    methodKind: "unary";
-    input: typeof CommandRequestSchema;
-    output: typeof CommandResponseSchema;
   },
 }>;
 

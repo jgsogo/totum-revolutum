@@ -10,7 +10,6 @@ service EngineService {
   rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (Participant);
 
   rpc SendGameAction(SendGameActionRequest) returns (google.protobuf.Empty);
-  rpc SubmitCommand (CommandRequest) returns (CommandResponse); // TODO: Remove this
 }
 
 message NewRoomRequest {
@@ -41,15 +40,4 @@ message SendGameActionRequest {
   string room_uuid = 1;
   string participant_uuid = 2;
   bytes payload = 3;
-}
-
-message CommandRequest {
-  string game_id = 1;
-  string player_id = 2;
-  bytes payload = 3; // Serialized game-specific command
-}
-
-message CommandResponse {
-  bool success = 1;
-  string message = 2;
 }
