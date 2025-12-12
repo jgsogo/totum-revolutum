@@ -38,6 +38,11 @@ export declare type MapData = Message<"board_games.ticket_to_ride.MapData"> & {
    * @generated from field: int32 size_y = 5;
    */
   sizeY: number;
+
+  /**
+   * @generated from field: board_games.ticket_to_ride.Background background = 6;
+   */
+  background?: Background;
 };
 
 /**
@@ -45,6 +50,42 @@ export declare type MapData = Message<"board_games.ticket_to_ride.MapData"> & {
  * Use `create(MapDataSchema)` to create a new message.
  */
 export declare const MapDataSchema: GenMessage<MapData>;
+
+/**
+ * @generated from message board_games.ticket_to_ride.Background
+ */
+export declare type Background = Message<"board_games.ticket_to_ride.Background"> & {
+  /**
+   * @generated from field: string filename = 1;
+   */
+  filename: string;
+
+  /**
+   * @generated from field: float rotate = 2;
+   */
+  rotate: number;
+
+  /**
+   * @generated from field: float scale = 3;
+   */
+  scale: number;
+
+  /**
+   * @generated from field: int32 translate_x = 4;
+   */
+  translateX: number;
+
+  /**
+   * @generated from field: int32 translate_y = 5;
+   */
+  translateY: number;
+};
+
+/**
+ * Describes the message board_games.ticket_to_ride.Background.
+ * Use `create(BackgroundSchema)` to create a new message.
+ */
+export declare const BackgroundSchema: GenMessage<Background>;
 
 /**
  * @generated from message board_games.ticket_to_ride.City

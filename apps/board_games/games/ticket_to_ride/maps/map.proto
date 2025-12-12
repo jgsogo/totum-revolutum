@@ -9,6 +9,15 @@ message MapData {
 
   int32 size_x = 4;
   int32 size_y = 5;
+  Background background = 6;
+}
+
+message Background {
+  string filename = 1;
+  float rotate = 2;
+  float scale = 3;
+  int32 translate_x = 4;
+  int32 translate_y = 5;
 }
 
 message City {
