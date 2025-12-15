@@ -3,7 +3,10 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "plugin_base",
     srcs = [],
-    hdrs = ["game_plugin.hpp"],
+    hdrs = [
+        "game_plugin.hpp",
+        "game_plugin_map.hpp",
+    ],
     visibility = [
         "//apps/board_games/engine/services:__subpackages__",
         "//apps/board_games/games:__subpackages__",

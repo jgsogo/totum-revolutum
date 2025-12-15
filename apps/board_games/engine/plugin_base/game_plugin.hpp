@@ -1,8 +1,7 @@
 #pragma once
 
-#include <string>
-// #include <google/protobuf/message_lite.h>
 #include <spdlog/spdlog.h>
+#include <string>
 
 #include "apps/board_games/engine/errors/errors.hpp"
 
@@ -33,12 +32,6 @@ namespace engine {
         std::string _name;
         std::string _description;
     };
-
-    struct GameTypeHasher {
-        std::size_t operator()(const data::GameType& k) const { return std::hash<std::string_view>()(k); }
-    };
-
-    using GamePluginsMap = std::unordered_map<data::GameType, std::unique_ptr<GamePluginBase>, GameTypeHasher>;
 
     template <typename TBoard, typename TActionProto, typename TEventProto> class GamePlugin : public GamePluginBase {
       public:
@@ -73,9 +66,8 @@ namespace engine {
                 return tl::unexpected(action.error());
             }
 
-            auto action_type = this->get_action_type(action.value());
             return this->_run(board.value(), action.value(), player_number)
-                .and_then([&action_type, this](auto&& t) -> Expected<data::GameActionResponse> {
+                .and_then([&](auto&& t) -> Expected<data::GameActionResponse> {
                     const auto& [new_game_payload, event] = t;
                     auto event_type = this->get_event_type(event);
                     auto new_board = this->get_game_state(new_game_payload);
@@ -95,6 +87,7 @@ namespace engine {
                     data::EventPayload event_{std::move(event_payload).value()};
                     data::GamePayload new_game_payload_{std::move(new_game_payload_expected).value()};
 
+                    auto action_type = this->get_action_type(action.value());
                     data::GameActionResponse game_action_response{std::string{action_type}, std::string{event_type},
                                                                   std::move(event_), std::move(new_game_payload_),
                                                                   new_board};

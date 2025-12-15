@@ -1,6 +1,6 @@
 #pragma once
 
-#include "apps/board_games/engine/plugin_base/game_plugin.hpp"
+#include "apps/board_games/engine/plugin_base/game_plugin_map.hpp"
 #include "apps/board_games/engine/protocol/engine.grpc.pb.h"
 #include "libraries/utils/cpp/libpqxx/connection_pool.h"
 
