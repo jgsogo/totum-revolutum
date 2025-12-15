@@ -4,7 +4,7 @@
 #include "apps/board_games/engine/data/models/game_type.hpp"
 #include "apps/board_games/engine/errors/errors.hpp"
 
-#include "apps/board_games/engine/game_plugin.hpp"
+#include "apps/board_games/engine/plugin_base/game_plugin.hpp"
 #include "apps/board_games/games/ticket_to_ride/models/actions.pb.h"
 #include "apps/board_games/games/ticket_to_ride/models/event_log.pb.h"
 #include "apps/board_games/games/ticket_to_ride/models/game.pb.h"

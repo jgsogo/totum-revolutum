@@ -3,7 +3,7 @@
 #include "apps/board_games/engine/data/models/game_action_response.hpp"
 #include "apps/board_games/engine/data/models/game_type.hpp"
 
-#include "apps/board_games/engine/game_plugin.hpp"
+#include "apps/board_games/engine/plugin_base/game_plugin.hpp"
 #include "apps/board_games/games/tic_tac_toe/models/board.pb.h"
 
 namespace board_games::tic_tac_toe {

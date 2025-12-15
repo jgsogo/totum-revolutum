@@ -6,7 +6,6 @@
 
 #include "apps/board_games/engine/data/game.h"
 #include "apps/board_games/engine/data/models/game_type.hpp"
-#include "apps/board_games/engine/game_plugin.hpp"
 #include "apps/board_games/engine/services/cli_service.h"
 #include "apps/board_games/engine/services/engine_service.h"
 #include "apps/board_games/games/tic_tac_toe/engine/tic_tac_toe.h"
@@ -44,7 +43,7 @@ int main(int argc, char** argv) {
     }
 
     // Working as a gRPC server
-    std::string server_address = "[::]:50051";
+    std::string server_address = "[::]:50051"; // FIXME: Hardcoded port
 
     services::CliServiceImpl service{pool};
     services::EngineServiceImpl engine_service{pool, games};

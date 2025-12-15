@@ -17,8 +17,8 @@ cc_library(
         "//apps/board_games/engine:__pkg__",
     ],
     deps = [
-        "//apps/board_games/engine:plugin",
         "//apps/board_games/engine/data",
+        "//apps/board_games/engine/plugin_base",
         "//apps/board_games/engine/protocol:cli_service_cpp_grpc",
         "//apps/board_games/engine/protocol:engine_cpp_grpc",
         "//bazel/logging:spdlog",
