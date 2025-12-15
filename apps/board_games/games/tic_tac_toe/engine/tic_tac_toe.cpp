@@ -52,7 +52,7 @@ namespace board_games::tic_tac_toe {
         return ACTION_PLACE_MARK;
     }
 
-    std::string_view TicTacToePlugin::get_event_type(const board_games::tic_tac_toe::event& event) const {
+    std::string_view TicTacToePlugin::get_event_type(const board_games::tic_tac_toe::Event& event) const {
         return EVENT_MARK_PLACED;
     }
 
@@ -76,7 +76,7 @@ namespace board_games::tic_tac_toe {
         return {std::move(board)};
     }
 
-    Expected<std::pair<board_games::tic_tac_toe::Board, board_games::tic_tac_toe::event>>
+    Expected<std::pair<board_games::tic_tac_toe::Board, board_games::tic_tac_toe::Event>>
     TicTacToePlugin::_run(const board_games::tic_tac_toe::Board& game_state,
                           const board_games::tic_tac_toe::Action& action, uint8_t player_number) {
         SPDLOG_DEBUG("[tic_tac_toe] Play action");
@@ -134,7 +134,7 @@ namespace board_games::tic_tac_toe {
         }
 
         // Compute return event log[s]
-        board_games::tic_tac_toe::event event;
+        board_games::tic_tac_toe::Event event;
         event.set_mark_placed_at_position(action.position());
         event.set_player(player_number);
 

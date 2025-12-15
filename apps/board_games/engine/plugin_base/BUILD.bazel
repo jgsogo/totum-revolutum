@@ -1,0 +1,16 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "plugin_base",
+    srcs = [],
+    hdrs = ["game_plugin.hpp"],
+    visibility = [
+        "//apps/board_games/engine/services:__subpackages__",
+        "//apps/board_games/games:__subpackages__",
+    ],
+    deps = [
+        "//apps/board_games/engine/data",
+        "//apps/board_games/engine/data/models",
+        "//bazel/logging:spdlog",
+    ],
+)

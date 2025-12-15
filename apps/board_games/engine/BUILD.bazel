@@ -1,29 +1,11 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel/containers/postgres:with_postgres_run.bzl", "with_postgres_run")
-
-cc_library(
-    name = "plugin",
-    srcs = [],
-    hdrs = ["game_plugin.hpp"],
-    visibility = [
-        "//apps/board_games/engine/services:__subpackages__",
-        "//apps/board_games/games:__subpackages__",
-    ],
-    deps = [
-        "//apps/board_games/engine/data",
-        "//apps/board_games/engine/data/models",
-        "//bazel/logging:spdlog",
-        "@tl-expected",
-    ],
-)
 
 cc_binary(
     name = "engine",
     srcs = ["main.cpp"],
     visibility = ["//apps/board_games:__subpackages__"],
     deps = [
-        ":plugin",
         "//apps/board_games/engine/services",
         "//apps/board_games/games/tic_tac_toe/engine",
         "//apps/board_games/games/ticket_to_ride/engine",
