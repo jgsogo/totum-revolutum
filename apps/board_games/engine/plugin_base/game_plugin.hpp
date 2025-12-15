@@ -40,46 +40,45 @@ namespace engine {
 
     using GamePluginsMap = std::unordered_map<data::GameType, std::unique_ptr<GamePluginBase>, GameTypeHasher>;
 
-    template <typename TGameStateProto, typename TGameActionProto, typename TeventProto>
-    class GamePlugin : public GamePluginBase {
+    template <typename TBoard, typename TActionProto, typename TEventProto> class GamePlugin : public GamePluginBase {
       public:
         explicit GamePlugin(const data::GameType& slug, std::string&& name, std::string&& description)
             : GamePluginBase{slug, std::move(name), std::move(description)} {};
 
         Expected<data::GamePayload> new_board() override {
-            return this->_new_board().and_then([](auto&& game_state) -> Expected<data::GamePayload> {
-                auto game_state_payload = data::GamePayload::from_proto(game_state);
-                if (!game_state_payload) {
-                    SPDLOG_ERROR("Error encoding '{}' protobuf", game_state.GetTypeName());
-                    return tl::unexpected(game_state_payload.error());
+            return this->_new_board().and_then([](TBoard&& board) -> Expected<data::GamePayload> {
+                auto game_payload = data::GamePayload::from_proto(board);
+                if (!game_payload) {
+                    SPDLOG_ERROR("Error encoding '{}' protobuf", board.GetTypeName());
+                    return tl::unexpected(game_payload.error());
                 }
-                return Expected<data::GamePayload>{std::move(game_state_payload.value())};
+                return Expected<data::GamePayload>{std::move(game_payload.value())};
             });
         }
 
-        Expected<data::GameActionResponse> run(const data::GamePayload& game_state_payload,
+        Expected<data::GameActionResponse> run(const data::GamePayload& game_payload,
                                                const data::ActionPayload& action_payload,
                                                uint8_t player_number) override {
-            // Decode 'game_state'
-            auto game_state = game_state_payload.into_proto<TGameStateProto>();
-            if (!game_state) {
-                SPDLOG_ERROR("Error decoding GamePayload: {}", game_state.error());
-                return tl::unexpected(game_state.error());
+            // Decode 'board'
+            auto board = game_payload.into_proto<TBoard>();
+            if (!board) {
+                SPDLOG_ERROR("Error decoding GamePayload: {}", board.error());
+                return tl::unexpected(board.error());
             }
 
             // Decode 'action_payload'
-            auto action = action_payload.into_proto<TGameActionProto>();
+            auto action = action_payload.into_proto<TActionProto>();
             if (!action) {
                 SPDLOG_ERROR("Error decoding ActionPayload: {}", action.error());
                 return tl::unexpected(action.error());
             }
 
             auto action_type = this->get_action_type(action.value());
-            return this->_run(game_state.value(), action.value(), player_number)
+            return this->_run(board.value(), action.value(), player_number)
                 .and_then([&action_type, this](auto&& t) -> Expected<data::GameActionResponse> {
                     const auto& [new_game_payload, event] = t;
                     auto event_type = this->get_event_type(event);
-                    auto new_game_state = this->get_game_state(new_game_payload);
+                    auto new_board = this->get_game_state(new_game_payload);
 
                     auto event_payload = data::EventPayload::from_proto(event);
                     if (!event_payload) {
@@ -98,18 +97,18 @@ namespace engine {
 
                     data::GameActionResponse game_action_response{std::string{action_type}, std::string{event_type},
                                                                   std::move(event_), std::move(new_game_payload_),
-                                                                  new_game_state};
+                                                                  new_board};
                     return {std::move(game_action_response)};
                 });
         }
 
       protected:
-        virtual std::string_view get_action_type(const TGameActionProto& action) const = 0;
-        virtual std::string_view get_event_type(const TeventProto& event) const = 0;
-        virtual data::GameState get_game_state(const TGameStateProto& game_state) const = 0;
-        virtual Expected<TGameStateProto> _new_board() = 0;
-        virtual Expected<std::pair<TGameStateProto, TeventProto>>
-        _run(const TGameStateProto& game_state, const TGameActionProto& action, uint8_t player_number) = 0;
+        virtual std::string_view get_action_type(const TActionProto& action) const = 0;
+        virtual std::string_view get_event_type(const TEventProto& event) const = 0;
+        virtual data::GameState get_game_state(const TBoard& game_state) const = 0;
+        virtual Expected<TBoard> _new_board() = 0;
+        virtual Expected<std::pair<TBoard, TEventProto>> _run(const TBoard& game_state, const TActionProto& action,
+                                                              uint8_t player_number) = 0;
     };
 
 } // namespace engine
