@@ -7,7 +7,7 @@ import "google/protobuf/empty.proto";
 service EngineService {
   rpc CreateNewRoom (NewRoomRequest) returns (google.protobuf.Empty);
   rpc StartGame (StartGameRequest) returns (google.protobuf.Empty);
-  rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (Participant);
+  rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (google.protobuf.Empty);
 
   rpc SendAction(SendActionRequest) returns (google.protobuf.Empty);
 }
@@ -29,12 +29,6 @@ message GetOrCreateParticipantRequest {
   optional uint32 player_number = 4;
 }
 
-message Participant {
-  string room_uuid = 1;
-  string uuid = 2;
-  string role = 3;
-  uint32 player_number = 4;
-}
 
 message SendActionRequest {
   string room_uuid = 1;

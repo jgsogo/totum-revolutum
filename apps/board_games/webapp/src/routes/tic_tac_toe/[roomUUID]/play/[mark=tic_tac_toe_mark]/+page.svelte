@@ -2,14 +2,14 @@
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import { connectToRoom } from '$lib/api/socket';
-  import { Board } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
+  import { Board, Player } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
   import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
   import { placeMark } from '$lib/tictactoe/api/place_mark';
-  import type { Participant as ParticipantProto } from '../../../../../../../engine/protocol/engine_pb';
 
   const roomUUID = page.params.roomUUID!;
   let refBoard: typeof TicTacToeBoard;
-  const participant: ParticipantProto = page.data.participant;
+  const participant_uuid: string = page.data.participant_uuid;
+  const player: Player = page.data.player;
 
   let game_data = $state({});
   let board: Board | undefined = $state();
@@ -36,13 +36,13 @@
 
   const onCellClick = async (cellId: number) => {
     console.log(`[frontend] You clicked on cell ${cellId}`);
-    if (board?.current_turn() !== participant.playerNumber) {
+    if (board?.current_turn() !== player) {
       alert("It's not your turn. Wait...");
       return;
     }
 
     try {
-      let r = await placeMark(roomUUID, participant.uuid, cellId);
+      let r = await placeMark(roomUUID, participant_uuid, cellId);
       console.log(`[frontend] Response: ${JSON.stringify(r)}`);
     } catch (err) {
       console.error('[frontend] Failed to send place_mark command', err);
@@ -52,23 +52,20 @@
 
 <h3>= Play view =</h3>
 <hr />
-<p>Session/Participant-id: {participant.uuid}</p>
-<p>Player number: {participant.playerNumber}</p>
-<hr />
-<hr />
-Participant: {JSON.stringify(page.data.participant)}
+<p>Session/Participant-id: {participant_uuid}</p>
+<p>Player: {player}</p>
 <hr />
 
 {#if board?.winner()}
   Player {board.winner()!.player()} won!
-  {#if board.winner()!.player() === participant.playerNumber}
+  {#if board.winner()!.player() === player}
     It's you!
   {:else}
     You lost :/
   {/if}
 {:else if board?.draw()}
   Draw. Noone won!
-{:else if board?.current_turn() === participant.playerNumber}
+{:else if board?.current_turn() === player}
   It's your turn!
 {:else}
   It's NOT your turn :/

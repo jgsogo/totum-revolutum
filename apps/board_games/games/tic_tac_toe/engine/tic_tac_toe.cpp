@@ -16,7 +16,8 @@ namespace board_games::tic_tac_toe {
 
     namespace {
 
-        std::optional<std::pair<char, std::array<int, 3>>> check_winner(std::string_view board_status) {
+        std::optional<std::pair<Player, std::array<int, 3>>>
+        _check_winner(const google::protobuf::RepeatedField<int>& board_status) {
             static const std::vector<std::array<int, 3>> winners{
                 {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // rows
                 {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // cols
@@ -25,20 +26,22 @@ namespace board_games::tic_tac_toe {
 
             auto it = std::find_if(winners.begin(), winners.end(), [&board_status](const auto& winner_line) {
                 auto& [a, b, c] = winner_line;
-                return (board_status[a] != EMPTY_SYMBOL && board_status[a] == board_status[b] &&
+                return (board_status[a] != Player::NONE && board_status[a] == board_status[b] &&
                         board_status[a] == board_status[c]);
             });
 
             if (it != winners.end()) {
                 const int& p = (*it)[0];
-                return std::make_pair(board_status.at(p), *it);
+                Player player =
+                    board_status.at(p) == static_cast<int>(Player::PLAYER_X) ? Player::PLAYER_X : Player::PLAYER_O;
+                return std::make_pair(player, *it);
             } else {
                 return std::nullopt;
             };
         }
 
-        bool is_draw(std::string_view board_status) {
-            return std::all_of(board_status.begin(), board_status.end(), [](char c) { return c != EMPTY_SYMBOL; });
+        bool _is_draw(const google::protobuf::RepeatedField<int>& board_status) {
+            return std::all_of(board_status.begin(), board_status.end(), [](auto p) { return p != Player::NONE; });
         }
 
     } // namespace
@@ -62,8 +65,8 @@ namespace board_games::tic_tac_toe {
     Expected<board_games::tic_tac_toe::Board> TicTacToePlugin::_new_board() {
         SPDLOG_DEBUG("[tic_tac_toe] Return new board");
         board_games::tic_tac_toe::Board board;
-        board.set_board_status(std::string(9, EMPTY_SYMBOL));
-        board.set_current_turn(0);
+        board.mutable_board_status()->Resize(9, Player::NONE);
+        board.set_current_turn(Player::PLAYER_X);
         return {std::move(board)};
     }
 
@@ -83,17 +86,18 @@ namespace board_games::tic_tac_toe {
     Expected<std::vector<Event>> TicTacToePlugin::_end_turn(const Board& board) {
         SPDLOG_DEBUG("[tic_tac_toe] _end_turn");
         Event event;
-        auto winner = check_winner(board.board_status());
+        auto winner = _check_winner(board.board_status());
         if (winner) {
             EventGameFinishedWinner* winner_event = event.mutable_game_finished_winner();
-            winner_event->set_player(winner->first == PLAYER_X_SYMBOL ? 0 : 1);
+            winner_event->set_player(winner->first);
             auto* data = winner_event->mutable_line();
             data->Assign(winner->second.begin(), winner->second.end());
-        } else if (is_draw(board.board_status())) {
+        } else if (_is_draw(board.board_status())) {
             auto _ = event.mutable_game_finished_draw();
         } else {
             EventNextTurn* next_turn_event = event.mutable_next_turn();
-            next_turn_event->set_next_player((board.current_turn() + 1) % 2);
+            next_turn_event->set_next_player(board.current_turn() == Player::PLAYER_X ? Player::PLAYER_O
+                                                                                      : Player::PLAYER_X);
         }
 
         return {{std::move(event)}};

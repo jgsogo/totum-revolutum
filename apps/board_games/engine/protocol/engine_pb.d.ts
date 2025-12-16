@@ -85,37 +85,6 @@ export declare type GetOrCreateParticipantRequest = Message<"board_games.GetOrCr
 export declare const GetOrCreateParticipantRequestSchema: GenMessage<GetOrCreateParticipantRequest>;
 
 /**
- * @generated from message board_games.Participant
- */
-export declare type Participant = Message<"board_games.Participant"> & {
-  /**
-   * @generated from field: string room_uuid = 1;
-   */
-  roomUuid: string;
-
-  /**
-   * @generated from field: string uuid = 2;
-   */
-  uuid: string;
-
-  /**
-   * @generated from field: string role = 3;
-   */
-  role: string;
-
-  /**
-   * @generated from field: uint32 player_number = 4;
-   */
-  playerNumber: number;
-};
-
-/**
- * Describes the message board_games.Participant.
- * Use `create(ParticipantSchema)` to create a new message.
- */
-export declare const ParticipantSchema: GenMessage<Participant>;
-
-/**
  * @generated from message board_games.SendActionRequest
  */
 export declare type SendActionRequest = Message<"board_games.SendActionRequest"> & {
@@ -167,7 +136,7 @@ export declare const EngineService: GenService<{
   getOrCreateParticipant: {
     methodKind: "unary";
     input: typeof GetOrCreateParticipantRequestSchema;
-    output: typeof ParticipantSchema;
+    output: typeof EmptySchema;
   },
   /**
    * @generated from rpc board_games.EngineService.SendAction

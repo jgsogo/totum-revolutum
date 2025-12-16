@@ -4,6 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
+import type { Player } from "./board_pb.js";
 
 /**
  * Describes the file apps/board_games/games/tic_tac_toe/models/events.proto.
@@ -20,9 +21,9 @@ export declare type EventMarkPlaced = Message<"board_games.tic_tac_toe.EventMark
   position: number;
 
   /**
-   * @generated from field: string mark = 2;
+   * @generated from field: board_games.tic_tac_toe.Player mark = 2;
    */
-  mark: string;
+  mark: Player;
 };
 
 /**
@@ -36,9 +37,9 @@ export declare const EventMarkPlacedSchema: GenMessage<EventMarkPlaced>;
  */
 export declare type EventGameFinishedWinner = Message<"board_games.tic_tac_toe.EventGameFinishedWinner"> & {
   /**
-   * @generated from field: uint32 player = 1;
+   * @generated from field: board_games.tic_tac_toe.Player player = 1;
    */
-  player: number;
+  player: Player;
 
   /**
    * @generated from field: repeated uint32 line = 2;
@@ -69,9 +70,9 @@ export declare const EventGameFinishedDrawSchema: GenMessage<EventGameFinishedDr
  */
 export declare type EventNextTurn = Message<"board_games.tic_tac_toe.EventNextTurn"> & {
   /**
-   * @generated from field: uint32 next_player = 1;
+   * @generated from field: board_games.tic_tac_toe.Player next_player = 1;
    */
-  nextPlayer: number;
+  nextPlayer: Player;
 };
 
 /**
