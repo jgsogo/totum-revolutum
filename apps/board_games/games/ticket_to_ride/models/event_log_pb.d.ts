@@ -11,14 +11,14 @@ import type { Message } from "@bufbuild/protobuf";
 export declare const file_apps_board_games_games_ticket_to_ride_models_event_log: GenFile;
 
 /**
- * @generated from message board_games.ticket_to_ride.event
+ * @generated from message board_games.ticket_to_ride.Event
  */
-export declare type event = Message<"board_games.ticket_to_ride.event"> & {
+export declare type Event = Message<"board_games.ticket_to_ride.Event"> & {
 };
 
 /**
- * Describes the message board_games.ticket_to_ride.event.
- * Use `create(eventSchema)` to create a new message.
+ * Describes the message board_games.ticket_to_ride.Event.
+ * Use `create(EventSchema)` to create a new message.
  */
-export declare const eventSchema: GenMessage<event>;
+export declare const EventSchema: GenMessage<Event>;
 

@@ -15,9 +15,14 @@ export declare const file_apps_board_games_games_tic_tac_toe_models_events: GenF
  */
 export declare type EventMarkPlaced = Message<"board_games.tic_tac_toe.EventMarkPlaced"> & {
   /**
-   * @generated from field: uint32 mark_placed_at_position = 1;
+   * @generated from field: uint32 position = 1;
    */
-  markPlacedAtPosition: number;
+  position: number;
+
+  /**
+   * @generated from field: string mark = 2;
+   */
+  mark: string;
 };
 
 /**
@@ -60,6 +65,22 @@ export declare type EventGameFinishedDraw = Message<"board_games.tic_tac_toe.Eve
 export declare const EventGameFinishedDrawSchema: GenMessage<EventGameFinishedDraw>;
 
 /**
+ * @generated from message board_games.tic_tac_toe.EventNextTurn
+ */
+export declare type EventNextTurn = Message<"board_games.tic_tac_toe.EventNextTurn"> & {
+  /**
+   * @generated from field: uint32 next_player = 1;
+   */
+  nextPlayer: number;
+};
+
+/**
+ * Describes the message board_games.tic_tac_toe.EventNextTurn.
+ * Use `create(EventNextTurnSchema)` to create a new message.
+ */
+export declare const EventNextTurnSchema: GenMessage<EventNextTurn>;
+
+/**
  * @generated from message board_games.tic_tac_toe.Event
  */
 export declare type Event = Message<"board_games.tic_tac_toe.Event"> & {
@@ -74,16 +95,22 @@ export declare type Event = Message<"board_games.tic_tac_toe.Event"> & {
     case: "markPlaced";
   } | {
     /**
-     * @generated from field: board_games.tic_tac_toe.EventGameFinishedWinner winner = 2;
+     * @generated from field: board_games.tic_tac_toe.EventGameFinishedWinner game_finished_winner = 2;
      */
     value: EventGameFinishedWinner;
-    case: "winner";
+    case: "gameFinishedWinner";
   } | {
     /**
-     * @generated from field: board_games.tic_tac_toe.EventGameFinishedDraw draw = 3;
+     * @generated from field: board_games.tic_tac_toe.EventGameFinishedDraw game_finished_draw = 3;
      */
     value: EventGameFinishedDraw;
-    case: "draw";
+    case: "gameFinishedDraw";
+  } | {
+    /**
+     * @generated from field: board_games.tic_tac_toe.EventNextTurn next_turn = 4;
+     */
+    value: EventNextTurn;
+    case: "nextTurn";
   } | { case: undefined; value?: undefined };
 };
 

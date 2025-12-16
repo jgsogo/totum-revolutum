@@ -1,4 +1,4 @@
 syntax = "proto3";
 package board_games.ticket_to_ride;
 
-message event {}
+message Event {}
