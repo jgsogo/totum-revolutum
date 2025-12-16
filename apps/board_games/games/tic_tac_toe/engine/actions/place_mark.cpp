@@ -17,10 +17,10 @@ namespace board_games::tic_tac_toe {
             if (board.current_turn() != player_number) {
                 SPDLOG_ERROR(
                     "Game state is expecting actions from player {}, however, game action comes from player {}",
-                    board.current_turn(), player_number);
+                    board.current_turn() == Player::PLAYER_X ? "X" : "O", player_number);
                 return tl::unexpected(errors::GameEngineError{std::format(
                     "Game state is expecting actions from player {}, however, game action comes from player {}",
-                    board.current_turn(), player_number)});
+                    board.current_turn() == Player::PLAYER_X ? "X" : "O", player_number)});
             }
             break;
         case board_games::tic_tac_toe::Board::TurnStateCase::kWinner:
@@ -45,8 +45,8 @@ namespace board_games::tic_tac_toe {
             Event event;
             EventMarkPlaced* mark_placed = event.mutable_mark_placed();
             mark_placed->set_position(action.position());
-            char mark = player_number == 0 ? PLAYER_X_SYMBOL : PLAYER_O_SYMBOL;
-            mark_placed->set_mark(std::string{mark});
+            auto player_mark = player_number == 0 ? Player::PLAYER_X : Player::PLAYER_O;
+            mark_placed->set_mark(player_mark);
 
             events.emplace_back(std::move(event));
         }

@@ -63,7 +63,7 @@ namespace board_games::tic_tac_toe {
         SPDLOG_DEBUG("[tic_tac_toe] Return new board");
         board_games::tic_tac_toe::Board board;
         board.set_board_status(std::string(9, EMPTY_SYMBOL));
-        board.set_current_turn(0);
+        board.set_current_turn(Player::PLAYER_X);
         return {std::move(board)};
     }
 
@@ -86,14 +86,15 @@ namespace board_games::tic_tac_toe {
         auto winner = check_winner(board.board_status());
         if (winner) {
             EventGameFinishedWinner* winner_event = event.mutable_game_finished_winner();
-            winner_event->set_player(winner->first == PLAYER_X_SYMBOL ? 0 : 1);
+            winner_event->set_player(winner->first == PLAYER_X_SYMBOL ? Player::PLAYER_X : Player::PLAYER_O);
             auto* data = winner_event->mutable_line();
             data->Assign(winner->second.begin(), winner->second.end());
         } else if (is_draw(board.board_status())) {
             auto _ = event.mutable_game_finished_draw();
         } else {
             EventNextTurn* next_turn_event = event.mutable_next_turn();
-            next_turn_event->set_next_player((board.current_turn() + 1) % 2);
+            next_turn_event->set_next_player(board.current_turn() == Player::PLAYER_X ? Player::PLAYER_O
+                                                                                      : Player::PLAYER_X);
         }
 
         return {{std::move(event)}};
