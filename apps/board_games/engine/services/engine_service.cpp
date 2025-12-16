@@ -187,7 +187,7 @@ namespace services {
                                     // On failure: RETURN to the user that the action could not be understood.
                                     .or_else(
                                         [&conn, &game, &participant, &action_payload](const auto& e) -> Expected<void> {
-                                            SPDLOG_ERROR("Failed to apply action to the game");
+                                            SPDLOG_ERROR("Failed to apply action to the game: {}", e);
                                             std::ignore = data::store_action(conn, game.id, participant.uuid, "unknown",
                                                                              action_payload, false);
                                             return tl::unexpected{errors::InvalidAction{

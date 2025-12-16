@@ -1,37 +1,29 @@
-import { Action as ActionProto, ActionSchema, ActionPlaceMark as ActionPlaceMarkProto, ActionPlaceMarkSchema } from "../../models/actions_pb.js"
+import { Action as ActionProto, ActionSchema, ActionPlaceMarkSchema } from "../../models/actions_pb.js"
 import { OutgoingMessage } from "./message.js";
 import { toBinary, create } from "@bufbuild/protobuf";
 
 
 export class Action extends OutgoingMessage {
-    private readonly data: ActionProto;
+    private readonly proto: ActionProto;
 
-    constructor(action: ActionPlaceMark) {
+    constructor(proto: ActionProto) {
         super();
+        this.proto = proto;
+    }
 
-        if (action instanceof ActionPlaceMark) {
-            this.data = create(ActionSchema, { place_mark: action }) as ActionProto;
-        } else {
-            throw new Error("Unknown action type");
-        }
+    static create_place_mark(position: number): Action {
+        const proto = create(ActionSchema, {
+            action: {
+                case: "placeMark",
+                value: create(ActionPlaceMarkSchema, {
+                position,
+                }),
+            },
+            }) as ActionProto;
+        return new Action(proto)
     }
 
     toBinary(): Uint8Array {
-        return toBinary(ActionSchema, this.data);
-    }
-}
-
-
-export class ActionPlaceMark extends OutgoingMessage {
-    private readonly data: ActionPlaceMarkProto;
-
-    constructor(position: number) {
-        super();
-
-        this.data = create(ActionPlaceMarkSchema, { position }) as ActionPlaceMarkProto;
-    }
-
-    toBinary(): Uint8Array {
-        return toBinary(ActionPlaceMarkSchema, this.data);
+        return toBinary(ActionSchema, this.proto);
     }
 }
