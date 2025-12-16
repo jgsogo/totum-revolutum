@@ -16,16 +16,16 @@ namespace services {
         SPDLOG_DEBUG("CreateNewRoom");
         return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) -> grpc::Status {
             data::RoomUUID room{std::string{request->uuid()}};
-            auto r = data::insert_new_room(conn, room, request->name())
-                         .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
+            return data::insert_new_room(conn, room, request->name())
+                .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
 
-                         .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
-                         .or_else([](const auto& e) {
-                             auto status = grpc::Status{grpc::StatusCode::INTERNAL,
-                                                        std::format("Failed to insert new room: {}", e)};
-                             return Expected<grpc::Status>{status};
-                         });
-            return r.value();
+                .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
+                .or_else([](const auto& e) {
+                    auto status =
+                        grpc::Status{grpc::StatusCode::INTERNAL, std::format("Failed to insert new room: {}", e)};
+                    return Expected<grpc::Status>{status};
+                })
+                .value();
         });
     }
 
@@ -38,29 +38,27 @@ namespace services {
             data::GameType game_type{std::string{request->game_type()}};
 
             // FIXME: remove_game and start_game should go inside the same transaction
-            auto r = data::remove_game(conn, room)
-                         .and_then([&conn, &room, &game_type, this]() -> Expected<void> {
-                             auto it = this->_games.find(game_type);
-                             if (it == this->_games.end()) {
-                                 SPDLOG_ERROR("Game type {} not known", game_type);
-                                 return tl::unexpected{
-                                     errors::InvalidData{std::format("Game type {} not known", game_type)}};
-                             }
-                             const auto& game = it->second;
-                             return game->new_board().and_then(
-                                 [&conn, &room, &game_type](data::GamePayload&& initial_board_status) {
-                                     return data::start_game(conn, room, game_type, initial_board_status);
-                                 });
-                         })
-                         .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
+            return data::remove_game(conn, room)
+                .and_then([&conn, &room, &game_type, this]() -> Expected<void> {
+                    auto it = this->_games.find(game_type);
+                    if (it == this->_games.end()) {
+                        SPDLOG_ERROR("Game type {} not known", game_type);
+                        return tl::unexpected{errors::InvalidData{std::format("Game type {} not known", game_type)}};
+                    }
+                    const auto& game = it->second;
+                    return game->new_board().and_then(
+                        [&conn, &room, &game_type](data::GamePayload&& initial_board_status) {
+                            return data::start_game(conn, room, game_type, initial_board_status);
+                        });
+                })
+                .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
 
-                         .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
-                         .or_else([](const auto& e) {
-                             auto status =
-                                 grpc::Status{grpc::StatusCode::INTERNAL, std::format("Failed to start game: {}", e)};
-                             return Expected<grpc::Status>{status};
-                         });
-            return r.value();
+                .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
+                .or_else([](const auto& e) {
+                    auto status = grpc::Status{grpc::StatusCode::INTERNAL, std::format("Failed to start game: {}", e)};
+                    return Expected<grpc::Status>{status};
+                })
+                .value();
         });
     }
 
@@ -167,11 +165,12 @@ namespace services {
                     return game_plugin
                         ->run(game.payload, action_payload, participant.player_number)
                         // Store to the database the action + new status + events
-                        // FIME: We might want to do all of this in a single transaction
+                        // FIXME: We might want to do all of this in a single transaction
                         .and_then([&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
                             return data::store_action(conn, game.id, participant.uuid, res.action_type, action_payload,
                                                       true)
                                 .and_then([&conn, &game, &res](const std::int64_t& action_id) -> Expected<void> {
+                                    // TODO: Bulk insert
                                     for (auto&& ev : res.events) {
                                         auto inserted =
                                             data::store_event(conn, game.id, ev.first, ev.second, action_id);
