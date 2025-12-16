@@ -170,14 +170,22 @@ namespace services {
                             Expected<void> r =
                                 game_plugin
                                     ->run(game.payload, action_payload, participant.player_number)
-                                    // Store to the database the action + new status + event
+                                    // Store to the database the action + new status + events
+                                    // FIME: We might want to do all of this in a single transaction
                                     .and_then(
                                         [&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
                                             return data::store_action(conn, game.id, participant.uuid, res.action_type,
                                                                       action_payload, true)
-                                                .and_then([&conn, &game, &res](const std::int64_t& action_id) {
-                                                    return data::store_event(conn, game.id, res.event_type,
-                                                                             res.event_payload, action_id);
+                                                .and_then([&conn, &game,
+                                                           &res](const std::int64_t& action_id) -> Expected<void> {
+                                                    for (auto&& ev : res.events) {
+                                                        auto inserted = data::store_event(conn, game.id, ev.first,
+                                                                                          ev.second, action_id);
+                                                        if (!inserted) {
+                                                            return inserted;
+                                                        }
+                                                    }
+                                                    return {};
                                                 })
                                                 .and_then([&conn, &game, &res]() {
                                                     return data::update_game_state(conn, game.id, res.new_game_state,

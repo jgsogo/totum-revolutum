@@ -18,8 +18,6 @@ namespace board_games::ticket_to_ride {
         TicketToRidePlugin();
 
       protected:
-        std::string_view get_action_type(const Action& action) const override;
-        std::string_view get_event_type(const Event& event) const override;
         data::GameState get_game_state(const GameState& game_state) const override;
         Expected<GameState> _new_board() override;
 

@@ -35,3 +35,5 @@ namespace utils::_impl {
             return tl::unexpected(_exp.error());                                                                       \
         std::forward<decltype(_exp.value())>(_exp.value());                                                            \
     })
+
+// FIXME: the macro fails for ExpectedType<void, ...>!

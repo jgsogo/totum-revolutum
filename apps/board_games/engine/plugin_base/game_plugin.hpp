@@ -76,21 +76,19 @@ namespace engine {
                         return {std::make_pair(board, events)};
                     }));
 
-            auto action_type = this->get_action_type(action);
-            // FIXME: We should return all events
-            auto event_type = this->get_event_type(events[0]);
-            auto event_payload = EXPECT(data::EventPayload::from_proto(events[0]));
-            auto board_payload = EXPECT(data::GamePayload::from_proto(board));
-            auto new_game_state = this->get_game_state(board);
-            data::GameActionResponse game_action_response{std::string{action_type}, std::string{event_type},
-                                                          std::move(event_payload), std::move(board_payload),
-                                                          new_game_state};
+            data::GameActionResponse game_action_response{.action_type = action.GetDescriptor()->full_name(),
+                                                          .new_game_payload =
+                                                              EXPECT(data::GamePayload::from_proto(board)),
+                                                          .new_game_state = this->get_game_state(board)};
+            for (auto&& ev : events) {
+                auto event_payload = EXPECT(data::EventPayload::from_proto(ev));
+                game_action_response.events.emplace_back(
+                    std::make_pair(ev.GetDescriptor()->full_name(), std::move(event_payload)));
+            }
             return {std::move(game_action_response)};
         }
 
       protected:
-        virtual std::string_view get_action_type(const TActionProto& action) const = 0;
-        virtual std::string_view get_event_type(const TEventProto& event) const = 0;
         virtual data::GameState get_game_state(const TBoard& game_state) const = 0;
         virtual Expected<TBoard> _new_board() = 0;
 

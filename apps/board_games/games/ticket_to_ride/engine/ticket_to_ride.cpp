@@ -10,23 +10,9 @@
 namespace board_games::ticket_to_ride {
     static constexpr data::GameType GAME_TYPE{"ticket_to_ride"};
 
-    static constexpr std::string_view ACTION_PLACE_MARK{"move_action"};
-
-    static constexpr std::string_view EVENT_MARK_PLACED{"move_action"};
-
     TicketToRidePlugin::TicketToRidePlugin()
         : TicketToRidePlugin::GamePlugin{GAME_TYPE, std::string{"Ticket to Ride"},
                                          std::string{"Ticket to Ride board game"}} {};
-
-    std::string_view TicketToRidePlugin::get_action_type(const Action& action) const {
-        SPDLOG_ERROR("[ticket_to_ride] Not implemented");
-        return ACTION_PLACE_MARK;
-    }
-
-    std::string_view TicketToRidePlugin::get_event_type(const Event& event) const {
-        SPDLOG_ERROR("[ticket_to_ride] Not implemented");
-        return EVENT_MARK_PLACED;
-    }
 
     data::GameState TicketToRidePlugin::get_game_state(const GameState& game_state) const {
         SPDLOG_ERROR("[ticket_to_ride] Not implemented");

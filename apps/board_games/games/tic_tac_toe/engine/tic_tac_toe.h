@@ -20,8 +20,6 @@ namespace board_games::tic_tac_toe {
         TicTacToePlugin();
 
       protected:
-        std::string_view get_action_type(const board_games::tic_tac_toe::Action& action) const override;
-        std::string_view get_event_type(const board_games::tic_tac_toe::Event& event) const override;
         data::GameState get_game_state(const board_games::tic_tac_toe::Board& game_state) const override;
         Expected<board_games::tic_tac_toe::Board> _new_board() override;
 
