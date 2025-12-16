@@ -7,8 +7,8 @@
 #include "apps/board_games/games/ticket_to_ride/engine/maps/usa/usa.h"
 #include "apps/board_games/games/ticket_to_ride/models/game.pb.h"
 
+#include "constants.hpp"
 namespace board_games::ticket_to_ride {
-    static constexpr data::GameType GAME_TYPE{"ticket_to_ride"};
 
     TicketToRidePlugin::TicketToRidePlugin()
         : TicketToRidePlugin::GamePlugin{GAME_TYPE, std::string{"Ticket to Ride"},

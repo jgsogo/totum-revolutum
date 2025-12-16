@@ -1,6 +1,19 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
+    name = "constants",
+    hdrs = [
+        "constants.hpp",
+    ],
+    visibility = [
+        "//apps/board_games/games/tic_tac_toe/engine:__subpackages__",
+    ],
+    deps = [
+        "//apps/board_games/engine/data/models",
+    ],
+)
+
+cc_library(
     name = "engine",
     srcs = [
         "tic_tac_toe.cpp",
@@ -8,14 +21,12 @@ cc_library(
     hdrs = [
         "tic_tac_toe.h",
     ],
-    defines = [
-        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
-    ],
     visibility = [
         "//apps/board_games/engine:__pkg__",
         "//apps/board_games/games/tic_tac_toe/engine/tests:__pkg__",
     ],
     deps = [
+        ":constants",
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
         "//apps/board_games/engine/plugin_base",

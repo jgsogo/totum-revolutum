@@ -10,12 +10,9 @@
 #include "apps/board_games/games/tic_tac_toe/engine/events/mark_placed.h"
 #include "apps/board_games/games/tic_tac_toe/engine/events/next_turn.h"
 
-namespace board_games::tic_tac_toe {
-    static constexpr data::GameType GAME_TYPE{"tic_tac_toe"};
+#include "constants.hpp"
 
-    constexpr static char PLAYER_X_SYMBOL = 'X';
-    // constexpr static char PLAYER_O_SYMBOL = 'O';
-    constexpr static char EMPTY_SYMBOL = ' ';
+namespace board_games::tic_tac_toe {
 
     namespace {
 

@@ -1,10 +1,8 @@
 #include "place_mark.h"
 
-namespace board_games::tic_tac_toe {
+#include "apps/board_games/games/tic_tac_toe/engine/constants.hpp"
 
-    constexpr static char PLAYER_X_SYMBOL = 'X';
-    constexpr static char PLAYER_O_SYMBOL = 'O';
-    constexpr static char EMPTY_SYMBOL = ' ';
+namespace board_games::tic_tac_toe {
 
     Expected<std::vector<Event>> _compute_place_mark(const Board& board, const ActionPlaceMark& action,
                                                      uint8_t player_number) {
