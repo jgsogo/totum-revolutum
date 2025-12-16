@@ -1,7 +1,5 @@
 #include "mark_placed.h"
 
-#include "apps/board_games/games/tic_tac_toe/engine/constants.hpp"
-
 namespace board_games::tic_tac_toe {
 
     Expected<Board> apply_mark_placed(Board&& board, const EventMarkPlaced& event) {

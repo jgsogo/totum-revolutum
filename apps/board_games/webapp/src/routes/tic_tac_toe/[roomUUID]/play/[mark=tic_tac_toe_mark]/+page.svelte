@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import { connectToRoom } from '$lib/api/socket';
-  import { Board } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
+  import { Board, Player } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
   import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
   import { placeMark } from '$lib/tictactoe/api/place_mark';
   import type { Participant as ParticipantProto } from '../../../../../../../engine/protocol/engine_pb';
@@ -10,6 +10,7 @@
   const roomUUID = page.params.roomUUID!;
   let refBoard: typeof TicTacToeBoard;
   const participant: ParticipantProto = page.data.participant;
+  const player: Player = page.data.player;
 
   let game_data = $state({});
   let board: Board | undefined = $state();
@@ -36,7 +37,7 @@
 
   const onCellClick = async (cellId: number) => {
     console.log(`[frontend] You clicked on cell ${cellId}`);
-    if (board?.current_turn() !== participant.playerNumber) {
+    if (board?.current_turn() !== player) {
       alert("It's not your turn. Wait...");
       return;
     }
@@ -54,21 +55,22 @@
 <hr />
 <p>Session/Participant-id: {participant.uuid}</p>
 <p>Player number: {participant.playerNumber}</p>
+<p>Player: {player}</p>
 <hr />
 <hr />
-Participant: {JSON.stringify(page.data.participant)}
+Participant: {JSON.stringify(participant)}
 <hr />
 
 {#if board?.winner()}
   Player {board.winner()!.player()} won!
-  {#if board.winner()!.player() === participant.playerNumber}
+  {#if board.winner()!.player() === player}
     It's you!
   {:else}
     You lost :/
   {/if}
 {:else if board?.draw()}
   Draw. Noone won!
-{:else if board?.current_turn() === participant.playerNumber}
+{:else if board?.current_turn() === player}
   It's your turn!
 {:else}
   It's NOT your turn :/

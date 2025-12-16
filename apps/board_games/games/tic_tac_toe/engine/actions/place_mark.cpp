@@ -1,7 +1,5 @@
 #include "place_mark.h"
 
-#include "apps/board_games/games/tic_tac_toe/engine/constants.hpp"
-
 namespace board_games::tic_tac_toe {
 
     Expected<std::vector<Event>> _compute_place_mark(const Board& board, const ActionPlaceMark& action,
@@ -33,7 +31,7 @@ namespace board_games::tic_tac_toe {
                 "Error decoding board_games::tic_tac_toe::Board protobuf: 'turn_state' is not set"});
         }
 
-        if (board.board_status()[action.position()] != EMPTY_SYMBOL) {
+        if (board.board_status()[action.position()] != Player::NONE) {
             SPDLOG_ERROR("Cell {} is already set", action.position());
             return tl::unexpected(errors::InvalidAction{std::format("Cell {} is already set", action.position())});
         }

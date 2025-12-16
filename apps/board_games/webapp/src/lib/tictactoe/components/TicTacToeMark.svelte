@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Spring } from 'svelte/motion';
+  import { Player } from '../../../../../games/tic_tac_toe/webapp/src/index';
 
   type TicTacToeMarkProps = {
     cell_id: number;
@@ -17,15 +18,28 @@
   const column = cell_id % 3;
   const cx = margin + column * cellSize + cellSize / 2;
   const cy = margin + row * cellSize + cellSize / 2;
+  const PLAYER_X_SYMBOL = 'X';
+  const PLAYER_O_SYMBOL = 'O';
+  const PLAYER_EMPTY_SYMBOL = ' ';
 
   const scale = new Spring(0, { stiffness: 0.25, damping: 0.7 });
   let mark: string = $state('');
 
-  export function updateCell(new_mark: 'X' | 'O' | '') {
+  export function updateCell(new_mark: Player) {
     console.log(`[frontend] updateCell(new_mark='${new_mark}') in cell_id='${cell_id}'`);
     const prev_mark = mark;
-    mark = new_mark;
-    if (prev_mark === '' && (new_mark === 'X' || new_mark === 'O')) {
+    switch (new_mark) {
+      case Player.PLAYER_X:
+        mark = PLAYER_X_SYMBOL;
+        break;
+      case Player.PLAYER_O:
+        mark = PLAYER_O_SYMBOL;
+        break;
+      case Player.NONE:
+        mark = PLAYER_EMPTY_SYMBOL;
+        break;
+    }
+    if (prev_mark === '' && (new_mark === Player.PLAYER_X || new_mark === Player.PLAYER_O)) {
       // animate: spring from 0 -> 1
       scale.set(0, { instant: true });
       scale.set(1);

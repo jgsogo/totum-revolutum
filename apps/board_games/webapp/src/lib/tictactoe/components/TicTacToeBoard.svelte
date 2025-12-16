@@ -1,5 +1,6 @@
 <script lang="ts">
   import TicTacToeMark from './TicTacToeMark.svelte';
+  import { Player } from '../../../../../games/tic_tac_toe/webapp/src/index';
 
   type TicTacToeBoardProps = {
     size?: number;
@@ -18,7 +19,7 @@
     return { cell_id: i, instance: typeof TicTacToeMark, margin, cellSize, strokeWidth };
   });
 
-  export function updateBoard(nextBoard: string[]) {
+  export function updateBoard(nextBoard: Player[]) {
     console.log(`[frontend] updateBoard(nextBoard='${nextBoard}')`);
     nextBoard.forEach((nextElem, idx) => {
       let cell = cells[idx];
