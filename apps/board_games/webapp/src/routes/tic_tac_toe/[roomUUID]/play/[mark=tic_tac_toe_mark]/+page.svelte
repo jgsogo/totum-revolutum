@@ -5,11 +5,10 @@
   import { Board, Player } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
   import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
   import { placeMark } from '$lib/tictactoe/api/place_mark';
-  import type { Participant as ParticipantProto } from '../../../../../../../engine/protocol/engine_pb';
 
   const roomUUID = page.params.roomUUID!;
   let refBoard: typeof TicTacToeBoard;
-  const participant: ParticipantProto = page.data.participant;
+  const participant_uuid: string = page.data.participant_uuid;
   const player: Player = page.data.player;
 
   let game_data = $state({});
@@ -43,7 +42,7 @@
     }
 
     try {
-      let r = await placeMark(roomUUID, participant.uuid, cellId);
+      let r = await placeMark(roomUUID, participant_uuid, cellId);
       console.log(`[frontend] Response: ${JSON.stringify(r)}`);
     } catch (err) {
       console.error('[frontend] Failed to send place_mark command', err);
@@ -53,12 +52,8 @@
 
 <h3>= Play view =</h3>
 <hr />
-<p>Session/Participant-id: {participant.uuid}</p>
-<p>Player number: {participant.playerNumber}</p>
+<p>Session/Participant-id: {participant_uuid}</p>
 <p>Player: {player}</p>
-<hr />
-<hr />
-Participant: {JSON.stringify(participant)}
 <hr />
 
 {#if board?.winner()}

@@ -1,8 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
 import { getOrCreateParticipant } from '../../../../../../../engine/protocol/engine_client';
-import type { Participant as ParticipantProto } from '../../../../../../../engine/protocol/engine_pb';
 import { Player } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
+import type { Empty } from '@bufbuild/protobuf/wkt';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
     const roomUUID = params.roomUUID;
@@ -25,10 +25,9 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
         console.log(`[backend] GRPC request: getOrCreateParticipant(roomUUID=${roomUUID}, participantUUID=${session_id}, role=${role})`);
         const player_number = mark === 'X' ? 0 : 1;
         const player = mark === 'X' ? Player.PLAYER_X : Player.PLAYER_O;
-        const participant: ParticipantProto = await getOrCreateParticipant(roomUUID, session_id, role, player_number);
-        console.log(`[backend] Participant '${session_id}' added to the game. Participant is ${JSON.stringify(participant)}, player ${player}`);
+        const response: Empty = await getOrCreateParticipant(roomUUID, session_id, role, player_number);
         return {
-            participant, player
+            participant_uuid: session_id, player
         };
     } catch (err) {
         console.error(`[backend] gRPC error trying to add participant:`, err);

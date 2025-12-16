@@ -6,7 +6,6 @@ import {
   StartGameRequestSchema,
   GetOrCreateParticipantRequest as GetOrCreateParticipantRequestProto,
   GetOrCreateParticipantRequestSchema,
-  Participant as ParticipantProto,
   SendActionRequest as SendActionRequestProto,
   SendActionRequestSchema,
 } from './engine_pb.js';
@@ -32,7 +31,7 @@ export async function startGame(room_uuid: string, game_type: string): Promise<E
   return await engine_service.startGame(request);
 }
 
-export async function getOrCreateParticipant(room_uuid: string, participant_uuid: string, participant_role: string, player_number: number | undefined): Promise<ParticipantProto> {
+export async function getOrCreateParticipant(room_uuid: string, participant_uuid: string, participant_role: string, player_number: number | undefined): Promise<Empty> {
   console.log(`[backend] getOrCreateParticipant(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, participant_role=${participant_role}, player_number=${player_number})`);
   const request: GetOrCreateParticipantRequestProto = create(GetOrCreateParticipantRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, participantRole: participant_role, playerNumber: player_number });
   return await engine_service.getOrCreateParticipant(request);
