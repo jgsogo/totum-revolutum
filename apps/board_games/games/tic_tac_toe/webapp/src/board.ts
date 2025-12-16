@@ -1,7 +1,26 @@
-import { Board as BoardProto, BoardSchema, Winner as WinnerProto } from "../../models/board_pb.js"
+import { Board as BoardProto, BoardSchema, Winner as WinnerProto, Player as PlayerProto } from "../../models/board_pb.js"
 import { IncomingMessageConstructor, staticImplements } from "./message.js";
 import { Buffer } from 'buffer';
 import { fromBinary } from "@bufbuild/protobuf";
+
+export enum Player {
+  PLAYER_X = 1,
+  PLAYER_O,
+  NONE,
+}
+
+export namespace Player {
+    export function from_proto(value: PlayerProto): Player  {
+        switch (value) {
+            case PlayerProto.PLAYER_X:
+                return Player.PLAYER_X;
+            case PlayerProto.PLAYER_O:
+                return Player.PLAYER_O;
+            case PlayerProto.NONE:
+                return Player.NONE;
+        }
+    }
+}
 
 export class BoardWinner {
     private readonly proto: WinnerProto;
@@ -10,8 +29,8 @@ export class BoardWinner {
         this.proto = proto;
     }
 
-    player(): number {
-        return this.proto.player;
+    player(): Player {
+        return Player.from_proto( this.proto.player);
     }
 
     line(): number[] {
@@ -30,12 +49,12 @@ export class Board {
         return new Board(board_proto);
     }
 
-    status(): string {
-        return this.board.boardStatus;
+    status(): Player[] {
+        return this.board.boardStatus.map((p: PlayerProto) => Player.from_proto(p));
     }
 
-    current_turn(): number | undefined {
-        return this.board.turnState.case === 'currentTurn' ? this.board.turnState.value : undefined;
+    current_turn(): Player | undefined {
+        return this.board.turnState.case === 'currentTurn' ? Player.from_proto( this.board.turnState.value) : undefined;
     }
 
     winner(): BoardWinner | undefined {

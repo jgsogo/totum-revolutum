@@ -17,9 +17,9 @@ export declare type Board = Message<"board_games.tic_tac_toe.Board"> & {
   /**
    * Linearized 3x3 board. Values: 'X', 'O', or ' ' (empty).
    *
-   * @generated from field: string board_status = 1;
+   * @generated from field: repeated board_games.tic_tac_toe.Player board_status = 1;
    */
-  boardStatus: string;
+  boardStatus: Player[];
 
   /**
    * FIXME: Every game will have this?
@@ -83,12 +83,17 @@ export enum Player {
   /**
    * @generated from enum value: PLAYER_X = 0;
    */
-  X = 0,
+  PLAYER_X = 0,
 
   /**
    * @generated from enum value: PLAYER_O = 1;
    */
-  O = 1,
+  PLAYER_O = 1,
+
+  /**
+   * @generated from enum value: NONE = 2;
+   */
+  NONE = 2,
 }
 
 /**

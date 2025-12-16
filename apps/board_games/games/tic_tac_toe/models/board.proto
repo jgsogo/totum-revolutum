@@ -4,11 +4,12 @@ package board_games.tic_tac_toe;
 enum Player {
   PLAYER_X = 0;
   PLAYER_O = 1;
+  NONE = 2;
 }
 
 message Board {
     // Linearized 3x3 board. Values: 'X', 'O', or ' ' (empty).
-    string board_status = 1;
+    repeated Player board_status = 1;
 
     oneof turn_state { // FIXME: Every game will have this?
         Player current_turn = 2;

@@ -9,6 +9,17 @@
 
 using namespace utils::libpqxx::testing;
 
+std::vector<board_games::tic_tac_toe::Player> to_v_players(const google::protobuf::RepeatedField<int>& board_status) {
+    std::vector<board_games::tic_tac_toe::Player> v;
+    v.reserve(board_status.size());
+
+    for (int raw : board_status) {
+        v.push_back(static_cast<board_games::tic_tac_toe::Player>(raw));
+    }
+
+    return v;
+}
+
 TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test DB interactions") {
     data::RoomUUID room_uuid{uuids::to_string(uuids::uuid_system_generator{}())};
     board_games::tic_tac_toe::TicTacToePlugin ttt;
@@ -30,7 +41,9 @@ TEST_CASE_PERSISTENT_FIXTURE(UniqueDBConnectionPool, "Test DB interactions") {
             auto game_state = game_found.value()->payload.into_proto<board_games::tic_tac_toe::Board>();
             REQUIRE(game_state.has_value());
             REQUIRE(game_state->current_turn() == 0);
-            REQUIRE(game_state->board_status() == "         ");
+            auto board_status = to_v_players(game_state->board_status());
+            REQUIRE(board_status ==
+                    std::vector<board_games::tic_tac_toe::Player>(9, board_games::tic_tac_toe::Player::NONE));
         });
     }
 }
