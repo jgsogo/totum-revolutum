@@ -7,6 +7,6 @@
 
 namespace board_games::tic_tac_toe {
 
-    Expected<Board> apply_game_finished_draw(const Board& board, const EventGameFinishedDraw&);
+    Expected<Board> apply_game_finished_draw(Board&& board, const EventGameFinishedDraw&);
 
 }

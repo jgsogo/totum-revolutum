@@ -7,6 +7,6 @@
 
 namespace board_games::tic_tac_toe {
 
-    Expected<Board> apply_mark_placed(const Board& board, const EventMarkPlaced&);
+    Expected<Board> apply_mark_placed(Board&& board, const EventMarkPlaced&);
 
 }

@@ -7,6 +7,6 @@
 
 namespace board_games::tic_tac_toe {
 
-    Expected<Board> apply_game_finished_winner(const Board& board, const EventGameFinishedWinner&);
+    Expected<Board> apply_game_finished_winner(Board&&, const EventGameFinishedWinner&);
 
 }

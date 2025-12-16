@@ -8,8 +8,11 @@ namespace data {
         template <typename T> class Payload {
           public:
             Payload() = delete;
-            Payload(const Payload&) = delete;
-            explicit Payload(Payload&& payload) = default;
+            Payload(const Payload&) = default;            // TODO: Remove this copy ctors
+            Payload& operator=(const Payload&) = default; // TODO: Remove this copy ctors
+
+            explicit Payload(Payload&& payload) noexcept = default;
+            Payload& operator=(Payload&&) noexcept = default;
 
             explicit Payload(std::vector<std::byte>&& payload) : _payload{std::move(payload)} {};
 

@@ -7,6 +7,6 @@
 
 namespace board_games::tic_tac_toe {
 
-    Expected<Board> apply_next_turn(const Board& board, const EventNextTurn&);
+    Expected<Board> apply_next_turn(Board&& board, const EventNextTurn&);
 
 }
