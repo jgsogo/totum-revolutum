@@ -54,37 +54,6 @@ export declare type StartGameRequest = Message<"board_games.StartGameRequest"> &
 export declare const StartGameRequestSchema: GenMessage<StartGameRequest>;
 
 /**
- * @generated from message board_games.GetOrCreateParticipantRequest
- */
-export declare type GetOrCreateParticipantRequest = Message<"board_games.GetOrCreateParticipantRequest"> & {
-  /**
-   * @generated from field: string room_uuid = 1;
-   */
-  roomUuid: string;
-
-  /**
-   * @generated from field: string participant_uuid = 2;
-   */
-  participantUuid: string;
-
-  /**
-   * @generated from field: string participant_role = 3;
-   */
-  participantRole: string;
-
-  /**
-   * @generated from field: optional uint32 player_number = 4;
-   */
-  playerNumber?: number;
-};
-
-/**
- * Describes the message board_games.GetOrCreateParticipantRequest.
- * Use `create(GetOrCreateParticipantRequestSchema)` to create a new message.
- */
-export declare const GetOrCreateParticipantRequestSchema: GenMessage<GetOrCreateParticipantRequest>;
-
-/**
  * @generated from message board_games.SendActionRequest
  */
 export declare type SendActionRequest = Message<"board_games.SendActionRequest"> & {
@@ -123,6 +92,8 @@ export declare const EngineService: GenService<{
     output: typeof EmptySchema;
   },
   /**
+   * rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (google.protobuf.Empty);
+   *
    * @generated from rpc board_games.EngineService.StartGame
    */
   startGame: {
@@ -131,11 +102,11 @@ export declare const EngineService: GenService<{
     output: typeof EmptySchema;
   },
   /**
-   * @generated from rpc board_games.EngineService.GetOrCreateParticipant
+   * @generated from rpc board_games.EngineService.JoinGame
    */
-  getOrCreateParticipant: {
+  joinGame: {
     methodKind: "unary";
-    input: typeof GetOrCreateParticipantRequestSchema;
+    input: typeof SendActionRequestSchema;
     output: typeof EmptySchema;
   },
   /**

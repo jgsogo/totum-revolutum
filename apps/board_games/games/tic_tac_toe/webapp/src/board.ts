@@ -20,6 +20,17 @@ export namespace Player {
                 return Player.NONE;
         }
     }
+
+    export function to_proto(value: Player) : PlayerProto {
+        switch (value) {
+            case Player.PLAYER_X:
+                return PlayerProto.PLAYER_X;
+            case Player.PLAYER_O:
+                return PlayerProto.PLAYER_O;
+            case Player.NONE:
+                return PlayerProto.NONE;
+        }
+    }
 }
 
 export class BoardWinner {

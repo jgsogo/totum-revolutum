@@ -62,10 +62,52 @@ namespace services {
         });
     }
 
-    grpc::Status EngineServiceImpl::GetOrCreateParticipant(grpc::ServerContext* context,
-                                                           const board_games::GetOrCreateParticipantRequest* request,
-                                                           google::protobuf::Empty* response) {
-        SPDLOG_DEBUG("GetOrCreateParticipant");
+    // grpc::Status EngineServiceImpl::GetOrCreateParticipant(grpc::ServerContext* context,
+    //                                                        const board_games::GetOrCreateParticipantRequest* request,
+    //                                                        google::protobuf::Empty* response) {
+    //     SPDLOG_DEBUG("GetOrCreateParticipant");
+    //     return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) {
+    //         data::RoomUUID room{std::string{request->room_uuid()}};
+    //         data::ParticipantUUID participant{std::string{request->participant_uuid()}};
+
+    //         {
+    //             // Try to get already existing participant
+    //             auto r = data::find_participant(conn, room, participant);
+    //             if (r.has_value() && r.value().has_value()) {
+    //                 return grpc::Status::OK;
+    //             }
+    //         }
+
+    //         {
+    //             // Add and return
+    //             auto role_expected = data::participant_role_from_string(request->participant_role());
+    //             if (!role_expected.has_value()) {
+    //                 auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to parse participant role"};
+    //                 return status;
+    //             }
+    //             data::ParticipantRole role = role_expected.value();
+
+    //             return data::add_participant(conn, room, participant, role, request->player_number())
+    //                 .and_then([&conn, &room](data::Participant&& _p) { return data::notify_room_update(conn, room);
+    //                 })
+
+    //                 .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
+    //                 .or_else([](const auto& e) {
+    //                     auto status = grpc::Status{grpc::StatusCode::INTERNAL,
+    //                                                std::format("Failed to add participant to room: {}", e)};
+    //                     return Expected<grpc::Status>{status};
+    //                 })
+    //                 .value();
+    //         }
+    //     });
+    // }
+
+    grpc::Status EngineServiceImpl::JoinGame(grpc::ServerContext* context,
+                                             const board_games::SendActionRequest* request,
+                                             google::protobuf::Empty* response) {
+        SPDLOG_DEBUG("JoinGame(request.room_uuid={}, request.participant_uuid={})", request->room_uuid(),
+                     request->participant_uuid());
+
         return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) {
             data::RoomUUID room{std::string{request->room_uuid()}};
             data::ParticipantUUID participant{std::string{request->participant_uuid()}};
@@ -80,15 +122,14 @@ namespace services {
 
             {
                 // Add and return
-                auto role_expected = data::participant_role_from_string(request->participant_role());
-                if (!role_expected.has_value()) {
-                    auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to parse participant role"};
-                    return status;
-                }
-                data::ParticipantRole role = role_expected.value();
-
-                return data::add_participant(conn, room, participant, role, request->player_number())
-                    .and_then([&conn, &room](data::Participant&& _p) { return data::notify_room_update(conn, room); })
+                return data::add_participant(conn, room, participant, data::ParticipantRole::PLAYER,
+                                             request->player_number())
+                    .and_then([&conn, &room](data::Participant&& _p) {
+                        // TODO: Execute the action on the board
+                        // TODO: Very likely we want to implement some other function to avoid duplicated code.
+                        asfdasdf return {};
+                    })
+                    .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
 
                     .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
                     .or_else([](const auto& e) {

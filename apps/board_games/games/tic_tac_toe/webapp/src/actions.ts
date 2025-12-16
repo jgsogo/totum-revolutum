@@ -1,4 +1,5 @@
-import { Action as ActionProto, ActionSchema, ActionPlaceMarkSchema } from "../../models/actions_pb.js"
+import { Action as ActionProto, ActionSchema, ActionPlaceMarkSchema, ActionJoinGameSchema } from "../../models/actions_pb.js"
+import { Player } from "./board.js";
 import { OutgoingMessage } from "./message.js";
 import { toBinary, create } from "@bufbuild/protobuf";
 
@@ -16,10 +17,22 @@ export class Action extends OutgoingMessage {
             action: {
                 case: "placeMark",
                 value: create(ActionPlaceMarkSchema, {
-                position,
+                    position,
                 }),
             },
-            }) as ActionProto;
+        }) as ActionProto;
+        return new Action(proto)
+    }
+
+    static create_join_game(player: Player): Action {
+        const proto = create(ActionSchema, {
+            action: {
+                case: "placeMark",
+                value: create(ActionJoinGameSchema, {
+                    player: Player.to_proto(player),
+                }),
+            },
+        }) as ActionProto;
         return new Action(proto)
     }
 

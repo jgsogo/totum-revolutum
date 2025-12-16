@@ -4,6 +4,7 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
+import type { Player } from "./board_pb.js";
 
 /**
  * Describes the file apps/board_games/games/tic_tac_toe/models/actions.proto.
@@ -29,6 +30,22 @@ export declare type ActionPlaceMark = Message<"board_games.tic_tac_toe.ActionPla
 export declare const ActionPlaceMarkSchema: GenMessage<ActionPlaceMark>;
 
 /**
+ * @generated from message board_games.tic_tac_toe.ActionJoinGame
+ */
+export declare type ActionJoinGame = Message<"board_games.tic_tac_toe.ActionJoinGame"> & {
+  /**
+   * @generated from field: board_games.tic_tac_toe.Player player = 1;
+   */
+  player: Player;
+};
+
+/**
+ * Describes the message board_games.tic_tac_toe.ActionJoinGame.
+ * Use `create(ActionJoinGameSchema)` to create a new message.
+ */
+export declare const ActionJoinGameSchema: GenMessage<ActionJoinGame>;
+
+/**
  * @generated from message board_games.tic_tac_toe.Action
  */
 export declare type Action = Message<"board_games.tic_tac_toe.Action"> & {
@@ -41,6 +58,12 @@ export declare type Action = Message<"board_games.tic_tac_toe.Action"> & {
      */
     value: ActionPlaceMark;
     case: "placeMark";
+  } | {
+    /**
+     * @generated from field: board_games.tic_tac_toe.ActionJoinGame join_game = 2;
+     */
+    value: ActionJoinGame;
+    case: "joinGame";
   } | { case: undefined; value?: undefined };
 };
 
