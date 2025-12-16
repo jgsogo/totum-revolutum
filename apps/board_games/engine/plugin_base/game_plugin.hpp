@@ -68,7 +68,7 @@ namespace engine {
                     })
                     .and_then([this](auto&& board_and_events) -> Expected<std::pair<TBoard, std::vector<TEventProto>>> {
                         auto&& [board, events] = board_and_events;
-                        auto win_events = EXPECT(this->_check_win_conditions(board));
+                        auto win_events = EXPECT(this->_end_turn(board));
                         for (const auto& event : win_events) {
                             board = EXPECT(this->_apply_event(std::move(board), event));
                         }
@@ -116,8 +116,8 @@ namespace engine {
         virtual Expected<std::vector<TEventProto>> _compute_events(const TBoard& board, const TActionProto& action,
                                                                    uint8_t player_number) = 0;
 
-        // Checks win condition and returns additional events
-        virtual Expected<std::vector<TEventProto>> _check_win_conditions(const TBoard& board) = 0;
+        // Returns events generated after a turn has finished (it also checks win condition)
+        virtual Expected<std::vector<TEventProto>> _end_turn(const TBoard& board) = 0;
 
         // Applies the given event on the given board, and return the new state for the board.
         virtual Expected<TBoard> _apply_event(TBoard&& board, const TEventProto& event) = 0;

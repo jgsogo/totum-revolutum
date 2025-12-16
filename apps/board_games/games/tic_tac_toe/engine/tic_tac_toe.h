@@ -29,8 +29,8 @@ namespace board_games::tic_tac_toe {
         Expected<std::vector<Event>> _compute_events(const Board& board, const Action& action,
                                                      uint8_t player_number) override final;
 
-        // Checks win condition and returns additional events
-        Expected<std::vector<Event>> _check_win_conditions(const Board& board) override final;
+        // Returns events generated after a turn has finished (it also checks win condition)
+        Expected<std::vector<Event>> _end_turn(const Board& board) override final;
 
         // Applies the given event on the given board, and return the new state for the board.
         Expected<Board> _apply_event(Board&& board, const Event& event) override final;

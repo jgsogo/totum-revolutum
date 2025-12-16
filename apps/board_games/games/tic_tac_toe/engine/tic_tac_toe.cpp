@@ -14,7 +14,7 @@ namespace board_games::tic_tac_toe {
     static constexpr data::GameType GAME_TYPE{"tic_tac_toe"};
 
     constexpr static char PLAYER_X_SYMBOL = 'X';
-    constexpr static char PLAYER_O_SYMBOL = 'O';
+    // constexpr static char PLAYER_O_SYMBOL = 'O';
     constexpr static char EMPTY_SYMBOL = ' ';
 
     static constexpr std::string_view ACTION_PLACE_MARK{"move_action"};
@@ -95,8 +95,8 @@ namespace board_games::tic_tac_toe {
         }
     }
 
-    Expected<std::vector<Event>> TicTacToePlugin::_check_win_conditions(const Board& board) {
-        SPDLOG_DEBUG("[tic_tac_toe] _check_win_conditions");
+    Expected<std::vector<Event>> TicTacToePlugin::_end_turn(const Board& board) {
+        SPDLOG_DEBUG("[tic_tac_toe] _end_turn");
         Event event;
         auto winner = check_winner(board.board_status());
         if (winner) {
