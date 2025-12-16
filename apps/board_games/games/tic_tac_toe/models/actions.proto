@@ -1,9 +1,15 @@
 syntax = "proto3";
 package board_games.tic_tac_toe;
 
+import "apps/board_games/games/tic_tac_toe/models/board.proto";
+
 message ActionPlaceMark {
     // Position 0–8, mapped left-to-right, top-to-bottom.
     uint32 position =1;
+}
+
+message ActionJoinGame {
+    Player player = 1;
 }
 
 message Action {

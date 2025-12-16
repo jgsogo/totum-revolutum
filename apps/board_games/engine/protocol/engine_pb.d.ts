@@ -54,9 +54,9 @@ export declare type StartGameRequest = Message<"board_games.StartGameRequest"> &
 export declare const StartGameRequestSchema: GenMessage<StartGameRequest>;
 
 /**
- * @generated from message board_games.GetOrCreateParticipantRequest
+ * @generated from message board_games.JoinGameRequest
  */
-export declare type GetOrCreateParticipantRequest = Message<"board_games.GetOrCreateParticipantRequest"> & {
+export declare type JoinGameRequest = Message<"board_games.JoinGameRequest"> & {
   /**
    * @generated from field: string room_uuid = 1;
    */
@@ -68,52 +68,16 @@ export declare type GetOrCreateParticipantRequest = Message<"board_games.GetOrCr
   participantUuid: string;
 
   /**
-   * @generated from field: string participant_role = 3;
+   * @generated from field: bytes payload = 3;
    */
-  participantRole: string;
-
-  /**
-   * @generated from field: optional uint32 player_number = 4;
-   */
-  playerNumber?: number;
+  payload: Uint8Array;
 };
 
 /**
- * Describes the message board_games.GetOrCreateParticipantRequest.
- * Use `create(GetOrCreateParticipantRequestSchema)` to create a new message.
+ * Describes the message board_games.JoinGameRequest.
+ * Use `create(JoinGameRequestSchema)` to create a new message.
  */
-export declare const GetOrCreateParticipantRequestSchema: GenMessage<GetOrCreateParticipantRequest>;
-
-/**
- * @generated from message board_games.Participant
- */
-export declare type Participant = Message<"board_games.Participant"> & {
-  /**
-   * @generated from field: string room_uuid = 1;
-   */
-  roomUuid: string;
-
-  /**
-   * @generated from field: string uuid = 2;
-   */
-  uuid: string;
-
-  /**
-   * @generated from field: string role = 3;
-   */
-  role: string;
-
-  /**
-   * @generated from field: uint32 player_number = 4;
-   */
-  playerNumber: number;
-};
-
-/**
- * Describes the message board_games.Participant.
- * Use `create(ParticipantSchema)` to create a new message.
- */
-export declare const ParticipantSchema: GenMessage<Participant>;
+export declare const JoinGameRequestSchema: GenMessage<JoinGameRequest>;
 
 /**
  * @generated from message board_games.SendActionRequest
@@ -154,6 +118,8 @@ export declare const EngineService: GenService<{
     output: typeof EmptySchema;
   },
   /**
+   * rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (Participant);
+   *
    * @generated from rpc board_games.EngineService.StartGame
    */
   startGame: {
@@ -162,12 +128,12 @@ export declare const EngineService: GenService<{
     output: typeof EmptySchema;
   },
   /**
-   * @generated from rpc board_games.EngineService.GetOrCreateParticipant
+   * @generated from rpc board_games.EngineService.JoinGame
    */
-  getOrCreateParticipant: {
+  joinGame: {
     methodKind: "unary";
-    input: typeof GetOrCreateParticipantRequestSchema;
-    output: typeof ParticipantSchema;
+    input: typeof JoinGameRequestSchema;
+    output: typeof EmptySchema;
   },
   /**
    * @generated from rpc board_games.EngineService.SendAction

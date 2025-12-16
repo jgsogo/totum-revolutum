@@ -1,7 +1,9 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
-import { getOrCreateParticipant } from '../../../../../../../engine/protocol/engine_client';
+import { sendAction, joinGame } from '../../../../../../../engine/protocol/engine_client';
 import type { Participant as ParticipantProto } from '../../../../../../../engine/protocol/engine_pb';
+import { Action, Player } from '../../../../../../../games/tic_tac_toe/webapp/src';
+import type { Empty } from "@bufbuild/protobuf/wkt";
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
     const roomUUID = params.roomUUID;
@@ -15,18 +17,17 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     }
     cookies.set('session-id', session_id, {
         path: `/tic_tac_toe/${roomUUID}`,
-        secure: false , // FIXME: We need this if using HTTP (https://github.com/jshttp/cookie#secure)
+        secure: false, // FIXME: We need this if using HTTP (https://github.com/jshttp/cookie#secure)
     });
 
     // Add or retrieve me as a participant
     try {
-        const role = "player";
-        console.log(`[backend] GRPC request: getOrCreateParticipant(roomUUID=${roomUUID}, participantUUID=${session_id}, role=${role})`);
-        const player_number = mark === 'X' ? 0 : 1;
-        const participant: ParticipantProto = await getOrCreateParticipant(roomUUID, session_id, role, player_number);
-        console.log(`[backend] Participant '${session_id}' added to the game. Participant is ${JSON.stringify(participant)}`);
+        console.log(`[backend] GRPC request: joinGame(roomUUID=${roomUUID}, participantUUID=${session_id})`);
+        const player = mark === 'X' ? Player.X : Player.O;
+        let action = Action.create_join_game(player);
+        const response: Empty = await joinGame(roomUUID, session_id, action.toBinary());
         return {
-            participant
+            player
         };
     } catch (err) {
         console.error(`[backend] gRPC error trying to add participant:`, err);

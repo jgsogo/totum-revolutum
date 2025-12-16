@@ -1,14 +1,15 @@
 syntax = "proto3";
 package board_games.tic_tac_toe;
 
+import "apps/board_games/games/tic_tac_toe/models/board.proto";
 
 message EventMarkPlaced {
     uint32 position = 1;
-    string mark = 2;
+    Player mark = 2;
 }
 
 message EventGameFinishedWinner {
-    uint32 player = 1;
+    Player player = 1;
     repeated uint32 line = 2;
 }
 
@@ -16,7 +17,7 @@ message EventGameFinishedDraw {
 }
 
 message EventNextTurn {
-    uint32 next_player = 1;
+    Player next_player = 1;
 }
 
 message Event {

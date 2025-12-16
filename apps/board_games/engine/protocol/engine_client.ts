@@ -4,11 +4,10 @@ import {
   NewRoomRequestSchema,
   StartGameRequest as StartGameRequestProto,
   StartGameRequestSchema,
-  GetOrCreateParticipantRequest as GetOrCreateParticipantRequestProto,
-  GetOrCreateParticipantRequestSchema,
-  Participant as ParticipantProto,
   SendActionRequest as SendActionRequestProto,
   SendActionRequestSchema,
+  JoinGameRequest as JoinGameRequestProto,
+  JoinGameRequestSchema
 } from './engine_pb.js';
 import { Empty } from "@bufbuild/protobuf/wkt";
 import grpc from '@grpc/grpc-js';
@@ -32,14 +31,14 @@ export async function startGame(room_uuid: string, game_type: string): Promise<E
   return await engine_service.startGame(request);
 }
 
-export async function getOrCreateParticipant(room_uuid: string, participant_uuid: string, participant_role: string, player_number: number | undefined): Promise<ParticipantProto> {
-  console.log(`[backend] getOrCreateParticipant(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, participant_role=${participant_role}, player_number=${player_number})`);
-  const request: GetOrCreateParticipantRequestProto = create(GetOrCreateParticipantRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, participantRole: participant_role, playerNumber: player_number });
-  return await engine_service.getOrCreateParticipant(request);
-}
-
 export async function sendAction(room_uuid: string, participant_uuid: string, payload: Uint8Array): Promise<Empty> {
   console.log(`[backend] sendAction(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, payload)`);
   const request: SendActionRequestProto = create(SendActionRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, payload });
   return await engine_service.sendAction(request);
+}
+
+export async function joinGame(room_uuid: string, participant_uuid: string, payload: Uint8Array): Promise<Empty> {
+  console.log(`[backend] joinGame(room_uuid=${room_uuid}, participant_uuid=${participant_uuid}, payload)`);
+  const request: JoinGameRequestProto = create(JoinGameRequestSchema, { roomUuid: room_uuid, participantUuid: participant_uuid, payload });
+  return await engine_service.joinGame(request);
 }

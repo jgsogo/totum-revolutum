@@ -16,9 +16,8 @@ namespace services {
         grpc::Status StartGame(grpc::ServerContext* context, const board_games::StartGameRequest* request,
                                google::protobuf::Empty* response) override;
 
-        grpc::Status GetOrCreateParticipant(grpc::ServerContext* context,
-                                            const board_games::GetOrCreateParticipantRequest* request,
-                                            board_games::Participant* response) override;
+        grpc::Status JoinGame(grpc::ServerContext* context, const board_games::JoinGameRequest* request,
+                              google::protobuf::Empty* response) override;
 
         grpc::Status SendAction(grpc::ServerContext* context, const board_games::SendActionRequest* request,
                                 google::protobuf::Empty* response) override;

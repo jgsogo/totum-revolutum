@@ -2,7 +2,7 @@
 // @generated from file apps/board_games/games/tic_tac_toe/models/board.proto (package board_games.tic_tac_toe, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
@@ -22,15 +22,13 @@ export declare type Board = Message<"board_games.tic_tac_toe.Board"> & {
   boardStatus: string;
 
   /**
-   * FIXME: Every game will have this?
-   *
    * @generated from oneof board_games.tic_tac_toe.Board.turn_state
    */
   turnState: {
     /**
-     * @generated from field: uint32 current_turn = 2;
+     * @generated from field: board_games.tic_tac_toe.Player current_turn = 2;
      */
-    value: number;
+    value: Player;
     case: "currentTurn";
   } | {
     /**
@@ -60,9 +58,9 @@ export declare const BoardSchema: GenMessage<Board>;
  */
 export declare type Winner = Message<"board_games.tic_tac_toe.Winner"> & {
   /**
-   * @generated from field: uint32 player = 1;
+   * @generated from field: board_games.tic_tac_toe.Player player = 1;
    */
-  player: number;
+  player: Player;
 
   /**
    * @generated from field: repeated uint32 line = 2;
@@ -75,4 +73,24 @@ export declare type Winner = Message<"board_games.tic_tac_toe.Winner"> & {
  * Use `create(WinnerSchema)` to create a new message.
  */
 export declare const WinnerSchema: GenMessage<Winner>;
+
+/**
+ * @generated from enum board_games.tic_tac_toe.Player
+ */
+export enum Player {
+  /**
+   * @generated from enum value: PLAYER_X = 0;
+   */
+  X = 0,
+
+  /**
+   * @generated from enum value: PLAYER_O = 1;
+   */
+  O = 1,
+}
+
+/**
+ * Describes the enum board_games.tic_tac_toe.Player.
+ */
+export declare const PlayerSchema: GenEnum<Player>;
 

@@ -2,14 +2,15 @@
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import { connectToRoom } from '$lib/api/socket';
-  import { Board } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
+  import { Board, Player } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
   import TicTacToeBoard from '$lib/tictactoe/components/TicTacToeBoard.svelte';
   import { placeMark } from '$lib/tictactoe/api/place_mark';
   import type { Participant as ParticipantProto } from '../../../../../../../engine/protocol/engine_pb';
 
+
   const roomUUID = page.params.roomUUID!;
   let refBoard: typeof TicTacToeBoard;
-  const participant: ParticipantProto = page.data.participant;
+  const player: Player = page.data.player;
 
   let game_data = $state({});
   let board: Board | undefined = $state();
