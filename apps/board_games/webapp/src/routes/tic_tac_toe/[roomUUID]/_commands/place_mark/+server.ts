@@ -10,7 +10,7 @@ export async function POST({ request, params }) {
   try {
     console.log(`[backend] POST request: placeMark(roomID=${roomUUID}, player_session=${player_session}, cell_id=${cell_id})`);
 
-    let action = new Action(cell_id);
+    let action = Action.create_place_mark(cell_id);
     const response: Empty = await sendAction(roomUUID, player_session, action.toBinary());
 
     return json({ ok: true }, { status: 200 });

@@ -21,12 +21,12 @@ message Winner {
     repeated uint32 line = 2;
 }
 
-message Action {
-    // Position 0–8, mapped left-to-right, top-to-bottom.
-    uint32 position =1;
-}
+// message Action {
+//     // Position 0–8, mapped left-to-right, top-to-bottom.
+//     uint32 position =1;
+// }
 
-message Event {
-    uint32 mark_placed_at_position = 1;
-    uint32 player = 2;
-}
+// message Event {
+//     uint32 mark_placed_at_position = 1;
+//     uint32 player = 2;
+// }

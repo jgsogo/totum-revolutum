@@ -7,26 +7,12 @@
 #include "apps/board_games/games/ticket_to_ride/engine/maps/usa/usa.h"
 #include "apps/board_games/games/ticket_to_ride/models/game.pb.h"
 
+#include "constants.hpp"
 namespace board_games::ticket_to_ride {
-    static constexpr data::GameType GAME_TYPE{"ticket_to_ride"};
-
-    static constexpr std::string_view ACTION_PLACE_MARK{"move_action"};
-
-    static constexpr std::string_view EVENT_MARK_PLACED{"move_action"};
 
     TicketToRidePlugin::TicketToRidePlugin()
         : TicketToRidePlugin::GamePlugin{GAME_TYPE, std::string{"Ticket to Ride"},
                                          std::string{"Ticket to Ride board game"}} {};
-
-    std::string_view TicketToRidePlugin::get_action_type(const Action& action) const {
-        SPDLOG_ERROR("[ticket_to_ride] Not implemented");
-        return ACTION_PLACE_MARK;
-    }
-
-    std::string_view TicketToRidePlugin::get_event_type(const event& event) const {
-        SPDLOG_ERROR("[ticket_to_ride] Not implemented");
-        return EVENT_MARK_PLACED;
-    }
 
     data::GameState TicketToRidePlugin::get_game_state(const GameState& game_state) const {
         SPDLOG_ERROR("[ticket_to_ride] Not implemented");
@@ -49,9 +35,20 @@ namespace board_games::ticket_to_ride {
         return game;
     }
 
-    Expected<std::pair<GameState, event>> TicketToRidePlugin::_run(const GameState& game_state, const Action& action,
-                                                                   uint8_t player_number) {
-        SPDLOG_ERROR("[ticket_to_ride] Not implemented");
+    Expected<std::vector<Event>> TicketToRidePlugin::_compute_events(const GameState& board, const Action& action,
+                                                                     uint8_t player_number) {
+        SPDLOG_ERROR("[ticket_to_ride] _compute_events");
         return tl::unexpected(utils::NotImplemented{"WIP"});
     }
+
+    Expected<std::vector<Event>> TicketToRidePlugin::_end_turn(const GameState& board) {
+        SPDLOG_ERROR("[ticket_to_ride] _end_turn");
+        return tl::unexpected(utils::NotImplemented{"WIP"});
+    }
+
+    Expected<GameState> TicketToRidePlugin::_apply_event(GameState&& board, const Event& event) {
+        SPDLOG_ERROR("[ticket_to_ride] _apply_event");
+        return tl::unexpected(utils::NotImplemented{"WIP"});
+    }
+
 } // namespace board_games::ticket_to_ride

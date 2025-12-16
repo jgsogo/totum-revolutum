@@ -11,19 +11,25 @@
 
 namespace board_games::ticket_to_ride {
 
-    class TicketToRidePlugin final : public engine::GamePlugin<GameState, Action, event> {
-        using GamePlugin = engine::GamePlugin<GameState, Action, event>;
+    class TicketToRidePlugin final : public engine::GamePlugin<GameState, Action, Event> {
+        using GamePlugin = engine::GamePlugin<GameState, Action, Event>;
 
       public:
         TicketToRidePlugin();
 
       protected:
-        std::string_view get_action_type(const Action& action) const override;
-        std::string_view get_event_type(const event& event) const override;
         data::GameState get_game_state(const GameState& game_state) const override;
         Expected<GameState> _new_board() override;
-        Expected<std::pair<GameState, event>> _run(const GameState& game_state, const Action& action,
-                                                   uint8_t player_number) override;
+
+        // Returns the events that are triggered by the given action on the given board.
+        Expected<std::vector<Event>> _compute_events(const GameState& board, const Action& action,
+                                                     uint8_t player_number) override final;
+
+        // Returns events generated after a turn has finished (it also checks win condition)
+        Expected<std::vector<Event>> _end_turn(const GameState& board) override final;
+
+        // Applies the given event on the given board, and return the new state for the board.
+        Expected<GameState> _apply_event(GameState&& board, const Event& event) override final;
     };
 
 } // namespace board_games::ticket_to_ride
