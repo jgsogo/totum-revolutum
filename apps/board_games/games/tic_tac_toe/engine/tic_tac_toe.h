@@ -4,7 +4,9 @@
 #include "apps/board_games/engine/data/models/game_type.hpp"
 
 #include "apps/board_games/engine/plugin_base/game_plugin.hpp"
+#include "apps/board_games/games/tic_tac_toe/models/actions.pb.h"
 #include "apps/board_games/games/tic_tac_toe/models/board.pb.h"
+#include "apps/board_games/games/tic_tac_toe/models/events.pb.h"
 
 namespace board_games::tic_tac_toe {
 
@@ -22,9 +24,16 @@ namespace board_games::tic_tac_toe {
         std::string_view get_event_type(const board_games::tic_tac_toe::Event& event) const override;
         data::GameState get_game_state(const board_games::tic_tac_toe::Board& game_state) const override;
         Expected<board_games::tic_tac_toe::Board> _new_board() override;
-        Expected<std::pair<board_games::tic_tac_toe::Board, board_games::tic_tac_toe::Event>>
-        _run(const board_games::tic_tac_toe::Board& game_state, const board_games::tic_tac_toe::Action& action,
-             uint8_t player_number) override;
+
+        // Returns the events that are triggered by the given action on the given board.
+        Expected<std::vector<Event>> _compute_events(const Board& board, const Action& action,
+                                                     uint8_t player_number) override final;
+
+        // Checks win condition and returns additional events
+        Expected<std::vector<Event>> _check_win_conditions(const Board& board) override final;
+
+        // Applies the given event on the given board, and return the new state for the board.
+        Expected<Board> _apply_event(Board&& board, const Event& event) override final;
     };
 
 } // namespace board_games::tic_tac_toe

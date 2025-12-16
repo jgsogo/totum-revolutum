@@ -1,0 +1,19 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "actions",
+    srcs = [
+        "place_mark.cpp",
+    ],
+    hdrs = [
+        "place_mark.h",
+    ],
+    visibility = [
+        "//apps/board_games/games/tic_tac_toe/engine:__subpackages__",
+    ],
+    deps = [
+        "//apps/board_games/engine/errors",
+        "//apps/board_games/games/tic_tac_toe/models:models_cc_proto",
+        "//bazel/logging:spdlog",
+    ],
+)

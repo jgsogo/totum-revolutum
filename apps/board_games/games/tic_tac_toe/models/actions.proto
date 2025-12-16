@@ -1,0 +1,13 @@
+syntax = "proto3";
+package board_games.tic_tac_toe;
+
+message ActionPlaceMark {
+    // Position 0–8, mapped left-to-right, top-to-bottom.
+    uint32 position =1;
+}
+
+message Action {
+    oneof action {
+        ActionPlaceMark place_mark = 1;
+    }
+}

@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 #include <string>
 
+#include "libraries/utils/cpp/expected_type/expect.hpp"
+
 #include "apps/board_games/engine/errors/errors.hpp"
 
 #include "apps/board_games/engine/data/models/game_action_response.hpp"
@@ -52,47 +54,56 @@ namespace engine {
         Expected<data::GameActionResponse> run(const data::GamePayload& game_payload,
                                                const data::ActionPayload& action_payload,
                                                uint8_t player_number) override {
-            // Decode 'board'
-            auto board = game_payload.into_proto<TBoard>();
-            if (!board) {
-                SPDLOG_ERROR("Error decoding GamePayload: {}", board.error());
-                return tl::unexpected(board.error());
-            }
+            auto board = EXPECT(game_payload.into_proto<TBoard>());
+            auto action = EXPECT(action_payload.into_proto<TActionProto>());
 
-            // Decode 'action_payload'
-            auto action = action_payload.into_proto<TActionProto>();
-            if (!action) {
-                SPDLOG_ERROR("Error decoding ActionPayload: {}", action.error());
-                return tl::unexpected(action.error());
-            }
+            auto _ =
+                this->_compute_events(board, action, player_number)
+                    .and_then([board = std::move(board),
+                               this](auto&& events) mutable -> Expected<std::pair<TBoard, std::vector<TEventProto>>> {
+                        for (const auto& event : events) {
+                            board = EXPECT(this->_apply_event(std::move(board), event));
+                        }
+                        return {std::make_pair(board, events)};
+                    })
+                    .and_then([this](auto&& board_and_events) -> Expected<std::pair<TBoard, std::vector<TEventProto>>> {
+                        auto&& [board, events] = board_and_events;
+                        auto win_events = EXPECT(this->_check_win_conditions(board));
+                        for (const auto& event : win_events) {
+                            board = EXPECT(this->_apply_event(std::move(board), event));
+                        }
+                        events.insert(events.end(), win_events.begin(), win_events.end());
+                        return {std::make_pair(board, events)};
+                    });
 
-            return this->_run(board.value(), action.value(), player_number)
-                .and_then([&](auto&& t) -> Expected<data::GameActionResponse> {
-                    const auto& [new_game_payload, event] = t;
-                    auto event_type = this->get_event_type(event);
-                    auto new_board = this->get_game_state(new_game_payload);
+            return tl::unexpected{utils::NotImplemented{"We need more logic here"}};
+            // return this->_run(board.value(), action.value(), player_number)
+            //     .and_then([&](auto&& t) -> Expected<data::GameActionResponse> {
+            //         const auto& [new_game_payload, event] = t;
+            //         auto event_type = this->get_event_type(event);
+            //         auto new_board = this->get_game_state(new_game_payload);
 
-                    auto event_payload = data::EventPayload::from_proto(event);
-                    if (!event_payload) {
-                        SPDLOG_ERROR("Error serializing {} into protobuf", event.GetTypeName());
-                        return tl::unexpected(event_payload.error());
-                    }
+            //         auto event_payload = data::EventPayload::from_proto(event);
+            //         if (!event_payload) {
+            //             SPDLOG_ERROR("Error serializing {} into protobuf", event.GetTypeName());
+            //             return tl::unexpected(event_payload.error());
+            //         }
 
-                    auto new_game_payload_expected = data::GamePayload::from_proto(new_game_payload);
-                    if (!new_game_payload_expected) {
-                        SPDLOG_ERROR("Error serializing {} into protobuf", new_game_payload.GetTypeName());
-                        return tl::unexpected(new_game_payload_expected.error());
-                    }
+            //         auto new_game_payload_expected = data::GamePayload::from_proto(new_game_payload);
+            //         if (!new_game_payload_expected) {
+            //             SPDLOG_ERROR("Error serializing {} into protobuf", new_game_payload.GetTypeName());
+            //             return tl::unexpected(new_game_payload_expected.error());
+            //         }
 
-                    data::EventPayload event_{std::move(event_payload).value()};
-                    data::GamePayload new_game_payload_{std::move(new_game_payload_expected).value()};
+            //         data::EventPayload event_{std::move(event_payload).value()};
+            //         data::GamePayload new_game_payload_{std::move(new_game_payload_expected).value()};
 
-                    auto action_type = this->get_action_type(action.value());
-                    data::GameActionResponse game_action_response{std::string{action_type}, std::string{event_type},
-                                                                  std::move(event_), std::move(new_game_payload_),
-                                                                  new_board};
-                    return {std::move(game_action_response)};
-                });
+            //         auto action_type = this->get_action_type(action.value());
+            //         data::GameActionResponse game_action_response{std::string{action_type}, std::string{event_type},
+            //                                                       std::move(event_), std::move(new_game_payload_),
+            //                                                       new_board};
+            //         return {std::move(game_action_response)};
+            //     });
         }
 
       protected:
@@ -100,8 +111,16 @@ namespace engine {
         virtual std::string_view get_event_type(const TEventProto& event) const = 0;
         virtual data::GameState get_game_state(const TBoard& game_state) const = 0;
         virtual Expected<TBoard> _new_board() = 0;
-        virtual Expected<std::pair<TBoard, TEventProto>> _run(const TBoard& game_state, const TActionProto& action,
-                                                              uint8_t player_number) = 0;
+
+        // Returns the events that are triggered by the given action on the given board.
+        virtual Expected<std::vector<TEventProto>> _compute_events(const TBoard& board, const TActionProto& action,
+                                                                   uint8_t player_number) = 0;
+
+        // Checks win condition and returns additional events
+        virtual Expected<std::vector<TEventProto>> _check_win_conditions(const TBoard& board) = 0;
+
+        // Applies the given event on the given board, and return the new state for the board.
+        virtual Expected<TBoard> _apply_event(TBoard&& board, const TEventProto& event) = 0;
     };
 
 } // namespace engine

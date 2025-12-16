@@ -1,0 +1,29 @@
+syntax = "proto3";
+package board_games.tic_tac_toe;
+
+
+message EventMarkPlaced {
+    uint32 position = 1;
+    string mark = 2;
+}
+
+message EventGameFinishedWinner {
+    uint32 player = 1;
+    repeated uint32 line = 2;
+}
+
+message EventGameFinishedDraw {
+}
+
+message EventNextTurn {
+    uint32 next_player = 1;
+}
+
+message Event {
+    oneof event {
+        EventMarkPlaced mark_placed = 1;
+        EventGameFinishedWinner game_finished_winner = 2;
+        EventGameFinishedDraw game_finished_draw = 3;
+        EventNextTurn next_turn = 4;
+    }
+}

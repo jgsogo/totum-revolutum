@@ -19,6 +19,8 @@ cc_library(
         "//apps/board_games/engine/data",
         "//apps/board_games/engine/data/models",
         "//apps/board_games/engine/plugin_base",
+        "//apps/board_games/games/tic_tac_toe/engine/actions",
+        "//apps/board_games/games/tic_tac_toe/engine/events",
         "//apps/board_games/games/tic_tac_toe/models:models_cc_proto",
         "//bazel/logging:spdlog",
     ],
