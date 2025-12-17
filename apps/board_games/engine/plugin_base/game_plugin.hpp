@@ -8,6 +8,7 @@
 #include "apps/board_games/engine/errors/errors.hpp"
 
 #include "apps/board_games/engine/data/models/game_action_response.hpp"
+#include "apps/board_games/engine/data/models/game_join_response.hpp"
 #include "apps/board_games/engine/data/models/game_type.hpp"
 #include "apps/board_games/engine/data/models/payload.hpp"
 
@@ -28,6 +29,9 @@ namespace engine {
         virtual Expected<data::GameActionResponse> run(const data::GamePayload& game_state_payload,
                                                        const data::ActionPayload& action_payload,
                                                        uint8_t player_number) = 0;
+
+        virtual Expected<data::GameJoinResponse> join_game(const data::GamePayload& game_payload,
+                                                           const data::ActionPayload& action_payload) = 0;
 
       protected:
         data::GameType _slug;
@@ -86,6 +90,11 @@ namespace engine {
                     std::make_pair(ev.GetDescriptor()->full_name(), std::move(event_payload)));
             }
             return {std::move(game_action_response)};
+        }
+
+        Expected<data::GameJoinResponse> join_game(const data::GamePayload& game_payload,
+                                                   const data::ActionPayload& action_payload) override {
+            return tl::unexpected(utils::NotImplemented{"GamePlugin::join_game"});
         }
 
       protected:

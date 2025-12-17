@@ -7,6 +7,7 @@ cc_library(
     hdrs = [
         "game.hpp",
         "game_action_response.hpp",
+        "game_join_response.hpp",
         "game_state.hpp",
         "game_type.hpp",
         "participant.hpp",
@@ -16,9 +17,6 @@ cc_library(
         "uuid_participant.hpp",
         "uuid_room.hpp",
     ],
-    defines = [
-        "SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE",
-    ],
     visibility = [
         "//apps/board_games/engine:__subpackages__",
         "//apps/board_games/games:__subpackages__",
@@ -26,6 +24,5 @@ cc_library(
     deps = [
         "//bazel/logging:spdlog",
         "@libpqxx",  # FIXME: Move libpqxx stuff to a different library
-        "@tl-expected",
     ],
 )

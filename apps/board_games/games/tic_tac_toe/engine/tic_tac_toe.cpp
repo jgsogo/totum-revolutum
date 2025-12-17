@@ -76,6 +76,8 @@ namespace board_games::tic_tac_toe {
         switch (action.action_case()) {
         case Action::ActionCase::kPlaceMark:
             return _compute_place_mark(board, action.place_mark(), player_number);
+        case Action::ActionCase::kJoinGame:
+            return tl::unexpected(utils::NotImplemented{"Logic for action kJoinGame is not implemented yet"});
         case Action::ActionCase::ACTION_NOT_SET: {
             SPDLOG_ERROR("Trying to execute an action, but action is not set");
             return tl::unexpected(errors::LogicalError{"Trying to execute an action, but action is not set"});

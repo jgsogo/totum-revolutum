@@ -9,7 +9,10 @@ namespace data {
     struct Game {
         Game() = delete;
         Game(const Game&) = delete;
-        explicit Game(Game&&) = default;
+
+        Game(Game&&) noexcept = default;
+        Game& operator=(Game&&) noexcept = default;
+
         explicit Game(std::int64_t id, RoomUUID room, GameType type, GameState state, GamePayload&& payload)
             : id{id}, room{room}, type{type}, state{state}, payload{std::move(payload)} {}
 
