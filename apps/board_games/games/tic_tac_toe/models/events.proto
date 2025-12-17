@@ -20,11 +20,17 @@ message EventNextTurn {
     Player next_player = 1;
 }
 
+message EventNewPlayer {
+    uint32 player_number = 1;
+    Player player = 2;
+}
+
 message Event {
     oneof event {
         EventMarkPlaced mark_placed = 1;
         EventGameFinishedWinner game_finished_winner = 2;
         EventGameFinishedDraw game_finished_draw = 3;
         EventNextTurn next_turn = 4;
+        EventNewPlayer new_player = 5;
     }
 }

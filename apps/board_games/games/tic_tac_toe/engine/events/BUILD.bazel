@@ -6,12 +6,14 @@ cc_library(
         "game_finished_draw.cpp",
         "game_finished_winner.cpp",
         "mark_placed.cpp",
+        "new_player.cpp",
         "next_turn.cpp",
     ],
     hdrs = [
         "game_finished_draw.h",
         "game_finished_winner.h",
         "mark_placed.h",
+        "new_player.h",
         "next_turn.h",
     ],
     visibility = [

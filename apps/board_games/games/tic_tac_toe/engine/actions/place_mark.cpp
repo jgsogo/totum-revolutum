@@ -6,19 +6,23 @@ namespace board_games::tic_tac_toe {
                                                      uint8_t player_number) {
         SPDLOG_DEBUG("[tic_tac_toe] _compute_place_mark");
 
+        // Get player from player_number
+        Player player = board.players().at(player_number);
+
         // Preconditions:
+        //
         //  - It's the players turn
         //  - Game is not finished
         //  - The cell is empty
         switch (board.turn_state_case()) {
         case board_games::tic_tac_toe::Board::TurnStateCase::kCurrentTurn:
-            if (board.current_turn() != player_number) {
+            if (board.current_turn() != player) {
                 SPDLOG_ERROR(
                     "Game state is expecting actions from player {}, however, game action comes from player {}",
-                    board.current_turn() == Player::PLAYER_X ? "X" : "O", player_number);
+                    board.current_turn() == Player::PLAYER_X ? "X" : "O", player == Player::PLAYER_X ? "X" : "O");
                 return tl::unexpected(errors::GameEngineError{std::format(
                     "Game state is expecting actions from player {}, however, game action comes from player {}",
-                    board.current_turn() == Player::PLAYER_X ? "X" : "O", player_number)});
+                    board.current_turn() == Player::PLAYER_X ? "X" : "O", player == Player::PLAYER_X ? "X" : "O")});
             }
             break;
         case board_games::tic_tac_toe::Board::TurnStateCase::kWinner:
@@ -43,8 +47,7 @@ namespace board_games::tic_tac_toe {
             Event event;
             EventMarkPlaced* mark_placed = event.mutable_mark_placed();
             mark_placed->set_position(action.position());
-            auto player_mark = player_number == 0 ? Player::PLAYER_X : Player::PLAYER_O;
-            mark_placed->set_mark(player_mark);
+            mark_placed->set_mark(player);
 
             events.emplace_back(std::move(event));
         }

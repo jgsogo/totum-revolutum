@@ -3,9 +3,11 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "actions",
     srcs = [
+        "join_game.cpp",
         "place_mark.cpp",
     ],
     hdrs = [
+        "join_game.h",
         "place_mark.h",
     ],
     visibility = [
