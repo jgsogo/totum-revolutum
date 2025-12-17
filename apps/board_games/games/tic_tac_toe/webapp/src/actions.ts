@@ -27,7 +27,7 @@ export class Action extends OutgoingMessage {
     static create_join_game(player: Player): Action {
         const proto = create(ActionSchema, {
             action: {
-                case: "placeMark",
+                case: "joinGame",
                 value: create(ActionJoinGameSchema, {
                     player: Player.to_proto(player),
                 }),

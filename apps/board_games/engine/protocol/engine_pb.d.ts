@@ -92,8 +92,6 @@ export declare const EngineService: GenService<{
     output: typeof EmptySchema;
   },
   /**
-   * rpc GetOrCreateParticipant (GetOrCreateParticipantRequest) returns (google.protobuf.Empty);
-   *
    * @generated from rpc board_games.EngineService.StartGame
    */
   startGame: {

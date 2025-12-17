@@ -82,6 +82,27 @@ export declare type EventNextTurn = Message<"board_games.tic_tac_toe.EventNextTu
 export declare const EventNextTurnSchema: GenMessage<EventNextTurn>;
 
 /**
+ * @generated from message board_games.tic_tac_toe.EventNewPlayer
+ */
+export declare type EventNewPlayer = Message<"board_games.tic_tac_toe.EventNewPlayer"> & {
+  /**
+   * @generated from field: uint32 player_number = 1;
+   */
+  playerNumber: number;
+
+  /**
+   * @generated from field: board_games.tic_tac_toe.Player player = 2;
+   */
+  player: Player;
+};
+
+/**
+ * Describes the message board_games.tic_tac_toe.EventNewPlayer.
+ * Use `create(EventNewPlayerSchema)` to create a new message.
+ */
+export declare const EventNewPlayerSchema: GenMessage<EventNewPlayer>;
+
+/**
  * @generated from message board_games.tic_tac_toe.Event
  */
 export declare type Event = Message<"board_games.tic_tac_toe.Event"> & {
@@ -112,6 +133,12 @@ export declare type Event = Message<"board_games.tic_tac_toe.Event"> & {
      */
     value: EventNextTurn;
     case: "nextTurn";
+  } | {
+    /**
+     * @generated from field: board_games.tic_tac_toe.EventNewPlayer new_player = 5;
+     */
+    value: EventNewPlayer;
+    case: "newPlayer";
   } | { case: undefined; value?: undefined };
 };
 
