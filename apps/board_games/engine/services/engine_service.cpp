@@ -49,6 +49,30 @@ namespace services {
                 });
         }
 
+        Expected<void> store_game_action_response(pqxx::connection& conn, const data::GameActionResponse& response,
+                                                  const data::RoomUUID& room, std::int32_t game_id,
+                                                  const data::ParticipantUUID& participant,
+                                                  const data::ActionPayload& action_payload) {
+            return data::store_action(conn, game_id, participant, response.action_type, action_payload, true)
+                .and_then([&conn, &game_id, &response](const std::int64_t& action_id) -> Expected<void> {
+                    // TODO: Bulk insert
+                    for (auto&& ev : response.events) {
+                        auto inserted = data::store_event(conn, game_id, ev.first, ev.second, action_id);
+                        // TODO: Notify events, the frontend might want to show
+                        // animations
+                        if (!inserted) {
+                            return inserted;
+                        }
+                    }
+                    return {};
+                })
+                .and_then([&conn, &game_id, &response]() -> Expected<void> {
+                    return data::update_game_state(conn, game_id, response.new_game_state, response.new_game_payload);
+                })
+                // Send notification to the room
+                .and_then([&conn, &room]() { return data::notify_room_update(conn, room); });
+        }
+
     } // namespace
 
     EngineServiceImpl::EngineServiceImpl(utils::libpqxx::ConnectionPool& pool, const engine::GamePluginsMap& games)
@@ -143,38 +167,19 @@ namespace services {
                             const auto& action_payload = data::ActionPayload{std::move(payload)};
 
                             return game_plugin->join_game(game.payload, action_payload)
-                                .and_then([&conn, &room, &participant, &game,
-                                           &action_payload](data::GameJoinResponse&& res) {
-                                    return data::add_participant(conn, room, participant, data::ParticipantRole::PLAYER,
-                                                                 res.player_number)
-                                        .and_then([&conn, &res, &game, &action_payload](
-                                                      data::Participant&& p) -> Expected<data::Participant> {
-                                            // TODO: This is duplicated. We have the same logic below in SendAction
-                                            return data::store_action(conn, game.id, p.uuid, res.action_type,
-                                                                      action_payload, true)
-                                                .and_then([&conn, &game,
-                                                           &res](const std::int64_t& action_id) -> Expected<void> {
-                                                    // TODO: Bulk insert
-                                                    for (auto&& ev : res.events) {
-                                                        auto inserted = data::store_event(conn, game.id, ev.first,
-                                                                                          ev.second, action_id);
-                                                        // TODO: Notify events, the frontend might want to show
-                                                        // animations
-                                                        if (!inserted) {
-                                                            return inserted;
-                                                        }
-                                                    }
-                                                    return {};
-                                                })
-                                                .and_then([&conn, &game, &res]() -> Expected<void> {
-                                                    return data::update_game_state(conn, game.id, res.new_game_state,
-                                                                                   res.new_game_payload);
-                                                })
-                                                .and_then([p = std::move(p)]() -> Expected<data::Participant> {
-                                                    return {std::move(p)};
-                                                });
-                                        });
-                                });
+                                .and_then(
+                                    [&conn, &room, &participant, &game, &action_payload](data::GameJoinResponse&& res) {
+                                        return data::add_participant(conn, room, participant,
+                                                                     data::ParticipantRole::PLAYER, res.player_number)
+                                            .and_then([&conn, &res, &room, &game, &action_payload](
+                                                          data::Participant&& p) -> Expected<data::Participant> {
+                                                return store_game_action_response(conn, res, room, game.id, p.uuid,
+                                                                                  action_payload)
+                                                    .and_then([p = std::move(p)]() -> Expected<data::Participant> {
+                                                        return {std::move(p)};
+                                                    });
+                                            });
+                                    });
                         })
                         .and_then([](data::Participant&& p) -> Expected<void> {
                             SPDLOG_INFO("Participant {} is successfully added as player {}", p.uuid, p.player_number);
@@ -201,7 +206,7 @@ namespace services {
             data::ParticipantUUID participant{std::string{request->participant_uuid()}};
 
             return get_game_and_participant_required(conn, room, participant)
-                .and_then([&conn, request, this](auto&& game_and_participant) -> Expected<void> {
+                .and_then([&conn, request, &room, this](auto&& game_and_participant) -> Expected<void> {
                     auto&& [game, participant] = std::move(game_and_participant);
 
                     // We don't care if the game is enabled or not. Maybe it's an ongoing game
@@ -218,25 +223,9 @@ namespace services {
                         ->run(game.payload, action_payload, participant.player_number)
                         // Store to the database the action + new status + events
                         // FIXME: We might want to do all of this in a single transaction
-                        .and_then([&conn, &game, &participant, &action_payload](data::GameActionResponse&& res) {
-                            return data::store_action(conn, game.id, participant.uuid, res.action_type, action_payload,
-                                                      true)
-                                .and_then([&conn, &game, &res](const std::int64_t& action_id) -> Expected<void> {
-                                    // TODO: Bulk insert
-                                    for (auto&& ev : res.events) {
-                                        auto inserted =
-                                            data::store_event(conn, game.id, ev.first, ev.second, action_id);
-                                        // TODO: Notify events, the frontend might want to show animations
-                                        if (!inserted) {
-                                            return inserted;
-                                        }
-                                    }
-                                    return {};
-                                })
-                                .and_then([&conn, &game, &res]() {
-                                    return data::update_game_state(conn, game.id, res.new_game_state,
-                                                                   res.new_game_payload);
-                                });
+                        .and_then([&conn, &room, &game, &participant, &action_payload](data::GameActionResponse&& res) {
+                            return store_game_action_response(conn, res, room, game.id, participant.uuid,
+                                                              action_payload);
                         })
                         // On failure: RETURN to the user that the action could not be understood.
                         .or_else([&conn, &game, &participant, &action_payload](const auto& e) -> Expected<void> {
@@ -247,8 +236,6 @@ namespace services {
                                 errors::InvalidAction{std::format("Failed to apply action to the game: {}", e)}};
                         });
                 })
-                // Send notification to the room
-                .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
                 // Always return a grpc::Status
                 .and_then([]() -> Expected<grpc::Status> { return {grpc::Status::OK}; })
                 .or_else([](auto&& e) -> Expected<grpc::Status> {

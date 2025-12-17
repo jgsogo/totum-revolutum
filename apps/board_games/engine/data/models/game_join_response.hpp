@@ -6,14 +6,12 @@
 #include "game_state.hpp"
 #include "payload.hpp"
 
+#include "game_action_response.hpp"
+
 namespace data {
 
-    struct GameJoinResponse {
+    struct GameJoinResponse : GameActionResponse {
         uint8_t player_number;
-        std::string_view action_type;
-        std::vector<std::pair<std::string_view, EventPayload>> events;
-        GamePayload new_game_payload;
-        GameState new_game_state;
     };
 
 } // namespace data
