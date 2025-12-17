@@ -29,6 +29,26 @@ namespace services {
                     }
                 });
         }
+
+        Expected<std::pair<data::Game, data::Participant>>
+        get_game_and_participant_required(pqxx::connection& conn, const data::RoomUUID& room,
+                                          const data::ParticipantUUID& participant) {
+            SPDLOG_DEBUG("get_game_and_participant_required(conn, room={}, participant={})", room, participant);
+            return get_game_and_participant(conn, room, participant)
+                .and_then([participant_uuid = participant, room_uuid = room](
+                              auto&& game_and_participant_opt) -> Expected<std::pair<data::Game, data::Participant>> {
+                    auto&& [game, participant_opt] = std::move(game_and_participant_opt);
+                    if (!participant_opt) {
+                        return tl::unexpected(errors::InvalidData{
+                            std::format("No participant found in room {} with uuid {}", room_uuid, participant_uuid)});
+                    }
+
+                    Expected<std::pair<data::Game, data::Participant>> r{
+                        std::make_pair(std::move(game), std::move(*participant_opt))};
+                    return r;
+                });
+        }
+
     } // namespace
 
     EngineServiceImpl::EngineServiceImpl(utils::libpqxx::ConnectionPool& pool, const engine::GamePluginsMap& games)
@@ -86,46 +106,6 @@ namespace services {
         });
     }
 
-    // grpc::Status EngineServiceImpl::GetOrCreateParticipant(grpc::ServerContext* context,
-    //                                                        const board_games::GetOrCreateParticipantRequest* request,
-    //                                                        google::protobuf::Empty* response) {
-    //     SPDLOG_DEBUG("GetOrCreateParticipant");
-    //     return pool.with_conn<grpc::Status>([request](pqxx::connection& conn) {
-    //         data::RoomUUID room{std::string{request->room_uuid()}};
-    //         data::ParticipantUUID participant{std::string{request->participant_uuid()}};
-
-    //         {
-    //             // Try to get already existing participant
-    //             auto r = data::find_participant(conn, room, participant);
-    //             if (r.has_value() && r.value().has_value()) {
-    //                 return grpc::Status::OK;
-    //             }
-    //         }
-
-    //         {
-    //             // Add and return
-    //             auto role_expected = data::participant_role_from_string(request->participant_role());
-    //             if (!role_expected.has_value()) {
-    //                 auto status = grpc::Status{grpc::StatusCode::INTERNAL, "Failed to parse participant role"};
-    //                 return status;
-    //             }
-    //             data::ParticipantRole role = role_expected.value();
-
-    //             return data::add_participant(conn, room, participant, role, request->player_number())
-    //                 .and_then([&conn, &room](data::Participant&& _p) { return data::notify_room_update(conn, room);
-    //                 })
-
-    //                 .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
-    //                 .or_else([](const auto& e) {
-    //                     auto status = grpc::Status{grpc::StatusCode::INTERNAL,
-    //                                                std::format("Failed to add participant to room: {}", e)};
-    //                     return Expected<grpc::Status>{status};
-    //                 })
-    //                 .value();
-    //         }
-    //     });
-    // }
-
     grpc::Status EngineServiceImpl::JoinGame(grpc::ServerContext* context,
                                              const board_games::SendActionRequest* request,
                                              google::protobuf::Empty* response) {
@@ -169,6 +149,7 @@ namespace services {
                                                                  res.player_number)
                                         .and_then([&conn, &res, &game, &action_payload](
                                                       data::Participant&& p) -> Expected<data::Participant> {
+                                            // TODO: This is duplicated. We have the same logic below in SendAction
                                             return data::store_action(conn, game.id, p.uuid, res.action_type,
                                                                       action_payload, true)
                                                 .and_then([&conn, &game,
@@ -207,36 +188,6 @@ namespace services {
                     return {status};
                 })
                 .value();
-
-            // 1. Get or create participant 2. With the game + participant, execute the action as usual
-
-            // {
-            //     // Try to get already existing participant
-            //     auto r = data::find_participant(conn, room, participant);
-            //     if (r.has_value() && r.value().has_value()) {
-            //         return grpc::Status::OK;
-            //     }
-            // }
-
-            // {
-            //     // Add and return
-            //     return data::add_participant(conn, room, participant, data::ParticipantRole::PLAYER,
-            //                                  request->player_number())
-            //         .and_then([&conn, &room](data::Participant&& _p) {
-            //             // TODO: Execute the action on the board
-            //             // TODO: Very likely we want to implement some other function to avoid duplicated code.
-            //             asfdasdf return {};
-            //         })
-            //         .and_then([&conn, &room]() { return data::notify_room_update(conn, room); })
-
-            //         .and_then([]() { return Expected<grpc::Status>{grpc::Status::OK}; })
-            //         .or_else([](const auto& e) {
-            //             auto status = grpc::Status{grpc::StatusCode::INTERNAL,
-            //                                        std::format("Failed to add participant to room: {}", e)};
-            //             return Expected<grpc::Status>{status};
-            //         })
-            //         .value();
-            // }
         });
     }
 
@@ -249,35 +200,9 @@ namespace services {
             data::RoomUUID room{std::string{request->room_uuid()}};
             data::ParticipantUUID participant{std::string{request->participant_uuid()}};
 
-            // Get the game and the participant from 'room_uuid'
-            return data::find_game(conn, room)
-                .and_then([&conn, &room, &participant](
-                              std::optional<data::Game> game) -> Expected<std::pair<data::Game, data::Participant>> {
-                    if (game) {
-                        // TODO: We can check game.state. If it is FINISHED or WAITING, no actions are expected
-                        return data::find_participant(conn, room, participant)
-                            .and_then([&game, &room, &participant](std::optional<data::Participant> participant_opt)
-                                          -> Expected<std::pair<data::Game, data::Participant>> {
-                                if (participant_opt) {
-                                    std::pair<data::Game, data::Participant> data{std::move(*game),
-                                                                                  participant_opt.value()};
-                                    Expected<std::pair<data::Game, data::Participant>> ret{std::move(data)};
-                                    return ret;
-                                } else {
-                                    SPDLOG_ERROR("No participant found in room {} with uuid {}", room, participant);
-                                    return tl::unexpected{errors::InvalidData{std::format(
-                                        "No participant found in room {} with uuid {}", room, participant)}};
-                                }
-                            });
-                    } else {
-                        SPDLOG_ERROR("No game found in room {}", room);
-                        return tl::unexpected{errors::InvalidData{std::format("No game found in room {}", room)}};
-                    }
-                })
-                // Switch based on game.game_type and execute the run function
-                .and_then([&conn, request, this](
-                              const std::pair<data::Game, data::Participant>&& game_and_participant) -> Expected<void> {
-                    const auto&& [game, participant] = std::move(game_and_participant);
+            return get_game_and_participant_required(conn, room, participant)
+                .and_then([&conn, request, this](auto&& game_and_participant) -> Expected<void> {
+                    auto&& [game, participant] = std::move(game_and_participant);
 
                     // We don't care if the game is enabled or not. Maybe it's an ongoing game
                     auto it = this->_games.find(game.type);

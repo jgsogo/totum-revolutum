@@ -26,7 +26,7 @@ namespace engine {
         std::string_view description() const { return _description; };
 
         virtual Expected<data::GamePayload> new_board() = 0;
-        virtual Expected<data::GameActionResponse> run(const data::GamePayload& game_state_payload,
+        virtual Expected<data::GameActionResponse> run(const data::GamePayload& game_payload,
                                                        const data::ActionPayload& action_payload,
                                                        uint8_t player_number) = 0;
 
