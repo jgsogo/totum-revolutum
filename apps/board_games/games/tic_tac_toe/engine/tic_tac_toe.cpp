@@ -70,6 +70,12 @@ namespace board_games::tic_tac_toe {
         return {std::move(board)};
     }
 
+    Expected<std::pair<std::vector<Event>, uint8_t>> TicTacToePlugin::_join_game(const Board& board,
+                                                                                 const Action& action) {
+        SPDLOG_DEBUG("[tic_tac_toe] _join_game");
+        return tl::unexpected(utils::NotImplemented{"WIP"});
+    }
+
     Expected<std::vector<Event>> TicTacToePlugin::_compute_events(const Board& board, const Action& action,
                                                                   uint8_t player_number) {
         SPDLOG_DEBUG("[tic_tac_toe] _compute_events");

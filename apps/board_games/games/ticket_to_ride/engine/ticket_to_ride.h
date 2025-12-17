@@ -21,6 +21,10 @@ namespace board_games::ticket_to_ride {
         data::GameState get_game_state(const GameState& game_state) const override;
         Expected<GameState> _new_board() override;
 
+        // Returns the events that are triggered when a new player joins a game.
+        Expected<std::pair<std::vector<Event>, uint8_t>> _join_game(const GameState& board,
+                                                                    const Action& action) override final;
+
         // Returns the events that are triggered by the given action on the given board.
         Expected<std::vector<Event>> _compute_events(const GameState& board, const Action& action,
                                                      uint8_t player_number) override final;

@@ -173,8 +173,8 @@ namespace services {
                                                                      data::ParticipantRole::PLAYER, res.player_number)
                                             .and_then([&conn, &res, &room, &game, &action_payload](
                                                           data::Participant&& p) -> Expected<data::Participant> {
-                                                return store_game_action_response(conn, res, room, game.id, p.uuid,
-                                                                                  action_payload)
+                                                return store_game_action_response(conn, res.action_response, room,
+                                                                                  game.id, p.uuid, action_payload)
                                                     .and_then([p = std::move(p)]() -> Expected<data::Participant> {
                                                         return {std::move(p)};
                                                     });

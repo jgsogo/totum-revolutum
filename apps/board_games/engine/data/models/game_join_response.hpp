@@ -10,8 +10,9 @@
 
 namespace data {
 
-    struct GameJoinResponse : GameActionResponse {
+    struct GameJoinResponse {
         uint8_t player_number;
+        GameActionResponse action_response;
     };
 
 } // namespace data

@@ -11,13 +11,15 @@ message Board {
     // Linearized 3x3 board. Values: 'X', 'O', or ' ' (empty).
     repeated Player board_status = 1;
 
+    map<uint32, Player> players = 2;
+
     oneof turn_state { // FIXME: Every game will have this?
-        Player current_turn = 2;
+        Player current_turn = 3;
 
         // If there is a winner, the game has finished
-        Winner winner = 3;
+        Winner winner = 4;
 
-        bool draw = 4;
+        bool draw = 5;
     }
 }
 
