@@ -58,6 +58,9 @@ js_run_binary(
         "//apps/board_games/engine/protocol:engine_proto/ts",
         # Games
         "//apps/board_games/games/tic_tac_toe/webapp:models/ts",
+        # "//apps/board_games/games/ticket_to_ride/webapp:models/ts",
+        "//apps/board_games/webapp/src/lib/ticket_to_ride:maps",
+        "//apps/board_games/webapp/static/ticket_to_ride:maps",
 
         # Sources
         ":configs",

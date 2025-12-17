@@ -25,7 +25,11 @@ def generate_map_targets(name):
             "{}.svg".format(name),
             "{}-background.svg".format(name),
         ],
-        visibility = ["//apps/board_games/games/ticket_to_ride:__subpackages__"],
+        visibility = [
+            "//apps/board_games/games/ticket_to_ride:__subpackages__",
+            "//apps/board_games/webapp/src/lib/ticket_to_ride:__pkg__",
+            "//apps/board_games/webapp/static/ticket_to_ride:__pkg__",
+        ],
     )
 
     native.filegroup(
