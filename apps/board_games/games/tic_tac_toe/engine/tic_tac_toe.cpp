@@ -34,7 +34,7 @@ namespace board_games::tic_tac_toe {
 
             if (it != winners.end()) {
                 const int& p = (*it)[0];
-                Player player = board_status.at(p);
+                Player player = static_cast<Player>(board_status.at(p));
                 return std::make_pair(player, *it);
             } else {
                 return std::nullopt;

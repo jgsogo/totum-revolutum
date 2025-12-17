@@ -16,8 +16,8 @@ namespace board_games::tic_tac_toe {
         auto found = std::find_if(board.players().begin(), board.players().end(),
                                   [&action](const auto& kv) { return kv.second == action.player(); });
         if (found != board.players().end()) {
-            return tl::unexpected(
-                errors::InvalidAction{std::format("Player {} is already taken", static_cast<int>(action.player()))});
+            return tl::unexpected(errors::InvalidAction{
+                std::format("Player {} is already taken", action.player() == Player::PLAYER_X ? "X" : "O")});
         }
 
         // Events:
