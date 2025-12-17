@@ -1,6 +1,7 @@
 <script lang="ts">
-    import USAMap from '$lib/ticket_to_ride/maps/usa.svg'
+    import TicketToRideBoard from '$lib/ticket_to_ride/components/TicketToRideBoard.svelte';
 
+    let refBoard: typeof TicketToRideBoard;
 </script>
 
 
@@ -8,5 +9,7 @@
 <hr />
 <hr />
 
+<TicketToRideBoard bind:this={refBoard} map="usa" />
+<!--
 <img alt="The project logo" src={USAMap} />
-<img alt="The project logo" src="/ticket_to_ride/maps/usa.svg" />
+<img alt="The project logo" src="/ticket_to_ride/maps/maps/usa.svg" /> -->

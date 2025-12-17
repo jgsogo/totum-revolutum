@@ -5,7 +5,7 @@ size_x: 1200
 size_y: 773
 
 # --- Background image --
-background: { filename: "usa-background.svg" rotate: -7.8 scale: 1.35 translate_x: -45 translate_y: 75 }
+background: { filename: "./usa-background.svg" rotate: -7.8 scale: 1.35 translate_x: -45 translate_y: 75 }
 
 # --- Cities ---
 cities: { id: 0  name: "Vancouver" pos_x: 97 pos_y: 90 }

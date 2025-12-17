@@ -1,5 +1,5 @@
 <svg width='1200' height='773' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
-  <image transform=' rotate(-7.8) scale(1.35) translate(-45, 75)' href='usa-background.svg'/>
+  <image transform=' rotate(-7.8) scale(1.35) translate(-45, 75)' href='./usa-background.svg'/>
   <defs>
   <circle id='city-point' stroke='black' stroke-width='1' fill='black' cx='0' cy='0' r='8'/>
   <g id='carriage'>

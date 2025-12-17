@@ -21,13 +21,13 @@ def generate_map_targets(name):
     native.filegroup(
         name = name,
         srcs = [
-            "{}.textproto".format(name),
-            "{}.svg".format(name),
+            ":{}-input".format(name),
+            ":{}-svg".format(name),
             "{}-background.svg".format(name),
         ],
         visibility = [
             "//apps/board_games/games/ticket_to_ride:__subpackages__",
-            "//apps/board_games/webapp/src/lib/ticket_to_ride:__pkg__",
+            "//apps/board_games/webapp/src/lib/ticket_to_ride/maps:__pkg__",
             "//apps/board_games/webapp/static/ticket_to_ride:__pkg__",
         ],
     )
@@ -41,7 +41,7 @@ def generate_map_targets(name):
     native.genrule(
         name = "{}-svg".format(name),
         srcs = [":{}-input".format(name)],
-        outs = ["{}.out.svg".format(name)],
+        outs = ["{}-gen.svg".format(name)],
         cmd = "$(location //apps/board_games/games/ticket_to_ride/maps/gen) --textproto=$(location :{}-input) --output=$@".format(name),
         tools = [
             "//apps/board_games/games/ticket_to_ride/maps/gen",
