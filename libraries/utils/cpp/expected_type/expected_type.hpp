@@ -48,15 +48,12 @@ namespace utils {
         }
 
         //! Transforms an std::optional<T> into ExpectedType<T, Errs...>
-        template <typename T, typename Err> ExpectedType<T, Err> ok_or(std::optional<T>&& opt, Err&& err) {
-            return opt
-                .and_then([](auto&& v) -> std::optional<ExpectedType<T, Err>> {
-                    return {ExpectedType<T, Err>{std::move(v)}};
-                })
-                .or_else([&err]() -> std::optional<ExpectedType<T, Err>> {
-                    return {ExpectedType<T, Err>{tl::unexpected{std::move(err)}}};
-                })
-                .value();
+        template <typename T, typename... Errs, typename Err>
+        ExpectedType<T, Errs..., Err> ok_or(std::optional<T>&& opt, Err&& err) {
+            if (opt) {
+                return ExpectedType<T, Errs..., Err>{std::move(*opt)};
+            }
+            return tl::unexpected(std::forward<Err>(err));
         }
 
     } // namespace expected

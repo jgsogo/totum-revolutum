@@ -22,13 +22,18 @@ export declare type Board = Message<"board_games.tic_tac_toe.Board"> & {
   boardStatus: Player[];
 
   /**
+   * @generated from field: map<uint32, board_games.tic_tac_toe.Player> players = 2;
+   */
+  players: { [key: number]: Player };
+
+  /**
    * FIXME: Every game will have this?
    *
    * @generated from oneof board_games.tic_tac_toe.Board.turn_state
    */
   turnState: {
     /**
-     * @generated from field: board_games.tic_tac_toe.Player current_turn = 2;
+     * @generated from field: board_games.tic_tac_toe.Player current_turn = 3;
      */
     value: Player;
     case: "currentTurn";
@@ -36,13 +41,13 @@ export declare type Board = Message<"board_games.tic_tac_toe.Board"> & {
     /**
      * If there is a winner, the game has finished
      *
-     * @generated from field: board_games.tic_tac_toe.Winner winner = 3;
+     * @generated from field: board_games.tic_tac_toe.Winner winner = 4;
      */
     value: Winner;
     case: "winner";
   } | {
     /**
-     * @generated from field: bool draw = 4;
+     * @generated from field: bool draw = 5;
      */
     value: boolean;
     case: "draw";

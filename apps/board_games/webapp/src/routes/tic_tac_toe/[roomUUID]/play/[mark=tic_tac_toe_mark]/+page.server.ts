@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from '../$types';
-import { getOrCreateParticipant } from '../../../../../../../engine/protocol/engine_client';
-import { Player } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
+import { joinGame } from '../../../../../../../engine/protocol/engine_client';
+import { Action, Player } from '../../../../../../../games/tic_tac_toe/webapp/src/index';
 import type { Empty } from '@bufbuild/protobuf/wkt';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
@@ -21,11 +21,11 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 
     // Add or retrieve me as a participant
     try {
-        const role = "player";
-        console.log(`[backend] GRPC request: getOrCreateParticipant(roomUUID=${roomUUID}, participantUUID=${session_id}, role=${role})`);
-        const player_number = mark === 'X' ? 0 : 1;
         const player = mark === 'X' ? Player.PLAYER_X : Player.PLAYER_O;
-        const response: Empty = await getOrCreateParticipant(roomUUID, session_id, role, player_number);
+        console.log(`[backend] GRPC request: joinGame(roomUUID=${roomUUID}, participantUUID=${session_id}, player=${player})`);
+
+        let action = Action.create_join_game(player);
+        const response: Empty = await joinGame(roomUUID, session_id, action.toBinary());
         return {
             participant_uuid: session_id, player
         };

@@ -8,6 +8,7 @@
 #include "apps/board_games/engine/errors/errors.hpp"
 
 #include "apps/board_games/engine/data/models/game_action_response.hpp"
+#include "apps/board_games/engine/data/models/game_join_response.hpp"
 #include "apps/board_games/engine/data/models/game_type.hpp"
 #include "apps/board_games/engine/data/models/payload.hpp"
 
@@ -25,9 +26,12 @@ namespace engine {
         std::string_view description() const { return _description; };
 
         virtual Expected<data::GamePayload> new_board() = 0;
-        virtual Expected<data::GameActionResponse> run(const data::GamePayload& game_state_payload,
+        virtual Expected<data::GameActionResponse> run(const data::GamePayload& game_payload,
                                                        const data::ActionPayload& action_payload,
                                                        uint8_t player_number) = 0;
+
+        virtual Expected<data::GameJoinResponse> join_game(const data::GamePayload& game_payload,
+                                                           const data::ActionPayload& action_payload) = 0;
 
       protected:
         data::GameType _slug;
@@ -88,9 +92,44 @@ namespace engine {
             return {std::move(game_action_response)};
         }
 
+        Expected<data::GameJoinResponse> join_game(const data::GamePayload& game_payload,
+                                                   const data::ActionPayload& action_payload) override {
+            auto input_board = EXPECT(game_payload.into_proto<TBoard>());
+            auto action = EXPECT(action_payload.into_proto<TActionProto>());
+
+            auto [board, events, player_number] = EXPECT(
+                this->_join_game(input_board, action)
+                    .and_then([input_board = std::move(input_board),
+                               this](std::pair<std::vector<TEventProto>, uint8_t>&& events_and_player_number) mutable
+                                  -> Expected<std::tuple<TBoard, std::vector<TEventProto>, uint8_t>> {
+                        auto&& [events, player_number] = events_and_player_number;
+                        for (const auto& event : events) {
+                            input_board = EXPECT(this->_apply_event(std::move(input_board), event));
+                        }
+                        return {std::make_tuple(input_board, events, player_number)};
+                    }));
+
+            data::GameJoinResponse game_join_response{
+                .player_number = player_number,
+                .action_response =
+                    data::GameActionResponse{.action_type = action.GetDescriptor()->full_name(),
+                                             .new_game_payload = EXPECT(data::GamePayload::from_proto(board)),
+                                             .new_game_state = this->get_game_state(board)}};
+            for (auto&& ev : events) {
+                auto event_payload = EXPECT(data::EventPayload::from_proto(ev));
+                game_join_response.action_response.events.emplace_back(
+                    std::make_pair(ev.GetDescriptor()->full_name(), std::move(event_payload)));
+            }
+            return {std::move(game_join_response)};
+        }
+
       protected:
         virtual data::GameState get_game_state(const TBoard& game_state) const = 0;
         virtual Expected<TBoard> _new_board() = 0;
+
+        // Returns the events that are triggered when a new player joins a game.
+        virtual Expected<std::pair<std::vector<TEventProto>, uint8_t>> _join_game(const TBoard& board,
+                                                                                  const TActionProto& action) = 0;
 
         // Returns the events that are triggered by the given action on the given board.
         virtual Expected<std::vector<TEventProto>> _compute_events(const TBoard& board, const TActionProto& action,

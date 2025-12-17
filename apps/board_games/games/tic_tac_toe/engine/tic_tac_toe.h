@@ -23,6 +23,10 @@ namespace board_games::tic_tac_toe {
         data::GameState get_game_state(const board_games::tic_tac_toe::Board& game_state) const override;
         Expected<board_games::tic_tac_toe::Board> _new_board() override;
 
+        // Returns the events that are triggered when a new player joins a game.
+        Expected<std::pair<std::vector<Event>, uint8_t>> _join_game(const Board& board,
+                                                                    const Action& action) override final;
+
         // Returns the events that are triggered by the given action on the given board.
         Expected<std::vector<Event>> _compute_events(const Board& board, const Action& action,
                                                      uint8_t player_number) override final;

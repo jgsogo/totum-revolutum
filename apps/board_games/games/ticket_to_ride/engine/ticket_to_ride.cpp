@@ -35,6 +35,12 @@ namespace board_games::ticket_to_ride {
         return game;
     }
 
+    Expected<std::pair<std::vector<Event>, uint8_t>> TicketToRidePlugin::_join_game(const GameState& board,
+                                                                                    const Action& action) {
+        SPDLOG_ERROR("[ticket_to_ride] _join_game");
+        return tl::unexpected(utils::NotImplemented{"WIP"});
+    }
+
     Expected<std::vector<Event>> TicketToRidePlugin::_compute_events(const GameState& board, const Action& action,
                                                                      uint8_t player_number) {
         SPDLOG_ERROR("[ticket_to_ride] _compute_events");

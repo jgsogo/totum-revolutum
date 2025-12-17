@@ -3,11 +3,13 @@
 #include <algorithm>
 #include <spdlog/spdlog.h>
 
+#include "apps/board_games/games/tic_tac_toe/engine/actions/join_game.h"
 #include "apps/board_games/games/tic_tac_toe/engine/actions/place_mark.h"
 
 #include "apps/board_games/games/tic_tac_toe/engine/events/game_finished_draw.h"
 #include "apps/board_games/games/tic_tac_toe/engine/events/game_finished_winner.h"
 #include "apps/board_games/games/tic_tac_toe/engine/events/mark_placed.h"
+#include "apps/board_games/games/tic_tac_toe/engine/events/new_player.h"
 #include "apps/board_games/games/tic_tac_toe/engine/events/next_turn.h"
 
 #include "constants.hpp"
@@ -32,8 +34,7 @@ namespace board_games::tic_tac_toe {
 
             if (it != winners.end()) {
                 const int& p = (*it)[0];
-                Player player =
-                    board_status.at(p) == static_cast<int>(Player::PLAYER_X) ? Player::PLAYER_X : Player::PLAYER_O;
+                Player player = static_cast<Player>(board_status.at(p));
                 return std::make_pair(player, *it);
             } else {
                 return std::nullopt;
@@ -70,12 +71,35 @@ namespace board_games::tic_tac_toe {
         return {std::move(board)};
     }
 
+    Expected<std::pair<std::vector<Event>, uint8_t>> TicTacToePlugin::_join_game(const Board& board,
+                                                                                 const Action& action) {
+        SPDLOG_DEBUG("[tic_tac_toe] _join_game");
+        switch (action.action_case()) {
+        case Action::ActionCase::kJoinGame:
+            return _compute_join_game(board, action.join_game());
+
+        // Every other action is unexpected for a _join_game
+        case Action::ActionCase::kPlaceMark:
+            return tl::unexpected(
+                errors::LogicalError{"kPlaceMark action is not expected in the '_join_game' function"});
+        case Action::ActionCase::ACTION_NOT_SET: {
+            SPDLOG_ERROR("Trying to execute an action, but action is not set");
+            return tl::unexpected(errors::LogicalError{"Trying to execute an action, but action is not set"});
+        }
+        }
+    }
+
     Expected<std::vector<Event>> TicTacToePlugin::_compute_events(const Board& board, const Action& action,
                                                                   uint8_t player_number) {
         SPDLOG_DEBUG("[tic_tac_toe] _compute_events");
         switch (action.action_case()) {
         case Action::ActionCase::kPlaceMark:
             return _compute_place_mark(board, action.place_mark(), player_number);
+
+        // These actions are unexpected here
+        case Action::ActionCase::kJoinGame:
+            return tl::unexpected(
+                errors::LogicalError{"kJoinGame action is not expected in the '_compute_events' function"});
         case Action::ActionCase::ACTION_NOT_SET: {
             SPDLOG_ERROR("Trying to execute an action, but action is not set");
             return tl::unexpected(errors::LogicalError{"Trying to execute an action, but action is not set"});
@@ -115,6 +139,8 @@ namespace board_games::tic_tac_toe {
             return apply_game_finished_draw(std::move(board), event.game_finished_draw());
         case Event::EventCase::kNextTurn:
             return apply_next_turn(std::move(board), event.next_turn());
+        case Event::EventCase::kNewPlayer:
+            return apply_new_player(std::move(board), event.new_player());
 
         case Event::EventCase::EVENT_NOT_SET: {
             SPDLOG_ERROR("Trying to apply an event, but the event is not set");
