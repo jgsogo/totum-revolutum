@@ -1,0 +1,75 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("//bazel:run_copy_to_workspace.bzl", "run_copy_to_workspace")
+
+genrule(
+    name = "svg",
+    srcs = ["data.textproto"],
+    outs = ["routes.svg"],
+    cmd = "$(location //apps/board_games/games/ticket_to_ride/maps/gen) --textproto=$(location :data.textproto) --output=$@",
+    tools = [
+        "//apps/board_games/games/ticket_to_ride/maps/gen",
+    ],
+)
+
+filegroup(
+    name = "usa",
+    srcs = [
+        "background.svg",
+        "data.textproto",
+        ":svg",
+    ],
+    visibility = [
+        "//apps/board_games/games/ticket_to_ride:__subpackages__",
+        "//apps/board_games/webapp/src/lib/ticket_to_ride/maps:__pkg__",
+        "//apps/board_games/webapp/static/ticket_to_ride:__pkg__",
+    ],
+)
+
+# Keep repository file updated
+run_copy_to_workspace(
+    name = "svg.update",
+    origin = ":svg",
+    tags = [
+        "manual",
+        "update",
+    ],
+    target = "usa-routes.svg",
+)
+
+diff_test(
+    name = "svg.update.test",
+    failure_message = "\n\nRun `bazel run {}:svg.update` to update the schema file".format(package_name()),
+    file1 = ":svg",
+    file2 = "usa-routes.svg",
+    tags = ["check"],
+)
+
+# Run tests on the input file
+genrule(
+    name = "test.map.build",
+    testonly = True,
+    srcs = [
+        ":data.textproto",
+    ],
+    outs = ["test.map.build.sh"],
+    cmd = """
+        echo '#!/bin/bash' > $@
+        echo '$(rootpath //apps/board_games/games/ticket_to_ride/maps/tests:test_map) \\' >> $@
+        echo '  --textproto=$(location :data.textproto) \' >> $@
+    """,
+    executable = True,
+    tools = [
+        "//apps/board_games/games/ticket_to_ride/maps/tests:test_map",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+sh_test(
+    name = "test.map",
+    srcs = [":test.map.build"],
+    data = [
+        ":data.textproto",
+        "//apps/board_games/games/ticket_to_ride/maps/tests:test_map",
+    ],
+)

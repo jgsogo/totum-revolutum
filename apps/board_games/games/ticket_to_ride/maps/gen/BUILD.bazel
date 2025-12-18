@@ -9,9 +9,9 @@ cc_binary(
         "route_data.cpp",
         "route_data.h",
     ],
-    visibility = ["//apps/board_games/games/ticket_to_ride/maps:__pkg__"],
+    visibility = ["//apps/board_games/games/ticket_to_ride/maps:__subpackages__"],
     deps = [
-        "//apps/board_games/games/ticket_to_ride/maps/cpp:maps",
+        "//apps/board_games/games/ticket_to_ride/maps/cpp:map_loader",
         "//bazel/logging:spdlog",
         "//libraries/utils/cpp/math/geometry/2d:geometry_2d",
         "//libraries/utils/cpp/svg",
