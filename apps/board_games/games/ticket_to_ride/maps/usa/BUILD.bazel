@@ -1,3 +1,4 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//bazel:run_copy_to_workspace.bzl", "run_copy_to_workspace")
@@ -12,17 +13,48 @@ genrule(
     ],
 )
 
+# Convert textproto file into binary format (JS doesn't know how to read textproto format)
+genrule(
+    name = "data-bin",
+    srcs = [
+        "data.textproto",
+        "//apps/board_games/games/ticket_to_ride/maps:map_proto_file",
+    ],
+    outs = ["data.bin"],
+    cmd = """
+        $(location @protobuf//:protoc) \\
+            --encode=board_games.ticket_to_ride.MapData  \\
+            -I $$(dirname $(location //apps/board_games/games/ticket_to_ride/maps:map_proto_file))  \\
+            $(location //apps/board_games/games/ticket_to_ride/maps:map_proto_file) \\
+            < $(location data.textproto) \\
+            > $@
+        """,
+    tools = [
+        "@protobuf//:protoc",
+    ],
+)
+
 filegroup(
     name = "usa",
     srcs = [
         "background.svg",
-        "data.textproto",
+        ":data-bin",
         ":svg",
     ],
     visibility = [
         "//apps/board_games/games/ticket_to_ride:__subpackages__",
         "//apps/board_games/webapp/src/lib/ticket_to_ride/maps:__pkg__",
         "//apps/board_games/webapp/static/ticket_to_ride:__pkg__",
+    ],
+)
+
+js_library(
+    name = "usa-js",
+    data = [
+        ":usa",
+    ],
+    visibility = [
+        "//apps/board_games/games/ticket_to_ride/maps:__pkg__",
     ],
 )
 
