@@ -7,7 +7,10 @@
   let { data }: { data: PageData } = $props();
 
   // const usa_data: MapData = page.data.usa_data;
+  const routes_svg: string = data.routes_svg;
   const usa_data: MapData = data.map_data;
+
+  const background = usa_data.background()
 
   //   let refBoard: typeof TicketToRideBoard;
 </script>
@@ -18,7 +21,9 @@
 
 <h1>{usa_data.name()}</h1>
 
-<!-- <TicketToRideBoard bind:this={refBoard} map="usa" /> -->
-<!--
-<img alt="The project logo" src={USAMap} />
-<img alt="The project logo" src="/ticket_to_ride/maps/maps/usa.svg" /> -->
+<svg width={usa_data.size()[0]} height={usa_data.size()[1]} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  {#if background}
+  <image href="/ticket_to_ride/maps/usa/{background.filename()}" transform="rotate({background.rotate()}) scale({background.scale()}) translate({background.translate()[0]}, {background.translate()[1]})"></image>
+  {/if}
+  <image href={routes_svg}></image>
+</svg>

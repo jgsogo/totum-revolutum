@@ -12,7 +12,7 @@ message MapData {
   Background background = 6;
 }
 
-message Background {
+message Background { // TODO: Rename to Image
   string filename = 1;
   float rotate = 2;
   float scale = 3;
