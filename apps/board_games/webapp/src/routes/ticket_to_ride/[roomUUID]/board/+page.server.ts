@@ -3,23 +3,25 @@ import { MapData } from '../../../../../../games/ticket_to_ride/maps/js/index'
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
-
+const usa_dirpath = 'apps/board_games/games/ticket_to_ride/maps/usa';
 
 export const load: PageServerLoad = async () => {
     // TODO: Somehow we need to be able to choose the map
-    const filepath = join('apps/board_games/games/ticket_to_ride/maps', 'usa/data.bin');
-    console.log(`[backend] Get the map data for USA: ${filepath}`);
+    console.log(`[backend] Get map data for USA from dir: ${usa_dirpath}`);
 
-    const buf = await readFile(filepath);
+    // - Read the proto.bin data
+    const buf = await readFile(join(usa_dirpath, 'data.bin'));
     const arrayBuffer: ArrayBuffer = buf.buffer.slice(
         buf.byteOffset,
         buf.byteOffset + buf.byteLength
     );
-
     const usa_data: MapData = MapData.create_from_array(arrayBuffer);
-    console.log(`[backend] USA map is loaded: ${usa_data.name()}`);
+
+    // - Read the routes SVG
+    const routes_svg = await readFile(join(usa_dirpath, 'routes.svg'))
 
     return {
+
         // usa_data,
         // game_types: await db.get_game_types(),
     };
