@@ -14,9 +14,10 @@ int main(int argc, char* argv[]) {
 
     using namespace Catch::Clara;
 
-    std::filesystem::path textproto;
+    std::filesystem::path textproto, protobin;
     // Extend Catch2's CLI
-    auto cli = session.cli() | Opt(textproto, "textproto")["--textproto"]("Path to textproto file");
+    auto cli = session.cli() | Opt(textproto, "textproto")["--textproto"]("Path to textproto file") |
+               Opt(protobin, "protobin")["--protobin"]("Path to proto file (binary format)");
 
     session.cli(cli);
 
@@ -25,15 +26,27 @@ int main(int argc, char* argv[]) {
     if (result != 0)
         return result; // Catch2 will print the error
 
-    assert(!textproto.empty());
+    // One or the other, but not both
+    assert(!textproto.empty() || !protobin.empty());
+    assert(textproto.empty() || protobin.empty());
 
-    auto map_data = board_games::ticket_to_ride::load_map_data(textproto);
-    if (!map_data) {
-        std::cerr << "Abort. " << map_data.error() << std::endl;
-        return -1;
-    }
+    // Populate TestConfig with the map_data, and run!
     auto& cfg = TestConfig::instance();
-    cfg.map_data = std::move(map_data.value());
+    if (!textproto.empty()) {
+        auto map_data = board_games::ticket_to_ride::load_map_data(textproto);
+        if (!map_data) {
+            std::cerr << "Abort. " << map_data.error() << std::endl;
+            return -1;
+        }
+        cfg.map_data = std::move(map_data.value());
+    } else {
+        auto map_data = board_games::ticket_to_ride::load_map_data_binary(protobin);
+        if (!map_data) {
+            std::cerr << "Abort. " << map_data.error() << std::endl;
+            return -1;
+        }
+        cfg.map_data = std::move(map_data.value());
+    }
 
     return session.run();
 }

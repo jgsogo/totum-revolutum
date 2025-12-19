@@ -7,7 +7,7 @@ genrule(
     name = "svg",
     srcs = ["data.textproto"],
     outs = ["routes.svg"],
-    cmd = "$(location //apps/board_games/games/ticket_to_ride/maps/gen) --textproto=$(location :data.textproto) --output=$@",
+    cmd = "$(location //apps/board_games/games/ticket_to_ride/maps/gen) --textproto=$(location :data.textproto) --output=$@",  # Gen from binary
     tools = [
         "//apps/board_games/games/ticket_to_ride/maps/gen",
     ],
@@ -67,7 +67,7 @@ ts_project(
     ],
 )
 
-# Keep repository file updated
+# Keep SVG file in the repository updated with the generated one
 run_copy_to_workspace(
     name = "svg.update",
     origin = ":svg",
@@ -86,16 +86,21 @@ diff_test(
     tags = ["check"],
 )
 
-# Run tests on the input file
+# Run tests on the input file. We run the tests on both textproto and protobin eventhough their
+# content should be identical, but this way we are also testing the 'map_loader' functionality.
 genrule(
     name = "test.map.build",
     testonly = True,
     srcs = [
-        ":data.textproto",
+        ":data-bin",
+        "data.textproto",
     ],
     outs = ["test.map.build.sh"],
     cmd = """
         echo '#!/bin/bash' > $@
+        echo 'set -e -o pipefail' >> $@
+        echo '$(rootpath //apps/board_games/games/ticket_to_ride/maps/tests:test_map) \\' >> $@
+        echo '  --protobin=$(rootpath :data-bin) \' >> $@
         echo '$(rootpath //apps/board_games/games/ticket_to_ride/maps/tests:test_map) \\' >> $@
         echo '  --textproto=$(location :data.textproto) \' >> $@
     """,
@@ -110,7 +115,8 @@ sh_test(
     name = "test.map",
     srcs = [":test.map.build"],
     data = [
-        ":data.textproto",
+        "data.textproto",
+        ":data-bin",
         "//apps/board_games/games/ticket_to_ride/maps/tests:test_map",
     ],
 )

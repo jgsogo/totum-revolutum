@@ -21,21 +21,5 @@ export class MapData {
     name(): string {
         return this.proto.name;
     }
-
-    // status(): Player[] {
-    //     return this.board.boardStatus.map((p: PlayerProto) => Player.from_proto(p));
-    // }
-
-    // current_turn(): Player | undefined {
-    //     return this.board.turnState.case === 'currentTurn' ? Player.from_proto( this.board.turnState.value) : undefined;
-    // }
-
-    // winner(): BoardWinner | undefined {
-    //     return this.board.turnState.case === 'winner' ? new BoardWinner(this.board.turnState.value) : undefined;
-    // }
-
-    // draw(): boolean | undefined {
-    //     return this.board.turnState.case === 'draw' ? this.board.turnState.value : undefined;
-    // }
 }
 staticImplements<IncomingMessageConstructor<MapData>>(MapData);

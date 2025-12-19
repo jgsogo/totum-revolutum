@@ -35,9 +35,6 @@ ts_proto_library(
     protoc_gen_options = {
         "import_extension": "js",
     },
-    # visibility = [
-    #     "//apps/board_games/games/ticket_to_ride/webapp:__pkg__",
-    # ],
 )
 
 ts_config(
