@@ -1,0 +1,6 @@
+{
+  "description": "TicketToRide TS library",
+  "name": "@totum-revolutum/ticket-to-ride/maps-usa",
+  "private": true,
+  "type": "module"
+}

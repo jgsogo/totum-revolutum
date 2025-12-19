@@ -43,6 +43,7 @@ ts_proto_library(
 ts_config(
     name = "tsconfig",
     src = "tsconfig.json",
+    visibility = ["//apps/board_games/games/ticket_to_ride:__subpackages__"],
 )
 
 ts_project(
@@ -54,21 +55,18 @@ ts_project(
             "js/**/*.test.ts",
         ],
     ) + ["package.json"],
-    data = [
-    ],
     declaration = True,
     source_map = True,
     tsconfig = ":tsconfig",
-    # visibility = ["//apps/board_games/webapp:__subpackages__"],
+    visibility = ["//apps/board_games/webapp:__subpackages__"],
     deps = [
+        ":maps_ts_proto",
         "//:node_modules/@types/node",
         "//:node_modules/buffer",
-        # "//apps/board_games/games/ticket_to_ride/models:models_ts_proto",
-        ":maps_ts_proto",
-        "//apps/board_games/games/ticket_to_ride/maps/usa:usa-js",
     ],
 )
 
+# Testing JS library
 ts_project(
     name = "src_test_ts",
     srcs = glob([
@@ -81,6 +79,7 @@ ts_project(
     deps = [
         ":maps-js",
         "//:node_modules/vitest",
+        "//apps/board_games/games/ticket_to_ride/maps/usa:usa-js",
     ],
 )
 

@@ -1,4 +1,4 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//bazel:run_copy_to_workspace.bzl", "run_copy_to_workspace")
@@ -48,13 +48,24 @@ filegroup(
     ],
 )
 
-js_library(
+ts_project(
     name = "usa-js",
+    srcs = [
+        "index.ts",
+        "package.json",
+    ],
     data = [
         ":usa",
     ],
+    declaration = True,
+    source_map = True,
+    tsconfig = "//apps/board_games/games/ticket_to_ride/maps:tsconfig",
     visibility = [
         "//apps/board_games/games/ticket_to_ride/maps:__pkg__",
+        "//apps/board_games/webapp:__subpackages__",
+    ],
+    deps = [
+        "//:node_modules/@types/node",
     ],
 )
 

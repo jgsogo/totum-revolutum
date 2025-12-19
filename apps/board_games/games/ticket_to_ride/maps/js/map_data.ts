@@ -2,7 +2,7 @@ import { MapData as MapDataProto, MapDataSchema } from "../map_pb.js"
 import { IncomingMessageConstructor, staticImplements } from "./message.js";
 import { Buffer } from 'buffer';
 import { fromBinary } from "@bufbuild/protobuf";
-import { readFileSync } from "fs";
+
 
 
 
@@ -16,15 +16,6 @@ export class MapData {
     static create_from_array(data: ArrayBuffer): MapData {
         const proto: MapDataProto = fromBinary(MapDataSchema, Buffer.from(data, 0, data.byteLength)) as MapDataProto;
         return new MapData(proto);
-    }
-
-    static create_from_protofile(filepath: string): MapData {
-        const buf = readFileSync(filepath);
-        const arrayBuffer = buf.buffer.slice(
-            buf.byteOffset,
-            buf.byteOffset + buf.byteLength
-        );
-        return this.create_from_array(arrayBuffer);
     }
 
     name(): string {
