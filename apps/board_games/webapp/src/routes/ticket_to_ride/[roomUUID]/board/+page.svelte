@@ -2,12 +2,13 @@
   import { page } from '$app/state';
   //   import TicketToRideBoard from '$lib/ticket_to_ride/components/TicketToRideBoard.svelte';
   import { MapData } from '../../../../../../games/ticket_to_ride/maps/js';
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
 
-  let { data }: { data: PageData } = $props();
+  let { data }: PageProps = $props();
 
   // const usa_data: MapData = page.data.usa_data;
   const routes_svg: string = data.routes_svg;
+  console.log(`routes_svg: ${routes_svg}`)
   const usa_data: MapData = data.map_data;
 
   const background = usa_data.background()
@@ -25,5 +26,6 @@
   {#if background}
   <image href="/ticket_to_ride/maps/usa/{background.filename()}" transform="rotate({background.rotate()}) scale({background.scale()}) translate({background.translate()[0]}, {background.translate()[1]})"></image>
   {/if}
-  <image href={routes_svg}></image>
+
+  {@html routes_svg}
 </svg>

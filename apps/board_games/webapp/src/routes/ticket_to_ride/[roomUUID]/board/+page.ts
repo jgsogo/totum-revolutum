@@ -1,9 +1,9 @@
 import type { PageLoad } from './$types';
 import { MapData } from '../../../../../../games/ticket_to_ride/maps/js';
 
-export const load: PageLoad = async () => {
+export const load: PageLoad = async ({ data }) => {
     const filepath = "/ticket_to_ride/maps/usa/data.bin";
-    const routes_svg = "/ticket_to_ride/maps/usa/routes.svg";
+    // const routes_svg = "/ticket_to_ride/maps/usa/routes.svg";
 
     console.log(`[frontend] Fetch data.bin for USA map: ${filepath}`);
 
@@ -11,8 +11,9 @@ export const load: PageLoad = async () => {
     const map_data = MapData.create_from_array(data_bin);
 
 
-	return {
+    return {
+        ...data,
         map_data,
-        routes_svg
-	};
+        // routes_svg
+    };
 };

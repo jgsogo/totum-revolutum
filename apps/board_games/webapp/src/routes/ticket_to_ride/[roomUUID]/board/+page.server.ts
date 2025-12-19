@@ -18,11 +18,9 @@ export const load: PageServerLoad = async () => {
     const usa_data: MapData = MapData.create_from_array(arrayBuffer);
 
     // - Read the routes SVG
-    const routes_svg = await readFile(join(usa_dirpath, 'routes.svg'))
+    const routes_svg = await readFile(join(usa_dirpath, 'routes.svg'), 'utf-8')
 
     return {
-
-        // usa_data,
-        // game_types: await db.get_game_types(),
+        routes_svg
     };
 };
