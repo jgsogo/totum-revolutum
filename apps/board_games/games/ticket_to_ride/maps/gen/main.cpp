@@ -173,16 +173,16 @@ int main(int argc, char** argv) {
     svg::SVGDoc doc;
     doc.size = Point<int>{.x = map_data.size_x(), .y = map_data.size_y()};
 
-    if (map_data.has_background()) {
-        // Background image
-        svg::Image& background = doc.add<svg::Image>();
-        background.href = map_data.background().filename();
-        background.transformation.emplace_back(
-            std::make_unique<svg::Rotate>(svg::Rotate{map_data.background().rotate()}));
-        background.transformation.emplace_back(std::make_unique<svg::Scale>(svg::Scale{map_data.background().scale()}));
-        background.transformation.emplace_back(std::make_unique<svg::Translate>(svg::Translate{
-            Point<int>{.x = map_data.background().translate_x(), .y = map_data.background().translate_y()}}));
-    }
+    // if (map_data.has_background()) {
+    //     // Background image
+    //     svg::Image& background = doc.add<svg::Image>();
+    //     background.href = map_data.background().filename();
+    //     background.transformation.emplace_back(
+    //         std::make_unique<svg::Rotate>(svg::Rotate{map_data.background().rotate()}));
+    //     background.transformation.emplace_back(std::make_unique<svg::Scale>(svg::Scale{map_data.background().scale()}));
+    //     background.transformation.emplace_back(std::make_unique<svg::Translate>(svg::Translate{
+    //         Point<int>{.x = map_data.background().translate_x(), .y = map_data.background().translate_y()}}));
+    // }
 
     // Reusable elements
     svg::SVGDefs& svg_defs = doc.add<svg::SVGDefs>();

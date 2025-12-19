@@ -58,6 +58,10 @@ js_run_binary(
         "//apps/board_games/engine/protocol:engine_proto/ts",
         # Games
         "//apps/board_games/games/tic_tac_toe/webapp:models/ts",
+        "//apps/board_games/games/ticket_to_ride/maps:maps-js",
+
+        # Ticket to ride maps
+        "//apps/board_games/games/ticket_to_ride/maps/usa:usa-js",  # Data available to the frontend/client (see 'viteStaticCopy' plugin)
 
         # Sources
         ":configs",
@@ -78,6 +82,7 @@ js_binary(
         "src/websocket_pg_notifications.js",
         "src/websocket_rooms.js",
         ":binary",
+        "//apps/board_games/games/ticket_to_ride/maps/usa:usa-js",  # This makes the data available to the server side (fileystem)
     ],
     entry_point = "src/websocket-server.js",
 )
