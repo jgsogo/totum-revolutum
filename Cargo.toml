@@ -44,7 +44,7 @@ clap-verbosity-flag = { version = "3.0.2" }
 confy = { version = "2.0.0", default-features = false, features = [
     "yaml_conf",
 ] }
-cron-parser = "0.11.0"
+cron-parser = "0.11.2"
 data-encoding = "2.8.0"
 diesel = { version = "2.2.7", default-features = false, features = [
     "sqlite",
