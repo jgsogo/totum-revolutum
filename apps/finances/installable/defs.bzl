@@ -23,10 +23,10 @@ LOGS_FOLDER = "/usr/local/{}/log".format(NAME)
 RUN_FOLDER = "/usr/local/{}/run".format(NAME)
 WWW_DATA_FOLDER = "/usr/local/{}/www-data".format(NAME)
 
-MACOS_APPLICATION_FOLDER = "/Applications/Finances.app"
-MACOS_APPLICATION_CONTENTS = "{}/Contents".format(MACOS_APPLICATION_FOLDER)
-MACOS_APPLICATION_CONTENTS_RESOURCES = "{}/Contents/Resources".format(MACOS_APPLICATION_FOLDER)
-MACOS_APPLICATION_CONTENTS_MACOS = "{}/Contents/MacOS".format(MACOS_APPLICATION_FOLDER)
+# MACOS_APPLICATION_FOLDER = "/Applications/Finances.app"
+# MACOS_APPLICATION_CONTENTS = "{}/Contents".format(MACOS_APPLICATION_FOLDER)
+# MACOS_APPLICATION_CONTENTS_RESOURCES = "{}/Contents/Resources".format(MACOS_APPLICATION_FOLDER)
+# MACOS_APPLICATION_CONTENTS_MACOS = "{}/Contents/MacOS".format(MACOS_APPLICATION_FOLDER)
 
 MACOS_APPLICATION_QT_FOLDER = "/Applications/FinancesQt.app"
 MACOS_APPLICATION_QT_CONTENTS = "{}/Contents".format(MACOS_APPLICATION_QT_FOLDER)
@@ -51,7 +51,7 @@ ALL_FOLDERS = select(
             "RUN_FOLDER": RUN_FOLDER,
             "DATA_FOLDER": "/usr/local/{}/data".format(NAME),
             "WWW_DATA_FOLDER": WWW_DATA_FOLDER,
-            "MACOS_APPLICATION_FOLDER": MACOS_APPLICATION_FOLDER,
+            # "MACOS_APPLICATION_FOLDER": MACOS_APPLICATION_FOLDER,
             "MACOS_APPLICATION_QT_FOLDER": MACOS_APPLICATION_QT_FOLDER,
         },
         # "@platforms//os:windows": "/Program Files/Finances",

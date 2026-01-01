@@ -787,6 +787,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":qt_core",
+        ":qt_d_bus",
     ],
 )
 

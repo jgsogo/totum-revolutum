@@ -50,6 +50,7 @@ rust_test(
     deps = [
         "//bazel/third_party/crates:bigdecimal",
         "//bazel/third_party/crates:lazy_static",
+        "@libpqxx//:libpq",
     ],
 )
 

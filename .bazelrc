@@ -21,6 +21,14 @@ build:stamp --stamp
 
 test:ci --verbose_failures --test_output=all --keep_going
 
+######
+# Java
+######
+
+# use Bazel remote JDK (hermetic)
+build --java_runtime_version=remotejdk_21
+build --tool_java_runtime_version=remotejdk_21
+build --tool_java_language_version=21
 
 ####################
 # Rust

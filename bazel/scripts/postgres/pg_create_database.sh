@@ -4,7 +4,7 @@ DB_ROOT_USER=$INSTALLER_USER
 # Function to check database connectivity
 check_db_connection() {
     log_debug 'check_db_connection'
-    PGPASSWORD="$DJANGO_SQL_PASSWORD" psql -h "$DJANGO_SQL_HOST" -p "$DJANGO_SQL_PORT" -U "$DJANGO_SQL_USER" -lqt &>/dev/null
+    PGPASSWORD="$DJANGO_SQL_PASSWORD" psql -h "$DJANGO_SQL_HOST" -p "$DJANGO_SQL_PORT" -U "$DJANGO_SQL_USER" -lqt
     return $?
 }
 

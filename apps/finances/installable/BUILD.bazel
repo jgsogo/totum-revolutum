@@ -95,7 +95,7 @@ pkg_tar(
     name = "payload",
     srcs = [
         ":dirs",
-        "//apps/finances/installable/application",
+        # "//apps/finances/installable/application",
         "//apps/finances/installable/application-qt",
         "//apps/finances/installable/bin",
         "//apps/finances/installable/data",
