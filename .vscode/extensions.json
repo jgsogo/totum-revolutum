@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "bazelbuild.vscode-bazel",
-        "ms-python.python"
+        "ms-python.python",
+        "rust-lang.rust-analyzer"
     ]
 }
