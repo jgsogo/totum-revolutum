@@ -12,7 +12,7 @@ fn test_app_state() {
         let body = json!({});
         let r = call_command(&webview, "get_app_state", body.into());
 
-        assert!(r.is_ok());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         let app_state: AppState = r.unwrap().try_into_proto().unwrap();
         assert_eq!(app_state.base_ccy().unwrap(), google_type::CurrencyCode::USD);
         assert!(app_state.db().is_ok());

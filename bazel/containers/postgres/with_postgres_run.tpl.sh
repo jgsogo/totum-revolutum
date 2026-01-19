@@ -22,7 +22,7 @@ fi
 
 # Ensure we stop the docker container
 function finish {
-    "$CONTAINER_CLI" stop %CONTAINER_NAME%
+    "$CONTAINER_CLI" stop %CONTAINER_NAME% 2>/dev/null || true
 }
 trap finish EXIT SIGTERM SIGINT # Capture Ctrl_C (SIGINT)
 
@@ -59,7 +59,19 @@ export SQL_PORT=$POSTGRES_PORT
 
 %ENV_TRANSPOSE%
 # Run the binaries
+EXIT_CODE=0
 for binary in %BINARIES%; do
     BINARY_CLI="$(rlocation "$binary")"
-    $BINARY_CLI
+    if [ ! -f "$BINARY_CLI" ]; then
+        echo "Error: Binary not found: $BINARY_CLI"
+        EXIT_CODE=1
+        continue
+    fi
+    echo "Running: $BINARY_CLI"
+    if ! $BINARY_CLI; then
+        echo "Error: Binary failed: $BINARY_CLI"
+        EXIT_CODE=1
+    fi
 done
+
+exit $EXIT_CODE

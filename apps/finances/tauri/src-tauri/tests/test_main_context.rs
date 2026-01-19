@@ -12,7 +12,7 @@ fn test_app_state() {
         let body = json!({});
         let r = call_command(&webview, "get_main_context", body.into());
 
-        assert!(r.is_ok());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         let _main_context: MainContext = r.unwrap().try_into_proto().unwrap();
     }
 }

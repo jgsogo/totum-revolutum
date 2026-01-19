@@ -21,7 +21,7 @@ fn test_create_transaction() {
         // Find a MovementType to use later
         let body = json!({});
         let r = call_command(&webview, "get_main_context", body.into());
-        assert!(r.is_ok());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         let main_context: MainContextProto = r.unwrap().try_into_proto().unwrap();
         main_context.find_movement_type_by_name("Tasas").unwrap().clone()
     };
