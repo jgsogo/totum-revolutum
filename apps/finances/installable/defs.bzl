@@ -51,7 +51,7 @@ ALL_FOLDERS = select(
             "RUN_FOLDER": RUN_FOLDER,
             "DATA_FOLDER": "/usr/local/{}/data".format(NAME),
             "WWW_DATA_FOLDER": WWW_DATA_FOLDER,
-            "MACOS_APPLICATION_FOLDER": MACOS_APPLICATION_FOLDER,
+            # "MACOS_APPLICATION_FOLDER": MACOS_APPLICATION_FOLDER,
             "MACOS_APPLICATION_QT_FOLDER": MACOS_APPLICATION_QT_FOLDER,
         },
         # "@platforms//os:windows": "/Program Files/Finances",

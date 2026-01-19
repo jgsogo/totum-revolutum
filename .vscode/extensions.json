@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "bazelbuild.vscode-bazel",
+        "ms-python.python",
+        "rust-lang.rust-analyzer",
+        "nefrob.vscode-just-syntax",
+        "eamodio.gitlens",
+        "llvm-vs-code-extensions.vscode-clangd"
+    ]
+}

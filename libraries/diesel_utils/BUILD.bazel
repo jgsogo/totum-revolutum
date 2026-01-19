@@ -26,6 +26,7 @@ rust_library_tests_and_docs(
         "//bazel/third_party/crates:diesel",
         "//bazel/third_party/crates:log",
         "//bazel/third_party/crates:thiserror",
+        "@libpqxx//:libpq",
     ],
 )
 

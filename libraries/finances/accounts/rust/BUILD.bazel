@@ -56,6 +56,7 @@ rust_binary(
         "//bazel/third_party/crates:log",
         "//bazel/third_party/crates:tracing",
         "//bazel/third_party/crates:tracing-subscriber",
+        "@libpqxx//:libpq",
     ],
 )
 
@@ -72,6 +73,7 @@ rust_test(
         "//bazel/third_party/crates:anyhow",
         "//bazel/third_party/crates:lazy_static",
         "//bazel/third_party/crates:tempfile",
+        "@libpqxx//:libpq",
     ],
 )
 

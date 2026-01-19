@@ -35,6 +35,9 @@ rust_test(
     name = "tests",
     crate = ":models/rust",
     crate_features = ["bazel"],
+    deps = [
+        "@libpqxx//:libpq",
+    ],
 )
 
 ###########
