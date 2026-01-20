@@ -122,6 +122,17 @@ def docker_compose(django_image_loaded, nginx_image_loaded, env_file):
     os.environ.pop("DOCKER_CONTEXT", None)
     print(f"DEBUG: After unsetting, DOCKER_CONTEXT: {os.environ.get('DOCKER_CONTEXT')}")
     
+    # Clean up any existing volumes from previous runs to avoid configuration conflicts
+    try:
+        subprocess.run(
+            ["docker", "compose", "-f", "docker-compose.yaml", "down", "-v"],
+            cwd=DOCKER_COMPOSE_PATH,
+            capture_output=True,
+            check=False,  # Don't fail if nothing to clean up
+        )
+    except Exception as e:
+        print(f"DEBUG: Failed to clean up volumes (this is OK if first run): {e}")
+    
     try:
         with DockerCompose(
             context=DOCKER_COMPOSE_PATH, compose_file_name="docker-compose.yaml", env_file=env_file

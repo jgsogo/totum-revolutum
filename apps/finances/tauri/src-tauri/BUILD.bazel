@@ -151,7 +151,6 @@ rust_test(
 
 # Integration tests
 integration_tests_files = glob(["tests/**/test_*.rs"])
-# integration_tests_files = ["tests/test_app_state.rs"]
 
 rust_test_suite(
     name = "_integration_tests",
