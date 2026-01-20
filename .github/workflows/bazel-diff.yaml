@@ -92,6 +92,7 @@ jobs:
           echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
           echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
           echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - name: Generate hashes from current
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
@@ -153,6 +154,7 @@ jobs:
           echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
           echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
           echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - name: Generate hashes from base
         run: |
@@ -223,6 +225,7 @@ jobs:
           echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
           echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
           echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - name: Test @rules_qt
         run: |
@@ -296,7 +299,7 @@ jobs:
           echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
           echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
           echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
-          echo "test --action_env=PATH" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - uses: actions/download-artifact@v6
         with:
@@ -386,7 +389,7 @@ jobs:
           echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
           echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
           echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
-          echo "test --action_env=PATH" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - name: Test all targets
         run: |
