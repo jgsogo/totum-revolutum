@@ -44,8 +44,15 @@ fn create_permission_files() -> Result<()> {
             for entry in archive.entries()? {
                 let mut entry = entry?;
                 if tar::EntryType::Regular == entry.header().entry_type() {
+                    let path = entry.path()?.to_path_buf();
+                    // Skip macOS metadata files (._* files)
+                    if let Some(file_name) = path.file_name() {
+                        if file_name.to_string_lossy().starts_with("._") {
+                            continue;
+                        }
+                    }
                     entry.unpack_in(&plugin_dir)?;
-                    all_files.push(std::fs::canonicalize(plugin_dir.join(entry.path()?))?);
+                    all_files.push(std::fs::canonicalize(plugin_dir.join(&path))?);
                 }
             }
 

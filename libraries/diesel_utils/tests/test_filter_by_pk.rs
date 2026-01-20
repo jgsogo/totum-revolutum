@@ -114,7 +114,7 @@ fn manager_with_integer_pk() {
     // test warn -- Duplicated PKs are removed and we get a warning
     testing_logger::setup();
     let r = User::filter_by_pk(vec![1, 1, 1], connection);
-    assert!(r.is_ok());
+    assert!(r.is_ok(), "Error: {}", r.unwrap_err());
     assert_eq!(r.unwrap().len(), 1);
     testing_logger::validate(|captured_logs| {
         assert_eq!(captured_logs.len(), 1);

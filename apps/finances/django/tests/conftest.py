@@ -1,11 +1,45 @@
 import functools
 import os
+import subprocess
 import tempfile
 
 import docker
 import pytest
 import requests
 from testcontainers.compose import DockerCompose
+
+
+def _get_docker_host() -> str | None:
+    """Get the Docker host URL from the current context or podman machine."""
+    # Try to get from podman machine connection first (most reliable on macOS with Podman)
+    try:
+        result = subprocess.run(
+            ["podman", "machine", "inspect", "--format", "{{.ConnectionInfo.PodmanSocket.Path}}"],
+            capture_output=True,
+            text=True,
+            check=False,  # Don't raise on error
+        )
+        if result.returncode == 0:
+            socket_path = result.stdout.strip()
+            if socket_path and os.path.exists(path=socket_path):
+                return f"unix://{socket_path}"
+    except Exception as e:
+        print(f"DEBUG: podman machine inspect failed: {e}")
+
+    # Try common podman/docker socket locations
+    common_sockets: list[str] = [
+        f"{os.path.expanduser('~')}/.local/share/containers/podman/machine/podman.sock",
+        "/run/podman/podman.sock",
+        "/var/run/docker.sock",
+    ]
+
+    for socket in common_sockets:
+        if os.path.exists(path=socket):
+            print(f"DEBUG: Found socket at: {socket}")
+            return f"unix://{socket}"
+
+    print("DEBUG: No docker/podman socket found")
+    return None
 
 
 @pytest.fixture(scope="session")
@@ -19,8 +53,30 @@ def env_file():
 
 
 @pytest.fixture(scope="session")
+def docker_env():
+    # Environment to use in the working process
+
+    old_environ = dict(os.environ)
+
+    try:
+        # Set DOCKER_HOST to use the local podman socket instead of SSH
+        docker_host = _get_docker_host()
+        if docker_host:
+            os.environ["DOCKER_HOST"] = docker_host
+
+        # Unset DOCKER_CONTEXT to prevent it from overriding DOCKER_HOST
+        os.environ.pop("DOCKER_CONTEXT", None)
+
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(old_environ)
+
+
+@pytest.fixture(scope="session")
 def docker_client():
-    yield docker.from_env()
+    docker_host = _get_docker_host()
+    return docker.DockerClient(base_url=docker_host)
 
 
 def _load_latest_tarball(docker_tarball, docker_client):
@@ -35,8 +91,20 @@ def _load_latest_tarball(docker_tarball, docker_client):
 
 
 @pytest.fixture(scope="session")
-def docker_compose(django_image_loaded, nginx_image_loaded, env_file):
+def docker_compose(docker_env, django_image_loaded, nginx_image_loaded, env_file):
     DOCKER_COMPOSE_PATH = os.getenv("TEST_SRCDIR") + "/_main/apps/finances/django"
+
+    # Clean up any existing volumes from previous runs to avoid configuration conflicts
+    try:
+        subprocess.run(
+            ["docker", "compose", "-f", "docker-compose.yaml", "down", "-v"],
+            cwd=DOCKER_COMPOSE_PATH,
+            capture_output=True,
+            check=False,  # Don't fail if nothing to clean up
+        )
+    except Exception as e:
+        print(f"DEBUG: Failed to clean up volumes (this is OK if first run): {e}")
+
     with DockerCompose(
         context=DOCKER_COMPOSE_PATH, compose_file_name="docker-compose.yaml", env_file=env_file
     ) as compose:

@@ -18,7 +18,7 @@ fn test_snapshot() {
     {
         let body = json!({"accountPk": account_id});
         let r = call_command(&webview, "get_account_context", body.into());
-        assert!(r.is_ok());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
         assert_eq!(account_context.snapshots().len(), 0);
     }
@@ -38,7 +38,7 @@ fn test_snapshot() {
         // Now we have one more snapshot
         let body = json!({"accountPk": account_id});
         let r = call_command(&webview, "get_account_context", body.into());
-        assert!(r.is_ok());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
         assert_eq!(account_context.snapshots().len(), 1);
     }
@@ -50,7 +50,7 @@ fn test_snapshot() {
     {
         let body = json!({"accountPk": account_id});
         let r = call_command(&webview, "get_account_context", body.into());
-        assert!(r.is_ok());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
         assert_eq!(account_context.snapshots().len(), 0);
     }
@@ -71,7 +71,7 @@ fn test_snapshot() {
         // Now we have one more snapshot
         let body = json!({"accountPk": account_id});
         let r = call_command(&webview, "get_account_context", body.into());
-        assert!(r.is_ok());
+        assert!(r.is_ok(), "Error: {}", r.unwrap_err());
         let account_context: AccountContext = r.unwrap().try_into_proto().unwrap();
         assert_eq!(account_context.snapshots().len(), 1);
     }

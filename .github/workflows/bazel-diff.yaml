@@ -2,7 +2,7 @@ name: CI pipeline
 
 # Docs:
 #
-# Regular build will compute the diff with a previous commit (either from `main` or from the `base` branch in PRs),
+# Regular build will compute the diff with a previous commit (either from `master` or from the `base` branch in PRs),
 # then it will use bazel-diff tool to find the impacted targets and execute just those tests.
 #
 # If `[skip-diff]` is provided in the commit message it will skip the bazel-diff stuff and just run all the tests.
@@ -18,6 +18,7 @@ env:
   BAZEL_CONFIG: "--config=ci"
   BAZEL_REMOTE_CACHE_URL: "grpc://bazel-remote:9092"
   BAZEL_DISK_CACHE_PATH: "~/.cache/bazel-disk-cache"
+
 
 jobs:
   # This job will find out if any self-hosted runner is available and return it
@@ -60,7 +61,6 @@ jobs:
 
   compute-current-hashes:
     needs:
-      # - debugging
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     steps:
@@ -81,12 +81,18 @@ jobs:
         run: |
           echo "build --disk_cache=~/.cache/bazel-disk-cache" >> user.bazelrc
 
-      - name: Configure bazel-remote
+      - name: Configure user.bazelrc for self-hosted
         if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
           echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> user.bazelrc
           echo "build --remote_timeout=10" >> user.bazelrc
           echo "build --remote_upload_local_results" >> user.bazelrc
+
+          # FIXME: These are local directories in MacOS filesystem
+          echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
+          echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - name: Generate hashes from current
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
@@ -137,12 +143,18 @@ jobs:
         run: |
           echo "build --disk_cache=~/.cache/bazel-disk-cache" >> user.bazelrc
 
-      - name: Configure bazel-remote
+      - name: Configure user.bazelrc for self-hosted
         if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
           echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> user.bazelrc
           echo "build --remote_timeout=10" >> user.bazelrc
           echo "build --remote_upload_local_results" >> user.bazelrc
+
+          # FIXME: These are local directories in MacOS filesystem
+          echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
+          echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - name: Generate hashes from base
         run: |
@@ -202,12 +214,18 @@ jobs:
           echo "build --disk_cache=~/.cache/bazel-disk-cache" >> user.bazelrc
           echo "test --disk_cache=~/.cache/bazel-disk-cache" >> user.bazelrc
 
-      - name: Configure bazel-remote
+      - name: Configure user.bazelrc for self-hosted
         if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
           echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> user.bazelrc
           echo "build --remote_timeout=10" >> user.bazelrc
           echo "build --remote_upload_local_results" >> user.bazelrc
+
+          # FIXME: These are local directories in MacOS filesystem
+          echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
+          echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - name: Test @rules_qt
         run: |
@@ -270,17 +288,18 @@ jobs:
           echo "build --disk_cache=~/.cache/bazel-disk-cache" >> user.bazelrc
           echo "test --disk_cache=~/.cache/bazel-disk-cache" >> user.bazelrc
 
-      - name: Configure bazel-remote
+      - name: Configure user.bazelrc for self-hosted
         if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
           echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> user.bazelrc
           echo "build --remote_timeout=10" >> user.bazelrc
           echo "build --remote_upload_local_results" >> user.bazelrc
 
-      - name: Add path to tools
-        if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
-        run: |
-          echo "test --action_env=PATH" >> user.bazelrc
+          # FIXME: These are local directories in MacOS filesystem
+          echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
+          echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - uses: actions/download-artifact@v6
         with:
@@ -359,17 +378,18 @@ jobs:
           echo "build --disk_cache=~/.cache/bazel-disk-cache" >> user.bazelrc
           echo "test --disk_cache=~/.cache/bazel-disk-cache" >> user.bazelrc
 
-      - name: Configure bazel-remote
+      - name: Configure user.bazelrc for self-hosted
         if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
         run: |
           echo "build --remote_cache=$BAZEL_REMOTE_CACHE_URL" >> user.bazelrc
           echo "build --remote_timeout=10" >> user.bazelrc
           echo "build --remote_upload_local_results" >> user.bazelrc
 
-      - name: Add path to tools
-        if: ${{ needs.check-runner.outputs.runner-label == 'self-hosted' }}
-        run: |
-          echo "test --action_env=PATH" >> user.bazelrc
+          # FIXME: These are local directories in MacOS filesystem
+          echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
+          echo "build --action_env=LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
+          echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
       - name: Test all targets
         run: |
