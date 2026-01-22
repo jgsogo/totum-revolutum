@@ -61,6 +61,7 @@ ts_project(
     tsconfig = ":tsconfig",
     deps = [
         ":googleapis/ts",
+        "//:node_modules/@vitest/runner",
         "//:node_modules/vitest",
     ],
 )

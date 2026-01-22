@@ -60,8 +60,8 @@ rust_library(
     }),
     version = "0.18.3",
     deps = [
-        "@crates__console-0.16.1//:console",
-        "@crates__portable-atomic-1.11.1//:portable_atomic",
+        "@crates__console-0.16.2//:console",
+        "@crates__portable-atomic-1.13.0//:portable_atomic",
         "@crates__unicode-width-0.2.2//:unicode_width",
         "@crates__unit-prefix-0.5.2//:unit_prefix",
     ],

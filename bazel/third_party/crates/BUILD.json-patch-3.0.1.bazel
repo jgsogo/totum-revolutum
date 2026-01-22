@@ -62,7 +62,7 @@ rust_library(
     deps = [
         "@crates__jsonptr-0.6.3//:jsonptr",
         "@crates__serde-1.0.228//:serde",
-        "@crates__serde_json-1.0.145//:serde_json",
+        "@crates__serde_json-1.0.149//:serde_json",
         "@crates__thiserror-1.0.69//:thiserror",
     ],
 )

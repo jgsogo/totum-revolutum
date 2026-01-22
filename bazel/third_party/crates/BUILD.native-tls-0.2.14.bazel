@@ -63,10 +63,10 @@ rust_library(
         "@crates__native-tls-0.2.14//:build_script_build",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.178//:libc",  # cfg(target_vendor = "apple")
+            "@crates__libc-0.2.180//:libc",  # cfg(target_vendor = "apple")
             "@crates__security-framework-2.11.1//:security_framework",  # cfg(target_vendor = "apple")
             "@crates__security-framework-sys-2.15.0//:security_framework_sys",  # cfg(target_vendor = "apple")
-            "@crates__tempfile-3.23.0//:tempfile",  # cfg(target_os = "macos")
+            "@crates__tempfile-3.24.0//:tempfile",  # cfg(target_os = "macos")
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
             "@crates__log-0.4.29//:log",  # cfg(not(any(target_os = "windows", target_vendor = "apple")))

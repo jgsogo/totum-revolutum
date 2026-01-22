@@ -1,8 +1,13 @@
 """Provide `rust_docs` rule to build together the documentation for several crates"""
 
-load("@rules_rust//rust/private:common.bzl", "rust_common")
+load("@rules_rust//rust:defs.bzl", "rust_common")
+
+# buildifier: disable=bzl-visibility
 load("@rules_rust//rust/private:rustdoc.bzl", "rustdoc_compile_action")
-load("@rules_rust//rust/private:utils.bzl", "dedent", "find_toolchain")
+
+# buildifier: disable=bzl-visibility
+load("@rules_rust//rust/private:utils.bzl", "find_toolchain")
+load("//bazel:dedent.bzl", "dedent")
 
 def _zip_action(ctx, input_dir, output_zip, crate_label):
     """Creates an archive of the generated documentation from `rustdoc`
@@ -228,5 +233,4 @@ rust_docs = rule(
         str(Label("@rules_rust//rust:toolchain_type")),
         "@bazel_tools//tools/cpp:toolchain_type",
     ],
-    incompatible_use_toolchain_transition = True,
 )

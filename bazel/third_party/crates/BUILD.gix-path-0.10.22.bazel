@@ -57,8 +57,8 @@ rust_library(
     version = "0.10.22",
     deps = [
         "@crates__bstr-1.12.1//:bstr",
-        "@crates__gix-trace-0.1.15//:gix_trace",
+        "@crates__gix-trace-0.1.17//:gix_trace",
         "@crates__gix-validate-0.10.1//:gix_validate",
-        "@crates__thiserror-2.0.17//:thiserror",
+        "@crates__thiserror-2.0.18//:thiserror",
     ],
 )

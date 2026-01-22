@@ -60,7 +60,7 @@ def django_admin(name, django_project, **kwargs):
     py_binary(
         name = "{}-bin".format(name),
         srcs = ["//bazel/python/django/project:manage.py"],
-        main = "manage.py",
+        main = "//bazel/python/django/project:manage.py",
         deps = [
             django_project,
         ],

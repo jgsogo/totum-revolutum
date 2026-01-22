@@ -60,12 +60,12 @@ rust_library(
     version = "5.3.3",
     deps = select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__libc-0.2.178//:libc",  # cfg(unix)
+            "@crates__libc-0.2.180//:libc",  # cfg(unix)
             "@crates__pathdiff-0.2.3//:pathdiff",  # cfg(all(unix, not(macos)))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
             "@crates__is-wsl-0.4.0//:is_wsl",  # cfg(any(target_os = "linux", target_os = "android", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd", target_os = "illumos", target_os = "solaris", target_os = "aix", target_os = "hurd"))
-            "@crates__libc-0.2.178//:libc",  # cfg(unix)
+            "@crates__libc-0.2.180//:libc",  # cfg(unix)
             "@crates__pathdiff-0.2.3//:pathdiff",  # cfg(all(unix, not(macos)))
         ],
         "//conditions:default": [],

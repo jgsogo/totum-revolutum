@@ -67,7 +67,7 @@ rust_library(
         "@crates__gix-utils-0.3.1//:gix_utils",
         "@crates__gix-validate-0.10.1//:gix_validate",
         "@crates__memmap2-0.9.9//:memmap2",
-        "@crates__thiserror-2.0.17//:thiserror",
+        "@crates__thiserror-2.0.18//:thiserror",
         "@crates__winnow-0.7.14//:winnow",
     ],
 )

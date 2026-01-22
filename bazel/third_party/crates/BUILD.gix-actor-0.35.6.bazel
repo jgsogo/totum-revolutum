@@ -59,8 +59,8 @@ rust_library(
         "@crates__bstr-1.12.1//:bstr",
         "@crates__gix-date-0.10.7//:gix_date",
         "@crates__gix-utils-0.3.1//:gix_utils",
-        "@crates__itoa-1.0.15//:itoa",
-        "@crates__thiserror-2.0.17//:thiserror",
+        "@crates__itoa-1.0.17//:itoa",
+        "@crates__thiserror-2.0.18//:thiserror",
         "@crates__winnow-0.7.14//:winnow",
     ],
 )

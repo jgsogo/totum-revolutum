@@ -80,8 +80,8 @@ rust_library(
         "@crates__sharded-slab-0.1.7//:sharded_slab",
         "@crates__smallvec-1.15.1//:smallvec",
         "@crates__thread_local-1.1.9//:thread_local",
-        "@crates__tracing-0.1.43//:tracing",
-        "@crates__tracing-core-0.1.35//:tracing_core",
+        "@crates__tracing-0.1.44//:tracing",
+        "@crates__tracing-core-0.1.36//:tracing_core",
         "@crates__tracing-log-0.2.0//:tracing_log",
     ],
 )

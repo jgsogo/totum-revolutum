@@ -8,9 +8,9 @@ bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "rules_proto_grpc", version = "5.8.0")
 bazel_dep(name = "rules_proto_grpc_cpp", version = "5.8.0")
 bazel_dep(name = "rules_proto_grpc_js", version = "5.8.0")
-bazel_dep(name = "toolchains_protoc", version = "0.6.0")
+bazel_dep(name = "toolchains_protoc", version = "0.6.1")
 bazel_dep(name = "protobuf", version = PROTOBUF_VERSION)
-bazel_dep(name = "rules_rust_prost", version = "0.67.0")
+bazel_dep(name = "rules_rust_prost", version = "0.68.1")
 
 # 2 Register Proto toolchain
 ###############################################################################
