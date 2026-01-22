@@ -64,7 +64,7 @@ rust_library(
     }),
     version = "0.14.1",
     deps = [
-        "@crates__aligned-0.4.2//:aligned",
+        "@crates__aligned-0.4.3//:aligned",
         "@crates__anyhow-1.0.100//:anyhow",
         "@crates__arrayvec-0.7.6//:arrayvec",
         "@crates__av-scenechange-0.14.1//:build_script_build",
@@ -72,7 +72,7 @@ rust_library(
         "@crates__num-rational-0.4.2//:num_rational",
         "@crates__num-traits-0.2.19//:num_traits",
         "@crates__rayon-1.11.0//:rayon",
-        "@crates__thiserror-2.0.17//:thiserror",
+        "@crates__thiserror-2.0.18//:thiserror",
         "@crates__v_frame-0.3.9//:v_frame",
         "@crates__y4m-0.8.0//:y4m",
     ],

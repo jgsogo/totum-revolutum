@@ -58,6 +58,6 @@ rust_library(
     deps = [
         "@crates__dunce-1.0.5//:dunce",
         "@crates__embed-resource-3.0.6//:embed_resource",
-        "@crates__toml-0.9.8//:toml",
+        "@crates__toml-0.9.11-spec-1.1.0//:toml",
     ],
 )

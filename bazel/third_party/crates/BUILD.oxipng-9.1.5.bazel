@@ -63,8 +63,8 @@ rust_library(
     deps = [
         "@crates__bitvec-1.0.1//:bitvec",
         "@crates__crossbeam-channel-0.5.15//:crossbeam_channel",
-        "@crates__filetime-0.2.26//:filetime",
-        "@crates__indexmap-2.12.1//:indexmap",
+        "@crates__filetime-0.2.27//:filetime",
+        "@crates__indexmap-2.13.0//:indexmap",
         "@crates__libdeflater-1.25.0//:libdeflater",
         "@crates__log-0.4.29//:log",
         "@crates__rayon-1.11.0//:rayon",

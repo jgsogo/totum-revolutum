@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.2.4",
     deps = [
-        "@crates__portable-atomic-1.11.1//:portable_atomic",
+        "@crates__portable-atomic-1.13.0//:portable_atomic",
         "@crates__portable-atomic-util-0.2.4//:build_script_build",
     ],
 )

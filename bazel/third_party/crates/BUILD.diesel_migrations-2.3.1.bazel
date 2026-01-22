@@ -62,7 +62,7 @@ rust_library(
     }),
     version = "2.3.1",
     deps = [
-        "@crates__diesel-2.3.4//:diesel",
+        "@crates__diesel-2.3.5//:diesel",
         "@crates__migrations_internals-2.3.0//:migrations_internals",
     ],
 )

@@ -56,7 +56,7 @@ impl PCloudServerMock {
         OAuth2TokenMock::new(&format!("{}:{}", self.server.host(), self.server.port()), "token")
     }
 
-    pub fn listfolder_mock(&self, params: HashMap<&str, &str>, body: impl AsRef<[u8]>) -> Mock {
+    pub fn listfolder_mock(&'_ self, params: HashMap<&str, &str>, body: impl AsRef<[u8]>) -> Mock<'_> {
         self.server.mock(|when, then| {
             let mut wh = when.method(GET).path(listfolder::ENDPOINT);
 
@@ -70,7 +70,7 @@ impl PCloudServerMock {
         })
     }
 
-    pub fn userinfo_mock(&self) -> Mock {
+    pub fn userinfo_mock(&'_ self) -> Mock<'_> {
         self.server.mock(|when, then| {
             when.method(GET).path("/userinfo").query_param("access_token", "token");
 
@@ -82,14 +82,14 @@ impl PCloudServerMock {
     }
 
     pub fn fileops_create_with_folder_and_name(
-        &mut self,
+        &'_ mut self,
         folder: FolderID,
         name: &str,
         folder_path: &Utf8Path,
         write_bytes: u64,
         read_content: Vec<u8>,
         chunk_size: usize,
-    ) -> (Mock, Mock, Mock, Mock, Mock, Mock, Mock) {
+    ) -> (Mock<'_>, Mock<'_>, Mock<'_>, Mock<'_>, Mock<'_>, Mock<'_>, Mock<'_>) {
         self.fd_count += 1;
         let fd = self.fd_count;
         let fileid = folder.inner() + fd;

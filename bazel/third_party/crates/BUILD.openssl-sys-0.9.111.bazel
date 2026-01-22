@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.9.111",
     deps = [
-        "@crates__libc-0.2.178//:libc",
+        "@crates__libc-0.2.180//:libc",
         "@crates__openssl-sys-0.9.111//:build_script_main",
     ],
 )
@@ -117,7 +117,7 @@ cargo_build_script(
     version = "0.9.111",
     visibility = ["//visibility:private"],
     deps = [
-        "@crates__cc-1.2.48//:cc",
+        "@crates__cc-1.2.53//:cc",
         "@crates__pkg-config-0.3.32//:pkg_config",
         "@crates__vcpkg-0.2.15//:vcpkg",
     ],

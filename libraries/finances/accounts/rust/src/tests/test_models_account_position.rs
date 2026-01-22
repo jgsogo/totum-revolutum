@@ -127,7 +127,10 @@ fn test_queries() {
         let position = account
             .position(&mut conn, &(snapshot_date_value - chrono::Days::new(1)))
             .unwrap();
-        assert_eq!(position, (-1f32).try_into().unwrap());
+        assert_eq!(
+            position,
+            <f32 as TryInto<bigdecimal::BigDecimal>>::try_into(-1f32).unwrap()
+        );
     }
 
     // If we add another snapshot at the very beginning
@@ -145,6 +148,9 @@ fn test_queries() {
         let position = account
             .position(&mut conn, &(snapshot_date_value - chrono::Days::new(1)))
             .unwrap();
-        assert_eq!(position, 99f32.try_into().unwrap());
+        assert_eq!(
+            position,
+            <f32 as TryInto<bigdecimal::BigDecimal>>::try_into(99f32).unwrap()
+        );
     }
 }
