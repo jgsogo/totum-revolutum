@@ -1,0 +1,12 @@
+customModes:
+  - slug: finances
+    name: Finances
+    description: Dev Finances app
+    roleDefinition: You are a C++ expert
+    groups:
+      - read
+      - edit
+      - browser
+      - command
+      - mcp
+    source: project

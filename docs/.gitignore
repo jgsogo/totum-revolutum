@@ -1,0 +1,37 @@
+# Distribution / packaging
+# IDEs
+# MkDocs build output
+# OS
+# Python cache
+# Python virtual environment
+*$py.class
+*.egg
+*.egg-info/
+*.py[cod]
+*.so
+*.swo
+*.swp
+*~
+.DS_Store
+.Python
+.eggs/
+.idea/
+.installed.cfg
+.venv/
+.vscode/
+Thumbs.db
+__pycache__/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+env/
+lib/
+lib64/
+parts/
+sdist/
+site/
+var/
+venv/
+wheels/

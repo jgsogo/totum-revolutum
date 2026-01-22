@@ -1,29 +1,35 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_test")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
 
 rust_binary(
     name = "capture_args_and_env",
     srcs = ["capture_args_and_env.rs"],
-    edition = "2018",
+    edition = "2021",
     visibility = ["//visibility:public"],
 )
 
 rust_binary(
     name = "run_scripts",
     srcs = ["run_scripts.rs"],
-    edition = "2018",
+    edition = "2021",
     visibility = ["//visibility:public"],
 )
 
-# Unittests
-rust_test(
-    name = "capture_args_and_env/tests",
-    crate = ":capture_args_and_env",
+bzl_library(
+    name = "defs",
+    srcs = ["defs.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
-        "//bazel/third_party/crates:tempfile",
+        "//bazel:dedent",
+        "@rules_rust//rust:bzl_lib",
     ],
 )
 
-rust_test(
-    name = "run_scripts/tests",
-    crate = ":run_scripts",
+stardoc(
+    name = "defs_doc",
+    out = "defs.md",
+    input = "defs.bzl",
+    visibility = ["//visibility:public"],
+    deps = [":defs"],
 )

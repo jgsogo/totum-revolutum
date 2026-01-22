@@ -1,11 +1,22 @@
-load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
 
 exports_files([
     "with_postgres_run.tpl.sh",
+    "example_users_table.sh",
 ])
 
-sh_binary(
-    name = "example_users_table",
-    srcs = ["example_users_table.sh"],
+bzl_library(
+    name = "with_postgres_run",
+    srcs = ["with_postgres_run.bzl"],
     visibility = ["//visibility:public"],
+    deps = ["@aspect_bazel_lib//lib:paths"],
+)
+
+stardoc(
+    name = "with_postgres_run_doc",
+    out = "with_postgres_run.md",
+    input = "with_postgres_run.bzl",
+    visibility = ["//visibility:public"],
+    deps = [":with_postgres_run"],
 )

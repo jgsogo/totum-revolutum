@@ -1,0 +1,17 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+bzl_library(
+    name = "defs",
+    srcs = ["defs.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["@rules_rust//rust:bzl_lib"],
+)
+
+stardoc(
+    name = "defs_doc",
+    out = "defs.md",
+    input = "defs.bzl",
+    visibility = ["//visibility:public"],
+    deps = [":defs"],
+)

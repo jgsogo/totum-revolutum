@@ -1,3 +1,36 @@
-exports_files([
-    "skip_rustfmt.patch",
-])
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+exports_files(["skip_rustfmt.patch"])
+
+bzl_library(
+    name = "diesel_print_schema",
+    srcs = ["diesel_print_schema.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bazel:run_copy_to_workspace",
+        "@bazel_skylib//rules:diff_test",
+    ],
+)
+
+stardoc(
+    name = "diesel_print_schema_doc",
+    out = "diesel_print_schema.md",
+    input = "diesel_print_schema.bzl",
+    visibility = ["//visibility:public"],
+    deps = [":diesel_print_schema"],
+)
+
+bzl_library(
+    name = "diesel_setup",
+    srcs = ["diesel_setup.bzl"],
+    visibility = ["//visibility:public"],
+)
+
+stardoc(
+    name = "diesel_setup_doc",
+    out = "diesel_setup.md",
+    input = "diesel_setup.bzl",
+    visibility = ["//visibility:public"],
+    deps = [":diesel_setup"],
+)
