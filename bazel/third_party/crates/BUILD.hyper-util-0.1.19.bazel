@@ -77,13 +77,13 @@ rust_library(
         "@crates__http-body-1.0.1//:http_body",
         "@crates__hyper-1.8.1//:hyper",
         "@crates__ipnet-2.11.0//:ipnet",
-        "@crates__libc-0.2.178//:libc",
+        "@crates__libc-0.2.180//:libc",
         "@crates__percent-encoding-2.3.2//:percent_encoding",
         "@crates__pin-project-lite-0.2.16//:pin_project_lite",
         "@crates__socket2-0.6.1//:socket2",
-        "@crates__tokio-1.48.0//:tokio",
+        "@crates__tokio-1.49.0//:tokio",
         "@crates__tower-service-0.3.3//:tower_service",
-        "@crates__tracing-0.1.43//:tracing",
+        "@crates__tracing-0.1.44//:tracing",
     ] + select({
         "@rules_rust//rust/platform:x86_64-apple-darwin": [
             "@crates__system-configuration-0.6.1//:system_configuration",  # x86_64-apple-darwin

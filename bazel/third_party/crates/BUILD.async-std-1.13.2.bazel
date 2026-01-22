@@ -82,7 +82,7 @@ rust_library(
         "@crates__async-channel-1.9.0//:async_channel",
         "@crates__async-global-executor-2.4.1//:async_global_executor",
         "@crates__async-io-2.6.0//:async_io",
-        "@crates__async-lock-3.4.1//:async_lock",
+        "@crates__async-lock-3.4.2//:async_lock",
         "@crates__crossbeam-utils-0.8.21//:crossbeam_utils",
         "@crates__futures-core-0.3.31//:futures_core",
         "@crates__futures-io-0.3.31//:futures_io",

@@ -62,7 +62,7 @@ rust_library(
     }),
     version = "5.2.0",
     deps = [
-        "@crates__rust_decimal-1.39.0//:rust_decimal",
+        "@crates__rust_decimal-1.40.0//:rust_decimal",
         "@crates__utf8-width-0.1.8//:utf8_width",
     ],
 )

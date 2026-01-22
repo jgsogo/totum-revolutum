@@ -23,7 +23,7 @@ rust_library(
         allow_empty = True,
     ),
     aliases = {
-        "@crates__rustls-pki-types-1.13.1//:rustls_pki_types": "pki_types",
+        "@crates__rustls-pki-types-1.14.0//:rustls_pki_types": "pki_types",
     },
     compile_data = glob(
         include = ["**"],
@@ -62,9 +62,9 @@ rust_library(
         "@crates__http-1.4.0//:http",
         "@crates__hyper-1.8.1//:hyper",
         "@crates__hyper-util-0.1.19//:hyper_util",
-        "@crates__rustls-0.23.35//:rustls",
-        "@crates__rustls-pki-types-1.13.1//:rustls_pki_types",
-        "@crates__tokio-1.48.0//:tokio",
+        "@crates__rustls-0.23.36//:rustls",
+        "@crates__rustls-pki-types-1.14.0//:rustls_pki_types",
+        "@crates__tokio-1.49.0//:tokio",
         "@crates__tokio-rustls-0.26.4//:tokio_rustls",
         "@crates__tower-service-0.3.3//:tower_service",
     ],

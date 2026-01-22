@@ -67,7 +67,7 @@ rust_library(
     version = "0.10.3",
     deps = [
         "@crates__fax-0.2.6//:fax",
-        "@crates__flate2-1.1.5//:flate2",
+        "@crates__flate2-1.1.8//:flate2",
         "@crates__half-2.7.1//:half",
         "@crates__quick-error-2.0.1//:quick_error",
         "@crates__weezl-0.1.12//:weezl",

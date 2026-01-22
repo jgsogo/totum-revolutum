@@ -61,6 +61,6 @@ rust_library(
     version = "1.4.0",
     deps = [
         "@crates__bytes-1.11.0//:bytes",
-        "@crates__itoa-1.0.15//:itoa",
+        "@crates__itoa-1.0.17//:itoa",
     ],
 )

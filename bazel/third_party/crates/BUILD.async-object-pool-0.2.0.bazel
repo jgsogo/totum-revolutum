@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.2.0",
     deps = [
-        "@crates__async-lock-3.4.1//:async_lock",
+        "@crates__async-lock-3.4.2//:async_lock",
         "@crates__event-listener-5.4.1//:event_listener",
     ],
 )

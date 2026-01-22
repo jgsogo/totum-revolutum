@@ -74,7 +74,7 @@ async fn test_create_write_read_in_root_folder() -> Result<()> {
     open_with_path.assert();
     read.assert();
     read_eof.assert();
-    close.assert_hits(1); // FIXME: There should be two hits here.
-    open.assert_hits(0);
+    close.assert_calls(1); // FIXME: There should be two hits here.
+    open.assert_calls(0);
     Ok(())
 }

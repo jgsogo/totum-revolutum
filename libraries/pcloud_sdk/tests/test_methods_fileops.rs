@@ -53,7 +53,7 @@ async fn test_fileops() -> Result<()> {
         pcloud.file_close(fd.fd.clone()).await?;
         close.assert();
 
-        open_with_path.assert_hits(0);
+        open_with_path.assert_calls(0);
         fd.fileid
     };
 
@@ -74,7 +74,7 @@ async fn test_fileops() -> Result<()> {
         read_eof.assert();
 
         pcloud.file_close(fd.fd.clone()).await?;
-        close.assert_hits(2);
+        close.assert_calls(2);
     }
 
     Ok(())

@@ -53,7 +53,7 @@ impl RemotePath {
     }
 
     /// Returns the [`Utf8Components`] of the path
-    pub fn components(&self) -> Utf8Components {
+    pub fn components(&'_ self) -> Utf8Components<'_> {
         self.0.components()
     }
 

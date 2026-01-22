@@ -175,7 +175,7 @@ impl DirectoryPath {
     /// Produces an iterator over the [`Utf8Components`] of the path.
     ///
     /// Forwards the call to [`Utf8Path::components`]
-    pub fn components(&self) -> Utf8Components {
+    pub fn components(&'_ self) -> Utf8Components<'_> {
         self.0.components()
     }
 
