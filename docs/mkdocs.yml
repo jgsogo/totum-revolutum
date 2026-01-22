@@ -4,6 +4,10 @@ site_author: Your Name
 repo_url: https://github.com/yourusername/totum-revolutum
 repo_name: totum-revolutum
 
+# Content is in the same directory as mkdocs.yml
+docs_dir: ./
+site_dir: ../site
+
 theme:
   name: material
   palette:
