@@ -76,7 +76,7 @@ httpmock = { version = "0.8" }
 hyper = { version = "1.6.0" }
 hyper-util = { version = "0.1.10" }
 ignore = { version = "0.4.23" }
-ignore-files = "=3.0.4"
+ignore-files = "=3.0.5"
 image = { version = "0.25.5" }
 indicatif = { version = "0.18.0" }
 itertools = "0.14.0"
