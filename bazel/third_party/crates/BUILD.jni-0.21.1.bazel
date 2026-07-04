@@ -50,7 +50,7 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -59,8 +59,8 @@ rust_library(
         "@crates__cesu8-1.1.0//:cesu8",
         "@crates__cfg-if-1.0.4//:cfg_if",
         "@crates__combine-4.6.7//:combine",
-        "@crates__jni-sys-0.3.0//:jni_sys",
-        "@crates__log-0.4.29//:log",
+        "@crates__jni-sys-0.3.1//:jni_sys",
+        "@crates__log-0.4.33//:log",
         "@crates__thiserror-1.0.69//:thiserror",
     ],
 )

@@ -20,7 +20,7 @@ def _fetch_envsubst_impl(_ctx):
         urls = [
             "https://github.com/a8m/envsubst/releases/download/v{version}/envsubst-Darwin-arm64".format(version = VERSION),
         ],
-        integrity = "sha256-Lo9FQGLSHyv4d/WzZMItANbDNG+tW4EO/X4c646yZOQ=",
+        integrity = "sha256-0gnNnlzBEQvSDwNDBJWyw9k6elHj+oIJPTifqdRHHpo=",
         executable = True,
     )
 

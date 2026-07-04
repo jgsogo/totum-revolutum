@@ -50,12 +50,12 @@ rust_proc_macro(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "0.1.0",
     deps = [
-        "@crates__quote-1.0.43//:quote",
+        "@crates__quote-1.0.46//:quote",
     ],
 )

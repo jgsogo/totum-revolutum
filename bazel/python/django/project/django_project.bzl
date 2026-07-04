@@ -156,7 +156,7 @@ def django_project_container(name, version, repository, env = None, entrypoint =
             "manual",
         ],
         target_platform = select({
-            "@platforms//cpu:arm64": "//bazel/platforms:linux_x86_64",
+            "@platforms//cpu:arm64": "//bazel/platforms:linux_arm64",
             "@platforms//cpu:x86_64": "//bazel/platforms:linux_x86_64",
         }),
     )

@@ -53,7 +53,7 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -63,7 +63,7 @@ rust_library(
         "@crates__gdkx11-sys-0.18.2//:gdk_x11_sys",
         "@crates__gio-0.18.4//:gio",
         "@crates__glib-0.18.5//:glib",
-        "@crates__libc-0.2.180//:libc",
+        "@crates__libc-0.2.186//:libc",
         "@crates__x11-2.21.0//:x11",
     ],
 )

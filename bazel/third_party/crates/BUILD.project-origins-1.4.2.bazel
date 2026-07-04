@@ -50,14 +50,14 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "1.4.2",
     deps = [
-        "@crates__futures-0.3.31//:futures",
-        "@crates__tokio-1.49.0//:tokio",
+        "@crates__futures-0.3.32//:futures",
+        "@crates__tokio-1.52.3//:tokio",
         "@crates__tokio-stream-0.1.18//:tokio_stream",
     ],
 )

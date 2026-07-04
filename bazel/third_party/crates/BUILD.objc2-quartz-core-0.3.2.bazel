@@ -34,14 +34,6 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
-    crate_features = [
-        "CADisplayLink",
-        "CALayer",
-        "CAMediaTiming",
-        "CAMediaTimingFunction",
-        "CAOpenGLLayer",
-        "bitflags",
-    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -58,14 +50,13 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "0.3.2",
     deps = [
-        "@crates__bitflags-2.10.0//:bitflags",
-        "@crates__objc2-0.6.3//:objc2",
+        "@crates__objc2-0.6.4//:objc2",
         "@crates__objc2-foundation-0.3.2//:objc2_foundation",
     ],
 )

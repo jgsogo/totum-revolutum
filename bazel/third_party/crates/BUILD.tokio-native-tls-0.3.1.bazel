@@ -50,13 +50,13 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "0.3.1",
     deps = [
-        "@crates__native-tls-0.2.14//:native_tls",
-        "@crates__tokio-1.49.0//:tokio",
+        "@crates__native-tls-0.2.18//:native_tls",
+        "@crates__tokio-1.52.3//:tokio",
     ],
 )

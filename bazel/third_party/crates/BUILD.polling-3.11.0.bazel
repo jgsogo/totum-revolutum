@@ -50,7 +50,7 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -58,11 +58,11 @@ rust_library(
     deps = [
         "@crates__cfg-if-1.0.4//:cfg_if",
     ] + select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__rustix-1.1.3//:rustix",  # cfg(any(unix, target_os = "fuchsia", target_os = "vxworks"))
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [
+            "@crates__rustix-1.1.4//:rustix",  # cfg(any(unix, target_os = "fuchsia", target_os = "vxworks"))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__rustix-1.1.3//:rustix",  # cfg(any(unix, target_os = "fuchsia", target_os = "vxworks"))
+            "@crates__rustix-1.1.4//:rustix",  # cfg(any(unix, target_os = "fuchsia", target_os = "vxworks"))
         ],
         "//conditions:default": [],
     }),

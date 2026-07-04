@@ -50,7 +50,7 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -59,6 +59,6 @@ rust_library(
         "@crates__dyn-clone-1.0.20//:dyn_clone",
         "@crates__ref-cast-1.0.25//:ref_cast",
         "@crates__serde-1.0.228//:serde",
-        "@crates__serde_json-1.0.149//:serde_json",
+        "@crates__serde_json-1.0.150//:serde_json",
     ],
 )

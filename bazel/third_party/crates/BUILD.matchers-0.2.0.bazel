@@ -50,12 +50,12 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "0.2.0",
     deps = [
-        "@crates__regex-automata-0.4.13//:regex_automata",
+        "@crates__regex-automata-0.4.14//:regex_automata",
     ],
 )

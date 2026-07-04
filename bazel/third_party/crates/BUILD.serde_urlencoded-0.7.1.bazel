@@ -50,15 +50,15 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "0.7.1",
     deps = [
         "@crates__form_urlencoded-1.2.2//:form_urlencoded",
-        "@crates__itoa-1.0.17//:itoa",
-        "@crates__ryu-1.0.22//:ryu",
+        "@crates__itoa-1.0.18//:itoa",
+        "@crates__ryu-1.0.23//:ryu",
         "@crates__serde-1.0.228//:serde",
     ],
 )

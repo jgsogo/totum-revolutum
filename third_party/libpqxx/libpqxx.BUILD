@@ -37,7 +37,8 @@ cmake(
     lib_source = ":all_srcs",
     # TODO: Use @postgres bazel module (https://registry.bazel.build/modules/postgres) to consume `pq` library from it
     linkopts = [
-        "-L/usr/local/Cellar/libpq/18.0/lib",
+        # "-L/usr/local/Cellar/libpq/18.0/lib",  # intel MacOS
+        "-L/opt/homebrew/Cellar/libpq@17/17.10/lib",  # ARM MacOS
         "-lpq",
     ],
     out_static_libs = [

@@ -54,16 +54,16 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "0.4.18",
     deps = [
         "@crates__aho-corasick-1.1.4//:aho_corasick",
-        "@crates__bstr-1.12.1//:bstr",
-        "@crates__log-0.4.29//:log",
-        "@crates__regex-automata-0.4.13//:regex_automata",
-        "@crates__regex-syntax-0.8.8//:regex_syntax",
+        "@crates__bstr-1.12.3//:bstr",
+        "@crates__log-0.4.33//:log",
+        "@crates__regex-automata-0.4.14//:regex_automata",
+        "@crates__regex-syntax-0.8.11//:regex_syntax",
     ],
 )

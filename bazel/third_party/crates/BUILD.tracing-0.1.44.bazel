@@ -60,14 +60,14 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     version = "0.1.44",
     deps = [
-        "@crates__log-0.4.29//:log",
-        "@crates__pin-project-lite-0.2.16//:pin_project_lite",
+        "@crates__log-0.4.33//:log",
+        "@crates__pin-project-lite-0.2.17//:pin_project_lite",
         "@crates__tracing-core-0.1.36//:tracing_core",
     ],
 )
