@@ -38,7 +38,7 @@
     {
       "automerge": false,
       "description": [
-        "Update pre-commits weekly (try automerge)"
+        "Update pre-commits weekly"
       ],
       "enabled": true,
       "extends": [
@@ -47,6 +47,20 @@
       "groupName": "pre-commit hooks",
       "matchManagers": [
         "pre-commit"
+      ]
+    },
+    {
+      "automerge": false,
+      "description": [
+        "Update github-actions weekly (Mondays during working hours)"
+      ],
+      "enabled": true,
+      "groupName": "github-actions",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "schedule": [
+        "* 10-17 * * 1"
       ]
     },
     {
