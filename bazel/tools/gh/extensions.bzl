@@ -23,7 +23,7 @@ def _fetch_gh_impl(_ctx):
             "https://github.com/cli/cli/releases/download/v{version}/gh_{version}_macOS_arm64.zip".format(version = GH_VERSION),
         ],
         type = "zip",
-        sha256 = "929ff6fa154d64b930d84d6c2b65ec03968622f20db947c50bf92a9910edd01c",
+        sha256 = "1489f762f2e0d49aa5fd8a7cf652faae5f8ac9212612b78c3180cbd88d00db25",
         strip_prefix = "gh_{version}_macOS_arm64".format(version = GH_VERSION),
         build_file = "//bazel/tools/gh:BUILD.gh.bazel",
     )
