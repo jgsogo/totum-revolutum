@@ -222,7 +222,7 @@ jobs:
           echo "build --remote_upload_local_results" >> user.bazelrc
 
           # FIXME: These are local directories in MacOS filesystem
-          echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/opt/homebrew/opt/libpq@17/bin" >> user.bazelrc
+          echo "build --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/opt/homebrew/bin" >> user.bazelrc
           echo "build --action_env=PKG_CONFIG_PATH=/opt/homebrew/opt/libpq@17/lib/pkgconfig:/opt/homebrew/opt/openssl/lib/pkgconfig:/opt/homebrew/opt/curl/lib/pkgconfig:/opt/homebrew/opt/zlib/lib/pkgconfig:/opt/homebrew/opt/brotli/lib/pkgconfig:/opt/homebrew/opt/zstd/lib/pkgconfig:/opt/homebrew/opt/libpsl/lib/pkgconfig:/opt/homebrew/opt/libssh2/lib/pkgconfig:/opt/homebrew/opt/libnghttp2/lib/pkgconfig:/opt/homebrew/opt/libngtcp2/lib/pkgconfig:/opt/homebrew/opt/libnghttp3/lib/pkgconfig" >> user.bazelrc
           echo "build --action_env=PostgreSQL_ROOT=/opt/homebrew/lib/postgresql@17" >> user.bazelrc
           echo "build --action_env=LIBRARY_PATH=/opt/homebrew/opt/libpq@17/lib" >> user.bazelrc
