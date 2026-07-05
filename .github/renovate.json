@@ -14,7 +14,9 @@
     "bazelisk",
     "cargo",
     "pre-commit",
-    "pip-compile"
+    "pip-compile",
+    "npm",
+    "github-actions"
   ],
   "extends": [
     "github>renovatebot/.github",
@@ -88,6 +90,16 @@
       ]
     },
     {
+      "automerge": false,
+      "description": [
+        "Individual NPM updates"
+      ],
+      "enabled": true,
+      "matchManagers": [
+        "npm"
+      ]
+    },
+    {
       "automerge": true,
       "commitMessagePrefix": "chore(deps-rust):",
       "description": [
@@ -107,6 +119,25 @@
       "minimumReleaseAge": "7"
     },
     {
+      "automerge": true,
+      "commitMessagePrefix": "chore(deps-npm):",
+      "description": [
+        "Grouped updates for patch NPM deps"
+      ],
+      "enabled": true,
+      "extends": [
+        "schedule:weekends"
+      ],
+      "groupName": "all patch NPM deps",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "7"
+    },
+    {
       "automerge": false,
       "commitMessagePrefix": "chore(deps-rust):",
       "description": [
@@ -116,6 +147,22 @@
       "groupName": "all minor Rust deps",
       "matchManagers": [
         "cargo"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "7"
+    },
+    {
+      "automerge": false,
+      "commitMessagePrefix": "chore(deps-npm):",
+      "description": [
+        "Grouped updates for minor NPM deps"
+      ],
+      "enabled": true,
+      "groupName": "all minor NPM deps",
+      "matchManagers": [
+        "npm"
       ],
       "matchUpdateTypes": [
         "minor"
