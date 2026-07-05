@@ -58,7 +58,7 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -74,7 +74,7 @@ rust_library(
         "@crates__url-2.5.8//:url",
         "@crates__wry-0.53.5//:wry",
     ] + select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [
             "@crates__objc2-0.6.3//:objc2",  # cfg(target_vendor = "apple")
             "@crates__objc2-app-kit-0.3.2//:objc2_app_kit",  # cfg(target_os = "macos")
             "@crates__objc2-foundation-0.3.2//:objc2_foundation",  # cfg(target_os = "macos")

@@ -5,6 +5,7 @@ load("@rules_qt//:constants.bzl", "QT_COMMON_LIBRARIES")
         name = library,
         actual = select({
             "@bazel_tools//src/conditions:darwin_x86_64": "@qt_mac_clang_64//:{}".format(library),
+            "@bazel_tools//src/conditions:darwin_arm64": "@qt_mac_clang_64//:{}".format(library),
         }),
         visibility = ["//visibility:public"],
     )

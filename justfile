@@ -139,10 +139,11 @@ gh-runner-linux-stop:
 [group('github')]
 [working-directory('actions-runner')]
 gh-runner-macos:
-    curl -o actions-runner-osx-x64.tar.gz -L https://github.com/actions/runner/releases/download/v2.328.0/actions-runner-osx-x64-2.328.0.tar.gz
-    echo "90c32dc6f292855339563148f3859dc5d402f237ecdf57010c841df3c8d12cc8  actions-runner-osx-x64.tar.gz" | shasum -a 256 -c
-    tar xzf ./actions-runner-osx-x64.tar.gz
-    rm actions-runner-osx-x64.tar.gz
+    # NOTE.- You will need to create the 'actions-runner' directory if it doesn't exist!!
+    curl -o actions-runner-osx-arm64.tar.gz -L https://github.com/actions/runner/releases/download/v2.335.1/actions-runner-osx-arm64-2.335.1.tar.gz
+    echo "e1a9bc7a3661e06fa0b129d15c2064fe65dc81a431001d8958a9db1409b73769  actions-runner-osx-arm64.tar.gz" | shasum -a 256 -c
+    tar xzf ./actions-runner-osx-arm64.tar.gz
+    rm actions-runner-osx-arm64.tar.gz
     ./../tools/github/self-hosted-runner/runner.sh # Do not detach
 
 # Run self-hosted runners for Linux and Macos

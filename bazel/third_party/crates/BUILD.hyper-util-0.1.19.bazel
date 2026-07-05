@@ -62,7 +62,7 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -85,8 +85,8 @@ rust_library(
         "@crates__tower-service-0.3.3//:tower_service",
         "@crates__tracing-0.1.44//:tracing",
     ] + select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__system-configuration-0.6.1//:system_configuration",  # x86_64-apple-darwin
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [
+            "@crates__system-configuration-0.6.1//:system_configuration",  # aarch64-apple-darwin
         ],
         "//conditions:default": [],
     }),

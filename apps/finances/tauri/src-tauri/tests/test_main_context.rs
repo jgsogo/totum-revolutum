@@ -5,7 +5,7 @@ use common::call_command;
 use finances_app_models::MainContext;
 
 #[test]
-fn test_app_state() {
+fn test_main_context() {
     let webview = common::webview();
 
     {

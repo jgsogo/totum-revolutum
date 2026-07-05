@@ -53,7 +53,7 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -68,8 +68,8 @@ rust_library(
         "@crates__toml-0.9.11-spec-1.1.0//:toml",
         "@crates__walkdir-2.5.0//:walkdir",
     ] + select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [
-            "@crates__plist-1.8.0//:plist",  # x86_64-apple-darwin
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [
+            "@crates__plist-1.8.0//:plist",  # aarch64-apple-darwin
         ],
         "//conditions:default": [],
     }),

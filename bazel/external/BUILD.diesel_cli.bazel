@@ -16,6 +16,23 @@ rust_binary(
         "postgres",
         "uses_information_schema",
     ],
+    env = {
+        # 👈 IMPORTANT: affects build.rs
+        "PQ_LIB_DIR": "/opt/homebrew/opt/libpq@17/lib",
+        "PQ_INCLUDE_DIR": "/opt/homebrew/opt/libpq@17/include",
+        "PKG_CONFIG_PATH": "/opt/homebrew/opt/libpq@17/lib/pkgconfig",
+    },
+    rustc_env = {
+        "PQ_LIB_DIR": "/opt/homebrew/opt/libpq@17/lib",
+        "PQ_INCLUDE_DIR": "/opt/homebrew/opt/libpq@17/include",
+        "PKG_CONFIG_PATH": "/opt/homebrew/opt/libpq@17/lib/pkgconfig",
+    },
+    rustc_flags = [
+        "-C",
+        "link-arg=-L/opt/homebrew/opt/libpq@17/lib",
+        "-C",
+        "link-arg=-Wl,-rpath,/opt/homebrew/opt/libpq@17/lib",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "@crates//:chrono",

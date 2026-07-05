@@ -57,7 +57,7 @@ rust_library(
         "norustfmt",
     ],
     target_compatible_with = select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [],
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
@@ -69,7 +69,7 @@ rust_library(
         "@crates__prodash-29.0.2//:prodash",
         "@crates__walkdir-2.5.0//:walkdir",
     ] + select({
-        "@rules_rust//rust/platform:x86_64-apple-darwin": [
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [
             "@crates__libc-0.2.180//:libc",  # cfg(unix)
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
