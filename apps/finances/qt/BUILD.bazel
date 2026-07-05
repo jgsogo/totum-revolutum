@@ -36,6 +36,7 @@ qt_cc_binary(
         "//apps/finances/qt/widgets/accounts",
         "//bazel/logging:spdlog",
         "@rules_qt//:qt_core",
+        "@rules_qt//:qt_d_bus",
         "@rules_qt//:qt_widgets",
     ],
 )

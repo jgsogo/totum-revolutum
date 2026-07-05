@@ -5,6 +5,7 @@ django-money~=3.5
 django-treenode~=0.23
 gunicorn~=23.0
 psycopg~=3.2
+psycopg2-binary
 pytest~=8.4
 semver~=3.0
 SQLAlchemy~=2.0
