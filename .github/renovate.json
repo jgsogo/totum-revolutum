@@ -96,11 +96,14 @@
     {
       "automerge": false,
       "description": [
-        "Individual rust crate updates"
+        "Individual Rust crate updates"
       ],
       "enabled": true,
       "matchManagers": [
         "cargo"
+      ],
+      "matchUpdateTypes": [
+        "major"
       ]
     },
     {
@@ -114,26 +117,27 @@
       ],
       "matchUpdateTypes": [
         "major"
-      ]
+      ],
+      "minimumReleaseAge": "7"
     },
     {
       "automerge": false,
       "commitMessagePrefix": "chore(deps-rust):",
       "description": [
-        "Grouped updates for patch Rust deps"
+        "Grouped updates for patch and minor Rust deps"
       ],
       "enabled": true,
       "extends": [
         "schedule:weekends"
       ],
-      "groupName": "all patch Rust deps",
+      "groupName": "all patch and minor Rust deps",
       "matchManagers": [
         "cargo"
       ],
       "matchUpdateTypes": [
-        "patch"
-      ],
-      "minimumReleaseAge": "7"
+        "patch",
+        "minor"
+      ]
     },
     {
       "automerge": false,
@@ -152,33 +156,39 @@
       "matchUpdateTypes": [
         "patch",
         "minor"
-      ],
-      "minimumReleaseAge": "7"
-    },
-    {
-      "automerge": false,
-      "commitMessagePrefix": "chore(deps-rust):",
-      "description": [
-        "Grouped updates for minor Rust deps"
-      ],
-      "enabled": true,
-      "groupName": "all minor Rust deps",
-      "matchManagers": [
-        "cargo"
-      ],
-      "matchUpdateTypes": [
-        "minor"
-      ],
-      "minimumReleaseAge": "7"
+      ]
     },
     {
       "automerge": false,
       "description": [
-        "Enable individual python package updates"
+        "Enable individual Python package updates"
       ],
       "enabled": true,
       "matchManagers": [
         "pip-compile"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "minimumReleaseAge": "7"
+    },
+    {
+      "automerge": false,
+      "commitMessagePrefix": "chore(deps-python):",
+      "description": [
+        "Grouped updates for patch and minor Python deps"
+      ],
+      "enabled": true,
+      "extends": [
+        "schedule:weekends"
+      ],
+      "groupName": "all patch and minor Python deps",
+      "matchManagers": [
+        "pip-compile"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
       ]
     }
   ],
