@@ -41,7 +41,7 @@ jobs:
       actions: write
       # workflows: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Checkout $BRANCH_NAME
         env:
@@ -65,7 +65,7 @@ jobs:
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/bazel-disk-cache

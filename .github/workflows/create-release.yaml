@@ -22,7 +22,7 @@ jobs:
   release:
     runs-on: "self-hosted"  # Run only locally
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Configure bazel-remote
         run: |

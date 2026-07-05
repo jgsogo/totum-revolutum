@@ -10,7 +10,7 @@ bazel_dep(name = "rules_proto_grpc_cpp", version = "5.8.0")
 bazel_dep(name = "rules_proto_grpc_js", version = "5.8.0")
 bazel_dep(name = "toolchains_protoc", version = "0.6.1")
 bazel_dep(name = "protobuf", version = PROTOBUF_VERSION)
-bazel_dep(name = "rules_rust_prost", version = "0.68.1")
+bazel_dep(name = "rules_rust_prost", version = "0.71.3")
 
 # 2 Register Proto toolchain
 ###############################################################################
@@ -27,7 +27,7 @@ register_toolchains("@//bazel/rust/prost:prost_toolchain")
 crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
 crate.spec(
     package = "protoc-gen-prost",
-    version = "0.4.0",
+    version = "0.5.0",
 )
 crate.annotation(
     crate = "protoc-gen-prost",
@@ -35,7 +35,7 @@ crate.annotation(
 )
 crate.spec(
     package = "protoc-gen-tonic",
-    version = "0.4.1",
+    version = "0.5.0",
 )
 crate.annotation(
     crate = "protoc-gen-tonic",

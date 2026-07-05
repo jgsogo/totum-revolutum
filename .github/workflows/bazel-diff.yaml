@@ -50,7 +50,7 @@ jobs:
     outputs:
       head-commit-message: ${{ steps.get_head_commit_message.outputs.commit-message }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Print head git commit message
@@ -64,11 +64,11 @@ jobs:
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -98,7 +98,7 @@ jobs:
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
 
       - name: Save current-hashes as an artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: current-hashes.json
           path: ${{ runner.temp }}/current-hashes.json
@@ -111,7 +111,7 @@ jobs:
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
@@ -130,7 +130,7 @@ jobs:
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -164,12 +164,12 @@ jobs:
           git worktree prune
 
       - name: Save base-hashes as an artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: base-hashes.json
           path: ${{ runner.temp }}/base-hashes.json
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         with:
           name: current-hashes.json
           path: ${{ runner.temp }}/
@@ -178,7 +178,7 @@ jobs:
         run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
 
       - name: Save impacted-targets as an artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/impacted-targets.txt
@@ -196,11 +196,11 @@ jobs:
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -254,7 +254,7 @@ jobs:
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install requirements for Tauri v2
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
@@ -274,7 +274,7 @@ jobs:
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -301,7 +301,7 @@ jobs:
           echo "build --action_env=DYLD_LIBRARY_PATH=/usr/local/opt/libpq/lib" >> user.bazelrc
           echo "test --action_env=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin" >> user.bazelrc
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         with:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/
@@ -344,7 +344,7 @@ jobs:
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install requirements for Tauri v2
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
@@ -364,7 +364,7 @@ jobs:
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
