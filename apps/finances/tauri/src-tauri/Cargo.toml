@@ -36,11 +36,11 @@ diesel = { version = "2.2.7", features = ["r2d2", "chrono"] }
 
 # FIXME: These are build-dependencies - If I don't list it here, Bazel doesn't include it in crate_libraries
 # tauri-build = { version = "2.2.0", features = [], path = "/Users/jgsogo/personal/tauri/crates/tauri-build" }
-tauri-build = { version = "~2.5.3", features = [] }
+tauri-build = { version = "2.2.0", features = [] }
 tar = { version  = "0.4.44"}
 flate2 = { version = "1.1.1" }
 
-tauri = { version = "~2.9.5", features = [] }
+tauri = { version = "2.5.1", features = ["custom-protocol"] }
 tauri-plugin-log = "2.4.0"
 tauri-plugin-shell = "2.2.1"
 serde = { version = "1.0.217", features = ["derive"] }
@@ -53,4 +53,4 @@ itertools = "0.14.0"
 finances_accounts = { path = "../../../../libraries/finances/accounts/rust", features = ["postgres", "test_utils"] }
 finances_investments = { path = "../../../../libraries/finances/investments/rust", features = ["postgres"] }
 finances-app = { path = ".", default-features = false, features = ["postgres"] }
-tauri = { version = "~2.9.5", features = ["test"] }
+tauri = { version = "2.2.5", features = ["test"] }
