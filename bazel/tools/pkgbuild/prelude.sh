@@ -2,7 +2,7 @@
 set -o pipefail -o errexit -o nounset
 
 # Add common paths explicitly
-export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin"
 
 INSTALLER_NAME="%NAME%"
 INSTALLER_USER=$(stat -f '%Su' $HOME)
