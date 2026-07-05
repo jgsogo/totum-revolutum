@@ -20,9 +20,7 @@
   ],
   "extends": [
     "github>renovatebot/.github",
-    ":automergeAll",
     ":dependencyDashboard",
-    ":dependencyDashboardApproval",
     ":enablePreCommit"
   ],
   "packageRules": [
