@@ -50,7 +50,7 @@ jobs:
     outputs:
       head-commit-message: ${{ steps.get_head_commit_message.outputs.commit-message }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Print head git commit message
@@ -64,11 +64,11 @@ jobs:
       - check-runner
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -98,7 +98,7 @@ jobs:
         run: bazel run $BAZEL_CONFIG //bazel/diff -- generate-hashes --excludeExternalTargets -w ${{ github.workspace }} ${{ runner.temp }}/current-hashes.json
 
       - name: Save current-hashes as an artifact
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: current-hashes.json
           path: ${{ runner.temp }}/current-hashes.json
@@ -111,7 +111,7 @@ jobs:
     runs-on: ${{ needs.check-runner.outputs.runner-label }}
     if: ${{ !contains(needs.head_commit_message.outputs.head-commit-message, '[skip-diff]') }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 2
 
@@ -130,7 +130,7 @@ jobs:
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -164,12 +164,12 @@ jobs:
           git worktree prune
 
       - name: Save base-hashes as an artifact
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: base-hashes.json
           path: ${{ runner.temp }}/base-hashes.json
 
-      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: current-hashes.json
           path: ${{ runner.temp }}/
@@ -178,7 +178,7 @@ jobs:
         run: bazel run $BAZEL_CONFIG //bazel/diff -- get-impacted-targets -sh ${{ runner.temp }}/base-hashes.json -fh ${{ runner.temp }}/current-hashes.json -o ${{ runner.temp }}/impacted-targets.txt
 
       - name: Save impacted-targets as an artifact
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/impacted-targets.txt
@@ -196,11 +196,11 @@ jobs:
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -254,7 +254,7 @@ jobs:
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
       - name: Install requirements for Tauri v2
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
@@ -274,7 +274,7 @@ jobs:
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
@@ -301,7 +301,7 @@ jobs:
           echo "build --action_env=PostgreSQL_ROOT=/opt/homebrew/lib/postgresql@17" >> user.bazelrc
           echo "build --action_env=LIBRARY_PATH=/opt/homebrew/opt/libpq@17/lib" >> user.bazelrc
 
-      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: impacted-targets.txt
           path: ${{ runner.temp }}/
@@ -344,7 +344,7 @@ jobs:
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
       - name: Install requirements for Tauri v2
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
@@ -364,7 +364,7 @@ jobs:
 
       - name: Cache Bazel
         if: ${{ needs.check-runner.outputs.runner-label != 'self-hosted' }}
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/.cache/bazel-disk-cache
