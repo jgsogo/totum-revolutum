@@ -1,8 +1,146 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    "config:semverAllMonthly"
+  "assignees": [
+    "jgsogo"
   ],
-  "rebaseWhen": "automerging"
+  "cargo": {
+    "lockFileMaintenance": {
+      "enabled": true
+    }
+  },
+  "enabledManagers": [
+    "bazel",
+    "bazel-module",
+    "bazelisk",
+    "cargo",
+    "pre-commit",
+    "pip-compile"
+  ],
+  "extends": [
+    "github>renovatebot/.github",
+    ":automergeAll",
+    ":dependencyDashboard",
+    ":dependencyDashboardApproval",
+    ":enablePreCommit"
+  ],
+  "packageRules": [
+    {
+      "description": [
+        "By default, disable everything. This is overridden by specific rules below this."
+      ],
+      "enabled": false,
+      "matchPackageNames": [
+        "*"
+      ]
+    },
+    {
+      "automerge": true,
+      "description": [
+        "Update pre-commits weekly (try automerge)"
+      ],
+      "enabled": true,
+      "extends": [
+        "schedule:weekends"
+      ],
+      "groupName": "pre-commit hooks",
+      "matchManagers": [
+        "pre-commit"
+      ]
+    },
+    {
+      "automerge": false,
+      "description": [
+        "Bazel related updates"
+      ],
+      "enabled": true,
+      "matchManagers": [
+        "bazel",
+        "bazel-module",
+        "bazelisk"
+      ]
+    },
+    {
+      "automerge": false,
+      "description": [
+        "Weekly grouped updates for non-major bazel module deps"
+      ],
+      "enabled": true,
+      "extends": [
+        "schedule:weekends"
+      ],
+      "groupName": "All non-major Bazel deps",
+      "matchDepTypes": [
+        "bazel_dep"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ]
+    },
+    {
+      "automerge": false,
+      "description": [
+        "Individual rust crate updates"
+      ],
+      "enabled": true,
+      "matchManagers": [
+        "cargo"
+      ]
+    },
+    {
+      "automerge": true,
+      "commitMessagePrefix": "chore(deps-rust):",
+      "description": [
+        "Grouped updates for patch Rust deps"
+      ],
+      "enabled": true,
+      "extends": [
+        "schedule:weekends"
+      ],
+      "groupName": "all patch Rust deps",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "7"
+    },
+    {
+      "automerge": false,
+      "commitMessagePrefix": "chore(deps-rust):",
+      "description": [
+        "Grouped updates for minor Rust deps"
+      ],
+      "enabled": true,
+      "groupName": "all minor Rust deps",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "7"
+    },
+    {
+      "automerge": false,
+      "description": [
+        "Enable individual python package updates"
+      ],
+      "enabled": true,
+      "matchManagers": [
+        "pip-compile"
+      ]
+    }
+  ],
+  "pip-compile": {
+    "lockFileMaintenance": {
+      "enabled": false
+    },
+    "managerFilePatterns": [
+      "/(^|/)bazel/third_party/requirements\\.lock$/"
+    ]
+  },
+  "prConcurrentLimit": 1,
+  "rebaseWhen": "conflicted"
 }
