@@ -97,6 +97,9 @@
       "enabled": true,
       "matchManagers": [
         "npm"
+      ],
+      "matchUpdateTypes": [
+        "major"
       ]
     },
     {
@@ -122,7 +125,7 @@
       "automerge": false,
       "commitMessagePrefix": "chore(deps-npm):",
       "description": [
-        "Grouped updates for patch NPM deps"
+        "Grouped updates for patch and minor NPM deps"
       ],
       "enabled": true,
       "extends": [
@@ -133,7 +136,8 @@
         "npm"
       ],
       "matchUpdateTypes": [
-        "patch"
+        "patch",
+        "minor"
       ],
       "minimumReleaseAge": "7"
     },
@@ -147,22 +151,6 @@
       "groupName": "all minor Rust deps",
       "matchManagers": [
         "cargo"
-      ],
-      "matchUpdateTypes": [
-        "minor"
-      ],
-      "minimumReleaseAge": "7"
-    },
-    {
-      "automerge": false,
-      "commitMessagePrefix": "chore(deps-npm):",
-      "description": [
-        "Grouped updates for minor NPM deps"
-      ],
-      "enabled": true,
-      "groupName": "all minor NPM deps",
-      "matchManagers": [
-        "npm"
       ],
       "matchUpdateTypes": [
         "minor"
