@@ -74,7 +74,7 @@ rust_library(
         "@crates__gio-sys-0.18.1//:gio_sys",
         "@crates__glib-sys-0.18.1//:glib_sys",
         "@crates__gobject-sys-0.18.0//:gobject_sys",
-        "@crates__libc-0.2.186//:libc",
+        "@crates__libc-0.2.180//:libc",
         "@crates__pango-sys-0.18.0//:pango_sys",
     ],
 )
@@ -131,7 +131,7 @@ cargo_build_script(
     version = "0.18.2",
     visibility = ["//visibility:private"],
     deps = [
-        "@crates__pkg-config-0.3.33//:pkg_config",
+        "@crates__pkg-config-0.3.32//:pkg_config",
         "@crates__system-deps-6.2.2//:system_deps",
     ],
 )

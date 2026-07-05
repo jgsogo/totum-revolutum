@@ -59,10 +59,10 @@ rust_library(
     }),
     version = "0.1.3",
     deps = [
-        "@crates__bytes-1.12.0//:bytes",
-        "@crates__futures-core-0.3.32//:futures_core",
-        "@crates__http-1.4.2//:http",
+        "@crates__bytes-1.11.0//:bytes",
+        "@crates__futures-core-0.3.31//:futures_core",
+        "@crates__http-1.4.0//:http",
         "@crates__http-body-1.0.1//:http_body",
-        "@crates__pin-project-lite-0.2.17//:pin_project_lite",
+        "@crates__pin-project-lite-0.2.16//:pin_project_lite",
     ],
 )

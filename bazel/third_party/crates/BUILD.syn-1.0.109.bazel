@@ -42,6 +42,8 @@ rust_library(
         "clone-impls",
         "default",
         "derive",
+        "extra-traits",
+        "fold",
         "full",
         "parsing",
         "printing",
@@ -71,9 +73,9 @@ rust_library(
     version = "1.0.109",
     deps = [
         "@crates__proc-macro2-1.0.106//:proc_macro2",
-        "@crates__quote-1.0.46//:quote",
+        "@crates__quote-1.0.43//:quote",
         "@crates__syn-1.0.109//:build_script_build",
-        "@crates__unicode-ident-1.0.24//:unicode_ident",
+        "@crates__unicode-ident-1.0.22//:unicode_ident",
     ],
 )
 
@@ -100,6 +102,8 @@ cargo_build_script(
         "clone-impls",
         "default",
         "derive",
+        "extra-traits",
+        "fold",
         "full",
         "parsing",
         "printing",

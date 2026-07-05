@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.1.9",
     deps = [
-        "@crates__erased-serde-0.4.10//:erased_serde",
+        "@crates__erased-serde-0.4.9//:erased_serde",
         "@crates__serde_core-1.0.228//:serde_core",
         "@crates__typeid-1.0.3//:typeid",
     ],

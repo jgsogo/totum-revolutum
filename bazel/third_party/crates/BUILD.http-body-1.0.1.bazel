@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "1.0.1",
     deps = [
-        "@crates__bytes-1.12.0//:bytes",
-        "@crates__http-1.4.2//:http",
+        "@crates__bytes-1.11.0//:bytes",
+        "@crates__http-1.4.0//:http",
     ],
 )

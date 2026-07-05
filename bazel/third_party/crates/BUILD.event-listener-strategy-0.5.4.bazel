@@ -60,6 +60,6 @@ rust_library(
     version = "0.5.4",
     deps = [
         "@crates__event-listener-5.4.1//:event_listener",
-        "@crates__pin-project-lite-0.2.17//:pin_project_lite",
+        "@crates__pin-project-lite-0.2.16//:pin_project_lite",
     ],
 )

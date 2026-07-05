@@ -61,7 +61,7 @@ rust_library(
     version = "0.6.0",
     deps = [
         "@crates__core-foundation-sys-0.8.7//:core_foundation_sys",
-        "@crates__libc-0.2.186//:libc",
+        "@crates__libc-0.2.180//:libc",
         "@crates__system-configuration-sys-0.6.0//:build_script_build",
     ],
 )

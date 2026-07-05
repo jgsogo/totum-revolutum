@@ -56,13 +56,13 @@ rust_library(
     }),
     version = "0.11.0",
     deps = [
-        "@crates__bitflags-2.13.0//:bitflags",
+        "@crates__bitflags-2.10.0//:bitflags",
     ] + select({
         "@rules_rust//rust/platform:aarch64-apple-darwin": [
-            "@crates__libc-0.2.186//:libc",  # cfg(not(windows))
+            "@crates__libc-0.2.180//:libc",  # cfg(not(windows))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__libc-0.2.186//:libc",  # cfg(not(windows))
+            "@crates__libc-0.2.180//:libc",  # cfg(not(windows))
         ],
         "//conditions:default": [],
     }),

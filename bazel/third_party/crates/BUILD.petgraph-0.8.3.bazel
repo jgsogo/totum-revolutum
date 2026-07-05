@@ -61,6 +61,6 @@ rust_library(
     deps = [
         "@crates__fixedbitset-0.5.7//:fixedbitset",
         "@crates__hashbrown-0.15.5//:hashbrown",
-        "@crates__indexmap-2.14.0//:indexmap",
+        "@crates__indexmap-2.13.0//:indexmap",
     ],
 )

@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "1.4.1",
     deps = [
-        "@crates__camino-1.2.4//:camino",
-        "@crates__tempfile-3.27.0//:tempfile",
+        "@crates__camino-1.2.2//:camino",
+        "@crates__tempfile-3.24.0//:tempfile",
     ],
 )

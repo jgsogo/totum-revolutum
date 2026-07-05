@@ -63,7 +63,7 @@ rust_library(
     }),
     version = "29.0.2",
     deps = [
-        "@crates__log-0.4.33//:log",
+        "@crates__log-0.4.29//:log",
         "@crates__parking_lot-0.12.5//:parking_lot",
     ],
 )

@@ -56,6 +56,6 @@ rust_library(
     }),
     version = "0.6.0+11769913",
     deps = [
-        "@crates__jni-sys-0.3.1//:jni_sys",
+        "@crates__jni-sys-0.3.0//:jni_sys",
     ],
 )

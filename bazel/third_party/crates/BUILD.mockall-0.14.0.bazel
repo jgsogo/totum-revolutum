@@ -65,10 +65,10 @@ rust_library(
     deps = [
         "@crates__cfg-if-1.0.4//:cfg_if",
         "@crates__downcast-0.11.0//:downcast",
-        "@crates__fragile-2.1.0//:fragile",
+        "@crates__fragile-2.0.1//:fragile",
         "@crates__mockall-0.14.0//:build_script_build",
-        "@crates__predicates-3.1.4//:predicates",
-        "@crates__predicates-tree-1.0.13//:predicates_tree",
+        "@crates__predicates-3.1.3//:predicates",
+        "@crates__predicates-tree-1.0.12//:predicates_tree",
     ],
 )
 

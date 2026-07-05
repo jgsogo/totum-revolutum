@@ -59,6 +59,6 @@ rust_library(
     }),
     version = "0.0.5",
     deps = [
-        "@crates__anyhow-1.0.103//:anyhow",
+        "@crates__anyhow-1.0.100//:anyhow",
     ],
 )

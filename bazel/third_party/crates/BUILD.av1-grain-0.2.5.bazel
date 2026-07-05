@@ -66,9 +66,9 @@ rust_library(
     }),
     version = "0.2.5",
     deps = [
-        "@crates__anyhow-1.0.103//:anyhow",
-        "@crates__arrayvec-0.7.8//:arrayvec",
-        "@crates__log-0.4.33//:log",
+        "@crates__anyhow-1.0.100//:anyhow",
+        "@crates__arrayvec-0.7.6//:arrayvec",
+        "@crates__log-0.4.29//:log",
         "@crates__nom-8.0.0//:nom",
         "@crates__num-rational-0.4.2//:num_rational",
         "@crates__v_frame-0.3.9//:v_frame",

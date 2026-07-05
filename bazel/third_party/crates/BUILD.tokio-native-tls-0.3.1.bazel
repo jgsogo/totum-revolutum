@@ -56,7 +56,7 @@ rust_library(
     }),
     version = "0.3.1",
     deps = [
-        "@crates__native-tls-0.2.18//:native_tls",
-        "@crates__tokio-1.52.3//:tokio",
+        "@crates__native-tls-0.2.14//:native_tls",
+        "@crates__tokio-1.49.0//:tokio",
     ],
 )

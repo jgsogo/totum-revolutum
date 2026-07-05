@@ -68,8 +68,8 @@ rust_library(
     }),
     version = "0.11.1",
     deps = [
-        "@crates__futures-core-0.3.32//:futures_core",
-        "@crates__futures-sink-0.3.32//:futures_sink",
+        "@crates__futures-core-0.3.31//:futures_core",
+        "@crates__futures-sink-0.3.31//:futures_sink",
         "@crates__nanorand-0.7.0//:nanorand",
         "@crates__spin-0.9.8//:spin",
     ],

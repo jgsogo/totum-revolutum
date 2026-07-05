@@ -57,9 +57,9 @@ rust_library(
     version = "0.4.1",
     deps = [
         "@crates__base64-0.22.1//:base64",
-        "@crates__bytes-1.12.0//:bytes",
+        "@crates__bytes-1.11.0//:bytes",
         "@crates__headers-core-0.3.0//:headers_core",
-        "@crates__http-1.4.2//:http",
+        "@crates__http-1.4.0//:http",
         "@crates__httpdate-1.0.3//:httpdate",
         "@crates__mime-0.3.17//:mime",
         "@crates__sha1-0.10.6//:sha1",

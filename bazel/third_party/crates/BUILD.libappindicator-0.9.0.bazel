@@ -60,6 +60,6 @@ rust_library(
         "@crates__gtk-0.18.2//:gtk",
         "@crates__gtk-sys-0.18.2//:gtk_sys",
         "@crates__libappindicator-sys-0.9.0//:libappindicator_sys",
-        "@crates__log-0.4.33//:log",
+        "@crates__log-0.4.29//:log",
     ],
 )

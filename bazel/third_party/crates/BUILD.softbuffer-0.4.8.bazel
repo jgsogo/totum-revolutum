@@ -60,7 +60,7 @@ rust_library(
         "@crates__tracing-0.1.44//:tracing",
     ] + select({
         "@rules_rust//rust/platform:aarch64-apple-darwin": [
-            "@crates__objc2-0.6.4//:objc2",  # cfg(target_vendor = "apple")
+            "@crates__objc2-0.6.3//:objc2",  # cfg(target_vendor = "apple")
             "@crates__objc2-core-foundation-0.3.2//:objc2_core_foundation",  # cfg(target_vendor = "apple")
             "@crates__objc2-core-graphics-0.3.2//:objc2_core_graphics",  # cfg(target_vendor = "apple")
             "@crates__objc2-foundation-0.3.2//:objc2_foundation",  # cfg(target_vendor = "apple")

@@ -58,6 +58,6 @@ rust_library(
     deps = [
         "@crates__android_log-sys-0.3.2//:android_log_sys",
         "@crates__env_filter-0.1.4//:env_filter",
-        "@crates__log-0.4.33//:log",
+        "@crates__log-0.4.29//:log",
     ],
 )

@@ -60,15 +60,15 @@ rust_library(
     version = "3.0.4",
     deps = [
         "@crates__dunce-1.0.5//:dunce",
-        "@crates__futures-0.3.32//:futures",
+        "@crates__futures-0.3.31//:futures",
         "@crates__gix-config-0.45.1//:gix_config",
-        "@crates__ignore-0.4.27//:ignore",
+        "@crates__ignore-0.4.25//:ignore",
         "@crates__miette-7.6.0//:miette",
         "@crates__normalize-path-0.2.1//:normalize_path",
         "@crates__project-origins-1.4.2//:project_origins",
         "@crates__radix_trie-0.2.1//:radix_trie",
         "@crates__thiserror-2.0.18//:thiserror",
-        "@crates__tokio-1.52.3//:tokio",
+        "@crates__tokio-1.49.0//:tokio",
         "@crates__tracing-0.1.44//:tracing",
     ],
 )

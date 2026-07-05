@@ -65,10 +65,10 @@ rust_library(
     }),
     version = "2.6.1",
     deps = [
-        "@crates__fastrand-2.4.1//:fastrand",
-        "@crates__futures-core-0.3.32//:futures_core",
-        "@crates__futures-io-0.3.32//:futures_io",
+        "@crates__fastrand-2.3.0//:fastrand",
+        "@crates__futures-core-0.3.31//:futures_core",
+        "@crates__futures-io-0.3.31//:futures_io",
         "@crates__parking-2.2.1//:parking",
-        "@crates__pin-project-lite-0.2.17//:pin_project_lite",
+        "@crates__pin-project-lite-0.2.16//:pin_project_lite",
     ],
 )

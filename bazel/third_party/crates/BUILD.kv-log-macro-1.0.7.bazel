@@ -56,6 +56,6 @@ rust_library(
     }),
     version = "1.0.7",
     deps = [
-        "@crates__log-0.4.33//:log",
+        "@crates__log-0.4.29//:log",
     ],
 )

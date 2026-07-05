@@ -60,7 +60,7 @@ rust_library(
     }),
     version = "0.1.3",
     deps = [
-        "@crates__libc-0.2.186//:libc",
+        "@crates__libc-0.2.180//:libc",
         "@crates__vswhom-sys-0.1.3//:build_script_build",
     ],
 )

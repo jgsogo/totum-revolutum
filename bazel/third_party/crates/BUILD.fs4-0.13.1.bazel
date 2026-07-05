@@ -61,10 +61,10 @@ rust_library(
     version = "0.13.1",
     deps = select({
         "@rules_rust//rust/platform:aarch64-apple-darwin": [
-            "@crates__rustix-1.1.4//:rustix",  # cfg(not(windows))
+            "@crates__rustix-1.1.3//:rustix",  # cfg(not(windows))
         ],
         "@rules_rust//rust/platform:x86_64-unknown-linux-gnu": [
-            "@crates__rustix-1.1.4//:rustix",  # cfg(not(windows))
+            "@crates__rustix-1.1.3//:rustix",  # cfg(not(windows))
         ],
         "//conditions:default": [],
     }),

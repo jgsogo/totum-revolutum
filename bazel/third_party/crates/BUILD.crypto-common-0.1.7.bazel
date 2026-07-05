@@ -60,6 +60,6 @@ rust_library(
     version = "0.1.7",
     deps = [
         "@crates__generic-array-0.14.7//:generic_array",
-        "@crates__typenum-1.20.1//:typenum",
+        "@crates__typenum-1.19.0//:typenum",
     ],
 )

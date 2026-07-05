@@ -34,6 +34,14 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
+    crate_features = [
+        "CTFont",
+        "CTFontCollection",
+        "CTFontDescriptor",
+        "CTGlyphInfo",
+        "bitflags",
+        "objc2",
+    ],
     crate_root = "src/lib.rs",
     edition = "2021",
     rustc_env_files = [
@@ -56,6 +64,8 @@ rust_library(
     }),
     version = "0.3.2",
     deps = [
+        "@crates__bitflags-2.10.0//:bitflags",
+        "@crates__objc2-0.6.3//:objc2",
         "@crates__objc2-core-foundation-0.3.2//:objc2_core_foundation",
     ],
 )

@@ -57,6 +57,6 @@ rust_library(
     version = "1.4.8",
     deps = [
         "@crates__errno-0.3.14//:errno",
-        "@crates__libc-0.2.186//:libc",
+        "@crates__libc-0.2.180//:libc",
     ],
 )

@@ -58,7 +58,7 @@ rust_library(
     deps = [
         "@crates__cfg-expr-0.15.8//:cfg_expr",
         "@crates__heck-0.5.0//:heck",
-        "@crates__pkg-config-0.3.33//:pkg_config",
+        "@crates__pkg-config-0.3.32//:pkg_config",
         "@crates__toml-0.8.2//:toml",
         "@crates__version-compare-0.2.1//:version_compare",
     ],

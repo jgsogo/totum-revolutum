@@ -59,7 +59,7 @@ rust_library(
         "@crates__raw-window-handle-0.6.2//:raw_window_handle",
     ] + select({
         "@rules_rust//rust/platform:aarch64-apple-darwin": [
-            "@crates__objc2-0.6.4//:objc2",  # cfg(target_os = "macos")
+            "@crates__objc2-0.6.3//:objc2",  # cfg(target_os = "macos")
             "@crates__objc2-app-kit-0.3.2//:objc2_app_kit",  # cfg(target_os = "macos")
             "@crates__objc2-core-foundation-0.3.2//:objc2_core_foundation",  # cfg(target_os = "macos")
             "@crates__objc2-foundation-0.3.2//:objc2_foundation",  # cfg(target_os = "macos")

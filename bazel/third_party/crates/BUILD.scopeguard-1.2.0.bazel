@@ -34,6 +34,13 @@ rust_library(
             "WORKSPACE.bazel",
         ],
     ),
+    crate_features = select({
+        "@rules_rust//rust/platform:aarch64-apple-darwin": [
+            "default",  # aarch64-apple-darwin
+            "use_std",  # aarch64-apple-darwin
+        ],
+        "//conditions:default": [],
+    }),
     crate_root = "src/lib.rs",
     edition = "2015",
     rustc_env_files = [

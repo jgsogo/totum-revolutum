@@ -57,6 +57,6 @@ rust_library(
     version = "2.3.0",
     deps = [
         "@crates__serde-1.0.228//:serde",
-        "@crates__toml-0.9.12-spec-1.1.0//:toml",
+        "@crates__toml-0.9.11-spec-1.1.0//:toml",
     ],
 )

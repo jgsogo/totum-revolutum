@@ -71,7 +71,7 @@ rust_library(
         "@crates__untrusted-0.9.0//:untrusted",
     ] + select({
         "@rules_rust//rust/platform:aarch64-apple-darwin": [
-            "@crates__libc-0.2.186//:libc",  # cfg(all(all(target_arch = "aarch64", target_endian = "little"), target_vendor = "apple", any(target_os = "ios", target_os = "macos", target_os = "tvos", target_os = "visionos", target_os = "watchos")))
+            "@crates__libc-0.2.180//:libc",  # cfg(all(all(target_arch = "aarch64", target_endian = "little"), target_vendor = "apple", any(target_os = "ios", target_os = "macos", target_os = "tvos", target_os = "visionos", target_os = "watchos")))
         ],
         "//conditions:default": [],
     }),
@@ -134,7 +134,7 @@ cargo_build_script(
     version = "0.17.14",
     visibility = ["//visibility:private"],
     deps = [
-        "@crates__cc-1.2.65//:cc",
+        "@crates__cc-1.2.53//:cc",
     ],
 )
 

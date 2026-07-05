@@ -57,6 +57,6 @@ rust_library(
     version = "2.0.2",
     deps = [
         "@crates__serde-1.0.228//:serde",
-        "@crates__serde_json-1.0.150//:serde_json",
+        "@crates__serde_json-1.0.149//:serde_json",
     ],
 )
