@@ -36,7 +36,7 @@
       ]
     },
     {
-      "automerge": true,
+      "automerge": false,
       "description": [
         "Update pre-commits weekly (try automerge)"
       ],
@@ -100,7 +100,7 @@
       ]
     },
     {
-      "automerge": true,
+      "automerge": false,
       "commitMessagePrefix": "chore(deps-rust):",
       "description": [
         "Grouped updates for patch Rust deps"
@@ -119,7 +119,7 @@
       "minimumReleaseAge": "7"
     },
     {
-      "automerge": true,
+      "automerge": false,
       "commitMessagePrefix": "chore(deps-npm):",
       "description": [
         "Grouped updates for patch NPM deps"
