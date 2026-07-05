@@ -38,6 +38,7 @@ def django_project(name, deps, srcs, **kwargs):
         deps = deps + [
             requirement("django"),
             requirement("psycopg"),  # Required because deployments can use Postgres
+            requirement("psycopg2-binary"),
         ],
     )
 

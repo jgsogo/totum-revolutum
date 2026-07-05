@@ -35,6 +35,7 @@ QT_COMMON_LIBRARIES = [
     "qt_core",
     "qt_widgets",
     "qt_gui",
+    "qt_d_bus",
     # FIXME: Add more libraries here. For sure, there are others that are provided by all the versions.
 ]
 

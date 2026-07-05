@@ -96,6 +96,7 @@ def django_app(name, deps = None, visibility = None, app_label = None):
         deps = [
             ":{}".format(name),
             requirement("psycopg"),  # Required because deployments can use Postgres
+            requirement("psycopg2-binary"),
         ],
         visibility = visibility,
     )
