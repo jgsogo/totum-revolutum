@@ -35,14 +35,59 @@
     },
     {
       "automerge": false,
-      "commitMessagePrefix": "chore(deps-pre-commits):",
       "description": [
-        "Update pre-commits weekly"
+        "\ud83d\udea8 Security updates: always fast-tracked"
       ],
       "enabled": true,
-      "extends": [
-        "schedule:weekends"
+      "matchUpdateTypes": [
+        "security"
       ],
+      "prPriority": 100,
+      "schedule": [
+        "at any time"
+      ]
+    },
+    {
+      "description": [
+        "\u26a1 Patch updates: slightly prioritized"
+      ],
+      "enabled": true,
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "prPriority": 10
+    },
+    {
+      "description": [
+        "\ud83d\udce6 Minor updates: normal priority"
+      ],
+      "enabled": true,
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "prPriority": 0
+    },
+    {
+      "description": [
+        "\ud83d\udca5 Major updates: lowest priority and slower"
+      ],
+      "enabled": true,
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "minimumReleaseAge": "14 days",
+      "prPriority": -10,
+      "schedule": [
+        "0 11 * * 2"
+      ]
+    },
+    {
+      "automerge": false,
+      "commitMessagePrefix": "chore(deps-pre-commits):",
+      "description": [
+        "Update pre-commits"
+      ],
+      "enabled": true,
       "groupName": "pre-commit hooks",
       "matchManagers": [
         "pre-commit"
@@ -52,15 +97,12 @@
       "automerge": false,
       "commitMessagePrefix": "chore(deps-github-actions):",
       "description": [
-        "Update github-actions weekly (Mondays during working hours)"
+        "Update github-actions"
       ],
       "enabled": true,
       "groupName": "github-actions",
       "matchManagers": [
         "github-actions"
-      ],
-      "schedule": [
-        "* 10-17 * * 1"
       ]
     },
     {
@@ -70,23 +112,40 @@
         "Bazel related updates"
       ],
       "enabled": true,
+      "groupName": "bazel (non-breaking)",
       "matchManagers": [
         "bazel",
         "bazel-module",
         "bazelisk"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
       ]
+    },
+    {
+      "description": [
+        "Bazel major updates"
+      ],
+      "enabled": true,
+      "matchManagers": [
+        "bazel",
+        "bazel-module",
+        "bazelisk"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "minimumReleaseAge": "14 days"
     },
     {
       "automerge": false,
       "commitMessagePrefix": "chore(deps-bazel_dep):",
       "description": [
-        "Weekly grouped updates for non-major bazel module deps"
+        "Grouped updates for non-major bazel module deps"
       ],
       "enabled": true,
-      "extends": [
-        "schedule:weekends"
-      ],
-      "groupName": "All non-major Bazel deps",
+      "groupName": "bazel modules (non-breaking)",
       "matchDepTypes": [
         "bazel_dep"
       ],
@@ -107,7 +166,8 @@
       ],
       "matchUpdateTypes": [
         "major"
-      ]
+      ],
+      "minimumReleaseAge": "14 days"
     },
     {
       "automerge": false,
@@ -122,7 +182,7 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "minimumReleaseAge": "7"
+      "minimumReleaseAge": "14 days"
     },
     {
       "automerge": false,
@@ -131,10 +191,7 @@
         "Grouped updates for patch and minor Rust deps"
       ],
       "enabled": true,
-      "extends": [
-        "schedule:weekends"
-      ],
-      "groupName": "all patch and minor Rust deps",
+      "groupName": "rust (non-breaking)",
       "matchManagers": [
         "cargo"
       ],
@@ -150,10 +207,7 @@
         "Grouped updates for patch and minor NPM deps"
       ],
       "enabled": true,
-      "extends": [
-        "schedule:weekends"
-      ],
-      "groupName": "all patch NPM deps",
+      "groupName": "npm (non-breaking)",
       "matchManagers": [
         "npm"
       ],
@@ -175,7 +229,7 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "minimumReleaseAge": "7"
+      "minimumReleaseAge": "14 days"
     },
     {
       "automerge": false,
@@ -184,10 +238,7 @@
         "Grouped updates for patch and minor Python deps"
       ],
       "enabled": true,
-      "extends": [
-        "schedule:weekends"
-      ],
-      "groupName": "all patch and minor Python deps",
+      "groupName": "python (non-breaking)",
       "matchManagers": [
         "pip-compile"
       ],
@@ -200,11 +251,14 @@
   "pip-compile": {
     "lockFileMaintenance": {
       "enabled": false
-    },
-    "managerFilePatterns": [
-      "/(^|/)bazel/third_party/requirements\\.lock$/"
-    ]
+    }
   },
   "prConcurrentLimit": 1,
-  "rebaseWhen": "conflicted"
+  "rebaseWhen": "conflicted",
+  "schedule": [
+    "0 10 * * 1",
+    "0 14 * * 3",
+    "0 11 * * 5"
+  ],
+  "timezone": "Europe/Madrid"
 }
