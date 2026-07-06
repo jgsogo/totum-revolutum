@@ -37,30 +37,24 @@
       "automerge": false,
       "commitMessagePrefix": "chore(deps-pre-commits):",
       "description": [
-        "Update pre-commits weekly"
+        "Update pre-commits"
       ],
       "enabled": true,
       "groupName": "pre-commit hooks",
       "matchManagers": [
         "pre-commit"
-      ],
-      "schedule": [
-        "0 11 * * 2"
       ]
     },
     {
       "automerge": false,
       "commitMessagePrefix": "chore(deps-github-actions):",
       "description": [
-        "Update github-actions weekly (Mondays during working hours)"
+        "Update github-actions"
       ],
       "enabled": true,
       "groupName": "github-actions",
       "matchManagers": [
         "github-actions"
-      ],
-      "schedule": [
-        "0 10 * * 1"
       ]
     },
     {
@@ -80,7 +74,7 @@
       "automerge": false,
       "commitMessagePrefix": "chore(deps-bazel_dep):",
       "description": [
-        "Weekly grouped updates for non-major bazel module deps"
+        "Grouped updates for non-major bazel module deps"
       ],
       "enabled": true,
       "groupName": "All non-major Bazel deps",
@@ -90,9 +84,6 @@
       "matchUpdateTypes": [
         "patch",
         "minor"
-      ],
-      "schedule": [
-        "0 15 * * 4"
       ]
     },
     {
@@ -139,9 +130,6 @@
       "matchUpdateTypes": [
         "patch",
         "minor"
-      ],
-      "schedule": [
-        "0 9 * * 1"
       ]
     },
     {
@@ -158,9 +146,6 @@
       "matchUpdateTypes": [
         "patch",
         "minor"
-      ],
-      "schedule": [
-        "0 14 * * 3"
       ]
     },
     {
@@ -192,21 +177,20 @@
       "matchUpdateTypes": [
         "patch",
         "minor"
-      ],
-      "schedule": [
-        "0 14 * * 5"
       ]
     }
   ],
   "pip-compile": {
     "lockFileMaintenance": {
       "enabled": false
-    },
-    "managerFilePatterns": [
-      "/(^|/)bazel/third_party/requirements\\.lock$/"
-    ]
+    }
   },
   "prConcurrentLimit": 3,
   "rebaseWhen": "conflicted",
+  "schedule": [
+    "0 10 * * 1",
+    "0 14 * * 3",
+    "0 11 * * 5"
+  ],
   "timezone": "Europe/Madrid"
 }
