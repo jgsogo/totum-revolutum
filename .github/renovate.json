@@ -124,6 +124,21 @@
       ]
     },
     {
+      "description": [
+        "Bazel major updates"
+      ],
+      "enabled": true,
+      "matchManagers": [
+        "bazel",
+        "bazel-module",
+        "bazelisk"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "minimumReleaseAge": "14 days"
+    },
+    {
       "automerge": false,
       "commitMessagePrefix": "chore(deps-bazel_dep):",
       "description": [
