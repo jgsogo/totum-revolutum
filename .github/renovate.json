@@ -35,6 +35,54 @@
     },
     {
       "automerge": false,
+      "description": [
+        "\ud83d\udea8 Security updates: always fast-tracked"
+      ],
+      "enabled": true,
+      "matchUpdateTypes": [
+        "security"
+      ],
+      "prPriority": 100,
+      "schedule": [
+        "at any time"
+      ]
+    },
+    {
+      "description": [
+        "\u26a1 Patch updates: slightly prioritized"
+      ],
+      "enabled": true,
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "prPriority": 10
+    },
+    {
+      "description": [
+        "\ud83d\udce6 Minor updates: normal priority"
+      ],
+      "enabled": true,
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "prPriority": 0
+    },
+    {
+      "description": [
+        "\ud83d\udca5 Major updates: lowest priority and slower"
+      ],
+      "enabled": true,
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "minimumReleaseAge": "14 days",
+      "prPriority": -10,
+      "schedule": [
+        "0 11 * * 2"
+      ]
+    },
+    {
+      "automerge": false,
       "commitMessagePrefix": "chore(deps-pre-commits):",
       "description": [
         "Update pre-commits"
@@ -64,10 +112,15 @@
         "Bazel related updates"
       ],
       "enabled": true,
+      "groupName": "bazel (non-breaking)",
       "matchManagers": [
         "bazel",
         "bazel-module",
         "bazelisk"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
       ]
     },
     {
@@ -77,7 +130,7 @@
         "Grouped updates for non-major bazel module deps"
       ],
       "enabled": true,
-      "groupName": "All non-major Bazel deps",
+      "groupName": "bazel modules (non-breaking)",
       "matchDepTypes": [
         "bazel_dep"
       ],
@@ -99,7 +152,7 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "minimumReleaseAge": "7 days"
+      "minimumReleaseAge": "14 days"
     },
     {
       "automerge": false,
@@ -114,7 +167,7 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "minimumReleaseAge": "7 days"
+      "minimumReleaseAge": "14 days"
     },
     {
       "automerge": false,
@@ -123,7 +176,7 @@
         "Grouped updates for patch and minor Rust deps"
       ],
       "enabled": true,
-      "groupName": "all patch and minor Rust deps",
+      "groupName": "rust (non-breaking)",
       "matchManagers": [
         "cargo"
       ],
@@ -139,7 +192,7 @@
         "Grouped updates for patch and minor NPM deps"
       ],
       "enabled": true,
-      "groupName": "all patch NPM deps",
+      "groupName": "npm (non-breaking)",
       "matchManagers": [
         "npm"
       ],
@@ -161,7 +214,7 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "minimumReleaseAge": "7 days"
+      "minimumReleaseAge": "14 days"
     },
     {
       "automerge": false,
@@ -170,7 +223,7 @@
         "Grouped updates for patch and minor Python deps"
       ],
       "enabled": true,
-      "groupName": "all patch and minor Python deps",
+      "groupName": "python (non-breaking)",
       "matchManagers": [
         "pip-compile"
       ],
@@ -185,7 +238,7 @@
       "enabled": false
     }
   },
-  "prConcurrentLimit": 3,
+  "prConcurrentLimit": 1,
   "rebaseWhen": "conflicted",
   "schedule": [
     "0 10 * * 1",
