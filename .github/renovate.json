@@ -78,7 +78,7 @@
       "minimumReleaseAge": "14 days",
       "prPriority": -10,
       "schedule": [
-        "0 11 * * 2"
+        "* 11 * * 2"
       ]
     },
     {
@@ -256,9 +256,9 @@
   "prConcurrentLimit": 1,
   "rebaseWhen": "conflicted",
   "schedule": [
-    "0 10 * * 1",
-    "0 14 * * 3",
-    "0 11 * * 5"
+    "* 10 * * 1",
+    "* 14 * * 3",
+    "* 11 * * 5"
   ],
   "timezone": "Europe/Madrid"
 }
