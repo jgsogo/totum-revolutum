@@ -85,7 +85,7 @@ log = "0.4.26"
 main_error = "0.1.2"
 mime = "0.3.17"
 mockall = { version = "0.14.0" }
-num-bigint = "0.4.6"
+num-bigint = "0.5.1"
 num-traits = "0.2.19"
 oxipng = { version = "9.1.4", features = [
     "parallel",
