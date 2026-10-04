@@ -1,9 +1,62 @@
-# TODO: Take docs from target `//libraries:docs.zip` and compose the documentation to be published
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
+# Copy generated docs to the docs directory structure
+genrule(
+    name = "copy_docs",
+    srcs = ["//bazel:all_docs"],
+    outs = [
+        "bazel/dedent.md",
+        "bazel/run_copy_to_workspace.md",
+        "bazel/sh_with_runfiles_binary.md",
+        "bazel/rust/defs.md",
+        "bazel/rust/docs/defs.md",
+        "bazel/rust/diesel/diesel_print_schema.md",
+        "bazel/rust/diesel/diesel_setup.md",
+        "bazel/containers/postgres/with_postgres_run.md",
+    ],
+    cmd = """
+        mkdir -p $(@D)/bazel/rust/docs
+        mkdir -p $(@D)/bazel/rust/diesel
+        mkdir -p $(@D)/bazel/containers/postgres
+
+        cp $(location //bazel:dedent_doc) $(@D)/bazel/dedent.md
+        cp $(location //bazel:run_copy_to_workspace_doc) $(@D)/bazel/run_copy_to_workspace.md
+        cp $(location //bazel:sh_with_runfiles_binary_doc) $(@D)/bazel/sh_with_runfiles_binary.md
+        cp $(location //bazel/rust:defs_doc) $(@D)/bazel/rust/defs.md
+        cp $(location //bazel/rust/docs:defs_doc) $(@D)/bazel/rust/docs/defs.md
+        cp $(location //bazel/rust/diesel:diesel_print_schema_doc) $(@D)/bazel/rust/diesel/diesel_print_schema.md
+        cp $(location //bazel/rust/diesel:diesel_setup_doc) $(@D)/bazel/rust/diesel/diesel_setup.md
+        cp $(location //bazel/containers/postgres:with_postgres_run_doc) $(@D)/bazel/containers/postgres/with_postgres_run.md
+    """,
+)
+
+# Filegroup with all documentation sources
 filegroup(
-    name = "docs",
+    name = "docs_sources",
     srcs = [
-        "//apps/syncronia:docs",
-        "//libraries:docs",
+        "bazel/index.md",
+        "index.md",
+        "mkdocs.yml",
+        ":copy_docs",
+        "//bazel/docs:README.md",
+    ],
+)
+
+# Shell script to build and serve the docs
+sh_binary(
+    name = "serve",
+    srcs = ["serve.sh"],
+    data = [
+        "requirements.txt",
+        ":docs_sources",
+    ],
+)
+
+sh_binary(
+    name = "build",
+    srcs = ["build.sh"],
+    data = [
+        "requirements.txt",
+        ":docs_sources",
     ],
 )

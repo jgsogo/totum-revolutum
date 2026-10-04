@@ -1,1 +1,63 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
 exports_files(["sh_with_runfiles_binary.tpl.sh"])
+
+bzl_library(
+    name = "dedent",
+    srcs = ["dedent.bzl"],
+    visibility = ["//visibility:public"],
+)
+
+stardoc(
+    name = "dedent_doc",
+    out = "dedent.md",
+    input = "dedent.bzl",
+    deps = [":dedent"],
+)
+
+bzl_library(
+    name = "run_copy_to_workspace",
+    srcs = ["run_copy_to_workspace.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["@aspect_bazel_lib//lib:paths"],
+)
+
+stardoc(
+    name = "run_copy_to_workspace_doc",
+    out = "run_copy_to_workspace.md",
+    input = "run_copy_to_workspace.bzl",
+    deps = [":run_copy_to_workspace"],
+)
+
+bzl_library(
+    name = "sh_with_runfiles_binary",
+    srcs = ["sh_with_runfiles_binary.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["@aspect_bazel_lib//lib:paths"],
+)
+
+stardoc(
+    name = "sh_with_runfiles_binary_doc",
+    out = "sh_with_runfiles_binary.md",
+    input = "sh_with_runfiles_binary.bzl",
+    deps = [":sh_with_runfiles_binary"],
+)
+
+# Collect all documentation
+# Note: Django rules are excluded because they depend on @aspect_rules_py//py:defs.bzl
+# which doesn't provide bzl_library targets needed by stardoc
+filegroup(
+    name = "all_docs",
+    srcs = [
+        ":dedent_doc",
+        ":run_copy_to_workspace_doc",
+        ":sh_with_runfiles_binary_doc",
+        "//bazel/containers/postgres:with_postgres_run_doc",
+        "//bazel/rust:defs_doc",
+        "//bazel/rust/diesel:diesel_print_schema_doc",
+        "//bazel/rust/diesel:diesel_setup_doc",
+        "//bazel/rust/docs:defs_doc",
+    ],
+    visibility = ["//visibility:public"],
+)

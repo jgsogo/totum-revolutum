@@ -1,8 +1,48 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
 exports_files([
     "manage.py",
-    "wsgi.py",
     "asgi.py",
-    "entrypoint.sh.tpl",
+    "wsgi.py",
     "django_admin.tpl.sh",
     "django_gunicorn.tpl.sh",
+    "entrypoint.sh.tpl",
 ])
+
+bzl_library(
+    name = "django_admin",
+    srcs = ["django_admin.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@aspect_bazel_lib//lib:paths",
+    ],
+)
+
+stardoc(
+    name = "django_admin_doc",
+    out = "django_admin.md",
+    input = "django_admin.bzl",
+    deps = [":django_admin"],
+)
+
+bzl_library(
+    name = "django_project",
+    srcs = ["django_project.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":django_admin",
+        "@aspect_bazel_lib//lib:paths",
+    ],
+)
+
+stardoc(
+    name = "django_project_doc",
+    out = "django_project.md",
+    input = "django_project.bzl",
+    deps = [":django_project"],
+)
+
+# Note: django_gunicorn.bzl cannot be documented with stardoc because it depends on
+# @rules_python//python/entry_points:py_console_script_binary.bzl which doesn't
+# provide bzl_library targets
