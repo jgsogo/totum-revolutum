@@ -1,0 +1,66 @@
+load("@py_deps//:requirements.bzl", "requirement")
+load("//bazel:sh_with_runfiles_binary.bzl", "sh_with_runfiles_binary")
+load("//bazel/python/django/project:django_project.bzl", "django_project")
+
+name = "app"
+
+django_project(
+    name = name,
+    srcs = [
+        "settings.py",
+        "urls.py",
+    ],
+    visibility = ["//apps/github_repo_stats:__subpackages__"],
+    deps = [
+        "//apps/github_repo_stats/database/github_repo_stats",
+        requirement("pyyaml"),
+        requirement("requests"),
+    ],
+)
+
+sh_with_runfiles_binary(
+    name = "local_migrate",
+    args = [
+        "migrate",
+    ],
+    env = {
+        "DEBUG": "True",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SECRET_KEY": "whatever",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_DATABASE": "/Users/jgsogo/github_repos.sqlite3",
+    },
+    tags = ["manual"],
+    tool = ":app-admin",
+)
+
+sh_with_runfiles_binary(
+    name = "local_create_superuser",
+    args = [
+        "createsuperuser",
+        "--noinput",
+        # "--username=jgsogo",
+        # "--email=jgsogo@jgsogo.es",
+    ],
+    env = {
+        "DJANGO_SUPERUSER_PASSWORD": "jgsogo",
+        "DJANGO_SUPERUSER_USERNAME": "jgsogo",
+        "DJANGO_SUPERUSER_EMAIL": "jgsogo@jgsogo.es",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_DATABASE": "/Users/jgsogo/github_repos.sqlite3",
+    },
+    tags = ["manual"],
+    tool = ":app-admin",
+)
+
+sh_with_runfiles_binary(
+    name = "local_runserver",
+    args = [
+        "runserver",
+        "127.0.0.1:8987",
+    ],
+    env = {
+        "DEBUG": "True",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SECRET_KEY": "whatever",
+        "GITHUB_REPO_STATS_DATABASE_DJANGO_SQL_DATABASE": "/Users/jgsogo/github_repos.sqlite3",
+    },
+    tags = ["manual"],
+    tool = ":app-admin",
+)
